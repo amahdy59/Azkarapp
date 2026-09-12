@@ -25,6 +25,7 @@ const DEVICE_MATRIX_SPECS = [
 
 const fullMatrix = process.env.E2E_FULL_MATRIX === "1";
 const deviceMatrix = fullMatrix ? undefined : DEVICE_MATRIX_SPECS.map((spec) => `**/${spec}`);
+const externalBaseUrl = process.env.E2E_BASE_URL;
 
 export default defineConfig({
   testDir: "./e2e",
@@ -45,7 +46,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 1,
   reporter: process.env.CI ? "github" : "list",
   use: {
-    baseURL: "http://127.0.0.1:4173",
+    baseURL: externalBaseUrl ?? "http://127.0.0.1:4173",
     trace: "retain-on-failure",
     reducedMotion: "reduce",
     timezoneId: "Africa/Cairo",
@@ -79,15 +80,17 @@ export default defineConfig({
       use: { ...devices["iPhone 14"] },
     },
   ],
-  webServer: {
-    command: "pnpm test:e2e:serve",
-    url: "http://127.0.0.1:4173",
-    // Deliberately never reused. Reuse looked like a free win — the build is
-    // only ~13 s — but a leftover preview from an interrupted run serves
-    // whatever `.playwright-dist` happened to contain, and a half-written
-    // directory with no `sw.js` fails the offline spec while looking like a
-    // code regression. Always build what you are about to test.
-    reuseExistingServer: false,
-    timeout: 120_000,
-  },
+  webServer: externalBaseUrl
+    ? undefined
+    : {
+        command: "pnpm test:e2e:serve",
+        url: "http://127.0.0.1:4173",
+        // Deliberately never reused. Reuse looked like a free win — the build is
+        // only ~13 s — but a leftover preview from an interrupted run serves
+        // whatever `.playwright-dist` happened to contain, and a half-written
+        // directory with no `sw.js` fails the offline spec while looking like a
+        // code regression. Always build what you are about to test.
+        reuseExistingServer: false,
+        timeout: 120_000,
+      },
 });

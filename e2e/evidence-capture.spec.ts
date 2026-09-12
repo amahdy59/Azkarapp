@@ -40,7 +40,8 @@ function seed(language: "ar" | "en", themeMode: ThemeMode) {
   };
 }
 
-async function enterApp(page: Page, language: "ar" | "en", themeMode: ThemeMode) {
+async function enterApp(page: Page, language: "ar" | "en", themeMode: ThemeMode, isoTime?: string) {
+  if (isoTime) await page.clock.setFixedTime(new Date(isoTime));
   await page.addInitScript(
     (state) => {
       window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
@@ -48,7 +49,7 @@ async function enterApp(page: Page, language: "ar" | "en", themeMode: ThemeMode)
     },
     seed(language, themeMode),
   );
-  await page.goto("/");
+  await page.goto("./");
   await expect(page.getByRole("status", { name: /Loading/i })).toHaveCount(0, { timeout: 10_000 });
   await expect(page.getByRole("navigation").first()).toBeVisible({ timeout: 10_000 });
 
@@ -62,6 +63,15 @@ async function enterApp(page: Page, language: "ar" | "en", themeMode: ThemeMode)
   await expect(page.getByText("الذكر اليومي للمسلم", { exact: false })).toHaveCount(0, { timeout: 15_000 });
   await page.waitForTimeout(800);
 }
+
+const PRAYERS = ["fajr", "dhuhr", "asr", "maghrib", "isha"] as const;
+const PRAYER_CAPTURE_TIMES = {
+  fajr: "2026-09-05T05:20:00+03:00",
+  dhuhr: "2026-09-05T13:00:00+03:00",
+  asr: "2026-09-05T16:30:00+03:00",
+  maghrib: "2026-09-05T19:10:00+03:00",
+  isha: "2026-09-05T20:40:00+03:00",
+} as const;
 
 async function shoot(page: Page, name: string, fallbackPath: string) {
   const outputPath = OUT_DIR ? join(OUT_DIR, `${name}.png`) : fallbackPath;
@@ -144,4 +154,31 @@ test("home in English light at desktop width", async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await enterApp(page, "en", "light");
   await shoot(page, "desktop-home-en-light", testInfo.outputPath("desktop-home-en-light.png"));
+});
+
+for (const [viewport, size] of [
+  ["compact", { width: 390, height: 844 }],
+  ["tablet", { width: 834, height: 1194 }],
+  ["desktop", { width: 1280, height: 900 }],
+] as const) {
+  for (const prayer of PRAYERS) {
+    test(`${prayer} expanded in Arabic midnight at ${viewport} width`, async ({ page }, testInfo) => {
+      await page.setViewportSize(size);
+      await enterApp(page, "ar", "midnight", PRAYER_CAPTURE_TIMES[prayer]);
+      const prayerButton = page.getByTestId(`prayer-card-${prayer}`).getByRole("button");
+      if ((await prayerButton.getAttribute("aria-expanded")) !== "true") await prayerButton.click();
+      await expect(page.getByTestId("home-prayer-moment")).toHaveAttribute("data-prayer", prayer);
+      await expect(page.getByTestId("home-prayer-notch")).toHaveAttribute("data-prayer", prayer);
+      await shoot(page, `${viewport}-home-prayer-${prayer}-ar-midnight`, testInfo.outputPath(`${prayer}.png`));
+    });
+  }
+}
+
+test("expanded prayer in English light at desktop width", async ({ page }, testInfo) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await enterApp(page, "en", "light", PRAYER_CAPTURE_TIMES.dhuhr);
+  const prayerButton = page.getByTestId("prayer-card-dhuhr").getByRole("button");
+  if ((await prayerButton.getAttribute("aria-expanded")) !== "true") await prayerButton.click();
+  await expect(page.getByTestId("home-prayer-moment")).toHaveAttribute("data-prayer", "dhuhr");
+  await shoot(page, "desktop-home-prayer-dhuhr-en-light", testInfo.outputPath("dhuhr-en-light.png"));
 });

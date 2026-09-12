@@ -25,13 +25,13 @@ This folder converts the Azkarapp UX and visual-design review into a controlled,
 
 These files already exist and must not be ignored:
 
-- `README.md` â€” product, setup, commands, architecture overview, deployment
-- `docs/ARCHITECTURE.md` â€” runtime boundaries, state ownership, navigation, sync, offline behavior
-- `docs/DESIGN_SYSTEM.md` â€” current implemented visual and interaction contracts
-- `docs/QUALITY_CHECKLIST.md` â€” automated and manual release gates
-- `docs/CONTENT_AUTHORING.md` â€” reviewed content rules
-- `docs/MOTION_SYSTEM.md` â€” motion requirements where applicable
-- `docs/PRAYER_TIMES.md` â€” location, timezone, DST, calculation and caching behavior
+- `README.md` — product, setup, commands, architecture overview, deployment
+- `docs/ARCHITECTURE.md` — runtime boundaries, state ownership, navigation, sync, offline behavior
+- `docs/DESIGN_SYSTEM.md` — current implemented visual and interaction contracts
+- `docs/QUALITY_CHECKLIST.md` — automated and manual release gates
+- `docs/CONTENT_AUTHORING.md` — reviewed content rules
+- `docs/MOTION_SYSTEM.md` — motion requirements where applicable
+- `docs/PRAYER_TIMES.md` — location, timezone, DST, calculation and caching behavior
 
 `docs/agent/` does not automatically replace those files. It defines the improvement program and the proposed target state. Approved implementation phases must update the existing authoritative files when a contract changes.
 
@@ -69,12 +69,12 @@ Run the phase files in numerical order unless the decision log explicitly record
 | 26    | `phases/PHASE_26_HOME_PRAYER_COMPOSITION.md`           | Focused Home IA and one integrated prayer-detail surface                |
 | 27    | `phases/PHASE_27_PRODUCTION_VISUAL_AUDIT.md`           | Fresh production visual audit across responsive matrix                  |
 
-Phases 15â€“20 derive from `docs/audits/DESIGN_CONSISTENCY_AUDIT.md` (2026-08-15) and are
-recorded in `DECISION_LOG.md` as DEC-064. Phase 15 is upstream of 16, 17 and 19 â€” its root
+Phases 15–20 derive from `docs/audits/DESIGN_CONSISTENCY_AUDIT.md` (2026-08-15) and are
+recorded in `DECISION_LOG.md` as DEC-064. Phase 15 is upstream of 16, 17 and 19 — its root
 cause (F01) produces several of the findings those phases address, so re-measure after it
 lands rather than working from the audit's pre-repair numbers. Phase 18 is independent and
 may run in parallel.
 
 ## Core rule
 
-The agent must never interpret â€œperfect the applicationâ€ as permission to rewrite the entire repository. Perfection is approached through evidence-backed iteration, not one-shot replacement.
+The agent must never interpret “perfect the application” as permission to rewrite the entire repository. Perfection is approached through evidence-backed iteration, not one-shot replacement.

@@ -97,6 +97,7 @@ test("desktop Home gives the expanded prayer, companion, and Wird the available 
     expect(primaryBox.y).toBeGreaterThanOrEqual(prayerDetailBox.y + prayerDetailBox.height + 12);
     expect(Math.abs(primaryBox.width - companionBox.width)).toBeLessThanOrEqual(2);
     expect(Math.abs(primaryBox.y - companionBox.y)).toBeLessThanOrEqual(2);
+    expect(companionBox.height).toBeLessThan(primaryBox.height);
     expect(wirdBox.y).toBeGreaterThanOrEqual(primaryBox.y + primaryBox.height + 12);
     expect(wirdBox.width).toBeGreaterThanOrEqual(gridBox.width - 2);
   }

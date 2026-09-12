@@ -665,7 +665,7 @@ export function HomeScreen({
 
                 <div
                   data-testid="home-context-grid"
-                  className="grid w-full grid-cols-1 items-stretch gap-4 lg:grid-cols-2 lg:gap-5"
+                  className="grid w-full grid-cols-1 items-start gap-4 lg:grid-cols-2 lg:gap-5"
                 >
                   {/* Contextual Hero */}
                   {hasPrimaryContext && (

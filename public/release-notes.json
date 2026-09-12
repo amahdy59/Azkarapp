@@ -1,15 +1,13 @@
 {
-  "release": "2026-09-12-home-focus",
+  "release": "2026-09-12-home-spacing",
   "en": [
-    "Prayer time, benefit, and the after-prayer journey now share one organized card.",
-    "The selected prayer has a clear pointer, can be closed, and cannot be recorded before its time.",
-    "Home keeps the date and streak separate while showing Quran and Friday cards only when relevant.",
-    "Saved remembrance, Benefits, Quran access, and the Masbaha are now together in the Azkar library."
+    "Desktop Home cards now size themselves to their own content.",
+    "The daily reminder stays compact beside the main routine card.",
+    "Reduced empty space makes the desktop Home easier to scan without changing its navigation."
   ],
   "ar": [
-    "أصبح وقت الصلاة وفضلها وخطوات ما بعدها داخل بطاقة واحدة منظمة.",
-    "تظهر إشارة واضحة للصلاة المختارة، ويمكن إغلاق بطاقتها، ولا يمكن تسجيلها قبل دخول وقتها.",
-    "يبقى التاريخ وسلسلة المتابعة عنصرين مستقلين، ولا تظهر بطاقتا القرآن والجمعة إلا عند الحاجة.",
-    "اجتمعت الأذكار المحفوظة والفوائد وورد القرآن والمسبحة داخل مكتبة الأذكار."
+    "تأخذ بطاقات الصفحة الرئيسية على سطح المكتب ارتفاع محتواها الطبيعي.",
+    "تبقى بطاقة التذكير اليومي مدمجة بجانب بطاقة الورد الرئيسية.",
+    "تقل المساحات الفارغة لتصبح الصفحة الرئيسية أوضح وأسهل في التصفح دون تغيير التنقل."
   ]
 }

@@ -10,20 +10,20 @@ Visual audit of the production GitHub Pages site across responsive viewports, RT
 
 ## Required reading
 
-- \docs/agent/phases/PHASE_26_HOME_PRAYER_COMPOSITION.md\
-- \docs/QUALITY_CHECKLIST.md\
+- `docs/agent/phases/PHASE_26_HOME_PRAYER_COMPOSITION.md`
+- `docs/QUALITY_CHECKLIST.md`
 
 ## Step 1 — Analysis only
 
 Do not edit code. Complete the following:
 
-1. Identify target URLs on production (\https://amahdy59.github.io/Azkarapp/\).
+1. Identify target URLs on production (`https://amahdy59.github.io/Azkarapp/`).
 2. Outline the device/viewport matrix to be tested (e.g., mobile narrow, tablet, desktop).
 3. Outline state matrix (e.g., Arabic/English, light/dark, prayer variations).
 4. Run manual or automated visual checks against the production site.
 5. Propose any remediation for visual regressions or inconsistencies found.
 
-Return the plan using the analysis-only format in \docs/agent/PROMPT_LIBRARY.md\.
+Return the plan using the analysis-only format in `docs/agent/PROMPT_LIBRARY.md`.
 
 ## Step 2 — Approval gate
 
@@ -44,7 +44,7 @@ Do not implement fixes until the user approves the audit findings and proposed r
 ## Required tests and evidence
 
 - Visual audit results summary.
-- Full local gates (\pnpm check\, \pnpm test:e2e\) if any code is modified.
+- Full local gates (`pnpm check`, `pnpm test:e2e`) if any code is modified.
 
 ## Prohibited changes
 
@@ -53,4 +53,4 @@ Do not implement fixes until the user approves the audit findings and proposed r
 
 ## Completion output
 
-Use \docs/agent/templates/PHASE_REPORT.md\.
+Use `docs/agent/templates/PHASE_REPORT.md`.
