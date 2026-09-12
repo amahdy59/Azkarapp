@@ -242,7 +242,9 @@ export function ProgressScreen({
                   records={prayerTracking}
                   dayKey={getProgressDayKey(now, progressDayStartHour)}
                   onToggle={onTogglePrayerTracking ?? (() => undefined)}
-                  onOpen={(prayer) => { if (prayer) onPrayerResume?.(prayer); }}
+                  onOpen={(prayer) => {
+                    if (prayer) onPrayerResume?.(prayer);
+                  }}
                 />
               ) : (
                 <PrayerTrackerStats
