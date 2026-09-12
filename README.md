@@ -160,8 +160,8 @@ remain device-local.
 
 1. Create `.env` from `.env.example`.
 2. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` (or the legacy `VITE_SUPABASE_ANON_KEY`).
-3. Apply [`supabase/schema.sql`](supabase/schema.sql) to a new project.
-4. Apply files in `supabase/migrations/` in filename order for an existing project.
+3. Run `supabase db push`; the ordered files in `supabase/migrations/` are the only deployment source of truth.
+4. Treat [`supabase/schema.sql`](supabase/schema.sql) as a generated current-state snapshot for review, not a second setup path.
 5. Configure the Supabase Site URL and redirect allowlist:
    - `https://amahdy59.github.io/Azkarapp/?view=auth-callback`
    - `http://localhost:5173/?view=auth-callback`

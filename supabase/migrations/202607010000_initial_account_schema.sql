@@ -1,6 +1,5 @@
--- Generated current-state snapshot of the ordered files in supabase/migrations/.
--- Use `supabase db push` for setup; do not apply this snapshot and the migrations
--- to the same database. Regenerate it from a migrated local database.
+-- Reproducible account baseline for a fresh `supabase db push`.
+-- Later migrations evolve category constraints and add further account tables.
 create table if not exists public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
   display_name text,
@@ -33,13 +32,8 @@ create table if not exists public.user_progress (
 create table if not exists public.session_history (
   id text primary key,
   user_id uuid not null references public.profiles (id) on delete cascade,
-  category text not null check (
-    category in (
-      'morning', 'evening', 'before_sleep', 'waking_up', 'home', 'mosque',
-      'after_prayer', 'restroom', 'food_drink', 'clothing', 'travel',
-      'distress_anxiety', 'illness_ruqyah', 'social_community',
-      'natural_events', 'friday_kahf', 'comprehensive_duas', 'miscellaneous'
-    )
+  category text not null constraint session_history_category_check check (
+    category in ('morning', 'evening', 'before_sleep')
   ),
   completed_count integer not null default 0,
   total_count integer not null default 0,
@@ -57,134 +51,53 @@ create table if not exists public.session_history (
 create index if not exists session_history_user_completed_idx
 on public.session_history (user_id, completed_at desc);
 
--- Append-only, conflict-safe completion ledger used by the private routine garden.
--- A row is a completed collection, not a spiritual score or rank.
-create table if not exists public.daily_collection_completions (
-  user_id uuid not null references public.profiles (id) on delete cascade,
-  day_key date not null,
-  category text not null check (
-    category in (
-      'morning', 'evening', 'before_sleep', 'waking_up', 'home', 'mosque',
-      'after_prayer', 'restroom', 'food_drink', 'clothing', 'travel',
-      'distress_anxiety', 'illness_ruqyah', 'social_community',
-      'natural_events', 'friday_kahf', 'comprehensive_duas', 'miscellaneous'
-    )
-  ),
-  time_zone text not null default 'local',
-  created_at timestamptz not null default now(),
-  primary key (user_id, day_key, category)
-);
-
-create table if not exists public.saved_zikr (
-  user_id uuid not null references public.profiles (id) on delete cascade,
-  zikr_id text not null,
-  created_at timestamptz not null default now(),
-  primary key (user_id, zikr_id)
-);
-
 alter table public.profiles enable row level security;
 alter table public.user_settings enable row level security;
 alter table public.user_progress enable row level security;
 alter table public.session_history enable row level security;
-alter table public.daily_collection_completions enable row level security;
-alter table public.saved_zikr enable row level security;
 
 drop policy if exists "profiles_select_own" on public.profiles;
 create policy "profiles_select_own"
-on public.profiles
-for select
-to authenticated
+on public.profiles for select to authenticated
 using ((select auth.uid()) = id);
 
 drop policy if exists "profiles_insert_own" on public.profiles;
 create policy "profiles_insert_own"
-on public.profiles
-for insert
-to authenticated
+on public.profiles for insert to authenticated
 with check ((select auth.uid()) = id);
 
 drop policy if exists "profiles_update_own" on public.profiles;
 create policy "profiles_update_own"
-on public.profiles
-for update
-to authenticated
+on public.profiles for update to authenticated
 using ((select auth.uid()) = id)
 with check ((select auth.uid()) = id);
 
 drop policy if exists "user_settings_own_all" on public.user_settings;
 create policy "user_settings_own_all"
-on public.user_settings
-for all
-to authenticated
+on public.user_settings for all to authenticated
 using ((select auth.uid()) = user_id)
 with check ((select auth.uid()) = user_id);
 
 drop policy if exists "user_progress_own_all" on public.user_progress;
 create policy "user_progress_own_all"
-on public.user_progress
-for all
-to authenticated
+on public.user_progress for all to authenticated
 using ((select auth.uid()) = user_id)
 with check ((select auth.uid()) = user_id);
 
 drop policy if exists "session_history_own_all" on public.session_history;
 create policy "session_history_own_all"
-on public.session_history
-for all
-to authenticated
+on public.session_history for all to authenticated
 using ((select auth.uid()) = user_id)
 with check ((select auth.uid()) = user_id);
-
-drop policy if exists "daily_collection_completions_own_all" on public.daily_collection_completions;
-create policy "daily_collection_completions_own_all"
-on public.daily_collection_completions
-for all
-to authenticated
-using ((select auth.uid()) = user_id)
-with check ((select auth.uid()) = user_id);
-
-drop policy if exists "saved_zikr_select_own" on public.saved_zikr;
-create policy "saved_zikr_select_own"
-on public.saved_zikr
-for select
-to authenticated
-using ((select auth.uid()) = user_id);
-
-drop policy if exists "saved_zikr_insert_own" on public.saved_zikr;
-create policy "saved_zikr_insert_own"
-on public.saved_zikr
-for insert
-to authenticated
-with check ((select auth.uid()) = user_id);
-
-drop policy if exists "saved_zikr_delete_own" on public.saved_zikr;
-create policy "saved_zikr_delete_own"
-on public.saved_zikr
-for delete
-to authenticated
-using ((select auth.uid()) = user_id);
 
 revoke all on table
   public.profiles,
   public.user_settings,
   public.user_progress,
-  public.session_history,
-  public.daily_collection_completions,
-  public.saved_zikr
-from anon;
-
-revoke all on table
-  public.profiles,
-  public.user_settings,
-  public.user_progress,
-  public.session_history,
-  public.daily_collection_completions,
-  public.saved_zikr
-from authenticated;
+  public.session_history
+from anon, authenticated;
 
 grant select, insert, update on table public.profiles to authenticated;
 grant select, insert, update on table public.user_settings to authenticated;
 grant select, insert, update on table public.user_progress to authenticated;
 grant select, insert, update on table public.session_history to authenticated;
-grant select, insert, update on table public.daily_collection_completions to authenticated;
-grant select, insert, delete on table public.saved_zikr to authenticated;

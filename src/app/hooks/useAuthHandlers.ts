@@ -13,7 +13,7 @@ import {
   verifyEmailOtp,
 } from "../../lib/auth";
 import { isSupabaseConfigured } from "../../lib/supabase";
-import { clearPrivateAppData } from "../state";
+import { clearPrivateAppData, clearPrivateStoredAppData } from "../state";
 import { t } from "../i18n";
 import { reportError } from "../../lib/observability";
 
@@ -255,6 +255,7 @@ export function useAuthHandlers({
           setAuthError("");
           setRemoteSyncReady(false);
           if (isSupabaseConfigured) await signOutSupabase();
+          clearPrivateStoredAppData();
           applyStateSnapshot(clearPrivateAppData(appStateSnapshot));
           setView("login");
           setActiveTab("home");

@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-11",
+  "release": "2026-09-11.2",
   "ar": [
-    "يتحقق التطبيق المثبّت من التحديثات فور تشغيله لتصل إصلاحات التلاوة بسرعة أكبر.",
-    "يعرض الضغط على أي صلاة تفاصيل وقتها وفضلها ومسار إتمامها داخل الصفحة الرئيسية.",
-    "يربط شق بصري الصلاة المختارة بتفاصيلها بدقة على الهاتف والجهاز اللوحي وسطح المكتب."
+    "يمحو حذف البيانات المحلية جلسة الحساب من الجهاز حتى عند تعذر الاتصال.",
+    "يزيل تسجيل الخروج سجل البحث الخاص مع الإبقاء على تفضيلات الجهاز والتنزيلات.",
+    "أصبحت مزامنة الأذكار المحفوظة أكثر موثوقية عند استخدام الحساب على أكثر من جهاز."
   ],
   "en": [
-    "The installed app now checks for updates at startup so recitation fixes arrive sooner.",
-    "Tapping any prayer now reveals its time, virtue, and completion journey directly on Home.",
-    "A responsive notch precisely connects the selected prayer to its details on phone, tablet, and desktop."
+    "Erasing local data now removes the device account session even when connectivity fails.",
+    "Signing out clears private search history while preserving device preferences and downloads.",
+    "Saved azkar now synchronize more reliably when the same account is used on multiple devices."
   ]
 }

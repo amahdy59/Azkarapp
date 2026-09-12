@@ -18,10 +18,12 @@ After opening a fresh Codex task so the authenticated Supabase MCP tools are loa
 
 1. Confirm `get_project_url` returns the expected URL.
 2. Inspect tables, migrations, functions, Auth logs, and security/performance advisors.
-3. Apply `supabase/migrations/20260730170636_provider_neutral_auth_and_sync.sql`.
+3. Run `supabase db push` so every ordered migration is applied, including the initial RLS baseline and privilege hardening.
 4. Generate `public` TypeScript types with the MCP development tool.
 5. Deploy `supabase/functions/delete-account`.
-6. Run RLS isolation checks as anonymous, User A, and User B.
+6. Run RLS isolation checks as anonymous, User A, and User B. Confirm anonymous access is revoked and each user can read only their own rows.
+
+`supabase/schema.sql` is a generated current-state review snapshot. Do not apply it before or after `supabase db push`; migrations are the deployment source of truth.
 
 The repository deliberately does not contain database passwords, service-role keys, provider secrets, or SMTP credentials.
 

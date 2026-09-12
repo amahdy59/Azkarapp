@@ -912,7 +912,42 @@ export function resetStoredSettings() {
  * the key from here as well would break that ordering guarantee if the Cache
  * API step ever failed.
  */
-const OWNED_STORAGE_PREFIXES = ["azkarapp.", "azkarapp_", "azkar.audio-preferences"];
+const OWNED_STORAGE_PREFIXES = [
+  "azkarapp.",
+  "azkarapp_",
+  "azkar.audio-preferences",
+  "azkar.audio-content-review",
+  // supabase-js owns this namespace, but it still contains the reader's live
+  // session and therefore belongs to an explicit local-data erasure.
+  "sb-",
+];
+
+const PRIVATE_STORAGE_PREFIXES = [
+  "azkarapp_recent_searches_",
+  // These are legacy coordinate-bearing caches. Startup also removes them,
+  // but sign-out must not depend on a later reload to protect a shared device.
+  "azkarapp.prayer_times_cache.",
+  "azkarapp.prayer_time_zone.",
+];
+
+function clearStoragePrefixes(prefixes: readonly string[]) {
+  for (let index = window.localStorage.length - 1; index >= 0; index -= 1) {
+    const key = window.localStorage.key(index);
+    if (key && prefixes.some((prefix) => key.startsWith(prefix))) {
+      window.localStorage.removeItem(key);
+    }
+  }
+}
+
+/** Removes account-private caches while preserving device preferences and downloads. */
+export function clearPrivateStoredAppData() {
+  if (typeof window === "undefined") return;
+  try {
+    clearStoragePrefixes(PRIVATE_STORAGE_PREFIXES);
+  } catch {
+    // In-memory private state is still cleared even when storage is blocked.
+  }
+}
 
 /** Removes only Azkar-owned local data, leaving unrelated origin storage untouched. */
 export function clearStoredAppData() {
@@ -921,12 +956,7 @@ export function clearStoredAppData() {
   }
 
   try {
-    for (let index = window.localStorage.length - 1; index >= 0; index -= 1) {
-      const key = window.localStorage.key(index);
-      if (key && OWNED_STORAGE_PREFIXES.some((prefix) => key.startsWith(prefix))) {
-        window.localStorage.removeItem(key);
-      }
-    }
+    clearStoragePrefixes(OWNED_STORAGE_PREFIXES);
   } catch {
     // Storage enumeration can fail where the whole API is restricted. Fall back
     // to the two keys that hold the user's own reading and saved data.

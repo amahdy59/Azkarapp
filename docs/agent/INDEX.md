@@ -65,6 +65,7 @@ Run the phase files in numerical order unless the decision log explicitly record
 | 23    | `phases/PHASE_23_PRAYER_HOME_AND_REMINDERS.md`         | Responsive prayer dashboard and efficient opt-in reminders              |
 | 24    | `phases/PHASE_24_KAHF_AUDIO_AND_PRAYER_NAV.md`         | Recoverable Al-Kahf playback and prayer-detail navigation               |
 | 24B   | `phases/PHASE_24B_INSTALLED_AUDIO_AND_PRAYER_NOTCH.md` | Immediate installed-app update discovery and in-place prayer disclosure |
+| 25A   | `phases/PHASE_25A_PUSH_SECURITY_FOUNDATION.md`         | Reproducible RLS baseline before server-backed push subscriptions       |
 
 Phases 15–20 derive from `docs/audits/DESIGN_CONSISTENCY_AUDIT.md` (2026-08-15) and are
 recorded in `DECISION_LOG.md` as DEC-064. Phase 15 is upstream of 16, 17 and 19 — its root

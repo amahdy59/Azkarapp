@@ -3,9 +3,12 @@ import { clearAllLocalData } from "./useSettingsHandlers";
 
 const removeDownloadedAudio = vi.hoisted(() => vi.fn(async () => undefined));
 const removeDownloadedMushaf = vi.hoisted(() => vi.fn(async () => undefined));
+const signOutSupabase = vi.hoisted(() => vi.fn(async () => undefined));
 
 vi.mock("../audio/audioOfflineCache", () => ({ removeDownloadedAudio }));
 vi.mock("../content/mushafOfflineCache", () => ({ removeDownloadedMushaf }));
+vi.mock("../../lib/auth", () => ({ deleteCurrentAccount: vi.fn(), signOutSupabase }));
+vi.mock("../../lib/supabase", () => ({ isSupabaseConfigured: true }));
 
 describe("clearAllLocalData", () => {
   afterEach(() => {
@@ -28,6 +31,7 @@ describe("clearAllLocalData", () => {
     order.push("storage");
 
     expect(removeDownloadedAudio).toHaveBeenCalledOnce();
+    expect(signOutSupabase).toHaveBeenCalledOnce();
     expect(order).toEqual(["audio", "storage"]);
     expect(window.localStorage.getItem("azkarapp.state.v1")).toBeNull();
     expect(window.localStorage.getItem("azkarapp_recent_searches_ar")).toBeNull();
@@ -64,5 +68,14 @@ describe("clearAllLocalData", () => {
 
     expect(removeDownloadedMushaf).toHaveBeenCalledOnce();
     expect(window.localStorage.getItem("azkarapp.state.v1")).toBeNull();
+  });
+
+  it("still erases the local Supabase session when remote sign-out fails", async () => {
+    signOutSupabase.mockRejectedValueOnce(new Error("offline"));
+    window.localStorage.setItem("sb-project-ref-auth-token", "private-token");
+
+    await expect(clearAllLocalData()).resolves.toBeUndefined();
+
+    expect(window.localStorage.getItem("sb-project-ref-auth-token")).toBeNull();
   });
 });

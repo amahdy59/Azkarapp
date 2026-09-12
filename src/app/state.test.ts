@@ -2,8 +2,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   DEFAULT_APP_STATE,
   MAX_STORED_SESSIONS,
-  clearStoredAppData,
   clearPrivateAppData,
+  clearPrivateStoredAppData,
+  clearStoredAppData,
   fromCompletedSets,
   loadAppState,
   mergeAppStates,
@@ -92,6 +93,8 @@ describe("app state persistence", () => {
       "azkarapp.prayer_time_zone.30.0.31.2",
       "azkarapp.last-successful-sync.v1",
       "azkar.audio-preferences.v1",
+      "azkar.audio-content-review.v1",
+      "sb-project-ref-auth-token",
     ];
     for (const key of owned) window.localStorage.setItem(key, "x");
     window.localStorage.setItem("unrelated.product.key", "keep");
@@ -105,6 +108,22 @@ describe("app state persistence", () => {
       expect(window.localStorage.getItem(key), `${key} should have been cleared`).toBeNull();
     }
     expect(window.localStorage.getItem("unrelated.product.key")).toBe("keep");
+    expect(window.localStorage.getItem("azkar.audio-downloads.v1")).toBe("{}");
+  });
+
+  it("clears account-private caches on sign-out without erasing device preferences", () => {
+    window.localStorage.setItem("azkarapp_recent_searches_ar", '["private"]');
+    window.localStorage.setItem("azkarapp.prayer_times_cache.2026-08-09.30.0.31.2.5", "{}");
+    window.localStorage.setItem("azkarapp.prayer_time_zone.30.0.31.2", "Africa/Cairo");
+    window.localStorage.setItem("azkar.audio-preferences.v1", '{"voice":"reader"}');
+    window.localStorage.setItem("azkar.audio-downloads.v1", "{}");
+
+    clearPrivateStoredAppData();
+
+    expect(window.localStorage.getItem("azkarapp_recent_searches_ar")).toBeNull();
+    expect(window.localStorage.getItem("azkarapp.prayer_times_cache.2026-08-09.30.0.31.2.5")).toBeNull();
+    expect(window.localStorage.getItem("azkarapp.prayer_time_zone.30.0.31.2")).toBeNull();
+    expect(window.localStorage.getItem("azkar.audio-preferences.v1")).not.toBeNull();
     expect(window.localStorage.getItem("azkar.audio-downloads.v1")).toBe("{}");
   });
 

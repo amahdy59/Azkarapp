@@ -166,13 +166,13 @@ time `VITE_EMAIL_AUTH_ENABLED` flips to true.
 `sb-<ref>-auth-token` key supabase-js writes, so the session survives the reload and
 `useRemoteAccountSync` pulls everything straight back down.
 
-- [ ] `await signOutSupabase()` inside `clearAllLocalData()` before `clearStoredAppData()`,
+- [x] `await signOutSupabase()` inside `clearAllLocalData()` before `clearStoredAppData()`,
       guarded by `isSupabaseConfigured` and tolerant of failure so an offline user can still erase
-- [ ] Add `sb-` to `OWNED_STORAGE_PREFIXES` as a belt-and-braces sweep for a revoked-but-unremoved token
-- [ ] Add the unswept `azkar.audio-content-review.v1` key to the sweep
-- [ ] Apply the same sign-out to `handleDeleteAccount` (`useSettingsHandlers.ts:84`), which
+- [x] Add `sb-` to `OWNED_STORAGE_PREFIXES` as a belt-and-braces sweep for a revoked-but-unremoved token
+- [x] Add the unswept `azkar.audio-content-review.v1` key to the sweep
+- [x] Apply the same sign-out to `handleDeleteAccount` (`useSettingsHandlers.ts:84`), which
       currently leaves a live JWT and refresh token on a deleted account
-- [ ] Update the DEC-049 entry: its claim that the sweep "cannot fall behind again" holds only for
+- [x] Update the DEC-049 entry: its claim that the sweep "cannot fall behind again" holds only for
       keys the app writes itself, and a dependency writing to the same origin defeats it
 
 **Test:** seed an `sb-<ref>-auth-token` key in `state.test.ts` and assert it is gone after erase.
@@ -188,9 +188,9 @@ and the policies define no UPDATE path. Either it fails immediately with `42501`
 real conflict — two devices saving the same zikr. Both throw inside `syncRemoteState` and stick the
 Account panel on "Needs attention".
 
-- [ ] Change to `.upsert(…, { ignoreDuplicates: true })` or a plain `.insert()`. The `additions`
+- [x] Change to `.upsert(…, { ignoreDuplicates: true })` or a plain `.insert()`. The `additions`
       array is already diffed against the server, so merge semantics are never wanted.
-- [ ] Do **not** add an UPDATE grant or policy — that widens the table's write surface for no benefit
+- [x] Do **not** add an UPDATE grant or policy — that widens the table's write surface for no benefit
 
 **Test:** cover the duplicate-save path and assert no error is thrown.
 
@@ -204,9 +204,9 @@ and prayer caches at `azkarapp.prayer_times_cache.<date>.<lat>.<lon>` — key na
 previous user's coordinates. On a shared device the next person sees the last person's queries,
 which in this app skew health-adjacent.
 
-- [ ] On sign-out, additionally clear the `azkarapp_recent_searches_` prefix
-- [ ] Clear the `azkarapp.prayer_times_cache.` and `azkarapp.prayer_time_zone.` prefixes
-- [ ] Use a narrow prefix sweep, **not** full `clearAllLocalData()` — device preferences and
+- [x] On sign-out, additionally clear the `azkarapp_recent_searches_` prefix
+- [x] Clear the `azkarapp.prayer_times_cache.` and `azkarapp.prayer_time_zone.` prefixes
+- [x] Use a narrow prefix sweep, **not** full `clearAllLocalData()` — device preferences and
       downloaded audio should survive a sign-out
 
 **Test:** add the assertion to the existing sign-out coverage in `useAuthHandlers.test.ts`.
@@ -220,10 +220,9 @@ No file in `supabase/migrations/` creates `profiles`, `user_settings`, `user_pro
 `supabase db push` following `docs/SUPABASE_SETUP.md` literally produces four tables with
 Supabase's default `grant all to authenticated` and no row policies: a full cross-tenant read.
 
-- [ ] Add an initial-schema migration holding the base tables, RLS enables, policies and grants
-- [ ] Make `schema.sql` a generated artifact rather than a parallel source of truth
-- [ ] At minimum, name `schema.sql` explicitly as step 0 in `docs/SUPABASE_SETUP.md`, which
-      currently disagrees with `README.md:169` about how RLS gets applied
+- [x] Add an initial-schema migration holding the base tables, RLS enables, policies and grants
+- [x] Make `schema.sql` a generated artifact rather than a parallel source of truth
+- [x] Replace the conflicting setup paths in `docs/SUPABASE_SETUP.md` and `README.md` with one ordered `supabase db push` contract
 
 **Acceptance:** `supabase db push` against an empty project produces every table with RLS enabled
 and `anon` revoked, with no manual `schema.sql` step.

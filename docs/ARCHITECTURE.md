@@ -111,7 +111,7 @@ The active practice day has one fixed boundary: local 00:00. `App.tsx` schedules
 
 Quran persistence deliberately separates the page currently open, one intentional continue-reading bookmark, completed-page history, whole-page bookmarks, and verse bookmarks. A forward reader turn records only newly read visible pages and keeps the last event for spread-aware Undo. Adaptive plans persist their inclusive start/target range, while per-day goal snapshots keep historical weekly comparisons stable. These fields pass through the same local normalization, private-data clearing, and deterministic remote merge boundaries as other account-owned progress; reusable Mushaf components receive callbacks and never write storage directly.
 
-Private-data clearing preserves device preferences while removing account-owned profile, saved, session, and completion data. Any new account-owned field must participate in `clearPrivateAppData()`.
+Private-data clearing preserves device preferences while removing account-owned profile, saved, session, and completion data. Sign-out also sweeps private search and retired coordinate-cache namespaces without touching downloads or device preferences. Full local erasure first attempts Supabase sign-out, then removes the Supabase session-token namespace even if that network request fails. Any new account-owned field must participate in `clearPrivateAppData()` and any dependency-owned local token must participate in the explicit erasure boundary.
 
 Geolocation is requested only after a user action. Precise coordinates remain device-local, are never synchronized to Supabase, and are not sent to a prayer-time service. No service-role Supabase credential belongs in the browser.
 
@@ -137,7 +137,7 @@ The sync layer:
 - Records the last successful sync time without making local reading depend on remote success
 - Never uploads precise location coordinates
 - Merges settings and ledgers deterministically
-- Deduplicates saved IDs and completion records
+- Deduplicates saved IDs and completion records; saved-zikr additions use conflict-ignore inserts so they never require update permission
 - Surfaces recoverable sync state without blocking local reading
 - Loads the Supabase SDK on demand so guest/offline startup does not pay the account-client cost
 - Reads the newest 100 sessions through `(user_id, completed_at desc)` and sends at most the same bounded page
@@ -168,7 +168,7 @@ limit 500;
 
 Expected evidence is an index scan using `session_history_user_completed_idx` and the completion-ledger primary key, with no material rows removed by filtering. Save plan output with release evidence when realistic production-sized data is available.
 
-Database schema changes require an ordered migration and corresponding application/tests in the same change.
+Database schema changes require an ordered migration and corresponding application/tests in the same change. The ordered files in `supabase/migrations/` are the deployment source of truth. `supabase/schema.sql` is a generated current-state review snapshot and must not be applied as a parallel setup path.
 
 ## Offline and PWA behavior
 

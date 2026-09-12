@@ -578,9 +578,10 @@ export async function syncRemoteState(
     const additions = [...desired].filter((zikrId) => !existing.has(zikrId));
     const removals = [...existing].filter((zikrId) => !desired.has(zikrId));
     if (additions.length > 0) {
-      const { error } = await client
-        .from("saved_zikr")
-        .upsert(additions.map((zikrId) => ({ user_id: userId, zikr_id: zikrId })));
+      const { error } = await client.from("saved_zikr").upsert(
+        additions.map((zikrId) => ({ user_id: userId, zikr_id: zikrId })),
+        { ignoreDuplicates: true },
+      );
       if (error) throw error;
     }
     if (removals.length > 0) {

@@ -1,7 +1,8 @@
 import type { AppLanguage, AppStateSnapshot } from "../types";
 import { clearStoredAppData, resetStoredSettings } from "../state";
 import { t } from "../i18n";
-import { deleteCurrentAccount } from "../../lib/auth";
+import { deleteCurrentAccount, signOutSupabase } from "../../lib/auth";
+import { isSupabaseConfigured } from "../../lib/supabase";
 import { reportError } from "../../lib/observability";
 
 /**
@@ -29,6 +30,7 @@ import { reportError } from "../../lib/observability";
  */
 export async function clearAllLocalData() {
   await Promise.allSettled([
+    ...(isSupabaseConfigured ? [signOutSupabase()] : []),
     import("../audio/audioOfflineCache").then(({ removeDownloadedAudio }) => removeDownloadedAudio()),
     import("../content/mushafOfflineCache").then(({ removeDownloadedMushaf }) => removeDownloadedMushaf()),
   ]);
