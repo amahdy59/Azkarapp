@@ -549,7 +549,6 @@ export function HomeScreen({
   const hasContextCompanion = Boolean(dailyEvidence);
 
   /* The named scroll region must itself be keyboard-scrollable. */
-  /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
   return (
     <ScreenContainer
       dir={direction}
@@ -564,6 +563,7 @@ export function HomeScreen({
 
       {/* Scrollable Content Area */}
       <div
+        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
         role="region"
         aria-label={t(language, "home.title")}
@@ -793,5 +793,4 @@ export function HomeScreen({
       </div>
     </ScreenContainer>
   );
-  /* eslint-enable jsx-a11y/no-noninteractive-tabindex */
 }
