@@ -1,13 +1,15 @@
 {
-  "release": "2026-09-11.2",
+  "release": "2026-09-12.1",
   "ar": [
-    "يمحو حذف البيانات المحلية جلسة الحساب من الجهاز حتى عند تعذر الاتصال.",
-    "يزيل تسجيل الخروج سجل البحث الخاص مع الإبقاء على تفضيلات الجهاز والتنزيلات.",
-    "أصبحت مزامنة الأذكار المحفوظة أكثر موثوقية عند استخدام الحساب على أكثر من جهاز."
+    "تُفتح الآن بطاقات الصلاة قبل وقت الصلاة بـ ٣٠ دقيقة لتجربة متابعة دقيقة ومريحة.",
+    "تم إعادة تصميم واجهة تفاصيل الصلاة المفتوحة لتصبح أكثر جمالاً وتناسقاً مع تصميم التطبيق.",
+    "تم إصلاح مشكلة عدم عمل الصوت في بعض الأحيان بسبب إعدادات السحابة.",
+    "تم تحسين شكل مؤشر المتابعة اليومية في أعلى الشاشة ليصبح في سطر واحد وواضح."
   ],
   "en": [
-    "Erasing local data now removes the device account session even when connectivity fails.",
-    "Signing out clears private search history while preserving device preferences and downloads.",
-    "Saved azkar now synchronize more reliably when the same account is used on multiple devices."
+    "Prayer cards now unlock exactly 30 minutes before prayer time for an accurate tracking experience.",
+    "The expanded prayer view has been beautifully redesigned to better match our visual design system.",
+    "Fixed an issue where audio would sometimes fail to play if certain cloud settings were misconfigured.",
+    "Refined the daily streak indicator in the top header so it stays on a single, easy-to-read line."
   ]
 }

@@ -71,7 +71,7 @@ test("desktop Home gives the expanded prayer, companion, and Wird the available 
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.clock.setFixedTime(new Date("2026-09-05T14:00:00+03:00"));
   await openReturningGuest(page, "ar", { textSize: "large" });
-  await page.getByTestId("prayer-card-asr").getByRole("button").click();
+  await page.getByTestId("prayer-card-dhuhr").getByRole("button").click();
 
   const grid = page.getByTestId("home-context-grid");
   const prayerDetail = page.getByTestId("home-prayer-moment");
@@ -127,7 +127,7 @@ test("wide Home keeps navigation exposed, contains its scene, and uses glass for
   await page.setViewportSize({ width: 1885, height: 982 });
   await page.clock.setFixedTime(new Date("2026-09-05T14:00:00+03:00"));
   await openReturningGuest(page, "ar");
-  await page.getByTestId("prayer-card-asr").getByRole("button").click();
+  await page.getByTestId("prayer-card-dhuhr").getByRole("button").click();
 
   const navigation = page.locator(".app-sidebar");
   const main = page.locator(".app-main");

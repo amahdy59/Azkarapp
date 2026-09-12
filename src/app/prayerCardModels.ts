@@ -22,10 +22,14 @@ export function buildPrayerCardModels(
   return PRAYER_NAMES.map((prayer, index) => {
     const isNext = prayer === next.name;
     const state = index === activeIndex ? "current" : isNext ? "next" : index < activeIndex ? "past" : "upcoming";
+    const isOpenable = state === "past" || state === "current" || (isNext && next.remainingMinutes <= 30);
+    const isRecordable = state === "past" || state === "current";
     return {
       prayer,
       time: period.prayerTimes[prayer],
       state,
+      isOpenable,
+      isRecordable,
       ...(isNext ? { countdown: next.formattedCountdown } : {}),
     };
   });

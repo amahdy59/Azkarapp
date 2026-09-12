@@ -89,18 +89,18 @@ test("a quiet stretch between prayers keeps Home to the compact five", async ({ 
 
 test("each Home prayer expands its shared properties under an aligned notch", async ({ page }) => {
   await openHomeAt(page, "2026-09-05T13:20:00");
-  await page.getByRole("button", { name: /Open Maghrib/i }).click();
+  await page.getByRole("button", { name: /Open Dhuhr/i }).click();
 
   await expect(page).toHaveURL(/\/?$/);
   const expanded = page.getByTestId("home-prayer-moment");
-  await expect(expanded).toHaveAttribute("data-prayer", "maghrib");
+  await expect(expanded).toHaveAttribute("data-prayer", "dhuhr");
   await expect(expanded.getByTestId("prayer-moment-hero")).toBeVisible();
   await expect(expanded.getByTestId("prayer-action-location")).toBeVisible();
 
-  const selected = page.getByTestId("prayer-card-maghrib");
+  const selected = page.getByTestId("prayer-card-dhuhr");
   await expect(selected.getByRole("button")).toHaveAttribute("aria-expanded", "true");
   const notch = page.getByTestId("home-prayer-notch");
-  await expect(notch).toHaveAttribute("data-prayer", "maghrib");
+  await expect(notch).toHaveAttribute("data-prayer", "dhuhr");
   const [selectedBox, notchBox] = await Promise.all([selected.boundingBox(), notch.boundingBox()]);
   expect(selectedBox).not.toBeNull();
   expect(notchBox).not.toBeNull();

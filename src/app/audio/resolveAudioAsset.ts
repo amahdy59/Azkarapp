@@ -4,7 +4,8 @@ import { createArabicTextFingerprint } from "./arabicMatching";
 import type { AudioCatalog, AudioPreferences, AudioResolution, ResolvedAudioSegment } from "./audioTypes";
 
 export function getAudioBaseUrl(): string {
-  return (import.meta.env.VITE_AUDIO_BASE_URL ?? "").trim().replace(/\/+$/, "");
+  const url = import.meta.env.VITE_AUDIO_BASE_URL || "https://pub-6e537fd865454e599c23a2bcfc22136e.r2.dev";
+  return url.trim().replace(/\/+$/, "");
 }
 
 function joinAudioUrl(baseUrl: string, relativePath: string): string {

@@ -50,6 +50,8 @@ function modelsWithCurrent(current: PrayerName): PrayerCardModel[] {
           : index === activeIndex + 1
             ? "next"
             : "upcoming",
+    isOpenable: index <= activeIndex, // mock implementation: current and past are openable, future are not
+    isRecordable: index <= activeIndex,
     ...(index === activeIndex + 1 ? { countdown: "01:00" } : {}),
   }));
 }

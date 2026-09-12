@@ -166,51 +166,44 @@ export function PrayerMomentPanel({
         {/* Fixed light-on-dark, because the scene is its own ground in every
             theme — the same rule the Home hero follows over its photograph. */}
         <div
-          className={`flex h-full flex-col justify-between gap-3 p-4 ${onGlass || !unified ? "text-white" : "text-foreground"}`}
+          className={`flex h-full flex-col justify-between gap-4 p-5 ${onGlass || !unified ? "text-white" : "text-foreground"}`}
         >
-          <div className="flex items-start justify-between gap-3">
-            <h2 className="text-2xl font-black leading-tight md:text-3xl" dir="auto">
-              {name}
-            </h2>
-            <span
-              className={`flex size-11 shrink-0 items-center justify-center rounded-full border border-[currentColor]/70 ${accentText}`}
-            >
-              <Icon size={22} aria-hidden="true" />
-            </span>
-          </div>
-          <div className="flex flex-col gap-2">
-            {/* The wait, before the time itself: "in 15 min" is what a reader
-                checking the card actually wants, and the clock time is the
-                detail that answers "when exactly". */}
-            {countdown && (
-              <p
-                className={`text-label font-bold ${onGlass || !unified ? "text-white/85" : "text-muted-foreground"}`}
-                dir="auto"
+          {/* Top block: Icon on left (if RTL, visually on left means start if flex-row-reverse or just justify-between), Name on right. Actually, flex items-start justify-between puts first item on start, second on end. To put Name on end and Icon on start, we can just use direction and let flex handle it. But the image shows Name on right (which is start in RTL) and Icon on left (which is end in RTL). So we use justify-between. */}
+          <div className="flex flex-col gap-1 text-start">
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-3xl font-black leading-tight md:text-4xl" dir="auto">
+                  {name}
+                </h2>
+                {countdown && (
+                  <p
+                    className={`mt-1 text-label font-medium ${onGlass || !unified ? "text-white/70" : "text-muted-foreground"}`}
+                    dir="auto"
+                  >
+                    {countdown}
+                  </p>
+                )}
+              </div>
+              <span
+                className={`flex size-12 shrink-0 items-center justify-center rounded-full border-[1.5px] border-[currentColor]/70 ${accentText}`}
               >
-                {countdown}
-              </p>
-            )}
+                <Icon size={24} aria-hidden="true" />
+              </span>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-3">
             <div className="flex flex-wrap items-center gap-2.5">
-              <p className="text-3xl font-black leading-none tabular-nums" dir="auto">
+              <p className="text-5xl font-black leading-none tabular-nums" dir="auto">
                 {formatPrayerTimeLabel(moment.time, isArabic)}
               </p>
-              {/* Only when the prayer is actually in.  also covers the
-                  approach and the moments after recording, so the badge read
-                  "Now" beside a countdown saying the prayer was thirteen minutes
-                  away — a contradiction that only became visible once the
-                  countdown was there to contradict. */}
               {moment.phase === "now" && (
                 <span className="rounded-full bg-primary px-3 py-1 text-xs font-black text-primary-foreground">
                   {t(language, "prayerMoment.badgeNow")}
                 </span>
               )}
             </div>
-            {/* How much of the approach has run. A meter rather than a
-                progressbar: this reports a quantity within a known range, and
-                it is measured against this prayer's own lead — which is capped
-                by half the gap from the previous prayer, so a bar drawn against
-                the uncapped constant would start part-filled for exactly the
-                prayers whose window is shortest. */}
+
             {approachFraction !== null && (
               <div
                 role="meter"
@@ -218,7 +211,7 @@ export function PrayerMomentPanel({
                 aria-valuemax={100}
                 aria-valuenow={Math.round(approachFraction * 100)}
                 aria-label={t(language, "prayerMoment.countdownProgress", { prayer: name })}
-                className={`h-1.5 w-full overflow-hidden rounded-full ${onGlass || !unified ? "bg-white/20" : "bg-muted"}`}
+                className={`h-2 w-full overflow-hidden rounded-full ${onGlass || !unified ? "bg-white/20" : "bg-muted"}`}
               >
                 <div
                   className="h-full rounded-full bg-primary transition-[width] duration-500 motion-reduce:transition-none"
@@ -228,7 +221,7 @@ export function PrayerMomentPanel({
             )}
           </div>
           <p
-            className={`flex items-center gap-2 text-label font-bold ${onGlass || !unified ? "text-white/80" : "text-muted-foreground"}`}
+            className={`flex items-center gap-2 text-label font-medium ${onGlass || !unified ? "text-white/90" : "text-muted-foreground"}`}
           >
             <span className="size-1.5 rounded-full bg-primary" aria-hidden="true" />
             {t(language, statusKey)}

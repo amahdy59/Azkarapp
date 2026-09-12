@@ -42,6 +42,8 @@ export interface PrayerCardModel {
   prayer: PrayerName;
   time: string;
   state: PrayerTemporalState;
+  isOpenable: boolean;
+  isRecordable: boolean;
   /** Only present on the next prayer. */
   countdown?: string;
 }
@@ -186,16 +188,16 @@ function PrayerCard({
   tracking: { mosque: boolean; adhkar: boolean; location: "mosque" | "home" | null; sunnah?: boolean };
   onGlass?: boolean;
   onToggle: (prayer: PrayerName, field: PrayerTrackingField, next: boolean) => void;
-  onOpen?: (prayer: PrayerName) => void;
+  onOpen?: (prayer: PrayerName | null) => void;
   summaryOnly?: boolean;
   selected?: boolean;
 }) {
-  const { prayer, time, state, countdown } = model;
+  const { prayer, time, state, countdown, isOpenable, isRecordable } = model;
   const Icon = PRAYER_ICON[prayer];
   const name = t(language, `notifications.${prayer}`);
   // Future prayers show their controls so the card keeps its shape, but they
   // cannot be marked: nothing has happened yet to record.
-  const disabled = state === "upcoming" || state === "next";
+  const disabled = !isRecordable;
   const isCurrent = state === "current";
 
   if (summaryOnly) {
@@ -216,8 +218,11 @@ function PrayerCard({
       >
         <button
           type="button"
-          onClick={() => onOpen?.(prayer)}
-          disabled={!onOpen}
+          onClick={() => {
+            if (!isOpenable) return;
+            onOpen?.(selected ? null : prayer);
+          }}
+          disabled={!onOpen || !isOpenable}
           aria-expanded={selected}
           aria-controls="home-expanded-prayer"
           aria-label={t(language, "prayerTracking.openPrayer", { prayer: name })}
@@ -458,7 +463,7 @@ export function PrayerTrackerCards({
   records: readonly PrayerTrackingRecord[];
   dayKey: string;
   onToggle: (prayer: PrayerName, field: PrayerTrackingField, next: boolean) => void;
-  onOpen?: (prayer: PrayerName) => void;
+  onOpen?: (prayer: PrayerName | null) => void;
   onGlass?: boolean;
   /** Keep overview surfaces scannable; focused views retain full recording. */
   summaryOnly?: boolean;

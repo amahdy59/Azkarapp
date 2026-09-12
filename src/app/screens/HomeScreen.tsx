@@ -2,7 +2,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { ArrowLeft, ArrowRight, Zap } from "../components/icons";
 import { TasbeehCounterButton } from "../components/TasbeehCounterButton";
-import { PalmTreeMark, TodayRoutineGarden } from "../components/RoutineGarden";
+import { TodayRoutineGarden } from "../components/RoutineGarden";
 import { ProductImage } from "../components/ProductImage";
 import { TranquilityCompletionCard } from "../components/TranquilityCompletionCard";
 import { getContextualEvidence, getReminderContexts, selectLibraryEvidence } from "../dailyEvidence";
@@ -681,56 +681,30 @@ export function HomeScreen({
           >
             <div
               data-testid="hijri-date"
-              className={`min-w-0 text-label font-bold sm:text-subtitle ${
+              className={`min-w-0 flex-1 truncate text-label font-bold sm:text-subtitle ${
                 homeVisualEffects ? "text-on-media-accent drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)]" : "text-primary"
               }`}
             >
-              {/* Wraps rather than truncates. At 320px "Sunday, Rabiʻ I 24,
-                  1448 AH" was clipped to "…14", which drops the year and reads
-                  as broken rather than as abbreviated. The date is secondary,
-                  so a second line costs less than a mangled one. */}
-              <time className="block leading-tight" dateTime={now.toISOString()}>
+              <time className="truncate" dateTime={now.toISOString()}>
                 {formatDisplayDate(now, language, calendarType)}
               </time>
             </div>
-            {/* One control, not two: the streak and the palm are two readings of
-                the same day, and they open the same surface. A button rather
-                than a decorated span, so it is reachable by keyboard and
-                announces what it opens.
-
-                `pointer-events-auto` because the header is a zero-height
-                overlay that deliberately lets pointers through to the content
-                beneath it. Without opting back in, this button is visible,
-                focusable and operable by keyboard while a tap on it lands on
-                the hero behind — which is the worst of both.
-
-                `min-h-11` because it is a touch target now. It was a pair of
-                decorated spans at the header's own type size, and promoting it
-                to a control without giving it a control's size made it the one
-                thing on the core flow too small to hit. */}
             <button
               type="button"
               data-testid="home-header-routine-summary"
               onClick={() => setPathSheetOpen(true)}
               aria-label={t(language, "dailyPath.title")}
-              className={`pointer-events-auto flex min-h-11 shrink-0 items-center gap-2 rounded-full px-2 text-label font-black transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:text-subtitle ${
+              className={`pointer-events-auto flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center gap-1.5 rounded-full px-2 py-1 text-subtitle font-black transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:text-title3 ${
                 homeVisualEffects
                   ? "text-on-media-accent drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)] hover:bg-on-media/10"
                   : "text-primary hover:bg-muted"
               }`}
             >
               <span className="flex items-center gap-1" title={t(language, "progress.dailyStreak")}>
-                <Zap className="size-4 sm:size-[1.125rem]" strokeWidth={2.5} aria-hidden="true" />
                 <bdi>
                   {formatNumerals(gardenSummary.currentPalmRhythm ?? gardenSummary.currentUsageStreak ?? 0, language)}
                 </bdi>
-                <span>{t(language, "progress.days")}</span>
-              </span>
-              <span className={`h-4 w-px ${homeVisualEffects ? "bg-on-media/45" : "bg-border"}`} aria-hidden="true" />
-              <span className="flex items-center gap-1" title={t(language, "progress.palmsTitle")}>
-                <PalmTreeMark size={18} filled={gardenSummary.lifetimePalms > 0} aria-hidden="true" />
-                <bdi>{formatNumerals(gardenSummary.lifetimePalms, language)}</bdi>
-                <span>{t(language, "progress.palmsUnit")}</span>
+                <Zap className="size-5 sm:size-6" strokeWidth={2.5} aria-hidden="true" />
               </span>
             </button>
           </header>
