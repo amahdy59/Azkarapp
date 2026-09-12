@@ -47,8 +47,8 @@ test("the prayer card is on Home inside the window, and gone outside it", async 
       );
     }),
   ).toBe(true);
-  await expect(card).toHaveClass(/hero-glass/);
-  await expect(card.locator(".hero-glass")).toHaveCount(0);
+  await expect(card).not.toHaveClass(/hero-glass/);
+  await expect(card.locator(".hero-glass").first()).toBeVisible();
 });
 
 test("recording the prayer as congregational works without leaving Home", async ({ page }) => {

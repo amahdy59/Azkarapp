@@ -130,7 +130,7 @@ describe("App Composition and Routing", () => {
 
     // The production reader is route-split. Give the complete parallel suite
     // room to resolve that boundary before asserting the audio contract.
-    const listen = await screen.findByTestId("mushaf-rail-listen", {}, { timeout: 15000 });
+    const listen = await screen.findByTestId("mushaf-rail-listen", {}, { timeout: 30000 });
     expect(listen).toBeEnabled();
     await waitFor(() => expect(loadAudioModuleMock).toHaveBeenCalledTimes(1));
 

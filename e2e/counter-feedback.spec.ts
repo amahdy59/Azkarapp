@@ -82,7 +82,7 @@ test("desktop Home gives the expanded prayer, companion, and Wird the available 
   const prayerSummary = page.getByTestId("prayer-tracker-cards");
 
   await expect(companion).toBeVisible();
-  await expect(prayerDetail).toHaveClass(/hero-glass/);
+  await expect(prayerDetail.locator(".hero-glass").first()).toBeVisible();
   await expect(primaryGlass).toBeVisible();
   await expect(companion.locator(".hero-glass").first()).toBeVisible();
   await expect(prayerSummary.locator('article[data-density="summary"]')).toHaveCount(5);
@@ -150,7 +150,7 @@ test("wide Home keeps navigation exposed, contains its scene, and uses glass for
 
   const glassCards = [
     page.getByTestId("prayer-tracker-cards"),
-    page.getByTestId("home-prayer-moment"),
+    page.getByTestId("home-prayer-moment").locator(".hero-glass").first(),
     page.getByTestId("home-primary-card").locator(".hero-glass").first(),
     page.getByTestId("home-context-companion").locator(".hero-glass").first(),
     page.getByTestId("home-wird-row").locator(".hero-glass").first(),

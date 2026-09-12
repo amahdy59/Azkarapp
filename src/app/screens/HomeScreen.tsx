@@ -738,9 +738,7 @@ export function HomeScreen({
                     data-prayer={expandedPrayer}
                     dir={direction}
                     aria-label={t(language, "prayerMoment.homeTitle")}
-                    className={`grid w-full grid-cols-1 overflow-hidden rounded-3xl md:grid-cols-2 ${
-                      homeVisualEffects ? "hero-glass" : "border border-border bg-card shadow-raised"
-                    }`}
+                    className="grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:gap-5"
                   >
                     <PrayerMomentPanel
                       prayer={expandedPrayer}
@@ -755,7 +753,6 @@ export function HomeScreen({
                         onOpenPrayerAdhkar ? onOpenPrayerAdhkar(prayer) : onResume("after_prayer")
                       }
                       onGlass={homeVisualEffects}
-                      unified
                     />
                   </section>
                 )}

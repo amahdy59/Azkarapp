@@ -50,9 +50,6 @@ describe("the prayer as one surface", () => {
   it("opens on the prayer, its time and its own sky", () => {
     renderScreen({ prayer: "maghrib", now: at(shift(times.maghrib, 5)) });
     expect(screen.getByTestId("prayer-moment-screen")).toHaveAttribute("data-prayer", "maghrib");
-    // Five scenes, one per prayer: the hour is the only thing that differs
-    // between them, and it is drawn rather than fetched.
-    expect(screen.getByTestId("prayer-scene")).toHaveAttribute("data-prayer-scene", "maghrib");
   });
 
   it("offers the virtue while it can still be an invitation", () => {
