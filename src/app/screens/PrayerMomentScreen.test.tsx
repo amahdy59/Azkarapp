@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { PrayerMomentScreen } from "./PrayerMomentScreen";
+import { PrayerMomentPanel } from "../components/PrayerMomentPanel";
 import { getEstimatedPrayerTimes } from "../content/prayerTimes";
 import type { PrayerName, PrayerTrackingRecord } from "../types";
 
@@ -47,14 +48,40 @@ function renderScreen({
 }
 
 describe("the prayer as one surface", () => {
+  it("allows an approaching prayer preview without allowing an early record", () => {
+    const onToggle = vi.fn();
+    render(
+      <PrayerMomentPanel
+        prayer="dhuhr"
+        language="en"
+        direction="ltr"
+        records={[]}
+        dayKey={DAY}
+        now={at(shift(times.dhuhr, -10))}
+        canRecord={false}
+        onToggle={onToggle}
+        onOpenAdhkar={() => undefined}
+      />,
+    );
+
+    const inputs = screen.getByTestId("prayer-journey").querySelectorAll("input[type=checkbox]");
+    expect(inputs.length).toBeGreaterThan(0);
+    for (const input of inputs) expect(input).toBeDisabled();
+    fireEvent.click(inputs[0]!);
+    expect(onToggle).not.toHaveBeenCalled();
+  });
+
   it("opens on the prayer, its time and its own sky", () => {
     renderScreen({ prayer: "maghrib", now: at(shift(times.maghrib, 5)) });
     expect(screen.getByTestId("prayer-moment-screen")).toHaveAttribute("data-prayer", "maghrib");
+    expect(screen.getByTestId("prayer-scene")).toHaveAttribute("data-prayer-scene", "maghrib");
   });
 
   it("offers the virtue while it can still be an invitation", () => {
     renderScreen({ now: at(shift(times.isha, 5)) });
-    expect(screen.getByTestId("prayer-moment-virtue")).toBeInTheDocument();
+    const virtue = screen.getByTestId("prayer-moment-virtue");
+    expect(virtue).toBeInTheDocument();
+    expect(virtue.closest("article")).toContainElement(screen.getByTestId("prayer-journey"));
   });
 
   it("drops the virtue once the prayer's time has gone", () => {

@@ -3543,3 +3543,11 @@ null` shape, so a record written before this change still loads and still
 - **Client boundary:** full erasure attempts remote sign-out and always sweeps the local Supabase token. Account sign-out clears only private search and legacy coordinate-cache keys, preserving device preferences and downloaded content. Saved-zikr additions ignore primary-key conflicts and therefore do not require update permission.
 - **Not enabled yet:** production provider flags remain off. Phase 25B must resolve the legal/identity and subscription lifecycle contract before a server scheduler is connected; no VAPID private key may enter browser code or Git.
 - **Tests/evidence required:** focused persistence/auth/schema regressions, full local gates, migration replay or an explicit environment limitation, and RLS isolation against the connected project before account or push enablement.
+
+## DEC-168 — Home is a daily dashboard and prayer detail is one card
+
+- **Decision:** keep the date and streak as separate persistent interface elements. Home contains the current prayer/routine, active continuations, and genuinely time-bound Friday content; Saved, Benefits, first-time Quran access, and the Masbaha belong to the existing Azkar library rather than new navigation destinations.
+- **Prayer composition:** the expanded prayer is one outer surface. Its smaller time block, reviewed benefit, and completion journey use internal sections and hairlines; the Open Azkar action is text-only. A triangular notch visually joins the card to its selected prayer summary.
+- **User control and truthfulness:** the automatically expanded prayer can be dismissed. A prayer may be previewed during the approach window, but recording controls remain disabled until the prayer is recordable. The focused prayer route retains its prayer-specific drawn sky.
+- **Navigation:** retain the existing four labeled destinations. Secondary content moves within the Azkar library, so no extra tab, hidden label, or ambiguous icon-only destination is introduced.
+- **Tests/evidence required:** one-card containment, dismiss/reopen behavior, early-recording guard, Library destination coverage, responsive LTR/RTL notch alignment, full local gates, and production verification.

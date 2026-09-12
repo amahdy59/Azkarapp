@@ -89,6 +89,10 @@ test("a quiet stretch between prayers keeps Home to the compact five", async ({ 
 
 test("each Home prayer expands its shared properties under an aligned notch", async ({ page }) => {
   await openHomeAt(page, "2026-09-05T13:20:00");
+  // The contextual prayer starts open. It can still be dismissed, then opened
+  // again explicitly from the stable five-prayer strip.
+  await page.getByRole("button", { name: /Open Dhuhr/i }).click();
+  await expect(page.getByTestId("home-prayer-moment")).toHaveCount(0);
   await page.getByRole("button", { name: /Open Dhuhr/i }).click();
 
   await expect(page).toHaveURL(/\/?$/);

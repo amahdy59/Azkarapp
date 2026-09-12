@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { ALL_AZKAR, getAzkarForMode } from "../content/azkar";
+import { getAzkarForMode } from "../content/azkar";
 import { CATEGORY_IDS, type CategoryId } from "../types";
 import { HomeScreen } from "./HomeScreen";
 
@@ -33,7 +33,6 @@ describe("HomeScreen quick access", () => {
         direction="rtl"
         onResume={onResume}
         routineModes={routineModes}
-        savedZikrIds={new Set()}
       />,
     );
 
@@ -49,13 +48,9 @@ describe("HomeScreen quick access", () => {
     expect(onResume).toHaveBeenCalledWith("comprehensive_duas");
   });
 
-  it("overlays the transparent utility header on the hero and exposes saved and benefit actions", () => {
+  it("keeps date and streak as separate interface controls and removes library cards from Home", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date(2026, 7, 7, 9, 5));
-    const saved = ALL_AZKAR.find((zikr) => !zikr.isCollectionIntroduction)!;
-    const onOpenSavedZikr = vi.fn();
-    const onOpenBenefits = vi.fn();
-
     render(
       <HomeScreen
         completed={emptyProgress()}
@@ -66,10 +61,6 @@ describe("HomeScreen quick access", () => {
         direction="ltr"
         onResume={() => undefined}
         routineModes={routineModes}
-        savedZikrIds={new Set([saved.id])}
-        onOpenSavedZikr={onOpenSavedZikr}
-        onOpenSavedLibrary={() => undefined}
-        onOpenBenefits={onOpenBenefits}
       />,
     );
 
@@ -78,19 +69,14 @@ describe("HomeScreen quick access", () => {
     expect(screen.getByTestId("home-hero").closest(".app-screen-surface")).toHaveStyle({ paddingTop: "0px" });
     expect(screen.queryByTestId("home-header-stats")).not.toBeInTheDocument();
     expect(screen.queryByText("The full reviewed collection.")).not.toBeInTheDocument();
-
-    fireEvent.click(screen.getByTestId("home-saved-section").getElementsByTagName("button")[0]!);
-    expect(onOpenSavedZikr).toHaveBeenCalledWith(saved.category, expect.any(Number));
-
-    fireEvent.click(screen.getByTestId("home-benefits-card"));
-    expect(onOpenBenefits).toHaveBeenCalledOnce();
+    expect(screen.getByTestId("home-header-routine-summary")).toBeInTheDocument();
+    expect(screen.queryByTestId("home-saved-section")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("home-benefits-card")).not.toBeInTheDocument();
   });
 
   it("renders the five-prayer rail on Home", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date(2026, 7, 10, 15, 45));
-    const onOpenCustomCounter = vi.fn();
-
     render(
       <HomeScreen
         completed={emptyProgress()}
@@ -101,19 +87,13 @@ describe("HomeScreen quick access", () => {
         direction="ltr"
         onResume={() => undefined}
         routineModes={routineModes}
-        savedZikrIds={new Set()}
-        onOpenSavedZikr={() => undefined}
-        onOpenSavedLibrary={() => undefined}
-        onOpenBenefits={() => undefined}
-        onOpenCustomCounter={onOpenCustomCounter}
       />,
     );
 
     expect(screen.getByTestId("prayer-card-fajr")).toBeInTheDocument();
     expect(screen.getByText(/today.?s wird/i)).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: "Masbaha" }));
-    expect(onOpenCustomCounter).toHaveBeenCalledOnce();
+    expect(screen.queryByRole("button", { name: "Masbaha" })).not.toBeInTheDocument();
   });
 
   it("keeps the utility header readable over the image while Home content scrolls", () => {
@@ -130,7 +110,6 @@ describe("HomeScreen quick access", () => {
         direction="ltr"
         onResume={() => undefined}
         routineModes={routineModes}
-        savedZikrIds={new Set()}
       />,
     );
 
@@ -155,7 +134,6 @@ describe("HomeScreen quick access", () => {
         direction="ltr"
         onResume={() => undefined}
         routineModes={routineModes}
-        savedZikrIds={new Set()}
       />,
     );
 
@@ -190,7 +168,6 @@ describe("HomeScreen document outline", () => {
         direction="rtl"
         onResume={vi.fn()}
         routineModes={routineModes}
-        savedZikrIds={new Set()}
       />,
     );
 
@@ -198,10 +175,7 @@ describe("HomeScreen document outline", () => {
 
     // Today's wird sits beside the routine card in the hero, not inside it.
     expect(outline).toContain("H2:وردك اليوم");
-    // A card inside a divider-labelled group is one level below that label.
-    const library = outline.indexOf("H2:مكتبتك");
-    expect(library).toBeGreaterThanOrEqual(0);
-    expect(outline.slice(library + 1)).toContain("H3:الأذكار المحفوظة");
+    expect(outline).not.toContain("H2:مكتبتك");
     // The hero offers one routine and the wird card lists all three. Without a
     // mark, the same routine reads as two separate things to do within one
     // screen; the row says it is the one already on offer above.

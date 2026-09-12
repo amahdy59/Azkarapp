@@ -116,9 +116,10 @@ test("Home utility status stays on one line without horizontal overflow", async 
   }
 });
 
-test("Home Benefits entry opens the dedicated collection with encoded WhatsApp sharing", async ({ page }) => {
+test("Library Benefits entry opens the dedicated collection with encoded WhatsApp sharing", async ({ page }) => {
   await openReturningGuest(page);
-  await page.getByTestId("home-benefits-card").click();
+  await page.getByTestId("nav-azkar").click();
+  await page.getByTestId("library-benefits-tool").click();
 
   await expect(page.locator('#main-content[data-view="benefits"]')).toBeVisible();
   await expect(page.getByTestId("benefits-list")).toBeVisible();
@@ -141,26 +142,27 @@ test("Home Benefits entry opens the dedicated collection with encoded WhatsApp s
   expect(new URL(href!).searchParams.get("text")).toBeTruthy();
 });
 
-test("Home Saved preview opens its item and the full Saved library state", async ({ page }) => {
+test("the Library exposes the full Saved state", async ({ page }) => {
   await openReturningGuest(page, ["m-hm-77m"]);
-
-  const savedSection = page.getByTestId("home-saved-section");
-  await expect(savedSection).toContainText("1");
-  await savedSection.getByRole("button").first().click();
-  await expect(page.getByTestId("reader-screen")).toBeVisible();
-
-  await page.goBack();
-  await expect(page.getByTestId("home-saved-section")).toBeVisible();
-  await page.getByTestId("home-saved-section").getByRole("button", { name: "Open all 1 saved zikr" }).click();
-
+  await page.getByTestId("nav-azkar").click();
+  await page.getByTestId("library-section-filter").click();
+  await page.getByRole("menuitemradio", { name: /Saved/ }).click();
   await expect(page.getByTestId("library-section-filter")).toHaveAccessibleName(/Saved/);
   await expect(page.getByRole("heading", { name: "Saved remembrance", exact: true })).toBeVisible();
+  await page
+    .getByRole("button", { name: /Morning Azkar/ })
+    .first()
+    .click();
+  await expect(page.getByTestId("reader-screen")).toBeVisible();
 });
 
-test("Home populated cards stay inside the content boundary at every responsive tier", async ({ page }, testInfo) => {
+test("Library tools and saved controls stay inside the content boundary at every responsive tier", async ({
+  page,
+}, testInfo) => {
   test.skip(testInfo.project.name !== "desktop-chromium", "One Chromium context covers the full width matrix.");
 
   await openReturningGuest(page, ["m-hm-77m", "m-hm-78m", "m-hm-75"], [], "ar");
+  await page.getByTestId("nav-azkar").click();
 
   for (const viewport of [
     { width: 320, height: 700 },
@@ -175,13 +177,15 @@ test("Home populated cards stay inside the content boundary at every responsive 
   ]) {
     await page.setViewportSize(viewport);
     await page.waitForTimeout(500);
+    await expect(page.getByTestId("library-benefits-tool")).toBeVisible();
+    await expect(page.getByTestId("library-quran-tool")).toBeVisible();
 
     const geometry = await page.evaluate(() => {
-      const saved = document.querySelector<HTMLElement>('[data-testid="home-saved-section"]')!;
-      const benefits = document.querySelector<HTMLElement>('[data-testid="home-benefits-card"]')!;
-      const region = saved.closest<HTMLElement>('[role="region"]')!;
+      const benefits = document.querySelector<HTMLElement>('[data-testid="library-benefits-tool"]')!;
+      const quran = document.querySelector<HTMLElement>('[data-testid="library-quran-tool"]')!;
+      const region = benefits.closest<HTMLElement>(".app-screen-surface")!;
       const regionBounds = region.getBoundingClientRect();
-      const elements = [saved, benefits, ...saved.querySelectorAll<HTMLElement>("button")];
+      const elements = [benefits, quran];
 
       return {
         regionOverflow: region.scrollWidth - region.clientWidth,

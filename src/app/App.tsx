@@ -1291,11 +1291,6 @@ function AppContent({
                     ensureCurrentFridayWeek();
                     push("friday");
                   }}
-                  onOpenProgress={() => {
-                    window.history.replaceState({ view: "progress" }, "", "?view=progress");
-                    setView("progress");
-                    setActiveTab("progress");
-                  }}
                   language={selectedLang}
                   calendarType={calendarType}
                   direction={layoutDirection}
@@ -1303,15 +1298,6 @@ function AppContent({
                   onSetRoutineMode={(categoryId, mode) => {
                     setRoutineModes((prev) => ({ ...prev, [categoryId]: mode }));
                   }}
-                  onOpenCustomCounter={() => push("custom_counter")}
-                  savedZikrIds={savedZikrIds}
-                  onOpenSavedZikr={(categoryId, index) => openReader(categoryId, index, "complete")}
-                  onOpenSavedLibrary={() => {
-                    setActiveTab("azkar");
-                    setLibrarySection(savedZikrIds.size > 0 ? "saved" : "collections");
-                    push("library");
-                  }}
-                  onOpenBenefits={() => push("benefits")}
                   onOpenWirdBenefits={() => push("wird_benefits")}
                   onOpenKhatmah={() => push("khatmah_overview")}
                   prayerTracking={prayerTracking}
@@ -1338,6 +1324,9 @@ function AppContent({
                   savedZikrIds={savedZikrIds}
                   routineModes={routineModes}
                   initialSection={librarySection}
+                  onOpenCustomCounter={() => push("custom_counter")}
+                  onOpenBenefits={() => push("benefits")}
+                  onOpenKhatmah={() => push("khatmah_overview")}
                 />
               )}
               {view === "progress" && (

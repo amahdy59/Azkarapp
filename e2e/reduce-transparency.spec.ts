@@ -112,8 +112,8 @@ test("the saved setting removes Home photography and uses theme cards", async ({
   await expect(page.getByTestId("time-of-day-scene-window")).toHaveCount(0);
   const prayerStrip = page.getByTestId("prayer-tracker-cards");
   await expect(prayerStrip).not.toHaveClass(/hero-glass/);
-  await expect(page.getByTestId("home-quran-card")).not.toHaveClass(/hero-glass/);
-  await expect(page.getByTestId("home-saved-section")).not.toHaveClass(/hero-glass/);
+  await expect(page.getByTestId("home-saved-section")).toHaveCount(0);
+  await expect(page.getByTestId("home-benefits-card")).toHaveCount(0);
   const surface = await prayerStrip.evaluate((element) => getComputedStyle(element).backgroundColor);
   expect(surface).not.toMatch(/rgba\(.*0?\.\d+\)/);
 });

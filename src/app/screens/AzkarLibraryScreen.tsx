@@ -1,5 +1,5 @@
 import { useDeferredValue, useId, useMemo, useState } from "react";
-import { Search, Bookmark, ChevronDown, SlidersHorizontal } from "../components/icons";
+import { Search, Bookmark, ChevronDown, ChevronNext, SlidersHorizontal } from "../components/icons";
 import { TasbeehCounterButton } from "../components/TasbeehCounterButton";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { CategoryCard } from "../components/CategoryCard";
@@ -45,6 +45,8 @@ export function AzkarLibraryScreen({
   savedZikrIds,
   routineModes,
   onOpenCustomCounter,
+  onOpenBenefits,
+  onOpenKhatmah,
   initialSection = "collections",
 }: {
   completed: Record<CategoryId, Set<string>>;
@@ -56,6 +58,8 @@ export function AzkarLibraryScreen({
   savedZikrIds: Set<string>;
   routineModes: Record<RoutineCategoryId, RoutineMode>;
   onOpenCustomCounter?: () => void;
+  onOpenBenefits?: () => void;
+  onOpenKhatmah?: () => void;
   initialSection?: LibrarySection;
 }) {
   const [section, setSection] = useState<LibrarySection>(initialSection);
@@ -233,6 +237,54 @@ export function AzkarLibraryScreen({
         <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-5 page-content-center outline-none focus-visible:ring-1 focus-visible:ring-ring/40">
           {section === "collections" ? (
             <>
+              {!deferredQuery && (onOpenBenefits || onOpenKhatmah) && (
+                <section aria-labelledby="library-tools-heading" className="mb-6">
+                  <h2
+                    id="library-tools-heading"
+                    className="mb-2.5 text-label font-bold uppercase tracking-wide text-muted-foreground"
+                  >
+                    {t(language, "home.yourLibrary")}
+                  </h2>
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                    {onOpenBenefits && (
+                      <button
+                        type="button"
+                        onClick={onOpenBenefits}
+                        data-testid="library-benefits-tool"
+                        className="interactive-elem flex min-h-[96px] items-center gap-3 rounded-3xl border border-border/40 bg-card p-4 text-start shadow-raised transition-colors hover:border-primary/40 hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                      >
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-subtitle font-black text-foreground">
+                            {t(language, "benefits.title")}
+                          </span>
+                          <span className="mt-1 line-clamp-2 block text-label font-semibold text-muted-foreground">
+                            {t(language, "benefits.homeDescription")}
+                          </span>
+                        </span>
+                        <ChevronNext className="size-5 shrink-0 text-primary rtl:rotate-180" aria-hidden="true" />
+                      </button>
+                    )}
+                    {onOpenKhatmah && (
+                      <button
+                        type="button"
+                        onClick={onOpenKhatmah}
+                        data-testid="library-quran-tool"
+                        className="interactive-elem flex min-h-[96px] items-center gap-3 rounded-3xl border border-border/40 bg-card p-4 text-start shadow-raised transition-colors hover:border-primary/40 hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                      >
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-subtitle font-black text-foreground">
+                            {t(language, "home.khatmahTitle")}
+                          </span>
+                          <span className="mt-1 block text-label font-semibold text-muted-foreground">
+                            {t(language, "home.khatmahDescription")}
+                          </span>
+                        </span>
+                        <ChevronNext className="size-5 shrink-0 text-primary rtl:rotate-180" aria-hidden="true" />
+                      </button>
+                    )}
+                  </div>
+                </section>
+              )}
               {filteredGroups.map(({ group, categories }) => (
                 <section key={group.id} aria-labelledby={`library-group-${group.id}`} className="mb-6 last:mb-0">
                   <h2
@@ -319,7 +371,7 @@ export function AzkarLibraryScreen({
                 </div>
               )}
               {onOpenCustomCounter && filteredGroups.length > 0 && (
-                <div className="mt-4">
+                <div className="mt-4" data-testid="library-masbaha-entry">
                   <TasbeehCounterButton onClick={onOpenCustomCounter} language={language} direction={direction} />
                 </div>
               )}

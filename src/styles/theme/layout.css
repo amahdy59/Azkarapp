@@ -269,12 +269,13 @@
   left: 50%;
   inset-block-end: calc(-1rem - 1px);
   z-index: 0;
-  width: 2.5rem;
-  height: 0.75rem;
+  width: 2.75rem;
+  height: 1rem;
   transform: translateX(-50%);
-  border-block-end: 0 !important;
-  border-block-start: 1px solid var(--border);
-  border-radius: 9999px 9999px 0 0;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  border: 0 !important;
+  border-radius: 0;
+  box-shadow: none;
   pointer-events: none;
 }
 

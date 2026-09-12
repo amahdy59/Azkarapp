@@ -305,7 +305,8 @@ test.skip("post-prayer cards hide what cannot be acted on and stay equal height"
 
   const tracker = page.getByTestId("after-prayer-trackers");
   const grid = page.getByTestId("prayer-tracker-cards");
-  const masbaha = page.getByTestId("home-masbaha-entry");
+  await page.getByTestId("nav-azkar").click();
+  const masbaha = page.getByTestId("library-masbaha-entry");
   const cards = grid.locator("article[data-prayer-state]");
 
   const [trackerBox, masbahaBox] = await Promise.all([tracker.boundingBox(), masbaha.boundingBox()]);

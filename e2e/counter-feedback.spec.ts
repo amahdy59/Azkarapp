@@ -154,11 +154,6 @@ test("wide Home keeps navigation exposed, contains its scene, and uses glass for
     page.getByTestId("home-primary-card").locator(".hero-glass").first(),
     page.getByTestId("home-context-companion").locator(".hero-glass").first(),
     page.getByTestId("home-wird-row").locator(".hero-glass").first(),
-    page.getByTestId("home-glass-masbaha"),
-    page.getByTestId("home-quran-card"),
-    page.getByTestId("home-saved-section"),
-    page.getByTestId("home-benefits-card"),
-    page.getByTestId("home-friday-card"),
   ];
   for (const cards of glassCards) {
     await expect(cards.first()).toHaveClass(/hero-glass/);
@@ -196,9 +191,10 @@ test("Home prayer strip keeps all five prayers legible without page overflow", a
   }
 });
 
-test("the Home masbaha entry fills compact/tablet layouts and is bounded on desktop", async ({ page }) => {
+test("the Library masbaha entry fills compact/tablet layouts and is bounded on desktop", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 568 });
   await openReturningGuest(page);
+  await page.getByTestId("nav-azkar").click();
   const entry = page.getByRole("button", { name: "Masbaha" }).first();
 
   for (const viewport of [
@@ -238,6 +234,7 @@ test("the OnePlus-class Salawat session keeps its counter controls and hint insi
 test("the custom counter stays bounded on a short phone and isolates focused-control shortcuts", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 568 });
   await openReturningGuest(page);
+  await page.getByTestId("nav-azkar").click();
   await page.getByRole("button", { name: "Masbaha" }).first().click();
 
   const screen = page.locator(".app-screen-surface");
@@ -282,6 +279,7 @@ test("the custom counter stays bounded on a short phone and isolates focused-con
 test("custom counter content keeps its reading-width bound on desktop", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await openReturningGuest(page);
+  await page.getByTestId("nav-azkar").click();
   await page.getByRole("button", { name: "Masbaha" }).first().click();
 
   const contentBox = await page.getByTestId("custom-counter-content").boundingBox();

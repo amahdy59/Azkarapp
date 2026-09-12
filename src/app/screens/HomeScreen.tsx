@@ -1,27 +1,16 @@
-/* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { ArrowLeft, ArrowRight, Zap } from "../components/icons";
-import { TasbeehCounterButton } from "../components/TasbeehCounterButton";
+import { Zap } from "../components/icons";
 import { TodayRoutineGarden } from "../components/RoutineGarden";
-import { ProductImage } from "../components/ProductImage";
 import { TranquilityCompletionCard } from "../components/TranquilityCompletionCard";
 import { getContextualEvidence, getReminderContexts, selectLibraryEvidence } from "../dailyEvidence";
 import type { DayMomentContext, PrayerMomentContext, ReminderContext } from "../types";
-import { DailyEvidenceCard, FridayHomeCard, PrayerRoutineCard, SavedZikrCard } from "../components/HomeCards";
+import { DailyEvidenceCard, FridayHomeCard, PrayerRoutineCard } from "../components/HomeCards";
 import { QuranHomeCard } from "../components/QuranHomeCard";
 import { PrayerMomentPanel } from "../components/PrayerMomentPanel";
 import { TodaysPathSheet } from "../components/TodaysPathSheet";
 import { getDailyPathStatus } from "../dailyPath";
 import { getLeadingPrayerMoment } from "../prayerMoment";
-import {
-  ALL_AZKAR,
-  estimateCompletionMinutes,
-  getAzkarByCategory,
-  getAzkarForMode,
-  getRoutineProgress,
-  isRoutineCategory,
-  registerLazyCollection,
-} from "../content/azkar";
+import { estimateCompletionMinutes, getAzkarForMode, getRoutineProgress, isRoutineCategory } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
 import { getEstimatedPrayerTimes, timeToMinutes, type PrayerName } from "../content/prayerTimes";
 import { PrayerTrackerCards, type PrayerTrackingWrite } from "../components/PrayerTrackerCards";
@@ -59,14 +48,6 @@ export type HomeAction = {
   completedCount: number;
   totalCount: number;
   kind: HomeActionKind;
-};
-
-type HomeSavedItem = {
-  id: string;
-  category: CategoryId;
-  arabicText: string;
-  translation: string;
-  source: "main" | "comprehensive" | "friday";
 };
 
 function suggestedCategoryId(date: Date, location?: LocationSettings): CategoryId {
@@ -158,10 +139,6 @@ export function getTimeOfDayZikr(now: Date = new Date(), language: AppLanguage =
   };
 }
 
-export function getHomeBackgroundCategoryId(now: Date, routineCategoryId: CategoryId): CategoryId {
-  return routineCategoryId;
-}
-
 export function isFridayFeatureWindow(now: Date, location?: LocationSettings): boolean {
   const day = now.getDay();
   if (day !== 4 && day !== 5) return false;
@@ -177,19 +154,6 @@ function hasStartedFridayKahf(): boolean {
   } catch {
     return false;
   }
-}
-
-/** Centred section heading with rules on either side, per the Home design. */
-function SectionDivider({ label }: { label: string }) {
-  return (
-    <div className="flex items-center gap-4 py-1">
-      <span className="h-px flex-1 bg-border" aria-hidden="true" />
-      <h2 className="text-subtitle font-bold text-primary" dir="auto">
-        {label}
-      </h2>
-      <span className="h-px flex-1 bg-border" aria-hidden="true" />
-    </div>
-  );
 }
 
 export function getHomeAction(
@@ -271,14 +235,8 @@ export function HomeScreen({
   dailyPathStartDayKey,
   onMosquePrayerGoalChange,
   onOpenFridayMode,
-  onOpenProgress: _onOpenProgress,
   routineModes,
   onSetRoutineMode,
-  onOpenCustomCounter,
-  savedZikrIds,
-  onOpenSavedZikr,
-  onOpenSavedLibrary,
-  onOpenBenefits,
   onOpenWirdBenefits,
   onOpenKhatmah,
   onContinueKhatmah,
@@ -312,14 +270,8 @@ export function HomeScreen({
   dailyPathStartDayKey?: string;
   onMosquePrayerGoalChange?: (goal: number | undefined) => void;
   onOpenFridayMode: () => void;
-  onOpenProgress?: () => void;
   routineModes: Record<RoutineCategoryId, RoutineMode>;
   onSetRoutineMode?: (categoryId: RoutineCategoryId, mode: RoutineMode) => void;
-  onOpenCustomCounter?: () => void;
-  savedZikrIds: Set<string>;
-  onOpenSavedZikr?: (categoryId: CategoryId, index: number) => void;
-  onOpenSavedLibrary?: () => void;
-  onOpenBenefits?: () => void;
   onOpenWirdBenefits?: () => void;
   onOpenKhatmah?: () => void;
   prayerTracking?: readonly PrayerTrackingRecord[];
@@ -335,12 +287,9 @@ export function HomeScreen({
   const [hasScrolledHomeContent, setHasScrolledHomeContent] = useState(false);
   const isArabic = language === "ar";
   const now = useNow();
-  const [savedOpenState, setSavedOpenState] = useState<{
-    loadingId: string | null;
-    errorId: string | null;
-  }>({ loadingId: null, errorId: null });
   const [fridayKahfStarted] = useState(hasStartedFridayKahf);
   const [selectedPrayer, setSelectedPrayer] = useState<PrayerName | null>(null);
+  const [dismissedAutoPrayer, setDismissedAutoPrayer] = useState<PrayerName | null>(null);
 
   /* How each day is judged. Days before the reader's daily path started keep
      the verdict they were lived under — see dailyPath.ts — so this is one
@@ -571,80 +520,36 @@ export function HomeScreen({
             count: formatNumerals(Math.max(0, totalCount - doneCount), language),
           });
 
-  const homeBackgroundCategoryId = getHomeBackgroundCategoryId(
-    now,
-    isLastThirdDua ? "before_sleep" : reminderInfo.categoryId,
-  );
+  const homeBackgroundCategoryId = isLastThirdDua ? "before_sleep" : reminderInfo.categoryId;
   const fridayInWindow = isFridayFeatureWindow(now, locationSettings);
   const fridayKahfComplete = completed.friday_kahf?.has("friday-kahf") ?? false;
   const fridayStatus = fridayKahfComplete ? "review" : fridayKahfStarted ? "continue" : "start";
-  const savedPreview = useMemo(() => {
-    const available: HomeSavedItem[] = ALL_AZKAR.filter(
-      (zikr) => !zikr.isCollectionIntroduction && savedZikrIds.has(zikr.id),
-    ).map((zikr) => ({
-      id: zikr.id,
-      category: zikr.category,
-      arabicText: zikr.arabicText,
-      translation: zikr.translation,
-      source: "main",
-    }));
-    const comprehensiveCategory = CATEGORIES.find((category) => category.id === "comprehensive_duas")!;
-    for (const id of [...savedZikrIds].sort()) {
-      if (!id.startsWith("friday-dua-") && !id.startsWith("comprehensive-dua-")) continue;
-      available.push({
-        id,
-        category: "comprehensive_duas",
-        arabicText: comprehensiveCategory.nameArabic,
-        translation: comprehensiveCategory.name,
-        source: "comprehensive",
-      });
-    }
-    if (savedZikrIds.has("friday-kahf")) {
-      const fridayCategory = CATEGORIES.find((category) => category.id === "friday_kahf")!;
-      available.unshift({
-        id: "friday-kahf",
-        category: "friday_kahf",
-        arabicText: fridayCategory.nameArabic,
-        translation: fridayCategory.name,
-        source: "friday",
-      });
-    }
-    return available.slice(0, 3);
-  }, [savedZikrIds]);
-
-  const openSavedZikr = async (zikr: HomeSavedItem) => {
-    setSavedOpenState({ loadingId: zikr.id, errorId: null });
-    try {
-      if (zikr.source === "friday") {
-        const { FRIDAY_KAHF } = await import("../content/fridayKahf");
-        registerLazyCollection("friday_kahf", FRIDAY_KAHF);
-        onOpenSavedZikr?.("friday_kahf", 0);
-        setSavedOpenState({ loadingId: null, errorId: null });
-        return;
-      }
-      if (zikr.source === "comprehensive") {
-        const { COMPREHENSIVE_DUAS } = await import("../content/comprehensiveDuas");
-        registerLazyCollection("comprehensive_duas", COMPREHENSIVE_DUAS);
-      }
-      const items = getAzkarByCategory(zikr.category);
-      const index = items.findIndex((item) => item.id === zikr.id);
-      if (index < 0) throw new Error(`Saved zikr ${zikr.id} was not found`);
-      onOpenSavedZikr?.(zikr.category, index);
-      setSavedOpenState({ loadingId: null, errorId: null });
-    } catch {
-      setSavedOpenState({ loadingId: null, errorId: zikr.id });
-    }
-  };
-
   const isPrayerHero = Boolean(
     leadingPrayer &&
     (leadingPrayer.phase === "approaching" || leadingPrayer.phase === "now" || leadingPrayer.phase === "recorded"),
   );
   const isRoutineHero = !isPrayerHero && showRoutineCard;
-  const expandedPrayer = selectedPrayer ?? (isPrayerHero ? leadingPrayer?.prayer : null);
+  const autoPrayer = isPrayerHero ? (leadingPrayer?.prayer ?? null) : null;
+  const expandedPrayer = selectedPrayer ?? (dismissedAutoPrayer === autoPrayer ? null : autoPrayer);
+  const expandedPrayerModel = prayerCardModels.find((model) => model.prayer === expandedPrayer);
+  const hasQuranActivity =
+    Boolean(quranWirdPlan?.startedDayKey) ||
+    (quranReadingPosition?.page ?? 1) > 1 ||
+    Object.values(wirdHistory ?? {}).some((pages) => pages.length > 0);
+
+  useEffect(() => {
+    if (dismissedAutoPrayer && dismissedAutoPrayer !== autoPrayer) setDismissedAutoPrayer(null);
+  }, [autoPrayer, dismissedAutoPrayer]);
+
+  const handlePrayerOpen = (prayer: PrayerName | null) => {
+    setSelectedPrayer(prayer);
+    setDismissedAutoPrayer(prayer ? null : autoPrayer);
+  };
   const hasPrimaryContext = showCompletionCard || isRoutineHero;
   const hasContextCompanion = Boolean(dailyEvidence);
 
+  /* The named scroll region must itself be keyboard-scrollable. */
+  /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
   return (
     <ScreenContainer
       dir={direction}
@@ -722,9 +627,9 @@ export function HomeScreen({
                     language={language}
                     direction={direction}
                     records={prayerTracking}
-                    dayKey={getProgressDayKey(now, progressDayStartHour)}
+                    dayKey={todayKey}
                     onToggle={onTogglePrayerTracking ?? (() => undefined)}
-                    onOpen={setSelectedPrayer}
+                    onOpen={handlePrayerOpen}
                     onGlass={homeVisualEffects}
                     summaryOnly
                     selectedPrayer={expandedPrayer}
@@ -738,14 +643,14 @@ export function HomeScreen({
                     data-prayer={expandedPrayer}
                     dir={direction}
                     aria-label={t(language, "prayerMoment.homeTitle")}
-                    className="grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:gap-5"
+                    className="w-full"
                   >
                     <PrayerMomentPanel
                       prayer={expandedPrayer}
                       language={language}
                       direction={direction}
                       records={prayerTracking}
-                      dayKey={getProgressDayKey(now, progressDayStartHour)}
+                      dayKey={todayKey}
                       locationSettings={locationSettings}
                       now={now}
                       onToggle={onTogglePrayerTracking ?? (() => undefined)}
@@ -753,6 +658,7 @@ export function HomeScreen({
                         onOpenPrayerAdhkar ? onOpenPrayerAdhkar(prayer) : onResume("after_prayer")
                       }
                       onGlass={homeVisualEffects}
+                      canRecord={expandedPrayerModel?.isRecordable ?? false}
                     />
                   </section>
                 )}
@@ -856,121 +762,36 @@ export function HomeScreen({
             onClose={() => setPathSheetOpen(false)}
           />
 
-          {onOpenCustomCounter && (
-            <div className="px-page" data-testid="home-masbaha-entry">
-              <TasbeehCounterButton
-                onClick={onOpenCustomCounter}
+          {hasQuranActivity && (
+            <QuranHomeCard
+              language={language}
+              direction={direction}
+              position={quranReadingPosition}
+              plan={quranWirdPlan}
+              wirdHistory={wirdHistory ?? {}}
+              progressDayStartHour={progressDayStartHour}
+              now={now}
+              onContinue={onContinueKhatmah ?? (() => {})}
+              onOverview={onOpenKhatmah ?? (() => {})}
+              onGlass={homeVisualEffects}
+            />
+          )}
+
+          {fridayInWindow && (
+            <div className="px-page">
+              <FridayHomeCard
                 language={language}
                 direction={direction}
+                expanded
+                status={fridayStatus}
+                onOpen={onOpenFridayMode}
                 onGlass={homeVisualEffects}
               />
             </div>
           )}
-
-          <QuranHomeCard
-            language={language}
-            direction={direction}
-            position={quranReadingPosition}
-            plan={quranWirdPlan}
-            wirdHistory={wirdHistory ?? {}}
-            progressDayStartHour={progressDayStartHour}
-            now={now}
-            onContinue={onContinueKhatmah ?? (() => {})}
-            onOverview={onOpenKhatmah ?? (() => {})}
-            onGlass={homeVisualEffects}
-          />
-
-          <div className="px-page">
-            <SectionDivider label={t(language, "home.yourLibrary")} />
-          </div>
-
-          {/* The reminder moved into the hero, beside the routines it explains.
-              Leaving a second copy here would have put the same narration on
-              the screen twice. */}
-          <div className="px-page grid grid-cols-1 items-start gap-3.5 lg:grid-cols-2">
-            <SavedZikrCard
-              language={language}
-              direction={direction}
-              count={savedZikrIds.size}
-              items={savedPreview.map((zikr) => {
-                const category = CATEGORIES.find((item) => item.id === zikr.category)!;
-                return {
-                  id: zikr.id,
-                  categoryLabel: isArabic ? category.nameArabic : category.name,
-                  displayText: isArabic ? zikr.arabicText : zikr.translation,
-                  source: zikr.source,
-                };
-              })}
-              loadingId={savedOpenState.loadingId}
-              errorId={savedOpenState.errorId}
-              onOpenItem={(id) => {
-                const item = savedPreview.find((zikr) => zikr.id === id);
-                if (item) void openSavedZikr(item);
-              }}
-              onOpenLibrary={onOpenSavedLibrary}
-              onGlass={homeVisualEffects}
-            />
-
-            {onOpenBenefits && (
-              <button
-                type="button"
-                onClick={onOpenBenefits}
-                className={`interactive-elem group relative flex min-h-[16rem] w-full flex-col justify-end overflow-hidden rounded-3xl text-start transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                  homeVisualEffects ? "hero-glass home-glass-surface" : "border border-border bg-card shadow-raised"
-                }`}
-                data-testid="home-benefits-card"
-              >
-                {homeVisualEffects && (
-                  <div className="absolute inset-0 z-0">
-                    <ProductImage name="benefits_zikr" className="h-full w-full object-cover object-[center_42%]" />
-                  </div>
-                )}
-                <div
-                  className={`relative z-10 m-3 rounded-2xl p-4 sm:m-4 sm:p-5 ${
-                    homeVisualEffects ? "border border-white/10 bg-black/45 shadow-raised backdrop-blur-md" : "bg-card"
-                  }`}
-                >
-                  <span className="block">
-                    <span
-                      className={`block text-xl font-black ${homeVisualEffects ? "text-on-media drop-shadow-md" : "text-foreground"}`}
-                    >
-                      {t(language, "benefits.title")}
-                    </span>
-                    <span
-                      className={`mt-2 block max-w-[34rem] text-label font-semibold leading-6 sm:text-sm ${homeVisualEffects ? "text-on-media-muted" : "text-muted-foreground"}`}
-                    >
-                      {t(language, "benefits.homeDescription")}
-                    </span>
-                    <span className="mt-4 flex items-center gap-2 text-sm font-black text-primary drop-shadow-sm">
-                      {t(language, "benefits.open")}
-                      {direction === "rtl" ? (
-                        <ArrowLeft size={18} className="transition-transform group-hover:-translate-x-1" />
-                      ) : (
-                        <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
-                      )}
-                    </span>
-                  </span>
-                </div>
-              </button>
-            )}
-          </div>
-
-          <div className="px-page">
-            <SectionDivider label={t(language, "home.fridayAzkar")} />
-          </div>
-
-          <div className="px-page">
-            <FridayHomeCard
-              language={language}
-              direction={direction}
-              expanded={fridayInWindow}
-              status={fridayStatus}
-              onOpen={onOpenFridayMode}
-              onGlass={homeVisualEffects}
-            />
-          </div>
         </div>
       </div>
     </ScreenContainer>
   );
+  /* eslint-enable jsx-a11y/no-noninteractive-tabindex */
 }

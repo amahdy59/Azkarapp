@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { TrackingCheckMark } from "./PrayerTrackerCards";
-import { CloudSun, Info, MoonStar, Sun, Sunrise, Sunset, Translate } from "./icons";
+import { PrayerSceneArt } from "./PrayerSceneArt";
+import { CloudSun, Info, MoonStar, Sun, Sunrise, Sunset } from "./icons";
 import { t } from "../i18n";
 import { formatPrayerTimeLabel } from "../content/prayerTimes";
 import { formatNumerals } from "../formatting";
@@ -45,6 +46,7 @@ export function PrayerMomentPanel({
   onToggle,
   onOpenAdhkar,
   onGlass = false,
+  canRecord = true,
 }: {
   prayer: PrayerName;
   language: AppLanguage;
@@ -70,6 +72,8 @@ export function PrayerMomentPanel({
    * were built for.
    */
   onGlass?: boolean;
+  /** Future prayers may be previewed shortly before adhan, but not recorded. */
+  canRecord?: boolean;
   onOpenAdhkar: (prayer: PrayerName) => void;
 }) {
   const moment: PrayerMoment = useMemo(
@@ -139,10 +143,11 @@ export function PrayerMomentPanel({
   return (
     <>
       <article
-        className={`flex flex-col overflow-hidden ${onGlass ? "hero-glass home-glass-surface" : "rounded-3xl border border-border bg-card shadow-raised"}`}
+        className={`flex flex-col overflow-hidden md:col-span-2 ${onGlass ? "hero-glass home-glass-surface" : "rounded-3xl border border-border bg-card shadow-raised"}`}
       >
-        <section
-          /* A floor, not a height: the scene is the ground for the name and
+        <div className="grid md:grid-cols-2">
+          <section
+            /* A floor, not a height: the scene is the ground for the name and
            the time, and at content height alone it read as a strip of sky
            rather than as the sky. It still grows for a longer name, and on
            the wide grid it stretches to match the virtue beside it.
@@ -153,74 +158,94 @@ export function PrayerMomentPanel({
            text sits on: the analyser read it as white on the light theme's
            page colour at 1.08:1, and it was right to — one failed paint and
            that is what a reader would get. */
-          className="relative isolate min-h-[11rem] border-b border-border/50"
-          data-testid="prayer-moment-hero"
-        >
-          {/* Fixed light-on-dark, because the scene is its own ground in every
-            theme — the same rule the Home hero follows over its photograph. */}
-          <div
-            className={`flex h-full flex-col justify-between gap-4 p-5 ${onGlass ? "text-white" : "text-foreground"}`}
+            className={`relative isolate min-h-[11rem] border-b border-border/50 ${
+              onGlass ? "" : "bg-on-media-surface text-white"
+            } ${virtue && isLive ? "" : "md:col-span-2"}`}
+            data-testid="prayer-moment-hero"
           >
-            {/* Top block: Icon on left (if RTL, visually on left means start if flex-row-reverse or just justify-between), Name on right. Actually, flex items-start justify-between puts first item on start, second on end. To put Name on end and Icon on start, we can just use direction and let flex handle it. But the image shows Name on right (which is start in RTL) and Icon on left (which is end in RTL). So we use justify-between. */}
-            <div className="flex flex-col gap-1 text-start">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h2 className="text-3xl font-black leading-tight md:text-4xl" dir="auto">
-                    {name}
-                  </h2>
-                  {countdown && (
-                    <p
-                      className={`mt-1 text-label font-medium ${onGlass ? "text-white/70" : "text-muted-foreground"}`}
-                      dir="auto"
-                    >
-                      {countdown}
-                    </p>
+            {!onGlass && <PrayerSceneArt prayer={prayer} className="absolute inset-0 -z-10" />}
+            {/* Fixed light-on-dark, because the scene is its own ground in every
+            theme — the same rule the Home hero follows over its photograph. */}
+            <div className="flex h-full flex-col justify-between gap-4 p-5 text-white">
+              {/* Top block: Icon on left (if RTL, visually on left means start if flex-row-reverse or just justify-between), Name on right. Actually, flex items-start justify-between puts first item on start, second on end. To put Name on end and Icon on start, we can just use direction and let flex handle it. But the image shows Name on right (which is start in RTL) and Icon on left (which is end in RTL). So we use justify-between. */}
+              <div className="flex flex-col gap-1 text-start">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h2 className="text-3xl font-black leading-tight md:text-4xl" dir="auto">
+                      {name}
+                    </h2>
+                    {countdown && (
+                      <p className="mt-1 text-label font-medium text-white/70" dir="auto">
+                        {countdown}
+                      </p>
+                    )}
+                  </div>
+                  <span
+                    className={`flex size-12 shrink-0 items-center justify-center rounded-full border-[1.5px] border-[currentColor]/70 ${accentText}`}
+                  >
+                    <Icon size={24} aria-hidden="true" />
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <p className="text-4xl font-black leading-none tabular-nums" dir="auto">
+                    {formatPrayerTimeLabel(moment.time, isArabic)}
+                  </p>
+                  {moment.phase === "now" && (
+                    <span className="rounded-full bg-primary px-3 py-1 text-xs font-black text-primary-foreground">
+                      {t(language, "prayerMoment.badgeNow")}
+                    </span>
                   )}
                 </div>
-                <span
-                  className={`flex size-12 shrink-0 items-center justify-center rounded-full border-[1.5px] border-[currentColor]/70 ${accentText}`}
-                >
-                  <Icon size={24} aria-hidden="true" />
-                </span>
-              </div>
-            </div>
 
-            <div className="flex flex-col gap-3">
-              <div className="flex flex-wrap items-center gap-2.5">
-                <p className="text-5xl font-black leading-none tabular-nums" dir="auto">
-                  {formatPrayerTimeLabel(moment.time, isArabic)}
-                </p>
-                {moment.phase === "now" && (
-                  <span className="rounded-full bg-primary px-3 py-1 text-xs font-black text-primary-foreground">
-                    {t(language, "prayerMoment.badgeNow")}
-                  </span>
+                {approachFraction !== null && (
+                  <div
+                    role="meter"
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-valuenow={Math.round(approachFraction * 100)}
+                    aria-label={t(language, "prayerMoment.countdownProgress", { prayer: name })}
+                    className={`h-2 w-full overflow-hidden rounded-full ${onGlass ? "bg-white/20" : "bg-muted"}`}
+                  >
+                    <div
+                      className="h-full rounded-full bg-primary transition-[width] duration-500 motion-reduce:transition-none"
+                      style={{ width: `${Math.round(approachFraction * 100)}%` }}
+                    />
+                  </div>
                 )}
               </div>
-
-              {approachFraction !== null && (
-                <div
-                  role="meter"
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                  aria-valuenow={Math.round(approachFraction * 100)}
-                  aria-label={t(language, "prayerMoment.countdownProgress", { prayer: name })}
-                  className={`h-2 w-full overflow-hidden rounded-full ${onGlass ? "bg-white/20" : "bg-muted"}`}
-                >
-                  <div
-                    className="h-full rounded-full bg-primary transition-[width] duration-500 motion-reduce:transition-none"
-                    style={{ width: `${Math.round(approachFraction * 100)}%` }}
-                  />
-                </div>
-              )}
+              <p className="flex items-center gap-2 text-label font-medium text-white/90">
+                <span className="size-1.5 rounded-full bg-primary" aria-hidden="true" />
+                {t(language, statusKey)}
+              </p>
             </div>
-            <p
-              className={`flex items-center gap-2 text-label font-medium ${onGlass ? "text-white/90" : "text-muted-foreground"}`}
+          </section>
+          {virtue && isLive && (
+            <section
+              className={`flex min-h-[11rem] flex-col justify-center border-b p-5 text-start md:border-s md:p-6 ${hairline}`}
+              data-testid="prayer-moment-virtue"
             >
-              <span className="size-1.5 rounded-full bg-primary" aria-hidden="true" />
-              {t(language, statusKey)}
-            </p>
-          </div>
-        </section>
+              <h3 className={`text-subtitle font-black ${accentText}`} dir="auto">
+                {t(language, "prayerMoment.virtueTitle", { prayer: name })}
+              </h3>
+              <p className={`mt-2 text-xs font-bold ${bodyText}`} dir="auto">
+                {t(language, "prayerMoment.virtueAttribution")}
+              </p>
+              <p
+                className={`mt-2 text-title font-bold leading-loose ${titleText} ${isArabic || !virtue.textEnglish ? "zikr-text" : ""}`}
+                dir={isArabic || !virtue.textEnglish ? "rtl" : "ltr"}
+                lang={isArabic || !virtue.textEnglish ? "ar" : "en"}
+              >
+                {isArabic ? virtue.textArabic : (virtue.textEnglish ?? virtue.textArabic)}
+              </p>
+              <p className={`mt-2 text-xs font-semibold ${bodyText}`} dir="auto">
+                {isArabic ? virtue.referenceArabic : virtue.referenceEnglish}
+              </p>
+            </section>
+          )}
+        </div>
         <section className="p-4 sm:p-5 md:p-6" data-testid="prayer-journey" aria-labelledby="prayer-journey-title">
           <div className="min-w-0">
             <h3 id="prayer-journey-title" className={`text-subtitle font-black ${titleText}`} dir="auto">
@@ -247,10 +272,13 @@ export function PrayerMomentPanel({
               <input
                 id="prayer-mosque"
                 type="checkbox"
+                disabled={!canRecord}
                 checked={moment.location === "mosque"}
-                onChange={(event) => onToggle(prayer, "location", event.currentTarget.checked ? "mosque" : null)}
+                onChange={(event) => {
+                  if (canRecord) onToggle(prayer, "location", event.currentTarget.checked ? "mosque" : null);
+                }}
                 aria-labelledby="prayer-mosque-title"
-                className="tracking-choice peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-xl opacity-0"
+                className="tracking-choice peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-xl opacity-0 disabled:cursor-not-allowed"
               />
               <div className="min-w-0 flex-1">
                 <p id="prayer-mosque-title" className={`text-subtitle font-black ${titleText}`} dir="auto">
@@ -274,10 +302,13 @@ export function PrayerMomentPanel({
               <input
                 id="prayer-adhkar"
                 type="checkbox"
+                disabled={!canRecord}
                 checked={moment.adhkarDone}
-                onChange={(event) => onToggle(prayer, "adhkar", event.currentTarget.checked)}
+                onChange={(event) => {
+                  if (canRecord) onToggle(prayer, "adhkar", event.currentTarget.checked);
+                }}
                 aria-labelledby="prayer-adhkar-title"
-                className="tracking-choice peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-xl opacity-0"
+                className="tracking-choice peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-xl opacity-0 disabled:cursor-not-allowed"
               />
               <div className="min-w-0 flex-1">
                 <p id="prayer-adhkar-title" className={`text-subtitle font-black ${titleText}`} dir="auto">
@@ -303,10 +334,13 @@ export function PrayerMomentPanel({
                 <input
                   id="prayer-sunnah"
                   type="checkbox"
+                  disabled={!canRecord}
                   checked={moment.sunnahDone}
-                  onChange={(event) => onToggle(prayer, "sunnah", event.currentTarget.checked)}
+                  onChange={(event) => {
+                    if (canRecord) onToggle(prayer, "sunnah", event.currentTarget.checked);
+                  }}
                   aria-labelledby="prayer-sunnah-title"
-                  className="tracking-choice peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-xl opacity-0"
+                  className="tracking-choice peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-xl opacity-0 disabled:cursor-not-allowed"
                 />
                 <div className="min-w-0 flex-1">
                   <p id="prayer-sunnah-title" className={`text-subtitle font-black ${titleText}`} dir="auto">
@@ -348,39 +382,10 @@ export function PrayerMomentPanel({
             data-testid="prayer-open-adhkar"
             className="mt-3 flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-primary px-4 text-subtitle font-black text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           >
-            <Translate size={18} aria-hidden="true" />
             {t(language, "prayerMoment.journeyOpenAdhkar")}
           </button>
         </section>
       </article>
-
-      {virtue && isLive && (
-        <section
-          className={`flex h-full flex-col justify-center gap-4 p-4 text-start sm:p-5 md:p-6 ${onGlass ? "hero-glass home-glass-surface" : "rounded-3xl border border-border bg-card shadow-raised"}`}
-          data-testid="prayer-moment-virtue"
-        >
-          <h3 className={`text-subtitle font-black ${accentText}`} dir="auto">
-            {t(language, "prayerMoment.virtueTitle", { prayer: name })}
-          </h3>
-          <p className={`mt-2 text-xs font-bold ${bodyText}`} dir="auto">
-            {t(language, "prayerMoment.virtueAttribution")}
-          </p>
-          {/* The narration itself, in the reader's language where a reviewed
-              rendering exists. `lang` and `dir` describe the text that is drawn,
-              not the interface around it — English prose marked `lang="ar"` is
-              read aloud with an Arabic voice. */}
-          <p
-            className={`mt-2 text-title font-bold leading-loose ${titleText} ${isArabic || !virtue.textEnglish ? "zikr-text" : ""}`}
-            dir={isArabic || !virtue.textEnglish ? "rtl" : "ltr"}
-            lang={isArabic || !virtue.textEnglish ? "ar" : "en"}
-          >
-            {isArabic ? virtue.textArabic : (virtue.textEnglish ?? virtue.textArabic)}
-          </p>
-          <p className={`mt-2 text-xs font-semibold ${bodyText}`} dir="auto">
-            {isArabic ? virtue.referenceArabic : virtue.referenceEnglish}
-          </p>
-        </section>
-      )}
 
       {sunnah && evidenceOpen && (
         <Modal

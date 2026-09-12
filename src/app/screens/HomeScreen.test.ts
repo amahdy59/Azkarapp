@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import {
   getHomeAction,
-  getHomeBackgroundCategoryId,
   getTimeOfDayZikr,
   isFridayFeatureWindow,
   isDhuhaWindow,
@@ -84,11 +83,6 @@ describe("getHomeAction", () => {
       title: "Time for Dua",
     });
     expect(isLastThirdOfNight(atTime(date, getEstimatedPrayerTimes(date, cairo).fajr), cairo)).toBe(false);
-  });
-
-  it("uses the Friday scene on Home without changing the recommended routine", () => {
-    expect(getHomeBackgroundCategoryId(new Date(2026, 7, 7, 9), "morning")).toBe("morning");
-    expect(getHomeBackgroundCategoryId(new Date(2026, 7, 8, 9), "morning")).toBe("morning");
   });
 
   it("expands the Friday feature from Thursday Maghrib until Friday Maghrib", () => {

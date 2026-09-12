@@ -5,6 +5,34 @@ import type { CategoryId } from "../types";
 import { AzkarLibraryScreen } from "./AzkarLibraryScreen";
 
 describe("AzkarLibraryScreen", () => {
+  it("keeps benefits, Quran, and the Masbaha in the Library instead of Home", () => {
+    const onOpenBenefits = vi.fn();
+    const onOpenKhatmah = vi.fn();
+    const onOpenCustomCounter = vi.fn();
+    render(
+      <AzkarLibraryScreen
+        completed={{} as Record<CategoryId, Set<string>>}
+        language="en"
+        direction="ltr"
+        routineModes={{ morning: "core", evening: "core", before_sleep: "core", after_prayer: "core" }}
+        onCategory={() => undefined}
+        onZikr={() => undefined}
+        onSearch={() => undefined}
+        savedZikrIds={new Set()}
+        onOpenBenefits={onOpenBenefits}
+        onOpenKhatmah={onOpenKhatmah}
+        onOpenCustomCounter={onOpenCustomCounter}
+      />,
+    );
+
+    fireEvent.click(screen.getByTestId("library-benefits-tool"));
+    fireEvent.click(screen.getByTestId("library-quran-tool"));
+    fireEvent.click(screen.getByRole("button", { name: "Masbaha" }));
+    expect(onOpenBenefits).toHaveBeenCalledOnce();
+    expect(onOpenKhatmah).toHaveBeenCalledOnce();
+    expect(onOpenCustomCounter).toHaveBeenCalledOnce();
+  });
+
   it("combines Collections and Saved into one accessible filter beside search", async () => {
     const user = userEvent.setup();
     render(
