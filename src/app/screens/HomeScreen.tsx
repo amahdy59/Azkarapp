@@ -12,7 +12,7 @@ import { getDailyPathStatus } from "../dailyPath";
 import { getLeadingPrayerMoment } from "../prayerMoment";
 import { estimateCompletionMinutes, getAzkarForMode, getRoutineProgress, isRoutineCategory } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
-import { getEstimatedPrayerTimes, timeToMinutes, type PrayerName } from "../content/prayerTimes";
+import { getEstimatedPrayerTimes, PRAYER_NAMES, timeToMinutes, type PrayerName } from "../content/prayerTimes";
 import { PrayerTrackerCards, type PrayerTrackingWrite } from "../components/PrayerTrackerCards";
 import { buildPrayerCardModels } from "../prayerCardModels";
 import { useNow } from "../hooks/useNow";
@@ -637,30 +637,31 @@ export function HomeScreen({
                 </div>
 
                 {expandedPrayer && (
-                  <section
-                    id="home-expanded-prayer"
-                    data-testid="home-prayer-moment"
-                    data-prayer={expandedPrayer}
-                    dir={direction}
-                    aria-label={t(language, "prayerMoment.homeTitle")}
-                    className="w-full"
-                  >
-                    <PrayerMomentPanel
-                      prayer={expandedPrayer}
-                      language={language}
-                      direction={direction}
-                      records={prayerTracking}
-                      dayKey={todayKey}
-                      locationSettings={locationSettings}
-                      now={now}
-                      onToggle={onTogglePrayerTracking ?? (() => undefined)}
-                      onOpenAdhkar={(prayer) =>
-                        onOpenPrayerAdhkar ? onOpenPrayerAdhkar(prayer) : onResume("after_prayer")
-                      }
-                      onGlass={homeVisualEffects}
-                      canRecord={expandedPrayerModel?.isRecordable ?? false}
-                    />
-                  </section>
+                  <div className="grid w-full grid-cols-1 md:grid-cols-2 md:gap-4 lg:gap-5" dir={direction}>
+                    <section
+                      id="home-expanded-prayer"
+                      data-testid="home-prayer-moment"
+                      data-prayer={expandedPrayer}
+                      aria-label={t(language, "prayerMoment.homeTitle")}
+                      className={PRAYER_NAMES.indexOf(expandedPrayer) < 3 ? "md:col-start-1" : "md:col-start-2"}
+                    >
+                      <PrayerMomentPanel
+                        prayer={expandedPrayer}
+                        language={language}
+                        direction={direction}
+                        records={prayerTracking}
+                        dayKey={todayKey}
+                        locationSettings={locationSettings}
+                        now={now}
+                        onToggle={onTogglePrayerTracking ?? (() => undefined)}
+                        onOpenAdhkar={(prayer) =>
+                          onOpenPrayerAdhkar ? onOpenPrayerAdhkar(prayer) : onResume("after_prayer")
+                        }
+                        onGlass={homeVisualEffects}
+                        canRecord={expandedPrayerModel?.isRecordable ?? false}
+                      />
+                    </section>
+                  </div>
                 )}
 
                 <div

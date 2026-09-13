@@ -10,6 +10,8 @@ class FakeAudio extends EventTarget {
   currentTime = 0;
   duration = 12;
   playbackRate = 1;
+  volume = 1;
+  muted = false;
   paused = true;
   ended = false;
   error: MediaError | null = null;
@@ -111,6 +113,7 @@ function Harness({ language = "en" }: { language?: "ar" | "en" }) {
 
 afterEach(() => {
   cleanup();
+  window.localStorage.clear();
   FakeAudio.rejectPlayWith = null;
   vi.unstubAllGlobals();
 });
@@ -174,18 +177,19 @@ describe("AudioProvider integration", () => {
     fireEvent.click(screen.getByRole("button", { name: "Start" }));
     expect(await screen.findByRole("region", { name: "Audio player" })).toBeInTheDocument();
 
-    // Minimize player
-    fireEvent.click(screen.getByRole("button", { name: "Minimize player" }));
     expect(screen.getByRole("button", { name: "Expand player" })).toBeInTheDocument();
 
-    // Expand player back
+    // Playback starts compact so it does not obscure the screen.
     fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
     expect(screen.getByRole("button", { name: "Minimize player" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Forward 10 seconds" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Rewind 10 seconds" })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Minimize player" }));
+    expect(screen.getByRole("button", { name: "Expand player" })).toBeInTheDocument();
   });
 
-  it("puts speed, replay and repeat on the surface rather than behind a disclosure", async () => {
+  it("puts relevant speed and repeat options on the expanded surface", async () => {
     vi.stubGlobal("Audio", FakeAudio);
     render(
       <AudioProvider>
@@ -194,6 +198,7 @@ describe("AudioProvider integration", () => {
     );
     fireEvent.click(screen.getByRole("button", { name: "Start repeat" }));
     expect(await screen.findByRole("region", { name: "Audio player" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
 
     // Where the reader is in a prescribed repetition, said once.
     expect(screen.getByText("Repetition 1 / 3")).toBeInTheDocument();
@@ -210,6 +215,38 @@ describe("AudioProvider integration", () => {
     fireEvent.click(repeat);
     expect(screen.getByRole("button", { name: "Repeat" })).toHaveAttribute("aria-pressed", "false");
 
-    expect(screen.getByRole("button", { name: "Replay this surah" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Replay/ })).not.toBeInTheDocument();
+  });
+
+  it("opens a mobile volume control and persists its accessible level", async () => {
+    vi.stubGlobal("Audio", FakeAudio);
+    render(
+      <AudioProvider>
+        <Harness />
+      </AudioProvider>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Start" }));
+    fireEvent.click(await screen.findByRole("button", { name: /Mute audio/ }));
+
+    const volume = screen.getByRole("slider", { name: "Volume" });
+    expect(volume).toHaveAttribute("aria-orientation", "vertical");
+    fireEvent.change(volume, { target: { value: "0.4" } });
+
+    expect(screen.getByRole("button", { name: /Volume 40%/ })).toBeInTheDocument();
+    expect(window.localStorage.getItem("azkar.audio-preferences.v1")).toContain('"volume":0.4');
+  });
+
+  it("fills the Arabic timeline from the right without changing media time", async () => {
+    vi.stubGlobal("Audio", FakeAudio);
+    render(
+      <AudioProvider>
+        <Harness language="ar" />
+      </AudioProvider>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Start" }));
+
+    const timeline = await screen.findByRole("slider", { name: "تقديم أو تأخير الصوت" });
+    expect(timeline.getAttribute("style")).toContain("to left");
+    expect(timeline).toHaveValue("0");
   });
 });

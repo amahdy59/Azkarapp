@@ -1,5 +1,17 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
-import { ChevronDown, ChevronUp, Headphones, Pause, Play, RotateCcw, SkipBack, SkipForward, X } from "./icons";
+import {
+  ChevronDown,
+  ChevronUp,
+  Headphones,
+  Pause,
+  Play,
+  RotateCcw,
+  SkipBack,
+  SkipForward,
+  Volume2,
+  VolumeX,
+  X,
+} from "./icons";
 import type { AppLanguage } from "../types";
 import type { AudioController } from "../audio/AudioProvider";
 import { formatNumerals } from "../formatting";
@@ -15,11 +27,11 @@ const COPY = {
     next: "Next item",
     jumpBack10: "Rewind 10 seconds",
     jumpForward10: "Forward 10 seconds",
-    replayQuran: "Replay this surah",
-    replayDua: "Replay this zikr",
-    replay: "Replay this item",
     stop: "Stop audio and close player",
     seek: "Seek audio",
+    volume: "Volume",
+    mute: "Mute audio",
+    unmute: "Unmute audio",
     options: "Audio options",
     speed: "Playback speed",
     voice: "Voice or reciter",
@@ -35,13 +47,11 @@ const COPY = {
     queueCompleted: "Audio queue completed",
     expand: "Expand player",
     collapse: "Minimize player",
-    customRecording: "Custom recording",
     recitationBy: "Recitation by",
     previousShort: "Previous",
     nextShort: "Next",
     back10Short: "Rewind",
     forward10Short: "Forward",
-    replayShort: "Replay",
     track: "Track",
     repetitionChip: "Repetition",
     speedShort: "Speed",
@@ -60,11 +70,11 @@ const COPY = {
     next: "الذكر التالي",
     jumpBack10: "تأخير ١٠ ثوانٍ",
     jumpForward10: "تقديم ١٠ ثوانٍ",
-    replayQuran: "إعادة تشغيل السورة",
-    replayDua: "إعادة تشغيل هذا الذكر",
-    replay: "إعادة تشغيل هذا المقطع",
     stop: "إيقاف الصوت وإغلاق المشغل",
     seek: "تقديم أو تأخير الصوت",
+    volume: "مستوى الصوت",
+    mute: "كتم الصوت",
+    unmute: "إلغاء كتم الصوت",
     options: "خيارات الصوت",
     speed: "سرعة التشغيل",
     voice: "الصوت أو القارئ",
@@ -80,13 +90,11 @@ const COPY = {
     queueCompleted: "اكتملت قائمة الصوت",
     expand: "توسيع المشغل",
     collapse: "تصغير المشغل",
-    customRecording: "تسجيل خاص",
     recitationBy: "تلاوة القارئ",
     previousShort: "السابق",
     nextShort: "التالي",
     back10Short: "تأخير",
     forward10Short: "تقديم",
-    replayShort: "إعادة",
     track: "المقطع",
     repetitionChip: "تكرار",
     speedShort: "السرعة",
@@ -271,6 +279,96 @@ const PILL_CLASS =
 const PILL_IDLE = "border-border text-foreground hover:bg-muted";
 const PILL_ACTIVE = "border-primary bg-primary/15 text-primary";
 
+function progressBackground(progress: number, direction: "rtl" | "ltr") {
+  return `linear-gradient(to ${direction === "rtl" ? "left" : "right"}, var(--primary) ${progress}%, var(--muted) ${progress}%)`;
+}
+
+function VolumeControl({
+  controller,
+  language,
+  copy,
+}: {
+  controller: AudioController;
+  language: AppLanguage;
+  copy: (typeof COPY)[AppLanguage];
+}) {
+  const supportsHover = useMediaQuery("(hover: hover) and (pointer: fine)");
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const level = controller.preferences.muted ? 0 : controller.preferences.volume;
+  const percentage = Math.round(level * 100);
+
+  useEffect(() => {
+    if (!open) return;
+    const closeOutside = (event: PointerEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
+    };
+    document.addEventListener("pointerdown", closeOutside);
+    return () => document.removeEventListener("pointerdown", closeOutside);
+  }, [open]);
+
+  return (
+    <div
+      ref={rootRef}
+      role="toolbar"
+      aria-label={copy.volume}
+      className="relative flex shrink-0"
+      onPointerEnter={() => supportsHover && setOpen(true)}
+      onPointerLeave={() => supportsHover && setOpen(false)}
+      onFocusCapture={() => supportsHover && setOpen(true)}
+      onBlurCapture={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false);
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "Escape") {
+          event.stopPropagation();
+          setOpen(false);
+        }
+      }}
+    >
+      <button
+        type="button"
+        aria-label={`${controller.preferences.muted ? copy.unmute : copy.mute} · ${copy.volume} ${formatNumerals(percentage, language)}%`}
+        aria-expanded={open}
+        aria-controls="audio-volume-control"
+        onClick={() => (supportsHover ? controller.toggleMuted() : setOpen((value) => !value))}
+        className="flex size-11 items-center justify-center rounded-full text-muted-foreground transition-[background-color,color,transform] duration-fast hover:bg-muted hover:text-foreground active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+      >
+        {controller.preferences.muted || controller.preferences.volume === 0 ? (
+          <VolumeX size={20} aria-hidden="true" />
+        ) : (
+          <Volume2 size={20} aria-hidden="true" />
+        )}
+      </button>
+
+      {open && (
+        <div
+          id="audio-volume-control"
+          className="absolute bottom-full end-1 z-10 mb-2 flex h-40 w-14 flex-col items-center justify-center rounded-2xl border border-border bg-card/98 py-3 shadow-overlay backdrop-blur-xl"
+        >
+          <input
+            type="range"
+            min={0}
+            max={1}
+            step={0.05}
+            value={level}
+            onChange={(event) => controller.setVolume(Number(event.currentTarget.value))}
+            aria-label={copy.volume}
+            aria-orientation="vertical"
+            aria-valuetext={`${formatNumerals(percentage, language)}%`}
+            style={{
+              writingMode: "vertical-lr",
+              direction: "rtl",
+              background: `linear-gradient(to top, var(--primary) ${percentage}%, var(--muted) ${percentage}%)`,
+            }}
+            className="h-28 w-2 cursor-pointer appearance-none rounded-full accent-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function FloatingAudioPlayer({
   controller,
   language,
@@ -292,7 +390,7 @@ export function FloatingAudioPlayer({
   /* A tablet or desktop has room for the player beside the page. */
   const hasRoomBesideReading = useMediaQuery("(min-width: 768px)");
   const coversReading = overReadingSurface && !hasRoomBesideReading;
-  const [isMinimized, setIsMinimized] = useState(coversReading);
+  const [isMinimized, setIsMinimized] = useState(true);
   const wasCoveringReading = useRef(coversReading);
   const [showOptions, setShowOptions] = useState(false);
 
@@ -302,6 +400,11 @@ export function FloatingAudioPlayer({
     if (coversReading && !wasCoveringReading.current) setIsMinimized(true);
     wasCoveringReading.current = coversReading;
   }, [coversReading]);
+
+  useEffect(() => {
+    // Recovery actions must never be hidden behind the compact player.
+    if (state.status === "error") setIsMinimized(false);
+  }, [state.status]);
 
   const jumpSeconds = useCallback(
     (delta: number) => {
@@ -350,16 +453,12 @@ export function FloatingAudioPlayer({
       ? `${formatNumerals(state.repetitionIndex + 1, language)} / ${formatNumerals(currentEntry.repetitions, language)}`
       : null;
   const title = language === "ar" ? currentEntry.titleArabic : currentEntry.titleEnglish;
-  const isQuran = currentEntry.contentKind === "quran";
-  const replayLabel = isQuran ? copy.replayQuran : copy.replayDua;
-
   const voiceId = state.currentVoiceId ?? currentEntry.defaultVoiceId;
   const reciterDisplayName = getAudioVoiceName(voiceId, language) ?? currentSegment?.voiceName ?? voiceId;
 
-  const attributionText =
-    language === "ar"
-      ? `${copy.recitationBy} ${reciterDisplayName} · ${copy.customRecording}`
-      : `${copy.recitationBy} ${reciterDisplayName} · ${copy.customRecording}`;
+  const attributionText = currentSegment
+    ? `${currentSegment.sourceName} · ${currentSegment.attribution}`
+    : `${copy.recitationBy} ${reciterDisplayName}`;
 
   const liveMessage =
     state.status === "error"
@@ -391,7 +490,8 @@ export function FloatingAudioPlayer({
       <section
         aria-label={copy.region}
         dir={direction}
-        className="fixed bottom-16 sm:bottom-6 inset-x-0 mx-auto z-40 w-[calc(100%-1rem)] sm:max-w-lg rounded-2xl border border-primary/30 bg-card/95 px-2.5 py-2 shadow-overlay backdrop-blur-xl dark:border-white/15"
+        data-variant="compact"
+        className="floating-audio-player floating-audio-player--compact fixed z-40 rounded-2xl border border-primary/30 bg-card/95 px-2.5 py-2 shadow-overlay backdrop-blur-xl dark:border-white/15"
       >
         <div className="sr-only" aria-live="polite" aria-atomic="true">
           {liveMessage}
@@ -400,8 +500,8 @@ export function FloatingAudioPlayer({
         {/* How far into the recitation, on the card's own top edge. */}
         <div className="absolute inset-x-0 top-0 h-1 overflow-hidden rounded-t-2xl bg-muted" aria-hidden="true">
           <div
-            className="h-full bg-primary transition-[width] duration-fast"
-            style={{ width: `${progressPercent}%` }}
+            className="absolute top-0 h-full bg-primary transition-[width] duration-fast"
+            style={{ width: `${progressPercent}%`, insetInlineStart: 0 }}
           />
         </div>
 
@@ -415,29 +515,54 @@ export function FloatingAudioPlayer({
             <ChevronUp size={20} aria-hidden="true" />
           </button>
 
-          <button
-            type="button"
-            onClick={() => setIsMinimized(false)}
-            aria-label={`${title} · ${copy.expand}`}
-            className="flex min-w-0 flex-1 items-center gap-2 rounded-xl px-1 text-start focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-          >
+          <div className="flex min-w-0 flex-1 items-center gap-2 px-1 text-start">
             <WaveBars playing={isPlaying} />
             <span className="min-w-0 flex-1">
               <span className="block truncate text-label font-black text-foreground">{title}</span>
               <span className="block truncate text-micro font-semibold text-muted-foreground">
                 {reciterDisplayName}
-                {" · "}
-                {/* The clock is Latin-ordered whatever the interface language,
-                    so only the times take an explicit direction — leaving the
-                    separator in the sentence it belongs to. */}
-                <span dir="ltr" className="tabular-nums">
-                  {formatTime(state.currentTime, language)} / {formatTime(state.duration, language)}
+                <span className="md:hidden">
+                  {" · "}
+                  <span dir="ltr" className="tabular-nums">
+                    {formatTime(state.currentTime, language)} / {formatTime(state.duration, language)}
+                  </span>
                 </span>
               </span>
             </span>
-          </button>
+          </div>
+
+          <div className="hidden min-w-32 flex-1 items-center gap-2 md:flex" dir={direction}>
+            <span className="w-10 text-center text-micro font-bold tabular-nums text-muted-foreground">
+              {formatTime(state.currentTime, language)}
+            </span>
+            <input
+              type="range"
+              min={0}
+              max={Math.max(0, state.duration)}
+              step={1}
+              value={Math.min(state.currentTime, state.duration || 0)}
+              disabled={state.duration <= 0}
+              onChange={(event) => controller.seek(Number(event.currentTarget.value))}
+              aria-label={copy.seek}
+              aria-valuetext={accessibleTime(state.currentTime, state.duration, language)}
+              style={{ background: progressBackground(progressPercent, direction) }}
+              className="h-2 min-w-0 flex-1 cursor-pointer appearance-none rounded-full accent-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            />
+            <span className="w-10 text-center text-micro font-bold tabular-nums text-muted-foreground">
+              {formatTime(state.duration, language)}
+            </span>
+          </div>
 
           <div className="flex shrink-0 items-center gap-1">
+            <button
+              type="button"
+              onClick={() => jumpSeconds(-10)}
+              disabled={state.duration <= 0}
+              aria-label={copy.jumpBack10}
+              className="hidden size-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-30 md:flex"
+            >
+              <JumpBack10Icon className="size-5" />
+            </button>
             <button
               type="button"
               onClick={isPlaying ? controller.pause : controller.play}
@@ -446,6 +571,16 @@ export function FloatingAudioPlayer({
             >
               {isPlaying ? <Pause size={22} aria-hidden="true" /> : <Play size={22} aria-hidden="true" />}
             </button>
+            <button
+              type="button"
+              onClick={() => jumpSeconds(10)}
+              disabled={state.duration <= 0}
+              aria-label={copy.jumpForward10}
+              className="hidden size-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-30 md:flex"
+            >
+              <JumpForward10Icon className="size-5" />
+            </button>
+            <VolumeControl controller={controller} language={language} copy={copy} />
             <button
               type="button"
               onClick={controller.stop}
@@ -464,7 +599,8 @@ export function FloatingAudioPlayer({
     <section
       aria-label={copy.region}
       dir={direction}
-      className="fixed bottom-16 sm:bottom-6 inset-x-0 mx-auto z-40 w-[calc(100%-1rem)] sm:max-w-lg rounded-3xl border border-primary/20 bg-card/95 px-4 pb-4 pt-2 sm:px-5 sm:pb-5 shadow-overlay backdrop-blur-xl dark:border-white/10"
+      data-variant="expanded"
+      className="floating-audio-player floating-audio-player--expanded fixed z-40 overflow-y-auto rounded-t-3xl border border-primary/20 bg-card/95 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2 shadow-overlay backdrop-blur-xl sm:max-w-2xl sm:rounded-3xl sm:px-5 sm:pb-5 lg:max-w-4xl dark:border-white/10"
     >
       <div className="sr-only" aria-live="polite" aria-atomic="true">
         {liveMessage}
@@ -509,7 +645,7 @@ export function FloatingAudioPlayer({
       </div>
 
       {/* Timeline / Scrub Bar with Generous 44px Hit Target */}
-      <div className="mt-4 flex items-center gap-3" dir="ltr">
+      <div className="mt-4 flex items-center gap-3" dir={direction}>
         <span className="w-11 text-center text-xs font-bold tabular-nums text-muted-foreground">
           {formatTime(state.currentTime, language)}
         </span>
@@ -528,7 +664,7 @@ export function FloatingAudioPlayer({
                stylesheet: a range input needs one gradient per browser engine
                to fill, and the value is already in hand. */
             style={{
-              background: `linear-gradient(to right, var(--primary) ${progressPercent}%, var(--muted) ${progressPercent}%)`,
+              background: progressBackground(progressPercent, direction),
             }}
             className="w-full h-2 rounded-full accent-primary appearance-none cursor-pointer focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           />
@@ -620,19 +756,9 @@ export function FloatingAudioPlayer({
         </div>
       )}
 
-      {/* The options that exist, on one row, rather than behind a disclosure
-          that hid the repeat toggle three taps from the reader who wants it. */}
+      {/* Only contextual options remain here. Restart is already available by
+          moving the timeline to its start and Play restarts an ended item. */}
       <div className="mt-4 flex flex-wrap items-center justify-center gap-2 border-t border-border/70 pt-4">
-        <button
-          type="button"
-          onClick={controller.replay}
-          aria-label={replayLabel}
-          className={`${PILL_CLASS} ${PILL_IDLE}`}
-        >
-          <RotateCcw size={16} aria-hidden="true" />
-          {copy.replayShort}
-        </button>
-
         {canRepeat && (
           <button
             type="button"
@@ -655,6 +781,8 @@ export function FloatingAudioPlayer({
             {formatNumerals(state.playbackRate, language)}×
           </span>
         </button>
+
+        <VolumeControl controller={controller} language={language} copy={copy} />
 
         {currentEntry.availableVoiceIds.length > 1 && (
           <button

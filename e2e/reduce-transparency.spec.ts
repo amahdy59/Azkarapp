@@ -86,8 +86,18 @@ test("a card over the hero photograph goes opaque, not merely unblurred", async 
   const glass = page.locator(".hero-glass").first();
   await glass.waitFor();
 
-  const translucent = await glass.evaluate((element) => getComputedStyle(element).backgroundColor);
-  expect(translucent, "the hero card should be translucent by default").toMatch(/rgba\(.*0?\.\d+\)/);
+  const material = await glass.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return {
+      backgroundColor: style.backgroundColor,
+      backgroundImage: style.backgroundImage,
+      backdropFilter: style.backdropFilter,
+    };
+  });
+  expect(material.backgroundColor, "the hero card should be translucent by default").toMatch(/rgba\(.*0?\.\d+\)/);
+  expect(material.backgroundImage).toContain("linear-gradient");
+  expect(material.backdropFilter).toContain("blur(18px)");
+  expect(material.backdropFilter).toContain("saturate(1.35)");
 
   await page.evaluate(() => document.documentElement.classList.add("reduce-transparency"));
 

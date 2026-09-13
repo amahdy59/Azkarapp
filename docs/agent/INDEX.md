@@ -70,6 +70,8 @@ Run the phase files in numerical order unless the decision log explicitly record
 | 27    | `phases/PHASE_27_PRODUCTION_VISUAL_AUDIT.md`           | Fresh production visual audit across responsive matrix                  |
 | 28    | `phases/PHASE_28_BEFORE_SLEEP_AUDIO.md`                | Verified owner-supplied audio for exact before-sleep content            |
 | 29    | `phases/PHASE_29_CORE_SLEEP_SAJDAH.md`                 | As-Sajdah in both sleep modes with verified audio and honest recovery   |
+| 30    | `phases/PHASE_30_HOME_GLASS_AND_PRAYER_WIDTH.md`       | Visible Home glass depth and half-width tablet/desktop prayer detail    |
+| 31    | `phases/PHASE_31_ADAPTIVE_AUDIO_PLAYER.md`             | Responsive audio dock, RTL timeline, and input-aware volume control     |
 
 Phases 15–20 derive from `docs/audits/DESIGN_CONSISTENCY_AUDIT.md` (2026-08-15) and are
 recorded in `DECISION_LOG.md` as DEC-064. Phase 15 is upstream of 16, 17 and 19 — its root

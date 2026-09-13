@@ -3567,3 +3567,19 @@ null` shape, so a record written before this change still loads and still
 - **Audio integrity:** record the exact byte size, duration, SHA-256, transcript fingerprint, source, and review state; publish it under the established immutable before-sleep audio path and require a byte-matching production object.
 - **User experience:** readers who choose the shorter routine encounter As-Sajdah in the existing Qur'an-protection section. Audio source-load failures use localized recovery copy and do not claim that a valid MP3 codec is unsupported.
 - **Tests/evidence required:** focused routine-mode membership, content integrity, Mushaf-page, audio-manifest, localized-error, full local, deployment, and production checks.
+
+## DEC-171 — Home glass keeps visible depth and prayer detail uses half the wide canvas
+
+- **Decision:** strengthen the shared Home glass material with a translucent highlight gradient, edge highlight, blur, and restrained saturation. Keep expanded prayer detail full-width on phones, then place it in one of two equal tracks from the tablet tier onward.
+- **Alignment:** the detail uses the track containing the selected prayer summary: Fajr through Asr use the first logical track and Maghrib through Isha use the second. Logical grid placement mirrors with RTL without reversing DOM or prayer order.
+- **Why:** a uniform black wash over the photograph's darkest region appeared opaque on large cards, while a full-dashboard prayer panel created excessive empty line length. Material depth and bounded measure solve those separate problems without nested cards or duplicated controls.
+- **Accessibility and performance:** the existing opaque reduced-transparency fallback remains authoritative. The blur radius stays at 18px and `contain: paint` remains in place; the change adds no image, runtime dependency, or interaction.
+- **Tests/evidence required:** computed glass material, exact half-track geometry at 834px and 1440px, RTL alignment, reduced-transparency fallback, responsive screenshots, full local gates, and production verification.
+
+## DEC-172 — One adaptive audio player follows screen, direction, and input method
+
+- **Decision:** keep the existing shared controller and floating player, but start playback in its compact form and adapt that form to the available app canvas. Expanded playback is a bottom sheet on phones, a bounded tablet panel, and a wider desktop panel; neither form may cover the desktop rail or sidebar.
+- **Direction:** the timeline, played fill, time endpoints, transport order, and arrow-key seeking follow the interface direction. Arabic therefore progresses from right to left without reversing media time or DOM semantics.
+- **Volume:** persist normalized volume and muted state beside playback rate. Fine-pointer devices reveal the vertical slider on hover or keyboard focus and use speaker activation for mute; touch devices reveal it on activation. The slider retains native semantics, vertical orientation, percentage value text, and visible focus.
+- **Focus:** Play/Pause remains the dominant action. Compact desktop adds scrubbing and ten-second seeking only when space permits; expanded options retain only repeat, speed, and a genuinely available reciter choice. Redundant replay and generic recording labels are removed, while exact source attribution remains visible.
+- **Tests/evidence required:** controller persistence, hover/touch/keyboard volume interaction, compact-first behavior, main-canvas geometry, RTL timeline fill and keyboard seeking, 320/834/1440 screenshots, cross-browser smoke, full local gates, and production verification.

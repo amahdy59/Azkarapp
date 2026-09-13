@@ -16,9 +16,10 @@ Automated tests cover exact/no-fallback lookup, Arabic fingerprints, canonical r
 
 ## Manual checklist
 
-- Use keyboard only: start, play/pause, previous/next, replay, seek with arrow keys, speed/voice, Retry/Skip/Stop.
+- Use keyboard only: start, expand/minimize, play/pause, previous/next, seek with arrow keys, speed/voice, volume/mute, Retry/Skip/Stop.
+- Verify the volume slider opens on hover and keyboard focus with a fine pointer, opens on click with touch input, reports a vertical orientation and percentage, and restores its persisted level.
 - Verify visible focus and 44px targets at narrow width, 200%, and 400% zoom.
-- Verify English LTR and Arabic RTL without horizontal overflow.
+- Verify English fills timeline progress left-to-right and Arabic fills it right-to-left without horizontal overflow.
 - With a screen reader, confirm dynamic Play/Pause names and polite track/error/repetition/queue announcements; current time must not announce every second.
 - Test offline with a fully downloaded item and an uncached item.
 - Switch category and Core/Complete during playback; the audio title/text identity and queue must not change.

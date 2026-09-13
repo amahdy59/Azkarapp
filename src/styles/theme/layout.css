@@ -80,6 +80,55 @@
   }
 }
 
+/* The one audio player follows the same responsive shell as the screen it
+   controls. Compact/mobile layouts clear the bottom navigation; expanded
+   layouts use the main canvas and never cover the rail or sidebar. */
+.floating-audio-player {
+  inset-inline: 0.5rem;
+  bottom: calc(4.5rem + env(safe-area-inset-bottom) + 0.5rem);
+}
+
+.floating-audio-player--expanded {
+  inset-inline: 0;
+  margin-inline: auto;
+  max-height: calc(100dvh - 5.5rem);
+}
+
+.app-shell.app-shell--navigation-hidden .floating-audio-player {
+  bottom: max(0.5rem, env(safe-area-inset-bottom));
+}
+
+.app-shell.app-shell--navigation-hidden .floating-audio-player--expanded {
+  max-height: calc(100dvh - 1rem);
+}
+
+@media (min-width: 37.5rem) {
+  .floating-audio-player {
+    inset-inline: 0.75rem;
+  }
+}
+
+@media (min-width: 56.25rem) {
+  .floating-audio-player {
+    bottom: 0.75rem;
+    inset-inline-end: 0.75rem;
+  }
+
+  .floating-audio-player--expanded {
+    max-height: calc(100dvh - 1.5rem);
+  }
+
+  .app-shell:not(.app-shell--navigation-hidden) .floating-audio-player {
+    inset-inline-start: calc(var(--nav-rail-width) + 0.75rem);
+  }
+}
+
+@media (min-width: 75rem) {
+  .app-shell:not(.app-shell--navigation-hidden) .floating-audio-player {
+    inset-inline-start: calc(var(--nav-sidebar-width) + 0.75rem);
+  }
+}
+
 /* Pre-app and authentication views do not render navigation, so their grid
    must not reserve an empty desktop rail or sidebar column. */
 @media (min-width: 56.25rem) {
@@ -243,9 +292,9 @@
    completion card, the routine card and the wird card cannot drift apart —
    they sit side by side and any difference between them shows. */
 .hero-glass {
-  background-color: rgb(0 0 0 / 0.34);
-  border: 1px solid rgb(255 255 255 / 0.1);
-  box-shadow: 0 8px 32px -8px rgb(0 0 0 / 0.4);
+  background-color: rgb(2 6 23 / 0.3);
+  background-image: linear-gradient(135deg, rgb(255 255 255 / 0.13), rgb(255 255 255 / 0.035) 38%, rgb(0 0 0 / 0.16));
+  border: 1px solid rgb(255 255 255 / 0.16);
   /* 18px, not 40px. Backdrop-filter cost scales with radius and area, and
      these are large cards over a photograph — three of them at 40px made
      scrolling the hero visibly sluggish. The extra opacity below carries the
@@ -254,10 +303,11 @@
 
      `contain: paint` stops the browser re-sampling the backdrop for anything
      outside each card's own box. */
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px) saturate(135%);
   contain: paint;
-  box-shadow: var(--ds-shadow-overlay);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.13),
+    var(--ds-shadow-overlay);
 }
 
 /* The selected prayer joins the stable five-prayer strip to its expanded

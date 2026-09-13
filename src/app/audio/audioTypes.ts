@@ -132,6 +132,8 @@ export interface AudioPreferences {
   quranReciterId: string;
   duaVoiceId: string;
   playbackRate: number;
+  volume: number;
+  muted: boolean;
   continueOnNavigation: boolean;
 }
 

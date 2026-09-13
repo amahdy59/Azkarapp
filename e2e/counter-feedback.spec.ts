@@ -67,7 +67,9 @@ test("the Home Wird keeps semantic order while mirroring Arabic placement and ex
   }
 });
 
-test("desktop Home gives the expanded prayer, companion, and Wird the available width", async ({ page }) => {
+test("tablet and desktop Home keep prayer detail to the selected half while other rows use their space", async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.clock.setFixedTime(new Date("2026-09-05T14:00:00+03:00"));
   await openReturningGuest(page, "ar", { textSize: "large" });
@@ -88,18 +90,31 @@ test("desktop Home gives the expanded prayer, companion, and Wird the available 
   await expect(prayerSummary.locator('article[data-density="summary"]')).toHaveCount(5);
   await expect(prayerSummary.getByRole("checkbox")).toHaveCount(0);
 
-  const [gridBox, prayerDetailBox, primaryBox, companionBox, wirdBox] = await Promise.all(
-    [grid, prayerDetail, primary, companion, wird].map((locator) => locator.boundingBox()),
+  const [gridBox, prayerDetailBox, primaryBox, companionBox, wirdBox, prayerSummaryBox] = await Promise.all(
+    [grid, prayerDetail, primary, companion, wird, prayerSummary].map((locator) => locator.boundingBox()),
   );
-  expect(gridBox && prayerDetailBox && primaryBox && companionBox && wirdBox).toBeTruthy();
-  if (gridBox && prayerDetailBox && primaryBox && companionBox && wirdBox) {
-    expect(prayerDetailBox.width).toBeGreaterThanOrEqual(gridBox.width - 2);
+  expect(gridBox && prayerDetailBox && primaryBox && companionBox && wirdBox && prayerSummaryBox).toBeTruthy();
+  if (gridBox && prayerDetailBox && primaryBox && companionBox && wirdBox && prayerSummaryBox) {
+    expect(Math.abs(prayerDetailBox.width - (prayerSummaryBox.width - 20) / 2)).toBeLessThanOrEqual(2);
+    expect(prayerDetailBox.x + prayerDetailBox.width).toBeCloseTo(prayerSummaryBox.x + prayerSummaryBox.width, 0);
     expect(primaryBox.y).toBeGreaterThanOrEqual(prayerDetailBox.y + prayerDetailBox.height + 12);
     expect(Math.abs(primaryBox.width - companionBox.width)).toBeLessThanOrEqual(2);
     expect(Math.abs(primaryBox.y - companionBox.y)).toBeLessThanOrEqual(2);
     expect(companionBox.height).toBeLessThan(primaryBox.height);
     expect(wirdBox.y).toBeGreaterThanOrEqual(primaryBox.y + primaryBox.height + 12);
     expect(wirdBox.width).toBeGreaterThanOrEqual(gridBox.width - 2);
+  }
+
+  await page.setViewportSize({ width: 834, height: 900 });
+  await page.waitForFunction(() => window.innerWidth === 834);
+  const [tabletPrayerBox, tabletSummaryBox] = await Promise.all([
+    prayerDetail.boundingBox(),
+    prayerSummary.boundingBox(),
+  ]);
+  expect(tabletPrayerBox && tabletSummaryBox).toBeTruthy();
+  if (tabletPrayerBox && tabletSummaryBox) {
+    expect(Math.abs(tabletPrayerBox.width - (tabletSummaryBox.width - 16) / 2)).toBeLessThanOrEqual(2);
+    expect(tabletPrayerBox.x + tabletPrayerBox.width).toBeCloseTo(tabletSummaryBox.x + tabletSummaryBox.width, 0);
   }
 
   const routineTiles = page.getByTestId("today-garden-card").getByRole("button", { name: / - (مكتملة|غير مكتملة)$/ });
@@ -159,6 +174,16 @@ test("wide Home keeps navigation exposed, contains its scene, and uses glass for
   for (const cards of glassCards) {
     await expect(cards.first()).toHaveClass(/hero-glass/);
   }
+
+  const material = await glassCards[1]!.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return {
+      backgroundImage: style.backgroundImage,
+      boxShadow: style.boxShadow,
+    };
+  });
+  expect(material.backgroundImage).toContain("linear-gradient");
+  expect(material.boxShadow).not.toBe("none");
 });
 
 test("Home prayer strip keeps all five prayers legible without page overflow", async ({ page }) => {

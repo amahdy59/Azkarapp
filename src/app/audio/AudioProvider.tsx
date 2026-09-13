@@ -34,6 +34,8 @@ export interface AudioController {
   retry: () => void;
   skip: () => void;
   seek: (seconds: number) => void;
+  setVolume: (volume: number) => void;
+  toggleMuted: () => void;
   setPlaybackRate: (rate: number) => void;
   setVoice: (voiceId: string) => void;
   setPlaybackMode: (mode: PlaybackMode) => void;
@@ -73,7 +75,11 @@ export function AudioProvider({
   }, []);
 
   const getAudio = useCallback(() => {
-    audioRef.current ??= new Audio();
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+      audioRef.current.volume = preferencesRef.current.volume;
+      audioRef.current.muted = preferencesRef.current.muted;
+    }
     return audioRef.current;
   }, []);
 
@@ -349,6 +355,27 @@ export function AudioProvider({
     audio.currentTime = Math.max(0, Math.min(seconds, Number.isFinite(audio.duration) ? audio.duration : seconds));
   }, []);
 
+  const setVolume = useCallback(
+    (volume: number) => {
+      const safeVolume = Math.max(0, Math.min(1, volume));
+      const muted = safeVolume === 0;
+      const audio = getAudio();
+      audio.volume = safeVolume;
+      audio.muted = muted;
+      updatePreferences({ ...preferencesRef.current, volume: safeVolume, muted });
+    },
+    [getAudio, updatePreferences],
+  );
+
+  const toggleMuted = useCallback(() => {
+    const muted = !preferencesRef.current.muted;
+    const volume = !muted && preferencesRef.current.volume === 0 ? 0.5 : preferencesRef.current.volume;
+    const audio = getAudio();
+    audio.muted = muted;
+    audio.volume = volume;
+    updatePreferences({ ...preferencesRef.current, volume, muted });
+  }, [getAudio, updatePreferences]);
+
   useEffect(() => {
     if (!("mediaSession" in navigator)) return;
     const setHandler = (action: MediaSessionAction, handler: MediaSessionActionHandler) => {
@@ -445,6 +472,8 @@ export function AudioProvider({
       retry,
       skip,
       seek,
+      setVolume,
+      toggleMuted,
       setPlaybackRate,
       setVoice,
       setPlaybackMode,
@@ -460,6 +489,7 @@ export function AudioProvider({
       replay,
       retry,
       seek,
+      setVolume,
       setPlaybackMode,
       setPlaybackRate,
       setVoice,
@@ -467,6 +497,7 @@ export function AudioProvider({
       startPlan,
       state,
       stop,
+      toggleMuted,
     ],
   );
 
