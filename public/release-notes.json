@@ -1,13 +1,15 @@
 {
-  "release": "2026-09-13-audio-fix",
+  "release": "2026-09-13-ui-improvements",
   "en": [
-    "Fixed an issue that prevented all audio recordings from loading in the web application.",
-    "Surah As-Sajdah is now included in the shorter before-sleep routine.",
-    "Arabic audio failures now show a clear retry message instead of an incorrect unsupported-format warning."
+    "Shrouk time is now shown directly within the prayer times panel to clarify the Fajr window.",
+    "Long Surahs (like Al-Kahf) now provide clear options to listen, read from the Mushaf, or read externally.",
+    "The desktop reader layout has been improved, bringing the counter closer to keyboard shortcuts and removing gaps.",
+    "The streak card layout has been simplified and decluttered by removing icons."
   ],
   "ar": [
-    "تم إصلاح مشكلة كانت تمنع تشغيل جميع التسجيلات الصوتية في التطبيق.",
-    "أصبحت سورة السجدة ضمن المجموعة المختصرة من أذكار النوم.",
-    "تظهر رسائل خطأ الصوت الآن بعبارة عربية واضحة لإعادة المحاولة بدلاً من تنبيه خاطئ عن صيغة غير مدعومة."
+    "يظهر وقت الشروق الآن مباشرة داخل بطاقة الفجر لتوضيح الوقت المتاح للصلاة.",
+    "الصفحات الخاصة بالسّور الطويلة (مثل الكهف) تعرض الآن ثلاث خيارات واضحة (استماع، قراءة من المصحف، قراءة خارجية).",
+    "تم تحسين تصميم شاشة الأذكار على الأجهزة المكتبية، حيث أصبح العداد أقرب لاختصارات لوحة المفاتيح مع إصلاح الفراغات.",
+    "تم تبسيط تصميم بطاقة تتبع الأيام المتتالية بإزالة الأيقونات لجعلها أكثر وضوحاً."
   ]
 }
