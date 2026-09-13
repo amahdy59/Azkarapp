@@ -26,21 +26,10 @@ import { trackedLocation } from "../prayerMoment";
  * gold no matter how it is set.
  */
 
-const CARD_PRAYER_ORDER = [
-  "fajr",
-  "shrouk",
-  "dhuhr",
-  "asr",
-  "maghrib",
-  "isha",
-] as const satisfies readonly CardPrayerName[];
 const PRAYER_ORDER = ["fajr", "dhuhr", "asr", "maghrib", "isha"] as const satisfies readonly PrayerName[];
 
-export type CardPrayerName = PrayerName | "shrouk";
-
-const PRAYER_ICON: Record<CardPrayerName, typeof Sun> = {
+const PRAYER_ICON: Record<PrayerName, typeof Sun> = {
   fajr: Sunrise,
-  shrouk: Sun,
   dhuhr: Sun,
   asr: CloudSun,
   maghrib: Sunset,
@@ -50,8 +39,10 @@ const PRAYER_ICON: Record<CardPrayerName, typeof Sun> = {
 export type PrayerTemporalState = "past" | "current" | "next" | "upcoming";
 
 export interface PrayerCardModel {
-  prayer: CardPrayerName;
+  prayer: PrayerName;
   time: string;
+  /** Sunrise closes the Fajr window; it is context, not a trackable prayer. */
+  shroukTime?: string;
   state: PrayerTemporalState;
   isOpenable: boolean;
   isRecordable: boolean;
@@ -231,7 +222,7 @@ function PrayerCard({
           type="button"
           onClick={() => {
             if (!isOpenable) return;
-            onOpen?.(selected ? null : (prayer as PrayerName));
+            onOpen?.(selected ? null : prayer);
           }}
           disabled={!onOpen || !isOpenable}
           aria-expanded={selected}
@@ -274,6 +265,13 @@ function PrayerCard({
           >
             {formatPrayerTimeLabel(time, language === "ar")}
           </p>
+          {prayer === "fajr" && model.shroukTime && (
+            <p
+              className={`mt-0.5 hidden text-micro font-bold sm:block ${onGlass ? "text-on-media-muted" : "text-muted-foreground"}`}
+            >
+              {t(language, "notifications.shrouk")}: {formatPrayerTimeLabel(model.shroukTime, language === "ar")}
+            </p>
+          )}
           {countdown && state === "next" && (
             <span
               data-testid="next-prayer"
@@ -323,7 +321,7 @@ function PrayerCard({
           adding a separate "open" control the brief rules out. */}
       <button
         type="button"
-        onClick={() => onOpen?.(prayer as PrayerName)}
+        onClick={() => onOpen?.(prayer)}
         disabled={!onOpen}
         /* It opens the prayer, not its adhkar — those are now one card
            inside it. The old name told a screen-reader user the wrong
@@ -379,6 +377,13 @@ function PrayerCard({
         >
           {formatPrayerTimeLabel(time, language === "ar")}
         </p>
+        {prayer === "fajr" && model.shroukTime && (
+          <p
+            className={`mt-1 hidden text-xs font-bold sm:block ${onGlass ? "text-on-media-muted" : "text-muted-foreground"}`}
+          >
+            {t(language, "notifications.shrouk")}: {formatPrayerTimeLabel(model.shroukTime, language === "ar")}
+          </p>
+        )}
       </button>
 
       {/* Section 2 — temporal status. Fixed height so the divider below never
@@ -432,7 +437,7 @@ function PrayerCard({
           }
           checked={tracking.location !== null}
           disabled={disabled}
-          onChange={(next) => onToggle(prayer as PrayerName, "mosque", next)}
+          onChange={(next) => onToggle(prayer, "mosque", next)}
           onGlass={onGlass}
         />
         <TrackingCheckbox
@@ -440,7 +445,7 @@ function PrayerCard({
           label={t(language, "prayerTracking.sunnah")}
           checked={tracking.sunnah ?? false}
           disabled={disabled}
-          onChange={(next) => onToggle(prayer as PrayerName, "sunnah", next)}
+          onChange={(next) => onToggle(prayer, "sunnah", next)}
           onGlass={onGlass}
         />
         <TrackingCheckbox
@@ -448,7 +453,7 @@ function PrayerCard({
           label={t(language, "prayerTracking.adhkar")}
           checked={tracking.adhkar}
           disabled={disabled}
-          onChange={(next) => onToggle(prayer as PrayerName, "adhkar", next)}
+          onChange={(next) => onToggle(prayer, "adhkar", next)}
           onGlass={onGlass}
         />
       </fieldset>
@@ -485,7 +490,7 @@ export function PrayerTrackerCards({
   const [virtuePrayer, setVirtuePrayer] = useState<PrayerName | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const ordered = CARD_PRAYER_ORDER.map((prayer) => models.find((model) => model.prayer === prayer)).filter(
+  const ordered = PRAYER_ORDER.map((prayer) => models.find((model) => model.prayer === prayer)).filter(
     (model): model is PrayerCardModel => Boolean(model),
   );
 
@@ -527,7 +532,7 @@ export function PrayerTrackerCards({
         style={{ ["--prayer-columns" as string]: "5" }}
       >
         {ordered.map((model) => {
-          const record = byPrayer.get(model.prayer as PrayerName);
+          const record = byPrayer.get(model.prayer);
           return (
             <PrayerCard
               key={model.prayer}

@@ -27,6 +27,7 @@ export function buildPrayerCardModels(
     return {
       prayer,
       time: period.prayerTimes[prayer],
+      ...(prayer === "fajr" && period.prayerTimes.shrouk ? { shroukTime: period.prayerTimes.shrouk } : {}),
       state,
       isOpenable,
       isRecordable,

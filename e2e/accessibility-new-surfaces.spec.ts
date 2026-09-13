@@ -38,9 +38,8 @@ test("immersive Mushaf mode has no automatically detectable WCAG A/AA violations
   await expect(page.getByTestId("reader-screen")).toBeVisible();
 
   const mushafBtn = page.getByTestId("reader-mushaf-button");
-  if ((await mushafBtn.count()) > 0) {
-    await mushafBtn.click();
-  }
+  await expect(mushafBtn).toBeVisible();
+  await mushafBtn.click();
   await expect(page.getByTestId("mushaf-immersive")).toBeVisible();
 
   expect(await scan(page, '[data-testid="mushaf-immersive"]')).toEqual([]);

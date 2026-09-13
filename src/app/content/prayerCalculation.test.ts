@@ -66,6 +66,7 @@ describe("prayerCalculation", () => {
 
     expect(times).toBeDefined();
     expect(times.fajr).toMatch(/^\d{2}:\d{2}$/);
+    expect(times.shrouk).toMatch(/^\d{2}:\d{2}$/);
     expect(times.dhuhr).toMatch(/^\d{2}:\d{2}$/);
     expect(times.asr).toMatch(/^\d{2}:\d{2}$/);
     expect(times.maghrib).toMatch(/^\d{2}:\d{2}$/);
@@ -73,10 +74,12 @@ describe("prayerCalculation", () => {
 
     // Verify reasonable time bounds for Cairo summer
     const fajrHour = parseInt(times.fajr.split(":")[0]!, 10);
+    const shroukHour = parseInt(times.shrouk!.split(":")[0]!, 10);
     const maghribHour = parseInt(times.maghrib.split(":")[0]!, 10);
 
     expect(fajrHour).toBeGreaterThanOrEqual(3);
     expect(fajrHour).toBeLessThanOrEqual(5);
+    expect(shroukHour).toBeGreaterThan(fajrHour);
 
     expect(maghribHour).toBeGreaterThanOrEqual(18);
     expect(maghribHour).toBeLessThanOrEqual(20);
@@ -131,11 +134,12 @@ describe("prayerCalculation", () => {
   it("applies per-prayer minute adjustments across midnight safely", () => {
     expect(
       applyPrayerAdjustments(
-        { fajr: "00:05", dhuhr: "12:00", asr: "15:00", maghrib: "18:00", isha: "23:55" },
+        { fajr: "00:05", shrouk: "06:18", dhuhr: "12:00", asr: "15:00", maghrib: "18:00", isha: "23:55" },
         { fajr: -10, isha: 10 },
       ),
     ).toEqual({
       fajr: "23:55",
+      shrouk: "06:18",
       dhuhr: "12:00",
       asr: "15:00",
       maghrib: "18:00",

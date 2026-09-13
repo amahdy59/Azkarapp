@@ -219,16 +219,6 @@ export function ReaderScreen({
   const showSurahChrome = Boolean(z?.isSurah) && !longSurah;
   const [immersiveOpen, setImmersiveOpen] = useState(false);
   /**
-   * Which zikr the Mushaf view was opened for, so closing it stays closed.
-   *
-   * A multi-page surah is page data — Al-Kahf, As-Sajdah and Al-Mulk are laid
-   * out as Mushaf pages and read as Mushaf pages. Opening them as a scroll of
-   * running text and hiding the real view behind a menu item meant most readers
-   * never saw it. It now opens that way by default, and a reader who leaves it
-   * gets their choice honoured until they move to a different zikr.
-   */
-  const autoOpenedFor = useRef<string | null>(null);
-  /**
    * The Mushaf position, held here rather than inside the view.
    *
    * That view is mounted only while it is open, so closing it on page four and
@@ -406,7 +396,6 @@ export function ReaderScreen({
     const id = z?.id;
     if (!id) return;
     if (!longSurah) {
-      autoOpenedFor.current = null;
       setImmersiveOpen(false);
       setMushafPageTuple([0, 1]);
       return;
@@ -619,6 +608,7 @@ export function ReaderScreen({
           <button
             type="button"
             onClick={() => setImmersiveOpen(true)}
+            data-testid="reader-mushaf-button"
             className="flex w-full items-center justify-center gap-3 rounded-2xl bg-primary px-6 py-4 text-subtitle font-bold text-primary-foreground transition-colors hover:bg-primary/90"
           >
             <BookOpen size={20} />
@@ -815,26 +805,16 @@ export function ReaderScreen({
 
   const renderReaderMenuItems = (layout: "mobile" | "desktop") => (
     <>
-      {/* Long surahs only: the immersive view pages a mushaf sideways, which
-          means nothing for a zikr that fits on one screen. */}
-      {longSurah && (
+      {!longSurah && (
         <DropdownMenuItem
-          onClick={() => setImmersiveOpen(true)}
-          className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted"
+          disabled={!audioAvailable}
+          onClick={onPlayAudio}
+          className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
         >
-          <BookOpen size={18} />
-          {t(language, "reader.immersiveOpen")}
+          <Volume2 size={18} />
+          {audioAvailable ? t(language, "reader.playAudioOnce") : t(language, "reader.audioUnavailable")}
         </DropdownMenuItem>
       )}
-
-      <DropdownMenuItem
-        disabled={!audioAvailable}
-        onClick={onPlayAudio}
-        className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
-      >
-        <Volume2 size={18} />
-        {audioAvailable ? t(language, "reader.playAudioOnce") : t(language, "reader.audioUnavailable")}
-      </DropdownMenuItem>
 
       {onRepeatAudio && (
         <DropdownMenuItem
@@ -1126,17 +1106,6 @@ export function ReaderScreen({
                           <ToggleTrack checked={showDifficultWords} />
                         </button>
                       )}
-                      {longSurah && (
-                        <button
-                          type="button"
-                          onClick={() => setImmersiveOpen(true)}
-                          data-testid="reader-mushaf-button"
-                          className="flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border border-[color:var(--on-media)]/25 px-3 text-xs font-black text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                        >
-                          <BookOpen size={14} aria-hidden="true" />
-                          {t(language, "reader.immersiveOpen")}
-                        </button>
-                      )}
                     </div>
                   </div>
                 )}
@@ -1290,17 +1259,6 @@ export function ReaderScreen({
                           {t(language, "settings.showDifficultWords")}
                         </span>
                         <ToggleTrack checked={showDifficultWords} />
-                      </button>
-                    )}
-                    {longSurah && (
-                      <button
-                        type="button"
-                        onClick={() => setImmersiveOpen(true)}
-                        data-testid="reader-mushaf-button"
-                        className="flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border border-border px-3 text-xs font-black text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                      >
-                        <BookOpen size={14} aria-hidden="true" />
-                        {t(language, "reader.immersiveOpen")}
                       </button>
                     )}
                   </div>

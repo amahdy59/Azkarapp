@@ -15,7 +15,7 @@ The Home prayer header displays the next prayer and a live countdown. Settings â
 - Apply a minute adjustment to each prayer
 - Enable one reminder before every daily prayer and choose a 10- or 15-minute lead time
 
-The five calculated prayers are Fajr, Dhuhr, Asr, Maghrib, and Isha.
+The five trackable prayers are Fajr, Dhuhr, Asr, Maghrib, and Isha. The same calculation also exposes Sunrise (Shrouk) as supporting Fajr-window context; it is never treated as a sixth prayer or given tracking controls.
 
 Prayer reminders are opt-in and use the same locally calculated times and adjustments shown on Home. While the PWA is open or backgrounded, one timer sleeps until the next due reminder and the app reconciles on focus/visibility; it does not poll continuously. The active service worker displays the notification where supported. Browser suspension means reliable delivery after the PWA is completely closed still requires a connected server Push API service, so Settings states this limitation rather than promising closed-app alarms.
 

@@ -1,14 +1,14 @@
 {
-  "release": "2026-09-13-ui-improvements",
+  "release": "2026-09-13-ui-improvements-2",
   "en": [
     "Shrouk time is now shown directly within the prayer times panel to clarify the Fajr window.",
-    "Long Surahs (like Al-Kahf) now provide clear options to listen, read from the Mushaf, or read externally.",
+    "Long surahs such as Al-Kahf now offer clear listening, Mushaf, and external-reading choices with accurate loading feedback.",
     "The desktop reader layout has been improved, bringing the counter closer to keyboard shortcuts and removing gaps.",
     "The streak card layout has been simplified and decluttered by removing icons."
   ],
   "ar": [
     "يظهر وقت الشروق الآن مباشرة داخل بطاقة الفجر لتوضيح الوقت المتاح للصلاة.",
-    "الصفحات الخاصة بالسّور الطويلة (مثل الكهف) تعرض الآن ثلاث خيارات واضحة (استماع، قراءة من المصحف، قراءة خارجية).",
+    "تعرض السور الطويلة مثل الكهف خيارات واضحة للاستماع أو القراءة من المصحف أو القراءة خارجه، مع بيان حالة التحميل بدقة.",
     "تم تحسين تصميم شاشة الأذكار على الأجهزة المكتبية، حيث أصبح العداد أقرب لاختصارات لوحة المفاتيح مع إصلاح الفراغات.",
     "تم تبسيط تصميم بطاقة تتبع الأيام المتتالية بإزالة الأيقونات لجعلها أكثر وضوحاً."
   ]

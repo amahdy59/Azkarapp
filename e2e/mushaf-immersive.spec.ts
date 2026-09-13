@@ -4,9 +4,8 @@ import { expect, test, type Page } from "@playwright/test";
  * The Mushaf view a multi-page surah opens in.
  *
  * It no longer has a presentation of its own: it carries the Mushaf's rail, its
- * spread and its page furniture, differing only in the span it may show. It
- * also opens without being asked, so these no longer reach for a menu item —
- * the surah is already showing its pages.
+ * spread and its page furniture, differing only in the span it may show. The
+ * long-surah landing page is the single way into that reading mode.
  */
 
 /** Reduce motion is on so pages jump rather than glide — the landing position
@@ -30,9 +29,8 @@ async function openReaderAt(page: Page, route: string) {
 /** A multi-page surah now offers options first, so we click the Mushaf button. */
 async function expectMushafShowing(page: Page) {
   const mushafBtn = page.getByTestId("reader-mushaf-button");
-  if ((await mushafBtn.count()) > 0) {
-    await mushafBtn.click();
-  }
+  await expect(mushafBtn).toBeVisible();
+  await mushafBtn.click();
   await expect(page.getByTestId("mushaf-immersive")).toBeVisible();
 }
 

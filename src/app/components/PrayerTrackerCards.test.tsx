@@ -42,6 +42,7 @@ function modelsWithCurrent(current: PrayerName): PrayerCardModel[] {
   return order.map((prayer, index) => ({
     prayer,
     time: TIMES[prayer],
+    ...(prayer === "fajr" ? { shroukTime: "06:18" } : {}),
     state:
       index === activeIndex
         ? "current"
@@ -76,6 +77,15 @@ describe("PrayerTrackerCards", () => {
   it("renders all five cards unconditionally", () => {
     stubViewport([]);
     expect(renderRow("fajr")).toEqual(["fajr", "dhuhr", "asr", "maghrib", "isha"]);
+  });
+
+  it("shows sunrise as Fajr context without creating a sixth prayer card", () => {
+    stubViewport(["(min-width: 1024px)"]);
+    renderRow("fajr");
+
+    expect(screen.getByTestId("prayer-card-fajr")).toHaveTextContent("Sunrise: 6:18 AM");
+    expect(screen.queryByTestId("prayer-card-shrouk")).toBeNull();
+    expect(screen.getAllByTestId(/^prayer-card-/)).toHaveLength(5);
   });
 
   it("keeps a summary row navigable without duplicating tracking controls", () => {
