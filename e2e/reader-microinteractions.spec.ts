@@ -69,34 +69,7 @@ async function openFirstMorningZikr(page: Page) {
  * The control differs by width: the rail carries it on a landscape screen and
  * the header bar on a narrow one.
  */
-async function leaveMushaf(page: Page) {
-  const mushaf = page.getByTestId("mushaf-immersive");
-  if ((await mushaf.count()) === 0) return;
-  const railBack = page.getByTestId("mushaf-rail-back");
-  if ((await railBack.count()) > 0) await railBack.click();
-  else await page.getByTestId("mushaf-immersive-close").click();
-  await expect(mushaf).toHaveCount(0);
-}
 
-async function openFridayKahf(page: Page) {
-  await page.addInitScript(() => {
-    window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
-    window.localStorage.setItem(
-      "azkarapp.state.v1",
-      JSON.stringify({
-        settings: { language: "en", themeMode: "midnight", forceRtl: false, reduceMotion: true },
-        profile: { displayName: "Guest", lastPhoneNumber: "", isGuest: true },
-        completed: { morning: [], evening: [], before_sleep: [], friday_kahf: [] },
-        sessions: [],
-      }),
-    );
-  });
-
-  await page.goto("/?view=friday");
-  await expect(page.getByRole("status", { name: "Loading Azkar" })).toHaveCount(0, { timeout: 5000 });
-  await page.getByRole("button", { name: "Start reading", exact: true }).click();
-  await expect(page.getByTestId("reader-screen")).toBeVisible();
-}
 
 test("the Reader counter keeps one rectangular shape across phone, tablet, and desktop", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 844 });
@@ -376,7 +349,6 @@ test("short surahs expose sourced difficult-word help", async ({ page }) => {
 
   await page.getByRole("switch", { name: /difficult words/i }).click();
 
-  const reader = page.getByTestId("reader-screen");
   const counter = page.getByTestId("counter-surface");
 
   await expect(counter).toBeVisible();
