@@ -159,7 +159,8 @@ function contentSecurityPolicy(audioBaseUrl?: string) {
 export default defineConfig(({ mode }) => {
   const isGithubPages = mode === "github-pages";
   const appBase = isGithubPages ? "/Azkarapp/" : "/";
-  const audioBaseUrl = loadEnv(mode, process.cwd(), "").VITE_AUDIO_BASE_URL?.replace(/\/+$/, "");
+  const envBaseUrl = loadEnv(mode, process.cwd(), "").VITE_AUDIO_BASE_URL;
+  const audioBaseUrl = (envBaseUrl || "https://pub-6e537fd865454e599c23a2bcfc22136e.r2.dev").replace(/\/+$/, "");
   const audioUrlPattern = audioBaseUrl
     ? new RegExp(`^${audioBaseUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}/`)
     : undefined;

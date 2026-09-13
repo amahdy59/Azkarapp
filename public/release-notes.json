@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-13-core-sajdah",
+  "release": "2026-09-13-audio-fix",
   "en": [
+    "Fixed an issue that prevented all audio recordings from loading in the web application.",
     "Surah As-Sajdah is now included in the shorter before-sleep routine.",
-    "Its complete 30 verses now include the owner-supplied recitation by Abdullah Muhammad.",
     "Arabic audio failures now show a clear retry message instead of an incorrect unsupported-format warning."
   ],
   "ar": [
-    "أصبحت سورة السجدة ضمن المختصر من أذكار النوم.",
-    "أصبحت آياتها الثلاثون كاملة متاحة بتلاوة عبد الله محمد التي زوّد بها مالك التطبيق.",
-    "تظهر أعطال الصوت الآن برسالة عربية واضحة لإعادة المحاولة بدلاً من تنبيه غير دقيق عن الصيغة."
+    "تم إصلاح مشكلة كانت تمنع تشغيل جميع التسجيلات الصوتية في التطبيق.",
+    "أصبحت سورة السجدة ضمن المجموعة المختصرة من أذكار النوم.",
+    "تظهر رسائل خطأ الصوت الآن بعبارة عربية واضحة لإعادة المحاولة بدلاً من تنبيه خاطئ عن صيغة غير مدعومة."
   ]
 }
