@@ -610,6 +610,7 @@ export function ReaderScreen({
             type="button"
             onClick={surahAudio?.onToggle ?? onPlayAudio}
             disabled={!audioAvailable}
+            aria-busy={surahAudio?.status === "loading" || surahAudio?.status === "buffering"}
             className="flex w-full items-center justify-center gap-3 rounded-2xl bg-primary/10 px-6 py-4 text-subtitle font-bold text-primary transition-colors hover:bg-primary/20 disabled:opacity-50"
           >
             <Volume2 size={20} />
