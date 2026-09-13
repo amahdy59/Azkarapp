@@ -70,7 +70,6 @@ async function openFirstMorningZikr(page: Page) {
  * the header bar on a narrow one.
  */
 
-
 test("the Reader counter keeps one rectangular shape across phone, tablet, and desktop", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 844 });
   await openFirstMorningZikr(page);
