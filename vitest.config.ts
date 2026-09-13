@@ -24,7 +24,7 @@ const shared = {
    */
   testTimeout: 45000,
   environment: "jsdom" as const,
-  pool: "threads" as const,
+  pool: "forks" as const,
   /**
    * Leave the machine some room. `pnpm check` runs the suite alongside the
    * build and the type-checker; an unbounded pool took every core, and the
