@@ -6,7 +6,7 @@ import { expect, test, type Page } from "@playwright/test";
  * The stepper is scoped to the mushaf page on screen, which is the passage the
  * reader is actually looking at — not the whole surah.
  */
-async function openKahf(page: Page) {
+async function openAyatAlKursi(page: Page) {
   await page.addInitScript(() => {
     window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
     window.localStorage.setItem(
@@ -19,31 +19,14 @@ async function openKahf(page: Page) {
       }),
     );
   });
-  await page.goto("/#/azkar/friday-kahf/1");
+  await page.goto("/#/azkar/morning/4");
   await expect(page.getByTestId("reader-screen")).toBeVisible();
-  await leaveMushaf(page);
   await page.getByRole("switch", { name: /الكلمات الغريبة/ }).click();
-}
-
-/**
- * Al-Kahf now opens in the Mushaf view, which covers the reader.
- *
- * These cover the reader's own word-meaning surface, so they step back to it.
- * The control differs by width: the rail carries it on a landscape screen and
- * the header bar on a narrow one.
- */
-async function leaveMushaf(page: Page) {
-  const mushaf = page.getByTestId("mushaf-immersive");
-  if ((await mushaf.count()) === 0) return;
-  const railBack = page.getByTestId("mushaf-rail-back");
-  if ((await railBack.count()) > 0) await railBack.click();
-  else await page.getByTestId("mushaf-immersive-close").click();
-  await expect(mushaf).toHaveCount(0);
 }
 
 test.describe("Quran word meanings", () => {
   test("steps from one word to the next without reopening the sheet", async ({ page }) => {
-    await openKahf(page);
+    await openAyatAlKursi(page);
 
     await page.getByTestId("quran-word-help").first().click();
     await expect(page.getByTestId("quran-word-popover")).toBeVisible();
@@ -70,7 +53,7 @@ test.describe("Quran word meanings", () => {
   });
 
   test("anchors the gloss under the tapped word and dismisses on Escape", async ({ page }) => {
-    await openKahf(page);
+    await openAyatAlKursi(page);
 
     const word = page.getByTestId("quran-word-help").first();
     await word.click();
@@ -116,7 +99,7 @@ test.describe("Quran word meanings", () => {
   });
 
   test("stops at the last annotated word of the page", async ({ page }) => {
-    await openKahf(page);
+    await openAyatAlKursi(page);
 
     const words = page.getByTestId("quran-word-help");
     const total = await words.count();
