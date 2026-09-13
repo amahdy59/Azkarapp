@@ -136,6 +136,11 @@ describe("azkar content totals", () => {
     expect(getAzkarByCategory("before_sleep").at(-1)?.groupId).toBe("final");
   });
 
+  it("includes Surah As-Sajdah in both before-sleep routine modes", () => {
+    expect(getAzkarForMode("before_sleep", "core").map((zikr) => zikr.id)).toContain("s-hm-110a");
+    expect(getAzkarForMode("before_sleep", "complete").map((zikr) => zikr.id)).toContain("s-hm-110a");
+  });
+
   it("passes comprehensive authenticity & content completeness audit across all zikrs", () => {
     const missingHadith: string[] = [];
     for (const category of eagerCategories) {

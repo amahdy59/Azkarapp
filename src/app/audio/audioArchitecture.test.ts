@@ -66,7 +66,7 @@ function catalogFor(zikrs: readonly Zikr[], voices = ["voice-a"]): { catalog: Au
 }
 
 describe("explicit audio content architecture", () => {
-  it("links only the eleven reviewed before-sleep recordings", () => {
+  it("links only the twelve reviewed before-sleep recordings", () => {
     const expectedAssignments = [
       "s-hm-102",
       "s-hm-104",
@@ -77,6 +77,7 @@ describe("explicit audio content architecture", () => {
       "s-hm-107",
       "s-hm-108",
       "s-hm-109a",
+      "s-hm-110a",
       "s-hm-110b",
       "s-hm-111",
     ];

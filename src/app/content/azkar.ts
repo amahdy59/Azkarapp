@@ -3215,7 +3215,7 @@ const ROUTINE_ARRANGEMENTS: Record<RoutineCategoryId, ArrangementGroup[]> = {
         { id: "s-hm-99-falaq", core: true, ritualGroupId: "three_quls" },
         { id: "s-hm-99-nas", core: true, ritualGroupId: "three_quls" },
         { id: "s-hm-109a", core: false },
-        { id: "s-hm-110a", core: false },
+        { id: "s-hm-110a", core: true },
         { id: "s-hm-110b", core: false },
       ],
     },

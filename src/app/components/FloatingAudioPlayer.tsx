@@ -47,6 +47,10 @@ const COPY = {
     speedShort: "Speed",
     reciterShort: "Reciter",
     repeatShort: "Repeat",
+    errorBlocked: "Playback was blocked. Press Play again.",
+    errorOffline: "This recording is not downloaded and the device is offline.",
+    errorDecode: "This recording could not be decoded.",
+    errorUnavailable: "The recording could not be loaded. Check the connection and try again.",
   },
   ar: {
     region: "مشغل الصوت",
@@ -88,6 +92,10 @@ const COPY = {
     speedShort: "السرعة",
     reciterShort: "القارئ",
     repeatShort: "التكرار",
+    errorBlocked: "تعذر بدء التشغيل. اضغط زر التشغيل مرة أخرى.",
+    errorOffline: "هذا التسجيل غير محمّل والجهاز غير متصل بالإنترنت.",
+    errorDecode: "تعذر فك ترميز هذا التسجيل.",
+    errorUnavailable: "تعذر تحميل التسجيل. تحقق من الاتصال ثم أعد المحاولة.",
   },
 } as const;
 
@@ -103,6 +111,13 @@ const PLAYBACK_RATES = [0.8, 1, 1.25, 1.5, 2] as const;
 function nextPlaybackRate(current: number) {
   const index = PLAYBACK_RATES.findIndex((rate) => rate === current);
   return PLAYBACK_RATES[(index + 1) % PLAYBACK_RATES.length] ?? 1;
+}
+
+function getErrorMessage(code: string | undefined, copy: (typeof COPY)[AppLanguage]) {
+  if (code === "playback-blocked") return copy.errorBlocked;
+  if (code === "offline-not-cached") return copy.errorOffline;
+  if (code === "decode") return copy.errorDecode;
+  return copy.errorUnavailable;
 }
 
 function formatTime(seconds: number, language: AppLanguage) {
@@ -348,7 +363,7 @@ export function FloatingAudioPlayer({
 
   const liveMessage =
     state.status === "error"
-      ? state.error?.message
+      ? getErrorMessage(state.error?.code, copy)
       : state.announcement === "queue-completed"
         ? copy.queueCompleted
         : state.announcement === "repetition-completed"
@@ -578,7 +593,7 @@ export function FloatingAudioPlayer({
       {/* Error state */}
       {state.status === "error" && (
         <div className="mt-3 rounded-2xl border border-destructive/30 bg-destructive/10 p-3.5" role="alert">
-          <p className="text-label font-semibold text-destructive">{state.error?.message}</p>
+          <p className="text-label font-semibold text-destructive">{getErrorMessage(state.error?.code, copy)}</p>
           <div className="mt-2.5 flex flex-wrap gap-2">
             <button
               type="button"

@@ -5,7 +5,7 @@ import { AudioProvider, useAudioController } from "./AudioProvider";
 import type { PlaybackPlan } from "./audioTypes";
 
 class FakeAudio extends EventTarget {
-  static rejectPlay = false;
+  static rejectPlayWith: "NotAllowedError" | "NotSupportedError" | null = null;
   private source = "";
   currentTime = 0;
   duration = 12;
@@ -26,7 +26,7 @@ class FakeAudio extends EventTarget {
     this.dispatchEvent(new Event("canplay"));
   }
   play() {
-    if (FakeAudio.rejectPlay) return Promise.reject(new DOMException("blocked", "NotAllowedError"));
+    if (FakeAudio.rejectPlayWith) return Promise.reject(new DOMException("failed", FakeAudio.rejectPlayWith));
     this.paused = false;
     this.dispatchEvent(new Event("playing"));
     return Promise.resolve();
@@ -93,7 +93,7 @@ const repeatPlan: PlaybackPlan = {
   ],
 };
 
-function Harness() {
+function Harness({ language = "en" }: { language?: "ar" | "en" }) {
   const controller = useAudioController();
   return (
     <>
@@ -104,14 +104,14 @@ function Harness() {
         Start repeat
       </button>
       <output>{controller.state.status}</output>
-      {controller.state.plan && <FloatingAudioPlayer controller={controller} language="en" />}
+      {controller.state.plan && <FloatingAudioPlayer controller={controller} language={language} />}
     </>
   );
 }
 
 afterEach(() => {
   cleanup();
-  FakeAudio.rejectPlay = false;
+  FakeAudio.rejectPlayWith = null;
   vi.unstubAllGlobals();
 });
 
@@ -136,7 +136,7 @@ describe("AudioProvider integration", () => {
   });
 
   it("surfaces a rejected play promise and leaves Retry and Skip explicit", async () => {
-    FakeAudio.rejectPlay = true;
+    FakeAudio.rejectPlayWith = "NotAllowedError";
     vi.stubGlobal("Audio", FakeAudio);
     render(
       <AudioProvider>
@@ -147,6 +147,21 @@ describe("AudioProvider integration", () => {
     await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("Playback was blocked"));
     expect(screen.getByRole("button", { name: "Retry" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Skip this item" })).toBeInTheDocument();
+  });
+
+  it("does not mislabel a failed mobile source as an unsupported format and localizes the error", async () => {
+    FakeAudio.rejectPlayWith = "NotSupportedError";
+    vi.stubGlobal("Audio", FakeAudio);
+    render(
+      <AudioProvider>
+        <Harness language="ar" />
+      </AudioProvider>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Start" }));
+    await waitFor(() =>
+      expect(screen.getByRole("alert")).toHaveTextContent("تعذر تحميل التسجيل. تحقق من الاتصال ثم أعد المحاولة."),
+    );
+    expect(screen.queryByText("This audio format is not supported.")).not.toBeInTheDocument();
   });
 
   it("toggles between expanded and mini-player modes without stopping audio", async () => {

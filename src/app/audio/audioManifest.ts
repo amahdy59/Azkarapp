@@ -2,12 +2,15 @@ import { APPROVED_AUDIO_ASSIGNMENTS } from "./audioAssignments";
 import type { AudioCatalog, AudioAsset, AudioSourceRecord } from "./audioTypes";
 import { validateAudioCatalog } from "./validateAudioCatalog";
 import { FRIDAY_KAHF } from "../content/fridayKahf";
+import { QURAN_PASSAGES } from "../content/quranPassages";
 import { createArabicTextFingerprint } from "./arabicMatching";
 
-export const AUDIO_MANIFEST_VERSION = 3;
+export const AUDIO_MANIFEST_VERSION = 4;
 
 const kahfText = FRIDAY_KAHF[0]!.arabicText;
 const kahfFingerprint = createArabicTextFingerprint(kahfText);
+const sajdahText = QURAN_PASSAGES.asSajdah.arabicText;
+const sajdahFingerprint = createArabicTextFingerprint(sajdahText);
 
 export const AUDIO_SOURCES: Readonly<Record<string, AudioSourceRecord>> = Object.freeze({
   "internal-upload": {
@@ -1326,6 +1329,45 @@ export const AUDIO_ASSETS: Readonly<Record<string, AudioAsset>> = Object.freeze(
             durationMs: 429264,
             byteSize: 17170560,
             sha256: "5aa6ef9f13ea737bdfdb3ebcda699ba5c1700d6d83d98f6668f4b686727a7555",
+            sourceId: "internal-upload-abdullah-muhammad",
+            reviewStatus: "approved",
+          },
+        ],
+      },
+    ],
+    defaultVoiceId: "abdullah-muhammad",
+    reviewStatus: "approved",
+    reviewedBy: "Ahmed Mahdy",
+    reviewedAt: "2026-09-13T00:00:00.000Z",
+    reviewNotes: "Owner-supplied revised recording approved for the before-sleep collection.",
+    version: 1,
+  },
+  "s-hm-110a": {
+    id: "s-hm-110a",
+    titleArabic: "السَّجْدَة",
+    titleEnglish: "As-Sajdah",
+    contentKind: "quran",
+    kind: "single",
+    canonicalArabicText: sajdahText,
+    normalizedTextHash: sajdahFingerprint,
+    requiredQuranRange: { surah: 32, ayahStart: 1, ayahEnd: 30 },
+    segments: [
+      {
+        id: "s-hm-110a-1",
+        order: 1,
+        transcriptArabic: sajdahText,
+        normalizedTranscriptHash: sajdahFingerprint,
+        quranReference: { surah: 32, ayahStart: 1, ayahEnd: 30 },
+        variants: [
+          {
+            id: "s-hm-110a-abdullah-muhammad-v1",
+            voiceId: "abdullah-muhammad",
+            voiceName: "عبد الله محمد",
+            relativePath: "azkar/before_sleep/abdullah-muhammad/v1/s-hm-110a.mp3",
+            mimeType: "audio/mpeg",
+            durationMs: 527640,
+            byteSize: 21105600,
+            sha256: "4841c555aa82e13d974cb01051341bb00b4aec13aa672a8724fdf95a0e082a90",
             sourceId: "internal-upload-abdullah-muhammad",
             reviewStatus: "approved",
           },

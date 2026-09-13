@@ -5,7 +5,7 @@ export function mapPlayError(error: unknown): AudioPlaybackError {
   if (name === "NotAllowedError")
     return { code: "playback-blocked", message: "Playback was blocked. Press Play again." };
   if (name === "NotSupportedError")
-    return { code: "unsupported-format", message: "This audio format is not supported." };
+    return { code: "unsupported-format", message: "The audio source could not be loaded." };
   return { code: "unknown", message: "Audio could not be played." };
 }
 

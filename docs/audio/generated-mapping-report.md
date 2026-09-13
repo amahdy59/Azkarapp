@@ -1,14 +1,14 @@
 # Generated audio mapping report
 
-Generated: 2026-09-12T21:48:21.500Z
+Generated: 2026-09-13T04:15:14.701Z
 
 | Metric                    | Count |
 | ------------------------- | ----: |
 | Zikr instances            |   194 |
 | Total canonical zikrs     |   147 |
-| Approved audio mappings   |    34 |
+| Approved audio mappings   |    35 |
 | Pending assets            |     0 |
-| Unmatched zikrs           |   160 |
+| Unmatched zikrs           |   159 |
 | Duplicate asset paths     |     0 |
 | Shared canonical groups   |    27 |
 | Qur'anic range errors     |     0 |
@@ -233,7 +233,6 @@ Record one file per canonical row, not one file per screen instance. The filenam
 - `s-hm-99-nas` — `quran-114`
 - `s-hm-100` — `quran-002-255`
 - `s-hm-101` — `quran-002-285-286`
-- `s-hm-110a` — `quran-032`
 - `s-hm-109` — `zikr:refuge-from-self-and-shaytan`
 - `wu-hm-1` — `zikr:wu-hm-1`
 - `wu-hm-2` — `zikr:wu-hm-2`

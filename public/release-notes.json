@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-13-before-sleep-audio",
+  "release": "2026-09-13-core-sajdah",
   "en": [
-    "Eleven before-sleep azkar now include recitation by Abdullah Muhammad.",
-    "Each recording is linked only to its exact matching supplication or surah.",
-    "Items without a verified recording remain available to read without misleading audio."
+    "Surah As-Sajdah is now included in the shorter before-sleep routine.",
+    "Its complete 30 verses now include the owner-supplied recitation by Abdullah Muhammad.",
+    "Arabic audio failures now show a clear retry message instead of an incorrect unsupported-format warning."
   ],
   "ar": [
-    "أصبحت إحدى عشرة فقرة من أذكار النوم متاحة بصوت عبد الله محمد.",
-    "رُبط كل تسجيل بالدعاء أو السورة المطابقة له بدقة فقط.",
-    "تبقى الفقرات التي لا تملك تسجيلاً موثقاً متاحة للقراءة دون صوت مضلل."
+    "أصبحت سورة السجدة ضمن المختصر من أذكار النوم.",
+    "أصبحت آياتها الثلاثون كاملة متاحة بتلاوة عبد الله محمد التي زوّد بها مالك التطبيق.",
+    "تظهر أعطال الصوت الآن برسالة عربية واضحة لإعادة المحاولة بدلاً من تنبيه غير دقيق عن الصيغة."
   ]
 }

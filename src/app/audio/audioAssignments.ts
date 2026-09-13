@@ -32,6 +32,7 @@ export const APPROVED_AUDIO_ASSIGNMENTS: Readonly<Record<string, string>> = Obje
   "s-hm-107": "s-hm-107",
   "s-hm-108": "s-hm-108",
   "s-hm-109a": "s-hm-109a",
+  "s-hm-110a": "s-hm-110a",
   "s-hm-110b": "s-hm-110b",
   "s-hm-111": "s-hm-111",
 });

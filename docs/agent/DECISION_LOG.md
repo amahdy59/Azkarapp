@@ -3559,3 +3559,11 @@ null` shape, so a record written before this change still loads and still
 - **Integrity:** manifest metadata records exact byte size, duration, SHA-256, transcript fingerprint, source, and review state. Public downloads must byte-match the reviewed local files; range probes must return `206` with `audio/mpeg` and the correct total size.
 - **User experience:** an audio action appears only where an approved exact assignment resolves. Reading, counting, and completion remain available for unassigned entries.
 - **Tests/evidence required:** exact before-sleep assignment regression, manifest validation, generated coverage report, full release gates, green Pages workflows, and production-origin playback verification.
+
+## DEC-170 — As-Sajdah belongs to both before-sleep routine modes with verified audio
+
+- **Decision:** include the existing reviewed `s-hm-110a` Surah As-Sajdah entry in both the shorter and complete before-sleep routines and assign the owner-supplied Abdullah Muhammad recitation to that exact entry.
+- **Content integrity:** reuse the canonical 30-ayah entry, attribution, translation, and reviewed pages 415–417 without changing Qur'anic text or source claims.
+- **Audio integrity:** record the exact byte size, duration, SHA-256, transcript fingerprint, source, and review state; publish it under the established immutable before-sleep audio path and require a byte-matching production object.
+- **User experience:** readers who choose the shorter routine encounter As-Sajdah in the existing Qur'an-protection section. Audio source-load failures use localized recovery copy and do not claim that a valid MP3 codec is unsupported.
+- **Tests/evidence required:** focused routine-mode membership, content integrity, Mushaf-page, audio-manifest, localized-error, full local, deployment, and production checks.
