@@ -68,7 +68,9 @@ const plan: PlaybackPlan = {
             voiceId: "voice",
             voiceName: "Voice",
             sourceName: "Source",
+            sourceNameArabic: "المصدر",
             attribution: "Attribution",
+            attributionArabic: "تلاوة القارئ",
             url: "https://audio.example.test/segment.mp3",
             durationMs: 12_000,
             mimeType: "audio/mpeg",
@@ -248,5 +250,9 @@ describe("AudioProvider integration", () => {
     const timeline = await screen.findByRole("slider", { name: "تقديم أو تأخير الصوت" });
     expect(timeline.getAttribute("style")).toContain("to left");
     expect(timeline).toHaveValue("0");
+
+    fireEvent.click(screen.getByRole("button", { name: "توسيع المشغل" }));
+    expect(screen.getByText("المصدر · تلاوة القارئ")).toBeInTheDocument();
+    expect(screen.queryByText("Source · Attribution")).not.toBeInTheDocument();
   });
 });

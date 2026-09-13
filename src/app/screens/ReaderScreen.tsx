@@ -158,6 +158,7 @@ export function ReaderScreen({
   mushafSettings,
   onMushafModeChange,
   onPlayAudio,
+  onPlayAllAudio,
   onRepeatAudio,
 }: {
   catId: CategoryId;
@@ -204,6 +205,7 @@ export function ReaderScreen({
   /** Announces when the Mushaf is the reader's body, so the shell can stand aside. */
   onMushafModeChange?: (showing: boolean) => void;
   onPlayAudio?: () => void;
+  onPlayAllAudio?: () => void;
   onRepeatAudio?: () => void;
 }) {
   const azkar = azkarList ?? getAzkarForMode(catId, routineMode);
@@ -816,6 +818,16 @@ export function ReaderScreen({
         </DropdownMenuItem>
       )}
 
+      {onPlayAllAudio && (
+        <DropdownMenuItem
+          onClick={onPlayAllAudio}
+          className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted"
+        >
+          <Volume2 size={18} />
+          {t(language, "category.playAllAudio")}
+        </DropdownMenuItem>
+      )}
+
       {onRepeatAudio && (
         <DropdownMenuItem
           onClick={onRepeatAudio}
@@ -1010,27 +1022,29 @@ export function ReaderScreen({
                 <ArrowPrevious size={20} />
               </IconButton>
 
-              {/* Two actions, the same two as on phones: Benefit, then the
+              {/* Two actions, the same two as on phones: Reference, then the
                 overflow menu. Save, share and sound used to sit out here as
                 three more icons — five ghost circles competing with the
                 collection name for the top of the reading screen. They are one
                 tap away in the menu now, and the toolbar reads as a pair
-                rather than a strip. Icon-only throughout; the Benefit tooltip
-                previews the actual benefit text rather than repeating the
-                button's own name. */}
+                rather than a strip. The reference label stays visible in this
+                wide layout so the book icon cannot be mistaken for a benefit. */}
               <div className="absolute end-4 top-4 flex items-center gap-2" data-testid="reader-hero-actions">
-                <IconButton
+                <button
+                  type="button"
                   onClick={(event) => {
                     event.stopPropagation();
                     setHasOpenedBenefit(true);
                     setBenefitOpen(true);
                   }}
-                  label={t(language, "reader.referencesButton")}
-                  title={getLocalizedZikrBenefit(z, language)}
-                  className="border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] hover:bg-[color:var(--on-media)]/20"
+                  aria-haspopup="dialog"
+                  aria-label={t(language, "reader.referencesButton")}
+                  title={t(language, "reader.referencesButton")}
+                  className="flex min-h-11 items-center gap-2 rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 px-3 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 >
-                  <BookOpen size={18} />
-                </IconButton>
+                  <BookOpen size={18} aria-hidden="true" />
+                  <span className="text-label font-extrabold">{t(language, "reader.referencesButton")}</span>
+                </button>
 
                 <DropdownMenu dir={direction}>
                   <DropdownMenuTrigger
@@ -1169,7 +1183,7 @@ export function ReaderScreen({
                 onBack={onBack}
                 language={language}
                 right={
-                  // Two actions at most: Benefit, then the overflow control.
+                  // Two actions at most: Reference, then the overflow control.
                   // Share used to sit between them; at 320-390px a third 44px
                   // target was the difference between the collection name
                   // fitting and being truncated to "أذكار ال…", and share is not
@@ -1184,11 +1198,14 @@ export function ReaderScreen({
                         setBenefitOpen(true);
                       }}
                       aria-haspopup="dialog"
-                      className={READER_HEADER_ACTION_CLASS}
+                      className={`${READER_HEADER_ACTION_CLASS} min-[600px]:w-auto min-[600px]:gap-2 min-[600px]:px-3`}
                       aria-label={t(language, "reader.referencesButton")}
                       title={t(language, "reader.referencesButton")}
                     >
-                      <BookOpen size={20} />
+                      <BookOpen size={20} aria-hidden="true" />
+                      <span className="hidden text-label font-extrabold min-[600px]:inline">
+                        {t(language, "reader.referencesButton")}
+                      </span>
                     </button>
 
                     <DropdownMenu dir={direction}>

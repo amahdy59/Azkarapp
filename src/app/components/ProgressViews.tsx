@@ -51,6 +51,14 @@ function getCategoryName(category: CategoryId | null | undefined, language: AppL
 
 type DayGroupCardStatus = "completed" | "pending";
 
+export interface QuranWirdTile {
+  progress: number;
+  goal: number;
+  complete: boolean;
+  active: boolean;
+  onPress: () => void;
+}
+
 function MainDhikrGroupCard({
   name,
   icon,
@@ -212,6 +220,7 @@ export function ProgressDayView({
   headingLevel = 2,
   recommendedCategoryId,
   onOpenWirdBenefits,
+  quranWird,
   onMedia = true,
 }: {
   summary: GardenSummary;
@@ -231,6 +240,8 @@ export function ProgressDayView({
   recommendedCategoryId?: CategoryId;
   /** Opens the evidence for keeping a wird. Omitted where that route is unreachable. */
   onOpenWirdBenefits?: () => void;
+  /** Home's fourth daily-wird item, derived from the existing Quran plan and history. */
+  quranWird?: QuranWirdTile;
   /**
    * Home renders this over the hero image and reserves a fixed height so the
    * card cannot resize under the photograph as routines complete. Progress
@@ -279,7 +290,9 @@ export function ProgressDayView({
   // Keep the semantic order stable. The RTL grid places Morning at the right
   // edge while preserving the same keyboard and assistive-technology order.
   const displayCategories = categories;
-  const completedCount = categories.filter((category) => completedToday.includes(category.id)).length;
+  const completedCount =
+    categories.filter((category) => completedToday.includes(category.id)).length + (quranWird?.complete ? 1 : 0);
+  const totalCount = categories.length + (quranWird ? 1 : 0);
   const [isWirdInfoOpen, setIsWirdInfoOpen] = useState(false);
 
   return (
@@ -344,9 +357,9 @@ export function ProgressDayView({
                 : "border-border-control bg-muted text-foreground"
             }`}
           >
-            {/* Isolated: a bare "0 / 3" between Arabic siblings gets reordered
+            {/* Isolated: a bare ratio between Arabic siblings gets reordered
                 by the bidi algorithm and starts reading as "3 / 0". */}
-            <bdi>{formatRatio(completedCount, categories.length, language)}</bdi>
+            <bdi>{formatRatio(completedCount, totalCount, language)}</bdi>
           </div>
         </div>
 
@@ -366,7 +379,7 @@ export function ProgressDayView({
 
         <div
           className={`stagger-in mt-5 grid grid-cols-1 gap-2.5 sm:mt-6 sm:gap-3 md:gap-4 ${
-            isHomeSubset ? "sm:grid-cols-3" : "sm:grid-cols-2 xl:grid-cols-4"
+            isHomeSubset ? "sm:grid-cols-2 lg:grid-cols-4" : "sm:grid-cols-2 xl:grid-cols-4"
           }`}
         >
           {displayCategories.map((col) => {
@@ -420,6 +433,26 @@ export function ProgressDayView({
               />
             );
           })}
+
+          {quranWird && (
+            <MainDhikrGroupCard
+              name={t(language, "mushaf.wirdTitle")}
+              icon={<BookOpen size={28} />}
+              status={quranWird.complete ? "completed" : "pending"}
+              completedLabel={t(language, "progress.completed")}
+              pendingLabel={
+                quranWird.active
+                  ? t(language, "mushaf.wirdProgress", {
+                      read: formatNumerals(quranWird.progress, language),
+                      goal: formatNumerals(quranWird.goal, language),
+                    })
+                  : t(language, "mushaf.freeReadingActive")
+              }
+              onPress={quranWird.onPress}
+              compact
+              onMedia={onMedia}
+            />
+          )}
         </div>
 
         {/* The card shows whether today's wird is done; this answers why it is

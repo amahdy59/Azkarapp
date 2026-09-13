@@ -5,10 +5,8 @@ import type { CategoryId } from "../types";
 import { AzkarLibraryScreen } from "./AzkarLibraryScreen";
 
 describe("AzkarLibraryScreen", () => {
-  it("keeps benefits, Quran, and the Masbaha in the Library instead of Home", () => {
+  it("keeps collections primary and exposes one clear Benefits destination", () => {
     const onOpenBenefits = vi.fn();
-    const onOpenKhatmah = vi.fn();
-    const onOpenCustomCounter = vi.fn();
     render(
       <AzkarLibraryScreen
         completed={{} as Record<CategoryId, Set<string>>}
@@ -20,20 +18,20 @@ describe("AzkarLibraryScreen", () => {
         onSearch={() => undefined}
         savedZikrIds={new Set()}
         onOpenBenefits={onOpenBenefits}
-        onOpenKhatmah={onOpenKhatmah}
-        onOpenCustomCounter={onOpenCustomCounter}
       />,
     );
 
-    fireEvent.click(screen.getByTestId("library-benefits-tool"));
-    fireEvent.click(screen.getByTestId("library-quran-tool"));
-    fireEvent.click(screen.getByRole("button", { name: "Masbaha" }));
+    const collection = screen.getByRole("button", { name: /^Morning Azkar/ });
+    const benefits = screen.getByTestId("library-benefits-tool");
+    expect(collection.compareDocumentPosition(benefits) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.queryByTestId("library-quran-tool")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Masbaha" })).not.toBeInTheDocument();
+
+    fireEvent.click(benefits);
     expect(onOpenBenefits).toHaveBeenCalledOnce();
-    expect(onOpenKhatmah).toHaveBeenCalledOnce();
-    expect(onOpenCustomCounter).toHaveBeenCalledOnce();
   });
 
-  it("combines Collections and Saved into one accessible filter beside search", async () => {
+  it("shows Collections and Saved as an accessible two-tab switch", async () => {
     const user = userEvent.setup();
     render(
       <AzkarLibraryScreen
@@ -48,13 +46,15 @@ describe("AzkarLibraryScreen", () => {
       />,
     );
 
-    const filter = screen.getByTestId("library-section-filter");
-    expect(filter).toHaveAccessibleName(/Collections/);
-    expect(screen.queryByRole("tablist")).not.toBeInTheDocument();
-    await user.click(filter);
-    const saved = screen.getByRole("menuitemradio", { name: "Saved" });
+    const tabs = screen.getByRole("tablist", { name: "Azkar Library" });
+    const collections = screen.getByTestId("library-section-collections");
+    const saved = screen.getByTestId("library-section-saved");
+    expect(tabs).toBeVisible();
+    expect(collections).toHaveAttribute("aria-selected", "true");
+    expect(saved).toHaveAttribute("aria-selected", "false");
     await user.click(saved);
-    expect(filter).toHaveAccessibleName(/Saved/);
+    expect(saved).toHaveAttribute("aria-selected", "true");
+    expect(collections).toHaveAttribute("aria-selected", "false");
     expect(screen.getByRole("heading", { name: "Nothing saved yet" })).toBeVisible();
   });
 

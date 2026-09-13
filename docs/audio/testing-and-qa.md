@@ -17,7 +17,9 @@ Automated tests cover exact/no-fallback lookup, Arabic fingerprints, canonical r
 ## Manual checklist
 
 - Use keyboard only: start, expand/minimize, play/pause, previous/next, seek with arrow keys, speed/voice, volume/mute, Retry/Skip/Stop.
-- Verify the volume slider opens on hover and keyboard focus with a fine pointer, opens on click with touch input, reports a vertical orientation and percentage, and restores its persisted level.
+- Verify the volume slider opens on hover and keyboard focus with a fine pointer, stays open while the pointer crosses from speaker to slider, opens on click with touch input, reports a vertical orientation and percentage, and restores its persisted level.
+- Verify collections with multiple reviewed recordings expose Play All on both overview and Reader, disclose partial coverage, and advance through the frozen queue.
+- Verify compact progress and both native slider tracks remain inside the player bounds, use CSS-rendered tracks/thumbs, retain 44px interaction height, and mirror their fill in RTL without reversing media time.
 - Verify visible focus and 44px targets at narrow width, 200%, and 400% zoom.
 - Verify English fills timeline progress left-to-right and Arabic fills it right-to-left without horizontal overflow.
 - With a screen reader, confirm dynamic Play/Pause names and polite track/error/repetition/queue announcements; current time must not announce every second.

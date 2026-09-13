@@ -109,6 +109,12 @@ const QuranWirdScreen = retryableScreen(() =>
 const CustomCounterScreen = retryableScreen(() =>
   import("./screens/CustomCounterScreen").then((module) => ({ default: module.CustomCounterScreen })),
 );
+const MoreScreen = retryableScreen(() =>
+  import("./screens/MoreScreen").then((module) => ({ default: module.MoreScreen })),
+);
+const QiblaScreen = retryableScreen(() =>
+  import("./screens/QiblaScreen").then((module) => ({ default: module.QiblaScreen })),
+);
 const SettingsScreen = retryableScreen(() =>
   import("./screens/settings/SettingsScreen").then((module) => ({ default: module.SettingsScreen })),
 );
@@ -952,6 +958,8 @@ function AppContent({
     !readerInMushafMode &&
     [
       "home",
+      "more",
+      "qibla",
       "library",
       "benefits",
       "wird_benefits",
@@ -1304,6 +1312,24 @@ function AppContent({
                   onTogglePrayerTracking={handleTogglePrayerTracking}
                 />
               )}
+              {view === "more" && (
+                <MoreScreen
+                  language={selectedLang}
+                  direction={layoutDirection}
+                  onOpenQibla={() => push("qibla")}
+                  onOpenMasbaha={() => push("custom_counter")}
+                  onOpenSettings={() => push("settings")}
+                />
+              )}
+              {view === "qibla" && (
+                <QiblaScreen
+                  language={selectedLang}
+                  direction={layoutDirection}
+                  locationSettings={locationSettings}
+                  reduceMotion={reduceMotion}
+                  onBack={pop}
+                />
+              )}
               {view === "wird_benefits" && (
                 <WirdBenefitsScreen language={selectedLang} direction={layoutDirection} onBack={pop} />
               )}
@@ -1324,9 +1350,7 @@ function AppContent({
                   savedZikrIds={savedZikrIds}
                   routineModes={routineModes}
                   initialSection={librarySection}
-                  onOpenCustomCounter={() => push("custom_counter")}
                   onOpenBenefits={() => push("benefits")}
-                  onOpenKhatmah={() => push("khatmah_overview")}
                 />
               )}
               {view === "progress" && (
@@ -1605,6 +1629,9 @@ function AppContent({
                   }
                   onPlayAudio={
                     activeZikrHasAudio && activeZikr ? () => void startAudio([activeZikr], "single") : undefined
+                  }
+                  onPlayAllAudio={
+                    activeCat !== "comprehensive_duas" && audioCoverage.available > 1 ? startPlayAllAudio : undefined
                   }
                   onRepeatAudio={
                     activeZikrHasAudio && activeZikr?.audioBehavior.supportedModes.includes("repeat-prescribed-count")

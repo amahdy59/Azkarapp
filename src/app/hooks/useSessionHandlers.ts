@@ -78,7 +78,7 @@ export function useSessionHandlers({
   push: (to: View) => void;
   pop: () => void;
   setView: (view: View) => void;
-  setActiveTab: (tab: "home" | "azkar" | "progress" | "settings") => void;
+  setActiveTab: (tab: "home" | "azkar" | "progress" | "more") => void;
   showConfirm: (
     title: string,
     description: string,

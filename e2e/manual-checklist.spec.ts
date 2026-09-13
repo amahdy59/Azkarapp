@@ -234,7 +234,8 @@ test("text resize: 200% zoom keeps primary navigation usable", async ({ page }) 
 
   await expectNoHorizontalOverflow(page, "200% zoom Home");
   await expect(page.getByRole("navigation")).toHaveCount(1);
-  await page.getByTestId("nav-settings").click();
+  await page.getByTestId("nav-more").click();
+  await page.getByRole("button", { name: /^Settings/ }).click();
   await expect(page.getByRole("heading", { name: "Settings", exact: true })).toBeVisible();
   await expectNoHorizontalOverflow(page, "200% zoom Settings");
 });
@@ -251,7 +252,8 @@ test("text reflow: 400% zoom equivalent keeps core actions reachable", async ({ 
   await morning.click();
   await expect(page.getByRole("button", { name: /Start Session|Continue/ }).first()).toBeVisible();
 
-  await page.getByTestId("nav-settings").click();
+  await page.getByTestId("nav-more").click();
+  await page.getByRole("button", { name: /^Settings/ }).click();
   await expect(page.getByRole("button", { name: "Accessibility", exact: true })).toBeVisible();
   await expectNoHorizontalOverflow(page, "400% zoom Settings");
 });
@@ -274,7 +276,8 @@ test("text spacing overrides do not clip core content or actions", async ({ page
   await page.getByTestId("nav-azkar").click();
   await expect(page.getByTestId("category-card-morning")).toBeVisible();
   await expectNoHorizontalOverflow(page, "text spacing Library");
-  await page.getByTestId("nav-settings").click();
+  await page.getByTestId("nav-more").click();
+  await page.getByRole("button", { name: /^Settings/ }).click();
   await expect(page.getByRole("button", { name: "Accessibility", exact: true })).toBeVisible();
   await expectNoHorizontalOverflow(page, "text spacing Settings");
 });
@@ -305,12 +308,9 @@ test.skip("post-prayer cards hide what cannot be acted on and stay equal height"
 
   const tracker = page.getByTestId("after-prayer-trackers");
   const grid = page.getByTestId("prayer-tracker-cards");
-  await page.getByTestId("nav-azkar").click();
-  const masbaha = page.getByTestId("library-masbaha-entry");
   const cards = grid.locator("article[data-prayer-state]");
 
-  const [trackerBox, masbahaBox] = await Promise.all([tracker.boundingBox(), masbaha.boundingBox()]);
-  expect(masbahaBox?.y).toBeGreaterThanOrEqual((trackerBox?.y ?? 0) + (trackerBox?.height ?? 0));
+  await expect(tracker).toBeVisible();
 
   /* Now that it's a carousel, we render all 5 cards on all viewports,
      and rely on CSS snapping and JS scrolling to show the relevant ones.
@@ -371,7 +371,8 @@ test("forced colors preserves focus and selected-state cues", async ({ page }) =
 // and offline results use the selected method."
 test("prayer times: effective timezone and offset are surfaced and survive going offline", async ({ page }) => {
   await seedAndOpen(page);
-  await page.getByTestId("nav-settings").click();
+  await page.getByTestId("nav-more").click();
+  await page.getByRole("button", { name: /^Settings/ }).click();
   await page.getByRole("button", { name: /Prayer Times & Reminders/ }).click();
 
   const status = page.getByTestId("daylight-saving-status");

@@ -4,6 +4,8 @@ import { parseHash, parseLocation, routeToHash } from "./routing";
 describe("routeToHash", () => {
   it("maps the primary destinations to stable paths", () => {
     expect(routeToHash({ view: "home" })).toBe("#/home");
+    expect(routeToHash({ view: "more" })).toBe("#/more");
+    expect(routeToHash({ view: "qibla" })).toBe("#/qibla");
     expect(routeToHash({ view: "library" })).toBe("#/azkar");
     expect(routeToHash({ view: "progress" })).toBe("#/progress");
     expect(routeToHash({ view: "settings" })).toBe("#/settings");
@@ -37,6 +39,8 @@ describe("parseHash", () => {
   it("round-trips every linkable view", () => {
     for (const route of [
       { view: "home" },
+      { view: "more" },
+      { view: "qibla" },
       { view: "library" },
       { view: "progress" },
       { view: "settings" },

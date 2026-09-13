@@ -47,7 +47,8 @@ async function backgroundAlpha(locator: Locator): Promise<number> {
 test("the destructive-action confirm dialog is centred behind a dimming scrim", async ({ page }) => {
   await openReturningGuest(page);
 
-  await page.getByRole("button", { name: "Settings", exact: true }).click();
+  await page.getByTestId("nav-more").click();
+  await page.getByRole("button", { name: /^Settings/ }).click();
   await page.getByRole("button", { name: /Account & data/ }).click();
   await page.getByRole("button", { name: "Erase local data", exact: true }).click();
 
@@ -155,9 +156,9 @@ test("radio menu items keep their logical-start indicator gutter in Arabic", asy
   expect(geometry.indicatorInsetFromLogicalStart ?? 999).toBeLessThanOrEqual(16);
 });
 
-/* ── Phase 17 / DEC-068: one menu surface, one item anatomy, logical alignment ── */
+/* ── Library section tabs: visible, bounded, and direction-aware ── */
 
-async function openLibraryScopeMenu(page: Page, language: "ar" | "en") {
+async function openLibrarySectionTabs(page: Page, language: "ar" | "en") {
   await page.addInitScript((selected) => {
     window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
     window.localStorage.setItem(
@@ -173,82 +174,41 @@ async function openLibraryScopeMenu(page: Page, language: "ar" | "en") {
   await page.goto("/");
   await expect(page.getByRole("navigation").first()).toBeVisible({ timeout: 10_000 });
   await page.getByTestId("nav-azkar").click();
-  await expect(page.getByTestId("library-section-filter")).toBeVisible();
-
-  // Pin the specific control. `[aria-haspopup="menu"]`.first() resolved to a
-  // different trigger on the mobile device profile, where the menu legitimately
-  // aligns elsewhere — which failed in CI with a 1052px delta while passing
-  // locally on the desktop profile.
-  const trigger = page.getByTestId("library-section-filter");
-  await expect(trigger).toBeVisible();
-  await trigger.click();
-  const menu = page.locator('[data-slot="dropdown-menu-content"]');
-  await expect(menu).toBeVisible();
-  return { trigger, menu };
+  const tablist = page.getByRole("tablist");
+  await expect(tablist).toBeVisible();
+  return {
+    tablist,
+    collections: page.getByTestId("library-section-collections"),
+    saved: page.getByTestId("library-section-saved"),
+  };
 }
 
-/**
- * The library scope menu uses align="end". Radix resolves that against the
- * direction on the menu root, so the edge it pins to must MIRROR between
- * languages: the trigger's logical-end edge is its right in LTR and its left in
- * RTL. Measured at desktop width so collision shifting, which is legitimate and
- * viewport-dependent, cannot confound the result.
- */
-test("menus align to the same logical edge in both reading directions", async ({ page }) => {
+test("Library section tabs mirror keyboard movement in both reading directions", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
 
-  const ltr = await openLibraryScopeMenu(page, "en");
-  const ltrMenu = await ltr.menu.boundingBox();
-  const ltrTrigger = await ltr.trigger.boundingBox();
-  expect(ltrMenu && ltrTrigger).toBeTruthy();
-  if (!ltrMenu || !ltrTrigger) return;
-  // LTR: logical end === physical right.
-  expect(Math.abs(ltrMenu.x + ltrMenu.width - (ltrTrigger.x + ltrTrigger.width))).toBeLessThanOrEqual(2);
+  const ltr = await openLibrarySectionTabs(page, "en");
+  await ltr.collections.focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(ltr.saved).toHaveAttribute("aria-selected", "true");
 
-  const rtl = await openLibraryScopeMenu(page, "ar");
+  const rtl = await openLibrarySectionTabs(page, "ar");
   await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
-  const rtlMenu = await rtl.menu.boundingBox();
-  const rtlTrigger = await rtl.trigger.boundingBox();
-  expect(rtlMenu && rtlTrigger).toBeTruthy();
-  if (!rtlMenu || !rtlTrigger) return;
-  // RTL: logical end === physical left. If this fails the menu is not
-  // mirroring, which is exactly the F09 defect.
-  expect(Math.abs(rtlMenu.x - rtlTrigger.x)).toBeLessThanOrEqual(2);
+  await rtl.collections.focus();
+  await page.keyboard.press("ArrowLeft");
+  await expect(rtl.saved).toHaveAttribute("aria-selected", "true");
 });
 
-test("every menu presents the same surface and 44px items", async ({ page }) => {
+test("Library section tabs stay bounded and meet the 44px target floor", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
-  const { menu } = await openLibraryScopeMenu(page, "en");
+  const { tablist, collections, saved } = await openLibrarySectionTabs(page, "en");
+  const listBounds = await tablist.boundingBox();
+  expect(listBounds).not.toBeNull();
 
-  const surface = await menu.evaluate((element) => {
-    const style = getComputedStyle(element);
-    return {
-      radius: style.borderTopLeftRadius,
-      padding: style.padding,
-      hasShadow: style.boxShadow !== "none",
-      borderColor: style.borderTopColor,
-    };
-  });
-  // --ds-radius-overlay is 1.5rem; menus are overlays, not cards.
-  expect(surface.radius).toBe("24px");
-  expect(surface.padding).toBe("6px");
-  expect(surface.hasShadow).toBe(true);
-
-  const items = menu.getByRole("menuitemradio");
-  const count = await items.count();
-  expect(count).toBeGreaterThan(0);
-  for (let index = 0; index < count; index += 1) {
-    // offsetHeight — the laid-out border box — rather than a measured rectangle.
-    // The Pixel 7 profile emulates a 2.625 device scale factor, and both
-    // boundingBox and getBoundingClientRect report the composited box, which
-    // comes back as 43.99998474121094 for an item whose min-height is exactly
-    // 44px: one part in 65,536 short, from the scale factor rather than from
-    // anything the layout did. Which side of that it lands on moves when
-    // unrelated type sizes shift the menu by a fraction of a pixel, so the
-    // rectangle cannot decide a touch-target floor. offsetHeight is integral
-    // and unscaled: the half-pixel it rounds away is far below the pixel a real
-    // regression would cost.
-    const height = await items.nth(index).evaluate((element) => (element as HTMLElement).offsetHeight);
-    expect(height).toBeGreaterThanOrEqual(44);
+  for (const tab of [collections, saved]) {
+    const bounds = await tab.boundingBox();
+    expect(bounds).not.toBeNull();
+    expect(await tab.evaluate((element) => (element as HTMLElement).offsetHeight)).toBeGreaterThanOrEqual(44);
+    expect(bounds!.x).toBeGreaterThanOrEqual(listBounds!.x - 1);
+    expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(listBounds!.x + listBounds!.width + 1);
   }
 });

@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { ProgressDayView, ProgressWeekView, ProgressMonthView, ProgressYearView } from "./ProgressViews";
 import type { GardenSummary } from "../progress";
 import type { DailyCollectionCompletion } from "../types";
@@ -68,6 +68,24 @@ describe("ProgressViews components", () => {
     expect(screen.getByRole("button", { name: "Evening Azkar - Start now - Not completed" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Morning Azkar - Completed" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Sleep Azkar - Not completed" })).toBeInTheDocument();
+  });
+
+  it("adds Quran as the fourth tracked item in the Home wird", () => {
+    const onPress = vi.fn();
+    render(
+      <ProgressDayView
+        summary={mockSummary}
+        language="en"
+        dynamicSubtitle="One routine complete"
+        visibleCategoryIds={["morning", "evening", "before_sleep"]}
+        quranWird={{ progress: 2, goal: 4, complete: false, active: true, onPress }}
+      />,
+    );
+
+    expect(screen.getByText("1 / 4")).toBeInTheDocument();
+    const quran = screen.getByRole("button", { name: "Quran Wird - 2 of 4 pages" });
+    fireEvent.click(quran);
+    expect(onPress).toHaveBeenCalledOnce();
   });
 
   it("does not recommend a routine the reader already completed today", () => {

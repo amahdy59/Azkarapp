@@ -16,14 +16,18 @@ export const AUDIO_SOURCES: Readonly<Record<string, AudioSourceRecord>> = Object
   "internal-upload": {
     id: "internal-upload",
     name: "Internal Upload",
+    nameArabic: "تسجيل مرفوع داخلياً",
     attribution: "Recitation by Muhammad Al-Shara",
+    attributionArabic: "تلاوة محمد الشرع",
     licenseName: "Publicly distributed",
     licenseEvidence: "N/A",
   },
   "internal-upload-abdullah-muhammad": {
     id: "internal-upload-abdullah-muhammad",
     name: "Azkarapp owner-supplied recordings",
+    nameArabic: "تسجيلات زوّد بها مالك وَذَكِّرْ",
     attribution: "Recitation by Abdullah Muhammad",
+    attributionArabic: "تلاوة عبد الله محمد",
     licenseName: "Owner-authorized internal upload",
     licenseEvidence: "internal:owner-upload-2026-09-12",
   },

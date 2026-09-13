@@ -115,10 +115,8 @@ describe("App Composition and Routing", () => {
 
     expect(await screen.findByRole("heading", { name: /settings/i, level: 1 }, { timeout: 5000 })).toBeInTheDocument();
 
-    const settingsTab = await screen.findByRole("button", {
-      name: /settings/i,
-    });
-    expect(settingsTab).toHaveAttribute("aria-current", "page");
+    const moreTab = await screen.findByTestId("nav-more");
+    expect(moreTab).toHaveAttribute("aria-current", "page");
   });
 
   it("keeps approved Al-Kahf audio actionable and retries audio initialization", async () => {
@@ -145,11 +143,11 @@ describe("App Composition and Routing", () => {
 
     await screen.findByRole("main");
 
-    // Press Alt+4 for settings
+    // Press Alt+4 for More
     await user.keyboard("{Alt>}{4}{/Alt}");
 
-    expect(await screen.findByRole("heading", { name: /settings/i, level: 1 }, { timeout: 5000 })).toBeInTheDocument();
-    expect(window.location.hash).toBe("#/settings");
+    expect(await screen.findByRole("heading", { name: /more/i, level: 1 }, { timeout: 5000 })).toBeInTheDocument();
+    expect(window.location.hash).toBe("#/more");
 
     // Press Alt+3 for progress
     await user.keyboard("{Alt>}{3}{/Alt}");
@@ -164,11 +162,9 @@ describe("App Composition and Routing", () => {
 
     await screen.findByRole("main");
 
-    // Click Settings tab
-    const settingsTab = await screen.findByRole("button", {
-      name: /settings/i,
-    });
-    await user.click(settingsTab);
+    // Click More tab, then open Settings from the tools screen.
+    await user.click(await screen.findByTestId("nav-more"));
+    await user.click(await screen.findByRole("button", { name: /^Settings/ }));
 
     expect(await screen.findByRole("heading", { name: /settings/i, level: 1 }, { timeout: 5000 })).toBeInTheDocument();
     expect(window.location.hash).toBe("#/settings");
@@ -178,12 +174,12 @@ describe("App Composition and Routing", () => {
       window.history.back();
     });
 
-    // Wait for home screen to return (Settings heading goes away)
+    // One Back step returns to the More screen that opened Settings.
     await waitFor(() => {
       expect(screen.queryByRole("heading", { name: /settings/i, level: 1 })).not.toBeInTheDocument();
     });
 
-    const homeTab = await screen.findByRole("button", { name: /home/i });
-    expect(homeTab).toHaveAttribute("aria-current", "page");
+    const moreTab = await screen.findByTestId("nav-more");
+    expect(moreTab).toHaveAttribute("aria-current", "page");
   });
 });

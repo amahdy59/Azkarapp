@@ -5,7 +5,6 @@ import { TranquilityCompletionCard } from "../components/TranquilityCompletionCa
 import { getContextualEvidence, getReminderContexts, selectLibraryEvidence } from "../dailyEvidence";
 import type { DayMomentContext, PrayerMomentContext, ReminderContext } from "../types";
 import { DailyEvidenceCard, FridayHomeCard, PrayerRoutineCard } from "../components/HomeCards";
-import { QuranHomeCard } from "../components/QuranHomeCard";
 import { PrayerMomentPanel } from "../components/PrayerMomentPanel";
 import { TodaysPathSheet } from "../components/TodaysPathSheet";
 import { getDailyPathStatus } from "../dailyPath";
@@ -636,8 +635,12 @@ export function HomeScreen({
                   />
                 </div>
 
-                {expandedPrayer && (
-                  <div className="grid w-full grid-cols-1 md:grid-cols-2 md:gap-4 lg:gap-5" dir={direction}>
+                <div
+                  data-testid="home-context-grid"
+                  className="grid w-full grid-cols-1 items-start gap-4 md:grid-cols-2 lg:gap-5"
+                  dir={direction}
+                >
+                  {expandedPrayer && (
                     <section
                       id="home-expanded-prayer"
                       data-testid="home-prayer-moment"
@@ -661,79 +664,85 @@ export function HomeScreen({
                         canRecord={expandedPrayerModel?.isRecordable ?? false}
                       />
                     </section>
-                  </div>
-                )}
-
-                <div
-                  data-testid="home-context-grid"
-                  className="grid w-full grid-cols-1 items-start gap-4 lg:grid-cols-2 lg:gap-5"
-                >
-                  {/* Contextual Hero */}
-                  {hasPrimaryContext && (
-                    <div
-                      data-testid="home-primary-card"
-                      className={`grid min-w-0 ${hasContextCompanion ? "lg:col-span-1" : "lg:col-span-2"}`}
-                    >
-                      {showCompletionCard ? (
-                        <div className="h-full">
-                          <TranquilityCompletionCard
-                            categoryId={reminderInfo.categoryId}
-                            language={language}
-                            isExiting={completionCardState === "exiting"}
-                            onGlass={homeVisualEffects}
-                          />
-                        </div>
-                      ) : isRoutineHero ? (
-                        <PrayerRoutineCard
-                          categoryId={reminderInfo.categoryId}
-                          language={language}
-                          direction={direction}
-                          categoryName={
-                            isLastThirdDua
-                              ? reminderInfo.title
-                              : isArabic
-                                ? reminderCategory.nameArabic
-                                : reminderCategory.name
-                          }
-                          description={reminderInfo.desc}
-                          mode={reminderMode}
-                          showModeSelector={!isLastThirdDua}
-                          onModeChange={(mode) => {
-                            if (isRoutineCategory(reminderInfo.categoryId)) {
-                              onSetRoutineMode?.(reminderInfo.categoryId, mode);
-                            }
-                          }}
-                          completedCount={doneCount}
-                          totalCount={totalCount}
-                          estimatedMinutes={estimatedMinutes}
-                          showEstimate={!isLastThirdDua}
-                          ctaLabel={ctaLabel}
-                          onOpen={() => onResume(reminderInfo.categoryId)}
-                          onGlass={homeVisualEffects}
-                        />
-                      ) : null}
-                    </div>
                   )}
 
-                  {/* One contextual companion keeps the primary action visually dominant. */}
-                  {dailyEvidence ? (
-                    <div
-                      data-testid="home-context-companion"
-                      className={`flex min-w-0 ${hasPrimaryContext ? "lg:col-span-1" : "lg:col-span-2"}`}
-                    >
-                      <DailyEvidenceCard
-                        language={language}
-                        direction={direction}
-                        evidence={dailyEvidence}
-                        onGlass={homeVisualEffects}
-                      />
-                    </div>
-                  ) : null}
+                  <div
+                    data-testid="home-context-stack"
+                    className={
+                      expandedPrayer
+                        ? `flex min-w-0 flex-col gap-4 lg:gap-5 ${
+                            PRAYER_NAMES.indexOf(expandedPrayer) < 3 ? "md:col-start-2" : "md:col-start-1"
+                          }`
+                        : "contents"
+                    }
+                  >
+                    {/* Contextual Hero */}
+                    {hasPrimaryContext && (
+                      <div
+                        data-testid="home-primary-card"
+                        className={`grid min-w-0 ${hasContextCompanion ? "md:col-span-1" : "md:col-span-2"}`}
+                      >
+                        {showCompletionCard ? (
+                          <div className="h-full">
+                            <TranquilityCompletionCard
+                              categoryId={reminderInfo.categoryId}
+                              language={language}
+                              isExiting={completionCardState === "exiting"}
+                              onGlass={homeVisualEffects}
+                            />
+                          </div>
+                        ) : isRoutineHero ? (
+                          <PrayerRoutineCard
+                            categoryId={reminderInfo.categoryId}
+                            language={language}
+                            direction={direction}
+                            categoryName={
+                              isLastThirdDua
+                                ? reminderInfo.title
+                                : isArabic
+                                  ? reminderCategory.nameArabic
+                                  : reminderCategory.name
+                            }
+                            description={reminderInfo.desc}
+                            mode={reminderMode}
+                            showModeSelector={!isLastThirdDua}
+                            onModeChange={(mode) => {
+                              if (isRoutineCategory(reminderInfo.categoryId)) {
+                                onSetRoutineMode?.(reminderInfo.categoryId, mode);
+                              }
+                            }}
+                            completedCount={doneCount}
+                            totalCount={totalCount}
+                            estimatedMinutes={estimatedMinutes}
+                            showEstimate={!isLastThirdDua}
+                            ctaLabel={ctaLabel}
+                            onOpen={() => onResume(reminderInfo.categoryId)}
+                            onGlass={homeVisualEffects}
+                          />
+                        ) : null}
+                      </div>
+                    )}
+
+                    {/* One contextual companion keeps the primary action visually dominant. */}
+                    {dailyEvidence ? (
+                      <div
+                        data-testid="home-context-companion"
+                        className={`flex min-w-0 ${hasPrimaryContext ? "md:col-span-1" : "md:col-span-2"}`}
+                      >
+                        <DailyEvidenceCard
+                          language={language}
+                          direction={direction}
+                          evidence={dailyEvidence}
+                          onGlass={homeVisualEffects}
+                        />
+                      </div>
+                    ) : null}
+                  </div>
 
                   {/* Today's Wird needs the full row: its three routine tiles must
                       respond to their own available width, not the viewport. */}
                   {quietProgressEnabled && (
-                    <div data-testid="home-wird-row" className="min-w-0 lg:col-span-2">
+                    <div data-testid="home-wird-row" className="min-w-0 md:col-span-2">
                       <TodayRoutineGarden
                         summary={gardenSummary}
                         language={language}
@@ -744,6 +753,15 @@ export function HomeScreen({
                         visibleCategoryIds={HOME_WIRD_CATEGORY_IDS}
                         recommendedCategoryId={isRoutineHero ? reminderInfo.categoryId : undefined}
                         onOpenWirdBenefits={onOpenWirdBenefits}
+                        quranWird={{
+                          progress: dailyPath.quran.progress,
+                          goal: dailyPath.quran.goal,
+                          complete: dailyPath.quran.complete,
+                          active: dailyPath.quran.active,
+                          onPress: hasQuranActivity
+                            ? (onContinueKhatmah ?? onOpenKhatmah ?? (() => undefined))
+                            : (onOpenKhatmah ?? (() => undefined)),
+                        }}
                         onMedia={homeVisualEffects}
                       />
                     </div>
@@ -762,21 +780,6 @@ export function HomeScreen({
             onMosquePrayerGoalChange={(goal) => onMosquePrayerGoalChange?.(goal)}
             onClose={() => setPathSheetOpen(false)}
           />
-
-          {hasQuranActivity && (
-            <QuranHomeCard
-              language={language}
-              direction={direction}
-              position={quranReadingPosition}
-              plan={quranWirdPlan}
-              wirdHistory={wirdHistory ?? {}}
-              progressDayStartHour={progressDayStartHour}
-              now={now}
-              onContinue={onContinueKhatmah ?? (() => {})}
-              onOverview={onOpenKhatmah ?? (() => {})}
-              onGlass={homeVisualEffects}
-            />
-          )}
 
           {fridayInWindow && (
             <div className="px-page">

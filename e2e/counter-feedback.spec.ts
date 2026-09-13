@@ -44,8 +44,9 @@ test("the Home Wird keeps semantic order while mirroring Arabic placement and ex
   expect(ltrBoxes.every(Boolean)).toBe(true);
   if (ltrBoxes[0] && ltrBoxes[1] && ltrBoxes[2]) {
     expect(ltrBoxes[0].x).toBeLessThan(ltrBoxes[1].x);
-    expect(ltrBoxes[1].x).toBeLessThan(ltrBoxes[2].x);
+    expect(ltrBoxes[2].y).toBeGreaterThan(ltrBoxes[0].y + ltrBoxes[0].height - 1);
   }
+  await expect(page.getByTestId("today-garden-card").getByRole("button", { name: /Quran Wird/ })).toBeVisible();
 
   await page.setViewportSize({ width: 320, height: 700 });
   await page.waitForFunction(() => window.innerWidth === 320);
@@ -63,7 +64,7 @@ test("the Home Wird keeps semantic order while mirroring Arabic placement and ex
   expect(rtlBoxes.every(Boolean)).toBe(true);
   if (rtlBoxes[0] && rtlBoxes[1] && rtlBoxes[2]) {
     expect(rtlBoxes[0].x).toBeGreaterThan(rtlBoxes[1].x);
-    expect(rtlBoxes[1].x).toBeGreaterThan(rtlBoxes[2].x);
+    expect(rtlBoxes[2].y).toBeGreaterThan(rtlBoxes[0].y + rtlBoxes[0].height - 1);
   }
 });
 
@@ -77,6 +78,7 @@ test("tablet and desktop Home keep prayer detail to the selected half while othe
 
   const grid = page.getByTestId("home-context-grid");
   const prayerDetail = page.getByTestId("home-prayer-moment");
+  const contextStack = page.getByTestId("home-context-stack");
   const primary = page.getByTestId("home-primary-card");
   const primaryGlass = primary.locator(".hero-glass").first();
   const companion = page.getByTestId("home-context-companion");
@@ -90,40 +92,55 @@ test("tablet and desktop Home keep prayer detail to the selected half while othe
   await expect(prayerSummary.locator('article[data-density="summary"]')).toHaveCount(5);
   await expect(prayerSummary.getByRole("checkbox")).toHaveCount(0);
 
-  const [gridBox, prayerDetailBox, primaryBox, companionBox, wirdBox, prayerSummaryBox] = await Promise.all(
-    [grid, prayerDetail, primary, companion, wird, prayerSummary].map((locator) => locator.boundingBox()),
-  );
-  expect(gridBox && prayerDetailBox && primaryBox && companionBox && wirdBox && prayerSummaryBox).toBeTruthy();
-  if (gridBox && prayerDetailBox && primaryBox && companionBox && wirdBox && prayerSummaryBox) {
+  const [gridBox, prayerDetailBox, contextStackBox, primaryBox, companionBox, wirdBox, prayerSummaryBox] =
+    await Promise.all(
+      [grid, prayerDetail, contextStack, primary, companion, wird, prayerSummary].map((locator) =>
+        locator.boundingBox(),
+      ),
+    );
+  expect(
+    gridBox && prayerDetailBox && contextStackBox && primaryBox && companionBox && wirdBox && prayerSummaryBox,
+  ).toBeTruthy();
+  if (gridBox && prayerDetailBox && contextStackBox && primaryBox && companionBox && wirdBox && prayerSummaryBox) {
     expect(Math.abs(prayerDetailBox.width - (prayerSummaryBox.width - 20) / 2)).toBeLessThanOrEqual(2);
     expect(prayerDetailBox.x + prayerDetailBox.width).toBeCloseTo(prayerSummaryBox.x + prayerSummaryBox.width, 0);
-    expect(primaryBox.y).toBeGreaterThanOrEqual(prayerDetailBox.y + prayerDetailBox.height + 12);
-    expect(Math.abs(primaryBox.width - companionBox.width)).toBeLessThanOrEqual(2);
-    expect(Math.abs(primaryBox.y - companionBox.y)).toBeLessThanOrEqual(2);
-    expect(companionBox.height).toBeLessThan(primaryBox.height);
-    expect(wirdBox.y).toBeGreaterThanOrEqual(primaryBox.y + primaryBox.height + 12);
+    expect(Math.abs(prayerDetailBox.y - contextStackBox.y)).toBeLessThanOrEqual(2);
+    expect(Math.abs(prayerDetailBox.width - contextStackBox.width)).toBeLessThanOrEqual(2);
+    expect(primaryBox.width).toBeCloseTo(contextStackBox.width, 0);
+    expect(companionBox.width).toBeCloseTo(contextStackBox.width, 0);
+    expect(companionBox.y).toBeGreaterThanOrEqual(primaryBox.y + primaryBox.height + 12);
+    expect(wirdBox.y).toBeGreaterThanOrEqual(
+      Math.max(prayerDetailBox.y + prayerDetailBox.height, companionBox.y + companionBox.height) + 12,
+    );
     expect(wirdBox.width).toBeGreaterThanOrEqual(gridBox.width - 2);
   }
 
   await page.setViewportSize({ width: 834, height: 900 });
   await page.waitForFunction(() => window.innerWidth === 834);
-  const [tabletPrayerBox, tabletSummaryBox] = await Promise.all([
+  const [tabletPrayerBox, tabletStackBox, tabletSummaryBox] = await Promise.all([
     prayerDetail.boundingBox(),
+    contextStack.boundingBox(),
     prayerSummary.boundingBox(),
   ]);
-  expect(tabletPrayerBox && tabletSummaryBox).toBeTruthy();
-  if (tabletPrayerBox && tabletSummaryBox) {
+  expect(tabletPrayerBox && tabletStackBox && tabletSummaryBox).toBeTruthy();
+  if (tabletPrayerBox && tabletStackBox && tabletSummaryBox) {
     expect(Math.abs(tabletPrayerBox.width - (tabletSummaryBox.width - 16) / 2)).toBeLessThanOrEqual(2);
     expect(tabletPrayerBox.x + tabletPrayerBox.width).toBeCloseTo(tabletSummaryBox.x + tabletSummaryBox.width, 0);
+    expect(Math.abs(tabletPrayerBox.y - tabletStackBox.y)).toBeLessThanOrEqual(2);
+    expect(Math.abs(tabletPrayerBox.width - tabletStackBox.width)).toBeLessThanOrEqual(2);
   }
 
   const routineTiles = page.getByTestId("today-garden-card").getByRole("button", { name: / - (مكتملة|غير مكتملة)$/ });
   await expect(routineTiles).toHaveCount(3);
+  const quranTile = page.getByTestId("today-garden-card").getByRole("button", { name: /ورد القرآن/ });
+  await expect(quranTile).toBeVisible();
   const tileBoxes = await Promise.all([0, 1, 2].map((index) => routineTiles.nth(index).boundingBox()));
-  expect(tileBoxes.every(Boolean)).toBe(true);
-  if (tileBoxes[0] && tileBoxes[1] && tileBoxes[2]) {
+  const quranTileBox = await quranTile.boundingBox();
+  expect(tileBoxes.every(Boolean) && quranTileBox).toBeTruthy();
+  if (tileBoxes[0] && tileBoxes[1] && tileBoxes[2] && quranTileBox) {
     expect(tileBoxes[0].x).toBeGreaterThan(tileBoxes[1].x + tileBoxes[1].width - 1);
-    expect(tileBoxes[1].x).toBeGreaterThan(tileBoxes[2].x + tileBoxes[2].width - 1);
+    expect(tileBoxes[2].x).toBeGreaterThan(quranTileBox.x + quranTileBox.width - 1);
+    expect(tileBoxes[2].y).toBeGreaterThan(tileBoxes[0].y + tileBoxes[0].height - 1);
   }
 
   const overflow = await grid.evaluate((element) => ({
@@ -140,6 +157,10 @@ test("tablet and desktop Home keep prayer detail to the selected half while othe
 });
 
 test("wide Home keeps navigation exposed, contains its scene, and uses glass for every card", async ({ page }) => {
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send("Emulation.setEmulatedMedia", {
+    features: [{ name: "prefers-reduced-transparency", value: "no-preference" }],
+  });
   await page.setViewportSize({ width: 1885, height: 982 });
   await page.clock.setFixedTime(new Date("2026-09-05T14:00:00+03:00"));
   await openReturningGuest(page, "ar");
@@ -178,11 +199,15 @@ test("wide Home keeps navigation exposed, contains its scene, and uses glass for
   const material = await glassCards[1]!.evaluate((element) => {
     const style = getComputedStyle(element);
     return {
+      backgroundColor: style.backgroundColor,
       backgroundImage: style.backgroundImage,
+      backdropFilter: style.backdropFilter,
       boxShadow: style.boxShadow,
     };
   });
+  expect(material.backgroundColor).toBe("rgba(2, 6, 23, 0.14)");
   expect(material.backgroundImage).toContain("linear-gradient");
+  expect(material.backdropFilter).toContain("blur(10px)");
   expect(material.boxShadow).not.toBe("none");
 });
 
@@ -217,16 +242,16 @@ test("Home prayer strip keeps all five prayers legible without page overflow", a
   }
 });
 
-test("the Library masbaha entry fills compact/tablet layouts and is bounded on desktop", async ({ page }) => {
+test("the More screen masbaha entry fills compact/tablet layouts and is bounded on desktop", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 568 });
   await openReturningGuest(page);
-  await page.getByTestId("nav-azkar").click();
+  await page.getByTestId("nav-more").click();
   const entry = page.getByRole("button", { name: "Masbaha" }).first();
 
   for (const viewport of [
     { width: 320, height: 568, minimumWidth: 260, maximumWidth: 320 },
-    { width: 834, height: 900, minimumWidth: 700, maximumWidth: 834 },
-    { width: 1440, height: 900, minimumWidth: 900, maximumWidth: 1440 },
+    { width: 834, height: 900, minimumWidth: 250, maximumWidth: 450 },
+    { width: 1440, height: 900, minimumWidth: 250, maximumWidth: 360 },
   ]) {
     await page.setViewportSize(viewport);
     const box = await entry.boundingBox();
@@ -260,7 +285,7 @@ test("the OnePlus-class Salawat session keeps its counter controls and hint insi
 test("the custom counter stays bounded on a short phone and isolates focused-control shortcuts", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 568 });
   await openReturningGuest(page);
-  await page.getByTestId("nav-azkar").click();
+  await page.getByTestId("nav-more").click();
   await page.getByRole("button", { name: "Masbaha" }).first().click();
 
   const screen = page.locator(".app-screen-surface");
@@ -305,7 +330,7 @@ test("the custom counter stays bounded on a short phone and isolates focused-con
 test("custom counter content keeps its reading-width bound on desktop", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await openReturningGuest(page);
-  await page.getByTestId("nav-azkar").click();
+  await page.getByTestId("nav-more").click();
   await page.getByRole("button", { name: "Masbaha" }).first().click();
 
   const contentBox = await page.getByTestId("custom-counter-content").boundingBox();

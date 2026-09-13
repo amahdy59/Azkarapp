@@ -12,7 +12,8 @@ async function enterEnglishGuestMode(page: Page) {
 }
 
 async function openSettings(page: Page) {
-  await page.getByRole("button", { name: "Settings", exact: true }).click();
+  await page.getByTestId("nav-more").click();
+  await page.getByRole("button", { name: /^Settings/ }).click();
   await expect(page.getByRole("heading", { name: "Settings", exact: true })).toBeVisible();
 }
 

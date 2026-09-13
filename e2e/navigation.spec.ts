@@ -23,6 +23,35 @@ test("@cross-browser Azkar tab opens the library and exposes search", async ({ p
   await expect(page.getByRole("heading", { name: "Azkar Library", exact: true })).toBeVisible();
 });
 
+test("@cross-browser More keeps Qibla, Masbaha, and Settings easy to reach", async ({ page }) => {
+  await enterAsEnglishGuest(page);
+
+  for (const viewport of [
+    { width: 320, height: 700 },
+    { width: 834, height: 1112 },
+    { width: 1440, height: 900 },
+  ]) {
+    await page.setViewportSize(viewport);
+    const moreTab = page.getByTestId("nav-more");
+    await moreTab.click();
+    await expect(moreTab).toHaveAttribute("aria-current", "page");
+    await expect(page.getByRole("heading", { name: "More", exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: /^Qibla/ })).toBeVisible();
+    await expect(page.getByRole("button", { name: /^Masbaha/ })).toBeVisible();
+    await expect(page.getByRole("button", { name: /^Settings/ })).toBeVisible();
+
+    await page.getByRole("button", { name: /^Qibla/ }).click();
+    await expect(page).toHaveURL(/#\/qibla$/);
+    await expect(page.getByRole("heading", { name: "Qibla", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Qibla is 136° from north/ })).toBeVisible();
+    await expect(moreTab).toHaveAttribute("aria-current", "page");
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    expect(overflow).toBeLessThanOrEqual(1);
+  }
+});
+
 test("hash routes restore lazy collections, reject invalid positions, and preserve PWA shortcuts", async ({ page }) => {
   await enterAsEnglishGuest(page);
 
@@ -53,8 +82,7 @@ test("saved zikr is visible from the first-class Saved library tab", async ({ pa
   await page.getByRole("menuitem", { name: "Save zikr", exact: true }).click();
   await page.getByRole("button", { name: "Back", exact: true }).click();
   await page.getByRole("button", { name: "Azkar", exact: true }).click();
-  await page.getByTestId("library-section-filter").click();
-  await page.getByRole("menuitemradio", { name: /Saved/ }).click();
+  await page.getByTestId("library-section-saved").click();
 
   await expect(page.getByRole("heading", { name: "Saved remembrance", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: /Azkar:/ }).first()).toBeVisible();

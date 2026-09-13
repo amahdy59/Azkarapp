@@ -111,6 +111,7 @@ test.describe("Baseline Capture Suite", () => {
     await page.getByTestId("onboarding-get-started").click();
     await page.getByTestId("continue-as-guest").click();
 
+    await page.getByTestId("nav-more").click();
     await page.getByRole("button", { name: "Settings" }).click();
     await expect(page.getByRole("heading", { name: "Preferences" })).toBeVisible();
     await page.screenshot({ path: testInfo.outputPath("baseline-settings.png"), fullPage: true });

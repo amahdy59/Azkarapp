@@ -412,6 +412,23 @@ test("reader actions stay inside a 320 px app canvas", async ({ page }) => {
   }
 });
 
+test("Reference keeps an accessible phone icon and gains visible text from tablet width", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 700 });
+  await openFirstMorningZikr(page);
+
+  const phoneReference = page.getByRole("button", { name: "Reference", exact: true });
+  await expect(phoneReference).toBeVisible();
+  await expect(phoneReference.getByText("Reference", { exact: true })).toBeHidden();
+
+  await page.setViewportSize({ width: 600, height: 800 });
+  await expect(
+    page.getByRole("button", { name: "Reference", exact: true }).getByText("Reference", { exact: true }),
+  ).toBeVisible();
+
+  await page.setViewportSize({ width: 1200, height: 800 });
+  await expect(page.getByTestId("reader-hero-actions").getByText("Reference", { exact: true })).toBeVisible();
+});
+
 test("reference sheet matches the approved hierarchy and stays usable on short screens", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 560 });
   await openFirstMorningZikr(page);

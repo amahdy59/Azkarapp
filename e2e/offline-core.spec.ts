@@ -42,7 +42,8 @@ test("core Reader and Settings are available on a first offline visit after inst
     await expect(counter).toHaveAccessibleName(/Completed\s*1\s*\/\s*1/);
 
     await page.goto("/");
-    await page.getByTestId("nav-settings").click();
+    await page.getByTestId("nav-more").click();
+    await page.getByRole("button", { name: /^Settings/ }).click();
     await expect(page.getByRole("heading", { name: "Settings", exact: true })).toBeVisible();
   } finally {
     await context.setOffline(false);

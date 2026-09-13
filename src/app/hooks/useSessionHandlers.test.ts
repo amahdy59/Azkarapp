@@ -41,7 +41,7 @@ function renderSessionHarness({
     const [savedIds, setSavedIds] = useState(new Set<string>());
     const [routineModes, setRoutineModes] = useState(DEFAULT_APP_STATE.settings.routineModes);
     const [view, setView] = useState<View>("reader");
-    const [activeTab, setActiveTab] = useState<"home" | "azkar" | "progress" | "settings">("azkar");
+    const [activeTab, setActiveTab] = useState<"home" | "azkar" | "progress" | "more">("azkar");
     const handlers = useSessionHandlers({
       activeCat: category,
       setActiveCat: setCategory,

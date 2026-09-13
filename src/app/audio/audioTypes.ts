@@ -17,7 +17,9 @@ export type AudioErrorCode =
 export interface AudioSourceRecord {
   id: string;
   name: string;
+  nameArabic?: string;
   attribution: string;
+  attributionArabic?: string;
   licenseName?: string;
   licenseEvidence?: string;
   notes?: string;
@@ -85,7 +87,9 @@ export interface ResolvedAudioSegment {
   voiceId: string;
   voiceName: string;
   sourceName: string;
+  sourceNameArabic?: string;
   attribution: string;
+  attributionArabic?: string;
   url: string;
   durationMs: number;
   mimeType: AudioVariant["mimeType"];

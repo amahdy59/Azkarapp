@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import {
   ChevronDown,
   ChevronUp,
@@ -344,25 +344,28 @@ function VolumeControl({
       {open && (
         <div
           id="audio-volume-control"
-          className="absolute bottom-full end-1 z-10 mb-2 flex h-40 w-14 flex-col items-center justify-center rounded-2xl border border-border bg-card/98 py-3 shadow-overlay backdrop-blur-xl"
+          data-testid="audio-volume-popover"
+          className="absolute bottom-full end-0 z-10 h-[10.5rem] w-14 pb-2"
         >
-          <input
-            type="range"
-            min={0}
-            max={1}
-            step={0.05}
-            value={level}
-            onChange={(event) => controller.setVolume(Number(event.currentTarget.value))}
-            aria-label={copy.volume}
-            aria-orientation="vertical"
-            aria-valuetext={`${formatNumerals(percentage, language)}%`}
-            style={{
-              writingMode: "vertical-lr",
-              direction: "rtl",
-              background: `linear-gradient(to top, var(--primary) ${percentage}%, var(--muted) ${percentage}%)`,
-            }}
-            className="h-28 w-2 cursor-pointer appearance-none rounded-full accent-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-          />
+          <div className="flex h-full w-full flex-col items-center justify-center rounded-2xl border border-border bg-card/98 py-3 shadow-overlay backdrop-blur-xl">
+            <input
+              type="range"
+              min={0}
+              max={1}
+              step={0.05}
+              value={level}
+              onChange={(event) => controller.setVolume(Number(event.currentTarget.value))}
+              aria-label={copy.volume}
+              aria-orientation="vertical"
+              aria-valuetext={`${formatNumerals(percentage, language)}%`}
+              style={{
+                writingMode: "vertical-lr",
+                direction: "rtl",
+                background: `linear-gradient(to top, var(--primary) ${percentage}%, var(--muted) ${percentage}%)`,
+              }}
+              className="audio-volume-range h-28 w-2 cursor-pointer appearance-none rounded-full accent-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            />
+          </div>
         </div>
       )}
     </div>
@@ -457,7 +460,11 @@ export function FloatingAudioPlayer({
   const reciterDisplayName = getAudioVoiceName(voiceId, language) ?? currentSegment?.voiceName ?? voiceId;
 
   const attributionText = currentSegment
-    ? `${currentSegment.sourceName} · ${currentSegment.attribution}`
+    ? `${language === "ar" ? (currentSegment.sourceNameArabic ?? currentSegment.sourceName) : currentSegment.sourceName} · ${
+        language === "ar"
+          ? (currentSegment.attributionArabic ?? currentSegment.attribution)
+          : currentSegment.attribution
+      }`
     : `${copy.recitationBy} ${reciterDisplayName}`;
 
   const liveMessage =
@@ -498,7 +505,11 @@ export function FloatingAudioPlayer({
         </div>
 
         {/* How far into the recitation, on the card's own top edge. */}
-        <div className="absolute inset-x-0 top-0 h-1 overflow-hidden rounded-t-2xl bg-muted" aria-hidden="true">
+        <div
+          data-testid="audio-compact-progress"
+          className="absolute inset-x-3 top-0.5 h-1 overflow-hidden rounded-full bg-muted"
+          aria-hidden="true"
+        >
           <div
             className="absolute top-0 h-full bg-primary transition-[width] duration-fast"
             style={{ width: `${progressPercent}%`, insetInlineStart: 0 }}
@@ -545,8 +556,8 @@ export function FloatingAudioPlayer({
               onChange={(event) => controller.seek(Number(event.currentTarget.value))}
               aria-label={copy.seek}
               aria-valuetext={accessibleTime(state.currentTime, state.duration, language)}
-              style={{ background: progressBackground(progressPercent, direction) }}
-              className="h-2 min-w-0 flex-1 cursor-pointer appearance-none rounded-full accent-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              style={{ "--audio-range-fill": progressBackground(progressPercent, direction) } as CSSProperties}
+              className="audio-timeline-range h-11 min-w-0 flex-1 cursor-pointer appearance-none accent-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             />
             <span className="w-10 text-center text-micro font-bold tabular-nums text-muted-foreground">
               {formatTime(state.duration, language)}
@@ -663,10 +674,8 @@ export function FloatingAudioPlayer({
             /* The played part of the track is drawn here rather than in a
                stylesheet: a range input needs one gradient per browser engine
                to fill, and the value is already in hand. */
-            style={{
-              background: progressBackground(progressPercent, direction),
-            }}
-            className="w-full h-2 rounded-full accent-primary appearance-none cursor-pointer focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            style={{ "--audio-range-fill": progressBackground(progressPercent, direction) } as CSSProperties}
+            className="audio-timeline-range h-11 w-full cursor-pointer appearance-none accent-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           />
         </div>
         <span className="w-11 text-center text-xs font-bold tabular-nums text-muted-foreground">

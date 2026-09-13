@@ -58,7 +58,8 @@ test("core app screens do not overflow a 320px viewport", async ({ page }) => {
 
   await page.getByRole("button", { name: "Back", exact: true }).click();
   await page.getByRole("button", { name: "Back", exact: true }).click();
-  await page.getByRole("button", { name: "Settings", exact: true }).click();
+  await page.getByTestId("nav-more").click();
+  await page.getByRole("button", { name: /^Settings/ }).click();
   await expect(page.getByRole("heading", { name: "Settings", exact: true })).toBeVisible();
   await expectNoHorizontalOverflow(page, "Settings");
 });
@@ -67,7 +68,8 @@ test("Arabic large text remains readable at 320px", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 700 });
   await enterEnglishGuestMode(page);
 
-  await page.getByTestId("nav-settings").click();
+  await page.getByTestId("nav-more").click();
+  await page.getByRole("button", { name: /^Settings/ }).click();
   await page.getByRole("button", { name: "Accessibility", exact: true }).click();
   await page.getByTestId("text-size-option-large").click();
   await page.getByRole("button", { name: "Back", exact: true }).click();

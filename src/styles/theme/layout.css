@@ -94,6 +94,83 @@
   max-height: calc(100dvh - 5.5rem);
 }
 
+/* Native range inputs keep their real keyboard, pointer and accessibility
+   behavior. Explicit CSS tracks and thumbs make their geometry consistent
+   across engines without bitmap artwork or a scripted slider. */
+.audio-timeline-range {
+  --audio-range-fill: var(--muted);
+  background: transparent;
+}
+
+.audio-timeline-range::-webkit-slider-runnable-track {
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: var(--audio-range-fill);
+}
+
+.audio-timeline-range::-webkit-slider-thumb {
+  width: 1.125rem;
+  height: 1.125rem;
+  margin-top: -0.3125rem;
+  appearance: none;
+  border: 2px solid var(--card);
+  border-radius: 9999px;
+  background: var(--primary);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.35);
+}
+
+.audio-timeline-range::-moz-range-track {
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: var(--audio-range-fill);
+}
+
+.audio-timeline-range::-moz-range-thumb {
+  width: 0.875rem;
+  height: 0.875rem;
+  border: 2px solid var(--card);
+  border-radius: 9999px;
+  background: var(--primary);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.35);
+}
+
+.audio-volume-range::-webkit-slider-runnable-track {
+  width: 0.5rem;
+  border-radius: 9999px;
+  background: inherit;
+}
+
+.audio-volume-range::-webkit-slider-thumb {
+  width: 1.125rem;
+  height: 1.125rem;
+  appearance: none;
+  border: 2px solid var(--card);
+  border-radius: 9999px;
+  background: var(--primary);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.35);
+}
+
+.audio-volume-range::-moz-range-track {
+  width: 0.5rem;
+  border-radius: 9999px;
+  background: inherit;
+}
+
+.audio-volume-range::-moz-range-thumb {
+  width: 0.875rem;
+  height: 0.875rem;
+  border: 2px solid var(--card);
+  border-radius: 9999px;
+  background: var(--primary);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.35);
+}
+
+.audio-timeline-range:disabled,
+.audio-volume-range:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
 .app-shell.app-shell--navigation-hidden .floating-audio-player {
   bottom: max(0.5rem, env(safe-area-inset-bottom));
 }
@@ -292,18 +369,16 @@
    completion card, the routine card and the wird card cannot drift apart —
    they sit side by side and any difference between them shows. */
 .hero-glass {
-  background-color: rgb(2 6 23 / 0.3);
-  background-image: linear-gradient(135deg, rgb(255 255 255 / 0.13), rgb(255 255 255 / 0.035) 38%, rgb(0 0 0 / 0.16));
-  border: 1px solid rgb(255 255 255 / 0.16);
-  /* 18px, not 40px. Backdrop-filter cost scales with radius and area, and
-     these are large cards over a photograph — three of them at 40px made
-     scrolling the hero visibly sluggish. The extra opacity below carries the
-     legibility the wider radius used to, at a fraction of the compositing
-     cost, and the two read the same at this size.
+  background-color: rgb(2 6 23 / 0.14);
+  background-image: linear-gradient(135deg, rgb(255 255 255 / 0.1), transparent 38%, rgb(0 0 0 / 0.1));
+  border: 1px solid rgb(255 255 255 / 0.22);
+  /* A short blur keeps the photograph visibly present instead of turning it
+     into a flat navy fill. Backdrop-filter cost scales with radius and area,
+     and these are large cards over a photograph.
 
      `contain: paint` stops the browser re-sampling the backdrop for anything
      outside each card's own box. */
-  backdrop-filter: blur(18px) saturate(135%);
+  backdrop-filter: blur(10px) saturate(125%);
   contain: paint;
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.13),

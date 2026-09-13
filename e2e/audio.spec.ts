@@ -103,14 +103,35 @@ test("desktop audio dock stays inside the main canvas and reveals volume on hove
   await page.getByRole("button", { name: "الاستماع للسورة", exact: true }).click();
 
   const player = page.getByRole("region", { name: "مشغل الصوت" });
+  const compactProgress = player.getByTestId("audio-compact-progress");
   const volume = player.getByRole("button", { name: /كتم الصوت/ });
   await volume.hover();
-  await expect(player.getByRole("slider", { name: "مستوى الصوت" })).toBeVisible();
+  const volumeSlider = player.getByRole("slider", { name: "مستوى الصوت" });
+  await expect(volumeSlider).toBeVisible();
+
+  // The invisible bridge belongs to the popover's hit area, so travelling
+  // from the speaker to the slider cannot dismiss it before it is usable.
+  const [volumeBox, sliderBox] = await Promise.all([volume.boundingBox(), volumeSlider.boundingBox()]);
+  expect(volumeBox && sliderBox).toBeTruthy();
+  if (volumeBox && sliderBox) {
+    await page.mouse.move(volumeBox.x + volumeBox.width / 2, volumeBox.y + volumeBox.height / 2);
+    await page.mouse.move(sliderBox.x + sliderBox.width / 2, sliderBox.y + sliderBox.height / 2, { steps: 12 });
+  }
+  await expect(volumeSlider).toBeVisible();
+  await volumeSlider.click({ position: { x: 4, y: 88 } });
+  await expect.poll(() => volumeSlider.inputValue()).not.toBe("1");
 
   const [mainBox, playerBox] = await Promise.all([page.locator(".app-main").boundingBox(), player.boundingBox()]);
   expect(mainBox && playerBox).toBeTruthy();
   if (mainBox && playerBox) {
     expect(playerBox.x).toBeGreaterThanOrEqual(mainBox.x);
     expect(playerBox.x + playerBox.width).toBeLessThanOrEqual(mainBox.x + mainBox.width + 1);
+  }
+
+  const progressBox = await compactProgress.boundingBox();
+  expect(progressBox && playerBox).toBeTruthy();
+  if (progressBox && playerBox) {
+    expect(progressBox.x).toBeGreaterThan(playerBox.x);
+    expect(progressBox.x + progressBox.width).toBeLessThan(playerBox.x + playerBox.width);
   }
 });

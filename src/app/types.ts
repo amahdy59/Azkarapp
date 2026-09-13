@@ -86,6 +86,8 @@ export type View =
   | "khatmah_overview"
   | "khatmah"
   | "home"
+  | "more"
+  | "qibla"
   | "library"
   | "progress"
   | "benefits"

@@ -1,17 +1,9 @@
 import { useDeferredValue, useId, useMemo, useState } from "react";
-import { Search, Bookmark, ChevronDown, ChevronNext, SlidersHorizontal } from "../components/icons";
-import { TasbeehCounterButton } from "../components/TasbeehCounterButton";
+import { Search, Bookmark, ChevronNext, Lightbulb } from "../components/icons";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { CategoryCard } from "../components/CategoryCard";
 import { StatePanel } from "../components/StatePanel";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-} from "../components/ui/dropdown-menu";
+import { TabList, tabPanelProps } from "../components/Tabs";
 import {
   ALL_AZKAR,
   getAzkarByCategory,
@@ -44,9 +36,7 @@ export function AzkarLibraryScreen({
   onSearch,
   savedZikrIds,
   routineModes,
-  onOpenCustomCounter,
   onOpenBenefits,
-  onOpenKhatmah,
   initialSection = "collections",
 }: {
   completed: Record<CategoryId, Set<string>>;
@@ -57,9 +47,7 @@ export function AzkarLibraryScreen({
   onSearch: (query: string) => void;
   savedZikrIds: Set<string>;
   routineModes: Record<RoutineCategoryId, RoutineMode>;
-  onOpenCustomCounter?: () => void;
   onOpenBenefits?: () => void;
-  onOpenKhatmah?: () => void;
   initialSection?: LibrarySection;
 }) {
   const [section, setSection] = useState<LibrarySection>(initialSection);
@@ -134,54 +122,18 @@ export function AzkarLibraryScreen({
               <label htmlFor={searchInputId} className={`mb-1.5 block ${FIELD_LABEL_CLASS}`}>
                 {t(language, "library.search")}
               </label>
-              <div className="flex items-center gap-2">
-                <div className="field-shell flex h-12 min-w-0 flex-1 items-center gap-3 rounded-2xl border border-border-control bg-card px-4 shadow-raised transition-colors focus-within:border-primary">
-                  <Search size={19} className="shrink-0 text-primary" aria-hidden="true" />
-                  <input
-                    id={searchInputId}
-                    type="text"
-                    value={searchQuery}
-                    placeholder={t(language, "library.search")}
-                    dir={searchQuery.trim() ? "auto" : direction}
-                    lang={language}
-                    autoComplete="off"
-                    onChange={(event) => setSearchQuery(event.currentTarget.value)}
-                    className="h-11 min-w-0 flex-1 bg-transparent text-start text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
-                  />
-                </div>
-                <DropdownMenu dir={direction}>
-                  <DropdownMenuTrigger asChild>
-                    <button
-                      type="button"
-                      className="interactive-elem flex h-12 shrink-0 items-center justify-center gap-2 rounded-2xl border border-border-control bg-card px-3.5 text-label font-extrabold text-foreground shadow-raised transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                      aria-label={`${t(language, "library.title")}: ${t(language, `library.${section}`)}`}
-                      data-testid="library-section-filter"
-                    >
-                      <SlidersHorizontal size={18} aria-hidden="true" />
-                      <span className="hidden sm:inline">{t(language, `library.${section}`)}</span>
-                      <ChevronDown size={15} aria-hidden="true" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="min-w-[13rem]">
-                    <DropdownMenuLabel className="px-3 py-2 text-xs font-black text-muted-foreground">
-                      {t(language, "library.title")}
-                    </DropdownMenuLabel>
-                    <DropdownMenuRadioGroup
-                      value={section}
-                      onValueChange={(value) => setSection(value as LibrarySection)}
-                    >
-                      {(["collections", "saved"] as const).map((value) => (
-                        <DropdownMenuRadioItem key={value} value={value} className="font-bold">
-                          {`${t(language, `library.${value}`)}${
-                            value === "saved" && savedZikrIds.size > 0
-                              ? ` (${formatNumerals(savedZikrIds.size, language)})`
-                              : ""
-                          }`}
-                        </DropdownMenuRadioItem>
-                      ))}
-                    </DropdownMenuRadioGroup>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+              <div className="field-shell flex h-12 min-w-0 items-center gap-3 rounded-2xl border border-border-control bg-card px-4 shadow-raised transition-colors focus-within:border-primary">
+                <Search size={19} className="shrink-0 text-primary" aria-hidden="true" />
+                <input
+                  id={searchInputId}
+                  type="text"
+                  value={searchQuery}
+                  dir={searchQuery.trim() ? "auto" : direction}
+                  lang={language}
+                  autoComplete="off"
+                  onChange={(event) => setSearchQuery(event.currentTarget.value)}
+                  className="h-11 min-w-0 flex-1 bg-transparent text-start text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+                />
               </div>
               {searchQuery.trim() && (
                 <p className="mt-1.5 px-1 text-xs text-muted-foreground">{t(language, "library.searchHint")}</p>
@@ -196,6 +148,28 @@ export function AzkarLibraryScreen({
                 {filterStatusMessage}
               </p>
             </form>
+            <TabList
+              value={section}
+              onChange={setSection}
+              direction={direction}
+              idPrefix="library-sections"
+              aria-label={t(language, "library.title")}
+              className="mt-3 grid grid-cols-2 rounded-2xl border border-border-control/60 bg-card p-1 shadow-xs"
+              tabs={(["collections", "saved"] as const).map((value) => ({
+                value,
+                testId: `library-section-${value}`,
+                label: `${t(language, `library.${value}`)}${
+                  value === "saved" && savedZikrIds.size > 0 ? ` (${formatNumerals(savedZikrIds.size, language)})` : ""
+                }`,
+              }))}
+              itemClassName={(selected) =>
+                `min-h-11 rounded-xl px-3 text-sm font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                  selected
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                }`
+              }
+            />
             {section === "collections" && !searchQuery.trim() && (
               <div
                 role="group"
@@ -234,57 +208,12 @@ export function AzkarLibraryScreen({
           </div>
         </header>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-5 page-content-center outline-none focus-visible:ring-1 focus-visible:ring-ring/40">
+        <div
+          className="min-h-0 flex-1 overflow-y-auto px-5 pb-5 page-content-center outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
+          {...tabPanelProps("library-sections", section)}
+        >
           {section === "collections" ? (
             <>
-              {!deferredQuery && (onOpenBenefits || onOpenKhatmah) && (
-                <section aria-labelledby="library-tools-heading" className="mb-6">
-                  <h2
-                    id="library-tools-heading"
-                    className="mb-2.5 text-label font-bold uppercase tracking-wide text-muted-foreground"
-                  >
-                    {t(language, "home.yourLibrary")}
-                  </h2>
-                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                    {onOpenBenefits && (
-                      <button
-                        type="button"
-                        onClick={onOpenBenefits}
-                        data-testid="library-benefits-tool"
-                        className="interactive-elem flex min-h-[96px] items-center gap-3 rounded-3xl border border-border/40 bg-card p-4 text-start shadow-raised transition-colors hover:border-primary/40 hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                      >
-                        <span className="min-w-0 flex-1">
-                          <span className="block text-subtitle font-black text-foreground">
-                            {t(language, "benefits.title")}
-                          </span>
-                          <span className="mt-1 line-clamp-2 block text-label font-semibold text-muted-foreground">
-                            {t(language, "benefits.homeDescription")}
-                          </span>
-                        </span>
-                        <ChevronNext className="size-5 shrink-0 text-primary rtl:rotate-180" aria-hidden="true" />
-                      </button>
-                    )}
-                    {onOpenKhatmah && (
-                      <button
-                        type="button"
-                        onClick={onOpenKhatmah}
-                        data-testid="library-quran-tool"
-                        className="interactive-elem flex min-h-[96px] items-center gap-3 rounded-3xl border border-border/40 bg-card p-4 text-start shadow-raised transition-colors hover:border-primary/40 hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                      >
-                        <span className="min-w-0 flex-1">
-                          <span className="block text-subtitle font-black text-foreground">
-                            {t(language, "home.khatmahTitle")}
-                          </span>
-                          <span className="mt-1 block text-label font-semibold text-muted-foreground">
-                            {t(language, "home.khatmahDescription")}
-                          </span>
-                        </span>
-                        <ChevronNext className="size-5 shrink-0 text-primary rtl:rotate-180" aria-hidden="true" />
-                      </button>
-                    )}
-                  </div>
-                </section>
-              )}
               {filteredGroups.map(({ group, categories }) => (
                 <section key={group.id} aria-labelledby={`library-group-${group.id}`} className="mb-6 last:mb-0">
                   <h2
@@ -370,10 +299,29 @@ export function AzkarLibraryScreen({
                   />
                 </div>
               )}
-              {onOpenCustomCounter && filteredGroups.length > 0 && (
-                <div className="mt-4" data-testid="library-masbaha-entry">
-                  <TasbeehCounterButton onClick={onOpenCustomCounter} language={language} direction={direction} />
-                </div>
+              {!deferredQuery && onOpenBenefits && filteredGroups.length > 0 && (
+                <button
+                  type="button"
+                  onClick={onOpenBenefits}
+                  data-testid="library-benefits-tool"
+                  className="interactive-elem mt-2 flex min-h-[72px] w-full items-center gap-3 rounded-3xl border border-border/40 bg-card p-4 text-start shadow-raised transition-colors hover:border-primary/40 hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                >
+                  <span
+                    className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary"
+                    aria-hidden="true"
+                  >
+                    <Lightbulb size={22} />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-subtitle font-black text-foreground">
+                      {t(language, "benefits.title")}
+                    </span>
+                    <span className="mt-0.5 line-clamp-1 block text-label font-semibold text-muted-foreground">
+                      {t(language, "benefits.open")}
+                    </span>
+                  </span>
+                  <ChevronNext className="size-5 shrink-0 text-primary rtl:rotate-180" aria-hidden="true" />
+                </button>
               )}
             </>
           ) : savedAzkar.length > 0 ? (

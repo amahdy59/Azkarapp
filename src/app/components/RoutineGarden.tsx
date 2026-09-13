@@ -3,7 +3,13 @@ import { CATEGORIES } from "../content/categories";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { type GardenMilestoneId, type GardenSummary, type GrowthEvent } from "../progress";
-import { ProgressDayView, ProgressWeekView, ProgressMonthView, ProgressYearView } from "./ProgressViews";
+import {
+  ProgressDayView,
+  ProgressWeekView,
+  ProgressMonthView,
+  ProgressYearView,
+  type QuranWirdTile,
+} from "./ProgressViews";
 import { tabPanelProps } from "./Tabs";
 import type { AppLanguage, CategoryId, DailyCollectionCompletion } from "../types";
 import { Zap } from "./icons";
@@ -42,6 +48,7 @@ export function TodayRoutineGarden({
   visibleCategoryIds,
   recommendedCategoryId,
   onOpenWirdBenefits,
+  quranWird,
   onMedia = true,
   activeTab = "day",
   displayDate = new Date(),
@@ -61,6 +68,7 @@ export function TodayRoutineGarden({
   onSelectCategory?: (categoryId: CategoryId) => void;
   /** Passed through to the day view; see ProgressDayView for the contract. */
   onOpenWirdBenefits?: () => void;
+  quranWird?: QuranWirdTile;
   activeTab?: "day" | "week" | "month" | "year";
   displayDate?: Date;
 }) {
@@ -68,16 +76,19 @@ export function TodayRoutineGarden({
   const streak = summary.currentUsageStreak ?? 0;
   // Fallback to internal navigation if not hidden (e.g. for HomeScreen where it uses its own simple label)
 
-  const completedCount = summary.today.completedCategories.length;
+  const completedCount = summary.today.completedCategories.length + (quranWird?.complete ? 1 : 0);
+  const totalCount = 3 + (quranWird ? 1 : 0);
   const dynamicSubtitle = t(
     language,
     completedCount === 0
       ? "garden.todayPromptEmpty"
       : completedCount === 1
         ? "garden.todayPromptOne"
-        : completedCount === 2
+        : completedCount === totalCount - 1
           ? "garden.todayPromptTwo"
-          : "garden.todayPromptComplete",
+          : completedCount >= totalCount
+            ? "garden.todayPromptComplete"
+            : "garden.todayPromptOne",
   );
 
   return (
@@ -140,6 +151,7 @@ export function TodayRoutineGarden({
             headingLevel={2}
             recommendedCategoryId={recommendedCategoryId}
             onOpenWirdBenefits={onOpenWirdBenefits}
+            quranWird={quranWird}
           />
         )}
 

@@ -35,6 +35,8 @@ const VIEW_PATHS = {
   khatmah: "/quran",
   wird_benefits: "/quran-wird/benefits",
   home: "/home",
+  more: "/more",
+  qibla: "/qibla",
   library: "/azkar",
   progress: "/progress",
   settings: "/settings",

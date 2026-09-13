@@ -224,6 +224,7 @@ test("home and settings flows have no automatically detectable WCAG A/AA violati
   await enterEnglishGuestMode(page);
   await expectNoWcagViolations(page);
 
+  await page.getByTestId("nav-more").click();
   await page.getByRole("button", { name: "Settings" }).click();
   await expect(page.getByRole("heading", { name: "Preferences" })).toBeVisible();
   await expectNoWcagViolations(page);
@@ -235,6 +236,7 @@ test("home and settings flows have no automatically detectable WCAG A/AA violati
 
 test("visible settings controls meet the 44px minimum touch target", async ({ page }) => {
   await enterEnglishGuestMode(page);
+  await page.getByTestId("nav-more").click();
   await page.getByRole("button", { name: "Settings" }).click();
   await page.getByRole("button", { name: "Accessibility", exact: true }).click();
 
@@ -289,7 +291,8 @@ test("dialogs have no automatically detectable WCAG A/AA violations", async ({ p
   await enterEnglishGuestMode(page);
 
   // Settings dialog
-  await page.getByTestId("nav-settings").click();
+  await page.getByTestId("nav-more").click();
+  await page.getByRole("button", { name: /^Settings/ }).click();
   await page.getByRole("button", { name: "Privacy & terms" }).click();
   await expect(page.getByRole("heading", { name: "Privacy & terms" })).toBeVisible();
 
@@ -312,6 +315,17 @@ test("custom counter has no automatically detectable WCAG A/AA violations", asyn
   await expectNoWcagViolations(page);
 });
 
+test("More and Qibla have no automatically detectable WCAG A/AA violations", async ({ page }) => {
+  await enterEnglishGuestMode(page);
+  await page.getByTestId("nav-more").click();
+  await expect(page.getByRole("heading", { name: "More", exact: true })).toBeVisible();
+  await expectNoWcagViolations(page);
+
+  await page.getByRole("button", { name: /^Qibla/ }).click();
+  await expect(page.getByRole("heading", { name: "Qibla", exact: true })).toBeVisible();
+  await expectNoWcagViolations(page);
+});
+
 test("Friday mode has no automatically detectable WCAG A/AA violations", async ({ page }) => {
   await enterEnglishGuestMode(page);
   await page.goto("/#/friday");
@@ -322,8 +336,7 @@ test("Friday mode has no automatically detectable WCAG A/AA violations", async (
 test("Saved zikr has no automatically detectable WCAG A/AA violations", async ({ page }) => {
   await enterEnglishGuestMode(page);
   await page.getByTestId("nav-azkar").click();
-  await page.getByTestId("library-section-filter").click();
-  await page.getByRole("menuitemradio", { name: /Saved/ }).click();
+  await page.getByTestId("library-section-saved").click();
   await expect(page.getByRole("heading", { name: "Nothing saved yet" })).toBeVisible();
   await expectNoWcagViolations(page);
 });

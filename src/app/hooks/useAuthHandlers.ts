@@ -115,7 +115,7 @@ export function useAuthHandlers({
     destructive?: boolean,
   ) => void;
   setView: (view: View) => void;
-  setActiveTab: (tab: "home" | "azkar" | "progress" | "settings") => void;
+  setActiveTab: (tab: "home" | "azkar" | "progress" | "more") => void;
 }) {
   const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
@@ -146,7 +146,7 @@ export function useAuthHandlers({
   const handleOpenAccountAuth = () => {
     setAuthError("");
     setView("login");
-    setActiveTab("settings");
+    setActiveTab("more");
   };
 
   const handleSendOtp = async (value: string) => {

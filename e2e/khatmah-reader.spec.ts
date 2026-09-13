@@ -22,9 +22,8 @@ test.beforeEach(async ({ page }) => {
     );
   });
 
-  await page.goto("/");
+  await page.goto("/#/quran-wird");
   await expect(page.getByRole("status", { name: "Loading Azkar" })).toHaveCount(0, { timeout: 5000 });
-  await page.getByRole("button", { name: /خطة القراءة/ }).click();
 });
 
 test("keeps progress in the Wird overview and turns one semantic page by swipe, key, or button", async ({ page }) => {

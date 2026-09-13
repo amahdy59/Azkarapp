@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowPrevious, BarChart3, BookOpen, Home, Settings, Globe, Moon, Sun, Contrast } from "./icons";
+import { ArrowPrevious, BarChart3, BookOpen, Home, MoreHorizontal, Globe, Moon, Sun, Contrast } from "./icons";
 import { PalmTreeMark } from "./RoutineGarden";
 import { t } from "../i18n";
 import { LANGUAGE_LABELS } from "../languageOptions";
@@ -7,7 +7,7 @@ import type { AppLanguage, ThemeMode } from "../types";
 
 // ─── Shared nav tab definition ────────────────────────────────────────────────
 
-export type NavTab = "home" | "azkar" | "progress" | "settings";
+export type NavTab = "home" | "azkar" | "progress" | "more";
 
 export interface NavProps {
   active: NavTab;
@@ -23,7 +23,7 @@ function getNavTabs(language: AppLanguage) {
     { id: "home" as const, label: t(language, "common.home"), Icon: Home },
     { id: "azkar" as const, label: t(language, "common.azkar"), Icon: BookOpen },
     { id: "progress" as const, label: t(language, "common.progress"), Icon: BarChart3 },
-    { id: "settings" as const, label: t(language, "common.settings"), Icon: Settings },
+    { id: "more" as const, label: t(language, "common.more"), Icon: MoreHorizontal },
   ];
 }
 

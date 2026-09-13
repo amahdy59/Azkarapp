@@ -3583,3 +3583,33 @@ null` shape, so a record written before this change still loads and still
 - **Volume:** persist normalized volume and muted state beside playback rate. Fine-pointer devices reveal the vertical slider on hover or keyboard focus and use speaker activation for mute; touch devices reveal it on activation. The slider retains native semantics, vertical orientation, percentage value text, and visible focus.
 - **Focus:** Play/Pause remains the dominant action. Compact desktop adds scrubbing and ten-second seeking only when space permits; expanded options retain only repeat, speed, and a genuinely available reciter choice. Redundant replay and generic recording labels are removed, while exact source attribution remains visible.
 - **Tests/evidence required:** controller persistence, hover/touch/keyboard volume interaction, compact-first behavior, main-canvas geometry, RTL timeline fill and keyboard seeking, 320/834/1440 screenshots, cross-browser smoke, full local gates, and production verification.
+
+## DEC-173 — Home glass stays transparent and audio controls remain reachable
+
+- **Decision:** supersede DEC-171's glass opacity, blur and empty-row composition details. Home uses a 14% tonal wash with a 10px blur so its photograph remains recognizable; the opaque reduced-transparency path is unchanged. Expanded prayer detail keeps its selected half while primary context and evidence stack in the opposite half.
+- **Audio interaction:** the fine-pointer volume popover includes the complete path between speaker and slider in its hover surface. Compact progress is inset within the player. Timeline and volume are native range controls with CSS-rendered tracks and thumbs, not images, and retain their native keyboard and assistive-technology behavior.
+- **Continuous listening:** collections with multiple reviewed recordings expose Play All in Reader as well as the collection overview. The existing frozen playback plan remains the one authority for ordered continuous playback and partial-coverage disclosure.
+- **Localization:** reviewed audio sources carry optional Arabic source and attribution labels; Arabic UI uses them while English retains the original evidence-facing labels.
+- **Tests/evidence required:** computed transparent material and opaque fallback, paired tablet/desktop layout geometry, uninterrupted speaker-to-slider pointer travel and level change, compact progress containment, Reader Play All exposure, RTL timeline behavior, full local gates, green workflows, and production verification.
+
+## DEC-174 — Quran is the fourth Home Wird tracker without adding navigation
+
+- **Decision:** Today's Wird on Home contains four peer actions: Morning, Evening, Before Sleep, and Quran. The Quran tile derives pages read, daily goal, and completion from the existing Quran plan and history, so there is no second tracker state that could disagree with the Mushaf.
+- **Responsive composition:** keep one semantic order. Phones stack four rows, tablets use two by two, and desktop uses one row of four. The former standalone Home Quran card is no longer rendered because it duplicates the same next action and progress.
+- **Navigation boundary:** this change adds no bottom-navigation destination. Qibla and a broader shortcut structure require a separate approved phase because sensor permissions, no-sensor fallback, and the correct library label/placement must be agreed first.
+- **Tests/evidence required:** four-item ratio and Quran progress/action unit coverage, 320/834/desktop layout and RTL order, no duplicate Home Quran card, full local gates, and production verification before release.
+
+## DEC-175 — More preserves four primary destinations and Qibla degrades honestly
+
+- **Decision:** supersede DEC-168 and DEC-174 only where they reserve the fourth primary destination for Settings or defer Qibla. Keep four visible destinations: Home, Azkar, Progress, and More. More contains labelled Qibla, Masbaha, and Settings cards; all three direct routes select More.
+- **Qibla calculation:** calculate the initial great-circle bearing to the fixed Kaaba coordinates locally from saved or transient current coordinates. Location detection uses the existing browser geolocation boundary and sends no coordinate to a service.
+- **Sensor boundary:** north-based bearing is the baseline. Live compass is an explicit progressive enhancement requested from a user activation on a secure context. It consumes only an absolute orientation or the supported WebKit compass heading and never presents relative alpha as a real compass.
+- **Accessibility and resilience:** the vector dial has a numeric and cardinal text equivalent. Permission denied, unsupported hardware, timeout/no heading, and geolocation failures retain actionable fallback copy. Live sensor changes move the decorative dial without flooding the live region; reduced motion disables interpolation.
+- **Tests/evidence required:** bearing and shortest-turn unit coverage, More action routing, direct route restoration, 320/834/1440 overflow and RTL checks, keyboard/focus, sensor permission and fallback checks, full local gates, and real-device compass calibration before release claims.
+
+## DEC-176 — The Azkar Library is collections first and icons keep one meaning
+
+- **Decision:** supersede DEC-168 only where it placed first-time Quran access and Masbaha inside the Library, and supersede the Library radio-menu presentation in earlier layout guidance. Collections and Saved are visible peer tabs below Search. Collections render first; one compact, labelled Lightbulb row for Zikr Benefits follows the collection groups. Quran remains in Today's Wird and the Mushaf flow, and Masbaha remains in More, so neither is duplicated in the Library.
+- **Icon semantics:** `Lightbulb` identifies the editorial Benefits index. `BookOpen` remains reserved for the reader evidence/reference sheet established by DEC-106; it must not be described as a benefit. The Reference text is visible from the 600px tier upward and becomes a localized icon-only action on narrower phones.
+- **Accessibility and responsiveness:** the shared APG tab primitive provides automatic activation, roving focus, Home/End, direction-aware arrows, and a labelled panel. Search keeps a visible label without duplicating that text as a placeholder. Every action retains a 44px target, visible focus, localized accessible name, and stable semantic order.
+- **Tests/evidence required:** focused Library unit coverage, Saved routing, RTL/LTR tab keyboard behavior, responsive containment, Reader label visibility at narrow and 600px-plus tiers, full local gates, and production verification before release.

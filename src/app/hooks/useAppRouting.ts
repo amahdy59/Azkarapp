@@ -26,10 +26,10 @@ export async function loadLazyRouteCategory(categoryId: CategoryId) {
   }
 }
 
-export type NavTab = "home" | "azkar" | "progress" | "settings";
+export type NavTab = "home" | "azkar" | "progress" | "more";
 
 export function tabForView(view: View): NavTab {
-  if (view === "settings") return "settings";
+  if (view === "more" || view === "qibla" || view === "settings" || view === "custom_counter") return "more";
   if (view === "progress") return "progress";
   if (view === "library" || view === "category" || view === "reader") return "azkar";
   return "home";
@@ -247,11 +247,12 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding }: UseAppRo
           setView("progress");
         } else if (e.key === "4") {
           e.preventDefault();
-          setActiveTab("settings");
-          setView("settings");
+          setActiveTab("more");
+          setView("more");
         } else if (e.key === "5") {
           e.preventDefault();
-          setView("custom_counter");
+          setActiveTab("more");
+          setView("settings");
         }
       }
     };
@@ -280,8 +281,8 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding }: UseAppRo
         push("library");
       } else if (tab === "progress") {
         push("progress");
-      } else if (tab === "settings") {
-        push("settings");
+      } else if (tab === "more") {
+        push("more");
       }
     },
     [push],

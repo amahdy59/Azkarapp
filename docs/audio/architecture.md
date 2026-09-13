@@ -10,6 +10,7 @@ Azkar uses explicit content identity and an approved asset registry. Playback ne
 - `buildPlaybackPlan.ts` snapshots stable zikr IDs, semantic order, segments, voices, and repetition behavior when Play is pressed.
 - `AudioProvider.tsx` owns the application’s single production `HTMLAudioElement`. Screen navigation cannot replace its plan.
 - `AudioProvider.tsx` also owns persisted playback rate, volume, and mute state. The floating player only renders and invokes that controller state; screens never manipulate an audio element directly.
+- Reviewed source records may carry Arabic display metadata alongside the original English attribution. Resolution preserves both, and the player selects the interface-language form without changing the reviewed media identity.
 
 Qur'anic passages are logical entries containing ordered verse segments. Next and Previous move by zikr; segment transitions remain internal. The Three Quls use one ritual-round progression. Audio repetition never changes the spiritual counter.
 

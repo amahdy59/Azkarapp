@@ -21,6 +21,40 @@ afterEach(() => {
 });
 
 describe("ReaderScreen audio identity", () => {
+  it("offers continuous play for the available routine from reader options", async () => {
+    const onPlayAllAudio = vi.fn();
+    render(
+      <ReaderScreen
+        catId="morning"
+        idx={2}
+        routineMode="core"
+        isArabic={false}
+        direction="ltr"
+        themeMode="light"
+        isDone={false}
+        collectionCompletedCount={0}
+        hapticFeedback={false}
+        showTranslation
+        showTransliteration
+        textSize="medium"
+        onTextSizeChange={() => undefined}
+        savedZikrIds={new Set()}
+        onBack={() => undefined}
+        onComplete={() => undefined}
+        onAdvance={() => undefined}
+        onNext={() => undefined}
+        onPrev={() => undefined}
+        onToggleSaved={() => undefined}
+        audioAvailable
+        onPlayAllAudio={onPlayAllAudio}
+      />,
+    );
+
+    fireEvent.pointerDown(screen.getByRole("button", { name: "Reader options" }), { button: 0, ctrlKey: false });
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Play All Audio" }));
+    expect(onPlayAllAudio).toHaveBeenCalledOnce();
+  });
+
   it("indexes the selected Core routine rather than the Complete list", () => {
     render(
       <ReaderScreen

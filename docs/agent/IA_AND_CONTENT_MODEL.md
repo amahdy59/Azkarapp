@@ -7,9 +7,9 @@ Recommended stable top-level structure:
 1. Home
 2. Azkar Library
 3. Progress
-4. Settings
+4. More
 
-Tasbeeh may remain a prominent utility or become a top-level destination only if usage data or user research demonstrates frequent direct access.
+More groups Qibla, Masbaha, and Settings behind clearly labelled cards. These utilities remain directly linkable, but they do not compete for separate bottom-navigation positions. Quran remains part of Today's Wird and the Mushaf flow rather than becoming a fifth tab.
 
 ## Home information model
 
@@ -26,6 +26,12 @@ Home should contain contextual modules, not become a second copy of every sectio
 ## Library taxonomy
 
 Recommended user-facing grouping:
+
+Collections and Saved are two visible peer tabs below Search. Collections stay
+primary and render before secondary destinations. Zikr Benefits follows the
+collection groups as one labelled lightbulb row. Quran is reached from Today's
+Wird and the Mushaf flow; Masbaha is reached from More, so neither is duplicated
+inside the Azkar Library.
 
 ### Day and worship
 

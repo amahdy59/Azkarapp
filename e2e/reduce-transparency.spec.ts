@@ -24,7 +24,8 @@ test("the setting makes blurred materials solid", async ({ page, browserName }) 
   await page.getByTestId("onboarding-get-started").click();
   await page.getByTestId("continue-as-guest").click();
   await page.getByRole("navigation").first().waitFor();
-  await page.getByRole("button", { name: "Settings", exact: true }).click();
+  await page.getByTestId("nav-more").click();
+  await page.getByRole("button", { name: /^Settings/ }).click();
   await page.getByRole("heading", { name: "Settings", exact: true }).waitFor();
   await page.getByRole("button", { name: /Help & FAQ/ }).click();
   await page.getByRole("heading", { name: "Help & FAQ", exact: true }).waitFor();
@@ -94,10 +95,12 @@ test("a card over the hero photograph goes opaque, not merely unblurred", async 
       backdropFilter: style.backdropFilter,
     };
   });
-  expect(material.backgroundColor, "the hero card should be translucent by default").toMatch(/rgba\(.*0?\.\d+\)/);
+  expect(material.backgroundColor, "the hero card should visibly reveal the photograph by default").toBe(
+    "rgba(2, 6, 23, 0.14)",
+  );
   expect(material.backgroundImage).toContain("linear-gradient");
-  expect(material.backdropFilter).toContain("blur(18px)");
-  expect(material.backdropFilter).toContain("saturate(1.35)");
+  expect(material.backdropFilter).toContain("blur(10px)");
+  expect(material.backdropFilter).toContain("saturate(1.25)");
 
   await page.evaluate(() => document.documentElement.classList.add("reduce-transparency"));
 

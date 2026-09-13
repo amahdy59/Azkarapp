@@ -1,15 +1,15 @@
 {
-  "release": "2026-09-13-home-and-audio",
+  "release": "2026-09-13-home-audio-polish",
   "en": [
-    "Home cards now show clearer glass depth over both bright and dark areas of the daily scene.",
-    "Expanded prayer details use half of the available width on tablets and desktop screens.",
-    "The audio player now adapts from a compact dock to a focused phone, tablet, or desktop panel.",
-    "Arabic audio progress flows right to left, with an accessible volume control for mouse, touch, and keyboard."
+    "Home cards reveal the daily scene clearly, and expanded prayer details use the full tablet and desktop layout.",
+    "Today's Wird now tracks Quran reading alongside Morning, Evening, and Before Sleep routines.",
+    "Audio volume stays reachable, Play All is available while reading, and progress and seeker controls stay inside the player.",
+    "More groups Qibla, Masbaha, and Settings, with offline Qibla guidance; the Azkar Library now puts collections first with clearer Saved and Benefits access."
   ],
   "ar": [
-    "تظهر بطاقات الرئيسية الآن بعمق زجاجي أوضح فوق المناطق الفاتحة والداكنة من المشهد اليومي.",
-    "تشغل تفاصيل الصلاة الموسعة نصف المساحة المتاحة على الأجهزة اللوحية وشاشات سطح المكتب.",
-    "يتكيف مشغل الصوت الآن من شريط مصغر إلى لوحة مركزة مناسبة للهاتف والجهاز اللوحي وسطح المكتب.",
-    "يتحرك تقدم الصوت العربي من اليمين إلى اليسار، مع تحكم ميسر بمستوى الصوت للفأرة واللمس ولوحة المفاتيح."
+    "تُظهر بطاقات الرئيسية المشهد اليومي بوضوح، وتستفيد تفاصيل الصلاة الموسعة من تخطيط الأجهزة اللوحية وسطح المكتب.",
+    "يتابع وردك اليوم قراءة القرآن إلى جانب أذكار الصباح والمساء والنوم.",
+    "يبقى مستوى الصوت في المتناول، ويتاح تشغيل الكل أثناء القراءة، وتظل مؤشرات التقدم والتحكم داخل المشغل.",
+    "يجمع قسم المزيد القبلة والمسبحة والإعدادات مع إرشاد للقبلة دون اتصال، وتعرض مكتبة الأذكار المجموعات أولًا مع وصول أوضح إلى المحفوظات وفضائل الذكر."
   ]
 }

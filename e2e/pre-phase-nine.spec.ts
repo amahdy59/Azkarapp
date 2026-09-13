@@ -145,9 +145,8 @@ test("Library Benefits entry opens the dedicated collection with encoded WhatsAp
 test("the Library exposes the full Saved state", async ({ page }) => {
   await openReturningGuest(page, ["m-hm-77m"]);
   await page.getByTestId("nav-azkar").click();
-  await page.getByTestId("library-section-filter").click();
-  await page.getByRole("menuitemradio", { name: /Saved/ }).click();
-  await expect(page.getByTestId("library-section-filter")).toHaveAccessibleName(/Saved/);
+  await page.getByTestId("library-section-saved").click();
+  await expect(page.getByTestId("library-section-saved")).toHaveAttribute("aria-selected", "true");
   await expect(page.getByRole("heading", { name: "Saved remembrance", exact: true })).toBeVisible();
   await page
     .getByRole("button", { name: /Morning Azkar/ })
@@ -156,7 +155,7 @@ test("the Library exposes the full Saved state", async ({ page }) => {
   await expect(page.getByTestId("reader-screen")).toBeVisible();
 });
 
-test("Library tools and saved controls stay inside the content boundary at every responsive tier", async ({
+test("Library Benefits entry and section tabs stay inside the content boundary at every responsive tier", async ({
   page,
 }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop-chromium", "One Chromium context covers the full width matrix.");
@@ -178,14 +177,16 @@ test("Library tools and saved controls stay inside the content boundary at every
     await page.setViewportSize(viewport);
     await page.waitForTimeout(500);
     await expect(page.getByTestId("library-benefits-tool")).toBeVisible();
-    await expect(page.getByTestId("library-quran-tool")).toBeVisible();
+    await expect(page.getByTestId("library-section-collections")).toBeVisible();
+    await expect(page.getByTestId("library-section-saved")).toBeVisible();
 
     const geometry = await page.evaluate(() => {
       const benefits = document.querySelector<HTMLElement>('[data-testid="library-benefits-tool"]')!;
-      const quran = document.querySelector<HTMLElement>('[data-testid="library-quran-tool"]')!;
+      const collections = document.querySelector<HTMLElement>('[data-testid="library-section-collections"]')!;
+      const saved = document.querySelector<HTMLElement>('[data-testid="library-section-saved"]')!;
       const region = benefits.closest<HTMLElement>(".app-screen-surface")!;
       const regionBounds = region.getBoundingClientRect();
-      const elements = [benefits, quran];
+      const elements = [benefits, collections, saved];
 
       return {
         regionOverflow: region.scrollWidth - region.clientWidth,
