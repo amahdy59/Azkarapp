@@ -52,6 +52,8 @@ export interface PrayerMoment {
   adhkarDone: boolean;
   /** The rawātib were prayed. */
   sunnahDone: boolean;
+  /** Shrouk time if applicable. */
+  shroukTime?: string;
 }
 
 /**
@@ -164,6 +166,7 @@ export function getPrayerMoment({
     location: place,
     adhkarDone: record?.adhkar ?? false,
     sunnahDone: record?.sunnah ?? false,
+    shroukTime: times.shrouk,
   };
 }
 

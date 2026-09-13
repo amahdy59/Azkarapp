@@ -16,6 +16,7 @@ export interface PrayerTimes {
   asr: string; // e.g. "15:30"
   maghrib: string; // e.g. "18:20"
   isha: string; // e.g. "19:45"
+  shrouk?: string;
 }
 
 /** Resolves exact or calculated prayer times for a date and location settings */

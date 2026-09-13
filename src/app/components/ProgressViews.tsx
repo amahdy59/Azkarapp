@@ -531,7 +531,6 @@ export function ProgressWeekView({
 
         {/* Best Streak Card */}
         <div className="flex flex-col items-center justify-center p-3.5 sm:p-4 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
-          <Zap className="h-5 w-5 text-primary fill-primary/20 mb-1" />
           <span className="text-xs font-bold text-muted-foreground mb-0.5">{t(language, "progress.bestStreak")}</span>
           <span className="text-subtitle font-black text-foreground">
             {formatNumerals(weekStats.bestStreakDays, language)} {t(language, "progress.days")}

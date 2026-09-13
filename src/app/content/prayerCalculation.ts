@@ -116,13 +116,17 @@ function minutesToTime(value: number): string {
 
 export function applyPrayerAdjustments(times: PrayerTimes, adjustments: LocationSettings["adjustments"]): PrayerTimes {
   if (!adjustments) return times;
-  return Object.fromEntries(
+  const adjusted = Object.fromEntries(
     PRAYER_NAMES.map((prayer) => {
       const adjustment = adjustments[prayer];
       const safeAdjustment = typeof adjustment === "number" && Number.isFinite(adjustment) ? adjustment : 0;
       return [prayer, minutesToTime(timeToMinutes(times[prayer]) + Math.round(safeAdjustment))];
     }),
   ) as unknown as PrayerTimes;
+  if (times.shrouk) {
+    adjusted.shrouk = times.shrouk;
+  }
+  return adjusted;
 }
 
 /**
@@ -271,9 +275,11 @@ export function calculateOfflinePrayerTimes(
     method.ishaMinutes !== undefined
       ? maghrib + method.ishaMinutes / 60
       : solarNoon + (ishaAngle ?? (sunsetAngle ?? 6) + (highLatitudePortion(method.ishaAngle) ?? 1.5));
+  const shrouk = solarNoon - (sunriseAngle ?? 6);
 
   return {
     fajr: formatHours(fajr),
+    shrouk: formatHours(shrouk),
     dhuhr: formatHours(dhuhr),
     asr: formatHours(asr),
     maghrib: formatHours(maghrib),

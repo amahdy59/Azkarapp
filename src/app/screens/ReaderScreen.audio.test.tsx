@@ -58,7 +58,7 @@ describe("ReaderScreen audio identity", () => {
     }
   });
 
-  it("renders reviewed Mushaf pages with a stable long-surah counter", () => {
+  it("renders 3 options for long surahs without the surah text", () => {
     registerLazyCollection("friday_kahf", FRIDAY_KAHF);
     const onComplete = vi.fn();
 
@@ -88,48 +88,23 @@ describe("ReaderScreen audio identity", () => {
       />,
     );
 
-    expect(screen.getByTestId("reader-screen")).toHaveAttribute("data-counting-mode", "counter-only");
+    // Now the 3 options should be visible, and NO surah text or difficult words toggle
+    expect(screen.queryByTestId("zikr-text")).toBeNull();
+    expect(screen.queryByRole("switch", { name: "تظليل الكلمات الغريبة" })).toBeNull();
+    expect(screen.queryByTestId("counter-surface")).toBeNull();
 
-    // A multi-page surah is page data, so it now opens as Mushaf pages rather
-    // than hiding that view behind a menu item most readers never found. The
-    // reader's own long-surah behaviour is behind it and still has to work, so
-    // this closes the Mushaf and goes on to assert it.
-    expect(screen.getByTestId("mushaf-immersive-track")).toBeInTheDocument();
-    // The surah view now carries the Mushaf's own toolbar, so leaving it is the
-    // rail's back control rather than a close button of its own.
-    fireEvent.click(screen.getByRole("button", { name: "رجوع" }));
+    // Check for the 3 buttons
+    expect(screen.getByRole("button", { name: "الاستماع للسورة" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "الاستماع للسورة" })).toBeDisabled(); // audioAvailable is false
 
-    const scrollRegion = screen.getByRole("region", { name: "نص الذكر" });
-    expect(screen.getByTestId("counter-surface")).toHaveAccessibleName(/اضغط العداد عند الإتمام/);
-    expect(screen.getByTestId("reader-mushaf-button")).toBeInTheDocument();
-    const endCounter = screen.getByTestId("counter-surface");
-    expect(scrollRegion).not.toContainElement(endCounter);
+    const readMushafBtn = screen.getByRole("button", { name: "قراءة من المصحف" });
+    expect(readMushafBtn).toBeInTheDocument();
 
-    // Reading taps and the global Space shortcut cannot complete a long surah.
-    fireEvent.click(screen.getAllByTestId("zikr-text")[0]!);
-    fireEvent.keyDown(window, { key: " ", code: "Space" });
-    expect(onComplete).not.toHaveBeenCalled();
+    const readExternallyBtn = screen.getByRole("button", { name: "قرأتها بالفعل" });
+    expect(readExternallyBtn).toBeInTheDocument();
 
-    // Clear mock to test the next interaction
-    onComplete.mockClear();
-
-    const meaningToggle = screen.getByRole("switch", { name: "تظليل الكلمات الغريبة" });
-    expect(meaningToggle).toHaveAttribute("aria-checked", "false");
-    fireEvent.click(meaningToggle);
-    const difficultWord = screen.getAllByTestId("quran-word-help")[0]!;
-    fireEvent.click(difficultWord);
-    // A tap answers in place under the word; the full sheet is one step further.
-    expect(screen.getByRole("dialog", { name: /المعنى/ })).toBe(screen.getByTestId("quran-word-popover"));
-    fireEvent.click(screen.getByTestId("quran-word-popover-all"));
-    expect(screen.getByTestId("quran-word-meaning-sheet")).toBeVisible();
-    expect(screen.getByRole("link", { name: /الميسر في غريب القرآن/ })).toHaveAttribute(
-      "href",
-      "https://qurancomplex.gov.sa/en/techquran/dev/",
-    );
-    expect(onComplete).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByLabelText("إغلاق معنى الكلمة"));
-
-    fireEvent.click(screen.getByTestId("counter-surface"));
+    // Clicking "قرأتها بالفعل" should complete it
+    fireEvent.click(readExternallyBtn);
     expect(onComplete).toHaveBeenCalledOnce();
   });
 

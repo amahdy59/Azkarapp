@@ -20,6 +20,7 @@ import {
   ChevronRight,
   Volume2,
   VolumeX,
+  Check,
 } from "../components/icons";
 import { t } from "../i18n";
 import { shouldReduceMotion } from "../motionPreferences";
@@ -410,19 +411,12 @@ export function ReaderScreen({
       setMushafPageTuple([0, 1]);
       return;
     }
-    // Once per zikr: reopening on every render would make the close button
-    // useless, and reopening on a re-render would fight the reader.
-    if (autoOpenedFor.current === id) return;
-    autoOpenedFor.current = id;
-    // Resume where this surah was left. Al-Kahf is twelve pages, so being
-    // handed page one again after closing the app is half an hour of reading
-    // repeated.
+    // Set the initial page for the long surah to where they left off
     const rememberedPage = surahReadingPagesRef.current?.[id];
     const rememberedIndex = rememberedPage
       ? (z?.mushafPages?.findIndex((entry) => entry.page === rememberedPage) ?? -1)
       : -1;
     setMushafPageTuple([rememberedIndex > 0 ? rememberedIndex : 0, 1]);
-    setImmersiveOpen(true);
   }, [longSurah, z?.id, z?.mushafPages]);
 
   /** Records the page being read, so closing the app does not lose the place. */
@@ -610,70 +604,100 @@ export function ReaderScreen({
     <article
       className={`mt-1 w-full px-4 pb-2 pt-2 flex flex-col items-center justify-center text-center bg-transparent ${longSurah ? "" : "cursor-pointer touch-manipulation transition-colors hover:bg-muted/10 active:bg-muted/20 my-auto"}`}
     >
-      {/* Short surahs keep their canonical Quran identity and text, without a
-          decorative card competing with the passage. Long surahs open in the
-          Mushaf view instead. */}
-      {showSurahChrome && <QuranSurahHeader zikr={z} language={language} />}
-
-      <div
-        className={showSurahChrome ? "w-full max-w-[42rem]" : "contents"}
-        data-testid={showSurahChrome ? "canonical-surah-passage" : undefined}
-      >
-        {z.isSurah && <QuranPrelude zikr={z} className="pointer-events-none mb-4" />}
-
-        {wordMeanings.length > 0 ? (
-          <QuranWordText
-            text={displayArabicText}
-            meanings={wordMeanings}
-            language={language}
-            style={{ fontFamily: readingFontFamily, fontSize: readingFontSize }}
-            onSelectMeanings={setWordMeaningSelection}
-            activeWordId={activeWordId}
-          />
-        ) : (
-          <p
-            className="zikr-text pointer-events-none text-center font-medium leading-[2.1] text-foreground"
-            data-testid="zikr-text"
-            dir="rtl"
-            lang="ar"
-            style={{ fontFamily: readingFontFamily, fontSize: readingFontSize }}
+      {longSurah ? (
+        <div className="mx-auto flex w-full max-w-sm flex-col items-center justify-center gap-4 py-8">
+          <button
+            type="button"
+            onClick={surahAudio?.onToggle ?? onPlayAudio}
+            disabled={!audioAvailable}
+            className="flex w-full items-center justify-center gap-3 rounded-2xl bg-primary/10 px-6 py-4 text-subtitle font-bold text-primary transition-colors hover:bg-primary/20 disabled:opacity-50"
           >
-            {displayArabicText}
-          </p>
-        )}
-      </div>
-
-      {!isArabic && (showTranslation || showTransliteration) && (
-        <div className="mt-5 space-y-4 border-t border-border pt-4 text-center">
-          {/* No surah exception. `!z.surahNameArabic` hid the translation for
-              every surah — Al-Kahf, As-Sajdah, Al-Mulk and the short ones —
-              while the transliteration of the same verses rendered right below
-              it. A reader who turned both on got the pronunciation of a surah
-              and never its meaning, and the meaning was present and complete
-              the whole time. The guard arrived in an unrelated commit and no
-              decision records it; DEC-108 says the opposite, that the reader is
-              where translation and transliteration live. */}
-          {showTranslation && z.translation && (
-            <section aria-labelledby="reader-translation-title">
-              <h2 id="reader-translation-title" className="text-label font-bold text-muted-foreground text-center">
-                {t(language, "reader.translationLabel")}
-              </h2>
-              <p className="mt-1 text-base leading-7 text-foreground text-center" lang="en" dir="ltr">
-                {z.translation}
-              </p>
-            </section>
-          )}
-          {showTransliteration && z.transliteration && (
-            <section aria-labelledby="reader-transliteration-title">
-              <h2 id="reader-transliteration-title" className="text-label font-bold text-muted-foreground text-center">
-                {t(language, "reader.transliterationLabel")}
-              </h2>
-              <p className="mt-1 text-base leading-7 text-foreground text-center" lang="en" dir="ltr">
-                {z.transliteration}
-              </p>
-            </section>
-          )}
+            <Volume2 size={20} />
+            {t(language, "reader.listenToSurah")}
+          </button>
+          <button
+            type="button"
+            onClick={() => setImmersiveOpen(true)}
+            className="flex w-full items-center justify-center gap-3 rounded-2xl bg-primary px-6 py-4 text-subtitle font-bold text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            <BookOpen size={20} />
+            {t(language, "reader.readFromMushaf")}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (!isDone) handleZikrCompletion(idx);
+              onAdvance(idx);
+            }}
+            className="flex w-full items-center justify-center gap-3 rounded-2xl border border-border/60 bg-card px-6 py-4 text-subtitle font-bold text-foreground transition-colors hover:bg-muted"
+          >
+            <Check size={20} />
+            {t(language, "reader.readExternally")}
+          </button>
         </div>
+      ) : (
+        <>
+          {/* Short surahs keep their canonical Quran identity and text, without a
+              decorative card competing with the passage. Long surahs open in the
+              Mushaf view instead. */}
+          {showSurahChrome && <QuranSurahHeader zikr={z} language={language} />}
+
+          <div
+            className={showSurahChrome ? "w-full max-w-[42rem]" : "contents"}
+            data-testid={showSurahChrome ? "canonical-surah-passage" : undefined}
+          >
+            {z.isSurah && <QuranPrelude zikr={z} className="pointer-events-none mb-4" />}
+
+            {wordMeanings.length > 0 ? (
+              <QuranWordText
+                text={displayArabicText}
+                meanings={wordMeanings}
+                language={language}
+                style={{ fontFamily: readingFontFamily, fontSize: readingFontSize }}
+                onSelectMeanings={setWordMeaningSelection}
+                activeWordId={activeWordId}
+              />
+            ) : (
+              <p
+                className="zikr-text pointer-events-none text-center font-medium leading-[2.1] text-foreground"
+                data-testid="zikr-text"
+                dir="rtl"
+                lang="ar"
+                style={{ fontFamily: readingFontFamily, fontSize: readingFontSize }}
+              >
+                {displayArabicText}
+              </p>
+            )}
+          </div>
+
+          {!isArabic && (showTranslation || showTransliteration) && (
+            <div className="mt-5 space-y-4 border-t border-border pt-4 text-center">
+              {showTranslation && z.translation && (
+                <section aria-labelledby="reader-translation-title">
+                  <h2 id="reader-translation-title" className="text-label font-bold text-muted-foreground text-center">
+                    {t(language, "reader.translationLabel")}
+                  </h2>
+                  <p className="mt-1 text-base leading-7 text-foreground text-center" lang="en" dir="ltr">
+                    {z.translation}
+                  </p>
+                </section>
+              )}
+              {showTransliteration && z.transliteration && (
+                <section aria-labelledby="reader-transliteration-title">
+                  <h2
+                    id="reader-transliteration-title"
+                    className="text-label font-bold text-muted-foreground text-center"
+                  >
+                    {t(language, "reader.transliterationLabel")}
+                  </h2>
+                  <p className="mt-1 text-base leading-7 text-foreground text-center" lang="en" dir="ltr">
+                    {z.transliteration}
+                  </p>
+                </section>
+              )}
+            </div>
+          )}
+        </>
       )}
     </article>
   );
@@ -725,7 +749,7 @@ export function ReaderScreen({
   );
 
   const renderCounterPanel = () => (
-    <div className="px-3 pb-3" data-testid="counter-panel">
+    <div className="px-3 pb-1" data-testid="counter-panel">
       <div className="adaptive-counter-row flex w-full items-center justify-center gap-2.5">
         <div className="md:hidden">{renderNavigationButton("prev")}</div>
         <div className="flex min-w-0 flex-1 justify-center">
@@ -908,7 +932,7 @@ export function ReaderScreen({
          which pushed the page down and left a strip of shell above a surface
          that is supposed to be the page itself. */
       edgeToEdge={showMushaf}
-      className="reader-swipe-surface relative !pb-0"
+      className="reader-swipe-surface relative !pb-0 sm:!pt-0"
       data-testid="reader-screen"
       data-zikr-index={idx}
       data-zikr-id={z.id}
@@ -991,7 +1015,7 @@ export function ReaderScreen({
               the same "always-dark brand band" role. */}
             <div
               data-testid="reader-desktop-hero"
-              className="relative mx-4 mt-3 flex shrink-0 flex-col items-center gap-2 overflow-hidden rounded-3xl px-6 py-3 text-center"
+              className="relative w-full flex shrink-0 flex-col items-center gap-2 overflow-hidden rounded-b-3xl px-6 pb-4 pt-3 text-center"
               style={{
                 background:
                   "radial-gradient(120% 140% at 50% 10%, rgba(232,180,32,0.18), transparent 60%), var(--brand-hero)",
@@ -1085,7 +1109,7 @@ export function ReaderScreen({
                       {readerZikrTitle}
                     </h2>
                     <div className="flex shrink-0 items-center gap-3">
-                      {z.isSurah && allWordMeanings.length > 0 && (
+                      {!longSurah && allWordMeanings.length > 0 && (
                         <button
                           type="button"
                           role="switch"
@@ -1163,7 +1187,7 @@ export function ReaderScreen({
                   {renderSideNavigation()}
                 </div>
 
-                <footer className="shrink-0 pb-3 pt-2">{renderCounterStack()}</footer>
+                {!longSurah && <footer className="shrink-0 pb-3 pt-2">{renderCounterStack()}</footer>}
               </div>
             </div>
           </>
@@ -1251,7 +1275,7 @@ export function ReaderScreen({
                     {readerZikrTitle}
                   </h2>
                   <div className="flex shrink-0 items-center gap-3">
-                    {z.isSurah && allWordMeanings.length > 0 && (
+                    {!longSurah && allWordMeanings.length > 0 && (
                       <button
                         type="button"
                         role="switch"
@@ -1317,7 +1341,11 @@ export function ReaderScreen({
               {/* The screen sets !pb-0 and the tab bar is hidden here, so the
                 counter itself owns the bottom inset — otherwise it would sit
                 flush against the home indicator. */}
-              <div className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">{renderCounterStack()}</div>
+              {!longSurah && (
+                <div className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">
+                  {renderCounterStack()}
+                </div>
+              )}
             </div>
           </>
         ))}

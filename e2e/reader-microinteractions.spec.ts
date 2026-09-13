@@ -352,43 +352,35 @@ test("the full reader canvas counts taps while controls and the reference sheet 
   await expectCompletionCueSeen(page);
 });
 
-test("full surahs count only from the counter and expose sourced difficult-word help", async ({ page }) => {
-  await openFridayKahf(page);
-  await leaveMushaf(page);
+async function openAyatAlKursi(page: Page) {
+  await page.addInitScript(() => {
+    window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+    window.localStorage.setItem(
+      "azkarapp.state.v1",
+      JSON.stringify({
+        settings: { language: "en", themeMode: "midnight", forceRtl: false, reduceMotion: true },
+        profile: { displayName: "Guest", lastPhoneNumber: "", isGuest: true },
+        completed: { morning: [], evening: [], before_sleep: [], friday_kahf: [] },
+        sessions: [],
+      }),
+    );
+  });
+
+  await page.goto("/#/azkar/morning/4");
+  await expect(page.getByRole("status", { name: "Loading Azkar" })).toHaveCount(0, { timeout: 5000 });
+  await expect(page.getByTestId("reader-screen")).toBeVisible();
+}
+
+test("short surahs expose sourced difficult-word help", async ({ page }) => {
+  await openAyatAlKursi(page);
+
   await page.getByRole("switch", { name: /difficult words/i }).click();
 
   const reader = page.getByTestId("reader-screen");
   const counter = page.getByTestId("counter-surface");
-  await expect(reader).toHaveAttribute("data-counting-mode", "counter-only");
 
   await expect(counter).toBeVisible();
   await expect(counter).toHaveAccessibleName(/0 \/ 1/);
-  await expect(counter).toBeInViewport();
-  await expect(page.getByTestId("reader-mushaf-button")).toBeVisible();
-
-  // Clicking the text or pressing Space while in counter-only mode must NOT
-  // advance the count (longSurah guard).
-  await reader.click({ position: { x: 2, y: 320 } });
-  await page.keyboard.press("Space");
-
-  const scrollRegion = page.getByRole("region", { name: "Zikr reading text" });
-  const counterBeforeScroll = await counter.boundingBox();
-  await scrollRegion.evaluate((el) => {
-    el.scrollTop = Math.min(800, el.scrollHeight - el.clientHeight);
-  });
-  await expect(counter).toBeVisible();
-  await expect(counter).toBeInViewport();
-  const counterAfterScroll = await counter.boundingBox();
-  expect(counterBeforeScroll).not.toBeNull();
-  expect(counterAfterScroll).not.toBeNull();
-  if (counterBeforeScroll && counterAfterScroll) {
-    expect(Math.abs(counterAfterScroll.y - counterBeforeScroll.y)).toBeLessThanOrEqual(1);
-  }
-
-  // Non-counter interactions must still not count.
-  await reader.click({ position: { x: 2, y: 320 } });
-  await page.keyboard.press("Space");
-  await expect(counter).toHaveAttribute("aria-label", /0 \/ 1/);
 
   const difficultWords = page.getByTestId("quran-word-help");
   expect(await difficultWords.count()).toBeGreaterThan(0);
@@ -419,24 +411,6 @@ test("full surahs count only from the counter and expose sourced difficult-word 
 
   await closeMeaning.click();
   await expect(meaningSheet).toBeHidden();
-  await page.waitForTimeout(500);
-
-  await armCompletionCueRecorder(page);
-  await counter.click();
-  // A full surah either completes in place or hands straight back to Friday
-  // mode. Both remain acceptable; the recorder just removes the race on the
-  // first, which the previous `.or()` masked rather than fixed.
-  await expect
-    .poll(
-      async () =>
-        ((await readCompletionCue(page))?.seenAt ?? null) !== null ||
-        (await page.getByTestId("friday-mode-screen").isVisible()),
-      {
-        message: "neither the completion cue nor the Friday mode screen appeared",
-        timeout: 5000,
-      },
-    )
-    .toBe(true);
 });
 
 test("reader actions stay inside a 320 px app canvas", async ({ page }) => {
@@ -775,8 +749,8 @@ test("the reader's text-size control resizes the zikr and never goes below the f
 });
 
 test("a highlighted Qur'an word is the same size as the ayah around it", async ({ page }) => {
-  await openFridayKahf(page);
-  await leaveMushaf(page);
+  await openAyatAlKursi(page);
+
   await page.getByRole("switch", { name: /difficult words/i }).click();
 
   const paragraph = page.getByTestId("zikr-text").first();

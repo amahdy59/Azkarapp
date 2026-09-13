@@ -143,9 +143,9 @@ export function PrayerMomentPanel({
   return (
     <>
       <article
-        className={`flex flex-col overflow-hidden md:col-span-2 ${onGlass ? "hero-glass home-glass-surface" : "rounded-3xl border border-border bg-card shadow-raised"}`}
+        className={`flex flex-col overflow-hidden ${onGlass ? "hero-glass home-glass-surface rounded-3xl" : "rounded-3xl border border-border bg-card shadow-raised"}`}
       >
-        <div className="grid md:grid-cols-2">
+        <div className="flex flex-col">
           <section
             /* A floor, not a height: the scene is the ground for the name and
            the time, and at content height alone it read as a strip of sky
@@ -160,7 +160,7 @@ export function PrayerMomentPanel({
            that is what a reader would get. */
             className={`relative isolate min-h-[11rem] border-b border-border/50 ${
               onGlass ? "" : "bg-on-media-surface text-white"
-            } ${virtue && isLive ? "" : "md:col-span-2"}`}
+            }`}
             data-testid="prayer-moment-hero"
           >
             {!onGlass && <PrayerSceneArt prayer={prayer} className="absolute inset-0 -z-10" />}
@@ -199,6 +199,11 @@ export function PrayerMomentPanel({
                     </span>
                   )}
                 </div>
+                {prayer === "fajr" && moment.shroukTime && (
+                  <p className="text-sm font-semibold text-white/80 sm:hidden" dir="auto">
+                    {t(language, "notifications.shrouk")}: {formatPrayerTimeLabel(moment.shroukTime, isArabic)}
+                  </p>
+                )}
 
                 {approachFraction !== null && (
                   <div
@@ -224,7 +229,7 @@ export function PrayerMomentPanel({
           </section>
           {virtue && isLive && (
             <section
-              className={`flex min-h-[11rem] flex-col justify-center border-b p-5 text-start md:border-s md:p-6 ${hairline}`}
+              className={`flex min-h-[11rem] flex-col justify-center border-b p-5 text-start md:p-6 ${hairline}`}
               data-testid="prayer-moment-virtue"
             >
               <h3 className={`text-subtitle font-black ${accentText}`} dir="auto">

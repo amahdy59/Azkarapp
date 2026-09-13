@@ -435,6 +435,7 @@ const en = {
     asr: "Asr",
     maghrib: "Maghrib",
     isha: "Isha",
+    shrouk: "Sunrise",
     title: "Notifications",
     availability: "Reminder availability",
     availabilityBody:
@@ -1089,6 +1090,9 @@ const en = {
     ayahBookmarkSaved: "Ayah bookmark saved.",
     ayahBookmarkRemoved: "Ayah bookmark removed.",
     openAyahActions: "Open actions for ayah {ayah}",
+    listenToSurah: "Listen to surah",
+    readFromMushaf: "Read from Mushaf",
+    readExternally: "I have read it already",
     playAudioOnce: "Play audio once",
     audioUnavailable: "Audio unavailable",
     audioUnavailableDescription: "Continue reading now or try the audio again.",

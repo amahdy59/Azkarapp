@@ -434,6 +434,7 @@ const ar = {
     asr: "العصر",
     maghrib: "المغرب",
     isha: "العشاء",
+    shrouk: "الشروق",
     title: "الإشعارات",
     availability: "توفر التذكيرات",
     availabilityBody:
@@ -1074,6 +1075,9 @@ const ar = {
     ayahBookmarkSaved: "تم حفظ الآية.",
     ayahBookmarkRemoved: "تمت إزالة حفظ الآية.",
     openAyahActions: "فتح إجراءات الآية {ayah}",
+    listenToSurah: "الاستماع للسورة",
+    readFromMushaf: "قراءة من المصحف",
+    readExternally: "قرأتها بالفعل",
     playAudioOnce: "تشغيل مرة واحدة",
     audioUnavailable: "الصوت غير متاح",
     audioUnavailableDescription: "يمكنك متابعة القراءة أو تجربة الصوت مرة أخرى.",

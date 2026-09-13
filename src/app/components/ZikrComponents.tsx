@@ -313,7 +313,7 @@ export function CounterShortcutHints({
       data-testid={testId}
       dir="ltr"
       lang={language}
-      className="mx-auto mt-5 hidden w-fit max-w-full flex-wrap items-center justify-center gap-3 rounded-full border border-border/40 bg-muted/60 px-4 py-1.5 text-xs font-medium text-muted-foreground md:flex"
+      className="mx-auto mt-1 hidden w-fit max-w-full flex-wrap items-center justify-center gap-3 rounded-full border border-border/40 bg-muted/60 px-4 py-1.5 text-xs font-medium text-muted-foreground md:flex"
     >
       {shortcuts.map((shortcut, index) => (
         <React.Fragment key={shortcut.label}>

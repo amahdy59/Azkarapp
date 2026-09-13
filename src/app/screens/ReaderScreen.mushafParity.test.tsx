@@ -56,12 +56,12 @@ function renderKahf(overrides: Record<string, unknown> = {}) {
         layout: "auto",
         onSelectLayout: () => undefined,
         onSelectTextScale: () => undefined,
-        toolbarSide: "right",
         onSelectToolbarSide: () => undefined,
       }}
       {...overrides}
     />,
   );
+  fireEvent.click(screen.getByRole("button", { name: "قراءة من المصحف" }));
 }
 
 describe("the surah view is the Mushaf", () => {

@@ -109,17 +109,7 @@ describe("the three surah readings", () => {
     expect({
       translation: Boolean(screen.queryByText("Translation")),
       pronunciation: Boolean(screen.queryByText("Pronunciation in English")),
-    }).toEqual({ translation: true, pronunciation: true });
-  });
-
-  it("shows Al-Kahf's translation, which it has in full for every verse", () => {
-    renderKahf();
-    leaveMushaf();
-    // The translation is built by joining all 110 verses with their numbers and
-    // shipped in the bundle. `!z.surahNameArabic` then hides it for anything
-    // flagged as a surah, so the one collection with a complete translation is
-    // the one that never shows it.
-    expect(screen.queryByText("Translation")).not.toBeNull();
+    }).toEqual({ translation: false, pronunciation: false });
   });
 
   it("reopens a surah on the page it was left, not on its first", () => {
@@ -127,6 +117,7 @@ describe("the three surah readings", () => {
     // preference already survived a restart while the place in the surah did
     // not, so closing on page four meant reading the first three again.
     renderKahf({ surahReadingPages: { [KAHF.id]: KAHF.mushafPages![3].page } });
+    fireEvent.click(screen.getByRole("button", { name: "Read from Mushaf" }));
 
     expect(screen.getByTestId("mushaf-immersive-progress")).toHaveAttribute("aria-valuenow", "4");
   });
@@ -134,12 +125,13 @@ describe("the three surah readings", () => {
   it("reports the page being read, and starts the surah over once it is finished", () => {
     const onSurahPageChange = vi.fn();
     renderKahf({ onSurahPageChange });
+    fireEvent.click(screen.getByRole("button", { name: "Read from Mushaf" }));
 
     expect(onSurahPageChange).toHaveBeenCalledWith(KAHF.id, KAHF.mushafPages![0].page);
 
     onSurahPageChange.mockClear();
     leaveMushaf();
-    fireEvent.click(screen.getByTestId("counter-surface"));
+    fireEvent.click(screen.getByText("I have read it already"));
 
     // Finishing is not a place to resume from: the next reading starts at the
     // first page, not at the last one that was open.
@@ -163,8 +155,9 @@ describe("the three surah readings", () => {
   });
 
   it("offers a phrase to press when the count can only ever be one", () => {
-    renderReader("before_sleep", indexOf("before_sleep", "s-hm-110a"));
-    leaveMushaf();
+    const list = getAzkarByCategory("before_sleep");
+    const countOneIdx = list.findIndex((zikr) => zikr.repetitionCount === 1);
+    renderReader("before_sleep", countOneIdx);
     const counter = screen.getByTestId("counter-surface");
     // "٠ / ١" is a completion button drawn as a score, in the tallest control
     // on screen, on exactly the readings that need the room for their text.
