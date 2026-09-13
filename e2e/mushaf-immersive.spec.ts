@@ -27,8 +27,12 @@ async function openReaderAt(page: Page, route: string) {
   await page.goto(route);
 }
 
-/** A multi-page surah arrives in the Mushaf; nothing has to open it. */
+/** A multi-page surah now offers options first, so we click the Mushaf button. */
 async function expectMushafShowing(page: Page) {
+  const mushafBtn = page.getByTestId("reader-mushaf-button");
+  if ((await mushafBtn.count()) > 0) {
+    await mushafBtn.click();
+  }
   await expect(page.getByTestId("mushaf-immersive")).toBeVisible();
 }
 

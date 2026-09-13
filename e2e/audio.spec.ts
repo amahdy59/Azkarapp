@@ -61,9 +61,9 @@ test("Al-Kahf queues an intentional listen press while the audio module loads", 
     await route.continue();
   });
   await page.goto("/#/azkar/friday-kahf/1");
-  await expect(page.getByTestId("mushaf-immersive")).toBeVisible();
+  await expect(page.getByTestId("reader-screen")).toBeVisible();
 
-  const listen = page.getByTestId("mushaf-rail-listen");
+  const listen = page.getByRole("button", { name: "الاستماع للسورة", exact: true });
   await expect(listen).toBeEnabled();
   await listen.click();
   await expect(listen).toHaveAttribute("aria-busy", "true");
