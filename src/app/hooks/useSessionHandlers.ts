@@ -246,13 +246,18 @@ export function useSessionHandlers({
     }
   };
 
-  const toggleZikrCompletion = (catId: CategoryId, idx: number) => {
-    const azkar = sessionAzkar(catId);
+  const toggleZikrCompletion = (
+    catId: CategoryId,
+    idx: number,
+    subCategory = catId === activeCat ? activeSubCategory : undefined,
+    mode = modeFor(catId),
+  ) => {
+    const azkar = sessionAzkar(catId, mode, subCategory);
     const zikrId = azkar[idx]?.id;
     if (!zikrId) {
       return;
     }
-    const prefixedId = prefixZikrId(catId, zikrId, activeSubCategory);
+    const prefixedId = prefixZikrId(catId, zikrId, subCategory);
     const setForCat = new Set(completed[catId] ?? new Set());
     const wasCompleted = setForCat.has(prefixedId);
 
@@ -268,7 +273,7 @@ export function useSessionHandlers({
     }));
 
     // Re-check completion using getEffectiveCompletedForSubcategory to see if the whole thing is done
-    const effectiveNow = getEffectiveCompletedForSubcategory(completed, catId, activeSubCategory);
+    const effectiveNow = getEffectiveCompletedForSubcategory(completed, catId, subCategory);
     if (!wasCompleted) effectiveNow.add(zikrId);
     else effectiveNow.delete(zikrId);
 
@@ -279,11 +284,11 @@ export function useSessionHandlers({
         catId,
         completedAt,
         progressDayStartHour,
-        modeFor(catId),
-        activeSubCategory,
+        mode,
+        subCategory,
       );
       setDailyCompletions(growth.records);
-      if (catId === "after_prayer" && activeSubCategory) onAfterPrayerCompleted?.(activeSubCategory);
+      if (catId === "after_prayer" && subCategory) onAfterPrayerCompleted?.(subCategory);
       setLastGrowthEvent(growth.event);
     }
   };

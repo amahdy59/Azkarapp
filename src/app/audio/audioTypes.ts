@@ -119,6 +119,8 @@ export interface PlaybackPlan {
     category: CategoryId;
     routineMode: RoutineMode;
     source: "single" | "section" | "full-session";
+    subCategory?: string;
+    fridayDuaFlow?: boolean;
   };
   entries: readonly PlaybackEntry[];
   createdAt: number;
@@ -154,6 +156,8 @@ export interface AudioControllerState {
   currentVoiceId: string | null;
   playbackRate: number;
   announcement: string;
+  completedEntryId: string | null;
+  completionSequence: number;
 }
 
 export type AudioResolution =

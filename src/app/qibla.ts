@@ -23,3 +23,11 @@ export function getQiblaTurn(bearing: number, heading: number): number {
   const turn = normalizeDegrees(bearing - heading);
   return turn > 180 ? turn - 360 : turn;
 }
+
+/** Smooth sensor jitter across the 0/360 seam without delaying large turns. */
+export function smoothCompassHeading(previous: number | null, next: number): number {
+  if (previous === null) return normalizeDegrees(next);
+  const shortestDelta = ((next - previous + 540) % 360) - 180;
+  if (Math.abs(shortestDelta) >= 45) return normalizeDegrees(next);
+  return normalizeDegrees(previous + shortestDelta * 0.25);
+}

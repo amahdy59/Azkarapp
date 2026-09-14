@@ -9,7 +9,7 @@ Recommended stable top-level structure:
 3. Progress
 4. More
 
-More groups Qibla, Masbaha, and Settings behind clearly labelled cards. These utilities remain directly linkable, but they do not compete for separate bottom-navigation positions. Quran remains part of Today's Wird and the Mushaf flow rather than becoming a fifth tab.
+More groups Qibla, Masbaha, and Settings behind clearly labelled cards in the bottom-navigation and rail tiers. The large labelled sidebar expands those utilities directly and omits More. These utilities remain directly linkable, but they do not compete for separate bottom-navigation positions. Quran remains part of Today's Wird and the Mushaf flow rather than becoming a fifth tab.
 
 ## Home information model
 

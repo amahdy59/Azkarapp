@@ -9,6 +9,7 @@ import { useSwipeGestures } from "../hooks/useSwipeGestures";
 import { useMediaQuery } from "../hooks/useMediaQuery";
 import { useWakeLock } from "../hooks/useWakeLock";
 import {
+  Lightbulb,
   BookOpen,
   ArrowPrevious,
   Share2,
@@ -53,6 +54,7 @@ import { formatNumerals } from "../formatting";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuRadioGroup,
@@ -160,6 +162,7 @@ export function ReaderScreen({
   onPlayAudio,
   onPlayAllAudio,
   onRepeatAudio,
+  audioModeActive = false,
 }: {
   catId: CategoryId;
   subCategory?: string;
@@ -207,6 +210,8 @@ export function ReaderScreen({
   onPlayAudio?: () => void;
   onPlayAllAudio?: () => void;
   onRepeatAudio?: () => void;
+  /** The shared player is currently responsible for this zikr's progress. */
+  audioModeActive?: boolean;
 }) {
   const azkar = azkarList ?? getAzkarForMode(catId, routineMode);
   const z = azkar[idx];
@@ -465,6 +470,7 @@ export function ReaderScreen({
       }
 
       if (e.key === " " || e.code === "Space") {
+        if (audioModeActive) return;
         if (longSurah) return;
         e.preventDefault();
         handleTap();
@@ -486,6 +492,7 @@ export function ReaderScreen({
         e.preventDefault();
         onBack();
       } else if (e.key === "r" || e.key === "R" || e.key === "ق") {
+        if (audioModeActive) return;
         e.preventDefault();
         handleResetCounter();
       } else if (e.key === "s" || e.key === "S" || e.key === "س") {
@@ -514,6 +521,7 @@ export function ReaderScreen({
     wordMeaningSelection,
     longSurah,
     immersiveOpen,
+    audioModeActive,
   ]);
 
   if (!z || !category) {
@@ -807,36 +815,39 @@ export function ReaderScreen({
 
   const renderReaderMenuItems = (layout: "mobile" | "desktop") => (
     <>
-      {!longSurah && (
-        <DropdownMenuItem
-          disabled={!audioAvailable}
-          onClick={onPlayAudio}
-          className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
-        >
-          <Volume2 size={18} />
-          {audioAvailable ? t(language, "reader.playAudioOnce") : t(language, "reader.audioUnavailable")}
-        </DropdownMenuItem>
-      )}
-
-      {onPlayAllAudio && (
-        <DropdownMenuItem
-          onClick={onPlayAllAudio}
-          className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted"
-        >
-          <Volume2 size={18} />
-          {t(language, "category.playAllAudio")}
-        </DropdownMenuItem>
-      )}
-
-      {onRepeatAudio && (
-        <DropdownMenuItem
-          onClick={onRepeatAudio}
-          className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted"
-        >
-          <RotateCcw size={18} />
-          {t(language, "reader.repeatPrescribed")}
-        </DropdownMenuItem>
-      )}
+      <DropdownMenuLabel className="px-3 pb-1 pt-2 text-xs font-bold text-muted-foreground">
+        {t(language, "reader.menuAudio")}
+      </DropdownMenuLabel>
+      <DropdownMenuGroup>
+        {!longSurah && (
+          <DropdownMenuItem
+            disabled={!audioAvailable}
+            onClick={onPlayAudio}
+            className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
+          >
+            <Volume2 size={18} />
+            {audioAvailable ? t(language, "reader.playAudioOnce") : t(language, "reader.audioUnavailable")}
+          </DropdownMenuItem>
+        )}
+        {onPlayAllAudio && (
+          <DropdownMenuItem
+            onClick={onPlayAllAudio}
+            className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted"
+          >
+            <Volume2 size={18} />
+            {t(language, "category.playAllAudio")}
+          </DropdownMenuItem>
+        )}
+        {onRepeatAudio && (
+          <DropdownMenuItem
+            onClick={onRepeatAudio}
+            className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted"
+          >
+            <RotateCcw size={18} />
+            {t(language, "reader.repeatPrescribed")}
+          </DropdownMenuItem>
+        )}
+      </DropdownMenuGroup>
 
       <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
 
@@ -846,67 +857,86 @@ export function ReaderScreen({
           drives the same app-wide setting Settings does, so the two can never
           disagree; changing it here also resizes the app's chrome. */}
       <DropdownMenuLabel className="px-3 pb-1 pt-2 text-xs font-bold uppercase tracking-wide text-muted-foreground">
-        {t(language, "settings.textSize")}
+        {t(language, "reader.menuDisplay")}
       </DropdownMenuLabel>
-      <DropdownMenuRadioGroup value={textSize} onValueChange={(value) => onTextSizeChange(value as TextSizeOption)}>
-        {READER_TEXT_SIZE_OPTIONS.map(({ value, labelKey, sampleClass }) => (
-          <DropdownMenuRadioItem
-            key={value}
-            value={value}
-            data-testid={`reader-text-size-${value}`}
-            className="cursor-pointer rounded-xl py-2.5 text-subtitle font-medium transition-colors hover:bg-muted"
-          >
-            <span className="flex items-center gap-3">
-              {/* The glyph previews the step; the word carries the meaning,
+      <DropdownMenuGroup>
+        <DropdownMenuLabel className="px-3 pb-1 pt-1 text-xs font-semibold text-muted-foreground">
+          {t(language, "settings.textSize")}
+        </DropdownMenuLabel>
+        <DropdownMenuRadioGroup value={textSize} onValueChange={(value) => onTextSizeChange(value as TextSizeOption)}>
+          {READER_TEXT_SIZE_OPTIONS.map(({ value, labelKey, sampleClass }) => (
+            <DropdownMenuRadioItem
+              key={value}
+              value={value}
+              data-testid={`reader-text-size-${value}`}
+              className="cursor-pointer rounded-xl py-2.5 text-subtitle font-medium transition-colors hover:bg-muted"
+            >
+              <span className="flex items-center gap-3">
+                {/* The glyph previews the step; the word carries the meaning,
                   so size is never the only thing distinguishing the options. */}
-              <span aria-hidden="true" className={`w-5 text-center font-bold leading-none ${sampleClass}`}>
-                Aa
+                <span aria-hidden="true" className={`w-5 text-center font-bold leading-none ${sampleClass}`}>
+                  Aa
+                </span>
+                {t(language, labelKey)}
               </span>
-              {t(language, labelKey)}
-            </span>
-          </DropdownMenuRadioItem>
-        ))}
-      </DropdownMenuRadioGroup>
+            </DropdownMenuRadioItem>
+          ))}
+        </DropdownMenuRadioGroup>
+      </DropdownMenuGroup>
 
       <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
 
       {/* Save, share and sound live here on every tier now, not just on
           phones: the header keeps two actions at most, so these three moved
           off the desktop hero toolbar into the same menu. */}
-      <DropdownMenuItem
-        onClick={handleToggleSaved}
-        className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted"
-      >
-        <Bookmark key={String(isSaved)} size={18} className={isSaved ? "favorite-pop fill-current" : ""} />
-        {isSaved ? t(language, "reader.unsave") : t(language, "reader.save")}
-      </DropdownMenuItem>
-      <DropdownMenuItem
-        onClick={() => void handleShare()}
-        disabled={isSharing}
-        className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
-      >
-        <Share2 size={18} />
-        {t(language, "reader.share")}
-      </DropdownMenuItem>
-      <DropdownMenuItem
-        onClick={toggleSound}
-        data-testid={`reader-counter-sound-toggle-${layout}`}
-        className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted"
-      >
-        {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
-        {t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}
-      </DropdownMenuItem>
+      <DropdownMenuLabel className="px-3 pb-1 pt-2 text-xs font-bold text-muted-foreground">
+        {t(language, "reader.menuActions")}
+      </DropdownMenuLabel>
+      <DropdownMenuGroup>
+        <DropdownMenuItem
+          onClick={handleToggleSaved}
+          className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted"
+        >
+          <Bookmark key={String(isSaved)} size={18} className={isSaved ? "favorite-pop fill-current" : ""} />
+          {isSaved ? t(language, "reader.unsave") : t(language, "reader.save")}
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => void handleShare()}
+          disabled={isSharing}
+          className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
+        >
+          <Share2 size={18} />
+          {t(language, "reader.share")}
+        </DropdownMenuItem>
+      </DropdownMenuGroup>
 
-      <DropdownMenuItem
-        onClick={handleResetCounter}
-        className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted"
-      >
-        <RotateCcw size={18} />
-        {t(language, "reader.resetCounter")}
-      </DropdownMenuItem>
+      <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
+      <DropdownMenuLabel className="px-3 pb-1 pt-2 text-xs font-bold text-muted-foreground">
+        {t(language, "reader.menuCounter")}
+      </DropdownMenuLabel>
+      <DropdownMenuGroup>
+        <DropdownMenuItem
+          onClick={toggleSound}
+          data-testid={`reader-counter-sound-toggle-${layout}`}
+          className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted"
+        >
+          {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
+          {t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={handleResetCounter}
+          className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted"
+        >
+          <RotateCcw size={18} />
+          {t(language, "reader.resetCounter")}
+        </DropdownMenuItem>
+      </DropdownMenuGroup>
 
       <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
 
+      <DropdownMenuLabel className="px-3 pb-1 pt-2 text-xs font-bold text-muted-foreground">
+        {t(language, "reader.menuNavigation")}
+      </DropdownMenuLabel>
       <DropdownMenuItem
         onClick={onBack}
         className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted"
@@ -1042,7 +1072,7 @@ export function ReaderScreen({
                   title={t(language, "reader.referencesButton")}
                   className="flex min-h-11 items-center gap-2 rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 px-3 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 >
-                  <BookOpen size={18} aria-hidden="true" />
+                  <Lightbulb size={18} aria-hidden="true" />
                   <span className="text-label font-extrabold">{t(language, "reader.referencesButton")}</span>
                 </button>
 
@@ -1171,7 +1201,9 @@ export function ReaderScreen({
                   {renderSideNavigation()}
                 </div>
 
-                {!longSurah && <footer className="shrink-0 pb-3 pt-2">{renderCounterStack()}</footer>}
+                {!longSurah && !audioModeActive && (
+                  <footer className="shrink-0 pb-3 pt-2">{renderCounterStack()}</footer>
+                )}
               </div>
             </div>
           </>
@@ -1198,12 +1230,12 @@ export function ReaderScreen({
                         setBenefitOpen(true);
                       }}
                       aria-haspopup="dialog"
-                      className={`${READER_HEADER_ACTION_CLASS} min-[600px]:w-auto min-[600px]:gap-2 min-[600px]:px-3`}
+                      className={`${READER_HEADER_ACTION_CLASS} w-auto gap-1.5 px-2.5`}
                       aria-label={t(language, "reader.referencesButton")}
                       title={t(language, "reader.referencesButton")}
                     >
-                      <BookOpen size={20} aria-hidden="true" />
-                      <span className="hidden text-label font-extrabold min-[600px]:inline">
+                      <Lightbulb size={18} aria-hidden="true" />
+                      <span className="text-xs font-extrabold min-[600px]:text-label">
                         {t(language, "reader.referencesButton")}
                       </span>
                     </button>
@@ -1317,7 +1349,7 @@ export function ReaderScreen({
               {/* The screen sets !pb-0 and the tab bar is hidden here, so the
                 counter itself owns the bottom inset — otherwise it would sit
                 flush against the home indicator. */}
-              {!longSurah && (
+              {!longSurah && !audioModeActive && (
                 <div className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">
                   {renderCounterStack()}
                 </div>

@@ -734,6 +734,29 @@ function AppContent({
     if (matchingIndex >= 0 && matchingIndex !== activeIdx) setActiveIdx(matchingIndex);
   }, [activeAzkarList, activeCat, activeIdx, audioController, view, setActiveIdx]);
 
+  const audioCompletionSequence = audioController?.state.completionSequence ?? 0;
+  useEffect(() => {
+    const zikrId = audioController?.state.completedEntryId;
+    const context = audioController?.state.plan?.context;
+    if (!zikrId || !context) return;
+
+    const planAzkar =
+      context.category === "after_prayer" && isPrayerName(context.subCategory)
+        ? getAzkarForPrayer(context.subCategory, context.routineMode)
+        : getAzkarForMode(context.category, context.routineMode);
+    const completedIndex = planAzkar.findIndex((zikr) => zikr.id === zikrId);
+    if (completedIndex < 0) return;
+    if (context.fridayDuaFlow && context.category === "comprehensive_duas") {
+      updateFridayDuaProgress(completedIndex, true);
+    }
+    if (getEffectiveCompletedForSubcategory(completed, context.category, context.subCategory).has(zikrId)) return;
+
+    toggleZikrCompletion(context.category, completedIndex, context.subCategory, context.routineMode);
+    // completionSequence is the event identity; the plan freezes the category
+    // context so navigation cannot redirect completion to another session.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [audioCompletionSequence]);
+
   const markOnboardingComplete = useCallback(() => {
     setHasCompletedOnboarding(true);
     try {
@@ -1007,13 +1030,19 @@ function AppContent({
       if (!audioController || !buildPlaybackPlan) return false;
       const plan = buildPlaybackPlan({
         zikrs: items,
-        context: { category: activeCat, routineMode: activeRoutineMode, source },
+        context: {
+          category: activeCat,
+          routineMode: activeRoutineMode,
+          source,
+          subCategory: activeSubCategory,
+          fridayDuaFlow,
+        },
         mode: repeatPrescribed ? "repeat-prescribed-count" : "play-once",
         preferences: audioController.preferences,
       });
       return audioController.startPlan(plan);
     },
-    [activeCat, activeRoutineMode, audioController, buildPlaybackPlan],
+    [activeCat, activeRoutineMode, activeSubCategory, audioController, buildPlaybackPlan, fridayDuaFlow],
   );
 
   useEffect(() => {
@@ -1062,7 +1091,13 @@ function AppContent({
     const playAvailable = () => {
       const plan = buildPlaybackPlan({
         zikrs: azkar,
-        context: { category: activeCat, routineMode: activeRoutineMode, source: "full-session" },
+        context: {
+          category: activeCat,
+          routineMode: activeRoutineMode,
+          source: "full-session",
+          subCategory: activeSubCategory,
+          fridayDuaFlow,
+        },
         preferences: audioController.preferences,
       });
       const firstZikrId = plan.entries[0]?.zikrId;
@@ -1142,9 +1177,30 @@ function AppContent({
         {showSidebar && (
           <NavSidebar
             active={activeTab}
+            activeUtility={
+              view === "qibla"
+                ? "qibla"
+                : view === "custom_counter"
+                  ? "masbaha"
+                  : view === "settings"
+                    ? "settings"
+                    : undefined
+            }
             onChange={(tab) => {
               setFridayDuaFlow(false);
               handleNavTab(tab);
+            }}
+            onOpenQibla={() => {
+              setFridayDuaFlow(false);
+              push("qibla");
+            }}
+            onOpenMasbaha={() => {
+              setFridayDuaFlow(false);
+              push("custom_counter");
+            }}
+            onOpenSettings={() => {
+              setFridayDuaFlow(false);
+              push("settings");
             }}
             isArabic={isArabic}
             themeMode={themeMode}
@@ -1638,6 +1694,13 @@ function AppContent({
                       ? () => void startAudio([activeZikr], "single", true)
                       : undefined
                   }
+                  audioModeActive={
+                    Boolean(audioController?.state.plan) &&
+                    audioController?.state.plan?.context.category === activeCat &&
+                    audioController?.state.plan?.context.subCategory === activeSubCategory &&
+                    audioController.currentEntry?.zikrId === activeZikr.id &&
+                    ["loading", "ready", "playing", "paused", "buffering"].includes(audioController.state.status)
+                  }
                 />
               )}
               {view === "prayer" && (
@@ -1862,6 +1925,7 @@ function AppContent({
             <FloatingAudioPlayer
               controller={audioController}
               language={selectedLang}
+              direction={layoutDirection}
               overReadingSurface={readerInMushafMode}
             />
           </Suspense>

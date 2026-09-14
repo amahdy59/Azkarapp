@@ -65,7 +65,7 @@ There is exactly one writer for the address bar: an effect in `App.tsx` that cal
 
 Onboarding and auth steps have no hash route on purpose: they are flow states gated by stored progress, not destinations, and `routeToHash` returns null so the URL is left untouched. The single exception is the OAuth return, which arrives as `?view=auth-callback` because `getAuthCallbackUrl` configures the provider redirect that way. Legacy `?view=` links still resolve, so older bookmarks keep working.
 
-A second, narrower `activeTab` state (`home | azkar | progress | more`) drives which top-level destination the navigation highlights. It is derived from `View` and kept in sync in `App.tsx`; `View` remains the source of truth for what renders. More groups Qibla, Masbaha, and Settings without increasing the four-item primary navigation. Their direct routes remain linkable and select More.
+A second, narrower `activeTab` state (`home | azkar | progress | more`) drives which top-level destination the navigation highlights. It is derived from `View` and kept in sync in `App.tsx`; `View` remains the source of truth for what renders. Compact and expanded navigation keep More as the fourth destination and group Qibla, Masbaha, and Settings there. The labelled large-desktop sidebar uses its available height to expose those three utilities directly and omits More. Their routes remain linkable at every tier.
 
 The shell is adaptive. `useLayoutMode` returns one of four width-only tiers — `compact` (≤599px), `medium` (600–899px), `expanded` (900–1199px), `large` (≥1200px) — and `App.tsx` mounts exactly one navigation component per tier: `BottomNav` for compact and medium, `NavRail` for expanded, `NavSidebar` for large. The corresponding grid areas live in `src/styles/theme/layout.css`; the JS boundaries and the CSS media queries must stay in agreement.
 
@@ -78,7 +78,7 @@ Rules:
 - Focus moves to `#main-content` on every view change (`useViewFocus`), skipping initial load.
 - Settings subsections use `SettingsSubScreen` within `SettingsScreen`.
 - The Azkar tab always opens the collection index, not an implicit prior category.
-- Qibla calculation is local and deterministic from coordinates. Live compass rotation is progressive enhancement: it is requested from a user action, accepts only an absolute heading (including the supported WebKit compass field), and leaves the north-based bearing usable when sensor permission or hardware is unavailable.
+- Qibla calculation is local and deterministic from coordinates. Live compass rotation is progressive enhancement: it is requested from a user action, uses the standard no-argument iOS permission call, accepts the absolute-orientation event or supported WebKit compass field, smooths across the north seam without delaying deliberate large turns, and leaves the north-based bearing usable when sensor permission or hardware is unavailable.
 
 ## Presentation boundaries
 

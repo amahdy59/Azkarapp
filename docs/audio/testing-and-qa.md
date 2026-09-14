@@ -25,5 +25,8 @@ Automated tests cover exact/no-fallback lookup, Arabic fingerprints, canonical r
 - With a screen reader, confirm dynamic Play/Pause names and polite track/error/repetition/queue announcements; current time must not announce every second.
 - Test offline with a fully downloaded item and an uncached item.
 - Switch category and Core/Complete during playback; the audio title/text identity and queue must not change.
+- Complete both Play Once and prescribed-repeat audio, navigate to another prayer or subcategory, and confirm natural completion updates only the frozen source session once. Repeat must wait for its final repetition; pause, stop, skip, and failure must not complete it.
+- Confirm the current Reader counter disappears while its audio plan is active, returns after a playback error, and never disappears for a different zikr.
+- Confirm Reader and player keyboard shortcuts do not both react to one Arrow, Space, or Escape press.
 - Listen to every production mapping with headphones and compare the complete displayed Arabic.
 - Exercise Chromium, Firefox, and WebKit; automated axe checks supplement but do not replace this review.

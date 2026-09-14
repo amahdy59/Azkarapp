@@ -544,7 +544,7 @@ export function HomeScreen({
     setSelectedPrayer(prayer);
     setDismissedAutoPrayer(prayer ? null : autoPrayer);
   };
-  const hasPrimaryContext = showCompletionCard || isRoutineHero;
+  const hasPrimaryContext = showCompletionCard || showRoutineCard;
   const hasContextCompanion = Boolean(dailyEvidence);
 
   /* The named scroll region must itself be keyboard-scrollable. */
@@ -691,7 +691,7 @@ export function HomeScreen({
                               onGlass={homeVisualEffects}
                             />
                           </div>
-                        ) : isRoutineHero ? (
+                        ) : showRoutineCard ? (
                           <PrayerRoutineCard
                             categoryId={reminderInfo.categoryId}
                             language={language}

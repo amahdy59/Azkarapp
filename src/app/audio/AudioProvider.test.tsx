@@ -5,6 +5,7 @@ import { AudioProvider, useAudioController } from "./AudioProvider";
 import type { PlaybackPlan } from "./audioTypes";
 
 class FakeAudio extends EventTarget {
+  static latest: FakeAudio | null = null;
   static rejectPlayWith: "NotAllowedError" | "NotSupportedError" | null = null;
   private source = "";
   currentTime = 0;
@@ -15,6 +16,11 @@ class FakeAudio extends EventTarget {
   paused = true;
   ended = false;
   error: MediaError | null = null;
+
+  constructor() {
+    super();
+    FakeAudio.latest = this;
+  }
 
   get src() {
     return this.source;
@@ -97,6 +103,12 @@ const repeatPlan: PlaybackPlan = {
   ],
 };
 
+const playOnceRepeatedPlan: PlaybackPlan = {
+  ...repeatPlan,
+  id: "play-once-repeated-plan",
+  entries: [{ ...repeatPlan.entries[0]!, repetitions: 1 }],
+};
+
 function Harness({ language = "en" }: { language?: "ar" | "en" }) {
   const controller = useAudioController();
   return (
@@ -107,7 +119,12 @@ function Harness({ language = "en" }: { language?: "ar" | "en" }) {
       <button type="button" onClick={() => controller.startPlan(repeatPlan)}>
         Start repeat
       </button>
+      <button type="button" onClick={() => controller.startPlan(playOnceRepeatedPlan)}>
+        Start repeated zikr once
+      </button>
       <output>{controller.state.status}</output>
+      <output data-testid="completed-audio-entry">{controller.state.completedEntryId ?? ""}</output>
+      <output data-testid="audio-completion-sequence">{controller.state.completionSequence}</output>
       {controller.state.plan && <FloatingAudioPlayer controller={controller} language={language} />}
     </>
   );
@@ -121,6 +138,42 @@ afterEach(() => {
 });
 
 describe("AudioProvider integration", () => {
+  it("reports a zikr complete only after its recording ends naturally", async () => {
+    vi.stubGlobal("Audio", FakeAudio);
+    render(
+      <AudioProvider>
+        <Harness />
+      </AudioProvider>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Start" }));
+    expect(screen.getByTestId("completed-audio-entry")).toBeEmptyDOMElement();
+
+    FakeAudio.latest!.ended = true;
+    FakeAudio.latest!.dispatchEvent(new Event("ended"));
+    await waitFor(() => expect(screen.getByTestId("completed-audio-entry")).toHaveTextContent("zikr"));
+  });
+
+  it("completes Play Once after one recitation but waits for the final prescribed repeat", async () => {
+    vi.stubGlobal("Audio", FakeAudio);
+    render(
+      <AudioProvider>
+        <Harness />
+      </AudioProvider>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Start repeated zikr once" }));
+    FakeAudio.latest!.dispatchEvent(new Event("ended"));
+    await waitFor(() => expect(screen.getByTestId("completed-audio-entry")).toHaveTextContent("zikr"));
+
+    fireEvent.click(screen.getByRole("button", { name: "Start repeat" }));
+    await waitFor(() => expect(screen.getByTestId("audio-completion-sequence")).toHaveTextContent("1"));
+    FakeAudio.latest!.dispatchEvent(new Event("ended"));
+    FakeAudio.latest!.dispatchEvent(new Event("ended"));
+    expect(screen.getByTestId("audio-completion-sequence")).toHaveTextContent("1");
+    FakeAudio.latest!.dispatchEvent(new Event("ended"));
+    await waitFor(() => expect(screen.getByTestId("audio-completion-sequence")).toHaveTextContent("2"));
+  });
+
   it("starts only after a user action and keeps the player visible while paused", async () => {
     vi.stubGlobal("Audio", FakeAudio);
     render(

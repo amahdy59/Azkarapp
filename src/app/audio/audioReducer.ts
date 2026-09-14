@@ -13,6 +13,8 @@ export const createInitialAudioState = (playbackRate = 1): AudioControllerState 
   currentVoiceId: null,
   playbackRate,
   announcement: "",
+  completedEntryId: null,
+  completionSequence: 0,
 });
 
 export type AudioAction =
@@ -32,6 +34,7 @@ export type AudioAction =
   | { type: "complete"; generation: number }
   | { type: "rate"; playbackRate: number }
   | { type: "announce"; announcement: string }
+  | { type: "entry-complete"; zikrId: string }
   | { type: "stop"; playbackRate: number };
 
 export function audioReducer(state: AudioControllerState, action: AudioAction): AudioControllerState {
@@ -66,6 +69,12 @@ export function audioReducer(state: AudioControllerState, action: AudioAction): 
       return { ...state, playbackRate: action.playbackRate };
     case "announce":
       return { ...state, announcement: action.announcement };
+    case "entry-complete":
+      return {
+        ...state,
+        completedEntryId: action.zikrId,
+        completionSequence: state.completionSequence + 1,
+      };
     case "stop":
       return createInitialAudioState(action.playbackRate);
   }

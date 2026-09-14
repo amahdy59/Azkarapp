@@ -138,6 +138,12 @@ export function AudioProvider({
   const advanceAfterEnded = useCallback(
     (plan: PlaybackPlan, entryIndex: number, segmentIndex: number, repetitionIndex: number, voiceId: string) => {
       const next = getNextPlaybackPosition(plan, { entryIndex, segmentIndex, repetitionIndex }, voiceId);
+      const entry = plan.entries[entryIndex];
+      const completedThisEntry =
+        Boolean(entry) &&
+        (next.complete || next.position.entryIndex !== entryIndex) &&
+        (entry!.repetitions === 1 || repetitionIndex + 1 >= entry!.repetitions);
+      if (completedThisEntry) dispatch({ type: "entry-complete", zikrId: entry!.zikrId });
       if (next.complete) {
         dispatch({ type: "complete", generation: generationRef.current });
         return;

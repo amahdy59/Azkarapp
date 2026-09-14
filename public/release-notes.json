@@ -1,13 +1,15 @@
 {
-  "release": "2026-09-14",
+  "release": "2026-09-15",
   "ar": [
     "إضافة تلاوات صوتية جديدة لأذكار المساء بصوت الشيخ عبد الله محمد.",
-    "تحسين آلية تشغيل الأذكار المشتركة بين الصباح والمساء.",
-    "إضافة دعم التلاوة الصوتية لأذكار ما قبل النوم."
+    "تحسين تشغيل الصوتيات المشتركة بين أذكار الصباح والمساء.",
+    "إضافة التلاوات الصوتية لأذكار ما قبل النوم.",
+    "تحسين واجهة المستخدم وتجربة الاستخدام على الشاشات الكبيرة والمكتبية."
   ],
   "en": [
     "Added new audio recitations for Evening Azkar by Sheikh Abdullah Muhammad.",
     "Improved audio playback for shared Morning and Evening Azkar.",
-    "Added audio recitation support for Before Sleep Azkar."
+    "Added audio recitation support for Before Sleep Azkar.",
+    "Enhanced the user interface and layout for desktop and tablet screens."
   ]
 }

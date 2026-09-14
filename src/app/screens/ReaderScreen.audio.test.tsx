@@ -83,13 +83,44 @@ describe("ReaderScreen audio identity", () => {
     );
 
     expect(screen.getByTestId("reader-screen")).toHaveAttribute("data-zikr-id", "m-hm-75");
-    // Header chrome is two actions: Reference and the overflow control. Share,
+    // Header chrome is two actions: Benefit and the overflow control. Share,
     // save and the counter-sound toggle all live inside that overflow menu.
-    expect(screen.getByRole("button", { name: "Reference" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Benefit" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Reader options" })).toBeInTheDocument();
     for (const name of ["Share zikr", "Save zikr", "Counter sound"]) {
       expect(screen.queryByRole("button", { name })).toBeNull();
     }
+  });
+
+  it("lets the active audio player own completion instead of showing a second counter", () => {
+    render(
+      <ReaderScreen
+        catId="morning"
+        idx={2}
+        routineMode="core"
+        isArabic={false}
+        direction="ltr"
+        themeMode="light"
+        isDone={false}
+        collectionCompletedCount={0}
+        hapticFeedback={false}
+        showTranslation={false}
+        showTransliteration={false}
+        textSize="medium"
+        onTextSizeChange={() => undefined}
+        savedZikrIds={new Set()}
+        onBack={() => undefined}
+        onComplete={() => undefined}
+        onAdvance={() => undefined}
+        onNext={() => undefined}
+        onPrev={() => undefined}
+        onToggleSaved={() => undefined}
+        audioAvailable
+        audioModeActive
+      />,
+    );
+
+    expect(screen.queryByTestId("reader-counter-stack")).not.toBeInTheDocument();
   });
 
   it("renders 3 options for long surahs without the surah text", () => {

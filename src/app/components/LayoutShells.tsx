@@ -1,5 +1,18 @@
 import React from "react";
-import { ArrowPrevious, BarChart3, BookOpen, Home, MoreHorizontal, Globe, Moon, Sun, Contrast } from "./icons";
+import {
+  ArrowPrevious,
+  BarChart3,
+  BookOpen,
+  Compass,
+  Contrast,
+  Globe,
+  Home,
+  Moon,
+  MoreHorizontal,
+  Settings,
+  Sparkles,
+  Sun,
+} from "./icons";
 import { PalmTreeMark } from "./RoutineGarden";
 import { t } from "../i18n";
 import { LANGUAGE_LABELS } from "../languageOptions";
@@ -16,6 +29,13 @@ export interface NavProps {
   themeMode?: ThemeMode;
   onThemeModeChange?: (mode: ThemeMode) => void;
   onLanguageChange?: (lang: AppLanguage) => void;
+}
+
+interface NavSidebarProps extends NavProps {
+  activeUtility?: "qibla" | "masbaha" | "settings";
+  onOpenQibla: () => void;
+  onOpenMasbaha: () => void;
+  onOpenSettings: () => void;
 }
 
 function getNavTabs(language: AppLanguage) {
@@ -195,9 +215,18 @@ export function NavSidebar({
   themeMode = "dark",
   onThemeModeChange,
   onLanguageChange,
-}: NavProps) {
+  activeUtility,
+  onOpenQibla,
+  onOpenMasbaha,
+  onOpenSettings,
+}: NavSidebarProps) {
   const language: AppLanguage = isArabic ? "ar" : "en";
-  const tabs = getNavTabs(language);
+  const tabs = getNavTabs(language).filter(({ id }) => id !== "more");
+  const utilityTabs = [
+    { id: "qibla" as const, label: t(language, "qibla.title"), Icon: Compass, onClick: onOpenQibla },
+    { id: "masbaha" as const, label: t(language, "counter.tasbeehTitle"), Icon: Sparkles, onClick: onOpenMasbaha },
+    { id: "settings" as const, label: t(language, "common.settings"), Icon: Settings, onClick: onOpenSettings },
+  ];
 
   const toggleLang = () => {
     onLanguageChange?.(isArabic ? "en" : "ar");
@@ -244,6 +273,28 @@ export function NavSidebar({
               key={id}
               data-testid={`nav-${id}`}
               onClick={() => onChange(id)}
+              aria-current={on ? "page" : undefined}
+              className="nav-sidebar-item"
+            >
+              <span className={on ? "nav-active-cue flex text-primary" : "flex"} key={`${id}-${on}`}>
+                <Icon size={20} />
+              </span>
+              <span className="font-semibold" dir="auto">
+                {label}
+              </span>
+            </button>
+          );
+        })}
+
+        <div className="my-2 border-t border-border/40" aria-hidden="true" />
+        {utilityTabs.map(({ id, label, Icon, onClick }) => {
+          const on = activeUtility === id;
+          return (
+            <button
+              key={id}
+              type="button"
+              data-testid={`nav-${id}`}
+              onClick={onClick}
               aria-current={on ? "page" : undefined}
               className="nav-sidebar-item"
             >

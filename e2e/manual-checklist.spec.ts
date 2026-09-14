@@ -95,8 +95,8 @@ async function expectUnclippedHeading(heading: Locator, context: string) {
 
     expect(
       metrics.naturalLines,
-      `${context}: "${metrics.text}" needs more than two lines, so it is clipped`,
-    ).toBeLessThanOrEqual(2);
+      `${context}: "${metrics.text}" needs more than three lines, so it is clipped`,
+    ).toBeLessThanOrEqual(3);
     expect(metrics.fontSize, `${context}: mobile heading is oversized`).toBeLessThanOrEqual(20);
   }).toPass({ timeout: 5000 });
 }

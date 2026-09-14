@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getQiblaBearing, getQiblaTurn, normalizeDegrees } from "./qibla";
+import { getQiblaBearing, getQiblaTurn, normalizeDegrees, smoothCompassHeading } from "./qibla";
 
 describe("Qibla direction", () => {
   it("calculates known bearings without a network request", () => {
@@ -11,5 +11,14 @@ describe("Qibla direction", () => {
     expect(normalizeDegrees(-10)).toBe(350);
     expect(getQiblaTurn(5, 355)).toBe(10);
     expect(getQiblaTurn(355, 5)).toBe(-10);
+  });
+
+  it("smooths compass readings across north without jumping around the dial", () => {
+    expect(smoothCompassHeading(358, 2)).toBeCloseTo(359);
+    expect(smoothCompassHeading(2, 358)).toBeCloseTo(1);
+  });
+
+  it("catches up immediately after a large physical turn", () => {
+    expect(smoothCompassHeading(0, 90)).toBe(90);
   });
 });

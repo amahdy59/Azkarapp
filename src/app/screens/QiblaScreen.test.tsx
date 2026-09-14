@@ -67,7 +67,7 @@ describe("QiblaScreen", () => {
 
     const control = screen.getByRole("button", { name: "Enable live compass" });
     await user.click(control);
-    expect(requestPermission).toHaveBeenCalledWith(true);
+    expect(requestPermission).toHaveBeenCalledWith();
     expect(screen.getByRole("button", { name: "Stop live compass" })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByText(/Waiting for an absolute compass heading/)).toBeVisible();
   });

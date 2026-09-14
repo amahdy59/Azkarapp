@@ -1,9 +1,9 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useEffect, useRef, useState } from "react";
-import { BookOpen, Check, Copy, X } from "./icons";
+import { Check, Copy, Lightbulb, X } from "./icons";
 import { t } from "../i18n";
 import type { AppLanguage, Zikr } from "../types";
-import { getLocalizedSourceReference } from "../content/localizedZikr";
+import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content/localizedZikr";
 import { ResponsiveSheet } from "./ResponsiveSheet";
 import { HadithWeakChainBadge } from "./ZikrComponents";
 
@@ -32,6 +32,7 @@ function ReferenceContent({
   const copyFeedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isArabic = language === "ar";
   const sourceReference = getLocalizedSourceReference(zikr, language);
+  const benefit = getLocalizedZikrBenefit(zikr, language);
 
   /**
    * The narration to show, and the language it is actually in.
@@ -85,7 +86,7 @@ function ReferenceContent({
       <div className="flex shrink-0 items-center justify-between gap-4 border-b border-border/40 px-5 py-3">
         <div className="flex items-center gap-3">
           <div className="flex size-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-            <BookOpen size={20} aria-hidden="true" />
+            <Lightbulb size={20} aria-hidden="true" />
           </div>
           <div aria-hidden="true" className="text-lg font-extrabold leading-snug text-foreground">
             {t(language, "reader.referencesButton")}
@@ -112,8 +113,21 @@ function ReferenceContent({
         dir={direction}
       >
         <div className="reference-sheet-content flex flex-col pb-4">
+          {benefit && (
+            <section aria-labelledby="reference-benefit-heading">
+              <h3 id="reference-benefit-heading" className="mb-2 text-subtitle font-extrabold text-primary">
+                {t(language, "reader.benefitLabel")}
+              </h3>
+              <p className="text-start text-base font-semibold leading-8 text-foreground" dir="auto">
+                {benefit}
+              </p>
+            </section>
+          )}
           {narration && (
-            <section aria-labelledby="reference-evidence-heading">
+            <section
+              aria-labelledby="reference-evidence-heading"
+              className={benefit ? "mt-4 border-t border-border/50 pt-3" : undefined}
+            >
               <div className="mb-2 flex items-center justify-between gap-2">
                 <h3
                   id="reference-evidence-heading"

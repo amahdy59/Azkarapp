@@ -169,6 +169,16 @@ describe("useSessionHandlers", () => {
     expect(result.current.dailyCompletions[0]).toMatchObject({ category: "after_prayer", subCategory: "fajr" });
   });
 
+  it("can record playback against its frozen prayer even after navigation", () => {
+    const fajr = getAzkarForPrayer("fajr", "complete");
+    const { result } = renderSessionHarness({ activeCat: "after_prayer", activeSubCategory: "dhuhr" });
+
+    act(() => result.current.handlers.toggleZikrCompletion("after_prayer", 0, "fajr", "complete"));
+
+    expect(result.current.completed.after_prayer).toContain(`fajr:${fajr[0]?.id}`);
+    expect(result.current.completed.after_prayer).not.toContain(`dhuhr:${fajr[0]?.id}`);
+  });
+
   it("keeps canonical progress intact during repeat sessions and advances to completion", () => {
     const items = getAzkarForMode("morning", "complete");
     const canonical = new Set(items.map((item) => item.id));

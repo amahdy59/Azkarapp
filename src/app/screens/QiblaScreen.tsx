@@ -6,7 +6,7 @@ import { Button } from "../components/ui/button";
 import { detectUserCoordinates } from "../content/prayerCalculation";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
-import { getQiblaBearing, getQiblaTurn, normalizeDegrees } from "../qibla";
+import { getQiblaBearing, getQiblaTurn, normalizeDegrees, smoothCompassHeading } from "../qibla";
 import type { AppLanguage, LocationSettings } from "../types";
 
 type OrientationEventWithCompass = DeviceOrientationEvent & {
@@ -15,7 +15,7 @@ type OrientationEventWithCompass = DeviceOrientationEvent & {
 };
 
 type OrientationConstructorWithPermission = typeof DeviceOrientationEvent & {
-  requestPermission?: (absolute?: boolean) => Promise<"granted" | "denied">;
+  requestPermission?: () => Promise<"granted" | "denied">;
 };
 
 function screenOrientationAngle(): number {
@@ -23,9 +23,9 @@ function screenOrientationAngle(): number {
   return window.screen.orientation?.angle ?? legacyOrientation ?? 0;
 }
 
-export function headingFromOrientation(event: OrientationEventWithCompass): number | null {
+export function headingFromOrientation(event: OrientationEventWithCompass, fromAbsoluteEvent = false): number | null {
   if (Number.isFinite(event.webkitCompassHeading)) return normalizeDegrees(event.webkitCompassHeading!);
-  if (!event.absolute || !Number.isFinite(event.alpha)) return null;
+  if ((!event.absolute && !fromAbsoluteEvent) || !Number.isFinite(event.alpha)) return null;
   return normalizeDegrees(360 - event.alpha! + screenOrientationAngle());
 }
 
@@ -137,10 +137,10 @@ export function QiblaScreen({
 
     const handleOrientation = (rawEvent: Event) => {
       const event = rawEvent as OrientationEventWithCompass;
-      const nextHeading = headingFromOrientation(event);
+      const nextHeading = headingFromOrientation(event, rawEvent.type === "deviceorientationabsolute");
       if (nextHeading === null) return;
       receivedHeading.current = true;
-      setHeading(nextHeading);
+      setHeading((previous) => smoothCompassHeading(previous, nextHeading));
       setCompassStatus(null);
     };
 
@@ -186,7 +186,7 @@ export function QiblaScreen({
     const orientation = DeviceOrientationEvent as OrientationConstructorWithPermission;
     if (orientation.requestPermission) {
       try {
-        const permission = await orientation.requestPermission(true);
+        const permission = await orientation.requestPermission();
         if (permission !== "granted") {
           setCompassStatus(t(language, "qibla.compassDenied"));
           return;

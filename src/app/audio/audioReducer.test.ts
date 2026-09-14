@@ -43,4 +43,13 @@ describe("audio reducer", () => {
     expect(failed.status).toBe("error");
     expect(failed.plan).toBe(plan);
   });
+
+  it("keeps naturally completed entries as distinct events", () => {
+    const initial = createInitialAudioState();
+    const first = audioReducer(initial, { type: "entry-complete", zikrId: "morning-1" });
+    const second = audioReducer(first, { type: "entry-complete", zikrId: "morning-2" });
+
+    expect(first).toMatchObject({ completedEntryId: "morning-1", completionSequence: 1 });
+    expect(second).toMatchObject({ completedEntryId: "morning-2", completionSequence: 2 });
+  });
 });

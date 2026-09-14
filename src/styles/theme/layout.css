@@ -136,8 +136,9 @@
 
 .audio-volume-range::-webkit-slider-runnable-track {
   width: 0.5rem;
+  margin-inline: auto;
   border-radius: 9999px;
-  background: inherit;
+  background: var(--audio-volume-fill);
 }
 
 .audio-volume-range::-webkit-slider-thumb {
@@ -153,12 +154,12 @@
 .audio-volume-range::-moz-range-track {
   width: 0.5rem;
   border-radius: 9999px;
-  background: inherit;
+  background: var(--audio-volume-fill);
 }
 
 .audio-volume-range::-moz-range-thumb {
-  width: 0.875rem;
-  height: 0.875rem;
+  width: 1.125rem;
+  height: 1.125rem;
   border: 2px solid var(--card);
   border-radius: 9999px;
   background: var(--primary);
@@ -186,6 +187,11 @@
 }
 
 @media (min-width: 56.25rem) {
+  .audio-compact-row {
+    display: grid;
+    grid-template-columns: auto minmax(8rem, 0.65fr) minmax(10rem, 1.35fr) auto;
+  }
+
   .floating-audio-player {
     bottom: 0.75rem;
     inset-inline-end: 0.75rem;

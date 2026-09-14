@@ -345,7 +345,7 @@ function VolumeControl({
         <div
           id="audio-volume-control"
           data-testid="audio-volume-popover"
-          className="absolute bottom-full end-0 z-10 h-[10.5rem] w-14 pb-2"
+          className="absolute bottom-full end-[-0.625rem] z-10 h-[10.5rem] w-16 pb-2"
         >
           <div className="flex h-full w-full flex-col items-center justify-center rounded-2xl border border-border bg-card/98 py-3 shadow-overlay backdrop-blur-xl">
             <input
@@ -358,12 +358,14 @@ function VolumeControl({
               aria-label={copy.volume}
               aria-orientation="vertical"
               aria-valuetext={`${formatNumerals(percentage, language)}%`}
-              style={{
-                writingMode: "vertical-lr",
-                direction: "rtl",
-                background: `linear-gradient(to top, var(--primary) ${percentage}%, var(--muted) ${percentage}%)`,
-              }}
-              className="audio-volume-range h-28 w-2 cursor-pointer appearance-none rounded-full accent-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              style={
+                {
+                  writingMode: "vertical-lr",
+                  direction: "rtl",
+                  "--audio-volume-fill": `linear-gradient(to top, var(--primary) ${percentage}%, var(--muted) ${percentage}%)`,
+                } as CSSProperties
+              }
+              className="audio-volume-range h-28 w-11 cursor-pointer appearance-none accent-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             />
           </div>
         </div>
@@ -375,10 +377,12 @@ function VolumeControl({
 export function FloatingAudioPlayer({
   controller,
   language,
+  direction = language === "ar" ? "rtl" : "ltr",
   overReadingSurface = false,
 }: {
   controller: AudioController;
   language: AppLanguage;
+  direction?: "ltr" | "rtl";
   /**
    * The player is covering something being read — today, the Mushaf.
    *
@@ -396,6 +400,10 @@ export function FloatingAudioPlayer({
   const [isMinimized, setIsMinimized] = useState(true);
   const wasCoveringReading = useRef(coversReading);
   const [showOptions, setShowOptions] = useState(false);
+  const controllerRef = useRef(controller);
+  controllerRef.current = controller;
+  const timingRef = useRef({ currentTime: state.currentTime, duration: state.duration });
+  timingRef.current = { currentTime: state.currentTime, duration: state.duration };
 
   useEffect(() => {
     // Only on the way in: opening the Mushaf while a surah plays should fold
@@ -409,44 +417,45 @@ export function FloatingAudioPlayer({
     if (state.status === "error") setIsMinimized(false);
   }, [state.status]);
 
-  const jumpSeconds = useCallback(
-    (delta: number) => {
-      const target = Math.max(0, Math.min(state.currentTime + delta, state.duration || 0));
-      controller.seek(target);
-    },
-    [controller, state.currentTime, state.duration],
-  );
+  const jumpSeconds = useCallback((delta: number) => {
+    const { currentTime, duration } = timingRef.current;
+    controllerRef.current.seek(Math.max(0, Math.min(currentTime + delta, duration || 0)));
+  }, []);
 
   useEffect(() => {
     const handleWindowKeyDown = (e: globalThis.KeyboardEvent) => {
-      const activeTag = (document.activeElement as HTMLElement | null)?.tagName;
-      if (activeTag === "INPUT" || activeTag === "TEXTAREA" || activeTag === "SELECT") return;
+      const activeElement = document.activeElement as HTMLElement | null;
+      if (activeElement?.closest("button, a[href], input, textarea, select, [contenteditable='true'], [role='button']"))
+        return;
 
-      if (e.key === " " && activeTag !== "BUTTON") {
+      if (e.key === " ") {
         e.preventDefault();
-        if (state.status === "playing") controller.pause();
-        else controller.play();
+        e.stopImmediatePropagation();
+        if (state.status === "playing") controllerRef.current.pause();
+        else controllerRef.current.play();
       } else if (e.key === "ArrowLeft") {
         e.preventDefault();
-        jumpSeconds(language === "ar" ? 5 : -5);
+        e.stopImmediatePropagation();
+        jumpSeconds(direction === "rtl" ? 5 : -5);
       } else if (e.key === "ArrowRight") {
         e.preventDefault();
-        jumpSeconds(language === "ar" ? -5 : 5);
+        e.stopImmediatePropagation();
+        jumpSeconds(direction === "rtl" ? -5 : 5);
       } else if (e.key === "Escape") {
         if (!isMinimized) {
           e.preventDefault();
+          e.stopImmediatePropagation();
           setIsMinimized(true);
         }
       }
     };
-    window.addEventListener("keydown", handleWindowKeyDown);
-    return () => window.removeEventListener("keydown", handleWindowKeyDown);
-  }, [controller, isMinimized, jumpSeconds, language, state.status]);
+    window.addEventListener("keydown", handleWindowKeyDown, true);
+    return () => window.removeEventListener("keydown", handleWindowKeyDown, true);
+  }, [direction, isMinimized, jumpSeconds, state.status]);
 
   if (!state.plan || !currentEntry) return null;
 
   const copy = COPY[language];
-  const direction = language === "ar" ? "rtl" : "ltr";
   const isPlaying = state.status === "playing";
   const isBusy = state.status === "loading" || state.status === "buffering";
   const totalTracks = state.plan.entries.length;
@@ -516,7 +525,7 @@ export function FloatingAudioPlayer({
           />
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="audio-compact-row flex items-center gap-2">
           <button
             type="button"
             onClick={() => setIsMinimized(false)}

@@ -75,6 +75,7 @@ Run the phase files in numerical order unless the decision log explicitly record
 | 32    | `phases/PHASE_32_HOME_GLASS_AND_AUDIO_POLISH.md`       | Transparent Home composition and reachable native audio controls        |
 | 33    | `phases/PHASE_33_MORE_AND_QIBLA.md`                    | Four-item navigation with accessible local Qibla guidance               |
 | 34    | `phases/PHASE_34_AZKAR_LIBRARY_HIERARCHY.md`           | Collections-first Library and unambiguous benefit/reference actions     |
+| 35    | `phases/PHASE_35_RESPONSIVE_UTILITY_AND_LISTENING.md`  | Filled Home composition, direct desktop utilities, and synced listening |
 
 Phases 15–20 derive from `docs/audits/DESIGN_CONSISTENCY_AUDIT.md` (2026-08-15) and are
 recorded in `DECISION_LOG.md` as DEC-064. Phase 15 is upstream of 16, 17 and 19 — its root
