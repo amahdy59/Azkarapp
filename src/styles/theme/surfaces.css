@@ -154,6 +154,15 @@
   outline: none;
 }
 
+/* The Reader text viewport is keyboard-focusable so arrow and page keys can
+   scroll long passages. Space is also the Reader's counting shortcut, so the
+   generic fallback above otherwise outlines this full-bleed region as one or
+   two stray horizontal lines. Descendant controls keep their own focus rings. */
+.reader-text-scroll:focus,
+.reader-text-scroll:focus-visible {
+  outline: none;
+}
+
 /* Composite fields: a borderless input sitting inside a rounded shell.
    The shell is the control the reader sees, so it carries the focus ring and
    the input inside carries none. Without this the fallback above draws its

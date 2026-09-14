@@ -98,6 +98,31 @@ test("the Reader counter keeps one rectangular shape across phone, tablet, and d
   }
 });
 
+test("Space counts without outlining the full Reader text region", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await openFirstMorningZikr(page);
+
+  for (const viewport of [
+    { width: 1440, height: 900 },
+    { width: 390, height: 844 },
+  ]) {
+    await page.setViewportSize(viewport);
+    const readingRegion = page.getByRole("region", { name: "Reading text" });
+    await expect(readingRegion).toBeVisible();
+    await readingRegion.focus();
+    await page.keyboard.press("Space");
+
+    const focusState = await page.evaluate(() => {
+      const active = document.activeElement;
+      return {
+        isReaderText: active?.classList.contains("reader-text-scroll") ?? false,
+        outlineStyle: active ? window.getComputedStyle(active).outlineStyle : null,
+      };
+    });
+    expect(focusState).toEqual({ isReaderText: true, outlineStyle: "none" });
+  }
+});
+
 test("desktop and tablet place navigation at the card sides and shortcuts below the counter", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await openFirstMorningZikr(page);

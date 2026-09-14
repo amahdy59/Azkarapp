@@ -1169,7 +1169,7 @@ export function ReaderScreen({
                     role="region"
                     tabIndex={0}
                     aria-label={t(language, "reader.readingText")}
-                    className={`h-full min-h-0 w-full overflow-y-auto ps-6 pe-7 py-4 outline-none focus-visible:outline-none focus:ring-0 [scrollbar-gutter:stable] ${
+                    className={`reader-text-scroll h-full min-h-0 w-full overflow-y-auto ps-6 pe-7 py-4 outline-none focus-visible:outline-none focus:ring-0 [scrollbar-gutter:stable] ${
                       justCompleted ? "zikr-step-exit" : "zikr-step-enter"
                     }`}
                   >
@@ -1326,7 +1326,7 @@ export function ReaderScreen({
                 role="region"
                 tabIndex={0}
                 aria-label={t(language, "reader.readingText")}
-                className={`flex-1 overflow-y-auto min-h-0 w-full outline-none focus:outline-none focus-visible:outline-none focus:ring-0 ${
+                className={`reader-text-scroll flex-1 overflow-y-auto min-h-0 w-full outline-none focus:outline-none focus-visible:outline-none focus:ring-0 ${
                   justCompleted ? "zikr-step-exit" : "zikr-step-enter"
                 }`}
               >

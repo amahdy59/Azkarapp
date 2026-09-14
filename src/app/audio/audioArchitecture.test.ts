@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { ALL_AZKAR, getAzkarForMode } from "../content/azkar";
 import type { Zikr } from "../types";
 import { createArabicTextFingerprint, normalizeArabicForAudioMatching } from "./arabicMatching";
+import { DEFAULT_AUDIO_PREFERENCES } from "./audioPreferences";
 import { buildPlaybackPlan, getAudioCoverage } from "./buildPlaybackPlan";
 import { APPROVED_AUDIO_ASSIGNMENTS } from "./audioAssignments";
 import { QURAN_AUDIO_REVIEW_CANDIDATES, REJECTED_LEGACY_AUDIO_MATCHES } from "./audioReviewCandidates";
@@ -142,6 +143,24 @@ describe("explicit audio content architecture", () => {
         expect(getAudioCoverage(zikrs, { catalog, baseUrl: "https://audio.example.test" }).unavailable).toBe(0);
       }
     }
+  });
+
+  it("defaults dual-voice duas to English narration in English mode without overriding a listener choice", () => {
+    const source = ALL_AZKAR.find((zikr) => zikr.id === "s-hm-104")!;
+    const { catalog, zikrs } = catalogFor([source], ["voice-a", "english-george"]);
+    const build = (language: "ar" | "en", duaVoiceId = "default-dua") =>
+      buildPlaybackPlan({
+        zikrs,
+        context: { category: "before_sleep", routineMode: "complete", source: "single" },
+        catalog,
+        baseUrl: "https://audio.example.test",
+        language,
+        preferences: { ...DEFAULT_AUDIO_PREFERENCES, duaVoiceId },
+      }).entries[0]!.defaultVoiceId;
+
+    expect(build("en")).toBe("english-george");
+    expect(build("ar")).toBe("voice-a");
+    expect(build("en", "voice-a")).toBe("voice-a");
   });
 
   it("reuses canonical identities across every audited shared group", () => {

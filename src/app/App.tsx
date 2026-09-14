@@ -1039,10 +1039,11 @@ function AppContent({
         },
         mode: repeatPrescribed ? "repeat-prescribed-count" : "play-once",
         preferences: audioController.preferences,
+        language: selectedLang,
       });
       return audioController.startPlan(plan);
     },
-    [activeCat, activeRoutineMode, activeSubCategory, audioController, buildPlaybackPlan, fridayDuaFlow],
+    [activeCat, activeRoutineMode, activeSubCategory, audioController, buildPlaybackPlan, fridayDuaFlow, selectedLang],
   );
 
   useEffect(() => {
@@ -1099,6 +1100,7 @@ function AppContent({
           fridayDuaFlow,
         },
         preferences: audioController.preferences,
+        language: selectedLang,
       });
       const firstZikrId = plan.entries[0]?.zikrId;
       if (!firstZikrId || !audioController.startPlan(plan)) return;

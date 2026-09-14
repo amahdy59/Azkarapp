@@ -1,4 +1,4 @@
-import type { Zikr } from "../types";
+import type { AppLanguage, Zikr } from "../types";
 import { AUDIO_CATALOG } from "./audioManifest";
 import { createArabicTextFingerprint } from "./arabicMatching";
 import type { AudioCatalog, AudioPreferences, AudioResolution, ResolvedAudioSegment } from "./audioTypes";
@@ -84,7 +84,16 @@ export function resolveAudioAsset(
 export function getPreferredVoiceId(
   resolution: Extract<AudioResolution, { available: true }>,
   preferences: AudioPreferences,
+  language?: AppLanguage,
 ) {
   const preferred = resolution.asset.contentKind === "quran" ? preferences.quranReciterId : preferences.duaVoiceId;
+  if (
+    resolution.asset.contentKind === "dua" &&
+    language === "en" &&
+    preferred === "default-dua" &&
+    resolution.availableVoiceIds.includes("english-george")
+  ) {
+    return "english-george";
+  }
   return resolution.availableVoiceIds.includes(preferred) ? preferred : resolution.asset.defaultVoiceId;
 }

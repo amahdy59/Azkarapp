@@ -1,4 +1,4 @@
-import type { RoutineMode, Zikr, ZikrAudioMode } from "../types";
+import type { AppLanguage, RoutineMode, Zikr, ZikrAudioMode } from "../types";
 import { AUDIO_CATALOG } from "./audioManifest";
 import { DEFAULT_AUDIO_PREFERENCES } from "./audioPreferences";
 import { getPreferredVoiceId, resolveAudioAsset } from "./resolveAudioAsset";
@@ -49,6 +49,7 @@ export function buildPlaybackPlan({
   catalog = AUDIO_CATALOG,
   baseUrl,
   preferences = DEFAULT_AUDIO_PREFERENCES,
+  language,
 }: {
   zikrs: readonly Zikr[];
   context: PlanContext;
@@ -56,6 +57,7 @@ export function buildPlaybackPlan({
   catalog?: AudioCatalog;
   baseUrl?: string;
   preferences?: AudioPreferences;
+  language?: AppLanguage;
 }): PlaybackPlan {
   const entries: PlaybackEntry[] = [];
   const resolvedZikrs = zikrs.flatMap((zikr) => {
@@ -94,7 +96,7 @@ export function buildPlaybackPlan({
       repetitionUnit: zikr.ritualGroupId === "three_quls" && completeRitual ? "ritual-round" : "zikr",
       ...(zikr.ritualGroupId && completeRitual ? { ritualGroupId: zikr.ritualGroupId } : {}),
       supportedModes: [...zikr.audioBehavior.supportedModes],
-      defaultVoiceId: getPreferredVoiceId(resolution, preferences),
+      defaultVoiceId: getPreferredVoiceId(resolution, preferences, language),
       segmentsByVoice: resolution.segmentsByVoice,
       availableVoiceIds: [...resolution.availableVoiceIds],
     });

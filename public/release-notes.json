@@ -1,15 +1,15 @@
 {
-  "release": "2026-09-14",
+  "release": "2026-09-14.1",
   "ar": [
     "أصبح بإمكانك الآن الاستماع إلى ترجمة الأذكار والأدعية باللغة الإنجليزية.",
     "أُضيف صوت جورج لتلاوة الترجمة الإنجليزية لأكثر من 111 زكرًا ودعاءً.",
-    "يمكنك الآن اختيار اللغة الإنجليزية والاستماع إلى معنى الأدعية بالصوت.",
-    "يمكن تشغيل الصوت بشكل مستقل لكل ذكر عند عرضه في اللغة الإنجليزية."
+    "تبدأ الترجمة الصوتية الإنجليزية تلقائيًا عند استخدام الواجهة الإنجليزية، مع الحفاظ على اختيارك اليدوي للصوت.",
+    "لم يعد الضغط على مفتاح المسافة يُظهر خطوطًا ذهبية حول نص الذكر على الحاسوب أو الهاتف."
   ],
   "en": [
     "You can now listen to English audio translations of azkar and duas.",
     "George's voice has been added for English translation recitation of over 111 azkar and duas.",
-    "Switch the app to English and tap the play button to hear the translation aloud.",
-    "English audio is available independently for each zikr in the English reading view."
+    "English narration now starts automatically in the English interface while preserving any voice you choose yourself.",
+    "Pressing Space no longer draws gold lines around the zikr text on desktop or mobile."
   ]
 }
