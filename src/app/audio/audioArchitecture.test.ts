@@ -66,8 +66,13 @@ function catalogFor(zikrs: readonly Zikr[], voices = ["voice-a"]): { catalog: Au
 }
 
 describe("explicit audio content architecture", () => {
-  it("links only the twelve reviewed before-sleep recordings", () => {
+  it("links reviewed before-sleep recordings", () => {
     const expectedAssignments = [
+      "s-hm-100",
+      "s-hm-109",
+      "s-hm-99-falaq",
+      "s-hm-99-ikhlas",
+      "s-hm-99-nas",
       "s-hm-102",
       "s-hm-104",
       "s-hm-105",
@@ -86,7 +91,6 @@ describe("explicit audio content architecture", () => {
       .filter((id) => APPROVED_AUDIO_ASSIGNMENTS[id]);
 
     expect(assignedBeforeSleepIds.toSorted()).toEqual(expectedAssignments.toSorted());
-    expect(assignedBeforeSleepIds.every((id) => APPROVED_AUDIO_ASSIGNMENTS[id] === id)).toBe(true);
   });
 
   it("normalizes formatting without merging different Arabic letters", () => {

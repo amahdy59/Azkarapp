@@ -1,15 +1,13 @@
 {
-  "release": "2026-09-13-home-audio-polish",
-  "en": [
-    "Home cards reveal the daily scene clearly, and expanded prayer details use the full tablet and desktop layout.",
-    "Today's Wird now tracks Quran reading alongside Morning, Evening, and Before Sleep routines.",
-    "Audio volume stays reachable, Play All is available while reading, and progress and seeker controls stay inside the player.",
-    "More groups Qibla, Masbaha, and Settings, with offline Qibla guidance; the Azkar Library now puts collections first with clearer Saved and Benefits access."
-  ],
+  "release": "2026-09-14",
   "ar": [
-    "تُظهر بطاقات الرئيسية المشهد اليومي بوضوح، وتستفيد تفاصيل الصلاة الموسعة من تخطيط الأجهزة اللوحية وسطح المكتب.",
-    "يتابع وردك اليوم قراءة القرآن إلى جانب أذكار الصباح والمساء والنوم.",
-    "يبقى مستوى الصوت في المتناول، ويتاح تشغيل الكل أثناء القراءة، وتظل مؤشرات التقدم والتحكم داخل المشغل.",
-    "يجمع قسم المزيد القبلة والمسبحة والإعدادات مع إرشاد للقبلة دون اتصال، وتعرض مكتبة الأذكار المجموعات أولًا مع وصول أوضح إلى المحفوظات وفضائل الذكر."
+    "إضافة تلاوات صوتية جديدة لأذكار المساء بصوت الشيخ عبد الله محمد.",
+    "تحسين آلية تشغيل الأذكار المشتركة بين الصباح والمساء.",
+    "إضافة دعم التلاوة الصوتية لأذكار ما قبل النوم."
+  ],
+  "en": [
+    "Added new audio recitations for Evening Azkar by Sheikh Abdullah Muhammad.",
+    "Improved audio playback for shared Morning and Evening Azkar.",
+    "Added audio recitation support for Before Sleep Azkar."
   ]
 }
