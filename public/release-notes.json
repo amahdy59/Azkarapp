@@ -1,15 +1,15 @@
 {
-  "release": "2026-09-15",
+  "release": "2026-09-14",
   "ar": [
-    "إضافة تلاوات صوتية جديدة لأذكار المساء بصوت الشيخ عبد الله محمد.",
-    "تحسين تشغيل الصوتيات المشتركة بين أذكار الصباح والمساء.",
-    "إضافة التلاوات الصوتية لأذكار ما قبل النوم.",
-    "تحسين واجهة المستخدم وتجربة الاستخدام على الشاشات الكبيرة والمكتبية."
+    "أصبح بإمكانك الآن الاستماع إلى ترجمة الأذكار والأدعية باللغة الإنجليزية.",
+    "أُضيف صوت جورج لتلاوة الترجمة الإنجليزية لأكثر من 111 زكرًا ودعاءً.",
+    "يمكنك الآن اختيار اللغة الإنجليزية والاستماع إلى معنى الأدعية بالصوت.",
+    "يمكن تشغيل الصوت بشكل مستقل لكل ذكر عند عرضه في اللغة الإنجليزية."
   ],
   "en": [
-    "Added new audio recitations for Evening Azkar by Sheikh Abdullah Muhammad.",
-    "Improved audio playback for shared Morning and Evening Azkar.",
-    "Added audio recitation support for Before Sleep Azkar.",
-    "Enhanced the user interface and layout for desktop and tablet screens."
+    "You can now listen to English audio translations of azkar and duas.",
+    "George's voice has been added for English translation recitation of over 111 azkar and duas.",
+    "Switch the app to English and tap the play button to hear the translation aloud.",
+    "English audio is available independently for each zikr in the English reading view."
   ]
 }
