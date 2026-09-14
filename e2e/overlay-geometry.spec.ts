@@ -47,8 +47,12 @@ async function backgroundAlpha(locator: Locator): Promise<number> {
 test("the destructive-action confirm dialog is centred behind a dimming scrim", async ({ page }) => {
   await openReturningGuest(page);
 
-  await page.getByTestId("nav-more").click();
-  await page.getByRole("button", { name: /^Settings/ }).click();
+  if (await page.getByTestId("nav-more").isVisible()) {
+    await page.getByTestId("nav-more").click();
+    await page.getByRole("button", { name: /^Settings/ }).click();
+  } else {
+    await page.getByTestId("nav-settings").click();
+  }
   await page.getByRole("button", { name: /Account & data/ }).click();
   await page.getByRole("button", { name: "Erase local data", exact: true }).click();
 

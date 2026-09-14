@@ -150,10 +150,10 @@ test("desktop and tablet place navigation at the card sides and shortcuts below 
   // Page-level actions live in the hero toolbar on this tier, not in a second
   // row under the counter.
   await expect(page.getByTestId("reader-actions")).toHaveCount(0);
-  // Two actions, the same pair as on phones: Reference and the overflow menu.
+  // Two actions, the same pair as on phones: Benefit and the overflow menu.
   // Save, share and sound used to sit out here as three more icons.
   const heroActions = page.getByTestId("reader-hero-actions");
-  await expect(heroActions.getByRole("button", { name: "Reference", exact: true })).toBeVisible();
+  await expect(heroActions.getByRole("button", { name: "Benefit", exact: true })).toBeVisible();
   await expect(heroActions.getByRole("button", { name: "Reader options", exact: true })).toBeVisible();
   await expect(heroActions.getByRole("button")).toHaveCount(2);
   await expect(desktopHero.getByRole("button", { name: "Share zikr", exact: true })).toHaveCount(0);
@@ -306,16 +306,16 @@ test("the full reader canvas counts taps while controls and the reference sheet 
   await expect(counterSurface).toHaveAttribute("aria-label", /0 \/ 1$/);
 
   // Save lives in the overflow menu on every tier now — the header carries at
-  // most two actions, Reference and the menu, so there is no width branch.
+  // most two actions, Benefit and the menu, so there is no width branch.
   await expect(page.getByRole("button", { name: "Save zikr", exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "Reader options", exact: true }).click();
   await page.getByRole("menuitem", { name: "Save zikr", exact: true }).click();
   await expect(counterSurface).toHaveAttribute("aria-label", /0 \/ 1$/);
 
-  await page.getByRole("button", { name: "Reference", exact: true }).click();
+  await page.getByRole("button", { name: "Benefit", exact: true }).click();
   const sheet = page.getByTestId("reference-sheet");
   await sheet.click();
-  await sheet.getByRole("button", { name: "Close reference", exact: true }).click();
+  await sheet.getByRole("button", { name: "Close benefit", exact: true }).click();
   await expect(counterSurface).toHaveAttribute("aria-label", /0 \/ 1$/);
 
   // Chrome outside the reading text still counts: tap the screen's own margin.
@@ -388,7 +388,7 @@ test("reader actions stay inside a 320 px app canvas", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 700 });
   await openFirstMorningZikr(page);
 
-  // Phone chrome is one header row (Reference, More) with no bottom action bar
+  // Phone chrome is one header row (Benefit, More) with no bottom action bar
   // and no tab bar, so the reading surface owns the viewport. Share moved into
   // the menu: at 320px a third 44px target was the difference between the
   // collection name fitting and being truncated.
@@ -398,7 +398,7 @@ test("reader actions stay inside a 320 px app canvas", async ({ page }) => {
 
   const readerBox = await page.getByTestId("reader-screen").boundingBox();
   const actionBoxes = await Promise.all(
-    ["Reference", "Reader options"].map((name) => page.getByRole("button", { name, exact: true }).boundingBox()),
+    ["Benefit", "Reader options"].map((name) => page.getByRole("button", { name, exact: true }).boundingBox()),
   );
   expect(readerBox).not.toBeNull();
   if (!readerBox) return;
@@ -412,35 +412,35 @@ test("reader actions stay inside a 320 px app canvas", async ({ page }) => {
   }
 });
 
-test("Reference keeps an accessible phone icon and gains visible text from tablet width", async ({ page }) => {
+test("Benefit keeps its visible label on phone, tablet, and desktop", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 700 });
   await openFirstMorningZikr(page);
 
-  const phoneReference = page.getByRole("button", { name: "Reference", exact: true });
+  const phoneReference = page.getByRole("button", { name: "Benefit", exact: true });
   await expect(phoneReference).toBeVisible();
-  await expect(phoneReference.getByText("Reference", { exact: true })).toBeHidden();
+  await expect(phoneReference.getByText("Benefit", { exact: true })).toBeVisible();
 
   await page.setViewportSize({ width: 600, height: 800 });
   await expect(
-    page.getByRole("button", { name: "Reference", exact: true }).getByText("Reference", { exact: true }),
+    page.getByRole("button", { name: "Benefit", exact: true }).getByText("Benefit", { exact: true }),
   ).toBeVisible();
 
   await page.setViewportSize({ width: 1200, height: 800 });
-  await expect(page.getByTestId("reader-hero-actions").getByText("Reference", { exact: true })).toBeVisible();
+  await expect(page.getByTestId("reader-hero-actions").getByText("Benefit", { exact: true })).toBeVisible();
 });
 
 test("reference sheet matches the approved hierarchy and stays usable on short screens", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 560 });
   await openFirstMorningZikr(page);
 
-  const trigger = page.getByRole("button", { name: "Reference", exact: true });
+  const trigger = page.getByRole("button", { name: "Benefit", exact: true });
   await trigger.click();
 
   const sheet = page.getByTestId("reference-sheet");
 
   await expect(sheet).toBeVisible();
   // Only the narration and its citation remain.
-  await expect(sheet.getByRole("heading", { level: 3 })).toHaveText(["Hadith text", "Source"]);
+  await expect(sheet.getByRole("heading", { level: 3 })).toHaveText(["Benefit", "Hadith text", "Source"]);
   await expect(sheet.getByRole("heading", { name: "Translation", exact: true })).toHaveCount(0);
   await expect(sheet.getByRole("heading", { name: "Pronunciation in English", exact: true })).toHaveCount(0);
   await expect(sheet.getByTestId("reference-zikr-label")).toHaveCount(0);
@@ -491,7 +491,7 @@ test("reference sheet rises from the bottom edge of the centered app canvas", as
   await page.setViewportSize({ width: 390, height: 800 });
   await openFirstMorningZikr(page);
 
-  await page.getByRole("button", { name: "Reference", exact: true }).click();
+  await page.getByRole("button", { name: "Benefit", exact: true }).click();
   // Wait for slide-up sheet-enter transition to complete
   await page.waitForTimeout(300);
   const reader = page.getByTestId("reader-screen");
@@ -508,8 +508,12 @@ test("reference sheet rises from the bottom edge of the centered app canvas", as
 });
 
 for (const locale of [
-  { language: "en", reference: "Reference", source: "Source" },
-  { language: "ar", reference: "\u0627\u0644\u062f\u0644\u064a\u0644", source: "\u0627\u0644\u0645\u0635\u062f\u0631" },
+  { language: "en", reference: "Benefit", source: "Source" },
+  {
+    language: "ar",
+    reference: "\u0627\u0644\u0641\u0627\u0626\u062f\u0629",
+    source: "\u0627\u0644\u0645\u0635\u062f\u0631",
+  },
 ] as const) {
   test(`${locale.language.toUpperCase()} reference sheet only shows content for its selected language`, async ({
     page,
@@ -537,7 +541,7 @@ for (const locale of [
          untranslated narration lang="ar"; this collection has none left. */
       await expect(sheet.locator("[lang='ar']")).toHaveCount(0);
       await expect(sheet.getByTestId("reference-hadith")).toHaveAttribute("lang", "en");
-      await expect(sheet.getByRole("heading", { level: 3 })).toHaveText(["Hadith text", "Source"]);
+      await expect(sheet.getByRole("heading", { level: 3 })).toHaveText(["Benefit", "Hadith text", "Source"]);
     }
   });
 }
@@ -593,7 +597,7 @@ test("reference dialog traps focus, restores it on close, and closes on Escape",
   await page.setViewportSize({ width: 1110, height: 835 });
   await openFirstMorningZikr(page);
 
-  const trigger = page.getByRole("button", { name: "Reference", exact: true });
+  const trigger = page.getByRole("button", { name: "Benefit", exact: true });
   await trigger.click();
 
   const sheet = page.getByTestId("reference-sheet");
@@ -669,7 +673,7 @@ test("resetting the counter clears an accidental completion from stored progress
   await expect.poll(stored).toHaveLength(0);
 });
 
-/** The header carries the Reference button and the overflow menu, nothing else. */
+/** The header carries the Benefit button and the overflow menu, nothing else. */
 function readerHeaderActions(page: Page) {
   // The phone header row and the wide-desktop hero toolbar are the same
   // contract under different test ids; exactly one of them is mounted.
@@ -682,7 +686,7 @@ test("the reader header carries exactly two actions on every tier", async ({ pag
   const actions = readerHeaderActions(page);
   await expect(actions).toBeVisible();
   await expect(actions.getByRole("button")).toHaveCount(2);
-  await expect(actions.getByRole("button", { name: "Reference", exact: true })).toBeVisible();
+  await expect(actions.getByRole("button", { name: "Benefit", exact: true })).toBeVisible();
   await expect(actions.getByRole("button", { name: "Reader options", exact: true })).toBeVisible();
 
   // The three that moved are reachable, just not as header chrome.

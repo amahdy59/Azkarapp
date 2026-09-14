@@ -24,8 +24,12 @@ test("the setting makes blurred materials solid", async ({ page, browserName }) 
   await page.getByTestId("onboarding-get-started").click();
   await page.getByTestId("continue-as-guest").click();
   await page.getByRole("navigation").first().waitFor();
-  await page.getByTestId("nav-more").click();
-  await page.getByRole("button", { name: /^Settings/ }).click();
+  if (await page.getByTestId("nav-more").isVisible()) {
+    await page.getByTestId("nav-more").click();
+    await page.getByRole("button", { name: /^Settings/ }).click();
+  } else {
+    await page.getByTestId("nav-settings").click();
+  }
   await page.getByRole("heading", { name: "Settings", exact: true }).waitFor();
   await page.getByRole("button", { name: /Help & FAQ/ }).click();
   await page.getByRole("heading", { name: "Help & FAQ", exact: true }).waitFor();

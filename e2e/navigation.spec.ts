@@ -29,7 +29,6 @@ test("@cross-browser More keeps Qibla, Masbaha, and Settings easy to reach", asy
   for (const viewport of [
     { width: 320, height: 700 },
     { width: 834, height: 1112 },
-    { width: 1440, height: 900 },
   ]) {
     await page.setViewportSize(viewport);
     const moreTab = page.getByTestId("nav-more");
@@ -50,6 +49,14 @@ test("@cross-browser More keeps Qibla, Masbaha, and Settings easy to reach", asy
     );
     expect(overflow).toBeLessThanOrEqual(1);
   }
+
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.getByTestId("nav-qibla").click();
+  await expect(page.getByTestId("nav-qibla")).toHaveAttribute("aria-current", "page");
+  await expect(page.getByTestId("nav-more")).toHaveCount(0);
+  await expect(page.getByTestId("nav-masbaha")).toBeVisible();
+  await expect(page.getByTestId("nav-settings")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Qibla", exact: true })).toBeVisible();
 });
 
 test("hash routes restore lazy collections, reject invalid positions, and preserve PWA shortcuts", async ({ page }) => {
@@ -77,7 +84,7 @@ test("saved zikr is visible from the first-class Saved library tab", async ({ pa
   await page.getByTestId("category-card-morning").click();
   await page.getByRole("button", { name: "Start Session", exact: true }).click();
   // Save lives in the reader's overflow menu on every tier: the header carries
-  // at most two actions, Reference and the menu.
+  // at most two actions, Benefit and the menu.
   await page.getByRole("button", { name: "Reader options", exact: true }).click();
   await page.getByRole("menuitem", { name: "Save zikr", exact: true }).click();
   await page.getByRole("button", { name: "Back", exact: true }).click();

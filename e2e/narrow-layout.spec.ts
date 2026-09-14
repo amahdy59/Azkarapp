@@ -51,15 +51,19 @@ test("core app screens do not overflow a 320px viewport", async ({ page }) => {
   await expect(page.getByTestId("reader-screen")).toBeVisible();
   await expectNoHorizontalOverflow(page, "Reader");
 
-  await page.getByRole("button", { name: "Reference", exact: true }).click();
+  await page.getByRole("button", { name: "Benefit", exact: true }).click();
   await expect(page.getByTestId("reference-sheet")).toBeVisible();
-  await expectNoHorizontalOverflow(page, "Reference sheet");
-  await page.getByTestId("reference-sheet").getByRole("button", { name: "Close reference", exact: true }).click();
+  await expectNoHorizontalOverflow(page, "Benefit sheet");
+  await page.getByTestId("reference-sheet").getByRole("button", { name: "Close benefit", exact: true }).click();
 
   await page.getByRole("button", { name: "Back", exact: true }).click();
   await page.getByRole("button", { name: "Back", exact: true }).click();
-  await page.getByTestId("nav-more").click();
-  await page.getByRole("button", { name: /^Settings/ }).click();
+  if (await page.getByTestId("nav-more").isVisible()) {
+    await page.getByTestId("nav-more").click();
+    await page.getByRole("button", { name: /^Settings/ }).click();
+  } else {
+    await page.getByTestId("nav-settings").click();
+  }
   await expect(page.getByRole("heading", { name: "Settings", exact: true })).toBeVisible();
   await expectNoHorizontalOverflow(page, "Settings");
 });
@@ -68,8 +72,12 @@ test("Arabic large text remains readable at 320px", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 700 });
   await enterEnglishGuestMode(page);
 
-  await page.getByTestId("nav-more").click();
-  await page.getByRole("button", { name: /^Settings/ }).click();
+  if (await page.getByTestId("nav-more").isVisible()) {
+    await page.getByTestId("nav-more").click();
+    await page.getByRole("button", { name: /^Settings/ }).click();
+  } else {
+    await page.getByTestId("nav-settings").click();
+  }
   await page.getByRole("button", { name: "Accessibility", exact: true }).click();
   await page.getByTestId("text-size-option-large").click();
   await page.getByRole("button", { name: "Back", exact: true }).click();

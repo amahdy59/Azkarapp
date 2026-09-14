@@ -37,6 +37,31 @@ test("Core Reader keeps the same stable zikr identity as its filtered routine", 
   expect(await page.evaluate(() => (window as unknown as { __audioPlayCalls: number }).__audioPlayCalls)).toBe(0);
 });
 
+test("the shared player replaces the current zikr counter while listening", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.addInitScript(() => {
+    window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+    window.localStorage.setItem(
+      "azkarapp.state.v1",
+      JSON.stringify({
+        settings: { language: "en", themeMode: "midnight", reduceMotion: true },
+        profile: { displayName: "Guest", isGuest: true },
+        completed: { morning: [], evening: [], before_sleep: [], friday_kahf: [] },
+        sessions: [],
+      }),
+    );
+    HTMLMediaElement.prototype.play = () => Promise.resolve();
+  });
+  await page.goto("/#/azkar/evening/1");
+
+  await expect(page.getByTestId("reader-counter-stack")).toBeVisible();
+  await page.getByRole("button", { name: "Reader options", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Play audio once", exact: true }).click();
+
+  await expect(page.getByRole("region", { name: "Audio player" })).toBeVisible();
+  await expect(page.getByTestId("reader-counter-stack")).toHaveCount(0);
+});
+
 test("Al-Kahf queues an intentional listen press while the audio module loads", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.addInitScript(() => {
@@ -114,6 +139,7 @@ test("desktop audio dock stays inside the main canvas and reveals volume on hove
   const [volumeBox, sliderBox] = await Promise.all([volume.boundingBox(), volumeSlider.boundingBox()]);
   expect(volumeBox && sliderBox).toBeTruthy();
   if (volumeBox && sliderBox) {
+    expect(Math.abs(volumeBox.x + volumeBox.width / 2 - (sliderBox.x + sliderBox.width / 2))).toBeLessThanOrEqual(2);
     await page.mouse.move(volumeBox.x + volumeBox.width / 2, volumeBox.y + volumeBox.height / 2);
     await page.mouse.move(sliderBox.x + sliderBox.width / 2, sliderBox.y + sliderBox.height / 2, { steps: 12 });
   }

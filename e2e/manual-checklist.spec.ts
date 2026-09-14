@@ -234,8 +234,12 @@ test("text resize: 200% zoom keeps primary navigation usable", async ({ page }) 
 
   await expectNoHorizontalOverflow(page, "200% zoom Home");
   await expect(page.getByRole("navigation")).toHaveCount(1);
-  await page.getByTestId("nav-more").click();
-  await page.getByRole("button", { name: /^Settings/ }).click();
+  if (await page.getByTestId("nav-more").isVisible()) {
+    await page.getByTestId("nav-more").click();
+    await page.getByRole("button", { name: /^Settings/ }).click();
+  } else {
+    await page.getByTestId("nav-settings").click();
+  }
   await expect(page.getByRole("heading", { name: "Settings", exact: true })).toBeVisible();
   await expectNoHorizontalOverflow(page, "200% zoom Settings");
 });
@@ -252,8 +256,12 @@ test("text reflow: 400% zoom equivalent keeps core actions reachable", async ({ 
   await morning.click();
   await expect(page.getByRole("button", { name: /Start Session|Continue/ }).first()).toBeVisible();
 
-  await page.getByTestId("nav-more").click();
-  await page.getByRole("button", { name: /^Settings/ }).click();
+  if (await page.getByTestId("nav-more").isVisible()) {
+    await page.getByTestId("nav-more").click();
+    await page.getByRole("button", { name: /^Settings/ }).click();
+  } else {
+    await page.getByTestId("nav-settings").click();
+  }
   await expect(page.getByRole("button", { name: "Accessibility", exact: true })).toBeVisible();
   await expectNoHorizontalOverflow(page, "400% zoom Settings");
 });
@@ -276,8 +284,12 @@ test("text spacing overrides do not clip core content or actions", async ({ page
   await page.getByTestId("nav-azkar").click();
   await expect(page.getByTestId("category-card-morning")).toBeVisible();
   await expectNoHorizontalOverflow(page, "text spacing Library");
-  await page.getByTestId("nav-more").click();
-  await page.getByRole("button", { name: /^Settings/ }).click();
+  if (await page.getByTestId("nav-more").isVisible()) {
+    await page.getByTestId("nav-more").click();
+    await page.getByRole("button", { name: /^Settings/ }).click();
+  } else {
+    await page.getByTestId("nav-settings").click();
+  }
   await expect(page.getByRole("button", { name: "Accessibility", exact: true })).toBeVisible();
   await expectNoHorizontalOverflow(page, "text spacing Settings");
 });
@@ -371,8 +383,12 @@ test("forced colors preserves focus and selected-state cues", async ({ page }) =
 // and offline results use the selected method."
 test("prayer times: effective timezone and offset are surfaced and survive going offline", async ({ page }) => {
   await seedAndOpen(page);
-  await page.getByTestId("nav-more").click();
-  await page.getByRole("button", { name: /^Settings/ }).click();
+  if (await page.getByTestId("nav-more").isVisible()) {
+    await page.getByTestId("nav-more").click();
+    await page.getByRole("button", { name: /^Settings/ }).click();
+  } else {
+    await page.getByTestId("nav-settings").click();
+  }
   await page.getByRole("button", { name: /Prayer Times & Reminders/ }).click();
 
   const status = page.getByTestId("daylight-saving-status");

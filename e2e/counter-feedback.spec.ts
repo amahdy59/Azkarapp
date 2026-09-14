@@ -242,7 +242,7 @@ test("Home prayer strip keeps all five prayers legible without page overflow", a
   }
 });
 
-test("the More screen masbaha entry fills compact/tablet layouts and is bounded on desktop", async ({ page }) => {
+test("the More screen masbaha entry fills compact and tablet layouts", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 568 });
   await openReturningGuest(page);
   await page.getByTestId("nav-more").click();
@@ -251,7 +251,6 @@ test("the More screen masbaha entry fills compact/tablet layouts and is bounded 
   for (const viewport of [
     { width: 320, height: 568, minimumWidth: 260, maximumWidth: 320 },
     { width: 834, height: 900, minimumWidth: 250, maximumWidth: 450 },
-    { width: 1440, height: 900, minimumWidth: 250, maximumWidth: 360 },
   ]) {
     await page.setViewportSize(viewport);
     const box = await entry.boundingBox();
@@ -330,8 +329,7 @@ test("the custom counter stays bounded on a short phone and isolates focused-con
 test("custom counter content keeps its reading-width bound on desktop", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await openReturningGuest(page);
-  await page.getByTestId("nav-more").click();
-  await page.getByRole("button", { name: "Masbaha" }).first().click();
+  await page.getByTestId("nav-masbaha").click();
 
   const contentBox = await page.getByTestId("custom-counter-content").boundingBox();
   expect(contentBox).not.toBeNull();

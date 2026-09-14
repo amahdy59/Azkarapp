@@ -13,8 +13,12 @@ test("Settings navigation via keyboard is fully operable", async ({ page }) => {
   await enterEnglishGuestMode(page);
 
   // Open settings
-  await page.getByTestId("nav-more").click();
-  await page.getByRole("button", { name: /^Settings/ }).click();
+  if (await page.getByTestId("nav-more").isVisible()) {
+    await page.getByTestId("nav-more").click();
+    await page.getByRole("button", { name: /^Settings/ }).click();
+  } else {
+    await page.getByTestId("nav-settings").click();
+  }
   await expect(page.getByRole("heading", { name: "Preferences" })).toBeVisible();
 
   // Test navigating into a sub-panel to verify full focus trap / keyboard flow

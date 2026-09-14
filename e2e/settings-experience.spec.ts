@@ -12,8 +12,12 @@ async function enterEnglishGuestMode(page: Page) {
 }
 
 async function openSettings(page: Page) {
-  await page.getByTestId("nav-more").click();
-  await page.getByRole("button", { name: /^Settings/ }).click();
+  if (await page.getByTestId("nav-more").isVisible()) {
+    await page.getByTestId("nav-more").click();
+    await page.getByRole("button", { name: /^Settings/ }).click();
+  } else {
+    await page.getByTestId("nav-settings").click();
+  }
   await expect(page.getByRole("heading", { name: "Settings", exact: true })).toBeVisible();
 }
 

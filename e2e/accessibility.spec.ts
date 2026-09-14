@@ -224,8 +224,12 @@ test("home and settings flows have no automatically detectable WCAG A/AA violati
   await enterEnglishGuestMode(page);
   await expectNoWcagViolations(page);
 
-  await page.getByTestId("nav-more").click();
-  await page.getByRole("button", { name: "Settings" }).click();
+  if (await page.getByTestId("nav-more").isVisible()) {
+    await page.getByTestId("nav-more").click();
+    await page.getByRole("button", { name: /^Settings/ }).click();
+  } else {
+    await page.getByTestId("nav-settings").click();
+  }
   await expect(page.getByRole("heading", { name: "Preferences" })).toBeVisible();
   await expectNoWcagViolations(page);
 
@@ -236,8 +240,12 @@ test("home and settings flows have no automatically detectable WCAG A/AA violati
 
 test("visible settings controls meet the 44px minimum touch target", async ({ page }) => {
   await enterEnglishGuestMode(page);
-  await page.getByTestId("nav-more").click();
-  await page.getByRole("button", { name: "Settings" }).click();
+  if (await page.getByTestId("nav-more").isVisible()) {
+    await page.getByTestId("nav-more").click();
+    await page.getByRole("button", { name: /^Settings/ }).click();
+  } else {
+    await page.getByTestId("nav-settings").click();
+  }
   await page.getByRole("button", { name: "Accessibility", exact: true }).click();
 
   const undersized = await page
@@ -280,19 +288,23 @@ test("visible core-flow controls meet the 44px product touch-target standard", a
   await expect(page.getByTestId("reader-screen")).toBeVisible();
   await expectVisibleInteractiveTargetsAtLeast44px(page, "Reader");
 
-  await page.getByRole("button", { name: "Reference", exact: true }).click();
+  await page.getByRole("button", { name: "Benefit", exact: true }).click();
   const benefitSheet = page.getByTestId("reference-sheet");
   await expect(benefitSheet).toBeVisible();
   await expect(benefitSheet.getByRole("heading", { name: "Hadith text", exact: true })).toHaveCount(1);
-  await expectVisibleInteractiveTargetsAtLeast44px(page, "Reference sheet");
+  await expectVisibleInteractiveTargetsAtLeast44px(page, "Benefit sheet");
 });
 
 test("dialogs have no automatically detectable WCAG A/AA violations", async ({ page }) => {
   await enterEnglishGuestMode(page);
 
   // Settings dialog
-  await page.getByTestId("nav-more").click();
-  await page.getByRole("button", { name: /^Settings/ }).click();
+  if (await page.getByTestId("nav-more").isVisible()) {
+    await page.getByTestId("nav-more").click();
+    await page.getByRole("button", { name: /^Settings/ }).click();
+  } else {
+    await page.getByTestId("nav-settings").click();
+  }
   await page.getByRole("button", { name: "Privacy & terms" }).click();
   await expect(page.getByRole("heading", { name: "Privacy & terms" })).toBeVisible();
 
@@ -317,11 +329,14 @@ test("custom counter has no automatically detectable WCAG A/AA violations", asyn
 
 test("More and Qibla have no automatically detectable WCAG A/AA violations", async ({ page }) => {
   await enterEnglishGuestMode(page);
-  await page.getByTestId("nav-more").click();
-  await expect(page.getByRole("heading", { name: "More", exact: true })).toBeVisible();
-  await expectNoWcagViolations(page);
-
-  await page.getByRole("button", { name: /^Qibla/ }).click();
+  if (await page.getByTestId("nav-more").isVisible()) {
+    await page.getByTestId("nav-more").click();
+    await expect(page.getByRole("heading", { name: "More", exact: true })).toBeVisible();
+    await expectNoWcagViolations(page);
+    await page.getByRole("button", { name: /^Qibla/ }).click();
+  } else {
+    await page.getByTestId("nav-qibla").click();
+  }
   await expect(page.getByRole("heading", { name: "Qibla", exact: true })).toBeVisible();
   await expectNoWcagViolations(page);
 });

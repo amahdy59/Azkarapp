@@ -92,7 +92,7 @@ test.describe("Baseline Capture Suite", () => {
     await expect(page.getByTestId("reader-screen")).toBeVisible();
     await page.screenshot({ path: testInfo.outputPath("baseline-reader-session.png"), fullPage: true });
 
-    await page.getByRole("button", { name: /Reference|الدليل/ }).click();
+    await page.getByRole("button", { name: /Benefit|الفائدة/ }).click();
     await expect(page.getByTestId("reference-sheet")).toBeVisible();
     await page.screenshot({ path: testInfo.outputPath("baseline-benefit-sheet.png"), fullPage: true });
   });
@@ -111,8 +111,12 @@ test.describe("Baseline Capture Suite", () => {
     await page.getByTestId("onboarding-get-started").click();
     await page.getByTestId("continue-as-guest").click();
 
-    await page.getByTestId("nav-more").click();
-    await page.getByRole("button", { name: "Settings" }).click();
+    if (await page.getByTestId("nav-more").isVisible()) {
+      await page.getByTestId("nav-more").click();
+      await page.getByRole("button", { name: /^Settings/ }).click();
+    } else {
+      await page.getByTestId("nav-settings").click();
+    }
     await expect(page.getByRole("heading", { name: "Preferences" })).toBeVisible();
     await page.screenshot({ path: testInfo.outputPath("baseline-settings.png"), fullPage: true });
 
