@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ReaderScreen } from "./ReaderScreen";
-import { registerLazyCollection } from "../content/azkar";
+import { getAzkarForMode, registerLazyCollection } from "../content/azkar";
 import { FRIDAY_KAHF } from "../content/fridayKahf";
 
 beforeEach(() => {
@@ -21,6 +21,97 @@ afterEach(() => {
 });
 
 describe("ReaderScreen audio identity", () => {
+  it("provides a direct, progress-aware collection navigator on wide screens", () => {
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn().mockImplementation((query: string) => ({
+        matches: query.includes("min-width: 768px"),
+        media: query,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      })),
+    );
+    const morning = getAzkarForMode("morning", "core");
+    const onSelectZikr = vi.fn();
+
+    render(
+      <ReaderScreen
+        catId="morning"
+        idx={0}
+        routineMode="core"
+        azkarList={morning}
+        isArabic
+        direction="rtl"
+        themeMode="light"
+        isDone
+        collectionCompletedCount={1}
+        completedZikrIds={new Set([morning[0].id])}
+        hapticFeedback={false}
+        showTranslation={false}
+        showTransliteration={false}
+        textSize="medium"
+        onTextSizeChange={() => undefined}
+        savedZikrIds={new Set()}
+        onBack={() => undefined}
+        onComplete={() => undefined}
+        onAdvance={() => undefined}
+        onNext={() => undefined}
+        onPrev={() => undefined}
+        onSelectZikr={onSelectZikr}
+        onToggleSaved={() => undefined}
+        audioAvailable={false}
+      />,
+    );
+
+    const navigator = screen.getByTestId("reader-collection-navigator");
+    expect(navigator).toHaveAccessibleName("عرض جميع الأذكار");
+    expect(screen.getByRole("button", { name: /ذكر .*, اكتمل/ })).toHaveAttribute("aria-current", "step");
+
+    fireEvent.click(screen.getByRole("button", { name: /ذكر ٢ من/ }));
+    expect(onSelectZikr).toHaveBeenCalledWith(1);
+  });
+
+  it("offers dedicated Arabic and English playback actions", async () => {
+    const onPlayAudio = vi.fn();
+    const onPlayEnglishAudio = vi.fn();
+    render(
+      <ReaderScreen
+        catId="before_sleep"
+        idx={3}
+        routineMode="complete"
+        isArabic={false}
+        direction="ltr"
+        themeMode="light"
+        isDone={false}
+        collectionCompletedCount={0}
+        hapticFeedback={false}
+        showTranslation
+        showTransliteration
+        textSize="medium"
+        onTextSizeChange={() => undefined}
+        savedZikrIds={new Set()}
+        onBack={() => undefined}
+        onComplete={() => undefined}
+        onAdvance={() => undefined}
+        onNext={() => undefined}
+        onPrev={() => undefined}
+        onToggleSaved={() => undefined}
+        audioAvailable
+        englishAudioAvailable
+        onPlayAudio={onPlayAudio}
+        onPlayEnglishAudio={onPlayEnglishAudio}
+      />,
+    );
+
+    fireEvent.pointerDown(screen.getByRole("button", { name: "Reader options" }), { button: 0, ctrlKey: false });
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Play Arabic recitation" }));
+    expect(onPlayAudio).toHaveBeenCalledOnce();
+
+    fireEvent.pointerDown(screen.getByRole("button", { name: "Reader options" }), { button: 0, ctrlKey: false });
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Play English translation" }));
+    expect(onPlayEnglishAudio).toHaveBeenCalledOnce();
+  });
+
   it("offers continuous play for the available routine from reader options", async () => {
     const onPlayAllAudio = vi.fn();
     render(

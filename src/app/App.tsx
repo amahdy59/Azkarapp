@@ -235,13 +235,16 @@ function AppContent({
   const layoutMode = useLayoutMode();
   useViewFocus(view);
 
+  const [selectedLang, setSelectedLang] = useState<AppLanguage>(initialState.settings.language);
   const audioCoverage = useMemo(
-    () => (getAudioCoverage ? getAudioCoverage(activeAzkarList) : EMPTY_AUDIO_COVERAGE),
-    [getAudioCoverage, activeAzkarList],
+    () =>
+      getAudioCoverage
+        ? getAudioCoverage(activeAzkarList, { language: selectedLang, preferences: audioController?.preferences })
+        : EMPTY_AUDIO_COVERAGE,
+    [getAudioCoverage, activeAzkarList, selectedLang, audioController?.preferences],
   );
   const [themeMode, setThemeMode] = useState<ThemeMode>(initialState.settings.themeMode);
   const darkMode = themeMode !== "light";
-  const [selectedLang, setSelectedLang] = useState<AppLanguage>(initialState.settings.language);
   const {
     applyUpdate,
     dismissInstall,
@@ -1005,11 +1008,15 @@ function AppContent({
    * "unavailable" made Al-Kahf's only approved recording look broken on slow
    * mobile/PWA starts. Once loaded, the manifest remains the source of truth.
    */
-  const activeZikrHasAudio = activeZikr
+  const activeZikrHasArabicAudio = activeZikr
     ? getAudioCoverage
-      ? getAudioCoverage([activeZikr]).available === 1
+      ? getAudioCoverage([activeZikr], { language: "ar", preferences: audioController?.preferences }).available === 1
       : Boolean(activeZikr.audioAssetId)
     : false;
+  const activeZikrHasEnglishAudio = Boolean(
+    activeZikr &&
+    getAudioCoverage?.([activeZikr], { language: "en", preferences: audioController?.preferences }).available === 1,
+  );
 
   /**
    * The active zikr's own playback status, or "idle" when the player is
@@ -1026,7 +1033,12 @@ function AppContent({
   })();
 
   const startAudio = useCallback(
-    (items: typeof azkar, source: "single" | "full-session", repeatPrescribed = false) => {
+    (
+      items: typeof azkar,
+      source: "single" | "full-session",
+      repeatPrescribed = false,
+      audioLanguage: AppLanguage = selectedLang,
+    ) => {
       if (!audioController || !buildPlaybackPlan) return false;
       const plan = buildPlaybackPlan({
         zikrs: items,
@@ -1039,7 +1051,7 @@ function AppContent({
         },
         mode: repeatPrescribed ? "repeat-prescribed-count" : "play-once",
         preferences: audioController.preferences,
-        language: selectedLang,
+        audioLanguage,
       });
       return audioController.startPlan(plan);
     },
@@ -1053,7 +1065,7 @@ function AppContent({
       return;
     }
     if (!audioController || !buildPlaybackPlan) return;
-    void startAudio([activeZikr], "single");
+    void startAudio([activeZikr], "single", false, "ar");
     setQueuedAudioZikrId(null);
   }, [activeZikr, audioController, buildPlaybackPlan, queuedAudioZikrId, startAudio]);
 
@@ -1070,7 +1082,7 @@ function AppContent({
    * controller, so either can pick up where the other left off.
    */
   const toggleActiveZikrAudio = () => {
-    if (!activeZikr || !activeZikrHasAudio) return;
+    if (!activeZikr || !activeZikrHasArabicAudio) return;
     if (!audioController || !buildPlaybackPlan) {
       setQueuedAudioZikrId(activeZikr.id);
       requestAudioModule();
@@ -1084,7 +1096,7 @@ function AppContent({
       audioController.play();
       return;
     }
-    void startAudio([activeZikr], "single");
+    void startAudio([activeZikr], "single", false, "ar");
   };
 
   const startPlayAllAudio = () => {
@@ -1100,7 +1112,7 @@ function AppContent({
           fridayDuaFlow,
         },
         preferences: audioController.preferences,
-        language: selectedLang,
+        audioLanguage: selectedLang,
       });
       const firstZikrId = plan.entries[0]?.zikrId;
       if (!firstZikrId || !audioController.startPlan(plan)) return;
@@ -1656,10 +1668,22 @@ function AppContent({
                   onPrev={() => {
                     if (activeIdx > 0) setActiveIdx((i) => i - 1);
                   }}
+                  onSelectZikr={setActiveIdx}
+                  completedZikrIds={
+                    isRepeatSession
+                      ? new Set(
+                          [...repeatCompleted]
+                            .map((completedIndex) => azkar[completedIndex]?.id)
+                            .filter((id): id is string => Boolean(id)),
+                        )
+                      : fridayDuaFlow && activeCat === "comprehensive_duas"
+                        ? fridayDuaCompletedIds
+                        : getEffectiveCompletedForSubcategory(completed, activeCat, activeSubCategory)
+                  }
                   onToggleSaved={toggleSavedZikr}
-                  audioAvailable={activeZikrHasAudio}
+                  audioAvailable={activeZikrHasArabicAudio}
                   surahAudio={{
-                    available: activeZikrHasAudio,
+                    available: activeZikrHasArabicAudio,
                     status: activeZikrAudioStatus,
                     onToggle: toggleActiveZikrAudio,
                   }}
@@ -1686,14 +1710,23 @@ function AppContent({
                     )
                   }
                   onPlayAudio={
-                    activeZikrHasAudio && activeZikr ? () => void startAudio([activeZikr], "single") : undefined
+                    activeZikrHasArabicAudio && activeZikr
+                      ? () => void startAudio([activeZikr], "single", false, "ar")
+                      : undefined
+                  }
+                  englishAudioAvailable={activeZikrHasEnglishAudio}
+                  onPlayEnglishAudio={
+                    activeZikrHasEnglishAudio && activeZikr
+                      ? () => void startAudio([activeZikr], "single", false, "en")
+                      : undefined
                   }
                   onPlayAllAudio={
                     activeCat !== "comprehensive_duas" && audioCoverage.available > 1 ? startPlayAllAudio : undefined
                   }
                   onRepeatAudio={
-                    activeZikrHasAudio && activeZikr?.audioBehavior.supportedModes.includes("repeat-prescribed-count")
-                      ? () => void startAudio([activeZikr], "single", true)
+                    activeZikrHasArabicAudio &&
+                    activeZikr?.audioBehavior.supportedModes.includes("repeat-prescribed-count")
+                      ? () => void startAudio([activeZikr], "single", true, "ar")
                       : undefined
                   }
                   audioModeActive={

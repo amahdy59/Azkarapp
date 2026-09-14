@@ -36,7 +36,8 @@
     "prepare:mushaf": "node scripts/prepare-mushaf-pages.mjs",
     "check:type-scale": "node scripts/check-type-scale.mjs",
     "report:unused-css": "node scripts/find-unused-css.mjs",
-    "report:english-coverage": "node scripts/check-english-coverage.mjs"
+    "report:english-coverage": "node scripts/check-english-coverage.mjs",
+    "audit:english-audio": "node scripts/audit-english-audio.mjs"
   },
   "dependencies": {
     "@fontsource-variable/noto-sans-arabic": "5.3.0",

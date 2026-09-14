@@ -56,7 +56,7 @@ test("the shared player replaces the current zikr counter while listening", asyn
 
   await expect(page.getByTestId("reader-counter-stack")).toBeVisible();
   await page.getByRole("button", { name: "Reader options", exact: true }).click();
-  await page.getByRole("menuitem", { name: "Play audio once", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Play English translation", exact: true }).click();
 
   await expect(page.getByRole("region", { name: "Audio player" })).toBeVisible();
   await expect(page.getByTestId("reader-counter-stack")).toHaveCount(0);

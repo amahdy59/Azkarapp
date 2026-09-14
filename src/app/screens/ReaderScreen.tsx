@@ -96,6 +96,8 @@ const SHARE_STATUS_KEYS: Record<ZikrShareCardStatus, string> = {
   error: "reader.shareCardError",
 };
 
+const EMPTY_COMPLETED_ZIKR_IDS: ReadonlySet<string> = new Set();
+
 /**
  * The heading above the reading canvas, or null when there is nothing worth
  * saying there.
@@ -149,6 +151,8 @@ export function ReaderScreen({
   onAdvance,
   onNext,
   onPrev,
+  onSelectZikr,
+  completedZikrIds = EMPTY_COMPLETED_ZIKR_IDS,
   onToggleSaved,
   audioAvailable,
   surahAudio,
@@ -160,6 +164,8 @@ export function ReaderScreen({
   mushafSettings,
   onMushafModeChange,
   onPlayAudio,
+  englishAudioAvailable = false,
+  onPlayEnglishAudio,
   onPlayAllAudio,
   onRepeatAudio,
   audioModeActive = false,
@@ -188,6 +194,9 @@ export function ReaderScreen({
   onAdvance: (idx: number) => void;
   onNext: () => void;
   onPrev: () => void;
+  /** Opens an existing item directly from the wide-screen collection navigator. */
+  onSelectZikr?: (idx: number) => void;
+  completedZikrIds?: ReadonlySet<string>;
   onToggleSaved: (zikrId: string) => void;
   audioAvailable: boolean;
   /**
@@ -208,6 +217,9 @@ export function ReaderScreen({
   /** Announces when the Mushaf is the reader's body, so the shell can stand aside. */
   onMushafModeChange?: (showing: boolean) => void;
   onPlayAudio?: () => void;
+  /** A separate, explicitly labelled English translation recording. */
+  englishAudioAvailable?: boolean;
+  onPlayEnglishAudio?: () => void;
   onPlayAllAudio?: () => void;
   onRepeatAudio?: () => void;
   /** The shared player is currently responsible for this zikr's progress. */
@@ -269,6 +281,7 @@ export function ReaderScreen({
   const shareTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const readerMainRef = useRef<HTMLDivElement | null>(null);
   const readingScrollRef = useRef<HTMLDivElement | null>(null);
+  const activeNavigatorItemRef = useRef<HTMLButtonElement | null>(null);
 
   // The hero band + card treatment now starts at the tablet breakpoint
   // (>=768px) rather than at the shell's "large" tier: tablets have the width
@@ -427,6 +440,12 @@ export function ReaderScreen({
       readingScrollRef.current.scrollTop = 0;
     }
   }, [idx]);
+
+  useEffect(() => {
+    const activeItem = activeNavigatorItemRef.current;
+    if (!activeItem || !window.matchMedia("(min-width: 1200px)").matches) return;
+    activeItem.scrollIntoView?.({ block: "nearest", behavior: reducedMotion ? "auto" : "smooth" });
+  }, [idx, reducedMotion]);
 
   const handleToggleSaved = useCallback(() => {
     if (z) onToggleSaved(z.id);
@@ -749,6 +768,98 @@ export function ReaderScreen({
     </div>
   );
 
+  const renderCollectionNavigator = () => {
+    if (!onSelectZikr) return null;
+
+    return (
+      <nav
+        aria-label={t(language, "reader.viewAllAzkar")}
+        className="hidden min-h-0 w-[34%] min-w-[20rem] shrink-0 flex-col overflow-hidden rounded-3xl border border-border/60 bg-card/70 shadow-xs min-[1200px]:flex"
+        data-testid="reader-collection-navigator"
+      >
+        <div className="shrink-0 border-b border-border/60 px-4 py-4">
+          <div className="flex items-center gap-2">
+            <List size={19} className="shrink-0 text-primary" aria-hidden="true" />
+            <h2 className="text-subtitle font-extrabold text-foreground">{t(language, "reader.viewAllAzkar")}</h2>
+          </div>
+          <p className="mt-1 text-xs font-semibold text-muted-foreground">
+            {t(language, "reader.progressSummary", {
+              done: formatNumerals(readingProgressValue, language),
+              total: formatNumerals(azkar.length, language),
+            })}
+          </p>
+        </div>
+
+        <ol className="min-h-0 flex-1 space-y-2 overflow-y-auto p-3">
+          {azkar.map((item, itemIndex) => {
+            const active = itemIndex === idx;
+            const completed = completedZikrIds.has(item.id);
+            const itemText = isArabic ? item.arabicText : item.translation;
+            const itemLabel = `${t(language, "reader.title", {
+              index: formatNumerals(itemIndex + 1, language),
+              total: formatNumerals(azkar.length, language),
+            })}${completed ? `, ${t(language, "reader.completed")}` : ""}`;
+
+            return (
+              <li key={item.id}>
+                <button
+                  ref={active ? activeNavigatorItemRef : undefined}
+                  type="button"
+                  aria-current={active ? "step" : undefined}
+                  aria-label={itemLabel}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onSelectZikr(itemIndex);
+                  }}
+                  className={`flex min-h-14 w-full items-center gap-3 rounded-2xl border px-3 py-2.5 text-start transition-[color,background-color,border-color,box-shadow,transform] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring active:scale-[0.98] ${
+                    active
+                      ? "border-primary bg-primary/10 shadow-xs"
+                      : "border-border/50 bg-background/55 hover:border-primary/35 hover:bg-muted/70"
+                  }`}
+                >
+                  <span
+                    className={`flex size-9 shrink-0 items-center justify-center rounded-xl border text-sm font-extrabold ${
+                      active
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border bg-muted text-foreground"
+                    }`}
+                    aria-hidden="true"
+                  >
+                    {formatNumerals(itemIndex + 1, language)}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span
+                      className={`${isArabic ? "zikr-text" : "font-sans"} line-clamp-2 text-label font-bold leading-6 text-foreground`}
+                      lang={isArabic ? "ar" : "en"}
+                      dir={direction}
+                    >
+                      {itemText}
+                    </span>
+                    <span className="mt-0.5 block text-xs font-semibold text-muted-foreground">
+                      {t(language, "category.repetitionInstruction", {
+                        count: formatNumerals(item.repetitionCount, language),
+                      })}
+                    </span>
+                  </span>
+                  <span
+                    className={`flex size-7 shrink-0 items-center justify-center rounded-full border ${
+                      completed
+                        ? "border-success bg-success text-white dark:text-primary-foreground"
+                        : "border-muted-foreground/50 text-transparent"
+                    }`}
+                    aria-hidden="true"
+                  >
+                    <Check size={15} strokeWidth={3} />
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ol>
+      </nav>
+    );
+  };
+
   const renderCounterPanel = () => (
     <div className="px-3 pb-1" data-testid="counter-panel">
       <div className="adaptive-counter-row flex w-full items-center justify-center gap-2.5">
@@ -826,7 +937,19 @@ export function ReaderScreen({
             className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
           >
             <Volume2 size={18} />
-            {audioAvailable ? t(language, "reader.playAudioOnce") : t(language, "reader.audioUnavailable")}
+            {audioAvailable ? t(language, "reader.playArabicAudio") : t(language, "reader.arabicAudioUnavailable")}
+          </DropdownMenuItem>
+        )}
+        {!longSurah && (
+          <DropdownMenuItem
+            disabled={!englishAudioAvailable}
+            onClick={onPlayEnglishAudio}
+            className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
+          >
+            <Volume2 size={18} />
+            {englishAudioAvailable
+              ? t(language, "reader.playEnglishAudio")
+              : t(language, "reader.englishAudioUnavailable")}
           </DropdownMenuItem>
         )}
         {onPlayAllAudio && (
@@ -1158,53 +1281,53 @@ export function ReaderScreen({
 
             {/* Wide-desktop card: reading content, side navigation, counter,
               and keyboard guidance. Page-level actions stay in the hero. */}
-            <div
-              className="relative mx-4 mb-4 mt-4 flex flex-1 min-h-0 flex-col overflow-hidden bg-transparent"
-              data-testid="reader-card"
-            >
-              <div ref={readerMainRef} className="flex flex-1 min-h-0 flex-col justify-between select-none">
-                <div className="relative flex min-h-0 flex-1">
-                  <div
-                    ref={readingScrollRef}
-                    role="region"
-                    tabIndex={0}
-                    aria-label={t(language, "reader.readingText")}
-                    className={`reader-text-scroll h-full min-h-0 w-full overflow-y-auto ps-6 pe-7 py-4 outline-none focus-visible:outline-none focus:ring-0 [scrollbar-gutter:stable] ${
-                      justCompleted ? "zikr-step-exit" : "zikr-step-enter"
-                    }`}
-                  >
-                    <AnimatePresence mode="wait">
-                      <motion.div
-                        key={z.id}
-                        initial={reducedMotion ? { opacity: 0 } : { opacity: 0, x: direction === "rtl" ? -20 : 20 }}
-                        animate={reducedMotion ? { opacity: 1 } : { opacity: 1, x: 0 }}
-                        exit={reducedMotion ? { opacity: 0 } : { opacity: 0, x: direction === "rtl" ? 20 : -20 }}
-                        transition={{ duration: reducedMotion ? 0.1 : 0.3, ease: "easeOut" }}
-                        className="reading-measure mx-auto flex min-h-full w-full flex-col py-4"
-                      >
-                        {/* Three transforms, three layers. The entrance slide is
+            <div className="relative mx-4 mb-4 mt-4 flex min-h-0 flex-1 gap-4 overflow-hidden bg-transparent">
+              <div className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden" data-testid="reader-card">
+                <div ref={readerMainRef} className="flex flex-1 min-h-0 flex-col justify-between select-none">
+                  <div className="relative flex min-h-0 flex-1">
+                    <div
+                      ref={readingScrollRef}
+                      role="region"
+                      tabIndex={0}
+                      aria-label={t(language, "reader.readingText")}
+                      className={`reader-text-scroll h-full min-h-0 w-full overflow-y-auto ps-6 pe-7 py-4 outline-none focus-visible:outline-none focus:ring-0 [scrollbar-gutter:stable] ${
+                        justCompleted ? "zikr-step-exit" : "zikr-step-enter"
+                      }`}
+                    >
+                      <AnimatePresence mode="wait">
+                        <motion.div
+                          key={z.id}
+                          initial={reducedMotion ? { opacity: 0 } : { opacity: 0, x: direction === "rtl" ? -20 : 20 }}
+                          animate={reducedMotion ? { opacity: 1 } : { opacity: 1, x: 0 }}
+                          exit={reducedMotion ? { opacity: 0 } : { opacity: 0, x: direction === "rtl" ? 20 : -20 }}
+                          transition={{ duration: reducedMotion ? 0.1 : 0.3, ease: "easeOut" }}
+                          className="reading-measure mx-auto flex min-h-full w-full flex-col py-4"
+                        >
+                          {/* Three transforms, three layers. The entrance slide is
                           framer's on the element above, the drag follows the
                           thumb here, and the press scales below — all animating
                           `transform`, so sharing an element would mean one
                           silently overwriting another. */}
-                        <div style={dragStyle} className="flex w-full flex-1 flex-col">
-                          <div
-                            style={pressStyle}
-                            className={`my-auto w-full flex flex-col items-center justify-center ${justCompleted ? "zikr-step-exit" : "zikr-step-enter"}`}
-                          >
-                            {renderReadingContent()}
+                          <div style={dragStyle} className="flex w-full flex-1 flex-col">
+                            <div
+                              style={pressStyle}
+                              className={`my-auto w-full flex flex-col items-center justify-center ${justCompleted ? "zikr-step-exit" : "zikr-step-enter"}`}
+                            >
+                              {renderReadingContent()}
+                            </div>
                           </div>
-                        </div>
-                      </motion.div>
-                    </AnimatePresence>
+                        </motion.div>
+                      </AnimatePresence>
+                    </div>
+                    {renderSideNavigation()}
                   </div>
-                  {renderSideNavigation()}
-                </div>
 
-                {!longSurah && !audioModeActive && (
-                  <footer className="shrink-0 pb-3 pt-2">{renderCounterStack()}</footer>
-                )}
+                  {!longSurah && !audioModeActive && (
+                    <footer className="shrink-0 pb-3 pt-2">{renderCounterStack()}</footer>
+                  )}
+                </div>
               </div>
+              {renderCollectionNavigator()}
             </div>
           </>
         ) : (

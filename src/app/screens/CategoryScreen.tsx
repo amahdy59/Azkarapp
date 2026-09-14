@@ -542,95 +542,78 @@ function ZikrAccordion({
       id={`zikr-card-${index}`}
       className={`flex w-full flex-col bg-transparent transition-[opacity,filter] ${isCardCompleted ? "opacity-60 grayscale" : ""}`}
     >
-      <div
-        role="button"
-        tabIndex={0}
-        onClick={() => setExpanded(!expanded)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            setExpanded(!expanded);
-          }
-        }}
-        className="flex w-full items-center p-3 gap-3 cursor-pointer outline-none focus-visible:ring-[3px] focus-visible:ring-ring rounded-t-2xl"
-        dir={direction}
-      >
-        {/* Index */}
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-primary bg-primary text-sm font-extrabold text-primary-foreground shadow-xs">
-          {formatNumerals(index + 1, language)}
-        </div>
+      <div className="flex w-full items-start gap-1 p-1" dir={direction}>
+        <button
+          type="button"
+          aria-expanded={expanded}
+          aria-controls={`zikr-details-${index}`}
+          onClick={() => setExpanded((current) => !current)}
+          className="flex min-h-[52px] min-w-0 flex-1 cursor-pointer items-start gap-3 rounded-2xl p-2 text-start outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        >
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-primary bg-primary text-sm font-extrabold text-primary-foreground shadow-xs">
+            {formatNumerals(index + 1, language)}
+          </span>
 
-        {/* Text */}
-        <div className="flex-1 text-start min-w-0" dir={direction}>
-          <p
-            className={`${isArabic ? "zikr-text" : "font-sans"} text-title font-bold text-foreground line-clamp-1`}
-            lang={isArabic ? "ar" : "en"}
+          <span className="min-w-0 flex-1 text-start" dir={direction}>
+            {expanded && isArabic && z.hasSeekRefuge && (
+              <span className="zikr-text mb-1 block text-label font-bold text-primary/90">
+                أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ
+              </span>
+            )}
+            {expanded && isArabic && (z.hasBasmalah || z.isSurah) && (
+              <span className="zikr-text mb-1 block text-subtitle font-bold text-primary/90">
+                بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+              </span>
+            )}
+            <span
+              data-testid={`zikr-summary-${index}`}
+              className={`${isArabic ? "zikr-text" : "font-sans"} block text-title font-bold leading-[1.85] text-foreground whitespace-pre-line ${expanded ? "" : "line-clamp-1"}`}
+              lang={isArabic ? "ar" : "en"}
+              dir={isArabic ? "rtl" : "ltr"}
+            >
+              {isArabic ? z.arabicText : z.translation}
+            </span>
+            <span className="mt-1 block text-xs font-semibold text-muted-foreground">
+              {t(language, "category.repetitionInstruction", { count: formatNumerals(targetCount, language) })}
+            </span>
+          </span>
+
+          <span
+            className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full"
+            aria-hidden="true"
           >
-            {isArabic ? z.arabicText : z.translation}
-          </p>
-          <p className="mt-1 text-xs font-semibold text-muted-foreground">
-            {t(language, "category.repetitionInstruction", { count: formatNumerals(targetCount, language) })}
-          </p>
-        </div>
-
-        {/* Actions */}
-        <div className="flex items-center gap-1 shrink-0">
-          <div className="flex items-center justify-center min-h-[44px] min-w-[44px] rounded-full">
             <ChevronDown
               size={20}
               className={`text-muted-foreground transition-transform ${expanded ? "rotate-180" : ""}`}
             />
-          </div>
-          {onToggleZikr && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleZikr(index);
-              }}
-              className="flex items-center justify-center min-h-[44px] min-w-[44px] rounded-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-              aria-label={
-                isCardCompleted
-                  ? t(language, "category.completedToggle", { defaultValue: "Completed — tap to uncheck" })
-                  : t(language, "category.remainingToggle", { defaultValue: "Not completed — tap to check" })
-              }
-            >
-              {isCardCompleted ? (
-                <Check size={24} className="text-success" strokeWidth={3} />
-              ) : (
-                <div className="size-[20px] rounded-full border-[2.5px] border-muted-foreground opacity-50" />
-              )}
-            </button>
-          )}
-        </div>
+          </span>
+        </button>
+
+        {onToggleZikr && (
+          <button
+            type="button"
+            onClick={() => onToggleZikr(index)}
+            className="mt-1 flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            aria-label={
+              isCardCompleted
+                ? t(language, "category.completedToggle", { defaultValue: "Completed — tap to uncheck" })
+                : t(language, "category.remainingToggle", { defaultValue: "Not completed — tap to check" })
+            }
+          >
+            {isCardCompleted ? (
+              <Check size={24} className="text-success" strokeWidth={3} />
+            ) : (
+              <span className="size-[20px] rounded-full border-[2.5px] border-muted-foreground opacity-50" />
+            )}
+          </button>
+        )}
       </div>
 
       {expanded && (
-        <div className="flex flex-col items-center gap-3 p-4 pt-1 border-t border-border/20 bg-muted/10">
-          <div className="min-h-[44px] min-w-0 w-full flex flex-col items-center text-center mt-3">
-            {isArabic && z.hasSeekRefuge && (
-              <div className="mb-2 text-center pointer-events-none">
-                <p className="zikr-text text-base font-bold text-primary/90 tracking-wide">
-                  أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ
-                </p>
-              </div>
-            )}
-            {isArabic && (z.hasBasmalah || z.isSurah) && (
-              <div className="mb-2 text-center pointer-events-none">
-                <p className="zikr-text text-title font-bold text-primary/90 tracking-wide">
-                  بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
-                </p>
-              </div>
-            )}
-            <p
-              className={`${isArabic ? "zikr-text" : "font-sans"} text-center text-title font-bold leading-[1.85] text-foreground whitespace-pre-line`}
-              dir={isArabic ? "rtl" : "ltr"}
-              lang={isArabic ? "ar" : "en"}
-            >
-              {isArabic ? z.arabicText : z.translation}
-            </p>
-          </div>
-
+        <div
+          id={`zikr-details-${index}`}
+          className="flex flex-col items-start gap-3 border-t border-border/20 bg-muted/10 px-4 pb-4 pt-3"
+        >
           {showTiming && timingText && (
             <div
               className="flex items-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-3.5 py-2 text-label font-extrabold text-primary"

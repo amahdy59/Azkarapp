@@ -3622,3 +3622,18 @@ null` shape, so a record written before this change still loads and still
 - **Listening and completion:** while the shared player owns the current Reader entry, the manual counter is hidden. Natural completion of the selected audio run records that entry exactly once against the playback plan's frozen category, prayer subcategory, routine mode, and special-flow identity. Play Once completes after one full recitation; Repeat waits for its prescribed repetitions. Partial listening, pause, stop, skip, and error do not record completion. Global player shortcuts consume handled keys so Reader navigation cannot fire from the same press.
 - **Qibla:** iOS orientation permission uses the standard no-argument request. Absolute-orientation events and the supported WebKit heading are accepted, with seam-aware smoothing that does not make deliberate large turns lag behind.
 - **Tests/evidence required:** focused reducer/provider/session/Qibla/Reader tests; responsive navigation and Home geometry; mobile Benefit visibility and grouped menus; counter/player ownership; volume alignment; RTL/LTR keyboard behavior; real-device compass; full gates and deployed-origin audio verification.
+
+## DEC-178 — Arabic recitation and English translation never share an implicit plan
+
+- **Decision:** Reader presents separate, explicit Arabic-recitation and English-translation actions. The selected action freezes the playback language for the whole plan and limits the available voice set to that language.
+- **Coverage:** missing English audio never falls back to Arabic, and missing Arabic audio never falls back to English. Play All uses the interface language and skips unavailable entries after the existing partial-coverage disclosure. Qur'anic audio remains Arabic recitation.
+- **Canonical storage:** when several zikr instances share identical reviewed wording, one canonical English recording is wired to their shared asset. Duplicate R2 object names are retained as unreferenced storage objects rather than creating competing production identities.
+- **Integrity:** approved English variants record the live R2 duration, byte size, and SHA-256. A dedicated audit downloads every wired English object and validates its MIME type, MP3 signature, size, and checksum.
+- **Tests/evidence required:** language-isolated plan and Reader-action regressions, complete Cloudflare inventory reconciliation, production-origin CORS/Range evidence, full local gates, and deployed browser verification before release.
+
+## DEC-179 — Qibla scrolls on compact screens and reuses its bearing on desktop
+
+- **Compact containment:** Qibla owns vertical scrolling inside the app's fixed main canvas. The bottom navigation stays fixed while the location, compass action, status, privacy, and calibration guidance remain reachable at short phone heights and large text sizes.
+- **Desktop relevance:** at 1024px and above with a fine pointer, retain the same locally calculated bearing and replace the normally unsupported motion-sensor action with three instructions for aligning a prayer space using a phone or physical compass. Touch-first devices retain the live-compass enhancement even at wider viewports.
+- **Scope:** no second calculation, map service, external request, new dependency, persisted state, or claim of sensor accuracy is introduced.
+- **Tests/evidence required:** scroll ownership and reachable lower content at 320px, fine-pointer desktop guidance, touch-device compass preservation, Arabic/English rendering, full local gates, green workflows, and production verification.

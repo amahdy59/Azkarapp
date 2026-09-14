@@ -82,4 +82,31 @@ describe("CategoryScreen comprehensive-dua session", () => {
     await user.click(screen.getByRole("menuitemradio", { name: /Core ·/ }));
     expect(onRoutineModeChange).toHaveBeenCalledWith("core");
   });
+
+  it("expands the existing zikr text instead of mounting a second copy", async () => {
+    const user = userEvent.setup();
+    render(
+      <CategoryScreen
+        catId="morning"
+        completed={new Set()}
+        isArabic
+        direction="rtl"
+        onZikr={() => undefined}
+        onReset={() => undefined}
+        onRepeat={() => undefined}
+        onBack={() => undefined}
+      />,
+    );
+
+    const summary = screen.getByTestId("zikr-summary-0");
+    const disclosure = summary.closest("button");
+    expect(disclosure).toHaveAttribute("aria-expanded", "false");
+    expect(summary).toHaveClass("line-clamp-1");
+
+    await user.click(disclosure!);
+
+    expect(disclosure).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByTestId("zikr-summary-0")).toBe(summary);
+    expect(summary).not.toHaveClass("line-clamp-1");
+  });
 });

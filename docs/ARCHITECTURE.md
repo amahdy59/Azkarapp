@@ -78,7 +78,7 @@ Rules:
 - Focus moves to `#main-content` on every view change (`useViewFocus`), skipping initial load.
 - Settings subsections use `SettingsSubScreen` within `SettingsScreen`.
 - The Azkar tab always opens the collection index, not an implicit prior category.
-- Qibla calculation is local and deterministic from coordinates. Live compass rotation is progressive enhancement: it is requested from a user action, uses the standard no-argument iOS permission call, accepts the absolute-orientation event or supported WebKit compass field, smooths across the north seam without delaying deliberate large turns, and leaves the north-based bearing usable when sensor permission or hardware is unavailable.
+- Qibla calculation is local and deterministic from coordinates. Live compass rotation is progressive enhancement: it is requested from a user action, uses the standard no-argument iOS permission call, accepts the absolute-orientation event or supported WebKit compass field, smooths across the north seam without delaying deliberate large turns, and leaves the north-based bearing usable when sensor permission or hardware is unavailable. Fine-pointer large screens present the same bearing as a static prayer-space alignment method instead of offering a sensor control that is normally unavailable; this is presentation-only and introduces no second bearing calculation or persisted state.
 
 ## Presentation boundaries
 

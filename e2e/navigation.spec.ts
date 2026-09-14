@@ -23,7 +23,7 @@ test("@cross-browser Azkar tab opens the library and exposes search", async ({ p
   await expect(page.getByRole("heading", { name: "Azkar Library", exact: true })).toBeVisible();
 });
 
-test("@cross-browser More keeps Qibla, Masbaha, and Settings easy to reach", async ({ page }) => {
+test("@cross-browser More keeps Qibla, Masbaha, and Settings easy to reach", async ({ page }, testInfo) => {
   await enterAsEnglishGuest(page);
 
   for (const viewport of [
@@ -48,6 +48,20 @@ test("@cross-browser More keeps Qibla, Masbaha, and Settings easy to reach", asy
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     );
     expect(overflow).toBeLessThanOrEqual(1);
+    if (viewport.width === 320) {
+      const qiblaSurface = page.locator(".app-screen-surface");
+      await expect
+        .poll(() =>
+          qiblaSurface.evaluate((element) => ({
+            canScroll: element.scrollHeight > element.clientHeight,
+            overflowY: getComputedStyle(element).overflowY,
+          })),
+        )
+        .toEqual({ canScroll: true, overflowY: "auto" });
+      await qiblaSurface.evaluate((element) => element.scrollTo({ top: element.scrollHeight }));
+      expect(await qiblaSurface.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
+      await expect(page.getByText(/Keep the device flat/)).toBeVisible();
+    }
   }
 
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -57,6 +71,10 @@ test("@cross-browser More keeps Qibla, Masbaha, and Settings easy to reach", asy
   await expect(page.getByTestId("nav-masbaha")).toBeVisible();
   await expect(page.getByTestId("nav-settings")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Qibla", exact: true })).toBeVisible();
+  if (testInfo.project.name.startsWith("desktop-")) {
+    await expect(page.getByRole("heading", { name: "Use the bearing on a larger screen" })).toBeVisible();
+    await expect(page.getByText("Turn clockwise to 136°.")).toBeVisible();
+  }
 });
 
 test("hash routes restore lazy collections, reject invalid positions, and preserve PWA shortcuts", async ({ page }) => {

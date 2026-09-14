@@ -98,6 +98,37 @@ test("the Reader counter keeps one rectangular shape across phone, tablet, and d
   }
 });
 
+test("wide Reader keeps a one-third RTL collection navigator and supports direct jumps", async ({ page }) => {
+  await page.setViewportSize({ width: 1600, height: 900 });
+  await openReturningGuestHome(page, "ar");
+  await page.getByTestId("category-card-morning").click();
+  await page.getByTestId("start-session-button").click();
+
+  const navigator = page.getByTestId("reader-collection-navigator");
+  const readerCard = page.getByTestId("reader-card");
+  await expect(navigator).toBeVisible();
+  await expect(navigator).toHaveAccessibleName("عرض جميع الأذكار");
+
+  const [navigatorBox, readerBox] = await Promise.all([navigator.boundingBox(), readerCard.boundingBox()]);
+  expect(navigatorBox).not.toBeNull();
+  expect(readerBox).not.toBeNull();
+  if (navigatorBox && readerBox) {
+    const occupiedWidth = navigatorBox.width + readerBox.width;
+    expect(navigatorBox.width / occupiedWidth).toBeGreaterThanOrEqual(0.32);
+    expect(navigatorBox.width / occupiedWidth).toBeLessThanOrEqual(0.36);
+    expect(navigatorBox.x + navigatorBox.width).toBeLessThanOrEqual(readerBox.x);
+  }
+
+  const items = navigator.getByRole("button");
+  expect(await items.count()).toBeGreaterThan(1);
+  await items.nth(1).click();
+  await expect(items.nth(1)).toHaveAttribute("aria-current", "step");
+  await expect(page).toHaveURL(/\/morning\/2$/);
+
+  await page.setViewportSize({ width: 1100, height: 800 });
+  await expect(navigator).toBeHidden();
+});
+
 test("Space counts without outlining the full Reader text region", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await openFirstMorningZikr(page);

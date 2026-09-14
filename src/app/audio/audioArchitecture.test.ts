@@ -145,22 +145,25 @@ describe("explicit audio content architecture", () => {
     }
   });
 
-  it("defaults dual-voice duas to English narration in English mode without overriding a listener choice", () => {
+  it("keeps explicitly requested Arabic and English playback plans separate", () => {
     const source = ALL_AZKAR.find((zikr) => zikr.id === "s-hm-104")!;
     const { catalog, zikrs } = catalogFor([source], ["voice-a", "english-george"]);
-    const build = (language: "ar" | "en", duaVoiceId = "default-dua") =>
+    const build = (audioLanguage: "ar" | "en", duaVoiceId = "default-dua") =>
       buildPlaybackPlan({
         zikrs,
         context: { category: "before_sleep", routineMode: "complete", source: "single" },
         catalog,
         baseUrl: "https://audio.example.test",
-        language,
+        audioLanguage,
         preferences: { ...DEFAULT_AUDIO_PREFERENCES, duaVoiceId },
-      }).entries[0]!.defaultVoiceId;
+      }).entries[0]!;
 
-    expect(build("en")).toBe("english-george");
-    expect(build("ar")).toBe("voice-a");
-    expect(build("en", "voice-a")).toBe("voice-a");
+    expect(build("en").defaultVoiceId).toBe("english-george");
+    expect(build("en").availableVoiceIds).toEqual(["english-george"]);
+    expect(build("ar").defaultVoiceId).toBe("voice-a");
+    expect(build("ar").availableVoiceIds).toEqual(["voice-a"]);
+    expect(build("en", "voice-a").defaultVoiceId).toBe("english-george");
+    expect(getAudioCoverage(zikrs, { catalog, language: "en" }).available).toBe(1);
   });
 
   it("reuses canonical identities across every audited shared group", () => {

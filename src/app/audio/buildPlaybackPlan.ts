@@ -1,7 +1,7 @@
 import type { AppLanguage, RoutineMode, Zikr, ZikrAudioMode } from "../types";
 import { AUDIO_CATALOG } from "./audioManifest";
 import { DEFAULT_AUDIO_PREFERENCES } from "./audioPreferences";
-import { getPreferredVoiceId, resolveAudioAsset } from "./resolveAudioAsset";
+import { getPreferredVoiceId, getVoiceIdForLanguage, resolveAudioAsset } from "./resolveAudioAsset";
 import type { AudioCatalog, AudioCoverage, AudioPreferences, PlaybackEntry, PlaybackPlan } from "./audioTypes";
 
 type PlanContext = PlaybackPlan["context"];
@@ -26,12 +26,17 @@ function freezePlan(plan: PlaybackPlan): PlaybackPlan {
 
 export function getAudioCoverage(
   zikrs: readonly Zikr[],
-  options: { catalog?: AudioCatalog; baseUrl?: string } = {},
+  options: { catalog?: AudioCatalog; baseUrl?: string; language?: AppLanguage; preferences?: AudioPreferences } = {},
 ): AudioCoverage {
   const availableZikrIds: string[] = [];
   const unavailableZikrIds: string[] = [];
   for (const zikr of zikrs) {
-    (resolveAudioAsset(zikr, options).available ? availableZikrIds : unavailableZikrIds).push(zikr.id);
+    const resolution = resolveAudioAsset(zikr, options);
+    const available =
+      resolution.available &&
+      (!options.language ||
+        getVoiceIdForLanguage(resolution, options.preferences ?? DEFAULT_AUDIO_PREFERENCES, options.language) !== null);
+    (available ? availableZikrIds : unavailableZikrIds).push(zikr.id);
   }
   return {
     total: zikrs.length,
@@ -49,7 +54,7 @@ export function buildPlaybackPlan({
   catalog = AUDIO_CATALOG,
   baseUrl,
   preferences = DEFAULT_AUDIO_PREFERENCES,
-  language,
+  audioLanguage,
 }: {
   zikrs: readonly Zikr[];
   context: PlanContext;
@@ -57,12 +62,14 @@ export function buildPlaybackPlan({
   catalog?: AudioCatalog;
   baseUrl?: string;
   preferences?: AudioPreferences;
-  language?: AppLanguage;
+  audioLanguage?: AppLanguage;
 }): PlaybackPlan {
   const entries: PlaybackEntry[] = [];
   const resolvedZikrs = zikrs.flatMap((zikr) => {
     const resolution = resolveAudioAsset(zikr, { catalog, baseUrl });
-    return resolution.available ? [{ zikr, resolution }] : [];
+    if (!resolution.available) return [];
+    const selectedVoiceId = audioLanguage ? getVoiceIdForLanguage(resolution, preferences, audioLanguage) : null;
+    return audioLanguage && !selectedVoiceId ? [] : [{ zikr, resolution, selectedVoiceId }];
   });
   const expectedRitualCounts = new Map<string, number>();
   const availableRitualCounts = new Map<string, number>();
@@ -75,7 +82,7 @@ export function buildPlaybackPlan({
       availableRitualCounts.set(zikr.ritualGroupId, (availableRitualCounts.get(zikr.ritualGroupId) ?? 0) + 1);
   }
 
-  for (const { zikr, resolution } of resolvedZikrs) {
+  for (const { zikr, resolution, selectedVoiceId } of resolvedZikrs) {
     const completeRitual =
       !zikr.ritualGroupId ||
       expectedRitualCounts.get(zikr.ritualGroupId) === availableRitualCounts.get(zikr.ritualGroupId);
@@ -96,9 +103,19 @@ export function buildPlaybackPlan({
       repetitionUnit: zikr.ritualGroupId === "three_quls" && completeRitual ? "ritual-round" : "zikr",
       ...(zikr.ritualGroupId && completeRitual ? { ritualGroupId: zikr.ritualGroupId } : {}),
       supportedModes: [...zikr.audioBehavior.supportedModes],
-      defaultVoiceId: getPreferredVoiceId(resolution, preferences, language),
-      segmentsByVoice: resolution.segmentsByVoice,
-      availableVoiceIds: [...resolution.availableVoiceIds],
+      defaultVoiceId: selectedVoiceId ?? getPreferredVoiceId(resolution, preferences),
+      segmentsByVoice: selectedVoiceId
+        ? Object.fromEntries(
+            Object.entries(resolution.segmentsByVoice).filter(([voiceId]) =>
+              audioLanguage === "en" ? voiceId === selectedVoiceId : voiceId !== "english-george",
+            ),
+          )
+        : resolution.segmentsByVoice,
+      availableVoiceIds: selectedVoiceId
+        ? resolution.availableVoiceIds.filter((voiceId) =>
+            audioLanguage === "en" ? voiceId === selectedVoiceId : voiceId !== "english-george",
+          )
+        : [...resolution.availableVoiceIds],
     });
   }
   return freezePlan({ id: createPlanId(), context: { ...context }, entries, createdAt: Date.now() });

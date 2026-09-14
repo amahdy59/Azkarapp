@@ -76,6 +76,9 @@ Run the phase files in numerical order unless the decision log explicitly record
 | 33    | `phases/PHASE_33_MORE_AND_QIBLA.md`                    | Four-item navigation with accessible local Qibla guidance               |
 | 34    | `phases/PHASE_34_AZKAR_LIBRARY_HIERARCHY.md`           | Collections-first Library and unambiguous benefit/reference actions     |
 | 35    | `phases/PHASE_35_RESPONSIVE_UTILITY_AND_LISTENING.md`  | Filled Home composition, direct desktop utilities, and synced listening |
+| 36    | `phases/PHASE_36_ENGLISH_AUDIO_SEPARATION.md`          | Verified English audio inventory and language-locked playback controls  |
+| 37    | `phases/PHASE_37_READER_COLLECTION_NAVIGATOR.md`       | Wide collection navigation and in-place compact disclosure              |
+| 38    | `phases/PHASE_38_QIBLA_RESPONSIVE_RELEVANCE.md`        | Reachable mobile Qibla and practical desktop bearing guidance           |
 
 Phases 15–20 derive from `docs/audits/DESIGN_CONSISTENCY_AUDIT.md` (2026-08-15) and are
 recorded in `DECISION_LOG.md` as DEC-064. Phase 15 is upstream of 16, 17 and 19 — its root

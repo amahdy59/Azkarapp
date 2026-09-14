@@ -1,15 +1,15 @@
 {
-  "release": "2026-09-14.1",
+  "release": "2026-09-14.3",
   "ar": [
-    "أصبح بإمكانك الآن الاستماع إلى ترجمة الأذكار والأدعية باللغة الإنجليزية.",
-    "أُضيف صوت جورج لتلاوة الترجمة الإنجليزية لأكثر من 111 زكرًا ودعاءً.",
-    "تبدأ الترجمة الصوتية الإنجليزية تلقائيًا عند استخدام الواجهة الإنجليزية، مع الحفاظ على اختيارك اليدوي للصوت.",
+    "يمكنك اختيار التلاوة العربية أو الترجمة الإنجليزية بوضوح، من دون انتقال تلقائي بين اللغتين عند غياب تسجيل.",
+    "يعرض قارئ الحاسوب قائمة الأذكار والتقدم بجانب النص، بينما يكشف العرض المختصر بقية النص نفسه عند التوسيع.",
+    "يمكن تمرير صفحة القبلة كاملة على الهاتف، وتعرض الشاشات الكبيرة خطوات عملية لاستخدام درجة الاتجاه في مكان الصلاة.",
     "لم يعد الضغط على مفتاح المسافة يُظهر خطوطًا ذهبية حول نص الذكر على الحاسوب أو الهاتف."
   ],
   "en": [
-    "You can now listen to English audio translations of azkar and duas.",
-    "George's voice has been added for English translation recitation of over 111 azkar and duas.",
-    "English narration now starts automatically in the English interface while preserving any voice you choose yourself.",
+    "Choose Arabic recitation or English translation clearly, without automatic switching when a recording is unavailable.",
+    "The desktop Reader now keeps the zikr list and progress beside the text, while compact expansion reveals more of the same text.",
+    "The full Qibla page is now scrollable on phones, and larger screens explain how to use the bearing to align a prayer space.",
     "Pressing Space no longer draws gold lines around the zikr text on desktop or mobile."
   ]
 }

@@ -29,6 +29,40 @@ describe("QiblaScreen", () => {
     expect(screen.getByRole("heading", { name: /Qibla is 136° from north/ })).toBeVisible();
     expect(screen.getByText("Cairo")).toBeVisible();
     expect(screen.getByRole("button", { name: "Enable live compass" })).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getByRole("heading", { name: "Qibla" }).closest(".app-screen-surface")).toHaveClass(
+      "overflow-y-auto",
+    );
+  });
+
+  it("turns the saved bearing into practical fine-pointer desktop guidance", () => {
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn(() => ({
+        matches: true,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      })),
+    );
+
+    render(
+      <QiblaScreen
+        language="en"
+        direction="ltr"
+        locationSettings={{
+          latitude: 30.0444,
+          longitude: 31.2357,
+          cityName: "Cairo",
+          calculationMethod: 5,
+          autoDetect: false,
+        }}
+        reduceMotion
+        onBack={() => undefined}
+      />,
+    );
+
+    expect(screen.getByRole("heading", { name: "Use the bearing on a larger screen" })).toBeVisible();
+    expect(screen.getByText("Turn clockwise to 136°.")).toBeVisible();
+    expect(screen.queryByRole("button", { name: "Enable live compass" })).not.toBeInTheDocument();
   });
 
   it("explains the static fallback when a live compass is unavailable", async () => {

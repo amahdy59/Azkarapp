@@ -84,16 +84,33 @@ export function resolveAudioAsset(
 export function getPreferredVoiceId(
   resolution: Extract<AudioResolution, { available: true }>,
   preferences: AudioPreferences,
-  language?: AppLanguage,
 ) {
   const preferred = resolution.asset.contentKind === "quran" ? preferences.quranReciterId : preferences.duaVoiceId;
-  if (
-    resolution.asset.contentKind === "dua" &&
-    language === "en" &&
-    preferred === "default-dua" &&
-    resolution.availableVoiceIds.includes("english-george")
-  ) {
-    return "english-george";
-  }
   return resolution.availableVoiceIds.includes(preferred) ? preferred : resolution.asset.defaultVoiceId;
+}
+
+/**
+ * Resolves a voice without ever crossing the listener's requested language.
+ * English narration exists only for dua assets; Qur'an remains Arabic
+ * recitation. Returning null lets coverage and playback omit unavailable
+ * entries instead of silently switching languages mid-session.
+ */
+export function getVoiceIdForLanguage(
+  resolution: Extract<AudioResolution, { available: true }>,
+  preferences: AudioPreferences,
+  language: AppLanguage,
+): string | null {
+  if (language === "en") {
+    return resolution.asset.contentKind === "dua" && resolution.availableVoiceIds.includes("english-george")
+      ? "english-george"
+      : null;
+  }
+
+  const arabicVoiceIds = resolution.availableVoiceIds.filter((voiceId) => voiceId !== "english-george");
+  if (arabicVoiceIds.length === 0) return null;
+  const preferred = resolution.asset.contentKind === "quran" ? preferences.quranReciterId : preferences.duaVoiceId;
+  if (arabicVoiceIds.includes(preferred)) return preferred;
+  return arabicVoiceIds.includes(resolution.asset.defaultVoiceId)
+    ? resolution.asset.defaultVoiceId
+    : arabicVoiceIds[0]!;
 }
