@@ -1,5 +1,12 @@
 import { getAzkarByCategory } from "./content/azkar";
-import { CATEGORY_IDS, type CategoryId, type DailyCollectionCompletion, type StoredSession } from "./types";
+import {
+  CATEGORY_IDS,
+  type CategoryId,
+  type DailyCollectionCompletion,
+  type StoredSession,
+  type DailyHabitCompletion,
+  type DailyHabitId,
+} from "./types";
 
 export { CATEGORY_IDS } from "./types";
 export const MAIN_CATEGORY_IDS: CategoryId[] = ["morning", "evening", "before_sleep", "after_prayer"];
@@ -16,6 +23,8 @@ export interface GrowthEvent {
   leafCount: number;
 }
 
+export type GardenLevel = 0 | 1 | 2 | 3 | 4 | 5;
+
 export interface GardenDay {
   dayKey: string;
   date: Date;
@@ -28,6 +37,9 @@ export interface GardenDay {
   extraLeafCount: number;
   isPalm: boolean;
   isToday: boolean;
+  level: GardenLevel;
+  hasQuranWird: boolean;
+  mosquePrayers: Extract<DailyHabitId, "mosque_3" | "mosque_5"> | null;
 }
 
 export interface GardenMilestone {
@@ -105,7 +117,7 @@ function dayOrdinal(dayKey: string) {
   return Math.floor(Date.UTC(year, month - 1, day) / 86_400_000);
 }
 
-function currentTimeZone() {
+export function currentTimeZone() {
   try {
     return Intl.DateTimeFormat().resolvedOptions().timeZone || "local";
   } catch {
@@ -150,6 +162,40 @@ export function normalizeDailyCompletions(value: unknown): DailyCollectionComple
 
 export function mergeDailyCompletions(base: DailyCollectionCompletion[], incoming: DailyCollectionCompletion[]) {
   return normalizeDailyCompletions([...base, ...incoming]);
+}
+
+export function normalizeDailyHabitCompletions(value: unknown): DailyHabitCompletion[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  const unique = new Map<string, DailyHabitCompletion>();
+  for (const candidate of value) {
+    if (!candidate || typeof candidate !== "object") {
+      continue;
+    }
+    const record = candidate as Partial<DailyHabitCompletion>;
+    if (
+      !isProgressDayKey(record.dayKey) ||
+      !record.habit ||
+      !["active", "quran_wird", "mosque_3", "mosque_5"].includes(record.habit) ||
+      typeof record.timeZone !== "string" ||
+      !record.timeZone.trim()
+    ) {
+      continue;
+    }
+    unique.set(`${record.dayKey}:${record.habit}`, {
+      dayKey: record.dayKey,
+      habit: record.habit,
+      timeZone: record.timeZone.trim(),
+    });
+  }
+
+  return [...unique.values()].sort((a, b) => a.dayKey.localeCompare(b.dayKey) || a.habit.localeCompare(b.habit));
+}
+
+export function mergeDailyHabitCompletions(base: DailyHabitCompletion[], incoming: DailyHabitCompletion[]) {
+  return normalizeDailyHabitCompletions([...base, ...incoming]);
 }
 
 export function deriveDailyCompletionsFromLegacySessions(
@@ -248,10 +294,21 @@ function categoryMap(records: DailyCollectionCompletion[]) {
   return byDay;
 }
 
+function habitMap(records: DailyHabitCompletion[]) {
+  const byDay = new Map<string, Set<DailyHabitId>>();
+  for (const record of normalizeDailyHabitCompletions(records)) {
+    const entry = byDay.get(record.dayKey) ?? new Set<DailyHabitId>();
+    entry.add(record.habit);
+    byDay.set(record.dayKey, entry);
+  }
+  return byDay;
+}
+
 function gardenDay(
   dayKey: string,
   todayKey: string,
   entry: { categories: Set<CategoryId>; afterPrayers: Set<string> } | undefined,
+  habits: Set<DailyHabitId>,
 ): GardenDay {
   const categories = entry?.categories ?? new Set<CategoryId>();
   const completedCategories = CATEGORY_IDS.filter((category) => categories.has(category));
@@ -262,6 +319,27 @@ function gardenDay(
   const goldenLeafCount = goldenCategories.length;
   const greenLeafCount = greenCategories.length;
 
+  const hasQuranWird = habits.has("quran_wird");
+  const mosquePrayers = habits.has("mosque_5") ? "mosque_5" : habits.has("mosque_3") ? "mosque_3" : null;
+
+  const hasMorning = goldenCategories.includes("morning");
+  const hasEvening = goldenCategories.includes("evening");
+  const hasSleep = goldenCategories.includes("before_sleep");
+  const hasAfterPrayerAll = entry?.afterPrayers.size === 5;
+
+  let level: GardenLevel = 0;
+  if (hasMorning && hasEvening && hasSleep && hasAfterPrayerAll && hasQuranWird && mosquePrayers) {
+    level = 5;
+  } else if (hasMorning && hasEvening && hasSleep) {
+    level = 4;
+  } else if (hasMorning && hasEvening) {
+    level = 3;
+  } else if (goldenLeafCount >= 1) {
+    level = 2;
+  } else if (habits.has("active") || categories.size > 0) {
+    level = 1;
+  }
+
   return {
     dayKey,
     date: dateFromProgressDayKey(dayKey),
@@ -271,20 +349,31 @@ function gardenDay(
     greenLeafCount,
     leafCount: goldenLeafCount,
     extraLeafCount: greenLeafCount,
-    isPalm: goldenLeafCount === MAIN_CATEGORY_IDS.length,
+    isPalm: level >= 4,
     isToday: dayKey === todayKey,
+    level,
+    hasQuranWird,
+    mosquePrayers,
   };
 }
 
 export function getUsageStreakSummary(
   records: DailyCollectionCompletion[],
+  habitRecords: DailyHabitCompletion[],
   now = new Date(),
   boundaryHour = DEFAULT_PROGRESS_DAY_START_HOUR,
 ) {
   const todayKey = getProgressDayKey(now, boundaryHour);
-  const activeKeys = [...categoryMap(records).entries()]
-    .filter(([dayKey, entry]) => dayKey <= todayKey && entry.categories.size > 0)
-    .map(([dayKey]) => dayKey)
+  const byDay = categoryMap(records);
+  const hByDay = habitMap(habitRecords);
+
+  const activeKeys = [...new Set([...byDay.keys(), ...hByDay.keys()])]
+    .filter((dayKey) => {
+      if (dayKey > todayKey) return false;
+      const entry = byDay.get(dayKey);
+      const hEntry = hByDay.get(dayKey);
+      return (entry && entry.categories.size > 0) || (hEntry && hEntry.size > 0);
+    })
     .sort();
 
   let longestUsageStreak = 0;
@@ -382,19 +471,21 @@ export function getPalmStreakSummary(
 
 export function getGardenSummary(
   records: DailyCollectionCompletion[],
+  habitRecords: DailyHabitCompletion[],
   now = new Date(),
   boundaryHour = DEFAULT_PROGRESS_DAY_START_HOUR,
 ): GardenSummary {
   const todayKey = getProgressDayKey(now, boundaryHour);
   const normalized = normalizeDailyCompletions(records).filter((record) => record.dayKey <= todayKey);
   const byDay = categoryMap(normalized);
+  const hByDay = habitMap(habitRecords);
   const days = Array.from({ length: 7 }, (_, index) => {
     const key = shiftProgressDayKey(todayKey, index - 6);
-    return gardenDay(key, todayKey, byDay.get(key));
+    return gardenDay(key, todayKey, byDay.get(key), hByDay.get(key) ?? new Set());
   });
-  const today = days.at(-1) ?? gardenDay(todayKey, todayKey, byDay.get(todayKey));
+  const today = days.at(-1) ?? gardenDay(todayKey, todayKey, byDay.get(todayKey), hByDay.get(todayKey) ?? new Set());
   const yesterday = days.at(-2);
-  const activeKeys = [...byDay.keys()].filter((dayKey) => dayKey <= todayKey).sort();
+  const activeKeys = [...new Set([...byDay.keys(), ...hByDay.keys()])].filter((dayKey) => dayKey <= todayKey).sort();
 
   const lifetimeGoldenLeaves = normalized.filter((record) => MAIN_CATEGORY_IDS.includes(record.category)).length;
   const lifetimeGreenLeaves = normalized.filter((record) => !MAIN_CATEGORY_IDS.includes(record.category)).length;
@@ -403,7 +494,7 @@ export function getGardenSummary(
     MAIN_CATEGORY_IDS.every((cat) => entry.categories.has(cat)),
   ).length;
   const { currentPalmRhythm, longestPalmRhythm } = getPalmStreakSummary(normalized, now, boundaryHour);
-  const { currentUsageStreak, longestUsageStreak } = getUsageStreakSummary(normalized, now, boundaryHour);
+  const { currentUsageStreak, longestUsageStreak } = getUsageStreakSummary(normalized, habitRecords, now, boundaryHour);
 
   let messageKind: GardenMessageKind;
   if (today.isPalm) {

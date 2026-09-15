@@ -2,7 +2,7 @@
 import { useState, useEffect, useMemo } from "react";
 import {
   Calendar,
-  Zap,
+  Droplets,
   ArrowLeft,
   ArrowRight,
   Check,
@@ -38,6 +38,7 @@ import {
 import { triggerBackgroundPrayerTimesRefresh } from "../content/prayerCalculation";
 import { formatDisplayDate, formatNumerals } from "../formatting";
 import { t } from "../i18n";
+import { DailyCompanionsCard } from "../components/DailyCompanionsCard";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { StatCard } from "../components/StatCard";
 import { TimeOfDayBackground } from "../components/TimeOfDayBackground";
@@ -226,6 +227,7 @@ export function getHomeAction(
 export function HomeScreen({
   completed,
   dailyCompletions,
+  dailyHabits = [],
   quietProgressEnabled,
   progressDayStartHour,
   language,
@@ -243,9 +245,11 @@ export function HomeScreen({
   onOpenSavedZikr,
   onOpenSavedLibrary,
   onOpenBenefits,
+  onToggleHabit,
 }: {
   completed: Record<CategoryId, Set<string>>;
   dailyCompletions: DailyCollectionCompletion[];
+  dailyHabits?: import("../types").DailyHabitCompletion[];
   language: AppLanguage;
   direction: "ltr" | "rtl";
   quietProgressEnabled: boolean;
@@ -263,6 +267,7 @@ export function HomeScreen({
   onOpenSavedZikr?: (categoryId: CategoryId, index: number) => void;
   onOpenSavedLibrary?: () => void;
   onOpenBenefits?: () => void;
+  onToggleHabit?: (habitId: import("../types").DailyHabitId) => void;
 }) {
   const isArabic = language === "ar";
   const [now, setNow] = useState(() => new Date());
@@ -296,8 +301,8 @@ export function HomeScreen({
   }, [locationSettings, prayerDateKey]);
 
   const gardenSummary = useMemo(
-    () => getGardenSummary(dailyCompletions, now, progressDayStartHour),
-    [dailyCompletions, now, progressDayStartHour],
+    () => getGardenSummary(dailyCompletions, dailyHabits, now, progressDayStartHour),
+    [dailyCompletions, dailyHabits, now, progressDayStartHour],
   );
   const nextPrayerInfo = getNextPrayerCountdown(now, language, locationSettings);
   const currentPrayerPeriod = getCurrentPrayerPeriod(now, locationSettings);
@@ -480,9 +485,9 @@ export function HomeScreen({
               <div
                 data-testid="header-streak"
                 className="flex items-center justify-center gap-1 text-[0.75rem] font-black text-on-media-accent drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)]"
-                title={t(language, "progress.dailyStreak")}
+                title={t(language, "progress.dailyRhythm")}
               >
-                <Zap className="h-[13px] w-[13px] text-on-media-accent" strokeWidth={2.5} aria-hidden="true" />
+                <Droplets className="h-[13px] w-[13px] text-on-media-accent" strokeWidth={2.5} aria-hidden="true" />
                 <span>{formatNumerals(streakDays, language)}</span>
               </div>
               <div
@@ -557,6 +562,7 @@ export function HomeScreen({
                       hideTabs={true}
                       calendarType={calendarType}
                       dailyCompletions={dailyCompletions}
+                      dailyHabits={dailyHabits}
                       progressDayStartHour={progressDayStartHour}
                       onSelectCategory={onResume}
                       visibleCategoryIds={HOME_WIRD_CATEGORY_IDS}
@@ -565,6 +571,15 @@ export function HomeScreen({
                 )}
               </div>
             )}
+          </div>
+
+          <div className="px-page mb-2">
+            <DailyCompanionsCard
+              language={language}
+              dailyHabits={dailyHabits}
+              todayKey={todayKey}
+              onToggleHabit={onToggleHabit ?? (() => {})}
+            />
           </div>
 
           <div className="px-page">
@@ -738,7 +753,7 @@ export function HomeScreen({
             <div className="min-w-[14rem] sm:min-w-0 sm:flex-1 snap-center">
               <StatCard
                 title={t(language, "home.streakTitle")}
-                icon={<Zap size={18} />}
+                icon={<Droplets size={18} />}
                 value={formatNumerals(streakDays, language)}
                 subtitle={t(language, "home.consecutiveDays")}
               />

@@ -57,6 +57,7 @@ import {
   millisecondsUntilNextProgressDay,
   resetStaleCompletedCollections,
   getEffectiveCompletedForSubcategory,
+  getProgressDayKey,
   type GrowthEvent,
 } from "./progress";
 
@@ -226,6 +227,7 @@ function AppContent() {
     initialState.settings.calendarType ?? "hijri",
   );
   const [dailyCompletions, setDailyCompletions] = useState(initialState.dailyCompletions);
+  const [dailyHabits, setDailyHabits] = useState(initialState.dailyHabits ?? []);
   const [lastGrowthEvent, setLastGrowthEvent] = useState<GrowthEvent | null>(null);
   const [completed, setCompleted] = useState<Record<CategoryId, Set<string>>>(() =>
     resetStaleCompletedCollections(
@@ -367,6 +369,7 @@ function AppContent() {
       completed: fromCompletedSets(completed),
       sessions,
       dailyCompletions,
+      dailyHabits,
       savedZikrIds: [...savedZikrIds].sort(),
     }),
     [
@@ -394,6 +397,7 @@ function AppContent() {
       selectedLang,
       sessions,
       dailyCompletions,
+      dailyHabits,
       savedZikrIds,
       showTranslation,
       showTransliteration,
@@ -531,6 +535,7 @@ function AppContent() {
     setIsGuest(state.profile.isGuest);
     setAccountUserId(state.profile.accountUserId);
     setDailyCompletions(state.dailyCompletions);
+    setDailyHabits(state.dailyHabits ?? []);
     setCompleted(
       resetStaleCompletedCollections(
         toCompletedSets(state.completed),
@@ -605,9 +610,18 @@ function AppContent() {
   useForegroundReminders({ reminders, dailyCompletions, progressDayStartHour, language: selectedLang });
 
   const reconcileDailyProgress = useCallback(() => {
-    setCompleted((previous) =>
-      resetStaleCompletedCollections(previous, dailyCompletions, new Date(), progressDayStartHour),
-    );
+    const now = new Date();
+    setCompleted((previous) => resetStaleCompletedCollections(previous, dailyCompletions, now, progressDayStartHour));
+    setDailyHabits((prev) => {
+      const todayKey = getProgressDayKey(now, progressDayStartHour);
+      if (!prev.some((h) => h.dayKey === todayKey && h.habit === "active")) {
+        return [
+          ...prev,
+          { dayKey: todayKey, habit: "active", timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone },
+        ];
+      }
+      return prev;
+    });
   }, [dailyCompletions, progressDayStartHour]);
 
   useEffect(() => {
@@ -657,6 +671,22 @@ function AppContent() {
     setPersistenceError(!saved);
     if (saved) setPersistenceNoticeDismissed(false);
   }, [appStateSnapshot]);
+
+  const toggleHabit = useCallback(
+    (habitId: import("./types").DailyHabitId) => {
+      setDailyHabits((prev) => {
+        const todayKey = getProgressDayKey(new Date(), progressDayStartHour);
+        const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const existing = prev.find((h) => h.dayKey === todayKey && h.habit === habitId);
+        if (existing) {
+          return prev.filter((h) => h !== existing);
+        } else {
+          return [...prev, { dayKey: todayKey, habit: habitId, timeZone }];
+        }
+      });
+    },
+    [progressDayStartHour],
+  );
 
   const showBottomNav = [
     "home",
@@ -926,6 +956,7 @@ function AppContent() {
                     push("library");
                   }}
                   onOpenBenefits={() => push("benefits")}
+                  onToggleHabit={toggleHabit}
                 />
               )}
               {view === "benefits" && (
@@ -1304,6 +1335,7 @@ function AppContent() {
         {showShareModal && (
           <ProgressShareModal
             dailyCompletions={dailyCompletions}
+            dailyHabits={dailyHabits}
             progressDayStartHour={progressDayStartHour}
             language={selectedLang}
             onClose={() => setShowShareModal(false)}

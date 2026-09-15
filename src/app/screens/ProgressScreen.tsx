@@ -7,6 +7,7 @@ import type { AppLanguage, CategoryId, DailyCollectionCompletion } from "../type
 
 export function ProgressScreen({
   dailyCompletions,
+  dailyHabits = [],
   progressDayStartHour,
   calendarType,
   language,
@@ -15,6 +16,7 @@ export function ProgressScreen({
   onSelectCategory,
 }: {
   dailyCompletions: DailyCollectionCompletion[];
+  dailyHabits?: import("../types").DailyHabitCompletion[];
   progressDayStartHour: number;
   calendarType: "hijri" | "gregorian";
   language: AppLanguage;
@@ -32,11 +34,12 @@ export function ProgressScreen({
       <div className="relative z-10 w-full flex flex-col items-center">
         <Header title={t(language, "common.progress")} language={language} />
         <TodayRoutineGarden
-          summary={getGardenSummary(dailyCompletions, new Date(), progressDayStartHour)}
+          summary={getGardenSummary(dailyCompletions, dailyHabits, new Date(), progressDayStartHour)}
           language={language}
           hideTabs={false}
           calendarType={calendarType}
           dailyCompletions={dailyCompletions}
+          dailyHabits={dailyHabits}
           progressDayStartHour={progressDayStartHour}
           onOpenShareModal={onOpenShareModal}
           onSelectCategory={onSelectCategory}

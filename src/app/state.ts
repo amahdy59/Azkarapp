@@ -15,6 +15,8 @@ import {
   getProgressDayKey,
   mergeDailyCompletions,
   normalizeDailyCompletions,
+  mergeDailyHabitCompletions,
+  normalizeDailyHabitCompletions,
 } from "./progress";
 import { ALL_AZKAR, getAzkarByCategory } from "./content/azkar";
 import { CALCULATION_METHODS, DEFAULT_LOCATION } from "./content/prayerCalculation";
@@ -70,6 +72,7 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
   sessions: [],
   dailyCompletions: [],
   savedZikrIds: [],
+  dailyHabits: [],
 };
 
 function isLanguage(value: string): value is AppLanguage {
@@ -390,6 +393,7 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
   const dailyCompletions = Array.isArray(parsed.dailyCompletions)
     ? normalizeDailyCompletions(parsed.dailyCompletions)
     : deriveDailyCompletionsFromLegacySessions(sessions, progressDayStartHour);
+  const dailyHabits = Array.isArray(parsed.dailyHabits) ? normalizeDailyHabitCompletions(parsed.dailyHabits) : [];
 
   const currentDayKey = getProgressDayKey(new Date(), progressDayStartHour);
   const lastActiveDayKey = typeof parsed.lastActiveDayKey === "string" ? parsed.lastActiveDayKey : "";
@@ -482,6 +486,7 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
     completed,
     sessions,
     dailyCompletions,
+    dailyHabits,
     savedZikrIds: Array.isArray(parsed.savedZikrIds)
       ? dedupeSavedZikrIds(parsed.savedZikrIds)
       : dedupeSavedZikrIds(fallbackSavedZikrIds),
@@ -744,6 +749,7 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
               : safeBase.settings.progressDayStartHour,
           ),
     ),
+    dailyHabits: mergeDailyHabitCompletions(safeBase.dailyHabits ?? [], incoming.dailyHabits ?? []),
     savedZikrIds: dedupeSavedZikrIds([...(safeBase.savedZikrIds ?? []), ...(incoming.savedZikrIds ?? [])]),
   };
 }
@@ -757,6 +763,7 @@ export function clearPrivateAppData(state: AppStateSnapshot): AppStateSnapshot {
     completed: Object.fromEntries(CATEGORY_IDS.map((id) => [id, []])) as unknown as Record<CategoryId, string[]>,
     sessions: [],
     dailyCompletions: [],
+    dailyHabits: [],
     savedZikrIds: [],
   };
 }

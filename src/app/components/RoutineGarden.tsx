@@ -7,7 +7,7 @@ import { getGardenSummary, type GardenMilestoneId, type GardenSummary, type Grow
 import { ProgressDayView, ProgressWeekView, ProgressMonthView, ProgressYearView } from "./ProgressViews";
 import { TabList, tabPanelProps } from "./Tabs";
 import type { AppLanguage, CategoryId, DailyCollectionCompletion } from "../types";
-import { Zap } from "./icons";
+import { Droplets } from "./icons";
 
 // Re-exported so existing imports from RoutineGarden keep working after the split.
 export {
@@ -18,10 +18,21 @@ export {
   BudMark,
   PalmTreeMark,
   GoldenPalmMark,
-  PalmMark,
+  DropletMark,
+  SeedlingMark,
+  BranchMark,
+  OasisMark,
 } from "./GardenMarks";
 export { getGardenDateLabel } from "./gardenDateLabel";
-import { GoldenLeafMark, GreenLeafMark, PalmTreeMark } from "./GardenMarks";
+import {
+  DropletMark,
+  SeedlingMark,
+  BranchMark,
+  OasisMark,
+  GoldenLeafMark,
+  GreenLeafMark,
+  PalmTreeMark,
+} from "./GardenMarks";
 import { getGardenDateLabel } from "./gardenDateLabel";
 import { shiftCalendarDate } from "../calendarPeriods";
 
@@ -41,6 +52,7 @@ export function TodayRoutineGarden({
   onOpenShareModal: _onOpenShareModal,
   calendarType = "hijri",
   dailyCompletions = [],
+  dailyHabits = [],
   progressDayStartHour = 4,
   onSelectCategory,
   visibleCategoryIds,
@@ -53,6 +65,7 @@ export function TodayRoutineGarden({
   onOpenShareModal?: () => void;
   calendarType?: "hijri" | "gregorian";
   dailyCompletions?: DailyCollectionCompletion[];
+  dailyHabits?: import("../types").DailyHabitCompletion[];
   progressDayStartHour?: number;
   onSelectCategory?: (categoryId: CategoryId) => void;
 }) {
@@ -69,12 +82,11 @@ export function TodayRoutineGarden({
     () =>
       offset === 0 && activeTab === "day"
         ? initialSummary
-        : getGardenSummary(dailyCompletions, displayDate, progressDayStartHour),
-    [initialSummary, dailyCompletions, displayDate, offset, activeTab, progressDayStartHour],
+        : getGardenSummary(dailyCompletions, dailyHabits, displayDate, progressDayStartHour),
+    [initialSummary, dailyCompletions, dailyHabits, displayDate, offset, activeTab, progressDayStartHour],
   );
 
   const totalPalms = summary.lifetimePalms;
-  const streak = summary.currentPalmRhythm ?? summary.currentUsageStreak ?? 0;
 
   const dateLabel = getGardenDateLabel(displayDate, activeTab, offset, language, calendarType);
 
@@ -174,16 +186,17 @@ export function TodayRoutineGarden({
 
       {!hideTabs && (
         <div className="mb-4 flex items-center justify-around rounded-3xl border border-border bg-card px-3 py-3 shadow-sm">
-          <div className="flex items-center gap-1.5" title={t(language, "progress.dailyStreak")}>
-            <Zap
-              className={`h-[1.25rem] w-[1.25rem] ${streak > 0 ? "text-primary" : "text-muted-foreground/40"}`}
+          <div className="flex items-center gap-1.5" title={t(language, "progress.activeDays")}>
+            <Droplets
+              className={`h-[1.25rem] w-[1.25rem] ${summary.activeDaysLast7 > 0 ? "text-primary" : "text-muted-foreground/40"}`}
               strokeWidth={2.5}
               aria-hidden="true"
             />
             <span
-              className={`text-[0.875rem] font-black leading-tight ${streak > 0 ? "text-primary" : "text-muted-foreground/60"}`}
+              className={`text-[0.875rem] font-black leading-tight ${summary.activeDaysLast7 > 0 ? "text-primary" : "text-muted-foreground/60"}`}
             >
-              {formatNumerals(streak, language)} {t(language, "progress.days")}
+              {formatNumerals(summary.activeDaysLast7, language)} / {formatNumerals(7, language)}{" "}
+              {t(language, "progress.days")}
             </span>
           </div>
           <span className="h-4 w-px bg-border" />
@@ -264,7 +277,16 @@ export function SevenDayGarden({ summary, language }: { summary: GardenSummary; 
           >
             <span className="text-[0.875rem] font-bold text-foreground">{weekday}</span>
             <div className="flex items-center gap-2">
-              {day.isPalm ? (
+              {day.level === 5 ? (
+                <div
+                  role="img"
+                  className="flex size-9 items-center justify-center rounded-xl border border-sky-400/80 bg-sky-500/20 text-sky-500 shadow-2xs dark:bg-sky-500/25"
+                  title={t(language, "progress.oasisCompleted")}
+                  aria-label={t(language, "progress.oasisCompleted")}
+                >
+                  <OasisMark size={22} filled />
+                </div>
+              ) : day.level === 4 ? (
                 <div
                   role="img"
                   className="flex size-9 items-center justify-center rounded-xl border border-amber-400/80 bg-amber-500/20 text-amber-500 shadow-2xs dark:bg-amber-500/25"
@@ -273,14 +295,32 @@ export function SevenDayGarden({ summary, language }: { summary: GardenSummary; 
                 >
                   <PalmTreeMark size={22} filled />
                 </div>
-              ) : azkarCount > 0 ? (
+              ) : day.level === 3 ? (
                 <div
                   role="img"
-                  className="flex size-9 items-center justify-center rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400"
-                  title={t(language, "progress.inProgress")}
-                  aria-label={t(language, "progress.inProgress")}
+                  className="flex size-9 items-center justify-center rounded-xl border border-emerald-400/80 bg-emerald-500/20 text-emerald-500 shadow-2xs dark:bg-emerald-500/25"
+                  title={t(language, "progress.branchCompleted")}
+                  aria-label={t(language, "progress.branchCompleted")}
                 >
-                  <GoldenLeafMark size={20} filled />
+                  <BranchMark size={22} filled />
+                </div>
+              ) : day.level === 2 ? (
+                <div
+                  role="img"
+                  className="flex size-9 items-center justify-center rounded-xl border border-lime-400/80 bg-lime-500/20 text-lime-600 shadow-2xs dark:bg-lime-500/25"
+                  title={t(language, "progress.seedlingCompleted")}
+                  aria-label={t(language, "progress.seedlingCompleted")}
+                >
+                  <SeedlingMark size={22} filled />
+                </div>
+              ) : day.level === 1 ? (
+                <div
+                  role="img"
+                  className="flex size-9 items-center justify-center rounded-xl border border-blue-300/80 bg-blue-500/10 text-blue-500 dark:text-blue-400"
+                  title={t(language, "progress.dropletCompleted")}
+                  aria-label={t(language, "progress.dropletCompleted")}
+                >
+                  <DropletMark size={20} filled />
                 </div>
               ) : (
                 <div
@@ -289,7 +329,7 @@ export function SevenDayGarden({ summary, language }: { summary: GardenSummary; 
                   title={t(language, "progress.inactive")}
                   aria-label={t(language, "progress.inactive")}
                 >
-                  <GoldenLeafMark size={20} filled={false} />
+                  <DropletMark size={20} filled={false} />
                 </div>
               )}
             </div>

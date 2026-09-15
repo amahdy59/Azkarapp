@@ -81,7 +81,7 @@ describe("quiet garden progress", () => {
       { dayKey: "2026-07-18", category: "travel" as const, timeZone: "Africa/Cairo" },
       { dayKey: "2026-07-18", category: "home" as const, timeZone: "Africa/Cairo" },
     ];
-    const summary = getGardenSummary(records, now, 4);
+    const summary = getGardenSummary(records, [], now, 4);
     expect(summary.today.leafCount).toBe(1);
     expect(summary.today.extraLeafCount).toBe(2);
   });
@@ -130,7 +130,7 @@ describe("quiet garden progress", () => {
       }
     }
 
-    const summary = getGardenSummary(records, new Date(2026, 6, 18, 12), 4);
+    const summary = getGardenSummary(records, [], new Date(2026, 6, 18, 12), 4);
     expect(summary.activeDaysLast7).toBe(7);
     expect(summary.palmDaysLast7).toBe(7);
     expect(summary.lifetimePalms).toBe(8);
@@ -156,7 +156,7 @@ describe("quiet garden progress", () => {
       records.push({ dayKey: "2026-07-17", category, timeZone: "Africa/Cairo" });
     }
 
-    const summary = getGardenSummary(records, new Date(2026, 6, 18, 12), 4);
+    const summary = getGardenSummary(records, [], new Date(2026, 6, 18, 12), 4);
     expect(summary.currentPalmRhythm).toBe(2);
     expect(summary.messageKind).toBe("continue");
   });
@@ -195,7 +195,7 @@ describe("quiet garden progress", () => {
       { dayKey: "2026-07-17", category: "morning", timeZone: "Africa/Cairo" },
       { dayKey: "2026-07-18", category: "evening", timeZone: "Africa/Cairo" },
     ];
-    const summary = getGardenSummary(records, new Date(2026, 6, 18, 12), 4);
+    const summary = getGardenSummary(records, [], new Date(2026, 6, 18, 12), 4);
     expect(summary.currentUsageStreak).toBe(3);
   });
 

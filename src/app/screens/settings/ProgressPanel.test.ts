@@ -10,7 +10,7 @@ describe("ProgressPanel rolling intention", () => {
       { dayKey: "2026-07-15", category: "morning", timeZone: "Africa/Cairo" },
     ];
 
-    const summary = getGardenSummary(records, new Date(2026, 6, 17, 12), 4);
+    const summary = getGardenSummary(records, [], new Date(2026, 6, 17, 12), 4);
     expect(summary.activeDaysLast7).toBe(2);
     expect(summary.palmDaysLast7).toBe(0);
   });

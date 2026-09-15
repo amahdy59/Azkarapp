@@ -98,6 +98,14 @@ export interface DailyCollectionCompletion {
   subCategory?: string;
 }
 
+export type DailyHabitId = "active" | "quran_wird" | "mosque_3" | "mosque_5";
+
+export interface DailyHabitCompletion {
+  dayKey: string;
+  habit: DailyHabitId;
+  timeZone: string;
+}
+
 /** A reviewed Madani Mushaf page boundary for one complete surah. */
 export interface MushafPageRange {
   page: number;
@@ -222,4 +230,5 @@ export interface AppStateSnapshot {
   savedZikrIds: string[];
   /** Day key for the last active progress day to auto-reset routine sessions on a new day. */
   lastActiveDayKey?: string;
+  dailyHabits?: DailyHabitCompletion[];
 }

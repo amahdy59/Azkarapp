@@ -174,3 +174,120 @@ export function GoldenPalmMark({
 export function PalmMark({ className = "", size = 32 }: { className?: string; size?: number }) {
   return <PalmTreeMark className={className} size={size} />;
 }
+
+export function DropletMark({
+  filled = true,
+  className = "",
+  size = 24,
+}: {
+  filled?: boolean;
+  className?: string;
+  size?: number;
+}) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill="none"
+      className={className}
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path
+        d="M12 21a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 10.1 5 12 5 14a7 7 0 0 0 7 7z"
+        fill="#3B82F6"
+        fillOpacity={filled ? 0.95 : 0.22}
+        stroke="#2563EB"
+        strokeOpacity={filled ? 1 : 0.45}
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+export function SeedlingMark({
+  filled = true,
+  className = "",
+  size = 24,
+}: {
+  filled?: boolean;
+  className?: string;
+  size?: number;
+}) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill="none"
+      className={className}
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path
+        d="M12 22V10M12 10C8 10 4 11 4 15M12 10C16 10 20 9 20 5C20 5 16 5 12 10Z"
+        fill="#10B981"
+        fillOpacity={filled ? 0.95 : 0.22}
+        stroke="#059669"
+        strokeOpacity={filled ? 1 : 0.45}
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+export function BranchMark({
+  filled = true,
+  className = "",
+  size = 24,
+}: {
+  filled?: boolean;
+  className?: string;
+  size?: number;
+}) {
+  return <GoldenLeafMark filled={filled} className={className} size={size} />;
+}
+
+export function OasisMark({
+  filled = true,
+  className = "",
+  size = 32,
+}: {
+  filled?: boolean;
+  className?: string;
+  size?: number;
+}) {
+  return (
+    <div className={`relative ${className}`} style={{ width: size, height: size }}>
+      <PalmTreeMark size={size} filled={filled} color="#E4A84A" />
+      <svg
+        viewBox="0 0 56 53"
+        width={size}
+        height={size}
+        fill="none"
+        className="absolute inset-0 z-10"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path
+          d="M12 48c3 2 6 2 9 0s6-2 9 0 6 2 9 0 6-2 9 0"
+          stroke="#3B82F6"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M15 52c3 2 6 2 9 0s6-2 9 0 6 2 9 0"
+          stroke="#60A5FA"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </div>
+  );
+}

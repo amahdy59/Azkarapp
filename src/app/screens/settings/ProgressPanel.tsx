@@ -20,6 +20,7 @@ export function ProgressPanel({
   direction,
   sessions,
   dailyCompletions,
+  dailyHabits = [],
   quietProgressEnabled,
   progressDayStartHour,
   weeklyGoalDays,
@@ -32,6 +33,7 @@ export function ProgressPanel({
   direction: "ltr" | "rtl";
   sessions: StoredSession[];
   dailyCompletions: DailyCollectionCompletion[];
+  dailyHabits?: import("../../types").DailyHabitCompletion[];
   quietProgressEnabled: boolean;
   progressDayStartHour: number;
   weeklyGoalDays: number;
@@ -40,7 +42,7 @@ export function ProgressPanel({
   onWeeklyGoalDaysChange: (value: number) => void;
 }) {
   const now = new Date();
-  const summary = getGardenSummary(dailyCompletions, now, progressDayStartHour);
+  const summary = getGardenSummary(dailyCompletions, dailyHabits, now, progressDayStartHour);
   const completedSessions = sessions.filter((session) => session.isComplete);
   const completedGoalDays = Math.min(summary.activeDaysLast7, weeklyGoalDays);
   const isArabic = language === "ar";
@@ -78,6 +80,7 @@ export function ProgressPanel({
               summary={summary}
               language={language}
               dailyCompletions={dailyCompletions}
+              dailyHabits={dailyHabits}
               calendarType="hijri"
             />
 

@@ -5,16 +5,19 @@ import { ShareableCardModal } from "./ShareableCardModal";
 
 export function ProgressShareModal({
   dailyCompletions,
+  dailyHabits,
   progressDayStartHour,
   language,
   onClose,
 }: {
   dailyCompletions: DailyCollectionCompletion[];
+  dailyHabits?: import("../types").DailyHabitCompletion[];
   progressDayStartHour: number;
   language: AppLanguage;
   onClose: () => void;
 }) {
-  const summary = getGardenSummary(dailyCompletions, new Date(), progressDayStartHour);
+  const today = new Date();
+  const summary = getGardenSummary(dailyCompletions, dailyHabits ?? [], today, progressDayStartHour);
 
   return (
     <ShareableCardModal
