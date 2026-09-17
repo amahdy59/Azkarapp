@@ -14,6 +14,10 @@ import {
   GoldenLeafMark,
   GreenLeafMark,
   PalmTreeMark,
+  DropletMark,
+  SeedlingMark,
+  BranchMark,
+  OasisMark,
   TodayRoutineGarden,
   GardenMilestones,
   GrowthEventStatus,
@@ -99,6 +103,10 @@ describe("leaf and palm marks", () => {
     expect(() => render(<GoldenLeafMark />)).not.toThrow();
     expect(() => render(<GreenLeafMark />)).not.toThrow();
     expect(() => render(<PalmTreeMark />)).not.toThrow();
+    expect(() => render(<DropletMark />)).not.toThrow();
+    expect(() => render(<SeedlingMark />)).not.toThrow();
+    expect(() => render(<BranchMark />)).not.toThrow();
+    expect(() => render(<OasisMark />)).not.toThrow();
   });
 });
 

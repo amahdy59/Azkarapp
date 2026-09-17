@@ -133,6 +133,9 @@ const WirdBenefitsScreen = retryableScreen(() =>
 const FridayModeScreen = retryableScreen(() =>
   import("./screens/FridayModeScreen").then((module) => ({ default: module.FridayModeScreen })),
 );
+const OasisPreviewScreen = retryableScreen(() =>
+  import("./screens/OasisPreviewScreen").then((module) => ({ default: module.OasisPreviewScreen })),
+);
 const FridaySalawatScreen = retryableScreen(() =>
   import("./screens/FridaySalawatScreen").then((module) => ({ default: module.FridaySalawatScreen })),
 );
@@ -1389,6 +1392,7 @@ function AppContent({
                   onOpenQibla={() => push("qibla")}
                   onOpenMasbaha={() => push("custom_counter")}
                   onOpenSettings={() => push("settings")}
+                  onOpenOasisPreview={() => push("oasis_preview")}
                 />
               )}
               {view === "qibla" && (
@@ -1926,6 +1930,15 @@ function AppContent({
                   onBack={pop}
                   hapticFeedback={hapticFeedback}
                   reduceMotion={reduceMotion}
+                />
+              )}
+              {view === "oasis_preview" && (
+                <OasisPreviewScreen
+                  language={selectedLang}
+                  direction={layoutDirection}
+                  dailyCompletions={dailyCompletions}
+                  dayKey={getProgressDayKey(new Date(), progressDayStartHour)}
+                  onBack={pop}
                 />
               )}
             </Suspense>

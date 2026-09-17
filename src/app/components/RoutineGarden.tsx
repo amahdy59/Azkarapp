@@ -24,6 +24,10 @@ export {
   PalmTreeMark,
   GoldenPalmMark,
   PalmMark,
+  DropletMark,
+  SeedlingMark,
+  BranchMark,
+  OasisMark,
 } from "./GardenMarks";
 export { getGardenDateLabel } from "./gardenDateLabel";
 import { GoldenLeafMark, GreenLeafMark, PalmTreeMark } from "./GardenMarks";

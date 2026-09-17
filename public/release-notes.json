@@ -1,15 +1,15 @@
 {
-  "release": "2026-09-14.3",
+  "release": "2026-09-17",
   "ar": [
-    "يمكنك اختيار التلاوة العربية أو الترجمة الإنجليزية بوضوح، من دون انتقال تلقائي بين اللغتين عند غياب تسجيل.",
-    "يعرض قارئ الحاسوب قائمة الأذكار والتقدم بجانب النص، بينما يكشف العرض المختصر بقية النص نفسه عند التوسيع.",
-    "يمكن تمرير صفحة القبلة كاملة على الهاتف، وتعرض الشاشات الكبيرة خطوات عملية لاستخدام درجة الاتجاه في مكان الصلاة.",
-    "لم يعد الضغط على مفتاح المسافة يُظهر خطوطًا ذهبية حول نص الذكر على الحاسوب أو الهاتف."
+    "يمكنك الآن استكشاف تجربة \"واحة الأذكار\" التجريبية من قسم المزيد، وهي رحلة تُجسّد نموّ ممارستك اليومية من قطرة إلى واحة مزدهرة.",
+    "يمكنك رؤية مستوى نموك للأيام السبعة الماضية دفعةً واحدة في شريط الإيقاع الأسبوعي.",
+    "أُضيفت بطاقة الرفقاء اليومية التي تتيح تسجيل وِرد القرآن وصلاة الجماعة بنقرة واحدة.",
+    "يمنحك المحاكي التفاعلي إمكانية تجربة كل مراحل النمو الخمس قبل أن تعيشها في الواقع."
   ],
   "en": [
-    "Choose Arabic recitation or English translation clearly, without automatic switching when a recording is unavailable.",
-    "The desktop Reader now keeps the zikr list and progress beside the text, while compact expansion reveals more of the same text.",
-    "The full Qibla page is now scrollable on phones, and larger screens explain how to use the bearing to align a prayer space.",
-    "Pressing Space no longer draws gold lines around the zikr text on desktop or mobile."
+    "Explore the Spiritual Oasis Lab from the More tab — a visual journey that turns your daily practice into a growing garden, from a single droplet to a full oasis.",
+    "The 7-day rhythm strip shows your growth level for each of the past week's days at a glance.",
+    "A Daily Companions card lets you log your Quran recitation and mosque prayers in one tap.",
+    "The interactive simulator lets you preview all five growth tiers before you reach them."
   ]
 }

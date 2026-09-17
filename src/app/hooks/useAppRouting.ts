@@ -29,7 +29,14 @@ export async function loadLazyRouteCategory(categoryId: CategoryId) {
 export type NavTab = "home" | "azkar" | "progress" | "more";
 
 export function tabForView(view: View): NavTab {
-  if (view === "more" || view === "qibla" || view === "settings" || view === "custom_counter") return "more";
+  if (
+    view === "more" ||
+    view === "qibla" ||
+    view === "settings" ||
+    view === "custom_counter" ||
+    view === "oasis_preview"
+  )
+    return "more";
   if (view === "progress") return "progress";
   if (view === "library" || view === "category" || view === "reader") return "azkar";
   return "home";

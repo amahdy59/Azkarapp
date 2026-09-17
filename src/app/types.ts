@@ -113,7 +113,9 @@ export type View =
   | "settings"
   // Phase 4
   | "search"
-  | "custom_counter";
+  | "custom_counter"
+  // Experimental / Preview
+  | "oasis_preview";
 
 export type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -149,6 +151,14 @@ export interface DailyCollectionCompletion {
   /** Core earns the category leaf; Complete upgrades that same leaf. */
   completionLevel?: RoutineMode;
   subCategory?: string;
+}
+
+export type DailyHabitId = "active" | "quran_wird" | "mosque_3" | "mosque_5";
+
+export interface DailyHabitCompletion {
+  dayKey: string;
+  habit: DailyHabitId;
+  timeZone: string;
 }
 
 /** A reviewed Madani Mushaf page boundary for one complete surah. */
