@@ -37,13 +37,14 @@ test("Core Reader keeps the same stable zikr identity as its filtered routine", 
   await page.getByTestId("confirm-language").click();
   await page.getByTestId("onboarding-get-started").click();
   await page.getByTestId("continue-as-guest").click();
-  
-  // We are now on Home Screen. The Hero card has the mode selector.
+
+  // Go to Library and click Morning Azkar to enter Reader Screen reliably.
+  await page.getByTestId("nav-azkar").click();
+  await page.getByTestId("category-card-morning").click();
+
+  // Now we are in ReaderScreen. Change the mode.
   await page.getByTestId("routine-mode-filter").click();
-  await page.getByRole("menuitemradio", { name: /^Core / }).click();
-  
-  // Now click the CTA to start the reading session directly from Home
-  await page.getByRole("button", { name: /Start (Morning|Evening) Azkar/ }).click();
+  await page.getByRole("menuitemradio", { name: /^Core/ }).click();
 
   const reader = page.getByTestId("reader-screen");
   await expect(reader).toHaveAttribute("data-zikr-id", "m-hm-77m");
