@@ -113,10 +113,10 @@ function MainDhikrGroupCard({
       } ${
         isCompleted
           ? compact && onMedia
-            ? "border-primary/55 bg-primary/15 text-white shadow-raised"
+            ? "border-primary/55 bg-primary/15 text-white shadow-raised backdrop-blur-md"
             : "border-primary/55 bg-primary/10 text-foreground shadow-raised"
           : compact && onMedia
-            ? "border-white/10 bg-black/30 text-white shadow-raised hover:border-white/20 hover:bg-black/40"
+            ? "border-white/10 bg-black/30 text-white shadow-raised hover:border-white/20 hover:bg-black/40 backdrop-blur-md"
             : "border-border bg-background text-foreground shadow-raised hover:border-primary/45 hover:bg-muted"
       }`}
       // The recommendation is added to the name, never substituted for the

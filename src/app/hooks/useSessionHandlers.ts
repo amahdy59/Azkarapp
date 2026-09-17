@@ -123,10 +123,8 @@ export function useSessionHandlers({
   const openCategory = (catId: CategoryId) => {
     setIsRepeatSession(false);
     setRepeatCompleted(new Set());
-    setActiveCat(catId);
-    setActiveSubCategory(undefined);
     setActiveTab("azkar");
-    push("category");
+    resumeCategory(catId);
   };
 
   const openReader = (catId: CategoryId, i: number, modeOverride?: RoutineMode, subCat?: string) => {

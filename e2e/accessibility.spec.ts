@@ -278,13 +278,6 @@ test("visible core-flow controls meet the 44px product touch-target standard", a
   await expectVisibleInteractiveTargetsAtLeast44px(page, "Azkar Library");
 
   await page.getByTestId("category-card-morning").click();
-  // Every other step here waits for a landmark before measuring; this one did
-  // not, so it measured the Category screen mid-mount. That was the only step
-  // that ever failed: 3 of 36 repeats, always Category, always 0x0.
-  await expect(page.getByRole("button", { name: "Start Session", exact: true })).toBeVisible();
-  await expectVisibleInteractiveTargetsAtLeast44px(page, "Category");
-
-  await page.getByRole("button", { name: "Start Session", exact: true }).click();
   await expect(page.getByTestId("reader-screen")).toBeVisible();
   await expectVisibleInteractiveTargetsAtLeast44px(page, "Reader");
 

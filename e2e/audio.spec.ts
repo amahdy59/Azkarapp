@@ -25,10 +25,26 @@ test("unreviewed audio is unavailable and never autoplays", async ({ page }) => 
 });
 
 test("Core Reader keeps the same stable zikr identity as its filtered routine", async ({ page }) => {
-  await enterEnglishGuestMode(page);
+  await page.addInitScript(() => {
+    Object.defineProperty(window, "__audioPlayCalls", { value: 0, writable: true });
+    HTMLMediaElement.prototype.play = function () {
+      (window as unknown as { __audioPlayCalls: number }).__audioPlayCalls += 1;
+      return Promise.resolve();
+    };
+  });
+  await page.goto("/");
+  await page.getByTestId("language-option-en").click();
+  await page.getByTestId("confirm-language").click();
+  await page.getByTestId("onboarding-get-started").click();
+  await page.getByTestId("continue-as-guest").click();
+  
+  // We are now on Home Screen. The Hero card has the mode selector.
   await page.getByTestId("routine-mode-filter").click();
-  await page.getByRole("menuitemradio", { name: /^Core ·/ }).click();
-  await page.getByRole("button", { name: "Start Session", exact: true }).click();
+  await page.getByRole("menuitemradio", { name: /^Core / }).click();
+  
+  // Now click the CTA to start the reading session directly from Home
+  await page.getByRole("button", { name: /Start (Morning|Evening) Azkar/ }).click();
+
   const reader = page.getByTestId("reader-screen");
   await expect(reader).toHaveAttribute("data-zikr-id", "m-hm-77m");
   await page.getByRole("button", { name: "Next" }).click();

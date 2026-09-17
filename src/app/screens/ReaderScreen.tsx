@@ -19,18 +19,18 @@ import {
   Bookmark,
   ChevronLeft,
   ChevronRight,
-  ChevronDown,
-  ChevronUp,
   Volume2,
   VolumeX,
   Check,
   Minus,
   Plus,
+  ChevronDown,
+  SlidersHorizontal,
 } from "../components/icons";
 import { t } from "../i18n";
 import { shouldReduceMotion } from "../motionPreferences";
 import { CATEGORIES } from "../content/categories";
-import { getAzkarForMode } from "../content/azkar";
+import { getAzkarForMode, isRoutineCategory } from "../content/azkar";
 import { isLongSurah } from "../content/mushafPages";
 import type { AppLanguage, CategoryId, RoutineMode, MushafTextScale, TextSizeOption, ThemeMode, Zikr } from "../types";
 import { isPrayerName } from "../content/prayerTimes";
@@ -55,35 +55,23 @@ import { QuranWordMeaningSheet } from "../components/QuranWordMeaningSheet";
 import { QuranWordPopover } from "../components/QuranWordPopover";
 import { getQuranWordMeanings, type WordMeaningSelection } from "../content/quranWordMeanings";
 import { formatNumerals } from "../formatting";
+import { AzkarListItem } from "../components/AzkarListItem";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
 } from "../components/ui/dropdown-menu";
+import { AzkarListLayout } from "../components/AzkarListLayout";
 import { getReadingFontSize } from "./readingTypography";
 
 /**
  * Same three steps, same labels and same order as Settings → Accessibility →
- * Text size, because both controls write the one `textSize` setting. If these
- * drift apart the reader and Settings start describing the same value
- * differently.
- */
-const READER_TEXT_SIZE_OPTIONS: ReadonlyArray<{
-  value: TextSizeOption;
-  labelKey: string;
-  sampleClass: string;
-}> = [
-  { value: "small", labelKey: "settings.textSmall", sampleClass: "text-xs" },
-  { value: "medium", labelKey: "settings.medium", sampleClass: "text-subtitle" },
-  { value: "large", labelKey: "settings.textLarge", sampleClass: "text-lg" },
-];
-
 /** Shared ghost icon-button treatment for every control in the phone header row. */
 const READER_HEADER_ACTION_CLASS =
   "flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full text-foreground/80 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40";
@@ -152,6 +140,8 @@ export function ReaderScreen({
   onBack,
   onComplete,
   onUncomplete,
+  onRoutineModeChange,
+  onReset,
   onAdvance,
   onNext,
   onPrev,
@@ -171,6 +161,7 @@ export function ReaderScreen({
   englishAudioAvailable = false,
   onPlayEnglishAudio,
   onPlayAllAudio,
+  audioCoverage,
   onRepeatAudio,
   audioModeActive = false,
 }: {
@@ -195,6 +186,8 @@ export function ReaderScreen({
   onComplete: (idx: number) => void;
   /** Clears a recorded completion so an accidental tap is recoverable. */
   onUncomplete?: (idx: number) => void;
+  onRoutineModeChange?: (mode: RoutineMode) => void;
+  onReset?: () => void;
   onAdvance: (idx: number) => void;
   onNext: () => void;
   onPrev: () => void;
@@ -225,6 +218,7 @@ export function ReaderScreen({
   englishAudioAvailable?: boolean;
   onPlayEnglishAudio?: () => void;
   onPlayAllAudio?: () => void;
+  audioCoverage?: { available: number; unavailable: number; total: number };
   onRepeatAudio?: () => void;
   /** The shared player is currently responsible for this zikr's progress. */
   audioModeActive?: boolean;
@@ -242,7 +236,7 @@ export function ReaderScreen({
   const showSurahChrome = Boolean(z?.isSurah) && !longSurah;
   const [immersiveOpen, setImmersiveOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [expandedZikrIds, setExpandedZikrIds] = useState<Set<string>>(new Set());
+
   /**
    * The Mushaf position, held here rather than inside the view.
    *
@@ -774,8 +768,20 @@ export function ReaderScreen({
     </div>
   );
 
+  const toggleCompleteAll = (complete: boolean) => {
+    if (!azkarList) return;
+    azkarList.forEach((_, i) => {
+      if (complete) {
+        if (onComplete) onComplete(i);
+      } else {
+        if (onUncomplete) onUncomplete(i);
+      }
+    });
+  };
   const renderCollectionNavigator = () => {
     if (!onSelectZikr) return null;
+    const doneCount = collectionCompletedCount;
+    const isFullyComplete = doneCount === (azkarList?.length ?? 0);
 
     return (
       <nav
@@ -796,114 +802,119 @@ export function ReaderScreen({
               total: formatNumerals(azkar.length, language),
             })}
           </p>
+          <div className="mt-4 flex w-full flex-wrap items-center gap-2">
+            {isRoutineCategory(catId) && onRoutineModeChange && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    className="flex h-9 flex-1 items-center justify-between rounded-lg border border-input bg-card px-3 text-start text-sm font-bold text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    <span className="flex items-center gap-2">
+                      <SlidersHorizontal size={14} className="text-muted-foreground" />
+                      {routineMode === "complete" ? t(language, "category.complete") : t(language, "category.core")}
+                    </span>
+                    <ChevronDown size={14} className="text-muted-foreground opacity-50" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align={direction === "rtl" ? "end" : "start"} className="w-48">
+                  <DropdownMenuLabel>{t(language, "category.routineLength")}</DropdownMenuLabel>
+                  <DropdownMenuRadioGroup
+                    value={routineMode}
+                    onValueChange={(value) => onRoutineModeChange(value as RoutineMode)}
+                  >
+                    <DropdownMenuRadioItem value="complete">{t(language, "category.complete")}</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="core">{t(language, "category.core")}</DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
+            <button
+              type="button"
+              onClick={() => toggleCompleteAll(!isFullyComplete)}
+              className={`flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-lg px-4 text-sm font-bold shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                isFullyComplete
+                  ? "border border-success/30 bg-success/15 text-success hover:bg-success/20 dark:text-success"
+                  : "border border-primary bg-primary text-primary-foreground hover:bg-primary/90"
+              }`}
+              aria-label={
+                isFullyComplete ? t(language, "category.completedToggle") : t(language, "category.remainingToggle")
+              }
+            >
+              <Check size={16} strokeWidth={isFullyComplete ? 3 : 2} />
+              <span>{t(language, "category.completeAction")}</span>
+            </button>
+
+            {doneCount > 0 && (
+              <button
+                type="button"
+                onClick={onReset}
+                className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 rounded-lg border border-input bg-card px-3 text-sm font-bold text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                aria-label={t(language, "category.resetProgress")}
+                title={t(language, "category.resetProgress")}
+              >
+                <RotateCcw size={14} />
+              </button>
+            )}
+
+            {onPlayAllAudio && (
+              <button
+                type="button"
+                onClick={onPlayAllAudio}
+                className="flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/10 px-3 text-sm font-bold text-primary shadow-xs transition-[color,background-color,border-color,box-shadow,transform] hover:bg-primary/20 active:scale-95 dark:text-primary"
+                aria-label={t(language, "category.playAllAudio")}
+                title={
+                  audioCoverage
+                    ? `${t(language, "category.playAllAudio")}: ${audioCoverage.available}/${audioCoverage.total}`
+                    : t(language, "category.playAllAudio")
+                }
+              >
+                <Volume2 size={16} />
+                <span>
+                  {t(language, "category.playAll")}
+                  {audioCoverage
+                    ? ` • ${formatNumerals(audioCoverage.available, language)}/${formatNumerals(audioCoverage.total, language)}`
+                    : ""}
+                </span>
+              </button>
+            )}
+          </div>
         </div>
 
-        <ol className="min-h-0 flex-1 space-y-2 overflow-y-auto p-3">
-          {azkar.map((item, itemIndex) => {
-            const active = itemIndex === idx;
-            const completed = completedZikrIds.has(item.id);
-            const itemText = isArabic ? item.arabicText : item.translation;
-            const itemLabel = `${t(language, "reader.title", {
-              index: formatNumerals(itemIndex + 1, language),
-              total: formatNumerals(azkar.length, language),
-            })}${completed ? `, ${t(language, "reader.completed")}` : ""}`;
+        <div className="min-h-0 flex-1 overflow-y-auto p-3">
+          <AzkarListLayout
+            azkar={azkar}
+            completed={completedZikrIds}
+            catId={catId}
+            isMainRoutine={isRoutineCategory(catId)}
+            routineMode={routineMode}
+            language={language}
+            renderZikrCard={({ z, index }, isCompleted) => {
+              const active = index === idx;
+              const itemLabel = `${t(language, "reader.title", {
+                index: formatNumerals(index + 1, language),
+                total: formatNumerals(azkar.length, language),
+              })}${isCompleted ? `, ${t(language, "reader.completed")}` : ""}`;
 
-            const isSpecialSurah = item.isSurah && (item.id === "sajda" || item.id === "tabark" || item.surahNameEnglish?.toLowerCase() === "as-sajdah" || item.surahNameEnglish?.toLowerCase() === "al-mulk");
-            const isItemExpanded = expandedZikrIds.has(item.id);
-            const shouldClamp = !isItemExpanded && !isSpecialSurah;
-
-            return (
-              <li key={item.id}>
-                <div
-                  className={`flex min-h-14 w-full items-start gap-3 rounded-2xl border p-2.5 text-start transition-[color,background-color,border-color,box-shadow,transform] ${
-                    active
-                      ? "border-primary bg-primary/10 shadow-xs"
-                      : "border-border/50 bg-background/55 hover:border-primary/35 hover:bg-muted/70"
-                  }`}
-                >
-                  {/* Start Column: Number badge on top, checkmark indicator below */}
-                  <div className="flex flex-col items-center gap-1.5 shrink-0 pt-0.5 pointer-events-none">
-                    <span
-                      className={`flex size-8 shrink-0 items-center justify-center rounded-xl border text-sm font-extrabold ${
-                        active
-                          ? "border-primary bg-primary text-primary-foreground"
-                          : "border-border bg-muted text-foreground"
-                      }`}
-                      aria-hidden="true"
-                    >
-                      {formatNumerals(itemIndex + 1, language)}
-                    </span>
-                    <span
-                      className={`flex size-6 shrink-0 items-center justify-center rounded-full border ${
-                        completed
-                          ? "border-success bg-success text-white dark:text-primary-foreground shadow-xs"
-                          : "border-muted-foreground/40 text-transparent"
-                      }`}
-                      aria-hidden="true"
-                    >
-                      <Check size={13} strokeWidth={3} />
-                    </span>
-                  </div>
-
-                  <div 
-                    ref={active ? activeNavigatorItemRef : undefined}
-                    aria-current={active ? "step" : undefined}
-                    aria-label={itemLabel}
-                    className="min-w-0 flex-1 flex flex-col items-start cursor-pointer focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring rounded-lg" 
-                    role="button"
-                    tabIndex={0}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      onSelectZikr(itemIndex);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        onSelectZikr(itemIndex);
-                      }
-                    }}
-                  >
-                    <span
-                      className={`${isArabic ? "zikr-text" : "font-sans"} ${shouldClamp ? "line-clamp-2" : ""} text-label font-bold leading-6 text-foreground`}
-                      lang={isArabic ? "ar" : "en"}
-                      dir={direction}
-                    >
-                      {itemText}
-                    </span>
-                    <span className="mt-1 block text-xs font-semibold text-muted-foreground">
-                      {t(language, "category.repetitionInstruction", {
-                        count: formatNumerals(item.repetitionCount, language),
-                      })}
-                    </span>
-                  </div>
-                  
-                  {!isSpecialSurah && (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setExpandedZikrIds((prev) => {
-                          const next = new Set(prev);
-                          if (next.has(item.id)) {
-                            next.delete(item.id);
-                          } else {
-                            next.add(item.id);
-                          }
-                          return next;
-                        });
-                      }}
-                      className="p-1 shrink-0 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-full transition-colors"
-                      aria-label={isItemExpanded ? t(language, "common.collapse") : t(language, "common.expand")}
-                    >
-                      {isItemExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                    </button>
-                  )}
-                </div>
-              </li>
-            );
-          })}
-        </ol>
+              return (
+                <AzkarListItem
+                  key={z.id}
+                  z={z}
+                  index={index}
+                  isCardCompleted={isCompleted}
+                  language={language}
+                  isArabic={isArabic}
+                  direction={direction}
+                  isActive={active}
+                  activeRef={activeNavigatorItemRef}
+                  onClickText={onSelectZikr}
+                  ariaLabelOverride={itemLabel}
+                />
+              );
+            }}
+          />
+        </div>
       </nav>
     );
   };
@@ -1028,9 +1039,7 @@ export function ReaderScreen({
           drives the same app-wide setting Settings does, so the two can never
           disagree; changing it here also resizes the app's chrome. */}
       <div className="flex items-center justify-between px-3 py-2.5">
-        <span className="text-sm font-semibold text-foreground">
-          {t(language, "settings.textSize")}
-        </span>
+        <span className="text-sm font-semibold text-foreground">{t(language, "settings.textSize")}</span>
         <div className="flex items-center gap-2 bg-muted rounded-full p-1 border border-border/50">
           <button
             type="button"
@@ -1111,8 +1120,6 @@ export function ReaderScreen({
           {t(language, "reader.resetCounter")}
         </DropdownMenuItem>
       </DropdownMenuGroup>
-
-
 
       {/* Mobile only navigation shortcut */}
       {layout === "mobile" && (
@@ -1345,7 +1352,7 @@ export function ReaderScreen({
                         role="region"
                         tabIndex={0}
                         aria-label={t(language, "reader.readingText")}
-                        className={`reader-text-scroll h-full min-h-0 w-full overflow-y-auto ps-6 pe-7 py-4 outline-none focus-visible:outline-none focus:ring-0 [scrollbar-gutter:stable] ${
+                        className={`reader-text-scroll h-full min-h-0 w-full overflow-y-auto ps-6 pe-7 md:px-20 py-4 outline-none focus-visible:outline-none focus:ring-0 [scrollbar-gutter:stable] ${
                           justCompleted ? "zikr-step-exit" : "zikr-step-enter"
                         }`}
                       >

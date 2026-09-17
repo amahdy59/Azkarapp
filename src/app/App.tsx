@@ -732,7 +732,7 @@ function AppContent({
       if (isLazyRouteCategory(categoryId) && !(await hydrateRouteCategory(categoryId, "category"))) {
         setActiveCat(categoryId);
         setActiveTab("azkar");
-        push("category");
+        push("reader");
         return;
       }
       openCategoryWithoutHydration(categoryId);
@@ -1674,6 +1674,32 @@ function AppContent({
                       return;
                     }
                     markComplete(i);
+                  }}
+                  onRoutineModeChange={(mode) => {
+                    if (isRoutineCategory(activeCat)) {
+                      setRoutineModes((previous) => ({ ...previous, [activeCat]: mode }));
+                    }
+                  }}
+                  onReset={() => {
+                    if (fridayDuaFlow && activeCat === "comprehensive_duas") {
+                      showConfirm(
+                        t(selectedLang, "category.resetConfirmTitle"),
+                        t(selectedLang, "category.resetConfirm"),
+                        t(selectedLang, "common.reset"),
+                        t(selectedLang, "common.cancel"),
+                        resetFridayDuaProgress,
+                        true,
+                      );
+                    } else {
+                      showConfirm(
+                        t(selectedLang, "category.resetConfirmTitle"),
+                        t(selectedLang, "category.resetConfirm"),
+                        t(selectedLang, "common.reset"),
+                        t(selectedLang, "common.cancel"),
+                        () => handleResetCategory(activeCat, activeSubCategory),
+                        true,
+                      );
+                    }
                   }}
                   onUncomplete={(i) => {
                     if (fridayDuaFlow && activeCat === "comprehensive_duas") {

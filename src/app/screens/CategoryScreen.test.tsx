@@ -99,7 +99,7 @@ describe("CategoryScreen comprehensive-dua session", () => {
     );
 
     const summary = screen.getByTestId("zikr-summary-0");
-    const disclosure = summary.closest("button");
+    const disclosure = summary.closest("[role='button']");
     expect(disclosure).toHaveAttribute("aria-expanded", "false");
     expect(summary).toHaveClass("line-clamp-2");
 
@@ -134,7 +134,7 @@ describe("CategoryScreen comprehensive-dua session", () => {
     );
 
     const summary = screen.getByTestId("zikr-summary-0");
-    const disclosure = summary.closest("button");
+    const disclosure = summary.closest("[role='button']");
     const checkmarkBtn = screen.getAllByRole("button", { name: /غير مكتمل/ })[0];
 
     expect(disclosure).toHaveAttribute("aria-expanded", "false");
@@ -161,7 +161,7 @@ describe("CategoryScreen comprehensive-dua session", () => {
 
     // Find the long surah (As-Sajda is at index 6 in before_sleep)
     const surahSummary = screen.getByTestId("zikr-summary-6");
-    const disclosure = surahSummary.closest("button");
+    const disclosure = surahSummary.closest("[role='button']");
     await user.click(disclosure!);
 
     expect(screen.getByText("اقرأ السورة كاملة في المصحف")).toBeInTheDocument();

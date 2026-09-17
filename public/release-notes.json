@@ -1,13 +1,15 @@
 {
-  "release": "2026-09-17.2",
+  "release": "2026-09-17.4",
   "ar": [
-    "قراءة الأذكار الطويلة أصبحت أسهل مع إمكانية طي وفتح النصوص لقراءة سريعة ومريحة.",
-    "قائمة الخيارات الإضافية والإعدادات أصبحت أكثر ترتيبًا في قائمة جانبية لسهولة الوصول إليها.",
-    "واجهة متابعة الصلاة الآن تتمدد لتملأ الشاشة بتصميم زجاجي أنيق ومريح للعين عند عدم وجود محتوى إضافي."
+    "النقر على أي مجموعة من الشاشة الرئيسية ينقلك الآن مباشرة إلى وضع القراءة، مما يجعل البدء أسرع بكثير.",
+    "تتميز القائمة الجانبية في وضع القراءة الآن ببطاقات قابلة للطي وزر جديد 'تشغيل جميع الصوتيات' لتسهيل التصفح والاستماع.",
+    "تم تحسين المظهر البصري للشاشة الرئيسية وإضافة تأثير الزجاج غير الشفاف إلى قسم 'وردك اليوم'.",
+    "بطاقة التهنئة بإتمام الورد اليومي ستظهر الآن مرة واحدة فقط في اليوم بدلاً من تكرار ظهورها عند العودة للشاشة الرئيسية."
   ],
   "en": [
-    "Reading long adhkar is now easier with the ability to collapse and expand texts for a quicker, more comfortable view.",
-    "The More Options and Settings menu has been reorganized into a streamlined sidebar for easier access.",
-    "The prayer tracking panel now expands to fill the screen with a beautiful, refined glassmorphic design when there's no additional content."
+    "Clicking a collection from the Home screen now drops you directly into reading mode, making it much faster to start.",
+    "The sidebar in Reader mode now features expanding cards and a new 'Play All Audio' button for easier navigation and listening.",
+    "Improved the Home screen visuals, adding a consistent frosted glass effect to the 'Today's Wird' section.",
+    "The congratulations card for completing a daily routine will now only appear once per day instead of showing up every time you return to the Home screen."
   ]
 }

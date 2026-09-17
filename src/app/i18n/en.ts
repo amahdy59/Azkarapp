@@ -878,6 +878,7 @@ const en = {
     playAllAudio: "Play All Audio",
     playAll: "Play All",
     resetProgress: "Reset Progress",
+    completeAction: "Mark as complete",
     completedToggle: "Completed — tap to uncheck",
     remainingToggle: "Not completed — tap to check",
     counterProgress: "{current} of {total}",

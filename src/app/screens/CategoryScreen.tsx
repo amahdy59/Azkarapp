@@ -1,9 +1,9 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useState } from "react";
-import { BookOpen, Check, ChevronDown, RotateCcw, SlidersHorizontal, Volume2 } from "../components/icons";
+import { Check, ChevronDown, RotateCcw, SlidersHorizontal, Volume2 } from "../components/icons";
 import { t } from "../i18n";
 import "../../styles/animations/ZikrAnimations.css";
-import { CATEGORIES, isOccasionalCategory } from "../content/categories";
+import { CATEGORIES } from "../content/categories";
 import {
   getAzkarByCategory,
   getAzkarForMode,
@@ -12,13 +12,13 @@ import {
   getRoutineStepCount,
   isRoutineCategory,
 } from "../content/azkar";
-import { isLongSurah } from "../content/mushafPages";
-import type { CategoryId, RitualGroupId, RoutineMode, Zikr, ZikrGroupId } from "../types";
+import type { CategoryId, RitualGroupId, RoutineMode, Zikr } from "../types";
 import { Header } from "../components/LayoutShells";
 import { ProgressBar } from "../components/ProgressBar";
 import { formatNumerals, numeralFontFamily } from "../formatting";
 import { ScreenContainer } from "../components/ScreenContainer";
-import { getLocalizedPreferredTiming, hasSpecificRecommendedTiming } from "../content/localizedZikr";
+import { AzkarListLayout } from "../components/AzkarListLayout";
+import { AzkarListItem } from "../components/AzkarListItem";
 import { isPrayerName } from "../content/prayerTimes";
 import {
   DropdownMenu,
@@ -71,48 +71,8 @@ export function CategoryScreen({
   const completedItemCount = azkar.filter((zikr) => completed.has(zikr.id)).length;
   const resumeIdx = azkar.findIndex((zikr) => !completed.has(zikr.id));
   const language = isArabic ? "ar" : "en";
-  const isOccasional = isOccasionalCategory(catId);
   const [preparationSteps, setPreparationSteps] = useState<Set<string>>(() => new Set());
   const orderedAzkar = azkar.map((z, i) => ({ z, index: i }));
-  const groupedAzkar = orderedAzkar.reduce<Array<{ groupId: ZikrGroupId; items: typeof orderedAzkar }>>(
-    (groups, item) => {
-      const groupId = item.z.groupId ?? "ask";
-      const existing = groups.find((group) => group.groupId === groupId);
-      if (existing) {
-        existing.items.push(item);
-      } else {
-        groups.push({ groupId, items: [item] });
-      }
-      return groups;
-    },
-    [],
-  );
-
-  const groupLabel = (groupId: ZikrGroupId) => {
-    const keys: Record<ZikrGroupId, string> = {
-      begin: "category.groupBegin",
-      quran_protection: "category.groupQuranProtection",
-      dua_protection: "category.groupDuaProtection",
-      renew: "category.groupRenew",
-      ask: "category.groupAsk",
-      repeat: "category.groupRepeat",
-      prepare: "category.prepareTitle",
-      settle: "category.groupSettle",
-      final: "category.groupFinal",
-    };
-    return t(language, keys[groupId]);
-  };
-
-  const ritualChunks = (items: typeof orderedAzkar) =>
-    items.reduce<Array<{ ritualGroupId?: RitualGroupId; items: typeof orderedAzkar }>>((chunks, item) => {
-      const previous = chunks.at(-1);
-      if (item.z.ritualGroupId && previous?.ritualGroupId === item.z.ritualGroupId) {
-        previous.items.push(item);
-      } else {
-        chunks.push({ ritualGroupId: item.z.ritualGroupId, items: [item] });
-      }
-      return chunks;
-    }, []);
 
   const stepProgress = (items: typeof orderedAzkar) => {
     const rituals = new Map<RitualGroupId, typeof orderedAzkar>();
@@ -138,7 +98,7 @@ export function CategoryScreen({
 
   const renderZikrCard = ({ z, index }: { z: Zikr; index: number }, isCardCompleted: boolean) => {
     return (
-      <ZikrAccordion
+      <AzkarListItem
         key={z.id}
         z={z}
         index={index}
@@ -430,225 +390,17 @@ export function CategoryScreen({
             </section>
           )}
 
-          {isOccasional ? (
-            <div className="flex flex-col gap-2">
-              {azkar.map((z, index) => renderZikrCard({ z, index }, completed.has(z.id)))}
-            </div>
-          ) : isMainRoutine ? (
-            <div className="mb-6 flex flex-col gap-6">
-              {groupedAzkar.map((group) => {
-                const groupProgress = stepProgress(group.items);
-                return (
-                  <section key={group.groupId} aria-labelledby={`group-${group.groupId}`}>
-                    <div className="mb-3 flex items-center justify-between gap-3 px-1">
-                      <h2 id={`group-${group.groupId}`} className="text-sm font-extrabold text-foreground">
-                        {groupLabel(group.groupId)}
-                      </h2>
-                      <span
-                        className="text-xs font-bold text-muted-foreground"
-                        style={{ fontFamily: numeralFontFamily(language) }}
-                      >
-                        {t(language, "category.groupProgress", {
-                          done: formatNumerals(groupProgress.done, language),
-                          total: formatNumerals(groupProgress.total, language),
-                        })}
-                      </span>
-                    </div>
-
-                    <div className="flex flex-col gap-2">
-                      {ritualChunks(group.items).map((chunk, chunkIndex) =>
-                        chunk.ritualGroupId ? (
-                          <div
-                            key={chunk.ritualGroupId}
-                            className={`rounded-3xl border ${routineMode === "core" ? "border-border/30 bg-card overflow-hidden" : "border-primary/25 bg-primary/5 p-3"}`}
-                            data-ritual-group={chunk.ritualGroupId}
-                          >
-                            <div className={`mb-3 px-1 ${routineMode === "core" ? "p-3 pb-0" : ""}`}>
-                              <h3 className="text-label font-extrabold text-primary">
-                                {t(
-                                  language,
-                                  chunk.ritualGroupId === "three_quls"
-                                    ? "category.ritualThreeQuls"
-                                    : "category.ritualTasbih",
-                                )}
-                              </h3>
-                              <p className="mt-1 text-xs font-semibold leading-5 text-muted-foreground">
-                                {t(
-                                  language,
-                                  chunk.ritualGroupId === "three_quls" && catId === "before_sleep"
-                                    ? "category.ritualSleepInstruction"
-                                    : chunk.ritualGroupId === "three_quls"
-                                      ? "category.ritualThreeQulsInstruction"
-                                      : "category.ritualTasbihInstruction",
-                                )}
-                              </p>
-                            </div>
-                            <div
-                              className={`flex flex-col ${routineMode === "core" ? "gap-0 divide-y divide-border/20" : "gap-3"}`}
-                            >
-                              {chunk.items.map(({ z, index }) => renderZikrCard({ z, index }, completed.has(z.id)))}
-                            </div>
-                          </div>
-                        ) : (
-                          <div
-                            key={`${group.groupId}-${chunkIndex}`}
-                            className={`flex flex-col ${routineMode === "core" ? "gap-0 divide-y divide-border/20 rounded-2xl border border-border/30 bg-card overflow-hidden" : "gap-2"}`}
-                          >
-                            {chunk.items.map(({ z, index }) => renderZikrCard({ z, index }, completed.has(z.id)))}
-                          </div>
-                        ),
-                      )}
-                    </div>
-                  </section>
-                );
-              })}
-            </div>
-          ) : (
-            <div
-              className={`mb-6 flex flex-col ${routineMode === "core" ? "gap-0 divide-y divide-border/20 rounded-2xl border border-border/30 bg-card overflow-hidden" : "gap-2"}`}
-            >
-              {orderedAzkar.map(({ z, index }) => renderZikrCard({ z, index }, completed.has(z.id)))}
-            </div>
-          )}
+          <AzkarListLayout
+            azkar={azkar}
+            completed={completed}
+            catId={catId}
+            isMainRoutine={isMainRoutine}
+            routineMode={routineMode}
+            language={language}
+            renderZikrCard={({ z, index }, isCompleted) => renderZikrCard({ z, index }, isCompleted)}
+          />
         </div>
       </div>
     </ScreenContainer>
-  );
-}
-
-function ZikrAccordion({
-  z,
-  index,
-  isCardCompleted,
-  language,
-  isArabic,
-  direction,
-  onToggleZikr,
-}: {
-  z: Zikr;
-  index: number;
-  isCardCompleted: boolean;
-  language: "ar" | "en";
-  isArabic: boolean;
-  direction: "ltr" | "rtl";
-  onToggleZikr?: (i: number) => void;
-}) {
-  const [expanded, setExpanded] = useState(false);
-  const targetCount = z.repetitionCount;
-  const showTiming = hasSpecificRecommendedTiming(z);
-  const timingText = getLocalizedPreferredTiming(z, language);
-  const longSurah = isLongSurah(z);
-
-  const toggleExpanded = () => setExpanded((current) => !current);
-
-  return (
-    <div
-      id={`zikr-card-${index}`}
-      className={`flex w-full flex-col rounded-2xl border border-border/40 bg-card/60 transition-[opacity,filter,background-color] hover:bg-card ${
-        isCardCompleted ? "opacity-60 grayscale" : ""
-      }`}
-    >
-      <div className="flex w-full items-start gap-3 p-3" dir={direction}>
-        {/* Start column: Number badge on top, checkmark button directly beneath it */}
-        <div className="flex flex-col items-center gap-1.5 shrink-0 pt-0.5">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-primary bg-primary text-sm font-extrabold text-primary-foreground shadow-xs">
-            {formatNumerals(index + 1, language)}
-          </span>
-
-          {onToggleZikr && (
-            <button
-              type="button"
-              onClick={(event) => {
-                event.stopPropagation();
-                onToggleZikr(index);
-              }}
-              className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full transition-transform active:scale-90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-              aria-label={
-                isCardCompleted
-                  ? t(language, "category.completedToggle", { defaultValue: "Completed — tap to uncheck" })
-                  : t(language, "category.remainingToggle", { defaultValue: "Not completed — tap to check" })
-              }
-            >
-              {isCardCompleted ? (
-                <span className="flex size-7 items-center justify-center rounded-full bg-success text-white dark:text-primary-foreground shadow-xs">
-                  <Check size={16} strokeWidth={3} />
-                </span>
-              ) : (
-                <span className="size-6 rounded-full border-2 border-muted-foreground/50 hover:border-primary transition-colors" />
-              )}
-            </button>
-          )}
-        </div>
-
-        {/* Center: Text area (clicks toggle expand/collapse) */}
-        <button
-          type="button"
-          aria-expanded={expanded}
-          aria-controls={`zikr-details-${index}`}
-          onClick={toggleExpanded}
-          className="min-w-0 flex-1 text-start cursor-pointer rounded-lg outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-          dir={direction}
-        >
-          {expanded && isArabic && z.hasSeekRefuge && (
-            <span className="zikr-text mb-1 block text-label font-bold text-primary/90">
-              أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ
-            </span>
-          )}
-          {expanded && isArabic && (z.hasBasmalah || z.isSurah) && (
-            <span className="zikr-text mb-1 block text-subtitle font-bold text-primary/90">
-              بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
-            </span>
-          )}
-          <span
-            data-testid={`zikr-summary-${index}`}
-            className={`${isArabic ? "zikr-text" : "font-sans"} block text-title font-bold leading-[1.85] text-foreground whitespace-pre-line ${
-              expanded ? (longSurah ? "max-h-64 overflow-y-auto pe-1" : "") : "line-clamp-2"
-            }`}
-            lang={isArabic ? "ar" : "en"}
-            dir={isArabic ? "rtl" : "ltr"}
-          >
-            {isArabic ? z.arabicText : z.translation}
-          </span>
-          {expanded && longSurah && (
-            <span className="mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-primary">
-              <BookOpen size={14} />
-              {t(language, "reader.readFullSurahInMushaf")}
-            </span>
-          )}
-          <span className="mt-1 block text-xs font-semibold text-muted-foreground">
-            {t(language, "category.repetitionInstruction", { count: formatNumerals(targetCount, language) })}
-          </span>
-        </button>
-
-        {/* End column: Interactive chevron button to toggle expand/collapse */}
-        <button
-          type="button"
-          aria-expanded={expanded}
-          aria-controls={`zikr-details-${index}`}
-          aria-label={expanded ? t(language, "reader.collapseZikr") : t(language, "reader.expandZikr")}
-          onClick={toggleExpanded}
-          className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/70 transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-        >
-          <ChevronDown size={20} className={`transition-transform duration-200 ${expanded ? "rotate-180" : ""}`} />
-        </button>
-      </div>
-
-      {expanded && showTiming && timingText && (
-        <div
-          id={`zikr-details-${index}`}
-          className="flex flex-col items-start gap-3 border-t border-border/20 bg-muted/10 px-4 pb-4 pt-3"
-        >
-          <div
-            className="flex items-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-3.5 py-2 text-label font-extrabold text-primary"
-            dir={isArabic ? "rtl" : "ltr"}
-          >
-            <span aria-hidden="true" className="shrink-0">
-              💡
-            </span>
-            <span className="leading-snug">{timingText}</span>
-          </div>
-        </div>
-      )}
-    </div>
   );
 }

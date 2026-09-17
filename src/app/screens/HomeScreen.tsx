@@ -33,6 +33,8 @@ import type {
   QuranWirdPlan,
 } from "../types";
 
+const seenCompletions = new Set<string>();
+
 /**
  * The three time-of-day routines listed in Home's "وردك اليوم" card. After-prayer
  * azkar are deliberately absent: they get their own card. Progress still counts
@@ -483,11 +485,18 @@ export function HomeScreen({
   const [completionCardState, setCompletionCardState] = useState<"hidden" | "visible" | "exiting">("hidden");
 
   useEffect(() => {
-    if (!isComplete) {
+    if (!isComplete || !reminderInfo.categoryId) {
       setCompletionCardState("hidden");
       return;
     }
 
+    const completionId = `${todayKey}-${reminderInfo.categoryId}`;
+    if (seenCompletions.has(completionId)) {
+      setCompletionCardState("hidden");
+      return;
+    }
+
+    seenCompletions.add(completionId);
     setCompletionCardState("visible");
     const exitTimer = window.setTimeout(() => setCompletionCardState("exiting"), 3_600);
     const hideTimer = window.setTimeout(() => setCompletionCardState("hidden"), 4_100);
@@ -495,7 +504,7 @@ export function HomeScreen({
       window.clearTimeout(exitTimer);
       window.clearTimeout(hideTimer);
     };
-  }, [isComplete, reminderInfo.categoryId]);
+  }, [isComplete, reminderInfo.categoryId, todayKey]);
 
   const showCompletionCard = isComplete && completionCardState !== "hidden";
   const showRoutineCard = !isComplete;
