@@ -1,4 +1,3 @@
-import os from "node:os";
 import { defineConfig, devices } from "@playwright/test";
 
 /**
@@ -42,7 +41,7 @@ export default defineConfig({
    * pass in isolation; a gate that fails at random is worth less than the
    * minutes it saves.
    */
-  workers: Math.max(2, Math.min(3, Math.floor(os.cpus().length / 4))),
+  workers: 1,
   retries: process.env.CI ? 2 : 1,
   reporter: process.env.CI ? "github" : "list",
   use: {
