@@ -1325,6 +1325,12 @@ const ar = {
     seedlingCompleted: "فسيلة نامية",
     branchCompleted: "غصن مكتمل",
     oasisCompleted: "واحة مزدهرة",
+    oasisStageTitle: "مرحلة الواحة الروحية",
+    oasisLevelBadge: "المستوى {level} من ٥",
+    stageCompletion: "اكتمال المرحلة",
+    nextMilestonePrefix: "للارتقاء للمستوى التالي: ",
+    sevenDayRhythm: "إيقاع الأيام السبعة",
+    today: "اليوم",
   },
   more: {
     title: "المزيد",

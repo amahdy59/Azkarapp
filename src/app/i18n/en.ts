@@ -1312,6 +1312,12 @@ const en = {
     seedlingCompleted: "Seedling Sprouted",
     branchCompleted: "Branch Grown",
     oasisCompleted: "Oasis Reached",
+    oasisStageTitle: "Daily Oasis Stage",
+    oasisLevelBadge: "Level {level} of 5",
+    stageCompletion: "Stage Completion",
+    nextMilestonePrefix: "Next milestone: ",
+    sevenDayRhythm: "7-Day Rhythm",
+    today: "Today",
   },
   more: {
     title: "More",

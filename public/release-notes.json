@@ -1,15 +1,15 @@
 {
-  "release": "2026-09-17",
+  "release": "2026-09-17.1",
   "ar": [
-    "يمكنك الآن استكشاف تجربة \"واحة الأذكار\" التجريبية من قسم المزيد، وهي رحلة تُجسّد نموّ ممارستك اليومية من قطرة إلى واحة مزدهرة.",
-    "يمكنك رؤية مستوى نموك للأيام السبعة الماضية دفعةً واحدة في شريط الإيقاع الأسبوعي.",
-    "أُضيفت بطاقة الرفقاء اليومية التي تتيح تسجيل وِرد القرآن وصلاة الجماعة بنقرة واحدة.",
-    "يمنحك المحاكي التفاعلي إمكانية تجربة كل مراحل النمو الخمس قبل أن تعيشها في الواقع."
+    "أُدمجت واحة الأذكار في شاشة التقدم لتعرض مرحلة نموك اليومية وشريط إيقاع الأيام السبعة بوضوح.",
+    "يمكنك تسجيل وِرد القرآن الكريم وصلوات المسجد مباشرةً من بطاقة الرفاق اليومية في شاشة التقدم.",
+    "تُحفظ عادات الرفاق اليومية وتتزامن تلقائيًا دون اتصال بالإنترنت مع الحفاظ على خصوصية بياناتك.",
+    "تحسين استجابة وتناسق شاشة التقدم ومتابعة الصلوات على مختلف الشاشات والأجهزة."
   ],
   "en": [
-    "Explore the Spiritual Oasis Lab from the More tab — a visual journey that turns your daily practice into a growing garden, from a single droplet to a full oasis.",
-    "The 7-day rhythm strip shows your growth level for each of the past week's days at a glance.",
-    "A Daily Companions card lets you log your Quran recitation and mosque prayers in one tap.",
-    "The interactive simulator lets you preview all five growth tiers before you reach them."
+    "Integrated the Spiritual Oasis progression and 7-day rhythm strip directly into the Progress screen.",
+    "Track your Quran wird and mosque prayers in one tap through the Daily Companions card on the Progress screen.",
+    "Daily Companion habits now save and merge reliably offline while preserving your data privacy.",
+    "Enhanced the responsiveness and visual consistency of progress tracking and prayer cards across all devices."
   ]
 }

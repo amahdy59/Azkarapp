@@ -3,6 +3,8 @@ import type {
   AppStateSnapshot,
   CategoryId,
   ColorBlindSupport,
+  DailyHabitCompletion,
+  DailyHabitId,
   LocationSettings,
   MushafTextScale,
   MushafTheme,
@@ -80,6 +82,41 @@ function mergePrayerTracking(base: PrayerTrackingRecord[], incoming: PrayerTrack
   return [...byKey.values()];
 }
 
+const VALID_HABIT_IDS = new Set<DailyHabitId>(["active", "quran_wird", "mosque_3", "mosque_5"]);
+
+/** Keeps well-formed daily companion habit records (Quran wird, mosque prayers). */
+export function normalizeDailyHabits(value: unknown): DailyHabitCompletion[] {
+  if (!Array.isArray(value)) return [];
+  const byKey = new Map<string, DailyHabitCompletion>();
+  for (const entry of value) {
+    if (!entry || typeof entry !== "object") continue;
+    const record = entry as Partial<DailyHabitCompletion>;
+    if (typeof record.dayKey !== "string" || !isProgressDayKey(record.dayKey)) continue;
+    if (typeof record.habit !== "string" || !VALID_HABIT_IDS.has(record.habit as DailyHabitId)) continue;
+    const timeZone = typeof record.timeZone === "string" ? record.timeZone : "UTC";
+    const key = record.habit.startsWith("mosque_") ? `${record.dayKey}:mosque` : `${record.dayKey}:${record.habit}`;
+    byKey.set(key, {
+      dayKey: record.dayKey,
+      habit: record.habit as DailyHabitId,
+      timeZone,
+    });
+  }
+  return [...byKey.values()];
+}
+
+/** Merges habit records with later incoming records taking precedence. */
+export function mergeDailyHabits(
+  base: DailyHabitCompletion[] = [],
+  incoming: DailyHabitCompletion[] = [],
+): DailyHabitCompletion[] {
+  const byKey = new Map<string, DailyHabitCompletion>();
+  for (const record of [...base, ...incoming]) {
+    const key = record.habit.startsWith("mosque_") ? `${record.dayKey}:mosque` : `${record.dayKey}:${record.habit}`;
+    byKey.set(key, record);
+  }
+  return [...byKey.values()];
+}
+
 export const DEFAULT_APP_STATE: AppStateSnapshot = {
   settings: {
     language: "en",
@@ -132,6 +169,7 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
   sessions: [],
   dailyCompletions: [],
   prayerTracking: [],
+  dailyHabits: [],
   savedZikrIds: [],
   khatmahPage: 1,
   mushafTheme: "follow-app",
@@ -781,6 +819,7 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
     sessions,
     dailyCompletions,
     prayerTracking,
+    dailyHabits: normalizeDailyHabits(parsed.dailyHabits),
     savedZikrIds: Array.isArray(parsed.savedZikrIds)
       ? dedupeSavedZikrIds(parsed.savedZikrIds)
       : dedupeSavedZikrIds(fallbackSavedZikrIds),
@@ -1129,6 +1168,10 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
       normalizePrayerTracking(safeBase.prayerTracking),
       normalizePrayerTracking(incoming.prayerTracking),
     ),
+    dailyHabits: mergeDailyHabits(
+      normalizeDailyHabits(safeBase.dailyHabits),
+      normalizeDailyHabits(incoming.dailyHabits),
+    ),
     savedZikrIds: dedupeSavedZikrIds([...(safeBase.savedZikrIds ?? []), ...(incoming.savedZikrIds ?? [])]),
     khatmahPage: incoming.khatmahPage ?? safeBase.khatmahPage ?? 1,
     mushafTheme: normalizeMushafTheme(incoming.mushafTheme ?? safeBase.mushafTheme),
@@ -1174,6 +1217,8 @@ export function clearPrivateAppData(state: AppStateSnapshot): AppStateSnapshot {
     completed: Object.fromEntries(CATEGORY_IDS.map((id) => [id, []])) as unknown as Record<CategoryId, string[]>,
     sessions: [],
     dailyCompletions: [],
+    prayerTracking: [],
+    dailyHabits: [],
     savedZikrIds: [],
     khatmahPage: 1,
     mushafBookmarks: [],

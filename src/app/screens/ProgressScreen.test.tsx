@@ -1,0 +1,136 @@
+import { describe, it, expect, vi } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { ProgressScreen } from "./ProgressScreen";
+import type { DailyCollectionCompletion, DailyHabitCompletion } from "../types";
+
+describe("ProgressScreen", () => {
+  const mockCompletions: DailyCollectionCompletion[] = [
+    { dayKey: "2026-08-01", category: "morning", timeZone: "UTC" },
+    { dayKey: "2026-08-01", category: "evening", timeZone: "UTC" },
+    { dayKey: "2026-08-01", category: "before_sleep", timeZone: "UTC" },
+  ];
+
+  const mockDailyHabits: DailyHabitCompletion[] = [
+    { dayKey: "2026-08-01", habit: "quran_wird", timeZone: "UTC" },
+    { dayKey: "2026-08-01", habit: "mosque_3", timeZone: "UTC" },
+  ];
+
+  it("renders Arabic version with Oasis Stage Card and 7-day rhythm strip in Day view", () => {
+    const onOpenShareModal = vi.fn();
+    render(
+      <ProgressScreen
+        dailyCompletions={mockCompletions}
+        dailyHabits={mockDailyHabits}
+        progressDayStartHour={3}
+        calendarType="gregorian"
+        language="ar"
+        direction="rtl"
+        onOpenShareModal={onOpenShareModal}
+      />,
+    );
+
+    // Oasis Stage Card
+    expect(screen.getByTestId("oasis-stage-card")).toBeInTheDocument();
+    expect(screen.getByText("مرحلة الواحة الروحية")).toBeInTheDocument();
+    expect(screen.getByRole("progressbar")).toBeInTheDocument();
+
+    // 7-Day Rhythm Strip
+    expect(screen.getByText("إيقاع الأيام السبعة")).toBeInTheDocument();
+
+    // Daily Companions Card
+    expect(screen.getByTestId("daily-companions-card")).toBeInTheDocument();
+    expect(screen.getByText("الرفاق اليومية")).toBeInTheDocument();
+
+    // After-prayer Adhkar section
+    expect(screen.getByTestId("progress-after-prayer")).toBeInTheDocument();
+  });
+
+  it("renders English version with proper headings and LTR layout", () => {
+    const onOpenShareModal = vi.fn();
+    render(
+      <ProgressScreen
+        dailyCompletions={mockCompletions}
+        dailyHabits={mockDailyHabits}
+        progressDayStartHour={3}
+        calendarType="gregorian"
+        language="en"
+        direction="ltr"
+        onOpenShareModal={onOpenShareModal}
+      />,
+    );
+
+    expect(screen.getByTestId("oasis-stage-card")).toBeInTheDocument();
+    expect(screen.getByText("Daily Oasis Stage")).toBeInTheDocument();
+    expect(screen.getByText("7-Day Rhythm")).toBeInTheDocument();
+    expect(screen.getByTestId("daily-companions-card")).toBeInTheDocument();
+    expect(screen.getByText("Daily Companions")).toBeInTheDocument();
+  });
+
+  it("invokes onToggleDailyHabit and onCycleMosqueHabit when daily companions are clicked", () => {
+    const onToggleDailyHabit = vi.fn();
+    const onCycleMosqueHabit = vi.fn();
+
+    render(
+      <ProgressScreen
+        dailyCompletions={mockCompletions}
+        dailyHabits={mockDailyHabits}
+        progressDayStartHour={3}
+        calendarType="gregorian"
+        language="ar"
+        direction="rtl"
+        onOpenShareModal={vi.fn()}
+        onToggleDailyHabit={onToggleDailyHabit}
+        onCycleMosqueHabit={onCycleMosqueHabit}
+      />,
+    );
+
+    // Toggle Quran Wird
+    const quranButton = screen.getByRole("button", { name: /ورد القرآن/ });
+    fireEvent.click(quranButton);
+    expect(onToggleDailyHabit).toHaveBeenCalledTimes(1);
+    expect(onToggleDailyHabit).toHaveBeenCalledWith(expect.any(String), "quran_wird");
+
+    // Cycle Mosque Prayers
+    const mosqueButton = screen.getByRole("button", { name: /صلوات المسجد/ });
+    fireEvent.click(mosqueButton);
+    expect(onCycleMosqueHabit).toHaveBeenCalledTimes(1);
+    expect(onCycleMosqueHabit).toHaveBeenCalledWith(expect.any(String));
+  });
+
+  it("switches tabs between Day, Week, Month, and Year", () => {
+    render(
+      <ProgressScreen
+        dailyCompletions={mockCompletions}
+        dailyHabits={mockDailyHabits}
+        progressDayStartHour={3}
+        calendarType="gregorian"
+        language="ar"
+        direction="rtl"
+        onOpenShareModal={vi.fn()}
+      />,
+    );
+
+    // Switch to Week tab
+    const weekTab = screen.getByRole("tab", { name: "أسبوع" });
+    fireEvent.click(weekTab);
+    expect(weekTab).toHaveAttribute("aria-selected", "true");
+    // Oasis stage card is exclusive to Day view
+    expect(screen.queryByTestId("oasis-stage-card")).not.toBeInTheDocument();
+
+    // Switch to Month tab
+    const monthTab = screen.getByRole("tab", { name: "شهر" });
+    fireEvent.click(monthTab);
+    expect(monthTab).toHaveAttribute("aria-selected", "true");
+
+    // Switch to Year tab
+    const yearTab = screen.getByRole("tab", { name: "سنة" });
+    fireEvent.click(yearTab);
+    expect(yearTab).toHaveAttribute("aria-selected", "true");
+
+    // Switch back to Day tab
+    const dayTab = screen.getByRole("tab", { name: "يوم" });
+    fireEvent.click(dayTab);
+    expect(dayTab).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByTestId("oasis-stage-card")).toBeInTheDocument();
+  });
+});

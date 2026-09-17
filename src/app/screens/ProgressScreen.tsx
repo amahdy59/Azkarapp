@@ -1,9 +1,9 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { Header } from "../components/LayoutShells";
 import { TodayRoutineGarden } from "../components/RoutineGarden";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { t } from "../i18n";
-import { getDailyPathStatus } from "../dailyPath";
+import { getDailyPathStatus, wasPrayedAtMosque } from "../dailyPath";
 import { getGardenSummary, getProgressDayKey } from "../progress";
 
 import { TabList } from "../components/Tabs";
@@ -18,10 +18,23 @@ import { PrayerTrackerStats } from "../components/PrayerTrackerStats";
 import { FridayProgressStats } from "../components/FridayProgressStats";
 
 import { getFridaySummary } from "../fridaySummary";
+import { formatNumerals } from "../formatting";
+import {
+  calculateOasisLevel,
+  deriveOasisRoutinesFromCompletions,
+  OASIS_LEVEL_DETAILS,
+  type GardenLevel,
+  type OasisHabits,
+} from "../oasis/oasisModel";
+import { DropletMark, SeedlingMark, BranchMark, PalmTreeMark, OasisMark } from "../components/GardenMarks";
+import { DailyCompanionsCard } from "../components/DailyCompanionsCard";
+import { Sparkles } from "../components/icons";
 import type {
   AppLanguage,
   CategoryId,
   DailyCollectionCompletion,
+  DailyHabitCompletion,
+  DailyHabitId,
   LocationSettings,
   PrayerName,
   PrayerTrackingRecord,
@@ -31,6 +44,29 @@ import type {
 /** The wird is the three time-of-day routines. After-prayer adhkar are tracked
  *  per prayer in their own section below, the same split Home uses. */
 const WIRD_CATEGORY_IDS = ["morning", "evening", "before_sleep"] as const satisfies readonly CategoryId[];
+
+function renderTierMark(level: GardenLevel, size = 32) {
+  switch (level) {
+    case 1:
+      return <DropletMark size={size} color="var(--primary)" />;
+    case 2:
+      return <SeedlingMark size={size} color="var(--success)" />;
+    case 3:
+      return <BranchMark size={size} />;
+    case 4:
+      return <PalmTreeMark size={size} />;
+    case 5:
+      return <OasisMark size={size} />;
+    default:
+      return (
+        <div
+          className="rounded-full border-2 border-dashed border-border"
+          style={{ width: size * 0.7, height: size * 0.7 }}
+          aria-hidden="true"
+        />
+      );
+  }
+}
 
 export function ProgressScreen({
   dailyCompletions,
@@ -42,12 +78,15 @@ export function ProgressScreen({
   onSelectCategory,
   locationSettings,
   prayerTracking = [],
+  dailyHabits = [],
   wirdHistory,
   quranWirdPlan,
   quranWirdDailyGoals,
   mosquePrayerGoal,
   dailyPathStartDayKey,
   onTogglePrayerTracking,
+  onToggleDailyHabit,
+  onCycleMosqueHabit,
   onPrayerResume,
   onOpenFriday,
 }: {
@@ -60,23 +99,19 @@ export function ProgressScreen({
   onSelectCategory?: (categoryId: CategoryId) => void;
   locationSettings?: LocationSettings;
   prayerTracking?: readonly PrayerTrackingRecord[];
+  dailyHabits?: readonly DailyHabitCompletion[];
   wirdHistory?: Record<string, number[]>;
   quranWirdPlan?: QuranWirdPlan;
   quranWirdDailyGoals?: Record<string, number>;
   mosquePrayerGoal?: number;
   dailyPathStartDayKey?: string;
   onTogglePrayerTracking?: (prayer: PrayerName, field: PrayerTrackingField, next: boolean) => void;
+  onToggleDailyHabit?: (dayKey: string, habit: DailyHabitId) => void;
+  onCycleMosqueHabit?: (dayKey: string) => void;
   onPrayerResume?: (prayer: PrayerName) => void;
   onOpenFriday?: () => void;
 }) {
-  // Ticking, not sampled once per mount: this screen is one people leave open,
-  // and a frozen clock left the prayer row framing Fajr and Dhuhr all evening
-  // and writing ticks to the previous day after midnight.
   const now = useNow();
-  /* Crossing midnight leaves the cached API times pointing at yesterday. The
-     offline calculation covers the new day on its own, so nothing is ever
-     blank; this only replaces it with the fetched times, the same way Home
-     does — Progress used to depend on Home having been opened first. */
 
   const [activeTab, setActiveTab] = useState<"day" | "week" | "month" | "year">("day");
   const [offset, setOffset] = useState(0);
@@ -92,8 +127,6 @@ export function ProgressScreen({
 
   const prayerCardModels = buildPrayerCardModels(now, language, locationSettings);
 
-  /* The same verdict Home uses. Two screens deriving palms by different rules
-     would disagree about the same day, which is worse than either rule. */
   const judgeDay = useCallback(
     (dayKey: string) => {
       const status = getDailyPathStatus({
@@ -118,7 +151,94 @@ export function ProgressScreen({
       wirdHistory,
     ],
   );
+
   const fridaySummary = getFridaySummary();
+
+  // Current day key for Oasis evaluation
+  const currentDayKey = getProgressDayKey(displayDate, progressDayStartHour);
+  const oasisRoutines = deriveOasisRoutinesFromCompletions(dailyCompletions, currentDayKey);
+  const dayHabits = (dailyHabits ?? []).filter((h) => h.dayKey === currentDayKey);
+
+  const quranWirdDone =
+    (wirdHistory?.[currentDayKey]?.length ?? 0) > 0 || dayHabits.some((h) => h.habit === "quran_wird");
+
+  const mosqueAttendanceCount = prayerTracking.filter((r) => r.dayKey === currentDayKey && wasPrayedAtMosque(r)).length;
+
+  const mosqueHabit = dayHabits.find((h) => h.habit.startsWith("mosque_"))?.habit as
+    "mosque_3" | "mosque_5" | undefined;
+  const resolvedMosquePrayers: "mosque_3" | "mosque_5" | null =
+    mosqueHabit ?? (mosqueAttendanceCount >= 5 ? "mosque_5" : mosqueAttendanceCount >= 3 ? "mosque_3" : null);
+
+  const activeHabit =
+    dayHabits.some((h) => h.habit === "active") ||
+    oasisRoutines.morning ||
+    oasisRoutines.evening ||
+    oasisRoutines.beforeSleep ||
+    oasisRoutines.afterPrayerCount > 0;
+
+  const oasisHabits: OasisHabits = {
+    quranWird: quranWirdDone,
+    mosquePrayers: resolvedMosquePrayers,
+    active: activeHabit,
+  };
+
+  const oasisLevel = calculateOasisLevel(oasisRoutines, oasisHabits);
+  const levelDetails = OASIS_LEVEL_DETAILS[oasisLevel];
+
+  // 7-day progression history ending on displayDate
+  const weekDaysStatus = useMemo(() => {
+    const days: Array<{
+      date: Date;
+      dayKey: string;
+      level: GardenLevel;
+      dayLabel: string;
+      isToday: boolean;
+    }> = [];
+
+    const todayKey = getProgressDayKey(now, progressDayStartHour);
+
+    const weekdayKeys = [
+      "progress.weekdaySunday",
+      "progress.weekdayMonday",
+      "progress.weekdayTuesday",
+      "progress.weekdayWednesday",
+      "progress.weekdayThursday",
+      "progress.weekdayFriday",
+      "progress.weekdaySaturday",
+    ] as const;
+
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(displayDate);
+      d.setDate(d.getDate() - i);
+      const dKey = getProgressDayKey(d, progressDayStartHour);
+      const routines = deriveOasisRoutinesFromCompletions(dailyCompletions, dKey);
+      const hRecords = (dailyHabits ?? []).filter((h) => h.dayKey === dKey);
+      const qDone = (wirdHistory?.[dKey]?.length ?? 0) > 0 || hRecords.some((h) => h.habit === "quran_wird");
+      const mCount = prayerTracking.filter((r) => r.dayKey === dKey && wasPrayedAtMosque(r)).length;
+      const mHab = hRecords.find((h) => h.habit.startsWith("mosque_"))?.habit as "mosque_3" | "mosque_5" | undefined;
+      const mRes = mHab ?? (mCount >= 5 ? "mosque_5" : mCount >= 3 ? "mosque_3" : null);
+      const lvl = calculateOasisLevel(routines, {
+        quranWird: qDone,
+        mosquePrayers: mRes,
+        active: routines.morning || routines.evening || routines.beforeSleep || routines.afterPrayerCount > 0,
+      });
+
+      const dayOfWeek = d.getDay();
+      const isToday = dKey === todayKey;
+      const dayKeyTranslation = weekdayKeys[dayOfWeek] ?? "progress.weekdaySunday";
+      const dayLabel = isToday ? t(language, "progress.today") : t(language, dayKeyTranslation);
+
+      days.push({
+        date: d,
+        dayKey: dKey,
+        level: lvl,
+        dayLabel,
+        isToday,
+      });
+    }
+    return days;
+  }, [displayDate, progressDayStartHour, dailyCompletions, dailyHabits, wirdHistory, prayerTracking, now, language]);
+
   return (
     <ScreenContainer
       dir={direction}
@@ -126,9 +246,6 @@ export function ProgressScreen({
       className="relative px-page py-4 overflow-y-auto page-content-center outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
       screenName={t(language, "common.progress")}
     >
-      {/* Capped at the same 80rem measure the day/week/month views use internally.
-          Without it the page container's 90rem let the tabs, summary strip, and
-          after-prayer card run 51px wider per side than the charts they frame. */}
       <div className="relative z-10 mx-auto w-full max-w-[80rem] flex flex-col items-center">
         <Header title={t(language, "common.progress")} language={language} />
 
@@ -201,80 +318,184 @@ export function ProgressScreen({
           </div>
         </div>
 
-        <TodayRoutineGarden
-          summary={
-            offset === 0 && activeTab === "day"
-              ? getGardenSummary(dailyCompletions, now, progressDayStartHour, judgeDay)
-              : getGardenSummary(dailyCompletions, displayDate, progressDayStartHour, judgeDay)
-          }
-          language={language}
-          hideTabs={true}
-          calendarType={calendarType}
-          dailyCompletions={dailyCompletions}
-          onOpenShareModal={onOpenShareModal}
-          onSelectCategory={onSelectCategory}
-          visibleCategoryIds={WIRD_CATEGORY_IDS}
-          onMedia={false}
-          activeTab={activeTab}
-          displayDate={displayDate}
-        />
-
-        <>
-          {/* After-prayer adhkar are tracked per prayer, not as one routine, so
-            they get their own section rather than a fourth tile inside the
-            wird card — the same separation Home makes. */}
+        {/* Oasis Stage Hero & 7-Day Rhythm (Day view) */}
+        {activeTab === "day" && (
           <section
-            data-testid="progress-after-prayer"
-            dir={direction}
-            className="mt-4 w-full overflow-hidden rounded-3xl border border-border bg-card text-foreground shadow-raised"
+            data-testid="oasis-stage-card"
+            className="w-full mb-5 overflow-hidden rounded-3xl border border-border bg-card text-foreground shadow-raised transition-all"
+            dir={isArabic ? "rtl" : "ltr"}
+            aria-labelledby="oasis-stage-heading"
           >
-            <div className="border-b border-primary/40 bg-gradient-to-b from-muted/45 to-transparent px-4 py-4 text-start sm:px-6">
-              <h2 className="text-lg font-black leading-tight text-foreground" dir="auto">
-                {t(language, "progress.postPrayerAzkar")}
-              </h2>
+            <div className="border-b border-border/60 bg-gradient-to-b from-muted/40 to-transparent p-5 sm:p-6">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3.5">
+                  <div className="flex size-12 sm:size-14 items-center justify-center rounded-2xl border border-border/80 bg-muted/30 shadow-sm shrink-0">
+                    {renderTierMark(oasisLevel, 36)}
+                  </div>
+                  <div>
+                    <span className="text-micro font-black uppercase tracking-wider text-muted-foreground block">
+                      {t(language, "progress.oasisStageTitle")}
+                    </span>
+                    <h2 id="oasis-stage-heading" className="text-title font-black text-foreground leading-tight">
+                      {isArabic ? levelDetails.nameArabic : levelDetails.name}
+                    </h2>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary/10 px-3.5 py-1 text-sm font-black text-primary shrink-0">
+                  <span>
+                    {t(language, "progress.oasisLevelBadge", { level: formatNumerals(oasisLevel, language) })}
+                  </span>
+                </div>
+              </div>
+
+              <p className="mt-3 text-caption font-semibold leading-relaxed text-muted-foreground" dir="auto">
+                {isArabic ? levelDetails.descriptionArabic : levelDetails.description}
+              </p>
+
+              {/* Progress Bar towards next milestone */}
+              <div className="mt-4">
+                <div className="flex items-center justify-between text-micro font-bold text-muted-foreground mb-1.5">
+                  <span>{t(language, "progress.stageCompletion")}</span>
+                  <span>{formatNumerals(levelDetails.progressPercent, language)}%</span>
+                </div>
+                <div
+                  role="progressbar"
+                  aria-valuenow={levelDetails.progressPercent}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label={isArabic ? levelDetails.nameArabic : levelDetails.name}
+                  className="h-2.5 w-full overflow-hidden rounded-full bg-muted"
+                >
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-success to-primary transition-all duration-500"
+                    style={{ width: `${levelDetails.progressPercent}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Next Milestone Hint */}
+              <div className="mt-3 flex items-start gap-2 rounded-2xl border border-primary/20 bg-primary/5 p-3 text-xs font-semibold text-foreground">
+                <Sparkles className="size-4 shrink-0 text-primary mt-0.5" aria-hidden="true" />
+                <span dir="auto">
+                  <strong className="font-black text-primary">{t(language, "progress.nextMilestonePrefix")}</strong>
+                  {isArabic ? levelDetails.nextMilestoneArabic : levelDetails.nextMilestone}
+                </span>
+              </div>
             </div>
-            <div className="py-4">
-              {activeTab === "day" ? (
-                <PrayerTrackerCards
-                  models={prayerCardModels}
-                  language={language}
-                  direction={direction}
-                  records={prayerTracking}
-                  dayKey={getProgressDayKey(now, progressDayStartHour)}
-                  onToggle={onTogglePrayerTracking ?? (() => undefined)}
-                  onOpen={(prayer) => {
-                    if (prayer) onPrayerResume?.(prayer);
-                  }}
-                />
-              ) : (
-                <PrayerTrackerStats
-                  records={prayerTracking}
-                  activeTab={activeTab}
-                  displayDate={displayDate}
-                  language={language}
-                  calendarType={calendarType}
-                />
-              )}
+
+            {/* 7-Day Rhythm Strip */}
+            <div className="bg-card px-4 py-3 sm:px-6">
+              <span className="text-micro font-bold uppercase tracking-wider text-muted-foreground block mb-2">
+                {t(language, "progress.sevenDayRhythm")}
+              </span>
+              <div className="grid grid-cols-7 gap-1.5 sm:gap-2 text-center" role="list">
+                {weekDaysStatus.map((day) => (
+                  <div
+                    key={day.dayKey}
+                    role="listitem"
+                    className={`flex flex-col items-center justify-center rounded-2xl p-1.5 sm:p-2 transition-all ${
+                      day.isToday
+                        ? "border-2 border-primary bg-primary/10 shadow-sm"
+                        : "border border-border/40 bg-muted/20 hover:bg-muted/40"
+                    }`}
+                  >
+                    <span className="text-micro font-bold text-muted-foreground">{day.dayLabel}</span>
+                    <div className="my-1 flex size-8 sm:size-9 items-center justify-center">
+                      {renderTierMark(day.level, 24)}
+                    </div>
+                    <span className="text-micro font-black text-foreground">
+                      {formatNumerals(day.level, language)}★
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           </section>
+        )}
 
-          {activeTab === "day" ? (
-            <FridayProgressCard
-              summary={fridaySummary}
+        {/* Wird Routines */}
+        <div className="w-full mb-5">
+          <TodayRoutineGarden
+            summary={
+              activeTab === "day" && offset === 0
+                ? getGardenSummary(dailyCompletions, now, progressDayStartHour, judgeDay)
+                : getGardenSummary(dailyCompletions, displayDate, progressDayStartHour, judgeDay)
+            }
+            language={language}
+            hideTabs={true}
+            calendarType={calendarType}
+            dailyCompletions={dailyCompletions}
+            onOpenShareModal={onOpenShareModal}
+            onSelectCategory={onSelectCategory}
+            visibleCategoryIds={WIRD_CATEGORY_IDS}
+            onMedia={false}
+            activeTab={activeTab}
+            displayDate={displayDate}
+          />
+        </div>
+
+        {/* Daily Companions (Day view) */}
+        {activeTab === "day" && (
+          <div className="w-full mb-5">
+            <DailyCompanionsCard
               language={language}
-              direction={direction}
-              onOpen={onOpenFriday}
+              quranWird={quranWirdDone}
+              mosquePrayers={resolvedMosquePrayers}
+              onToggleQuranWird={() => onToggleDailyHabit?.(currentDayKey, "quran_wird")}
+              onCycleMosquePrayers={() => onCycleMosqueHabit?.(currentDayKey)}
             />
-          ) : (
-            <FridayProgressStats
-              activeTab={activeTab}
-              displayDate={displayDate}
-              language={language}
-              calendarType={calendarType}
-              direction={direction}
-            />
-          )}
-        </>
+          </div>
+        )}
+
+        {/* After-prayer Adhkar section */}
+        <section
+          data-testid="progress-after-prayer"
+          dir={direction}
+          className="w-full mb-5 overflow-hidden rounded-3xl border border-border bg-card text-foreground shadow-raised"
+        >
+          <div className="border-b border-primary/40 bg-gradient-to-b from-muted/45 to-transparent px-4 py-4 text-start sm:px-6">
+            <h2 className="text-lg font-black leading-tight text-foreground" dir="auto">
+              {t(language, "progress.postPrayerAzkar")}
+            </h2>
+          </div>
+          <div className="py-4">
+            {activeTab === "day" ? (
+              <PrayerTrackerCards
+                models={prayerCardModels}
+                language={language}
+                direction={direction}
+                records={prayerTracking}
+                dayKey={currentDayKey}
+                onToggle={onTogglePrayerTracking ?? (() => undefined)}
+                onOpen={(prayer) => {
+                  if (prayer) onPrayerResume?.(prayer);
+                }}
+              />
+            ) : (
+              <PrayerTrackerStats
+                records={prayerTracking}
+                activeTab={activeTab}
+                displayDate={displayDate}
+                language={language}
+                calendarType={calendarType}
+              />
+            )}
+          </div>
+        </section>
+
+        {/* Friday Card / Stats */}
+        {activeTab === "day" ? (
+          <FridayProgressCard summary={fridaySummary} language={language} direction={direction} onOpen={onOpenFriday} />
+        ) : (
+          <FridayProgressStats
+            activeTab={activeTab}
+            displayDate={displayDate}
+            language={language}
+            calendarType={calendarType}
+            direction={direction}
+          />
+        )}
       </div>
     </ScreenContainer>
   );

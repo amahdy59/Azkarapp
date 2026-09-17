@@ -8,6 +8,7 @@ import type {
   AppStateSnapshot,
   CategoryId,
   ColorBlindSupport,
+  DailyHabitId,
   LocationSettings,
   ReminderSettings,
   RoutineMode,
@@ -296,6 +297,7 @@ function AppContent({
   );
   const [dailyCompletions, setDailyCompletions] = useState(initialState.dailyCompletions);
   const [prayerTracking, setPrayerTracking] = useState(initialState.prayerTracking);
+  const [dailyHabits, setDailyHabits] = useState(initialState.dailyHabits ?? []);
   const [khatmahPage, setKhatmahPage] = useState(() => quranPage ?? initialState.khatmahPage ?? 1);
 
   useEffect(() => {
@@ -422,6 +424,36 @@ function AppContent({
     },
     [progressDayStartHour],
   );
+
+  const handleToggleDailyHabit = useCallback((dayKey: string, habit: DailyHabitId) => {
+    setDailyHabits((current) => {
+      const records = current ?? [];
+      const exists = records.some((r) => r.dayKey === dayKey && r.habit === habit);
+      if (exists) {
+        return records.filter((r) => !(r.dayKey === dayKey && r.habit === habit));
+      }
+      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+      return [...records, { dayKey, habit, timeZone }];
+    });
+  }, []);
+
+  const handleCycleMosqueHabit = useCallback((dayKey: string) => {
+    setDailyHabits((current) => {
+      const records = current ?? [];
+      const existingMosque = records.find((r) => r.dayKey === dayKey && r.habit.startsWith("mosque_"));
+      const withoutMosque = records.filter((r) => !(r.dayKey === dayKey && r.habit.startsWith("mosque_")));
+      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+
+      if (!existingMosque) {
+        return [...withoutMosque, { dayKey, habit: "mosque_3", timeZone }];
+      }
+      if (existingMosque.habit === "mosque_3") {
+        return [...withoutMosque, { dayKey, habit: "mosque_5", timeZone }];
+      }
+      return withoutMosque;
+    });
+  }, []);
+
   const [lastGrowthEvent, setLastGrowthEvent] = useState<GrowthEvent | null>(null);
   const [completed, setCompleted] = useState<Record<CategoryId, Set<string>>>(() =>
     resetStaleCompletedCollections(
@@ -577,6 +609,7 @@ function AppContent({
       sessions,
       dailyCompletions,
       prayerTracking,
+      dailyHabits,
       savedZikrIds: [...savedZikrIds].sort(),
       khatmahPage,
       mushafTheme,
@@ -624,6 +657,7 @@ function AppContent({
       sessions,
       dailyCompletions,
       prayerTracking,
+      dailyHabits,
       savedZikrIds,
       khatmahPage,
       mushafTheme,
@@ -805,6 +839,7 @@ function AppContent({
     // or synced state from an earlier version — has no prayerTracking. The
     // type says otherwise, but restore data does not obey the type.
     setPrayerTracking(state.prayerTracking ?? []);
+    setDailyHabits(state.dailyHabits ?? []);
     setCompleted(
       resetStaleCompletedCollections(
         toCompletedSets(state.completed),
@@ -1439,6 +1474,9 @@ function AppContent({
                   locationSettings={locationSettings}
                   prayerTracking={prayerTracking}
                   onTogglePrayerTracking={handleTogglePrayerTracking}
+                  dailyHabits={dailyHabits}
+                  onToggleDailyHabit={handleToggleDailyHabit}
+                  onCycleMosqueHabit={handleCycleMosqueHabit}
                   onOpenFriday={() => push("friday")}
                   wirdHistory={wirdHistory}
                   quranWirdPlan={quranWirdPlan}

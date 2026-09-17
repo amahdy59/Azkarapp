@@ -630,4 +630,37 @@ describe("prayer tracking persistence", () => {
     expect(fajr[0]?.adhkar).toBe(true);
     expect(merged.prayerTracking).toHaveLength(2);
   });
+
+  it("normalizes and merges daily companion habits reliably", () => {
+    const state = normalizeAppState({
+      ...DEFAULT_APP_STATE,
+      dailyHabits: [
+        { dayKey: "2026-09-17", habit: "quran_wird", timeZone: "Africa/Cairo" },
+        { dayKey: "2026-09-17", habit: "mosque_3", timeZone: "Africa/Cairo" },
+        { dayKey: "invalid-day", habit: "quran_wird", timeZone: "UTC" },
+        { dayKey: "2026-09-17", habit: "invalid-habit" },
+      ],
+    });
+
+    expect(state.dailyHabits).toHaveLength(2);
+    expect(state.dailyHabits).toContainEqual({
+      dayKey: "2026-09-17",
+      habit: "quran_wird",
+      timeZone: "Africa/Cairo",
+    });
+    expect(state.dailyHabits).toContainEqual({
+      dayKey: "2026-09-17",
+      habit: "mosque_3",
+      timeZone: "Africa/Cairo",
+    });
+
+    // Merging updates mosque tier without duplicating
+    const merged = mergeAppStates(state, {
+      ...DEFAULT_APP_STATE,
+      dailyHabits: [{ dayKey: "2026-09-17", habit: "mosque_5", timeZone: "Africa/Cairo" }],
+    });
+
+    expect(merged.dailyHabits).toHaveLength(2);
+    expect(merged.dailyHabits?.find((h) => h.habit.startsWith("mosque_"))?.habit).toBe("mosque_5");
+  });
 });
