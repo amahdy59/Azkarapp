@@ -808,7 +808,8 @@ export function ReaderScreen({
                 <DropdownMenuTrigger asChild>
                   <button
                     type="button"
-                    className="flex h-9 flex-1 items-center justify-between rounded-lg border border-input bg-card px-3 text-start text-sm font-bold text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    data-testid="routine-mode-filter"
+                    className="flex min-h-[44px] flex-1 items-center justify-between rounded-lg border border-input bg-card px-3 text-start text-sm font-bold text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     <span className="flex items-center gap-2">
                       <SlidersHorizontal size={14} className="text-muted-foreground" />
