@@ -2,8 +2,8 @@
   "//": "Recorded sizes the bundle budget measures growth against. Update this file in the same change as a deliberate increase, so the number is reviewed rather than absorbed. See scripts/check-bundle-budget.mjs.",
   "recordedOn": "2026-09-17",
   "metrics": {
-    "stylesheetBytes": 165566,
-    "stylesheetGzip": 27928,
+    "stylesheetBytes": 167663,
+    "stylesheetGzip": 28572,
     "initialRouteGzip": 218110
   }
 }

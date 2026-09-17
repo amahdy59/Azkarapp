@@ -47,6 +47,7 @@ export function PrayerMomentPanel({
   onOpenAdhkar,
   onGlass = false,
   canRecord = true,
+  fullWidth = false,
 }: {
   prayer: PrayerName;
   language: AppLanguage;
@@ -75,6 +76,7 @@ export function PrayerMomentPanel({
   /** Future prayers may be previewed shortly before adhan, but not recorded. */
   canRecord?: boolean;
   onOpenAdhkar: (prayer: PrayerName) => void;
+  fullWidth?: boolean;
 }) {
   const moment: PrayerMoment = useMemo(
     () => getPrayerMoment({ prayer, now, dayKey, records, location: locationSettings }),
@@ -145,22 +147,22 @@ export function PrayerMomentPanel({
       <article
         className={`flex flex-col overflow-hidden ${onGlass ? "hero-glass home-glass-surface rounded-3xl" : "rounded-3xl border border-border bg-card shadow-raised"}`}
       >
-        <div className="flex flex-col">
+        <div className={`flex flex-col ${fullWidth && virtue && isLive ? "md:grid md:grid-cols-2" : ""}`}>
           <section
             /* A floor, not a height: the scene is the ground for the name and
-           the time, and at content height alone it read as a strip of sky
-           rather than as the sky. It still grows for a longer name, and on
-           the wide grid it stretches to match the virtue beside it.
+            the time, and at content height alone it read as a strip of sky
+            rather than as the sky. It still grows for a longer name, and on
+            the wide grid it stretches to match the virtue beside it.
 
-           bg-on-media-surface under the art, as the Home hero carries under
-           its photograph. The scene is an absolutely positioned sibling at
-           -z-10, so nothing in the ancestor chain describes what this white
-           text sits on: the analyser read it as white on the light theme's
-           page colour at 1.08:1, and it was right to — one failed paint and
-           that is what a reader would get. */
-            className={`relative isolate min-h-[11rem] border-b border-border/50 ${
-              onGlass ? "" : "bg-on-media-surface text-white"
-            }`}
+            bg-on-media-surface under the art, as the Home hero carries under
+            its photograph. The scene is an absolutely positioned sibling at
+            -z-10, so nothing in the ancestor chain describes what this white
+            text sits on: the analyser read it as white on the light theme's
+            page colour at 1.08:1, and it was right to — one failed paint and
+            that is what a reader would get. */
+            className={`relative isolate min-h-[11rem] border-b ${hairline} ${
+              fullWidth && virtue && isLive ? "journey-hero-aside" : ""
+            } ${onGlass ? "" : "bg-on-media-surface text-white"}`}
             data-testid="prayer-moment-hero"
           >
             {!onGlass && <PrayerSceneArt prayer={prayer} className="absolute inset-0 -z-10" />}
@@ -261,11 +263,22 @@ export function PrayerMomentPanel({
             </p>
           </div>
 
-          <ol className="mt-3 flex flex-col">
+          <ol
+            className={`mt-3 flex flex-col ${fullWidth ? "md:grid md:grid-cols-2 md:gap-3" : ""}`}
+            style={
+              fullWidth
+                ? ({
+                    "--border-journey-step": onGlass ? "rgb(255 255 255 / 0.15)" : "var(--border)",
+                  } as React.CSSProperties)
+                : undefined
+            }
+          >
             {/* Where it was prayed. Two choices rather than one tick, so "at
               home" is a recorded answer instead of the absence of one. */}
             <li
-              className={`relative flex items-start gap-3 border-t py-3.5 first:border-t-0 first:pt-0 ${hairline}`}
+              className={`relative flex items-start gap-3 border-t py-3.5 ${fullWidth ? "" : "first:border-t-0 first:pt-0"} ${hairline} ${
+                fullWidth ? "journey-step-card" : ""
+              }`}
               data-testid="prayer-action-location"
             >
               {/* One answer, not a choice of two places. Whether the prayer was
@@ -301,7 +314,9 @@ export function PrayerMomentPanel({
 
             {/* The adhkar that follow the prayer. */}
             <li
-              className={`relative flex items-start gap-3 border-t py-3.5 ${hairline}`}
+              className={`relative flex items-start gap-3 border-t py-3.5 ${hairline} ${
+                fullWidth ? "journey-step-card" : ""
+              }`}
               data-testid="prayer-action-prayer-adhkar"
             >
               <input
@@ -333,7 +348,9 @@ export function PrayerMomentPanel({
               in. */}
             {sunnah && moment.sunnahFocus && (
               <li
-                className={`relative flex items-start gap-3 border-t py-3.5 ${hairline}`}
+                className={`relative flex items-start gap-3 border-t py-3.5 ${hairline} ${
+                  fullWidth ? "journey-step-card" : ""
+                }`}
                 data-testid="prayer-action-prayer-sunnah"
               >
                 <input

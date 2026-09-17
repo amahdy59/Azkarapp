@@ -58,13 +58,10 @@ describe("theme token contracts (Phase 02 delta)", () => {
     expect(themeCss).toMatch(/--ds-shadow-overlay:/);
   });
 
-  it("keeps .bg-card opaque by default; blur stays scoped to the glass/wird opt-in", () => {
+  it("keeps .bg-card opaque by default", () => {
     // Regression guard for the old rule that put .bg-card in the same
     // backdrop-filter block as .glass-card/.wird-card.
     expect(themeCss).not.toMatch(/\.bg-card\s*,\s*\n\s*\.glass-card/);
-
-    const glassBlock = themeBlock(".glass-card,\n.wird-card");
-    expect(glassBlock).toContain("backdrop-filter: blur(16px)");
   });
 
   it("no longer references the removed orphaned word-meaning-dialog CSS", () => {

@@ -101,12 +101,69 @@ describe("CategoryScreen comprehensive-dua session", () => {
     const summary = screen.getByTestId("zikr-summary-0");
     const disclosure = summary.closest("button");
     expect(disclosure).toHaveAttribute("aria-expanded", "false");
-    expect(summary).toHaveClass("line-clamp-1");
+    expect(summary).toHaveClass("line-clamp-2");
 
     await user.click(disclosure!);
 
     expect(disclosure).toHaveAttribute("aria-expanded", "true");
     expect(screen.getByTestId("zikr-summary-0")).toBe(summary);
-    expect(summary).not.toHaveClass("line-clamp-1");
+    expect(summary).not.toHaveClass("line-clamp-2");
+
+    // Collapses back via chevron toggle button
+    const chevron = screen.getByRole("button", { name: "طي الذكر" });
+    await user.click(chevron);
+    expect(disclosure).toHaveAttribute("aria-expanded", "false");
+    expect(summary).toHaveClass("line-clamp-2");
+  });
+
+  it("toggles checkmark completion without triggering card expansion", async () => {
+    const onToggleZikr = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <CategoryScreen
+        catId="morning"
+        completed={new Set()}
+        isArabic
+        direction="rtl"
+        onZikr={() => undefined}
+        onToggleZikr={onToggleZikr}
+        onReset={() => undefined}
+        onRepeat={() => undefined}
+        onBack={() => undefined}
+      />,
+    );
+
+    const summary = screen.getByTestId("zikr-summary-0");
+    const disclosure = summary.closest("button");
+    const checkmarkBtn = screen.getAllByRole("button", { name: /غير مكتمل/ })[0];
+
+    expect(disclosure).toHaveAttribute("aria-expanded", "false");
+    await user.click(checkmarkBtn!);
+
+    expect(onToggleZikr).toHaveBeenCalledWith(0);
+    expect(disclosure).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("shows bounded preview with full Mushaf link when long surah is expanded", async () => {
+    const user = userEvent.setup();
+    render(
+      <CategoryScreen
+        catId="before_sleep"
+        completed={new Set()}
+        isArabic
+        direction="rtl"
+        onZikr={() => undefined}
+        onReset={() => undefined}
+        onRepeat={() => undefined}
+        onBack={() => undefined}
+      />,
+    );
+
+    // Find the long surah (As-Sajda is at index 6 in before_sleep)
+    const surahSummary = screen.getByTestId("zikr-summary-6");
+    const disclosure = surahSummary.closest("button");
+    await user.click(disclosure!);
+
+    expect(screen.getByText("اقرأ السورة كاملة في المصحف")).toBeInTheDocument();
   });
 });

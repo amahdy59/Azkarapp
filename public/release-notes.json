@@ -1,15 +1,13 @@
 {
-  "release": "2026-09-17.1",
+  "release": "2026-09-17.2",
   "ar": [
-    "أُدمجت واحة الأذكار في شاشة التقدم لتعرض مرحلة نموك اليومية وشريط إيقاع الأيام السبعة بوضوح.",
-    "يمكنك تسجيل وِرد القرآن الكريم وصلوات المسجد مباشرةً من بطاقة الرفاق اليومية في شاشة التقدم.",
-    "تُحفظ عادات الرفاق اليومية وتتزامن تلقائيًا دون اتصال بالإنترنت مع الحفاظ على خصوصية بياناتك.",
-    "تحسين استجابة وتناسق شاشة التقدم ومتابعة الصلوات على مختلف الشاشات والأجهزة."
+    "قراءة الأذكار الطويلة أصبحت أسهل مع إمكانية طي وفتح النصوص لقراءة سريعة ومريحة.",
+    "قائمة الخيارات الإضافية والإعدادات أصبحت أكثر ترتيبًا في قائمة جانبية لسهولة الوصول إليها.",
+    "واجهة متابعة الصلاة الآن تتمدد لتملأ الشاشة بتصميم زجاجي أنيق ومريح للعين عند عدم وجود محتوى إضافي."
   ],
   "en": [
-    "Integrated the Spiritual Oasis progression and 7-day rhythm strip directly into the Progress screen.",
-    "Track your Quran wird and mosque prayers in one tap through the Daily Companions card on the Progress screen.",
-    "Daily Companion habits now save and merge reliably offline while preserving your data privacy.",
-    "Enhanced the responsiveness and visual consistency of progress tracking and prayer cards across all devices."
+    "Reading long adhkar is now easier with the ability to collapse and expand texts for a quicker, more comfortable view.",
+    "The More Options and Settings menu has been reorganized into a streamlined sidebar for easier access.",
+    "The prayer tracking panel now expands to fill the screen with a beautiful, refined glassmorphic design when there's no additional content."
   ]
 }

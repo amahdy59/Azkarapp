@@ -477,7 +477,7 @@ export function DailyEvidenceCard({
 }) {
   const Surface = onGlass ? "section" : Card;
   const surfaceProps = onGlass
-    ? { className: "hero-glass flex min-h-0 flex-1 flex-col gap-3 rounded-3xl p-5" }
+    ? { className: "hero-glass home-glass-surface flex min-h-0 flex-1 flex-col gap-3 rounded-3xl p-5" }
     : { as: "section" as const, elevation: "flat" as const, className: "flex flex-col gap-3" };
 
   return (

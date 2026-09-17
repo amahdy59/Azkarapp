@@ -307,7 +307,9 @@ export function ProgressDayView({
     >
       <div
         className={`flex w-full flex-col rounded-3xl p-5 sm:p-7 md:p-8 ${
-          onGlass ? "hero-glass flex-1" : "border border-border bg-card text-foreground shadow-raised"
+          onGlass
+            ? "hero-glass home-glass-surface flex-1"
+            : "border border-border bg-card text-foreground shadow-raised"
         }`}
       >
         <div className="flex items-start justify-between gap-3">

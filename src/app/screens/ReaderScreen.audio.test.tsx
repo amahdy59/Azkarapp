@@ -69,6 +69,59 @@ describe("ReaderScreen audio identity", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /ذكر ٢ من/ }));
     expect(onSelectZikr).toHaveBeenCalledWith(1);
+
+    // Collapsing sidebar using toggle button
+    const toggleBtn = screen.getByTestId("reader-sidebar-toggle");
+    fireEvent.click(toggleBtn);
+    expect(navigator).toHaveClass("w-0");
+
+    // Expanding sidebar using toggle button
+    fireEvent.click(toggleBtn);
+    expect(navigator).toHaveClass("w-[34%]");
+  });
+
+  it("renders a compact horizontal text size segmented control in the more options menu", async () => {
+    const onTextSizeChange = vi.fn();
+    render(
+      <ReaderScreen
+        catId="morning"
+        idx={0}
+        routineMode="core"
+        isArabic
+        direction="rtl"
+        themeMode="light"
+        isDone={false}
+        collectionCompletedCount={0}
+        hapticFeedback={false}
+        showTranslation={false}
+        showTransliteration={false}
+        textSize="medium"
+        onTextSizeChange={onTextSizeChange}
+        savedZikrIds={new Set()}
+        onBack={() => undefined}
+        onComplete={() => undefined}
+        onAdvance={() => undefined}
+        onNext={() => undefined}
+        onPrev={() => undefined}
+        onToggleSaved={() => undefined}
+        audioAvailable={false}
+      />,
+    );
+
+    fireEvent.pointerDown(screen.getByRole("button", { name: "خيارات القارئ" }), { button: 0, ctrlKey: false });
+
+    const smallBtn = await screen.findByTestId("reader-text-size-small");
+    const mediumBtn = await screen.findByTestId("reader-text-size-medium");
+    const largeBtn = await screen.findByTestId("reader-text-size-large");
+
+    expect(smallBtn).toBeInTheDocument();
+    expect(mediumBtn).toBeInTheDocument();
+    expect(largeBtn).toBeInTheDocument();
+    expect(mediumBtn).toHaveAttribute("aria-checked", "true");
+    expect(smallBtn).toHaveAttribute("aria-checked", "false");
+
+    fireEvent.click(largeBtn);
+    expect(onTextSizeChange).toHaveBeenCalledWith("large");
   });
 
   it("offers dedicated Arabic and English playback actions", async () => {

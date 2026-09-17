@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useState } from "react";
-import { Check, ChevronDown, RotateCcw, SlidersHorizontal, Volume2 } from "../components/icons";
+import { BookOpen, Check, ChevronDown, RotateCcw, SlidersHorizontal, Volume2 } from "../components/icons";
 import { t } from "../i18n";
 import "../../styles/animations/ZikrAnimations.css";
 import { CATEGORIES, isOccasionalCategory } from "../content/categories";
@@ -12,6 +12,7 @@ import {
   getRoutineStepCount,
   isRoutineCategory,
 } from "../content/azkar";
+import { isLongSurah } from "../content/mushafPages";
 import type { CategoryId, RitualGroupId, RoutineMode, Zikr, ZikrGroupId } from "../types";
 import { Header } from "../components/LayoutShells";
 import { ProgressBar } from "../components/ProgressBar";
@@ -536,95 +537,116 @@ function ZikrAccordion({
   const targetCount = z.repetitionCount;
   const showTiming = hasSpecificRecommendedTiming(z);
   const timingText = getLocalizedPreferredTiming(z, language);
+  const longSurah = isLongSurah(z);
+
+  const toggleExpanded = () => setExpanded((current) => !current);
 
   return (
     <div
       id={`zikr-card-${index}`}
-      className={`flex w-full flex-col bg-transparent transition-[opacity,filter] ${isCardCompleted ? "opacity-60 grayscale" : ""}`}
+      className={`flex w-full flex-col rounded-2xl border border-border/40 bg-card/60 transition-[opacity,filter,background-color] hover:bg-card ${
+        isCardCompleted ? "opacity-60 grayscale" : ""
+      }`}
     >
-      <div className="flex w-full items-start gap-1 p-1" dir={direction}>
-        <button
-          type="button"
-          aria-expanded={expanded}
-          aria-controls={`zikr-details-${index}`}
-          onClick={() => setExpanded((current) => !current)}
-          className="flex min-h-[52px] min-w-0 flex-1 cursor-pointer items-start gap-3 rounded-2xl p-2 text-start outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-        >
+      <div className="flex w-full items-start gap-3 p-3" dir={direction}>
+        {/* Start column: Number badge on top, checkmark button directly beneath it */}
+        <div className="flex flex-col items-center gap-1.5 shrink-0 pt-0.5">
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-primary bg-primary text-sm font-extrabold text-primary-foreground shadow-xs">
             {formatNumerals(index + 1, language)}
           </span>
 
-          <span className="min-w-0 flex-1 text-start" dir={direction}>
-            {expanded && isArabic && z.hasSeekRefuge && (
-              <span className="zikr-text mb-1 block text-label font-bold text-primary/90">
-                أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ
-              </span>
-            )}
-            {expanded && isArabic && (z.hasBasmalah || z.isSurah) && (
-              <span className="zikr-text mb-1 block text-subtitle font-bold text-primary/90">
-                بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
-              </span>
-            )}
-            <span
-              data-testid={`zikr-summary-${index}`}
-              className={`${isArabic ? "zikr-text" : "font-sans"} block text-title font-bold leading-[1.85] text-foreground whitespace-pre-line ${expanded ? "" : "line-clamp-1"}`}
-              lang={isArabic ? "ar" : "en"}
-              dir={isArabic ? "rtl" : "ltr"}
+          {onToggleZikr && (
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                onToggleZikr(index);
+              }}
+              className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full transition-transform active:scale-90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              aria-label={
+                isCardCompleted
+                  ? t(language, "category.completedToggle", { defaultValue: "Completed — tap to uncheck" })
+                  : t(language, "category.remainingToggle", { defaultValue: "Not completed — tap to check" })
+              }
             >
-              {isArabic ? z.arabicText : z.translation}
-            </span>
-            <span className="mt-1 block text-xs font-semibold text-muted-foreground">
-              {t(language, "category.repetitionInstruction", { count: formatNumerals(targetCount, language) })}
-            </span>
-          </span>
+              {isCardCompleted ? (
+                <span className="flex size-7 items-center justify-center rounded-full bg-success text-white dark:text-primary-foreground shadow-xs">
+                  <Check size={16} strokeWidth={3} />
+                </span>
+              ) : (
+                <span className="size-6 rounded-full border-2 border-muted-foreground/50 hover:border-primary transition-colors" />
+              )}
+            </button>
+          )}
+        </div>
 
+        {/* Center: Text area (clicks toggle expand/collapse) */}
+        <button
+          type="button"
+          aria-expanded={expanded}
+          aria-controls={`zikr-details-${index}`}
+          onClick={toggleExpanded}
+          className="min-w-0 flex-1 text-start cursor-pointer rounded-lg outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          dir={direction}
+        >
+          {expanded && isArabic && z.hasSeekRefuge && (
+            <span className="zikr-text mb-1 block text-label font-bold text-primary/90">
+              أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ
+            </span>
+          )}
+          {expanded && isArabic && (z.hasBasmalah || z.isSurah) && (
+            <span className="zikr-text mb-1 block text-subtitle font-bold text-primary/90">
+              بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+            </span>
+          )}
           <span
-            className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full"
-            aria-hidden="true"
+            data-testid={`zikr-summary-${index}`}
+            className={`${isArabic ? "zikr-text" : "font-sans"} block text-title font-bold leading-[1.85] text-foreground whitespace-pre-line ${
+              expanded ? (longSurah ? "max-h-64 overflow-y-auto pe-1" : "") : "line-clamp-2"
+            }`}
+            lang={isArabic ? "ar" : "en"}
+            dir={isArabic ? "rtl" : "ltr"}
           >
-            <ChevronDown
-              size={20}
-              className={`text-muted-foreground transition-transform ${expanded ? "rotate-180" : ""}`}
-            />
+            {isArabic ? z.arabicText : z.translation}
+          </span>
+          {expanded && longSurah && (
+            <span className="mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-primary">
+              <BookOpen size={14} />
+              {t(language, "reader.readFullSurahInMushaf")}
+            </span>
+          )}
+          <span className="mt-1 block text-xs font-semibold text-muted-foreground">
+            {t(language, "category.repetitionInstruction", { count: formatNumerals(targetCount, language) })}
           </span>
         </button>
 
-        {onToggleZikr && (
-          <button
-            type="button"
-            onClick={() => onToggleZikr(index)}
-            className="mt-1 flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-            aria-label={
-              isCardCompleted
-                ? t(language, "category.completedToggle", { defaultValue: "Completed — tap to uncheck" })
-                : t(language, "category.remainingToggle", { defaultValue: "Not completed — tap to check" })
-            }
-          >
-            {isCardCompleted ? (
-              <Check size={24} className="text-success" strokeWidth={3} />
-            ) : (
-              <span className="size-[20px] rounded-full border-[2.5px] border-muted-foreground opacity-50" />
-            )}
-          </button>
-        )}
+        {/* End column: Interactive chevron button to toggle expand/collapse */}
+        <button
+          type="button"
+          aria-expanded={expanded}
+          aria-controls={`zikr-details-${index}`}
+          aria-label={expanded ? t(language, "reader.collapseZikr") : t(language, "reader.expandZikr")}
+          onClick={toggleExpanded}
+          className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/70 transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        >
+          <ChevronDown size={20} className={`transition-transform duration-200 ${expanded ? "rotate-180" : ""}`} />
+        </button>
       </div>
 
-      {expanded && (
+      {expanded && showTiming && timingText && (
         <div
           id={`zikr-details-${index}`}
           className="flex flex-col items-start gap-3 border-t border-border/20 bg-muted/10 px-4 pb-4 pt-3"
         >
-          {showTiming && timingText && (
-            <div
-              className="flex items-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-3.5 py-2 text-label font-extrabold text-primary"
-              dir={isArabic ? "rtl" : "ltr"}
-            >
-              <span aria-hidden="true" className="shrink-0">
-                💡
-              </span>
-              <span className="leading-snug">{timingText}</span>
-            </div>
-          )}
+          <div
+            className="flex items-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-3.5 py-2 text-label font-extrabold text-primary"
+            dir={isArabic ? "rtl" : "ltr"}
+          >
+            <span aria-hidden="true" className="shrink-0">
+              💡
+            </span>
+            <span className="leading-snug">{timingText}</span>
+          </div>
         </div>
       )}
     </div>

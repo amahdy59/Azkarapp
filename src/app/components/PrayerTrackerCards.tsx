@@ -526,7 +526,7 @@ export function PrayerTrackerCards({
         data-testid="prayer-tracker-cards"
         className={`stagger-in ${
           summaryOnly
-            ? `grid grid-cols-5 gap-1 overflow-visible rounded-3xl border p-1.5 sm:gap-2 sm:p-2 ${onGlass ? "hero-glass" : "border-border bg-card shadow-raised"}`
+            ? `grid grid-cols-5 gap-1 overflow-visible rounded-3xl border p-1.5 sm:gap-2 sm:p-2 ${onGlass ? "hero-glass home-glass-surface" : "border-border bg-card shadow-raised"}`
             : "flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:grid sm:grid-cols-[repeat(var(--prayer-columns),minmax(9rem,1fr))] sm:px-6 sm:pb-0 lg:grid-cols-[repeat(var(--prayer-columns),minmax(11rem,1fr))] lg:overflow-x-auto lg:px-8 [&::-webkit-scrollbar]:hidden"
         }`}
         style={{ ["--prayer-columns" as string]: "5" }}

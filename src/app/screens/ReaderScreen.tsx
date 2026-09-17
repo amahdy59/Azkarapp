@@ -237,6 +237,7 @@ export function ReaderScreen({
   /** A surah short enough to be read here rather than in the Mushaf view. */
   const showSurahChrome = Boolean(z?.isSurah) && !longSurah;
   const [immersiveOpen, setImmersiveOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   /**
    * The Mushaf position, held here rather than inside the view.
    *
@@ -774,7 +775,9 @@ export function ReaderScreen({
     return (
       <nav
         aria-label={t(language, "reader.viewAllAzkar")}
-        className="hidden min-h-0 w-[34%] min-w-[20rem] shrink-0 flex-col overflow-hidden rounded-3xl border border-border/60 bg-card/70 shadow-xs min-[1200px]:flex"
+        className={`hidden h-full min-h-0 shrink-0 flex-col overflow-hidden border-s border-border/60 bg-card/85 backdrop-blur-sm shadow-md transition-all duration-300 min-[1200px]:flex ${
+          isSidebarOpen ? "w-[34%] min-w-[20rem]" : "w-0 !min-w-0 !p-0 !border-0 pointer-events-none opacity-0"
+        }`}
         data-testid="reader-collection-navigator"
       >
         <div className="shrink-0 border-b border-border/60 px-4 py-4">
@@ -811,22 +814,36 @@ export function ReaderScreen({
                     event.stopPropagation();
                     onSelectZikr(itemIndex);
                   }}
-                  className={`flex min-h-14 w-full items-center gap-3 rounded-2xl border px-3 py-2.5 text-start transition-[color,background-color,border-color,box-shadow,transform] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring active:scale-[0.98] ${
+                  className={`flex min-h-14 w-full items-start gap-3 rounded-2xl border p-2.5 text-start transition-[color,background-color,border-color,box-shadow,transform] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring active:scale-[0.98] ${
                     active
                       ? "border-primary bg-primary/10 shadow-xs"
                       : "border-border/50 bg-background/55 hover:border-primary/35 hover:bg-muted/70"
                   }`}
                 >
-                  <span
-                    className={`flex size-9 shrink-0 items-center justify-center rounded-xl border text-sm font-extrabold ${
-                      active
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border bg-muted text-foreground"
-                    }`}
-                    aria-hidden="true"
-                  >
-                    {formatNumerals(itemIndex + 1, language)}
-                  </span>
+                  {/* Start Column: Number badge on top, checkmark indicator below */}
+                  <div className="flex flex-col items-center gap-1.5 shrink-0 pt-0.5">
+                    <span
+                      className={`flex size-8 shrink-0 items-center justify-center rounded-xl border text-sm font-extrabold ${
+                        active
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border bg-muted text-foreground"
+                      }`}
+                      aria-hidden="true"
+                    >
+                      {formatNumerals(itemIndex + 1, language)}
+                    </span>
+                    <span
+                      className={`flex size-6 shrink-0 items-center justify-center rounded-full border ${
+                        completed
+                          ? "border-success bg-success text-white dark:text-primary-foreground shadow-xs"
+                          : "border-muted-foreground/40 text-transparent"
+                      }`}
+                      aria-hidden="true"
+                    >
+                      <Check size={13} strokeWidth={3} />
+                    </span>
+                  </div>
+
                   <span className="min-w-0 flex-1">
                     <span
                       className={`${isArabic ? "zikr-text" : "font-sans"} line-clamp-2 text-label font-bold leading-6 text-foreground`}
@@ -835,21 +852,11 @@ export function ReaderScreen({
                     >
                       {itemText}
                     </span>
-                    <span className="mt-0.5 block text-xs font-semibold text-muted-foreground">
+                    <span className="mt-1 block text-xs font-semibold text-muted-foreground">
                       {t(language, "category.repetitionInstruction", {
                         count: formatNumerals(item.repetitionCount, language),
                       })}
                     </span>
-                  </span>
-                  <span
-                    className={`flex size-7 shrink-0 items-center justify-center rounded-full border ${
-                      completed
-                        ? "border-success bg-success text-white dark:text-primary-foreground"
-                        : "border-muted-foreground/50 text-transparent"
-                    }`}
-                    aria-hidden="true"
-                  >
-                    <Check size={15} strokeWidth={3} />
                   </span>
                 </button>
               </li>
@@ -979,54 +986,49 @@ export function ReaderScreen({
           when the text in front of them is the thing that is too small. It
           drives the same app-wide setting Settings does, so the two can never
           disagree; changing it here also resizes the app's chrome. */}
-      <DropdownMenuLabel className="px-3 pb-1 pt-2 text-xs font-bold uppercase tracking-wide text-muted-foreground">
-        {t(language, "reader.menuDisplay")}
+      <DropdownMenuLabel className="px-3 pb-1 pt-1 text-xs font-semibold text-muted-foreground">
+        {t(language, "settings.textSize")}
       </DropdownMenuLabel>
-      <DropdownMenuGroup>
-        <DropdownMenuLabel className="px-3 pb-1 pt-1 text-xs font-semibold text-muted-foreground">
-          {t(language, "settings.textSize")}
-        </DropdownMenuLabel>
-        <DropdownMenuRadioGroup value={textSize} onValueChange={(value) => onTextSizeChange(value as TextSizeOption)}>
-          {READER_TEXT_SIZE_OPTIONS.map(({ value, labelKey, sampleClass }) => (
-            <DropdownMenuRadioItem
-              key={value}
-              value={value}
-              data-testid={`reader-text-size-${value}`}
-              className="cursor-pointer rounded-xl py-2.5 text-subtitle font-medium transition-colors hover:bg-muted"
-            >
-              <span className="flex items-center gap-3">
-                {/* The glyph previews the step; the word carries the meaning,
-                  so size is never the only thing distinguishing the options. */}
-                <span aria-hidden="true" className={`w-5 text-center font-bold leading-none ${sampleClass}`}>
-                  Aa
-                </span>
-                {t(language, labelKey)}
+      <DropdownMenuRadioGroup value={textSize} onValueChange={(value) => onTextSizeChange(value as TextSizeOption)}>
+        {READER_TEXT_SIZE_OPTIONS.map(({ value, labelKey, sampleClass }) => (
+          <DropdownMenuRadioItem
+            key={value}
+            value={value}
+            data-testid={`reader-text-size-${value}`}
+            className="cursor-pointer rounded-xl py-2.5 text-subtitle font-medium transition-colors hover:bg-muted"
+          >
+            <span className="flex items-center gap-3">
+              <span aria-hidden="true" className={`w-5 text-center font-bold leading-none ${sampleClass}`}>
+                Aa
               </span>
-            </DropdownMenuRadioItem>
-          ))}
-        </DropdownMenuRadioGroup>
-      </DropdownMenuGroup>
+              {t(language, labelKey)}
+            </span>
+          </DropdownMenuRadioItem>
+        ))}
+      </DropdownMenuRadioGroup>
 
       <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
 
-      {/* Save, share and sound live here on every tier now, not just on
-          phones: the header keeps two actions at most, so these three moved
-          off the desktop hero toolbar into the same menu. */}
-      <DropdownMenuLabel className="px-3 pb-1 pt-2 text-xs font-bold text-muted-foreground">
+      {/* Save & Share */}
+      <DropdownMenuLabel className="px-3 pb-1 pt-1 text-xs font-bold text-muted-foreground">
         {t(language, "reader.menuActions")}
       </DropdownMenuLabel>
       <DropdownMenuGroup>
         <DropdownMenuItem
           onClick={handleToggleSaved}
-          className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted"
+          className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2 text-subtitle font-medium transition-colors hover:bg-muted"
         >
-          <Bookmark key={String(isSaved)} size={18} className={isSaved ? "favorite-pop fill-current" : ""} />
+          <Bookmark
+            key={String(isSaved)}
+            size={18}
+            className={isSaved ? "favorite-pop fill-current text-primary" : ""}
+          />
           {isSaved ? t(language, "reader.unsave") : t(language, "reader.save")}
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => void handleShare()}
           disabled={isSharing}
-          className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
+          className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2 text-subtitle font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
         >
           <Share2 size={18} />
           {t(language, "reader.share")}
@@ -1034,39 +1036,61 @@ export function ReaderScreen({
       </DropdownMenuGroup>
 
       <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
-      <DropdownMenuLabel className="px-3 pb-1 pt-2 text-xs font-bold text-muted-foreground">
+      <DropdownMenuLabel className="px-3 pb-1 pt-1 text-xs font-bold text-muted-foreground">
         {t(language, "reader.menuCounter")}
       </DropdownMenuLabel>
       <DropdownMenuGroup>
         <DropdownMenuItem
           onClick={toggleSound}
           data-testid={`reader-counter-sound-toggle-${layout}`}
-          className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted"
+          className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2 text-subtitle font-medium transition-colors hover:bg-muted"
         >
           {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
           {t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={handleResetCounter}
-          className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted"
+          className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2 text-subtitle font-medium transition-colors hover:bg-muted"
         >
           <RotateCcw size={18} />
           {t(language, "reader.resetCounter")}
         </DropdownMenuItem>
       </DropdownMenuGroup>
 
-      <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
+      {/* Desktop sidebar toggle shortcut */}
+      {layout === "desktop" && (
+        <>
+          <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
+          <DropdownMenuLabel className="px-3 pb-1 pt-1 text-xs font-bold text-muted-foreground">
+            {t(language, "reader.menuNavigation")}
+          </DropdownMenuLabel>
+          <DropdownMenuItem
+            onClick={() => setIsSidebarOpen((prev) => !prev)}
+            data-testid="reader-menu-sidebar-toggle"
+            className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2 text-subtitle font-medium transition-colors hover:bg-muted"
+          >
+            <List size={18} />
+            {isSidebarOpen ? t(language, "reader.collapseSidebar") : t(language, "reader.expandSidebar")}
+          </DropdownMenuItem>
+        </>
+      )}
 
-      <DropdownMenuLabel className="px-3 pb-1 pt-2 text-xs font-bold text-muted-foreground">
-        {t(language, "reader.menuNavigation")}
-      </DropdownMenuLabel>
-      <DropdownMenuItem
-        onClick={onBack}
-        className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted"
-      >
-        <List size={18} />
-        {t(language, "reader.viewAllAzkar")}
-      </DropdownMenuItem>
+      {/* Mobile only navigation shortcut */}
+      {layout === "mobile" && (
+        <>
+          <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
+          <DropdownMenuLabel className="px-3 pb-1 pt-1 text-xs font-bold text-muted-foreground">
+            {t(language, "reader.menuNavigation")}
+          </DropdownMenuLabel>
+          <DropdownMenuItem
+            onClick={onBack}
+            className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2 text-subtitle font-medium transition-colors hover:bg-muted"
+          >
+            <List size={18} />
+            {t(language, "reader.viewAllAzkar")}
+          </DropdownMenuItem>
+        </>
+      )}
     </>
   );
 
@@ -1153,183 +1177,198 @@ export function ReaderScreen({
           that duplication is what made the two feel like separate screens. */}
       {!showMushaf &&
         (isDesktopReader ? (
-          <>
-            {/* Wide-desktop hero band (>=1200px). Fixed navy brand surface,
-              independent of the active theme — mirrors the Home screen's
-              .azkar-hero background (src/app/components/azkar-hero-background.css)
-              rather than following light/dark/midnight tokens, since it plays
-              the same "always-dark brand band" role. */}
-            <div
-              data-testid="reader-desktop-hero"
-              className="relative w-full flex shrink-0 flex-col items-center gap-2 overflow-hidden rounded-b-3xl px-6 pb-4 pt-3 text-center"
-              style={{
-                background:
-                  "radial-gradient(120% 140% at 50% 10%, rgba(232,180,32,0.18), transparent 60%), var(--brand-hero)",
-              }}
-            >
-              <IconButton
-                onClick={onBack}
-                label={t(language, "common.back")}
-                className="absolute start-4 top-4 border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] hover:bg-[color:var(--on-media)]/20"
+          <div className="flex h-full w-full min-h-0 flex-1 overflow-hidden" dir={direction}>
+            {/* Reading Canvas Column (flex-1): Hero + Reading Card + Counter */}
+            <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+              {/* Wide-desktop hero band (>=1200px). Fixed navy brand surface,
+                independent of the active theme — mirrors the Home screen's
+                .azkar-hero background (src/app/components/azkar-hero-background.css)
+                rather than following light/dark/midnight tokens, since it plays
+                the same "always-dark brand band" role. */}
+              <div
+                data-testid="reader-desktop-hero"
+                className="relative w-full flex shrink-0 flex-col items-center gap-2 overflow-hidden rounded-b-3xl px-6 pb-4 pt-3 text-center"
+                style={{
+                  background:
+                    "radial-gradient(120% 140% at 50% 10%, rgba(232,180,32,0.18), transparent 60%), var(--brand-hero)",
+                }}
               >
-                <ArrowPrevious size={20} />
-              </IconButton>
-
-              {/* Two actions, the same two as on phones: Reference, then the
-                overflow menu. Save, share and sound used to sit out here as
-                three more icons — five ghost circles competing with the
-                collection name for the top of the reading screen. They are one
-                tap away in the menu now, and the toolbar reads as a pair
-                rather than a strip. The reference label stays visible in this
-                wide layout so the book icon cannot be mistaken for a benefit. */}
-              <div className="absolute end-4 top-4 flex items-center gap-2" data-testid="reader-hero-actions">
-                <button
-                  type="button"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    setHasOpenedBenefit(true);
-                    setBenefitOpen(true);
-                  }}
-                  aria-haspopup="dialog"
-                  aria-label={t(language, "reader.referencesButton")}
-                  title={t(language, "reader.referencesButton")}
-                  className="flex min-h-11 items-center gap-2 rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 px-3 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                <IconButton
+                  onClick={onBack}
+                  label={t(language, "common.back")}
+                  className="absolute start-4 top-4 border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] hover:bg-[color:var(--on-media)]/20"
                 >
-                  <Lightbulb size={18} aria-hidden="true" />
-                  <span className="text-label font-extrabold">{t(language, "reader.referencesButton")}</span>
-                </button>
+                  <ArrowPrevious size={20} />
+                </IconButton>
 
-                <DropdownMenu dir={direction}>
-                  <DropdownMenuTrigger
-                    aria-label={t(language, "reader.menu")}
-                    onPointerEnter={() => void prepareZikrShareCardFonts()}
-                    onFocus={() => void prepareZikrShareCardFonts()}
-                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                {/* Hero actions: Reference, Overflow menu. Exactly two actions on all tiers. */}
+                <div className="absolute end-4 top-4 flex items-center gap-2" data-testid="reader-hero-actions">
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setHasOpenedBenefit(true);
+                      setBenefitOpen(true);
+                    }}
+                    aria-haspopup="dialog"
+                    aria-label={t(language, "reader.referencesButton")}
+                    title={t(language, "reader.referencesButton")}
+                    className="flex min-h-11 items-center gap-2 rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 px-3 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                   >
-                    <MoreVertical size={18} />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="min-w-[210px]">
-                    {renderReaderMenuItems("desktop")}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+                    <Lightbulb size={18} aria-hidden="true" />
+                    <span className="text-label font-extrabold">{t(language, "reader.referencesButton")}</span>
+                  </button>
 
-              <h1 className="text-display font-extrabold text-[color:var(--on-media-accent)]" dir="auto">
-                {displayCategoryName}
-              </h1>
-
-              <div className="flex w-full max-w-[520px] flex-col items-center gap-2">
-                <div className="flex w-full items-center justify-between px-1" aria-hidden="true">
-                  <span className="text-label font-semibold text-[color:var(--on-media-accent)]">
-                    {t(language, "reader.collectionPercentComplete", { percent: localizedReadingPercent })}
-                  </span>
-                  <span className="text-xs font-bold text-[color:var(--on-media-accent)]">
-                    {t(language, "reader.collectionCount", {
-                      done: formatNumerals(readingProgressValue, language),
-                      total: formatNumerals(azkar.length, language),
-                    })}
-                  </span>
+                  <DropdownMenu dir={direction}>
+                    <DropdownMenuTrigger
+                      aria-label={t(language, "reader.menu")}
+                      onPointerEnter={() => void prepareZikrShareCardFonts()}
+                      onFocus={() => void prepareZikrShareCardFonts()}
+                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                    >
+                      <MoreVertical size={18} />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="min-w-[210px]">
+                      {renderReaderMenuItems("desktop")}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
-                <ProgressBar
-                  value={readingProgressValue}
-                  max={azkar.length}
-                  height={8}
-                  trackColor="rgba(255,255,255,0.2)"
-                  fillColor="var(--on-media-accent)"
-                  direction={direction}
-                  aria-label={t(language, "reader.groupProgress")}
-                />
-                {/* Only surah names reach here. This margin adds to the column's
-                  gap-2 for 14px under the bar — comfortably past the 4px
-                  minimum, which Arabic needs because harakat sit well above
-                  the cap line and would otherwise crowd the track. */}
-                {/* The way into Mushaf mode sits on the title's own line rather
-                  than only inside the overflow menu: it belongs to this
-                  passage, so it reads as part of naming it. */}
-                {readerZikrTitle && (
-                  <div className="mt-1.5 flex w-full items-center justify-between gap-3">
-                    <h2
-                      className="min-w-0 truncate text-start text-sm font-extrabold leading-relaxed text-[color:var(--on-media)]"
-                      dir="auto"
-                      title={readerZikrTitle}
-                      data-testid="reader-zikr-title"
-                    >
-                      {readerZikrTitle}
-                    </h2>
-                    <div className="flex shrink-0 items-center gap-3">
-                      {!longSurah && allWordMeanings.length > 0 && (
-                        <button
-                          type="button"
-                          role="switch"
-                          aria-checked={showDifficultWords}
-                          onClick={() => setShowDifficultWords((v) => !v)}
-                          className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-[color:var(--on-media)] rounded-full"
-                          aria-label={t(language, "settings.showDifficultWords")}
-                          title={t(language, "settings.showDifficultWords")}
-                        >
-                          <span className="text-xs font-bold text-[color:var(--on-media)] hidden sm:inline">
-                            {t(language, "settings.showDifficultWords")}
-                          </span>
-                          <ToggleTrack checked={showDifficultWords} />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
 
-            {/* Wide-desktop card: reading content, side navigation, counter,
-              and keyboard guidance. Page-level actions stay in the hero. */}
-            <div className="relative mx-4 mb-4 mt-4 flex min-h-0 flex-1 gap-4 overflow-hidden bg-transparent">
-              <div className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden" data-testid="reader-card">
-                <div ref={readerMainRef} className="flex flex-1 min-h-0 flex-col justify-between select-none">
-                  <div className="relative flex min-h-0 flex-1">
-                    <div
-                      ref={readingScrollRef}
-                      role="region"
-                      tabIndex={0}
-                      aria-label={t(language, "reader.readingText")}
-                      className={`reader-text-scroll h-full min-h-0 w-full overflow-y-auto ps-6 pe-7 py-4 outline-none focus-visible:outline-none focus:ring-0 [scrollbar-gutter:stable] ${
-                        justCompleted ? "zikr-step-exit" : "zikr-step-enter"
-                      }`}
-                    >
-                      <AnimatePresence mode="wait">
-                        <motion.div
-                          key={z.id}
-                          initial={reducedMotion ? { opacity: 0 } : { opacity: 0, x: direction === "rtl" ? -20 : 20 }}
-                          animate={reducedMotion ? { opacity: 1 } : { opacity: 1, x: 0 }}
-                          exit={reducedMotion ? { opacity: 0 } : { opacity: 0, x: direction === "rtl" ? 20 : -20 }}
-                          transition={{ duration: reducedMotion ? 0.1 : 0.3, ease: "easeOut" }}
-                          className="reading-measure mx-auto flex min-h-full w-full flex-col py-4"
-                        >
-                          {/* Three transforms, three layers. The entrance slide is
-                          framer's on the element above, the drag follows the
-                          thumb here, and the press scales below — all animating
-                          `transform`, so sharing an element would mean one
-                          silently overwriting another. */}
-                          <div style={dragStyle} className="flex w-full flex-1 flex-col">
-                            <div
-                              style={pressStyle}
-                              className={`my-auto w-full flex flex-col items-center justify-center ${justCompleted ? "zikr-step-exit" : "zikr-step-enter"}`}
-                            >
-                              {renderReadingContent()}
-                            </div>
-                          </div>
-                        </motion.div>
-                      </AnimatePresence>
-                    </div>
-                    {renderSideNavigation()}
-                  </div>
+                <h1 className="text-display font-extrabold text-[color:var(--on-media-accent)]" dir="auto">
+                  {displayCategoryName}
+                </h1>
 
-                  {!longSurah && !audioModeActive && (
-                    <footer className="shrink-0 pb-3 pt-2">{renderCounterStack()}</footer>
+                <div className="flex w-full max-w-[520px] flex-col items-center gap-2">
+                  <div className="flex w-full items-center justify-between px-1" aria-hidden="true">
+                    <span className="text-label font-semibold text-[color:var(--on-media-accent)]">
+                      {t(language, "reader.collectionPercentComplete", { percent: localizedReadingPercent })}
+                    </span>
+                    <span className="text-xs font-bold text-[color:var(--on-media-accent)]">
+                      {t(language, "reader.collectionCount", {
+                        done: formatNumerals(readingProgressValue, language),
+                        total: formatNumerals(azkar.length, language),
+                      })}
+                    </span>
+                  </div>
+                  <ProgressBar
+                    value={readingProgressValue}
+                    max={azkar.length}
+                    height={8}
+                    trackColor="rgba(255,255,255,0.2)"
+                    fillColor="var(--on-media-accent)"
+                    direction={direction}
+                    aria-label={t(language, "reader.groupProgress")}
+                  />
+                  {readerZikrTitle && (
+                    <div className="mt-1.5 flex w-full items-center justify-between gap-3">
+                      <h2
+                        className="min-w-0 truncate text-start text-sm font-extrabold leading-relaxed text-[color:var(--on-media)]"
+                        dir="auto"
+                        title={readerZikrTitle}
+                        data-testid="reader-zikr-title"
+                      >
+                        {readerZikrTitle}
+                      </h2>
+                      <div className="flex shrink-0 items-center gap-3">
+                        {!longSurah && allWordMeanings.length > 0 && (
+                          <button
+                            type="button"
+                            role="switch"
+                            aria-checked={showDifficultWords}
+                            onClick={() => setShowDifficultWords((v) => !v)}
+                            className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-[color:var(--on-media)] rounded-full"
+                            aria-label={t(language, "settings.showDifficultWords")}
+                            title={t(language, "settings.showDifficultWords")}
+                          >
+                            <span className="text-xs font-bold text-[color:var(--on-media)] hidden sm:inline">
+                              {t(language, "settings.showDifficultWords")}
+                            </span>
+                            <ToggleTrack checked={showDifficultWords} />
+                          </button>
+                        )}
+                      </div>
+                    </div>
                   )}
                 </div>
               </div>
-              {renderCollectionNavigator()}
+
+              {/* Wide-desktop card: reading content, side navigation, counter,
+                and keyboard guidance. Page-level actions stay in the hero. */}
+              <div className="relative mx-4 mb-4 mt-4 flex min-h-0 flex-1 overflow-hidden bg-transparent">
+                <div
+                  className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
+                  data-testid="reader-card"
+                >
+                  <div ref={readerMainRef} className="flex flex-1 min-h-0 flex-col justify-between select-none">
+                    <div className="relative flex min-h-0 flex-1">
+                      <div
+                        ref={readingScrollRef}
+                        role="region"
+                        tabIndex={0}
+                        aria-label={t(language, "reader.readingText")}
+                        className={`reader-text-scroll h-full min-h-0 w-full overflow-y-auto ps-6 pe-7 py-4 outline-none focus-visible:outline-none focus:ring-0 [scrollbar-gutter:stable] ${
+                          justCompleted ? "zikr-step-exit" : "zikr-step-enter"
+                        }`}
+                      >
+                        <AnimatePresence mode="wait">
+                          <motion.div
+                            key={z.id}
+                            initial={reducedMotion ? { opacity: 0 } : { opacity: 0, x: direction === "rtl" ? -20 : 20 }}
+                            animate={reducedMotion ? { opacity: 1 } : { opacity: 1, x: 0 }}
+                            exit={reducedMotion ? { opacity: 0 } : { opacity: 0, x: direction === "rtl" ? 20 : -20 }}
+                            transition={{ duration: reducedMotion ? 0.1 : 0.3, ease: "easeOut" }}
+                            className="reading-measure mx-auto flex min-h-full w-full flex-col py-4"
+                          >
+                            <div style={dragStyle} className="flex w-full flex-1 flex-col">
+                              <div
+                                style={pressStyle}
+                                className={`my-auto w-full flex flex-col items-center justify-center ${justCompleted ? "zikr-step-exit" : "zikr-step-enter"}`}
+                              >
+                                {renderReadingContent()}
+                              </div>
+                            </div>
+                          </motion.div>
+                        </AnimatePresence>
+                      </div>
+                      {renderSideNavigation()}
+                    </div>
+
+                    {!longSurah && !audioModeActive && (
+                      <footer className="shrink-0 pb-3 pt-2">{renderCounterStack()}</footer>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
-          </>
+
+            {/* Desktop Sidebar Toggle Button */}
+            <div className="hidden min-[1200px]:flex items-center shrink-0 z-20 -mx-5 pointer-events-none">
+              <button
+                type="button"
+                onClick={() => setIsSidebarOpen((prev) => !prev)}
+                aria-expanded={isSidebarOpen}
+                aria-label={isSidebarOpen ? t(language, "reader.collapseSidebar") : t(language, "reader.expandSidebar")}
+                title={isSidebarOpen ? t(language, "reader.collapseSidebar") : t(language, "reader.expandSidebar")}
+                data-testid="reader-sidebar-toggle"
+                className="pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full border border-border/80 bg-card shadow-md text-foreground transition-[color,background-color,transform] hover:bg-muted hover:scale-105 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              >
+                {isSidebarOpen ? (
+                  direction === "rtl" ? (
+                    <ChevronLeft size={20} />
+                  ) : (
+                    <ChevronRight size={20} />
+                  )
+                ) : direction === "rtl" ? (
+                  <ChevronRight size={20} />
+                ) : (
+                  <ChevronLeft size={20} />
+                )}
+              </button>
+            </div>
+
+            {/* Desktop Full-Height All-Azkar Sidebar */}
+            {renderCollectionNavigator()}
+          </div>
         ) : (
           <>
             <div>

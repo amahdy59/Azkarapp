@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { getAzkarForMode } from "../content/azkar";
+import * as dailyEvidence from "../dailyEvidence";
 import { CATEGORY_IDS, type CategoryId } from "../types";
 import { HomeScreen } from "./HomeScreen";
 
@@ -148,6 +149,38 @@ describe("HomeScreen quick access", () => {
     expect(screen.queryByTestId("prayer-tracker-cards")).toBeNull();
     expect(screen.getByTestId("home-hero")).toBeInTheDocument();
     expect(screen.queryByTestId("home-primary-cta")).not.toBeInTheDocument();
+  });
+
+  it("expands prayer moment across both columns when context stack has no content", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 7, 7, 9, 5));
+    vi.spyOn(dailyEvidence, "getContextualEvidence").mockReturnValue(null);
+    vi.spyOn(dailyEvidence, "selectLibraryEvidence").mockReturnValue(null);
+    const completed = emptyProgress();
+    completed.morning = new Set(getAzkarForMode("morning", "complete").map((zikr) => zikr.id));
+
+    render(
+      <HomeScreen
+        completed={completed}
+        dailyCompletions={[]}
+        quietProgressEnabled={true}
+        progressDayStartHour={4}
+        language="ar"
+        direction="rtl"
+        onResume={() => undefined}
+        routineModes={routineModes}
+      />,
+    );
+
+    act(() => vi.advanceTimersByTime(4_200));
+
+    const fajrButton = screen.getByRole("button", { name: /الفجر/i });
+    fireEvent.click(fajrButton);
+
+    const expandedPrayer = screen.getByTestId("home-prayer-moment");
+    expect(expandedPrayer).toBeInTheDocument();
+    expect(expandedPrayer).toHaveClass("md:col-span-2");
+    expect(screen.queryByTestId("home-context-stack")).toBeNull();
   });
 });
 

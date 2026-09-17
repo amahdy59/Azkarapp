@@ -428,33 +428,17 @@
   color: var(--on-media);
 }
 
-/* Glassmorphic Card Backdrop & Styling — opt-in only (DEC-003: functional/
-   devotional content uses stable opaque surfaces). .bg-card itself stays
-   opaque; reach for .glass-card/.wird-card explicitly on decorative,
-   non-functional surfaces only. */
-.glass-card,
-.wird-card {
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-}
-
-/* The shadow here used to be a per-theme literal duplicating the raised token.
-   It now uses the token itself, which is already theme-aware (DEC-067 / F11),
-   so these surfaces cannot drift away from every other card again. */
-.glass-card,
-.wird-card {
-  background-color: var(--card);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: var(--ds-shadow-raised);
-}
-
-.dark .glass-card,
-.dark .wird-card,
-.theme-dark .glass-card,
-.theme-dark .wird-card,
-.theme-midnight .glass-card,
-.theme-midnight .wird-card {
-  border: 1px solid rgba(255, 255, 255, 0.1);
+/* Journey cards — full-width prayer panel at md. */
+@media (min-width: 768px) {
+  .journey-step-card {
+    border: 1px solid var(--border-journey-step, rgb(255 255 255 / 0.15));
+    border-radius: 1rem;
+    padding: 0.875rem;
+  }
+  .journey-hero-aside {
+    border-bottom: 0;
+    border-inline-end-width: 1px;
+  }
 }
 
 @keyframes stagger-enter {

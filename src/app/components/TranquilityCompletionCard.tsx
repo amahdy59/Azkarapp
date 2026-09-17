@@ -33,7 +33,7 @@ export function TranquilityCompletionCard({
       <div className="min-h-0 overflow-hidden">
         <div
           className={`tranquility-completion-card flex flex-col items-center gap-5 rounded-3xl px-5 py-6 text-center sm:px-6 sm:py-7 ${
-            onGlass ? "hero-glass" : "border border-border bg-card shadow-raised"
+            onGlass ? "hero-glass home-glass-surface" : "border border-border bg-card shadow-raised"
           }`}
         >
           <div className="tranquility-completion-icon flex size-24 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[0_20px_35px_color-mix(in_srgb,var(--primary)_32%,transparent)] sm:size-28">
