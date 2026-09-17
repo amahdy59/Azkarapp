@@ -1,0 +1,184 @@
+/* tailwind-bridge.css — part of the theme layer, split from a single 1,422-line file (DEC-077).
+   The @theme inline layer: what the design tokens expose to Tailwind.
+
+   These parts are imported by theme.css in a fixed order and are NOT independent:
+   the split was strictly sequential so the cascade is unchanged. Moving a rule
+   between parts, or reordering the imports, can change which declaration wins. */
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-on-media: var(--on-media);
+  --color-on-media-muted: var(--on-media-muted);
+  --color-on-media-accent: var(--on-media-accent);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-control: var(--border-control);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-switch-background: var(--switch-background);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-sleep: var(--sleep);
+  --color-evening: var(--evening);
+  --color-on-media-surface: var(--on-media-surface);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --radius-sm: var(--ds-radius-small);
+  --radius-md: var(--ds-radius-small);
+  --radius-lg: var(--ds-radius-control);
+  --radius-xl: var(--ds-radius-control);
+  --radius-2xl: var(--ds-radius-card);
+  --radius-3xl: var(--ds-radius-overlay);
+  /* Motion tokens existed but were never exposed to Tailwind, so components
+     reached for raw duration-150/200/300/500 utilities instead and the scale
+     went unused (DEC-070 / F19). These make `duration-standard`, `ease-enter`
+     and friends real utilities. */
+  --transition-duration-press: var(--motion-duration-press);
+  --transition-duration-fast: var(--motion-duration-fast);
+  --transition-duration-standard: var(--motion-duration-standard);
+  --transition-duration-entrance: var(--motion-duration-entrance);
+  --transition-duration-emphasis: var(--motion-duration-emphasis);
+  --ease-standard: var(--motion-ease-standard);
+  --ease-enter: var(--motion-ease-enter);
+  --ease-exit: var(--motion-ease-exit);
+  --shadow-raised: var(--ds-shadow-raised);
+  --shadow-overlay: var(--ds-shadow-overlay);
+}
+
+@layer utilities {
+  .interactive-elem {
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      box-shadow 0.2s ease,
+      opacity 0.2s ease;
+    cursor: pointer;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    line-height: 1.5;
+  }
+
+  html {
+    font-size: var(--font-size);
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  h1 {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h2 {
+    font-size: var(--text-xl);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h3 {
+    font-size: var(--text-lg);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h4 {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  label {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  button {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  input {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-normal);
+    line-height: 1.5;
+  }
+}
+
+@layer components {
+  .ui-surface {
+    border: var(--ds-stroke) solid var(--border);
+    border-radius: var(--ds-radius-card);
+    background: var(--card);
+  }
+
+  .ui-control {
+    min-height: var(--ds-control-height-compact);
+    border-radius: var(--ds-radius-control);
+  }
+
+  .ui-icon-button {
+    display: inline-flex;
+    width: var(--ds-icon-size);
+    height: var(--ds-icon-size);
+    min-width: var(--ds-icon-size);
+    min-height: var(--ds-icon-size);
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-full);
+    color: var(--foreground);
+    transition:
+      background-color 150ms ease,
+      opacity 150ms ease,
+      transform 150ms ease;
+    touch-action: manipulation;
+  }
+
+  .ui-icon-button:hover {
+    background: var(--muted);
+  }
+
+  .ui-icon-button:active {
+    background: var(--muted);
+    transform: scale(var(--motion-scale-pressed));
+  }
+
+  .ui-icon-button:disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .ui-icon-button:focus-visible,
+  .ui-control:focus-visible {
+    outline: var(--ds-focus-width) solid var(--ring);
+    outline-offset: 2px;
+  }
+}

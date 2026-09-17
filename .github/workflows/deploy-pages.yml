@@ -1,0 +1,238 @@
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches:
+      - "main"
+    paths-ignore:
+      - "AGENTS.md"
+      - "README.md"
+      - "README_FIRST.md"
+      - "docs/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    # Without an explicit timeout this job inherits GitHub's 6-hour default.
+    # Because the "pages" concurrency group does not cancel in progress, one
+    # hung step would block every subsequent deployment for that whole window.
+    timeout-minutes: 45
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup and Test
+        uses: ./.github/actions/setup-and-test
+        with:
+          vite-audio-base-url: ${{ vars.VITE_AUDIO_BASE_URL }}
+
+      - name: Build app for GitHub Pages
+        run: pnpm build:pages
+        env:
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_APP_URL: https://amahdy59.github.io/Azkarapp/
+          VITE_TERMS_URL: https://amahdy59.github.io/Azkarapp/terms.html
+          VITE_PRIVACY_URL: https://amahdy59.github.io/Azkarapp/privacy.html
+          VITE_GOOGLE_AUTH_ENABLED: ${{ vars.VITE_GOOGLE_AUTH_ENABLED }}
+          VITE_EMAIL_AUTH_ENABLED: ${{ vars.VITE_EMAIL_AUTH_ENABLED }}
+          VITE_APPLE_AUTH_ENABLED: ${{ vars.VITE_APPLE_AUTH_ENABLED }}
+          VITE_AUDIO_BASE_URL: ${{ vars.VITE_AUDIO_BASE_URL }}
+
+      - name: Generate deployment metadata
+        run: |
+          node -e "
+          const fs = require('fs');
+          const meta = {
+            sha: process.env.GITHUB_SHA,
+            runId: process.env.GITHUB_RUN_ID,
+            runAttempt: process.env.GITHUB_RUN_ATTEMPT,
+            builtAt: new Date().toISOString()
+          };
+          fs.writeFileSync('./dist/deployment-meta.json', JSON.stringify(meta, null, 2));
+          console.log('Generated deployment-meta.json:', meta);
+          "
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+
+      - name: Configure Pages
+        # Normally seconds. It has stalled for 45+ minutes before, holding the
+        # pages lock, so bound it and let a re-run recover instead.
+        timeout-minutes: 5
+        uses: actions/configure-pages@v6
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: ./dist
+
+  deploy:
+    timeout-minutes: 30
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
+        with:
+          timeout: 1200000
+
+  verify-production:
+    timeout-minutes: 10
+    needs: deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: none
+    steps:
+      - name: Verify production deployment
+        run: |
+          node -e "
+          const http = require('http');
+          const https = require('https');
+
+          const rawUrl = '${{ needs.deploy.outputs.page_url }}';
+          const baseUrl = (rawUrl.endsWith('/') ? rawUrl : rawUrl + '/');
+          const expectedSha = '${{ github.sha }}';
+          const cacheBust = Date.now();
+
+          function fetchUrl(url, headers = {}) {
+            return new Promise((resolve, reject) => {
+              const client = url.startsWith('https') ? https : http;
+              const options = { headers: { 'Cache-Control': 'no-cache, no-store', 'Pragma': 'no-cache', ...headers } };
+              client.get(url, options, (res) => {
+                let data = '';
+                res.on('data', (chunk) => data += chunk);
+                res.on('end', () => resolve({ statusCode: res.statusCode, data, headers: res.headers }));
+              }).on('error', reject);
+            });
+          }
+
+          async function verify() {
+            const maxAttempts = 12;
+            const delayMs = 10000;
+
+            console.log('Starting production smoke test for:', baseUrl);
+            console.log('Expected commit SHA:', expectedSha);
+
+            for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+              console.log(\`Attempt \${attempt}/\${maxAttempts}...\`);
+              try {
+                // 1. Main page: HTTP 200 and root element present
+                const mainRes = await fetchUrl(baseUrl + '?cb=' + cacheBust);
+                if (mainRes.statusCode !== 200) {
+                  console.log(\`Main page status \${mainRes.statusCode}, retrying...\`);
+                  await new Promise(r => setTimeout(r, delayMs));
+                  continue;
+                }
+                if (!mainRes.data.includes('id=\"root\"') && !mainRes.data.includes(\"id='root'\")) {
+                  console.log('Main page HTML missing root element, retrying...');
+                  await new Promise(r => setTimeout(r, delayMs));
+                  continue;
+                }
+                console.log('Main page OK (200, root element found)');
+
+                // 2. Deployment metadata: reachable and SHA matches
+                const metaRes = await fetchUrl(baseUrl + 'deployment-meta.json?cb=' + cacheBust);
+                if (metaRes.statusCode !== 200) {
+                  console.log(\`Metadata status \${metaRes.statusCode}, retrying...\`);
+                  await new Promise(r => setTimeout(r, delayMs));
+                  continue;
+                }
+                const meta = JSON.parse(metaRes.data);
+                console.log('Fetched production metadata:', meta);
+                if (meta.sha !== expectedSha) {
+                  console.log(\`SHA mismatch: expected \${expectedSha}, got \${meta.sha}. Retrying...\`);
+                  await new Promise(r => setTimeout(r, delayMs));
+                  continue;
+                }
+                console.log('Deployment metadata SHA verified');
+
+                // 3. PWA manifest reachable
+                const manifestRes = await fetchUrl(baseUrl + 'manifest.webmanifest?cb=' + cacheBust);
+                if (manifestRes.statusCode !== 200) {
+                  console.log(\`Manifest status \${manifestRes.statusCode}, retrying...\`);
+                  await new Promise(r => setTimeout(r, delayMs));
+                  continue;
+                }
+                console.log('PWA manifest OK');
+
+                // 4. Verify at least one JS asset referenced in the HTML is reachable
+                const jsAssetMatch = mainRes.data.match(/src=\"([^\"]*\/assets\/[^\"]+\.js[^\"]*)\"/);
+                if (jsAssetMatch) {
+                  const jsUrl = new URL(jsAssetMatch[1], baseUrl).href;
+                  const jsRes = await fetchUrl(jsUrl);
+                  if (jsRes.statusCode !== 200) {
+                    console.log(\`JS asset status \${jsRes.statusCode} for \${jsUrl}, retrying...\`);
+                    await new Promise(r => setTimeout(r, delayMs));
+                    continue;
+                  }
+                  console.log('JS asset OK:', jsUrl.split('/').pop());
+                } else {
+                  console.log('No JS asset reference found in HTML, skipping asset check');
+                }
+
+                // 5. Verify at least one CSS asset is reachable
+                const cssAssetMatch = mainRes.data.match(/href=\"([^\"]*\/assets\/[^\"]+\.css[^\"]*)\"/);
+                if (cssAssetMatch) {
+                  const cssUrl = new URL(cssAssetMatch[1], baseUrl).href;
+                  const cssRes = await fetchUrl(cssUrl);
+                  if (cssRes.statusCode !== 200) {
+                    console.log(\`CSS asset status \${cssRes.statusCode} for \${cssUrl}, retrying...\`);
+                    await new Promise(r => setTimeout(r, delayMs));
+                    continue;
+                  }
+                  console.log('CSS asset OK:', cssUrl.split('/').pop());
+                } else {
+                  console.log('No CSS asset reference found in HTML, skipping asset check');
+                }
+
+                // 6. Verify base path: /Azkarapp/ must appear in the HTML
+                if (!mainRes.data.includes('/Azkarapp/')) {
+                  console.log('WARNING: /Azkarapp/ base path not found in HTML. Application may have wrong base URL.');
+                }
+
+                // 7. Service worker / workbox script reachable
+                const swRes = await fetchUrl(baseUrl + 'sw.js?cb=' + cacheBust);
+                if (swRes.statusCode === 200) {
+                  console.log('Service worker OK');
+                } else {
+                  console.log(\`Service worker returned \${swRes.statusCode} — may be expected if offline shell is not separate\`);
+                }
+
+                console.log('');
+                console.log('SUCCESS: All production smoke tests passed!');
+                console.log('  SHA:', meta.sha);
+                console.log('  Built at:', meta.builtAt);
+                console.log('  Run ID:', meta.runId);
+                console.log('  Attempt:', meta.runAttempt);
+                process.exit(0);
+              } catch (err) {
+                console.log('Error during attempt:', err.message);
+                await new Promise(r => setTimeout(r, delayMs));
+              }
+            }
+
+            console.error('FAILED: Production verification timed out after', maxAttempts, 'attempts.');
+            process.exit(1);
+          }
+
+          verify();
+          "

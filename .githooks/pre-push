@@ -1,0 +1,59 @@
+#!/bin/sh
+
+set -e
+
+resolve_pnpm() {
+  if command -v pnpm >/dev/null 2>&1; then
+    PNPM="pnpm"
+    return
+  fi
+
+  # Git for Windows hooks run under sh, which does not resolve .cmd shims
+  # when they are invoked without their extension. where.exe still resolves
+  # the shim through Windows' PATHEXT rules.
+  if command -v where.exe >/dev/null 2>&1; then
+    pnpm_candidates=$(where.exe pnpm 2>/dev/null || true)
+    if [ -n "$pnpm_candidates" ]; then
+      old_ifs=$IFS
+      IFS='
+'
+      set -- $pnpm_candidates
+      IFS=$old_ifs
+      PNPM=$1
+      return
+    fi
+  fi
+
+  echo "pnpm was not found. Install the repository-pinned pnpm version before pushing." >&2
+  exit 1
+}
+
+resolve_pnpm
+
+if ! command -v node >/dev/null 2>&1 && [ "$PNPM" != "pnpm" ]; then
+  pnpm_posix=$(printf '%s' "$PNPM" | sed 's#\\#/#g; s#^\([A-Za-z]\):#/\1#')
+  pnpm_runtime_root=$(dirname "$(dirname "$(dirname "$pnpm_posix")")")
+  bundled_node_dir="$pnpm_runtime_root/node/bin"
+  if [ -x "$bundled_node_dir/node.exe" ]; then
+    PATH="$bundled_node_dir:$PATH"
+    export PATH
+  fi
+fi
+
+if ! command -v node >/dev/null 2>&1; then
+  echo "node was not found. Install the Node version pinned by .nvmrc before pushing." >&2
+  exit 1
+fi
+
+echo "Verifying the pinned Node and pnpm toolchain..."
+"$PNPM" run verify:toolchain
+
+echo "Verifying the frozen dependency graph and seven-day package quarantine..."
+"$PNPM" install --frozen-lockfile
+
+echo "Running repository quality gates..."
+"$PNPM" check
+"$PNPM" test:e2e
+"$PNPM" build:pages
+
+echo "All pre-push release gates passed."

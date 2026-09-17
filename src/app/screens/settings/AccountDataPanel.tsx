@@ -1,0 +1,194 @@
+import type { ReactNode } from "react";
+import { Card } from "../../components/Card";
+import { Button } from "../../components/ui/button";
+import { Database, Download, LogOut, RotateCcw, User, Wifi } from "../../components/icons";
+import { t } from "../../i18n";
+import type { AppLanguage } from "../../types";
+import { SectionLabel, SubHeader } from "./SettingsPrimitives";
+
+export function AccountDataPanel({
+  language,
+  isGuest,
+  isSyncing,
+  syncError,
+  syncStatus,
+  lastSuccessfulSyncAt,
+  sessionCount,
+  savedCount,
+  onActivateAccount,
+  onSignOut,
+  onExportData,
+  onResetPreferences,
+  onClearLocalData,
+  onDeleteAccount,
+  onBack,
+}: {
+  language: AppLanguage;
+  isGuest: boolean;
+  isSyncing: boolean;
+  syncError: string;
+  syncStatus: "offline" | "needs-attention" | "syncing" | "up-to-date";
+  lastSuccessfulSyncAt: string;
+  sessionCount: number;
+  savedCount: number;
+  onActivateAccount: () => void;
+  onSignOut: () => void;
+  onExportData: () => void;
+  onResetPreferences: () => void;
+  onClearLocalData: () => void;
+  onDeleteAccount: () => void;
+  onBack: () => void;
+}) {
+  const syncStatusLabel =
+    syncStatus === "offline"
+      ? t(language, "accountData.savedOffline")
+      : syncError
+        ? t(language, "accountData.needsAttention")
+        : isSyncing
+          ? t(language, "accountData.syncing")
+          : t(language, "accountData.upToDate");
+  const lastSyncLabel = lastSuccessfulSyncAt
+    ? new Intl.DateTimeFormat(language === "ar" ? "ar" : "en", {
+        dateStyle: "medium",
+        timeStyle: "short",
+      }).format(new Date(lastSuccessfulSyncAt))
+    : "";
+
+  return (
+    <div className="slide-in-from-right flex h-full flex-col bg-background/50 backdrop-blur-md">
+      <SubHeader title={t(language, "accountData.title")} onBack={onBack} language={language} />
+      <div className="flex-1 space-y-4 overflow-y-auto px-4 pb-8 pt-3">
+        <Card as="section" padding="lg">
+          <div className="flex items-start gap-3">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              {isGuest ? <User size={22} aria-hidden="true" /> : <Wifi size={22} aria-hidden="true" />}
+            </span>
+            <div className="min-w-0 flex-1">
+              <h2 className="text-[1rem] font-semibold text-foreground">
+                {t(language, isGuest ? "accountData.guestTitle" : "accountData.signedInTitle")}
+              </h2>
+              <p className="mt-1 text-[0.8125rem] leading-5 text-muted-foreground">
+                {t(language, isGuest ? "accountData.guestBody" : "accountData.signedInBody")}
+              </p>
+              {!isGuest && (
+                <p className="mt-2 text-[0.75rem] font-semibold text-foreground">
+                  {t(language, "accountData.syncStatus")}: {syncStatusLabel}
+                </p>
+              )}
+              {!isGuest && lastSyncLabel && (
+                <p className="mt-1 text-[0.75rem] text-muted-foreground">
+                  {t(language, "settings.lastSuccessfulSync")}: {lastSyncLabel}
+                </p>
+              )}
+            </div>
+          </div>
+          <Button
+            type="button"
+            variant={isGuest ? "default" : "outline"}
+            onClick={isGuest ? onActivateAccount : onSignOut}
+            className={`mt-4 w-full text-[0.875rem] ${isGuest ? "" : "border-destructive/60 text-destructive"}`}
+          >
+            {t(language, isGuest ? "accountData.signIn" : "accountData.signOut")}
+          </Button>
+        </Card>
+
+        <div>
+          <SectionLabel label={t(language, "accountData.yourData")} />
+          <Card as="section" padding="lg">
+            <p className="text-[0.8125rem] leading-5 text-muted-foreground">{t(language, "accountData.dataSummary")}</p>
+            <dl className="mt-4 grid grid-cols-2 gap-3">
+              <DataCount label={t(language, "accountData.sessions")} value={sessionCount} />
+              <DataCount label={t(language, "accountData.savedItems")} value={savedCount} />
+            </dl>
+          </Card>
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <DataAction
+            icon={<Download size={20} aria-hidden="true" />}
+            title={t(language, "accountData.exportTitle")}
+            body={t(language, "accountData.exportBody")}
+            action={t(language, "accountData.exportAction")}
+            onPress={onExportData}
+          />
+          <DataAction
+            icon={<RotateCcw size={20} aria-hidden="true" />}
+            title={t(language, "accountData.preferencesTitle")}
+            body={t(language, "accountData.preferencesBody")}
+            action={t(language, "accountData.preferencesAction")}
+            onPress={onResetPreferences}
+          />
+          <DataAction
+            icon={<Database size={20} aria-hidden="true" />}
+            title={t(language, "accountData.clearTitle")}
+            body={t(language, "accountData.clearBody")}
+            action={t(language, "accountData.clearAction")}
+            onPress={onClearLocalData}
+            destructive
+          />
+          {!isGuest && (
+            <DataAction
+              icon={<LogOut size={20} aria-hidden="true" />}
+              title={t(language, "settings.deleteAccountShort")}
+              body={t(language, "accountData.deleteAccountBody")}
+              action={t(language, "settings.exportAndDelete")}
+              onPress={onDeleteAccount}
+              destructive
+            />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DataCount({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="rounded-xl bg-muted/60 p-3 border border-border/50">
+      <dt className="text-[0.75rem] text-muted-foreground">{label}</dt>
+      <dd className="mt-1 text-[1.375rem] font-bold text-foreground">{value}</dd>
+    </div>
+  );
+}
+
+function DataAction({
+  icon,
+  title,
+  body,
+  action,
+  onPress,
+  destructive = false,
+}: {
+  icon: ReactNode;
+  title: string;
+  body: string;
+  action: string;
+  onPress: () => void;
+  destructive?: boolean;
+}) {
+  return (
+    <Card as="section">
+      <div className="flex items-start gap-3">
+        <span
+          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
+            destructive ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-primary"
+          }`}
+        >
+          {destructive ? <LogOut size={20} aria-hidden="true" /> : icon}
+        </span>
+        <div className="min-w-0 flex-1">
+          <h2 className="text-[0.9375rem] font-semibold text-foreground">{title}</h2>
+          <p className="mt-1 text-[0.8125rem] leading-5 text-muted-foreground">{body}</p>
+        </div>
+      </div>
+      <Button
+        type="button"
+        variant="outline"
+        onClick={onPress}
+        className={`mt-3 w-full text-[0.8125rem] ${destructive ? "border-destructive/60 text-destructive" : "border-border bg-card"}`}
+      >
+        {action}
+      </Button>
+    </Card>
+  );
+}

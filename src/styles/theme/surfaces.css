@@ -1,0 +1,437 @@
+/* surfaces.css — part of the theme layer, split from a single 1,422-line file (DEC-077).
+   Scrollbars, shell surfaces, press micro-interactions and reduced motion.
+
+   These parts are imported by theme.css in a fixed order and are NOT independent:
+   the split was strictly sequential so the cascade is unchanged. Moving a rule
+   between parts, or reordering the imports, can change which declaration wins. */
+
+/* Hide native scrollbar on compact touch screens; show elegant thin scrollbars on tablet & desktop */
+@media (max-width: 767px) {
+  .app-shell,
+  .app-shell * {
+    scrollbar-width: none;
+  }
+
+  .app-shell *::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .app-shell,
+  .app-shell * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--primary) 45%, var(--muted-foreground) 30%) transparent;
+  }
+
+  .app-shell *::-webkit-scrollbar {
+    display: block;
+    width: 6px;
+    height: 6px;
+  }
+
+  .app-shell *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .app-shell *::-webkit-scrollbar-thumb {
+    background-color: color-mix(in srgb, var(--primary) 35%, var(--muted-foreground) 30%);
+    border-radius: 9999px;
+  }
+
+  .app-shell *::-webkit-scrollbar-thumb:hover {
+    background-color: var(--primary);
+  }
+}
+
+[data-slot="dropdown-menu-radio-item"][data-state="checked"],
+[data-slot="dropdown-menu-checkbox-item"][data-state="checked"] {
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 14%, var(--popover));
+}
+
+.app-viewport {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100dvh;
+  min-height: 100dvh;
+  overflow: hidden;
+  background: var(--background);
+}
+
+.app-shell {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: min(100vw, 390px);
+  height: min(100dvh, 882px);
+  border-radius: var(--ds-radius-device);
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+.marketing-landing {
+  box-sizing: border-box;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+@media (min-width: 768px) {
+  .app-shell {
+    width: 390px;
+    height: min(100dvh, 882px);
+    border: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+  }
+}
+
+.skip-link {
+  position: fixed;
+  inset-block-start: 0.5rem;
+  inset-inline-start: 0.5rem;
+  z-index: 100;
+  transform: translateY(-160%);
+  border-radius: 0.5rem;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  padding: 0.75rem 1rem;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.app-status {
+  grid-area: status;
+  min-width: 0;
+}
+
+.network-status {
+  z-index: 20;
+  background: var(--destructive);
+  color: var(--destructive-foreground);
+  padding: 0 1rem;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.sync-status {
+  z-index: 19;
+  display: flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background: var(--card);
+  color: var(--card-foreground);
+  padding: 0.35rem 1rem;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.sync-status-error {
+  justify-content: space-between;
+  background: color-mix(in srgb, var(--destructive) 16%, var(--card));
+  color: var(--foreground);
+}
+
+:where(button, a, input, select, textarea, [tabindex]):focus-visible {
+  outline: var(--ds-focus-width) solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* The main landmark carries tabindex="-1" only so route changes and the skip
+   link can move screen-reader position to it. It is not an operable control,
+   and it is full-bleed, so the rule above painted a 3px ring around the entire
+   viewport. It showed up as a stray gold line above the Reader counter: the
+   counter answers the space bar, so the last input was a key, and Chrome grants
+   :focus-visible to a programmatically focused element in that state.
+
+   Scoped to this one landmark rather than excluding negative tabindex globally,
+   because roving-tabindex widgets legitimately focus tabindex="-1" items and
+   still need the fallback ring. */
+#main-content:focus,
+#main-content:focus-visible {
+  outline: none;
+}
+
+/* Composite fields: a borderless input sitting inside a rounded shell.
+   The shell is the control the reader sees, so it carries the focus ring and
+   the input inside carries none. Without this the fallback above draws its
+   outline around the input's own box — which has no radius — producing a
+   square stroke inside the shell's rounded border.
+
+   Both rules must stay OUTSIDE @layer: the fallback is unlayered, and an
+   unlayered rule beats a layered one whatever the specificity, so a Tailwind
+   `focus:outline-none` on the input cannot switch it off. `:focus` rather than
+   `:focus-visible` because the shell shows its ring for pointer focus too, and
+   two indicators at once is worse than one. */
+.field-shell:focus-within {
+  outline: var(--ds-focus-width) solid var(--ring);
+  outline-offset: 2px;
+}
+
+.field-shell :is(input, textarea, select):focus {
+  outline: none;
+}
+
+/* Full-bleed across the whole compact tier (up to 599px, where the fluid grid
+   takes over), so this matches useLayoutMode's 600px compact boundary. Ending
+   it at 430px used to leave 431–599px rendering a letterboxed 390px "phone
+   card" that belonged to no documented tier. */
+@media (max-width: 599px) {
+  .app-viewport {
+    height: 100dvh;
+    min-height: 100dvh;
+    align-items: stretch;
+    justify-content: flex-start;
+    overflow: hidden;
+    padding: 0;
+  }
+  .app-shell {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
+
+:root {
+  --theme-transition:
+    background-color 200ms cubic-bezier(0.4, 0, 0.2, 1), border-color 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    color 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.app-viewport,
+.app-shell {
+  transition: var(--theme-transition);
+}
+
+@keyframes pulse-horizontal-ltr {
+  0%,
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(4px);
+    opacity: 0.65;
+  }
+}
+@keyframes pulse-horizontal-rtl {
+  0%,
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(-4px);
+    opacity: 0.65;
+  }
+}
+
+.animate-pulse-horizontal {
+  animation: pulse-horizontal-ltr 1.2s ease-in-out 3;
+}
+[dir="rtl"] .animate-pulse-horizontal {
+  animation: pulse-horizontal-rtl 1.2s ease-in-out 3;
+}
+/* .element-pop is declared with .favorite-pop above, on the motion tokens. */
+
+.zikr-text {
+  font-family: var(--font-reading-arabic);
+}
+
+/* ─── Universal Press Micro-interactions ─────────────────────────────
+   Placed OUTSIDE @layer so they override Tailwind utility classes
+   (transition-all, transition-colors, etc.) which live in @layer utilities.
+   ──────────────────────────────────────────────────────────────────── */
+
+/* The per-prayer icon chip.
+   The tint is mixed explicitly against --card rather than expressed as an
+   alpha on the accent: an opacity modifier over an arbitrary var() does not
+   reliably resolve, which left the glyph sitting on a near-identical fill
+   (1.29:1 in light mode). Mixing against the card guarantees a light tint on
+   light grounds and a dark one on dark grounds, so the glyph always has a
+   surface to contrast with. */
+.prayer-chip {
+  background-color: color-mix(in srgb, var(--prayer-accent) 9%, var(--card));
+  border-color: color-mix(in srgb, var(--prayer-accent) 34%, transparent);
+  color: var(--prayer-accent);
+}
+
+/* A pointer on anything that acts.
+   Browsers give <button> a default arrow, so most of this app looked inert to
+   a mouse even though nearly all of it is clickable — only two dozen call
+   sites had set cursor-pointer by hand. Declared on the same selector family
+   as the press treatment below so the two cannot describe different sets of
+   elements. Anything that cannot be acted on says so instead. */
+button:not(:disabled):not([aria-disabled="true"]),
+[role="button"]:not([aria-disabled="true"]),
+[role="tab"]:not([aria-disabled="true"]),
+[role="menuitem"]:not([aria-disabled="true"]),
+[role="menuitemradio"]:not([aria-disabled="true"]),
+[role="menuitemcheckbox"]:not([aria-disabled="true"]),
+[role="option"]:not([aria-disabled="true"]),
+[role="switch"]:not([aria-disabled="true"]),
+a[href],
+summary,
+select:not(:disabled),
+label:has(> input:not(:disabled)),
+input[type="checkbox"]:not(:disabled),
+input[type="radio"]:not(:disabled) {
+  cursor: pointer;
+}
+
+button:disabled,
+select:disabled,
+input:disabled,
+[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+button:not(:disabled):not(.no-press),
+[role="button"]:not([aria-disabled="true"]):not(.no-press),
+a[href]:not(.no-press),
+.interactive-elem {
+  touch-action: manipulation;
+  transition:
+    transform var(--motion-duration-press) var(--motion-ease-standard),
+    filter var(--motion-duration-fast) var(--motion-ease-standard),
+    opacity var(--motion-duration-press) var(--motion-ease-standard);
+}
+
+/* One hover treatment for everything that acts.
+   Hovers were previously per-component and mostly absent, so the app felt
+   static under a mouse. A brightness lift is used rather than a transform or a
+   background change: it costs no layout, it works on a photograph, a gradient
+   and a flat fill alike, and it cannot fight whatever background a component
+   already sets — which is why a global `hover:bg-*` would not have worked.
+
+   Gated on a real hovering pointer so touch devices do not get a state that
+   sticks after a tap. Reduced motion keeps the change but removes its
+   transition, through the rule above. */
+@media (hover: hover) and (pointer: fine) {
+  button:not(:disabled):not(.no-press):hover,
+  [role="button"]:not([aria-disabled="true"]):not(.no-press):hover,
+  a[href]:not(.no-press):not(.skip-link):hover,
+  .interactive-elem:hover {
+    filter: brightness(1.08);
+  }
+}
+
+button:not(:disabled):not(.no-press):active,
+[role="button"]:not([aria-disabled="true"]):not(.no-press):active,
+a[href]:not(.no-press):active,
+.interactive-elem:active {
+  transform: scale(var(--motion-scale-pressed)) !important;
+  opacity: 0.88;
+}
+
+/* Elastic Overscroll & Container Boundaries */
+.scroll-container,
+[data-radix-scroll-area-viewport] {
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* The in-app Reduce motion setting must do what the OS preference does.
+   It used to reach only transitions on buttons, links and .interactive-elem,
+   so every keyframe animation — entrances, the save pop, the counter ripple,
+   the nav cue — kept running for someone who had turned the setting on but
+   whose OS reported no preference. This mirrors the
+   prefers-reduced-motion block below.
+
+   Deliberately placed before the press rules that follow: both use
+   !important, so the later, more specific rule still wins and a press keeps
+   its opacity feedback. Reduced motion means "stop moving", not "stop
+   responding". */
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Reduce-motion overrides for press effects */
+.reduce-motion button:active,
+.reduce-motion [role="button"]:active,
+.reduce-motion a:active,
+.reduce-motion .interactive-elem:active {
+  opacity: 0.88;
+}
+
+.reduce-motion button,
+.reduce-motion [role="button"],
+.reduce-motion a:not(.skip-link),
+.reduce-motion .interactive-elem {
+  transition: opacity var(--motion-duration-press) var(--motion-ease-standard) !important;
+  transform: none !important;
+}
+
+.reduce-motion .skip-link {
+  transition: none !important;
+}
+
+/* The per-component `.tap-ripple` reduced-motion rule that used to sit here is
+   owned by ZikrComponents.css alongside the ripple itself (DEC-067 / F22). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Adaptive Layout Tokens */
+:root {
+  --content-reading: 34rem;
+  --content-form: 40rem;
+  --content-dashboard: 90rem;
+  --content-app-shell: 100rem;
+  --nav-rail-width: 5rem;
+  --nav-sidebar-width: 16rem;
+}
+
+/* Responsive Typography */
+.screen-title {
+  font-size: clamp(1.375rem, 1.2rem + 0.5vw, 1.875rem);
+}
+.arabic-zikr {
+  font-size: clamp(1.75rem, 1.55rem + 0.75vw, 2.5rem);
+}
+.body-text {
+  font-size: clamp(1rem, 0.96rem + 0.15vw, 1.125rem);
+}
+
+/* .app-main compact base */
+.app-main {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Global subtle noise texture overlay for all screens to reduce visual flatness and eye strain.
+   The texture is high-contrast-safe and scales across the entire shell background. */
+.app-shell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 150px 150px;
+  mix-blend-mode: overlay;
+}
+
+.reduce-transparency .app-shell::after,
+.high-contrast .app-shell::after {
+  display: none !important;
+}

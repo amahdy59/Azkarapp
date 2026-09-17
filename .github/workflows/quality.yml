@@ -1,0 +1,33 @@
+name: Quality
+
+on:
+  push:
+    branches:
+      - "main"
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Setup and Test
+        uses: ./.github/actions/setup-and-test
+        with:
+          vite-audio-base-url: ${{ vars.VITE_AUDIO_BASE_URL }}
+
+      - name: Verify GitHub Pages build
+        run: pnpm build:pages
+        env:
+          VITE_AUDIO_BASE_URL: ${{ vars.VITE_AUDIO_BASE_URL }}
+
+      - name: Audit production dependencies
+        run: pnpm audit:prod

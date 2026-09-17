@@ -1,0 +1,15 @@
+# Enforce LF line endings for all text files in git repository
+* text=auto eol=lf
+
+# Denote binary files (do not normalize line endings)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.eot binary

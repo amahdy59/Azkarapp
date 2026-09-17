@@ -1,0 +1,28 @@
+@media (min-width: 56.25rem) {
+  .settings-two-pane {
+    display: grid;
+    grid-template-columns: minmax(21rem, 24rem) minmax(0, 1fr);
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .settings-nav-pane {
+    border-inline-end: 1px solid var(--border-subtle);
+    overflow-y: auto;
+  }
+
+  .settings-detail-pane {
+    overflow-y: auto;
+  }
+
+  .settings-detail-pane .settings-form-inner {
+    max-width: var(--content-form);
+    margin-inline: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-two-pane {
+    transition: none !important;
+  }
+}

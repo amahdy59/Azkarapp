@@ -1,0 +1,340 @@
+/* eslint-disable jsx-a11y/no-noninteractive-tabindex */
+import { useEffect, useRef, useState } from "react";
+import { BookOpen, Check, Copy, X } from "./icons";
+import { t } from "../i18n";
+import type { AppLanguage, Zikr } from "../types";
+import {
+  getLocalizedPreferredTiming,
+  getLocalizedSourceReference,
+  getLocalizedZikrBenefit,
+} from "../content/localizedZikr";
+import { ResponsiveSheet } from "./ResponsiveSheet";
+import { FormattedBenefit } from "./FormattedBenefit";
+import { useLayoutMode } from "../hooks/useLayoutMode";
+
+type ReferenceCopyKey = "translation" | "transliteration" | "benefit" | "hadith" | "source";
+
+function ReferenceContent({
+  zikr,
+  language,
+  direction,
+  onClose,
+  onAnnouncement,
+  variant,
+}: {
+  zikr: Zikr;
+  language: AppLanguage;
+  direction: "ltr" | "rtl";
+  onClose: () => void;
+  onAnnouncement: (message: string) => void;
+  variant: "sheet" | "dialog";
+}) {
+  const [copiedReference, setCopiedReference] = useState<ReferenceCopyKey | null>(null);
+  const [showFullZikr, setShowFullZikr] = useState(false);
+  const copyFeedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isArabic = language === "ar";
+  const sourceReference = getLocalizedSourceReference(zikr, language);
+  const benefit = getLocalizedZikrBenefit(zikr, language);
+  const primaryText = isArabic ? zikr.arabicText : zikr.translation;
+  const collapseLimit = zikr.isSurah ? 180 : 280;
+  const shouldCollapseZikr = primaryText.length > collapseLimit;
+  const displayedPrimaryText =
+    shouldCollapseZikr && !showFullZikr ? `${primaryText.slice(0, collapseLimit).trimEnd()}…` : primaryText;
+
+  useEffect(() => setShowFullZikr(false), [zikr.id]);
+
+  useEffect(() => {
+    return () => {
+      if (copyFeedbackTimer.current) {
+        clearTimeout(copyFeedbackTimer.current);
+      }
+    };
+  }, []);
+
+  const copyReference = async (key: ReferenceCopyKey, value: string) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopiedReference(key);
+      onAnnouncement(t(language, "reader.referenceCopied"));
+      if (copyFeedbackTimer.current) {
+        clearTimeout(copyFeedbackTimer.current);
+      }
+      copyFeedbackTimer.current = setTimeout(() => {
+        setCopiedReference(null);
+        onAnnouncement("");
+      }, 1600);
+    } catch {
+      setCopiedReference(null);
+      onAnnouncement(t(language, "reader.copyError"));
+    }
+  };
+
+  const renderCopyButton = (key: ReferenceCopyKey, value: string, label: string) => (
+    <button
+      type="button"
+      onClick={() => void copyReference(key, value)}
+      aria-label={label}
+      className="flex h-[48px] w-[48px] min-h-[48px] min-w-[48px] shrink-0 items-center justify-center rounded-full bg-muted/80 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer"
+    >
+      {copiedReference === key ? <Check size={16} className="favorite-pop text-primary" /> : <Copy size={16} />}
+    </button>
+  );
+
+  return (
+    <div className="flex flex-col h-full max-h-[inherit] overflow-hidden">
+      {/* Top Drag Handle (sheet only) */}
+      {variant === "sheet" && (
+        <div className="flex shrink-0 justify-center pt-3 pb-1">
+          <div className="h-1.5 w-12 rounded-full bg-muted-foreground/30" aria-hidden="true" />
+        </div>
+      )}
+
+      {/* Top Header */}
+      <div className="flex shrink-0 items-center justify-between px-6 py-4 border-b border-border/40">
+        <div className="flex items-center gap-3">
+          <div className="flex size-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            <BookOpen size={20} aria-hidden="true" />
+          </div>
+          <div>
+            <div
+              aria-hidden="true"
+              className="block max-w-full truncate whitespace-nowrap text-[1.125rem] font-extrabold leading-snug text-foreground"
+            >
+              {t(language, "reader.referencesButton")}
+            </div>
+            <p id="reader-reference-description" className="text-[0.75rem] font-medium text-muted-foreground">
+              {t(language, "reader.referenceTitle")}
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label={t(language, "reader.closeReference")}
+          className="flex h-[48px] w-[48px] min-h-[48px] min-w-[48px] items-center justify-center rounded-full bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer"
+        >
+          <X size={18} />
+        </button>
+      </div>
+
+      {/* Scrollable Main Content Area */}
+      <div
+        role="region"
+        aria-label={t(language, "reader.referencesButton")}
+        className="reference-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-4 outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        tabIndex={0}
+        dir={direction}
+      >
+        <div className="reference-sheet-content flex flex-col gap-4 pb-4">
+          {/* Arabic Zikr Card Header */}
+          {isArabic ? (
+            <div className="rounded-2xl border border-primary/30 bg-primary/10 p-4 text-center shadow-xs">
+              <p className="zikr-text text-[1.25rem] font-bold leading-relaxed text-primary" dir="rtl" lang="ar">
+                {displayedPrimaryText}
+              </p>
+              {shouldCollapseZikr && (
+                <button
+                  type="button"
+                  className="mt-3 min-h-12 rounded-xl px-3 text-[0.8125rem] font-black text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                  onClick={() => setShowFullZikr((current) => !current)}
+                  aria-expanded={showFullZikr}
+                >
+                  {t(language, showFullZikr ? "reader.hideFullText" : "reader.showFullText")}
+                </button>
+              )}
+            </div>
+          ) : (
+            <>
+              {/* English Translation Section */}
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="h-4 w-1 rounded-full bg-primary" aria-hidden="true" />
+                    <h3 className="text-[0.8125rem] font-bold tracking-wide uppercase text-muted-foreground">
+                      {t(language, "reader.translationLabel")}
+                    </h3>
+                  </div>
+                  {renderCopyButton("translation", zikr.translation, t(language, "reader.copyTranslation"))}
+                </div>
+                <div className="rounded-2xl border border-border/50 bg-card p-4 shadow-xs">
+                  <p className="latin-ui text-left text-[1rem] leading-relaxed text-foreground" lang="en" dir="ltr">
+                    {displayedPrimaryText}
+                  </p>
+                  {shouldCollapseZikr && (
+                    <button
+                      type="button"
+                      className="mt-3 min-h-12 rounded-xl px-3 text-[0.8125rem] font-black text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                      onClick={() => setShowFullZikr((current) => !current)}
+                      aria-expanded={showFullZikr}
+                    >
+                      {t(language, showFullZikr ? "reader.hideFullText" : "reader.showFullText")}
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Transliteration Section */}
+              {zikr.transliteration && (
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="h-4 w-1 rounded-full bg-primary" aria-hidden="true" />
+                      <h3 className="text-[0.8125rem] font-bold tracking-wide uppercase text-muted-foreground">
+                        {t(language, "reader.transliterationLabel")}
+                      </h3>
+                    </div>
+                    {renderCopyButton(
+                      "transliteration",
+                      zikr.transliteration,
+                      t(language, "reader.copyTransliteration"),
+                    )}
+                  </div>
+                  <div className="rounded-2xl border border-border/50 bg-card p-4 shadow-xs">
+                    <p
+                      className="latin-ui text-left text-[0.9375rem] leading-relaxed text-muted-foreground"
+                      lang="en"
+                      dir="ltr"
+                    >
+                      {zikr.transliteration}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Benefit Section */}
+          {benefit && (
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="h-4 w-1 rounded-full bg-primary" aria-hidden="true" />
+                  <h3
+                    aria-label={t(language, "reader.benefitDetails")}
+                    className="text-[0.8125rem] font-bold tracking-wide uppercase text-muted-foreground"
+                  >
+                    {t(language, "reader.benefitLabel")}
+                  </h3>
+                </div>
+                {renderCopyButton("benefit", benefit, t(language, "reader.copyBenefit"))}
+              </div>
+              <FormattedBenefit text={benefit} isArabic={isArabic} direction={direction} />
+            </div>
+          )}
+
+          {/* Evidence / Hadith Section */}
+          {zikr.hadithText && (
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="h-4 w-1 rounded-full bg-primary" aria-hidden="true" />
+                  <h3 className="text-[0.8125rem] font-bold tracking-wide uppercase text-muted-foreground">
+                    {t(language, "reader.evidence")}
+                  </h3>
+                </div>
+                {renderCopyButton("hadith", zikr.hadithText, t(language, "reader.copyHadith"))}
+              </div>
+              <div className="rounded-2xl border border-border/50 bg-card p-4 shadow-xs">
+                <p
+                  className="zikr-text text-right text-[1rem] font-medium leading-8 text-foreground"
+                  lang={isArabic ? "ar" : undefined}
+                  dir={isArabic ? "rtl" : undefined}
+                >
+                  {zikr.hadithText}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Recommended Timing & Guidance */}
+          {getLocalizedPreferredTiming(zikr, language) && (
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <span className="h-4 w-1 rounded-full bg-amber-500" aria-hidden="true" />
+                <h3 className="text-[0.8125rem] font-bold tracking-wide uppercase text-amber-600 dark:text-amber-400">
+                  {t(language, "reader.timingGuidance")}
+                </h3>
+              </div>
+              <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4">
+                <p
+                  className="text-start text-[0.875rem] font-semibold leading-relaxed text-amber-950 dark:text-amber-200"
+                  lang={isArabic ? "ar" : "en"}
+                  dir={direction}
+                >
+                  {getLocalizedPreferredTiming(zikr, language)}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Source Reference Footer Card */}
+          <div className="flex flex-col gap-2 mt-1">
+            <div className="flex items-center gap-2">
+              <span className="h-4 w-1 rounded-full bg-primary" aria-hidden="true" />
+              <h3 className="text-[0.8125rem] font-bold tracking-wide uppercase text-muted-foreground">
+                {t(language, "reader.sourceLabel")}
+              </h3>
+            </div>
+            <div className="flex items-center justify-between gap-3 rounded-2xl border border-border/60 bg-card p-3.5 shadow-xs">
+              <div className="min-w-0 flex-1 text-start">
+                <span className="block text-[0.6875rem] font-bold uppercase tracking-wider text-muted-foreground/80">
+                  {t(language, "reader.sourceLabel")}
+                </span>
+                <span
+                  className="mt-0.5 block text-[0.8125rem] font-semibold text-foreground leading-snug"
+                  lang={isArabic ? "ar" : "en"}
+                  dir={direction}
+                >
+                  {sourceReference}
+                </span>
+              </div>
+              {renderCopyButton("source", sourceReference, t(language, "reader.copySource"))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function ReaderReferenceSheet({
+  open,
+  zikr,
+  language,
+  direction,
+  onClose,
+  onAnnouncement,
+}: {
+  open: boolean;
+  zikr: Zikr;
+  language: AppLanguage;
+  direction: "ltr" | "rtl";
+  onClose: () => void;
+  onAnnouncement: (message: string) => void;
+}) {
+  const layoutMode = useLayoutMode();
+
+  if (!open || !zikr) return null;
+
+  return (
+    <ResponsiveSheet
+      open={open}
+      onClose={onClose}
+      title={t(language, "reader.referencesButton")}
+      direction={direction}
+      testId="reference-sheet"
+      describedById="reader-reference-description"
+      // `.reference-sheet` carries the sheet height rules in ReaderScreen.css.
+      drawerClassName="reference-sheet"
+    >
+      <ReferenceContent
+        zikr={zikr}
+        language={language}
+        direction={direction}
+        onClose={onClose}
+        onAnnouncement={onAnnouncement}
+        variant={layoutMode === "compact" ? "sheet" : "dialog"}
+      />
+    </ResponsiveSheet>
+  );
+}
