@@ -110,17 +110,15 @@ describe("ReaderScreen audio identity", () => {
 
     fireEvent.pointerDown(screen.getByRole("button", { name: "خيارات القارئ" }), { button: 0, ctrlKey: false });
 
-    const smallBtn = await screen.findByTestId("reader-text-size-small");
-    const mediumBtn = await screen.findByTestId("reader-text-size-medium");
-    const largeBtn = await screen.findByTestId("reader-text-size-large");
+    const decreaseBtn = await screen.findByTestId("reader-text-size-small");
+    const increaseBtn = await screen.findByTestId("reader-text-size-large");
 
-    expect(smallBtn).toBeInTheDocument();
-    expect(mediumBtn).toBeInTheDocument();
-    expect(largeBtn).toBeInTheDocument();
-    expect(mediumBtn).toHaveAttribute("aria-checked", "true");
-    expect(smallBtn).toHaveAttribute("aria-checked", "false");
+    expect(decreaseBtn).toBeInTheDocument();
+    expect(increaseBtn).toBeInTheDocument();
+    expect(decreaseBtn).not.toBeDisabled();
+    expect(increaseBtn).not.toBeDisabled();
 
-    fireEvent.click(largeBtn);
+    fireEvent.click(increaseBtn);
     expect(onTextSizeChange).toHaveBeenCalledWith("large");
   });
 

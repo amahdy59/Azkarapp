@@ -5,6 +5,8 @@ const ar = {
     previous: "السابق",
     increase: "زيادة",
     decrease: "نقصان",
+    expand: "توسيع",
+    collapse: "طي",
     undo: "تراجع",
     mushaf: "المصحف",
     settings: "\u0627\u0644\u0625\u0639\u062f\u0627\u062f\u0627\u062a",

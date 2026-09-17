@@ -5,6 +5,8 @@ const en = {
     previous: "Previous",
     increase: "Increase",
     decrease: "Decrease",
+    expand: "Expand",
+    collapse: "Collapse",
     undo: "Undo",
     mushaf: "Mushaf",
     settings: "Settings",

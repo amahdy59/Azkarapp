@@ -19,9 +19,13 @@ import {
   Bookmark,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  ChevronUp,
   Volume2,
   VolumeX,
   Check,
+  Minus,
+  Plus,
 } from "../components/icons";
 import { t } from "../i18n";
 import { shouldReduceMotion } from "../motionPreferences";
@@ -238,6 +242,7 @@ export function ReaderScreen({
   const showSurahChrome = Boolean(z?.isSurah) && !longSurah;
   const [immersiveOpen, setImmersiveOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [expandedZikrIds, setExpandedZikrIds] = useState<Set<string>>(new Set());
   /**
    * The Mushaf position, held here rather than inside the view.
    *
@@ -282,7 +287,7 @@ export function ReaderScreen({
   const shareTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const readerMainRef = useRef<HTMLDivElement | null>(null);
   const readingScrollRef = useRef<HTMLDivElement | null>(null);
-  const activeNavigatorItemRef = useRef<HTMLButtonElement | null>(null);
+  const activeNavigatorItemRef = useRef<HTMLDivElement | null>(null);
 
   // The hero band + card treatment now starts at the tablet breakpoint
   // (>=768px) rather than at the shell's "large" tier: tablets have the width
@@ -803,25 +808,21 @@ export function ReaderScreen({
               total: formatNumerals(azkar.length, language),
             })}${completed ? `, ${t(language, "reader.completed")}` : ""}`;
 
+            const isSpecialSurah = item.isSurah && (item.id === "sajda" || item.id === "tabark" || item.surahNameEnglish?.toLowerCase() === "as-sajdah" || item.surahNameEnglish?.toLowerCase() === "al-mulk");
+            const isItemExpanded = expandedZikrIds.has(item.id);
+            const shouldClamp = !isItemExpanded && !isSpecialSurah;
+
             return (
               <li key={item.id}>
-                <button
-                  ref={active ? activeNavigatorItemRef : undefined}
-                  type="button"
-                  aria-current={active ? "step" : undefined}
-                  aria-label={itemLabel}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    onSelectZikr(itemIndex);
-                  }}
-                  className={`flex min-h-14 w-full items-start gap-3 rounded-2xl border p-2.5 text-start transition-[color,background-color,border-color,box-shadow,transform] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring active:scale-[0.98] ${
+                <div
+                  className={`flex min-h-14 w-full items-start gap-3 rounded-2xl border p-2.5 text-start transition-[color,background-color,border-color,box-shadow,transform] ${
                     active
                       ? "border-primary bg-primary/10 shadow-xs"
                       : "border-border/50 bg-background/55 hover:border-primary/35 hover:bg-muted/70"
                   }`}
                 >
                   {/* Start Column: Number badge on top, checkmark indicator below */}
-                  <div className="flex flex-col items-center gap-1.5 shrink-0 pt-0.5">
+                  <div className="flex flex-col items-center gap-1.5 shrink-0 pt-0.5 pointer-events-none">
                     <span
                       className={`flex size-8 shrink-0 items-center justify-center rounded-xl border text-sm font-extrabold ${
                         active
@@ -844,9 +845,27 @@ export function ReaderScreen({
                     </span>
                   </div>
 
-                  <span className="min-w-0 flex-1">
+                  <div 
+                    ref={active ? activeNavigatorItemRef : undefined}
+                    aria-current={active ? "step" : undefined}
+                    aria-label={itemLabel}
+                    className="min-w-0 flex-1 flex flex-col items-start cursor-pointer focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring rounded-lg" 
+                    role="button"
+                    tabIndex={0}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onSelectZikr(itemIndex);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        onSelectZikr(itemIndex);
+                      }
+                    }}
+                  >
                     <span
-                      className={`${isArabic ? "zikr-text" : "font-sans"} line-clamp-2 text-label font-bold leading-6 text-foreground`}
+                      className={`${isArabic ? "zikr-text" : "font-sans"} ${shouldClamp ? "line-clamp-2" : ""} text-label font-bold leading-6 text-foreground`}
                       lang={isArabic ? "ar" : "en"}
                       dir={direction}
                     >
@@ -857,8 +876,30 @@ export function ReaderScreen({
                         count: formatNumerals(item.repetitionCount, language),
                       })}
                     </span>
-                  </span>
-                </button>
+                  </div>
+                  
+                  {!isSpecialSurah && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setExpandedZikrIds((prev) => {
+                          const next = new Set(prev);
+                          if (next.has(item.id)) {
+                            next.delete(item.id);
+                          } else {
+                            next.add(item.id);
+                          }
+                          return next;
+                        });
+                      }}
+                      className="p-1 shrink-0 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-full transition-colors"
+                      aria-label={isItemExpanded ? t(language, "common.collapse") : t(language, "common.expand")}
+                    >
+                      {isItemExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                    </button>
+                  )}
+                </div>
               </li>
             );
           })}
@@ -986,26 +1027,40 @@ export function ReaderScreen({
           when the text in front of them is the thing that is too small. It
           drives the same app-wide setting Settings does, so the two can never
           disagree; changing it here also resizes the app's chrome. */}
-      <DropdownMenuLabel className="px-3 pb-1 pt-1 text-xs font-semibold text-muted-foreground">
-        {t(language, "settings.textSize")}
-      </DropdownMenuLabel>
-      <DropdownMenuRadioGroup value={textSize} onValueChange={(value) => onTextSizeChange(value as TextSizeOption)}>
-        {READER_TEXT_SIZE_OPTIONS.map(({ value, labelKey, sampleClass }) => (
-          <DropdownMenuRadioItem
-            key={value}
-            value={value}
-            data-testid={`reader-text-size-${value}`}
-            className="cursor-pointer rounded-xl py-2.5 text-subtitle font-medium transition-colors hover:bg-muted"
+      <div className="flex items-center justify-between px-3 py-2.5">
+        <span className="text-sm font-semibold text-foreground">
+          {t(language, "settings.textSize")}
+        </span>
+        <div className="flex items-center gap-2 bg-muted rounded-full p-1 border border-border/50">
+          <button
+            type="button"
+            data-testid="reader-text-size-small"
+            className="flex h-8 w-10 items-center justify-center rounded-full text-muted-foreground hover:bg-background hover:text-foreground transition-colors disabled:opacity-30 disabled:hover:bg-transparent"
+            disabled={textSize === "small"}
+            aria-label={t(language, "settings.textSmall")}
+            onClick={(e) => {
+              e.stopPropagation();
+              onTextSizeChange(textSize === "large" ? "medium" : "small");
+            }}
           >
-            <span className="flex items-center gap-3">
-              <span aria-hidden="true" className={`w-5 text-center font-bold leading-none ${sampleClass}`}>
-                Aa
-              </span>
-              {t(language, labelKey)}
-            </span>
-          </DropdownMenuRadioItem>
-        ))}
-      </DropdownMenuRadioGroup>
+            <Minus size={18} />
+          </button>
+          <span className="text-xs font-bold w-6 text-center text-foreground font-sans">Aa</span>
+          <button
+            type="button"
+            data-testid="reader-text-size-large"
+            className="flex h-8 w-10 items-center justify-center rounded-full text-muted-foreground hover:bg-background hover:text-foreground transition-colors disabled:opacity-30 disabled:hover:bg-transparent"
+            disabled={textSize === "large"}
+            aria-label={t(language, "settings.textLarge")}
+            onClick={(e) => {
+              e.stopPropagation();
+              onTextSizeChange(textSize === "small" ? "medium" : "large");
+            }}
+          >
+            <Plus size={18} />
+          </button>
+        </div>
+      </div>
 
       <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
 
@@ -1057,23 +1112,7 @@ export function ReaderScreen({
         </DropdownMenuItem>
       </DropdownMenuGroup>
 
-      {/* Desktop sidebar toggle shortcut */}
-      {layout === "desktop" && (
-        <>
-          <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
-          <DropdownMenuLabel className="px-3 pb-1 pt-1 text-xs font-bold text-muted-foreground">
-            {t(language, "reader.menuNavigation")}
-          </DropdownMenuLabel>
-          <DropdownMenuItem
-            onClick={() => setIsSidebarOpen((prev) => !prev)}
-            data-testid="reader-menu-sidebar-toggle"
-            className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2 text-subtitle font-medium transition-colors hover:bg-muted"
-          >
-            <List size={18} />
-            {isSidebarOpen ? t(language, "reader.collapseSidebar") : t(language, "reader.expandSidebar")}
-          </DropdownMenuItem>
-        </>
-      )}
+
 
       {/* Mobile only navigation shortcut */}
       {layout === "mobile" && (
