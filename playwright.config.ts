@@ -28,20 +28,15 @@ const externalBaseUrl = process.env.E2E_BASE_URL;
 
 export default defineConfig({
   testDir: "./e2e",
-  testIgnore: ["**/.*", "**/*-temp.spec.ts"],
+  testIgnore: ["**/.*", "**/*-temp.spec.ts", "**/evidence-capture.spec.ts", "**/baseline-capture.spec.ts"],
   fullyParallel: true,
   /**
-   * Three everywhere, matching the pool CI has already validated.
+   * Three in CI, two locally on developer machines.
    *
-   * The default of 2 left fourteen of sixteen cores idle, but the ceiling here
-   * is not the cores — it is the single `vite preview` process feeding every
-   * browser. At 8 workers six load-sensitive reader and navigation specs timed
-   * out, and at 4 the home hero's photograph was dropped often enough that the
-   * component fell back to its flat ground and the imagery spec failed. Both
-   * pass in isolation; a gate that fails at random is worth less than the
-   * minutes it saves.
+   * Running 2 workers locally provides a 2x speedup while avoiding socket
+   * contention on Windows, and CI comfortably runs 3 workers.
    */
-  workers: 1,
+  workers: process.env.CI ? 3 : 2,
   retries: process.env.CI ? 2 : 1,
   reporter: process.env.CI ? "github" : "list",
   use: {

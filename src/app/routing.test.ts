@@ -52,6 +52,8 @@ describe("parseHash", () => {
       { view: "khatmah_overview" },
       { view: "wird_benefits" },
       { view: "oasis_preview" },
+      { view: "category", categoryId: "morning" },
+      { view: "category", categoryId: "comprehensive_duas" },
     ] as const) {
       expect(parseHash(routeToHash(route)!)).toEqual(route);
     }

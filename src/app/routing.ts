@@ -113,7 +113,7 @@ export function parseHash(hash: string): RouteState | null {
     if (!categoryId) return null;
 
     if (segments.length === 2) {
-      return { view: "reader", categoryId, index: 0 };
+      return { view: "category", categoryId };
     }
 
     const oneBased = Number(segments[2]);
