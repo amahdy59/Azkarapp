@@ -1,7 +1,13 @@
-import { BookOpen, Sparkles, Sun, Users } from "../components/icons";
+import { Mosque, PrayerBeads, PrayerRug } from "../components/icons";
 import { t } from "../i18n";
 import type { AppLanguage, PrayerName, PrayerTrackingRecord } from "../types";
-import { getPrayerSunnah, type PrayerSunnah, type SunnahRank } from "./prayerSunnah";
+import {
+  getPrayerSunnah,
+  TWELVE_RAKAHS,
+  type PrayerSunnah,
+  type SunnahEvidence,
+  type SunnahRank,
+} from "./prayerSunnah";
 import type { PrayerTrackingWrite } from "../components/PrayerTrackerCards";
 
 export type PrayerActionId = "congregation" | "sunnah_before" | "adhkar" | "sunnah_after";
@@ -9,7 +15,7 @@ export type PrayerActionId = "congregation" | "sunnah_before" | "adhkar" | "sunn
 export interface PrayerActionItem {
   id: PrayerActionId;
   label: string;
-  Icon: typeof Users;
+  Icon: typeof Mosque;
   field: PrayerTrackingWrite;
   checked: boolean;
   testId: string;
@@ -26,10 +32,17 @@ export interface PrayerSunnahDetail {
   sunnah: PrayerSunnah;
 }
 
+export interface PrayerRawatibVirtue {
+  title: string;
+  description: string;
+  evidence: SunnahEvidence;
+}
+
 export interface PrayerInfoData {
   prayer: PrayerName;
   prayerName: string;
   modalTitle: string;
+  rawatibVirtue: PrayerRawatibVirtue;
   sunnahItems: PrayerSunnahDetail[];
 }
 
@@ -57,7 +70,7 @@ export function getPrayerActions({
   actions.push({
     id: "congregation",
     label: t(language, "prayerActions.prayedCongregation", { prayer: name }),
-    Icon: Users,
+    Icon: Mosque,
     field: "location",
     checked: record?.location === "mosque" || record?.mosque === true,
     testId: "prayer-action-location",
@@ -69,10 +82,17 @@ export function getPrayerActions({
     const isChecked =
       prayer === "dhuhr" ? (record?.sunnahBefore ?? false) : (record?.sunnahBefore ?? record?.sunnah ?? false);
 
+    const labelKey =
+      prayer === "fajr"
+        ? "prayerActions.fajrBeforeAction"
+        : prayer === "dhuhr"
+          ? "prayerActions.dhuhrBeforeAction"
+          : "prayerActions.asrBeforeAction";
+
     actions.push({
       id: "sunnah_before",
-      label: t(language, "prayerActions.sunnahBefore", { prayer: name }),
-      Icon: Sparkles,
+      label: t(language, labelKey),
+      Icon: PrayerRug,
       field: prayer === "dhuhr" ? "sunnahBefore" : "sunnah",
       checked: isChecked,
       testId: `prayer-action-${prayer}-sunnah-before`,
@@ -83,7 +103,7 @@ export function getPrayerActions({
   actions.push({
     id: "adhkar",
     label: t(language, "prayerActions.adhkarAfterPrayer"),
-    Icon: BookOpen,
+    Icon: PrayerBeads,
     field: "adhkar",
     checked: record?.adhkar === true,
     testId: `prayer-action-${prayer}-adhkar`,
@@ -95,10 +115,17 @@ export function getPrayerActions({
     const isChecked =
       prayer === "dhuhr" ? (record?.sunnahAfter ?? false) : (record?.sunnahAfter ?? record?.sunnah ?? false);
 
+    const labelKey =
+      prayer === "dhuhr"
+        ? "prayerActions.dhuhrAfterAction"
+        : prayer === "maghrib"
+          ? "prayerActions.maghribAfterAction"
+          : "prayerActions.ishaAfterAction";
+
     actions.push({
       id: "sunnah_after",
-      label: t(language, "prayerActions.sunnahAfter", { prayer: name }),
-      Icon: Sun,
+      label: t(language, labelKey),
+      Icon: PrayerRug,
       field: prayer === "dhuhr" ? "sunnahAfter" : "sunnah",
       checked: isChecked,
       testId: `prayer-action-${prayer}-sunnah-after`,
@@ -172,6 +199,11 @@ export function getPrayerInfoData(prayer: PrayerName, language: AppLanguage): Pr
     prayer,
     prayerName,
     modalTitle,
+    rawatibVirtue: {
+      title: t(language, "prayerActions.rawatibVirtueTitle"),
+      description: t(language, "prayerActions.rawatibVirtueDesc"),
+      evidence: TWELVE_RAKAHS,
+    },
     sunnahItems,
   };
 }

@@ -1,9 +1,17 @@
 import { useMemo, useState } from "react";
-import { BookOpen, Info, Mosque } from "./icons";
+import { BookOpen, CloudSun, Info, MoonStar, Mosque, PrayerRug, Sun, Sunrise, Sunset } from "./icons";
 import { TrackingCheckMark } from "./PrayerTrackerCards";
 import { Modal } from "./ResponsiveSheet";
 import { t } from "../i18n";
 import type { AppLanguage, PrayerName, PrayerTrackingRecord } from "../types";
+
+const PRAYER_ICON: Record<PrayerName, typeof Sunrise> = {
+  fajr: Sunrise,
+  dhuhr: Sun,
+  asr: CloudSun,
+  maghrib: Sunset,
+  isha: MoonStar,
+};
 import { getPrayerActions, getPrayerInfoData } from "../content/prayerActions";
 import type { PrayerTrackingWrite } from "./PrayerTrackerCards";
 
@@ -64,14 +72,17 @@ export function PrayerActionsCard({
       aria-labelledby={`prayer-actions-heading-${prayer}`}
       className={`flex flex-col gap-3 p-4 sm:p-5 md:p-6 ${className}`}
     >
-      {/* Header: Mosque Icon + Heading + More Info Button */}
+      {/* Header: Prayer Icon + Heading + More Info Button */}
       <div className="flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-2.5">
           <span
             aria-hidden="true"
             className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary"
           >
-            <Mosque size={18} />
+            {(() => {
+              const HeaderIcon = PRAYER_ICON[prayer] ?? Mosque;
+              return <HeaderIcon size={18} />;
+            })()}
           </span>
           <h3
             id={`prayer-actions-heading-${prayer}`}
@@ -178,6 +189,47 @@ export function PrayerActionsCard({
           maxWidthClassName="max-w-lg"
         >
           <div className="flex flex-col gap-4 px-5 py-4 text-start">
+            {/* Rawatib Virtue Foundation Banner */}
+            <aside
+              className="flex flex-col gap-2 rounded-2xl border border-primary/30 bg-primary/10 p-4"
+              data-testid="rawatib-virtue-banner"
+            >
+              <div className="flex items-center gap-2">
+                <span
+                  aria-hidden="true"
+                  className="flex size-7 items-center justify-center rounded-lg bg-primary/20 text-primary"
+                >
+                  <PrayerRug size={16} />
+                </span>
+                <h4 className="text-sm font-black text-primary sm:text-base" dir="auto">
+                  {infoData.rawatibVirtue.title}
+                </h4>
+              </div>
+              <p className="text-xs font-semibold leading-relaxed text-muted-foreground sm:text-sm" dir="auto">
+                {infoData.rawatibVirtue.description}
+              </p>
+              <blockquote
+                className="mt-1 rounded-xl border border-primary/20 bg-card p-3"
+                dir={isArabic || !infoData.rawatibVirtue.evidence.textEnglish ? "rtl" : "ltr"}
+              >
+                <p
+                  className={`text-sm font-bold leading-loose text-foreground ${
+                    isArabic || !infoData.rawatibVirtue.evidence.textEnglish ? "zikr-text" : ""
+                  }`}
+                  lang={isArabic || !infoData.rawatibVirtue.evidence.textEnglish ? "ar" : "en"}
+                >
+                  {isArabic
+                    ? infoData.rawatibVirtue.evidence.textArabic
+                    : (infoData.rawatibVirtue.evidence.textEnglish ?? infoData.rawatibVirtue.evidence.textArabic)}
+                </p>
+                <footer className="mt-1 text-micro font-semibold text-muted-foreground">
+                  {isArabic
+                    ? infoData.rawatibVirtue.evidence.referenceArabic
+                    : infoData.rawatibVirtue.evidence.referenceEnglish}
+                </footer>
+              </blockquote>
+            </aside>
+
             {infoData.sunnahItems.length === 0 ? (
               <p className="text-center text-sm font-medium text-muted-foreground" dir="auto">
                 {t(language, "prayerMoment.statusNow")}

@@ -84,11 +84,9 @@ describe("the prayer as one surface", () => {
     expect(virtue.closest("article")).toContainElement(screen.getByTestId("prayer-journey"));
   });
 
-  it("drops the virtue once the prayer's time has gone", () => {
-    // After the window it could only congratulate, which is the reward-shaped
-    // dialog this screen replaced.
+  it("keeps the virtue hadith present even after the prayer's time has passed", () => {
     renderScreen({ prayer: "fajr", now: at(shift(times.dhuhr, 30)) });
-    expect(screen.queryByTestId("prayer-moment-virtue")).toBeNull();
+    expect(screen.getByTestId("prayer-moment-virtue")).toBeInTheDocument();
   });
 
   it("asks whether the prayer was in congregation, not where it was prayed", () => {
@@ -125,9 +123,9 @@ describe("the prayer as one surface", () => {
     renderScreen({ prayer: "dhuhr" });
     expect(screen.getByRole("heading", { level: 3, name: /أعمال صلاة الظهر/ })).toBeInTheDocument();
     expect(screen.getByTestId("prayer-action-location")).toHaveTextContent("صليت الظهر جماعة");
-    expect(screen.getByTestId("prayer-action-dhuhr-sunnah-before")).toHaveTextContent("سنة الظهر القبلية");
+    expect(screen.getByTestId("prayer-action-dhuhr-sunnah-before")).toHaveTextContent("أربع ركعات قبل الظهر");
     expect(screen.getByTestId("prayer-action-dhuhr-adhkar")).toHaveTextContent("أذكار بعد الصلاة");
-    expect(screen.getByTestId("prayer-action-dhuhr-sunnah-after")).toHaveTextContent("سنة الظهر البعدية");
+    expect(screen.getByTestId("prayer-action-dhuhr-sunnah-after")).toHaveTextContent("ركعتان بعد الظهر");
   });
 
   it("names an encouraged sunnah in More Info, not as one of the twelve", () => {

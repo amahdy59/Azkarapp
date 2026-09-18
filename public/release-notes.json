@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-18c",
+  "release": "2026-09-18d",
   "ar": [
-    "إتاحة بطاقة أعمال الصلاة التفاعلية لجميع الصلوات الخمس مع تتبع صلاة الجماعة والسنن الرواتب.",
-    "إضافة دليل إرشادي ومعلومات توثيقية عن سنن كل صلاة وأحاديثها النبوية وفضلها.",
-    "زر مباشر ومميز لبدء أذكار ما بعد الصلاة بانسيابية وسرعة."
+    "تثبيت حديث فضل الصلاة في جماعة ليظهر دائماً بشكل ثابت عبر جميع بطاقات الصلاة دون اختفاء.",
+    "توضيح عناوين السنن بعدد الركعات وموعدها (مثل ركعتان بعد العشاء وأربع ركعات قبل الظهر).",
+    "تحديث الأيقونات برموز دينية معبرة للمسجد وسجادة الصلاة والمسبحة مع إضافة فضل السنن الرواتب."
   ],
   "en": [
-    "Added an interactive Prayer Actions card for all five daily prayers to track congregation and Sunnah prayers.",
-    "Added educational guides with verified prophetic hadiths explaining the Sunnah prayers for each prayer.",
-    "Added a dedicated quick-action button to start post-prayer adhkar seamlessly."
+    "Permanently displayed the prayer virtue hadith across all prayer cards without conditional toggling.",
+    "Clarified Sunnah action titles with exact rak'ah counts and timing (e.g., 2 rak'ahs after Isha).",
+    "Updated action icons with authentic devotional symbols and added the overarching virtue of Sunan Rawatib."
   ]
 }

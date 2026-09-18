@@ -153,3 +153,58 @@ export function Mosque({
     createElement("path", { d: "M20.5 11 17 8" }),
   );
 }
+
+export function PrayerRug({
+  size = 20,
+  className,
+  ...props
+}: { size?: number; className?: string } & SVGProps<SVGSVGElement>) {
+  return createElement(
+    "svg",
+    {
+      width: size,
+      height: size,
+      viewBox: "0 0 24 24",
+      fill: "none",
+      stroke: "currentColor",
+      strokeWidth: 2,
+      strokeLinecap: "round",
+      strokeLinejoin: "round",
+      className,
+      ...props,
+    },
+    createElement("rect", { x: "5", y: "3", width: "14", height: "18", rx: "2" }),
+    createElement("path", { d: "M9 15v-4.5c0-1.7 1.3-3 3-3s3 1.3 3 3V15" }),
+    createElement("path", { d: "M5 6h14" }),
+    createElement("path", { d: "M5 18h14" }),
+  );
+}
+
+export function PrayerBeads({
+  size = 20,
+  className,
+  ...props
+}: { size?: number; className?: string } & SVGProps<SVGSVGElement>) {
+  return createElement(
+    "svg",
+    {
+      width: size,
+      height: size,
+      viewBox: "0 0 24 24",
+      fill: "none",
+      stroke: "currentColor",
+      strokeWidth: 2,
+      strokeLinecap: "round",
+      strokeLinejoin: "round",
+      className,
+      ...props,
+    },
+    createElement("circle", { cx: "12", cy: "9", r: "6" }),
+    createElement("circle", { cx: "12", cy: "3", r: "1", fill: "currentColor" }),
+    createElement("circle", { cx: "18", cy: "9", r: "1", fill: "currentColor" }),
+    createElement("circle", { cx: "6", cy: "9", r: "1", fill: "currentColor" }),
+    createElement("circle", { cx: "12", cy: "15", r: "1.2", fill: "currentColor" }),
+    createElement("path", { d: "M12 16.5v3.5" }),
+    createElement("path", { d: "M10 22l2-2 2 2" }),
+  );
+}

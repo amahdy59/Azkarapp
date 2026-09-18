@@ -47,7 +47,7 @@ export interface PrayerSunnah {
   evidence: SunnahEvidence;
 }
 
-const TWELVE_RAKAHS: SunnahEvidence = {
+export const TWELVE_RAKAHS: SunnahEvidence = {
   textArabic:
     "«مَنْ صَلَّى اثْنَتَيْ عَشْرَةَ رَكْعَةً فِي يَوْمٍ وَلَيْلَةٍ بُنِيَ لَهُ بِهِنَّ بَيْتٌ فِي الْجَنَّةِ»",
   referenceArabic: "صحيح مسلم ٧٢٨",

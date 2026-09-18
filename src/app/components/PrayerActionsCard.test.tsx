@@ -31,9 +31,9 @@ describe("PrayerActionsCard", () => {
 
     // Checklist rows (4 for Dhuhr)
     expect(screen.getByTestId("prayer-action-location")).toHaveTextContent("صليت الظهر جماعة");
-    expect(screen.getByTestId("prayer-action-dhuhr-sunnah-before")).toHaveTextContent("سنة الظهر القبلية");
+    expect(screen.getByTestId("prayer-action-dhuhr-sunnah-before")).toHaveTextContent("أربع ركعات قبل الظهر");
     expect(screen.getByTestId("prayer-action-dhuhr-adhkar")).toHaveTextContent("أذكار بعد الصلاة");
-    expect(screen.getByTestId("prayer-action-dhuhr-sunnah-after")).toHaveTextContent("سنة الظهر البعدية");
+    expect(screen.getByTestId("prayer-action-dhuhr-sunnah-after")).toHaveTextContent("ركعتان بعد الظهر");
 
     // Checkboxes count
     const checkboxes = screen.getAllByRole("checkbox");
@@ -55,7 +55,7 @@ describe("PrayerActionsCard", () => {
 
     expect(screen.getByRole("heading", { level: 3 })).toHaveTextContent("أعمال صلاة الفجر");
     expect(screen.getByTestId("prayer-action-location")).toHaveTextContent("صليت الفجر جماعة");
-    expect(screen.getByTestId("prayer-action-fajr-sunnah-before")).toHaveTextContent("سنة الفجر القبلية");
+    expect(screen.getByTestId("prayer-action-fajr-sunnah-before")).toHaveTextContent("ركعتان قبل الفجر");
     expect(screen.getByTestId("prayer-action-fajr-adhkar")).toHaveTextContent("أذكار بعد الصلاة");
     expect(screen.queryByTestId("prayer-action-fajr-sunnah-after")).toBeNull();
 
@@ -77,7 +77,7 @@ describe("PrayerActionsCard", () => {
 
     expect(screen.getByRole("heading", { level: 3 })).toHaveTextContent("أعمال صلاة العصر");
     expect(screen.getByTestId("prayer-action-location")).toHaveTextContent("صليت العصر جماعة");
-    expect(screen.getByTestId("prayer-action-asr-sunnah-before")).toHaveTextContent("سنة العصر القبلية");
+    expect(screen.getByTestId("prayer-action-asr-sunnah-before")).toHaveTextContent("أربع ركعات قبل العصر");
     expect(screen.getByTestId("prayer-action-asr-adhkar")).toHaveTextContent("أذكار بعد الصلاة");
     expect(screen.queryByTestId("prayer-action-asr-sunnah-after")).toBeNull();
 
@@ -100,7 +100,7 @@ describe("PrayerActionsCard", () => {
     expect(screen.getByRole("heading", { level: 3 })).toHaveTextContent("أعمال صلاة المغرب");
     expect(screen.getByTestId("prayer-action-location")).toHaveTextContent("صليت المغرب جماعة");
     expect(screen.getByTestId("prayer-action-maghrib-adhkar")).toHaveTextContent("أذكار بعد الصلاة");
-    expect(screen.getByTestId("prayer-action-maghrib-sunnah-after")).toHaveTextContent("سنة المغرب البعدية");
+    expect(screen.getByTestId("prayer-action-maghrib-sunnah-after")).toHaveTextContent("ركعتان بعد المغرب");
     expect(screen.queryByTestId("prayer-action-maghrib-sunnah-before")).toBeNull();
 
     expect(screen.getAllByRole("checkbox")).toHaveLength(3);
@@ -122,7 +122,7 @@ describe("PrayerActionsCard", () => {
     expect(screen.getByRole("heading", { level: 3 })).toHaveTextContent("أعمال صلاة العشاء");
     expect(screen.getByTestId("prayer-action-location")).toHaveTextContent("صليت العشاء جماعة");
     expect(screen.getByTestId("prayer-action-isha-adhkar")).toHaveTextContent("أذكار بعد الصلاة");
-    expect(screen.getByTestId("prayer-action-isha-sunnah-after")).toHaveTextContent("سنة العشاء البعدية");
+    expect(screen.getByTestId("prayer-action-isha-sunnah-after")).toHaveTextContent("ركعتان بعد العشاء");
     expect(screen.queryByTestId("prayer-action-isha-sunnah-before")).toBeNull();
 
     expect(screen.getAllByRole("checkbox")).toHaveLength(3);
@@ -230,6 +230,16 @@ describe("PrayerActionsCard", () => {
     const modal = screen.getByTestId("prayer-actions-info-modal");
     expect(modal).toBeInTheDocument();
     expect(modal).toHaveTextContent("سنن صلاة الظهر");
+
+    // Overarching Rawatib Foundation Banner
+    const rawatibBanner = screen.getByTestId("rawatib-virtue-banner");
+    expect(rawatibBanner).toBeInTheDocument();
+    expect(rawatibBanner).toHaveTextContent("فضل السنن الرواتب");
+    expect(rawatibBanner).toHaveTextContent(
+      "مَنْ صَلَّى اثْنَتَيْ عَشْرَةَ رَكْعَةً فِي يَوْمٍ وَلَيْلَةٍ بُنِيَ لَهُ بِهِنَّ بَيْتٌ فِي الْجَنَّةِ",
+    );
+
+    // Individual Sunnah breakdown
     expect(modal).toHaveTextContent("قبل الصلاة");
     expect(modal).toHaveTextContent("أربع ركعات");
     expect(modal).toHaveTextContent("بعد الصلاة");
@@ -273,9 +283,9 @@ describe("PrayerActionsCard", () => {
 
     expect(screen.getByRole("heading", { level: 3 })).toHaveTextContent("Deeds of Dhuhr prayer");
     expect(screen.getByTestId("prayer-action-location")).toHaveTextContent("Prayed Dhuhr in congregation");
-    expect(screen.getByTestId("prayer-action-dhuhr-sunnah-before")).toHaveTextContent("Dhuhr Sunnah before");
+    expect(screen.getByTestId("prayer-action-dhuhr-sunnah-before")).toHaveTextContent("4 rak'ahs before Dhuhr");
     expect(screen.getByTestId("prayer-action-dhuhr-adhkar")).toHaveTextContent("Azkar after prayer");
-    expect(screen.getByTestId("prayer-action-dhuhr-sunnah-after")).toHaveTextContent("Dhuhr Sunnah after");
+    expect(screen.getByTestId("prayer-action-dhuhr-sunnah-after")).toHaveTextContent("2 rak'ahs after Dhuhr");
     expect(screen.getByTestId("prayer-open-adhkar")).toHaveTextContent("Start Azkar");
   });
 });

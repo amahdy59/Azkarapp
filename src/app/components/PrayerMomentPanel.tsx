@@ -124,7 +124,7 @@ export function PrayerMomentPanel({
   return (
     <>
       <HomeCard as="article" onGlass={onGlass} className="flex flex-col overflow-hidden">
-        <div className={`flex flex-col ${fullWidth && virtue && isLive ? "md:grid md:grid-cols-2" : ""}`}>
+        <div className={`flex flex-col ${fullWidth && virtue ? "md:grid md:grid-cols-2" : ""}`}>
           <section
             /* A floor, not a height: the scene is the ground for the name and
             the time, and at content height alone it read as a strip of sky
@@ -206,7 +206,7 @@ export function PrayerMomentPanel({
               </p>
             </div>
           </section>
-          {virtue && isLive && (
+          {virtue && (
             <section
               className={`flex min-h-[11rem] flex-col justify-center border-b p-5 text-start md:p-6 ${hairline}`}
               data-testid="prayer-moment-virtue"
