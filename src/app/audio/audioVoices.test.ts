@@ -5,7 +5,7 @@ describe("audio voices", () => {
   it("orders Arabic names by the Arabic alphabet, not by code point", () => {
     const names = getAudioVoices("ar").map((voice) => voice.nameArabic);
     // George (جورج) sorts before عبد/محمد in Arabic collation
-    expect(names).toEqual(["جورج (الترجمة الإنجليزية)", "عبد الله محمد", "محمد الشرع", "محمد معتز"]);
+    expect(names).toEqual(["جورج (الترجمة الإنجليزية)", "عبد الله محمد", "محمد شرعي", "محمد معتز"]);
   });
 
   it("orders English names alphabetically", () => {

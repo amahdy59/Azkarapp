@@ -15,7 +15,7 @@ export interface AudioVoice {
 
 const VOICES: readonly AudioVoice[] = Object.freeze([
   { id: "abdullah-muhammad", nameArabic: "عبد الله محمد", nameEnglish: "Abdullah Muhammad" },
-  { id: "muhammad-alshara", nameArabic: "محمد الشرع", nameEnglish: "Muhammad Al-Shara" },
+  { id: "muhammad-alshara", nameArabic: "محمد شرعي", nameEnglish: "Muhammad Shari" },
   { id: "muhammad-moataz", nameArabic: "محمد معتز", nameEnglish: "Muhammad Moataz" },
   { id: "english-george", nameArabic: "جورج (الترجمة الإنجليزية)", nameEnglish: "English Translation (George)" },
 ]);
