@@ -3,6 +3,7 @@ import {
   getHomeAction,
   getTimeOfDayZikr,
   isFridayFeatureWindow,
+  isFridayDaytime,
   isDhuhaWindow,
   isLastThirdOfNight,
 } from "./HomeScreen";
@@ -96,6 +97,22 @@ describe("getHomeAction", () => {
     expect(isFridayFeatureWindow(atTime(friday, fridayMaghrib, -1), cairo)).toBe(true);
     expect(isFridayFeatureWindow(atTime(friday, fridayMaghrib), cairo)).toBe(false);
     expect(isFridayFeatureWindow(new Date(2026, 7, 8, 12), cairo)).toBe(false);
+  });
+
+  it("activates Friday daytime only from Friday Fajr until Friday Maghrib", () => {
+    const thursday = new Date(2026, 7, 6, 12);
+    const friday = new Date(2026, 7, 7, 12);
+    const saturday = new Date(2026, 7, 8, 12);
+    const fridayFajr = getEstimatedPrayerTimes(friday, cairo).fajr;
+    const fridayMaghrib = getEstimatedPrayerTimes(friday, cairo).maghrib;
+
+    expect(isFridayDaytime(thursday, cairo)).toBe(false);
+    expect(isFridayDaytime(atTime(friday, fridayFajr, -1), cairo)).toBe(false);
+    expect(isFridayDaytime(atTime(friday, fridayFajr), cairo)).toBe(true);
+    expect(isFridayDaytime(atTime(friday, "12:00"), cairo)).toBe(true);
+    expect(isFridayDaytime(atTime(friday, fridayMaghrib, -1), cairo)).toBe(true);
+    expect(isFridayDaytime(atTime(friday, fridayMaghrib), cairo)).toBe(false);
+    expect(isFridayDaytime(saturday, cairo)).toBe(false);
   });
 });
 

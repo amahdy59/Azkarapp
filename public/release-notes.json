@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-18b",
+  "release": "2026-09-18c",
   "ar": [
-    "تحسين المظهر العام وتوحيد تصميم البطاقات والتأثيرات الزجاجية في الشاشة الرئيسية.",
-    "إتاحة التحكم المباشر في حجم خط القراءة من قائمة الخيارات داخل صفحة الذكر.",
-    "تحسين التنقل واستعراض مجموعات الأذكار بسلاسة وتجاوب أعلى أثناء القراءة."
+    "إتاحة بطاقة أعمال الصلاة التفاعلية لجميع الصلوات الخمس مع تتبع صلاة الجماعة والسنن الرواتب.",
+    "إضافة دليل إرشادي ومعلومات توثيقية عن سنن كل صلاة وأحاديثها النبوية وفضلها.",
+    "زر مباشر ومميز لبدء أذكار ما بعد الصلاة بانسيابية وسرعة."
   ],
   "en": [
-    "Refined visual styling and unified glassmorphism effects across all cards on the Home screen.",
-    "Added convenient text size controls directly within the Reader options menu.",
-    "Smoother navigation and responsive collection browsing during reading sessions."
+    "Added an interactive Prayer Actions card for all five daily prayers to track congregation and Sunnah prayers.",
+    "Added educational guides with verified prophetic hadiths explaining the Sunnah prayers for each prayer.",
+    "Added a dedicated quick-action button to start post-prayer adhkar seamlessly."
   ]
 }

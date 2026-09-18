@@ -57,7 +57,9 @@ export function pickPrayerRecord(a: PrayerTrackingRecord, b: PrayerTrackingRecor
   // device and the rawatib on another is one prayer with both done.
   const fallback = other ?? (base === a ? b : a);
   merged.adhkar = a.adhkar || b.adhkar;
-  merged.sunnah = a.sunnah || b.sunnah || undefined;
+  merged.sunnahBefore = a.sunnahBefore || b.sunnahBefore || undefined;
+  merged.sunnahAfter = a.sunnahAfter || b.sunnahAfter || undefined;
+  merged.sunnah = a.sunnah || b.sunnah || merged.sunnahBefore || merged.sunnahAfter || undefined;
   if (!merged.location && fallback.location) merged.location = fallback.location;
   merged.mosque = merged.location ? merged.location === "mosque" : a.mosque || b.mosque;
   return merged;

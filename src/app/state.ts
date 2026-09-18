@@ -59,7 +59,9 @@ function normalizePrayerTracking(value: unknown): PrayerTrackingRecord[] {
        written, so the two fields can never disagree on the way in. */
     const mosque = record.mosque === true || location === "mosque";
     const adhkar = record.adhkar === true;
-    const sunnah = record.sunnah === true;
+    const sunnahBefore = record.sunnahBefore === true;
+    const sunnahAfter = record.sunnahAfter === true;
+    const sunnah = record.sunnah === true || sunnahBefore || sunnahAfter;
     if (!mosque && !adhkar && !sunnah && !location) continue;
     byKey.set(`${record.dayKey}:${record.prayer}`, {
       dayKey: record.dayKey,
@@ -68,6 +70,8 @@ function normalizePrayerTracking(value: unknown): PrayerTrackingRecord[] {
       adhkar,
       ...(location ? { location } : {}),
       ...(sunnah ? { sunnah } : {}),
+      ...(sunnahBefore ? { sunnahBefore } : {}),
+      ...(sunnahAfter ? { sunnahAfter } : {}),
     });
   }
   return [...byKey.values()];

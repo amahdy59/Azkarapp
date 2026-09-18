@@ -1,16 +1,15 @@
-import { useMemo, useState } from "react";
-import { TrackingCheckMark } from "./PrayerTrackerCards";
+import { useMemo } from "react";
+import type { PrayerTrackingWrite } from "./PrayerTrackerCards";
 import { PrayerSceneArt } from "./PrayerSceneArt";
-import { CloudSun, Info, MoonStar, Sun, Sunrise, Sunset } from "./icons";
+import { CloudSun, MoonStar, Sun, Sunrise, Sunset } from "./icons";
 import { t } from "../i18n";
 import { formatPrayerTimeLabel } from "../content/prayerTimes";
 import { formatNumerals } from "../formatting";
-import { getPrayerSunnah } from "../content/prayerSunnah";
-import { Modal } from "./ResponsiveSheet";
 import { getPrayerVirtues } from "../content/prayerVirtues";
 import { getPrayerMoment, type PrayerMoment } from "../prayerMoment";
 import type { AppLanguage, LocationSettings, PrayerName, PrayerTrackingRecord } from "../types";
 import { HomeCard } from "./HomeCard";
+import { PrayerActionsCard } from "./PrayerActionsCard";
 
 export const PRAYER_ICON: Record<PrayerName, typeof Sunrise> = {
   fajr: Sunrise,
@@ -58,11 +57,7 @@ export function PrayerMomentPanel({
   locationSettings?: LocationSettings;
   /** Injected so the states can be held to a fixed clock in a test. */
   now?: Date;
-  onToggle: (
-    prayer: PrayerName,
-    field: "location" | "adhkar" | "sunnah",
-    value: boolean | "mosque" | "home" | null,
-  ) => void;
+  onToggle: (prayer: PrayerName, field: PrayerTrackingWrite, value: boolean | "mosque" | "home" | null) => void;
   /**
    * Rendered over the Home hero's photograph rather than on the page ground.
    *
@@ -87,8 +82,6 @@ export function PrayerMomentPanel({
   const isArabic = language === "ar";
   const name = t(language, `notifications.${prayer}`);
   const Icon = PRAYER_ICON[prayer];
-  const sunnah = moment.sunnahFocus ? getPrayerSunnah(prayer, moment.sunnahFocus) : null;
-  const [evidenceOpen, setEvidenceOpen] = useState(false);
   const virtue = getPrayerVirtues(prayer)[0];
 
   /* The prayer leads from twenty minutes before its adhan until the next one,
@@ -101,9 +94,6 @@ export function PrayerMomentPanel({
   const bodyText = onGlass ? "text-on-media-muted" : "text-muted-foreground";
   const accentText = onGlass ? "text-on-media-accent" : "text-primary";
   const hairline = onGlass ? "border-white/20" : "border-border/60";
-  const iconButton = onGlass
-    ? "border-white/30 text-on-media-muted hover:bg-white/10"
-    : "border-border text-muted-foreground hover:bg-muted";
 
   const isLive = moment.phase === "now" || moment.phase === "approaching" || moment.phase === "recorded";
 
@@ -130,18 +120,6 @@ export function PrayerMomentPanel({
           : moment.phase === "passed"
             ? "prayerMoment.statusPassed"
             : "prayerMoment.statusUpcoming";
-
-  /* Arabic counts its rak'ahs, it does not number them: two is a dual noun and
-     four takes the plural, so a "{count} rak'ahs" template would read as
-     broken Arabic at both of the counts the confirmed rawātib actually use. */
-  const rakahCount = (sunnah?.before ?? 0) + (sunnah?.after ?? 0);
-  const rakahs = t(language, rakahCount === 4 ? "prayerMoment.rakahFour" : "prayerMoment.rakahTwo");
-  const sunnahDetail = moment.sunnahFocus
-    ? t(language, moment.sunnahFocus === "before" ? "prayerMoment.sunnahBefore" : "prayerMoment.sunnahAfter", {
-        rakahs,
-        prayer: name,
-      })
-    : "";
 
   return (
     <>
@@ -252,205 +230,20 @@ export function PrayerMomentPanel({
             </section>
           )}
         </div>
-        <section className="p-4 sm:p-5 md:p-6" data-testid="prayer-journey" aria-labelledby="prayer-journey-title">
-          <div className="min-w-0">
-            <h3 id="prayer-journey-title" className={`text-subtitle font-black ${titleText}`} dir="auto">
-              {t(language, "prayerMoment.journeyTitle")}
-            </h3>
-            <p className={`mt-0.5 text-label font-semibold ${bodyText}`} dir="auto">
-              {t(language, "prayerMoment.journeySubtitle")}
-            </p>
-          </div>
-
-          <ol
-            className={`mt-3 flex flex-col ${fullWidth ? "md:grid md:grid-cols-2 md:gap-3" : ""}`}
-            style={
-              fullWidth
-                ? ({
-                    "--border-journey-step": onGlass ? "rgb(255 255 255 / 0.15)" : "var(--border)",
-                  } as React.CSSProperties)
-                : undefined
-            }
-          >
-            {/* Where it was prayed. Two choices rather than one tick, so "at
-              home" is a recorded answer instead of the absence of one. */}
-            <li
-              className={`relative flex items-start gap-3 border-t py-3.5 ${fullWidth ? "" : "first:border-t-0 first:pt-0"} ${hairline} ${
-                fullWidth ? "journey-step-card" : ""
-              }`}
-              data-testid="prayer-action-location"
-            >
-              {/* One answer, not a choice of two places. Whether the prayer was
-                prayed at all is the reader's business; whether it was prayed in
-                congregation is what the day's path counts, so that is what is
-                asked. Recording "at home" changed no outcome anywhere — it was
-                a question asked for the app's benefit rather than the
-                reader's. */}
-              <input
-                id="prayer-mosque"
-                type="checkbox"
-                disabled={!canRecord}
-                checked={moment.location === "mosque"}
-                onChange={(event) => {
-                  if (canRecord) onToggle(prayer, "location", event.currentTarget.checked ? "mosque" : null);
-                }}
-                aria-labelledby="prayer-mosque-title"
-                className="tracking-choice peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-xl opacity-0 disabled:cursor-not-allowed"
-              />
-              <div className="min-w-0 flex-1">
-                <p id="prayer-mosque-title" className={`text-subtitle font-black ${titleText}`} dir="auto">
-                  <span className={bodyText}>{formatNumerals(1, language)}. </span>
-                  {t(language, "prayerTracking.mosque")}
-                </p>
-                <p className={`mt-0.5 text-label font-semibold ${bodyText}`} dir="auto">
-                  {moment.location === "mosque"
-                    ? t(language, "prayerMoment.mosqueRecorded")
-                    : t(language, "prayerMoment.mosquePrompt")}
-                </p>
-              </div>
-              <TrackingCheckMark checked={moment.location === "mosque"} />
-            </li>
-
-            {/* The adhkar that follow the prayer. */}
-            <li
-              className={`relative flex items-start gap-3 border-t py-3.5 ${hairline} ${
-                fullWidth ? "journey-step-card" : ""
-              }`}
-              data-testid="prayer-action-prayer-adhkar"
-            >
-              <input
-                id="prayer-adhkar"
-                type="checkbox"
-                disabled={!canRecord}
-                checked={moment.adhkarDone}
-                onChange={(event) => {
-                  if (canRecord) onToggle(prayer, "adhkar", event.currentTarget.checked);
-                }}
-                aria-labelledby="prayer-adhkar-title"
-                className="tracking-choice peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-xl opacity-0 disabled:cursor-not-allowed"
-              />
-              <div className="min-w-0 flex-1">
-                <p id="prayer-adhkar-title" className={`text-subtitle font-black ${titleText}`} dir="auto">
-                  <span className={bodyText}>{formatNumerals(2, language)}. </span>
-                  {t(language, "prayerMoment.journeyStepAdhkar")}
-                </p>
-                <p className={`mt-0.5 text-label font-semibold ${bodyText}`} dir="auto">
-                  {t(language, "prayerMoment.journeyStepAdhkarDetail")}
-                </p>
-              </div>
-              <TrackingCheckMark checked={moment.adhkarDone} />
-            </li>
-
-            {/* The rawātib. Absent for a prayer that has none rather than shown
-              empty, and it names the rak'ahs that are due now — the ones before
-              the fard while it is still ahead, the ones after it once it is
-              in. */}
-            {sunnah && moment.sunnahFocus && (
-              <li
-                className={`relative flex items-start gap-3 border-t py-3.5 ${hairline} ${
-                  fullWidth ? "journey-step-card" : ""
-                }`}
-                data-testid="prayer-action-prayer-sunnah"
-              >
-                <input
-                  id="prayer-sunnah"
-                  type="checkbox"
-                  disabled={!canRecord}
-                  checked={moment.sunnahDone}
-                  onChange={(event) => {
-                    if (canRecord) onToggle(prayer, "sunnah", event.currentTarget.checked);
-                  }}
-                  aria-labelledby="prayer-sunnah-title"
-                  className="tracking-choice peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-xl opacity-0 disabled:cursor-not-allowed"
-                />
-                <div className="min-w-0 flex-1">
-                  <p id="prayer-sunnah-title" className={`text-subtitle font-black ${titleText}`} dir="auto">
-                    <span className={bodyText}>{formatNumerals(3, language)}. </span>
-                    {/* The rank is named, not implied by position: the four
-                      before Asr are encouraged without being among the twelve,
-                      and a layout that cannot tell the two apart tells the
-                      reader something untrue. */}
-                    {t(
-                      language,
-                      sunnah.rank === "confirmed" ? "prayerMoment.sunnahTitle" : "prayerMoment.sunnahTitleOptional",
-                    )}
-                  </p>
-                  <p className={`mt-0.5 text-label font-semibold ${bodyText}`} dir="auto">
-                    {sunnahDetail}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setEvidenceOpen(true)}
-                  data-testid="prayer-sunnah-evidence"
-                  aria-label={t(language, "prayerMoment.evidenceOpen")}
-                  className={`relative z-10 flex size-11 shrink-0 items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${iconButton}`}
-                >
-                  <Info size={17} aria-hidden="true" />
-                </button>
-                <TrackingCheckMark checked={moment.sunnahDone} />
-              </li>
-            )}
-          </ol>
-
-          {/* One primary action for the whole card, rather than a control inside
-            each step. It stays locked until the prayer itself is recorded —
-            the reader's own answer, not the clock's guess — and it is never the
-            only way in: the collection keeps its place in the Azkar library. */}
-          <button
-            type="button"
-            onClick={() => onOpenAdhkar(prayer)}
-            data-testid="prayer-open-adhkar"
-            className="mt-3 flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-primary px-4 text-subtitle font-black text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-          >
-            {t(language, "prayerMoment.journeyOpenAdhkar")}
-          </button>
-        </section>
+        <div data-testid="prayer-journey">
+          <PrayerActionsCard
+            prayer={prayer}
+            language={language}
+            direction={direction}
+            records={records}
+            dayKey={dayKey}
+            canRecord={canRecord}
+            onToggle={onToggle}
+            onOpenAdhkar={onOpenAdhkar}
+            onGlass={onGlass}
+          />
+        </div>
       </HomeCard>
-
-      {sunnah && evidenceOpen && (
-        <Modal
-          open
-          onClose={() => setEvidenceOpen(false)}
-          title={t(language, "prayerMoment.evidenceTitle")}
-          direction={direction}
-          testId="prayer-sunnah-evidence-sheet"
-          maxWidthClassName="max-w-[32rem]"
-        >
-          <div className="flex flex-col gap-3 px-5 py-4 text-center">
-            <p className="text-subtitle font-black text-primary" dir="auto">
-              {sunnahDetail}
-            </p>
-            {/* The narration in the reader's language where one is reviewed,
-                with lang and dir describing the text drawn rather than the
-                interface around it. */}
-            <p
-              className={`text-base font-bold leading-loose text-foreground ${
-                isArabic || !sunnah.evidence.textEnglish ? "zikr-text" : ""
-              }`}
-              dir={isArabic || !sunnah.evidence.textEnglish ? "rtl" : "ltr"}
-              lang={isArabic || !sunnah.evidence.textEnglish ? "ar" : "en"}
-            >
-              {isArabic ? sunnah.evidence.textArabic : (sunnah.evidence.textEnglish ?? sunnah.evidence.textArabic)}
-            </p>
-            <p className="text-label font-semibold text-muted-foreground" dir="auto">
-              {isArabic ? sunnah.evidence.referenceArabic : sunnah.evidence.referenceEnglish}
-            </p>
-            {/* Named only where the narration sits outside the two Sahihs,
-                which is exactly where a reader needs to be told. */}
-            {(isArabic ? sunnah.evidence.gradingArabic : sunnah.evidence.gradingEnglish) && (
-              <p className="text-xs font-bold text-muted-foreground/80" dir="auto">
-                {isArabic ? sunnah.evidence.gradingArabic : sunnah.evidence.gradingEnglish}
-              </p>
-            )}
-            {sunnah.rank === "optional" && (
-              <p className="text-xs font-semibold leading-6 text-muted-foreground" dir="auto">
-                {t(language, "prayerMoment.optionalNote")}
-              </p>
-            )}
-          </div>
-        </Modal>
-      )}
     </>
   );
 }

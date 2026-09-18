@@ -226,4 +226,28 @@ describe("HomeScreen document outline", () => {
       expect(container.querySelector(`#${labelledBy}`)?.textContent?.trim()).toBeTruthy();
     }
   });
+
+  it("renders the Friday morning background scene during Friday daytime", () => {
+    vi.useFakeTimers();
+    // Friday Aug 7, 2026 at 10:00 AM
+    vi.setSystemTime(new Date(2026, 7, 7, 10, 0));
+
+    const { container } = render(
+      <HomeScreen
+        completed={emptyProgress()}
+        dailyCompletions={[]}
+        quietProgressEnabled={false}
+        progressDayStartHour={4}
+        language="ar"
+        direction="rtl"
+        onResume={vi.fn()}
+        routineModes={routineModes}
+      />,
+    );
+
+    const scene = container.querySelector('[data-testid="time-of-day-scene-window"]');
+    expect(scene).toBeInTheDocument();
+    const img = scene?.querySelector("img");
+    expect(img).toHaveAttribute("src", expect.stringContaining("friday"));
+  });
 });

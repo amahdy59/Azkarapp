@@ -121,45 +121,32 @@ describe("the prayer as one surface", () => {
     expect(onOpenAdhkar).toHaveBeenCalledWith("isha");
   });
 
-  it("names the rak'ahs due now, in Arabic that counts them", () => {
-    // Two is a dual noun and four takes the plural, so the copy cannot be a
-    // number dropped into one template.
-    renderScreen({ prayer: "dhuhr", now: at(shift(times.dhuhr, -10)) });
-    expect(screen.getByTestId("prayer-action-prayer-sunnah")).toHaveTextContent("أربع ركعات قبل الظهر");
+  it("renders the prayer actions card with prayer-specific deeds", () => {
+    renderScreen({ prayer: "dhuhr" });
+    expect(screen.getByRole("heading", { level: 3, name: /أعمال صلاة الظهر/ })).toBeInTheDocument();
+    expect(screen.getByTestId("prayer-action-location")).toHaveTextContent("صليت الظهر جماعة");
+    expect(screen.getByTestId("prayer-action-dhuhr-sunnah-before")).toHaveTextContent("سنة الظهر القبلية");
+    expect(screen.getByTestId("prayer-action-dhuhr-adhkar")).toHaveTextContent("أذكار بعد الصلاة");
+    expect(screen.getByTestId("prayer-action-dhuhr-sunnah-after")).toHaveTextContent("سنة الظهر البعدية");
   });
 
-  it("names an encouraged sunnah as encouraged, not as one of the twelve", () => {
-    // The four before Asr rest on their own narration and are not among the
-    // confirmed rawātib. The card has to say which it is.
-    renderScreen({ prayer: "asr", now: at(shift(times.asr, -10)) });
-    const card = screen.getByTestId("prayer-action-prayer-sunnah");
-    expect(card).toHaveTextContent("سنة مستحبة");
-    expect(card).toHaveTextContent("أربع ركعات قبل العصر");
-  });
-
-  it("shows no sunnah card where the prayer has nothing in that position", () => {
-    // Asr has nothing after it, and once it is in there is nothing to name.
-    renderScreen({ prayer: "asr", now: at(shift(times.asr, 5)) });
-    expect(screen.queryByTestId("prayer-action-prayer-sunnah")).toBeNull();
+  it("names an encouraged sunnah in More Info, not as one of the twelve", () => {
+    renderScreen({ prayer: "asr" });
+    fireEvent.click(screen.getByTestId("prayer-actions-more-info"));
+    const modal = screen.getByTestId("prayer-actions-info-modal");
+    expect(modal).toHaveTextContent("سنة مستحبة");
+    expect(modal).toHaveTextContent("أربع ركعات");
+    expect(modal).toHaveTextContent("رَحِمَ اللَّهُ امْرَأً صَلَّى قَبْلَ الْعَصْرِ أَرْبَعًا");
+    expect(modal).toHaveTextContent("حسّنه الألباني");
   });
 
   it("offers the narration a sunnah rests on, without recording anything", () => {
-    renderScreen({ prayer: "asr", now: at(shift(times.asr, -10)) });
-    fireEvent.click(screen.getByTestId("prayer-sunnah-evidence"));
-    const sheet = screen.getByTestId("prayer-sunnah-evidence-sheet");
-    expect(sheet).toHaveTextContent("رَحِمَ اللَّهُ امْرَأً صَلَّى قَبْلَ الْعَصْرِ أَرْبَعًا");
-    // Outside the two Sahihs, so the grading is named rather than assumed.
-    expect(sheet).toHaveTextContent("حسّنه الألباني");
-    expect(sheet).toHaveTextContent("ليست من الرواتب الاثنتي عشرة");
-  });
-
-  it("names the grading only where it is needed", () => {
-    // Muslim needs no grading line beside it.
-    renderScreen({ prayer: "fajr", now: at(shift(times.fajr, -10)) });
-    fireEvent.click(screen.getByTestId("prayer-sunnah-evidence"));
-    const sheet = screen.getByTestId("prayer-sunnah-evidence-sheet");
-    expect(sheet).toHaveTextContent("صحيح مسلم ٧٢٥");
-    expect(sheet).not.toHaveTextContent("الألباني");
+    renderScreen({ prayer: "fajr" });
+    fireEvent.click(screen.getByTestId("prayer-actions-more-info"));
+    const modal = screen.getByTestId("prayer-actions-info-modal");
+    expect(modal).toHaveTextContent("رَكْعَتَا الْفَجْرِ خَيْرٌ مِنَ الدُّنْيَا وَمَا فِيهَا");
+    expect(modal).toHaveTextContent("صحيح مسلم ٧٢٥");
+    expect(modal).not.toHaveTextContent("الألباني");
   });
 
   it("keeps the day's five within reach", () => {
@@ -170,9 +157,7 @@ describe("the prayer as one surface", () => {
   });
 
   it("names each card once, not twice", () => {
-    // The card carried a screen-reader-only copy of its own title beside the
-    // visible one, so it announced itself twice.
     renderScreen();
-    expect(screen.getAllByText("أذكار ما بعد الصلاة")).toHaveLength(1);
+    expect(screen.getAllByText("أذكار بعد الصلاة")).toHaveLength(1);
   });
 });

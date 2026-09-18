@@ -149,6 +149,22 @@ export function isFridayFeatureWindow(now: Date, location?: LocationSettings): b
   return (day === 4 && currentMinutes >= maghrib) || (day === 5 && currentMinutes < maghrib);
 }
 
+/**
+ * Friday daytime (morning through afternoon until Maghrib evening prayer).
+ *
+ * During this window on Friday (day 5), the dedicated Friday devotional
+ * background image is active.
+ */
+export function isFridayDaytime(now: Date = new Date(), location?: LocationSettings): boolean {
+  if (now.getDay() !== 5) return false;
+
+  const prayerTimes = getEstimatedPrayerTimes(now, location);
+  const fajr = timeToMinutes(prayerTimes.fajr);
+  const maghrib = timeToMinutes(prayerTimes.maghrib);
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  return currentMinutes >= fajr && currentMinutes < maghrib;
+}
+
 function hasStartedFridayKahf(): boolean {
   try {
     return window.localStorage.getItem(fridayKahfOpenedKey()) === "true";
@@ -528,7 +544,8 @@ export function HomeScreen({
             count: formatNumerals(Math.max(0, totalCount - doneCount), language),
           });
 
-  const homeBackgroundCategoryId = isLastThirdDua ? "before_sleep" : reminderInfo.categoryId;
+  const isFridayDay = isFridayDaytime(now, locationSettings);
+  const homeBackgroundCategoryId = isLastThirdDua ? "before_sleep" : isFridayDay ? "friday" : reminderInfo.categoryId;
   const fridayInWindow = isFridayFeatureWindow(now, locationSettings);
   const fridayKahfComplete = completed.friday_kahf?.has("friday-kahf") ?? false;
   const fridayStatus = fridayKahfComplete ? "review" : fridayKahfStarted ? "continue" : "start";

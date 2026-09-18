@@ -337,6 +337,10 @@ export interface PrayerTrackingRecord {
   location?: "mosque" | "home";
   /** Prayed the confirmed rawātib attached to this prayer. */
   sunnah?: boolean;
+  /** Prayed the sunnah before the prayer (Qabliyyah). */
+  sunnahBefore?: boolean;
+  /** Prayed the sunnah after the prayer (Ba'diyyah). */
+  sunnahAfter?: boolean;
   /**
    * When this record was last written, ISO.
    *

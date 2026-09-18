@@ -6,6 +6,7 @@ import type { AppLanguage, PrayerName, PrayerTrackingRecord } from "../types";
 import type { PrayerTimes } from "../content/prayerTimes";
 import { formatPrayerTimeLabel } from "../content/prayerTimes";
 import { trackedLocation } from "../prayerMoment";
+import { HomeCard } from "./HomeCard";
 
 /**
  * The five after-prayer cards.
@@ -50,16 +51,14 @@ export interface PrayerCardModel {
   countdown?: string;
 }
 
-/** The three independent booleans a card tracks. */
-export type PrayerTrackingField = "mosque" | "adhkar" | "sunnah";
+/** The independent fields a prayer card or actions card tracks. */
+export type PrayerTrackingField = "mosque" | "adhkar" | "sunnah" | "sunnahBefore" | "sunnahAfter";
 
 /**
- * Everything the prayer surfaces may record. The cards here still write the
- * two booleans; the prayer screen also writes where the prayer was prayed and
- * whether its rawātib were, which is why the write type is wider than the
- * field type above.
+ * Everything the prayer surfaces may record. The cards here write the
+ * booleans; the prayer screen also writes where the prayer was prayed.
  */
-export type PrayerTrackingWrite = PrayerTrackingField | "location" | "sunnah";
+export type PrayerTrackingWrite = PrayerTrackingField | "location";
 
 function statusLabel(language: AppLanguage, state: PrayerTemporalState) {
   if (state === "current") return t(language, "prayerTracking.now");
@@ -520,42 +519,76 @@ export function PrayerTrackerCards({
 
   return (
     <div className="flex flex-col gap-3">
-      <div
-        ref={scrollRef}
-        dir={direction}
-        data-testid="prayer-tracker-cards"
-        className={`stagger-in ${
-          summaryOnly
-            ? `grid grid-cols-5 gap-1 overflow-visible rounded-3xl border p-1.5 sm:gap-2 sm:p-2 ${onGlass ? "hero-glass home-glass-surface" : "border-border bg-card shadow-raised"}`
-            : "flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:grid sm:grid-cols-[repeat(var(--prayer-columns),minmax(9rem,1fr))] sm:px-6 sm:pb-0 lg:grid-cols-[repeat(var(--prayer-columns),minmax(11rem,1fr))] lg:overflow-x-auto lg:px-8 [&::-webkit-scrollbar]:hidden"
-        }`}
-        style={{ ["--prayer-columns" as string]: "5" }}
-      >
-        {ordered.map((model) => {
-          const record = byPrayer.get(model.prayer);
-          return (
-            <PrayerCard
-              key={model.prayer}
-              model={model}
-              language={language}
-              onGlass={onGlass}
-              tracking={{
-                mosque: record?.mosque ?? false,
-                adhkar: record?.adhkar ?? false,
-                sunnah: record?.sunnah ?? false,
-                location: trackedLocation(record),
-              }}
-              onToggle={(prayer, field, next) => {
-                onToggle(prayer, field, next);
-                if (field === "mosque" && next) setVirtuePrayer(prayer);
-              }}
-              onOpen={onOpen}
-              summaryOnly={summaryOnly}
-              selected={summaryOnly && model.prayer === selectedPrayer}
-            />
-          );
-        })}
-      </div>
+      {summaryOnly ? (
+        <HomeCard
+          as="div"
+          ref={scrollRef as unknown as React.Ref<HTMLElement>}
+          dir={direction}
+          data-testid="prayer-tracker-cards"
+          onGlass={onGlass}
+          elevation="raised"
+          className="stagger-in grid grid-cols-5 gap-1 overflow-visible p-1.5 sm:gap-2 sm:p-2"
+          style={{ ["--prayer-columns" as string]: "5" }}
+        >
+          {ordered.map((model) => {
+            const record = byPrayer.get(model.prayer);
+            return (
+              <PrayerCard
+                key={model.prayer}
+                model={model}
+                language={language}
+                onGlass={onGlass}
+                tracking={{
+                  mosque: record?.mosque ?? false,
+                  adhkar: record?.adhkar ?? false,
+                  sunnah: record?.sunnah ?? false,
+                  location: trackedLocation(record),
+                }}
+                onToggle={(prayer, field, next) => {
+                  onToggle(prayer, field, next);
+                  if (field === "mosque" && next) setVirtuePrayer(prayer);
+                }}
+                onOpen={onOpen}
+                summaryOnly={summaryOnly}
+                selected={summaryOnly && model.prayer === selectedPrayer}
+              />
+            );
+          })}
+        </HomeCard>
+      ) : (
+        <div
+          ref={scrollRef}
+          dir={direction}
+          data-testid="prayer-tracker-cards"
+          className="stagger-in flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:grid sm:grid-cols-[repeat(var(--prayer-columns),minmax(9rem,1fr))] sm:px-6 sm:pb-0 lg:grid-cols-[repeat(var(--prayer-columns),minmax(11rem,1fr))] lg:overflow-x-auto lg:px-8 [&::-webkit-scrollbar]:hidden"
+          style={{ ["--prayer-columns" as string]: "5" }}
+        >
+          {ordered.map((model) => {
+            const record = byPrayer.get(model.prayer);
+            return (
+              <PrayerCard
+                key={model.prayer}
+                model={model}
+                language={language}
+                onGlass={onGlass}
+                tracking={{
+                  mosque: record?.mosque ?? false,
+                  adhkar: record?.adhkar ?? false,
+                  sunnah: record?.sunnah ?? false,
+                  location: trackedLocation(record),
+                }}
+                onToggle={(prayer, field, next) => {
+                  onToggle(prayer, field, next);
+                  if (field === "mosque" && next) setVirtuePrayer(prayer);
+                }}
+                onOpen={onOpen}
+                summaryOnly={summaryOnly}
+                selected={summaryOnly && model.prayer === selectedPrayer}
+              />
+            );
+          })}
+        </div>
+      )}
 
       <PrayerVirtueModal
         prayer={virtuePrayer}

@@ -6,6 +6,8 @@ import { t } from "../i18n";
 import { PRAYER_NAMES, formatPrayerTimeLabel, getEstimatedPrayerTimes } from "../content/prayerTimes";
 import type { AppLanguage, LocationSettings, PrayerName, PrayerTrackingRecord } from "../types";
 
+import type { PrayerTrackingWrite } from "../components/PrayerTrackerCards";
+
 export function PrayerMomentScreen({
   prayer,
   language,
@@ -28,11 +30,7 @@ export function PrayerMomentScreen({
   /** Injected so the screen's states can be held to a fixed clock in a test. */
   now?: Date;
   onBack: () => void;
-  onToggle: (
-    prayer: PrayerName,
-    field: "location" | "adhkar" | "sunnah",
-    value: boolean | "mosque" | "home" | null,
-  ) => void;
+  onToggle: (prayer: PrayerName, field: PrayerTrackingWrite, value: boolean | "mosque" | "home" | null) => void;
   onOpenAdhkar: (prayer: PrayerName) => void;
   onSelectPrayer: (prayer: PrayerName) => void;
 }) {

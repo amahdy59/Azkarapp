@@ -105,6 +105,8 @@ export {
   Type01 as TypeIcon,
   Type01 as Type,
   User01 as User,
+  Users01 as Users,
+  Users01,
   VolumeMax as Volume2,
   VolumeX,
   Wifi,
@@ -119,3 +121,35 @@ export {
   Zap as Flame,
   Zap as Spark,
 } from "@untitledui/icons";
+
+import { createElement, type SVGProps } from "react";
+
+export function Mosque({
+  size = 20,
+  className,
+  ...props
+}: { size?: number; className?: string } & SVGProps<SVGSVGElement>) {
+  return createElement(
+    "svg",
+    {
+      width: size,
+      height: size,
+      viewBox: "0 0 24 24",
+      fill: "none",
+      stroke: "currentColor",
+      strokeWidth: 2,
+      strokeLinecap: "round",
+      strokeLinejoin: "round",
+      className,
+      ...props,
+    },
+    createElement("path", { d: "M12 2v2" }),
+    createElement("path", { d: "M12 4c-3 0-5 2.5-5 5.5V19h10V9.5c0-3-2-5.5-5-5.5z" }),
+    createElement("path", { d: "M10 19v-3a2 2 0 0 1 4 0v3" }),
+    createElement("path", { d: "M4 11v8" }),
+    createElement("path", { d: "M20 11v8" }),
+    createElement("path", { d: "M2 19h20" }),
+    createElement("path", { d: "M3.5 11 7 8" }),
+    createElement("path", { d: "M20.5 11 17 8" }),
+  );
+}

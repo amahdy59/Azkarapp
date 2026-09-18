@@ -429,16 +429,22 @@ export function FridayHomeCard({
           )}
         </div>
 
-        <div className="hidden w-full rounded-2xl bg-muted p-4 text-start md:block">
+        <HomeCard.SubSurface onGlass={onGlass} className="hidden w-full p-4 text-start md:block">
           <div>
-            <h4 className="text-sm font-black text-foreground">{t(language, "home.fridayVirtues")}</h4>
-            <ul className="mt-3 flex list-disc flex-col gap-2 ps-5 text-xs font-semibold leading-5 text-foreground">
+            <h4 className={`text-sm font-black ${onGlass ? "text-on-media" : "text-foreground"}`}>
+              {t(language, "home.fridayVirtues")}
+            </h4>
+            <ul
+              className={`mt-3 flex list-disc flex-col gap-2 ps-5 text-xs font-semibold leading-5 ${
+                onGlass ? "text-on-media/90" : "text-foreground"
+              }`}
+            >
               <li>{t(language, "home.fridayVirtueFajr")}</li>
               <li>{t(language, "home.fridayVirtueEarly")}</li>
               <li>{t(language, "home.fridayVirtueDua")}</li>
             </ul>
           </div>
-        </div>
+        </HomeCard.SubSurface>
       </div>
     </HomeCard>
   );

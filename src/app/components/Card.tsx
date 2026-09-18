@@ -1,4 +1,4 @@
-import type { ComponentPropsWithoutRef, ElementType, ReactNode } from "react";
+import { forwardRef, type ComponentPropsWithoutRef, type ElementType, type ReactNode } from "react";
 
 export interface CardProps extends ComponentPropsWithoutRef<"section"> {
   /** Semantic element for the wrapper. Card adds no interactive semantics of its own. */
@@ -24,20 +24,17 @@ const PADDING_CLASS: Record<NonNullable<CardProps["padding"]>, string> = {
 };
 
 /** Shared card surface: opaque bg-card, border, radius, and one of the three documented elevation levels. */
-export function Card({
-  as: Component = "div",
-  elevation = "raised",
-  padding = "md",
-  className = "",
-  children,
-  ...rest
-}: CardProps) {
+export const Card = forwardRef<HTMLElement, CardProps>(function Card(
+  { as: Component = "div", elevation = "raised", padding = "md", className = "", children, ...rest },
+  ref,
+) {
   return (
     <Component
+      ref={ref}
       className={`rounded-3xl border border-border/40 bg-card ${PADDING_CLASS[padding]} ${ELEVATION_CLASS[elevation]} ${className}`.trim()}
       {...rest}
     >
       {children}
     </Component>
   );
-}
+});

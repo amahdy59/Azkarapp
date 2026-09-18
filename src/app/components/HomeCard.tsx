@@ -1,4 +1,4 @@
-import type { ComponentPropsWithoutRef, ElementType, ReactNode } from "react";
+import { forwardRef, type ComponentPropsWithoutRef, type ElementType, type ReactNode } from "react";
 import { Card } from "./Card";
 import { cn } from "./ui/utils";
 
@@ -16,29 +16,75 @@ export interface HomeCardProps extends ComponentPropsWithoutRef<"section"> {
   children: ReactNode;
 }
 
+export interface HomeCardSubSurfaceProps extends ComponentPropsWithoutRef<"div"> {
+  /**
+   * Whether the sub-surface sits over a glass card on media.
+   * If true, uses a frosted glass style instead of an opaque theme background.
+   */
+  onGlass?: boolean;
+  className?: string;
+  children: ReactNode;
+}
+
+/**
+ * Standard nested sub-surface for inner blocks, cards, or lists inside HomeCard
+ * ensuring consistent frost, border, and backdrop-blur.
+ */
+export function HomeCardSubSurface({ onGlass = false, className = "", children, ...rest }: HomeCardSubSurfaceProps) {
+  return (
+    <div
+      className={cn(
+        onGlass
+          ? "rounded-2xl border border-white/10 bg-black/30 text-on-media backdrop-blur-md"
+          : "rounded-2xl border border-border bg-muted text-foreground",
+        className,
+      )}
+      {...rest}
+    >
+      {children}
+    </div>
+  );
+}
+
+interface HomeCardComponent {
+  (props: HomeCardProps & { ref?: React.Ref<HTMLElement> }): ReactNode;
+  SubSurface: typeof HomeCardSubSurface;
+}
+
 /**
  * A standard surface for all home screen cards to ensure consistent glassmorphism
  * effects, borders, shadows, and padding across all screens and screen sizes.
  */
-export function HomeCard({
-  as: Component = "section",
-  onGlass = false,
-  elevation = "raised",
-  className = "",
-  children,
-  ...rest
-}: HomeCardProps) {
+const HomeCardBase = forwardRef<HTMLElement, HomeCardProps>(function HomeCard(
+  { as: Component = "section", onGlass = false, elevation = "raised", className = "", children, ...rest },
+  ref,
+) {
   if (onGlass) {
     return (
-      <Component className={cn("hero-glass home-glass-surface rounded-3xl p-5 sm:p-6 md:p-7", className)} {...rest}>
+      <Component
+        ref={ref}
+        className={cn("hero-glass home-glass-surface rounded-3xl p-5 sm:p-6 md:p-7", className)}
+        {...rest}
+      >
         {children}
       </Component>
     );
   }
 
   return (
-    <Card as={Component} elevation={elevation} padding="none" className={cn("p-5 sm:p-6 md:p-7", className)} {...rest}>
+    <Card
+      ref={ref}
+      as={Component}
+      elevation={elevation}
+      padding="none"
+      className={cn("p-5 sm:p-6 md:p-7", className)}
+      {...rest}
+    >
       {children}
     </Card>
   );
-}
+});
+
+export const HomeCard = Object.assign(HomeCardBase, {
+  SubSurface: HomeCardSubSurface,
+}) as HomeCardComponent;

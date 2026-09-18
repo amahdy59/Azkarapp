@@ -403,17 +403,44 @@ function AppContent({
            ordering on the values, under which correcting "at the mosque" to
            "at home" never survives a sync. See syncMerge.ts. */
         const updatedAt = new Date().toISOString();
-        const updated: PrayerTrackingRecord =
-          field === "location"
-            ? {
-                ...existing,
-                updatedAt,
-                mosque: next === "mosque",
-                ...(next === "mosque" || next === "home"
-                  ? { location: next as "mosque" | "home" }
-                  : { location: undefined }),
-              }
-            : { ...existing, updatedAt, [field]: next === true };
+        let updated: PrayerTrackingRecord;
+        if (field === "location") {
+          updated = {
+            ...existing,
+            updatedAt,
+            mosque: next === "mosque",
+            ...(next === "mosque" || next === "home"
+              ? { location: next as "mosque" | "home" }
+              : { location: undefined }),
+          };
+        } else if (field === "sunnahBefore") {
+          const sunnahBefore = next === true;
+          const sunnahAfter = existing.sunnahAfter === true;
+          updated = {
+            ...existing,
+            updatedAt,
+            sunnahBefore,
+            sunnah: sunnahBefore || sunnahAfter,
+          };
+        } else if (field === "sunnahAfter") {
+          const sunnahBefore = existing.sunnahBefore === true;
+          const sunnahAfter = next === true;
+          updated = {
+            ...existing,
+            updatedAt,
+            sunnahAfter,
+            sunnah: sunnahBefore || sunnahAfter,
+          };
+        } else if (field === "sunnah") {
+          updated = {
+            ...existing,
+            updatedAt,
+            sunnah: next === true,
+            ...(next === true ? {} : { sunnahBefore: false, sunnahAfter: false }),
+          };
+        } else {
+          updated = { ...existing, updatedAt, [field]: next === true };
+        }
         if (index >= 0) {
           const copy = records.slice();
           copy[index] = updated;
