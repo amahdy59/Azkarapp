@@ -102,7 +102,7 @@ export function PrayerRoutineCard({
                 direction={direction}
                 aria-label={t(language, "home.routineMode")}
                 className={`flex items-center rounded-3xl border p-1 ${
-                  onGlass ? "border-on-media/16 bg-black/35 backdrop-blur-md" : "border-border bg-muted"
+                  onGlass ? "border-on-media/16 bg-black/35" : "border-border bg-muted"
                 }`}
                 itemClassName={(selected) =>
                   `flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${

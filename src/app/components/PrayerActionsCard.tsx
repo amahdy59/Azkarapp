@@ -77,7 +77,9 @@ export function PrayerActionsCard({
         <div className="flex min-w-0 items-center gap-2.5">
           <span
             aria-hidden="true"
-            className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary"
+            className={`flex size-8 shrink-0 items-center justify-center rounded-xl ${
+              onGlass ? "bg-white/15 text-on-media-accent" : "bg-primary/15 text-primary"
+            }`}
           >
             {(() => {
               const HeaderIcon = PRAYER_ICON[prayer] ?? Mosque;
@@ -98,7 +100,7 @@ export function PrayerActionsCard({
           onClick={() => setInfoOpen(true)}
           data-testid="prayer-actions-more-info"
           aria-label={t(language, "prayerActions.moreInfoAria", { prayer: infoData.prayerName })}
-          className={`flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-bold backdrop-blur-sm transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+          className={`flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
             onGlass
               ? "border-white/20 bg-white/10 text-on-media hover:bg-white/20"
               : "border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -120,7 +122,7 @@ export function PrayerActionsCard({
             <li
               key={action.id}
               data-testid={action.testId}
-              className={`group/item relative flex min-h-12 items-center justify-between gap-3 rounded-2xl border px-3.5 py-2 backdrop-blur-md transition-colors duration-fast ${
+              className={`group/item relative flex min-h-12 items-center justify-between gap-3 rounded-2xl border px-3.5 py-2 transition-colors duration-fast ${
                 onGlass
                   ? "border-white/10 bg-white/10 hover:bg-white/20 text-on-media"
                   : "border-border/60 bg-card hover:bg-muted/40 text-foreground"

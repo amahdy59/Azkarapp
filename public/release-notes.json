@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-18d",
+  "release": "2026-09-18e",
   "ar": [
-    "تثبيت حديث فضل الصلاة في جماعة ليظهر دائماً بشكل ثابت عبر جميع بطاقات الصلاة دون اختفاء.",
-    "توضيح عناوين السنن بعدد الركعات وموعدها (مثل ركعتان بعد العشاء وأربع ركعات قبل الظهر).",
-    "تحديث الأيقونات برموز دينية معبرة للمسجد وسجادة الصلاة والمسبحة مع إضافة فضل السنن الرواتب."
+    "توحيد تأثير الزجاج المثلج على جميع بطاقات الشاشة الرئيسية لمظهر متناسق في الضوء والظلام.",
+    "إزالة التمويه المزدوج الذي كان يجعل بعض البطاقات تبدو أكثر عتامة من غيرها.",
+    "تحسين أيقونة رأس بطاقة أعمال الصلاة لتتناسق مع ألوان الخلفية الفوتوغرافية."
   ],
   "en": [
-    "Permanently displayed the prayer virtue hadith across all prayer cards without conditional toggling.",
-    "Clarified Sunnah action titles with exact rak'ah counts and timing (e.g., 2 rak'ahs after Isha).",
-    "Updated action icons with authentic devotional symbols and added the overarching virtue of Sunan Rawatib."
+    "Unified frosted glass effect across all Home screen cards for a consistent look in all themes.",
+    "Removed double-blur that made some cards appear more opaque than others.",
+    "Polished prayer actions card header icon to match the on-media colour palette."
   ]
 }

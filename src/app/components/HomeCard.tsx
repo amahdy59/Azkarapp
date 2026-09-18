@@ -35,7 +35,7 @@ export function HomeCardSubSurface({ onGlass = false, className = "", children, 
     <div
       className={cn(
         onGlass
-          ? "rounded-2xl border border-white/10 bg-black/30 text-on-media backdrop-blur-md"
+          ? "rounded-2xl border border-white/10 bg-white/8 text-on-media"
           : "rounded-2xl border border-border bg-muted text-foreground",
         className,
       )}
