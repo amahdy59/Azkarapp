@@ -2,6 +2,7 @@ import type { AppLanguage, CategoryId } from "../types";
 import { CATEGORIES } from "../content/categories";
 import { t } from "../i18n";
 import { Check } from "./icons";
+import { HomeCard } from "./HomeCard";
 
 interface TranquilityCompletionCardProps {
   categoryId: CategoryId;
@@ -31,11 +32,7 @@ export function TranquilityCompletionCard({
       className={`tranquility-completion grid w-full ${isExiting ? "is-exiting" : "is-entering"}`}
     >
       <div className="min-h-0 overflow-hidden">
-        <div
-          className={`tranquility-completion-card flex flex-col items-center gap-5 rounded-3xl px-5 py-6 text-center sm:px-6 sm:py-7 ${
-            onGlass ? "hero-glass home-glass-surface" : "border border-border bg-card shadow-raised"
-          }`}
-        >
+        <HomeCard onGlass={onGlass} className="tranquility-completion-card flex-col items-center gap-5 text-center">
           <div className="tranquility-completion-icon flex size-24 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[0_20px_35px_color-mix(in_srgb,var(--primary)_32%,transparent)] sm:size-28">
             <Check size={34} strokeWidth={2.8} aria-hidden="true" />
           </div>
@@ -54,7 +51,7 @@ export function TranquilityCompletionCard({
               {completedSubtitle}
             </p>
           </div>
-        </div>
+        </HomeCard>
       </div>
     </section>
   );

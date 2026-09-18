@@ -10,6 +10,7 @@ import { Modal } from "./ResponsiveSheet";
 import { getPrayerVirtues } from "../content/prayerVirtues";
 import { getPrayerMoment, type PrayerMoment } from "../prayerMoment";
 import type { AppLanguage, LocationSettings, PrayerName, PrayerTrackingRecord } from "../types";
+import { HomeCard } from "./HomeCard";
 
 export const PRAYER_ICON: Record<PrayerName, typeof Sunrise> = {
   fajr: Sunrise,
@@ -144,9 +145,7 @@ export function PrayerMomentPanel({
 
   return (
     <>
-      <article
-        className={`flex flex-col overflow-hidden ${onGlass ? "hero-glass home-glass-surface rounded-3xl" : "rounded-3xl border border-border bg-card shadow-raised"}`}
-      >
+      <HomeCard as="article" onGlass={onGlass} className="flex flex-col overflow-hidden">
         <div className={`flex flex-col ${fullWidth && virtue && isLive ? "md:grid md:grid-cols-2" : ""}`}>
           <section
             /* A floor, not a height: the scene is the ground for the name and
@@ -407,7 +406,7 @@ export function PrayerMomentPanel({
             {t(language, "prayerMoment.journeyOpenAdhkar")}
           </button>
         </section>
-      </article>
+      </HomeCard>
 
       {sunnah && evidenceOpen && (
         <Modal

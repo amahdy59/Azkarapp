@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { formatNumerals, formatRatio } from "../formatting";
 import { t } from "../i18n";
+import { HomeCard } from "./HomeCard";
 import type { AppLanguage, CategoryId } from "../types";
 import {
   getWeekGardenStats,
@@ -305,13 +306,7 @@ export function ProgressDayView({
       }`}
       dir={isArabic ? "rtl" : "ltr"}
     >
-      <div
-        className={`flex w-full flex-col rounded-3xl p-5 sm:p-7 md:p-8 ${
-          onGlass
-            ? "hero-glass home-glass-surface flex-1"
-            : "border border-border bg-card text-foreground shadow-raised"
-        }`}
-      >
+      <HomeCard onGlass={onGlass} className={`flex-col ${onGlass ? "flex-1" : ""}`}>
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
@@ -476,7 +471,7 @@ export function ProgressDayView({
             {t(language, "wirdBenefits.openCta")}
           </button>
         )}
-      </div>
+      </HomeCard>
     </div>
   );
 }

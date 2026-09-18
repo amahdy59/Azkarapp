@@ -5,6 +5,7 @@ import { getSurahDisplayName } from "../content/surahInfo";
 import { getQuranWirdGoal } from "../screens/quranWirdGoal";
 import { getProgressDayKey } from "../progress";
 import { formatNumerals } from "../formatting";
+import { HomeCard } from "./HomeCard";
 
 export function QuranHomeCard({
   language,
@@ -39,10 +40,7 @@ export function QuranHomeCard({
     // First-time user state
     return (
       <div className={`px-page mt-2 mb-2 ${textAlignment}`} dir={direction}>
-        <div
-          data-testid="home-quran-card"
-          className={`flex flex-col rounded-2xl p-4 ${onGlass ? "hero-glass home-glass-surface" : "border border-border bg-card/80 shadow-raised backdrop-blur-md"}`}
-        >
+        <HomeCard data-testid="home-quran-card" onGlass={onGlass} className="flex flex-col !rounded-2xl !p-4">
           <div className="flex items-center gap-3 mb-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
               <BookOpen size={20} />
@@ -64,7 +62,7 @@ export function QuranHomeCard({
           >
             {t(language, "mushaf.setPlan")}
           </button>
-        </div>
+        </HomeCard>
       </div>
     );
   }
@@ -80,9 +78,10 @@ export function QuranHomeCard({
 
   return (
     <div className={`px-page mt-2 mb-2 ${textAlignment}`} dir={direction}>
-      <div
+      <HomeCard
         data-testid="home-quran-card"
-        className={`flex flex-col overflow-hidden rounded-2xl ${onGlass ? "hero-glass home-glass-surface" : "border border-border bg-card/80 shadow-raised backdrop-blur-md"}`}
+        onGlass={onGlass}
+        className="flex flex-col overflow-hidden !rounded-2xl !p-0"
       >
         {/* Main Content Area: Continue Reading */}
         <div className={`flex flex-col items-start p-4 ${textAlignment}`}>
@@ -160,7 +159,7 @@ export function QuranHomeCard({
           </div>
           <ArrowNext size={16} data-rtl-flip aria-hidden="true" />
         </button>
-      </div>
+      </HomeCard>
     </div>
   );
 }

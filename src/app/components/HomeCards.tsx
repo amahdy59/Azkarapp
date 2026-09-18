@@ -2,7 +2,7 @@ import { t } from "../i18n";
 import type { DailyEvidence } from "../dailyEvidence";
 import type { AppLanguage, RoutineMode } from "../types";
 import { formatNumerals } from "../formatting";
-import { Card } from "./Card";
+import { HomeCard } from "./HomeCard";
 import { ProductImage } from "./ProductImage";
 import { SegmentedControl } from "./SegmentedControl";
 import { ArrowLeft, ArrowRight, Bookmark, BookOpen, Clock, Sparkles, Heart, Sun, MoonStar, Moon } from "./icons";
@@ -81,11 +81,7 @@ export function PrayerRoutineCard({
       data-testid="home-routine-card"
       className="flex h-full min-w-0 flex-col justify-between transition-colors"
     >
-      <div
-        className={`flex flex-1 flex-col gap-5 rounded-3xl px-5 py-6 text-start sm:px-6 sm:py-7 md:p-7 ${
-          onGlass ? "hero-glass home-glass-surface" : "border border-border bg-card shadow-raised"
-        }`}
-      >
+      <HomeCard onGlass={onGlass} className="flex-1 flex-col gap-5 text-start">
         {/* Header Row: "It is time for" + Mode Selector */}
         <div className="flex w-full items-center justify-between gap-4">
           <div
@@ -203,7 +199,7 @@ export function PrayerRoutineCard({
           <span>{ctaLabel}</span>
           <DirectionArrow direction={direction} size={20} className="transition-transform group-hover:scale-110" />
         </button>
-      </div>
+      </HomeCard>
     </section>
   );
 }
@@ -242,11 +238,12 @@ export function SavedZikrCard({
   onGlass?: boolean;
 }) {
   return (
-    <Card
+    <HomeCard
       as="section"
       elevation="flat"
+      onGlass={onGlass}
       aria-labelledby="home-saved-heading"
-      className={`flex h-full flex-col ${onGlass ? "hero-glass home-glass-surface" : ""}`}
+      className="flex h-full flex-col"
       data-testid="home-saved-section"
     >
       <div className="flex items-start justify-between gap-3">
@@ -339,7 +336,7 @@ export function SavedZikrCard({
             : t(language, "home.browseAzkar")}
         </button>
       )}
-    </Card>
+    </HomeCard>
   );
 }
 
@@ -362,12 +359,13 @@ export function FridayHomeCard({
 
   if (!expanded) {
     return (
-      <Card
+      <HomeCard
         as="section"
+        onGlass={onGlass}
         data-testid="home-friday-card"
         aria-labelledby="friday-card-heading"
         elevation="flat"
-        className={`flex flex-col gap-4 sm:flex-row sm:items-center ${onGlass ? "hero-glass home-glass-surface" : ""}`}
+        className="flex flex-col gap-4 sm:flex-row sm:items-center"
       >
         <span className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-primary/20 bg-primary/10 text-primary">
           <ProductImage name="mosque_prophet" className="h-full w-full object-cover" />
@@ -392,16 +390,17 @@ export function FridayHomeCard({
             </button>
           )}
         </div>
-      </Card>
+      </HomeCard>
     );
   }
 
   return (
-    <Card
+    <HomeCard
       as="section"
+      onGlass={onGlass}
       data-testid="home-friday-card"
       aria-labelledby="friday-card-heading"
-      className={`overflow-hidden p-0 ${onGlass ? "hero-glass home-glass-surface" : ""}`}
+      className="overflow-hidden p-0"
     >
       <div className="grid gap-5 p-5 sm:p-6 xl:grid-cols-[14rem_minmax(0,1fr)_19rem] xl:items-center">
         <div className="relative flex h-44 w-full items-center justify-center self-center overflow-hidden rounded-2xl border border-primary/20 bg-primary/10 text-primary sm:h-52 xl:h-48">
@@ -441,7 +440,7 @@ export function FridayHomeCard({
           </div>
         </div>
       </div>
-    </Card>
+    </HomeCard>
   );
 }
 
@@ -475,17 +474,15 @@ export function DailyEvidenceCard({
    */
   onGlass?: boolean;
 }) {
-  const Surface = onGlass ? "section" : Card;
-  const surfaceProps = onGlass
-    ? { className: "hero-glass home-glass-surface flex min-h-0 flex-1 flex-col gap-3 rounded-3xl p-5" }
-    : { as: "section" as const, elevation: "flat" as const, className: "flex flex-col gap-3" };
-
   return (
-    <Surface
+    <HomeCard
+      as="section"
+      onGlass={onGlass}
+      elevation="flat"
       aria-labelledby="home-evidence-heading"
       data-testid="home-daily-evidence"
       dir={direction}
-      {...surfaceProps}
+      className="flex min-h-0 flex-1 flex-col gap-3"
     >
       <div className="flex items-center gap-2">
         <span
@@ -546,6 +543,6 @@ export function DailyEvidenceCard({
           </span>
         )}
       </footer>
-    </Surface>
+    </HomeCard>
   );
 }
