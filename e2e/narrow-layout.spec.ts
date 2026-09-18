@@ -47,7 +47,6 @@ test("core app screens do not overflow a 320px viewport", async ({ page }) => {
   await expect(page.locator("h1", { hasText: "Morning Azkar" })).toBeVisible();
   await expectNoHorizontalOverflow(page, "Category");
 
-  await page.getByRole("button", { name: "Start Session", exact: true }).click();
   await expect(page.getByTestId("reader-screen")).toBeVisible();
   await expectNoHorizontalOverflow(page, "Reader");
 

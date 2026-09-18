@@ -116,7 +116,6 @@ test("Saved zikr keyboard removal", async ({ page }) => {
   // Save an item first
   await page.getByTestId("nav-azkar").click();
   await page.getByTestId("category-card-morning").click();
-  await page.getByRole("button", { name: /Start session/i }).click();
 
   // Save is a menu item on every tier now, so no width branch.
   await page.getByRole("button", { name: /Reader options/i }).click();
@@ -125,7 +124,6 @@ test("Saved zikr keyboard removal", async ({ page }) => {
   await saveBtn.click();
 
   // Go back to the library
-  await page.getByRole("button", { name: /Back/i }).click();
   await page.getByRole("button", { name: /Back/i }).click();
 
   const savedTab = page.getByTestId("library-section-saved");
