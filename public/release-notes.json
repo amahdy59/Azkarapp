@@ -1,15 +1,15 @@
 {
-  "release": "2026-09-17.4",
+  "release": "2026-09-18",
   "ar": [
-    "النقر على أي مجموعة من الشاشة الرئيسية ينقلك الآن مباشرة إلى وضع القراءة، مما يجعل البدء أسرع بكثير.",
-    "تتميز القائمة الجانبية في وضع القراءة الآن ببطاقات قابلة للطي وزر جديد 'تشغيل جميع الصوتيات' لتسهيل التصفح والاستماع.",
-    "تم تحسين المظهر البصري للشاشة الرئيسية وإضافة تأثير الزجاج غير الشفاف إلى قسم 'وردك اليوم'.",
-    "بطاقة التهنئة بإتمام الورد اليومي ستظهر الآن مرة واحدة فقط في اليوم بدلاً من تكرار ظهورها عند العودة للشاشة الرئيسية."
+    "تخطي شاشة تفاصيل الفئة من الصفحة الرئيسية لتتمكن من القراءة مباشرة وبشكل أسرع.",
+    "تحسين تصميم الصفحة الرئيسية وإضافة تأثير زجاجي لقسم 'ورد اليوم'.",
+    "تحسينات على شريط التنقل الجانبي في صفحة القراءة وإضافة زر 'تشغيل كل الصوتيات'.",
+    "تم تعديل اسم القارئ 'محمد الشرع' إلى 'محمد شرعي' في الإعدادات وقوائم التلاوة."
   ],
   "en": [
-    "Clicking a collection from the Home screen now drops you directly into reading mode, making it much faster to start.",
-    "The sidebar in Reader mode now features expanding cards and a new 'Play All Audio' button for easier navigation and listening.",
-    "Improved the Home screen visuals, adding a consistent frosted glass effect to the 'Today's Wird' section.",
-    "The congratulations card for completing a daily routine will now only appear once per day instead of showing up every time you return to the Home screen."
+    "Opening a collection from the Home screen now goes straight to reading mode.",
+    "Improved Home screen visuals with a frosted glass effect on the 'Today's Wird' cards.",
+    "The reader sidebar now has expandable cards and a new 'Play All Audio' button.",
+    "Updated the reciter name from 'Muhammad Al-Shara' to 'Muhammad Shari' across the app."
   ]
 }
