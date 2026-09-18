@@ -134,6 +134,12 @@
   box-shadow: 0 1px 4px rgb(0 0 0 / 0.35);
 }
 
+.audio-volume-range {
+  --audio-volume-fill: var(--muted);
+  width: 1.125rem;
+  background: transparent;
+}
+
 .audio-volume-range::-webkit-slider-runnable-track {
   width: 0.5rem;
   margin-inline: auto;
@@ -144,6 +150,7 @@
 .audio-volume-range::-webkit-slider-thumb {
   width: 1.125rem;
   height: 1.125rem;
+  margin: 0;
   appearance: none;
   border: 2px solid var(--card);
   border-radius: 9999px;

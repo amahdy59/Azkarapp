@@ -365,7 +365,7 @@ function VolumeControl({
                   "--audio-volume-fill": `linear-gradient(to top, var(--primary) ${percentage}%, var(--muted) ${percentage}%)`,
                 } as CSSProperties
               }
-              className="audio-volume-range h-28 w-11 cursor-pointer appearance-none accent-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              className="audio-volume-range h-28 w-[1.125rem] cursor-pointer appearance-none accent-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             />
           </div>
         </div>

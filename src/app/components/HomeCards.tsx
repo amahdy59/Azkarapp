@@ -102,14 +102,14 @@ export function PrayerRoutineCard({
                 direction={direction}
                 aria-label={t(language, "home.routineMode")}
                 className={`flex items-center rounded-3xl border p-1 ${
-                  onGlass ? "border-on-media/16 bg-black/35" : "border-border bg-muted"
+                  onGlass ? "border-white/15 bg-white/10 backdrop-blur-sm" : "border-border bg-muted"
                 }`}
                 itemClassName={(selected) =>
                   `flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                     selected
                       ? "bg-primary text-primary-foreground shadow-sm"
                       : onGlass
-                        ? "text-on-media-muted hover:bg-on-media/8 hover:text-on-media"
+                        ? "text-on-media-muted hover:bg-white/15 hover:text-on-media"
                         : "text-muted-foreground hover:bg-card hover:text-foreground"
                   }`
                 }
@@ -174,7 +174,7 @@ export function PrayerRoutineCard({
             </div>
 
             <div
-              className={`h-2.5 w-full overflow-hidden rounded-full shadow-inner ${onGlass ? "bg-black/40" : "bg-muted"}`}
+              className={`h-2.5 w-full overflow-hidden rounded-full shadow-inner ${onGlass ? "bg-white/15" : "bg-muted"}`}
               role="progressbar"
               aria-valuenow={completedCount}
               aria-valuemin={0}

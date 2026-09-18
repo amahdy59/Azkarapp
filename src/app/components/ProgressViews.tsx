@@ -114,10 +114,10 @@ function MainDhikrGroupCard({
       } ${
         isCompleted
           ? compact && onMedia
-            ? "border-primary/55 bg-primary/15 text-white shadow-raised"
+            ? "border-primary/55 bg-primary/20 text-on-media shadow-raised shadow-[0_0_15px_rgba(201,155,76,0.15)] backdrop-blur-sm"
             : "border-primary/55 bg-primary/10 text-foreground shadow-raised"
           : compact && onMedia
-            ? "border-white/10 bg-black/30 text-white shadow-raised hover:border-white/20 hover:bg-black/40"
+            ? "border-white/15 bg-white/8 text-on-media shadow-raised hover:border-white/25 hover:bg-white/14 backdrop-blur-sm"
             : "border-border bg-background text-foreground shadow-raised hover:border-primary/45 hover:bg-muted"
       }`}
       // The recommendation is added to the name, never substituted for the
@@ -135,7 +135,7 @@ function MainDhikrGroupCard({
               ? "border-success/60 bg-success/20 text-success"
               : "border-success/60 bg-success/15 text-success"
             : compact && onMedia
-              ? "border-white/10 bg-black/40 text-on-media-muted"
+              ? "border-white/15 bg-white/10 text-on-media-accent backdrop-blur-xs"
               : "border-border bg-muted text-primary"
         }`}
       >
@@ -164,7 +164,7 @@ function MainDhikrGroupCard({
               : showRecommended
                 ? "bg-primary text-primary-foreground shadow-sm"
                 : compact && onMedia
-                  ? "border border-white/5 bg-black/45 text-white/60"
+                  ? "border border-white/15 bg-white/10 text-on-media-muted backdrop-blur-xs"
                   : "bg-muted text-muted-foreground"
           }`}
         >
@@ -178,7 +178,9 @@ function MainDhikrGroupCard({
                 key={item.id}
                 role="img"
                 aria-label={item.name}
-                className={`inline-flex h-1.5 w-4 rounded-full ${item.isCompleted ? "bg-success" : "bg-muted-foreground/45"}`}
+                className={`inline-flex h-1.5 w-4 rounded-full ${
+                  item.isCompleted ? "bg-success" : compact && onMedia ? "bg-white/25" : "bg-muted-foreground/45"
+                }`}
               />
             ))}
           </div>
@@ -301,9 +303,9 @@ export function ProgressDayView({
     // Progress screen the parent has no definite height, so both resolve to
     // auto and nothing changes there.
     <div
-      className={`mx-auto flex w-full max-w-[44rem] flex-col gap-4 fade-in xl:max-w-[80rem] ${
-        onGlass ? "flex-1 sm:min-h-[21rem] md:min-h-[22rem]" : ""
-      }`}
+      className={`mx-auto flex w-full flex-col gap-4 fade-in ${
+        isHomeSubset ? "max-w-none" : "max-w-[44rem] xl:max-w-[80rem]"
+      } ${onGlass ? "flex-1 sm:min-h-[21rem] md:min-h-[22rem]" : ""}`}
       dir={isArabic ? "rtl" : "ltr"}
     >
       <HomeCard onGlass={onGlass} className={`flex-col ${onGlass ? "flex-1" : ""}`}>
@@ -333,7 +335,9 @@ export function ProgressDayView({
                   aria-label={t(language, "garden.explanationLabel")}
                   onClick={() => setIsWirdInfoOpen((open) => !open)}
                   className={`flex size-11 shrink-0 items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                    onGlass ? "text-on-media-muted hover:bg-black/25" : "text-muted-foreground hover:bg-muted"
+                    onGlass
+                      ? "text-on-media-muted hover:bg-white/15 hover:text-on-media"
+                      : "text-muted-foreground hover:bg-muted"
                   }`}
                 >
                   <Info size={18} aria-hidden="true" />
@@ -349,9 +353,7 @@ export function ProgressDayView({
 
           <div
             className={`flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-label font-black ${
-              onGlass
-                ? "border-on-media/16 bg-black/45 text-on-media"
-                : "border-border-control bg-muted text-foreground"
+              onGlass ? "border-white/15 bg-white/10 text-on-media" : "border-border-control bg-muted text-foreground"
             }`}
           >
             {/* Isolated: a bare ratio between Arabic siblings gets reordered
@@ -365,7 +367,7 @@ export function ProgressDayView({
             role="tooltip"
             className={`mt-3 w-full rounded-2xl border p-3 text-label font-semibold leading-6 shadow-xs ${
               onGlass
-                ? "border-on-media/20 bg-on-media-surface/95 text-on-media"
+                ? "border-white/15 bg-white/10 text-on-media backdrop-blur-md"
                 : "border-border bg-popover text-popover-foreground"
             }`}
             dir={isArabic ? "rtl" : "ltr"}

@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-18e",
+  "release": "2026-09-19",
   "ar": [
-    "توحيد تأثير الزجاج المثلج على جميع بطاقات الشاشة الرئيسية لمظهر متناسق في الضوء والظلام.",
-    "إزالة التمويه المزدوج الذي كان يجعل بعض البطاقات تبدو أكثر عتامة من غيرها.",
-    "تحسين أيقونة رأس بطاقة أعمال الصلاة لتتناسق مع ألوان الخلفية الفوتوغرافية."
+    "توحيد تأثير الزجاج المثلج والشفافية لبطاقة ورد الأذكار والقرآن الكريم لتتطابق تماماً مع باقي بطاقات الشاشة الرئيسية.",
+    "ثبات نص الذكر في شاشة القراءة ومنع اهتزازه أو انزلاقه للأسفل عند تشغيل المشغل الصوتي.",
+    "محاذاة دقيقة لمؤشر التحكم في مستوى الصوت داخل المشغل الصوتي العائم لتجربة استخدام أكثر سلاسة."
   ],
   "en": [
-    "Unified frosted glass effect across all Home screen cards for a consistent look in all themes.",
-    "Removed double-blur that made some cards appear more opaque than others.",
-    "Polished prayer actions card header icon to match the on-media colour palette."
+    "Unified frosted glass depth and translucency for the daily zikr and Quran tracking card to perfectly match all Home screen cards.",
+    "Stabilized reading screen text to eliminate vertical jumping when starting audio playback.",
+    "Centered the volume slider control within the floating audio player for precise alignment and smoother control."
   ]
 }

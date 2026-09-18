@@ -1392,9 +1392,16 @@ export function ReaderScreen({
                       {renderSideNavigation()}
                     </div>
 
-                    {!longSurah && !audioModeActive && (
-                      <footer className="shrink-0 pb-3 pt-2">{renderCounterStack()}</footer>
-                    )}
+                    {!longSurah &&
+                      (audioModeActive ? (
+                        <footer
+                          data-testid="reader-audio-spacer-desktop"
+                          className="shrink-0 h-[5.5rem] pb-3 pt-2 pointer-events-none"
+                          aria-hidden="true"
+                        />
+                      ) : (
+                        <footer className="shrink-0 pb-3 pt-2">{renderCounterStack()}</footer>
+                      ))}
                   </div>
                 </div>
               </div>
@@ -1570,11 +1577,18 @@ export function ReaderScreen({
               {/* The screen sets !pb-0 and the tab bar is hidden here, so the
                 counter itself owns the bottom inset — otherwise it would sit
                 flush against the home indicator. */}
-              {!longSurah && !audioModeActive && (
-                <div className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">
-                  {renderCounterStack()}
-                </div>
-              )}
+              {!longSurah &&
+                (audioModeActive ? (
+                  <div
+                    data-testid="reader-audio-spacer-mobile"
+                    className="shrink-0 h-[5.5rem] pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 pointer-events-none"
+                    aria-hidden="true"
+                  />
+                ) : (
+                  <div className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">
+                    {renderCounterStack()}
+                  </div>
+                ))}
             </div>
           </>
         ))}
