@@ -100,6 +100,7 @@ test("saved zikr is visible from the first-class Saved library tab", async ({ pa
   // Comprehensive Duas during the last third of the night.
   await page.getByRole("button", { name: "Azkar", exact: true }).click();
   await page.getByTestId("category-card-morning").click();
+  await page.getByRole("button", { name: "Start Session", exact: true }).click();
 
   // Save lives in the reader's overflow menu on every tier: the header carries
   // at most two actions, Benefit and the menu.

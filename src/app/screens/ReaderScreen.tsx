@@ -1055,7 +1055,19 @@ export function ReaderScreen({
           >
             <Minus size={18} />
           </button>
-          <span className="text-xs font-bold w-6 text-center text-foreground font-sans">Aa</span>
+          <button
+            type="button"
+            data-testid="reader-text-size-medium"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-foreground hover:bg-background transition-colors disabled:opacity-40 disabled:hover:bg-transparent font-sans"
+            disabled={textSize === "medium"}
+            aria-label={t(language, "settings.medium")}
+            onClick={(e) => {
+              e.stopPropagation();
+              onTextSizeChange("medium");
+            }}
+          >
+            Aa
+          </button>
           <button
             type="button"
             data-testid="reader-text-size-large"

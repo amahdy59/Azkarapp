@@ -26,7 +26,7 @@
     "test:e2e": "playwright test",
     "test:e2e:evidence": "playwright test e2e/evidence-capture.spec.ts",
     "test:e2e:baseline": "playwright test e2e/baseline-capture.spec.ts",
-    "test:e2e:serve": "node scripts/cleanup-test-server.mjs && vite build --outDir .playwright-dist && vite preview --outDir .playwright-dist --host 127.0.0.1 --port 4173 --strictPort",
+    "test:e2e:serve": "vite build --outDir .playwright-dist && vite preview --outDir .playwright-dist --host 127.0.0.1 --port 4173 --strictPort",
     "test:coverage": "vitest run --coverage",
     "test:run": "vitest run",
     "budget": "node scripts/check-bundle-budget.mjs",

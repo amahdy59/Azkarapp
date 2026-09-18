@@ -32,6 +32,7 @@ test("core Reader and Settings are available on a first offline visit after inst
   try {
     await page.getByTestId("nav-azkar").click();
     await page.getByTestId("category-card-morning").click();
+    await page.getByRole("button", { name: "Start Session", exact: true }).click();
 
     const counter = page.getByTestId("counter-surface");
     await expect(counter).toBeVisible();

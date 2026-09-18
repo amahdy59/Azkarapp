@@ -91,7 +91,7 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding }: UseAppRo
         const items = getAzkarForMode(categoryId, mode);
         if (targetView === "reader" && (targetIndex < 0 || targetIndex >= items.length)) {
           setActiveIdx(0);
-          setView(items.length > 0 ? "reader" : "library");
+          setView("category");
         }
         return true;
       } catch (error) {
@@ -274,8 +274,7 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding }: UseAppRo
     if (!category) return;
     setActiveCat(category);
     setActiveTab("azkar");
-    setView("reader");
-    window.history.replaceState(null, "", window.location.pathname);
+    setView("category");
   }, [initialShortcutCategory, view]);
 
   const handleNavTab = useCallback(

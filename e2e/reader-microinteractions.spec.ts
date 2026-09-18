@@ -59,6 +59,7 @@ async function openFirstMorningZikr(page: Page) {
   await page.getByTestId("continue-as-guest").click();
   await page.getByTestId("nav-azkar").click();
   await page.getByTestId("category-card-waking_up").click();
+  await page.getByRole("button", { name: "Start Session", exact: true }).click();
 }
 
 /**
@@ -118,7 +119,7 @@ test("wide Reader keeps a one-third RTL collection navigator and supports direct
     expect(navigatorBox.x + navigatorBox.width).toBeLessThanOrEqual(readerBox.x);
   }
 
-  const items = navigator.getByRole("button");
+  const items = navigator.locator('[id^="zikr-card-"]').locator('[role="button"][aria-controls]');
   expect(await items.count()).toBeGreaterThan(1);
   await items.nth(1).click();
   await expect(items.nth(1)).toHaveAttribute("aria-current", "step");
@@ -779,8 +780,11 @@ test("the reader's text-size control resizes the zikr and never goes below the f
 
   const measured: Record<string, number> = {};
   for (const step of ["small", "medium", "large"] as const) {
-    await page.getByRole("button", { name: "Reader options", exact: true }).click();
-    await page.getByTestId(`reader-text-size-${step}`).click();
+    const sizeButton = page.getByTestId(`reader-text-size-${step}`);
+    if (!(await sizeButton.isVisible())) {
+      await page.getByRole("button", { name: "Reader options", exact: true }).click();
+    }
+    await sizeButton.click();
     // The menu writes the one app-wide setting, so the root token moves too.
     await expect
       .poll(async () =>

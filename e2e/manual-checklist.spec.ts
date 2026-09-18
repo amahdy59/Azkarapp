@@ -224,7 +224,7 @@ test("text resize: largest app text setting keeps content and actions reachable"
 
   // The card must remain operable, not merely present.
   await card.click();
-  await expect(page.getByTestId("reader-screen")).toBeVisible();
+  await expect(page.getByRole("button", { name: /Start Session|Continue/ }).first()).toBeVisible();
 });
 
 test("text resize: 200% zoom keeps primary navigation usable", async ({ page }) => {
@@ -254,7 +254,7 @@ test("text reflow: 400% zoom equivalent keeps core actions reachable", async ({ 
   await expect(morning).toBeVisible();
   await expectNoHorizontalOverflow(page, "400% zoom Library");
   await morning.click();
-  await expect(page.getByTestId("reader-screen")).toBeVisible();
+  await expect(page.getByRole("button", { name: /Start Session|Continue/ }).first()).toBeVisible();
 
   if (await page.getByTestId("nav-more").isVisible()) {
     await page.getByTestId("nav-more").click();
@@ -482,6 +482,10 @@ for (const language of ["ar", "en"] as const) {
     );
 
     // And again in the reader, where two header actions compete for the row.
+    await page
+      .getByRole("button", { name: /Start Session|ابدأ/ })
+      .first()
+      .click();
     await expect(page.getByTestId("reader-screen")).toBeVisible();
     await expectUnclippedHeading(page.getByRole("heading", { level: 1 }).first(), `${language} reader header at 320px`);
   });

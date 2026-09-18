@@ -1,15 +1,13 @@
 {
-  "release": "2026-09-18",
+  "release": "2026-09-18b",
   "ar": [
-    "تخطي شاشة تفاصيل الفئة من الصفحة الرئيسية لتتمكن من القراءة مباشرة وبشكل أسرع.",
-    "تحسين تصميم الصفحة الرئيسية وإضافة تأثير زجاجي لقسم 'ورد اليوم'.",
-    "تحسينات على شريط التنقل الجانبي في صفحة القراءة وإضافة زر 'تشغيل كل الصوتيات'.",
-    "تم تعديل اسم القارئ 'محمد الشرع' إلى 'محمد شرعي' في الإعدادات وقوائم التلاوة."
+    "تحسين المظهر العام وتوحيد تصميم البطاقات والتأثيرات الزجاجية في الشاشة الرئيسية.",
+    "إتاحة التحكم المباشر في حجم خط القراءة من قائمة الخيارات داخل صفحة الذكر.",
+    "تحسين التنقل واستعراض مجموعات الأذكار بسلاسة وتجاوب أعلى أثناء القراءة."
   ],
   "en": [
-    "Opening a collection from the Home screen now goes straight to reading mode.",
-    "Improved Home screen visuals with a frosted glass effect on the 'Today's Wird' cards.",
-    "The reader sidebar now has expandable cards and a new 'Play All Audio' button.",
-    "Updated the reciter name from 'Muhammad Al-Shara' to 'Muhammad Shari' across the app."
+    "Refined visual styling and unified glassmorphism effects across all cards on the Home screen.",
+    "Added convenient text size controls directly within the Reader options menu.",
+    "Smoother navigation and responsive collection browsing during reading sessions."
   ]
 }

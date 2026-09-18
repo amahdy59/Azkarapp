@@ -15,6 +15,7 @@ async function enterEnglishGuestMode(page: import("@playwright/test").Page) {
   await page.getByTestId("continue-as-guest").click();
   await page.getByTestId("nav-azkar").click();
   await page.getByTestId("category-card-morning").click();
+  await page.getByRole("button", { name: "Start Session", exact: true }).click();
 }
 
 test("unreviewed audio is unavailable and never autoplays", async ({ page }) => {
@@ -38,13 +39,14 @@ test("Core Reader keeps the same stable zikr identity as its filtered routine", 
   await page.getByTestId("onboarding-get-started").click();
   await page.getByTestId("continue-as-guest").click();
 
-  // Go to Library and click Morning Azkar to enter Reader Screen reliably.
+  // Go to Library and click Morning Azkar to enter Category Screen.
   await page.getByTestId("nav-azkar").click();
   await page.getByTestId("category-card-morning").click();
 
-  // Now we are in ReaderScreen. Change the mode.
+  // Change the mode, then start session into ReaderScreen.
   await page.getByTestId("routine-mode-filter").click();
   await page.getByRole("menuitemradio", { name: /^Core/ }).click();
+  await page.getByRole("button", { name: "Start Session", exact: true }).click();
 
   const reader = page.getByTestId("reader-screen");
   await expect(reader).toHaveAttribute("data-zikr-id", "m-hm-77m");

@@ -55,6 +55,7 @@ echo "Verifying the frozen dependency graph and seven-day package quarantine..."
 "$PNPM" install --frozen-lockfile
 
 echo "Running repository quality gates..."
+node scripts/cleanup-test-server.mjs
 "$PNPM" check
 "$PNPM" test:e2e
 "$PNPM" build:pages

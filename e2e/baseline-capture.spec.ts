@@ -88,6 +88,7 @@ test.describe("Baseline Capture Suite", () => {
 
     await page.getByTestId("nav-azkar").click();
     await page.getByTestId("category-card-morning").click();
+    await page.getByRole("button", { name: /Start Session|ابدأ الجلسة/ }).click();
     await expect(page.getByTestId("reader-screen")).toBeVisible();
     await page.screenshot({ path: testInfo.outputPath("baseline-reader-session.png"), fullPage: true });
 

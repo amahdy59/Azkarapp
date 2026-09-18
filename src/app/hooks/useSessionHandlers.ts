@@ -124,7 +124,8 @@ export function useSessionHandlers({
     setIsRepeatSession(false);
     setRepeatCompleted(new Set());
     setActiveTab("azkar");
-    resumeCategory(catId);
+    setActiveCat(catId);
+    push("category");
   };
 
   const openReader = (catId: CategoryId, i: number, modeOverride?: RoutineMode, subCat?: string) => {
