@@ -138,7 +138,7 @@ export function PrayerMomentPanel({
           that is what a reader would get. */
           className={`relative isolate min-h-[11rem] border-b ${hairline} ${
             fullWidth && virtue && isLive ? "journey-hero-aside" : ""
-          } ${onGlass ? "bg-on-media-surface/60" : "bg-on-media-surface text-white"}`}
+          } ${onGlass ? "bg-transparent" : "bg-on-media-surface text-white"}`}
           data-testid="prayer-moment-hero"
         >
           {!onGlass && <PrayerSceneArt prayer={prayer} className="absolute inset-0 -z-10" />}
@@ -207,7 +207,7 @@ export function PrayerMomentPanel({
         {virtue && (
           <section
             className={`flex min-h-[11rem] flex-col justify-center border-b p-5 sm:p-6 text-start ${hairline} ${
-              onGlass ? "bg-on-media-surface/60" : ""
+              onGlass ? "bg-transparent" : ""
             }`}
             data-testid="prayer-moment-virtue"
           >

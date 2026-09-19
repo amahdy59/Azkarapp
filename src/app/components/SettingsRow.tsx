@@ -165,7 +165,7 @@ export function SettingsSelectRow({
 }
 
 export function RowChevron() {
-  return <ChevronNext size={18} className="text-foreground/70 rtl:rotate-180" />;
+  return <ChevronNext size={18} className="text-foreground/70" />;
 }
 
 export function RowValue({ value, withChevron = true }: { value: string; withChevron?: boolean }) {

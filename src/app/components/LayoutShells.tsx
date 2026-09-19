@@ -3,7 +3,6 @@ import {
   ArrowPrevious,
   BarChart3,
   BookOpen,
-  Compass,
   Contrast,
   Globe,
   Home,
@@ -32,8 +31,8 @@ export interface NavProps {
 }
 
 interface NavSidebarProps extends NavProps {
-  activeUtility?: "qibla" | "masbaha" | "settings";
-  onOpenQibla: () => void;
+  activeUtility?: "quran" | "masbaha" | "settings";
+  onOpenQuran?: () => void;
   onOpenMasbaha: () => void;
   onOpenSettings: () => void;
 }
@@ -101,7 +100,7 @@ export function Header({
             lines as well. `title` still carries the full string for a
             pointer, and truncation remains the backstop past two lines. */}
         <h1
-          className="line-clamp-2 max-w-full font-sans text-lg font-extrabold leading-tight text-foreground min-[360px]:text-xl sm:text-2xl"
+          className="truncate whitespace-nowrap max-w-full font-sans text-lg font-extrabold leading-tight text-foreground min-[360px]:text-xl sm:text-2xl"
           title={title}
         >
           {title}
@@ -216,14 +215,14 @@ export function NavSidebar({
   onThemeModeChange,
   onLanguageChange,
   activeUtility,
-  onOpenQibla,
+  onOpenQuran,
   onOpenMasbaha,
   onOpenSettings,
 }: NavSidebarProps) {
   const language: AppLanguage = isArabic ? "ar" : "en";
   const tabs = getNavTabs(language).filter(({ id }) => id !== "more");
   const utilityTabs = [
-    { id: "qibla" as const, label: t(language, "qibla.title"), Icon: Compass, onClick: onOpenQibla },
+    { id: "quran" as const, label: t(language, "common.mushaf"), Icon: BookOpen, onClick: onOpenQuran },
     { id: "masbaha" as const, label: t(language, "counter.tasbeehTitle"), Icon: Sparkles, onClick: onOpenMasbaha },
     { id: "settings" as const, label: t(language, "common.settings"), Icon: Settings, onClick: onOpenSettings },
   ];

@@ -27,9 +27,8 @@ describe("the Mushaf page frame", () => {
   });
 
   it("uses the documented crisp page-turn distance and duration", () => {
-    expect(viewer).toContain('"-6px" : "6px"');
-    expect(viewer).toContain("duration: 150");
-    expect(viewer).not.toContain('"-22px" : "22px"');
+    expect(viewer).toContain('"-28px" : "28px"');
+    expect(viewer).toContain("duration: 220");
   });
 
   it("gives the type generous room to sit inside the paper's edge", () => {

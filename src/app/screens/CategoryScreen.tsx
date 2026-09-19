@@ -118,7 +118,15 @@ export function CategoryScreen({
         data-testid="category-overview"
       >
         <Header
-          title={`${isArabic ? cat.nameArabic : cat.name}${prayer ? ` · ${t(language, `notifications.${prayer}`)}` : ""}`}
+          title={
+            catId === "after_prayer" && prayer
+              ? isArabic
+                ? `أذكار بعد ${t(language, `notifications.${prayer}`)}`
+                : `After ${t(language, `notifications.${prayer}`)}`
+              : isArabic
+                ? cat.nameArabic
+                : cat.name
+          }
           onBack={onBack}
           language={language}
         />

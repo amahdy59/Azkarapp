@@ -314,7 +314,9 @@ describe("the phone layout integrates controls directly into the Mushaf canvas",
     setViewport(390, 844);
     renderKahf();
     const surahBtn = screen.getByTestId("mushaf-furniture-surah-btn");
-    expect(surahBtn).toHaveTextContent("الكهف");
+    // The button shows the full surah name with diacritics + juz,
+    // e.g. "سورة الكَهْف·الجزء ١٥". We use a broad substring match.
+    expect(surahBtn.textContent).toMatch(/الكهف|الكَهْف/);
   });
 
   it("does not repeat what the page already prints into separate chrome bars", () => {

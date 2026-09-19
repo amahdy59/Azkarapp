@@ -59,6 +59,113 @@ export interface QuranWirdTile {
   onPress: () => void;
 }
 
+// ─── Rich Wird Category Card (glassmorphic home routine card) ────────────────
+const WIRD_CARD_CONFIG = {
+  morning: {
+    subtitleKey: "progress.morningCardSubtitle",
+  },
+  evening: {
+    subtitleKey: "progress.eveningCardSubtitle",
+  },
+  before_sleep: {
+    subtitleKey: "progress.sleepCardSubtitle",
+  },
+  quran: {
+    subtitleKey: "progress.quranCardSubtitle",
+  },
+} as const;
+
+function WirdCategoryCard({
+  categoryKey,
+  name,
+  icon,
+  status,
+  completedLabel,
+  pendingLabel,
+  subtitle,
+  ctaLabel,
+  onPress,
+  isRecommendedNow = false,
+  recommendedLabel,
+}: {
+  categoryKey: keyof typeof WIRD_CARD_CONFIG;
+  name: string;
+  icon: React.ReactNode;
+  status: DayGroupCardStatus;
+  completedLabel: string;
+  pendingLabel: string;
+  subtitle: string;
+  ctaLabel: string;
+  onPress?: () => void;
+  isRecommendedNow?: boolean;
+  recommendedLabel?: string;
+}) {
+  const isCompleted = status === "completed";
+  const statusLabel = isCompleted ? completedLabel : pendingLabel;
+  const showRecommended = isRecommendedNow && !isCompleted && Boolean(recommendedLabel);
+
+  return (
+    <button
+      type="button"
+      onClick={onPress}
+      aria-label={showRecommended ? `${name} - ${recommendedLabel} - ${statusLabel}` : `${name} - ${statusLabel}`}
+      data-recommended-now={showRecommended ? "true" : undefined}
+      data-category={categoryKey}
+      style={{ minHeight: "11rem" }}
+      className={`hero-glass home-glass-surface group relative flex flex-col overflow-hidden rounded-3xl p-4 text-start transition-all duration-standard ease-standard focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-95 ${
+        isCompleted ? "border-primary/55 shadow-raised" : "border-white/20 shadow-raised hover:border-white/40"
+      }`}
+    >
+      {/* Top row: badge icon & completion checkmark */}
+      <div className="flex w-full items-center justify-between">
+        <span
+          className="flex size-10 items-center justify-center rounded-2xl border border-white/20 bg-white/10 text-on-media-accent shadow-xs"
+          aria-hidden="true"
+        >
+          {icon}
+        </span>
+
+        {isCompleted && (
+          <span className="flex size-7 items-center justify-center rounded-full bg-success text-success-foreground shadow-md">
+            <Check size={14} strokeWidth={3} aria-hidden="true" />
+          </span>
+        )}
+      </div>
+
+      {/* Content: name, subtitle, CTA */}
+      <div className="mt-auto flex w-full flex-col items-start gap-1.5 pt-4">
+        <p className="text-base font-black leading-tight text-on-media drop-shadow-sm sm:text-lg" dir="auto">
+          {name}
+        </p>
+        <p className="line-clamp-2 text-xs font-semibold leading-snug text-on-media-muted" dir="auto">
+          {subtitle}
+        </p>
+        <span
+          className={`mt-2 inline-flex h-9 items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-black shadow-md transition-colors ${
+            isCompleted
+              ? "bg-success text-success-foreground"
+              : "bg-primary text-primary-foreground hover:bg-primary/90"
+          }`}
+        >
+          {isCompleted ? (
+            <>
+              <Check size={12} strokeWidth={3} aria-hidden="true" />
+              {completedLabel}
+            </>
+          ) : (
+            <>
+              {ctaLabel}
+              <span className="inline-block text-micro leading-none opacity-90 rtl:rotate-180" aria-hidden="true">
+                →
+              </span>
+            </>
+          )}
+        </span>
+      </div>
+    </button>
+  );
+}
+
 function MainDhikrGroupCard({
   name,
   icon,
@@ -113,10 +220,10 @@ function MainDhikrGroupCard({
       } ${
         isCompleted
           ? onMedia
-            ? "border-primary/55 bg-primary/20 text-on-media shadow-raised shadow-[0_0_15px_rgba(201,155,76,0.15)]"
+            ? "hero-glass home-glass-surface border-primary/55 bg-primary/20 text-on-media shadow-raised shadow-[0_0_15px_rgba(201,155,76,0.15)]"
             : "border-primary/55 bg-primary/10 text-foreground shadow-raised"
           : onMedia
-            ? "border-white/20 bg-on-media-surface/60 text-on-media shadow-raised hover:border-white/40 hover:bg-on-media-surface/60"
+            ? "hero-glass home-glass-surface border-white/20 text-on-media shadow-raised hover:border-white/40"
             : "border-border bg-background text-foreground shadow-raised hover:border-primary/45 hover:bg-muted"
       }`}
       // The recommendation is added to the name, never substituted for the
@@ -132,7 +239,7 @@ function MainDhikrGroupCard({
           isCompleted
             ? "border-success/60 bg-success/20 text-success"
             : onMedia
-              ? "border-white/20 bg-on-media-surface/60 text-on-media-accent"
+              ? "border-white/20 bg-white/10 text-on-media-accent"
               : "border-border bg-muted text-primary"
         }`}
       >
@@ -414,6 +521,30 @@ export function ProgressDayView({
                   ]
                 : undefined;
 
+            // Home wird row: use immersive image card. Only morning/evening/before_sleep
+            // appear in HOME_WIRD_CATEGORY_IDS so after_prayer has no entry, but
+            // we guard with a key check so TypeScript is satisfied.
+            if (isHomeSubset && col.id in WIRD_CARD_CONFIG) {
+              const cardKey = col.id as keyof typeof WIRD_CARD_CONFIG;
+              const subtitleI18nKey = WIRD_CARD_CONFIG[cardKey].subtitleKey as Parameters<typeof t>[1];
+              return (
+                <WirdCategoryCard
+                  key={col.id}
+                  categoryKey={cardKey}
+                  name={col.name}
+                  icon={col.icon}
+                  status={isDone ? "completed" : "pending"}
+                  completedLabel={t(language, "progress.completed")}
+                  pendingLabel={t(language, "progress.notCompleted")}
+                  subtitle={t(language, subtitleI18nKey)}
+                  ctaLabel={t(language, "progress.startNow")}
+                  onPress={() => onSelectCategory?.(col.id)}
+                  isRecommendedNow={col.id === recommendedCategoryId}
+                  recommendedLabel={t(language, "progress.startNow")}
+                />
+              );
+            }
+
             return (
               <MainDhikrGroupCard
                 key={col.id}
@@ -432,7 +563,26 @@ export function ProgressDayView({
             );
           })}
 
-          {quranWird && (
+          {quranWird && isHomeSubset ? (
+            <WirdCategoryCard
+              categoryKey="quran"
+              name={t(language, "mushaf.wirdTitle")}
+              icon={<BookOpen size={20} />}
+              status={quranWird.complete ? "completed" : "pending"}
+              completedLabel={t(language, "progress.completed")}
+              pendingLabel={
+                quranWird.active
+                  ? t(language, "mushaf.wirdProgress", {
+                      read: formatNumerals(quranWird.progress, language),
+                      goal: formatNumerals(quranWird.goal, language),
+                    })
+                  : t(language, "mushaf.freeReadingActive")
+              }
+              subtitle={t(language, "progress.quranCardSubtitle")}
+              ctaLabel={t(language, "progress.startNow")}
+              onPress={quranWird.onPress}
+            />
+          ) : quranWird ? (
             <MainDhikrGroupCard
               name={t(language, "mushaf.wirdTitle")}
               icon={<BookOpen size={28} />}
@@ -450,7 +600,7 @@ export function ProgressDayView({
               compact
               onMedia={onMedia}
             />
-          )}
+          ) : null}
         </div>
 
         {/* The card shows whether today's wird is done; this answers why it is

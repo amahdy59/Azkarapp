@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { Header } from "../../components/LayoutShells";
 import { t } from "../../i18n";
 import { shouldReduceMotion } from "../../motionPreferences";
@@ -168,6 +168,8 @@ export function SettingsScreen({
     return () => cancelAnimationFrame(frame);
   }, [isTwoPaneLayout, sub]);
 
+  const forwardOffset = direction === "rtl" ? -28 : 28;
+
   const panelVariants = motionReduced
     ? {
         initial: { opacity: 0 },
@@ -176,10 +178,10 @@ export function SettingsScreen({
         transition: { duration: 0.1 },
       }
     : {
-        initial: { x: direction === "rtl" ? "-100%" : "100%", opacity: 0 },
+        initial: { x: forwardOffset, opacity: 0 },
         animate: { x: 0, opacity: 1 },
-        exit: { x: direction === "rtl" ? "-100%" : "100%", opacity: 0 },
-        transition: { type: "tween", duration: 0.22, ease: [0.16, 1, 0.3, 1] },
+        exit: { x: -forwardOffset, opacity: 0 },
+        transition: { duration: 0.22, ease: [0.22, 1, 0.36, 1] },
       };
 
   const rootVariants = motionReduced
@@ -190,10 +192,10 @@ export function SettingsScreen({
         transition: { duration: 0.1 },
       }
     : {
-        initial: { x: 0, opacity: 1 },
+        initial: { x: -forwardOffset, opacity: 0 },
         animate: { x: 0, opacity: 1 },
-        exit: { x: direction === "rtl" ? "30%" : "-30%", opacity: 0 },
-        transition: { type: "tween", duration: 0.22, ease: "easeInOut" },
+        exit: { x: forwardOffset, opacity: 0 },
+        transition: { duration: 0.22, ease: [0.22, 1, 0.36, 1] },
       };
 
   return (
@@ -232,9 +234,9 @@ export function SettingsScreen({
           </div>
         </div>
       ) : (
-        /* ── Compact/medium: existing slide-in animation ── */
-        <>
-          {sub === "root" && (
+        /* ── Compact/medium: smooth transition ── */
+        <AnimatePresence mode="wait" initial={false}>
+          {sub === "root" ? (
             <motion.div
               key="root"
               variants={rootVariants}
@@ -262,8 +264,7 @@ export function SettingsScreen({
                 onCalendarTypeChange={onCalendarTypeChange}
               />
             </motion.div>
-          )}
-          {sub !== "root" && (
+          ) : (
             <motion.div
               key={sub}
               variants={panelVariants}
@@ -275,7 +276,7 @@ export function SettingsScreen({
               {renderSubPanel(sub)}
             </motion.div>
           )}
-        </>
+        </AnimatePresence>
       )}
     </div>
   );

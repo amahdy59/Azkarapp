@@ -13,7 +13,6 @@ export const SURAH_PLACEMENTS: Record<number, SurahPlacement> = {
   "1": {
     page: 1,
     line: 1,
-    openingBand: true,
   },
   "2": {
     page: 2,

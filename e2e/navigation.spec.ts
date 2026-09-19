@@ -65,13 +65,15 @@ test("@cross-browser More keeps Qibla, Masbaha, and Settings easy to reach", asy
   }
 
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.getByTestId("nav-qibla").click();
-  await expect(page.getByTestId("nav-qibla")).toHaveAttribute("aria-current", "page");
+  await page.getByTestId("nav-quran").click();
+  await expect(page.getByTestId("nav-quran")).toHaveAttribute("aria-current", "page");
   await expect(page.getByTestId("nav-more")).toHaveCount(0);
+  await expect(page.getByTestId("nav-qibla")).toHaveCount(0);
   await expect(page.getByTestId("nav-masbaha")).toBeVisible();
   await expect(page.getByTestId("nav-settings")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Qibla", exact: true })).toBeVisible();
   if (testInfo.project.name.startsWith("desktop-")) {
+    await page.goto("/#/qibla");
+    await expect(page.getByRole("heading", { name: "Qibla", exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Use the bearing on a larger screen" })).toBeVisible();
     await expect(page.getByText("Turn clockwise to 136°.")).toBeVisible();
   }

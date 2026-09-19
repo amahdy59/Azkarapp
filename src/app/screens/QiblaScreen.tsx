@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Compass, MapPin } from "../components/icons";
 import { Header } from "../components/LayoutShells";
 import { ScreenContainer } from "../components/ScreenContainer";
@@ -24,9 +24,38 @@ function screenOrientationAngle(): number {
   return window.screen.orientation?.angle ?? legacyOrientation ?? 0;
 }
 
-export function headingFromOrientation(event: OrientationEventWithCompass, fromAbsoluteEvent = false): number | null {
+function computeHeadingFromEuler(alpha: number, beta: number, gamma: number): number {
+  const rad = Math.PI / 180;
+  const x = beta * rad;
+  const y = gamma * rad;
+  const z = alpha * rad;
+
+  const cY = Math.cos(y);
+  const cZ = Math.cos(z);
+  const sX = Math.sin(x);
+  const sY = Math.sin(y);
+  const sZ = Math.sin(z);
+
+  const Vx = -cZ * sY - sZ * sX * cY;
+  const Vy = -sZ * sY + cZ * sX * cY;
+
+  let heading = Math.atan2(Vx, Vy) * (180 / Math.PI);
+  if (heading < 0) heading += 360;
+  return normalizeDegrees(heading + screenOrientationAngle());
+}
+
+export function headingFromOrientation(event: OrientationEventWithCompass, _fromAbsoluteEvent = false): number | null {
   if (Number.isFinite(event.webkitCompassHeading)) return normalizeDegrees(event.webkitCompassHeading!);
-  if ((!event.absolute && !fromAbsoluteEvent) || !Number.isFinite(event.alpha)) return null;
+  if (!Number.isFinite(event.alpha)) return null;
+
+  if (
+    Number.isFinite(event.beta) &&
+    Number.isFinite(event.gamma) &&
+    (Math.abs(event.beta!) > 5 || Math.abs(event.gamma!) > 5)
+  ) {
+    return computeHeadingFromEuler(event.alpha!, event.beta!, event.gamma!);
+  }
+
   return normalizeDegrees(360 - event.alpha! + screenOrientationAngle());
 }
 
@@ -112,10 +141,13 @@ export function QiblaScreen({
   reduceMotion: boolean;
   onBack: () => void;
 }) {
-  const savedCoordinates =
-    Number.isFinite(locationSettings?.latitude) && Number.isFinite(locationSettings?.longitude)
-      ? { latitude: locationSettings!.latitude!, longitude: locationSettings!.longitude! }
-      : null;
+  const savedCoordinates = useMemo(
+    () =>
+      Number.isFinite(locationSettings?.latitude) && Number.isFinite(locationSettings?.longitude)
+        ? { latitude: locationSettings!.latitude!, longitude: locationSettings!.longitude! }
+        : null,
+    [locationSettings],
+  );
   const [coordinates, setCoordinates] = useState(savedCoordinates);
   const [locationLabel, setLocationLabel] = useState(locationSettings?.cityName ?? null);
   const [isLocating, setIsLocating] = useState(false);
@@ -159,7 +191,7 @@ export function QiblaScreen({
     };
   }, [compassEnabled, language]);
 
-  const detectLocation = async () => {
+  const detectLocation = useCallback(async () => {
     setIsLocating(true);
     setLocationMessage(null);
     const result = await detectUserCoordinates();
@@ -171,7 +203,27 @@ export function QiblaScreen({
       setLocationMessage(t(language, `qibla.location${result.reason[0]!.toUpperCase()}${result.reason.slice(1)}`));
     }
     setIsLocating(false);
-  };
+  }, [language]);
+
+  useEffect(() => {
+    if (!savedCoordinates) {
+      void detectLocation();
+    }
+  }, [detectLocation, savedCoordinates]);
+
+  useEffect(() => {
+    if (
+      !showDesktopGuide &&
+      typeof window !== "undefined" &&
+      typeof DeviceOrientationEvent !== "undefined" &&
+      window.isSecureContext
+    ) {
+      const orientation = DeviceOrientationEvent as unknown as OrientationConstructorWithPermission;
+      if (!orientation.requestPermission) {
+        setCompassEnabled(true);
+      }
+    }
+  }, [showDesktopGuide]);
 
   const toggleCompass = async () => {
     if (compassEnabled) {

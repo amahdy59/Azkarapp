@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-19i",
+  "release": "2026-09-19j",
   "ar": [
-    "تجربة قراءة كاملة للمصحف الشريف على الهواتف بمساحة عرض واسعة ودون أشرطة خارجية، مع إمكانية التنقل والتصفح مباشرة عبر اسم السورة ورقم الصفحة.",
-    "أزرار وأدوات مدمجة بأركان المصحف للوصول السريع إلى معاني الكلمات، وحفظ الموضع، والخيارات الإضافية كالتسجيل من مصحف خارجي.",
-    "متابعة شاملة للصلوات المفروضة والسنن الرواتب وصلاة المسجد وأذكار ما بعد الصلاة عبر عروض اليوم والأسبوع والشهر والسنة، مع مزامنة شريط الصفحة الرئيسية."
+    "بطاقات أوراد يومية تفاعلية ومميزة بصرياً لأذكار الصباح والمساء والنوم وورد القرآن في واجهة الصفحة الرئيسية.",
+    "تجربة مصحف نظيفة ومريحة للعين بدون أشرطة خارجية، مع أدوات مدمجة للتنقل السريع ومعاني الكلمات وحفظ الموضع.",
+    "تصحيح اتجاه أسهم التنقل والقوائم في الواجهتين العربية والإنجليزية، مع تحسين بوصلة القبلة للمحمول ومشغّل المصحف للمكتب."
   ],
   "en": [
-    "Edge-to-edge full-screen Holy Quran reading on mobile without external toolbars, enabling intuitive navigation directly via the Surah name and page number.",
-    "Integrated corner controls inside the Mushaf for instant access to word meanings, bookmarks, and options like reading from an external physical Quran.",
-    "Comprehensive tracking for obligatory prayers, Sunan Rawātib, mosque congregation, and post-prayer adhkar across Day, Week, Month, and Year tabs."
+    "Interactive, visually distinct daily wird cards for morning, evening, sleep adhkar, and Quran on the Home screen.",
+    "Clean, comfortable Mushaf reading canvas without external toolbars, featuring integrated quick controls and page transitions.",
+    "Refined outward navigation arrow directions for both Arabic and English, along with mobile Qibla orientation and desktop Quran launcher."
   ]
 }

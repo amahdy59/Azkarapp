@@ -602,7 +602,7 @@ export function AzkarLibraryScreen({
                         {t(language, "benefits.open")}
                       </span>
                     </span>
-                    <ChevronNext className="size-5 shrink-0 text-primary rtl:rotate-180" aria-hidden="true" />
+                    <ChevronNext className="size-5 shrink-0 text-primary" aria-hidden="true" />
                   </button>
                 )}
               </>

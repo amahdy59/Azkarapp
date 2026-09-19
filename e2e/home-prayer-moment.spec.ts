@@ -103,23 +103,15 @@ test("each Home prayer expands its shared properties under an aligned notch", as
 
   const selected = page.getByTestId("prayer-card-dhuhr");
   await expect(selected.getByRole("button")).toHaveAttribute("aria-expanded", "true");
-  const notch = page.getByTestId("home-prayer-notch");
-  await expect(notch).toHaveAttribute("data-prayer", "dhuhr");
-  const [selectedBox, notchBox] = await Promise.all([selected.boundingBox(), notch.boundingBox()]);
-  expect(selectedBox).not.toBeNull();
-  expect(notchBox).not.toBeNull();
-  expect(Math.abs(selectedBox!.x + selectedBox!.width / 2 - (notchBox!.x + notchBox!.width / 2))).toBeLessThan(2);
+  await expect(selected).toHaveAttribute("data-selected", "true");
 });
 
-test("the selected prayer notch follows the RTL visual order", async ({ page }) => {
+test("the selected prayer card reflects selection in RTL visual order", async ({ page }) => {
   await openHomeAt(page, "2026-09-05T13:20:00", "ar");
-  await page.getByTestId("prayer-card-fajr").getByRole("button").click();
-
-  const selectedBox = await page.getByTestId("prayer-card-fajr").boundingBox();
-  const notchBox = await page.getByTestId("home-prayer-notch").boundingBox();
-  expect(selectedBox).not.toBeNull();
-  expect(notchBox).not.toBeNull();
-  expect(Math.abs(selectedBox!.x + selectedBox!.width / 2 - (notchBox!.x + notchBox!.width / 2))).toBeLessThan(2);
+  const fajrCard = page.getByTestId("prayer-card-fajr");
+  await fajrCard.getByRole("button").click();
+  await expect(fajrCard).toHaveAttribute("data-selected", "true");
+  await expect(fajrCard.getByRole("button")).toHaveAttribute("aria-expanded", "true");
 });
 
 /**

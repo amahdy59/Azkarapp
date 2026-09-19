@@ -155,7 +155,7 @@ export function PrayerActionsCard({
                   aria-hidden="true"
                   className={`flex size-9 shrink-0 items-center justify-center rounded-full ${
                     onGlass
-                      ? "border border-white/15 bg-on-media-surface/60 text-white"
+                      ? "border border-white/15 bg-on-media-surface/60 text-on-media-accent"
                       : "border border-border/60 bg-muted text-primary"
                   }`}
                 >
@@ -223,7 +223,7 @@ export function PrayerActionsCard({
                     aria-hidden="true"
                     className={`flex size-7 items-center justify-center rounded-lg ${
                       onGlass
-                        ? "border border-white/15 bg-on-media-surface/60 text-white"
+                        ? "border border-white/15 bg-on-media-surface/60 text-on-media-accent"
                         : "bg-primary/20 text-primary"
                     }`}
                   >

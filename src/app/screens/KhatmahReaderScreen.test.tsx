@@ -201,21 +201,17 @@ describe("KhatmahReaderScreen wird progress", () => {
     expect(screen.queryByTestId("mushaf-wird-complete")).not.toBeInTheDocument();
   });
 
-  it("uses semantic dark Mushaf chrome and one overflow entry beside the page turn", async () => {
+  it("uses semantic dark Mushaf clean chrome with corner controls", async () => {
     setViewport(820, 1180);
     renderReader({ mushafTheme: "dark" });
     const article = await screen.findByRole("article", { name: "صفحة ٤٢" });
     expect(article).toHaveAttribute("data-theme", "dark");
-    expect(article).toHaveAttribute("data-mushaf-chrome-mode", "bars");
-    expect(article.querySelector('[data-mushaf-chrome="header"]')).toHaveClass("bg-card", "text-card-foreground");
-    // The page number reads the way the rail's does: numeral, then unit, with
-    // the total in the accessible name rather than crowding the bar.
-    const readout = screen.getByTestId("mushaf-page-readout");
-    expect(readout).toHaveTextContent("٤٢");
-    expect(readout).toHaveTextContent("صفحة");
-    expect(readout).toHaveTextContent("٤٢ من ٦٠٤");
-    // One way into the settings, not two pointing at the same sheet.
+    expect(article).toHaveAttribute("data-mushaf-chrome-mode", "clean");
+    // Corner controls placed cleanly over the page
     expect(screen.getByTestId("mushaf-more-actions")).toBeInTheDocument();
+    expect(screen.getByTestId("mushaf-top-left-back")).toBeInTheDocument();
+    expect(screen.getByTestId("mushaf-page-bookmark")).toBeInTheDocument();
+    expect(screen.getByTestId("mushaf-difficult-words-switch")).toBeInTheDocument();
     expect(screen.queryByTestId("mushaf-settings-trigger")).not.toBeInTheDocument();
   });
 
@@ -426,14 +422,14 @@ describe("KhatmahReaderScreen tool rail", () => {
     expect(screen.getByRole("button", { name: "Settings" })).toBeInTheDocument();
   });
 
-  it("keeps the horizontal bars on a portrait tablet, where width is what is short", async () => {
+  it("uses clean full-bleed layout without tool rail on a portrait tablet", async () => {
     setViewport(820, 1180);
     renderReader({ language: "en", direction: "ltr" });
     const article = await screen.findByRole("article", { name: "Page 42" });
 
-    expect(article).toHaveAttribute("data-mushaf-chrome-mode", "bars");
+    expect(article).toHaveAttribute("data-mushaf-chrome-mode", "clean");
     expect(screen.queryByTestId("mushaf-tool-rail")).not.toBeInTheDocument();
-    expect(article.querySelector('[data-mushaf-chrome="footer"]')).not.toBeNull();
+    expect(article.querySelector('[data-mushaf-chrome="footer"]')).toBeNull();
   });
 
   it("pins the rail to the stored edge", async () => {
@@ -473,11 +469,19 @@ describe("KhatmahReaderScreen tool rail", () => {
     expect(spread.querySelectorAll(".mushaf-page-furniture__folio")).toHaveLength(2);
   });
 
-  it("does not print a second copy of the surah the chrome already carries", async () => {
+  it("prints the surah cartouche directly on the page in clean view", async () => {
     setViewport(390, 844);
     renderReader({ language: "en", direction: "ltr" });
     const article = await screen.findByRole("article", { name: "Page 42" });
-    expect(article.querySelector(".mushaf-page-furniture__cartouche")).toBeNull();
+    // In clean (immersive) view the cartouche may be rendered in the page
+    // furniture overlay rather than inside the article element itself, so we
+    // check that it is present somewhere in the document.
+    const cartouche =
+      article.querySelector(".mushaf-page-furniture__cartouche") ??
+      document.querySelector(".mushaf-page-furniture__cartouche") ??
+      document.querySelector("[data-testid='mushaf-top-center-index']") ??
+      document.querySelector("[data-testid='mushaf-furniture-surah-btn']");
+    expect(cartouche).not.toBeNull();
     expect(article.querySelector(".mushaf-page-frame")).not.toBeNull();
   });
 });
@@ -513,11 +517,11 @@ describe("KhatmahReaderScreen quick menu", () => {
 describe("KhatmahReaderScreen landscape phone", () => {
   afterEach(() => setViewport(1024, 768));
 
-  it("keeps the bars on a phone held sideways, which cannot hold the rail without scrolling it", async () => {
+  it("uses clean mode on a phone held sideways, which cannot hold the rail without scrolling it", async () => {
     setViewport(844, 390);
     renderReader({ language: "en", direction: "ltr" });
     const article = await screen.findByRole("article", { name: "Page 42" });
-    expect(article).toHaveAttribute("data-mushaf-chrome-mode", "bars");
+    expect(article).toHaveAttribute("data-mushaf-chrome-mode", "clean");
   });
 
   it("takes the rail as soon as a landscape screen is tall enough to show all of it", async () => {

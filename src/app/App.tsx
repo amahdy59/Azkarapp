@@ -1257,8 +1257,8 @@ function AppContent({
           <NavSidebar
             active={activeTab}
             activeUtility={
-              view === "qibla"
-                ? "qibla"
+              view === "khatmah_overview" || view === "khatmah"
+                ? "quran"
                 : view === "custom_counter"
                   ? "masbaha"
                   : view === "settings"
@@ -1269,9 +1269,9 @@ function AppContent({
               setFridayDuaFlow(false);
               handleNavTab(tab);
             }}
-            onOpenQibla={() => {
+            onOpenQuran={() => {
               setFridayDuaFlow(false);
-              push("qibla");
+              push("khatmah_overview");
             }}
             onOpenMasbaha={() => {
               setFridayDuaFlow(false);

@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { SettingsRowItem, SettingsSelectRow, SettingsToggleRow } from "./SettingsRow";
+import { RowChevron, SettingsRowItem, SettingsSelectRow, SettingsToggleRow } from "./SettingsRow";
 
 describe("SettingsRowItem", () => {
   it("renders as a button and fires onPress", () => {
@@ -75,5 +75,15 @@ describe("SettingsToggleRow", () => {
 
     expect(screen.getByRole("switch", { name: /High contrast/ })).toHaveAttribute("aria-checked", "true");
     expect(screen.getByText("Increases text and border contrast")).toBeInTheDocument();
+  });
+});
+
+describe("RowChevron", () => {
+  it("renders with data-rtl-flip and without conflicting rtl:rotate-180", () => {
+    const { container } = render(<RowChevron />);
+    const svg = container.querySelector("svg");
+    expect(svg).toBeInTheDocument();
+    expect(svg).toHaveAttribute("data-rtl-flip");
+    expect(svg?.getAttribute("class") ?? "").not.toContain("rtl:rotate-180");
   });
 });

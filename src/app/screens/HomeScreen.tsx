@@ -683,9 +683,9 @@ export function HomeScreen({
                       className={
                         hasContextStackContent
                           ? direction === "rtl"
-                            ? "md:col-start-1"
-                            : "md:col-start-2"
-                          : "md:col-span-2"
+                            ? "md:col-start-1 md:row-start-1"
+                            : "md:col-start-2 md:row-start-1"
+                          : "md:col-span-2 md:row-start-1"
                       }
                     >
                       <PrayerMomentPanel
@@ -713,7 +713,7 @@ export function HomeScreen({
                       className={
                         expandedPrayer
                           ? `flex min-w-0 flex-col gap-4 lg:gap-5 ${
-                              direction === "rtl" ? "md:col-start-2" : "md:col-start-1"
+                              direction === "rtl" ? "md:col-start-2 md:row-start-1" : "md:col-start-1 md:row-start-1"
                             }`
                           : "contents"
                       }

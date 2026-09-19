@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, startTransition, type CSSProperties } from "react";
-import { ArrowPrevious, Bookmark, CheckCircle2, MoreVertical, Translate } from "./icons";
+import { ArrowPrevious, Bookmark, CheckCircle2, ChevronDown, MoreVertical, Translate } from "./icons";
 import { useSwipeGestures } from "../hooks/useSwipeGestures";
 import { PAPER_ASPECT, spreadStart, useMushafShell } from "./mushafShell";
 import { MushafToolRail, MUSHAF_RAIL_WIDTH, type SurahAudioControl } from "./MushafToolRail";
@@ -9,6 +9,7 @@ import { MushafKeyboardShortcutList } from "./MushafKeyboardShortcuts";
 import { MushafQuickMenu } from "./MushafQuickMenu";
 import { ResponsiveSheet } from "./ResponsiveSheet";
 import { t } from "../i18n";
+import { formatNumerals } from "../formatting";
 import type {
   AppLanguage,
   MushafLayout,
@@ -450,6 +451,29 @@ export function MushafImmersiveReader({
       </button>
     ) : undefined;
 
+  const mobileTopCenter =
+    !shell.rail && !isFocusMode ? (
+      <button
+        type="button"
+        dir={direction}
+        onClick={() => setIsIndexOpen(true)}
+        data-testid="mushaf-furniture-surah-btn"
+        style={{ maxWidth: "calc(100vw - 7.5rem)" }}
+        className="flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-full border border-border bg-card px-3 text-foreground shadow-sm backdrop-blur transition-all active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+      >
+        <span className="truncate font-bold text-sm leading-none">{surahName}</span>
+        <span className="text-muted-foreground opacity-40 text-xs select-none">·</span>
+        <span className="shrink-0 text-xs text-muted-foreground font-medium leading-none">
+          {t(language, "common.juz")} {formatNumerals(juzNumber, language)}
+        </span>
+        <ChevronDown
+          size={14}
+          className="text-muted-foreground shrink-0 opacity-70 select-none ms-0.5"
+          aria-hidden="true"
+        />
+      </button>
+    ) : undefined;
+
   const mobileBottomRight =
     !shell.rail && !isFocusMode ? (
       <button
@@ -564,6 +588,7 @@ export function MushafImmersiveReader({
             {...(shell.rail && !isFocusMode ? { railContent: toolRail, railSide: "right" as const } : {})}
             topLeftControl={mobileTopLeft}
             topRightControl={mobileTopRight}
+            topCenterControl={mobileTopCenter}
             bottomLeftControl={mobileBottomLeft}
             bottomRightControl={mobileBottomRight}
             onSurahClick={() => setIsIndexOpen(true)}

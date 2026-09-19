@@ -168,7 +168,7 @@ for (const [viewport, size] of [
       const prayerButton = page.getByTestId(`prayer-card-${prayer}`).getByRole("button");
       if ((await prayerButton.getAttribute("aria-expanded")) !== "true") await prayerButton.click();
       await expect(page.getByTestId("home-prayer-moment")).toHaveAttribute("data-prayer", prayer);
-      await expect(page.getByTestId("home-prayer-notch")).toHaveAttribute("data-prayer", prayer);
+      await expect(page.getByTestId(`prayer-card-${prayer}`)).toHaveAttribute("data-selected", "true");
       await shoot(page, `${viewport}-home-prayer-${prayer}-ar-midnight`, testInfo.outputPath(`${prayer}.png`));
     });
   }

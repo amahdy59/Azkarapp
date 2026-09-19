@@ -212,7 +212,7 @@ function PrayerCard({
         data-prayer-state={state}
         data-density="summary"
         aria-current={isCurrent ? "step" : undefined}
-        data-selected={selected || undefined}
+        data-selected={selected ? "true" : undefined}
         className={`relative flex min-w-0 flex-col rounded-3xl border text-center transition-all duration-standard ease-standard ${
           selected
             ? "border-primary bg-primary/25 text-on-media shadow-[inset_0_0_0_1px_var(--primary)]"
@@ -240,7 +240,9 @@ function PrayerCard({
           )}
           <span
             aria-hidden="true"
-            className={`prayer-chip flex size-9 items-center justify-center rounded-full border sm:size-10 ${isCurrent ? "text-primary" : ""}`}
+            className={`prayer-chip flex size-9 items-center justify-center rounded-full border sm:size-10 ${
+              isCurrent ? (onGlass ? "text-on-media-accent" : "text-primary") : ""
+            }`}
           >
             <Icon size={19} />
           </span>
@@ -286,25 +288,6 @@ function PrayerCard({
           )}
           <span className="sr-only">{statusLabel(language, state)}</span>
         </button>
-        {selected && (
-          <span
-            aria-hidden="true"
-            data-testid="home-prayer-notch"
-            data-prayer={prayer}
-            className={`home-prayer-notch ${onGlass ? "text-on-media-accent" : "text-primary"}`}
-          >
-            <svg
-              width="18"
-              height="9"
-              viewBox="0 0 18 9"
-              fill="none"
-              className="overflow-visible drop-shadow-md"
-              aria-hidden="true"
-            >
-              <path d="M1 0 L7.5 6.5 C8.3 7.3, 9.7 7.3, 10.5 6.5 L17 0 Z" fill="currentColor" />
-            </svg>
-          </span>
-        )}
       </article>
     );
   }

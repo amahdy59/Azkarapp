@@ -330,7 +330,7 @@ test("More and Qibla have no automatically detectable WCAG A/AA violations", asy
     await expectNoWcagViolations(page);
     await page.getByRole("button", { name: /^Qibla/ }).click();
   } else {
-    await page.getByTestId("nav-qibla").click();
+    await page.goto("/#/qibla");
   }
   await expect(page.getByRole("heading", { name: "Qibla", exact: true })).toBeVisible();
   await expectNoWcagViolations(page);

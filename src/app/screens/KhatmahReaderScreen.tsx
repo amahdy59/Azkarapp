@@ -13,16 +13,13 @@ import type {
   ThemeMode,
 } from "../types";
 import {
-  ChevronRight,
-  ChevronLeft,
+  ArrowPrevious,
   CheckCircle2,
+  ChevronDown,
   X,
   RotateCcw,
   Bookmark,
-  ArrowRight,
-  ArrowLeft,
   BookOpen,
-  ChevronDown,
   MoreVertical,
 } from "../components/icons";
 import { PAPER_ASPECT, spreadStart, useMushafShell } from "../components/mushafShell";
@@ -499,6 +496,8 @@ export function KhatmahReaderScreen({
     };
   }, [pageData, displayPage, language]);
 
+  const formattedJuz = `${t(language, "common.juz")} ${formatNumerals(juzNumber, language)}`;
+
   useEffect(() => {
     if (!pageData?.length) return;
     const [surahNumber] = (pageData[0]?.k ?? "1:1").split(":").map(Number);
@@ -643,63 +642,81 @@ export function KhatmahReaderScreen({
     endDrag(null, null, null, true);
   };
 
-  const isArabic = language === "ar";
-  const backIcon = isArabic ? <ArrowRight size={20} /> : <ArrowLeft size={20} />;
-  const headerActionClass =
-    "inline-flex min-h-11 min-w-0 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-current/15 bg-current/5 px-2 text-micro font-extrabold transition-colors hover:bg-current/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:px-3";
-  /** The page turn carries the bar's weight: a bordered chip, like the rail's. */
-  const footerActionClass =
-    "flex min-h-11 min-w-0 flex-1 flex-col items-center justify-center gap-0 rounded-lg border border-current/15 bg-current/5 px-1 text-micro font-extrabold transition-colors enabled:hover:bg-current/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40";
-  /** The study toggles sit back until they are on, so they do not outrank it. */
-  const footerToggleClass = (active: boolean) =>
-    `inline-flex h-11 w-11 items-center justify-center gap-2 rounded-lg border px-2 transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-60 md:w-auto md:px-3 ${
-      active ? "border-primary/60 bg-primary/15 text-primary" : "border-transparent hover:bg-current/5"
-    }`;
-
-  const pageHeader = (
-    <div className="flex w-full min-w-0 items-center gap-1" dir={direction}>
-      <button type="button" onClick={onBack} className={headerActionClass} aria-label={t(language, "common.back")}>
-        {backIcon}
-        <span>{t(language, "common.back")}</span>
-      </button>
+  const mobileTopLeft =
+    !useRail && !isFocusMode ? (
       <button
         type="button"
-        onClick={() => setIsIndexOpen(true)}
-        className="arabic-ui flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1 rounded-xl px-1.5 text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        aria-label={t(language, "mushaf.indexTitle")}
+        onClick={onBack}
+        data-testid="mushaf-top-left-back"
+        aria-label={t(language, "common.back")}
+        className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border/60 bg-card/90 text-foreground shadow-sm backdrop-blur-md transition-all active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
-        <span className="min-w-0 truncate text-sm font-extrabold">{surahName}</span>
-        {/* The juz and the chevron are the parts a reader can lose: the
-            surah name is the one that must never truncate to a single letter. */}
-        <span className="hidden shrink-0 text-xs font-bold opacity-70 sm:inline">
-          ، {t(language, "common.juz")} {formatNumerals(juzNumber, language)}
-        </span>
-        <ChevronDown size={16} className="hidden shrink-0 opacity-60 sm:block" aria-hidden="true" />
+        <ArrowPrevious size={20} aria-hidden="true" />
       </button>
+    ) : undefined;
 
-      {/* One overflow button carries the index, saved places, study mode,
-          focus, and settings. It shows wherever the bars do, not only on a
-          phone: a portrait tablet has the same bars and had been left with
-          focus mode two taps and a scroll deep inside Settings. */}
+  const mobileTopRight =
+    !useRail && !isFocusMode ? (
       <button
         type="button"
         onClick={() => setIsQuickMenuOpen(true)}
-        className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-current/15 bg-current/5 transition-colors hover:bg-current/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-        aria-label={t(language, "mushaf.moreActions")}
         data-testid="mushaf-more-actions"
+        aria-label={t(language, "mushaf.moreActions")}
+        title={t(language, "mushaf.moreActions")}
+        className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border/60 bg-card/90 text-foreground shadow-sm backdrop-blur-md transition-all active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
-        <MoreVertical size={18} aria-hidden="true" />
+        <MoreVertical size={20} aria-hidden="true" />
       </button>
-    </div>
-  );
+    ) : undefined;
 
-  const pageFooter = (
-    <nav
-      dir={direction}
-      aria-label={t(language, "mushaf.pageNavigation")}
-      className="grid w-full items-center gap-1 md:gap-2"
-      style={{ gridTemplateColumns: "minmax(3.5rem, auto) minmax(0, 1fr) minmax(3.5rem, auto)" }}
-    >
+  const mobileTopCenter =
+    !useRail && !isFocusMode ? (
+      <button
+        type="button"
+        dir={direction}
+        onClick={() => {
+          setIndexTab("surahs");
+          setIsIndexOpen(true);
+        }}
+        data-testid="mushaf-top-center-index"
+        aria-label={t(language, "mushaf.indexTitle")}
+        title={t(language, "mushaf.indexTitle")}
+        style={{ maxWidth: "calc(100vw - 7.5rem)" }}
+        className="flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-full border border-border bg-card px-3 text-foreground shadow-sm backdrop-blur transition-all active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+      >
+        <span className="truncate font-bold text-sm leading-none">{surahShortName}</span>
+        <span className="text-muted-foreground opacity-40 text-xs select-none">·</span>
+        <span className="shrink-0 text-xs text-muted-foreground font-medium leading-none">{formattedJuz}</span>
+        <ChevronDown
+          size={14}
+          className="text-muted-foreground shrink-0 opacity-70 select-none ms-0.5"
+          aria-hidden="true"
+        />
+      </button>
+    ) : undefined;
+
+  const mobileBottomLeft =
+    !useRail && !isFocusMode ? (
+      <button
+        type="button"
+        role="switch"
+        aria-checked={isPageBookmarked}
+        onClick={togglePageBookmark}
+        data-testid="mushaf-page-bookmark"
+        aria-label={t(language, "mushaf.bookmarkCurrentPage")}
+        title={t(language, "mushaf.bookmarkCurrentPage")}
+        className={`flex size-11 shrink-0 items-center justify-center rounded-full border shadow-sm backdrop-blur-md transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+          isPageBookmarked
+            ? "border-primary bg-primary text-primary-foreground"
+            : "border-border/60 bg-card/90 text-foreground hover:bg-muted"
+        }`}
+      >
+        <Bookmark size={19} className={isPageBookmarked ? "fill-current" : undefined} aria-hidden="true" />
+      </button>
+    ) : undefined;
+
+  const mobileBottomRight =
+    !useRail && !isFocusMode ? (
       <button
         type="button"
         role="switch"
@@ -707,85 +724,18 @@ export function KhatmahReaderScreen({
         aria-busy={isLoadingWordMeanings}
         disabled={isLoadingWordMeanings}
         onClick={() => void toggleWordMeanings()}
-        className={footerToggleClass(showWordMeanings)}
-        aria-label={t(language, "mushaf.difficultWordsInvite")}
         data-testid="mushaf-difficult-words-switch"
+        aria-label={t(language, "mushaf.difficultWordsInvite")}
+        title={t(language, "mushaf.difficultWordsInvite")}
+        className={`flex size-11 shrink-0 items-center justify-center rounded-full border shadow-sm backdrop-blur-md transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+          showWordMeanings
+            ? "border-primary bg-primary text-primary-foreground"
+            : "border-border/60 bg-card/90 text-foreground hover:bg-muted"
+        }`}
       >
-        {showWordMeanings ? (
-          <CheckCircle2 size={19} aria-hidden="true" className="shrink-0" />
-        ) : (
-          <BookOpen size={19} aria-hidden="true" className="shrink-0" />
-        )}
-        <span className="hidden max-w-[11rem] truncate font-bold md:block">
-          {t(language, "mushaf.difficultWordsInvite")}
-        </span>
+        {showWordMeanings ? <CheckCircle2 size={19} aria-hidden="true" /> : <BookOpen size={19} aria-hidden="true" />}
       </button>
-
-      {/* Page-turn controls follow natural reading progression:
-          In RTL (Arabic Mushaf), Previous is on the right pointing right (>) and Next is on the left pointing left (<). */}
-      <div
-        className="grid min-w-0 items-center gap-1"
-        style={{ gridTemplateColumns: "minmax(2.75rem,1fr) minmax(4rem,0.8fr) minmax(2.75rem,1fr)" }}
-        dir="rtl"
-      >
-        <button
-          type="button"
-          onClick={() => paginate(-1)}
-          disabled={currentPage <= 1}
-          className={footerActionClass}
-          aria-label={t(language, "common.previous")}
-        >
-          <ChevronRight size={22} aria-hidden="true" />
-          <span className="truncate">{t(language, "common.previous")}</span>
-        </button>
-
-        {/* The same readout the rail carries on a wide screen: the numeral,
-            then the unit, with the total in the accessible name. One anatomy
-            for the page number wherever the reader meets it. */}
-        <p
-          className="flex min-h-11 min-w-0 flex-col items-center justify-center px-1"
-          data-testid="mushaf-page-readout"
-        >
-          <bdi className="text-subtitle leading-[1.4] font-extrabold tabular-nums">
-            {formatNumerals(displayPage, language)}
-          </bdi>
-          <span className="text-micro leading-[1.4] font-bold opacity-70">{t(language, "mushaf.railPageUnit")}</span>
-          <span className="sr-only">
-            {t(language, "mushaf.pageOfTotal", {
-              page: formatNumerals(displayPage, language),
-              total: formatNumerals(LAST_PAGE, language),
-            })}
-          </span>
-        </p>
-
-        <button
-          type="button"
-          onClick={() => paginate(1)}
-          disabled={currentPage >= LAST_PAGE}
-          className={footerActionClass}
-          aria-label={t(language, "common.next")}
-        >
-          <ChevronLeft size={22} aria-hidden="true" />
-          <span className="truncate">{t(language, "common.next")}</span>
-        </button>
-      </div>
-
-      <button
-        type="button"
-        role="switch"
-        aria-checked={isPageBookmarked}
-        onClick={togglePageBookmark}
-        className={footerToggleClass(isPageBookmarked)}
-        aria-label={t(language, "mushaf.bookmarkCurrentPage")}
-        data-testid="mushaf-page-bookmark"
-      >
-        <Bookmark size={19} className={isPageBookmarked ? "shrink-0 fill-current" : "shrink-0"} aria-hidden="true" />
-        <span className="hidden max-w-[11rem] truncate font-bold md:block">
-          {t(language, "mushaf.bookmarkCurrentPage")}
-        </span>
-      </button>
-    </nav>
-  );
+    ) : undefined;
   /**
    * The same actions, stood on end. Where the rail is shown it is the only
    * chrome, so every control the bars carry has to be here.
@@ -928,10 +878,34 @@ export function KhatmahReaderScreen({
                   ? { pageNumber: leftSide.page, lines: leftSide.lines, useQcfGlyphs: leftSide.qcf }
                   : undefined
               }
-              headerContent={isFocusMode || useRail ? undefined : pageHeader}
-              footerContent={isFocusMode || useRail ? undefined : pageFooter}
+              headerContent={undefined}
+              footerContent={undefined}
               railContent={useRail && !isFocusMode ? toolRail : undefined}
               railSide={mushafToolbarSide}
+              topLeftControl={mobileTopLeft}
+              topRightControl={mobileTopRight}
+              topCenterControl={mobileTopCenter}
+              bottomLeftControl={mobileBottomLeft}
+              bottomRightControl={mobileBottomRight}
+              onSurahClick={() => {
+                setIndexTab("surahs");
+                setIsIndexOpen(true);
+              }}
+              onJuzClick={() => {
+                setIndexTab("surahs");
+                setIsIndexOpen(true);
+              }}
+              onPageClick={() => {
+                setIndexTab("surahs");
+                setIsIndexOpen(true);
+              }}
+              onEdgeTap={(edge) => {
+                if (edge === "left") paginate(1);
+                else paginate(-1);
+              }}
+              onPrevious={() => paginate(-1)}
+              onNext={() => paginate(1)}
+              onCenterTap={() => setIsFocusMode((v) => !v)}
               progressBar={wirdProgressBar}
               paperRef={paperRef}
               pageTransitionDirection={pageTransitionDirection}

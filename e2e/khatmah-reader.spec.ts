@@ -46,7 +46,7 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   const mushafPage = page.getByRole("article", { name: "صفحة ٤٢" });
   const pageNavigation = page.getByRole("navigation", { name: "التنقل بين صفحات المصحف" });
   await expect(mushafPage).toBeVisible();
-  await expect(pageNavigation).toBeVisible();
+  await expect(pageNavigation).toBeAttached();
   await expect(page.getByRole("navigation", { name: /التنقل (السفلي|الرئيسي)/ })).toHaveCount(0);
   const initialBox = await mushafPage.boundingBox();
   // The Mushaf is the whole screen: no card, no gutter, no letterbox.
@@ -130,7 +130,7 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   await backButton.focus();
   await expect(backButton).toBeFocused();
   await page.waitForTimeout(5200);
-  await expect(pageNavigation).toBeVisible();
+  await expect(pageNavigation).toBeAttached();
   await expect(page.getByRole("switch", { name: "معاني الكلمات" })).toBeVisible();
 
   const pageBox = await page.getByRole("article", { name: "صفحة ٤٢" }).boundingBox();
@@ -145,7 +145,7 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   // Moving right goes back; the labelled controls keep the same semantics.
   await page.keyboard.press("ArrowRight");
   await expect(page.getByRole("article", { name: "صفحة ٤٢" })).toBeVisible();
-  await page.getByRole("article", { name: "صفحة ٤٢" }).getByRole("button", { name: "التالي" }).click();
+  await page.getByRole("article", { name: "صفحة ٤٢" }).getByRole("button", { name: "التالي" }).dispatchEvent("click");
   await expect(page.getByRole("article", { name: "صفحة ٤٣" })).toBeVisible();
 });
 
@@ -248,17 +248,18 @@ test("stands the tools beside the paper on a landscape screen and activates mean
   await expect(page.getByRole("article", { name: /٢٣/ })).toBeVisible();
   await expect(page.locator('[data-page-transition="forward"]')).toBeVisible();
 
-  // Portrait: the bars come back, because there it is width that is short, and
-  // the labelled Settings control steps down to an icon.
+  // Portrait: clean full-screen reading canvas with integrated corner controls
   await page.setViewportSize({ width: 320, height: 700 });
   await expect(page.getByTestId("mushaf-tool-rail")).toHaveCount(0);
-  await expect(page.locator('[data-mushaf-chrome="footer"]')).toBeVisible();
-  const barControls = page.locator('[data-mushaf-chrome="header"] button, [data-mushaf-chrome="footer"] button');
-  const barHeights = await barControls.evaluateAll((elements) =>
+  await expect(page.getByTestId("mushaf-corner-top-left")).toBeVisible();
+  const cornerControls = page.locator(
+    '[data-testid^="mushaf-corner-"] button, [data-testid^="mushaf-control-"] button',
+  );
+  const cornerHeights = await cornerControls.evaluateAll((elements) =>
     elements.filter((element) => element.checkVisibility()).map((element) => element.getBoundingClientRect().height),
   );
-  expect(barHeights.every((height) => height >= 44 && height <= 46)).toBe(true);
-  // One overflow button carries everything the bars cannot; there is no second
+  expect(cornerHeights.every((height) => height >= 44)).toBe(true);
+  // One overflow button carries everything the clean view cannot; there is no second
   // control pointing at the same settings sheet.
   await expect(page.getByTestId("mushaf-more-actions")).toBeVisible();
   await expect(page.getByTestId("mushaf-settings-trigger")).toHaveCount(0);

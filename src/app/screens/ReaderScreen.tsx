@@ -227,9 +227,12 @@ export function ReaderScreen({
   const z = azkar[idx];
   const category = CATEGORIES.find((item) => item.id === catId);
   const language: AppLanguage = isArabic ? "ar" : "en";
-  const displayCategoryName = `${category ? (isArabic ? category.nameArabic : category.name) : ""}${
-    catId === "after_prayer" && isPrayerName(subCategory) ? ` · ${t(language, `notifications.${subCategory}`)}` : ""
-  }`;
+  const displayCategoryName =
+    catId === "after_prayer" && isPrayerName(subCategory)
+      ? isArabic
+        ? `أذكار بعد ${t(language, `notifications.${subCategory}`)}`
+        : `After ${t(language, `notifications.${subCategory}`)}`
+      : `${category ? (isArabic ? category.nameArabic : category.name) : ""}`;
   const reducedMotion = shouldReduceMotion(reduceMotion);
   const longSurah = isLongSurah(z);
   /** A surah short enough to be read here rather than in the Mushaf view. */
@@ -1321,7 +1324,7 @@ export function ReaderScreen({
                     direction={direction}
                     aria-label={t(language, "reader.groupProgress")}
                   />
-                  {readerZikrTitle && (
+                  {!showSurahChrome && readerZikrTitle && (
                     <div className="mt-1.5 flex w-full items-center justify-between gap-3">
                       <h2
                         className="min-w-0 truncate text-start text-sm font-extrabold leading-relaxed text-[color:var(--on-media)]"
@@ -1331,24 +1334,24 @@ export function ReaderScreen({
                       >
                         {readerZikrTitle}
                       </h2>
-                      <div className="flex shrink-0 items-center gap-3">
-                        {!longSurah && allWordMeanings.length > 0 && (
-                          <button
-                            type="button"
-                            role="switch"
-                            aria-checked={showDifficultWords}
-                            onClick={() => setShowDifficultWords((v) => !v)}
-                            className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-[color:var(--on-media)] rounded-full"
-                            aria-label={t(language, "settings.showDifficultWords")}
-                            title={t(language, "settings.showDifficultWords")}
-                          >
-                            <span className="text-xs font-bold text-[color:var(--on-media)] hidden sm:inline">
-                              {t(language, "settings.showDifficultWords")}
-                            </span>
-                            <ToggleTrack checked={showDifficultWords} />
-                          </button>
-                        )}
-                      </div>
+                    </div>
+                  )}
+                  {!longSurah && allWordMeanings.length > 0 && (
+                    <div className="mt-1.5 flex w-full items-center justify-end gap-2">
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-checked={showDifficultWords}
+                        onClick={() => setShowDifficultWords((v) => !v)}
+                        className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-on-media rounded-full py-1"
+                        aria-label={t(language, "settings.showDifficultWords")}
+                        title={t(language, "settings.showDifficultWords")}
+                      >
+                        <span className="text-xs font-bold text-on-media">
+                          {t(language, "settings.showDifficultWords")}
+                        </span>
+                        <ToggleTrack checked={showDifficultWords} />
+                      </button>
                     </div>
                   )}
                 </div>
@@ -1515,7 +1518,7 @@ export function ReaderScreen({
               />
               {/* See the desktop heading: only surah names render, and the 10px
                 margin keeps harakat clear of the progress track. */}
-              {readerZikrTitle && (
+              {!showSurahChrome && readerZikrTitle && (
                 <div className="mt-2.5 flex w-full items-center justify-between gap-3">
                   <h2
                     className="min-w-0 truncate whitespace-nowrap text-start text-sm font-extrabold leading-relaxed text-foreground"
@@ -1525,24 +1528,24 @@ export function ReaderScreen({
                   >
                     {readerZikrTitle}
                   </h2>
-                  <div className="flex shrink-0 items-center gap-3">
-                    {!longSurah && allWordMeanings.length > 0 && (
-                      <button
-                        type="button"
-                        role="switch"
-                        aria-checked={showDifficultWords}
-                        onClick={() => setShowDifficultWords((v) => !v)}
-                        className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring rounded-full"
-                        aria-label={t(language, "settings.showDifficultWords")}
-                        title={t(language, "settings.showDifficultWords")}
-                      >
-                        <span className="text-xs font-bold text-muted-foreground hidden sm:inline">
-                          {t(language, "settings.showDifficultWords")}
-                        </span>
-                        <ToggleTrack checked={showDifficultWords} />
-                      </button>
-                    )}
-                  </div>
+                </div>
+              )}
+              {!longSurah && allWordMeanings.length > 0 && (
+                <div className="mt-2 flex w-full items-center justify-end gap-2">
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={showDifficultWords}
+                    onClick={() => setShowDifficultWords((v) => !v)}
+                    className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring rounded-full py-1"
+                    aria-label={t(language, "settings.showDifficultWords")}
+                    title={t(language, "settings.showDifficultWords")}
+                  >
+                    <span className="text-xs font-bold text-muted-foreground">
+                      {t(language, "settings.showDifficultWords")}
+                    </span>
+                    <ToggleTrack checked={showDifficultWords} />
+                  </button>
                 </div>
               )}
             </div>

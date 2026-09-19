@@ -303,3 +303,73 @@ describe("MushafPageViewer spread measure", () => {
     }
   });
 });
+
+describe("MushafPageViewer opening pages consistency (pages 1 & 2)", () => {
+  const fatihahLines = [
+    [], // Line 1: Surah header
+    [
+      { verseKey: "1:1", position: 1, isEnd: 0, text: "بِسْمِ" },
+      { verseKey: "1:1", position: 2, isEnd: 0, text: "ٱللَّهِ" },
+      { verseKey: "1:1", position: 3, isEnd: 0, text: "ٱلرَّحْمَـٰنِ" },
+      { verseKey: "1:1", position: 4, isEnd: 0, text: "ٱلرَّحِيمِ" },
+      { verseKey: "1:1", position: 5, isEnd: 1, text: "١" },
+    ],
+    [
+      { verseKey: "1:2", position: 1, isEnd: 0, text: "ٱلْحَمْدُ" },
+      { verseKey: "1:2", position: 2, isEnd: 0, text: "لِلَّهِ" },
+      { verseKey: "1:2", position: 3, isEnd: 0, text: "رَبِّ" },
+      { verseKey: "1:2", position: 4, isEnd: 0, text: "ٱلْعَـٰلَمِينَ" },
+      { verseKey: "1:2", position: 5, isEnd: 1, text: "٢" },
+    ],
+  ];
+
+  const baqarahOpeningLines = [
+    [], // Line 1: Surah header
+    [], // Line 2: Basmalah
+    [
+      { verseKey: "2:1", position: 1, isEnd: 0, text: "الٓمٓ" },
+      { verseKey: "2:1", position: 2, isEnd: 1, text: "١" },
+      { verseKey: "2:2", position: 1, isEnd: 0, text: "ذَٰلِكَ" },
+    ],
+  ];
+
+  it("renders Page 1 (Al-Fatihah) with 15 line slots, Surah header on line 1, and Basmalah as Ayah 1 on line 2", () => {
+    const { container } = render(
+      <MushafPageViewer
+        lines={fatihahLines}
+        language="ar"
+        pageNumber={1}
+        surahName="سورة الفاتحة"
+        juzNumber={1}
+        direction="rtl"
+      />,
+    );
+
+    const slots = container.querySelectorAll("[data-mushaf-column] > div");
+    expect(slots).toHaveLength(8);
+    expect(screen.getByRole("heading", { level: 2, name: "سورة الفاتحة" })).toBeInTheDocument();
+    expect(screen.getByText("بِسْمِ")).toBeInTheDocument();
+    expect(screen.getByText("ٱلْحَمْدُ")).toBeInTheDocument();
+  });
+
+  it("renders Page 2 (Al-Baqarah) with 15 line slots, Surah header on line 1, and standard Basmalah on line 2", () => {
+    const { container } = render(
+      <MushafPageViewer
+        lines={baqarahOpeningLines}
+        language="ar"
+        pageNumber={2}
+        surahName="سورة البقرة"
+        juzNumber={1}
+        direction="rtl"
+      />,
+    );
+
+    const slots = container.querySelectorAll("[data-mushaf-column] > div");
+    expect(slots).toHaveLength(8);
+    expect(screen.getByRole("heading", { level: 2, name: "سورة البقرة" })).toBeInTheDocument();
+    const bismillah = screen.getByLabelText("بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ");
+    expect(bismillah).toBeInTheDocument();
+    expect(bismillah).toHaveAttribute("role", "img");
+    expect(screen.getByText("الٓمٓ")).toBeInTheDocument();
+  });
+});
