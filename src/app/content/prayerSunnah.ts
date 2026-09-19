@@ -89,6 +89,29 @@ const MAGHRIB_PAIR: SunnahEvidence = {
   textEnglish: "“Pray two rakʿahs before the Maghrib prayer,” then he said the third time: “for whoever wishes.”",
 };
 
+const DHUHR_AFTER_PAIR: SunnahEvidence = {
+  textArabic:
+    "«كَانَ يُصَلِّي فِي بَيْتِي قَبْلَ الظُّهْرِ أَرْبَعًا، ثُمَّ يَخْرُجُ فَيُصَلِّي بِالنَّاسِ، ثُمَّ يَدْخُلُ فَيُصَلِّي رَكْعَتَيْنِ»",
+  referenceArabic: "صحيح مسلم ٧٣٠",
+  referenceEnglish: "Sahih Muslim 730",
+  textEnglish:
+    "“He used to pray four rakʿahs in my house before Dhuhr, then go out and lead the people in prayer, then come in and pray two rakʿahs.”",
+};
+
+const MAGHRIB_AFTER_PAIR: SunnahEvidence = {
+  textArabic: "«وَكَانَ يُصَلِّي بِالنَّاسِ الْمَغْرِبَ، ثُمَّ يَدْخُلُ فَيُصَلِّي رَكْعَتَيْنِ»",
+  referenceArabic: "صحيح مسلم ٧٣٠",
+  referenceEnglish: "Sahih Muslim 730",
+  textEnglish: "“And he would lead the people in the Maghrib prayer, then enter my house and pray two rakʿahs.”",
+};
+
+const ISHA_AFTER_PAIR: SunnahEvidence = {
+  textArabic: "«وَيُصَلِّي بِالنَّاسِ الْعِشَاءَ، وَيَدْخُلُ بَيْتِي فَيُصَلِّي رَكْعَتَيْنِ»",
+  referenceArabic: "صحيح مسلم ٧٣٠",
+  referenceEnglish: "Sahih Muslim 730",
+  textEnglish: "“And he would lead the people in the Isha prayer, and enter my house and pray two rakʿahs.”",
+};
+
 /**
  * What is due before the fard, and what after it.
  *
@@ -101,17 +124,17 @@ const SUNNAH: Record<PrayerName, { before?: PrayerSunnah; after?: PrayerSunnah }
   },
   dhuhr: {
     before: { before: 4, after: 0, rank: "confirmed", evidence: DHUHR_FOUR },
-    after: { before: 0, after: 2, rank: "confirmed", evidence: TWELVE_RAKAHS },
+    after: { before: 0, after: 2, rank: "confirmed", evidence: DHUHR_AFTER_PAIR },
   },
   asr: {
     before: { before: 4, after: 0, rank: "optional", evidence: ASR_FOUR },
   },
   maghrib: {
     before: { before: 2, after: 0, rank: "optional", evidence: MAGHRIB_PAIR },
-    after: { before: 0, after: 2, rank: "confirmed", evidence: TWELVE_RAKAHS },
+    after: { before: 0, after: 2, rank: "confirmed", evidence: MAGHRIB_AFTER_PAIR },
   },
   isha: {
-    after: { before: 0, after: 2, rank: "confirmed", evidence: TWELVE_RAKAHS },
+    after: { before: 0, after: 2, rank: "confirmed", evidence: ISHA_AFTER_PAIR },
   },
 };
 

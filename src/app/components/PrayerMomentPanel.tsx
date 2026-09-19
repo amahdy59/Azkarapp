@@ -138,7 +138,7 @@ export function PrayerMomentPanel({
           that is what a reader would get. */
           className={`relative isolate min-h-[11rem] border-b ${hairline} ${
             fullWidth && virtue && isLive ? "journey-hero-aside" : ""
-          } ${onGlass ? "" : "bg-on-media-surface text-white"}`}
+          } ${onGlass ? "bg-on-media-surface/60" : "bg-on-media-surface text-white"}`}
           data-testid="prayer-moment-hero"
         >
           {!onGlass && <PrayerSceneArt prayer={prayer} className="absolute inset-0 -z-10" />}
@@ -206,7 +206,9 @@ export function PrayerMomentPanel({
         </section>
         {virtue && (
           <section
-            className={`flex min-h-[11rem] flex-col justify-center border-b p-5 sm:p-6 text-start ${hairline}`}
+            className={`flex min-h-[11rem] flex-col justify-center border-b p-5 sm:p-6 text-start ${hairline} ${
+              onGlass ? "bg-on-media-surface/60" : ""
+            }`}
             data-testid="prayer-moment-virtue"
           >
             <h3 className={`text-subtitle font-black ${accentText}`} dir="auto">
@@ -216,7 +218,9 @@ export function PrayerMomentPanel({
               {t(language, "prayerMoment.virtueAttribution")}
             </p>
             <p
-              className={`mt-2 text-title font-bold leading-loose ${titleText} ${isArabic || !virtue.textEnglish ? "zikr-text" : ""}`}
+              className={`mt-2 text-title font-bold leading-loose ${titleText} ${
+                isArabic || !virtue.textEnglish ? "zikr-text" : ""
+              }`}
               dir={isArabic || !virtue.textEnglish ? "rtl" : "ltr"}
               lang={isArabic || !virtue.textEnglish ? "ar" : "en"}
             >

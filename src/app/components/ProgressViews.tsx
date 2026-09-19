@@ -116,7 +116,7 @@ function MainDhikrGroupCard({
             ? "border-primary/55 bg-primary/20 text-on-media shadow-raised shadow-[0_0_15px_rgba(201,155,76,0.15)]"
             : "border-primary/55 bg-primary/10 text-foreground shadow-raised"
           : onMedia
-            ? "border-white/20 bg-white/10 text-on-media shadow-raised hover:border-white/30 hover:bg-white/15"
+            ? "border-white/20 bg-on-media-surface/60 text-on-media shadow-raised hover:border-white/40 hover:bg-on-media-surface/60"
             : "border-border bg-background text-foreground shadow-raised hover:border-primary/45 hover:bg-muted"
       }`}
       // The recommendation is added to the name, never substituted for the
@@ -132,7 +132,7 @@ function MainDhikrGroupCard({
           isCompleted
             ? "border-success/60 bg-success/20 text-success"
             : onMedia
-              ? "border-white/20 bg-white/15 text-on-media-accent"
+              ? "border-white/20 bg-on-media-surface/60 text-on-media-accent"
               : "border-border bg-muted text-primary"
         }`}
       >
@@ -161,7 +161,7 @@ function MainDhikrGroupCard({
               : showRecommended
                 ? "bg-primary text-primary-foreground shadow-sm"
                 : onMedia
-                  ? "border border-white/15 bg-white/10 text-on-media-muted backdrop-blur-xs"
+                  ? "border border-white/20 bg-on-media-surface/60 text-on-media-muted backdrop-blur-xs"
                   : "bg-muted text-muted-foreground"
           }`}
         >
@@ -333,7 +333,7 @@ export function ProgressDayView({
                   onClick={() => setIsWirdInfoOpen((open) => !open)}
                   className={`flex size-11 shrink-0 items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                     onGlass
-                      ? "text-on-media-muted hover:bg-white/15 hover:text-on-media"
+                      ? "text-on-media-muted hover:bg-on-media-surface/60 hover:text-on-media"
                       : "text-muted-foreground hover:bg-muted"
                   }`}
                 >
@@ -350,7 +350,9 @@ export function ProgressDayView({
 
           <div
             className={`flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-label font-black ${
-              onGlass ? "border-white/15 bg-white/10 text-on-media" : "border-border-control bg-muted text-foreground"
+              onGlass
+                ? "border-white/20 bg-on-media-surface/60 text-on-media"
+                : "border-border-control bg-muted text-foreground"
             }`}
           >
             {/* Isolated: a bare ratio between Arabic siblings gets reordered
@@ -364,7 +366,7 @@ export function ProgressDayView({
             role="tooltip"
             className={`mt-3 w-full rounded-2xl border p-3 text-label font-semibold leading-6 shadow-xs ${
               onGlass
-                ? "border-white/15 bg-white/10 text-on-media backdrop-blur-md"
+                ? "border-white/20 bg-on-media-surface/60 text-on-media backdrop-blur-md"
                 : "border-border bg-popover text-popover-foreground"
             }`}
             dir={isArabic ? "rtl" : "ltr"}
@@ -462,7 +464,7 @@ export function ProgressDayView({
             data-testid="open-wird-benefits"
             className={`mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border px-4 text-label font-black transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
               onGlass
-                ? "border-white/20 bg-white/14 text-on-media backdrop-blur-md hover:bg-white/20"
+                ? "border-white/20 bg-on-media-surface/60 text-on-media backdrop-blur-md hover:border-white/40 hover:bg-on-media-surface/60"
                 : "border-primary/35 bg-primary/10 text-primary hover:bg-primary/15"
             }`}
           >

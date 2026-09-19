@@ -244,8 +244,29 @@ describe("PrayerActionsCard", () => {
     expect(modal).toHaveTextContent("أربع ركعات");
     expect(modal).toHaveTextContent("بعد الصلاة");
     expect(modal).toHaveTextContent("ركعتان");
-    // Hadith evidence
+    // Hadith evidence - distinct narrations for before and after prayer without repetition
     expect(modal).toHaveTextContent("مَنْ حَافَظَ عَلَى أَرْبَعِ رَكَعَاتٍ قَبْلَ الظُّهْرِ");
+    expect(modal).toHaveTextContent("كَانَ يُصَلِّي فِي بَيْتِي قَبْلَ الظُّهْرِ أَرْبَعًا");
+  });
+
+  it("omits rawatib banner for Asr since its Sunnah is optional rather than rawatib", () => {
+    render(
+      <PrayerActionsCard
+        prayer="asr"
+        language="ar"
+        direction="rtl"
+        records={[]}
+        dayKey={DAY}
+        onToggle={vi.fn()}
+        onOpenAdhkar={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByTestId("prayer-actions-more-info"));
+    expect(screen.queryByTestId("rawatib-virtue-banner")).toBeNull();
+    const modal = screen.getByTestId("prayer-actions-info-modal");
+    expect(modal).toHaveTextContent("سنن صلاة العصر");
+    expect(modal).toHaveTextContent("رَحِمَ اللَّهُ امْرَأً صَلَّى قَبْلَ الْعَصْرِ أَرْبَعًا");
   });
 
   it("triggers onOpenAdhkar when bottom primary CTA is clicked", () => {
@@ -308,7 +329,7 @@ describe("PrayerActionsCard", () => {
 
     const row = screen.getByTestId("prayer-action-location");
     expect(row).not.toHaveClass("backdrop-blur-md");
-    expect(row).toHaveClass("bg-white/10");
+    expect(row).toHaveClass("bg-on-media-surface/60");
 
     const heading = screen.getByRole("heading", { level: 3 });
     expect(heading).toHaveClass("text-on-media-accent");

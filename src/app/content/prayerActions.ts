@@ -42,7 +42,7 @@ export interface PrayerInfoData {
   prayer: PrayerName;
   prayerName: string;
   modalTitle: string;
-  rawatibVirtue: PrayerRawatibVirtue;
+  rawatibVirtue?: PrayerRawatibVirtue;
   sunnahItems: PrayerSunnahDetail[];
 }
 
@@ -195,15 +195,19 @@ export function getPrayerInfoData(prayer: PrayerName, language: AppLanguage): Pr
     });
   }
 
+  const hasRawatib = prayer !== "asr";
+
   return {
     prayer,
     prayerName,
     modalTitle,
-    rawatibVirtue: {
-      title: t(language, "prayerActions.rawatibVirtueTitle"),
-      description: t(language, "prayerActions.rawatibVirtueDesc"),
-      evidence: TWELVE_RAKAHS,
-    },
+    rawatibVirtue: hasRawatib
+      ? {
+          title: t(language, "prayerActions.rawatibVirtueTitle"),
+          description: t(language, "prayerActions.rawatibVirtueDesc"),
+          evidence: TWELVE_RAKAHS,
+        }
+      : undefined,
     sunnahItems,
   };
 }

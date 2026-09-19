@@ -25,6 +25,7 @@ export function TimeOfDayBackground({ categoryId = "morning" }: { categoryId?: s
         priority={true}
         className="w-full h-full absolute inset-0 transition-opacity duration-entrance ease-out"
       />
+      <div className="home-photo-scrim" aria-hidden="true" />
     </div>
   );
 }

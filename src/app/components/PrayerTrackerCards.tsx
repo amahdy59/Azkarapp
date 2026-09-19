@@ -217,7 +217,7 @@ function PrayerCard({
           selected
             ? "border-primary bg-primary/25 text-on-media shadow-[inset_0_0_0_1px_var(--primary)]"
             : onGlass
-              ? "border-transparent bg-transparent hover:border-white/20 hover:bg-white/15"
+              ? "border-transparent bg-transparent hover:border-white/20 hover:bg-on-media-surface/60"
               : "border-transparent bg-transparent hover:border-border hover:bg-muted"
         }`}
       >
@@ -294,20 +294,14 @@ function PrayerCard({
             className={`home-prayer-notch ${onGlass ? "text-on-media-accent" : "text-primary"}`}
           >
             <svg
-              width="20"
-              height="12"
-              viewBox="0 0 20 12"
+              width="18"
+              height="9"
+              viewBox="0 0 18 9"
               fill="none"
               className="overflow-visible drop-shadow-md"
               aria-hidden="true"
             >
-              <path
-                d="M10 1 V9 M4 5.5 L10 10.5 L16 5.5"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
+              <path d="M1 0 L7.5 6.5 C8.3 7.3, 9.7 7.3, 10.5 6.5 L17 0 Z" fill="currentColor" />
             </svg>
           </span>
         )}

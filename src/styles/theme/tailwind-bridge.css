@@ -134,12 +134,6 @@
 }
 
 @layer components {
-  .ui-surface {
-    border: var(--ds-stroke) solid var(--border);
-    border-radius: var(--ds-radius-card);
-    background: var(--card);
-  }
-
   .ui-control {
     min-height: var(--ds-control-height-compact);
     border-radius: var(--ds-radius-control);

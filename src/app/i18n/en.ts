@@ -259,7 +259,7 @@ const en = {
     hadithReference: "Hadith Reference",
     rawatibVirtueTitle: "Virtue of Sunan Rawatib",
     rawatibVirtueDesc:
-      "Twelve voluntary rak'ahs in a day and night; whoever observes them, Allah builds for them a house in Paradise.",
+      "Confirmed Sunan regularly observed by the Prophet ﷺ: two rak'ahs before Fajr, four before Dhuhr and two after, two after Maghrib, and two after Isha.",
     fajrBeforeDesc: "Two light rak'ahs before Fajr that are better than this world and everything in it",
     dhuhrBeforeDesc: "Four rak'ahs in pairs before Dhuhr prayer",
     dhuhrAfterDesc: "Two rak'ahs after Dhuhr prayer from the confirmed rawātib",

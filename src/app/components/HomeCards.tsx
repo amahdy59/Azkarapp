@@ -102,14 +102,14 @@ export function PrayerRoutineCard({
                 direction={direction}
                 aria-label={t(language, "home.routineMode")}
                 className={`flex items-center rounded-3xl border p-1 ${
-                  onGlass ? "border-white/20 bg-white/10 backdrop-blur-md" : "border-border bg-muted"
+                  onGlass ? "border-white/20 bg-on-media-surface/60 backdrop-blur-md" : "border-border bg-muted"
                 }`}
                 itemClassName={(selected) =>
                   `flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                     selected
                       ? "bg-primary text-primary-foreground shadow-sm"
                       : onGlass
-                        ? "text-on-media-muted hover:bg-white/15 hover:text-on-media"
+                        ? "text-on-media-muted hover:bg-on-media-surface/60 hover:text-on-media"
                         : "text-muted-foreground hover:bg-card hover:text-foreground"
                   }`
                 }
@@ -510,7 +510,9 @@ export function DailyEvidenceCard({
       <div className="flex items-center gap-2">
         <span
           className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${
-            onGlass ? "bg-white/15 text-on-media-accent" : "bg-primary/10 text-primary"
+            onGlass
+              ? "border border-white/20 bg-on-media-surface/60 text-on-media-accent"
+              : "bg-primary/10 text-primary"
           }`}
           aria-hidden="true"
         >

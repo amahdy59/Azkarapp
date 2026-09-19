@@ -507,13 +507,8 @@ button.ui-icon-button:not(:disabled):not(.no-press):active,
   transition-property: none !important;
 }
 
-.reduce-transparency .glass-panel::after {
-  display: none;
-}
-
 @media (prefers-reduced-transparency: reduce) {
-  .app-shell::after,
-  .glass-panel::after {
+  .app-shell::after {
     display: none !important;
   }
 

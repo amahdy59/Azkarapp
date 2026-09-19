@@ -78,7 +78,9 @@ export function PrayerActionsCard({
           <span
             aria-hidden="true"
             className={`flex size-9 shrink-0 items-center justify-center rounded-full ${
-              onGlass ? "border border-white/20 bg-white/15 text-on-media-accent" : "bg-primary/15 text-primary"
+              onGlass
+                ? "border border-white/20 bg-on-media-surface/60 text-on-media-accent"
+                : "bg-primary/15 text-primary"
             }`}
           >
             {(() => {
@@ -102,7 +104,7 @@ export function PrayerActionsCard({
           aria-label={t(language, "prayerActions.moreInfoAria", { prayer: infoData.prayerName })}
           className={`flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
             onGlass
-              ? "border-white/20 bg-white/14 text-white backdrop-blur-md hover:bg-white/20"
+              ? "border-white/20 bg-on-media-surface/60 text-white backdrop-blur-md hover:border-white/40 hover:bg-on-media-surface/60"
               : "border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground"
           }`}
         >
@@ -124,7 +126,7 @@ export function PrayerActionsCard({
               data-testid={action.testId}
               className={`group/item relative flex min-h-14 items-center justify-between gap-3 rounded-2xl px-4 py-3 transition-colors duration-fast ${
                 onGlass
-                  ? "border border-white/15 bg-white/10 text-white hover:bg-white/15"
+                  ? "border border-white/20 bg-on-media-surface/60 text-white hover:border-white/40 hover:bg-on-media-surface/60"
                   : "border border-border/60 bg-card hover:bg-muted/40 text-foreground"
               }`}
             >
@@ -152,7 +154,9 @@ export function PrayerActionsCard({
                 <span
                   aria-hidden="true"
                   className={`flex size-9 shrink-0 items-center justify-center rounded-full ${
-                    onGlass ? "bg-white/15 text-white" : "border border-border/60 bg-muted text-primary"
+                    onGlass
+                      ? "border border-white/15 bg-on-media-surface/60 text-white"
+                      : "border border-border/60 bg-muted text-primary"
                   }`}
                 >
                   <ItemIcon size={19} />
@@ -205,56 +209,67 @@ export function PrayerActionsCard({
             </div>
 
             {/* Rawatib Virtue Foundation Banner */}
-            <aside
-              className={`flex flex-col gap-2 rounded-2xl p-4 ${
-                onGlass ? "border border-white/20 bg-white/10 text-white" : "border border-primary/30 bg-primary/10"
-              }`}
-              data-testid="rawatib-virtue-banner"
-            >
-              <div className="flex items-center gap-2">
-                <span
-                  aria-hidden="true"
-                  className={`flex size-7 items-center justify-center rounded-lg ${
-                    onGlass ? "bg-white/20 text-white" : "bg-primary/20 text-primary"
-                  }`}
-                >
-                  <PrayerRug size={16} />
-                </span>
-                <h4 className={`text-sm font-black sm:text-base ${onGlass ? "text-white" : "text-primary"}`} dir="auto">
-                  {infoData.rawatibVirtue.title}
-                </h4>
-              </div>
-              <p
-                className={`text-xs font-semibold leading-relaxed sm:text-sm ${onGlass ? "text-white/80" : "text-muted-foreground"}`}
-                dir="auto"
-              >
-                {infoData.rawatibVirtue.description}
-              </p>
-              <blockquote
-                className={`mt-1 rounded-xl p-3 ${
-                  onGlass ? "border border-white/20 bg-white/10 text-white" : "border border-primary/20 bg-card"
+            {infoData.rawatibVirtue && (
+              <aside
+                className={`flex flex-col gap-2 rounded-2xl p-4 ${
+                  onGlass
+                    ? "border border-white/20 bg-on-media-surface/60 text-white"
+                    : "border border-primary/30 bg-primary/10"
                 }`}
-                dir={isArabic || !infoData.rawatibVirtue.evidence.textEnglish ? "rtl" : "ltr"}
+                data-testid="rawatib-virtue-banner"
               >
+                <div className="flex items-center gap-2">
+                  <span
+                    aria-hidden="true"
+                    className={`flex size-7 items-center justify-center rounded-lg ${
+                      onGlass
+                        ? "border border-white/15 bg-on-media-surface/60 text-white"
+                        : "bg-primary/20 text-primary"
+                    }`}
+                  >
+                    <PrayerRug size={16} />
+                  </span>
+                  <h4
+                    className={`text-sm font-black sm:text-base ${onGlass ? "text-white" : "text-primary"}`}
+                    dir="auto"
+                  >
+                    {infoData.rawatibVirtue.title}
+                  </h4>
+                </div>
                 <p
-                  className={`text-sm font-bold leading-loose ${onGlass ? "text-white" : "text-foreground"} ${
-                    isArabic || !infoData.rawatibVirtue.evidence.textEnglish ? "zikr-text" : ""
-                  }`}
-                  lang={isArabic || !infoData.rawatibVirtue.evidence.textEnglish ? "ar" : "en"}
+                  className={`text-xs font-semibold leading-relaxed sm:text-sm ${onGlass ? "text-white/80" : "text-muted-foreground"}`}
+                  dir="auto"
                 >
-                  {isArabic
-                    ? infoData.rawatibVirtue.evidence.textArabic
-                    : (infoData.rawatibVirtue.evidence.textEnglish ?? infoData.rawatibVirtue.evidence.textArabic)}
+                  {infoData.rawatibVirtue.description}
                 </p>
-                <footer
-                  className={`mt-1 text-micro font-semibold ${onGlass ? "text-white/80" : "text-muted-foreground"}`}
+                <blockquote
+                  className={`mt-1 rounded-xl p-3 ${
+                    onGlass
+                      ? "border border-white/20 bg-on-media-surface/60 text-white"
+                      : "border border-primary/20 bg-card"
+                  }`}
+                  dir={isArabic || !infoData.rawatibVirtue.evidence.textEnglish ? "rtl" : "ltr"}
                 >
-                  {isArabic
-                    ? infoData.rawatibVirtue.evidence.referenceArabic
-                    : infoData.rawatibVirtue.evidence.referenceEnglish}
-                </footer>
-              </blockquote>
-            </aside>
+                  <p
+                    className={`text-sm font-bold leading-loose ${onGlass ? "text-white" : "text-foreground"} ${
+                      isArabic || !infoData.rawatibVirtue.evidence.textEnglish ? "zikr-text" : ""
+                    }`}
+                    lang={isArabic || !infoData.rawatibVirtue.evidence.textEnglish ? "ar" : "en"}
+                  >
+                    {isArabic
+                      ? infoData.rawatibVirtue.evidence.textArabic
+                      : (infoData.rawatibVirtue.evidence.textEnglish ?? infoData.rawatibVirtue.evidence.textArabic)}
+                  </p>
+                  <footer
+                    className={`mt-1 text-micro font-semibold ${onGlass ? "text-white/80" : "text-muted-foreground"}`}
+                  >
+                    {isArabic
+                      ? infoData.rawatibVirtue.evidence.referenceArabic
+                      : infoData.rawatibVirtue.evidence.referenceEnglish}
+                  </footer>
+                </blockquote>
+              </aside>
+            )}
 
             {infoData.sunnahItems.length === 0 ? (
               <p
@@ -268,7 +283,9 @@ export function PrayerActionsCard({
                 <article
                   key={`${item.position}-${idx}`}
                   className={`flex flex-col gap-2.5 rounded-2xl p-4 ${
-                    onGlass ? "border border-white/20 bg-white/10 text-white" : "border border-border/80 bg-muted/30"
+                    onGlass
+                      ? "border border-white/20 bg-on-media-surface/60 text-white"
+                      : "border border-border/80 bg-muted/30"
                   }`}
                 >
                   {/* Category Header & Badges */}
@@ -286,7 +303,9 @@ export function PrayerActionsCard({
                     <div className="flex items-center gap-1.5">
                       <span
                         className={`rounded-full px-2.5 py-0.5 text-micro font-black sm:text-xs ${
-                          onGlass ? "bg-white/15 text-white" : "bg-primary/15 text-primary"
+                          onGlass
+                            ? "border border-white/15 bg-on-media-surface/60 text-white"
+                            : "bg-primary/15 text-primary"
                         }`}
                       >
                         {item.rakahsLabel}
@@ -298,7 +317,7 @@ export function PrayerActionsCard({
                               ? "border border-success bg-success/15 text-success"
                               : "bg-success/15 text-success"
                             : onGlass
-                              ? "bg-white/15 text-white/80"
+                              ? "border border-white/15 bg-on-media-surface/60 text-white/90"
                               : "bg-muted text-muted-foreground"
                         }`}
                       >
@@ -315,40 +334,43 @@ export function PrayerActionsCard({
                     {item.description}
                   </p>
 
-                  {/* Supporting Hadith Evidence */}
-                  <blockquote
-                    className={`mt-1 rounded-xl p-3 ${
-                      onGlass
-                        ? "border border-white/20 bg-white/10 text-white"
-                        : "border border-primary/20 bg-primary/5"
-                    }`}
-                    dir={isArabic || !item.sunnah.evidence.textEnglish ? "rtl" : "ltr"}
-                  >
-                    <p
-                      className={`text-sm font-bold leading-loose ${onGlass ? "text-white" : "text-foreground"} ${
-                        isArabic || !item.sunnah.evidence.textEnglish ? "zikr-text" : ""
-                      }`}
-                      lang={isArabic || !item.sunnah.evidence.textEnglish ? "ar" : "en"}
-                    >
-                      {isArabic
-                        ? item.sunnah.evidence.textArabic
-                        : (item.sunnah.evidence.textEnglish ?? item.sunnah.evidence.textArabic)}
-                    </p>
-                    <footer
-                      className={`mt-2 flex flex-wrap items-center justify-between gap-2 text-micro font-semibold ${
-                        onGlass ? "text-white/70" : "text-muted-foreground"
-                      }`}
-                    >
-                      <span>
-                        {isArabic ? item.sunnah.evidence.referenceArabic : item.sunnah.evidence.referenceEnglish}
-                      </span>
-                      {(isArabic ? item.sunnah.evidence.gradingArabic : item.sunnah.evidence.gradingEnglish) && (
-                        <span className={`font-bold ${onGlass ? "text-on-media-accent" : "text-primary"}`}>
-                          {isArabic ? item.sunnah.evidence.gradingArabic : item.sunnah.evidence.gradingEnglish}
-                        </span>
-                      )}
-                    </footer>
-                  </blockquote>
+                  {/* Supporting Hadith Evidence - rendered only when distinct from the overarching rawatib banner */}
+                  {item.sunnah.evidence &&
+                    item.sunnah.evidence.textArabic !== infoData.rawatibVirtue?.evidence.textArabic && (
+                      <blockquote
+                        className={`mt-1 rounded-xl p-3 ${
+                          onGlass
+                            ? "border border-white/20 bg-on-media-surface/60 text-white"
+                            : "border border-primary/20 bg-primary/5"
+                        }`}
+                        dir={isArabic || !item.sunnah.evidence.textEnglish ? "rtl" : "ltr"}
+                      >
+                        <p
+                          className={`text-sm font-bold leading-loose ${onGlass ? "text-white" : "text-foreground"} ${
+                            isArabic || !item.sunnah.evidence.textEnglish ? "zikr-text" : ""
+                          }`}
+                          lang={isArabic || !item.sunnah.evidence.textEnglish ? "ar" : "en"}
+                        >
+                          {isArabic
+                            ? item.sunnah.evidence.textArabic
+                            : (item.sunnah.evidence.textEnglish ?? item.sunnah.evidence.textArabic)}
+                        </p>
+                        <footer
+                          className={`mt-2 flex flex-wrap items-center justify-between gap-2 text-micro font-semibold ${
+                            onGlass ? "text-white/70" : "text-muted-foreground"
+                          }`}
+                        >
+                          <span>
+                            {isArabic ? item.sunnah.evidence.referenceArabic : item.sunnah.evidence.referenceEnglish}
+                          </span>
+                          {(isArabic ? item.sunnah.evidence.gradingArabic : item.sunnah.evidence.gradingEnglish) && (
+                            <span className={`font-bold ${onGlass ? "text-on-media-accent" : "text-primary"}`}>
+                              {isArabic ? item.sunnah.evidence.gradingArabic : item.sunnah.evidence.gradingEnglish}
+                            </span>
+                          )}
+                        </footer>
+                      </blockquote>
+                    )}
                 </article>
               ))
             )}
