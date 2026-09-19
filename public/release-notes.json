@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-19h",
+  "release": "2026-09-19i",
   "ar": [
-    "تعزيز وضوح النصوص والبطاقات الزجاجية في الصفحة الرئيسية لتطابق معايير التباين العالي وسهولة القراءة فوق الخلفيات المصورة.",
-    "استبدال سهم اختيار الصلاة بمؤشر مثلثي متصل وأنيق يربط بين الصلاة المحددة وتفاصيلها.",
-    "تحسين خلفيات عناصر المتابعة وسنن الصلاة وبطاقات الورد لتوفير تباين بصري مريح ومحمي من السطوع."
+    "تجربة قراءة كاملة للمصحف الشريف على الهواتف بمساحة عرض واسعة ودون أشرطة خارجية، مع إمكانية التنقل والتصفح مباشرة عبر اسم السورة ورقم الصفحة.",
+    "أزرار وأدوات مدمجة بأركان المصحف للوصول السريع إلى معاني الكلمات، وحفظ الموضع، والخيارات الإضافية كالتسجيل من مصحف خارجي.",
+    "متابعة شاملة للصلوات المفروضة والسنن الرواتب وصلاة المسجد وأذكار ما بعد الصلاة عبر عروض اليوم والأسبوع والشهر والسنة، مع مزامنة شريط الصفحة الرئيسية."
   ],
   "en": [
-    "Enhanced contrast and legibility across home glass cards to ensure high-contrast readability over dynamic photography.",
-    "Replaced the prayer selection arrow with an anchored notch indicator connecting each prayer to its details.",
-    "Upgraded prayer tracking, Sunnah, and Wird sub-surfaces with protective high-contrast backgrounds."
+    "Edge-to-edge full-screen Holy Quran reading on mobile without external toolbars, enabling intuitive navigation directly via the Surah name and page number.",
+    "Integrated corner controls inside the Mushaf for instant access to word meanings, bookmarks, and options like reading from an external physical Quran.",
+    "Comprehensive tracking for obligatory prayers, Sunan Rawātib, mosque congregation, and post-prayer adhkar across Day, Week, Month, and Year tabs."
   ]
 }

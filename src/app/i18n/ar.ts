@@ -285,6 +285,13 @@ const ar = {
     atMosque: "في المسجد",
     atHome: "في المنزل",
     upcoming: "لم يحن وقتها",
+    fard: "صلاة الفريضة",
+    rawatib: "السنن الرواتب",
+    tasbeeh: "أذكار وتسابيح الصلاة",
+    prayersSummary: "إجمالي الصلوات المفروضة",
+    mosqueSummary: "صلوات المسجد",
+    rawatibSummary: "السنن الرواتب",
+    adhkarSummary: "أذكار بعد الصلاة",
   },
   wirdBenefits: {
     title: "أهمية الوِرد",

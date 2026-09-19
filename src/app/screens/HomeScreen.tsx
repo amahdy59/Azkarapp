@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { Zap } from "../components/icons";
+import { PalmTreeMark } from "../components/GardenMarks";
 import { TodayRoutineGarden } from "../components/RoutineGarden";
 import { TranquilityCompletionCard } from "../components/TranquilityCompletionCard";
 import { getContextualEvidence, getReminderContexts, selectLibraryEvidence } from "../dailyEvidence";
@@ -625,16 +626,20 @@ export function HomeScreen({
               data-testid="home-header-routine-summary"
               onClick={() => setPathSheetOpen(true)}
               aria-label={t(language, "dailyPath.title")}
-              className={`pointer-events-auto flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center gap-1.5 rounded-full px-2 py-1 text-subtitle font-black transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:text-title3 ${
+              className={`pointer-events-auto flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center gap-2 rounded-full px-2.5 py-1 text-subtitle font-black transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:text-title3 ${
                 homeVisualEffects
                   ? "text-on-media-accent drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)] hover:bg-on-media/10"
                   : "text-primary hover:bg-muted"
               }`}
             >
-              <span className="flex items-center gap-1" title={t(language, "progress.dailyStreak")}>
-                <bdi>
-                  {formatNumerals(gardenSummary.currentPalmRhythm ?? gardenSummary.currentUsageStreak ?? 0, language)}
-                </bdi>
+              {Boolean(gardenSummary.currentPalmRhythm && gardenSummary.currentPalmRhythm > 0) && (
+                <span className="flex items-center gap-1" title={t(language, "progress.lifetimePalmsSummary")}>
+                  <bdi>{formatNumerals(gardenSummary.currentPalmRhythm!, language)}</bdi>
+                  <PalmTreeMark size={18} className="text-inherit" />
+                </span>
+              )}
+              <span className="flex items-center gap-1" title={t(language, "progress.activeStreakSummary")}>
+                <bdi>{formatNumerals(gardenSummary.currentUsageStreak ?? 0, language)}</bdi>
                 <Zap className="size-5 sm:size-6" strokeWidth={2.5} aria-hidden="true" />
               </span>
             </button>

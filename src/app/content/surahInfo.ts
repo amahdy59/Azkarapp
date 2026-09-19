@@ -965,6 +965,15 @@ export function getJuzNumberForPage(page: number): number {
   return 1;
 }
 
+export function getSurahNumberForPage(page: number): number {
+  for (let i = SURAHS.length - 1; i >= 0; i--) {
+    if (page >= SURAHS[i]!.startPage) {
+      return SURAHS[i]!.number;
+    }
+  }
+  return 1;
+}
+
 export function getSurahMeta(surahNumber: number | string): SurahMeta | undefined {
   const num = typeof surahNumber === "string" ? parseInt(surahNumber, 10) : surahNumber;
   return SURAHS.find((s) => s.number === num);

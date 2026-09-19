@@ -288,7 +288,7 @@ describe("the Mushaf offers the surah's recitation", () => {
  * header is now the name and the way out; the footer turns pages and carries
  * the tools.
  */
-describe("the surah bars divide the work between them", () => {
+describe("the phone layout integrates controls directly into the Mushaf canvas", () => {
   const setViewport = (width: number, height: number) => {
     Object.defineProperty(window, "innerWidth", { configurable: true, writable: true, value: width });
     Object.defineProperty(window, "innerHeight", { configurable: true, writable: true, value: height });
@@ -296,62 +296,61 @@ describe("the surah bars divide the work between them", () => {
 
   afterEach(() => setViewport(1024, 768));
 
-  function phoneChrome() {
+  it("keeps the mobile canvas full-screen with corner controls and zero external bars", () => {
     setViewport(390, 844);
     renderKahf({ surahAudio: { available: true, status: "idle" as const, onToggle: () => undefined } });
-    const header = document.querySelector('[data-mushaf-chrome="header"]');
-    const footer = document.querySelector('[data-mushaf-chrome="footer"]');
-    if (!header || !footer) throw new Error("the phone layout renders both bars");
-    return { header: header as HTMLElement, footer: footer as HTMLElement };
-  }
 
-  it("keeps the header to the surah and the way out", () => {
-    const { header } = phoneChrome();
+    expect(screen.queryByTestId("mushaf-tool-rail")).toBeNull();
+    expect(document.querySelector('[data-mushaf-chrome="header"]')).toBeNull();
+    expect(document.querySelector('[data-mushaf-chrome="footer"]')).toBeNull();
 
-    expect(within(header).getByRole("heading", { level: 2 })).toHaveTextContent("الكَهْف");
-    // One action beside the title, not four.
-    expect(within(header).getAllByRole("button")).toHaveLength(1);
-    expect(within(header).getByTestId("mushaf-immersive-close")).toBeInTheDocument();
+    expect(screen.getByTestId("mushaf-immersive-close")).toBeInTheDocument();
+    expect(screen.getByTestId("mushaf-immersive-more")).toBeInTheDocument();
+    expect(screen.getByTestId("mushaf-immersive-word-meanings")).toBeInTheDocument();
+    expect(screen.getByTestId("mushaf-immersive-bookmark")).toBeInTheDocument();
   });
 
-  it("names the surah being read, not the one the page happens to open with", () => {
-    // Page 293 opens with the tail of Al-Isra, so a header derived from the
-    // page named Al-Isra on a screen opened to read Al-Kahf.
-    const { header } = phoneChrome();
-    expect(header.textContent).not.toMatch(/الإسراء/);
+  it("names the surah being read in the cartouche", () => {
+    setViewport(390, 844);
+    renderKahf();
+    const surahBtn = screen.getByTestId("mushaf-furniture-surah-btn");
+    expect(surahBtn).toHaveTextContent("الكهف");
   });
 
-  it("does not repeat what the page already prints", () => {
-    const { header } = phoneChrome();
-    // The Mushaf page number and the juz are page furniture; the page prints
-    // both on itself, as a bound Mushaf does.
-    expect(header.textContent).not.toMatch(/٢٩٣/);
-    expect(header.textContent).not.toMatch(/الجزء/);
+  it("does not repeat what the page already prints into separate chrome bars", () => {
+    setViewport(390, 844);
+    renderKahf();
+    expect(document.querySelector('[data-mushaf-chrome="header"]')).toBeNull();
+    expect(document.querySelector('[data-mushaf-chrome="footer"]')).toBeNull();
   });
 
-  it("gives the footer the turning and the tools", () => {
-    const { footer } = phoneChrome();
-
-    expect(within(footer).getByTestId("mushaf-immersive-previous")).toBeInTheDocument();
-    expect(within(footer).getByTestId("mushaf-immersive-next")).toBeInTheDocument();
-    expect(within(footer).getByTestId("mushaf-immersive-word-meanings")).toBeInTheDocument();
-    expect(within(footer).getByTestId("mushaf-immersive-listen")).toBeInTheDocument();
-    expect(within(footer).getByTestId("mushaf-immersive-jump")).toBeInTheDocument();
-  });
-
-  it("makes the place in the surah the way to move within it", () => {
-    const { footer } = phoneChrome();
-    const jump = within(footer).getByTestId("mushaf-immersive-jump");
-
-    // The label a reader hears has to contain what they can see on it.
-    expect(jump).toHaveAccessibleName(expect.stringContaining("١ / ١٢"));
-    fireEvent.click(jump);
+  it("makes tapping the surah name in the cartouche open the navigator", () => {
+    setViewport(390, 844);
+    renderKahf();
+    const surahBtn = screen.getByTestId("mushaf-furniture-surah-btn");
+    fireEvent.click(surahBtn);
     expect(screen.getByRole("dialog")).toBeInTheDocument();
   });
 
+  it("makes tapping the page number in the folio open the jump modal", () => {
+    setViewport(390, 844);
+    renderKahf();
+    const pageBtn = screen.getByTestId("mushaf-furniture-page-btn");
+    expect(pageBtn).toHaveTextContent("٢٩٣");
+    fireEvent.click(pageBtn);
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+  });
+
+  it("toggles word meanings from the bottom-right corner", () => {
+    setViewport(390, 844);
+    renderKahf();
+    const meaningsBtn = screen.getByTestId("mushaf-immersive-word-meanings");
+    expect(meaningsBtn).toHaveAttribute("aria-checked", "false");
+    fireEvent.click(meaningsBtn);
+    expect(meaningsBtn).toHaveAttribute("aria-checked", "true");
+  });
+
   it("runs the page to the edges of the screen", () => {
-    // The reader kept its own 8px top inset in Mushaf mode, which left a strip
-    // of shell above a surface that is supposed to be the page.
     setViewport(390, 844);
     renderKahf();
     const surface = screen.getByTestId("reader-screen");
@@ -367,34 +366,37 @@ describe("the recitation is reachable without a rail", () => {
 
   afterEach(() => setViewport(1024, 768));
 
-  it("puts the listen control in the bars when the rail is not shown", () => {
+  it("offers the recitation through the more menu when no rail is present", () => {
     setViewport(390, 844);
     renderKahf({ surahAudio: { available: true, status: "idle" as const, onToggle: () => undefined } });
 
-    // The premise: no rail on this screen, so the rail's copy cannot be what
-    // this assertion is finding.
     expect(screen.queryByTestId("mushaf-tool-rail")).toBeNull();
-    expect(screen.getByTestId("mushaf-immersive-listen")).toHaveAccessibleName("الاستماع إلى السورة");
+    fireEvent.click(screen.getByTestId("mushaf-immersive-more"));
+    expect(screen.getByTestId("mushaf-quick-audio")).toBeInTheDocument();
+    expect(screen.getByTestId("mushaf-quick-audio")).toHaveTextContent("الاستماع إلى السورة");
   });
 
-  it("drives the same controller from the phone's control", () => {
+  it("drives the same controller from the quick menu audio action", () => {
     setViewport(390, 844);
     const onToggle = vi.fn();
     renderKahf({ surahAudio: { available: true, status: "idle" as const, onToggle } });
-    fireEvent.click(screen.getByTestId("mushaf-immersive-listen"));
+    fireEvent.click(screen.getByTestId("mushaf-immersive-more"));
+    fireEvent.click(screen.getByTestId("mushaf-quick-audio"));
     expect(onToggle).toHaveBeenCalledOnce();
   });
 
-  it("reports playing state on the phone too", () => {
+  it("reports playing state in the quick menu audio action", () => {
     setViewport(390, 844);
     renderKahf({ surahAudio: { available: true, status: "playing" as const, onToggle: () => undefined } });
-    expect(screen.getByTestId("mushaf-immersive-listen")).toHaveAccessibleName("إيقاف التلاوة مؤقتاً");
+    fireEvent.click(screen.getByTestId("mushaf-immersive-more"));
+    expect(screen.getByTestId("mushaf-quick-audio")).toHaveTextContent("إيقاف التلاوة مؤقتاً");
   });
 
-  it("disables it on a surah with no reviewed recitation", () => {
+  it("disables the quick menu audio action on a surah with no reviewed recitation", () => {
     setViewport(390, 844);
     renderKahf({ surahAudio: { available: false, status: "idle" as const, onToggle: () => undefined } });
-    expect(screen.getByTestId("mushaf-immersive-listen")).toBeDisabled();
+    fireEvent.click(screen.getByTestId("mushaf-immersive-more"));
+    expect(screen.getByTestId("mushaf-quick-audio")).toBeDisabled();
   });
 });
 

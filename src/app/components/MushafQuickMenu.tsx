@@ -3,7 +3,20 @@ import { ResponsiveSheet } from "./ResponsiveSheet";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
-import { Bookmark, BookmarkCheck, BookOpen, ChevronLeft, ChevronRight, Eye, List, SlidersHorizontal } from "./icons";
+import type { SurahAudioControl } from "./MushafToolRail";
+import {
+  Bookmark,
+  BookmarkCheck,
+  BookOpen,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  List,
+  Pause,
+  Play,
+  SlidersHorizontal,
+} from "./icons";
 
 /**
  * The Mushaf's secondary actions, off the page.
@@ -43,6 +56,8 @@ export interface MushafQuickMenuProps {
   onTogglePageBookmark: () => void;
   onEnterFocusMode: () => void;
   onOpenSettings: () => void;
+  onReadExternally?: () => void;
+  surahAudio?: SurahAudioControl;
 }
 
 export function MushafQuickMenu({
@@ -62,8 +77,44 @@ export function MushafQuickMenu({
   onTogglePageBookmark,
   onEnterFocusMode,
   onOpenSettings,
+  onReadExternally,
+  surahAudio,
 }: MushafQuickMenuProps) {
   const items: QuickMenuItem[] = [
+    ...(surahAudio
+      ? [
+          {
+            id: "surah-audio",
+            label:
+              surahAudio.status === "playing"
+                ? t(language, "mushaf.pauseRecitation")
+                : t(language, !surahAudio.available ? "reader.audioUnavailable" : "mushaf.listenSurah"),
+            icon:
+              surahAudio.status === "playing" ? (
+                <Pause size={19} aria-hidden="true" />
+              ) : (
+                <Play size={19} aria-hidden="true" />
+              ),
+            disabled: !surahAudio.available,
+            onSelect: surahAudio.onToggle,
+            testId: "mushaf-quick-audio",
+          },
+        ]
+      : []),
+    ...(onReadExternally
+      ? [
+          {
+            id: "read-externally",
+            label: t(language, "reader.readExternally"),
+            icon: <Check size={19} aria-hidden="true" />,
+            onSelect: () => {
+              onClose();
+              onReadExternally();
+            },
+            testId: "mushaf-quick-read-externally",
+          },
+        ]
+      : []),
     {
       id: "index",
       label: t(language, "mushaf.indexTitle"),

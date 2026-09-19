@@ -1202,6 +1202,10 @@ export function ReaderScreen({
           mushafSettings={mushafSettings}
           surahAudio={surahAudio}
           onClose={() => setImmersiveOpen(false)}
+          onReadExternally={() => {
+            if (!isDone) handleZikrCompletion(idx);
+            onAdvance(idx);
+          }}
           onComplete={() => {
             /**
              * Finishing the surah is the whole act: it records the reading and

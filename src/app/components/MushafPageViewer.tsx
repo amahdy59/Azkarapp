@@ -15,7 +15,7 @@ import { getQuranWordMeaningEntry, type QuranWordMeaning } from "../content/qura
 import { t } from "../i18n";
 import { Bookmark } from "./icons";
 import { formatNumerals } from "../formatting";
-import { getJuzNumberForPage, getSurahDisplayName } from "../content/surahInfo";
+import { getJuzNumberForPage, getSurahDisplayName, getSurahNumberForPage } from "../content/surahInfo";
 import { QuranWordPopover } from "./QuranWordPopover";
 import { shouldReduceMotion } from "../motionPreferences";
 import { MushafSurahHeaderArt } from "./MushafSurahHeaderArt";
@@ -598,21 +598,52 @@ function PageFurnitureHead({
   surahNumber,
   juzNumber,
   language,
+  onSurahClick,
+  onJuzClick,
 }: {
   surahNumber: number | null;
   juzNumber: number;
   language: AppLanguage;
+  onSurahClick?: () => void;
+  onJuzClick?: () => void;
 }) {
   return (
     <div className="mushaf-page-furniture flex shrink-0 items-center justify-between gap-2" dir="rtl">
-      <span className="mushaf-page-furniture__juz arabic-ui min-w-0 shrink truncate" aria-hidden="true">
-        {t(language, "mushaf.juzLabel", { juz: formatNumerals(juzNumber, language) })}
-      </span>
-      {surahNumber !== null && (
-        <span className="mushaf-page-furniture__cartouche arabic-ui truncate" aria-hidden="true">
-          {getSurahDisplayName(surahNumber, language)}
+      {onJuzClick ? (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onJuzClick();
+          }}
+          data-testid="mushaf-furniture-juz-btn"
+          className="mushaf-page-furniture__juz arabic-ui min-w-0 shrink truncate cursor-pointer rounded-full px-2 py-0.5 transition-colors hover:bg-foreground/10 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          {t(language, "mushaf.juzLabel", { juz: formatNumerals(juzNumber, language) })}
+        </button>
+      ) : (
+        <span className="mushaf-page-furniture__juz arabic-ui min-w-0 shrink truncate" aria-hidden="true">
+          {t(language, "mushaf.juzLabel", { juz: formatNumerals(juzNumber, language) })}
         </span>
       )}
+      {surahNumber !== null &&
+        (onSurahClick ? (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onSurahClick();
+            }}
+            data-testid="mushaf-furniture-surah-btn"
+            className="mushaf-page-furniture__cartouche arabic-ui truncate cursor-pointer rounded-full px-2.5 py-0.5 transition-colors hover:bg-foreground/10 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            {getSurahDisplayName(surahNumber, language)}
+          </button>
+        ) : (
+          <span className="mushaf-page-furniture__cartouche arabic-ui truncate" aria-hidden="true">
+            {getSurahDisplayName(surahNumber, language)}
+          </span>
+        ))}
       {/* Balances the juz label so the cartouche stays optically centred. */}
       <span className="mushaf-page-furniture__juz invisible min-w-0 shrink truncate" aria-hidden="true">
         {t(language, "mushaf.juzLabel", { juz: formatNumerals(juzNumber, language) })}
@@ -621,12 +652,35 @@ function PageFurnitureHead({
   );
 }
 
-function PageFurnitureFoot({ pageNumber, language }: { pageNumber: number; language: AppLanguage }) {
+function PageFurnitureFoot({
+  pageNumber,
+  language,
+  onPageClick,
+}: {
+  pageNumber: number;
+  language: AppLanguage;
+  onPageClick?: () => void;
+}) {
   return (
     <div className="mushaf-page-furniture flex shrink-0 items-center justify-center" dir="rtl">
-      <span className="mushaf-page-furniture__folio tabular-nums" aria-hidden="true">
-        {formatNumerals(pageNumber, language)}
-      </span>
+      {onPageClick ? (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onPageClick();
+          }}
+          data-testid="mushaf-furniture-page-btn"
+          aria-label={t(language, "mushaf.pagePosition", { position: formatNumerals(pageNumber, language) })}
+          className="mushaf-page-furniture__folio tabular-nums cursor-pointer rounded-full px-3 py-0.5 transition-colors hover:bg-foreground/10 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          {formatNumerals(pageNumber, language)}
+        </button>
+      ) : (
+        <span className="mushaf-page-furniture__folio tabular-nums" aria-hidden="true">
+          {formatNumerals(pageNumber, language)}
+        </span>
+      )}
     </div>
   );
 }
@@ -653,6 +707,9 @@ function MushafPageCanvas({
   showPageIdentity,
   onAyahAction,
   highlightedVerseKey,
+  onSurahClick,
+  onJuzClick,
+  onPageClick,
 }: {
   lines: MushafWordToken[][];
   language: AppLanguage;
@@ -675,6 +732,9 @@ function MushafPageCanvas({
   showPageIdentity: boolean;
   onAyahAction?: (verseKey: string, pageNumber: number) => void;
   highlightedVerseKey?: string | null;
+  onSurahClick?: () => void;
+  onJuzClick?: () => void;
+  onPageClick?: () => void;
 }) {
   const [activeWord, setActiveWord] = useState<ActiveWord | null>(null);
 
@@ -717,8 +777,8 @@ function MushafPageCanvas({
       const surah = Number(first.verseKey.split(":")[0]);
       return Number.isFinite(surah) ? surah : null;
     }
-    return null;
-  }, [lines]);
+    return getSurahNumberForPage(pageNumber);
+  }, [lines, pageNumber]);
   const pageJuzNumber = useMemo(() => getJuzNumberForPage(pageNumber), [pageNumber]);
   const handleActiveWordChange = useCallback((word: ActiveWord | null) => setActiveWord(word), []);
 
@@ -802,7 +862,13 @@ function MushafPageCanvas({
           }`}
         >
           {showPageIdentity && (
-            <PageFurnitureHead surahNumber={pageSurahNumber} juzNumber={pageJuzNumber} language={language} />
+            <PageFurnitureHead
+              surahNumber={pageSurahNumber}
+              juzNumber={pageJuzNumber}
+              language={language}
+              onSurahClick={onSurahClick}
+              onJuzClick={onJuzClick}
+            />
           )}
           {/* The fifteen slots, and nothing else: a stable hook for the
               geometry assertions that guard DEC-089. */}
@@ -857,7 +923,9 @@ function MushafPageCanvas({
               </div>
             ))}
           </div>
-          {showPageIdentity && <PageFurnitureFoot pageNumber={pageNumber} language={language} />}
+          {showPageIdentity && (
+            <PageFurnitureFoot pageNumber={pageNumber} language={language} onPageClick={onPageClick} />
+          )}
         </div>
       )}
       <QuranWordPopover
@@ -937,6 +1005,15 @@ export function MushafPageViewer({
   facingPage,
   onAyahAction,
   highlightedVerseKey,
+  onSurahClick,
+  onJuzClick,
+  onPageClick,
+  topLeftControl,
+  topRightControl,
+  bottomLeftControl,
+  bottomRightControl,
+  onEdgeTap,
+  onCenterTap,
 }: {
   lines: MushafWordToken[][];
   language: AppLanguage;
@@ -977,6 +1054,15 @@ export function MushafPageViewer({
   textScale?: MushafTextScale;
   onAyahAction?: (verseKey: string, pageNumber: number) => void;
   highlightedVerseKey?: string | null;
+  onSurahClick?: () => void;
+  onJuzClick?: () => void;
+  onPageClick?: () => void;
+  topLeftControl?: ReactNode;
+  topRightControl?: ReactNode;
+  bottomLeftControl?: ReactNode;
+  bottomRightControl?: ReactNode;
+  onEdgeTap?: (edge: "left" | "right") => void;
+  onCenterTap?: () => void;
 }) {
   const formattedJuz = `${t(language, "common.juz")} ${formatNumerals(juzNumber, language)}`;
 
@@ -994,6 +1080,27 @@ export function MushafPageViewer({
     );
     return () => animation.cancel();
   }, [facingPage?.pageNumber, pageNumber, pageTransitionDirection, paperRef, reduceMotion]);
+
+  const handlePaperPointerUp = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (e.button !== 0 && e.pointerType === "mouse") return;
+      const target = e.target as HTMLElement;
+      if (target.closest('button, [role="button"], a, input, select, textarea, [data-interactive="true"]')) {
+        return;
+      }
+      const rect = e.currentTarget.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const ratio = clickX / rect.width;
+      if (ratio < 0.22) {
+        onEdgeTap?.("left");
+      } else if (ratio > 0.78) {
+        onEdgeTap?.("right");
+      } else {
+        onCenterTap?.();
+      }
+    },
+    [onCenterTap, onEdgeTap],
+  );
 
   // Theme styling classes. `--mushaf-ink-stroke` gives the glyphs a hairline of
   // extra weight for legibility: QCF v2 is a single-weight face, so synthetic
@@ -1050,6 +1157,43 @@ export function MushafPageViewer({
         </div>
       )}
 
+      {/* 4 Corner Integrated Controls for Mobile Portrait */}
+      {topLeftControl && (
+        <div
+          data-testid="mushaf-corner-top-left"
+          className="pointer-events-auto absolute left-2.5 top-[max(0.6rem,env(safe-area-inset-top))] z-30 flex items-center justify-center"
+        >
+          {topLeftControl}
+        </div>
+      )}
+
+      {topRightControl && (
+        <div
+          data-testid="mushaf-corner-top-right"
+          className="pointer-events-auto absolute right-2.5 top-[max(0.6rem,env(safe-area-inset-top))] z-30 flex items-center justify-center"
+        >
+          {topRightControl}
+        </div>
+      )}
+
+      {bottomLeftControl && (
+        <div
+          data-testid="mushaf-corner-bottom-left"
+          className="pointer-events-auto absolute left-2.5 bottom-[max(0.6rem,env(safe-area-inset-bottom))] z-30 flex items-center justify-center"
+        >
+          {bottomLeftControl}
+        </div>
+      )}
+
+      {bottomRightControl && (
+        <div
+          data-testid="mushaf-corner-bottom-right"
+          className="pointer-events-auto absolute right-2.5 bottom-[max(0.6rem,env(safe-area-inset-bottom))] z-30 flex items-center justify-center"
+        >
+          {bottomRightControl}
+        </div>
+      )}
+
       {/* On a landscape screen the tools stand beside the paper, because there
           height is the scarce dimension and the two horizontal bars spent 112px
           of it. Elsewhere the chrome keeps the physical Mushaf header/footer
@@ -1098,6 +1242,7 @@ export function MushafPageViewer({
         className={`mushaf-paper flex min-h-0 min-w-0 flex-1 ${facingPage ? "mushaf-spread" : ""}`}
         data-page-transition={pageTransitionDirection}
         dir="rtl"
+        onPointerUp={handlePaperPointerUp}
       >
         {/* Plain visual words step aside from the accessibility tree until
             study mode is enabled; ayah-marker buttons remain operable in
@@ -1118,6 +1263,9 @@ export function MushafPageViewer({
             showPageIdentity={showPageIdentity}
             onAyahAction={onAyahAction}
             highlightedVerseKey={highlightedVerseKey}
+            onSurahClick={onSurahClick}
+            onJuzClick={onJuzClick}
+            onPageClick={onPageClick}
           />
           {facingPage && (
             <>
@@ -1136,6 +1284,9 @@ export function MushafPageViewer({
                 showPageIdentity={showPageIdentity}
                 onAyahAction={onAyahAction}
                 highlightedVerseKey={highlightedVerseKey}
+                onSurahClick={onSurahClick}
+                onJuzClick={onJuzClick}
+                onPageClick={onPageClick}
               />
             </>
           )}

@@ -285,6 +285,13 @@ const en = {
     atMosque: "At the mosque",
     atHome: "At home",
     upcoming: "Not yet due",
+    fard: "Obligatory prayer",
+    rawatib: "Sunan Rawātib",
+    tasbeeh: "Post-prayer adhkar & tasbeeh",
+    prayersSummary: "Total Obligatory Prayers",
+    mosqueSummary: "Mosque Prayers",
+    rawatibSummary: "Sunan Rawātib",
+    adhkarSummary: "After-Prayer Adhkar",
   },
   wirdBenefits: {
     title: "Why a daily wird",
