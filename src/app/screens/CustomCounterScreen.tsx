@@ -10,7 +10,6 @@ import {
   Sparkles,
   Volume2,
   VolumeX,
-  X,
 } from "../components/icons";
 import { ReadingScreenChrome } from "../components/ReadingScreenChrome";
 import { Modal } from "../components/ResponsiveSheet";
@@ -363,28 +362,21 @@ export function CustomCounterScreen({
           onClose={() => setShowReference(false)}
           title={t(language, "counter.virtueReference")}
           direction={direction}
+          language={language}
           maxWidthClassName="max-w-md"
-          className="p-6"
+          className="p-5 sm:p-6"
         >
-          <div className="text-start">
-            <div className="mb-5 flex items-center justify-between gap-3">
+          <div className="text-start space-y-3">
+            <div className="flex items-center gap-3 pe-10">
+              <span className="flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                <Sparkles size={20} aria-hidden="true" />
+              </span>
               <h2 className="text-lg font-black text-foreground">{t(language, "counter.virtueReference")}</h2>
-              <button
-                type="button"
-                onClick={() => setShowReference(false)}
-                className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border-control bg-background text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                aria-label={t(language, "common.close")}
-              >
-                <X size={20} aria-hidden="true" />
-              </button>
             </div>
-            <span className="flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-              <Sparkles size={20} aria-hidden="true" />
-            </span>
-            <p className="mt-4 text-subtitle font-semibold leading-7 text-foreground" dir="auto">
+            <p className="text-subtitle font-semibold leading-7 text-foreground" dir="auto">
               {isArabic ? selectedAuthentic.virtueAr : selectedAuthentic.virtueEn}
             </p>
-            <p className="mt-4 text-label font-bold leading-6 text-muted-foreground" dir="auto">
+            <p className="text-label font-bold leading-6 text-muted-foreground" dir="auto">
               {isArabic ? selectedAuthentic.sourceRefAr : selectedAuthentic.sourceRefEn} ·{" "}
               {isArabic ? selectedAuthentic.hadithGradeAr : selectedAuthentic.hadithGradeEn}
             </p>

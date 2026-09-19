@@ -1,15 +1,13 @@
 {
-  "release": "2026-09-19e",
+  "release": "2026-09-19f",
   "ar": [
-    "استبدال إحصاء الأوراد الفائتة بإبراز أكثر الأوراد حفظاً ومواظبة تعزيزاً للتحفيز الروحي والسكينة.",
-    "إضافة زر مباشر لمشاركة بطاقة التقدم وإبراز ملخص النخيل المثمر وسلسلة الحفظ.",
-    "تضمين هدي نبوي كريم عن المداومة على العمل الصالح وتوحيد مظهر الزجاج المثلج للبطاقات.",
-    "إصلاح محاذاة الأرقام والنسب باللغة العربية وتدقيق نسب إتمام الأوراد في التقويم الشهري."
+    "توحيد وتنسيق أبعاد ومحاذاة أزرار تحديد الأهداف والأذكار في المسبحة لتجربة استخدام أكثر سلاسة وتناسقاً.",
+    "تحسين إمكانية الوصول في النوافذ المنبثقة للأهداف وفضائل الأذكار وتوفير أزرار إغلاق واضحة وسهلة الاستخدام.",
+    "الحفاظ على دقة ونقاء الأذكار المأثورة الصحيحة وتيسير اختيارها بدون أخطاء إملائية."
   ],
   "en": [
-    "Replaced missed routine callouts with encouraging most consistent routine insights in weekly progress.",
-    "Added direct action to share devotional progress cards along with daily enduring palms and streak summaries.",
-    "Added an uplifting Prophetic reminder on constancy and unified frosted glass styling across progress cards.",
-    "Fixed Arabic bidi numeral ordering and refined routine completion ratios in monthly calendar views."
+    "Harmonized dimensions and alignment for Masbaha target and zikr selection buttons for a smoother experience.",
+    "Enhanced accessibility in target and virtue dialogs with unified, easy-to-reach close controls.",
+    "Preserved authentic prophetic adhkar selection with verified diacritics and mistake-proof choices."
   ]
 }
