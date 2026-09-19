@@ -113,10 +113,10 @@ function MainDhikrGroupCard({
       } ${
         isCompleted
           ? onMedia
-            ? "border-primary/55 bg-primary/20 text-on-media shadow-raised shadow-[0_0_15px_rgba(201,155,76,0.15)] backdrop-blur-md"
+            ? "border-primary/55 bg-primary/20 text-on-media shadow-raised shadow-[0_0_15px_rgba(201,155,76,0.15)]"
             : "border-primary/55 bg-primary/10 text-foreground shadow-raised"
           : onMedia
-            ? "border-white/20 bg-white/14 text-on-media shadow-raised hover:border-white/30 hover:bg-white/20 backdrop-blur-md"
+            ? "border-white/20 bg-white/10 text-on-media shadow-raised hover:border-white/30 hover:bg-white/15"
             : "border-border bg-background text-foreground shadow-raised hover:border-primary/45 hover:bg-muted"
       }`}
       // The recommendation is added to the name, never substituted for the
@@ -132,7 +132,7 @@ function MainDhikrGroupCard({
           isCompleted
             ? "border-success/60 bg-success/20 text-success"
             : onMedia
-              ? "border-white/20 bg-white/15 text-on-media-accent backdrop-blur-sm"
+              ? "border-white/20 bg-white/15 text-on-media-accent"
               : "border-border bg-muted text-primary"
         }`}
       >

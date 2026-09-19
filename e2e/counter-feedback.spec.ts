@@ -205,9 +205,9 @@ test("wide Home keeps navigation exposed, contains its scene, and uses glass for
       boxShadow: style.boxShadow,
     };
   });
-  expect(material.backgroundColor).toBe("rgba(2, 6, 23, 0.14)");
+  expect(material.backgroundColor).toBe("rgba(255, 255, 255, 0.08)");
   expect(material.backgroundImage).toContain("linear-gradient");
-  expect(material.backdropFilter).toContain("blur(10px)");
+  expect(material.backdropFilter).toContain("blur(14px)");
   expect(material.boxShadow).not.toBe("none");
 });
 

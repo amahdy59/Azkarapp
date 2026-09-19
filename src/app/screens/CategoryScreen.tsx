@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useState } from "react";
-import { Check, ChevronDown, RotateCcw, SlidersHorizontal, Volume2 } from "../components/icons";
+import { ArrowNext, Check, ChevronDown, RefreshCw, RotateCcw, SlidersHorizontal, Volume2 } from "../components/icons";
 import { t } from "../i18n";
 import "../../styles/animations/ZikrAnimations.css";
 import { CATEGORIES } from "../content/categories";
@@ -211,9 +211,7 @@ export function CategoryScreen({
                   <span className="leading-none">
                     {completedItemCount === 0 ? t(language, "category.startSession") : t(language, "common.continue")}
                   </span>
-                  <span className="text-lg leading-none" aria-hidden="true">
-                    {direction === "rtl" ? "←" : "→"}
-                  </span>
+                  <ArrowNext size={18} data-rtl-flip aria-hidden="true" className="shrink-0" />
                 </button>
                 {onPlayAllAudio && (
                   <button
@@ -257,11 +255,11 @@ export function CategoryScreen({
                   {isArabic ? (
                     <>
                       <span className="text-subtitle font-bold leading-none">{t(language, "category.readAgain")}</span>
-                      <RotateCcw size={18} className="shrink-0" />
+                      <RefreshCw size={18} className="shrink-0" aria-hidden="true" />
                     </>
                   ) : (
                     <>
-                      <RotateCcw size={18} className="shrink-0" />
+                      <RefreshCw size={18} className="shrink-0" aria-hidden="true" />
                       <span className="text-subtitle font-bold leading-none">{t(language, "category.readAgain")}</span>
                     </>
                   )}

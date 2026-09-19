@@ -307,8 +307,8 @@ describe("PrayerActionsCard", () => {
     expect(section).toHaveClass("p-5");
 
     const row = screen.getByTestId("prayer-action-location");
-    expect(row).toHaveClass("backdrop-blur-md");
-    expect(row).toHaveClass("bg-white/14");
+    expect(row).not.toHaveClass("backdrop-blur-md");
+    expect(row).toHaveClass("bg-white/10");
 
     const heading = screen.getByRole("heading", { level: 3 });
     expect(heading).toHaveClass("text-on-media-accent");

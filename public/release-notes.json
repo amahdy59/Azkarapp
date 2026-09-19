@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-19f",
+  "release": "2026-09-19g",
   "ar": [
-    "توحيد وتنسيق أبعاد ومحاذاة أزرار تحديد الأهداف والأذكار في المسبحة لتجربة استخدام أكثر سلاسة وتناسقاً.",
-    "تحسين إمكانية الوصول في النوافذ المنبثقة للأهداف وفضائل الأذكار وتوفير أزرار إغلاق واضحة وسهلة الاستخدام.",
-    "الحفاظ على دقة ونقاء الأذكار المأثورة الصحيحة وتيسير اختيارها بدون أخطاء إملائية."
+    "إعادة تفعيل المظهر الزجاجي الشفاف المتناسق للبطاقات في الصفحة الرئيسية لتحسين وضوح الرؤية والجمالية.",
+    "تحسين سهولة الاستخدام وتكبير مساحة زر مسح البحث في مكتبة الأذكار لتسهيل التفاعل باللمس.",
+    "تصحيح حالة عرض الحديقة في الإعدادات لتظهر بدقة عند تفعيلها، مع تمييز أيقونات إعادة القراءة وتصفح المجموعات."
   ],
   "en": [
-    "Harmonized dimensions and alignment for Masbaha target and zikr selection buttons for a smoother experience.",
-    "Enhanced accessibility in target and virtue dialogs with unified, easy-to-reach close controls.",
-    "Preserved authentic prophetic adhkar selection with verified diacritics and mistake-proof choices."
+    "Restored frosted glass styling across home cards for enhanced visual depth and clearer contrast over photography.",
+    "Improved accessibility and enlarged the clear search touch target in the Azkar Library.",
+    "Corrected the garden status display in settings and provided distinct icons for restarting and navigating collections."
   ]
 }

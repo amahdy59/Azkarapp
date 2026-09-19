@@ -80,6 +80,7 @@ export {
   Phone01 as Smartphone,
   Play,
   RefreshCcw01 as RotateCcw,
+  RefreshCw01 as RefreshCw,
   // Distinct from RotateCcw, which the design system reserves for reset/restart.
   ReverseLeft as Undo,
   Route,

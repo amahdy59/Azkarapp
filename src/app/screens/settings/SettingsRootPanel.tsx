@@ -187,7 +187,7 @@ export function SettingsRootPanel({
           label={t(language, "settings.myProgress")}
           right={
             <RowValue
-              value={quietProgressEnabled ? t(language, "settings.gardenHidden") : t(language, "settings.gardenActive")}
+              value={quietProgressEnabled ? t(language, "settings.gardenActive") : t(language, "settings.gardenHidden")}
             />
           }
           onPress={() => onNav("progress")}

@@ -124,7 +124,7 @@ export function PrayerActionsCard({
               data-testid={action.testId}
               className={`group/item relative flex min-h-14 items-center justify-between gap-3 rounded-2xl px-4 py-3 transition-colors duration-fast ${
                 onGlass
-                  ? "border border-white/20 bg-white/14 text-white backdrop-blur-md hover:bg-white/20"
+                  ? "border border-white/15 bg-white/10 text-white hover:bg-white/15"
                   : "border border-border/60 bg-card hover:bg-muted/40 text-foreground"
               }`}
             >

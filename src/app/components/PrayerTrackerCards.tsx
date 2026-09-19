@@ -215,7 +215,7 @@ function PrayerCard({
         data-selected={selected || undefined}
         className={`relative flex min-w-0 flex-col rounded-3xl border text-center transition-all duration-standard ease-standard ${
           selected
-            ? "border-primary bg-primary/20 text-on-media shadow-[inset_0_0_0_1px_var(--primary)] backdrop-blur-sm"
+            ? "border-primary bg-primary/25 text-on-media shadow-[inset_0_0_0_1px_var(--primary)]"
             : onGlass
               ? "border-transparent bg-transparent hover:border-white/20 hover:bg-white/15"
               : "border-transparent bg-transparent hover:border-border hover:bg-muted"
@@ -231,7 +231,7 @@ function PrayerCard({
           aria-expanded={selected}
           aria-controls="home-expanded-prayer"
           aria-label={t(language, "prayerTracking.openPrayer", { prayer: name })}
-          className="relative z-10 flex min-h-[7.5rem] min-w-0 flex-col items-center justify-center rounded-3xl px-1.5 py-2 outline-none transition-colors focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring sm:min-h-[8.5rem] sm:px-3 sm:py-3"
+          className="relative z-10 flex min-h-[7.5rem] min-w-0 flex-col items-center justify-center rounded-3xl px-1 py-1.5 outline-none transition-colors focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring sm:min-h-[8.5rem] sm:px-3 sm:py-3"
         >
           {isCurrent && (
             <span className="mb-1 rounded-full bg-primary px-2.5 py-0.5 text-micro font-black text-primary-foreground sm:text-xs">
@@ -246,7 +246,7 @@ function PrayerCard({
           </span>
           <h3
             id={`prayer-card-heading-${prayer}`}
-            className={`mt-1 min-w-0 max-w-full truncate text-label font-black sm:text-subtitle ${
+            className={`mt-1 min-w-0 max-w-full truncate text-xs font-black leading-tight sm:text-subtitle ${
               onGlass
                 ? isCurrent
                   ? "text-on-media-accent"

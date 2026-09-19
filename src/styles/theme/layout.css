@@ -382,24 +382,18 @@
    completion card, the routine card and the wird card cannot drift apart —
    they sit side by side and any difference between them shows. */
 .hero-glass {
-  background-color: rgb(2 6 23 / 0.14);
-  background-image: linear-gradient(135deg, rgb(255 255 255 / 0.1), transparent 38%, rgb(0 0 0 / 0.1));
+  background-color: rgb(255 255 255 / 0.08);
+  background-image: linear-gradient(
+    135deg,
+    rgb(255 255 255 / 0.15) 0%,
+    rgb(255 255 255 / 0.03) 40%,
+    rgb(0 0 0 / 0.08) 100%
+  );
   border: 1px solid rgb(255 255 255 / 0.22);
-  /* A short blur keeps the photograph visibly present instead of turning it
-     into a flat navy fill. Backdrop-filter cost scales with radius and area,
-     and these are large cards over a photograph.
-
-     `contain: paint` stops the browser re-sampling the backdrop for anything
-     outside each card's own box, except where child indicators (like prayer notches)
-     overflow intentionally. */
-  backdrop-filter: blur(10px) saturate(125%);
+  backdrop-filter: blur(14px) saturate(135%);
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.13),
+    inset 0 1px 0 rgb(255 255 255 / 0.18),
     var(--ds-shadow-overlay);
-}
-
-.hero-glass:not(.overflow-visible) {
-  contain: paint;
 }
 
 /* The selected prayer indicates the active expanded prayer card below with

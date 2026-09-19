@@ -204,7 +204,7 @@ export function AzkarLibraryScreen({
                   <button
                     type="button"
                     onClick={() => setSearchQuery("")}
-                    className="-me-2 flex size-9 shrink-0 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+                    className="-me-2.5 flex size-11 min-h-11 min-w-11 shrink-0 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
                     aria-label={t(language, "search.clearAriaLabel")}
                   >
                     <X size={16} aria-hidden="true" />

@@ -1454,7 +1454,6 @@ function AppContent({
                   onOpenQibla={() => push("qibla")}
                   onOpenMasbaha={() => push("custom_counter")}
                   onOpenSettings={() => push("settings")}
-                  onOpenOasisPreview={() => push("oasis_preview")}
                 />
               )}
               {view === "qibla" && (

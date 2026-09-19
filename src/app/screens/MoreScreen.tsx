@@ -47,14 +47,12 @@ export function MoreScreen({
   onOpenQibla,
   onOpenMasbaha,
   onOpenSettings,
-  onOpenOasisPreview,
 }: {
   language: AppLanguage;
   direction: "ltr" | "rtl";
   onOpenQibla: () => void;
   onOpenMasbaha: () => void;
   onOpenSettings: () => void;
-  onOpenOasisPreview?: () => void;
 }) {
   return (
     <ScreenContainer dir={direction} screenName={t(language, "more.title")}>
@@ -79,14 +77,6 @@ export function MoreScreen({
           Icon={Settings}
           onClick={onOpenSettings}
         />
-        {onOpenOasisPreview && (
-          <ToolCard
-            title={t(language, "oasisPreview.title")}
-            description={t(language, "oasisPreview.subtitle")}
-            Icon={Sparkles}
-            onClick={onOpenOasisPreview}
-          />
-        )}
       </div>
     </ScreenContainer>
   );
