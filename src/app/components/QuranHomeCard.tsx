@@ -46,12 +46,15 @@ export function QuranHomeCard({
               <BookOpen size={20} />
             </div>
             <div className={`flex-1 ${textAlignment}`}>
-              <div className="text-title font-bold text-foreground" dir={direction}>
+              <div className={`text-title font-bold ${onGlass ? "text-on-media" : "text-foreground"}`} dir={direction}>
                 {t(language, "home.khatmahTitle")}
               </div>
             </div>
           </div>
-          <div className="text-sm font-medium text-muted-foreground mb-4" dir={direction}>
+          <div
+            className={`text-sm font-medium ${onGlass ? "text-on-media-muted" : "text-muted-foreground"} mb-4`}
+            dir={direction}
+          >
             {t(language, "mushaf.wirdIntro")}
           </div>
           <button
@@ -93,14 +96,20 @@ export function QuranHomeCard({
               <div className="text-label font-medium text-primary mb-0.5 uppercase tracking-wider" dir={direction}>
                 {t(language, "common.mushaf")}
               </div>
-              <div className="text-title font-bold text-foreground" dir={direction}>
+              <div className={`text-title font-bold ${onGlass ? "text-on-media" : "text-foreground"}`} dir={direction}>
                 {surahName} · {t(language, "mushaf.pageLabel", { page: formatNumerals(pageNumber, language) })}
               </div>
             </div>
           </div>
 
           {goalResult.expired ? (
-            <div className="mb-3 rounded-xl border border-warning/40 bg-warning/10 px-3 py-2 text-label font-semibold text-foreground">
+            <div
+              className={`mb-3 rounded-xl border px-3 py-2 text-label font-semibold ${
+                onGlass
+                  ? "border-warning/40 bg-warning/10 text-on-media"
+                  : "border-warning/40 bg-warning/10 text-foreground"
+              }`}
+            >
               {t(language, "mushaf.planExpired")}
             </div>
           ) : isComplete ? (
@@ -112,14 +121,18 @@ export function QuranHomeCard({
 
           {goal > 0 && !isComplete && (
             <div className="mb-3 w-full">
-              <div className="flex justify-between items-center mb-1.5 text-label font-semibold text-foreground">
+              <div
+                className={`flex justify-between items-center mb-1.5 text-label font-semibold ${
+                  onGlass ? "text-on-media" : "text-foreground"
+                }`}
+              >
                 <span>{t(language, "mushaf.wirdToday")}</span>
-                <span className="text-muted-foreground">
+                <span className={onGlass ? "text-on-media-muted" : "text-muted-foreground"}>
                   {formatNumerals(read, language)} /{" "}
                   {t(language, "mushaf.pagesCount", { count: formatNumerals(goal, language) })}
                 </span>
               </div>
-              <div className="h-1.5 w-full bg-current/10 rounded-full overflow-hidden">
+              <div className={`h-1.5 w-full rounded-full overflow-hidden ${onGlass ? "bg-white/20" : "bg-current/10"}`}>
                 <div
                   role="progressbar"
                   aria-label={t(language, "mushaf.todayProgress", {
@@ -146,14 +159,16 @@ export function QuranHomeCard({
           </button>
         </div>
 
-        <div className="h-px w-full bg-border" />
+        <div className={`h-px w-full ${onGlass ? "bg-white/15" : "bg-border"}`} />
 
         <button
           type="button"
           onClick={onOverview}
-          className="flex min-h-11 w-full items-center justify-between p-4 text-sm font-semibold text-foreground hover:bg-muted/50 transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
+          className={`flex min-h-11 w-full items-center justify-between p-4 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring ${
+            onGlass ? "text-on-media hover:bg-white/10" : "text-foreground hover:bg-muted/50"
+          }`}
         >
-          <div className="flex items-center gap-2 text-muted-foreground">
+          <div className={`flex items-center gap-2 ${onGlass ? "text-on-media-muted" : "text-muted-foreground"}`}>
             <Calendar size={16} />
             <span>{t(language, plan.kind === "free" ? "mushaf.readingPreferences" : "mushaf.planAndProgress")}</span>
           </div>

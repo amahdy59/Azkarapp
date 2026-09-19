@@ -288,4 +288,32 @@ describe("PrayerActionsCard", () => {
     expect(screen.getByTestId("prayer-action-dhuhr-sunnah-after")).toHaveTextContent("2 rak'ahs after Dhuhr");
     expect(screen.getByTestId("prayer-open-adhkar")).toHaveTextContent("Start Azkar");
   });
+
+  it("renders with unified frosted sub-surface styling and floating layout when onGlass is true", () => {
+    render(
+      <PrayerActionsCard
+        prayer="dhuhr"
+        language="ar"
+        direction="rtl"
+        records={[]}
+        dayKey={DAY}
+        onToggle={vi.fn()}
+        onOpenAdhkar={vi.fn()}
+        onGlass
+      />,
+    );
+
+    const section = screen.getByTestId("prayer-actions-card");
+    expect(section).toHaveClass("p-0");
+
+    const row = screen.getByTestId("prayer-action-location");
+    expect(row).toHaveClass("backdrop-blur-md");
+    expect(row).toHaveClass("bg-white/14");
+
+    const heading = screen.getByRole("heading", { level: 3 });
+    expect(heading).toHaveClass("text-on-media-accent");
+
+    const cta = screen.getByTestId("prayer-open-adhkar");
+    expect(cta).toHaveClass("bg-primary");
+  });
 });

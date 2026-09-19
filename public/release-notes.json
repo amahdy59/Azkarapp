@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-19",
+  "release": "2026-09-19b",
   "ar": [
-    "توحيد تأثير الزجاج المثلج والشفافية لبطاقة ورد الأذكار والقرآن الكريم لتتطابق تماماً مع باقي بطاقات الشاشة الرئيسية.",
-    "ثبات نص الذكر في شاشة القراءة ومنع اهتزازه أو انزلاقه للأسفل عند تشغيل المشغل الصوتي.",
-    "محاذاة دقيقة لمؤشر التحكم في مستوى الصوت داخل المشغل الصوتي العائم لتجربة استخدام أكثر سلاسة."
+    "تصميم عائم وخفيف لأعمال الصلوات بدون بطاقات مجمعة مع كبسولات مثلجة تطفو مباشرة فوق خلفية الشاشة.",
+    "تأثير الزجاج المثلج الحقيقي والشفافية العالية لجميع بطاقات وعناصر الشاشة الرئيسية مع دعم كامل لأجهزة iOS.",
+    "دوائر تحديد واضحة ومشرقة لكل طاعة مع زر ذهبي بارز ومريح لبدء أذكار ما بعد الصلاة."
   ],
   "en": [
-    "Unified frosted glass depth and translucency for the daily zikr and Quran tracking card to perfectly match all Home screen cards.",
-    "Stabilized reading screen text to eliminate vertical jumping when starting audio playback.",
-    "Centered the volume slider control within the floating audio player for precise alignment and smoother control."
+    "Cardless floating prayer actions layout with frosted glass capsules positioned directly over the canvas photograph.",
+    "Luminous frosted glassmorphism and deep backdrop blur across all Home screen cards with full iOS WebKit support.",
+    "Crisp devotion check rings and prominent golden action button to seamlessly start post-prayer azkar."
   ]
 }

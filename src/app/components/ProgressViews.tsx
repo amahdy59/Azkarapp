@@ -114,10 +114,10 @@ function MainDhikrGroupCard({
       } ${
         isCompleted
           ? compact && onMedia
-            ? "border-primary/55 bg-primary/20 text-on-media shadow-raised shadow-[0_0_15px_rgba(201,155,76,0.15)] backdrop-blur-sm"
+            ? "border-primary/55 bg-primary/20 text-on-media shadow-raised shadow-[0_0_15px_rgba(201,155,76,0.15)] backdrop-blur-md"
             : "border-primary/55 bg-primary/10 text-foreground shadow-raised"
           : compact && onMedia
-            ? "border-white/15 bg-white/8 text-on-media shadow-raised hover:border-white/25 hover:bg-white/14 backdrop-blur-sm"
+            ? "border-white/20 bg-white/14 text-on-media shadow-raised hover:border-white/30 hover:bg-white/20 backdrop-blur-md"
             : "border-border bg-background text-foreground shadow-raised hover:border-primary/45 hover:bg-muted"
       }`}
       // The recommendation is added to the name, never substituted for the
@@ -135,7 +135,7 @@ function MainDhikrGroupCard({
               ? "border-success/60 bg-success/20 text-success"
               : "border-success/60 bg-success/15 text-success"
             : compact && onMedia
-              ? "border-white/15 bg-white/10 text-on-media-accent backdrop-blur-xs"
+              ? "border-white/20 bg-white/15 text-on-media-accent backdrop-blur-sm"
               : "border-border bg-muted text-primary"
         }`}
       >
@@ -465,7 +465,7 @@ export function ProgressDayView({
             data-testid="open-wird-benefits"
             className={`mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border px-4 text-label font-black transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
               onGlass
-                ? "border-on-media/20 bg-black/35 text-on-media hover:bg-black/50"
+                ? "border-white/20 bg-white/14 text-on-media backdrop-blur-md hover:bg-white/20"
                 : "border-primary/35 bg-primary/10 text-primary hover:bg-primary/15"
             }`}
           >

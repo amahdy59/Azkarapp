@@ -84,18 +84,20 @@ function statusLabel(language: AppLanguage, state: PrayerTemporalState) {
  * with a transparent fill and a grey ring. It still reads `peer-*` for hover
  * and active, which have no such problem.
  */
-export function TrackingCheckMark({ checked }: { checked: boolean }) {
+export function TrackingCheckMark({ checked, onGlass = false }: { checked: boolean; onGlass?: boolean }) {
   return (
     <span
       aria-hidden="true"
       data-checked={checked ? "true" : undefined}
-      className={`tracking-check pointer-events-none flex size-6 shrink-0 items-center justify-center rounded-full border-2 transition-[background-color,border-color,transform,box-shadow] duration-standard ease-standard peer-enabled:peer-active:scale-90 ${
+      className={`tracking-check pointer-events-none flex size-7 shrink-0 items-center justify-center rounded-full border-2 transition-[background-color,border-color,transform,box-shadow] duration-standard ease-standard peer-enabled:peer-active:scale-90 ${
         checked
           ? "border-primary bg-primary text-primary-foreground shadow-[0_2px_8px_-2px_var(--primary)]"
-          : "border-border-control text-transparent peer-enabled:peer-hover:border-primary peer-enabled:peer-hover:bg-primary/10"
+          : onGlass
+            ? "border-white/70 text-transparent peer-enabled:peer-hover:border-white peer-enabled:peer-hover:bg-white/10"
+            : "border-border-control text-transparent peer-enabled:peer-hover:border-primary peer-enabled:peer-hover:bg-primary/10"
       }`}
     >
-      <Check size={14} strokeWidth={3} />
+      <Check size={16} strokeWidth={3} />
     </span>
   );
 }
@@ -169,7 +171,7 @@ function TrackingCheckbox({
           colour declarations never landed, so a ticked box kept a transparent
           fill and a grey ring — the state was announced correctly but invisible.
           Reading the prop we already hold removes the indirection entirely. */}
-      <TrackingCheckMark checked={checked} />
+      <TrackingCheckMark checked={checked} onGlass={onGlass} />
     </label>
   );
 }

@@ -70,25 +70,25 @@ export function PrayerActionsCard({
       data-testid="prayer-actions-card"
       data-prayer={prayer}
       aria-labelledby={`prayer-actions-heading-${prayer}`}
-      className={`flex flex-col gap-3 p-4 sm:p-5 md:p-6 ${className}`}
+      className={`flex flex-col gap-3 ${onGlass ? "p-0" : "p-4 sm:p-5 md:p-6"} ${className}`}
     >
       {/* Header: Prayer Icon + Heading + More Info Button */}
       <div className="flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-2.5">
           <span
             aria-hidden="true"
-            className={`flex size-8 shrink-0 items-center justify-center rounded-xl ${
-              onGlass ? "bg-white/15 text-on-media-accent" : "bg-primary/15 text-primary"
+            className={`flex size-9 shrink-0 items-center justify-center rounded-full ${
+              onGlass ? "border border-white/20 bg-white/15 text-on-media-accent" : "bg-primary/15 text-primary"
             }`}
           >
             {(() => {
               const HeaderIcon = PRAYER_ICON[prayer] ?? Mosque;
-              return <HeaderIcon size={18} />;
+              return <HeaderIcon size={20} />;
             })()}
           </span>
           <h3
             id={`prayer-actions-heading-${prayer}`}
-            className={`truncate text-base font-black sm:text-lg ${titleColor}`}
+            className={`truncate text-subtitle font-black ${onGlass ? "text-on-media-accent" : titleColor}`}
             dir="auto"
           >
             {t(language, "prayerActions.heading", { prayer: infoData.prayerName })}
@@ -102,16 +102,16 @@ export function PrayerActionsCard({
           aria-label={t(language, "prayerActions.moreInfoAria", { prayer: infoData.prayerName })}
           className={`flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
             onGlass
-              ? "border-white/20 bg-white/10 text-on-media hover:bg-white/20"
+              ? "border-white/20 bg-white/14 text-white backdrop-blur-md hover:bg-white/20"
               : "border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground"
           }`}
         >
-          <Info size={15} aria-hidden="true" />
+          <Info size={16} aria-hidden="true" />
           <span>{t(language, "prayerActions.moreInfo")}</span>
         </button>
       </div>
 
-      {/* Main Checklist: 1 line per item, frosted glass pill */}
+      {/* Main Checklist: 1 line per item, floating frosted glass pill */}
       <ol className="flex flex-col gap-2">
         {actions.map((action) => {
           const ItemIcon = action.Icon;
@@ -122,10 +122,10 @@ export function PrayerActionsCard({
             <li
               key={action.id}
               data-testid={action.testId}
-              className={`group/item relative flex min-h-12 items-center justify-between gap-3 rounded-2xl border px-3.5 py-2 transition-colors duration-fast ${
+              className={`group/item relative flex min-h-14 items-center justify-between gap-3 rounded-2xl px-4 py-3 transition-colors duration-fast ${
                 onGlass
-                  ? "border-white/10 bg-white/10 hover:bg-white/20 text-on-media"
-                  : "border-border/60 bg-card hover:bg-muted/40 text-foreground"
+                  ? "border border-white/20 bg-white/14 text-white backdrop-blur-md hover:bg-white/20"
+                  : "border border-border/60 bg-card hover:bg-muted/40 text-foreground"
               }`}
             >
               {/* Overlay transparent checkbox spanning full row for accessibility & 48px hit target */}
@@ -151,19 +151,23 @@ export function PrayerActionsCard({
               <div className="flex min-w-0 flex-1 items-center gap-3">
                 <span
                   aria-hidden="true"
-                  className={`flex size-9 shrink-0 items-center justify-center rounded-xl border ${
-                    onGlass ? "border-white/20 bg-white/10 text-primary" : "border-border/60 bg-muted text-primary"
+                  className={`flex size-9 shrink-0 items-center justify-center rounded-full ${
+                    onGlass ? "bg-white/15 text-white" : "border border-border/60 bg-muted text-primary"
                   }`}
                 >
-                  <ItemIcon size={18} />
+                  <ItemIcon size={19} />
                 </span>
-                <span id={labelId} className={`truncate text-sm font-bold sm:text-base ${titleColor}`} dir="auto">
+                <span
+                  id={labelId}
+                  className={`truncate text-base font-bold ${onGlass ? "text-white" : titleColor}`}
+                  dir="auto"
+                >
                   {action.label}
                 </span>
               </div>
 
               {/* End: Circular tracking checkmark on far left (RTL) / far right (LTR) */}
-              <TrackingCheckMark checked={action.checked} />
+              <TrackingCheckMark checked={action.checked} onGlass={onGlass} />
             </li>
           );
         })}
@@ -174,9 +178,9 @@ export function PrayerActionsCard({
         type="button"
         onClick={() => onOpenAdhkar(prayer)}
         data-testid="prayer-open-adhkar"
-        className="mt-1 flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-base font-black text-primary-foreground shadow-raised transition-colors duration-fast hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring active:scale-95"
+        className="mt-2 flex min-h-14 w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-lg font-black text-primary-foreground shadow-raised transition-colors duration-fast hover:bg-primary/90 active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
-        <BookOpen size={20} aria-hidden="true" />
+        <BookOpen size={22} aria-hidden="true" />
         <span>{t(language, "prayerActions.startAdhkar")}</span>
       </button>
 
