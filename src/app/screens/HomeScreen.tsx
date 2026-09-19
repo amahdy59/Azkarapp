@@ -11,7 +11,7 @@ import { getDailyPathStatus } from "../dailyPath";
 import { getLeadingPrayerMoment } from "../prayerMoment";
 import { estimateCompletionMinutes, getAzkarForMode, getRoutineProgress, isRoutineCategory } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
-import { getEstimatedPrayerTimes, PRAYER_NAMES, timeToMinutes, type PrayerName } from "../content/prayerTimes";
+import { getEstimatedPrayerTimes, timeToMinutes, type PrayerName } from "../content/prayerTimes";
 import { PrayerTrackerCards, type PrayerTrackingWrite } from "../components/PrayerTrackerCards";
 import { buildPrayerCardModels } from "../prayerCardModels";
 import { useNow } from "../hooks/useNow";
@@ -234,62 +234,6 @@ export function getHomeAction(
     ? getRoutineProgress(suggestedId, routineModes[suggestedId], completed[suggestedId] ?? []).total
     : getAzkarForMode(suggestedId, "complete").length;
   return { categoryId: suggestedId, index: 0, completedCount: totalCount, totalCount, kind: "again" };
-}
-
-function PrayerStripConnector({
-  prayer,
-  direction,
-  onGlass = false,
-}: {
-  prayer: PrayerName;
-  direction: "ltr" | "rtl";
-  onGlass?: boolean;
-}) {
-  const isRtl = direction === "rtl";
-  const prayerIndex = PRAYER_NAMES.indexOf(prayer);
-  if (prayerIndex === -1) return null;
-
-  // Percentage from left for the 5 columns (0..4):
-  // in RTL: 0(fajr)=90%, 1(dhuhr)=70%, 2(asr)=50%, 3(maghrib)=30%, 4(isha)=10%
-  // in LTR: 0(fajr)=10%, 1(dhuhr)=30%, 2(asr)=50%, 3(maghrib)=70%, 4(isha)=90%
-  const x1 = isRtl ? 90 - prayerIndex * 20 : 10 + prayerIndex * 20;
-  // On desktop, the right column center is at ~75%
-  const x2 = 75;
-
-  return (
-    <div
-      aria-hidden="true"
-      data-testid="prayer-strip-connector"
-      data-prayer={prayer}
-      style={{ marginBlock: "-0.25rem" }}
-      className="hidden md:block relative w-full h-5 overflow-visible pointer-events-none z-10"
-    >
-      <svg viewBox="0 0 100 20" preserveAspectRatio="none" className="w-full h-full overflow-visible">
-        {/* Soft glow underlying curve */}
-        <path
-          d={`M ${x1} 0 C ${x1} 10, ${x2} 10, ${x2} 20`}
-          fill="none"
-          stroke="var(--primary)"
-          strokeWidth="3.5"
-          strokeLinecap="round"
-          style={{ filter: "blur(1.5px)" }}
-          className="opacity-30"
-        />
-        {/* Elegant connecting line */}
-        <path
-          d={`M ${x1} 0 C ${x1} 10, ${x2} 10, ${x2} 20`}
-          fill="none"
-          stroke={onGlass ? "#e8b420" : "var(--primary)"}
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
-        {/* Origin dot under selected prayer */}
-        <circle cx={x1} cy={2} r={2.5} fill={onGlass ? "#e8b420" : "var(--primary)"} />
-        {/* Destination dot entering right prayer card */}
-        <circle cx={x2} cy={18} r={2.5} fill={onGlass ? "#e8b420" : "var(--primary)"} />
-      </svg>
-    </div>
-  );
 }
 
 export function HomeScreen({
@@ -718,13 +662,11 @@ export function HomeScreen({
                   />
                 </div>
 
-                {expandedPrayer && (
-                  <PrayerStripConnector prayer={expandedPrayer} direction={direction} onGlass={homeVisualEffects} />
-                )}
-
                 <div
                   data-testid="home-context-grid"
-                  className="grid w-full grid-cols-1 items-start gap-4 md:grid-cols-2 lg:gap-5"
+                  className={`grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:gap-5 ${
+                    hasContextStackContent && !expandedPrayer ? "items-stretch" : "items-start"
+                  }`}
                   dir={direction}
                 >
                   {expandedPrayer && (

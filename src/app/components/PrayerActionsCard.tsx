@@ -70,7 +70,7 @@ export function PrayerActionsCard({
       data-testid="prayer-actions-card"
       data-prayer={prayer}
       aria-labelledby={`prayer-actions-heading-${prayer}`}
-      className={`flex flex-col gap-3 ${onGlass ? "p-0" : "p-4 sm:p-5 md:p-6"} ${className}`}
+      className={`flex flex-col gap-3 p-5 sm:p-6 ${className}`}
     >
       {/* Header: Prayer Icon + Heading + More Info Button */}
       <div className="flex items-center justify-between gap-3">

@@ -12,6 +12,7 @@ export interface HomeCardProps extends ComponentPropsWithoutRef<"section"> {
    */
   onGlass?: boolean;
   elevation?: "flat" | "raised" | "overlay";
+  padding?: "none" | "sm" | "md" | "lg";
   className?: string;
   children: ReactNode;
 }
@@ -51,19 +52,36 @@ interface HomeCardComponent {
   SubSurface: typeof HomeCardSubSurface;
 }
 
+const HOME_CARD_PADDING: Record<"none" | "sm" | "md" | "lg", string> = {
+  none: "",
+  sm: "p-1.5 sm:p-2",
+  md: "p-4 sm:p-6",
+  lg: "p-5 sm:p-6 md:p-7",
+};
+
 /**
  * A standard surface for all home screen cards to ensure consistent glassmorphism
  * effects, borders, shadows, and padding across all screens and screen sizes.
  */
 const HomeCardBase = forwardRef<HTMLElement, HomeCardProps>(function HomeCard(
-  { as: Component = "section", onGlass = false, elevation = "raised", className = "", children, ...rest },
+  {
+    as: Component = "section",
+    onGlass = false,
+    elevation = "raised",
+    padding = "lg",
+    className = "",
+    children,
+    ...rest
+  },
   ref,
 ) {
+  const paddingClass = HOME_CARD_PADDING[padding];
+
   if (onGlass) {
     return (
       <Component
         ref={ref}
-        className={cn("hero-glass home-glass-surface rounded-3xl p-5 sm:p-6 md:p-7", className)}
+        className={cn("hero-glass home-glass-surface rounded-3xl", paddingClass, className)}
         {...rest}
       >
         {children}
@@ -77,7 +95,7 @@ const HomeCardBase = forwardRef<HTMLElement, HomeCardProps>(function HomeCard(
       as={Component}
       elevation={elevation}
       padding="none"
-      className={cn("p-5 sm:p-6 md:p-7", className)}
+      className={cn("rounded-3xl", paddingClass, className)}
       {...rest}
     >
       {children}

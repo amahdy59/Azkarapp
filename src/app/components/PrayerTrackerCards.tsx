@@ -213,10 +213,12 @@ function PrayerCard({
         data-density="summary"
         aria-current={isCurrent ? "step" : undefined}
         data-selected={selected || undefined}
-        className={`relative flex min-w-0 flex-col rounded-3xl border text-center transition-[background-color,border-color,box-shadow,transform] duration-standard ease-standard ${
+        className={`relative flex min-w-0 flex-col rounded-3xl border text-center transition-all duration-standard ease-standard ${
           selected
-            ? "border-primary bg-primary/10 shadow-[inset_0_0_0_1px_var(--primary)]"
-            : "border-transparent bg-transparent"
+            ? "border-primary bg-primary/20 text-on-media shadow-[inset_0_0_0_1px_var(--primary)] backdrop-blur-sm"
+            : onGlass
+              ? "border-transparent bg-transparent hover:border-white/20 hover:bg-white/15"
+              : "border-transparent bg-transparent hover:border-border hover:bg-muted"
         }`}
       >
         <button
@@ -289,8 +291,25 @@ function PrayerCard({
             aria-hidden="true"
             data-testid="home-prayer-notch"
             data-prayer={prayer}
-            className={`home-prayer-notch ${onGlass ? "hero-glass" : "border border-border bg-card shadow-raised"}`}
-          />
+            className={`home-prayer-notch ${onGlass ? "text-on-media-accent" : "text-primary"}`}
+          >
+            <svg
+              width="20"
+              height="12"
+              viewBox="0 0 20 12"
+              fill="none"
+              className="overflow-visible drop-shadow-md"
+              aria-hidden="true"
+            >
+              <path
+                d="M10 1 V9 M4 5.5 L10 10.5 L16 5.5"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </span>
         )}
       </article>
     );
@@ -529,7 +548,8 @@ export function PrayerTrackerCards({
           data-testid="prayer-tracker-cards"
           onGlass={onGlass}
           elevation="raised"
-          className="stagger-in grid grid-cols-5 gap-1 overflow-visible p-1.5 sm:gap-2 sm:p-2"
+          padding="sm"
+          className="stagger-in grid grid-cols-5 gap-1 overflow-visible sm:gap-2"
           style={{ ["--prayer-columns" as string]: "5" }}
         >
           {ordered.map((model) => {

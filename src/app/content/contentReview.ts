@@ -178,15 +178,19 @@ const BENEFIT_OVERRIDES: Readonly<Record<string, string>> = {
 };
 
 const QURAN_RELIANCE_CORRECTION: Partial<Zikr> = {
-  repetitionCount: 1,
-  countLabel: "1",
-  benefit: "A Qur’anic declaration that Allah alone is sufficient and worthy of reliance.",
-  sourceReference: "Qur’an 9:129.",
+  repetitionCount: 7,
+  countLabel: "7",
+  benefit:
+    "Whoever recites it seven times in the morning and evening, Allah will suffice him in whatever concerns him of worldly and hereafter matters.",
+  benefitArabic: "من قالها سبع مرات حين يصبح وحين يمسي كفاه الله ما أهمه من أمر الدنيا والآخرة.",
+  sourceReference: "Abu Dawud 5081; Ibn as-Sunni 71; Hisn al-Muslim 83.",
+  sourceReferenceArabic: "أبو داود ٥٠٨١؛ وابن السني ٧١؛ حصن المسلم ٨٣.",
   hadithText:
-    "قَالَ اللَّهُ تَعَالَى: ﴿حَسْبِيَ اللَّهُ لَا إِلَهَ إِلَّا هُوَ عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ﴾.",
-  authenticityNote: "Qur’an 9:129; Abu Dawud 5081 is graded fabricated by al-Albani and is not used.",
+    "عَنْ أَبِي الدَّرْدَاءِ رضي الله عنه قَالَ: مَنْ قَالَ إِذَا أَصْبَحَ وَإِذَا أَمْسَى: «حَسْبِيَ اللَّهُ لاَ إِلَهَ إِلاَّ هُوَ عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ» سَبْعَ مَرَّاتٍ كَفَاهُ اللَّهُ مَا أَهَمَّهُ.",
+  authenticityNote:
+    "Reported in Abu Dawud 5081 and Ibn as-Sunni 71; authentic mawquf chain according to hadith scholars; Hisn al-Muslim 83.",
   hadithTextEnglish:
-    "Allah, exalted is He, said: “Allah is sufficient for me; there is no god but He. On Him I rely, and He is the Lord of the Mighty Throne.”",
+    "Abu al-Darda’ (may Allah be pleased with him) said: Whoever says in the morning and in the evening: “Allah is sufficient for me; there is no god but He. On Him I rely, and He is the Lord of the Mighty Throne” seven times, Allah will suffice him in whatever troubles him.",
   sourceUrl: "https://sunnah.com/abudawud%3A5081",
 };
 

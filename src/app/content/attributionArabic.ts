@@ -53,6 +53,8 @@ export const AUTHENTICITY_ARABIC: Readonly<Record<string, string>> = Object.free
     "أحد أسانيده جيد، كما في حصن المسلم وموقع Sunnah.com.",
   "Qur’an 9:129; Abu Dawud 5081 is graded fabricated by al-Albani and is not used.":
     "القرآن الكريم ٩:١٢٩؛ وحديث أبي داود ٥٠٨١ حكم عليه الألباني بالوضع فلم يُعتمد.",
+  "Reported in Abu Dawud 5081 and Ibn as-Sunni 71; authentic mawquf chain according to hadith scholars; Hisn al-Muslim 83.":
+    "أخرجه أبو داود ٥٠٨١ وابن السني ٧١، وصحح إسناده موقوفاً جماعة من أهل العلم؛ حصن المسلم ٨٣.",
   "Sahih (Abu Dawud & At-Tirmidhi).": "صحيح (أبو داود والترمذي).",
   "Sahih (Abu Dawud).": "صحيح (أبو داود).",
   "Sahih (al-Albani).": "صحيح (الألباني).",
@@ -260,6 +262,7 @@ export const SOURCE_REFERENCE_ARABIC: Readonly<Record<string, string>> = Object.
   "Abu Dawud 4/324; Ahmad 5/42; An-Nasa’i; Ibn as-Sunni; Al-Adab al-Mufrad; Hisn al-Muslim 82.":
     "أبو داود ٤/٣٢٤؛ أحمد ٥/٤٢؛ النسائي؛ ابن السني؛ الأدب المفرد؛ حصن المسلم ٨٢.",
   "Qur’an 9:129.": "القرآن ٩:١٢٩.",
+  "Abu Dawud 5081; Ibn as-Sunni 71; Hisn al-Muslim 83.": "أبو داود ٥٠٨١؛ ابن السني ٧١؛ حصن المسلم ٨٣.",
   "Abu Dawud; Ibn Majah; Ahmad; An-Nasa’i; Hisn al-Muslim 84.": "أبو داود؛ ابن ماجه؛ أحمد؛ النسائي؛ حصن المسلم ٨٤.",
   "At-Tirmidhi; Abu Dawud 4/317; Hisn al-Muslim 85/109.": "الترمذي؛ أبو داود ٤/٣١٧؛ حصن المسلم ٨٥/١٠٩.",
   "Abu Dawud 4/323; At-Tirmidhi 5/465; Ibn Majah; Ahmad; Hisn al-Muslim 86.":

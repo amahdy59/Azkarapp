@@ -1,15 +1,15 @@
 {
-  "release": "2026-09-19c",
+  "release": "2026-09-19d",
   "ar": [
-    "تأثير الزجاج المثلج وزر إغلاق واضح ومريح لكافة النوافذ المنبثقة وبطاقات الفضائل عند تفعيل الشفافية.",
-    "ثبات بطاقة الصلاة الموسعة يميناً على الشاشات الكبيرة مع خط انسيابي أنيق يربط الصلاة المحددة بتفاصيلها.",
-    "حصر تفاعل العد بدقة داخل بطاقة الذكر والعداد لمنع الزيادات غير المقصودة عند النقر على هوامش الشاشة.",
-    "توحيد شاشتي المسبحة والصلاة على النبي ﷺ بنفس التصميم والتباعد وأزرار العد المعتمدة في شاشة القراءة."
+    "توحيد مظهر وتأثيرات البطاقات على الشاشة الرئيسية بمستويات زجاج مثلج متناسقة وتباين عالي يسهل القراءة على الحواسيب والهواتف.",
+    "البحث والتصفية الفورية للأذكار والتصنيفات مباشرة داخل صفحة المكتبة دون الحاجة للانتقال لصفحة أخرى.",
+    "إعادة تنظيم قائمة الإعدادات في أقسام واضحة ومتدرجة تيسر الوصول السريع لخيارات القراءة والصوت والسمات.",
+    "تصحيح وتدقيق أعداد تكرار الأذكار المأثورة ومصادرها العربية وفق السنة النبوية المطهرة."
   ],
   "en": [
-    "Frosted glassmorphism and clear close buttons across modals and virtue cards when transparency is active.",
-    "Fixed right-column prayer card layout on desktop connected with an elegant curved line to the selected prayer.",
-    "Isolated counting strictly to the devotional card and counter surface to avoid accidental taps on margins.",
-    "Unified Masbaha and Salawat screens with the exact same layout, spacing, and counter as the reader screen."
+    "Unified Home screen cards with consistent frosted glass styling, smooth borders, and high-contrast accessible typography across mobile and desktop.",
+    "Instant in-page search and category filtering directly within the Azkar Library without navigating away.",
+    "Reorganized Settings into intuitive, accessible sections for quick access to reading preferences, audio, and themes.",
+    "Corrected dhikr repetition counts and Arabic attribution references in accordance with authentic Prophetic Sunnah."
   ]
 }

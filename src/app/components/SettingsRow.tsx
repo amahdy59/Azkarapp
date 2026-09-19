@@ -31,8 +31,8 @@ export function SettingsRowItem({
         {icon}
       </div>
       <p
-        className="min-w-0 flex-1 break-normal text-start font-sans text-subtitle md:text-base font-semibold leading-snug"
-        style={{ color: labelColor === "text-foreground" ? "var(--foreground)" : undefined }}
+        className={`min-w-0 flex-1 break-normal text-start font-sans text-subtitle md:text-base leading-snug ${current ? "font-bold text-primary" : "font-semibold text-foreground"}`}
+        style={{ color: current ? undefined : labelColor === "text-foreground" ? "var(--foreground)" : undefined }}
       >
         {label}
       </p>
@@ -48,13 +48,18 @@ export function SettingsRowItem({
           onClick={onPress}
           data-testid={testId}
           aria-current={current ? "page" : undefined}
-          className={`flex min-h-16 w-full items-center gap-3 px-4 py-3 text-start transition-[color,background-color,border-color,box-shadow,opacity] active:opacity-70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring ${current ? "border-s-4 border-primary" : "border-s-4 border-transparent"}`}
-          style={{ background: "var(--card)" }}
+          className={`flex min-h-16 w-full items-center gap-3 px-4 py-3 text-start transition-[color,background-color,border-color,box-shadow,opacity] active:opacity-70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring ${
+            current ? "border-s-4 border-primary bg-primary/10" : "border-s-4 border-transparent bg-card"
+          }`}
+          style={{ background: current ? "color-mix(in srgb, var(--primary) 10%, var(--card))" : "var(--card)" }}
         >
           {content}
         </button>
       ) : (
-        <div className="flex min-h-16 w-full items-center gap-3 px-4 py-3" style={{ background: "var(--card)" }}>
+        <div
+          className="flex min-h-16 w-full items-center gap-3 bg-card px-4 py-3"
+          style={{ background: "var(--card)" }}
+        >
           {content}
         </div>
       )}
@@ -160,7 +165,7 @@ export function SettingsSelectRow({
 }
 
 export function RowChevron() {
-  return <ChevronNext size={18} className="text-foreground/70" />;
+  return <ChevronNext size={18} className="text-foreground/70 rtl:rotate-180" />;
 }
 
 export function RowValue({ value, withChevron = true }: { value: string; withChevron?: boolean }) {

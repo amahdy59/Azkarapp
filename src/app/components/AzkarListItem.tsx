@@ -76,7 +76,7 @@ export function AzkarListItem({
       id={`zikr-card-${index}`}
       ref={isActive ? activeRef : undefined}
       aria-current={isActive ? "step" : undefined}
-      className={`flex w-full flex-col rounded-2xl border transition-all ${
+      className={`relative flex w-full flex-col rounded-2xl border transition-all ${
         isActive
           ? "border-primary bg-primary/10 shadow-xs"
           : isCardCompleted
@@ -154,7 +154,7 @@ export function AzkarListItem({
               handleTextClick();
             }
           }}
-          className="min-w-0 flex-1 text-start cursor-pointer rounded-lg outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="min-w-0 flex-1 text-start cursor-pointer rounded-lg outline-none focus-visible:ring-[3px] focus-visible:ring-ring pe-12"
           dir={direction}
         >
           {expanded && isArabic && z.hasSeekRefuge && (
@@ -188,7 +188,7 @@ export function AzkarListItem({
           </span>
         </div>
 
-        {/* End column: Interactive chevron button to toggle expand/collapse */}
+        {/* Floating glassmorphic chevron button */}
         {!isSpecialSurah && (
           <button
             type="button"
@@ -203,9 +203,9 @@ export function AzkarListItem({
               e.stopPropagation();
               toggleExpanded();
             }}
-            className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/70 transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            className="absolute top-2 end-2 z-10 flex size-11 items-center justify-center rounded-full border border-border-control bg-card/80 backdrop-blur-md text-muted-foreground shadow-xs transition-all hover:bg-card hover:text-foreground hover:border-primary active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer"
           >
-            <ChevronDown size={20} className={`transition-transform duration-200 ${expanded ? "rotate-180" : ""}`} />
+            <ChevronDown size={18} className={`transition-transform duration-200 ${expanded ? "rotate-180" : ""}`} />
           </button>
         )}
       </div>

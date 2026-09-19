@@ -907,16 +907,16 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     translation:
       "My Lord, forgive me and accept my repentance. You are truly the One who repeatedly accepts repentance, the Most Merciful.",
     benefit:
-      "The Companions counted the Prophet ﷺ saying this one hundred times in a single gathering. The count belongs to that reported context and is not Friday-specific; fewer repetitions remain permissible.",
+      "Recited 3 times (or once). The Prophet ﷺ was observed seeking forgiveness and repenting about 100 times in a single gathering and during the day.",
     benefitArabic:
-      "دعاء التوبة والاستغفار في المجلس\n• تب علي: اقبل توبتي ووفقني للثبات عليها.\n• التواب: كثير التوفيق للتوبة والقبول لها.",
-    repetitionCount: 100,
-    sourceReference: "Sunan Abi Dawud 1516; Sahih (al-Albani).",
-    sourceReferenceArabic: "سنن أبي داود 1516؛ صحيح بحسب تصنيف الألباني.",
+      "دعاء التوبة والاستغفار في المجلس\n• يُقرأ 3 مرات (أو مرة واحدة)، وكان النبي ﷺ يستغفر الله ويتوب إليه في المجلس الواحد نحو مائة مرة، وفي اليوم مائة مرة.\n• تب علي: اقبل توبتي ووفقني للثبات عليها.\n• التواب: كثير التوفيق للتوبة والقبول لها.",
+    repetitionCount: 3,
+    sourceReference: "Sunan Abi Dawud 1516; Sahih (al-Albani); Sahih Muslim 2702.",
+    sourceReferenceArabic: "سنن أبي داود 1516؛ صحيح بحسب تصنيف الألباني؛ صحيح مسلم 2702.",
     hadithText:
-      "عن عبد الله بن عمر رضي الله عنهما قال: إن كنا لنعد لرسول الله ﷺ في المجلس الواحد مائة مرة يقول: «رب اغفر لي وتب علي إنك أنت التواب الرحيم». (أخرجه أبو داود 1516، والترمذي 3434، وصححه الألباني).",
+      "عن عبد الله بن عمر رضي الله عنهما قال: إن كنا لنعد لرسول الله ﷺ في المجلس الواحد مائة مرة يقول: «رب اغفر لي وتب علي إنك أنت التواب الرحيم». (أخرجه أبو داود 1516، والترمذي 3434، وصححه الألباني). وقال ﷺ: «يا أيها الناس توبوا إلى الله فإني أتوب في اليوم إليه مائة مرة». (رواه مسلم 2702).",
     hadithTextEnglish:
-      "‘Abdullah ibn ‘Umar (may Allah be pleased with them both) said: We would count for the Messenger of Allah ﷺ in a single sitting a hundred times that he said: “My Lord, forgive me and accept my repentance; You are the Ever-Relenting, the Most Merciful.” (Abu Dawud 1516; al-Tirmidhi 3434, graded sahih by al-Albani.)",
+      "‘Abdullah ibn ‘Umar (may Allah be pleased with them both) said: We would count for the Messenger of Allah ﷺ in a single sitting a hundred times that he said: “My Lord, forgive me and accept my repentance; You are the Ever-Relenting, the Most Merciful.” (Abu Dawud 1516; al-Tirmidhi 3434, graded sahih by al-Albani.) The Prophet ﷺ also said: “O people, turn in repentance to Allah, for I repent to Him a hundred times a day.” (Sahih Muslim 2702.)",
     sourceUrl: "https://sunnah.com/abudawud%3A1516",
     attributionType: "said_by_prophet",
     category: "comprehensive_duas",

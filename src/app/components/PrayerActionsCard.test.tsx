@@ -304,7 +304,7 @@ describe("PrayerActionsCard", () => {
     );
 
     const section = screen.getByTestId("prayer-actions-card");
-    expect(section).toHaveClass("p-0");
+    expect(section).toHaveClass("p-5");
 
     const row = screen.getByTestId("prayer-action-location");
     expect(row).toHaveClass("backdrop-blur-md");

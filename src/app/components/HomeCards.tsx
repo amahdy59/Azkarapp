@@ -102,7 +102,7 @@ export function PrayerRoutineCard({
                 direction={direction}
                 aria-label={t(language, "home.routineMode")}
                 className={`flex items-center rounded-3xl border p-1 ${
-                  onGlass ? "border-white/15 bg-white/10 backdrop-blur-sm" : "border-border bg-muted"
+                  onGlass ? "border-white/20 bg-white/10 backdrop-blur-md" : "border-border bg-muted"
                 }`}
                 itemClassName={(selected) =>
                   `flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
@@ -126,7 +126,7 @@ export function PrayerRoutineCard({
         <div className="flex w-full flex-col items-start gap-3 px-1 mt-2">
           <h2
             id="current-zikr-heading"
-            className={`block max-w-full truncate whitespace-nowrap text-[clamp(1.75rem,5vw,2.25rem)] font-black tracking-tight md:text-5xl ${
+            className={`block max-w-full truncate whitespace-nowrap text-3xl font-black tracking-tight leading-tight md:text-4xl ${
               onGlass ? "text-on-media-accent drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" : "text-primary"
             }`}
             dir="auto"
@@ -364,17 +364,23 @@ export function FridayHomeCard({
         onGlass={onGlass}
         data-testid="home-friday-card"
         aria-labelledby="friday-card-heading"
-        elevation="flat"
+        elevation="raised"
+        padding="md"
         className="flex flex-col gap-4 sm:flex-row sm:items-center"
       >
         <span className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-primary/20 bg-primary/10 text-primary">
           <ProductImage name="mosque_prophet" className="h-full w-full object-cover" />
         </span>
         <div className="min-w-0 flex-1 text-start">
-          <h3 id="friday-card-heading" className="text-lg font-black text-foreground">
+          <h3
+            id="friday-card-heading"
+            className={`text-lg font-black ${onGlass ? "text-on-media" : "text-foreground"}`}
+          >
             {t(language, "friday.title")}
           </h3>
-          <p className="mt-1 max-w-[65ch] text-sm font-medium leading-6 text-muted-foreground">
+          <p
+            className={`mt-1 max-w-[65ch] text-sm font-medium leading-6 ${onGlass ? "text-on-media-muted" : "text-muted-foreground"}`}
+          >
             {t(language, "home.fridayCompactBody")}
           </p>
         </div>
@@ -398,9 +404,11 @@ export function FridayHomeCard({
     <HomeCard
       as="section"
       onGlass={onGlass}
+      padding="none"
       data-testid="home-friday-card"
       aria-labelledby="friday-card-heading"
-      className="overflow-hidden p-0"
+      elevation="raised"
+      className="overflow-hidden"
     >
       <div className="grid gap-5 p-5 sm:p-6 xl:grid-cols-[14rem_minmax(0,1fr)_19rem] xl:items-center">
         <div className="relative flex h-44 w-full items-center justify-center self-center overflow-hidden rounded-2xl border border-primary/20 bg-primary/10 text-primary sm:h-52 xl:h-48">
@@ -408,13 +416,22 @@ export function FridayHomeCard({
         </div>
 
         <div className="min-w-0 text-start">
-          <p className="text-xs font-black uppercase tracking-wide text-primary">
+          <p
+            className={`text-xs font-black uppercase tracking-wide ${onGlass ? "text-on-media-accent" : "text-primary"}`}
+          >
             {t(language, "home.fridayWindowLabel")}
           </p>
-          <h3 id="friday-card-heading" className="mt-1 text-xl font-black text-foreground md:text-2xl" dir="auto">
+          <h3
+            id="friday-card-heading"
+            className={`mt-1 text-xl font-black md:text-2xl ${onGlass ? "text-on-media" : "text-foreground"}`}
+            dir="auto"
+          >
             {t(language, "home.kahfMerit")}
           </h3>
-          <p className="mt-3 max-w-[62ch] text-sm font-medium leading-7 text-muted-foreground" dir="auto">
+          <p
+            className={`mt-3 max-w-[62ch] text-sm font-medium leading-7 ${onGlass ? "text-on-media-muted" : "text-muted-foreground"}`}
+            dir="auto"
+          >
             {t(language, "friday.kahfHadith")}
           </p>
           {onOpen && (
@@ -484,7 +501,7 @@ export function DailyEvidenceCard({
     <HomeCard
       as="section"
       onGlass={onGlass}
-      elevation="flat"
+      elevation="raised"
       aria-labelledby="home-evidence-heading"
       data-testid="home-daily-evidence"
       dir={direction}
@@ -532,7 +549,7 @@ export function DailyEvidenceCard({
 
       <footer
         className={`mt-auto flex flex-wrap items-center gap-x-2 gap-y-1 border-t pt-3 ${
-          onGlass ? "border-white/15" : "border-border/40"
+          onGlass ? "border-white/20" : "border-border/40"
         }`}
       >
         <span

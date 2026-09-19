@@ -122,7 +122,7 @@ export function PrayerMomentPanel({
             : "prayerMoment.statusUpcoming";
 
   return (
-    <HomeCard as="article" onGlass={onGlass} className="flex flex-col overflow-hidden">
+    <HomeCard as="article" onGlass={onGlass} padding="none" className="flex flex-col overflow-hidden">
       <div className={`flex flex-col ${fullWidth && virtue ? "md:grid md:grid-cols-2" : ""}`}>
         <section
           /* A floor, not a height: the scene is the ground for the name and
@@ -144,7 +144,7 @@ export function PrayerMomentPanel({
           {!onGlass && <PrayerSceneArt prayer={prayer} className="absolute inset-0 -z-10" />}
           {/* Fixed light-on-dark, because the scene is its own ground in every
           theme — the same rule the Home hero follows over its photograph. */}
-          <div className="flex h-full flex-col justify-between gap-4 p-5 text-white">
+          <div className="flex h-full flex-col justify-between gap-4 p-5 sm:p-6 text-white">
             <div className="flex flex-col gap-1 text-start">
               <div className="flex items-start justify-between">
                 <div>
@@ -206,7 +206,7 @@ export function PrayerMomentPanel({
         </section>
         {virtue && (
           <section
-            className={`flex min-h-[11rem] flex-col justify-center border-b p-5 text-start md:p-6 ${hairline}`}
+            className={`flex min-h-[11rem] flex-col justify-center border-b p-5 sm:p-6 text-start ${hairline}`}
             data-testid="prayer-moment-virtue"
           >
             <h3 className={`text-subtitle font-black ${accentText}`} dir="auto">

@@ -390,37 +390,33 @@
      and these are large cards over a photograph.
 
      `contain: paint` stops the browser re-sampling the backdrop for anything
-     outside each card's own box. */
+     outside each card's own box, except where child indicators (like prayer notches)
+     overflow intentionally. */
   backdrop-filter: blur(10px) saturate(125%);
-  contain: paint;
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.13),
     var(--ds-shadow-overlay);
 }
 
-/* The selected prayer joins the stable five-prayer strip to its expanded
-   detail without cutting or masking either interactive surface. The notch is
-   anchored to the selected card itself, so it follows responsive grid sizing
-   and RTL visual order without coordinate calculations. */
+.hero-glass:not(.overflow-visible) {
+  contain: paint;
+}
+
+/* The selected prayer indicates the active expanded prayer card below with
+   a clean downward arrow, anchored to the selected card itself so it follows
+   responsive grid sizing and RTL visual order without coordinate calculations. */
 .home-prayer-notch {
   position: absolute;
   left: 50%;
-  inset-block-end: calc(-1rem - 1px);
-  z-index: 0;
-  width: 2.75rem;
+  inset-block-end: -0.75rem;
+  z-index: 10;
+  width: 1.5rem;
   height: 1rem;
   transform: translateX(-50%);
-  clip-path: polygon(50% 0, 100% 100%, 0 100%);
-  border: 0 !important;
-  border-radius: 0;
-  box-shadow: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   pointer-events: none;
-}
-
-@media (min-width: 1024px) {
-  .home-prayer-notch {
-    inset-block-end: calc(-1.25rem - 1px);
-  }
 }
 
 /* Home is a photographic canvas. Components that normally consume theme

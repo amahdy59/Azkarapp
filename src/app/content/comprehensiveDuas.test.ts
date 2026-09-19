@@ -21,7 +21,7 @@ describe("comprehensive duas content", () => {
 
   it("provides bilingual benefits and sources without prescribing a Friday-specific count", () => {
     for (const dua of duas) {
-      expect(dua.repetitionCount).toBe(dua.id === "comprehensive-dua-42" ? 100 : 1);
+      expect(dua.repetitionCount).toBe(dua.id === "comprehensive-dua-42" ? 3 : 1);
       expect(dua.benefit.trim()).not.toBe("");
       expect(dua.benefitArabic).toMatch(/[\u0600-\u06ff]/);
       expect(dua.sourceReference.trim()).not.toBe("");

@@ -80,13 +80,7 @@ export function useCountingSurface({ onCount, reduceMotion = false }: UseCountin
     (event: PointerEvent<HTMLElement>) => {
       if (reduceMotion || isOwnControl(event.target)) return;
       setIsPressed(true);
-      const rect = event.currentTarget.getBoundingClientRect();
-      setRipples((current) => [
-        // Four concurrent ripples is already more than the eye resolves; a fast
-        // count would otherwise pile up unbounded nodes.
-        ...current.slice(-3),
-        { id: Date.now() + Math.random(), x: event.clientX - rect.left, y: event.clientY - rect.top },
-      ]);
+      // Screen tap ripple disabled: tactile press effect is cleaner and eliminates visual distraction over devotional text.
     },
     [reduceMotion],
   );

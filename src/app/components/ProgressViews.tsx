@@ -113,10 +113,10 @@ function MainDhikrGroupCard({
           : "min-h-[9.5rem] flex-col items-center justify-between px-3 py-4 text-center"
       } ${
         isCompleted
-          ? compact && onMedia
+          ? onMedia
             ? "border-primary/55 bg-primary/20 text-on-media shadow-raised shadow-[0_0_15px_rgba(201,155,76,0.15)] backdrop-blur-md"
             : "border-primary/55 bg-primary/10 text-foreground shadow-raised"
-          : compact && onMedia
+          : onMedia
             ? "border-white/20 bg-white/14 text-on-media shadow-raised hover:border-white/30 hover:bg-white/20 backdrop-blur-md"
             : "border-border bg-background text-foreground shadow-raised hover:border-primary/45 hover:bg-muted"
       }`}
@@ -131,10 +131,8 @@ function MainDhikrGroupCard({
           compact ? "size-14 sm:size-16 lg:size-13 xl:size-14" : "size-16"
         } ${
           isCompleted
-            ? compact
-              ? "border-success/60 bg-success/20 text-success"
-              : "border-success/60 bg-success/15 text-success"
-            : compact && onMedia
+            ? "border-success/60 bg-success/20 text-success"
+            : onMedia
               ? "border-white/20 bg-white/15 text-on-media-accent backdrop-blur-sm"
               : "border-border bg-muted text-primary"
         }`}
@@ -158,12 +156,12 @@ function MainDhikrGroupCard({
           /* 32px clear of the name. The column used to space every child
              equally, so this gap could not grow without shoving the
              after-prayer dots down with it. */
-          className={`mt-8 inline-flex items-center justify-center whitespace-nowrap rounded-full px-3 py-1 text-xs font-bold ${compact ? "lg:px-2 lg:text-micro xl:px-3" : ""} ${
+          className={`mt-8 inline-flex items-center justify-center whitespace-nowrap rounded-full px-3 py-1 text-xs font-bold ${
             isCompleted
               ? "bg-success text-success-foreground shadow-sm"
               : showRecommended
                 ? "bg-primary text-primary-foreground shadow-sm"
-                : compact && onMedia
+                : onMedia
                   ? "border border-white/15 bg-white/10 text-on-media-muted backdrop-blur-xs"
                   : "bg-muted text-muted-foreground"
           }`}
@@ -179,7 +177,7 @@ function MainDhikrGroupCard({
                 role="img"
                 aria-label={item.name}
                 className={`inline-flex h-1.5 w-4 rounded-full ${
-                  item.isCompleted ? "bg-success" : compact && onMedia ? "bg-white/25" : "bg-muted-foreground/45"
+                  item.isCompleted ? "bg-success" : onMedia ? "bg-white/30" : "bg-muted-foreground/45"
                 }`}
               />
             ))}

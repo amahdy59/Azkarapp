@@ -31,7 +31,7 @@ describe("useZikrCounter with comprehensive duas", () => {
       act(() => result.current.handleTap());
     }
 
-    expect(result.current.count).toBe(100);
+    expect(result.current.count).toBe(3);
     expect(onComplete).toHaveBeenCalledOnce();
     act(() => vi.advanceTimersByTime(COUNTER_ADVANCE_DELAY_MS));
     expect(onAdvance).toHaveBeenCalledWith(41);

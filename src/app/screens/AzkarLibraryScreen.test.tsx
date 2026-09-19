@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import type { CategoryId } from "../types";
+import { normalizeSearchText } from "../content/searchNormalization";
 import { AzkarLibraryScreen } from "./AzkarLibraryScreen";
 
 describe("AzkarLibraryScreen", () => {
@@ -113,8 +114,9 @@ describe("AzkarLibraryScreen", () => {
     expect(screen.getByTestId("library-filter-status")).toHaveAttribute("aria-live", "polite");
   });
 
-  it("escalates to full search only when the query is submitted", () => {
+  it("keeps search within the library page and allows opening matching zikr directly", () => {
     const onSearch = vi.fn();
+    const onZikr = vi.fn();
 
     render(
       <AzkarLibraryScreen
@@ -123,7 +125,7 @@ describe("AzkarLibraryScreen", () => {
         direction="ltr"
         routineModes={{ morning: "core", evening: "core", before_sleep: "core", after_prayer: "core" }}
         onCategory={() => undefined}
-        onZikr={() => undefined}
+        onZikr={onZikr}
         onSearch={onSearch}
         savedZikrIds={new Set()}
       />,
@@ -135,10 +137,25 @@ describe("AzkarLibraryScreen", () => {
     fireEvent.submit(input.closest("form")!);
     expect(onSearch).not.toHaveBeenCalled();
 
-    fireEvent.change(input, { target: { value: " sleep " } });
+    // Searching in-page shows results and submitting delegates to onSearch
+    fireEvent.change(input, { target: { value: "sleep" } });
     fireEvent.submit(input.closest("form")!);
-    expect(onSearch).toHaveBeenCalledOnce();
     expect(onSearch).toHaveBeenCalledWith("sleep");
+
+    // Matching collections and matching azkar are rendered in-page
+    expect(screen.getByRole("button", { name: /^Before Sleep Azkar/ })).toBeInTheDocument();
+    const matchingZikrCards = screen.getAllByTestId("matching-zikr-card");
+    expect(matchingZikrCards.length).toBeGreaterThan(0);
+
+    // Clicking a matching zikr directly calls onZikr
+    fireEvent.click(matchingZikrCards[0]);
+    expect(onZikr).toHaveBeenCalledOnce();
+
+    // Clear button resets the search
+    const clearBtn = screen.getAllByRole("button", { name: "Clear search" })[0];
+    fireEvent.click(clearBtn);
+    expect(input.value).toBe("");
+    expect(screen.getByRole("button", { name: /^Morning Azkar/ })).toBeInTheDocument();
   });
 
   it("starts an empty Arabic query in RTL and uses automatic direction after typing", () => {
@@ -164,5 +181,56 @@ describe("AzkarLibraryScreen", () => {
 
     fireEvent.change(input, { target: { value: "English" } });
     expect(input).toHaveAttribute("dir", "auto");
+  });
+
+  it("normalizes unvocalized Arabic search and finds vocalized azkar in-page", () => {
+    const onZikr = vi.fn();
+    render(
+      <AzkarLibraryScreen
+        completed={{} as Record<CategoryId, Set<string>>}
+        language="ar"
+        direction="rtl"
+        routineModes={{ morning: "core", evening: "core", before_sleep: "core", after_prayer: "core" }}
+        onCategory={() => undefined}
+        onZikr={onZikr}
+        onSearch={() => undefined}
+        savedZikrIds={new Set()}
+      />,
+    );
+
+    const input = screen.getByRole("textbox") as HTMLInputElement;
+    // Type without tashkeel
+    fireEvent.change(input, { target: { value: "حسبي الله" } });
+
+    const matchingZikrCards = screen.getAllByTestId("matching-zikr-card");
+    expect(matchingZikrCards.length).toBeGreaterThan(0);
+    expect(normalizeSearchText(matchingZikrCards[0].textContent!)).toContain("حسبي الله");
+
+    fireEvent.click(matchingZikrCards[0]);
+    expect(onZikr).toHaveBeenCalled();
+  });
+
+  it("shows empty state when no results match and restores on clear", () => {
+    render(
+      <AzkarLibraryScreen
+        completed={{} as Record<CategoryId, Set<string>>}
+        language="ar"
+        direction="rtl"
+        routineModes={{ morning: "core", evening: "core", before_sleep: "core", after_prayer: "core" }}
+        onCategory={() => undefined}
+        onZikr={() => undefined}
+        onSearch={() => undefined}
+        savedZikrIds={new Set()}
+      />,
+    );
+
+    const input = screen.getByRole("textbox") as HTMLInputElement;
+    fireEvent.change(input, { target: { value: "xyznonexistent" } });
+
+    expect(screen.getByRole("heading", { name: "لم يتم العثور على أذكار" })).toBeInTheDocument();
+    const clearActions = screen.getAllByRole("button", { name: "مسح البحث" });
+    expect(clearActions.length).toBeGreaterThan(0);
+    fireEvent.click(clearActions[0]);
+    expect(input.value).toBe("");
   });
 });

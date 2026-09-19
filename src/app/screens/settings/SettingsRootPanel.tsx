@@ -9,6 +9,7 @@ import {
   Info,
   MapPin,
   Moon,
+  Sparkles,
   User,
 } from "../../components/icons";
 import { t } from "../../i18n";
@@ -47,6 +48,7 @@ export function SettingsRootPanel({
   isGuest,
   isSyncing,
   syncError,
+  quietProgressEnabled,
   locationSettings,
   calendarType = "hijri",
   onCalendarTypeChange,
@@ -77,10 +79,11 @@ export function SettingsRootPanel({
 
   return (
     <div className="flex-1 overflow-y-auto pb-8">
+      {/* ── 1. Preferences: Appearance & Regional Locale ── */}
       <SettingsSection label={t(language, "settings.preferences")} variant="content">
         <div className="mb-3 flex items-center gap-3">
           <span
-            className="flex size-9 shrink-0 items-center justify-center rounded-xl"
+            className="flex size-10 shrink-0 items-center justify-center rounded-xl"
             style={{ background: iconBackground }}
             aria-hidden="true"
           >
@@ -104,7 +107,7 @@ export function SettingsRootPanel({
         <div className="p-4 border-b border-border/50">
           <div className="mb-3 flex items-center gap-3">
             <span
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+              className="flex size-10 shrink-0 items-center justify-center rounded-xl"
               style={{ backgroundColor: iconBackground }}
               aria-hidden="true"
             >
@@ -131,17 +134,11 @@ export function SettingsRootPanel({
           />
         </div>
 
-        {/* Calendar system sits beside Language, not under Accessibility where
-            it used to live. It is a locale preference, not an accessibility
-            aid, and Phase 09 calls for it in General. Same SegmentedControl as
-            Language above, which also gives it the radiogroup semantics the
-            hand-rolled radio items lacked. Presentation move only — the
-            persisted calendarType field and its normalization are unchanged. */}
         {onCalendarTypeChange && (
-          <div className="border-b border-border/50 p-4">
+          <div className="p-4">
             <div className="mb-3 flex items-center gap-3">
               <span
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+                className="flex size-10 shrink-0 items-center justify-center rounded-xl"
                 style={{ backgroundColor: iconBackground }}
                 aria-hidden="true"
               >
@@ -171,46 +168,35 @@ export function SettingsRootPanel({
             />
           </div>
         )}
+      </SettingsSection>
 
-        {/* One row, one destination. "Prayer Times & Location" and
-            "Notifications" were two labels with two different values that both
-            opened this same panel — the ambiguous-chevron problem in
-            AGENTS.md §7. The panel owns both concerns, so the row names both.
-            The value shows the configured city, or an explicit unset state:
-            defaulting the label to "Cairo" presented a fallback as though the
-            user had chosen it. */}
-
+      {/* ── 2. Devotional Routine: Prayer Times & Wird Progress ── */}
+      <SettingsSection label={t(language, "settings.routineAndReminders")}>
         <SettingsRowItem
           iconBg={iconBackground}
           icon={<MapPin size={20} className="text-primary" />}
           label={t(language, "settings.prayerTimesAndReminders")}
           right={<RowValue value={locationSettings?.cityName || t(language, "settings.locationNotSet")} />}
           onPress={() => onNav("notifications")}
-          hasDivider={false}
+          hasDivider={true}
           {...itemProps("notifications")}
         />
-      </SettingsSection>
-
-      <SettingsSection label={t(language, "settings.contentSection")}>
         <SettingsRowItem
           iconBg={iconBackground}
-          icon={<Download size={20} className="text-primary" />}
-          label={t(language, "settings.offlineAccess")}
-          right={<RowValue value={t(language, "settings.included")} />}
-          onPress={() => onNav("downloads")}
-          {...itemProps("downloads")}
-        />
-        <SettingsRowItem
-          iconBg={iconBackground}
-          icon={<BookOpen size={20} className="text-primary" />}
-          label={t(language, "settings.contentSources")}
-          right={<RowChevron />}
-          onPress={() => onNav("sources")}
+          icon={<Sparkles size={20} className="text-primary" />}
+          label={t(language, "settings.myProgress")}
+          right={
+            <RowValue
+              value={quietProgressEnabled ? t(language, "settings.gardenHidden") : t(language, "settings.gardenActive")}
+            />
+          }
+          onPress={() => onNav("progress")}
           hasDivider={false}
-          {...itemProps("sources")}
+          {...itemProps("progress")}
         />
       </SettingsSection>
 
+      {/* ── 3. Reading & Accessibility: Typography, Legibility & Offline Packs ── */}
       <SettingsSection label={t(language, "settings.accessibilitySection")}>
         <SettingsRowItem
           iconBg={iconBackground}
@@ -218,11 +204,21 @@ export function SettingsRootPanel({
           label={t(language, "settings.accessibility")}
           right={<RowChevron />}
           onPress={() => onNav("accessibility")}
-          hasDivider={false}
+          hasDivider={true}
           {...itemProps("accessibility")}
+        />
+        <SettingsRowItem
+          iconBg={iconBackground}
+          icon={<Download size={20} className="text-primary" />}
+          label={t(language, "settings.offlineAccess")}
+          right={<RowValue value={t(language, "settings.included")} />}
+          onPress={() => onNav("downloads")}
+          hasDivider={false}
+          {...itemProps("downloads")}
         />
       </SettingsSection>
 
+      {/* ── 4. Account & Synchronization ── */}
       <SettingsSection label={t(language, "settings.accountSection")}>
         <SettingsRowItem
           iconBg={iconBackground}
@@ -247,13 +243,24 @@ export function SettingsRootPanel({
         />
       </SettingsSection>
 
+      {/* ── 5. About & Support ── */}
       <SettingsSection label={t(language, "settings.supportSection")}>
+        <SettingsRowItem
+          iconBg={iconBackground}
+          icon={<BookOpen size={20} className="text-primary" />}
+          label={t(language, "settings.contentSources")}
+          right={<RowChevron />}
+          onPress={() => onNav("sources")}
+          hasDivider={true}
+          {...itemProps("sources")}
+        />
         <SettingsRowItem
           iconBg={iconBackground}
           icon={<HelpCircle size={20} className="text-primary" />}
           label={t(language, "settings.helpFaq")}
           right={<RowChevron />}
           onPress={() => onNav("help")}
+          hasDivider={true}
           {...itemProps("help")}
         />
         <SettingsRowItem
@@ -262,6 +269,7 @@ export function SettingsRootPanel({
           label={t(language, "settings.privacyTerms")}
           right={<RowChevron />}
           onPress={() => onNav("legal")}
+          hasDivider={true}
           {...itemProps("legal")}
         />
         <SettingsRowItem

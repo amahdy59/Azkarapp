@@ -220,8 +220,8 @@ describe("azkar content totals", () => {
     expect(ALL_AZKAR.some((zikr) => zikr.id === "ap-ref-11")).toBe(false);
     for (const id of ["m-hm-83", "e-hm-83", "da-ref-5"]) {
       const zikr = ALL_AZKAR.find((item) => item.id === id);
-      expect(zikr?.repetitionCount, id).toBe(1);
-      expect(zikr?.sourceReference, id).toBe("Qur’an 9:129.");
+      expect(zikr?.repetitionCount, id).toBe(7);
+      expect(zikr?.sourceReference, id).toContain("Abu Dawud 5081");
     }
 
     const eclipse = ALL_AZKAR.find((zikr) => zikr.id === "ne-ref-6");
