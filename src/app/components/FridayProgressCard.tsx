@@ -53,9 +53,9 @@ export function FridayProgressCard({
     <section
       data-testid="progress-friday"
       dir={direction}
-      className="mt-4 w-full overflow-hidden rounded-3xl border border-border bg-card text-foreground shadow-raised"
+      className="mt-4 w-full overflow-hidden rounded-3xl border border-border/60 bg-card/90 text-foreground shadow-raised backdrop-blur-md"
     >
-      <div className="border-b border-primary/40 bg-gradient-to-b from-muted/45 to-transparent px-4 py-4 text-start sm:px-6">
+      <div className="border-b border-border/60 bg-muted/40 px-4 py-4 text-start sm:px-6">
         <h2 className="text-lg font-black leading-tight text-foreground" dir="auto">
           {t(language, "friday.weeklyProgress")}
         </h2>

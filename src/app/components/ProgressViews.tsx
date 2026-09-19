@@ -19,7 +19,6 @@ import {
   CheckCircle2,
   Calendar,
   Sun,
-  Moon,
   Sunrise,
   Sunset,
   MoonStar,
@@ -543,7 +542,7 @@ export function ProgressWeekView({
     [completionIndex, referenceDate, language],
   );
 
-  const mostMissedName = getCategoryName(weekStats.mostMissedRoutine, language);
+  const bestRoutineName = getCategoryName(weekStats.bestRoutine, language);
 
   return (
     <div
@@ -552,11 +551,13 @@ export function ProgressWeekView({
     >
       {/* Top 3 Stat Cards */}
       <div className="grid grid-cols-3 gap-3">
-        {/* Most Missed Routine Card */}
+        {/* Most Consistent Routine Card */}
         <div className="flex flex-col items-center justify-center p-3.5 sm:p-4 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
-          <Moon size={20} className="text-primary mb-1" />
-          <span className="text-xs font-bold text-muted-foreground mb-0.5">{t(language, "progress.mostMissed")}</span>
-          <span className="text-sm font-black text-foreground truncate max-w-full">{mostMissedName}</span>
+          <Sun size={20} className="text-primary mb-1" />
+          <span className="text-xs font-bold text-muted-foreground mb-0.5">
+            {t(language, "progress.mostConsistentRoutine")}
+          </span>
+          <span className="text-sm font-black text-foreground truncate max-w-full">{bestRoutineName}</span>
         </div>
 
         {/* Best Streak Card */}
@@ -928,7 +929,10 @@ export function ProgressMonthView({
                     status: isPalm
                       ? t(language, "progress.monthDayComplete")
                       : count > 0
-                        ? t(language, "progress.monthDayPartial", { count: formatNumerals(count, language) })
+                        ? t(language, "progress.monthDayPartial", {
+                            count: formatNumerals(count, language),
+                            total: formatNumerals(3, language),
+                          })
                         : t(language, "progress.monthDayUnstarted"),
                   })}
                   aria-pressed={isSelected}
@@ -947,9 +951,7 @@ export function ProgressMonthView({
                     {isPalm ? (
                       <Check size={12} strokeWidth={3} className="text-success" />
                     ) : count > 0 ? (
-                      <span className="text-[0.5625rem] font-extrabold text-info">
-                        {formatRatio(count, 4, language)}
-                      </span>
+                      <bdi className="text-[0.5625rem] font-extrabold text-info">{formatRatio(count, 3, language)}</bdi>
                     ) : (
                       <span className="text-micro text-muted-foreground/40">-</span>
                     )}

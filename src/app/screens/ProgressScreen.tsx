@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
-import { Header } from "../components/LayoutShells";
+import { Header, IconButton } from "../components/LayoutShells";
 import { TodayRoutineGarden } from "../components/RoutineGarden";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { t } from "../i18n";
@@ -28,7 +28,7 @@ import {
 } from "../oasis/oasisModel";
 import { DropletMark, SeedlingMark, BranchMark, PalmTreeMark, OasisMark } from "../components/GardenMarks";
 import { DailyCompanionsCard } from "../components/DailyCompanionsCard";
-import { Sparkles } from "../components/icons";
+import { Share2, Sparkles, Zap } from "../components/icons";
 import type {
   AppLanguage,
   CategoryId,
@@ -154,6 +154,14 @@ export function ProgressScreen({
 
   const fridaySummary = getFridaySummary();
 
+  const activeGardenSummary = useMemo(
+    () =>
+      activeTab === "day" && offset === 0
+        ? getGardenSummary(dailyCompletions, now, progressDayStartHour, judgeDay)
+        : getGardenSummary(dailyCompletions, displayDate, progressDayStartHour, judgeDay),
+    [activeTab, offset, dailyCompletions, now, progressDayStartHour, judgeDay, displayDate],
+  );
+
   // Current day key for Oasis evaluation
   const currentDayKey = getProgressDayKey(displayDate, progressDayStartHour);
   const oasisRoutines = deriveOasisRoutinesFromCompletions(dailyCompletions, currentDayKey);
@@ -247,7 +255,28 @@ export function ProgressScreen({
       screenName={t(language, "common.progress")}
     >
       <div className="relative z-10 mx-auto w-full max-w-[80rem] flex flex-col items-center">
-        <Header title={t(language, "common.progress")} language={language} />
+        <Header
+          title={t(language, "common.progress")}
+          language={language}
+          right={
+            onOpenShareModal ? (
+              <IconButton onClick={onOpenShareModal} label={t(language, "progress.shareProgressCard")}>
+                <Share2 size={20} className="text-foreground" />
+              </IconButton>
+            ) : undefined
+          }
+        />
+
+        {/* Serene Prophetic Touchstone on Constancy */}
+        <div className="w-full mb-4 flex items-center justify-center gap-2 rounded-2xl border border-primary/20 bg-primary/5 px-4 py-2.5 text-center shadow-xs">
+          <Sparkles className="size-4 shrink-0 text-primary" aria-hidden="true" />
+          <p className="text-xs font-bold text-foreground leading-relaxed" dir="auto">
+            <span>{t(language, "progress.constancyHadith")}</span>
+            <span className="ms-1.5 text-micro font-semibold text-muted-foreground">
+              — {t(language, "progress.constancyHadithSource")}
+            </span>
+          </p>
+        </div>
 
         <div className="w-full mb-4">
           <TabList
@@ -318,11 +347,44 @@ export function ProgressScreen({
           </div>
         </div>
 
+        {/* Enduring Palms and Preserved Streak Summary in Day View */}
+        {activeTab === "day" && (
+          <div data-testid="progress-summary-strip" className="w-full mb-4 grid grid-cols-2 gap-3">
+            <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card/85 p-3.5 shadow-sm backdrop-blur-md">
+              <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
+                <Zap className="size-5" />
+              </div>
+              <div className="min-w-0">
+                <span className="block text-micro font-bold text-muted-foreground truncate">
+                  {t(language, "progress.activeStreakSummary")}
+                </span>
+                <span className="block text-sm font-black text-foreground">
+                  {formatNumerals(activeGardenSummary.currentUsageStreak ?? 0, language)} {t(language, "progress.days")}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card/85 p-3.5 shadow-sm backdrop-blur-md">
+              <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
+                <PalmTreeMark size={22} className="text-primary" />
+              </div>
+              <div className="min-w-0">
+                <span className="block text-micro font-bold text-muted-foreground truncate">
+                  {t(language, "progress.lifetimePalmsSummary")}
+                </span>
+                <span className="block text-sm font-black text-foreground">
+                  {formatNumerals(activeGardenSummary.lifetimePalms, language)} {t(language, "progress.palmsUnit")}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Oasis Stage Hero & 7-Day Rhythm (Day view) */}
         {activeTab === "day" && (
           <section
             data-testid="oasis-stage-card"
-            className="w-full mb-5 overflow-hidden rounded-3xl border border-border bg-card text-foreground shadow-raised transition-all"
+            className="w-full mb-5 overflow-hidden rounded-3xl border border-border/60 bg-card/90 text-foreground shadow-raised backdrop-blur-md transition-all"
             dir={isArabic ? "rtl" : "ltr"}
             aria-labelledby="oasis-stage-heading"
           >
@@ -385,30 +447,35 @@ export function ProgressScreen({
             </div>
 
             {/* 7-Day Rhythm Strip */}
-            <div className="bg-card px-4 py-3 sm:px-6">
+            <div className="bg-card/90 px-4 py-3 sm:px-6">
               <span className="text-micro font-bold uppercase tracking-wider text-muted-foreground block mb-2">
                 {t(language, "progress.sevenDayRhythm")}
               </span>
               <div className="grid grid-cols-7 gap-1.5 sm:gap-2 text-center" role="list">
-                {weekDaysStatus.map((day) => (
-                  <div
-                    key={day.dayKey}
-                    role="listitem"
-                    className={`flex flex-col items-center justify-center rounded-2xl p-1.5 sm:p-2 transition-all ${
-                      day.isToday
-                        ? "border-2 border-primary bg-primary/10 shadow-sm"
-                        : "border border-border/40 bg-muted/20 hover:bg-muted/40"
-                    }`}
-                  >
-                    <span className="text-micro font-bold text-muted-foreground">{day.dayLabel}</span>
-                    <div className="my-1 flex size-8 sm:size-9 items-center justify-center">
-                      {renderTierMark(day.level, 24)}
+                {weekDaysStatus.map((day) => {
+                  const levelShortName = isArabic
+                    ? OASIS_LEVEL_DETAILS[day.level].nameArabic.split(" ")[0]
+                    : OASIS_LEVEL_DETAILS[day.level].name.split(" ")[0];
+                  return (
+                    <div
+                      key={day.dayKey}
+                      role="listitem"
+                      className={`flex flex-col items-center justify-center rounded-2xl p-1.5 sm:p-2 transition-all ${
+                        day.isToday
+                          ? "border-2 border-primary bg-primary/10 shadow-sm"
+                          : "border border-border/40 bg-muted/20 hover:bg-muted/40"
+                      }`}
+                    >
+                      <span className="text-micro font-bold text-muted-foreground">{day.dayLabel}</span>
+                      <div className="my-1 flex size-8 sm:size-9 items-center justify-center">
+                        {renderTierMark(day.level, 24)}
+                      </div>
+                      <span className="text-micro font-bold text-foreground truncate max-w-full">
+                        {day.level > 0 ? levelShortName : "—"}
+                      </span>
                     </div>
-                    <span className="text-micro font-black text-foreground">
-                      {formatNumerals(day.level, language)}★
-                    </span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </section>
@@ -417,11 +484,7 @@ export function ProgressScreen({
         {/* Wird Routines */}
         <div className="w-full mb-5">
           <TodayRoutineGarden
-            summary={
-              activeTab === "day" && offset === 0
-                ? getGardenSummary(dailyCompletions, now, progressDayStartHour, judgeDay)
-                : getGardenSummary(dailyCompletions, displayDate, progressDayStartHour, judgeDay)
-            }
+            summary={activeGardenSummary}
             language={language}
             hideTabs={true}
             calendarType={calendarType}
@@ -452,9 +515,9 @@ export function ProgressScreen({
         <section
           data-testid="progress-after-prayer"
           dir={direction}
-          className="w-full mb-5 overflow-hidden rounded-3xl border border-border bg-card text-foreground shadow-raised"
+          className="w-full mb-5 overflow-hidden rounded-3xl border border-border/60 bg-card/90 text-foreground shadow-raised backdrop-blur-md"
         >
-          <div className="border-b border-primary/40 bg-gradient-to-b from-muted/45 to-transparent px-4 py-4 text-start sm:px-6">
+          <div className="border-b border-border/60 bg-muted/40 px-4 py-4 text-start sm:px-6">
             <h2 className="text-lg font-black leading-tight text-foreground" dir="auto">
               {t(language, "progress.postPrayerAzkar")}
             </h2>

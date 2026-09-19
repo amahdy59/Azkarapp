@@ -34,8 +34,23 @@ describe("ProgressScreen", () => {
     expect(screen.getByText("مرحلة الواحة الروحية")).toBeInTheDocument();
     expect(screen.getByRole("progressbar")).toBeInTheDocument();
 
-    // 7-Day Rhythm Strip
+    // Prophetic Constancy Hadith Touchstone
+    expect(screen.getByText(/أَحَبُّ الأَعْمَالِ إِلَى اللَّهِ/)).toBeInTheDocument();
+
+    // Summary Strip in Day view
+    expect(screen.getByTestId("progress-summary-strip")).toBeInTheDocument();
+    expect(screen.getByText("سلسلة الحفظ")).toBeInTheDocument();
+    expect(screen.getByText("النخيل المثمر")).toBeInTheDocument();
+
+    // Share action in Header
+    const shareBtn = screen.getByRole("button", { name: "مشاركة بطاقة التقدم" });
+    expect(shareBtn).toBeInTheDocument();
+    fireEvent.click(shareBtn);
+    expect(onOpenShareModal).toHaveBeenCalledTimes(1);
+
+    // 7-Day Rhythm Strip without star glyphs
     expect(screen.getByText("إيقاع الأيام السبعة")).toBeInTheDocument();
+    expect(screen.queryByText(/★/)).not.toBeInTheDocument();
 
     // Daily Companions Card
     expect(screen.getByTestId("daily-companions-card")).toBeInTheDocument();

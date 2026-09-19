@@ -3,6 +3,7 @@ import { AppLanguage } from "../types";
 import { getPeriodRange } from "../calendarPeriods";
 import { CalendarType } from "../calendarPeriods";
 import { getFridaySummary } from "../fridaySummary";
+import { formatNumerals, formatRatio } from "../formatting";
 import { t } from "../i18n";
 import { CheckCircle2, BookOpen } from "./icons";
 
@@ -64,7 +65,7 @@ export function FridayProgressStats({
     >
       <div className="border-b border-primary/40 bg-gradient-to-b from-muted/45 to-transparent px-4 py-4 text-start sm:px-6">
         <h2 className="text-lg font-black leading-tight text-foreground" dir="auto">
-          {t(language, "friday.progressTitle", { count: stats.fridaysCount })}
+          {t(language, "friday.progressTitle", { count: formatNumerals(stats.fridaysCount, language) })}
         </h2>
       </div>
 
@@ -75,9 +76,9 @@ export function FridayProgressStats({
               <CheckCircle2 size={16} className="text-primary" />
               <span>{t(language, "friday.practicesDone")}</span>
             </div>
-            <span>
-              {stats.practicesDoneCount} / {stats.practicesTotalCount}
-            </span>
+            <bdi className="text-sm font-bold text-foreground">
+              {formatRatio(stats.practicesDoneCount, stats.practicesTotalCount, language)}
+            </bdi>
           </div>
           <div className="h-2 w-full rounded-full bg-black/5 dark:bg-white/10 overflow-hidden">
             <div
@@ -95,9 +96,9 @@ export function FridayProgressStats({
               <BookOpen size={16} className="text-success" />
               <span>{t(language, "friday.kahfOpened")}</span>
             </div>
-            <span>
-              {stats.kahfOpenedCount} / {stats.fridaysCount}
-            </span>
+            <bdi className="text-sm font-bold text-foreground">
+              {formatRatio(stats.kahfOpenedCount, stats.fridaysCount, language)}
+            </bdi>
           </div>
           <div className="h-2 w-full rounded-full bg-black/5 dark:bg-white/10 overflow-hidden">
             <div
@@ -112,7 +113,7 @@ export function FridayProgressStats({
         <div className="flex flex-col gap-2">
           <div className="flex justify-between items-center text-sm font-bold">
             <span>{t(language, "friday.salawatCount")}</span>
-            <span className="text-primary">{stats.salawatCount}</span>
+            <bdi className="text-sm font-bold text-primary">{formatNumerals(stats.salawatCount, language)}</bdi>
           </div>
         </div>
       </div>

@@ -1,15 +1,15 @@
 {
-  "release": "2026-09-19d",
+  "release": "2026-09-19e",
   "ar": [
-    "توحيد مظهر وتأثيرات البطاقات على الشاشة الرئيسية بمستويات زجاج مثلج متناسقة وتباين عالي يسهل القراءة على الحواسيب والهواتف.",
-    "البحث والتصفية الفورية للأذكار والتصنيفات مباشرة داخل صفحة المكتبة دون الحاجة للانتقال لصفحة أخرى.",
-    "إعادة تنظيم قائمة الإعدادات في أقسام واضحة ومتدرجة تيسر الوصول السريع لخيارات القراءة والصوت والسمات.",
-    "تصحيح وتدقيق أعداد تكرار الأذكار المأثورة ومصادرها العربية وفق السنة النبوية المطهرة."
+    "استبدال إحصاء الأوراد الفائتة بإبراز أكثر الأوراد حفظاً ومواظبة تعزيزاً للتحفيز الروحي والسكينة.",
+    "إضافة زر مباشر لمشاركة بطاقة التقدم وإبراز ملخص النخيل المثمر وسلسلة الحفظ.",
+    "تضمين هدي نبوي كريم عن المداومة على العمل الصالح وتوحيد مظهر الزجاج المثلج للبطاقات.",
+    "إصلاح محاذاة الأرقام والنسب باللغة العربية وتدقيق نسب إتمام الأوراد في التقويم الشهري."
   ],
   "en": [
-    "Unified Home screen cards with consistent frosted glass styling, smooth borders, and high-contrast accessible typography across mobile and desktop.",
-    "Instant in-page search and category filtering directly within the Azkar Library without navigating away.",
-    "Reorganized Settings into intuitive, accessible sections for quick access to reading preferences, audio, and themes.",
-    "Corrected dhikr repetition counts and Arabic attribution references in accordance with authentic Prophetic Sunnah."
+    "Replaced missed routine callouts with encouraging most consistent routine insights in weekly progress.",
+    "Added direct action to share devotional progress cards along with daily enduring palms and streak summaries.",
+    "Added an uplifting Prophetic reminder on constancy and unified frosted glass styling across progress cards.",
+    "Fixed Arabic bidi numeral ordering and refined routine completion ratios in monthly calendar views."
   ]
 }

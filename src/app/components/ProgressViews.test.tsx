@@ -118,6 +118,8 @@ describe("ProgressViews components", () => {
 
     expect(screen.getByText("التزامك هذا الأسبوع")).toBeInTheDocument();
     expect(screen.getByText("ملخص الأوراد هذا الأسبوع")).toBeInTheDocument();
+    expect(screen.getByText("أكثر الأوراد حفظاً")).toBeInTheDocument();
+    expect(screen.queryByText("أكثر ورد فاتك")).not.toBeInTheDocument();
   });
 
   it("renders ProgressMonthView with calendar matrix in Arabic", () => {

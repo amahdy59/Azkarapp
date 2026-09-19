@@ -3,6 +3,7 @@ import { AppLanguage, PrayerName, PrayerTrackingRecord } from "../types";
 import { getPeriodRange } from "../calendarPeriods";
 import { CalendarType } from "../calendarPeriods";
 import { PRAYER_ORDER } from "./PrayerTrackerCards";
+import { formatRatio } from "../formatting";
 import { t } from "../i18n";
 
 export function PrayerTrackerStats({
@@ -63,11 +64,9 @@ export function PrayerTrackerStats({
 
             <div className="grid grid-cols-2 gap-3 mt-1">
               <div className="flex flex-col gap-1">
-                <div className="flex justify-between text-xs font-medium text-muted-foreground">
+                <div className="flex justify-between items-center text-xs font-medium text-muted-foreground">
                   <span>{t(language, "prayerTracking.mosque")}</span>
-                  <span>
-                    {mosque} / {stats.daysInPeriod}
-                  </span>
+                  <bdi className="font-bold text-foreground">{formatRatio(mosque, stats.daysInPeriod, language)}</bdi>
                 </div>
                 <div className="h-1.5 w-full rounded-full bg-black/5 dark:bg-white/10 overflow-hidden">
                   <div
@@ -78,11 +77,9 @@ export function PrayerTrackerStats({
               </div>
 
               <div className="flex flex-col gap-1">
-                <div className="flex justify-between text-xs font-medium text-muted-foreground">
+                <div className="flex justify-between items-center text-xs font-medium text-muted-foreground">
                   <span>{t(language, "prayerTracking.adhkar")}</span>
-                  <span>
-                    {adhkar} / {stats.daysInPeriod}
-                  </span>
+                  <bdi className="font-bold text-foreground">{formatRatio(adhkar, stats.daysInPeriod, language)}</bdi>
                 </div>
                 <div className="h-1.5 w-full rounded-full bg-black/5 dark:bg-white/10 overflow-hidden">
                   <div

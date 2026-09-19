@@ -33,9 +33,9 @@ export function DailyCompanionsCard({
       data-testid="daily-companions-card"
       dir={isArabic ? "rtl" : "ltr"}
       aria-labelledby="daily-companions-heading"
-      className={`overflow-hidden rounded-3xl border border-border bg-card text-foreground shadow-raised ${className}`}
+      className={`overflow-hidden rounded-3xl border border-border/60 bg-card/90 text-foreground shadow-raised backdrop-blur-md ${className}`}
     >
-      <div className="border-b border-border/70 bg-muted/40 px-4 py-3.5 sm:px-6">
+      <div className="border-b border-border/60 bg-muted/40 px-4 py-3.5 sm:px-6">
         <h2 id="daily-companions-heading" className="text-subtitle font-black leading-tight text-foreground" dir="auto">
           {t(language, "home.dailyCompanions")}
         </h2>
