@@ -69,7 +69,7 @@ export function ReadingScreenChrome({
          because it plays the same "always-dark brand band" role. */
       <div
         data-testid={`${testId}-desktop-hero`}
-        className="relative mx-4 mt-3 flex shrink-0 flex-col items-center gap-2 overflow-hidden rounded-3xl px-6 py-3 text-center"
+        className="relative w-full flex shrink-0 flex-col items-center gap-2 overflow-hidden rounded-b-3xl px-6 pb-4 pt-3 text-center"
         style={{
           background:
             "radial-gradient(120% 140% at 50% 10%, rgba(232,180,32,0.18), transparent 60%), var(--brand-hero)",

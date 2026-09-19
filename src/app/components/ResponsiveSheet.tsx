@@ -2,6 +2,9 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { useEffect, type ReactNode } from "react";
 import { Drawer, DrawerContent, DrawerTitle } from "./ui/drawer";
 import { useLayoutMode } from "../hooks/useLayoutMode";
+import { X } from "./icons";
+import { t } from "../i18n";
+import type { AppLanguage } from "../types";
 
 /**
  * Returns focus to whatever was focused before the surface opened.
@@ -30,6 +33,7 @@ interface ModalProps {
   /** Required accessible name. Rendered visually hidden — content supplies its own visible heading. */
   title: string;
   direction: "ltr" | "rtl";
+  language?: AppLanguage;
   children: ReactNode;
   testId?: string;
   describedById?: string;
@@ -45,6 +49,10 @@ interface ModalProps {
    * for class candidates, and a bare one here compiles a rule nothing uses.
    */
   overlayClassName?: string;
+  /** Enables frosted glassmorphism matching the Home screen and translucent surfaces. */
+  onGlass?: boolean;
+  /** Whether to show a close button in the top corner. Defaults to true. */
+  showCloseButton?: boolean;
 }
 
 /**
@@ -58,14 +66,18 @@ export function Modal({
   onClose,
   title,
   direction,
+  language,
   children,
   testId,
   describedById,
   maxWidthClassName = "max-w-[var(--content-reading)]",
   className = "",
   overlayClassName,
+  onGlass = false,
+  showCloseButton = true,
 }: ModalProps) {
   useRestoreFocusOnClose(open);
+  const lang: AppLanguage = language ?? (direction === "rtl" ? "ar" : "en");
 
   return (
     <DialogPrimitive.Root
@@ -92,9 +104,26 @@ export function Modal({
           // treats Escape as "leave the reader", so dismissing a dialog would
           // exit the reading session underneath it.
           onEscapeKeyDown={(event) => event.stopPropagation()}
-          className={`fixed left-1/2 top-1/2 z-[100] flex w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col ${maxWidthClassName} max-h-[85vh] overflow-hidden rounded-3xl border border-border/60 bg-card shadow-overlay outline-none animate-in fade-in-0 zoom-in-95 duration-standard ${className}`.trim()}
+          className={`fixed left-1/2 top-1/2 z-[100] flex w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col ${maxWidthClassName} max-h-[85vh] overflow-hidden rounded-3xl outline-none animate-in fade-in-0 zoom-in-95 duration-standard ${
+            onGlass ? "hero-glass text-white" : "border border-border/60 bg-card shadow-overlay"
+          } ${className}`.trim()}
         >
           <DialogPrimitive.Title className="sr-only">{title}</DialogPrimitive.Title>
+          {showCloseButton && (
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label={t(lang, "common.close")}
+              data-testid="modal-close-button"
+              className={`absolute top-3 end-3 z-30 flex size-10 min-h-[44px] min-w-[44px] items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                onGlass
+                  ? "text-white/80 hover:bg-white/15 hover:text-white"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              }`}
+            >
+              <X size={20} aria-hidden="true" />
+            </button>
+          )}
           {children}
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
@@ -187,16 +216,20 @@ export function ResponsiveSheet({
   onClose,
   title,
   direction,
+  language,
   children,
   testId,
   describedById,
   maxWidthClassName,
   overlayClassName,
+  onGlass = false,
+  showCloseButton = false,
   dialogClassName = "",
   drawerClassName = "",
 }: ResponsiveSheetProps) {
   const layoutMode = useLayoutMode();
   const isCompact = layoutMode === "compact";
+  const lang: AppLanguage = language ?? (direction === "rtl" ? "ar" : "en");
   // Modal runs this itself; only the drawer branch needs it here.
   useRestoreFocusOnClose(isCompact && open);
 
@@ -219,10 +252,13 @@ export function ResponsiveSheet({
         onClose={onClose}
         title={title}
         direction={direction}
+        language={lang}
         testId={testId}
         describedById={describedById}
         maxWidthClassName={maxWidthClassName}
         overlayClassName={overlayClassName}
+        onGlass={onGlass}
+        showCloseButton={showCloseButton}
         className={dialogClassName}
       >
         {children}
@@ -242,9 +278,26 @@ export function ResponsiveSheet({
         data-prevent-count="true"
         aria-describedby={describedById}
         dir={direction}
-        className={`fixed inset-x-0 bottom-0 z-[100] mx-auto flex w-full max-w-lg flex-col rounded-t-3xl border-t border-border/40 bg-background shadow-overlay outline-none focus-visible:outline-none max-h-[88vh] pb-safe ${drawerClassName}`.trim()}
+        className={`fixed inset-x-0 bottom-0 z-[100] mx-auto flex w-full max-w-lg flex-col rounded-t-3xl outline-none focus-visible:outline-none max-h-[88vh] pb-safe ${
+          onGlass ? "hero-glass text-white" : "border-t border-border/40 bg-background shadow-overlay"
+        } ${drawerClassName}`.trim()}
       >
         <DrawerTitle className="sr-only">{title}</DrawerTitle>
+        {showCloseButton && (
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label={t(lang, "common.close")}
+            data-testid="modal-close-button"
+            className={`absolute top-3 end-3 z-30 flex size-10 min-h-[44px] min-w-[44px] items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+              onGlass
+                ? "text-white/80 hover:bg-white/15 hover:text-white"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+            }`}
+          >
+            <X size={20} aria-hidden="true" />
+          </button>
+        )}
         {children}
       </DrawerContent>
     </Drawer>

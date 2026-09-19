@@ -180,7 +180,7 @@ test("desktop and tablet place navigation at the card sides and shortcuts below 
     await expect(sideNavigation.getByRole("button", { name: "Next", exact: true })).toBeVisible();
     await expect(card.getByTestId("reader-counter-stack").getByTestId("reader-keyboard-shortcuts")).toBeVisible();
     await expect(shortcutGuide).toHaveAccessibleName("Keyboard shortcuts");
-    await expect(counter).toHaveAccessibleName(/Click anywhere or press Space to count/);
+    await expect(counter).toHaveAccessibleName(/Click the dhikr, counter, or press Space to count/);
 
     const zikrText = card.getByTestId("zikr-text").first();
     const [textBox, navigationBox, counterBox, guideBox] = await Promise.all([
@@ -374,9 +374,13 @@ test("the full reader canvas counts taps while controls and the reference sheet 
   await sheet.getByRole("button", { name: "Close benefit", exact: true }).click();
   await expect(counterSurface).toHaveAttribute("aria-label", /0 \/ 1$/);
 
-  // Chrome outside the reading text still counts: tap the screen's own margin.
-  await armCompletionCueRecorder(page);
+  // Chrome outside the reading card does not count: tap the screen's own margin.
   await page.getByTestId("reader-screen").click({ position: { x: 2, y: 2 } });
+  await expect(counterSurface).toHaveAttribute("aria-label", /0 \/ 1$/);
+
+  // Tapping within the reading card counts.
+  await armCompletionCueRecorder(page);
+  await page.getByTestId("reader-card").click();
   await expectCompletionCueSeen(page);
 });
 

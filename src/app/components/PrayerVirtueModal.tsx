@@ -18,11 +18,13 @@ export function PrayerVirtueModal({
   language,
   direction,
   onClose,
+  onGlass = false,
 }: {
   prayer: PrayerName | null;
   language: AppLanguage;
   direction: "ltr" | "rtl";
   onClose: () => void;
+  onGlass?: boolean;
 }) {
   if (!prayer) return null;
   const virtues = getPrayerVirtues(prayer);
@@ -38,11 +40,18 @@ export function PrayerVirtueModal({
       direction={direction}
       testId="prayer-virtue-modal"
       maxWidthClassName="max-w-[32rem]"
+      onGlass={onGlass}
     >
       <div className="flex min-h-0 flex-col">
-        <header className="shrink-0 border-b border-border/50 bg-gradient-to-b from-primary/12 to-transparent px-5 py-4 text-center">
-          <p className="text-xs font-bold text-muted-foreground">{t(language, "prayerTracking.mosque")}</p>
-          <h2 className="mt-0.5 text-lg font-black text-foreground" dir="auto">
+        <header
+          className={`shrink-0 border-b px-5 py-4 text-center ${
+            onGlass ? "border-white/20 bg-white/10" : "border-border/50 bg-gradient-to-b from-primary/12 to-transparent"
+          }`}
+        >
+          <p className={`text-xs font-bold ${onGlass ? "text-white/80" : "text-muted-foreground"}`}>
+            {t(language, "prayerTracking.mosque")}
+          </p>
+          <h2 className={`mt-0.5 text-lg font-black ${onGlass ? "text-white" : "text-foreground"}`} dir="auto">
             {t(language, "prayerTracking.virtueTitle", { prayer: name })}
           </h2>
         </header>
@@ -58,14 +67,20 @@ export function PrayerVirtueModal({
               <li
                 key={virtue.referenceArabic + virtue.textArabic.slice(0, 12)}
                 data-testid="prayer-virtue-item"
-                className="rounded-2xl border border-border/60 bg-background px-4 py-3"
+                className={`rounded-2xl p-4 ${
+                  onGlass ? "border border-white/20 bg-white/10 text-white" : "border border-border/60 bg-background"
+                }`}
               >
-                <p className="zikr-text text-base font-bold leading-[1.9] text-foreground" lang="ar" dir="rtl">
+                <p
+                  className={`zikr-text text-base font-bold leading-[1.9] ${onGlass ? "text-white" : "text-foreground"}`}
+                  lang="ar"
+                  dir="rtl"
+                >
                   {virtue.textArabic}
                 </p>
                 {/* Isolated so the collection number cannot reorder against the
                     Arabic name of the collection beside it. */}
-                <bdi className="mt-2 block text-xs font-bold text-muted-foreground">
+                <bdi className={`mt-2 block text-xs font-bold ${onGlass ? "text-white/70" : "text-muted-foreground"}`}>
                   {language === "ar" ? virtue.referenceArabic : virtue.referenceEnglish}
                 </bdi>
               </li>
@@ -74,7 +89,9 @@ export function PrayerVirtueModal({
 
           <p
             data-testid="prayer-virtue-closing"
-            className="zikr-text mt-4 rounded-2xl bg-primary/10 px-4 py-3 text-center text-subtitle font-black leading-[1.9] text-primary"
+            className={`zikr-text mt-4 rounded-2xl px-4 py-3 text-center text-subtitle font-black leading-[1.9] ${
+              onGlass ? "bg-white/15 text-white border border-white/20" : "bg-primary/10 text-primary"
+            }`}
             lang="ar"
             dir="rtl"
           >
@@ -82,7 +99,7 @@ export function PrayerVirtueModal({
           </p>
         </div>
 
-        <footer className="shrink-0 border-t border-border/50 px-5 py-3">
+        <footer className={`shrink-0 border-t px-5 py-3 ${onGlass ? "border-white/20" : "border-border/50"}`}>
           <button
             type="button"
             onClick={onClose}

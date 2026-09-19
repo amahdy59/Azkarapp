@@ -26,4 +26,40 @@ describe("Modal accessibility", () => {
     expect(dialog).toHaveAccessibleDescription("Copy, bookmark, or share the canonical text.");
     expect(screen.getAllByText("Ayah actions")).toHaveLength(1);
   });
+
+  it("renders an accessible close button and triggers onClose when clicked", () => {
+    const handleClose = vi.fn();
+    render(
+      <Modal open onClose={handleClose} title="Ayah actions" direction="ltr">
+        <p>Content</p>
+      </Modal>,
+    );
+
+    const closeBtn = screen.getByTestId("modal-close-button");
+    expect(closeBtn).toBeInTheDocument();
+    expect(closeBtn).toHaveAccessibleName("Close");
+    closeBtn.click();
+    expect(handleClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("can hide the close button when showCloseButton is false", () => {
+    render(
+      <Modal open onClose={vi.fn()} title="Ayah actions" direction="rtl" showCloseButton={false}>
+        <p>Content</p>
+      </Modal>,
+    );
+
+    expect(screen.queryByTestId("modal-close-button")).not.toBeInTheDocument();
+  });
+
+  it("applies frosted glass styling when onGlass is true", () => {
+    render(
+      <Modal open onClose={vi.fn()} title="Ayah actions" direction="rtl" onGlass testId="glass-modal">
+        <p>Content</p>
+      </Modal>,
+    );
+
+    const modal = screen.getByTestId("glass-modal");
+    expect(modal).toHaveClass("hero-glass");
+  });
 });

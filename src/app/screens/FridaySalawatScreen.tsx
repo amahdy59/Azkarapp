@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { CounterTargetPicker } from "../components/CounterTargetPicker";
-import { BookOpen, ExternalLink, MoreVertical, RotateCcw, Sparkles, Volume2, VolumeX, X } from "../components/icons";
+import { BookOpen, ExternalLink, MoreVertical, RotateCcw, Sparkles, Volume2, VolumeX } from "../components/icons";
 import { ReadingScreenChrome } from "../components/ReadingScreenChrome";
 import { Modal } from "../components/ResponsiveSheet";
 import { CountingRipples, useCountingSurface } from "../components/countingSurface";
@@ -68,7 +68,7 @@ function ReferenceLink({ text, source, href }: { text: string; source: string; h
   );
 }
 
-const COMPACT_ACTION_CLASS =
+const HEADER_ACTION_CLASS =
   "interactive-elem flex size-11 items-center justify-center rounded-full border border-border-control bg-card text-foreground shadow-xs hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
 
 /* The wide band is a fixed navy surface, so its controls take on-media colours
@@ -166,9 +166,8 @@ export function FridaySalawatScreen({
   return (
     <ScreenContainer
       dir={direction}
-      className="relative flex flex-col overflow-y-auto page-content-center"
+      className="relative flex flex-col overflow-y-auto h-full !pb-0 sm:!pt-0"
       screenName={copy.title}
-      {...surfaceProps}
     >
       <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden" aria-hidden="true">
         <CountingRipples ripples={canvasRipples} onDismiss={dismissRipple} />
@@ -200,7 +199,7 @@ export function FridaySalawatScreen({
             </div>
           }
           actions={(tier) => {
-            const actionClass = tier === "wide" ? HERO_ACTION_CLASS : COMPACT_ACTION_CLASS;
+            const actionClass = tier === "wide" ? HERO_ACTION_CLASS : HEADER_ACTION_CLASS;
             return (
               <div className="flex items-center gap-1.5">
                 <button
@@ -239,54 +238,70 @@ export function FridaySalawatScreen({
           {complete ? copy.completed : ""}
         </p>
 
-        <div
-          className="relative z-10 mx-auto flex min-h-0 w-full max-w-[44rem] flex-1 flex-col overflow-y-auto px-4 pb-6 pt-2 sm:px-5"
-          data-counting-mode="canvas"
-        >
+        <div className="relative mx-4 mb-4 mt-4 flex min-h-0 flex-1 overflow-hidden bg-transparent">
           <div
-            className="flex-1 flex flex-col justify-center items-center py-6 sm:py-10 origin-center"
-            style={{
-              ...pressStyle,
-            }}
+            className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden cursor-pointer"
+            data-testid="reader-card"
+            data-counting-mode="canvas"
+            {...surfaceProps}
           >
-            <p
-              className="zikr-text max-w-[34rem] text-center text-xl font-extrabold leading-[2] text-foreground sm:text-2xl"
-              dir="rtl"
-              lang="ar"
+            <div
+              className="salawat-stage mx-auto flex min-h-0 w-full max-w-[44rem] flex-1 flex-col justify-between select-none relative"
+              data-testid="salawat-content"
             >
-              {copy.phrase}
-            </p>
-          </div>
-
-          <footer className="shrink-0 flex flex-col items-center justify-center pb-3 pt-2">
-            <div className="flex w-full items-center justify-center gap-2.5">
-              <div className="flex min-w-0 flex-1 justify-center">
-                <ZikrCounterSurface
-                  count={progress.count}
-                  total={progress.target}
-                  complete={complete}
-                  onTap={increment}
-                  language={language}
-                  instructionText={t(language, "reader.tapAnywhere")}
-                  testId="salawat-counter"
-                  reduceMotion={reduceMotion}
-                />
+              <div className="relative flex min-h-0 flex-1">
+                <div className="reader-text-scroll h-full min-h-0 w-full overflow-y-auto ps-6 pe-7 md:px-20 py-4 outline-none focus-visible:outline-none focus:ring-0">
+                  <div className="reading-measure mx-auto flex min-h-full w-full flex-col py-4">
+                    <div style={pressStyle} className="my-auto w-full flex flex-col items-center justify-center">
+                      <p
+                        className="zikr-text max-w-[34rem] text-center text-xl font-extrabold leading-[2] text-foreground sm:text-2xl"
+                        dir="rtl"
+                        lang="ar"
+                      >
+                        {copy.phrase}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-            <p className="mt-3 text-center text-sm font-medium text-muted-foreground">
-              {t(language, "reader.tapAnywhere")}
-            </p>
 
-            <CounterShortcutHints
-              language={language}
-              direction={direction}
-              ariaLabel={t(language, "reader.keyboardShortcuts")}
-              shortcuts={[
-                { keys: ["Space"], label: t(language, "counter.count") },
-                { keys: ["R"], label: t(language, "counter.reset") },
-              ]}
-            />
-          </footer>
+              <footer className="shrink-0 pb-3 pt-2">
+                <div data-testid="reader-counter-stack">
+                  <div className="px-3 pb-1" data-testid="counter-panel">
+                    <div className="adaptive-counter-row flex w-full items-center justify-center gap-2.5">
+                      <div className="flex min-w-0 flex-1 justify-center">
+                        <ZikrCounterSurface
+                          count={progress.count}
+                          total={progress.target}
+                          complete={complete}
+                          onTap={increment}
+                          language={language}
+                          instructionText={t(language, "reader.tapAnywhere")}
+                          testId="salawat-counter"
+                          reduceMotion={reduceMotion}
+                        />
+                      </div>
+                    </div>
+                    <p className="mt-3 min-h-5 text-center text-sm font-medium text-muted-foreground">
+                      {t(language, "reader.tapAnywhere")}
+                    </p>
+                  </div>
+                  <div className="hidden md:block">
+                    <CounterShortcutHints
+                      language={language}
+                      direction={direction}
+                      testId="counter-keyboard-shortcuts"
+                      ariaLabel={t(language, "reader.keyboardShortcuts")}
+                      shortcuts={[
+                        { keys: ["Space"], label: t(language, "counter.count") },
+                        { keys: ["R"], label: t(language, "counter.reset") },
+                      ]}
+                    />
+                  </div>
+                </div>
+              </footer>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -300,20 +315,12 @@ export function FridaySalawatScreen({
           className="p-5 sm:p-6"
         >
           <div className="space-y-3">
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 pe-10">
+              <span className="flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                <Sparkles size={20} aria-hidden="true" />
+              </span>
               <h2 className="text-lg font-black text-foreground">{copy.benefits}</h2>
-              <button
-                type="button"
-                onClick={() => setShowBenefits(false)}
-                className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border-control bg-background text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                aria-label={t(language, "common.close")}
-              >
-                <X size={20} aria-hidden="true" />
-              </button>
             </div>
-            <span className="flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-              <Sparkles size={20} aria-hidden="true" />
-            </span>
             <ReferenceLink text={copy.muslim} source={copy.muslimSource} href="https://sunnah.com/muslim:408" />
             <ReferenceLink text={copy.friday} source={copy.fridaySource} href="https://sunnah.com/abudawud:1047" />
           </div>

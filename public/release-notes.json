@@ -1,13 +1,15 @@
 {
-  "release": "2026-09-19b",
+  "release": "2026-09-19c",
   "ar": [
-    "تصميم عائم وخفيف لأعمال الصلوات بدون بطاقات مجمعة مع كبسولات مثلجة تطفو مباشرة فوق خلفية الشاشة.",
-    "تأثير الزجاج المثلج الحقيقي والشفافية العالية لجميع بطاقات وعناصر الشاشة الرئيسية مع دعم كامل لأجهزة iOS.",
-    "دوائر تحديد واضحة ومشرقة لكل طاعة مع زر ذهبي بارز ومريح لبدء أذكار ما بعد الصلاة."
+    "تأثير الزجاج المثلج وزر إغلاق واضح ومريح لكافة النوافذ المنبثقة وبطاقات الفضائل عند تفعيل الشفافية.",
+    "ثبات بطاقة الصلاة الموسعة يميناً على الشاشات الكبيرة مع خط انسيابي أنيق يربط الصلاة المحددة بتفاصيلها.",
+    "حصر تفاعل العد بدقة داخل بطاقة الذكر والعداد لمنع الزيادات غير المقصودة عند النقر على هوامش الشاشة.",
+    "توحيد شاشتي المسبحة والصلاة على النبي ﷺ بنفس التصميم والتباعد وأزرار العد المعتمدة في شاشة القراءة."
   ],
   "en": [
-    "Cardless floating prayer actions layout with frosted glass capsules positioned directly over the canvas photograph.",
-    "Luminous frosted glassmorphism and deep backdrop blur across all Home screen cards with full iOS WebKit support.",
-    "Crisp devotion check rings and prominent golden action button to seamlessly start post-prayer azkar."
+    "Frosted glassmorphism and clear close buttons across modals and virtue cards when transparency is active.",
+    "Fixed right-column prayer card layout on desktop connected with an elegant curved line to the selected prayer.",
+    "Isolated counting strictly to the devotional card and counter surface to avoid accidental taps on margins.",
+    "Unified Masbaha and Salawat screens with the exact same layout, spacing, and counter as the reader screen."
   ]
 }

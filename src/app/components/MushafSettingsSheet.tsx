@@ -384,6 +384,7 @@ export function MushafSettingsSheet({
       overlayClassName="bg-black/50"
       dialogClassName={sheetSurfaceClass}
       drawerClassName={sheetSurfaceClass}
+      showCloseButton={false}
     >
       {body}
     </ResponsiveSheet>

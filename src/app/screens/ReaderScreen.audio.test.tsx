@@ -345,11 +345,17 @@ describe("ReaderScreen audio identity", () => {
     );
 
     const reader = screen.getByTestId("reader-screen");
+    const readerCard = screen.getByTestId("reader-card");
     const counter = screen.getByTestId("counter-surface");
     expect(reader).toHaveAttribute("data-counting-mode", "canvas");
     expect(counter).toHaveAccessibleName(/٠ \/ ٣/);
 
+    // Clicking outer screen margin does not count
     fireEvent.click(reader);
+    expect(counter).toHaveAccessibleName(/٠ \/ ٣/);
+
+    // Clicking reader card counts
+    fireEvent.click(readerCard);
     expect(counter).toHaveAccessibleName(/١ \/ ٣/);
     expect(onComplete).not.toHaveBeenCalled();
   });
@@ -384,7 +390,7 @@ describe("ReaderScreen audio identity", () => {
     );
 
     expect(screen.getByTestId("reader-screen")).toHaveAttribute("data-counting-mode", "canvas");
-    fireEvent.click(screen.getByTestId("reader-screen"));
+    fireEvent.click(screen.getByTestId("reader-card"));
     expect(onComplete).toHaveBeenCalledOnce();
   });
 });

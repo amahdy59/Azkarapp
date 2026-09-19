@@ -1233,8 +1233,8 @@ const ar = {
     openCounter: "\u0641\u062a\u062d \u0634\u0627\u0634\u0629 \u0627\u0644\u0639\u062f\u0627\u062f",
     counterReadyComplete:
       "\u062a\u0645 \u0627\u0644\u0625\u0646\u062c\u0627\u0632 \u0645\u0633\u0628\u0642\u0627\u064b",
-    tapAnywhere: "\u0627\u0636\u063a\u0637 \u0623\u064a \u0645\u0643\u0627\u0646 \u0644\u0644\u0639\u062f",
-    tapAnywhereDesktop: "انقر في أي مكان أو استخدم المسافة للعد",
+    tapAnywhere: "اضغط على الذكر أو العداد للعد",
+    tapAnywhereDesktop: "انقر على الذكر أو زر الإتمام أو استخدم المسافة للعد",
     tapCounterWhenFinished:
       "\u0627\u0636\u063a\u0637 \u0627\u0644\u0639\u062f\u0627\u062f \u0639\u0646\u062f \u0627\u0644\u0625\u062a\u0645\u0627\u0645",
     mushafPage: "\u0635\u0641\u062d\u0629 \u0627\u0644\u0645\u0635\u062d\u0641 {page}",

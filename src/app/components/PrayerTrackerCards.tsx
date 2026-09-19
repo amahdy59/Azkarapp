@@ -597,6 +597,7 @@ export function PrayerTrackerCards({
         language={language}
         direction={direction}
         onClose={() => setVirtuePrayer(null)}
+        onGlass={onGlass}
       />
     </div>
   );

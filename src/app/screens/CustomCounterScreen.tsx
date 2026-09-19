@@ -35,7 +35,7 @@ import { useWakeLock } from "../hooks/useWakeLock";
 import type { AppLanguage } from "../types";
 
 const HEADER_ACTION_CLASS =
-  "interactive-elem flex size-11 items-center justify-center rounded-full border border-border-control bg-card text-foreground shadow-xs hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
+  "flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full text-foreground/80 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40";
 
 /* The wide band is a fixed navy surface, so its controls take on-media colours
    rather than theme ones. Reusing the compact class there is what produced
@@ -141,9 +141,8 @@ export function CustomCounterScreen({
   return (
     <ScreenContainer
       dir={direction}
-      className="relative flex flex-col overflow-y-auto page-content-center"
+      className="relative flex flex-col overflow-y-auto h-full !pb-0 sm:!pt-0"
       screenName={t(language, "counter.tasbeehTitle")}
-      {...surfaceProps}
     >
       <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden" aria-hidden="true">
         <CountingRipples ripples={canvasRipples} onDismiss={dismissRipple} />
@@ -252,55 +251,70 @@ export function CustomCounterScreen({
           }}
         />
 
-        <div
-          className="custom-counter-stage relative mx-auto flex min-h-0 w-full max-w-[44rem] flex-1 flex-col overflow-y-auto px-4 pb-6 pt-2 sm:px-5"
-          data-testid="custom-counter-content"
-          data-counting-mode="canvas"
-        >
+        <div className="relative mx-4 mb-4 mt-4 flex min-h-0 flex-1 overflow-hidden bg-transparent">
           <div
-            className="flex-1 flex flex-col justify-center items-center py-6 sm:py-10 origin-center"
-            style={{
-              ...pressStyle,
-            }}
+            className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden cursor-pointer"
+            data-testid="reader-card"
+            data-counting-mode="canvas"
+            {...surfaceProps}
           >
-            <p
-              className="zikr-text max-w-[34rem] text-center text-xl font-extrabold leading-[2] text-foreground sm:text-2xl"
-              dir="rtl"
-              lang="ar"
+            <div
+              className="custom-counter-stage mx-auto flex min-h-0 w-full max-w-[44rem] flex-1 flex-col justify-between select-none relative"
+              data-testid="custom-counter-content"
             >
-              {activeText}
-            </p>
-          </div>
-
-          <footer className="shrink-0 flex flex-col items-center justify-center pb-3 pt-2">
-            <div className="flex w-full items-center justify-center gap-2.5">
-              <div className="flex min-w-0 flex-1 justify-center">
-                <ZikrCounterSurface
-                  count={count}
-                  total={target}
-                  complete={isTargetComplete}
-                  onTap={handleTap}
-                  language={language}
-                  instructionText={t(language, "reader.tapAnywhere")}
-                  testId="custom-counter-surface"
-                  reduceMotion={reduceMotion}
-                />
+              <div className="relative flex min-h-0 flex-1">
+                <div className="reader-text-scroll h-full min-h-0 w-full overflow-y-auto ps-6 pe-7 md:px-20 py-4 outline-none focus-visible:outline-none focus:ring-0">
+                  <div className="reading-measure mx-auto flex min-h-full w-full flex-col py-4">
+                    <div style={pressStyle} className="my-auto w-full flex flex-col items-center justify-center">
+                      <p
+                        className="zikr-text max-w-[34rem] text-center text-xl font-extrabold leading-[2] text-foreground sm:text-2xl"
+                        dir="rtl"
+                        lang="ar"
+                      >
+                        {activeText}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-            <p className="mt-3 text-center text-sm font-medium text-muted-foreground">
-              {t(language, "reader.tapAnywhere")}
-            </p>
 
-            <CounterShortcutHints
-              language={language}
-              direction={direction}
-              ariaLabel={t(language, "reader.keyboardShortcuts")}
-              shortcuts={[
-                { keys: ["Space"], label: t(language, "counter.count") },
-                { keys: ["R"], label: t(language, "counter.reset") },
-              ]}
-            />
-          </footer>
+              <footer className="shrink-0 pb-3 pt-2">
+                <div data-testid="reader-counter-stack">
+                  <div className="px-3 pb-1" data-testid="counter-panel">
+                    <div className="adaptive-counter-row flex w-full items-center justify-center gap-2.5">
+                      <div className="flex min-w-0 flex-1 justify-center">
+                        <ZikrCounterSurface
+                          count={count}
+                          total={target}
+                          complete={isTargetComplete}
+                          onTap={handleTap}
+                          language={language}
+                          instructionText={t(language, "reader.tapAnywhere")}
+                          testId="custom-counter-surface"
+                          reduceMotion={reduceMotion}
+                        />
+                      </div>
+                    </div>
+                    <p className="mt-3 min-h-5 text-center text-sm font-medium text-muted-foreground">
+                      {t(language, "reader.tapAnywhere")}
+                    </p>
+                  </div>
+                  <div className="hidden md:block">
+                    <CounterShortcutHints
+                      language={language}
+                      direction={direction}
+                      testId="counter-keyboard-shortcuts"
+                      ariaLabel={t(language, "reader.keyboardShortcuts")}
+                      shortcuts={[
+                        { keys: ["Space"], label: t(language, "counter.count") },
+                        { keys: ["R"], label: t(language, "counter.reset") },
+                      ]}
+                    />
+                  </div>
+                </div>
+              </footer>
+            </div>
+          </div>
         </div>
       </div>
 

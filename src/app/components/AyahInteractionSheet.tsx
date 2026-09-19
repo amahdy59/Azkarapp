@@ -100,6 +100,7 @@ export function AyahInteractionSheet({
       direction={language === "ar" ? "rtl" : "ltr"}
       describedById={descriptionId}
       testId="ayah-interaction-sheet"
+      showCloseButton={false}
     >
       <div className="flex flex-col pb-6 pt-3">
         <div className="flex items-start justify-between gap-3 px-5 pb-4">

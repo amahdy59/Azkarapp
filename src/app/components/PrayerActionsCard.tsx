@@ -193,33 +193,51 @@ export function PrayerActionsCard({
           direction={direction}
           testId="prayer-actions-info-modal"
           maxWidthClassName="max-w-lg"
+          onGlass={onGlass}
         >
-          <div className="flex flex-col gap-4 px-5 py-4 text-start">
+          <div className="flex max-h-[75vh] flex-col gap-4 overflow-y-auto px-5 py-4 text-start">
+            <div
+              className={`flex items-center justify-between border-b pb-3 pe-12 ${onGlass ? "border-white/20" : "border-border/40"}`}
+            >
+              <h3 className={`text-base font-black ${onGlass ? "text-white" : "text-foreground"}`} dir="auto">
+                {infoData.modalTitle}
+              </h3>
+            </div>
+
             {/* Rawatib Virtue Foundation Banner */}
             <aside
-              className="flex flex-col gap-2 rounded-2xl border border-primary/30 bg-primary/10 p-4"
+              className={`flex flex-col gap-2 rounded-2xl p-4 ${
+                onGlass ? "border border-white/20 bg-white/10 text-white" : "border border-primary/30 bg-primary/10"
+              }`}
               data-testid="rawatib-virtue-banner"
             >
               <div className="flex items-center gap-2">
                 <span
                   aria-hidden="true"
-                  className="flex size-7 items-center justify-center rounded-lg bg-primary/20 text-primary"
+                  className={`flex size-7 items-center justify-center rounded-lg ${
+                    onGlass ? "bg-white/20 text-white" : "bg-primary/20 text-primary"
+                  }`}
                 >
                   <PrayerRug size={16} />
                 </span>
-                <h4 className="text-sm font-black text-primary sm:text-base" dir="auto">
+                <h4 className={`text-sm font-black sm:text-base ${onGlass ? "text-white" : "text-primary"}`} dir="auto">
                   {infoData.rawatibVirtue.title}
                 </h4>
               </div>
-              <p className="text-xs font-semibold leading-relaxed text-muted-foreground sm:text-sm" dir="auto">
+              <p
+                className={`text-xs font-semibold leading-relaxed sm:text-sm ${onGlass ? "text-white/80" : "text-muted-foreground"}`}
+                dir="auto"
+              >
                 {infoData.rawatibVirtue.description}
               </p>
               <blockquote
-                className="mt-1 rounded-xl border border-primary/20 bg-card p-3"
+                className={`mt-1 rounded-xl p-3 ${
+                  onGlass ? "border border-white/20 bg-white/10 text-white" : "border border-primary/20 bg-card"
+                }`}
                 dir={isArabic || !infoData.rawatibVirtue.evidence.textEnglish ? "rtl" : "ltr"}
               >
                 <p
-                  className={`text-sm font-bold leading-loose text-foreground ${
+                  className={`text-sm font-bold leading-loose ${onGlass ? "text-white" : "text-foreground"} ${
                     isArabic || !infoData.rawatibVirtue.evidence.textEnglish ? "zikr-text" : ""
                   }`}
                   lang={isArabic || !infoData.rawatibVirtue.evidence.textEnglish ? "ar" : "en"}
@@ -228,7 +246,9 @@ export function PrayerActionsCard({
                     ? infoData.rawatibVirtue.evidence.textArabic
                     : (infoData.rawatibVirtue.evidence.textEnglish ?? infoData.rawatibVirtue.evidence.textArabic)}
                 </p>
-                <footer className="mt-1 text-micro font-semibold text-muted-foreground">
+                <footer
+                  className={`mt-1 text-micro font-semibold ${onGlass ? "text-white/80" : "text-muted-foreground"}`}
+                >
                   {isArabic
                     ? infoData.rawatibVirtue.evidence.referenceArabic
                     : infoData.rawatibVirtue.evidence.referenceEnglish}
@@ -237,27 +257,49 @@ export function PrayerActionsCard({
             </aside>
 
             {infoData.sunnahItems.length === 0 ? (
-              <p className="text-center text-sm font-medium text-muted-foreground" dir="auto">
+              <p
+                className={`text-center text-sm font-medium ${onGlass ? "text-white/80" : "text-muted-foreground"}`}
+                dir="auto"
+              >
                 {t(language, "prayerMoment.statusNow")}
               </p>
             ) : (
               infoData.sunnahItems.map((item, idx) => (
                 <article
                   key={`${item.position}-${idx}`}
-                  className="flex flex-col gap-2.5 rounded-2xl border border-border/80 bg-muted/30 p-4"
+                  className={`flex flex-col gap-2.5 rounded-2xl p-4 ${
+                    onGlass ? "border border-white/20 bg-white/10 text-white" : "border border-border/80 bg-muted/30"
+                  }`}
                 >
                   {/* Category Header & Badges */}
-                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/60 pb-2">
-                    <h4 className="text-sm font-black text-foreground sm:text-base" dir="auto">
+                  <div
+                    className={`flex flex-wrap items-center justify-between gap-2 border-b pb-2 ${
+                      onGlass ? "border-white/20" : "border-border/60"
+                    }`}
+                  >
+                    <h4
+                      className={`text-sm font-black sm:text-base ${onGlass ? "text-white" : "text-foreground"}`}
+                      dir="auto"
+                    >
                       {item.title}
                     </h4>
                     <div className="flex items-center gap-1.5">
-                      <span className="rounded-full bg-primary/15 px-2.5 py-0.5 text-micro font-black text-primary sm:text-xs">
+                      <span
+                        className={`rounded-full px-2.5 py-0.5 text-micro font-black sm:text-xs ${
+                          onGlass ? "bg-white/15 text-white" : "bg-primary/15 text-primary"
+                        }`}
+                      >
                         {item.rakahsLabel}
                       </span>
                       <span
                         className={`rounded-full px-2.5 py-0.5 text-micro font-bold sm:text-xs ${
-                          item.rank === "confirmed" ? "bg-success/15 text-success" : "bg-muted text-muted-foreground"
+                          item.rank === "confirmed"
+                            ? onGlass
+                              ? "border border-success bg-success/15 text-success"
+                              : "bg-success/15 text-success"
+                            : onGlass
+                              ? "bg-white/15 text-white/80"
+                              : "bg-muted text-muted-foreground"
                         }`}
                       >
                         {item.rankLabel}
@@ -266,17 +308,24 @@ export function PrayerActionsCard({
                   </div>
 
                   {/* Short Explanation */}
-                  <p className="text-xs font-semibold leading-relaxed text-muted-foreground sm:text-sm" dir="auto">
+                  <p
+                    className={`text-xs font-semibold leading-relaxed sm:text-sm ${onGlass ? "text-white/80" : "text-muted-foreground"}`}
+                    dir="auto"
+                  >
                     {item.description}
                   </p>
 
                   {/* Supporting Hadith Evidence */}
                   <blockquote
-                    className="mt-1 rounded-xl border border-primary/20 bg-primary/5 p-3"
+                    className={`mt-1 rounded-xl p-3 ${
+                      onGlass
+                        ? "border border-white/20 bg-white/10 text-white"
+                        : "border border-primary/20 bg-primary/5"
+                    }`}
                     dir={isArabic || !item.sunnah.evidence.textEnglish ? "rtl" : "ltr"}
                   >
                     <p
-                      className={`text-sm font-bold leading-loose text-foreground ${
+                      className={`text-sm font-bold leading-loose ${onGlass ? "text-white" : "text-foreground"} ${
                         isArabic || !item.sunnah.evidence.textEnglish ? "zikr-text" : ""
                       }`}
                       lang={isArabic || !item.sunnah.evidence.textEnglish ? "ar" : "en"}
@@ -285,12 +334,16 @@ export function PrayerActionsCard({
                         ? item.sunnah.evidence.textArabic
                         : (item.sunnah.evidence.textEnglish ?? item.sunnah.evidence.textArabic)}
                     </p>
-                    <footer className="mt-2 flex flex-wrap items-center justify-between gap-2 text-micro font-semibold text-muted-foreground">
+                    <footer
+                      className={`mt-2 flex flex-wrap items-center justify-between gap-2 text-micro font-semibold ${
+                        onGlass ? "text-white/70" : "text-muted-foreground"
+                      }`}
+                    >
                       <span>
                         {isArabic ? item.sunnah.evidence.referenceArabic : item.sunnah.evidence.referenceEnglish}
                       </span>
                       {(isArabic ? item.sunnah.evidence.gradingArabic : item.sunnah.evidence.gradingEnglish) && (
-                        <span className="font-bold text-primary">
+                        <span className={`font-bold ${onGlass ? "text-on-media-accent" : "text-primary"}`}>
                           {isArabic ? item.sunnah.evidence.gradingArabic : item.sunnah.evidence.gradingEnglish}
                         </span>
                       )}

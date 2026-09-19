@@ -57,4 +57,18 @@ describe("FridaySalawatScreen", () => {
       "https://sunnah.com/abudawud:1047",
     );
   });
+
+  it("counts from the devotional reader-card while protecting controls", async () => {
+    const user = userEvent.setup();
+    render(<FridaySalawatScreen language="en" direction="ltr" onBack={() => undefined} />);
+
+    const card = screen.getByTestId("reader-card");
+    const counter = screen.getByTestId("salawat-counter");
+    fireEvent.click(card);
+    expect(counter).toHaveAccessibleName(/1 \/ 100/);
+
+    // Clicking target picker does not increment
+    await user.click(screen.getByTestId("counter-target-filter"));
+    expect(counter).toHaveAccessibleName(/1 \/ 100/);
+  });
 });
