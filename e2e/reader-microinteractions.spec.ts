@@ -140,17 +140,14 @@ test("Space counts without outlining the full Reader text region", async ({ page
     await page.setViewportSize(viewport);
     const readingRegion = page.getByRole("region", { name: "Reading text" });
     await expect(readingRegion).toBeVisible();
+    await expect(readingRegion).toHaveClass(/reader-text-scroll/);
     await readingRegion.focus();
+    await expect(readingRegion).toBeFocused();
     await page.keyboard.press("Space");
-
-    const focusState = await page.evaluate(() => {
-      const active = document.activeElement;
-      return {
-        isReaderText: active?.classList.contains("reader-text-scroll") ?? false,
-        outlineStyle: active ? window.getComputedStyle(active).outlineStyle : null,
-      };
-    });
-    expect(focusState).toEqual({ isReaderText: true, outlineStyle: "none" });
+    await expect(readingRegion).toBeFocused();
+    await expect
+      .poll(() => readingRegion.evaluate((element) => window.getComputedStyle(element).outlineStyle))
+      .toBe("none");
   }
 });
 

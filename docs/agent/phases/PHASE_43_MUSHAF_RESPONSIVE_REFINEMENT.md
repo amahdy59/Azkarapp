@@ -21,6 +21,7 @@ Make the Mushaf calmer and more page-like across desktop and mobile: remove app-
 - `src/styles/theme/layout.css`
 - `src/app/screens/KhatmahReaderScreen.test.tsx`
 - `e2e/khatmah-reader.spec.ts`
+- `e2e/reader-microinteractions.spec.ts`
 - `docs/DESIGN_SYSTEM.md`
 - `docs/agent/DECISION_LOG.md`
 - `docs/agent/INDEX.md`
@@ -52,14 +53,15 @@ Make the Mushaf calmer and more page-like across desktop and mobile: remove app-
 
 ## Commands run
 
-| Command                               | Result                                                |
-| ------------------------------------- | ----------------------------------------------------- |
-| Focused Mushaf Vitest suites          | Passed: 82 tests                                      |
-| Focused desktop Chromium Mushaf suite | Passed: 8 tests                                       |
-| `pnpm install --frozen-lockfile`      | Passed; lockfile already current                      |
-| `pnpm check`                          | Passed in 45.9s; 1,027 unit tests passed              |
-| `pnpm test:e2e`                       | Passed: 376 passed, 1 skipped, 3 flaky retries passed |
-| `pnpm build:pages`                    | Passed; bundle and CSS budgets passed                 |
+| Command                                                                      | Result                                                |
+| ---------------------------------------------------------------------------- | ----------------------------------------------------- |
+| Focused Mushaf Vitest suites                                                 | Passed: 82 tests                                      |
+| Focused desktop Chromium Mushaf suite                                        | Passed: 8 tests                                       |
+| Reader focus regression repeated across desktop, mobile, and tablet Chromium | Passed: 9 tests                                       |
+| `pnpm install --frozen-lockfile`                                             | Passed; lockfile already current                      |
+| `pnpm check`                                                                 | Passed in 45.9s; 1,027 unit tests passed              |
+| `pnpm test:e2e`                                                              | Passed: 376 passed, 1 skipped, 3 flaky retries passed |
+| `pnpm build:pages`                                                           | Passed; bundle and CSS budgets passed                 |
 
 ## Visual/manual evidence
 
@@ -77,7 +79,7 @@ Responsive browser geometry verifies a facing desktop spread, one-page portrait 
 
 - Real-device safe-area and screen-reader behavior remain manual release evidence.
 - Very short landscape windows intentionally scroll the paper internally to preserve legibility.
-- Three unrelated browser checks timed out or lost focus on their first attempt under full-suite load; all passed on automatic retry and the required command exited successfully.
+- Three unrelated browser checks timed out or lost focus on their first attempt under the first full-suite load; all passed on automatic retry. A later pre-push run exposed a responsive-remount race in the Reader focus assertion; the assertion now waits for and verifies the same focus contract deterministically across desktop, mobile, and tablet Chromium.
 
 ## Out-of-scope findings
 
