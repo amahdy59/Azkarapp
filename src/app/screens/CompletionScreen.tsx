@@ -163,28 +163,28 @@ export function CompletionScreen({
 
   return (
     <div
-      className="completion-screen-enter relative h-full overflow-y-auto bg-background px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-6 text-center"
+      className="completion-screen-enter relative h-full overflow-y-auto bg-background px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-4 text-center"
       dir={direction}
     >
-      <div className="relative z-10 mx-auto flex min-h-full w-full max-w-md flex-col">
+      <div className="relative z-10 mx-auto flex min-h-full w-full max-w-md flex-col justify-center py-4 sm:py-8">
         <p className="sr-only" role="status" aria-live="polite">
           {t(language, "completion.sessionComplete", { category: categoryName })}
         </p>
 
         <div
-          className="celebration-glow celebration-pop relative mx-auto mt-2 flex h-20 w-20 items-center justify-center rounded-full bg-primary"
+          className="celebration-glow celebration-pop relative mx-auto flex size-16 items-center justify-center rounded-2xl bg-primary"
           aria-hidden="true"
         >
-          <Check size={38} className="text-primary-foreground" strokeWidth={2.25} />
+          <Check size={30} className="text-primary-foreground" strokeWidth={2.5} />
         </div>
 
-        <h1 className="mt-5 text-display font-extrabold leading-9 text-primary">
+        <h1 className="mt-4 text-display font-extrabold leading-9 text-primary">
           {t(language, "completion.mashaAllah")}
         </h1>
         <p className="mt-1 text-lg font-bold text-card-foreground">
           {t(language, "completion.completed", { category: categoryName })}
         </p>
-        <p className="mt-3 text-sm leading-6 text-foreground/80">
+        <p className="mx-auto mt-2 max-w-[36ch] text-sm leading-6 text-foreground/80">
           {quietProgressEnabled ? streakMessage : t(language, "completion.reflection")}
         </p>
 
@@ -193,13 +193,13 @@ export function CompletionScreen({
         )}
 
         <section
-          className="mt-7 grid grid-cols-2 overflow-hidden rounded-3xl border border-border/40 bg-card shadow-raised"
+          className="mt-5 grid grid-cols-2 overflow-hidden rounded-2xl border border-border bg-card"
           aria-label={t(language, "completion.sessionSummary")}
         >
           {stats.map(({ value, label }, index) => (
             <article
               key={label}
-              className={`summary-item-enter flex min-h-[92px] flex-col items-center justify-center p-4 ${index === 0 ? "border-e border-white/30 dark:border-white/10" : ""}`}
+              className={`summary-item-enter flex min-h-[82px] flex-col items-center justify-center p-3 ${index === 0 ? "border-e border-border" : ""}`}
               style={{ animationDelay: `${180 + index * 55}ms` }}
             >
               <p
@@ -213,16 +213,16 @@ export function CompletionScreen({
           ))}
         </section>
 
-        <div className="mt-auto pt-7">
+        <div className="pt-5">
           <p className="text-xs text-foreground/70" dir="auto">
             {formatHijriDate(new Date(), language)}
           </p>
-          <div className="mt-3 grid gap-3">
+          <div className="mt-3 grid gap-2.5">
             {isRoutineCategory(catId) && completionLevel === "core" && onContinueComplete && (
               <button
                 type="button"
                 onClick={onContinueComplete}
-                className="flex min-h-[48px] items-center justify-center rounded-lg border border-primary/40 bg-primary/10 px-4 font-bold text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring dark:text-primary"
+                className="flex min-h-12 items-center justify-center rounded-xl border border-primary/40 bg-primary/10 px-4 font-bold text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring dark:text-primary"
               >
                 {t(language, "category.continueAdditional", {
                   count: formatNumerals(

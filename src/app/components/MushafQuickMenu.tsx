@@ -58,6 +58,12 @@ export interface MushafQuickMenuProps {
   onOpenSettings: () => void;
   onReadExternally?: () => void;
   surahAudio?: SurahAudioControl;
+  /** The full-screen Mushaf already exposes these as permanent corner controls. */
+  showPageTools?: boolean;
+  /** Focus mode is intentionally absent when the page is already the whole screen. */
+  showFocusAction?: boolean;
+  /** The surah-name control already opens the index in the full-screen reader. */
+  showIndexAction?: boolean;
 }
 
 export function MushafQuickMenu({
@@ -79,6 +85,9 @@ export function MushafQuickMenu({
   onOpenSettings,
   onReadExternally,
   surahAudio,
+  showPageTools = true,
+  showFocusAction = true,
+  showIndexAction = true,
 }: MushafQuickMenuProps) {
   const items: QuickMenuItem[] = [
     ...(surahAudio
@@ -115,15 +124,19 @@ export function MushafQuickMenu({
           },
         ]
       : []),
-    {
-      id: "index",
-      label: t(language, "mushaf.indexTitle"),
-      detail: `${surahName} · ${t(language, "mushaf.juzLabel", { juz: formatNumerals(juzNumber, language) })}`,
-      icon: <List size={19} aria-hidden="true" />,
-      onSelect: onOpenIndex,
-      opensSurface: true,
-      testId: "mushaf-quick-index",
-    },
+    ...(showIndexAction
+      ? [
+          {
+            id: "index",
+            label: t(language, "mushaf.indexTitle"),
+            detail: `${surahName} · ${t(language, "mushaf.juzLabel", { juz: formatNumerals(juzNumber, language) })}`,
+            icon: <List size={19} aria-hidden="true" />,
+            onSelect: onOpenIndex,
+            opensSurface: true,
+            testId: "mushaf-quick-index",
+          },
+        ]
+      : []),
     {
       id: "bookmarks",
       label: t(language, "mushaf.tabBookmarks"),
@@ -132,32 +145,40 @@ export function MushafQuickMenu({
       opensSurface: true,
       testId: "mushaf-quick-bookmarks",
     },
-    {
-      id: "page-bookmark",
-      label: t(language, "mushaf.bookmarkCurrentPage"),
-      detail: t(language, "mushaf.pageLabel", { page: formatNumerals(pageNumber, language) }),
-      icon: <Bookmark size={19} aria-hidden="true" className={isPageBookmarked ? "fill-current" : undefined} />,
-      onSelect: onTogglePageBookmark,
-      pressed: isPageBookmarked,
-      testId: "mushaf-quick-page-bookmark",
-    },
-    {
-      id: "word-meanings",
-      label: t(language, "mushaf.difficultWordsInvite"),
-      icon: <BookOpen size={19} aria-hidden="true" />,
-      onSelect: onToggleWordMeanings,
-      pressed: showWordMeanings,
-      disabled: isLoadingWordMeanings,
-      testId: "mushaf-quick-word-meanings",
-    },
-    {
-      id: "focus",
-      label: t(language, "mushaf.focusMode"),
-      detail: t(language, "mushaf.focusModeHint"),
-      icon: <Eye size={19} aria-hidden="true" />,
-      onSelect: onEnterFocusMode,
-      testId: "mushaf-quick-focus",
-    },
+    ...(showPageTools
+      ? [
+          {
+            id: "page-bookmark",
+            label: t(language, "mushaf.bookmarkCurrentPage"),
+            detail: t(language, "mushaf.pageLabel", { page: formatNumerals(pageNumber, language) }),
+            icon: <Bookmark size={19} aria-hidden="true" className={isPageBookmarked ? "fill-current" : undefined} />,
+            onSelect: onTogglePageBookmark,
+            pressed: isPageBookmarked,
+            testId: "mushaf-quick-page-bookmark",
+          },
+          {
+            id: "word-meanings",
+            label: t(language, "mushaf.difficultWordsInvite"),
+            icon: <BookOpen size={19} aria-hidden="true" />,
+            onSelect: onToggleWordMeanings,
+            pressed: showWordMeanings,
+            disabled: isLoadingWordMeanings,
+            testId: "mushaf-quick-word-meanings",
+          },
+        ]
+      : []),
+    ...(showFocusAction
+      ? [
+          {
+            id: "focus",
+            label: t(language, "mushaf.focusMode"),
+            detail: t(language, "mushaf.focusModeHint"),
+            icon: <Eye size={19} aria-hidden="true" />,
+            onSelect: onEnterFocusMode,
+            testId: "mushaf-quick-focus",
+          },
+        ]
+      : []),
     {
       id: "settings",
       label: t(language, "mushaf.readingSettings"),

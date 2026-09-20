@@ -3637,3 +3637,28 @@ null` shape, so a record written before this change still loads and still
 - **Desktop relevance:** at 1024px and above with a fine pointer, retain the same locally calculated bearing and replace the normally unsupported motion-sensor action with three instructions for aligning a prayer space using a phone or physical compass. Touch-first devices retain the live-compass enhancement even at wider viewports.
 - **Scope:** no second calculation, map service, external request, new dependency, persisted state, or claim of sensor accuracy is introduced.
 - **Tests/evidence required:** scroll ownership and reachable lower content at 320px, fine-pointer desktop guidance, touch-device compass preservation, Arabic/English rendering, full local gates, green workflows, and production verification.
+
+## DEC-180 — the standalone Mushaf is one full-screen page at every width
+
+- **Decision:** supersede DEC-096 and DEC-102 only where they introduced facing-page spreads, a desktop tool rail, or Focus Mode for the standalone Mushaf. The reader always presents one canonical page with the same four corner actions. The Surah name and printed page folio are direct navigation controls.
+- **Menu hierarchy:** Back, Reading options, page bookmark, and word meanings stay visible. Reading options contains saved places and reading settings; it does not repeat the visible index, bookmark, meaning, or focus actions. Navigation contains Surahs, Ajza', direct page jump, and saved places.
+- **Page geometry:** the folio has a reserved band after the fifteenth line and is biased toward the lower controls. Reduced frame and control reserves give the ayah lines the remaining height without changing their count. The exit arrow is a physical outward arrow and does not mirror in RTL.
+- **Why:** changing the reader's control system by viewport created multiple modes to learn and made common actions move. One stable full-screen composition preserves reading focus and makes the four most useful actions predictable.
+- **Compatibility:** stored layout and toolbar-side values remain accepted by state normalization but no longer alter the standalone reader. Qur'an text, QCF data, fifteen-line geometry, progress, bookmarks, and physical page-turn direction do not change.
+- **Tests/evidence required:** single-page rendering and identical corner controls at phone, tablet, landscape, and desktop widths; direct Surah and page navigation; reduced reading-options contents; keyboard, focus, RTL/LTR, full local gates, and production verification.
+
+## DEC-181 — Progress answers the selected period before presenting reflection metaphors
+
+- **Decision:** the Progress screen uses one compact period control and navigator, then presents the selected day, week, month, or year answer before garden stages and secondary trackers. Day routines use efficient themed rows rather than Home's photographic cards. The Oasis stage is a collapsed disclosure by default.
+- **Visual hierarchy:** related metrics share one bordered definition-list surface instead of separate elevated cards. Period views use consistent two-level surfaces, restrained radius and elevation, and stable icon meanings. The completion screen keeps its result, session metrics, and actions together instead of pushing actions to the foot of tall phones.
+- **Accessibility:** tabs retain the shared APG behavior; period navigation retains explicit names and disabled state. Charts retain visible numeric labels and gain programmatic progress values or text equivalents. Completion remains a polite status without turning the whole screen into a live region. Ordinary targets remain at least 44px.
+- **Data boundary:** all values remain derived from existing local completion, habit, prayer, Quran, and calendar data. No remote analytics, schema change, migration, leaderboard, or fabricated metric is introduced.
+- **Tests/evidence required:** progress and garden unit coverage, period keyboard behavior, chart equivalents, empty content, Arabic/English responsive evidence, completion-screen containment, full local gates, and owner review before release.
+
+## DEC-182 — Audio keeps stable edges, bottom docking, and one persisted completion path
+
+- **Decision:** compact and expanded audio players keep Expand/Minimize on one logical edge and Stop/Close on the other, so changing player size never swaps the actions under a reader's fingers. On reading screens both forms dock directly to the bottom safe area and use the space normally reserved for the reader counter/navigation controls.
+- **Progress:** both forms expose named listening progress. The value combines frozen queue position, prescribed repetition, and current-media position; the compact metadata also exposes track or repetition position without requiring expansion.
+- **Visual hierarchy:** the current title and reciter use one stable tonal surface, Play/Pause remains dominant, time seeking remains native, and speed/repeat/volume/voice remain secondary controls. No decorative color introduces a second semantic status system.
+- **Completion integrity:** natural completion continues through the existing `entry-complete` event and frozen plan context. Play Once records after one complete recitation; prescribed Repeat records only after its final repetition. The same local completion set drives the Reader counter and collection progress, while pause, stop, seek, skip, failure, and partial listening never fabricate completion.
+- **Tests/evidence required:** provider completion sequencing, Reader counter ownership, stable-edge geometry, named progress in both forms, bottom docking, RTL/LTR seek direction, focused browser audio coverage, full local gates, and owner review before release.

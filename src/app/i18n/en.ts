@@ -1041,7 +1041,7 @@ const en = {
     pageOfTotal: "{page} of {total}",
     enterFullscreen: "Full screen",
     exitFullscreen: "Exit full screen",
-    moreActions: "More options",
+    moreActions: "Reading options",
     juzLabel: "Juz {juz}",
     layoutAuto: "Automatic",
     layoutSingle: "Single Page",

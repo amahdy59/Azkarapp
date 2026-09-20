@@ -281,76 +281,24 @@ describe("KhatmahReaderScreen difficult words", () => {
   });
 });
 
-describe("KhatmahReaderScreen facing pages", () => {
-  const resize = (width: number, height: number) => {
-    Object.defineProperty(window, "innerWidth", { configurable: true, value: width });
-    Object.defineProperty(window, "innerHeight", { configurable: true, value: height });
-  };
-
-  afterEach(() => resize(1024, 768));
+describe("KhatmahReaderScreen single-page contract", () => {
+  afterEach(() => setViewport(1024, 768));
 
   it.each([
-    [1, "صفحتا ١ و٢", ["1", "2"]],
-    [2, "صفحتا ١ و٢", ["1", "2"]],
-    [603, "صفحتا ٦٠٣ و٦٠٤", ["603", "604"]],
-    [604, "صفحتا ٦٠٣ و٦٠٤", ["603", "604"]],
-  ] as const)("keeps endpoint page %i in its authoritative spread", async (page, label, expectedPages) => {
-    resize(1440, 900);
-    renderReader({ khatmahPage: page });
-
-    const spread = await screen.findByRole("article", { name: label });
-    const canvases = spread.querySelectorAll("[data-mushaf-rendering]");
-    expect([...canvases].map((canvas) => canvas.getAttribute("data-mushaf-page"))).toEqual([...expectedPages]);
-  });
-
-  it("pairs the odd page on the right whichever half you arrive on", async () => {
-    resize(1440, 900);
-    renderReader({ khatmahPage: 50 });
-
-    // The Mushaf opens with page 1 on the right, so pairs run (1,2), (3,4)...
-    // Arriving on the even half must still show the same spread, not page 50
-    // twice — which is what assuming the current page was the right-hand one did.
-    const spread = await screen.findByRole("article", { name: "صفحتا ٤٩ و٥٠" });
-    const canvases = spread.querySelectorAll("[data-mushaf-rendering]");
-    expect([...canvases].map((c) => c.getAttribute("data-mushaf-page"))).toEqual(["49", "50"]);
-    expect(spread.querySelector(".mushaf-spread")).toBeInTheDocument();
-    expect([...canvases].every((canvas) => canvas.classList.contains("mushaf-spread__page"))).toBe(true);
-  });
-
-  it("starts both facing-page loads and their nearest neighbours together", async () => {
-    resize(1440, 900);
-    const requested: number[] = [];
-    let release!: () => void;
-    const gate = new Promise<void>((resolve) => {
-      release = resolve;
-    });
-    vi.stubGlobal(
-      "fetch",
-      vi.fn(async (input: string) => {
-        const page = Number(String(input).match(/(\d+)\.json(?:\?.*)?$/)?.[1] ?? 1);
-        requested.push(page);
-        await gate;
-        return { ok: true, json: async () => pageFixture(page) };
-      }),
-    );
-
-    renderReader({ khatmahPage: 101 });
-    await waitFor(() => expect([...requested].sort((a, b) => a - b)).toEqual([100, 101, 102, 103]));
-    release();
-    await screen.findByRole("article", { name: "صفحتا ١٠١ و١٠٢" });
-  });
-
-  it("shows a single page when the screen has no room for two", async () => {
-    resize(820, 1180);
-    renderReader({ khatmahPage: 50 });
-    await screen.findByRole("article", { name: "صفحة ٥٠" });
-  });
-
-  it("never lets a stored spread preference force two pages onto mobile", async () => {
-    resize(390, 844);
+    [390, 844],
+    [834, 1112],
+    [1440, 900],
+  ] as const)("keeps one full-screen page with the same corner controls at %i×%i", async (width, height) => {
+    setViewport(width, height);
     renderReader({ khatmahPage: 50, mushafLayout: "spread" });
     const article = await screen.findByRole("article", { name: "صفحة ٥٠" });
+    expect(article).toHaveAttribute("data-mushaf-chrome-mode", "clean");
     expect(article.querySelectorAll("[data-mushaf-rendering]")).toHaveLength(1);
+    expect(screen.queryByTestId("mushaf-tool-rail")).not.toBeInTheDocument();
+    expect(screen.getByTestId("mushaf-top-left-back")).toBeInTheDocument();
+    expect(screen.getByTestId("mushaf-more-actions")).toBeInTheDocument();
+    expect(screen.getByTestId("mushaf-page-bookmark")).toBeInTheDocument();
+    expect(screen.getByTestId("mushaf-difficult-words-switch")).toBeInTheDocument();
   });
 });
 
@@ -385,121 +333,39 @@ describe("KhatmahReaderScreen settings menu", () => {
     expect(sheet.queryByTestId("mushaf-bookmark-toggle")).not.toBeInTheDocument();
     expect(sheet.queryByTestId("mushaf-focus-mode-action")).not.toBeInTheDocument();
   });
-
-  it("offers facing-page layout only when the desktop can fit it", async () => {
-    const user = userEvent.setup();
-    const setMushafLayout = vi.fn();
-    resize(1440, 900);
-    renderReader({ language: "en", direction: "ltr", setMushafLayout });
-    await screen.findByRole("article", { name: "Pages 41 and 42" });
-
-    await user.click(screen.getByRole("button", { name: "Settings" }));
-    const spreadOption = await screen.findByTestId("mushaf-layout-option-spread");
-    await user.click(spreadOption);
-    expect(setMushafLayout).toHaveBeenCalledWith("spread");
-  });
-});
-
-describe("KhatmahReaderScreen tool rail", () => {
-  afterEach(() => setViewport(1024, 768));
-
-  it("stands the tools beside the paper on a landscape screen instead of across it", async () => {
-    setViewport(1440, 900);
-    renderReader({ language: "en", direction: "ltr" });
-    const article = await screen.findByRole("article", { name: "Pages 41 and 42" });
-
-    expect(article).toHaveAttribute("data-mushaf-chrome-mode", "rail");
-    expect(screen.getByTestId("mushaf-tool-rail")).toBeInTheDocument();
-    // The two horizontal bars are the whole point: they are gone, and the
-    // 112px of height they cost goes back to the page.
-    expect(article.querySelector('[data-mushaf-chrome="header"]')).toBeNull();
-    expect(article.querySelector('[data-mushaf-chrome="footer"]')).toBeNull();
-    // Every control the bars carried is still reachable, by the same name.
-    expect(screen.getByRole("button", { name: "Next" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Previous" })).toBeInTheDocument();
-    expect(screen.getByRole("switch", { name: "Word meanings" })).toBeInTheDocument();
-    expect(screen.getByRole("switch", { name: "Add to page bookmarks" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Settings" })).toBeInTheDocument();
-  });
-
-  it("uses clean full-bleed layout without tool rail on a portrait tablet", async () => {
-    setViewport(820, 1180);
-    renderReader({ language: "en", direction: "ltr" });
-    const article = await screen.findByRole("article", { name: "Page 42" });
-
-    expect(article).toHaveAttribute("data-mushaf-chrome-mode", "clean");
-    expect(screen.queryByTestId("mushaf-tool-rail")).not.toBeInTheDocument();
-    expect(article.querySelector('[data-mushaf-chrome="footer"]')).toBeNull();
-  });
-
-  it("pins the rail to the stored edge", async () => {
-    setViewport(1440, 900);
-    renderReader({ language: "en", direction: "ltr", mushafToolbarSide: "left" });
-    await screen.findByRole("article", { name: "Pages 41 and 42" });
-    expect(screen.getByTestId("mushaf-tool-rail")).toHaveAttribute("data-rail-side", "left");
-  });
-
-  it("gives the whole screen to the page in focus mode, and gives the tools back on Escape", async () => {
-    const user = userEvent.setup();
-    const onBack = vi.fn();
-    setViewport(1440, 900);
-    renderReader({ language: "en", direction: "ltr", onBack });
-    await screen.findByRole("article", { name: "Pages 41 and 42" });
-
-    await user.click(screen.getByTestId("mushaf-focus-enter"));
-    expect(screen.queryByTestId("mushaf-tool-rail")).not.toBeInTheDocument();
-    const handle = screen.getByTestId("mushaf-focus-exit");
-    expect(handle).toHaveAccessibleName("Show tools");
-
-    // Escape hands back the tools before it hands back the screen: leaving the
-    // Mushaf outright would lose the reader's place to a keypress meant to undo.
-    await user.keyboard("{Escape}");
-    expect(onBack).not.toHaveBeenCalled();
-    expect(screen.getByTestId("mushaf-tool-rail")).toBeInTheDocument();
-
-    await user.keyboard("{Escape}");
-    expect(onBack).toHaveBeenCalledOnce();
-  });
-
-  it("lets each half of a spread name itself, and does not repeat the chrome on a phone", async () => {
-    setViewport(1440, 900);
-    renderReader({ language: "en", direction: "ltr" });
-    const spread = await screen.findByRole("article", { name: "Pages 41 and 42" });
-    // The chrome can only ever name one of the two; the paper names both.
-    expect(spread.querySelectorAll(".mushaf-page-furniture__folio")).toHaveLength(2);
-  });
-
-  it("prints the surah cartouche directly on the page in clean view", async () => {
-    setViewport(390, 844);
-    renderReader({ language: "en", direction: "ltr" });
-    const article = await screen.findByRole("article", { name: "Page 42" });
-    // In clean (immersive) view the cartouche may be rendered in the page
-    // furniture overlay rather than inside the article element itself, so we
-    // check that it is present somewhere in the document.
-    const cartouche =
-      article.querySelector(".mushaf-page-furniture__cartouche") ??
-      document.querySelector(".mushaf-page-furniture__cartouche") ??
-      document.querySelector("[data-testid='mushaf-top-center-index']") ??
-      document.querySelector("[data-testid='mushaf-furniture-surah-btn']");
-    expect(cartouche).not.toBeNull();
-    expect(article.querySelector(".mushaf-page-frame")).not.toBeNull();
-  });
 });
 
 describe("KhatmahReaderScreen quick menu", () => {
   afterEach(() => setViewport(1024, 768));
 
-  it("puts the phone's secondary actions one tap behind the header", async () => {
+  it("uses the Surah name and printed folio as direct navigation buttons", async () => {
     const user = userEvent.setup();
-    const setMushafBookmarks = vi.fn();
     setViewport(390, 844);
-    renderReader({ language: "en", direction: "ltr", setMushafBookmarks });
+    renderReader({ language: "en", direction: "ltr" });
+    await screen.findByRole("article", { name: "Page 42" });
+
+    await user.click(screen.getByTestId("mushaf-top-center-index"));
+    expect(await screen.findByRole("tab", { name: /Surahs/, selected: true })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Close" }));
+
+    await user.click(screen.getByTestId("mushaf-furniture-page-btn"));
+    expect(await screen.findByRole("tab", { name: "Page", selected: true })).toBeInTheDocument();
+  });
+
+  it("keeps duplicated page tools out of the reading-options menu", async () => {
+    const user = userEvent.setup();
+    setViewport(390, 844);
+    renderReader({ language: "en", direction: "ltr" });
     await screen.findByRole("article", { name: "Page 42" });
 
     await user.click(screen.getByTestId("mushaf-more-actions"));
     await screen.findByTestId("mushaf-quick-menu");
-    await user.click(screen.getByTestId("mushaf-quick-page-bookmark"));
-    expect(setMushafBookmarks).toHaveBeenCalledWith([42]);
+    expect(screen.queryByTestId("mushaf-quick-index")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("mushaf-quick-page-bookmark")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("mushaf-quick-word-meanings")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("mushaf-quick-focus")).not.toBeInTheDocument();
+    expect(screen.getByTestId("mushaf-quick-bookmarks")).toBeInTheDocument();
+    expect(screen.getByTestId("mushaf-quick-settings")).toBeInTheDocument();
   });
 
   it("opens the index straight onto bookmarks when that is what was asked for", async () => {
@@ -524,31 +390,29 @@ describe("KhatmahReaderScreen landscape phone", () => {
     expect(article).toHaveAttribute("data-mushaf-chrome-mode", "clean");
   });
 
-  it("takes the rail as soon as a landscape screen is tall enough to show all of it", async () => {
+  it("keeps the same clean corner layout on a taller landscape screen", async () => {
     setViewport(900, 600);
     renderReader({ language: "en", direction: "ltr" });
     const article = await screen.findByRole("article", { name: "Page 42" });
-    expect(article).toHaveAttribute("data-mushaf-chrome-mode", "rail");
-    // Still one page: the spread gate is separate and this screen fails its
-    // 1024px width floor.
+    expect(article).toHaveAttribute("data-mushaf-chrome-mode", "clean");
     expect(article.querySelectorAll("[data-mushaf-rendering]")).toHaveLength(1);
+    expect(screen.getByTestId("mushaf-top-center-index")).toHaveTextContent("Al-Baqarah");
   });
 });
 
 describe("KhatmahReaderScreen settings presentation", () => {
   afterEach(() => setViewport(1024, 768));
 
-  it("docks the reading settings beside the paper where the rail is showing", async () => {
+  it("keeps the reading settings in the same sheet on wide screens", async () => {
     const user = userEvent.setup();
     setViewport(1440, 900);
     renderReader({ language: "en", direction: "ltr" });
-    await screen.findByRole("article", { name: "Pages 41 and 42" });
+    await screen.findByRole("article", { name: "Page 42" });
 
-    await user.click(screen.getByTestId("mushaf-settings-trigger"));
-    const panel = await screen.findByTestId("mushaf-settings-sheet");
-    // Docked to the rail's own edge, held back far enough to leave it visible.
-    expect(panel).toHaveAttribute("data-side", "right");
-    expect(panel.style.right).toBe("72px");
+    await user.click(screen.getByTestId("mushaf-more-actions"));
+    await user.click(await screen.findByTestId("mushaf-quick-settings"));
+    const sheet = await screen.findByTestId("mushaf-settings-sheet");
+    expect(sheet).not.toHaveAttribute("data-side");
   });
 
   it("keeps the centred sheet where there is no width to dock into", async () => {

@@ -233,10 +233,12 @@ describe("AudioProvider integration", () => {
     expect(await screen.findByRole("region", { name: "Audio player" })).toBeInTheDocument();
 
     expect(screen.getByRole("button", { name: "Expand player" })).toBeInTheDocument();
+    expect(screen.getByRole("progressbar", { name: "Listening progress" })).toHaveAttribute("aria-valuenow", "0");
 
     // Playback starts compact so it does not obscure the screen.
     fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
     expect(screen.getByRole("button", { name: "Minimize player" })).toBeInTheDocument();
+    expect(screen.getByRole("progressbar", { name: "Listening progress" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Forward 10 seconds" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Rewind 10 seconds" })).toBeInTheDocument();
 
@@ -273,7 +275,7 @@ describe("AudioProvider integration", () => {
     expect(screen.queryByRole("button", { name: /Replay/ })).not.toBeInTheDocument();
   });
 
-  it("opens a mobile volume control and persists its accessible level", async () => {
+  it("opens an aligned mobile volume control and persists its accessible level", async () => {
     vi.stubGlobal("Audio", FakeAudio);
     render(
       <AudioProvider>
@@ -284,7 +286,7 @@ describe("AudioProvider integration", () => {
     fireEvent.click(await screen.findByRole("button", { name: /Mute audio/ }));
 
     const volume = screen.getByRole("slider", { name: "Volume" });
-    expect(volume).toHaveAttribute("aria-orientation", "vertical");
+    expect(volume).not.toHaveAttribute("aria-orientation", "vertical");
     fireEvent.change(volume, { target: { value: "0.4" } });
 
     expect(screen.getByRole("button", { name: /Volume 40%/ })).toBeInTheDocument();

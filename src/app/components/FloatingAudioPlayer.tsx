@@ -54,6 +54,7 @@ const COPY = {
     forward10Short: "Forward",
     track: "Track",
     repetitionChip: "Repetition",
+    sessionProgress: "Listening progress",
     speedShort: "Speed",
     reciterShort: "Reciter",
     repeatShort: "Repeat",
@@ -97,6 +98,7 @@ const COPY = {
     forward10Short: "تقديم",
     track: "المقطع",
     repetitionChip: "تكرار",
+    sessionProgress: "تقدم الاستماع",
     speedShort: "السرعة",
     reciterShort: "القارئ",
     repeatShort: "التكرار",
@@ -287,10 +289,12 @@ function VolumeControl({
   controller,
   language,
   copy,
+  inline = false,
 }: {
   controller: AudioController;
   language: AppLanguage;
   copy: (typeof COPY)[AppLanguage];
+  inline?: boolean;
 }) {
   const supportsHover = useMediaQuery("(hover: hover) and (pointer: fine)");
   const [open, setOpen] = useState(false);
@@ -299,13 +303,52 @@ function VolumeControl({
   const percentage = Math.round(level * 100);
 
   useEffect(() => {
-    if (!open) return;
+    if (inline || !open) return;
     const closeOutside = (event: PointerEvent) => {
       if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
     };
     document.addEventListener("pointerdown", closeOutside);
     return () => document.removeEventListener("pointerdown", closeOutside);
-  }, [open]);
+  }, [inline, open]);
+
+  if (inline) {
+    return (
+      <div
+        role="toolbar"
+        aria-label={copy.volume}
+        className="flex min-h-11 items-center gap-1 rounded-full border border-border px-1"
+      >
+        <button
+          type="button"
+          aria-label={`${controller.preferences.muted ? copy.unmute : copy.mute} · ${copy.volume} ${formatNumerals(percentage, language)}%`}
+          onClick={controller.toggleMuted}
+          className="flex size-11 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        >
+          {controller.preferences.muted || controller.preferences.volume === 0 ? (
+            <VolumeX size={20} aria-hidden="true" />
+          ) : (
+            <Volume2 size={20} aria-hidden="true" />
+          )}
+        </button>
+        <input
+          type="range"
+          min={0}
+          max={1}
+          step={0.05}
+          value={level}
+          onChange={(event) => controller.setVolume(Number(event.currentTarget.value))}
+          aria-label={copy.volume}
+          aria-valuetext={`${formatNumerals(percentage, language)}%`}
+          style={
+            {
+              "--audio-range-fill": progressBackground(percentage, language === "ar" ? "rtl" : "ltr"),
+            } as CSSProperties
+          }
+          className="audio-timeline-range h-11 w-20 cursor-pointer appearance-none accent-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:w-28"
+        />
+      </div>
+    );
+  }
 
   return (
     <div
@@ -314,7 +357,6 @@ function VolumeControl({
       aria-label={copy.volume}
       className="relative flex shrink-0"
       onPointerEnter={() => supportsHover && setOpen(true)}
-      onPointerLeave={() => supportsHover && setOpen(false)}
       onFocusCapture={() => supportsHover && setOpen(true)}
       onBlurCapture={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false);
@@ -345,9 +387,14 @@ function VolumeControl({
         <div
           id="audio-volume-control"
           data-testid="audio-volume-popover"
-          className="absolute bottom-full end-[-0.625rem] z-10 h-[10.5rem] w-16 pb-2"
+          className="absolute bottom-full end-[-0.625rem] z-10 h-16 w-44 pb-2"
         >
-          <div className="flex h-full w-full flex-col items-center justify-center rounded-2xl border border-border bg-card/98 py-3 shadow-overlay backdrop-blur-xl">
+          <div className="flex h-full w-full items-center gap-1 rounded-2xl border border-border bg-card/98 px-2 shadow-overlay backdrop-blur-xl">
+            {controller.preferences.muted || controller.preferences.volume === 0 ? (
+              <VolumeX size={18} className="shrink-0 text-muted-foreground" aria-hidden="true" />
+            ) : (
+              <Volume2 size={18} className="shrink-0 text-muted-foreground" aria-hidden="true" />
+            )}
             <input
               type="range"
               min={0}
@@ -356,16 +403,13 @@ function VolumeControl({
               value={level}
               onChange={(event) => controller.setVolume(Number(event.currentTarget.value))}
               aria-label={copy.volume}
-              aria-orientation="vertical"
               aria-valuetext={`${formatNumerals(percentage, language)}%`}
               style={
                 {
-                  writingMode: "vertical-lr",
-                  direction: "rtl",
-                  "--audio-volume-fill": `linear-gradient(to top, var(--primary) ${percentage}%, var(--muted) ${percentage}%)`,
+                  "--audio-range-fill": progressBackground(percentage, language === "ar" ? "rtl" : "ltr"),
                 } as CSSProperties
               }
-              className="audio-volume-range h-28 w-[1.125rem] cursor-pointer appearance-none accent-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              className="audio-timeline-range h-11 min-w-0 flex-1 cursor-pointer appearance-none accent-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             />
           </div>
         </div>
@@ -493,6 +537,11 @@ export function FloatingAudioPlayer({
     Number.isFinite(state.duration) && state.duration > 0
       ? Math.min(100, Math.max(0, (state.currentTime / state.duration) * 100))
       : 0;
+  const entryProgress =
+    currentEntry.repetitions > 1
+      ? (state.repetitionIndex + progressPercent / 100) / currentEntry.repetitions
+      : progressPercent / 100;
+  const sessionProgressPercent = Math.min(100, Math.max(0, ((state.entryIndex + entryProgress) / totalTracks) * 100));
 
   const positionChip =
     totalTracks > 1
@@ -507,7 +556,7 @@ export function FloatingAudioPlayer({
         aria-label={copy.region}
         dir={direction}
         data-variant="compact"
-        className="floating-audio-player floating-audio-player--compact fixed z-40 rounded-2xl border border-primary/30 bg-card/95 px-2.5 py-2 shadow-overlay backdrop-blur-xl dark:border-white/15"
+        className={`floating-audio-player floating-audio-player--compact fixed z-40 rounded-t-2xl border border-b-0 border-primary/30 bg-card px-2.5 py-2 shadow-overlay dark:border-white/15 ${overReadingSurface ? "floating-audio-player--reading" : ""}`}
       >
         <div className="sr-only" aria-live="polite" aria-atomic="true">
           {liveMessage}
@@ -517,11 +566,15 @@ export function FloatingAudioPlayer({
         <div
           data-testid="audio-compact-progress"
           className="absolute inset-x-3 top-0.5 h-1 overflow-hidden rounded-full bg-muted"
-          aria-hidden="true"
+          role="progressbar"
+          aria-label={copy.sessionProgress}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(sessionProgressPercent)}
         >
           <div
             className="absolute top-0 h-full bg-primary transition-[width] duration-fast"
-            style={{ width: `${progressPercent}%`, insetInlineStart: 0 }}
+            style={{ width: `${sessionProgressPercent}%`, insetInlineStart: 0 }}
           />
         </div>
 
@@ -541,6 +594,7 @@ export function FloatingAudioPlayer({
               <span className="block truncate text-label font-black text-foreground">{title}</span>
               <span className="block truncate text-micro font-semibold text-muted-foreground">
                 {reciterDisplayName}
+                {positionChip ? ` · ${positionChip}` : ""}
                 <span className="md:hidden">
                   {" · "}
                   <span dir="ltr" className="tabular-nums">
@@ -620,48 +674,62 @@ export function FloatingAudioPlayer({
       aria-label={copy.region}
       dir={direction}
       data-variant="expanded"
-      className="floating-audio-player floating-audio-player--expanded fixed z-40 overflow-y-auto rounded-t-3xl border border-primary/20 bg-card/95 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2 shadow-overlay backdrop-blur-xl sm:max-w-2xl sm:rounded-3xl sm:px-5 sm:pb-5 lg:max-w-4xl dark:border-white/10"
+      className={`floating-audio-player floating-audio-player--expanded fixed z-40 overflow-y-auto rounded-t-3xl border border-b-0 border-primary/20 bg-card px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2 shadow-overlay sm:max-w-2xl sm:px-5 lg:max-w-4xl dark:border-white/10 ${overReadingSurface ? "floating-audio-player--reading" : ""}`}
     >
       <div className="sr-only" aria-live="polite" aria-atomic="true">
         {liveMessage}
       </div>
 
-      {/* Closing sits in the corner; folding the player away is the centre
-          grabber, because it is the one people reach for while reciting. */}
-      <div className="relative flex items-center justify-center">
-        <button
-          type="button"
-          onClick={controller.stop}
-          aria-label={copy.stop}
-          className="absolute start-0 flex size-11 items-center justify-center rounded-full text-muted-foreground transition-[transform,background-color,color] duration-fast active:scale-95 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-        >
-          <X size={19} aria-hidden="true" />
-        </button>
+      {/* Minimize and close retain the same logical edges in both player sizes. */}
+      <div className="flex items-center justify-between">
         <button
           type="button"
           onClick={() => setIsMinimized(true)}
           aria-label={copy.collapse}
-          className="flex h-11 w-20 items-center justify-center rounded-full text-muted-foreground transition-[transform,background-color,color] duration-fast active:scale-95 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="flex size-11 items-center justify-center rounded-xl text-muted-foreground transition-[transform,background-color,color] duration-fast active:scale-95 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           <ChevronDown size={22} aria-hidden="true" />
+        </button>
+        <button
+          type="button"
+          onClick={controller.stop}
+          aria-label={copy.stop}
+          className="flex size-11 items-center justify-center rounded-xl text-muted-foreground transition-[transform,background-color,color] duration-fast active:scale-95 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        >
+          <X size={19} aria-hidden="true" />
         </button>
       </div>
 
       {/* What is playing, read down the middle: cue, surah, reciter, place. */}
-      <div className="flex flex-col items-center text-center">
-        <WaveBars playing={isPlaying} />
-        <h3 className="mt-2 line-clamp-2 text-xl font-black leading-tight text-foreground">{title}</h3>
-        <p className="mt-1 truncate text-label font-semibold text-muted-foreground">{reciterDisplayName}</p>
-        {positionChip && (
-          <p className="mt-2.5 rounded-full border border-border px-3 py-1 text-xs font-bold text-muted-foreground">
-            {positionChip}
-          </p>
-        )}
-        {isBusy && (
-          <p className="mt-2 text-xs font-semibold text-primary" role="status">
-            {state.status === "buffering" ? copy.buffering : copy.loading}
-          </p>
-        )}
+      <div className="rounded-2xl bg-muted/40 px-3 py-3 text-center">
+        <div className="flex flex-col items-center">
+          <WaveBars playing={isPlaying} />
+          <h3 className="mt-2 line-clamp-2 text-xl font-black leading-tight text-foreground">{title}</h3>
+          <p className="mt-1 truncate text-label font-semibold text-muted-foreground">{reciterDisplayName}</p>
+          {positionChip && (
+            <p className="mt-2.5 rounded-full border border-border px-3 py-1 text-xs font-bold text-muted-foreground">
+              {positionChip}
+            </p>
+          )}
+          {isBusy && (
+            <p className="mt-2 text-xs font-semibold text-primary" role="status">
+              {state.status === "buffering" ? copy.buffering : copy.loading}
+            </p>
+          )}
+        </div>
+        <div
+          className="mt-3 h-1.5 overflow-hidden rounded-full bg-muted"
+          role="progressbar"
+          aria-label={copy.sessionProgress}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(sessionProgressPercent)}
+        >
+          <div
+            className="h-full rounded-full bg-primary transition-[width] duration-fast"
+            style={{ width: `${sessionProgressPercent}%` }}
+          />
+        </div>
       </div>
 
       {/* Timeline / Scrub Bar with Generous 44px Hit Target */}
@@ -800,7 +868,7 @@ export function FloatingAudioPlayer({
           </span>
         </button>
 
-        <VolumeControl controller={controller} language={language} copy={copy} />
+        <VolumeControl controller={controller} language={language} copy={copy} inline />
 
         {currentEntry.availableVoiceIds.length > 1 && (
           <button

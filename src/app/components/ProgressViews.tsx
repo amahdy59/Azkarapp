@@ -245,18 +245,20 @@ function MainDhikrGroupCard({
     <button
       type="button"
       onClick={onPress}
-      className={`stagger-content group relative flex w-full rounded-3xl border transition-[background-color,border-color,box-shadow] duration-standard focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 ${
+      className={`stagger-content group relative flex w-full rounded-2xl border transition-[background-color,border-color] duration-standard focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 ${
         compact
-          ? "min-h-[6.5rem] items-center gap-3 px-4 py-4 text-start sm:min-h-[13rem] sm:flex-col sm:justify-between sm:gap-4 sm:px-4 sm:py-5 sm:text-center lg:min-h-[11.5rem] lg:gap-2.5 lg:px-2.5 lg:py-4 xl:min-h-[11.5rem] xl:gap-3 xl:px-4 xl:py-4"
+          ? onMedia
+            ? "min-h-[6.5rem] items-center gap-3 px-4 py-4 text-start sm:min-h-[13rem] sm:flex-col sm:justify-between sm:gap-4 sm:px-4 sm:py-5 sm:text-center lg:min-h-[11.5rem] lg:gap-2.5 lg:px-2.5 lg:py-4 xl:min-h-[11.5rem] xl:gap-3 xl:px-4 xl:py-4"
+            : "min-h-[4.5rem] items-center gap-3 px-3 py-2.5 text-start"
           : "min-h-[9.5rem] flex-col items-center justify-between px-3 py-4 text-center"
       } ${
         isCompleted
           ? onMedia
             ? "hero-glass home-glass-surface border-primary/55 bg-primary/20 text-on-media shadow-raised shadow-[0_0_15px_rgba(201,155,76,0.15)]"
-            : "border-primary/55 bg-primary/10 text-foreground shadow-raised"
+            : "border-primary/55 bg-primary/10 text-foreground"
           : onMedia
             ? "hero-glass home-glass-surface border-white/20 text-on-media shadow-raised hover:border-white/40"
-            : "border-border bg-background text-foreground shadow-raised hover:border-primary/45 hover:bg-muted"
+            : "border-border bg-background text-foreground hover:border-primary/45 hover:bg-muted"
       }`}
       // The recommendation is added to the name, never substituted for the
       // status: swapping them told a screen-reader user this routine was
@@ -265,26 +267,30 @@ function MainDhikrGroupCard({
       data-recommended-now={showRecommended ? "true" : undefined}
     >
       <div
-        className={`flex shrink-0 items-center justify-center rounded-full border transition-colors ${
-          compact ? "size-14 sm:size-16 lg:size-13 xl:size-14" : "size-16"
+        className={`flex shrink-0 items-center justify-center transition-colors ${
+          compact
+            ? onMedia
+              ? "size-14 rounded-full border sm:size-16 lg:size-13 xl:size-14"
+              : "size-10"
+            : "size-16 rounded-full border"
         } ${
           isCompleted
             ? "border-success/60 bg-success/20 text-success"
             : onMedia
               ? "border-white/20 bg-white/10 text-on-media-accent"
-              : "border-border bg-muted text-primary"
+              : "text-primary"
         }`}
       >
         {icon}
       </div>
 
       <div
-        className={`flex min-w-0 flex-1 flex-col ${compact ? "items-start sm:items-center" : "w-full items-center"}`}
+        className={`flex min-w-0 flex-1 flex-col ${compact ? (onMedia ? "items-start sm:items-center" : "items-start") : "w-full items-center"}`}
       >
         <span
           dir="auto"
-          className={`text-base font-black leading-relaxed text-inherit sm:text-title ${
-            compact ? "lg:text-subtitle" : ""
+          className={`text-base font-black leading-relaxed text-inherit ${
+            compact ? (onMedia ? "sm:text-title lg:text-subtitle" : "") : "sm:text-title"
           }`}
         >
           {name}
@@ -294,7 +300,7 @@ function MainDhikrGroupCard({
           /* 32px clear of the name. The column used to space every child
              equally, so this gap could not grow without shoving the
              after-prayer dots down with it. */
-          className={`mt-8 inline-flex items-center justify-center whitespace-nowrap rounded-full px-3 py-1 text-xs font-bold ${
+          className={`${compact && !onMedia ? "mt-0.5" : "mt-8 rounded-full px-3 py-1"} inline-flex items-center justify-center whitespace-nowrap text-xs font-bold ${
             isCompleted
               ? "bg-success text-success-foreground shadow-sm"
               : showRecommended
@@ -563,7 +569,7 @@ export function ProgressDayView({
             // Home wird row: use immersive image card. Only morning/evening/before_sleep
             // appear in HOME_WIRD_CATEGORY_IDS so after_prayer has no entry, but
             // we guard with a key check so TypeScript is satisfied.
-            if (isHomeSubset && col.id in WIRD_CARD_CONFIG) {
+            if (isHomeSubset && onMedia && col.id in WIRD_CARD_CONFIG) {
               const cardKey = col.id as keyof typeof WIRD_CARD_CONFIG;
               const subtitleI18nKey = WIRD_CARD_CONFIG[cardKey].subtitleKey as Parameters<typeof t>[1];
               return (
@@ -602,7 +608,7 @@ export function ProgressDayView({
             );
           })}
 
-          {quranWird && isHomeSubset ? (
+          {quranWird && isHomeSubset && onMedia ? (
             <WirdCategoryCard
               categoryKey="quran"
               name={t(language, "mushaf.wirdTitle")}
@@ -740,39 +746,38 @@ export function ProgressWeekView({
       className="mx-auto flex w-full max-w-[44rem] flex-col gap-4 fade-in xl:max-w-[80rem]"
       dir={isArabic ? "rtl" : "ltr"}
     >
-      {/* Top 3 Stat Cards */}
-      <div className="grid grid-cols-3 gap-3">
+      {/* One scan line answers the three common weekly questions without
+          presenting three equally dominant cards. */}
+      <dl className="grid grid-cols-3 overflow-hidden rounded-2xl border border-border bg-card">
         {/* Most Consistent Routine Card */}
-        <div className="flex flex-col items-center justify-center p-3.5 sm:p-4 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
+        <div className="flex min-w-0 flex-col items-center justify-center border-e border-border p-3 text-center">
           <Sun size={20} className="text-primary mb-1" />
-          <span className="text-xs font-bold text-muted-foreground mb-0.5">
+          <dt className="mb-0.5 text-xs font-bold text-muted-foreground">
             {t(language, "progress.mostConsistentRoutine")}
-          </span>
-          <span className="text-sm font-black text-foreground truncate max-w-full">{bestRoutineName}</span>
+          </dt>
+          <dd className="max-w-full truncate text-sm font-black text-foreground">{bestRoutineName}</dd>
         </div>
 
         {/* Best Streak Card */}
-        <div className="flex flex-col items-center justify-center p-3.5 sm:p-4 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
-          <span className="text-xs font-bold text-muted-foreground mb-0.5">{t(language, "progress.bestStreak")}</span>
-          <span className="text-subtitle font-black text-foreground">
+        <div className="flex min-w-0 flex-col items-center justify-center border-e border-border p-3 text-center">
+          <dt className="mb-0.5 text-xs font-bold text-muted-foreground">{t(language, "progress.bestStreak")}</dt>
+          <dd className="text-subtitle font-black text-foreground">
             {formatNumerals(weekStats.bestStreakDays, language)} {t(language, "progress.days")}
-          </span>
+          </dd>
         </div>
 
         {/* Completed Days Card */}
-        <div className="flex flex-col items-center justify-center p-3.5 sm:p-4 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
+        <div className="flex min-w-0 flex-col items-center justify-center p-3 text-center">
           <CheckCircle2 size={20} className="text-success mb-1" />
-          <span className="text-xs font-bold text-muted-foreground mb-0.5">
-            {t(language, "progress.completedDays")}
-          </span>
-          <span className="text-subtitle font-black text-foreground">
+          <dt className="mb-0.5 text-xs font-bold text-muted-foreground">{t(language, "progress.completedDays")}</dt>
+          <dd className="text-subtitle font-black text-foreground">
             {formatNumerals(weekStats.completedDaysCount, language)} {t(language, "progress.ofSeven")}
-          </span>
+          </dd>
         </div>
-      </div>
+      </dl>
 
       {/* Main Weekly Commitment Matrix Card */}
-      <div className="w-full rounded-3xl bg-card border border-border/40 p-5 md:p-6 shadow-raised">
+      <div className="w-full rounded-2xl border border-border bg-card p-4 md:p-5">
         <h2
           data-testid="progress-primary-heading"
           className="mb-4 block max-w-full truncate whitespace-nowrap text-start text-base font-black text-foreground sm:text-lg md:text-xl"
@@ -869,8 +874,8 @@ export function ProgressWeekView({
       {/* Bottom Row: Insight Card & Routine Summary Card */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Insight Card */}
-        <div className="p-5 rounded-3xl bg-card border border-success shadow-raised flex items-center gap-4">
-          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-success/20 border border-success/40 text-success shrink-0">
+        <div className="flex items-center gap-3 rounded-2xl border border-success/50 bg-success/5 p-4">
+          <div className="flex size-10 shrink-0 items-center justify-center text-success">
             <Sparkles size={24} />
           </div>
           <div>
@@ -890,7 +895,7 @@ export function ProgressWeekView({
         </div>
 
         {/* Routine Summary Progress Bars Card */}
-        <div className="p-5 rounded-3xl bg-card border border-border/40 shadow-raised flex flex-col justify-center gap-3">
+        <div className="flex flex-col justify-center gap-3 rounded-2xl border border-border bg-card p-4">
           <h3 className="mb-1 block max-w-full truncate whitespace-nowrap text-sm font-black text-foreground">
             {t(language, "progress.weeklySummary")}
           </h3>
@@ -900,7 +905,14 @@ export function ProgressWeekView({
             <span className="text-muted-foreground w-14 shrink-0">
               {formatNumerals(weekStats.morningCompletedCount, language)} {t(language, "progress.ofSeven")}
             </span>
-            <div className="flex-1 h-2 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
+            <div
+              className="h-2 flex-1 overflow-hidden rounded-full bg-black/10 dark:bg-white/10"
+              role="progressbar"
+              aria-label={t(language, "progress.morningAzkar")}
+              aria-valuemin={0}
+              aria-valuemax={7}
+              aria-valuenow={weekStats.morningCompletedCount}
+            >
               <div
                 className="h-full bg-success rounded-full"
                 style={{ width: `${Math.round((weekStats.morningCompletedCount / 7) * 100)}%` }}
@@ -917,7 +929,14 @@ export function ProgressWeekView({
             <span className="text-muted-foreground w-14 shrink-0">
               {formatNumerals(weekStats.eveningCompletedCount, language)} {t(language, "progress.ofSeven")}
             </span>
-            <div className="flex-1 h-2 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
+            <div
+              className="h-2 flex-1 overflow-hidden rounded-full bg-black/10 dark:bg-white/10"
+              role="progressbar"
+              aria-label={t(language, "progress.eveningAzkar")}
+              aria-valuemin={0}
+              aria-valuemax={7}
+              aria-valuenow={weekStats.eveningCompletedCount}
+            >
               <div
                 className="h-full bg-primary rounded-full"
                 style={{ width: `${Math.round((weekStats.eveningCompletedCount / 7) * 100)}%` }}
@@ -934,7 +953,14 @@ export function ProgressWeekView({
             <span className="text-muted-foreground w-14 shrink-0">
               {formatNumerals(weekStats.sleepCompletedCount, language)} {t(language, "progress.ofSeven")}
             </span>
-            <div className="flex-1 h-2 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
+            <div
+              className="h-2 flex-1 overflow-hidden rounded-full bg-black/10 dark:bg-white/10"
+              role="progressbar"
+              aria-label={t(language, "progress.sleepAzkar")}
+              aria-valuemin={0}
+              aria-valuemax={7}
+              aria-valuenow={weekStats.sleepCompletedCount}
+            >
               <div
                 className="h-full bg-sleep rounded-full"
                 style={{ width: `${Math.round((weekStats.sleepCompletedCount / 7) * 100)}%` }}
@@ -1034,58 +1060,46 @@ export function ProgressMonthView({
       className="mx-auto flex w-full max-w-[44rem] flex-col gap-4 fade-in xl:max-w-[80rem]"
       dir={isArabic ? "rtl" : "ltr"}
     >
-      {/* Top 4 Stat Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <dl className="grid grid-cols-2 overflow-hidden rounded-2xl border border-border bg-card sm:grid-cols-4">
         {/* Best Routine */}
-        <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
+        <div className="flex flex-col items-center justify-center p-3 text-center">
           <Sun size={20} className="text-primary mb-1" />
-          <span className="text-micro font-bold text-muted-foreground mb-0.5">
-            {t(language, "progress.bestRoutine")}
-          </span>
-          <span className="text-label font-black text-foreground truncate max-w-full">
+          <dt className="mb-0.5 text-micro font-bold text-muted-foreground">{t(language, "progress.bestRoutine")}</dt>
+          <dd className="max-w-full truncate text-label font-black text-foreground">
             {getCategoryName(monthStats.bestRoutine, language)}
-          </span>
+          </dd>
         </div>
 
         {/* Longest Streak */}
-        <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
+        <div className="flex flex-col items-center justify-center p-3 text-center">
           <Zap className="h-5 w-5 text-primary fill-primary/20 mb-1" />
-          <span className="text-micro font-bold text-muted-foreground mb-0.5">
-            {t(language, "progress.longestStreak")}
-          </span>
-          <span className="text-sm font-black text-foreground">
+          <dt className="mb-0.5 text-micro font-bold text-muted-foreground">{t(language, "progress.longestStreak")}</dt>
+          <dd className="text-sm font-black text-foreground">
             {formatNumerals(monthStats.longestStreak, language)} {t(language, "progress.days")}
-          </span>
+          </dd>
         </div>
 
         {/* Full Days */}
-        <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
+        <div className="flex flex-col items-center justify-center p-3 text-center">
           <Calendar size={20} className="text-success mb-1" />
-          <span className="text-micro font-bold text-muted-foreground mb-0.5">{t(language, "progress.fullDays")}</span>
-          <span className="text-sm font-black text-foreground">
-            {formatNumerals(monthStats.fullDaysCount, language)}
-          </span>
+          <dt className="mb-0.5 text-micro font-bold text-muted-foreground">{t(language, "progress.fullDays")}</dt>
+          <dd className="text-sm font-black text-foreground">{formatNumerals(monthStats.fullDaysCount, language)}</dd>
         </div>
 
         {/* Completion Rate */}
-        <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
+        <div className="flex flex-col items-center justify-center p-3 text-center">
           <Sprout size={20} className="text-success mb-1" />
-          <span className="text-micro font-bold text-muted-foreground mb-0.5">
+          <dt className="mb-0.5 text-micro font-bold text-muted-foreground">
             {t(language, "progress.completionRate")}
-          </span>
-          <span className="text-sm font-black text-primary">
-            %{formatNumerals(monthStats.completionRate, language)}
-          </span>
+          </dt>
+          <dd className="text-sm font-black text-primary">%{formatNumerals(monthStats.completionRate, language)}</dd>
         </div>
-      </div>
+      </dl>
 
       {/* Main Month View: Calendar Grid + Selected Day Details */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Calendar Grid Card (2 Columns on desktop) */}
-        <div
-          data-testid="garden-month-calendar"
-          className="md:col-span-2 p-5 rounded-3xl bg-card border border-border/40 shadow-raised"
-        >
+        <div data-testid="garden-month-calendar" className="rounded-2xl border border-border bg-card p-4 md:col-span-2">
           {/* Weekday headers */}
           <div className="grid grid-cols-7 gap-1 mb-2 text-center">
             {weekdays.map((day) => (
@@ -1175,7 +1189,7 @@ export function ProgressMonthView({
         {/* Selected Day Details & Monthly Insight Card (1 Column on desktop) */}
         <div className="flex flex-col gap-4">
           {/* Day Details Card */}
-          <div className="p-5 rounded-3xl bg-card border border-border/40 shadow-raised flex flex-col gap-3">
+          <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4">
             <div className="flex items-center justify-between border-b border-white/20 dark:border-white/10 pb-2">
               <div className="min-w-0 flex-1">
                 <h2
@@ -1245,7 +1259,7 @@ export function ProgressMonthView({
           </div>
 
           {/* Month Improvement Insight */}
-          <div className="p-4 rounded-3xl bg-card border border-success shadow-raised flex items-start gap-3">
+          <div className="flex items-start gap-3 rounded-2xl border border-success/50 bg-success/5 p-4">
             <Sprout size={20} className="text-success shrink-0 mt-0.5" />
             <div>
               <h3 className="mb-1 block max-w-full truncate whitespace-nowrap text-sm font-black text-foreground">
@@ -1313,57 +1327,50 @@ export function ProgressYearView({
       className="mx-auto flex w-full max-w-[44rem] flex-col gap-4 fade-in xl:max-w-[80rem]"
       dir={isArabic ? "rtl" : "ltr"}
     >
-      {/* Top 4 Stat Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <dl className="grid grid-cols-2 overflow-hidden rounded-2xl border border-border bg-card sm:grid-cols-4">
         {/* Completion Rate */}
-        <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
+        <div className="flex flex-col items-center justify-center p-3 text-center">
           <Sprout size={20} className="text-success mb-1" />
-          <span className="text-micro font-bold text-muted-foreground mb-0.5">
+          <dt className="mb-0.5 text-micro font-bold text-muted-foreground">
             {t(language, "progress.completionRate")}
-          </span>
-          <span className="text-subtitle font-black text-primary">
+          </dt>
+          <dd className="text-subtitle font-black text-primary">
             %{formatNumerals(yearStats.overallCompletionRate, language)}
-          </span>
+          </dd>
         </div>
 
         {/* Longest Streak */}
-        <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
+        <div className="flex flex-col items-center justify-center p-3 text-center">
           <Star size={20} className="text-primary mb-1" />
-          <span className="text-micro font-bold text-muted-foreground mb-0.5">
-            {t(language, "progress.longestStreak")}
-          </span>
-          <span className="text-sm font-black text-foreground">
+          <dt className="mb-0.5 text-micro font-bold text-muted-foreground">{t(language, "progress.longestStreak")}</dt>
+          <dd className="text-sm font-black text-foreground">
             {formatNumerals(yearStats.longestStreak, language)} {t(language, "progress.days")}
-          </span>
+          </dd>
         </div>
 
         {/* Current Streak */}
-        <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
+        <div className="flex flex-col items-center justify-center p-3 text-center">
           <Zap className="h-5 w-5 text-primary fill-primary/20 mb-1" />
-          <span className="text-micro font-bold text-muted-foreground mb-0.5">
-            {t(language, "progress.currentStreak")}
-          </span>
-          <span className="text-sm font-black text-foreground">
+          <dt className="mb-0.5 text-micro font-bold text-muted-foreground">{t(language, "progress.currentStreak")}</dt>
+          <dd className="text-sm font-black text-foreground">
             {formatNumerals(yearStats.currentStreak, language)} {t(language, "progress.days")}
-          </span>
+          </dd>
         </div>
 
         {/* Active Days */}
-        <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
+        <div className="flex flex-col items-center justify-center p-3 text-center">
           <Calendar size={20} className="text-success mb-1" />
-          <span className="text-micro font-bold text-muted-foreground mb-0.5">
-            {t(language, "progress.activeDays")}
-          </span>
-          <span className="text-sm font-black text-foreground">
+          <dt className="mb-0.5 text-micro font-bold text-muted-foreground">{t(language, "progress.activeDays")}</dt>
+          <dd className="text-sm font-black text-foreground">
             {formatNumerals(yearStats.activeDays, language)} {t(language, "progress.activeSuffix")}
-          </span>
+          </dd>
         </div>
-      </div>
+      </dl>
 
       {/* Middle Section: Monthly Bar Chart + Quick Glance */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Monthly Completion Bar Chart (2 Columns on desktop) */}
-        <div className="md:col-span-2 p-5 rounded-3xl bg-card border border-border/40 shadow-raised flex flex-col">
+        <div className="flex flex-col rounded-2xl border border-border bg-card p-4 md:col-span-2">
           <div className="flex items-center justify-between mb-1">
             <h2
               data-testid="progress-primary-heading"
@@ -1410,10 +1417,17 @@ export function ProgressYearView({
               );
             })}
           </div>
+          <ul className="sr-only overflow-hidden">
+            {yearStats.months.map((month, index) => (
+              <li key={month.monthIndex} className="overflow-hidden">
+                {monthNames[index]}: {formatNumerals(month.completionRate, language)}%
+              </li>
+            ))}
+          </ul>
         </div>
 
         {/* Quick Glance Card (1 Column on desktop) */}
-        <div className="p-5 rounded-3xl bg-card border border-border/40 shadow-raised flex flex-col justify-between gap-3">
+        <div className="flex flex-col justify-between gap-3 rounded-2xl border border-border bg-card p-4">
           <h2 className="block max-w-full truncate whitespace-nowrap border-b border-white/20 pb-2 text-subtitle font-black text-foreground dark:border-white/10">
             {t(language, "progress.quickGlance")}
           </h2>
@@ -1476,7 +1490,7 @@ export function ProgressYearView({
               </div>
 
               {/* Mini day grid */}
-              <div className="grid grid-cols-7 gap-0.5">
+              <div className="grid grid-cols-7 gap-0.5" aria-hidden="true">
                 {m.dayCells.slice(0, 28).map((cell) => (
                   <div
                     key={cell.dayNum}
@@ -1496,7 +1510,7 @@ export function ProgressYearView({
       </div>
 
       {/* Motivational Quote / Closing Prayer Card */}
-      <div className="p-4 rounded-3xl bg-muted border border-border shadow-raised flex items-center justify-center text-center">
+      <div className="flex items-center justify-center rounded-2xl bg-muted p-4 text-center">
         <p className="text-sm font-bold text-foreground">
           {yearStats.totalCollections > 0
             ? t(language, "garden.yearActivitySummary", {

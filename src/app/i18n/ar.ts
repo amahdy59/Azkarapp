@@ -1026,7 +1026,7 @@ const ar = {
     pageOfTotal: "{page} من {total}",
     enterFullscreen: "ملء الشاشة",
     exitFullscreen: "إنهاء ملء الشاشة",
-    moreActions: "خيارات أخرى",
+    moreActions: "خيارات القراءة",
     juzLabel: "الجزء {juz}",
     layoutAuto: "تلقائي",
     layoutSingle: "صفحة واحدة",

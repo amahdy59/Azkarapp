@@ -394,7 +394,7 @@ const JUSTIFY_FILL_THRESHOLD = 0.82;
  * This non-negotiable rule prevents 'just nudging' leading or line counts, which breaks the Mushaf layout.
  * SLOT_INK_ALLOWANCE adjusts the ink-to-slot ratio (internal letter scaling) without altering the 15-line geometry.
  */
-const SLOT_INK_ALLOWANCE = { "qcf-v2": 0.88, fallback: 0.68 } as const;
+const SLOT_INK_ALLOWANCE = { "qcf-v2": 0.9, fallback: 0.72 } as const;
 
 /**
  * The reader's type-size choice, as a multiplier on the ink allowance above.
@@ -652,7 +652,7 @@ function PageFurnitureFoot({
   }, [pageNumber]);
 
   return (
-    <div className="mushaf-page-furniture flex shrink-0 items-center justify-center" dir="rtl">
+    <div className="mushaf-page-furniture mushaf-page-furniture--foot flex shrink-0 items-end justify-center" dir="rtl">
       {onPageClick ? (
         <button
           type="button"
@@ -662,10 +662,8 @@ function PageFurnitureFoot({
           }}
           data-testid="mushaf-furniture-page-btn"
           aria-label={t(language, "mushaf.pagePosition", { position: formatNumerals(pageNumber, language) })}
-          className={`mushaf-page-furniture__folio tabular-nums cursor-pointer rounded-full px-3 py-0.5 transition-all duration-300 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-            highlighted
-              ? "border-primary bg-primary/20 text-primary ring-2 ring-primary/40 scale-105 font-black"
-              : "hover:bg-foreground/10"
+          className={`mushaf-page-furniture__folio tabular-nums cursor-pointer transition-colors duration-300 hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+            highlighted ? "text-primary font-black" : ""
           }`}
         >
           {formatNumerals(pageNumber, language)}
@@ -673,7 +671,7 @@ function PageFurnitureFoot({
       ) : (
         <span
           className={`mushaf-page-furniture__folio tabular-nums transition-all duration-300 ${
-            highlighted ? "border-primary bg-primary/20 text-primary ring-2 ring-primary/40 scale-105 font-black" : ""
+            highlighted ? "text-primary font-black" : ""
           }`}
           aria-hidden="true"
         >
@@ -802,8 +800,8 @@ function MushafPageCanvas({
         containerType: "size",
         ...(hasFloatingControls
           ? {
-              paddingTop: "calc(3.6rem + env(safe-area-inset-top))",
-              paddingBottom: "calc(3.6rem + env(safe-area-inset-bottom))",
+              paddingTop: "calc(3.25rem + env(safe-area-inset-top))",
+              paddingBottom: "calc(2.875rem + env(safe-area-inset-bottom))",
             }
           : {}),
       }}

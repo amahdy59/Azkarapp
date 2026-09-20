@@ -1,101 +1,87 @@
-# Phase Report — Phase 08 Progress and Quiet Garden
+# Phase Report — Progress and quiet completion
 
 ## Objective
 
-Make Progress a useful, accessible, gentle reflection area whose period metrics are supported by recorded data.
+Make Progress a calm reflection area that answers the selected period clearly, and make routine completion concise and actionable.
 
 ## Scope completed
 
-- Removed every hard-coded metric fallback and unsupported comparison from Week, Month, and Year views.
-- Corrected selectors to count exactly the four `MAIN_CATEGORY_IDS` and ignore unrelated collections.
-- Added after-prayer to weekly text equivalents, routine summaries, monthly fractions, selected-day details, best-routine calculations, and annual consistency calculations.
-- Made best routine, most missed routine, best month, and most consistent routine neutral when no activity is recorded.
-- Prevented future dates from resetting the current-year streak.
-- Replaced unsupported praise/comparison claims with factual, localized empty and activity summaries.
-- Completed the previously deferred `RoutineGarden` split under DEC-040; it is now 418 lines with extracted marks and date-label helpers.
+- Consolidated the period controls, navigation, and headline metrics.
+- Placed the selected period's useful content before optional garden context.
+- Replaced Progress-only photographic routine cards with compact theme-aware rows.
+- Made the Oasis stage a native collapsed disclosure.
+- Reduced competing cards, shadows, icon containers, and inconsistent radii across period summaries.
+- Kept completion feedback, metrics, date, and actions in one centered content flow.
 
 ## Files changed
 
-- `src/app/gardenViews.ts`
-- `src/app/gardenViews.test.ts`
+- `src/app/screens/ProgressScreen.tsx`
 - `src/app/components/ProgressViews.tsx`
-- `src/app/components/ProgressViews.test.tsx`
-- `src/app/components/RoutineGarden.tsx`
-- `src/app/i18n/en.ts`
-- `src/app/i18n/ar.ts`
-- `e2e/quiet-garden.spec.ts`
+- `src/app/screens/CompletionScreen.tsx`
+- `src/app/screens/ProgressScreen.test.tsx`
 - `docs/agent/DECISION_LOG.md`
 - `docs/agent/evidence/phase-08/PHASE_08_REPORT.md`
-- `docs/agent/evidence/phase-08/*.png`
 
 ## Components added or modified
 
-- `ProgressWeekView`: four-routine matrix and summaries; recorded zero values; neutral empty state.
-- `ProgressMonthView`: four-routine calendar fractions/details; recorded statistics; factual monthly summary.
-- `ProgressYearView`: recorded chart values and totals; nullable best-period labels; neutral annual guidance.
-- `TodayRoutineGarden`: removed an obsolete summary prop from the Week view call.
-- Garden view selectors: main-routine filtering, nullable empty-state leaders, after-prayer coverage, and elapsed-date streak logic.
+- `ProgressScreen`
+- `ProgressDayView`
+- `ProgressWeekView`
+- `ProgressMonthView`
+- `ProgressYearView`
+- `MainDhikrGroupCard`
+- `CompletionScreen`
 
 ## User-visible changes
 
-- New users see zero rather than example numbers such as 74%, 214 active days, or 14,367 completions.
-- Progress no longer claims improvement without prior-period evidence.
-- Week and Month now visibly account for Post-Prayer Azkar and use a denominator of four.
-- Empty periods explain that no routine activity is recorded and how to begin.
+- Period controls occupy less vertical space and use one predictable anatomy.
+- Day routines are compact rows and precede the optional garden-stage explanation.
+- Week, month, and year headline metrics scan as one group rather than many competing cards.
+- Completion actions no longer sit at the bottom of otherwise empty tall screens.
 
 ## Accessibility work
 
-- Weekly chart/list equivalence now exposes 28 labelled status cells across four routine columns.
-- Every week header retains `scope="col"`; every status keeps readable completed/not-completed text.
-- Month calendar accessible names now announce partial completion out of four.
-- Selected-day details expose the fourth routine in text, not only through aggregate color or marks.
-- Automated evidence does not replace the outstanding manual screen-reader walkthrough.
+- Preserved APG tabs, explicit period-navigation labels, disabled-state semantics, headings, keyboard operation, and 44px targets.
+- Converted grouped metrics to semantic definition lists.
+- Added names and numeric values to weekly progress bars.
+- Added a textual monthly-rate equivalent to the annual visual chart.
+- Used native `details`/`summary` for progressive disclosure.
 
 ## Tests added or updated
 
-- Selector tests cover empty periods, non-main-category exclusion, after-prayer as the strongest routine, and current-year streak preservation.
-- Component tests reject fabricated zero-data values and unsupported comparison copy.
-- Playwright weekly-grid coverage now expects and checks all 28 labelled cells, including Post-Prayer.
+- Added coverage for the collapsed Oasis disclosure, non-photographic Progress routines, and numeric weekly progress bars.
 
 ## Commands run
 
-| Command                                                                                      | Result                                                           |
-| -------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| `pnpm exec vitest run src/app/gardenViews.test.ts src/app/components/ProgressViews.test.tsx` | Passed — 14 tests                                                |
-| `pnpm typecheck`                                                                             | Passed                                                           |
-| `pnpm lint`                                                                                  | Passed                                                           |
-| `pnpm install --frozen-lockfile`                                                             | Passed — lockfile current                                        |
-| `pnpm check`                                                                                 | Passed — 56 files, 296 tests, coverage/build/bundle budget green |
-| `pnpm test:e2e`                                                                              | Passed — 256 tests                                               |
-| `pnpm build:pages`                                                                           | Passed — Pages artifact and bundle budget green                  |
+| Command                                    | Result                             |
+| ------------------------------------------ | ---------------------------------- |
+| Focused Progress and view Vitest suites    | Passed: 13 tests                   |
+| `pnpm typecheck`                           | Passed                             |
+| `git diff --check`                         | Passed                             |
+| Focused responsive Progress Chromium suite | Passed: day, week, month, and year |
+| `pnpm check`                               | Passed in 59.3s                    |
 
 ## Visual/manual evidence
 
-- `empty-week-mobile.png` — 390×844, recorded zeros and four-routine matrix.
-- `empty-month-mobile.png` — 390×844, four-routine legend/details and factual empty summary.
-- `empty-year-mobile.png` — 390×844, zero-height bars and neutral annual guidance.
-- `empty-week-desktop.png` — 1440×900, all five table headers visible with no viewport overflow.
-- Browser DOM review confirmed Week, Month, and Year semantics; mobile and desktop document widths matched their viewports.
+- Local compact-width browser review confirmed the revised hierarchy, compact controls, routine rows, fixed bottom navigation, and accessibility-tree order.
 
 ## Documentation updated
 
-- DEC-042 records the supported-metric and four-routine read-model contract.
-- This report corrects the stale DEC-037-era claims about fabricated metrics and the since-completed `RoutineGarden` split.
+- Recorded the approved information architecture in DEC-181 and this phase report.
 
 ## Decisions recorded
 
-- DEC-042 — Phase 08 progress metrics must reflect only recorded main-routine data.
+- DEC-181.
 
 ## Known limitations or remaining risks
 
-- The required manual screen-reader walkthrough of the chart/summary reading order still needs a human VoiceOver, NVDA, or TalkBack session. Automated labels cannot prove that experience is coherent.
-- `ProgressViews.tsx` remains large; splitting it is separate technical debt and was intentionally not mixed into this integrity correction.
-- When the Hijri calendar preference is selected, the visible period label is Hijri while persisted progress buckets and month/year calculations remain Gregorian. Resolving that calendar-display contract needs a separate product decision; this release does not reinterpret or migrate stored dates.
+- The complete responsive/theme evidence matrix remains before release.
+- Automated checks do not replace mobile and desktop screen-reader review.
 
 ## Out-of-scope findings
 
-- Local browser review reproduced the existing React warning for `fetchPriority` in `AzkarHeroBackground`; it is unrelated to Progress and belongs in the next P0 defect release.
+- No persisted progress model, reviewed devotional content, prayer calculations, sync behavior, or navigation destinations changed.
 
 ## Recommended next step
 
-Deploy and verify this Phase 08 integrity release, then address the P0 UI defect backlog as the next isolated release.
+- Complete responsive visual checks and full local quality gates, then return the local diff for owner review without committing or pushing.

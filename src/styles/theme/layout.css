@@ -134,57 +134,28 @@
   box-shadow: 0 1px 4px rgb(0 0 0 / 0.35);
 }
 
-.audio-volume-range {
-  --audio-volume-fill: var(--muted);
-  width: 1.125rem;
-  background: transparent;
-}
-
-.audio-volume-range::-webkit-slider-runnable-track {
-  width: 0.5rem;
-  margin-inline: auto;
-  border-radius: 9999px;
-  background: var(--audio-volume-fill);
-}
-
-.audio-volume-range::-webkit-slider-thumb {
-  width: 1.125rem;
-  height: 1.125rem;
-  margin: 0;
-  appearance: none;
-  border: 2px solid var(--card);
-  border-radius: 9999px;
-  background: var(--primary);
-  box-shadow: 0 1px 4px rgb(0 0 0 / 0.35);
-}
-
-.audio-volume-range::-moz-range-track {
-  width: 0.5rem;
-  border-radius: 9999px;
-  background: var(--audio-volume-fill);
-}
-
-.audio-volume-range::-moz-range-thumb {
-  width: 1.125rem;
-  height: 1.125rem;
-  border: 2px solid var(--card);
-  border-radius: 9999px;
-  background: var(--primary);
-  box-shadow: 0 1px 4px rgb(0 0 0 / 0.35);
-}
-
-.audio-timeline-range:disabled,
-.audio-volume-range:disabled {
+.audio-timeline-range:disabled {
   cursor: not-allowed;
   opacity: 0.45;
 }
 
 .app-shell.app-shell--navigation-hidden .floating-audio-player {
-  bottom: max(0.5rem, env(safe-area-inset-bottom));
+  bottom: env(safe-area-inset-bottom);
+}
+
+.floating-audio-player--reading {
+  /* Mobile reading hides the tab bar independently of the global navigation
+     flag. Dock to the actual reading surface so no phantom nav-sized gap is
+     left below either player state. */
+  bottom: env(safe-area-inset-bottom);
 }
 
 .app-shell.app-shell--navigation-hidden .floating-audio-player--expanded {
-  max-height: calc(100dvh - 1rem);
+  max-height: calc(100dvh - env(safe-area-inset-top));
+}
+
+.floating-audio-player--expanded.floating-audio-player--reading {
+  max-height: calc(100dvh - env(safe-area-inset-top));
 }
 
 @media (min-width: 37.5rem) {
@@ -495,7 +466,7 @@
   --mushaf-frame-pad: clamp(0.5rem, 4.5cqi, 2.75rem);
   max-width: min(100%, calc(var(--mushaf-measure, 100%) + 2 * var(--mushaf-frame-pad)));
   padding-inline: var(--mushaf-frame-pad);
-  padding-block: clamp(0.3rem, 1cqh, 0.7rem);
+  padding-block: clamp(0.1rem, 0.45cqh, 0.35rem);
 }
 
 /* The page is the screen, so the page has no edge to draw.
@@ -532,11 +503,34 @@
   opacity: 0.72;
 }
 
-.mushaf-page-furniture__cartouche,
-.mushaf-page-furniture__folio {
+.mushaf-page-furniture__cartouche {
   border: 1px solid;
   border-radius: 999px;
   padding: 0.3em 0.85em;
+}
+
+.mushaf-page-furniture__folio {
+  display: inline-flex;
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-bottom: 1px solid currentcolor;
+  border-radius: 0.5rem;
+  padding: 0.3em 0.85em;
+}
+
+/* The folio belongs below the final ayah line, never inside its ink area. Its
+   band reserves separation, then settles toward the permanent lower controls. */
+.mushaf-page-furniture--foot {
+  position: absolute;
+  inset-inline: 0;
+  bottom: calc(-2.875rem - env(safe-area-inset-bottom));
+  z-index: 20;
+  height: 2.75rem;
+  padding: 0;
+  transform: none;
 }
 
 /* ---------------------------------------------------------------------------

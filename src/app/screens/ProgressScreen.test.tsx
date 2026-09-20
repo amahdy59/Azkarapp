@@ -31,6 +31,7 @@ describe("ProgressScreen", () => {
 
     // Oasis Stage Card
     expect(screen.getByTestId("oasis-stage-card")).toBeInTheDocument();
+    expect(screen.getByTestId("oasis-stage-card")).not.toHaveAttribute("open");
     expect(screen.getByText("مرحلة الواحة الروحية")).toBeInTheDocument();
     expect(screen.getByRole("progressbar")).toBeInTheDocument();
 
@@ -58,6 +59,9 @@ describe("ProgressScreen", () => {
 
     // After-prayer Adhkar section
     expect(screen.getByTestId("progress-after-prayer")).toBeInTheDocument();
+
+    // Progress uses efficient themed rows, not Home's decorative photo cards.
+    expect(screen.getByTestId("today-garden-card").querySelector("img")).toBeNull();
   });
 
   it("renders English version with proper headings and LTR layout", () => {
@@ -131,6 +135,7 @@ describe("ProgressScreen", () => {
     expect(weekTab).toHaveAttribute("aria-selected", "true");
     // Oasis stage card is exclusive to Day view
     expect(screen.queryByTestId("oasis-stage-card")).not.toBeInTheDocument();
+    expect(screen.getAllByRole("progressbar")).toHaveLength(3);
 
     // Switch to Month tab
     const monthTab = screen.getByRole("tab", { name: "شهر" });

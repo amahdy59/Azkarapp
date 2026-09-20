@@ -1,13 +1,15 @@
 {
-  "release": "2026-09-20",
+  "release": "2026-09-20-2",
   "ar": [
-    "بطاقات ورد اليوم تعرض صوراً مميزة لأذكار الصباح والمساء والنوم وورد القرآن لتسهيل التعرّف عليها بسرعة.",
-    "أزرار البدء وحالات الإكمال داخل بطاقات الورد أصبحت أوضح بألوان خاصة لكل نوع من الأوراد.",
-    "واجهة الصفحة الرئيسية الزجاجية أصبحت أخف وأكثر شفافية، مع عنوان ووصف أوضح لورد اليوم."
+    "صفحة المصحف تملأ الشاشة بصفحة واحدة واضحة، مع تنقّل مباشر عبر اسم السورة ورقم الصفحة.",
+    "مشغل الصوت أصبح ثابتاً أسفل شاشة القراءة، مع تقدم واضح وأزرار لا تتبدل أماكنها عند التوسيع.",
+    "شريط مستوى الصوت في المشغل المصغر أصبح أفقياً ومصطفاً دون حجب مساحة كبيرة من الصفحة.",
+    "صفحات التقدم والإنجاز أصبحت أبسط وأكثر تركيزاً على ملخص الفترة والخطوة التالية."
   ],
   "en": [
-    "Today's Wird cards now use distinct imagery for morning, evening, sleep adhkar, and Quran so each routine is easier to recognize.",
-    "Start actions and completion states are clearer, with a dedicated accent color for each type of wird.",
-    "The Home glass surface is lighter and more transparent, with a clearer heading and description for today's wird."
+    "The Mushaf now fills the screen with one clear page and direct navigation through the Surah name and page number.",
+    "The audio player stays anchored to the reading screen, with clear progress and controls that keep their positions when expanded.",
+    "The compact player's volume control is now horizontal and aligned without covering a tall portion of the page.",
+    "Progress and completion pages are simpler and focus on the selected period summary and the next useful action."
   ]
 }

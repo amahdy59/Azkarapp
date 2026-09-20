@@ -13,7 +13,7 @@ import type {
   ThemeMode,
 } from "../types";
 import {
-  ArrowPrevious,
+  ArrowLeft,
   CheckCircle2,
   ChevronDown,
   X,
@@ -219,7 +219,9 @@ export function KhatmahReaderScreen({
 
   const shell = useMushafShell();
 
-  const autoSpreadRoom = shell.spreadRoom;
+  // The Mushaf is one full-screen page at every viewport. A second spread or
+  // side rail created a different reader to learn on desktop.
+  const autoSpreadRoom = false;
   /**
    * Whether the reading type size can change anything here.
    *
@@ -230,8 +232,8 @@ export function KhatmahReaderScreen({
   const typeSizeApplies = shell.pageAspect >= PAPER_ASPECT;
   // A stored desktop preference never forces two pages onto a phone or tall
   // tablet. The physical fit gate is authoritative; settings only opt out.
-  const spreadRoom = autoSpreadRoom && mushafLayout !== "single";
-  const useRail = shell.rail;
+  const spreadRoom = false;
+  const useRail = false;
 
   const paperRef = useRef<HTMLDivElement>(null);
   const readerRootRef = useRef<HTMLDivElement>(null);
@@ -244,7 +246,7 @@ export function KhatmahReaderScreen({
   const [isFocusMode, setIsFocusMode] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isQuickMenuOpen, setIsQuickMenuOpen] = useState(false);
-  const [indexTab, setIndexTab] = useState<"surahs" | "bookmarks">("surahs");
+  const [indexTab, setIndexTab] = useState<"surahs" | "juzs" | "jump" | "bookmarks">("surahs");
 
   useEffect(() => {
     const sync = () => setIsFullscreen(Boolean(document.fullscreenElement));
@@ -496,8 +498,6 @@ export function KhatmahReaderScreen({
     };
   }, [pageData, displayPage, language]);
 
-  const formattedJuz = `${t(language, "common.juz")} ${formatNumerals(juzNumber, language)}`;
-
   useEffect(() => {
     if (!pageData?.length) return;
     const [surahNumber] = (pageData[0]?.k ?? "1:1").split(":").map(Number);
@@ -545,20 +545,13 @@ export function KhatmahReaderScreen({
       else if (e.key === "ArrowRight" || e.key === "PageUp") paginate(-1);
       else if (e.key === "Home") setKhatmahPage(1);
       else if (e.key === "End") setKhatmahPage(LAST_PAGE);
-      // Focus mode is otherwise two taps away; on a keyboard it is one key.
-      else if (e.key === "f" || e.key === "F") setIsFocusMode((on) => !on);
-      // Escape gives the tools back before it gives up the reader: leaving the
-      // Mushaf entirely from a keypress meant to undo the last thing you did
-      // is a surprise you cannot take back without losing your place.
-      else if (e.key === "Escape") {
-        if (isFocusMode) setIsFocusMode(false);
-        else onBack();
-      } else handled = false;
+      else if (e.key === "Escape") onBack();
+      else handled = false;
       if (handled) e.preventDefault();
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeAyah, isFocusMode, isIndexOpen, isOptionsMenuOpen, isQuickMenuOpen, onBack, paginate, setKhatmahPage]);
+  }, [activeAyah, isIndexOpen, isOptionsMenuOpen, isQuickMenuOpen, onBack, paginate, setKhatmahPage]);
 
   // Pointer-driven page turn. The transform is written straight to the node, so
   // dragging costs no React render at all — the previous implementation ran a
@@ -596,9 +589,8 @@ export function KhatmahReaderScreen({
       const heldFor = performance.now() - startedAt;
       if (moved > TAP_SLOP || heldFor > TAP_MS) return;
       if (target instanceof Element && target.closest("button, a, [role='button'], [role='switch']")) return;
-      // A deliberate tap on the paper — not a swipe, not a scroll, and not on a
-      // word or an ayah marker, which have their own answer — toggles the tools.
-      setIsFocusMode((prev) => !prev);
+      // A still tap belongs to the page. The four corner controls remain
+      // available, so reading never changes into a second hidden-tools mode.
     },
     [paginate],
   );
@@ -649,9 +641,9 @@ export function KhatmahReaderScreen({
         onClick={onBack}
         data-testid="mushaf-top-left-back"
         aria-label={t(language, "common.back")}
-        className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border/60 bg-card/90 text-foreground shadow-sm backdrop-blur-md transition-all active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="flex size-11 shrink-0 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
-        <ArrowPrevious size={20} aria-hidden="true" />
+        <ArrowLeft size={20} aria-hidden="true" />
       </button>
     ) : undefined;
 
@@ -663,7 +655,7 @@ export function KhatmahReaderScreen({
         data-testid="mushaf-more-actions"
         aria-label={t(language, "mushaf.moreActions")}
         title={t(language, "mushaf.moreActions")}
-        className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border/60 bg-card/90 text-foreground shadow-sm backdrop-blur-md transition-all active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="flex size-11 shrink-0 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
         <MoreVertical size={20} aria-hidden="true" />
       </button>
@@ -682,11 +674,9 @@ export function KhatmahReaderScreen({
         aria-label={t(language, "mushaf.indexTitle")}
         title={t(language, "mushaf.indexTitle")}
         style={{ maxWidth: "calc(100vw - 7.5rem)" }}
-        className="flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-full border border-border bg-card px-3 text-foreground shadow-sm backdrop-blur transition-all active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+        className="flex h-11 shrink-0 items-center justify-center gap-1 rounded-lg px-2 text-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer"
       >
         <span className="truncate font-bold text-sm leading-none">{surahShortName}</span>
-        <span className="text-muted-foreground opacity-40 text-xs select-none">·</span>
-        <span className="shrink-0 text-xs text-muted-foreground font-medium leading-none">{formattedJuz}</span>
         <ChevronDown
           size={14}
           className="text-muted-foreground shrink-0 opacity-70 select-none ms-0.5"
@@ -705,10 +695,8 @@ export function KhatmahReaderScreen({
         data-testid="mushaf-page-bookmark"
         aria-label={t(language, "mushaf.bookmarkCurrentPage")}
         title={t(language, "mushaf.bookmarkCurrentPage")}
-        className={`flex size-11 shrink-0 items-center justify-center rounded-full border shadow-sm backdrop-blur-md transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-          isPageBookmarked
-            ? "border-primary bg-primary text-primary-foreground"
-            : "border-border/60 bg-card/90 text-foreground hover:bg-muted"
+        className={`relative flex size-11 shrink-0 items-center justify-center rounded-lg transition-colors active:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+          isPageBookmarked ? "text-primary" : "text-foreground hover:bg-muted"
         }`}
       >
         <Bookmark size={19} className={isPageBookmarked ? "fill-current" : undefined} aria-hidden="true" />
@@ -727,13 +715,14 @@ export function KhatmahReaderScreen({
         data-testid="mushaf-difficult-words-switch"
         aria-label={t(language, "mushaf.difficultWordsInvite")}
         title={t(language, "mushaf.difficultWordsInvite")}
-        className={`flex size-11 shrink-0 items-center justify-center rounded-full border shadow-sm backdrop-blur-md transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-          showWordMeanings
-            ? "border-primary bg-primary text-primary-foreground"
-            : "border-border/60 bg-card/90 text-foreground hover:bg-muted"
+        className={`relative flex size-11 shrink-0 items-center justify-center rounded-lg transition-colors active:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-60 ${
+          showWordMeanings ? "text-primary" : "text-foreground hover:bg-muted"
         }`}
       >
-        {showWordMeanings ? <CheckCircle2 size={19} aria-hidden="true" /> : <BookOpen size={19} aria-hidden="true" />}
+        <BookOpen size={19} className={showWordMeanings ? "stroke-[2.5]" : undefined} aria-hidden="true" />
+        {showWordMeanings && (
+          <span className="absolute bottom-1.5 size-1.5 rounded-full bg-current" aria-hidden="true" />
+        )}
       </button>
     ) : undefined;
   /**
@@ -892,11 +881,11 @@ export function KhatmahReaderScreen({
                 setIsIndexOpen(true);
               }}
               onJuzClick={() => {
-                setIndexTab("surahs");
+                setIndexTab("juzs");
                 setIsIndexOpen(true);
               }}
               onPageClick={() => {
-                setIndexTab("surahs");
+                setIndexTab("jump");
                 setIsIndexOpen(true);
               }}
               onEdgeTap={(edge) => {
@@ -905,7 +894,7 @@ export function KhatmahReaderScreen({
               }}
               onPrevious={() => paginate(-1)}
               onNext={() => paginate(1)}
-              onCenterTap={() => setIsFocusMode((v) => !v)}
+              onCenterTap={undefined}
               progressBar={wirdProgressBar}
               paperRef={paperRef}
               pageTransitionDirection={pageTransitionDirection}
@@ -1035,6 +1024,9 @@ export function KhatmahReaderScreen({
         onTogglePageBookmark={togglePageBookmark}
         onEnterFocusMode={() => setIsFocusMode(true)}
         onOpenSettings={() => setIsOptionsMenuOpen(true)}
+        showPageTools={false}
+        showFocusAction={false}
+        showIndexAction={false}
       />
 
       {/* Index & Navigation Modal */}

@@ -251,7 +251,7 @@ export function ProgressScreen({
     <ScreenContainer
       dir={direction}
       tabIndex={0}
-      className="relative px-page py-4 overflow-y-auto page-content-center outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
+      className="relative overflow-y-auto px-page py-2 page-content-center outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
       screenName={t(language, "common.progress")}
     >
       <div className="relative z-10 mx-auto w-full max-w-[80rem] flex flex-col items-center">
@@ -267,30 +267,26 @@ export function ProgressScreen({
           }
         />
 
-        {/* Serene Prophetic Touchstone on Constancy */}
-        <div className="w-full mb-4 flex items-center justify-center gap-2 rounded-2xl border border-primary/20 bg-primary/5 px-4 py-2.5 text-center shadow-xs">
-          <Sparkles className="size-4 shrink-0 text-primary" aria-hidden="true" />
-          <p className="text-xs font-bold text-foreground leading-relaxed" dir="auto">
+        {/* A supporting note, not a second hero competing with the period data. */}
+        <div className="mb-3 flex w-full items-start justify-center gap-2 px-2 text-center">
+          <Sparkles className="mt-0.5 size-3.5 shrink-0 text-primary" aria-hidden="true" />
+          <p className="text-xs font-semibold leading-relaxed text-muted-foreground" dir="auto">
             <span>{t(language, "progress.constancyHadith")}</span>
-            <span className="ms-1.5 text-micro font-semibold text-muted-foreground">
-              — {t(language, "progress.constancyHadithSource")}
-            </span>
+            <span className="ms-1.5 text-micro">— {t(language, "progress.constancyHadithSource")}</span>
           </p>
         </div>
 
-        <div className="w-full mb-4">
+        <div className="mb-4 w-full">
           <TabList
             value={activeTab}
             onChange={handleTabChange}
             direction={isArabic ? "rtl" : "ltr"}
             idPrefix="global-progress"
             aria-label={t(language, "garden.viewMode")}
-            className="mb-4 flex rounded-full border border-border bg-muted p-1"
+            className="mb-2 flex rounded-xl bg-muted p-1"
             itemClassName={(selected) =>
-              `flex flex-1 min-h-[44px] items-center justify-center rounded-full py-2 text-sm font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 ${
-                selected
-                  ? "bg-primary text-primary-foreground shadow-md"
-                  : "text-muted-foreground hover:text-foreground"
+              `flex min-h-11 flex-1 items-center justify-center rounded-lg px-1 py-2 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                selected ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
               }`
             }
             tabs={(["day", "week", "month", "year"] as const).map((tab) => ({
@@ -309,13 +305,13 @@ export function ProgressScreen({
             }))}
           />
 
-          <div className="flex items-center justify-between rounded-3xl border border-border/40 bg-card px-3 py-2 shadow-raised">
+          <div className="flex min-h-12 items-center justify-between border-y border-border px-1 py-1">
             <button
               type="button"
               onClick={() => setOffset((prev) => prev - 1)}
               aria-label={t(language, "garden.prevPeriod")}
               title={t(language, "garden.prevPeriod")}
-              className="flex h-[44px] min-h-[44px] w-[44px] min-w-[44px] items-center justify-center rounded-xl border border-border/60 hover:bg-muted text-foreground transition-colors active:scale-95 shrink-0 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="flex size-11 shrink-0 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
                 <polyline points={isArabic ? "9 18 15 12 9 6" : "15 18 9 12 15 6"} />
@@ -324,7 +320,7 @@ export function ProgressScreen({
 
             <span
               data-testid="garden-view-date"
-              className="px-2 text-center text-subtitle font-black tracking-wide text-foreground"
+              className="px-2 text-center text-base font-bold text-foreground"
               dir="auto"
               aria-live="polite"
               aria-atomic="true"
@@ -338,7 +334,7 @@ export function ProgressScreen({
               disabled={offset >= 0}
               aria-label={t(language, "garden.nextPeriod")}
               title={t(language, "garden.nextPeriod")}
-              className="flex h-[44px] min-h-[44px] w-[44px] min-w-[44px] items-center justify-center rounded-xl border border-border/60 text-foreground transition-colors active:scale-95 shrink-0 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-30 disabled:hover:bg-transparent enabled:hover:bg-muted"
+              className="flex size-11 shrink-0 items-center justify-center rounded-lg text-foreground transition-colors enabled:hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-30 disabled:hover:bg-transparent"
             >
               <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
                 <polyline points={isArabic ? "15 18 9 12 15 6" : "9 18 15 12 9 6"} />
@@ -349,62 +345,92 @@ export function ProgressScreen({
 
         {/* Enduring Palms and Preserved Streak Summary in Day View */}
         {activeTab === "day" && (
-          <div data-testid="progress-summary-strip" className="w-full mb-4 grid grid-cols-2 gap-3">
-            <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card/85 p-3.5 shadow-sm backdrop-blur-md">
-              <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
+          <dl
+            data-testid="progress-summary-strip"
+            className="mb-4 grid w-full grid-cols-2 overflow-hidden rounded-2xl border border-border bg-card"
+          >
+            <div className="flex min-w-0 items-center gap-2.5 border-e border-border p-3">
+              <div className="flex size-8 shrink-0 items-center justify-center text-primary">
                 <Zap className="size-5" />
               </div>
               <div className="min-w-0">
-                <span className="block text-micro font-bold text-muted-foreground truncate">
+                <dt className="truncate text-micro font-bold text-muted-foreground">
                   {t(language, "progress.activeStreakSummary")}
-                </span>
-                <span className="block text-sm font-black text-foreground">
+                </dt>
+                <dd className="text-sm font-black text-foreground">
                   {formatNumerals(activeGardenSummary.currentUsageStreak ?? 0, language)} {t(language, "progress.days")}
-                </span>
+                </dd>
               </div>
             </div>
 
-            <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card/85 p-3.5 shadow-sm backdrop-blur-md">
-              <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
+            <div className="flex min-w-0 items-center gap-2.5 p-3">
+              <div className="flex size-8 shrink-0 items-center justify-center text-primary">
                 <PalmTreeMark size={22} className="text-primary" />
               </div>
               <div className="min-w-0">
-                <span className="block text-micro font-bold text-muted-foreground truncate">
+                <dt className="truncate text-micro font-bold text-muted-foreground">
                   {t(language, "progress.lifetimePalmsSummary")}
-                </span>
-                <span className="block text-sm font-black text-foreground">
+                </dt>
+                <dd className="text-sm font-black text-foreground">
                   {formatNumerals(activeGardenSummary.lifetimePalms, language)} {t(language, "progress.palmsUnit")}
-                </span>
+                </dd>
               </div>
             </div>
-          </div>
+          </dl>
         )}
 
-        {/* Oasis Stage Hero & 7-Day Rhythm (Day view) */}
+        {/* The selected period's answer is the primary content. */}
+        <div className="mb-5 w-full">
+          <TodayRoutineGarden
+            summary={activeGardenSummary}
+            language={language}
+            hideTabs={true}
+            calendarType={calendarType}
+            dailyCompletions={dailyCompletions}
+            onOpenShareModal={onOpenShareModal}
+            onSelectCategory={onSelectCategory}
+            visibleCategoryIds={WIRD_CATEGORY_IDS}
+            onMedia={false}
+            activeTab={activeTab}
+            displayDate={displayDate}
+          />
+        </div>
+
+        {/* The garden is reflective context, so it follows the day's answer and
+            stays collapsed until a reader asks for it. */}
         {activeTab === "day" && (
-          <section
+          <details
             data-testid="oasis-stage-card"
-            className="w-full mb-5 overflow-hidden rounded-3xl border border-border/60 bg-card/90 text-foreground shadow-raised backdrop-blur-md transition-all"
+            className="mb-5 w-full overflow-hidden rounded-2xl border border-border bg-card text-foreground"
             dir={isArabic ? "rtl" : "ltr"}
-            aria-labelledby="oasis-stage-heading"
           >
-            <div className="border-b border-border/60 bg-gradient-to-b from-muted/40 to-transparent p-5 sm:p-6">
+            <summary className="min-h-11 cursor-pointer px-4 py-3 text-start focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+              <span className="flex min-w-0 items-center gap-3">
+                <span className="flex size-9 shrink-0 items-center justify-center" aria-hidden="true">
+                  {renderTierMark(oasisLevel, 28)}
+                </span>
+                <span className="min-w-0 text-start">
+                  <span className="block text-micro font-bold text-muted-foreground">
+                    {t(language, "progress.oasisStageTitle")}
+                  </span>
+                  <span className="block truncate text-sm font-black text-foreground">
+                    {isArabic ? levelDetails.nameArabic : levelDetails.name}
+                  </span>
+                </span>
+              </span>
+            </summary>
+
+            <div className="border-t border-border px-4 pb-4 pt-3 sm:px-5">
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3.5">
-                  <div className="flex size-12 sm:size-14 items-center justify-center rounded-2xl border border-border/80 bg-muted/30 shadow-sm shrink-0">
-                    {renderTierMark(oasisLevel, 36)}
-                  </div>
                   <div>
-                    <span className="text-micro font-black uppercase tracking-wider text-muted-foreground block">
-                      {t(language, "progress.oasisStageTitle")}
-                    </span>
                     <h2 id="oasis-stage-heading" className="text-title font-black text-foreground leading-tight">
                       {isArabic ? levelDetails.nameArabic : levelDetails.name}
                     </h2>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary/10 px-3.5 py-1 text-sm font-black text-primary shrink-0">
+                <div className="shrink-0 rounded-lg bg-primary/10 px-2.5 py-1 text-sm font-black text-primary">
                   <span>
                     {t(language, "progress.oasisLevelBadge", { level: formatNumerals(oasisLevel, language) })}
                   </span>
@@ -437,7 +463,7 @@ export function ProgressScreen({
               </div>
 
               {/* Next Milestone Hint */}
-              <div className="mt-3 flex items-start gap-2 rounded-2xl border border-primary/20 bg-primary/5 p-3 text-xs font-semibold text-foreground">
+              <div className="mt-3 flex items-start gap-2 rounded-xl bg-primary/5 p-3 text-xs font-semibold text-foreground">
                 <Sparkles className="size-4 shrink-0 text-primary mt-0.5" aria-hidden="true" />
                 <span dir="auto">
                   <strong className="font-black text-primary">{t(language, "progress.nextMilestonePrefix")}</strong>
@@ -447,7 +473,7 @@ export function ProgressScreen({
             </div>
 
             {/* 7-Day Rhythm Strip */}
-            <div className="bg-card/90 px-4 py-3 sm:px-6">
+            <div className="border-t border-border px-4 py-3 sm:px-5">
               <span className="text-micro font-bold uppercase tracking-wider text-muted-foreground block mb-2">
                 {t(language, "progress.sevenDayRhythm")}
               </span>
@@ -460,7 +486,7 @@ export function ProgressScreen({
                     <div
                       key={day.dayKey}
                       role="listitem"
-                      className={`flex flex-col items-center justify-center rounded-2xl p-1.5 sm:p-2 transition-all ${
+                      className={`flex flex-col items-center justify-center rounded-xl p-1.5 sm:p-2 transition-all ${
                         day.isToday
                           ? "border-2 border-primary bg-primary/10 shadow-sm"
                           : "border border-border/40 bg-muted/20 hover:bg-muted/40"
@@ -478,25 +504,8 @@ export function ProgressScreen({
                 })}
               </div>
             </div>
-          </section>
+          </details>
         )}
-
-        {/* Wird Routines */}
-        <div className="w-full mb-5">
-          <TodayRoutineGarden
-            summary={activeGardenSummary}
-            language={language}
-            hideTabs={true}
-            calendarType={calendarType}
-            dailyCompletions={dailyCompletions}
-            onOpenShareModal={onOpenShareModal}
-            onSelectCategory={onSelectCategory}
-            visibleCategoryIds={WIRD_CATEGORY_IDS}
-            onMedia={false}
-            activeTab={activeTab}
-            displayDate={displayDate}
-          />
-        </div>
 
         {/* Daily Companions (Day view) */}
         {activeTab === "day" && (

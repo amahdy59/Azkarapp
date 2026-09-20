@@ -2064,7 +2064,7 @@ function AppContent({
               controller={audioController}
               language={selectedLang}
               direction={layoutDirection}
-              overReadingSurface={readerInMushafMode}
+              overReadingSurface={view === "reader"}
             />
           </Suspense>
         )}

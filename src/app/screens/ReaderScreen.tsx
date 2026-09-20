@@ -76,6 +76,8 @@ import { getReadingFontSize } from "./readingTypography";
 const READER_HEADER_ACTION_CLASS =
   "flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full text-foreground/80 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40";
 
+const QURAN_CARD_IMAGE = `${import.meta.env.BASE_URL || "/"}assets/cards/wird-quran.jpg`;
+
 const SHARE_STATUS_KEYS: Record<ZikrShareCardStatus, string> = {
   generating: "reader.shareCardGenerating",
   openingShareSheet: "reader.shareCardOpening",
@@ -626,7 +628,21 @@ export function ReaderScreen({
       className={`mt-1 w-full px-4 pb-2 pt-2 flex flex-col items-center justify-center text-center bg-transparent ${longSurah ? "" : "cursor-pointer touch-manipulation transition-colors hover:bg-muted/10 active:bg-muted/20 my-auto"}`}
     >
       {longSurah ? (
-        <div className="mx-auto flex w-full max-w-sm flex-col items-center justify-center gap-4 py-8">
+        <div className="mx-auto flex w-full max-w-sm flex-col items-center justify-center gap-4 pb-5 pt-2">
+          <figure className="relative mb-1 h-32 w-full overflow-hidden rounded-3xl border border-primary/20 bg-primary/5 shadow-soft">
+            <img
+              src={QURAN_CARD_IMAGE}
+              alt=""
+              aria-hidden="true"
+              className="h-full w-full object-cover object-center opacity-75"
+              decoding="async"
+            />
+            <div className="absolute inset-x-0 bottom-0 flex justify-center pb-3" aria-hidden="true">
+              <span className="flex size-11 items-center justify-center rounded-2xl border border-primary/20 bg-card/90 text-primary shadow-soft backdrop-blur-sm">
+                <BookOpen size={22} />
+              </span>
+            </div>
+          </figure>
           <button
             type="button"
             onClick={surahAudio?.onToggle ?? onPlayAudio}
@@ -1388,7 +1404,7 @@ export function ReaderScreen({
                             <div style={dragStyle} className="flex w-full flex-1 flex-col">
                               <div
                                 style={pressStyle}
-                                className={`my-auto w-full flex flex-col items-center justify-center ${justCompleted ? "zikr-step-exit" : "zikr-step-enter"}`}
+                                className={`${longSurah ? "mb-auto mt-2" : "my-auto"} w-full flex flex-col items-center justify-center ${justCompleted ? "zikr-step-exit" : "zikr-step-enter"}`}
                               >
                                 {renderReadingContent()}
                               </div>
@@ -1575,7 +1591,7 @@ export function ReaderScreen({
                   <div
                     key={z.id}
                     style={pressStyle}
-                    className={`my-auto w-full flex flex-col items-center justify-center ${justCompleted ? "zikr-step-exit" : "zikr-step-enter"}`}
+                    className={`${longSurah ? "mb-auto mt-2" : "my-auto"} w-full flex flex-col items-center justify-center ${justCompleted ? "zikr-step-exit" : "zikr-step-enter"}`}
                   >
                     {renderReadingContent()}
                   </div>

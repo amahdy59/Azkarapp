@@ -118,14 +118,26 @@ test("Al-Kahf queues an intentional listen press while the audio module loads", 
 
   const player = page.getByRole("region", { name: "مشغل الصوت" });
   await expect(player).toHaveAttribute("data-variant", "compact");
+  const compactMinimizeBox = await player.getByRole("button", { name: "توسيع المشغل" }).boundingBox();
+  const compactCloseBox = await player.getByRole("button", { name: "إيقاف الصوت وإغلاق المشغل" }).boundingBox();
+  await expect(player.getByRole("progressbar", { name: "تقدم الاستماع" })).toBeVisible();
   await player.getByRole("button", { name: "توسيع المشغل" }).click();
   await expect(player).toHaveAttribute("data-variant", "expanded");
+  const expandedMinimizeBox = await player.getByRole("button", { name: "تصغير المشغل" }).boundingBox();
+  const expandedCloseBox = await player.getByRole("button", { name: "إيقاف الصوت وإغلاق المشغل" }).boundingBox();
+  expect(compactMinimizeBox && compactCloseBox && expandedMinimizeBox && expandedCloseBox).toBeTruthy();
+  if (compactMinimizeBox && compactCloseBox && expandedMinimizeBox && expandedCloseBox) {
+    expect(Math.sign(compactMinimizeBox.x - compactCloseBox.x)).toBe(
+      Math.sign(expandedMinimizeBox.x - expandedCloseBox.x),
+    );
+  }
   await expect(player.getByRole("slider", { name: "تقديم أو تأخير الصوت" })).toHaveAttribute(
     "style",
     /linear-gradient\(to left/,
   );
   await player.getByRole("button", { name: /كتم الصوت/ }).click();
-  await expect(player.getByRole("slider", { name: "مستوى الصوت" })).toHaveAttribute("aria-orientation", "vertical");
+  await expect(player.getByRole("slider", { name: "مستوى الصوت" })).toBeVisible();
+  await expect(player.getByRole("slider", { name: "مستوى الصوت" })).not.toHaveAttribute("aria-orientation", "vertical");
 });
 
 test("desktop audio dock stays inside the main canvas and reveals volume on hover", async ({ page }) => {
@@ -153,18 +165,19 @@ test("desktop audio dock stays inside the main canvas and reveals volume on hove
   const volumeSlider = player.getByRole("slider", { name: "مستوى الصوت" });
   await expect(volumeSlider).toBeVisible();
 
-  // The invisible bridge belongs to the popover's hit area, so travelling
-  // from the speaker to the slider cannot dismiss it before it is usable.
+  // The compact control opens inward as a shallow horizontal panel. It keeps
+  // the slider near the speaker without covering a tall strip of reading text.
   const [volumeBox, sliderBox] = await Promise.all([volume.boundingBox(), volumeSlider.boundingBox()]);
   expect(volumeBox && sliderBox).toBeTruthy();
   if (volumeBox && sliderBox) {
-    expect(Math.abs(volumeBox.x + volumeBox.width / 2 - (sliderBox.x + sliderBox.width / 2))).toBeLessThanOrEqual(2);
+    expect(Math.abs(volumeBox.y + volumeBox.height / 2 - (sliderBox.y + sliderBox.height / 2))).toBeLessThanOrEqual(64);
     await page.mouse.move(volumeBox.x + volumeBox.width / 2, volumeBox.y + volumeBox.height / 2);
     await page.mouse.move(sliderBox.x + sliderBox.width / 2, sliderBox.y + sliderBox.height / 2, { steps: 12 });
   }
   await expect(volumeSlider).toBeVisible();
-  await volumeSlider.click({ position: { x: 4, y: 88 } });
-  await expect.poll(() => volumeSlider.inputValue()).not.toBe("1");
+  await expect(volumeSlider).not.toHaveAttribute("aria-orientation", "vertical");
+  await volumeSlider.fill("0.4");
+  await expect(volumeSlider).toHaveValue("0.4");
 
   const [mainBox, playerBox] = await Promise.all([page.locator(".app-main").boundingBox(), player.boundingBox()]);
   expect(mainBox && playerBox).toBeTruthy();

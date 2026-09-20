@@ -79,6 +79,8 @@ Run the phase files in numerical order unless the decision log explicitly record
 | 36    | `phases/PHASE_36_ENGLISH_AUDIO_SEPARATION.md`          | Verified English audio inventory and language-locked playback controls  |
 | 37    | `phases/PHASE_37_READER_COLLECTION_NAVIGATOR.md`       | Wide collection navigation and in-place compact disclosure              |
 | 38    | `phases/PHASE_38_QIBLA_RESPONSIVE_RELEVANCE.md`        | Reachable mobile Qibla and practical desktop bearing guidance           |
+| 39    | `phases/PHASE_39_SINGLE_PAGE_MUSHAF.md`                | One full-screen Mushaf page and focused navigation at every width       |
+| 40    | `phases/PHASE_40_AUDIO_DOCK_REFINEMENT.md`             | Stable audio controls, bottom docking, and visible listening progress   |
 
 Phases 15–20 derive from `docs/audits/DESIGN_CONSISTENCY_AUDIT.md` (2026-08-15) and are
 recorded in `DECISION_LOG.md` as DEC-064. Phase 15 is upstream of 16, 17 and 19 — its root
