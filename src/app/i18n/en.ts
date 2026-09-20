@@ -1312,6 +1312,7 @@ const en = {
     inProgress: "In Progress",
     inactive: "Inactive",
     todayWird: "Today's Wird",
+    todayWirdSubtitle: "Simple steps .. for a tranquil heart",
     morningAzkar: "Morning Azkar",
     eveningAzkar: "Evening Azkar",
     sleepAzkar: "Sleep Azkar",

@@ -63,15 +63,27 @@ export interface QuranWirdTile {
 const WIRD_CARD_CONFIG = {
   morning: {
     subtitleKey: "progress.morningCardSubtitle",
+    image: "assets/cards/wird-morning.jpg",
+    badgeStyle: { backgroundColor: "#f59e0b", color: "#020617" },
+    btnStyle: { backgroundColor: "#f59e0b", color: "#020617" },
   },
   evening: {
     subtitleKey: "progress.eveningCardSubtitle",
+    image: "assets/cards/wird-evening.jpg",
+    badgeStyle: { backgroundColor: "#6366f1", color: "#ffffff" },
+    btnStyle: { backgroundColor: "#6366f1", color: "#ffffff" },
   },
   before_sleep: {
     subtitleKey: "progress.sleepCardSubtitle",
+    image: "assets/cards/wird-sleep.jpg",
+    badgeStyle: { backgroundColor: "#3b82f6", color: "#ffffff" },
+    btnStyle: { backgroundColor: "#3b82f6", color: "#ffffff" },
   },
   quran: {
     subtitleKey: "progress.quranCardSubtitle",
+    image: "assets/cards/wird-quran.jpg",
+    badgeStyle: { backgroundColor: "#10b981", color: "#020617" },
+    btnStyle: { backgroundColor: "#10b981", color: "#020617" },
   },
 } as const;
 
@@ -103,6 +115,9 @@ function WirdCategoryCard({
   const isCompleted = status === "completed";
   const statusLabel = isCompleted ? completedLabel : pendingLabel;
   const showRecommended = isRecommendedNow && !isCompleted && Boolean(recommendedLabel);
+  const config = WIRD_CARD_CONFIG[categoryKey];
+  const baseUrl = import.meta.env.BASE_URL || "/";
+  const imageSrc = `${baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`}${config.image}`;
 
   return (
     <button
@@ -111,15 +126,33 @@ function WirdCategoryCard({
       aria-label={showRecommended ? `${name} - ${recommendedLabel} - ${statusLabel}` : `${name} - ${statusLabel}`}
       data-recommended-now={showRecommended ? "true" : undefined}
       data-category={categoryKey}
-      style={{ minHeight: "11rem" }}
-      className={`hero-glass home-glass-surface group relative flex flex-col overflow-hidden rounded-3xl p-4 text-start transition-all duration-standard ease-standard focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-95 ${
-        isCompleted ? "border-primary/55 shadow-raised" : "border-white/20 shadow-raised hover:border-white/40"
+      style={{ minHeight: "17.5rem" }}
+      className={`hero-glass home-glass-surface group relative flex flex-col overflow-hidden rounded-3xl p-4 text-start transition-all duration-standard ease-standard focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-95 border border-white/20 shadow-raised hover:border-white/40 ${
+        isCompleted ? "ring-2 ring-success/60" : ""
       }`}
     >
+      {/* Visual Background Photo */}
+      <img
+        src={imageSrc}
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 h-full w-full object-cover transition-transform duration-slow ease-out group-hover:scale-105"
+        loading="lazy"
+      />
+      {/* Translucent Glass Scrim & Ambient Overlay — inline style avoids generating new Tailwind gradient utilities */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0"
+        style={{
+          background: "linear-gradient(to top, rgb(0 0 0 / 0.9) 0%, rgb(0 0 0 / 0.45) 50%, rgb(0 0 0 / 0.25) 100%)",
+        }}
+      />
+
       {/* Top row: badge icon & completion checkmark */}
-      <div className="flex w-full items-center justify-between">
+      <div className="relative z-10 flex w-full items-center justify-between">
         <span
-          className="flex size-10 items-center justify-center rounded-2xl border border-white/20 bg-white/10 text-on-media-accent shadow-xs"
+          style={config.badgeStyle}
+          className="flex size-10 items-center justify-center rounded-2xl shadow-md"
           aria-hidden="true"
         >
           {icon}
@@ -133,29 +166,28 @@ function WirdCategoryCard({
       </div>
 
       {/* Content: name, subtitle, CTA */}
-      <div className="mt-auto flex w-full flex-col items-start gap-1.5 pt-4">
-        <p className="text-base font-black leading-tight text-on-media drop-shadow-sm sm:text-lg" dir="auto">
+      <div className="relative z-10 mt-auto flex w-full flex-col items-start gap-1 pt-6">
+        <p className="text-lg font-black leading-tight text-white drop-shadow-md" dir="auto">
           {name}
         </p>
-        <p className="line-clamp-2 text-xs font-semibold leading-snug text-on-media-muted" dir="auto">
+        <p className="line-clamp-2 text-xs font-semibold leading-snug text-white/80 drop-shadow-sm" dir="auto">
           {subtitle}
         </p>
         <span
-          className={`mt-2 inline-flex h-9 items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-black shadow-md transition-colors ${
-            isCompleted
-              ? "bg-success text-success-foreground"
-              : "bg-primary text-primary-foreground hover:bg-primary/90"
+          style={!isCompleted ? config.btnStyle : undefined}
+          className={`mt-2.5 inline-flex h-9 items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-black shadow-md transition-opacity hover:opacity-95 ${
+            isCompleted ? "bg-success text-success-foreground" : ""
           }`}
         >
           {isCompleted ? (
             <>
-              <Check size={12} strokeWidth={3} aria-hidden="true" />
+              <Check size={13} strokeWidth={3} aria-hidden="true" />
               {completedLabel}
             </>
           ) : (
             <>
               {ctaLabel}
-              <span className="inline-block text-micro leading-none opacity-90 rtl:rotate-180" aria-hidden="true">
+              <span className="inline-block text-xs leading-none rtl:rotate-180" aria-hidden="true">
                 →
               </span>
             </>
@@ -416,6 +448,9 @@ export function ProgressDayView({
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
+              {onGlass && isHomeSubset && (
+                <Calendar size={22} className="text-on-media-accent shrink-0" aria-hidden="true" />
+              )}
               <Heading
                 data-testid="progress-primary-heading"
                 className={`block max-w-full truncate whitespace-nowrap text-xl font-black tracking-tight sm:text-headline md:text-2xl ${
@@ -448,11 +483,15 @@ export function ProgressDayView({
                 </button>
               </div>
             </div>
-            {!onGlass && (
+            {isHomeSubset && onGlass ? (
+              <p className="mt-1 text-label font-semibold text-white/80 sm:text-sm" dir="auto">
+                {t(language, "progress.todayWirdSubtitle")}
+              </p>
+            ) : !onGlass ? (
               <p className="mt-1 text-label font-semibold text-muted-foreground sm:text-sm" dir="auto">
                 {dynamicSubtitle}
               </p>
-            )}
+            ) : null}
           </div>
 
           <div

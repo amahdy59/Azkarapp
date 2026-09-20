@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-19j",
+  "release": "2026-09-20",
   "ar": [
-    "بطاقات أوراد يومية تفاعلية ومميزة بصرياً لأذكار الصباح والمساء والنوم وورد القرآن في واجهة الصفحة الرئيسية.",
-    "تجربة مصحف نظيفة ومريحة للعين بدون أشرطة خارجية، مع أدوات مدمجة للتنقل السريع ومعاني الكلمات وحفظ الموضع.",
-    "تصحيح اتجاه أسهم التنقل والقوائم في الواجهتين العربية والإنجليزية، مع تحسين بوصلة القبلة للمحمول ومشغّل المصحف للمكتب."
+    "بطاقات ورد اليوم تعرض صوراً مميزة لأذكار الصباح والمساء والنوم وورد القرآن لتسهيل التعرّف عليها بسرعة.",
+    "أزرار البدء وحالات الإكمال داخل بطاقات الورد أصبحت أوضح بألوان خاصة لكل نوع من الأوراد.",
+    "واجهة الصفحة الرئيسية الزجاجية أصبحت أخف وأكثر شفافية، مع عنوان ووصف أوضح لورد اليوم."
   ],
   "en": [
-    "Interactive, visually distinct daily wird cards for morning, evening, sleep adhkar, and Quran on the Home screen.",
-    "Clean, comfortable Mushaf reading canvas without external toolbars, featuring integrated quick controls and page transitions.",
-    "Refined outward navigation arrow directions for both Arabic and English, along with mobile Qibla orientation and desktop Quran launcher."
+    "Today's Wird cards now use distinct imagery for morning, evening, sleep adhkar, and Quran so each routine is easier to recognize.",
+    "Start actions and completion states are clearer, with a dedicated accent color for each type of wird.",
+    "The Home glass surface is lighter and more transparent, with a clearer heading and description for today's wird."
   ]
 }

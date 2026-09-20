@@ -100,11 +100,11 @@ test("a card over the hero photograph goes opaque, not merely unblurred", async 
     };
   });
   expect(material.backgroundColor, "the hero card should visibly reveal the photograph by default").toBe(
-    "rgba(15, 23, 42, 0.8)",
+    "rgba(255, 255, 255, 0.08)",
   );
   expect(material.backgroundImage).toContain("linear-gradient");
-  expect(material.backdropFilter).toContain("blur(16px)");
-  expect(material.backdropFilter).toContain("saturate(1.45)");
+  expect(material.backdropFilter).toContain("blur(14px)");
+  expect(material.backdropFilter).toContain("saturate(1.35)");
 
   await page.evaluate(() => document.documentElement.classList.add("reduce-transparency"));
 

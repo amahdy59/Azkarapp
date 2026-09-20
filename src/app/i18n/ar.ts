@@ -1328,6 +1328,7 @@ const ar = {
     inProgress: "نشط",
     inactive: "غير نشط",
     todayWird: "وردك اليوم",
+    todayWirdSubtitle: "خطوات بسيطة .. لقلب أكثر طمأنينة",
     morningAzkar: "أذكار الصباح",
     eveningAzkar: "أذكار المساء",
     sleepAzkar: "أذكار النوم",

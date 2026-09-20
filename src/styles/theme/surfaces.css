@@ -511,18 +511,6 @@ button.ui-icon-button:not(:disabled):not(.no-press):active,
   .app-shell::after {
     display: none !important;
   }
-
-  *,
-  *::before,
-  *::after {
-    backdrop-filter: none !important;
-  }
-
-  .hero-glass {
-    background-color: var(--on-media-surface) !important;
-    background-image: none !important;
-    transition-property: none !important;
-  }
 }
 
 /* Semantic surfaces extracted from PrayerTrackerCards for consistency */
