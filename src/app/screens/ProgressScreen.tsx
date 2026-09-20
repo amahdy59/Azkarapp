@@ -251,7 +251,8 @@ export function ProgressScreen({
     <ScreenContainer
       dir={direction}
       tabIndex={0}
-      className="relative overflow-y-auto px-page py-2 page-content-center outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
+      className="relative overflow-y-auto px-page pb-2 page-content-center outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
+      style={{ paddingTop: 0 }}
       screenName={t(language, "common.progress")}
     >
       <div className="relative z-10 mx-auto w-full max-w-[80rem] flex flex-col items-center">

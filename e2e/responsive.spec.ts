@@ -411,6 +411,80 @@ test("there is exactly one main landmark and focus moves to it on navigation", a
   await expect(page.locator("#main-content")).toBeFocused();
 });
 
+test("the Library keeps mobile category pills and compacts only the section switch", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await enterEnglishGuestMode(page);
+  await page.getByTestId("nav-azkar").click();
+
+  const heading = page.getByRole("heading", { name: "Azkar Library", exact: true });
+  const sectionMenu = page.getByTestId("library-mobile-section");
+  await expect(heading).toBeVisible();
+  await expect(sectionMenu).toBeVisible();
+  await expect(sectionMenu).toHaveText(/Collections/);
+  const allPill = page.getByRole("button", { name: "All", exact: true });
+  await expect(allPill).toBeVisible();
+  await expect(page.getByRole("button", { name: "Daily Azkar", exact: true })).toBeVisible();
+  const [mobileSectionBox, allPillBox] = await Promise.all([sectionMenu.boundingBox(), allPill.boundingBox()]);
+  expect(mobileSectionBox).not.toBeNull();
+  expect(allPillBox).not.toBeNull();
+  if (mobileSectionBox && allPillBox) {
+    expect(Math.abs(mobileSectionBox.y - allPillBox.y)).toBeLessThan(3);
+  }
+
+  await sectionMenu.click();
+  await page.getByRole("menuitemradio", { name: "Saved" }).click();
+  await expect(sectionMenu).toHaveText(/Saved/);
+  await expect(page.getByRole("heading", { name: "Nothing saved yet" })).toBeVisible();
+
+  await sectionMenu.click();
+  await page.getByRole("menuitemradio", { name: "Collections" }).click();
+
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await expect(sectionMenu).toBeHidden();
+  await expect(page.getByRole("button", { name: "All", exact: true })).toBeVisible();
+
+  const [headingBox, tablistBox] = await Promise.all([
+    heading.boundingBox(),
+    page.getByRole("tablist", { name: "Azkar Library" }).boundingBox(),
+  ]);
+  expect(headingBox).not.toBeNull();
+  expect(tablistBox).not.toBeNull();
+  if (headingBox && tablistBox) {
+    expect(Math.abs(headingBox.y + headingBox.height / 2 - (tablistBox.y + tablistBox.height / 2))).toBeLessThan(16);
+  }
+});
+
+test("shared screen headers gain a glass surface after scrolling without changing Home", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 700 });
+  await enterEnglishGuestMode(page);
+
+  const homeHeader = page.getByTestId("home-utility-header");
+  await expect(homeHeader).toBeVisible();
+  await expect(page.getByTestId("shared-screen-header")).toHaveCount(0);
+
+  await page.getByTestId("nav-progress").click();
+  const header = page.getByTestId("shared-screen-header");
+  await expect(header).toBeVisible();
+  await expect(header).not.toHaveAttribute("data-scrolled");
+
+  await page.locator(".app-screen-surface").evaluate((surface) => {
+    surface.scrollTop = 120;
+    surface.dispatchEvent(new Event("scroll"));
+  });
+  await expect(header).toHaveAttribute("data-scrolled", "true");
+  await expect(header).toHaveClass(/scroll-glass-header/);
+
+  const [surfaceBox, headerBox] = await Promise.all([
+    page.locator(".app-screen-surface").boundingBox(),
+    header.boundingBox(),
+  ]);
+  expect(surfaceBox).not.toBeNull();
+  expect(headerBox).not.toBeNull();
+  if (surfaceBox && headerBox) {
+    expect(Math.abs(headerBox.y - surfaceBox.y)).toBeLessThanOrEqual(1);
+  }
+});
+
 test("status banners get a full-width area above the nav, not an implicit row", async ({ page }) => {
   await page.setViewportSize({ width: 1000, height: 800 });
   await enterEnglishGuestMode(page);

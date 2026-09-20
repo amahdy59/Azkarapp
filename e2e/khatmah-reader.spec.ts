@@ -228,20 +228,24 @@ test("offers clear RTL reading choices and free reading without progress trackin
   expect(stored.wirdHistory).toEqual({});
 });
 
-test("keeps one full-screen page and the same corner tools in landscape", async ({ page }) => {
+test("keeps one full-screen page with a right tool rail in landscape and corner tools in portrait", async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 1280, height: 720 });
   await page.getByRole("button", { name: "متابعة القراءة" }).click();
 
   const article = page.getByRole("article", { name: "صفحة ٤٢" });
   await expect(article).toBeVisible();
-  await expect(page.getByTestId("mushaf-tool-rail")).toHaveCount(0);
+  await expect(page.getByTestId("mushaf-tool-rail")).toBeVisible();
+  await expect(page.getByTestId("mushaf-tool-rail")).toHaveAttribute("data-rail-side", "right");
   await expect(article.locator("[data-mushaf-page]")).toHaveCount(1);
-  await expect(page.getByTestId("mushaf-top-left-back")).toBeVisible();
-  await expect(page.getByTestId("mushaf-more-actions")).toBeVisible();
-  await expect(page.getByTestId("mushaf-page-bookmark")).toBeVisible();
+  await expect(page.getByTestId("mushaf-top-left-back")).toHaveCount(0);
+  await expect(page.getByTestId("mushaf-more-actions")).toHaveCount(0);
+  await expect(page.getByTestId("mushaf-rail-page-bookmark")).toBeVisible();
   await expect(page.getByTestId("mushaf-difficult-words-switch")).toBeVisible();
+  await expect(page.getByTestId("mushaf-focus-enter")).toHaveCount(0);
 
-  await page.getByTestId("mushaf-top-center-index").click();
+  await page.getByTestId("mushaf-rail-index").click();
   await page.getByRole("tab", { name: "صفحة" }).click();
   await page.getByLabel("أدخل رقم الصفحة (١-٦٠٤)").fill("21");
   await page.getByRole("button", { name: "انتقال" }).click();
@@ -345,28 +349,27 @@ test("turns pages by swipe without hiding the permanent controls", async ({ page
   await expect(page.getByTestId("mushaf-page-bookmark")).toBeVisible();
 });
 
-test("keeps the full-screen corner controls accessible", async ({ page }) => {
+test("keeps the full-screen desktop rail accessible", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 720 });
   await page.getByRole("button", { name: "متابعة القراءة" }).click();
   await expect(page.getByRole("article", { name: "صفحة ٤٢" })).toBeVisible();
 
   const accessibility = await new AxeBuilder({ page })
-    .include('article[data-mushaf-chrome-mode="clean"]')
+    .include('article[data-mushaf-chrome-mode="rail"]')
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
     .analyze();
   expect(accessibility.violations).toEqual([]);
 });
 
-test("keeps reading settings in one consistent sheet", async ({ page }) => {
+test("keeps reading settings in a consistent wide-screen side panel", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 720 });
   await page.getByRole("button", { name: "متابعة القراءة" }).click();
-  await page.getByTestId("mushaf-more-actions").click();
-  await page.getByTestId("mushaf-quick-settings").click();
+  await page.getByTestId("mushaf-settings-trigger").click();
   const panel = page.getByTestId("mushaf-settings-sheet");
   await expect(panel).toBeVisible();
-  await expect(panel).not.toHaveAttribute("data-side");
+  await expect(panel).toHaveAttribute("data-side", "right");
   await expect(page.getByText("تخطيط الصفحة")).toHaveCount(0);
-  await expect(page.getByText("مكان شريط الأدوات")).toHaveCount(0);
+  await expect(page.getByText("مكان شريط الأدوات")).toBeVisible();
 
   // Choosing a theme is visible immediately, and the settings stay open so the
   // next choice can be compared against it. Queried by selector, not by role:

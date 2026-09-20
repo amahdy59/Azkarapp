@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   ArrowPrevious,
   BarChart3,
@@ -79,8 +79,39 @@ export function Header({
   right?: React.ReactNode;
   language?: AppLanguage;
 }) {
+  const headerRef = useRef<HTMLDivElement>(null);
+  const [hasScrolledContent, setHasScrolledContent] = useState(false);
+
+  useEffect(() => {
+    const header = headerRef.current;
+    const screen = header?.closest<HTMLElement>(".app-screen-surface");
+    if (!screen) return;
+
+    const updateFromScroll = (event: Event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      setHasScrolledContent(target.scrollTop > 4);
+    };
+
+    // Scroll does not bubble, but it can be observed in the capture phase.
+    // This keeps Header independent from each screen's choice of scroll owner:
+    // some screens scroll the surface itself, while others use a nested region.
+    screen.addEventListener("scroll", updateFromScroll, true);
+    return () => screen.removeEventListener("scroll", updateFromScroll, true);
+  }, []);
+
   return (
-    <div className="flex w-full shrink-0 items-center gap-2 px-4 pt-0 pb-1" style={{ minHeight: 56 }}>
+    <div
+      ref={headerRef}
+      data-testid="shared-screen-header"
+      data-scrolled={hasScrolledContent || undefined}
+      className={`sticky top-0 z-40 flex w-full shrink-0 items-center gap-2 border-b px-4 pt-0 pb-1 transition-colors duration-standard ${
+        hasScrolledContent
+          ? "scroll-glass-header border-border bg-background/95 shadow-sm backdrop-blur-md"
+          : "border-transparent bg-transparent"
+      }`}
+      style={{ minHeight: 56 }}
+    >
       {onBack && (
         <IconButton onClick={onBack} label={t(language, "common.back")}>
           <ArrowPrevious size={20} className="text-foreground" />

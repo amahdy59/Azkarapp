@@ -63,7 +63,7 @@ test("submitting the Library query opens Search and preserves it", async ({ page
   expect(await searchInput.evaluate(hasVisibleLabel)).toBe(true);
 });
 
-test("Library search and visible section tabs stay bounded at every responsive tier", async ({ page }) => {
+test("Library search and responsive section controls stay bounded at every tier", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   const input = await openArabicLibrary(page);
   const tabs = page.getByRole("tablist", { name: "مكتبة الأذكار" });
@@ -72,17 +72,22 @@ test("Library search and visible section tabs stay bounded at every responsive t
   const desktopTabs = await tabs.boundingBox();
   expect(desktopInput).not.toBeNull();
   expect(desktopTabs).not.toBeNull();
-  expect(desktopTabs!.y).toBeGreaterThan(desktopInput!.y + desktopInput!.height);
+  expect(desktopTabs!.y + desktopTabs!.height).toBeLessThanOrEqual(desktopInput!.y);
+  expect(desktopTabs!.x).toBeGreaterThanOrEqual(0);
+  expect(desktopTabs!.x + desktopTabs!.width).toBeLessThanOrEqual(1440);
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.waitForTimeout(500); // Wait for the media query layout shift to settle
   const compactInput = await input.boundingBox();
-  const compactTabs = await tabs.boundingBox();
+  const compactSection = page.getByTestId("library-mobile-section");
+  await expect(compactSection).toBeVisible();
+  await expect(tabs).toBeHidden();
+  const compactControl = await compactSection.boundingBox();
   expect(compactInput).not.toBeNull();
-  expect(compactTabs).not.toBeNull();
-  expect(compactTabs!.y).toBeGreaterThan(compactInput!.y + compactInput!.height);
-  expect(compactTabs!.x).toBeGreaterThanOrEqual(0);
-  expect(compactTabs!.x + compactTabs!.width).toBeLessThanOrEqual(390);
+  expect(compactControl).not.toBeNull();
+  expect(compactControl!.y).toBeGreaterThan(compactInput!.y + compactInput!.height);
+  expect(compactControl!.x).toBeGreaterThanOrEqual(0);
+  expect(compactControl!.x + compactControl!.width).toBeLessThanOrEqual(390);
 });
 
 test("Arabic search matches undiacritized typing against vocalized content", async ({ page }) => {

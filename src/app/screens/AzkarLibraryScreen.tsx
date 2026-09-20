@@ -1,9 +1,17 @@
-import { useDeferredValue, useId, useMemo, useState } from "react";
-import { Search, Bookmark, ChevronNext, Lightbulb, X } from "../components/icons";
+import { useDeferredValue, useEffect, useId, useMemo, useRef, useState } from "react";
+import { Search, Bookmark, ChevronDown, ChevronNext, Lightbulb, X } from "../components/icons";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { CategoryCard } from "../components/CategoryCard";
 import { StatePanel } from "../components/StatePanel";
 import { TabList, tabPanelProps } from "../components/Tabs";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "../components/ui/dropdown-menu";
 import {
   ALL_AZKAR,
   getAzkarByCategory,
@@ -78,6 +86,7 @@ export function AzkarLibraryScreen({
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGroupId, setSelectedGroupId] = useState<string>("all");
   const searchInputId = useId();
+  const selectedGroupRef = useRef<HTMLButtonElement>(null);
   const isArabic = language === "ar";
   const savedAzkar = useMemo(() => {
     const available: SavedLibraryItem[] = [...ALL_AZKAR, ...COMPREHENSIVE_DUA_ITEMS].filter(
@@ -160,14 +169,47 @@ export function AzkarLibraryScreen({
     });
   }, [savedAzkar, normalizedQuery]);
 
+  useEffect(() => {
+    selectedGroupRef.current?.scrollIntoView?.({ block: "nearest", inline: "nearest" });
+  }, [selectedGroupId]);
+
   return (
     <ScreenContainer dir={direction} className="relative" screenName={t(language, "library.title")}>
       <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col min-h-screen">
-        <header className="shrink-0 px-5 pb-4 pt-3">
-          <h1 className="block max-w-full truncate whitespace-nowrap text-xl font-extrabold text-foreground sm:text-2xl">
-            {t(language, "library.title")}
-          </h1>
-          <div className="mt-4">
+        <header className="shrink-0 px-5 pb-3 pt-3 sm:pb-4 lg:pt-5">
+          <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <h1 className="block max-w-full truncate whitespace-nowrap text-xl font-extrabold text-foreground sm:text-2xl">
+                {t(language, "library.title")}
+              </h1>
+              <p className="mt-1 hidden text-sm text-muted-foreground lg:block">{t(language, "library.subtitle")}</p>
+            </div>
+
+            <TabList
+              value={section}
+              onChange={setSection}
+              direction={direction}
+              idPrefix="library-sections"
+              aria-label={t(language, "library.title")}
+              className="hidden min-w-64 grid-cols-2 rounded-2xl border border-border-control/60 bg-card p-1 shadow-xs sm:grid"
+              tabs={(["collections", "saved"] as const).map((value) => ({
+                value,
+                testId: `library-section-${value}`,
+                label: `${t(language, `library.${value}`)}${
+                  value === "saved" && savedZikrIds.size > 0 ? ` (${formatNumerals(savedZikrIds.size, language)})` : ""
+                }`,
+              }))}
+              itemClassName={(selected) =>
+                `min-h-11 rounded-xl px-3 text-sm font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                  selected
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                }`
+              }
+            />
+          </div>
+
+          <div className="mt-3 sm:mt-4">
             <form
               className="min-w-0"
               onSubmit={(event) => {
@@ -221,66 +263,78 @@ export function AzkarLibraryScreen({
                 {filterStatusMessage}
               </p>
             </form>
-
-            <TabList
-              value={section}
-              onChange={setSection}
-              direction={direction}
-              idPrefix="library-sections"
-              aria-label={t(language, "library.title")}
-              className="mt-3 grid grid-cols-2 rounded-2xl border border-border-control/60 bg-card p-1 shadow-xs"
-              tabs={(["collections", "saved"] as const).map((value) => ({
-                value,
-                testId: `library-section-${value}`,
-                label: `${t(language, `library.${value}`)}${
-                  value === "saved" && savedZikrIds.size > 0 ? ` (${formatNumerals(savedZikrIds.size, language)})` : ""
-                }`,
-              }))}
-              itemClassName={(selected) =>
-                `min-h-11 rounded-xl px-3 text-sm font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                  selected
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                }`
-              }
-            />
           </div>
 
-          {section === "collections" && (
-            <div
-              role="group"
-              className="mt-3 flex items-center gap-2 overflow-x-auto no-scrollbar pb-1"
-              aria-label={t(language, "library.title")}
-            >
-              <button
-                type="button"
-                aria-pressed={selectedGroupId === "all"}
-                onClick={() => setSelectedGroupId("all")}
-                className={`interactive-elem shrink-0 flex min-h-11 items-center justify-center rounded-2xl px-4 py-1.5 text-sm font-bold transition-colors cursor-pointer ${
-                  selectedGroupId === "all"
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "bg-card border border-border-control/50 text-muted-foreground hover:text-foreground hover:bg-muted"
-                }`}
-              >
-                {t(language, "library.all")}
-              </button>
-              {CATEGORY_GROUPS.map((group) => (
+          <div className={`mt-3 min-w-0 items-center gap-2 ${section === "collections" ? "flex" : "flex sm:hidden"}`}>
+            <DropdownMenu dir={direction}>
+              <DropdownMenuTrigger asChild>
                 <button
-                  key={group.id}
                   type="button"
-                  aria-pressed={selectedGroupId === group.id}
-                  onClick={() => setSelectedGroupId(group.id)}
+                  data-testid="library-mobile-section"
+                  className="interactive-elem flex min-h-11 shrink-0 items-center gap-2 rounded-2xl border border-border-control/60 bg-card px-3.5 text-start text-sm font-extrabold text-foreground shadow-xs focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:hidden"
+                  aria-label={`${t(language, "library.title")}: ${t(language, `library.${section}`)}`}
+                >
+                  <span>{t(language, `library.${section}`)}</span>
+                  {section === "saved" && savedZikrIds.size > 0 && (
+                    <span className="text-xs text-muted-foreground">{formatNumerals(savedZikrIds.size, language)}</span>
+                  )}
+                  <ChevronDown size={16} className="shrink-0 text-muted-foreground" aria-hidden="true" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="min-w-[14rem]">
+                <DropdownMenuLabel className="px-3 py-2 text-xs font-black text-muted-foreground">
+                  {t(language, "library.title")}
+                </DropdownMenuLabel>
+                <DropdownMenuRadioGroup value={section} onValueChange={(value) => setSection(value as LibrarySection)}>
+                  <DropdownMenuRadioItem value="collections" className="font-bold">
+                    {t(language, "library.collections")}
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="saved" className="font-bold">
+                    {t(language, "library.saved")}
+                    {savedZikrIds.size > 0 ? ` (${formatNumerals(savedZikrIds.size, language)})` : ""}
+                  </DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {section === "collections" && (
+              <div
+                role="group"
+                className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto no-scrollbar pb-1"
+                aria-label={t(language, "library.title")}
+              >
+                <button
+                  type="button"
+                  ref={selectedGroupId === "all" ? selectedGroupRef : undefined}
+                  aria-pressed={selectedGroupId === "all"}
+                  onClick={() => setSelectedGroupId("all")}
                   className={`interactive-elem shrink-0 flex min-h-11 items-center justify-center rounded-2xl px-4 py-1.5 text-sm font-bold transition-colors cursor-pointer ${
-                    selectedGroupId === group.id
+                    selectedGroupId === "all"
                       ? "bg-primary text-primary-foreground shadow-sm"
                       : "bg-card border border-border-control/50 text-muted-foreground hover:text-foreground hover:bg-muted"
                   }`}
                 >
-                  {t(language, `library.groups.${group.labelKey}`)}
+                  {t(language, "library.all")}
                 </button>
-              ))}
-            </div>
-          )}
+                {CATEGORY_GROUPS.map((group) => (
+                  <button
+                    key={group.id}
+                    type="button"
+                    ref={selectedGroupId === group.id ? selectedGroupRef : undefined}
+                    aria-pressed={selectedGroupId === group.id}
+                    onClick={() => setSelectedGroupId(group.id)}
+                    className={`interactive-elem shrink-0 flex min-h-11 items-center justify-center rounded-2xl px-4 py-1.5 text-sm font-bold transition-colors cursor-pointer ${
+                      selectedGroupId === group.id
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "bg-card border border-border-control/50 text-muted-foreground hover:text-foreground hover:bg-muted"
+                    }`}
+                  >
+                    {t(language, `library.groups.${group.labelKey}`)}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </header>
 
         <div

@@ -3662,3 +3662,26 @@ null` shape, so a record written before this change still loads and still
 - **Visual hierarchy:** the current title and reciter use one stable tonal surface, Play/Pause remains dominant, time seeking remains native, and speed/repeat/volume/voice remain secondary controls. No decorative color introduces a second semantic status system.
 - **Completion integrity:** natural completion continues through the existing `entry-complete` event and frozen plan context. Play Once records after one complete recitation; prescribed Repeat records only after its final repetition. The same local completion set drives the Reader counter and collection progress, while pause, stop, seek, skip, failure, and partial listening never fabricate completion.
 - **Tests/evidence required:** provider completion sequencing, Reader counter ownership, stable-edge geometry, named progress in both forms, bottom docking, RTL/LTR seek direction, focused browser audio coverage, full local gates, and owner review before release.
+
+## DEC-183 — Library sections compact without hiding category pills
+
+- **Decision:** supersede DEC-176 only for responsive placement. On phones, Collections and Saved use one rounded single-choice menu; from the small breakpoint upward they remain peer APG tabs beside the Library heading. Search retains its full-width row and visible label.
+- **Filtering:** directly below Search, the fixed section selector sits beside the horizontally scrolling category pills. Category pills remain the primary mobile filtering interaction. The selected pill stays visible through color, text, and `aria-pressed`; no all-in-one category menu replaces them.
+- **Why:** Collections/Saved is a low-frequency view switch and can be disclosed compactly. Category groups are frequent browsing shortcuts, benefit from recognition over recall, and should remain directly visible.
+- **Accessibility and compatibility:** the desktop tabs retain APG keyboard behavior and direction-aware arrows. The mobile section menu uses radio-item semantics, keyboard navigation, Escape dismissal, focus restoration, 44px targets, visible focus, RTL/LTR, and localized copy. Existing search, result cards, and saved state remain authoritative.
+- **Tests/evidence required:** focused Library unit coverage, mobile section-menu semantics, category-pill visibility, desktop/tab alignment, responsive containment, full local gates, and owner review before release.
+
+## DEC-184 — Shared headers become glass only after their content scrolls
+
+- **Decision:** the shared app header remains visually transparent at the top of a screen and becomes a bordered, elevated, translucent background surface only after that screen's scroll owner moves. It observes captured scroll events within the current screen so nested and surface-level scroll regions share one behavior.
+- **Home boundary:** Home retains its existing image-aware utility header, composition, materials, cards, and scroll behavior. The shared treatment does not render there and does not alter its look and feel.
+- **Accessibility:** the header remains in document order and sticky rather than becoming a detached overlay. Reduced-transparency settings replace the translucent material with the opaque semantic background and remove backdrop blur. Focus order, landmarks, names, and target sizes do not change.
+- **Tests/evidence required:** unit coverage for the scroll threshold and reset, reduced-transparency CSS, browser coverage proving Home is unaffected and a shared header changes after scroll, full local gates, and owner review before release.
+
+## DEC-185 — The one-page Mushaf restores a right rail where width is available
+
+- **Decision:** supersede DEC-180 only where it removed the desktop tool rail. The standalone Mushaf remains one canonical page with no facing spread and no Focus Mode. Desktop and landscape-tablet viewports that pass the existing rail fit gate place the reading tools in the right-side rail; compact and portrait viewports retain the approved four corner controls.
+- **Why:** wide landscape surfaces have spare horizontal space but limited height. Moving controls beside the paper restores the established desktop navigation, makes tools directly discoverable, and gives the fifteen canonical lines more vertical room without creating a second reading mode or obscuring sacred text.
+- **Accessibility and consistency:** the rail is a labelled group rather than a false ARIA toolbar, keeps native buttons and visible focus, preserves physical outward Back and page-turn direction, and exposes bookmark, meanings, fullscreen, settings, index, and page navigation without an overflow step. Focus Mode is omitted so users do not have to learn an alternate hidden-controls state.
+- **Compatibility:** Qur'an content, QCF pagination, page geometry, progress, bookmarks, stored layout values, and mobile controls do not change. The existing toolbar-side preference remains readable, while the default and approved presentation is the right rail.
+- **Tests/evidence required:** one-page rendering at all widths; right rail on desktop and qualifying landscape tablet; corner controls on mobile and portrait tablet; no Focus Mode entry in the standalone rail; keyboard, focus, RTL/LTR, full local gates, deployment, and production smoke verification.

@@ -59,6 +59,35 @@ describe("AzkarLibraryScreen", () => {
     expect(screen.getByRole("heading", { name: "Nothing saved yet" })).toBeVisible();
   });
 
+  it("offers Collections and Saved through one compact section menu", async () => {
+    const user = userEvent.setup();
+    render(
+      <AzkarLibraryScreen
+        completed={{} as Record<CategoryId, Set<string>>}
+        language="en"
+        direction="ltr"
+        routineModes={{ morning: "core", evening: "core", before_sleep: "core", after_prayer: "core" }}
+        onCategory={() => undefined}
+        onZikr={() => undefined}
+        onSearch={() => undefined}
+        savedZikrIds={new Set()}
+      />,
+    );
+
+    const sectionMenu = screen.getByTestId("library-mobile-section");
+    expect(sectionMenu).toHaveAttribute("aria-haspopup", "menu");
+    expect(sectionMenu).toHaveTextContent("Collections");
+    expect(screen.getByRole("button", { name: "All" })).toHaveAttribute("aria-pressed", "true");
+
+    await user.click(sectionMenu);
+    const saved = screen.getByRole("menuitemradio", { name: "Saved" });
+    expect(saved).toHaveAttribute("aria-checked", "false");
+    await user.click(saved);
+
+    expect(sectionMenu).toHaveTextContent("Saved");
+    expect(screen.getByRole("heading", { name: "Nothing saved yet" })).toBeVisible();
+  });
+
   it("keeps the collection available from the Azkar Library every day", () => {
     const onCategory = vi.fn();
 

@@ -143,7 +143,9 @@ export interface MushafToolRailProps {
   onToggleWordMeanings: () => void;
   onTogglePageBookmark: () => void;
   onToggleFullscreen: () => void;
-  onEnterFocusMode: () => void;
+  /** Optional because the standalone reader intentionally has one visible
+   * interaction mode; immersive readers may still provide this action. */
+  onEnterFocusMode?: () => void;
   onOpenSettings: () => void;
   /** Omitted where the surah has no reviewed recitation to offer. */
   surahAudio?: SurahAudioControl;
@@ -242,14 +244,18 @@ export function MushafToolRail({
 
   /** How much of the screen the page gets — the view, not the reading. */
   const displayTools: MushafToolRailAction[] = [
-    {
-      id: "focus",
-      label: t(language, "mushaf.focusModeEnter"),
-      caption: t(language, "mushaf.railFocus"),
-      icon: <Eye size={iconSize} />,
-      onClick: onEnterFocusMode,
-      testId: "mushaf-focus-enter",
-    },
+    ...(onEnterFocusMode
+      ? [
+          {
+            id: "focus",
+            label: t(language, "mushaf.focusModeEnter"),
+            caption: t(language, "mushaf.railFocus"),
+            icon: <Eye size={iconSize} />,
+            onClick: onEnterFocusMode,
+            testId: "mushaf-focus-enter",
+          },
+        ]
+      : []),
     {
       id: "fullscreen",
       label: t(language, isFullscreen ? "mushaf.exitFullscreen" : "mushaf.enterFullscreen"),

@@ -511,6 +511,15 @@ button.ui-icon-button:not(:disabled):not(.no-press):active,
   .app-shell::after {
     display: none !important;
   }
+
+  .scroll-glass-header {
+    background-color: var(--background) !important;
+    backdrop-filter: none !important;
+  }
+}
+
+.reduce-transparency .scroll-glass-header {
+  background-color: var(--background) !important;
 }
 
 /* Semantic surfaces extracted from PrayerTrackerCards for consistency */

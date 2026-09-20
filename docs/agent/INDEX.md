@@ -81,6 +81,8 @@ Run the phase files in numerical order unless the decision log explicitly record
 | 38    | `phases/PHASE_38_QIBLA_RESPONSIVE_RELEVANCE.md`        | Reachable mobile Qibla and practical desktop bearing guidance           |
 | 39    | `phases/PHASE_39_SINGLE_PAGE_MUSHAF.md`                | One full-screen Mushaf page and focused navigation at every width       |
 | 40    | `phases/PHASE_40_AUDIO_DOCK_REFINEMENT.md`             | Stable audio controls, bottom docking, and visible listening progress   |
+| 41    | `phases/PHASE_41_LIBRARY_FILTER_DISCLOSURE.md`         | Compact mobile filters and responsive Library hierarchy                 |
+| 42    | `phases/PHASE_42_MUSHAF_DESKTOP_RAIL.md`               | Right-side wide-screen Mushaf tools with mobile corner controls         |
 
 Phases 15–20 derive from `docs/audits/DESIGN_CONSISTENCY_AUDIT.md` (2026-08-15) and are
 recorded in `DECISION_LOG.md` as DEC-064. Phase 15 is upstream of 16, 17 and 19 — its root

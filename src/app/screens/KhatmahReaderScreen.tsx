@@ -219,8 +219,9 @@ export function KhatmahReaderScreen({
 
   const shell = useMushafShell();
 
-  // The Mushaf is one full-screen page at every viewport. A second spread or
-  // side rail created a different reader to learn on desktop.
+  // The Mushaf always keeps one canonical page. Wide landscape surfaces place
+  // the same reading actions in a right-side rail so the page gains vertical
+  // room; compact and portrait surfaces retain the four corner actions.
   const autoSpreadRoom = false;
   /**
    * Whether the reading type size can change anything here.
@@ -233,7 +234,7 @@ export function KhatmahReaderScreen({
   // A stored desktop preference never forces two pages onto a phone or tall
   // tablet. The physical fit gate is authoritative; settings only opt out.
   const spreadRoom = false;
-  const useRail = false;
+  const useRail = shell.rail;
 
   const paperRef = useRef<HTMLDivElement>(null);
   const readerRootRef = useRef<HTMLDivElement>(null);
@@ -755,7 +756,6 @@ export function KhatmahReaderScreen({
       onToggleWordMeanings={() => void toggleWordMeanings()}
       onTogglePageBookmark={togglePageBookmark}
       onToggleFullscreen={toggleFullscreen}
-      onEnterFocusMode={() => setIsFocusMode(true)}
       onOpenSettings={() => setIsOptionsMenuOpen(true)}
     />
   );

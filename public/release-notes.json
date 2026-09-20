@@ -1,15 +1,15 @@
 {
-  "release": "2026-09-20-2",
+  "release": "2026-09-20-3",
   "ar": [
-    "صفحة المصحف تملأ الشاشة بصفحة واحدة واضحة، مع تنقّل مباشر عبر اسم السورة ورقم الصفحة.",
-    "مشغل الصوت أصبح ثابتاً أسفل شاشة القراءة، مع تقدم واضح وأزرار لا تتبدل أماكنها عند التوسيع.",
-    "شريط مستوى الصوت في المشغل المصغر أصبح أفقياً ومصطفاً دون حجب مساحة كبيرة من الصفحة.",
-    "صفحات التقدم والإنجاز أصبحت أبسط وأكثر تركيزاً على ملخص الفترة والخطوة التالية."
+    "أصبح التبديل بين المجموعات والمحفوظات أكثر اختصاراً على الهاتف، مع بقاء تصنيفات الأذكار ظاهرة وسهلة التمرير.",
+    "تظهر المجموعات والمحفوظات بجانب عنوان المكتبة على الشاشات الأوسع، بينما يبقى البحث واضحاً بعرض الصفحة.",
+    "تثبت عناوين الشاشات بسطح زجاجي هادئ عند التمرير لتبقى القراءة والتنقل واضحين.",
+    "عادت أدوات المصحف إلى شريط جانبي واضح على الشاشات الواسعة، مع بقاء أزرار الزوايا المدمجة على الهاتف."
   ],
   "en": [
-    "The Mushaf now fills the screen with one clear page and direct navigation through the Surah name and page number.",
-    "The audio player stays anchored to the reading screen, with clear progress and controls that keep their positions when expanded.",
-    "The compact player's volume control is now horizontal and aligned without covering a tall portion of the page.",
-    "Progress and completion pages are simpler and focus on the selected period summary and the next useful action."
+    "Switching between Collections and Saved is more compact on phones while category pills stay visible and easy to scroll.",
+    "Collections and Saved sit beside the Library title on wider screens while Search keeps a clear full-width row.",
+    "Screen headers gain a calm glass surface after scrolling so navigation stays clear over content.",
+    "Mushaf tools return in a clear right-side rail on wide screens while phones retain the integrated corner controls."
   ]
 }

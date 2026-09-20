@@ -346,7 +346,14 @@ test("Friday mode has no automatically detectable WCAG A/AA violations", async (
 test("Saved zikr has no automatically detectable WCAG A/AA violations", async ({ page }) => {
   await enterEnglishGuestMode(page);
   await page.getByTestId("nav-azkar").click();
-  await page.getByTestId("library-section-saved").click();
+  const compactSection = page.getByTestId("library-mobile-section");
+  if ((page.viewportSize()?.width ?? 0) < 640) {
+    await expect(compactSection).toBeVisible();
+    await compactSection.click();
+    await page.getByRole("menuitemradio", { name: "Saved" }).click();
+  } else {
+    await page.getByTestId("library-section-saved").click();
+  }
   await expect(page.getByRole("heading", { name: "Nothing saved yet" })).toBeVisible();
   await expectNoWcagViolations(page);
 });
