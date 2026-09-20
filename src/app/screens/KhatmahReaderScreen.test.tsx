@@ -284,30 +284,41 @@ describe("KhatmahReaderScreen difficult words", () => {
 describe("KhatmahReaderScreen responsive chrome contract", () => {
   afterEach(() => setViewport(1024, 768));
 
-  it.each([
-    [390, 844, false],
-    [834, 1112, false],
-    [1440, 900, true],
-  ] as const)("keeps one full-screen page with appropriate chrome at %i×%i", async (width, height, hasRail) => {
-    setViewport(width, height);
-    renderReader({ khatmahPage: 50, mushafLayout: "spread" });
+  it("keeps Automatic to one page when a technically fitting spread would be cramped", async () => {
+    setViewport(1100, 700);
+    renderReader({ khatmahPage: 50, mushafLayout: "auto" });
     const article = await screen.findByRole("article", { name: "صفحة ٥٠" });
-    expect(article).toHaveAttribute("data-mushaf-chrome-mode", hasRail ? "rail" : "clean");
     expect(article.querySelectorAll("[data-mushaf-rendering]")).toHaveLength(1);
-    if (hasRail) {
-      expect(screen.getByTestId("mushaf-tool-rail")).toHaveAttribute("data-rail-side", "right");
-      expect(screen.getByTestId("mushaf-rail-back")).toBeInTheDocument();
-      expect(screen.getByTestId("mushaf-rail-page-bookmark")).toBeInTheDocument();
-      expect(screen.getByTestId("mushaf-difficult-words-switch")).toBeInTheDocument();
-      expect(screen.queryByTestId("mushaf-focus-enter")).not.toBeInTheDocument();
-    } else {
-      expect(screen.queryByTestId("mushaf-tool-rail")).not.toBeInTheDocument();
-      expect(screen.getByTestId("mushaf-top-left-back")).toBeInTheDocument();
-      expect(screen.getByTestId("mushaf-more-actions")).toBeInTheDocument();
-      expect(screen.getByTestId("mushaf-page-bookmark")).toBeInTheDocument();
-      expect(screen.getByTestId("mushaf-difficult-words-switch")).toBeInTheDocument();
-    }
   });
+
+  it.each([
+    [390, 844, false, 1],
+    [834, 1112, false, 1],
+    [1440, 900, true, 2],
+  ] as const)(
+    "fits the requested page layout and appropriate chrome at %i×%i",
+    async (width, height, hasRail, pages) => {
+      setViewport(width, height);
+      renderReader({ khatmahPage: 50, mushafLayout: "spread" });
+      const article = await screen.findByRole("article");
+      expect(article).toHaveAttribute("data-mushaf-chrome-mode", hasRail ? "rail" : "clean");
+      expect(article.querySelectorAll("[data-mushaf-rendering]")).toHaveLength(pages);
+      if (hasRail) {
+        expect(screen.getByTestId("mushaf-tool-rail")).toHaveAttribute("data-rail-side", "right");
+        expect(screen.getByTestId("mushaf-rail-back")).toBeInTheDocument();
+        expect(screen.getByTestId("mushaf-rail-page-bookmark")).toBeInTheDocument();
+        expect(screen.getByTestId("mushaf-difficult-words-switch")).toBeInTheDocument();
+        expect(screen.queryByTestId("mushaf-focus-enter")).not.toBeInTheDocument();
+        expect(screen.getByTestId("mushaf-rail-more")).toBeInTheDocument();
+      } else {
+        expect(screen.queryByTestId("mushaf-tool-rail")).not.toBeInTheDocument();
+        expect(screen.getByTestId("mushaf-top-left-back")).toBeInTheDocument();
+        expect(screen.getByTestId("mushaf-more-actions")).toBeInTheDocument();
+        expect(screen.getByTestId("mushaf-page-bookmark")).toBeInTheDocument();
+        expect(screen.getByTestId("mushaf-difficult-words-switch")).toBeInTheDocument();
+      }
+    },
+  );
 });
 
 describe("KhatmahReaderScreen settings menu", () => {
@@ -349,7 +360,7 @@ describe("KhatmahReaderScreen quick menu", () => {
   it("uses the Surah name and printed folio as direct navigation buttons", async () => {
     const user = userEvent.setup();
     setViewport(390, 844);
-    renderReader({ language: "en", direction: "ltr" });
+    renderReader({ language: "en", direction: "ltr", setMushafLayout: vi.fn() });
     await screen.findByRole("article", { name: "Page 42" });
 
     await user.click(screen.getByTestId("mushaf-top-center-index"));
@@ -415,12 +426,14 @@ describe("KhatmahReaderScreen settings presentation", () => {
   it("keeps the reading settings in the same sheet on wide screens", async () => {
     const user = userEvent.setup();
     setViewport(1440, 900);
-    renderReader({ language: "en", direction: "ltr" });
+    renderReader({ language: "en", direction: "ltr", setMushafLayout: vi.fn() });
     await screen.findByRole("article", { name: "Page 42" });
 
-    await user.click(screen.getByTestId("mushaf-settings-trigger"));
+    await user.click(screen.getByTestId("mushaf-rail-more"));
+    await user.click(await screen.findByTestId("mushaf-quick-settings"));
     const sheet = await screen.findByTestId("mushaf-settings-sheet");
     expect(sheet).toHaveAttribute("data-side", "right");
+    expect(screen.getByTestId("mushaf-layout-option-spread")).toBeInTheDocument();
   });
 
   it("keeps the centred sheet where there is no width to dock into", async () => {

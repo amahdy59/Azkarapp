@@ -1,15 +1,15 @@
 {
-  "release": "2026-09-20-3",
+  "release": "2026-09-20-4",
   "ar": [
-    "أصبح التبديل بين المجموعات والمحفوظات أكثر اختصاراً على الهاتف، مع بقاء تصنيفات الأذكار ظاهرة وسهلة التمرير.",
-    "تظهر المجموعات والمحفوظات بجانب عنوان المكتبة على الشاشات الأوسع، بينما يبقى البحث واضحاً بعرض الصفحة.",
-    "تثبت عناوين الشاشات بسطح زجاجي هادئ عند التمرير لتبقى القراءة والتنقل واضحين.",
-    "عادت أدوات المصحف إلى شريط جانبي واضح على الشاشات الواسعة، مع بقاء أزرار الزوايا المدمجة على الهاتف."
+    "يمكن اختيار عرض صفحة واحدة أو صفحتين من المصحف على الشاشات الواسعة، بينما يبقى الهاتف على صفحة واحدة مريحة.",
+    "أصبحت صفحات المصحف بلا إطارات أو خلفيات إضافية لتملأ مساحة القراءة بهدوء.",
+    "يعرض شريط أدوات المصحف الوظائف الأساسية فقط، مع جمع الخيارات الثانوية في قائمة واحدة.",
+    "تحسّن تباعد سطور الفاتحة وبداية البقرة، وأصبحت أيقونة معاني الكلمات موحّدة بين الهاتف وسطح المكتب."
   ],
   "en": [
-    "Switching between Collections and Saved is more compact on phones while category pills stay visible and easy to scroll.",
-    "Collections and Saved sit beside the Library title on wider screens while Search keeps a clear full-width row.",
-    "Screen headers gain a calm glass surface after scrolling so navigation stays clear over content.",
-    "Mushaf tools return in a clear right-side rail on wide screens while phones retain the integrated corner controls."
+    "Choose one or two Mushaf pages on wide screens while phones keep a comfortable single-page view.",
+    "Mushaf pages now fill the reading area without extra outlines, cards, or background layers.",
+    "The Mushaf rail shows only essential reading tools and gathers secondary options in one menu.",
+    "Al-Fatihah and the beginning of Al-Baqarah have a more familiar line rhythm, with one word-meanings icon across devices."
   ]
 }

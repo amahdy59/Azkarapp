@@ -24,6 +24,7 @@ describe("the Mushaf page frame", () => {
     expect(viewer).not.toContain("MushafOpeningFrameArt");
     expect(viewer).toContain("mushaf-opening__content");
     expect(viewer).toContain("gridTemplateRows:");
+    expect(viewer).toContain('className="grid h-[84%]');
   });
 
   it("uses the documented crisp page-turn distance and duration", () => {
@@ -54,24 +55,12 @@ describe("the Mushaf page frame", () => {
     expect(immersive).toContain("textScale={textScale}");
   });
 
-  it("gives the page a paper surface from the tablet tier up, and the screen itself below it", () => {
-    // DEC-135 made the page paper rather than a transparent rectangle on the
-    // shell. On a phone there is no shell beside it to be a sheet against: the
-    // page fills the viewport, so the ground, the radius and the shadow drew a
-    // panel of nearly the app background colour with a rounded edge against
-    // nothing. The sheet is now a wide-screen treatment and the phone reads the
-    // page directly on the app ground, as high contrast already did.
-    const frame = layout.slice(
-      layout.indexOf(".mushaf-page-frame {"),
-      layout.indexOf(".high-contrast .mushaf-page-frame"),
-    );
-    expect(frame).toContain("@media (min-width: 640px)");
-    expect(frame).toContain("background: var(--mushaf-paper)");
-    expect(frame).toContain("border-radius: 0.5rem");
-    // Nothing paints a ground before that breakpoint.
-    const base = layout.slice(layout.indexOf(".mushaf-page-frame {"), layout.indexOf("@media (min-width: 640px)"));
-    expect(base).not.toContain("background:");
-    expect(base).not.toContain("box-shadow:");
+  it("keeps the page borderless and on the reader ground at every width", () => {
+    const frame = layout.slice(layout.indexOf(".mushaf-page-frame {"), layout.indexOf(".mushaf-page-furniture"));
+    expect(frame).not.toContain("background:");
+    expect(frame).not.toContain("border:");
+    expect(frame).not.toContain("border-radius:");
+    expect(frame).not.toContain("box-shadow:");
 
     expect(tokens).toContain("--mushaf-paper: #101010"); // root fallback
     expect(tokens).toContain("--mushaf-paper: #141312"); // dark
@@ -87,7 +76,6 @@ describe("the Mushaf page frame", () => {
     expect(viewer).toContain('theme === "oled" ? "theme-oled"');
     expect(tokens).toMatch(/\.theme-oled\s*\{[^}]*--mushaf-paper:\s*#000000/);
 
-    // High contrast and OLED omit drop shadow to preserve contrast purity
-    expect(layout).toMatch(/\.theme-oled \.mushaf-page-frame\s*\{[^}]*box-shadow:\s*none/);
+    expect(layout).not.toContain(".theme-oled .mushaf-page-frame");
   });
 });

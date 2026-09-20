@@ -815,59 +815,10 @@ function MushafPageCanvas({
           }`}
         >
           <div
-            className="mushaf-opening__content relative z-10 flex h-full w-full flex-col justify-between rounded-2xl border border-primary/35 bg-card/25 shadow-sm p-3 sm:p-5 ring-1 ring-inset ring-primary/15"
+            className="mushaf-opening__content relative z-10 flex h-full w-full flex-col justify-center p-3 sm:p-5"
             style={{ maxWidth: "min(100%, calc(100cqh * 2 / 3))" }}
             data-testid="mushaf-opening-content"
           >
-            {/* Elegant Islamic Corner Ornaments */}
-            <svg
-              viewBox="0 0 24 24"
-              className="absolute top-2 left-2 size-5 text-primary/50 pointer-events-none select-none"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              aria-hidden="true"
-            >
-              <path d="M4 14V8a4 4 0 0 1 4-4h6" />
-              <circle cx="8" cy="8" r="1.5" fill="currentColor" />
-            </svg>
-            <svg
-              viewBox="0 0 24 24"
-              className="absolute top-2 right-2 size-5 text-primary/50 pointer-events-none select-none"
-              style={{ transform: "scaleX(-1)" }}
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              aria-hidden="true"
-            >
-              <path d="M4 14V8a4 4 0 0 1 4-4h6" />
-              <circle cx="8" cy="8" r="1.5" fill="currentColor" />
-            </svg>
-            <svg
-              viewBox="0 0 24 24"
-              className="absolute bottom-2 left-2 size-5 text-primary/50 pointer-events-none select-none"
-              style={{ transform: "scaleY(-1)" }}
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              aria-hidden="true"
-            >
-              <path d="M4 14V8a4 4 0 0 1 4-4h6" />
-              <circle cx="8" cy="8" r="1.5" fill="currentColor" />
-            </svg>
-            <svg
-              viewBox="0 0 24 24"
-              className="absolute bottom-2 right-2 size-5 text-primary/50 pointer-events-none select-none"
-              style={{ transform: "scale(-1, -1)" }}
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              aria-hidden="true"
-            >
-              <path d="M4 14V8a4 4 0 0 1 4-4h6" />
-              <circle cx="8" cy="8" r="1.5" fill="currentColor" />
-            </svg>
-
             {showPageFurnitureHead && (
               <PageFurnitureHead
                 surahNumber={pageSurahNumber}
@@ -879,7 +830,7 @@ function MushafPageCanvas({
             )}
             <div
               data-mushaf-column=""
-              className="grid min-h-0 w-full flex-1"
+              className="grid h-[84%] min-h-0 w-full flex-none self-center"
               style={{
                 gridTemplateRows: "repeat(8, minmax(0, 1fr))",
                 fontFamily: useQcfGlyphs ? `qcf-v2-page-${pageNumber}, var(--font-mushaf)` : "var(--font-mushaf)",

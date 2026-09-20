@@ -19,7 +19,7 @@ import {
   X,
   RotateCcw,
   Bookmark,
-  BookOpen,
+  Translate,
   MoreVertical,
 } from "../components/icons";
 import { PAPER_ASPECT, spreadStart, useMushafShell } from "../components/mushafShell";
@@ -222,7 +222,7 @@ export function KhatmahReaderScreen({
   // The Mushaf always keeps one canonical page. Wide landscape surfaces place
   // the same reading actions in a right-side rail so the page gains vertical
   // room; compact and portrait surfaces retain the four corner actions.
-  const autoSpreadRoom = false;
+  const autoSpreadRoom = shell.spreadRoom && shell.pageAspect >= 0.78;
   /**
    * Whether the reading type size can change anything here.
    *
@@ -233,7 +233,7 @@ export function KhatmahReaderScreen({
   const typeSizeApplies = shell.pageAspect >= PAPER_ASPECT;
   // A stored desktop preference never forces two pages onto a phone or tall
   // tablet. The physical fit gate is authoritative; settings only opt out.
-  const spreadRoom = false;
+  const spreadRoom = shell.spreadRoom && (mushafLayout === "spread" || (mushafLayout === "auto" && autoSpreadRoom));
   const useRail = shell.rail;
 
   const paperRef = useRef<HTMLDivElement>(null);
@@ -720,7 +720,7 @@ export function KhatmahReaderScreen({
           showWordMeanings ? "text-primary" : "text-foreground hover:bg-muted"
         }`}
       >
-        <BookOpen size={19} className={showWordMeanings ? "stroke-[2.5]" : undefined} aria-hidden="true" />
+        <Translate size={19} className={showWordMeanings ? "stroke-[2.5]" : undefined} aria-hidden="true" />
         {showWordMeanings && (
           <span className="absolute bottom-1.5 size-1.5 rounded-full bg-current" aria-hidden="true" />
         )}
@@ -757,6 +757,7 @@ export function KhatmahReaderScreen({
       onTogglePageBookmark={togglePageBookmark}
       onToggleFullscreen={toggleFullscreen}
       onOpenSettings={() => setIsOptionsMenuOpen(true)}
+      onOpenMore={() => setIsQuickMenuOpen(true)}
     />
   );
 
@@ -986,7 +987,7 @@ export function KhatmahReaderScreen({
         onSelectTheme={handleSelectTheme}
         mushafLayout={mushafLayout}
         onSelectLayout={setMushafLayout}
-        autoSpreadRoom={autoSpreadRoom}
+        autoSpreadRoom={shell.spreadRoom}
         textScale={mushafTextScale}
         onSelectTextScale={setMushafTextScale}
         textScaleApplies={typeSizeApplies}

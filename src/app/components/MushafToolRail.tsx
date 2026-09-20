@@ -14,6 +14,7 @@ import {
   HelpCircle,
   Maximize,
   Minimize,
+  MoreVertical,
   Pause,
   Play,
   SlidersHorizontal,
@@ -147,6 +148,7 @@ export interface MushafToolRailProps {
    * interaction mode; immersive readers may still provide this action. */
   onEnterFocusMode?: () => void;
   onOpenSettings: () => void;
+  onOpenMore?: () => void;
   /** Omitted where the surah has no reviewed recitation to offer. */
   surahAudio?: SurahAudioControl;
   /** Omitted on surfaces with no keyboard to describe, which is every phone. */
@@ -178,6 +180,7 @@ export function MushafToolRail({
   onToggleFullscreen,
   onEnterFocusMode,
   onOpenSettings,
+  onOpenMore,
   surahAudio,
   onOpenShortcuts,
   onComplete,
@@ -242,56 +245,69 @@ export function MushafToolRail({
     },
   ];
 
-  /** How much of the screen the page gets — the view, not the reading. */
-  const displayTools: MushafToolRailAction[] = [
-    ...(onEnterFocusMode
-      ? [
-          {
-            id: "focus",
-            label: t(language, "mushaf.focusModeEnter"),
-            caption: t(language, "mushaf.railFocus"),
-            icon: <Eye size={iconSize} />,
-            onClick: onEnterFocusMode,
-            testId: "mushaf-focus-enter",
-          },
-        ]
-      : []),
-    {
-      id: "fullscreen",
-      label: t(language, isFullscreen ? "mushaf.exitFullscreen" : "mushaf.enterFullscreen"),
-      caption: t(language, "mushaf.railFullscreen"),
-      icon: isFullscreen ? <Minimize size={iconSize} /> : <Maximize size={iconSize} />,
-      onClick: onToggleFullscreen,
-      testId: "mushaf-fullscreen-toggle",
-    },
-  ];
+  /** Secondary display and preference actions stay behind one disclosure. */
+  const moreTools: MushafToolRailAction[] = onOpenMore
+    ? [
+        {
+          id: "more",
+          label: t(language, "mushaf.moreActions"),
+          caption: t(language, "mushaf.moreActions"),
+          icon: <MoreVertical size={iconSize} />,
+          onClick: onOpenMore,
+          testId: "mushaf-rail-more",
+        },
+      ]
+    : [];
 
-  /** Preferences, and the list of what the keys do. */
-  const helpTools: MushafToolRailAction[] = [
-    {
-      id: "settings",
-      label: t(language, "common.settings"),
-      caption: t(language, "mushaf.railSettings"),
-      icon: <SlidersHorizontal size={iconSize} />,
-      onClick: onOpenSettings,
-      testId: "mushaf-settings-trigger",
-    },
-    // Last, and only where a keyboard exists to describe. The keys were
-    // discoverable only by opening the reading settings and scrolling past
-    // them, which is not where a reader looks for "what can I press".
-    ...(onOpenShortcuts
-      ? [
-          {
-            id: "shortcuts",
-            label: t(language, "mushaf.keyboardTitle"),
-            caption: t(language, "mushaf.railShortcuts"),
-            icon: <HelpCircle size={iconSize} />,
-            onClick: onOpenShortcuts,
-            testId: "mushaf-rail-shortcuts",
-          },
-        ]
-      : []),
-  ];
+  const displayTools: MushafToolRailAction[] = onOpenMore
+    ? []
+    : [
+        ...(onEnterFocusMode
+          ? [
+              {
+                id: "focus",
+                label: t(language, "mushaf.focusModeEnter"),
+                caption: t(language, "mushaf.railFocus"),
+                icon: <Eye size={iconSize} />,
+                onClick: onEnterFocusMode,
+                testId: "mushaf-focus-enter",
+              },
+            ]
+          : []),
+        {
+          id: "fullscreen",
+          label: t(language, isFullscreen ? "mushaf.exitFullscreen" : "mushaf.enterFullscreen"),
+          caption: t(language, "mushaf.railFullscreen"),
+          icon: isFullscreen ? <Minimize size={iconSize} /> : <Maximize size={iconSize} />,
+          onClick: onToggleFullscreen,
+          testId: "mushaf-fullscreen-toggle",
+        },
+      ];
+
+  const helpTools: MushafToolRailAction[] = onOpenMore
+    ? []
+    : [
+        {
+          id: "settings",
+          label: t(language, "common.settings"),
+          caption: t(language, "mushaf.railSettings"),
+          icon: <SlidersHorizontal size={iconSize} />,
+          onClick: onOpenSettings,
+          testId: "mushaf-settings-trigger",
+        },
+        ...(onOpenShortcuts
+          ? [
+              {
+                id: "shortcuts",
+                label: t(language, "mushaf.keyboardTitle"),
+                caption: t(language, "mushaf.railShortcuts"),
+                icon: <HelpCircle size={iconSize} />,
+                onClick: onOpenShortcuts,
+                testId: "mushaf-rail-shortcuts",
+              },
+            ]
+          : []),
+      ];
 
   /**
    * The tools below the page navigation, in bands.
@@ -313,6 +329,7 @@ export function MushafToolRail({
     { id: "reading", label: t(language, "mushaf.groupReading"), actions: readingTools },
     { id: "display", label: t(language, "mushaf.groupDisplay"), actions: displayTools },
     { id: "help", label: t(language, "mushaf.groupSettings"), actions: helpTools },
+    { id: "more", label: t(language, "mushaf.groupSettings"), actions: moreTools },
   ].filter((group) => group.actions.length > 0);
 
   return (

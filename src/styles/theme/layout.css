@@ -469,30 +469,8 @@
   padding-block: clamp(0.1rem, 0.45cqh, 0.35rem);
 }
 
-/* The page is the screen, so the page has no edge to draw.
-   The frame used to paint `--mushaf-paper` behind the type, round its corners
-   and cast a shadow — a sheet of paper laid on the shell. On a phone, where
-   the sheet is the whole viewport anyway, that reads as a panel floating on a
-   background of almost the same colour: two tones of navy a few percent apart,
-   a rounded edge with nothing beside it, and a shadow with nothing to cast
-   onto. High contrast already dropped the lift for its own reasons; this makes
-   that the rule rather than the exception, and the reading ground is simply
-   the app's. A spread keeps its gutter rule, which is what separates two
-   facing pages once there are two.
-   Wider screens keep the sheet: there the page really is a page on a desk,
-   with shell either side of it to be a page against. */
-@media (min-width: 640px) {
-  .mushaf-page-frame {
-    background: var(--mushaf-paper);
-    border-radius: 0.5rem;
-    box-shadow: 0 1px 12px rgb(0 0 0 / 0.18);
-  }
-
-  .high-contrast .mushaf-page-frame,
-  .theme-oled .mushaf-page-frame {
-    box-shadow: none;
-  }
-}
+/* The page is the screen at every width. It never becomes a card laid on a
+   second background; a facing spread is separated only by its quiet gutter. */
 
 .mushaf-page-furniture {
   height: 5.2%;
@@ -504,9 +482,9 @@
 }
 
 .mushaf-page-furniture__cartouche {
-  border: 1px solid;
-  border-radius: 999px;
-  padding: 0.3em 0.85em;
+  border: 0;
+  border-radius: 0.5rem;
+  padding: 0.3em 0.55em;
 }
 
 .mushaf-page-furniture__folio {

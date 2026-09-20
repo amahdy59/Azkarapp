@@ -228,22 +228,28 @@ test("offers clear RTL reading choices and free reading without progress trackin
   expect(stored.wirdHistory).toEqual({});
 });
 
-test("keeps one full-screen page with a right tool rail in landscape and corner tools in portrait", async ({
-  page,
-}) => {
+test("fits a two-page desktop spread with a focused rail and returns to one page in portrait", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 720 });
   await page.getByRole("button", { name: "متابعة القراءة" }).click();
 
-  const article = page.getByRole("article", { name: "صفحة ٤٢" });
+  const article = page.locator("article[data-mushaf-chrome-mode='rail']");
   await expect(article).toBeVisible();
   await expect(page.getByTestId("mushaf-tool-rail")).toBeVisible();
   await expect(page.getByTestId("mushaf-tool-rail")).toHaveAttribute("data-rail-side", "right");
-  await expect(article.locator("[data-mushaf-page]")).toHaveCount(1);
+  await expect(article.locator("[data-mushaf-page]")).toHaveCount(2);
   await expect(page.getByTestId("mushaf-top-left-back")).toHaveCount(0);
   await expect(page.getByTestId("mushaf-more-actions")).toHaveCount(0);
   await expect(page.getByTestId("mushaf-rail-page-bookmark")).toBeVisible();
   await expect(page.getByTestId("mushaf-difficult-words-switch")).toBeVisible();
+  await expect(page.getByTestId("mushaf-rail-more")).toBeVisible();
   await expect(page.getByTestId("mushaf-focus-enter")).toHaveCount(0);
+  const desktopGeometry = await page.evaluate(() => ({
+    viewportHeight: window.innerHeight,
+    documentHeight: document.documentElement.scrollHeight,
+    bodyHeight: document.body.scrollHeight,
+  }));
+  expect(desktopGeometry.documentHeight).toBeLessThanOrEqual(desktopGeometry.viewportHeight);
+  expect(desktopGeometry.bodyHeight).toBeLessThanOrEqual(desktopGeometry.viewportHeight);
 
   await page.getByTestId("mushaf-rail-index").click();
   await page.getByRole("tab", { name: "صفحة" }).click();
@@ -263,6 +269,7 @@ test("keeps one full-screen page with a right tool rail in landscape and corner 
   // Portrait: clean full-screen reading canvas with integrated corner controls
   await page.setViewportSize({ width: 320, height: 700 });
   await expect(page.getByTestId("mushaf-tool-rail")).toHaveCount(0);
+  await expect(page.locator("article [data-mushaf-page]")).toHaveCount(1);
   await expect(page.getByTestId("mushaf-corner-top-left")).toBeVisible();
   const cornerControls = page.locator(
     '[data-testid^="mushaf-corner-"] button, [data-testid^="mushaf-control-"] button',
@@ -352,7 +359,7 @@ test("turns pages by swipe without hiding the permanent controls", async ({ page
 test("keeps the full-screen desktop rail accessible", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 720 });
   await page.getByRole("button", { name: "متابعة القراءة" }).click();
-  await expect(page.getByRole("article", { name: "صفحة ٤٢" })).toBeVisible();
+  await expect(page.locator("article[data-mushaf-chrome-mode='rail']")).toBeVisible();
 
   const accessibility = await new AxeBuilder({ page })
     .include('article[data-mushaf-chrome-mode="rail"]')
@@ -364,11 +371,12 @@ test("keeps the full-screen desktop rail accessible", async ({ page }) => {
 test("keeps reading settings in a consistent wide-screen side panel", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 720 });
   await page.getByRole("button", { name: "متابعة القراءة" }).click();
-  await page.getByTestId("mushaf-settings-trigger").click();
+  await page.getByTestId("mushaf-rail-more").click();
+  await page.getByTestId("mushaf-quick-settings").click();
   const panel = page.getByTestId("mushaf-settings-sheet");
   await expect(panel).toBeVisible();
   await expect(panel).toHaveAttribute("data-side", "right");
-  await expect(page.getByText("تخطيط الصفحة")).toHaveCount(0);
+  await expect(page.getByText("تخطيط الصفحة")).toBeVisible();
   await expect(page.getByText("مكان شريط الأدوات")).toBeVisible();
 
   // Choosing a theme is visible immediately, and the settings stay open so the
