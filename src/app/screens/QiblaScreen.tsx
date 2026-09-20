@@ -44,8 +44,9 @@ function computeHeadingFromEuler(alpha: number, beta: number, gamma: number): nu
   return normalizeDegrees(heading + screenOrientationAngle());
 }
 
-export function headingFromOrientation(event: OrientationEventWithCompass, _fromAbsoluteEvent = false): number | null {
+export function headingFromOrientation(event: OrientationEventWithCompass, fromAbsoluteEvent = false): number | null {
   if (Number.isFinite(event.webkitCompassHeading)) return normalizeDegrees(event.webkitCompassHeading!);
+  if (!fromAbsoluteEvent && event.absolute !== true) return null;
   if (!Number.isFinite(event.alpha)) return null;
 
   if (

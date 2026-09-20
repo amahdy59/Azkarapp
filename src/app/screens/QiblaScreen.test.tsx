@@ -1,7 +1,26 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { QiblaScreen } from "./QiblaScreen";
+import { headingFromOrientation, QiblaScreen } from "./QiblaScreen";
+
+function orientationEvent(values: Partial<DeviceOrientationEvent> & { webkitCompassHeading?: number }) {
+  return values as DeviceOrientationEvent & { webkitCompassHeading?: number };
+}
+
+describe("headingFromOrientation", () => {
+  it("accepts the iOS WebKit compass heading", () => {
+    expect(headingFromOrientation(orientationEvent({ alpha: 15, absolute: false, webkitCompassHeading: 42 }))).toBe(42);
+  });
+
+  it("accepts Android absolute headings from either absolute event path", () => {
+    expect(headingFromOrientation(orientationEvent({ alpha: 90, beta: 0, gamma: 0, absolute: true }))).toBe(270);
+    expect(headingFromOrientation(orientationEvent({ alpha: 90, beta: 0, gamma: 0 }), true)).toBe(270);
+  });
+
+  it("rejects relative orientation so it cannot override a real compass heading", () => {
+    expect(headingFromOrientation(orientationEvent({ alpha: 90, beta: 0, gamma: 0, absolute: false }))).toBeNull();
+  });
+});
 
 describe("QiblaScreen", () => {
   afterEach(() => {

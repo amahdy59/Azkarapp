@@ -1,15 +1,13 @@
 {
-  "release": "2026-09-20-4",
+  "release": "2026-09-21",
   "ar": [
-    "يمكن اختيار عرض صفحة واحدة أو صفحتين من المصحف على الشاشات الواسعة، بينما يبقى الهاتف على صفحة واحدة مريحة.",
-    "أصبحت صفحات المصحف بلا إطارات أو خلفيات إضافية لتملأ مساحة القراءة بهدوء.",
-    "يعرض شريط أدوات المصحف الوظائف الأساسية فقط، مع جمع الخيارات الثانوية في قائمة واحدة.",
-    "تحسّن تباعد سطور الفاتحة وبداية البقرة، وأصبحت أيقونة معاني الكلمات موحّدة بين الهاتف وسطح المكتب."
+    "أصبحت البوصلة المباشرة أكثر ثباتًا على هواتف أندرويد ولا تتأثر بقراءات الاتجاه النسبي.",
+    "يستمر دعم بوصلة الآيفون والآيباد بعد منح إذن الحركة والاتجاه.",
+    "يبقى اتجاه القبلة بالدرجات من الشمال متاحًا عندما لا يوفّر الهاتف قراءة بوصلة مطلقة."
   ],
   "en": [
-    "Choose one or two Mushaf pages on wide screens while phones keep a comfortable single-page view.",
-    "Mushaf pages now fill the reading area without extra outlines, cards, or background layers.",
-    "The Mushaf rail shows only essential reading tools and gathers secondary options in one menu.",
-    "Al-Fatihah and the beginning of Al-Baqarah have a more familiar line rhythm, with one word-meanings icon across devices."
+    "The live compass is steadier on Android phones and no longer follows relative orientation readings.",
+    "iPhone and iPad compass support continues to work after motion and orientation permission is granted.",
+    "The Qibla bearing from north remains available when a phone cannot provide an absolute compass reading."
   ]
 }

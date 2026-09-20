@@ -3694,3 +3694,10 @@ null` shape, so a record written before this change still loads and still
 - **Opening pages:** pages 1–2 keep their reviewed text, QCF glyphs, and canonical line assignments while using a tighter centered eight-track composition that resembles their printed opening-page rhythm.
 - **Viewport rule:** normal desktop reading fills the fixed app canvas without document scrolling. Only unusually short landscape windows may scroll the paper internally to avoid shrinking Qur'an text below a legible floor.
 - **Tests/evidence required:** automatic-versus-explicit spread coverage, desktop-to-portrait collapse, zero desktop document scroll, stable mobile controls, accessibility scan, full local gates, and production verification.
+
+## DEC-187 — Mobile Qibla consumes only earth-referenced headings
+
+- **Decision:** preserve the local bearing and permission behavior from DEC-175 and DEC-177, but reject ordinary `deviceorientation` alpha values unless the event explicitly reports absolute data. Continue accepting `deviceorientationabsolute` and Safari's supported `webkitCompassHeading` path.
+- **Why:** relative alpha is referenced to an arbitrary starting pose rather than magnetic north. Some Android browsers emit it alongside an absolute event, allowing a later relative reading to overwrite the real compass heading and make the Qibla dial appear wrong or unstable.
+- **Fallback:** location-derived degrees from north remain available when no absolute sensor reading arrives. No map, remote request, dependency, persisted state, or accuracy claim is added.
+- **Tests/evidence required:** focused coverage for iOS WebKit headings, both Android absolute-event forms, rejection of relative alpha, full local gates, and real-device verification before claiming sensor accuracy.
