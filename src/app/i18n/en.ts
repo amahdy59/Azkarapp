@@ -1427,7 +1427,9 @@ const en = {
     compassUnavailable: "This device did not provide a reliable compass heading. Use the bearing from north instead.",
     compassUnsupported:
       "A live compass needs a supported device and a secure connection. Use the bearing from north instead.",
-    compassDenied: "Compass access was not allowed. You can still use the bearing from north.",
+    compassDenied:
+      "Motion sensors are blocked for this site. Check its sensor permission in your browser settings (Chrome: Settings → Site settings → Motion sensors), then reopen the app and try again. The bearing from north remains available.",
+    compassStatic: "Static bearing — the arrow moves only when the live compass receives a heading.",
     calibrationHint:
       "Keep the device flat and away from metal or magnets. Sensor readings can be affected by interference.",
     desktopGuideTitle: "Use the bearing on a larger screen",

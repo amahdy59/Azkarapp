@@ -26,7 +26,8 @@ async function requestOrientationPermission(
 
   try {
     return await orientation.requestPermission(true);
-  } catch {
+  } catch (error) {
+    if (!(error instanceof TypeError)) throw error;
     // Safari shipped the permission API before its optional `absolute`
     // argument. Those versions can reject the standards-based call even
     // though their ordinary orientation event exposes webkitCompassHeading.
@@ -60,7 +61,10 @@ function computeHeadingFromEuler(alpha: number, beta: number, gamma: number): nu
 }
 
 export function headingFromOrientation(event: OrientationEventWithCompass, fromAbsoluteEvent = false): number | null {
-  if (Number.isFinite(event.webkitCompassHeading)) return normalizeDegrees(event.webkitCompassHeading!);
+  // WebKit uses a negative compass heading to signal an invalid reading.
+  if (Number.isFinite(event.webkitCompassHeading) && event.webkitCompassHeading! >= 0) {
+    return normalizeDegrees(event.webkitCompassHeading!);
+  }
   if (!fromAbsoluteEvent && event.absolute !== true) return null;
   if (!Number.isFinite(event.alpha)) return null;
 
@@ -82,10 +86,12 @@ function cardinalKey(degrees: number): string {
 
 function CompassDial({
   rotation,
+  northRotation,
   reduceMotion,
   language,
 }: {
   rotation: number;
+  northRotation: number;
   reduceMotion: boolean;
   language: AppLanguage;
 }) {
@@ -95,42 +101,45 @@ function CompassDial({
     <svg viewBox="0 0 320 320" className="aspect-square w-full" aria-hidden="true">
       <circle cx="160" cy="160" r="146" fill="var(--card)" stroke="var(--border)" strokeWidth="2" />
       <circle cx="160" cy="160" r="124" fill="none" stroke="var(--border)" strokeWidth="1" opacity="0.55" />
-      {ticks.map((degrees) => {
-        const major = degrees % 90 === 0;
-        return (
-          <line
-            key={degrees}
-            x1="160"
-            y1={major ? 22 : 27}
-            x2="160"
-            y2={major ? 40 : 35}
-            stroke={major ? "var(--foreground)" : "var(--muted-foreground)"}
-            strokeWidth={major ? 3 : 1.5}
-            transform={`rotate(${degrees} 160 160)`}
-          />
-        );
-      })}
-      <g
-        fill="var(--foreground)"
-        fontFamily="inherit"
-        fontSize={language === "ar" ? "12" : "17"}
-        fontWeight="800"
-        textAnchor="middle"
-      >
-        <text x="160" y="58">
-          {cardinalLabels[0]}
-        </text>
-        <text x="263" y="166">
-          {cardinalLabels[1]}
-        </text>
-        <text x="160" y="274">
-          {cardinalLabels[2]}
-        </text>
-        <text x="57" y="166">
-          {cardinalLabels[3]}
-        </text>
+      <g data-testid="compass-rose" transform={`rotate(${northRotation} 160 160)`}>
+        {ticks.map((degrees) => {
+          const major = degrees % 90 === 0;
+          return (
+            <line
+              key={degrees}
+              x1="160"
+              y1={major ? 22 : 27}
+              x2="160"
+              y2={major ? 40 : 35}
+              stroke={major ? "var(--foreground)" : "var(--muted-foreground)"}
+              strokeWidth={major ? 3 : 1.5}
+              transform={`rotate(${degrees} 160 160)`}
+            />
+          );
+        })}
+        <g
+          fill="var(--foreground)"
+          fontFamily="inherit"
+          fontSize={language === "ar" ? "12" : "17"}
+          fontWeight="800"
+          textAnchor="middle"
+        >
+          <text x="160" y="58">
+            {cardinalLabels[0]}
+          </text>
+          <text x="263" y="166">
+            {cardinalLabels[1]}
+          </text>
+          <text x="160" y="274">
+            {cardinalLabels[2]}
+          </text>
+          <text x="57" y="166">
+            {cardinalLabels[3]}
+          </text>
+        </g>
       </g>
       <g
+        data-testid="qibla-arrow"
         transform={`rotate(${rotation} 160 160)`}
         style={reduceMotion ? undefined : { transition: "transform 180ms ease-out" }}
       >
@@ -180,6 +189,7 @@ export function QiblaScreen({
   );
   const turn = bearing === null || heading === null ? null : getQiblaTurn(bearing, heading);
   const dialRotation = turn ?? bearing ?? 0;
+  const northRotation = heading === null ? 0 : normalizeDegrees(-heading);
   const roundedBearing = bearing === null ? null : Math.round(bearing);
 
   useEffect(() => {
@@ -292,7 +302,12 @@ export function QiblaScreen({
           ) : (
             <>
               <div className="w-full max-w-[22rem]">
-                <CompassDial rotation={dialRotation} reduceMotion={reduceMotion} language={language} />
+                <CompassDial
+                  rotation={dialRotation}
+                  northRotation={northRotation}
+                  reduceMotion={reduceMotion}
+                  language={language}
+                />
               </div>
               <h2 id="qibla-bearing" className="mt-2 text-center text-title font-extrabold text-foreground">
                 {guidance ?? t(language, "qibla.bearing", { degrees: formatNumerals(roundedBearing!, language) })}
@@ -300,6 +315,11 @@ export function QiblaScreen({
               <p className="mt-1 text-center text-sm font-semibold text-muted-foreground">
                 {t(language, `qibla.${cardinalKey(bearing)}`)} · {formatNumerals(roundedBearing!, language)}°
               </p>
+              {heading === null && !showDesktopGuide && (
+                <p className="mt-2 text-center text-xs font-semibold leading-5 text-muted-foreground">
+                  {t(language, "qibla.compassStatic")}
+                </p>
+              )}
             </>
           )}
         </section>

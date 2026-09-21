@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-21-wird-density-2",
+  "release": "2026-09-21-qibla-permission",
   "ar": [
-    "تشغل بطاقات وردك اليوم مساحة رأسية أقل على الهاتف لتظهر أعمال يومية أكثر في الشاشة.",
-    "تحافظ عناوين البطاقات ووصفها وأزرارها على أحجامها الواضحة من دون تصغير النص.",
-    "يبقى تركيز لوحة المفاتيح داخل شاشة القراءة عند إكمال الذكر والانتقال إلى الذكر التالي بمفتاح المسافة."
+    "إذا مُنع الوصول إلى البوصلة، توضح الشاشة أين تتحقق من إذن مستشعرات الحركة ثم تعيد المحاولة.",
+    "توضح الشاشة متى يكون سهم القبلة ثابتًا ويعتمد على درجة الاتجاه من الشمال، بدل الإيحاء بأنه بوصلة مباشرة.",
+    "عند توفر قراءة موثوقة، تتحرك علامات الشمال وسهم القبلة معًا باتجاه متسق."
   ],
   "en": [
-    "Today's Wird cards take less vertical space on phones, bringing more of the daily routine into view.",
-    "Card titles, descriptions, and actions keep their readable sizes without shrinking the text.",
-    "Keyboard focus now stays in the Reader when Space completes a remembrance and advances to the next one."
+    "If compass access is blocked, the screen explains where to check motion-sensor permission before trying again.",
+    "The screen now labels the north-based Qibla arrow as static instead of implying it is a live compass.",
+    "With a reliable heading, the north marks and Qibla arrow move together consistently."
   ]
 }

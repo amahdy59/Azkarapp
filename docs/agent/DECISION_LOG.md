@@ -3741,3 +3741,10 @@ null` shape, so a record written before this change still loads and still
 - **Why:** the fixed height made a single-column phone layout consume excessive vertical space and made wide layouts feel oversized relative to the amount of information. Responsive height keeps the image recognizable while bringing the next routine into view sooner.
 - **Accessibility and compatibility:** semantic order, Arabic/English direction, visible focus, status naming, at least 44px whole-card targets, and completion data do not change. Text remains 18px/12px and may use its existing two-line description wrap without clipping or horizontal overflow.
 - **Tests/evidence required:** browser checks at 320px and tablet widths for height, text size, internal overflow, and RTL/LTR order; visual review at phone and desktop widths; full release gates and production verification.
+
+## DEC-193 — Qibla denial is recoverable, not silently bypassed
+
+- **Owner:** User (installed Android app shows no compass prompt, an unmoving arrow, and permission denied on 2026-09-21)
+- **Decision:** Keep DEC-191's absolute-first permission request and never listen after an explicit denial. Limit the legacy no-argument retry to a compatibility `TypeError`; other failures remain denied. Explain how to check the site's motion-sensor setting in the browser and label the bearing-only arrow as static. Invalid negative WebKit headings are ignored; when a valid earth-referenced heading arrives, both north marks and Qibla arrow rotate consistently.
+- **Why:** the supplied installed-app screenshot shows the permission gate denying access before sensor events can arrive. Web code cannot change a reader's browser permission. The old generic denial message gave no recovery path, and a fixed compass rose could misrepresent a later valid heading.
+- **Tests/evidence required:** denied/granted/legacy permission paths, invalid WebKit heading, dial transforms, Android-sized browser denial state, full local gates, and physical-device retest after the reader changes browser permission.

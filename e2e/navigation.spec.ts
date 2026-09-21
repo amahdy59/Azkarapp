@@ -79,6 +79,28 @@ test("@cross-browser More keeps Qibla, Masbaha, and Settings easy to reach", asy
   }
 });
 
+test("Qibla keeps the static bearing and explains Android sensor denial", async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(window, "DeviceOrientationEvent", {
+      configurable: true,
+      value: class extends Event {
+        static async requestPermission() {
+          return "denied";
+        }
+      },
+    });
+  });
+  await enterAsEnglishGuest(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/#/qibla");
+
+  await page.getByRole("button", { name: "Enable live compass" }).click();
+  await expect(page.getByText(/Settings → Site settings → Motion sensors/)).toBeVisible();
+  await expect(page.getByRole("button", { name: "Enable live compass" })).toHaveAttribute("aria-pressed", "false");
+  await expect(page.getByText(/Static bearing/)).toBeVisible();
+  await expect(page.getByTestId("qibla-arrow")).toHaveAttribute("transform", /^rotate\(136\./);
+});
+
 test("hash routes restore lazy collections, reject invalid positions, and preserve PWA shortcuts", async ({ page }) => {
   await enterAsEnglishGuest(page);
 
