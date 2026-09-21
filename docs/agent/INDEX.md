@@ -87,6 +87,7 @@ Run the phase files in numerical order unless the decision log explicitly record
 | 44    | `phases/PHASE_44_MOBILE_QIBLA_RELIABILITY.md`          | Reliable absolute mobile compass headings without relative drift        |
 | 45    | `phases/PHASE_45_PROGRESS_PRIORITY_AND_DISCLOSURE.md`  | Prayer-first progress hierarchy with calmer progressive disclosure      |
 | 46    | `phases/PHASE_46_AUDIO_PLAYER_HARDENING.md`            | Narrow-screen containment and truthful background media controls        |
+| 47    | `phases/PHASE_47_QIBLA_AND_IOS_SHELL.md`                | Explicit compass opt-in and single-owner bottom safe area               |
 
 Phases 15–20 derive from `docs/audits/DESIGN_CONSISTENCY_AUDIT.md` (2026-08-15) and are
 recorded in `DECISION_LOG.md` as DEC-064. Phase 15 is upstream of 16, 17 and 19 — its root

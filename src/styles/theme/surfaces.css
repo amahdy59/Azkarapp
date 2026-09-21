@@ -66,7 +66,9 @@
   width: min(100vw, 390px);
   height: min(100dvh, 882px);
   border-radius: var(--ds-radius-device);
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  /* The bottom navigation and full-screen readers own their own safe-area
+     inset. Applying it to the shell as well leaves a second empty band on iOS. */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);
 }
 
 .marketing-landing {

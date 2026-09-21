@@ -3718,3 +3718,10 @@ null` shape, so a record written before this change still loads and still
 - **Background behavior:** Media Session metadata follows the recording rather than the interface language. English narration uses its English title and narrator; Arabic dua and Qur'an retain Arabic identity. Platform playback state mirrors the controller, Stop is available where supported, artwork uses the installed app icons, and ending or stopping clears stale metadata.
 - **Why:** fixed 68px Previous/Next controls extended 16px beyond both edges at 320px. English translation audio was also presented to lock screens with an Arabic title and album, which made the background interface contradict the audio.
 - **Tests/evidence required:** controller coverage for metadata, playback state, artwork and Stop cleanup; a real-browser 320px queue-containment check; focused audio tests; full local gates; production verification.
+
+## DEC-190 — Mobile compass opt-in and one bottom safe-area owner
+
+- **Owner:** User (Qibla edit and iOS bottom-gap request on 2026-09-21)
+- **Decision:** The live compass begins only after the named user action. When exposed, request absolute orientation permission from that action; keep the local north-based bearing available on denial or unsupported sensors. Supersedes the no-argument permission detail of DEC-187.
+- **Safe area:** the fixed shell does not reserve bottom inset a second time. Compact navigation and full-screen reading chrome own their bottom safe-area spacing, so the navigation surface reaches the viewport edge without an empty band below it.
+- **Tests/evidence required:** focused Qibla permission coverage, browser shell/nav boundary coverage, full release gates, and physical iOS verification before claiming every standalone Safari inset variant is covered.

@@ -16,7 +16,7 @@ type OrientationEventWithCompass = DeviceOrientationEvent & {
 };
 
 type OrientationConstructorWithPermission = typeof DeviceOrientationEvent & {
-  requestPermission?: () => Promise<"granted" | "denied">;
+  requestPermission?: (absolute?: boolean) => Promise<"granted" | "denied">;
 };
 
 function screenOrientationAngle(): number {
@@ -212,20 +212,6 @@ export function QiblaScreen({
     }
   }, [detectLocation, savedCoordinates]);
 
-  useEffect(() => {
-    if (
-      !showDesktopGuide &&
-      typeof window !== "undefined" &&
-      typeof DeviceOrientationEvent !== "undefined" &&
-      window.isSecureContext
-    ) {
-      const orientation = DeviceOrientationEvent as unknown as OrientationConstructorWithPermission;
-      if (!orientation.requestPermission) {
-        setCompassEnabled(true);
-      }
-    }
-  }, [showDesktopGuide]);
-
   const toggleCompass = async () => {
     if (compassEnabled) {
       setCompassEnabled(false);
@@ -241,7 +227,7 @@ export function QiblaScreen({
     const orientation = DeviceOrientationEvent as OrientationConstructorWithPermission;
     if (orientation.requestPermission) {
       try {
-        const permission = await orientation.requestPermission();
+        const permission = await orientation.requestPermission(true);
         if (permission !== "granted") {
           setCompassStatus(t(language, "qibla.compassDenied"));
           return;

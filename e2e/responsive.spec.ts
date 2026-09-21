@@ -45,6 +45,14 @@ test("the production shell does not render simulated device chrome", async ({ pa
   await expect(navigation).toBeVisible();
   await expect(shell.getByText("9:41", { exact: true })).toHaveCount(0);
   await expect(navigation).toHaveCSS("height", "72px");
+  await expect(shell).toHaveCSS("padding-bottom", "0px");
+  const shellBounds = await shell.boundingBox();
+  const navigationBounds = await navigation.boundingBox();
+  expect(shellBounds).not.toBeNull();
+  expect(navigationBounds).not.toBeNull();
+  if (shellBounds && navigationBounds) {
+    expect(navigationBounds.y + navigationBounds.height).toBeCloseTo(shellBounds.y + shellBounds.height, 0);
+  }
 
   const simulatedHomeIndicators = await navigation.locator("span").evaluateAll(
     (spans) =>
