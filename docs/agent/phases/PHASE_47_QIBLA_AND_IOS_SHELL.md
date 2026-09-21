@@ -33,14 +33,14 @@ Preserve the owner's Qibla permission edit and remove the duplicate bottom inset
 
 ## Commands run
 
-| Command | Result |
-| ------- | ------ |
-| Focused Qibla unit | 7 passed |
-| Focused Chromium responsive regression | 1 passed |
-| `pnpm install --frozen-lockfile` | Passed; lockfile current |
-| `pnpm check` | Passed all repository checks |
-| `pnpm test:e2e` | 380 passed, 1 intentionally skipped |
-| `pnpm build:pages` | Passed; PWA and bundle checks passed |
+| Command                                | Result                               |
+| -------------------------------------- | ------------------------------------ |
+| Focused Qibla unit                     | 7 passed                             |
+| Focused Chromium responsive regression | 1 passed                             |
+| `pnpm install --frozen-lockfile`       | Passed; lockfile current             |
+| `pnpm check`                           | Passed all repository checks         |
+| `pnpm test:e2e`                        | 380 passed, 1 intentionally skipped  |
+| `pnpm build:pages`                     | Passed; PWA and bundle checks passed |
 
 The final release handoff records push and production deployment results.
 
