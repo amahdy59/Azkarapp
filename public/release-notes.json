@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-21-wird-density",
+  "release": "2026-09-21-wird-density-2",
   "ar": [
     "تشغل بطاقات وردك اليوم مساحة رأسية أقل على الهاتف لتظهر أعمال يومية أكثر في الشاشة.",
     "تحافظ عناوين البطاقات ووصفها وأزرارها على أحجامها الواضحة من دون تصغير النص.",
-    "تعرض الأجهزة اللوحية والمكتبية صور الورد في بطاقات أكثر توازناً مع بقاء حالة الإنجاز واضحة."
+    "يبقى تركيز لوحة المفاتيح داخل شاشة القراءة عند إكمال الذكر والانتقال إلى الذكر التالي بمفتاح المسافة."
   ],
   "en": [
     "Today's Wird cards take less vertical space on phones, bringing more of the daily routine into view.",
     "Card titles, descriptions, and actions keep their readable sizes without shrinking the text.",
-    "Tablet and desktop layouts use more balanced image cards while keeping completion status clear."
+    "Keyboard focus now stays in the Reader when Space completes a remembrance and advances to the next one."
   ]
 }

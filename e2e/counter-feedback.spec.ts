@@ -238,15 +238,18 @@ test("Home prayer strip keeps all five prayers legible without page overflow", a
     { width: 1440, height: 900 },
   ]) {
     await page.setViewportSize(viewport);
+    await page.waitForFunction((width) => window.innerWidth === width, viewport.width);
     await expect(cards).toHaveCount(5);
-    const geometry = await strip.evaluate((element) => ({
-      clientWidth: element.clientWidth,
-      scrollWidth: element.scrollWidth,
-      clippedCards: [...element.querySelectorAll("article")].filter((card) => card.scrollWidth > card.clientWidth + 1)
-        .length,
-    }));
-    expect(geometry.scrollWidth).toBeLessThanOrEqual(geometry.clientWidth + 1);
-    expect(geometry.clippedCards).toBe(0);
+    await expect
+      .poll(() =>
+        strip.evaluate((element) => ({
+          stripOverflows: element.scrollWidth > element.clientWidth + 1,
+          clippedCards: [...element.querySelectorAll("article")].filter(
+            (card) => card.scrollWidth > card.clientWidth + 1,
+          ).length,
+        })),
+      )
+      .toEqual({ stripOverflows: false, clippedCards: 0 });
     if (viewport.width === 390) {
       const [fajr, dhuhr] = await Promise.all([cards.nth(0).boundingBox(), cards.nth(1).boundingBox()]);
       expect(fajr && dhuhr).toBeTruthy();

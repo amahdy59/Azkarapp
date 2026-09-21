@@ -177,34 +177,6 @@ export function useZikrCounter({
     setReaderAnnouncement(t(language, isLongSurah(z) ? "reader.tapCounterWhenFinished" : "reader.tapAnywhere"));
   };
 
-  useEffect(() => {
-    const handleGlobalKeyDown = (e: KeyboardEvent) => {
-      if (e.key === " " || e.code === "Space") {
-        // e.target may be window/document in some environments, guard before
-        // calling DOM methods that only exist on Element/HTMLElement.
-        const target = e.target instanceof HTMLElement ? e.target : null;
-        if (
-          target?.tagName === "INPUT" ||
-          target?.tagName === "TEXTAREA" ||
-          target?.hasAttribute("contenteditable") ||
-          target?.closest("button, [role='button']") // Let focused buttons handle their own spacebar
-        ) {
-          return;
-        }
-
-        if (isLongSurah(z)) {
-          return;
-        }
-
-        e.preventDefault();
-        handleTap();
-      }
-    };
-
-    window.addEventListener("keydown", handleGlobalKeyDown);
-    return () => window.removeEventListener("keydown", handleGlobalKeyDown);
-  }, [z, handleTap]);
-
   const restoreCount = useCallback(
     (targetCount: number) => {
       if (!z) return;

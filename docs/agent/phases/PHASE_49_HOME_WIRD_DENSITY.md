@@ -31,10 +31,13 @@ Reduce the vertical footprint of Home's photographic Wird cards, especially on p
 - Preserved the native button, accessible status name, full-card target, visible focus ring, and semantic/keyboard order.
 - Confirmed that the 18px title and 12px description sizes did not change and that the longer English description wraps without internal overflow at 320px.
 - Preserved Arabic and English direction and allowed content to grow beyond the minimum when text needs more room.
+- Restored Reader keyboard focus after Space completes and advances a remembrance, and removed the duplicate global Space listener that could process the same key twice.
 
 ## Tests added or updated
 
 - Extended the Home Wird browser test with four-card identity, tablet/mobile height bounds, unchanged typography, and internal-overflow coverage.
+- Kept the prayer-strip containment assertion strict while polling for the completed responsive layout instead of sampling during resize.
+- Retained the Reader focus assertion that exposed the deployment failure.
 
 ## Commands run
 
@@ -45,7 +48,7 @@ Reduce the vertical footprint of Home's photographic Wird cards, especially on p
 | `pnpm run check:release-notes`                                                                                   | Passed                                                                                                 |
 | `pnpm install --frozen-lockfile`                                                                                 | Passed; lockfile current                                                                               |
 | `pnpm check`                                                                                                     | Passed all repository checks                                                                           |
-| `pnpm test:e2e`                                                                                                  | 381 passed, 1 skipped; 2 unrelated tablet cases passed on retry                                        |
+| `pnpm test:e2e`                                                                                                  | Final remediation run: 383 passed, 1 skipped, no retries or flakes                                     |
 | `pnpm exec playwright test e2e/accessibility.spec.ts --project=tablet-chromium --grep "Friday mode\|Saved zikr"` | 2 passed in isolation, confirming the first-attempt timeouts were load-related rather than regressions |
 | `pnpm build:pages`                                                                                               | Passed; PWA, bundle-budget, and CSS-utility checks passed                                              |
 
@@ -72,6 +75,7 @@ The final release handoff records push and production deployment results.
 ## Out-of-scope findings
 
 - The two tablet accessibility cases that initially timed out under full-suite load passed on automatic retry and again in a focused rerun.
+- The first Pages attempt exposed Reader focus loss after keyboard completion; the remediation is included in this release and the failed workflow is superseded by the next verified deployment.
 - No devotional content, completion data, Progress cards, navigation, or persistence behavior changed.
 
 ## Recommended next step

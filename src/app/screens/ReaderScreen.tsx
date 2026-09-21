@@ -286,6 +286,7 @@ export function ReaderScreen({
   const shareTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const readerMainRef = useRef<HTMLDivElement | null>(null);
   const readingScrollRef = useRef<HTMLDivElement | null>(null);
+  const restoreReadingFocusOnAdvanceRef = useRef(false);
   const activeNavigatorItemRef = useRef<HTMLDivElement | null>(null);
 
   // The hero band + card treatment now starts at the tablet breakpoint
@@ -443,6 +444,10 @@ export function ReaderScreen({
   useLayoutEffect(() => {
     if (readingScrollRef.current) {
       readingScrollRef.current.scrollTop = 0;
+      if (restoreReadingFocusOnAdvanceRef.current) {
+        readingScrollRef.current.focus({ preventScroll: true });
+        restoreReadingFocusOnAdvanceRef.current = false;
+      }
     }
   }, [idx]);
 
@@ -497,6 +502,7 @@ export function ReaderScreen({
         if (audioModeActive) return;
         if (longSurah) return;
         e.preventDefault();
+        restoreReadingFocusOnAdvanceRef.current = document.activeElement === readingScrollRef.current;
         handleTap();
       } else if (e.key === "ArrowRight") {
         e.preventDefault();
