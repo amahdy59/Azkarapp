@@ -57,3 +57,17 @@ for (const tab of ["يوم", "أسبوع", "شهر", "سنة"]) {
     expect(pageScrolls).toBe(false);
   });
 }
+
+test("longer Progress periods lead with totals and disclose the prayer matrix", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await openProgress(page);
+
+  await expect(page.getByText(/أَحَبُّ الأَعْمَالِ/)).toBeHidden();
+  await page.getByRole("tab", { name: "أسبوع", exact: true }).click();
+
+  const disclosure = page.locator("details").filter({ hasText: "عرض كل صلاة" });
+  await expect(disclosure).not.toHaveAttribute("open", "");
+  await disclosure.getByText("عرض كل صلاة").click();
+  await expect(disclosure).toHaveAttribute("open", "");
+  await expect(disclosure.getByText("الفجر", { exact: true })).toBeVisible();
+});

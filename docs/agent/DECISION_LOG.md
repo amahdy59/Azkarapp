@@ -3725,3 +3725,11 @@ null` shape, so a record written before this change still loads and still
 - **Decision:** The live compass begins only after the named user action. When exposed, request absolute orientation permission from that action; keep the local north-based bearing available on denial or unsupported sensors. Supersedes the no-argument permission detail of DEC-187.
 - **Safe area:** the fixed shell does not reserve bottom inset a second time. Compact navigation and full-screen reading chrome own their bottom safe-area spacing, so the navigation surface reaches the viewport edge without an empty band below it.
 - **Tests/evidence required:** focused Qibla permission coverage, browser shell/nav boundary coverage, full release gates, and physical iOS verification before claiming every standalone Safari inset variant is covered.
+
+## DEC-191 — Progress summaries lead; matrices disclose
+
+- **Owner:** User (Progress organization and Qibla reliability request on 2026-09-21)
+- **Decision:** Preserve the prayer-first order from DEC-188 while applying summary-first disclosure consistently. Week, Month, and Year show four prayer totals first and keep the five-prayer metric matrix in one native disclosure. Compact Progress omits the repeated supporting quotation so period controls and current results lead the screen.
+- **Qibla compatibility:** request the standards-based absolute orientation permission first, then retry Safari's earlier no-argument method only when that call throws. A denied result remains denied and is never bypassed. The sensor still starts only from its named user action and still accepts earth-referenced headings only.
+- **Accessibility:** native details/summary preserves keyboard and assistive-technology access, the disclosure target remains at least 44px, all totals remain textual, and Arabic/English retain one semantic order.
+- **Tests/evidence required:** focused permission fallback and dispatched-heading coverage; collapsed/expanded prayer-matrix coverage; compact Arabic browser evidence; full release gates and physical-device compass verification.

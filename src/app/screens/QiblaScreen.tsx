@@ -19,6 +19,21 @@ type OrientationConstructorWithPermission = typeof DeviceOrientationEvent & {
   requestPermission?: (absolute?: boolean) => Promise<"granted" | "denied">;
 };
 
+async function requestOrientationPermission(
+  orientation: OrientationConstructorWithPermission,
+): Promise<"granted" | "denied"> {
+  if (!orientation.requestPermission) return "granted";
+
+  try {
+    return await orientation.requestPermission(true);
+  } catch {
+    // Safari shipped the permission API before its optional `absolute`
+    // argument. Those versions can reject the standards-based call even
+    // though their ordinary orientation event exposes webkitCompassHeading.
+    return orientation.requestPermission();
+  }
+}
+
 function screenOrientationAngle(): number {
   const legacyOrientation = (window as typeof window & { orientation?: number }).orientation;
   return window.screen.orientation?.angle ?? legacyOrientation ?? 0;
@@ -227,7 +242,7 @@ export function QiblaScreen({
     const orientation = DeviceOrientationEvent as OrientationConstructorWithPermission;
     if (orientation.requestPermission) {
       try {
-        const permission = await orientation.requestPermission(true);
+        const permission = await requestOrientationPermission(orientation);
         if (permission !== "granted") {
           setCompassStatus(t(language, "qibla.compassDenied"));
           return;

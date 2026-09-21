@@ -1,15 +1,13 @@
 {
-  "release": "2026-09-21-player-qibla",
+  "release": "2026-09-21-progress-qibla-2",
   "ar": [
-    "أصبح ملخص التقدم يرتب الصلاة أولاً، ثم القرآن والذكر، ثم بقية الممارسات.",
-    "يعرض طريق اليوم الصلوات المسجّلة والجماعة بوضوح، وتبقى التفاصيل الثانوية مطوية حتى تطلبها.",
-    "أصبحت عناصر مشغل الصوت الموسع ملائمة للشاشات الصغيرة، وتعرض شاشة القفل بيانات صحيحة للتلاوة العربية أو الترجمة الإنجليزية.",
-    "يمكن تشغيل البوصلة الحية بإذن واضح على الأجهزة المدعومة، ولم تعد تظهر مساحة فارغة أسفل شريط التنقل على iPhone."
+    "تعرض فترات الأسبوع والشهر والسنة ملخص الصلاة أولاً، ويمكن فتح تفاصيل كل صلاة عند الحاجة.",
+    "أصبحت شاشة التقدم على الهاتف أقصر وأسهل في المسح مع إبراز الفترة والنتائج الحالية.",
+    "أصبحت البوصلة الحية متوافقة مع طريقة الإذن الأقدم في Safari مع الحفاظ على الاتجاه الثابت كبديل."
   ],
   "en": [
-    "Progress now puts prayer first, followed by Qur'an and remembrance, then additional practices.",
-    "Today's path clearly distinguishes recorded prayers and congregation, with secondary details tucked away until needed.",
-    "Expanded audio controls now fit small screens, and lock-screen details correctly identify Arabic recitation or English narration.",
-    "You can enable the live compass with a clear permission step on supported devices, and iPhone navigation no longer leaves an empty strip below it."
+    "Week, Month, and Year now show prayer totals first, with each-prayer detail available when you ask for it.",
+    "Progress is shorter and easier to scan on phones, keeping the selected period and current results prominent.",
+    "The live compass now supports Safari's earlier permission method while preserving the stable bearing as a fallback."
   ]
 }

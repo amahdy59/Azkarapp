@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { headingFromOrientation, QiblaScreen } from "./QiblaScreen";
@@ -123,5 +123,46 @@ describe("QiblaScreen", () => {
     expect(requestPermission).toHaveBeenCalledWith(true);
     expect(screen.getByRole("button", { name: "Stop live compass" })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByText(/Waiting for an absolute compass heading/)).toBeVisible();
+  });
+
+  it("falls back to Safari's legacy no-argument orientation permission", async () => {
+    const requestPermission = vi
+      .fn<(absolute?: boolean) => Promise<"granted" | "denied">>()
+      .mockRejectedValueOnce(new TypeError("absolute permission is unsupported"))
+      .mockResolvedValueOnce("granted");
+    class MockDeviceOrientationEvent extends Event {
+      static requestPermission = requestPermission;
+    }
+    vi.stubGlobal("DeviceOrientationEvent", MockDeviceOrientationEvent);
+    Object.defineProperty(window, "isSecureContext", { configurable: true, value: true });
+    const user = userEvent.setup();
+    render(
+      <QiblaScreen
+        language="en"
+        direction="ltr"
+        locationSettings={{ latitude: 30.0444, longitude: 31.2357, calculationMethod: 5, autoDetect: false }}
+        reduceMotion={false}
+        onBack={() => undefined}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Enable live compass" }));
+
+    expect(requestPermission).toHaveBeenNthCalledWith(1, true);
+    expect(requestPermission).toHaveBeenNthCalledWith(2);
+    expect(screen.getByRole("button", { name: "Stop live compass" })).toHaveAttribute("aria-pressed", "true");
+
+    await act(async () => {
+      window.dispatchEvent(
+        Object.assign(new Event("deviceorientation"), {
+          alpha: 260,
+          beta: 0,
+          gamma: 0,
+          absolute: false,
+          webkitCompassHeading: 100,
+        }),
+      );
+    });
+    expect(screen.getByRole("heading", { name: "Turn 36° right" })).toBeVisible();
   });
 });

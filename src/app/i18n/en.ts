@@ -1302,6 +1302,7 @@ const en = {
     quranAndRemembrance: "Qur'an and remembrance",
     quranAndRemembranceDesc: "Your Qur'an goal and established daily remembrance",
     reviewPrayerDetails: "Review prayer and connected practices",
+    showPrayerBreakdown: "View each prayer",
     recordedPracticeReflection: "A gentle reflection on recorded practices, not a measure of faith or reward.",
     weekdaySaturday: "Sat",
     weekdaySunday: "Sun",

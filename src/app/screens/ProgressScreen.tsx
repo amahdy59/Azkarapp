@@ -279,7 +279,7 @@ export function ProgressScreen({
         />
 
         {/* A supporting note, not a second hero competing with the period data. */}
-        <div className="mb-3 flex w-full items-start justify-center gap-2 px-2 text-center">
+        <div className="mb-3 hidden w-full items-start justify-center gap-2 px-2 text-center sm:flex">
           <Sparkles className="mt-0.5 size-3.5 shrink-0 text-primary" aria-hidden="true" />
           <p className="text-xs font-semibold leading-relaxed text-muted-foreground" dir="auto">
             <span>{t(language, "progress.constancyHadith")}</span>

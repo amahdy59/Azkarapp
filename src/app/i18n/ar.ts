@@ -1317,6 +1317,7 @@ const ar = {
     quranAndRemembrance: "القرآن والذكر",
     quranAndRemembranceDesc: "ورد القرآن والأذكار اليومية المأثورة",
     reviewPrayerDetails: "مراجعة الصلاة وما يتصل بها",
+    showPrayerBreakdown: "عرض كل صلاة",
     recordedPracticeReflection: "تأمل لطيف فيما سجلته، وليس مقياساً للإيمان أو الأجر.",
     weekdaySaturday: "السبت",
     weekdaySunday: "الأحد",

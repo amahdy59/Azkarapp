@@ -156,87 +156,108 @@ export function PrayerTrackerStats({
         </div>
       </div>
 
-      {/* Per-Prayer Detailed Breakdown */}
-      {PRAYER_ORDER.map((prayer) => {
-        const { fard, mosque, rawatib, adhkar } = stats.counts[prayer];
-        const prayerName = t(language, `notifications.${prayer}`);
-        const hasRawatib = prayer !== "asr";
+      {/* The totals answer the common question first. The five-prayer matrix is
+          useful for investigation, but too dense to lead every period view. */}
+      <details className="overflow-hidden rounded-2xl border border-border/60 bg-card">
+        <summary className="flex min-h-11 cursor-pointer items-center px-3.5 py-3 text-sm font-extrabold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+          {t(language, "progress.showPrayerBreakdown")}
+        </summary>
+        <div className="flex flex-col gap-3 border-t border-border/60 p-3">
+          {PRAYER_ORDER.map((prayer) => {
+            const { fard, mosque, rawatib, adhkar } = stats.counts[prayer];
+            const prayerName = t(language, `notifications.${prayer}`);
+            const hasRawatib = prayer !== "asr";
 
-        return (
-          <div key={prayer} className="flex flex-col gap-2 rounded-2xl border border-border/50 bg-card p-3.5 shadow-xs">
-            <div className="flex items-center justify-between">
-              <span className="font-extrabold text-subtitle text-foreground">{prayerName}</span>
-              <span className="text-xs font-bold text-muted-foreground">
-                {formatRatio(fard, stats.daysInPeriod, language)}
-              </span>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {/* Fard */}
-              <div className="flex flex-col gap-1">
-                <div className="flex justify-between items-center text-micro font-semibold text-muted-foreground">
-                  <span>{t(language, "prayerTracking.fard")}</span>
-                  <bdi className="font-bold text-foreground">{formatRatio(fard, stats.daysInPeriod, language)}</bdi>
+            return (
+              <div
+                key={prayer}
+                className="flex flex-col gap-2 rounded-2xl border border-border/50 bg-card p-3.5 shadow-xs"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-extrabold text-subtitle text-foreground">{prayerName}</span>
+                  <span className="text-xs font-bold text-muted-foreground">
+                    {formatRatio(fard, stats.daysInPeriod, language)}
+                  </span>
                 </div>
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                  <div
-                    className="h-full rounded-full bg-primary transition-all duration-500"
-                    style={{ width: `${Math.min(100, Math.round((fard / Math.max(1, stats.daysInPeriod)) * 100))}%` }}
-                  />
+
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  {/* Fard */}
+                  <div className="flex flex-col gap-1">
+                    <div className="flex justify-between items-center text-micro font-semibold text-muted-foreground">
+                      <span>{t(language, "prayerTracking.fard")}</span>
+                      <bdi className="font-bold text-foreground">{formatRatio(fard, stats.daysInPeriod, language)}</bdi>
+                    </div>
+                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                      <div
+                        className="h-full rounded-full bg-primary transition-all duration-500"
+                        style={{
+                          width: `${Math.min(100, Math.round((fard / Math.max(1, stats.daysInPeriod)) * 100))}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Mosque */}
+                  <div className="flex flex-col gap-1">
+                    <div className="flex justify-between items-center text-micro font-semibold text-muted-foreground">
+                      <span>{t(language, "prayerTracking.atMosque")}</span>
+                      <bdi className="font-bold text-foreground">
+                        {formatRatio(mosque, stats.daysInPeriod, language)}
+                      </bdi>
+                    </div>
+                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                      <div
+                        className="h-full rounded-full bg-primary/80 transition-all duration-500"
+                        style={{
+                          width: `${Math.min(100, Math.round((mosque / Math.max(1, stats.daysInPeriod)) * 100))}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Rawatib (if applicable) */}
+                  <div className="flex flex-col gap-1">
+                    <div className="flex justify-between items-center text-micro font-semibold text-muted-foreground">
+                      <span>{t(language, "prayerTracking.rawatib")}</span>
+                      <bdi className="font-bold text-foreground">
+                        {hasRawatib ? formatRatio(rawatib, stats.daysInPeriod, language) : "—"}
+                      </bdi>
+                    </div>
+                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                      <div
+                        className="h-full rounded-full bg-secondary transition-all duration-500"
+                        style={{
+                          width: hasRawatib
+                            ? `${Math.min(100, Math.round((rawatib / Math.max(1, stats.daysInPeriod)) * 100))}%`
+                            : "0%",
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Adhkar */}
+                  <div className="flex flex-col gap-1">
+                    <div className="flex justify-between items-center text-micro font-semibold text-muted-foreground">
+                      <span>{t(language, "prayerTracking.adhkar")}</span>
+                      <bdi className="font-bold text-foreground">
+                        {formatRatio(adhkar, stats.daysInPeriod, language)}
+                      </bdi>
+                    </div>
+                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                      <div
+                        className="h-full rounded-full bg-success transition-all duration-500"
+                        style={{
+                          width: `${Math.min(100, Math.round((adhkar / Math.max(1, stats.daysInPeriod)) * 100))}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
-
-              {/* Mosque */}
-              <div className="flex flex-col gap-1">
-                <div className="flex justify-between items-center text-micro font-semibold text-muted-foreground">
-                  <span>{t(language, "prayerTracking.atMosque")}</span>
-                  <bdi className="font-bold text-foreground">{formatRatio(mosque, stats.daysInPeriod, language)}</bdi>
-                </div>
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                  <div
-                    className="h-full rounded-full bg-primary/80 transition-all duration-500"
-                    style={{ width: `${Math.min(100, Math.round((mosque / Math.max(1, stats.daysInPeriod)) * 100))}%` }}
-                  />
-                </div>
-              </div>
-
-              {/* Rawatib (if applicable) */}
-              <div className="flex flex-col gap-1">
-                <div className="flex justify-between items-center text-micro font-semibold text-muted-foreground">
-                  <span>{t(language, "prayerTracking.rawatib")}</span>
-                  <bdi className="font-bold text-foreground">
-                    {hasRawatib ? formatRatio(rawatib, stats.daysInPeriod, language) : "—"}
-                  </bdi>
-                </div>
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                  <div
-                    className="h-full rounded-full bg-secondary transition-all duration-500"
-                    style={{
-                      width: hasRawatib
-                        ? `${Math.min(100, Math.round((rawatib / Math.max(1, stats.daysInPeriod)) * 100))}%`
-                        : "0%",
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* Adhkar */}
-              <div className="flex flex-col gap-1">
-                <div className="flex justify-between items-center text-micro font-semibold text-muted-foreground">
-                  <span>{t(language, "prayerTracking.adhkar")}</span>
-                  <bdi className="font-bold text-foreground">{formatRatio(adhkar, stats.daysInPeriod, language)}</bdi>
-                </div>
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                  <div
-                    className="h-full rounded-full bg-success transition-all duration-500"
-                    style={{ width: `${Math.min(100, Math.round((adhkar / Math.max(1, stats.daysInPeriod)) * 100))}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-      })}
+            );
+          })}
+        </div>
+      </details>
     </div>
   );
 }
