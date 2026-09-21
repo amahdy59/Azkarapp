@@ -109,6 +109,30 @@ const playOnceRepeatedPlan: PlaybackPlan = {
   entries: [{ ...repeatPlan.entries[0]!, repetitions: 1 }],
 };
 
+const englishPlan: PlaybackPlan = {
+  ...plan,
+  id: "english-plan",
+  entries: [
+    {
+      ...plan.entries[0]!,
+      contentKind: "dua",
+      defaultVoiceId: "english-george",
+      availableVoiceIds: ["english-george"],
+      segmentsByVoice: {
+        "english-george": [
+          {
+            ...plan.entries[0]!.segmentsByVoice.voice![0]!,
+            id: "english-segment",
+            variantId: "english-variant",
+            voiceId: "english-george",
+            voiceName: "George",
+          },
+        ],
+      },
+    },
+  ],
+};
+
 function Harness({ language = "en" }: { language?: "ar" | "en" }) {
   const controller = useAudioController();
   return (
@@ -121,6 +145,9 @@ function Harness({ language = "en" }: { language?: "ar" | "en" }) {
       </button>
       <button type="button" onClick={() => controller.startPlan(playOnceRepeatedPlan)}>
         Start repeated zikr once
+      </button>
+      <button type="button" onClick={() => controller.startPlan(englishPlan)}>
+        Start English
       </button>
       <output>{controller.state.status}</output>
       <output data-testid="completed-audio-entry">{controller.state.completedEntryId ?? ""}</output>
@@ -309,5 +336,53 @@ describe("AudioProvider integration", () => {
     fireEvent.click(screen.getByRole("button", { name: "توسيع المشغل" }));
     expect(screen.getByText("المصدر · تلاوة القارئ")).toBeInTheDocument();
     expect(screen.queryByText("Source · Attribution")).not.toBeInTheDocument();
+  });
+
+  it("keeps lock-screen metadata and controls synchronized with the actual recording", async () => {
+    vi.stubGlobal("Audio", FakeAudio);
+    const handlers = new Map<MediaSessionAction, MediaSessionActionHandler | null>();
+    const mediaSession = {
+      metadata: null as MediaMetadata | null,
+      playbackState: "none" as MediaSessionPlaybackState,
+      setActionHandler: vi.fn((action: MediaSessionAction, handler: MediaSessionActionHandler | null) => {
+        handlers.set(action, handler);
+      }),
+      setPositionState: vi.fn(),
+    };
+    class FakeMediaMetadata {
+      constructor(init: MediaMetadataInit) {
+        Object.assign(this, init);
+      }
+    }
+    Object.defineProperty(window.navigator, "mediaSession", { configurable: true, value: mediaSession });
+    vi.stubGlobal("MediaMetadata", FakeMediaMetadata);
+
+    render(
+      <AudioProvider>
+        <Harness />
+      </AudioProvider>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Start English" }));
+    await waitFor(() => expect(mediaSession.playbackState).toBe("playing"));
+    expect(mediaSession.metadata).toMatchObject({
+      title: "Ayat al-Kursi",
+      artist: "English Translation (George)",
+      album: "Azkar English Translation",
+    });
+    expect(mediaSession.metadata?.artwork).toHaveLength(2);
+    expect(handlers.get("stop")).toBeTypeOf("function");
+
+    handlers.get("pause")?.({ action: "pause" });
+    await waitFor(() => expect(mediaSession.playbackState).toBe("paused"));
+    handlers.get("play")?.({ action: "play" });
+    await waitFor(() => expect(mediaSession.playbackState).toBe("playing"));
+    handlers.get("stop")?.({ action: "stop" });
+    await waitFor(() => {
+      expect(mediaSession.playbackState).toBe("none");
+      expect(mediaSession.metadata).toBeNull();
+    });
+
+    Object.defineProperty(window.navigator, "mediaSession", { configurable: true, value: undefined });
   });
 });

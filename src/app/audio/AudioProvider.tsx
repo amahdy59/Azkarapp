@@ -86,15 +86,36 @@ export function AudioProvider({
   useEffect(() => {
     if (!("mediaSession" in navigator)) return;
     const entry = state.plan?.entries[state.entryIndex];
-    if (!entry) return;
+    if (!entry) {
+      navigator.mediaSession.metadata = null;
+      navigator.mediaSession.playbackState = "none";
+      return;
+    }
     const voiceId = state.currentVoiceId ?? entry.defaultVoiceId;
-    const reciterName = getAudioVoiceName(voiceId, "ar") ?? voiceId;
+    const isEnglishNarration = voiceId === "english-george";
+    const metadataLanguage = isEnglishNarration ? "en" : "ar";
+    const reciterName = getAudioVoiceName(voiceId, metadataLanguage) ?? voiceId;
+    const baseUrl = new URL(import.meta.env.BASE_URL, window.location.origin);
     navigator.mediaSession.metadata = new MediaMetadata({
-      title: entry.titleArabic,
+      title: isEnglishNarration ? entry.titleEnglish : entry.titleArabic,
       artist: reciterName,
-      album: entry.contentKind === "quran" ? "القرآن الكريم" : "أذكار المسلم",
+      album: isEnglishNarration
+        ? "Azkar English Translation"
+        : entry.contentKind === "quran"
+          ? "القرآن الكريم"
+          : "أذكار المسلم",
+      artwork: [
+        { src: new URL("192.png", baseUrl).href, sizes: "192x192", type: "image/png" },
+        { src: new URL("512.png", baseUrl).href, sizes: "512x512", type: "image/png" },
+      ],
     });
   }, [state.currentVoiceId, state.entryIndex, state.plan]);
+
+  useEffect(() => {
+    if (!("mediaSession" in navigator)) return;
+    navigator.mediaSession.playbackState =
+      state.status === "playing" ? "playing" : state.status === "idle" || state.status === "ended" ? "none" : "paused";
+  }, [state.status]);
 
   useEffect(() => {
     if (!("mediaSession" in navigator) || !navigator.mediaSession.setPositionState) return;
@@ -393,6 +414,7 @@ export function AudioProvider({
     };
     setHandler("play", play);
     setHandler("pause", pause);
+    setHandler("stop", stop);
     setHandler("previoustrack", previous);
     setHandler("nexttrack", next);
     setHandler("seekbackward", (details) => seek((audioRef.current?.currentTime ?? 0) - (details.seekOffset ?? 10)));
@@ -402,6 +424,7 @@ export function AudioProvider({
       for (const action of [
         "play",
         "pause",
+        "stop",
         "previoustrack",
         "nexttrack",
         "seekbackward",
@@ -415,7 +438,7 @@ export function AudioProvider({
         }
       }
     };
-  }, [next, pause, play, previous, seek]);
+  }, [next, pause, play, previous, seek, stop]);
 
   const setPlaybackRate = useCallback(
     (playbackRate: number) => {

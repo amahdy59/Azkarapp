@@ -21,7 +21,9 @@ Automated tests cover exact/no-fallback lookup, Arabic fingerprints, canonical r
 - Verify collections with multiple reviewed recordings expose Play All on both overview and Reader, disclose partial coverage, and advance through the frozen queue.
 - Verify compact progress and both native slider tracks remain inside the player bounds, use CSS-rendered tracks/thumbs, retain 44px interaction height, and mirror their fill in RTL without reversing media time.
 - Verify visible focus and 44px targets at narrow width, 200%, and 400% zoom.
+- At 320px, expand a multi-item queue in Arabic and English. Confirm the player has no horizontal overflow and Previous, Rewind, Forward, and Next remain fully inside its bounds.
 - Verify English fills timeline progress left-to-right and Arabic fills it right-to-left without horizontal overflow.
+- On supported devices, verify lock-screen/notification metadata matches the recording language, Play/Pause/Seek/Previous/Next work, Stop clears the media card, and headset controls do not complete an interrupted item.
 - With a screen reader, confirm dynamic Play/Pause names and polite track/error/repetition/queue announcements; current time must not announce every second.
 - Test offline with a fully downloaded item and an uncached item.
 - Switch category and Core/Complete during playback; the audio title/text identity and queue must not change.

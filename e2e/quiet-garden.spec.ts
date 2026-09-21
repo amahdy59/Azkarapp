@@ -217,7 +217,7 @@ test("month view shows the calendar without the removed summary card", async ({ 
   await expect(page.getByText("Full Palms", { exact: true })).toHaveCount(0);
 });
 
-test("both Home and Progress keep after-prayer outside the wird card", async ({ page }) => {
+test("both Home and Progress keep prayer tracking outside the wird card", async ({ page }) => {
   await seedReturningGardenUser(page, { completedToday: ["morning"] });
   await openReturningHome(page);
 
@@ -235,18 +235,20 @@ test("both Home and Progress keep after-prayer outside the wird card", async ({ 
   const progressGarden = page.getByTestId("today-garden-card");
   await expect(progressGarden.getByRole("button", { name: /After Prayer Azkar/ })).toHaveCount(0);
 
-  // It stays reachable, in a section of its own that follows the wird card.
-  const afterPrayer = page.getByTestId("progress-after-prayer");
-  await expect(afterPrayer).toBeVisible();
-  await expect(afterPrayer.locator("article[data-prayer-state]").first()).toBeVisible();
-  await expect(afterPrayer.locator('input[type="checkbox"]').first()).toBeAttached();
+  // It stays reachable in the prayer-first group, behind the one named
+  // disclosure rather than adding a fourth tile to the wird.
+  const prayerGroup = page.getByTestId("progress-prayer-group");
+  await expect(prayerGroup).toBeVisible();
+  await prayerGroup.getByText("Review prayer and connected practices", { exact: true }).click();
+  await expect(prayerGroup.locator("article[data-prayer-state]").first()).toBeVisible();
+  await expect(prayerGroup.locator('input[type="checkbox"]').first()).toBeAttached();
   expect(
     await page.evaluate(() => {
       // Compared inside the page: Node.DOCUMENT_POSITION_* only exists there.
       const card = document.querySelector('[data-testid="today-garden-card"]');
-      const section = document.querySelector('[data-testid="progress-after-prayer"]');
+      const section = document.querySelector('[data-testid="progress-prayer-group"]');
       if (!card || !section) return false;
-      return Boolean(card.compareDocumentPosition(section) & Node.DOCUMENT_POSITION_FOLLOWING);
+      return Boolean(section.compareDocumentPosition(card) & Node.DOCUMENT_POSITION_FOLLOWING);
     }),
   ).toBe(true);
 });

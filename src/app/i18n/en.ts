@@ -178,16 +178,22 @@ const en = {
   },
   dailyPath: {
     title: "Today's path",
+    prayer: "Prayer",
     dhikr: "Dhikr",
     quran: "Qur'an wird",
     mosque: "Prayers in congregation",
     ofThree: "{done} of 3 complete",
     pages: "{read} of {goal} pages",
     prayers: "{done} of {goal} prayers",
+    prayerSummary: "{recorded} of 5 recorded · {congregation} in congregation",
     noGoalYet: "No goal set yet",
     mosqueGoal: "Prayers in congregation each day",
     mosqueGoalHint:
       "Choose how many of the five you mean to pray in congregation. Leave it unset and it simply is not part of your path.",
+    adjustCongregationGoal: "Adjust congregation intention",
+    recordingNote:
+      "This summarizes what you recorded. Unrecorded does not mean missed, and the app does not measure faith or reward.",
+    viewProgress: "View full progress",
     streakSecured: "Your consistency is secured for today.",
     streakPending: "Complete two parts of today's path to secure your consistency.",
     palmEarned: "Today's palm is complete.",
@@ -1293,6 +1299,10 @@ const en = {
     completedSurah: "Completed",
   },
   progress: {
+    quranAndRemembrance: "Qur'an and remembrance",
+    quranAndRemembranceDesc: "Your Qur'an goal and established daily remembrance",
+    reviewPrayerDetails: "Review prayer and connected practices",
+    recordedPracticeReflection: "A gentle reflection on recorded practices, not a measure of faith or reward.",
     weekdaySaturday: "Sat",
     weekdaySunday: "Sun",
     weekdayMonday: "Mon",

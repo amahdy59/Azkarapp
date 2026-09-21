@@ -257,6 +257,7 @@ export function HomeScreen({
   onSetRoutineMode,
   onOpenWirdBenefits,
   onOpenKhatmah,
+  onOpenProgress,
   onContinueKhatmah,
   quranReadingPosition,
   quranWirdPlan,
@@ -292,6 +293,7 @@ export function HomeScreen({
   onSetRoutineMode?: (categoryId: RoutineCategoryId, mode: RoutineMode) => void;
   onOpenWirdBenefits?: () => void;
   onOpenKhatmah?: () => void;
+  onOpenProgress?: () => void;
   prayerTracking?: readonly PrayerTrackingRecord[];
   /* Widened to PrayerTrackingWrite because the prayer panel records where a
      prayer was prayed, not only that it was. The tracker cards below still
@@ -821,8 +823,9 @@ export function HomeScreen({
             direction={direction}
             mosquePrayerGoal={mosquePrayerGoal}
             onMosquePrayerGoalChange={(goal) => onMosquePrayerGoalChange?.(goal)}
+            onViewProgress={onOpenProgress}
             onClose={() => setPathSheetOpen(false)}
-            onGlass={homeVisualEffects}
+            onGlass={false}
           />
 
           {fridayInWindow && (

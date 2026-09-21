@@ -16,6 +16,9 @@ async function openHome(page: Page) {
     );
   });
   await page.goto("/#/progress");
+  const details = page.getByText("مراجعة الصلاة وما يتصل بها", { exact: true });
+  await expect(details).toBeVisible();
+  await details.click();
   await expect(page.getByTestId("prayer-tracker-cards")).toBeVisible();
 }
 
@@ -139,16 +142,15 @@ test.describe("after-prayer tracking", () => {
     await expect.poll(async () => grid.evaluate((el) => el.scrollWidth > el.clientWidth)).toBe(false);
   });
 
-  test("renders every prayer as a scrollable carousel on mobile without a reveal button", async ({ page }) => {
+  test("renders every prayer as a scrollable carousel after opening the one details disclosure", async ({ page }) => {
     await openHome(page);
     const cards = page.getByTestId("prayer-tracker-cards").locator("article");
 
     await page.setViewportSize({ width: 1280, height: 900 });
     await expect(cards).toHaveCount(5);
-    await expect(page.getByTestId("prayer-show-upcoming")).toHaveCount(0);
 
     await page.setViewportSize({ width: 375, height: 812 });
     await expect(cards).toHaveCount(5);
-    await expect(page.getByTestId("prayer-show-upcoming")).toHaveCount(0);
+    await expect(page.getByText("مراجعة الصلاة وما يتصل بها", { exact: true })).toHaveCount(1);
   });
 });

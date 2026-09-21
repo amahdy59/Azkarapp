@@ -3701,3 +3701,20 @@ null` shape, so a record written before this change still loads and still
 - **Why:** relative alpha is referenced to an arbitrary starting pose rather than magnetic north. Some Android browsers emit it alongside an absolute event, allowing a later relative reading to overwrite the real compass heading and make the Qibla dial appear wrong or unstable.
 - **Fallback:** location-derived degrees from north remain available when no absolute sensor reading arrives. No map, remote request, dependency, persisted state, or accuracy claim is added.
 - **Tests/evidence required:** focused coverage for iOS WebKit headings, both Android absolute-event forms, rejection of relative alpha, full local gates, and real-device verification before claiming sensor accuracy.
+
+## DEC-188 — Progress uses one prayer-first hierarchy without scoring faith
+
+- **Owner:** User (approved the 2026-09-21 Progress master plan)
+- **Decision:** Home's daily-path sheet and every Progress period use one canonical order: prayer first, then Qur'an and established daily remembrance, then prayer-connected practices and additional contextual practices. Congregation is an attribute of a recorded prayer, not a peer habit that competes with prayer. The app distinguishes recorded from unrecorded and never equates missing data with missed worship.
+- **Disclosure:** the daily Progress answer shows concise group summaries first. The five full prayer cards and their fifteen recording controls stay behind one named disclosure. The Home sheet leads with three ordered summaries, keeps the congregation intention behind a secondary disclosure, and links to full Progress. Reflection metaphors, streaks, palms, and Friday detail follow the practical daily groups.
+- **Integrity:** no point value, percentage, garden level, or completion label may claim to measure faith, divine reward, or a person's standing with Allah. Existing streak, palm, Oasis, prayer, Qur'an, dhikr, and Friday records remain readable and are not migrated or re-judged. Prayer-at-its-time is not inferred because the current record does not prove timing.
+- **Accessibility:** the hierarchy is semantic as well as visual; native disclosure keeps detailed controls optional, labels state numeric facts in text, target sizes remain at least 44px, and Arabic/English use the same DOM order.
+- **Tests/evidence required:** daily-summary derivation, Home-sheet order and disclosure, Progress group order, period navigation, Arabic/English responsive evidence, full local gates, and production verification.
+
+## DEC-189 — Audio transport contains at 320px and background controls tell the truth
+
+- **Owner:** User (approved audio-player hardening on 2026-09-21)
+- **Decision:** Keep the shared compact-first player and its visible transport labels, but let secondary transport targets flex from 44px to 68px so a five-control queue remains fully contained at 320px. The expanded sheet contains horizontal overflow and uses bounded vertical scrolling rather than reducing targets below the accessibility baseline.
+- **Background behavior:** Media Session metadata follows the recording rather than the interface language. English narration uses its English title and narrator; Arabic dua and Qur'an retain Arabic identity. Platform playback state mirrors the controller, Stop is available where supported, artwork uses the installed app icons, and ending or stopping clears stale metadata.
+- **Why:** fixed 68px Previous/Next controls extended 16px beyond both edges at 320px. English translation audio was also presented to lock screens with an Arabic title and album, which made the background interface contradict the audio.
+- **Tests/evidence required:** controller coverage for metadata, playback state, artwork and Stop cleanup; a real-browser 320px queue-containment check; focused audio tests; full local gates; production verification.

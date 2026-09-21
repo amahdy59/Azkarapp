@@ -8,6 +8,7 @@ export function DailyCompanionsCard({
   mosquePrayers,
   onToggleQuranWird,
   onCycleMosquePrayers,
+  showMosque = true,
   className = "",
 }: {
   language: AppLanguage;
@@ -15,6 +16,7 @@ export function DailyCompanionsCard({
   mosquePrayers: "mosque_3" | "mosque_5" | null;
   onToggleQuranWird: () => void;
   onCycleMosquePrayers: () => void;
+  showMosque?: boolean;
   className?: string;
 }) {
   const isArabic = language === "ar";
@@ -37,10 +39,10 @@ export function DailyCompanionsCard({
     >
       <div className="border-b border-border/60 bg-muted/40 px-4 py-3.5 sm:px-6">
         <h2 id="daily-companions-heading" className="text-subtitle font-black leading-tight text-foreground" dir="auto">
-          {t(language, "home.dailyCompanions")}
+          {t(language, showMosque ? "home.dailyCompanions" : "progress.quranAndRemembrance")}
         </h2>
         <p className="mt-0.5 text-caption font-semibold text-muted-foreground" dir="auto">
-          {t(language, "home.dailyCompanionsDesc")}
+          {t(language, showMosque ? "home.dailyCompanionsDesc" : "progress.quranAndRemembranceDesc")}
         </p>
       </div>
 
@@ -83,33 +85,37 @@ export function DailyCompanionsCard({
         </button>
 
         {/* Mosque Prayers Item */}
-        <button
-          type="button"
-          onClick={onCycleMosquePrayers}
-          className="flex w-full min-h-[48px] items-center justify-between px-4 py-3.5 text-start transition-colors hover:bg-muted/40 active:bg-muted/70 sm:px-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-        >
-          <div className="flex items-center gap-3.5">
-            <div
-              className={`flex size-10 items-center justify-center rounded-2xl transition-colors ${
-                hasMosque ? "bg-warning/15 text-warning" : "bg-muted text-muted-foreground"
-              }`}
-            >
-              <MapPin size={20} strokeWidth={hasMosque ? 2.5 : 2} aria-hidden="true" />
-            </div>
-            <div>
-              <span className="block text-body font-bold text-foreground">{t(language, "progress.mosquePrayers")}</span>
-              <span
-                className={`block text-caption font-semibold ${hasMosque ? "text-warning" : "text-muted-foreground"}`}
+        {showMosque && (
+          <button
+            type="button"
+            onClick={onCycleMosquePrayers}
+            className="flex w-full min-h-[48px] items-center justify-between px-4 py-3.5 text-start transition-colors hover:bg-muted/40 active:bg-muted/70 sm:px-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
+            <div className="flex items-center gap-3.5">
+              <div
+                className={`flex size-10 items-center justify-center rounded-2xl transition-colors ${
+                  hasMosque ? "bg-warning/15 text-warning" : "bg-muted text-muted-foreground"
+                }`}
               >
-                {mosqueState}
-              </span>
+                <MapPin size={20} strokeWidth={hasMosque ? 2.5 : 2} aria-hidden="true" />
+              </div>
+              <div>
+                <span className="block text-body font-bold text-foreground">
+                  {t(language, "progress.mosquePrayers")}
+                </span>
+                <span
+                  className={`block text-caption font-semibold ${hasMosque ? "text-warning" : "text-muted-foreground"}`}
+                >
+                  {mosqueState}
+                </span>
+              </div>
             </div>
-          </div>
 
-          <span className="text-caption font-bold rounded-lg border border-border/80 bg-muted/60 px-2.5 py-1 text-muted-foreground">
-            {mosquePrayers === "mosque_5" ? "5/5" : mosquePrayers === "mosque_3" ? "3/5" : "0/5"}
-          </span>
-        </button>
+            <span className="text-caption font-bold rounded-lg border border-border/80 bg-muted/60 px-2.5 py-1 text-muted-foreground">
+              {mosquePrayers === "mosque_5" ? "5/5" : mosquePrayers === "mosque_3" ? "3/5" : "0/5"}
+            </span>
+          </button>
+        )}
       </div>
     </section>
   );

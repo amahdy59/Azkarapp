@@ -33,7 +33,7 @@ describe("ProgressScreen", () => {
     expect(screen.getByTestId("oasis-stage-card")).toBeInTheDocument();
     expect(screen.getByTestId("oasis-stage-card")).not.toHaveAttribute("open");
     expect(screen.getByText("مرحلة الواحة الروحية")).toBeInTheDocument();
-    expect(screen.getByRole("progressbar")).toBeInTheDocument();
+    expect(screen.getByText("تأمل لطيف فيما سجلته، وليس مقياساً للإيمان أو الأجر.")).toBeInTheDocument();
 
     // Prophetic Constancy Hadith Touchstone
     expect(screen.getByText(/أَحَبُّ الأَعْمَالِ إِلَى اللَّهِ/)).toBeInTheDocument();
@@ -53,12 +53,11 @@ describe("ProgressScreen", () => {
     expect(screen.getByText("إيقاع الأيام السبعة")).toBeInTheDocument();
     expect(screen.queryByText(/★/)).not.toBeInTheDocument();
 
-    // Daily Companions Card
+    // Qur'an and remembrance follow the primary prayer group.
     expect(screen.getByTestId("daily-companions-card")).toBeInTheDocument();
-    expect(screen.getByText("الرفاق اليومية")).toBeInTheDocument();
+    expect(screen.getByText("القرآن والذكر")).toBeInTheDocument();
 
-    // After-prayer Adhkar section
-    expect(screen.getByTestId("progress-after-prayer")).toBeInTheDocument();
+    expect(screen.getByTestId("progress-prayer-group")).toBeInTheDocument();
 
     // Progress uses efficient themed rows, not Home's decorative photo cards.
     expect(screen.getByTestId("today-garden-card").querySelector("img")).toBeNull();
@@ -82,10 +81,10 @@ describe("ProgressScreen", () => {
     expect(screen.getByText("Daily Oasis Stage")).toBeInTheDocument();
     expect(screen.getByText("7-Day Rhythm")).toBeInTheDocument();
     expect(screen.getByTestId("daily-companions-card")).toBeInTheDocument();
-    expect(screen.getByText("Daily Companions")).toBeInTheDocument();
+    expect(screen.getByText("Qur'an and remembrance")).toBeInTheDocument();
   });
 
-  it("invokes onToggleDailyHabit and onCycleMosqueHabit when daily companions are clicked", () => {
+  it("records the Quran from its focused group without duplicating mosque tracking", () => {
     const onToggleDailyHabit = vi.fn();
     const onCycleMosqueHabit = vi.fn();
 
@@ -109,11 +108,8 @@ describe("ProgressScreen", () => {
     expect(onToggleDailyHabit).toHaveBeenCalledTimes(1);
     expect(onToggleDailyHabit).toHaveBeenCalledWith(expect.any(String), "quran_wird");
 
-    // Cycle Mosque Prayers
-    const mosqueButton = screen.getByRole("button", { name: /صلوات المسجد/ });
-    fireEvent.click(mosqueButton);
-    expect(onCycleMosqueHabit).toHaveBeenCalledTimes(1);
-    expect(onCycleMosqueHabit).toHaveBeenCalledWith(expect.any(String));
+    expect(screen.queryByRole("button", { name: /صلوات المسجد/ })).not.toBeInTheDocument();
+    expect(onCycleMosqueHabit).not.toHaveBeenCalled();
   });
 
   it("switches tabs between Day, Week, Month, and Year", () => {

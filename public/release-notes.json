@@ -1,13 +1,15 @@
 {
-  "release": "2026-09-21",
+  "release": "2026-09-21-progress",
   "ar": [
-    "أصبحت البوصلة المباشرة أكثر ثباتًا على هواتف أندرويد ولا تتأثر بقراءات الاتجاه النسبي.",
-    "يستمر دعم بوصلة الآيفون والآيباد بعد منح إذن الحركة والاتجاه.",
-    "يبقى اتجاه القبلة بالدرجات من الشمال متاحًا عندما لا يوفّر الهاتف قراءة بوصلة مطلقة."
+    "أصبح ملخص التقدم يرتب الصلاة أولاً، ثم القرآن والذكر، ثم بقية الممارسات.",
+    "تعرض نافذة طريق اليوم ما سُجّل من الصلوات وما كان منها في جماعة من دون اعتبار غير المسجّل فائتاً.",
+    "صارت تفاصيل الصلوات ومؤشرات التأمل الثانوية مطوية افتراضياً لتبقى الصفحة أبسط وأهدأ.",
+    "أصبحت عناصر مشغل الصوت الموسع ملائمة للشاشات الصغيرة، وتعرض شاشة القفل بيانات صحيحة للتلاوة العربية أو الترجمة الإنجليزية."
   ],
   "en": [
-    "The live compass is steadier on Android phones and no longer follows relative orientation readings.",
-    "iPhone and iPad compass support continues to work after motion and orientation permission is granted.",
-    "The Qibla bearing from north remains available when a phone cannot provide an absolute compass reading."
+    "Progress now puts prayer first, followed by Qur'an and remembrance, then additional practices.",
+    "Today's path distinguishes prayers recorded from prayers in congregation without treating unrecorded activity as missed.",
+    "Prayer details and secondary reflection metrics are collapsed by default to keep progress calmer and easier to scan.",
+    "Expanded audio controls now fit small screens, and lock-screen details correctly identify Arabic recitation or English narration."
   ]
 }

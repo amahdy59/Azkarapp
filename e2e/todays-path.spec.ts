@@ -33,36 +33,39 @@ test("the indicators open today's path", async ({ page }) => {
   const sheet = page.getByTestId("todays-path-sheet");
   await expect(sheet).toBeVisible();
 
-  // All three pillars are named, with their state in text rather than colour.
-  await expect(sheet.getByText("Dhikr", { exact: true })).toBeVisible();
+  // The three summaries follow the reviewed order and expose their state in
+  // text rather than colour.
+  await expect(sheet.getByText("Prayer", { exact: true })).toBeVisible();
+  await expect(sheet.getByText("0 of 5 recorded · 0 in congregation", { exact: true })).toBeVisible();
   await expect(sheet.getByText("Qur'an wird", { exact: true })).toBeVisible();
-  await expect(sheet.getByText("Prayers in congregation", { exact: true })).toBeVisible();
+  await expect(sheet.getByText("Dhikr", { exact: true })).toBeVisible();
   await expect(sheet.getByText("0 of 3 complete")).toBeVisible();
 });
 
-test("a pillar nobody set up says so, and can be set up here", async ({ page }) => {
+test("the secondary congregation intention can be set from its disclosure", async ({ page }) => {
   await openHome(page);
   await page.getByTestId("home-header-routine-summary").click();
   const sheet = page.getByTestId("todays-path-sheet");
 
-  // Unset is not a target of zero: it asks nothing of the day.
-  await expect(sheet.getByText("No goal set yet").first()).toBeVisible();
+  // The optional congregation intention is configured separately from the
+  // prayer record and stays out of the primary summary until requested.
+  await sheet.getByText("Adjust congregation intention", { exact: true }).click();
 
   const three = sheet.getByTestId("mosque-goal-3");
   await expect(three).toHaveAttribute("aria-checked", "false");
   await three.click();
   await expect(three).toHaveAttribute("aria-checked", "true");
-  await expect(sheet.getByText("0 of 3 prayers")).toBeVisible();
 });
 
-test("the day's standing is stated without loss language", async ({ page }) => {
+test("the day's record is explained without loss or faith-scoring language", async ({ page }) => {
   await openHome(page);
   await page.getByTestId("home-header-routine-summary").click();
   const summary = page.getByTestId("todays-path-summary");
   await expect(summary).toBeVisible();
 
   const text = (await summary.textContent()) ?? "";
-  expect(text).toMatch(/consistency/i);
+  expect(text).toMatch(/what you recorded/i);
+  expect(text).toMatch(/does not measure faith or reward/i);
   // Never phrased as failure, loss, or a streak about to die.
   expect(text).not.toMatch(/lost|failed|don't break|dies/i);
 });

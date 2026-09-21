@@ -267,7 +267,7 @@ function TransportButton({
       onClick={onClick}
       disabled={disabled}
       aria-label={ariaLabel}
-      className="flex w-[4.25rem] shrink-0 flex-col items-center gap-1 rounded-2xl px-1 py-2 text-muted-foreground transition-[transform,background-color,color] duration-fast hover:bg-muted hover:text-foreground active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-30 disabled:active:scale-100"
+      className="flex min-w-11 max-w-[4.25rem] flex-1 flex-col items-center gap-1 rounded-2xl px-1 py-2 text-muted-foreground transition-[transform,background-color,color] duration-fast hover:bg-muted hover:text-foreground active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-30 disabled:active:scale-100"
     >
       {children}
       <span className="text-micro font-semibold leading-4">{label}</span>
@@ -674,7 +674,7 @@ export function FloatingAudioPlayer({
       aria-label={copy.region}
       dir={direction}
       data-variant="expanded"
-      className={`floating-audio-player floating-audio-player--expanded fixed z-40 overflow-y-auto rounded-t-3xl border border-b-0 border-primary/20 bg-card px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2 shadow-overlay sm:max-w-2xl sm:px-5 lg:max-w-4xl dark:border-white/10 ${overReadingSurface ? "floating-audio-player--reading" : ""}`}
+      className={`floating-audio-player floating-audio-player--expanded fixed z-40 overflow-x-hidden overflow-y-auto overscroll-contain rounded-t-3xl border border-b-0 border-primary/20 bg-card px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2 shadow-overlay sm:max-w-2xl sm:px-5 lg:max-w-4xl dark:border-white/10 ${overReadingSurface ? "floating-audio-player--reading" : ""}`}
     >
       <div className="sr-only" aria-live="polite" aria-atomic="true">
         {liveMessage}
@@ -761,7 +761,7 @@ export function FloatingAudioPlayer({
       </div>
 
       {/* Primary Transport Controls Row */}
-      <div className="mt-1 flex items-start justify-center gap-0.5 sm:gap-2">
+      <div className="mt-1 flex w-full items-start justify-center gap-0.5 sm:gap-2">
         {totalTracks > 1 && (
           <TransportButton
             label={copy.previousShort}

@@ -53,6 +53,8 @@ export interface DailyPathStatus {
   };
   salah: {
     target: number | null;
+    /** Prayers the reader recorded, regardless of where they prayed. */
+    recordedCount: number;
     mosqueCount: number;
     complete: boolean;
     /** False until the reader has chosen a goal. */
@@ -123,6 +125,9 @@ export function getDailyPathStatus(input: DailyPathInput): DailyPathStatus {
 
   const target = input.mosquePrayerGoal && input.mosquePrayerGoal > 0 ? input.mosquePrayerGoal : null;
   const dayRecords = input.prayerTracking.filter((record) => record.dayKey === input.dayKey);
+  const recordedCount = PRAYER_NAMES.filter((prayer) =>
+    dayRecords.some((record) => record.prayer === prayer && trackedLocation(record) !== null),
+  ).length;
   const mosqueCount = PRAYER_NAMES.filter((prayer) =>
     wasPrayedAtMosque(dayRecords.find((record) => record.prayer === prayer)),
   ).length;
@@ -138,6 +143,7 @@ export function getDailyPathStatus(input: DailyPathInput): DailyPathStatus {
   const quran = { goal, progress, complete: quranActive && progress >= goal, active: quranActive };
   const salah = {
     target,
+    recordedCount,
     mosqueCount,
     complete: target !== null && mosqueCount >= target,
     configured: target !== null,

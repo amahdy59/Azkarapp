@@ -193,3 +193,46 @@ test("desktop audio dock stays inside the main canvas and reveals volume on hove
     expect(progressBox.x + progressBox.width).toBeLessThan(playerBox.x + playerBox.width);
   }
 });
+
+test("expanded queue controls stay inside a 320px phone viewport", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.addInitScript(() => {
+    window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+    window.localStorage.setItem(
+      "azkarapp.state.v1",
+      JSON.stringify({
+        settings: { language: "en", themeMode: "midnight", reduceMotion: true },
+        profile: { displayName: "Guest", isGuest: true },
+        completed: { morning: [], evening: [], before_sleep: [], friday_kahf: [] },
+        sessions: [],
+      }),
+    );
+    HTMLMediaElement.prototype.play = () => Promise.resolve();
+  });
+  await page.goto("/#/azkar/morning");
+  await page.getByRole("button", { name: "Play All Audio" }).click();
+  await page.getByRole("button", { name: "Play available" }).click();
+
+  const player = page.getByRole("region", { name: "Audio player" });
+  await player.getByRole("button", { name: "Expand player" }).click();
+  await expect(player).toHaveAttribute("data-variant", "expanded");
+
+  const geometry = await player.evaluate((element) => {
+    const bounds = element.getBoundingClientRect();
+    const transportButtons = Array.from(element.querySelectorAll("button")).filter((button) =>
+      ["Previous item", "Rewind 10 seconds", "Forward 10 seconds", "Next item"].includes(
+        button.getAttribute("aria-label") ?? "",
+      ),
+    );
+    return {
+      clientWidth: element.clientWidth,
+      scrollWidth: element.scrollWidth,
+      controlsInside: transportButtons.every((button) => {
+        const control = button.getBoundingClientRect();
+        return control.left >= bounds.left && control.right <= bounds.right;
+      }),
+    };
+  });
+  expect(geometry.scrollWidth).toBeLessThanOrEqual(geometry.clientWidth);
+  expect(geometry.controlsInside).toBe(true);
+});

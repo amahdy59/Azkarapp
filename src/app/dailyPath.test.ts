@@ -99,8 +99,17 @@ describe("the mosque pillar", () => {
 
   it("does not count a prayer prayed at home", () => {
     const result = status({ mosquePrayerGoal: 1, prayerTracking: [prayed("fajr", "home")] });
+    expect(result.salah.recordedCount).toBe(1);
     expect(result.salah.mosqueCount).toBe(0);
     expect(result.salah.complete).toBe(false);
+  });
+
+  it("reports every recorded prayer separately from congregation", () => {
+    const result = status({
+      prayerTracking: [prayed("fajr", "mosque"), prayed("dhuhr", "home"), prayed("asr", "mosque")],
+    });
+    expect(result.salah.recordedCount).toBe(3);
+    expect(result.salah.mosqueCount).toBe(2);
   });
 
   it("counts a legacy record that has the boolean and no location", () => {

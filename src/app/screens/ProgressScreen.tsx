@@ -164,6 +164,16 @@ export function ProgressScreen({
 
   // Current day key for Oasis evaluation
   const currentDayKey = getProgressDayKey(displayDate, progressDayStartHour);
+  const selectedDayPath = getDailyPathStatus({
+    dayKey: currentDayKey,
+    dailyCompletions,
+    wirdHistory: wirdHistory ?? {},
+    quranWirdPlan,
+    quranWirdDailyGoals,
+    prayerTracking,
+    mosquePrayerGoal,
+    dailyPathStartDayKey,
+  });
   const oasisRoutines = deriveOasisRoutinesFromCompletions(dailyCompletions, currentDayKey);
   const dayHabits = (dailyHabits ?? []).filter((h) => h.dayKey === currentDayKey);
 
@@ -344,43 +354,76 @@ export function ProgressScreen({
           </div>
         </div>
 
-        {/* Enduring Palms and Preserved Streak Summary in Day View */}
-        {activeTab === "day" && (
-          <dl
-            data-testid="progress-summary-strip"
-            className="mb-4 grid w-full grid-cols-2 overflow-hidden rounded-2xl border border-border bg-card"
-          >
-            <div className="flex min-w-0 items-center gap-2.5 border-e border-border p-3">
-              <div className="flex size-8 shrink-0 items-center justify-center text-primary">
-                <Zap className="size-5" />
-              </div>
-              <div className="min-w-0">
-                <dt className="truncate text-micro font-bold text-muted-foreground">
-                  {t(language, "progress.activeStreakSummary")}
-                </dt>
-                <dd className="text-sm font-black text-foreground">
-                  {formatNumerals(activeGardenSummary.currentUsageStreak ?? 0, language)} {t(language, "progress.days")}
-                </dd>
-              </div>
+        {/* Prayer is the canonical first practice group in every period. The
+            day keeps its fifteen recording controls behind one disclosure; a
+            reader who only needs the summary does not have to traverse them. */}
+        <section
+          data-testid="progress-prayer-group"
+          dir={direction}
+          className="mb-5 w-full overflow-hidden rounded-2xl border border-border bg-card text-foreground"
+        >
+          <div className="flex items-center justify-between gap-4 px-4 py-4 text-start sm:px-5">
+            <div className="min-w-0">
+              <h2 className="text-lg font-black leading-tight text-foreground" dir="auto">
+                {t(language, "dailyPath.prayer")}
+              </h2>
+              {activeTab === "day" && (
+                <p className="mt-1 text-xs font-semibold text-muted-foreground" dir="auto">
+                  {t(language, "dailyPath.prayerSummary", {
+                    recorded: formatNumerals(selectedDayPath.salah.recordedCount, language),
+                    congregation: formatNumerals(selectedDayPath.salah.mosqueCount, language),
+                  })}
+                </p>
+              )}
             </div>
+          </div>
+          {activeTab === "day" ? (
+            <details className="border-t border-border">
+              <summary className="min-h-11 cursor-pointer px-4 py-3 text-label font-black focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:px-5">
+                {t(language, "progress.reviewPrayerDetails")}
+              </summary>
+              <div className="border-t border-border py-4">
+                <PrayerTrackerCards
+                  models={prayerCardModels}
+                  language={language}
+                  direction={direction}
+                  records={prayerTracking}
+                  dayKey={currentDayKey}
+                  onToggle={onTogglePrayerTracking ?? (() => undefined)}
+                  onOpen={(prayer) => {
+                    if (prayer) onPrayerResume?.(prayer);
+                  }}
+                />
+              </div>
+            </details>
+          ) : (
+            <div className="border-t border-border py-4">
+              <PrayerTrackerStats
+                records={prayerTracking}
+                activeTab={activeTab}
+                displayDate={displayDate}
+                language={language}
+                calendarType={calendarType}
+              />
+            </div>
+          )}
+        </section>
 
-            <div className="flex min-w-0 items-center gap-2.5 p-3">
-              <div className="flex size-8 shrink-0 items-center justify-center text-primary">
-                <PalmTreeMark size={22} className="text-primary" />
-              </div>
-              <div className="min-w-0">
-                <dt className="truncate text-micro font-bold text-muted-foreground">
-                  {t(language, "progress.lifetimePalmsSummary")}
-                </dt>
-                <dd className="text-sm font-black text-foreground">
-                  {formatNumerals(activeGardenSummary.lifetimePalms, language)} {t(language, "progress.palmsUnit")}
-                </dd>
-              </div>
-            </div>
-          </dl>
+        {/* Qur'an is presented before the collection breakdown. */}
+        {activeTab === "day" && (
+          <div className="mb-5 w-full">
+            <DailyCompanionsCard
+              language={language}
+              quranWird={quranWirdDone}
+              mosquePrayers={resolvedMosquePrayers}
+              onToggleQuranWird={() => onToggleDailyHabit?.(currentDayKey, "quran_wird")}
+              onCycleMosquePrayers={() => onCycleMosqueHabit?.(currentDayKey)}
+              showMosque={false}
+            />
+          </div>
         )}
 
-        {/* The selected period's answer is the primary content. */}
+        {/* The selected period's dhikr answer follows prayer and Qur'an. */}
         <div className="mb-5 w-full">
           <TodayRoutineGarden
             summary={activeGardenSummary}
@@ -442,34 +485,9 @@ export function ProgressScreen({
                 {isArabic ? levelDetails.descriptionArabic : levelDetails.description}
               </p>
 
-              {/* Progress Bar towards next milestone */}
-              <div className="mt-4">
-                <div className="flex items-center justify-between text-micro font-bold text-muted-foreground mb-1.5">
-                  <span>{t(language, "progress.stageCompletion")}</span>
-                  <span>{formatNumerals(levelDetails.progressPercent, language)}%</span>
-                </div>
-                <div
-                  role="progressbar"
-                  aria-valuenow={levelDetails.progressPercent}
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                  aria-label={isArabic ? levelDetails.nameArabic : levelDetails.name}
-                  className="h-2.5 w-full overflow-hidden rounded-full bg-muted"
-                >
-                  <div
-                    className="h-full rounded-full bg-gradient-to-r from-success to-primary transition-all duration-500"
-                    style={{ width: `${levelDetails.progressPercent}%` }}
-                  />
-                </div>
-              </div>
-
-              {/* Next Milestone Hint */}
               <div className="mt-3 flex items-start gap-2 rounded-xl bg-primary/5 p-3 text-xs font-semibold text-foreground">
                 <Sparkles className="size-4 shrink-0 text-primary mt-0.5" aria-hidden="true" />
-                <span dir="auto">
-                  <strong className="font-black text-primary">{t(language, "progress.nextMilestonePrefix")}</strong>
-                  {isArabic ? levelDetails.nextMilestoneArabic : levelDetails.nextMilestone}
-                </span>
+                <span dir="auto">{t(language, "progress.recordedPracticeReflection")}</span>
               </div>
             </div>
 
@@ -508,54 +526,42 @@ export function ProgressScreen({
           </details>
         )}
 
-        {/* Daily Companions (Day view) */}
+        {/* Legacy rhythm and palm records remain available, but as reflection
+            after today's practices rather than as the definition of the day. */}
         {activeTab === "day" && (
-          <div className="w-full mb-5">
-            <DailyCompanionsCard
-              language={language}
-              quranWird={quranWirdDone}
-              mosquePrayers={resolvedMosquePrayers}
-              onToggleQuranWird={() => onToggleDailyHabit?.(currentDayKey, "quran_wird")}
-              onCycleMosquePrayers={() => onCycleMosqueHabit?.(currentDayKey)}
-            />
-          </div>
-        )}
+          <dl
+            data-testid="progress-summary-strip"
+            className="mb-5 grid w-full grid-cols-2 overflow-hidden rounded-2xl border border-border bg-card"
+          >
+            <div className="flex min-w-0 items-center gap-2.5 border-e border-border p-3">
+              <div className="flex size-8 shrink-0 items-center justify-center text-primary">
+                <Zap className="size-5" />
+              </div>
+              <div className="min-w-0">
+                <dt className="truncate text-micro font-bold text-muted-foreground">
+                  {t(language, "progress.activeStreakSummary")}
+                </dt>
+                <dd className="text-sm font-black text-foreground">
+                  {formatNumerals(activeGardenSummary.currentUsageStreak ?? 0, language)} {t(language, "progress.days")}
+                </dd>
+              </div>
+            </div>
 
-        {/* After-prayer Adhkar section */}
-        <section
-          data-testid="progress-after-prayer"
-          dir={direction}
-          className="w-full mb-5 overflow-hidden rounded-3xl border border-border/60 bg-card/90 text-foreground shadow-raised backdrop-blur-md"
-        >
-          <div className="border-b border-border/60 bg-muted/40 px-4 py-4 text-start sm:px-6">
-            <h2 className="text-lg font-black leading-tight text-foreground" dir="auto">
-              {t(language, "progress.postPrayerAzkar")}
-            </h2>
-          </div>
-          <div className="py-4">
-            {activeTab === "day" ? (
-              <PrayerTrackerCards
-                models={prayerCardModels}
-                language={language}
-                direction={direction}
-                records={prayerTracking}
-                dayKey={currentDayKey}
-                onToggle={onTogglePrayerTracking ?? (() => undefined)}
-                onOpen={(prayer) => {
-                  if (prayer) onPrayerResume?.(prayer);
-                }}
-              />
-            ) : (
-              <PrayerTrackerStats
-                records={prayerTracking}
-                activeTab={activeTab}
-                displayDate={displayDate}
-                language={language}
-                calendarType={calendarType}
-              />
-            )}
-          </div>
-        </section>
+            <div className="flex min-w-0 items-center gap-2.5 p-3">
+              <div className="flex size-8 shrink-0 items-center justify-center text-primary">
+                <PalmTreeMark size={22} className="text-primary" />
+              </div>
+              <div className="min-w-0">
+                <dt className="truncate text-micro font-bold text-muted-foreground">
+                  {t(language, "progress.lifetimePalmsSummary")}
+                </dt>
+                <dd className="text-sm font-black text-foreground">
+                  {formatNumerals(activeGardenSummary.lifetimePalms, language)} {t(language, "progress.palmsUnit")}
+                </dd>
+              </div>
+            </div>
+          </dl>
+        )}
 
         {/* Friday Card / Stats */}
         {activeTab === "day" ? (
