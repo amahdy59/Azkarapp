@@ -40,11 +40,14 @@ test("the Home Wird keeps semantic order while mirroring Arabic placement and ex
   // waits out the whole 90s test timeout and reports as a timeout rather than
   // as the missing card it actually is.
   await expect(ltrCards).not.toHaveCount(0);
+  const ltrWirdCards = page.getByTestId("wird-category-card");
+  await expect(ltrWirdCards).toHaveCount(4);
   const ltrBoxes = await Promise.all([0, 1, 2].map((index) => ltrCards.nth(index).boundingBox()));
   expect(ltrBoxes.every(Boolean)).toBe(true);
   if (ltrBoxes[0] && ltrBoxes[1] && ltrBoxes[2]) {
     expect(ltrBoxes[0].x).toBeLessThan(ltrBoxes[1].x);
     expect(ltrBoxes[2].y).toBeGreaterThan(ltrBoxes[0].y + ltrBoxes[0].height - 1);
+    expect(ltrBoxes[0].height).toBeLessThanOrEqual(218);
   }
   await expect(page.getByTestId("today-garden-card").getByRole("button", { name: /Quran Wird/ })).toBeVisible();
 
@@ -54,7 +57,17 @@ test("the Home Wird keeps semantic order while mirroring Arabic placement and ex
   expect(mobileBoxes.every(Boolean)).toBe(true);
   if (mobileBoxes[0] && mobileBoxes[1] && mobileBoxes[2]) {
     expect(mobileBoxes[0].width).toBeGreaterThanOrEqual(180);
+    expect(mobileBoxes[0].height).toBeLessThanOrEqual(202);
   }
+  const mobileCardPresentation = await ltrWirdCards.first().evaluate((card) => {
+    const [title, subtitle] = card.querySelectorAll("p");
+    return {
+      titleSize: title ? window.getComputedStyle(title).fontSize : "",
+      subtitleSize: subtitle ? window.getComputedStyle(subtitle).fontSize : "",
+      overflow: card.scrollHeight - card.clientHeight,
+    };
+  });
+  expect(mobileCardPresentation).toEqual({ titleSize: "18px", subtitleSize: "12px", overflow: 0 });
 
   await openReturningGuest(page, "ar");
   await page.setViewportSize({ width: 834, height: 900 });

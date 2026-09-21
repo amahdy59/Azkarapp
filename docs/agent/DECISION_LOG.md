@@ -3733,3 +3733,11 @@ null` shape, so a record written before this change still loads and still
 - **Qibla compatibility:** request the standards-based absolute orientation permission first, then retry Safari's earlier no-argument method only when that call throws. A denied result remains denied and is never bypassed. The sensor still starts only from its named user action and still accepts earth-referenced headings only.
 - **Accessibility:** native details/summary preserves keyboard and assistive-technology access, the disclosure target remains at least 44px, all totals remain textual, and Arabic/English retain one semantic order.
 - **Tests/evidence required:** focused permission fallback and dispatched-heading coverage; collapsed/expanded prayer-matrix coverage; compact Arabic browser evidence; full release gates and physical-device compass verification.
+
+## DEC-192 — Home Wird cards use responsive density without smaller content
+
+- **Owner:** User (Home Wird density request on 2026-09-21)
+- **Decision:** Replace the photographic Wird cards' fixed 17.5rem minimum with responsive 12rem, 13.5rem, and 14.5rem minimum heights across phone, tablet, and desktop tiers. Reduce only the flexible spacer above the copy; preserve title, description, icon, completion mark, action label, padding, and whole-card interaction sizing.
+- **Why:** the fixed height made a single-column phone layout consume excessive vertical space and made wide layouts feel oversized relative to the amount of information. Responsive height keeps the image recognizable while bringing the next routine into view sooner.
+- **Accessibility and compatibility:** semantic order, Arabic/English direction, visible focus, status naming, at least 44px whole-card targets, and completion data do not change. Text remains 18px/12px and may use its existing two-line description wrap without clipping or horizontal overflow.
+- **Tests/evidence required:** browser checks at 320px and tablet widths for height, text size, internal overflow, and RTL/LTR order; visual review at phone and desktop widths; full release gates and production verification.

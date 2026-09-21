@@ -89,6 +89,7 @@ Run the phase files in numerical order unless the decision log explicitly record
 | 46    | `phases/PHASE_46_AUDIO_PLAYER_HARDENING.md`            | Narrow-screen containment and truthful background media controls        |
 | 47    | `phases/PHASE_47_QIBLA_AND_IOS_SHELL.md`               | Explicit compass opt-in and single-owner bottom safe area               |
 | 48    | `phases/PHASE_48_QIBLA_COMPAT_AND_PROGRESS_CLARITY.md` | Safari compass compatibility and summary-first Progress views           |
+| 49    | `phases/PHASE_49_HOME_WIRD_DENSITY.md`                 | Compact responsive Home Wird cards without smaller content              |
 
 Phases 15–20 derive from `docs/audits/DESIGN_CONSISTENCY_AUDIT.md` (2026-08-15) and are
 recorded in `DECISION_LOG.md` as DEC-064. Phase 15 is upstream of 16, 17 and 19 — its root

@@ -126,8 +126,8 @@ function WirdCategoryCard({
       aria-label={showRecommended ? `${name} - ${recommendedLabel} - ${statusLabel}` : `${name} - ${statusLabel}`}
       data-recommended-now={showRecommended ? "true" : undefined}
       data-category={categoryKey}
-      style={{ minHeight: "17.5rem" }}
-      className={`hero-glass home-glass-surface group relative flex flex-col overflow-hidden rounded-3xl p-4 text-start transition-all duration-standard ease-standard focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-95 border border-white/20 shadow-raised hover:border-white/40 ${
+      data-testid="wird-category-card"
+      className={`hero-glass home-glass-surface group relative flex min-h-48 flex-col overflow-hidden rounded-3xl border border-white/20 p-4 text-start shadow-raised transition-all duration-standard ease-standard hover:border-white/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-95 sm:min-h-[13.5rem] lg:min-h-[14.5rem] ${
         isCompleted ? "ring-2 ring-success/60" : ""
       }`}
     >
@@ -166,7 +166,7 @@ function WirdCategoryCard({
       </div>
 
       {/* Content: name, subtitle, CTA */}
-      <div className="relative z-10 mt-auto flex w-full flex-col items-start gap-1 pt-6">
+      <div className="relative z-10 mt-auto flex w-full flex-col items-start gap-1 pt-4">
         <p className="text-lg font-black leading-tight text-white drop-shadow-md" dir="auto">
           {name}
         </p>

@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-21-progress-qibla-2",
+  "release": "2026-09-21-wird-density",
   "ar": [
-    "تعرض فترات الأسبوع والشهر والسنة ملخص الصلاة أولاً، ويمكن فتح تفاصيل كل صلاة عند الحاجة.",
-    "أصبحت شاشة التقدم على الهاتف أقصر وأسهل في المسح مع إبراز الفترة والنتائج الحالية.",
-    "أصبحت البوصلة الحية متوافقة مع طريقة الإذن الأقدم في Safari مع الحفاظ على الاتجاه الثابت كبديل."
+    "تشغل بطاقات وردك اليوم مساحة رأسية أقل على الهاتف لتظهر أعمال يومية أكثر في الشاشة.",
+    "تحافظ عناوين البطاقات ووصفها وأزرارها على أحجامها الواضحة من دون تصغير النص.",
+    "تعرض الأجهزة اللوحية والمكتبية صور الورد في بطاقات أكثر توازناً مع بقاء حالة الإنجاز واضحة."
   ],
   "en": [
-    "Week, Month, and Year now show prayer totals first, with each-prayer detail available when you ask for it.",
-    "Progress is shorter and easier to scan on phones, keeping the selected period and current results prominent.",
-    "The live compass now supports Safari's earlier permission method while preserving the stable bearing as a fallback."
+    "Today's Wird cards take less vertical space on phones, bringing more of the daily routine into view.",
+    "Card titles, descriptions, and actions keep their readable sizes without shrinking the text.",
+    "Tablet and desktop layouts use more balanced image cards while keeping completion status clear."
   ]
 }
