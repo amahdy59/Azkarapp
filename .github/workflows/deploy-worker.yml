@@ -22,15 +22,25 @@ jobs:
     # so bound it and let a re-run recover instead.
     timeout-minutes: 15
     runs-on: ubuntu-latest
-    # Without Cloudflare credentials there is nothing to deploy to. Skip
-    # instead of failing so setups without the secrets stay green; adding
-    # CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID enables the deploy.
-    if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
+    # Without Cloudflare credentials there is nothing to deploy to. The
+    # Cloudflare steps skip instead of failing so setups without the secrets
+    # stay green; adding CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID
+    # enables the deploy. (The `secrets` context is not available in a job
+    # `if`, so each Cloudflare step carries its own guard.)
     steps:
       - name: Checkout
         uses: actions/checkout@v7
 
+      - name: Check Cloudflare credentials
+        run: |
+          if [ -z "${{ secrets.CLOUDFLARE_API_TOKEN }}" ]; then
+            echo "CLOUDFLARE_API_TOKEN is not set; Worker deploy steps will skip."
+          else
+            echo "Cloudflare credentials present; deploy will run."
+          fi
+
       - name: Apply D1 migrations
+        if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -38,6 +48,7 @@ jobs:
           command: d1 migrations apply azkarapp-production --remote
 
       - name: Deploy Worker
+        if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -45,6 +56,7 @@ jobs:
           command: deploy
 
       - name: Verify Worker health
+        if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
         run: |
           for attempt in $(seq 1 12); do
             body=$(curl -fsS https://azkarapp-api.amahdy59.workers.dev/v1/health || true)
