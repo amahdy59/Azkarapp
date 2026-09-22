@@ -77,7 +77,7 @@ async function handle(request: Request, env: Env) {
       status: 204,
       headers: {
         ...cors(request, env),
-        "access-control-allow-headers": "authorization, content-type",
+        "access-control-allow-headers": "authorization, content-type, if-match",
         "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
       },
     });

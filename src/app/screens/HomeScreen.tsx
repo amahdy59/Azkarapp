@@ -841,9 +841,11 @@ export function HomeScreen({
               />
             </div>
           )}
+          <div className="px-page">
+            <VisitorCount language={language} />
+          </div>
         </div>
       </div>
-      <VisitorCount language={language} />
     </ScreenContainer>
   );
 }
