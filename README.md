@@ -194,6 +194,8 @@ Pushes to `main` trigger `.github/workflows/deploy-pages.yml`, which runs the re
 
 Repository settings must use **GitHub Actions** as the Pages source. Add `VITE_SUPABASE_URL` as an Actions variable and a publishable key as `VITE_SUPABASE_PUBLISHABLE_KEY` (a secret is acceptable despite the key being public). Provider flags are Actions variables and should remain false until the corresponding provider is configured.
 
+Pushes to `main` that touch `cloudflare/**` or `wrangler.jsonc` additionally trigger `.github/workflows/deploy-worker.yml`, which applies D1 migrations, deploys the `azkarapp-api` Worker, and verifies its health endpoint. That workflow skips until the repository has `CLOUDFLARE_API_TOKEN` (Workers and D1 edit permissions) and `CLOUDFLARE_ACCOUNT_ID` secrets; without them the Worker must be deployed manually with `wrangler d1 migrations apply azkarapp-production --remote` followed by `wrangler deploy`. The `VISITOR_SALT` value itself is set once outside version control with `wrangler secret put VISITOR_SALT`.
+
 ## Maintenance workflow
 
 1. Fetch `origin/main` and confirm the working tree scope.

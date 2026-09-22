@@ -130,6 +130,13 @@ previously configured deployments. Public email OTP is disabled until Cloudflare
 Email Service is enabled on a paid plan; QR device pairing is the active
 cross-device path on the free tier.
 
+Worker releases are automated: pushes to `main` that touch `cloudflare/**` or
+`wrangler.jsonc` run `.github/workflows/deploy-worker.yml`, which applies D1
+migrations to `azkarapp-production`, deploys the Worker, and checks
+`/v1/health`. The workflow needs `CLOUDFLARE_API_TOKEN` and
+`CLOUDFLARE_ACCOUNT_ID` repository secrets and skips without them, in which
+case deploy manually with wrangler as described in the README.
+
 Supabase is optional. Without its environment variables, guest/local mode remains functional.
 
 Authentication is provider-neutral:
