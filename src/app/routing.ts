@@ -165,9 +165,13 @@ function safeDecode(value: string): string | undefined {
  * keep working.
  */
 export function parseLocation(search: string, hash: string): RouteState | null {
-  const legacyView = new URLSearchParams(search).get("view");
+  const params = new URLSearchParams(search);
+  const legacyView = params.get("view");
   if (legacyView === "auth-callback") {
     return { view: "auth-callback" };
+  }
+  if (params.has("pair")) {
+    return { view: "settings" };
   }
 
   const fromHash = parseHash(hash);

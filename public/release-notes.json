@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-21-qibla-permission",
+  "release": "2026-09-22-cloudflare-sync",
   "ar": [
-    "إذا مُنع الوصول إلى البوصلة، توضح الشاشة أين تتحقق من إذن مستشعرات الحركة ثم تعيد المحاولة.",
-    "توضح الشاشة متى يكون سهم القبلة ثابتًا ويعتمد على درجة الاتجاه من الشمال، بدل الإيحاء بأنه بوصلة مباشرة.",
-    "عند توفر قراءة موثوقة، تتحرك علامات الشمال وسهم القبلة معًا باتجاه متسق."
+    "يظهر عدد الزوار في أسفل الصفحة الرئيسية بطريقة لا تكشف بيانات شخصية.",
+    "يمكن ربط جهازين مؤقتًا عبر رمز QR من إعدادات الحساب والبيانات.",
+    "تستمر القراءة والتقدم محليًا حتى عند انقطاع الاتصال، وتتم المزامنة عند توفره."
   ],
   "en": [
-    "If compass access is blocked, the screen explains where to check motion-sensor permission before trying again.",
-    "The screen now labels the north-based Qibla arrow as static instead of implying it is a live compass.",
-    "With a reliable heading, the north marks and Qibla arrow move together consistently."
+    "The Home screen now shows a privacy-safe visitor count.",
+    "You can temporarily link two devices with a QR code from Account & data settings.",
+    "Reading and progress remain local offline, then sync when a connection is available."
   ]
 }

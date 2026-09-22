@@ -1,6 +1,7 @@
 export type { SettingsSubScreen } from "./SettingsRootPanel";
 export { SettingsRootPanel } from "./SettingsRootPanel";
 export { AccountDataPanel } from "./AccountDataPanel";
+export { QrSyncPanel } from "./QrSyncPanel";
 export { AccessibilityPanel } from "./AccessibilityPanel";
 export { DownloadsPanel } from "./DownloadsPanel";
 export { NotificationsPanel } from "./NotificationsPanel";

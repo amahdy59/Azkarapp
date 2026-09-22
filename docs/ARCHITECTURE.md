@@ -14,7 +14,7 @@ flowchart TD
   Screens --> Content["Static content and domain services"]
   State --> Storage["localStorage"]
   Hooks --> State
-  Supabase --> State
+  RemoteSync[Cloudflare Worker + D1] --> State
   App --> PWA["Service worker and update lifecycle"]
 ```
 
@@ -117,6 +117,18 @@ Private-data clearing preserves device preferences while removing account-owned 
 Geolocation is requested only after a user action. Precise coordinates remain device-local, are never synchronized to Supabase, and are not sent to a prayer-time service. No service-role Supabase credential belongs in the browser.
 
 ## Remote synchronization
+
+Cloudflare is the production sync boundary for device pairing and anonymous visitor
+aggregation. The Worker at `azkarapp-api.amahdy59.workers.dev` uses D1 tables for
+device credentials, one-time five-minute pairing tokens, progress snapshots, and
+privacy-safe visitor identifiers. Device secrets are stored only as SHA-256 hashes
+in D1; the QR contains a short-lived pairing token and never contains progress or
+credentials. Core reading remains local when the Worker is unavailable.
+
+The existing Supabase adapter remains available during the migration window for
+previously configured deployments. Public email OTP is disabled until Cloudflare
+Email Service is enabled on a paid plan; QR device pairing is the active
+cross-device path on the free tier.
 
 Supabase is optional. Without its environment variables, guest/local mode remains functional.
 

@@ -140,7 +140,9 @@ export function SettingsScreen({
   onClearLocalData,
   onDeleteAccount,
 }: SettingsScreenProps) {
-  const [sub, setSub] = useState<SettingsSubScreen>("root");
+  const [sub, setSub] = useState<SettingsSubScreen>(() =>
+    new URLSearchParams(window.location.search).has("pair") ? "account-data" : "root",
+  );
   const focusReturnSub = useRef<SettingsSubScreen>("root");
   const goBack = () => {
     const returnSub = focusReturnSub.current;

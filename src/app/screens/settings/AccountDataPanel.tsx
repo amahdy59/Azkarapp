@@ -5,6 +5,7 @@ import { Database, Download, LogOut, RotateCcw, User, Wifi } from "../../compone
 import { t } from "../../i18n";
 import type { AppLanguage } from "../../types";
 import { SectionLabel, SubHeader } from "./SettingsPrimitives";
+import { QrSyncPanel } from "./QrSyncPanel";
 
 export function AccountDataPanel({
   language,
@@ -91,6 +92,8 @@ export function AccountDataPanel({
             {t(language, isGuest ? "accountData.signIn" : "accountData.signOut")}
           </Button>
         </Card>
+
+        <QrSyncPanel language={language} />
 
         <div>
           <SectionLabel label={t(language, "accountData.yourData")} />

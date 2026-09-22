@@ -63,6 +63,7 @@ import { loadAudioModule, EMPTY_AUDIO_COVERAGE, type AudioModule } from "./audio
 import { t } from "./i18n";
 import { reportError } from "../lib/observability";
 import { useRemoteAccountSync } from "./hooks/useRemoteAccountSync";
+import { useCloudflareDeviceSync } from "./hooks/useCloudflareDeviceSync";
 import { getLocationBasedReminders, useForegroundReminders } from "./hooks/useForegroundReminders";
 import { useAuthHandlers, type ConfirmDialogOptions, type GuestMigrationDecision } from "./hooks/useAuthHandlers";
 import { useSettingsHandlers } from "./hooks/useSettingsHandlers";
@@ -960,6 +961,8 @@ function AppContent({
     requestGuestMigrationDecision,
     skipInitialHydration: view === "auth-callback",
   });
+
+  useCloudflareDeviceSync(appStateSnapshot, applyStateSnapshot);
 
   useForegroundReminders({
     reminders,

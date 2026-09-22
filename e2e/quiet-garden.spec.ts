@@ -113,10 +113,12 @@ for (const language of ["en", "ar"] as const) {
     // Three: after-prayer adhkar are tracked per prayer in their own section.
     const routineCards = garden.getByRole("button", { name: / - (Completed|Not completed|مكتملة|غير مكتملة)$/ });
     await expect(routineCards).toHaveCount(3);
-    const routineCardTops = await routineCards.evaluateAll((cards) =>
-      cards.map((card) => Math.round(card.getBoundingClientRect().top)),
-    );
-    expect(new Set(routineCardTops).size).toBe(1);
+    await expect(async () => {
+      const routineCardTops = await routineCards.evaluateAll((cards) =>
+        cards.map((card) => Math.round(card.getBoundingClientRect().top)),
+      );
+      expect(new Set(routineCardTops).size).toBe(1);
+    }).toPass();
     await expect(page.locator("html")).toHaveAttribute("dir", language === "ar" ? "rtl" : "ltr");
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(1280);
   });

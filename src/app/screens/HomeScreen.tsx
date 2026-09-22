@@ -22,6 +22,7 @@ import { ScreenContainer } from "../components/ScreenContainer";
 import { TimeOfDayBackground } from "../components/TimeOfDayBackground";
 import { getFirstIncompleteZikrIndex, getGardenSummary, getProgressDayKey } from "../progress";
 import { fridayKahfOpenedKey } from "../fridayProgress";
+import { VisitorCount } from "../components/VisitorCount";
 import type {
   AppLanguage,
   CategoryId,
@@ -842,6 +843,7 @@ export function HomeScreen({
           )}
         </div>
       </div>
+      <VisitorCount language={language} />
     </ScreenContainer>
   );
 }
