@@ -480,4 +480,10 @@ export interface AppStateSnapshot {
   quranReadingPosition?: QuranReadingPosition;
   /** The single active daily Quran plan. */
   quranWirdPlan?: QuranWirdPlan;
+  /**
+   * Partial tallies for zikrs in progress, keyed by stable zikr id.
+   * Persisted so leaving the reader, navigating between sections, or reloading
+   * the app preserves counts mid-routine until completed or explicitly reset.
+   */
+  partialZikrCounts?: Record<string, number>;
 }

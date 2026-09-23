@@ -1,6 +1,6 @@
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { CheckCircle2 } from "../../components/icons";
-import { PalmTreeMark, TodayRoutineGarden } from "../../components/RoutineGarden";
+import { PalmTreeMark } from "../../components/RoutineGarden";
 import { CATEGORIES } from "../../content/categories";
 import { formatNumerals } from "../../formatting";
 import { t } from "../../i18n";
@@ -71,13 +71,7 @@ export function ProgressPanel({
 
         {quietProgressEnabled ? (
           <>
-            {/* Embedded Routine Garden with Day, Week, Month, and 12-Month Year views */}
-            <TodayRoutineGarden
-              summary={summary}
-              language={language}
-              dailyCompletions={dailyCompletions}
-              calendarType="hijri"
-            />
+            <p className="text-sm leading-6 text-muted-foreground">{t(language, "progressPanel.preferencesHint")}</p>
 
             {/* Weekly goal */}
             <section
@@ -164,10 +158,13 @@ export function ProgressPanel({
           </div>
         </section>
 
-        <section aria-labelledby="recent-sessions-title">
-          <h2 id="recent-sessions-title" className="mb-3 text-subtitle font-bold text-foreground">
+        <details>
+          <summary
+            id="recent-sessions-title"
+            className="flex min-h-11 cursor-pointer items-center text-subtitle font-bold text-foreground focus-visible:ring-[3px] focus-visible:ring-ring"
+          >
             {t(language, "progressPanel.recentSessions")}
-          </h2>
+          </summary>
           <div className="space-y-2">
             {completedSessions.slice(0, 5).map((session) => (
               <article
@@ -197,7 +194,7 @@ export function ProgressPanel({
               </p>
             )}
           </div>
-        </section>
+        </details>
       </div>
     </div>
   );

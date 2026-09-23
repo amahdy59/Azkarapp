@@ -28,16 +28,12 @@ function randomToken(bytes = 32) {
 
 function cors(request: Request, env: Env) {
   const origin = request.headers.get("origin");
-  const allowed = new Set(
-    [
-      env.APP_ORIGIN,
-      "https://amahdy59.github.io",
-      "https://wa-zaker.com",
-      "http://localhost:5173",
-      "http://127.0.0.1:5173",
-    ].filter(Boolean),
-  );
-  return origin && allowed.has(origin) ? { "access-control-allow-origin": origin, vary: "Origin" } : {};
+  if (!origin) return {};
+  const allowed = new Set([env.APP_ORIGIN, "https://amahdy59.github.io", "https://wa-zaker.com"].filter(Boolean));
+  if (allowed.has(origin) || /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+    return { "access-control-allow-origin": origin, vary: "Origin" };
+  }
+  return {};
 }
 
 async function authenticatedDevice(request: Request, env: Env) {
@@ -85,6 +81,37 @@ async function handle(request: Request, env: Env) {
 
   if (path === "/v1/health" && request.method === "GET") return json({ ok: true });
 
+  const limits: Record<string, number> = {
+    "/v1/devices": 10,
+    "/v1/pairings": 20,
+    "/v1/pairings/claim": 20,
+    "/v1/pairings/qr": 30,
+    "/v1/visitors": 30,
+  };
+  if (limits[path]) {
+    const windowEnd = (Math.floor(Date.now() / 60_000) + 1) * 60_000;
+    const key = await sha256(
+      `${env.VISITOR_SALT}:${request.headers.get("cf-connecting-ip") ?? "local"}:${path}:${windowEnd}`,
+    );
+    const allowed = await env.DB.prepare(
+      `INSERT INTO request_limits (key, hits, expires_at) VALUES (?, 1, ?)
+       ON CONFLICT(key) DO UPDATE SET hits = hits + 1 WHERE hits < ? RETURNING hits`,
+    )
+      .bind(key, windowEnd, limits[path])
+      .first();
+    if (!allowed)
+      return json(
+        { error: "rate_limited" },
+        {
+          status: 429,
+          headers: {
+            ...cors(request, env),
+            "retry-after": String(Math.max(1, Math.ceil((windowEnd - Date.now()) / 1000))),
+          },
+        },
+      );
+  }
+
   if (path === "/v1/visitors" && request.method === "POST") {
     const address = request.headers.get("cf-connecting-ip") ?? "unknown";
     const agent = request.headers.get("user-agent") ?? "unknown";
@@ -112,9 +139,12 @@ async function handle(request: Request, env: Env) {
   if (path === "/v1/pairings" && request.method === "POST") {
     const device = await authenticatedDevice(request, env);
     if (!device) return json({ error: "unauthorized" }, { status: 401, headers: cors(request, env) });
+    const now = Date.now();
+    await env.DB.prepare("DELETE FROM pairing_tokens WHERE expires_at < ?").bind(now).run();
+    await env.DB.prepare("UPDATE devices SET last_seen_at = ? WHERE id = ?").bind(now, device.id).run();
     const token = randomToken(24);
     await env.DB.prepare("INSERT INTO pairing_tokens (token_hash, account_id, expires_at) VALUES (?, ?, ?)")
-      .bind(await sha256(token), device.account_id, Date.now() + 5 * 60_000)
+      .bind(await sha256(token), device.account_id, now + 5 * 60_000)
       .run();
     return json({ token, expiresIn: 300 }, { status: 201, headers: cors(request, env) });
   }
@@ -133,9 +163,11 @@ async function handle(request: Request, env: Env) {
 
   if (path === "/v1/pairings/claim" && request.method === "POST") {
     const body = (await request.json().catch(() => ({}))) as { token?: string };
-    if (!body.token) return json({ error: "invalid_pairing" }, { status: 400, headers: cors(request, env) });
+    if (typeof body.token !== "string" || !body.token || body.token.length > 128)
+      return json({ error: "invalid_pairing" }, { status: 400, headers: cors(request, env) });
     const hash = await sha256(body.token);
     const now = Date.now();
+    await env.DB.prepare("DELETE FROM pairing_tokens WHERE expires_at < ?").bind(now).run();
     const pairing = await env.DB.prepare(
       "SELECT account_id FROM pairing_tokens WHERE token_hash = ? AND expires_at > ? AND consumed_at IS NULL",
     )
@@ -157,12 +189,19 @@ async function handle(request: Request, env: Env) {
     const device = await authenticatedDevice(request, env);
     if (!device) return json({ error: "unauthorized" }, { status: 401, headers: cors(request, env) });
     await env.DB.prepare("DELETE FROM devices WHERE id = ?").bind(device.id).run();
+    await env.DB.prepare(
+      "DELETE FROM accounts WHERE id = ? AND NOT EXISTS (SELECT 1 FROM devices WHERE account_id = accounts.id)",
+    )
+      .bind(device.account_id)
+      .run();
     return json({ ok: true }, { headers: cors(request, env) });
   }
 
   if (path === "/v1/sync") {
     const device = await authenticatedDevice(request, env);
     if (!device) return json({ error: "unauthorized" }, { status: 401, headers: cors(request, env) });
+    const now = Date.now();
+    await env.DB.prepare("UPDATE devices SET last_seen_at = ? WHERE id = ?").bind(now, device.id).run();
     if (request.method === "GET") {
       const row = await env.DB.prepare("SELECT snapshot, revision, updated_at FROM sync_snapshots WHERE account_id = ?")
         .bind(device.account_id)
@@ -179,25 +218,27 @@ async function handle(request: Request, env: Env) {
       const serialized = JSON.stringify(body?.snapshot ?? null);
       if (serialized.length > 1_000_000)
         return json({ error: "snapshot_too_large" }, { status: 413, headers: cors(request, env) });
-      const now = Date.now();
       const expectedRevision = Number(request.headers.get("if-match") ?? "0");
-      const current = await env.DB.prepare("SELECT revision FROM sync_snapshots WHERE account_id = ?")
-        .bind(device.account_id)
-        .first<{ revision: number }>();
-      if (current && (!Number.isInteger(expectedRevision) || expectedRevision !== current.revision)) {
-        return json(
-          { error: "sync_conflict", revision: current.revision },
-          { status: 409, headers: cors(request, env) },
-        );
+      if (!Number.isSafeInteger(expectedRevision) || expectedRevision < 0) {
+        return json({ error: "invalid_revision" }, { status: 400, headers: cors(request, env) });
       }
-      await env.DB.prepare(
-        `INSERT INTO sync_snapshots (account_id, snapshot, revision, updated_at) VALUES (?, ?, 1, ?)
-         ON CONFLICT(account_id) DO UPDATE SET snapshot = excluded.snapshot,
-         revision = sync_snapshots.revision + 1, updated_at = excluded.updated_at`,
-      )
-        .bind(device.account_id, serialized, now)
-        .run();
-      return json({ ok: true, updatedAt: now }, { headers: cors(request, env) });
+      // The revision comparison and write must be one SQL operation.
+      const saved =
+        expectedRevision === 0
+          ? await env.DB.prepare(
+              "INSERT INTO sync_snapshots (account_id, snapshot, revision, updated_at) VALUES (?, ?, 1, ?) ON CONFLICT(account_id) DO NOTHING RETURNING revision",
+            )
+              .bind(device.account_id, serialized, now)
+              .first<{ revision: number }>()
+          : await env.DB.prepare(
+              "UPDATE sync_snapshots SET snapshot = ?, revision = revision + 1, updated_at = ? WHERE account_id = ? AND revision = ? RETURNING revision",
+            )
+              .bind(serialized, now, device.account_id, expectedRevision)
+              .first<{ revision: number }>();
+      if (!saved) {
+        return json({ error: "sync_conflict" }, { status: 409, headers: cors(request, env) });
+      }
+      return json({ ok: true, revision: saved.revision, updatedAt: now }, { headers: cors(request, env) });
     }
   }
 
@@ -205,6 +246,13 @@ async function handle(request: Request, env: Env) {
 }
 
 export default {
+  async scheduled(_event: unknown, env: Env) {
+    const now = Date.now();
+    await env.DB.batch([
+      env.DB.prepare("DELETE FROM request_limits WHERE expires_at <= ?").bind(now),
+      env.DB.prepare("DELETE FROM pairing_tokens WHERE expires_at <= ?").bind(now),
+    ]);
+  },
   async fetch(request: Request, env: Env) {
     try {
       return await handle(request, env);

@@ -9,6 +9,7 @@ import {
   loadAppState,
   mergeAppStates,
   normalizeAppState,
+  resetDailyPartialCounts,
   saveAppState,
   toCompletedSets,
 } from "./state";
@@ -16,6 +17,12 @@ import { getProgressDayKey, shiftProgressDayKey } from "./progress";
 
 describe("app state persistence", () => {
   beforeEach(() => window.localStorage.clear());
+
+  it("resets daily partial counts at rollover but retains situational progress", () => {
+    expect(resetDailyPartialCounts({ "m-hm-77m": 1, "ap-tasbeeh-subhanallah": 30, "travel-progress": 12 })).toEqual({
+      "travel-progress": 12,
+    });
+  });
 
   it("returns defaults when storage is empty", () => {
     expect(loadAppState()).toEqual(DEFAULT_APP_STATE);
@@ -244,6 +251,22 @@ describe("app state persistence", () => {
 
     expect(base.wirdHistory).toEqual({ "2026-08-24": [41, 42] });
     expect(merged.wirdHistory).toEqual({ "2026-08-24": [41, 42, 43] });
+  });
+
+  it("normalizes and merges in-progress partial zikr counts and clears on private data wipe", () => {
+    const base = normalizeAppState({
+      partialZikrCounts: { "zikr-1": 30, "bad-zikr": -5, "": 10, invalid: "3" as unknown as number },
+    });
+    expect(base.partialZikrCounts).toEqual({ "zikr-1": 30 });
+
+    const incoming = normalizeAppState({
+      partialZikrCounts: { "zikr-1": 31, "zikr-2": 15 },
+    });
+    const merged = mergeAppStates(base, incoming);
+    expect(merged.partialZikrCounts).toEqual({ "zikr-1": 31, "zikr-2": 15 });
+
+    const wiped = clearPrivateAppData(merged);
+    expect(wiped.partialZikrCounts).toEqual({});
   });
 
   it("migrates Reader-only saved zikr into app state", () => {

@@ -278,6 +278,7 @@ export function MushafSettingsSheet({
           <div
             role="radiogroup"
             aria-labelledby="mushaf-layout-heading"
+            aria-describedby="mushaf-layout-hint"
             className="grid grid-cols-3 gap-1.5 rounded-xl border border-border/60 bg-muted/40 p-1"
           >
             {layoutOptions.map(([id, label]) => {
@@ -301,6 +302,13 @@ export function MushafSettingsSheet({
               );
             })}
           </div>
+          <p id="mushaf-layout-hint" className="text-micro font-medium leading-snug text-muted-foreground">
+            {mushafLayout === "single"
+              ? t(language, "mushaf.layoutHintSingle")
+              : mushafLayout === "spread"
+                ? t(language, "mushaf.layoutHintSpread")
+                : t(language, "mushaf.layoutHintAuto")}
+          </p>
         </section>
       )}
 

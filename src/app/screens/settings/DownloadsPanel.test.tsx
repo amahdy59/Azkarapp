@@ -51,4 +51,48 @@ describe("DownloadsPanel", () => {
     await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("Could not remove downloaded audio"));
     expect(screen.queryByText(/raw cache/i)).not.toBeInTheDocument();
   });
+
+  it("handles Mushaf download progress and cancellation independently without affecting audio", async () => {
+    Object.defineProperty(navigator, "storage", {
+      configurable: true,
+      value: { estimate: vi.fn().mockResolvedValue({ usage: 1024, quota: 512 * 1024 * 1024 }) },
+    });
+    const { downloadMushaf } = await import("../../content/mushafOfflineCache");
+    let capturedSignal: AbortSignal | undefined;
+
+    vi.mocked(downloadMushaf).mockImplementation(async (options) => {
+      capturedSignal = options?.signal;
+      options?.onProgress?.(100, 604);
+      return new Promise((_, reject) => {
+        options?.signal?.addEventListener("abort", () => {
+          reject(new DOMException("Download cancelled", "AbortError"));
+        });
+      });
+    });
+
+    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+
+    const downloadMushafBtn = await screen.findByRole("button", { name: "Download complete Mushaf" });
+    fireEvent.click(downloadMushafBtn);
+
+    // Shows progress and cancel button
+    const cancelBtn = await screen.findByRole("button", { name: "Cancel download" });
+    expect(cancelBtn).toBeInTheDocument();
+    expect(screen.getByText(/100 of 604 pages downloaded/i)).toBeInTheDocument();
+
+    // Clicking cancel aborts the signal and displays cancelled status
+    fireEvent.click(cancelBtn);
+    expect(capturedSignal?.aborted).toBe(true);
+    await waitFor(() => {
+      expect(screen.getByText(/download cancelled/i)).toBeInTheDocument();
+    });
+  });
+
+  it("does not start a Mushaf download when estimated storage is insufficient", async () => {
+    const { downloadMushaf } = await import("../../content/mushafOfflineCache");
+    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    fireEvent.click(await screen.findByRole("button", { name: "Download complete Mushaf" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent(/space/i);
+    expect(downloadMushaf).not.toHaveBeenCalled();
+  });
 });

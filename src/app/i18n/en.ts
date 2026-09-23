@@ -533,6 +533,12 @@ const en = {
     prayerReminderBody: "{prayer} prayer is in {minutes} minutes.",
   },
   downloads: {
+    storageFull:
+      "There is not enough storage. Remove some downloads and try again. Pages already saved remain available.",
+    mushafReady: "{count} of 604 pages available offline",
+    estimatedRemaining: "Estimated remaining download: {size}. Actual size may vary.",
+    mushafDownloaded: "Mushaf available offline",
+    resumeMushaf: "Resume Mushaf download",
     downloadedAudio: "Downloaded audio",
     downloadedMushaf: "Downloaded Mushaf pages",
     mushafTitle: "Complete Mushaf offline",
@@ -651,6 +657,17 @@ const en = {
     qrSyncExpired: "This code expired or was already used.",
     qrSyncUnlink: "Unlink this device",
     qrSyncUnlinked: "This device has been unlinked.",
+    qrSyncThisDevice: "This device",
+    qrSyncStatusLinked: "Connected and syncing",
+    qrSyncStatusNotLinked: "Not connected to other devices",
+    qrSyncUnlinkConfirm:
+      "Are you sure you want to unlink this device? Your local reading progress will remain safely on this device.",
+    qrSyncCancel: "Cancel",
+    qrSyncConfirmUnlinkAction: "Yes, unlink device",
+    qrSyncLinkAnother: "Link another device",
+    qrSyncExpiresIn: "Code expires in {time}",
+    qrSyncExpiredNotice: "QR code expired. Generate a new code to pair.",
+    qrSyncOrEnterToken: "Or enter pairing code from other device",
   },
   help: {
     title: "Help & FAQ",
@@ -748,6 +765,8 @@ const en = {
     installDismissed: "Installation was not started. You can install later.",
   },
   progressPanel: {
+    preferencesHint:
+      "Adjust progress preferences here. Open Progress from the main navigation to review your day, week, or month.",
     title: "My progress",
     sinceStart: "Since you started",
     totalCompleted: "Total azkar completed",
@@ -1067,6 +1086,9 @@ const en = {
     layoutAuto: "Automatic",
     layoutSingle: "Single Page",
     layoutSpread: "Two Pages",
+    layoutHintAuto: "Shows two pages side-by-side on wide screens (>1024px) and a single page on mobile.",
+    layoutHintSingle: "Always shows a single canonical page centered on the screen.",
+    layoutHintSpread: "Displays two pages side-by-side whenever the screen has sufficient width.",
     wirdTitle: "Quran Wird",
     wirdProgress: "{read} of {goal} pages",
     wirdGoalReached: "Masha'Allah! Daily wird completed",
@@ -1464,6 +1486,13 @@ const en = {
     southWest: "South-west",
     west: "West",
     northWest: "North-west",
+    distanceToKaaba: "{distance} km to the Holy Kaaba",
+    alignmentStepsTitle: "Finding the direction",
+    alignmentStep1: "Find North (0°) using any standard compass app or landmark.",
+    alignmentStep2: "Turn clockwise to {degrees}° ({cardinal}).",
+    alignmentStep3: "Align your prayer mat in this direction.",
+    sensorToggleTitle: "Live compass alignment",
+    sensorToggleHint: "Optionally use your device's orientation sensor for real-time turn guidance.",
   },
   counter: {
     custom: "Custom",

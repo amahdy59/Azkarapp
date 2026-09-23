@@ -1,13 +1,15 @@
 {
   "ar": [
-    "أصبحت مزامنة التقدم عبر رمز QR تكتمل بموثوقية بين الجهازين المرتبطين.",
-    "انتقل عدد الزوار إلى نهاية محتوى الصفحة الرئيسية بدل ظهوره كشريط منفصل.",
-    "الأجهزة المرتبطة سابقا تستفيد من الإصلاح تلقائيا دون حاجة لإعادة الربط."
+    "أصبح عداد الذكر الجاري يُحفظ تلقائياً عند التنقل أو تحديث الصفحة دون فقدان التقدم.",
+    "توحدت متابعة ورد القرآن اليومي لعرض عدد الصفحات والتقدم الفعلي بدقة عبر كافة الشاشات.",
+    "تعرض القبلة الآن زاوية الاتجاه الدقيقة والمسافة إلى مكة مع إرشادات عملية لمصلى القبلة.",
+    "فُصلت تنزيلات المصحف والصوتيات دون تداخل مع تحسين تصفح المكتبة وتوضيح تخطيط المصحف."
   ],
   "en": [
-    "QR sync uploads now complete reliably between linked devices.",
-    "The visitor count moved into the end of the Home content instead of a separate strip.",
-    "Already-linked devices pick up the fix automatically with no need to relink."
+    "In-progress zikr counts now persist smoothly when switching screens or reloading.",
+    "Quran wird reading progress and daily goals now display unified fractional progress across all screens.",
+    "Qiblah now highlights your exact bearing, cardinal direction, and distance to Mecca with practical alignment steps.",
+    "Offline Quran and audio downloads now operate independently with enhanced library filtering and desktop page layout guidance."
   ],
-  "release": "2026-09-23-sync-repair"
+  "release": "2026-09-23-audit-fixes"
 }

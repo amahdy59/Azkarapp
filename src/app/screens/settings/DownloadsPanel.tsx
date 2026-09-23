@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Card } from "../../components/Card";
 import { Button } from "../../components/ui/button";
-import { CheckCircle2, CloudOff, Database, Download, RotateCcw, X } from "../../components/icons";
+import { CloudOff, Database, Download, RotateCcw, X } from "../../components/icons";
 import { t } from "../../i18n";
 import type { AppLanguage } from "../../types";
 import { formatNumerals } from "../../formatting";
@@ -18,6 +18,7 @@ import {
   removeDownloadedAudio,
 } from "../../audio/audioOfflineCache";
 import { downloadMushaf, getMushafDownloadStatus, removeDownloadedMushaf } from "../../content/mushafOfflineCache";
+import { hasDownloadSpace, isStorageQuotaError, MUSHAF_ESTIMATED_PAGE_BYTES } from "../../content/downloadStorage";
 
 type OfflineStatus = {
   cacheCount: number;
@@ -44,7 +45,8 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
   const [successMessage, setSuccessMessage] = useState("");
   const [downloadProgress, setDownloadProgress] = useState<{ completed: number; total: number } | null>(null);
   const [mushafProgress, setMushafProgress] = useState<{ completed: number; total: number } | null>(null);
-  const abortRef = useRef<AbortController | null>(null);
+  const mushafAbortRef = useRef<AbortController | null>(null);
+  const audioAbortRef = useRef<AbortController | null>(null);
   const [audioPreferences, setAudioPreferences] = useState(loadAudioPreferences);
   const voices = useMemo(() => getAudioVoices(language), [language]);
 
@@ -59,6 +61,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
       return next;
     });
   }, []);
+
   const audioCollections = useMemo(
     () =>
       (["morning", "evening", "before_sleep"] as const).map((category) => {
@@ -101,16 +104,20 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
 
   useEffect(() => {
     void refreshStatus();
-    return () => abortRef.current?.abort();
+    return () => {
+      mushafAbortRef.current?.abort();
+      audioAbortRef.current?.abort();
+    };
   }, [refreshStatus]);
 
   const downloadCollection = async (collection: (typeof audioCollections)[number]) => {
     const controller = new AbortController();
-    abortRef.current = controller;
+    audioAbortRef.current = controller;
     setErrorMessage("");
     setSuccessMessage("");
     setDownloadProgress({ completed: 0, total: collection.byteSize });
     try {
+      if (!(await hasDownloadSpace(collection.byteSize))) throw new DOMException("Storage full", "QuotaExceededError");
       await downloadAudioForZikrs(collection.zikrs, audioPreferences, {
         signal: controller.signal,
         onProgress: (completed, total) => setDownloadProgress({ completed, total }),
@@ -118,14 +125,17 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
       await refreshStatus();
       setSuccessMessage(t(language, "downloads.downloadComplete"));
     } catch (error) {
+      await refreshStatus();
       if (controller.signal.aborted) {
         setSuccessMessage(t(language, "downloads.downloadCancelled"));
       } else {
         reportError(error, "audio-download");
-        setErrorMessage(t(language, "downloads.downloadErrorDescription"));
+        setErrorMessage(
+          t(language, isStorageQuotaError(error) ? "downloads.storageFull" : "downloads.downloadErrorDescription"),
+        );
       }
     } finally {
-      abortRef.current = null;
+      audioAbortRef.current = null;
       setDownloadProgress(null);
     }
   };
@@ -158,11 +168,16 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
 
   const downloadCompleteMushaf = async () => {
     const controller = new AbortController();
-    abortRef.current = controller;
+    mushafAbortRef.current = controller;
     setErrorMessage("");
     setSuccessMessage("");
     setMushafProgress({ completed: 0, total: 604 });
     try {
+      if (
+        !(await hasDownloadSpace(Math.max(0, 604 - (status?.downloadedMushafPages ?? 0)) * MUSHAF_ESTIMATED_PAGE_BYTES))
+      ) {
+        throw new DOMException("Storage full", "QuotaExceededError");
+      }
       await downloadMushaf({
         signal: controller.signal,
         onProgress: (completed, total) => setMushafProgress({ completed, total }),
@@ -170,141 +185,70 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
       await refreshStatus();
       setSuccessMessage(t(language, "downloads.mushafDownloadComplete"));
     } catch (error) {
-      if (controller.signal.aborted) setSuccessMessage(t(language, "downloads.downloadCancelled"));
-      else {
+      await refreshStatus();
+      if (controller.signal.aborted) {
+        setSuccessMessage(t(language, "downloads.downloadCancelled"));
+      } else {
         reportError(error, "mushaf-download");
-        setErrorMessage(t(language, "downloads.downloadErrorDescription"));
+        setErrorMessage(
+          t(language, isStorageQuotaError(error) ? "downloads.storageFull" : "downloads.downloadErrorDescription"),
+        );
       }
     } finally {
-      abortRef.current = null;
+      mushafAbortRef.current = null;
       setMushafProgress(null);
     }
   };
+
+  const isAnyJobActive = downloadProgress !== null || mushafProgress !== null;
 
   return (
     <div className="slide-in-from-right flex h-full flex-col bg-background/50 backdrop-blur-md">
       <SubHeader title={t(language, "downloads.title")} onBack={onBack} language={language} />
       <div className="flex-1 space-y-4 overflow-y-auto px-4 pb-8 pt-3">
+        {/* Card 1: What works offline out of the box */}
         <InformationCard
           icon={<CloudOff size={20} aria-hidden="true" />}
           title={t(language, "downloads.bundledTitle")}
           body={t(language, "downloads.bundledBody")}
         />
 
-        <Card as="section" padding="lg" aria-labelledby="audio-reciter-title">
-          <h2 id="audio-reciter-title" className="text-subtitle font-extrabold text-foreground">
-            {t(language, "downloads.reciterTitle")}
-          </h2>
-          <p className="mt-1 text-xs leading-5 text-muted-foreground">{t(language, "downloads.reciterHint")}</p>
-          <label
-            className="mt-3 flex min-h-11 items-center justify-between gap-3 text-label font-semibold text-foreground"
-            htmlFor="audio-reciter"
-          >
-            <span>{t(language, "downloads.reciterLabel")}</span>
-            <select
-              id="audio-reciter"
-              value={audioPreferences.duaVoiceId}
-              onChange={(event) => handleVoiceChange(event.target.value)}
-              className="h-11 max-w-[60%] rounded-xl border border-border-control bg-background px-3 text-label font-bold text-foreground"
-              dir={language === "ar" ? "rtl" : "ltr"}
-            >
-              {voices.map((voice) => (
-                <option key={voice.id} value={voice.id}>
-                  {language === "ar" ? voice.nameArabic : voice.nameEnglish}
-                </option>
-              ))}
-            </select>
-          </label>
-        </Card>
-
-        <Card as="section" padding="lg" aria-labelledby="offline-status-title">
-          <div className="flex items-start gap-3">
-            <span
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-muted"
-              aria-hidden="true"
-            >
-              {status?.serviceWorkerReady ? (
-                <CheckCircle2 size={22} className="text-primary" />
-              ) : (
-                <Database size={22} className="text-primary" />
-              )}
-            </span>
-            <div className="min-w-0 flex-1">
-              <h2 id="offline-status-title" className="text-title font-semibold text-foreground">
-                {t(language, "downloads.statusTitle")}
-              </h2>
-              {isLoading ? (
-                <p className="mt-1 text-sm text-muted-foreground" role="status">
-                  {t(language, "downloads.checking")}
-                </p>
-              ) : status ? (
-                <dl className="mt-2 space-y-2 text-sm">
-                  <div className="flex justify-between gap-3">
-                    <dt className="text-muted-foreground">{t(language, "downloads.serviceWorker")}</dt>
-                    <dd className="font-medium text-foreground">
-                      {status.serviceWorkerReady ? t(language, "downloads.active") : t(language, "downloads.inactive")}
-                    </dd>
-                  </div>
-                  <div className="flex justify-between gap-3">
-                    <dt className="text-muted-foreground">{t(language, "downloads.downloadedMushaf")}</dt>
-                    <dd className="font-medium text-foreground">
-                      {formatNumerals(status.downloadedMushafPages, language)} / {formatNumerals(604, language)}
-                    </dd>
-                  </div>
-                  <div className="flex justify-between gap-3">
-                    <dt className="text-muted-foreground">{t(language, "downloads.caches")}</dt>
-                    <dd className="font-medium text-foreground">{status.cacheCount}</dd>
-                  </div>
-                  <div className="flex justify-between gap-3">
-                    <dt className="text-muted-foreground">{t(language, "downloads.storageUsed")}</dt>
-                    <dd className="font-medium text-foreground">{formatMegabytes(status.usageBytes, language)}</dd>
-                  </div>
-                  <div className="flex justify-between gap-3">
-                    <dt className="text-muted-foreground">{t(language, "downloads.quota")}</dt>
-                    <dd className="font-medium text-foreground">{formatMegabytes(status.quotaBytes, language)}</dd>
-                  </div>
-                  <div className="flex justify-between gap-3">
-                    <dt className="text-muted-foreground">{t(language, "downloads.downloadedAudio")}</dt>
-                    <dd className="font-medium text-foreground">
-                      {status.downloadedAudioAssets} · {formatMegabytes(status.downloadedAudioBytes, language)}
-                    </dd>
-                  </div>
-                </dl>
-              ) : null}
-            </div>
-          </div>
-
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => void refreshStatus()}
-            disabled={isLoading}
-            className="mt-4 w-full"
-          >
-            <RotateCcw size={18} aria-hidden="true" />
-            {t(language, "downloads.refresh")}
-          </Button>
-
-          {errorMessage && (
-            <p className="mt-3 text-sm text-destructive" role="alert">
-              {errorMessage}
-            </p>
-          )}
-        </Card>
-
+        {/* Card 2: Complete Offline Mushaf */}
         <Card as="section" padding="lg" aria-labelledby="mushaf-download-title">
-          <h2 id="mushaf-download-title" className="text-title font-semibold text-foreground">
+          <h2 id="mushaf-download-title" className="text-subtitle font-extrabold text-foreground">
             {t(language, "downloads.mushafTitle")}
           </h2>
-          <p className="mt-1 text-sm leading-[22px] text-muted-foreground">{t(language, "downloads.mushafBody")}</p>
+          <p className="mt-1 text-xs leading-5 text-muted-foreground">{t(language, "downloads.mushafBody")}</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {t(language, "downloads.mushafReady", {
+              count: formatNumerals(status?.downloadedMushafPages ?? 0, language),
+            })}
+          </p>
+          {(status?.downloadedMushafPages ?? 0) < 604 && (
+            <p className="mt-1 text-xs text-muted-foreground">
+              {t(language, "downloads.estimatedRemaining", {
+                size: formatMegabytes(
+                  (604 - (status?.downloadedMushafPages ?? 0)) * MUSHAF_ESTIMATED_PAGE_BYTES,
+                  language,
+                ),
+              })}
+            </p>
+          )}
           <Button
             type="button"
             onClick={() => void downloadCompleteMushaf()}
-            disabled={downloadProgress !== null || mushafProgress !== null}
+            disabled={isAnyJobActive || status?.downloadedMushafPages === 604}
             className="mt-4 w-full"
           >
             <Download size={18} aria-hidden="true" />
-            {t(language, "downloads.downloadMushaf")}
+            {t(
+              language,
+              status?.downloadedMushafPages === 604
+                ? "downloads.mushafDownloaded"
+                : (status?.downloadedMushafPages ?? 0) > 0
+                  ? "downloads.resumeMushaf"
+                  : "downloads.downloadMushaf",
+            )}
           </Button>
           {mushafProgress && (
             <div className="mt-3">
@@ -323,7 +267,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => abortRef.current?.abort()}
+                onClick={() => mushafAbortRef.current?.abort()}
                 className="mt-2 w-full border-border"
               >
                 <X size={18} aria-hidden="true" />
@@ -336,6 +280,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
             <Button
               type="button"
               variant="outline"
+              disabled={isAnyJobActive}
               onClick={() => void removeMushaf()}
               className="mt-3 w-full border-destructive/40 text-destructive"
             >
@@ -344,11 +289,33 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
           )}
         </Card>
 
+        {/* Card 3: Optional Audio Downloads */}
         <Card as="section" padding="lg" aria-labelledby="audio-downloads-title">
-          <h2 id="audio-downloads-title" className="text-title font-semibold text-foreground">
+          <h2 id="audio-downloads-title" className="text-subtitle font-extrabold text-foreground">
             {t(language, "downloads.optionalAudioDownloads")}
           </h2>
-          <p className="mt-1 text-sm leading-[22px] text-muted-foreground">{t(language, "downloads.approvedOnly")}</p>
+          <p className="mt-1 text-xs leading-5 text-muted-foreground">{t(language, "downloads.approvedOnly")}</p>
+
+          <label
+            className="mt-3 flex min-h-11 items-center justify-between gap-3 text-label font-semibold text-foreground"
+            htmlFor="audio-reciter"
+          >
+            <span>{t(language, "downloads.reciterLabel")}</span>
+            <select
+              id="audio-reciter"
+              value={audioPreferences.duaVoiceId}
+              onChange={(event) => handleVoiceChange(event.target.value)}
+              disabled={isAnyJobActive}
+              className="h-11 max-w-[60%] rounded-xl border border-border-control bg-background px-3 text-label font-bold text-foreground disabled:opacity-50"
+              dir={language === "ar" ? "rtl" : "ltr"}
+            >
+              {voices.map((voice) => (
+                <option key={voice.id} value={voice.id}>
+                  {language === "ar" ? voice.nameArabic : voice.nameEnglish}
+                </option>
+              ))}
+            </select>
+          </label>
 
           <div className="mt-4 grid gap-2">
             {audioCollections.map((collection) => {
@@ -364,9 +331,9 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
                 <button
                   key={collection.category}
                   type="button"
-                  disabled={collection.byteSize === 0 || downloadProgress !== null}
+                  disabled={collection.byteSize === 0 || isAnyJobActive}
                   onClick={() => void downloadCollection(collection)}
-                  className="flex min-h-11 items-center justify-between gap-3 rounded-xl border border-border bg-background px-3 text-start font-semibold text-foreground disabled:opacity-50"
+                  className="flex min-h-11 items-center justify-between gap-3 rounded-xl border border-border bg-background px-3 text-start font-semibold text-foreground disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <span className="flex items-center gap-2">
                     <Download size={18} aria-hidden="true" />
@@ -407,7 +374,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => abortRef.current?.abort()}
+                onClick={() => audioAbortRef.current?.abort()}
                 className="mt-2 w-full border-border"
               >
                 <X size={18} aria-hidden="true" />
@@ -419,18 +386,89 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
           <Button
             type="button"
             variant="outline"
-            disabled={!status?.downloadedAudioAssets || downloadProgress !== null}
+            disabled={!status?.downloadedAudioAssets || isAnyJobActive}
             onClick={() => void removeDownloads()}
             className="mt-3 w-full border-destructive/40 text-destructive"
           >
             {t(language, "downloads.removeDownloadedAudio")}
           </Button>
-          {successMessage && (
-            <p className="mt-3 text-center text-label font-semibold text-primary" role="status" aria-live="polite">
-              {successMessage}
-            </p>
-          )}
         </Card>
+
+        {/* Card 4: Technical Diagnostics in an expandable disclosure */}
+        <details className="rounded-2xl border border-border/60 bg-card p-4 transition-colors">
+          <summary className="flex cursor-pointer select-none items-center justify-between text-subtitle font-semibold text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <span className="flex items-center gap-2">
+              <Database size={18} className="text-primary" aria-hidden="true" />
+              {t(language, "downloads.statusTitle")}
+            </span>
+            <span className="text-xs font-semibold text-muted-foreground">
+              {status?.serviceWorkerReady ? t(language, "downloads.active") : t(language, "downloads.inactive")}
+            </span>
+          </summary>
+          <div className="mt-3 border-t border-border/60 pt-3">
+            {isLoading ? (
+              <p className="text-sm text-muted-foreground" role="status">
+                {t(language, "downloads.checking")}
+              </p>
+            ) : status ? (
+              <dl className="space-y-2 text-sm">
+                <div className="flex justify-between gap-3">
+                  <dt className="text-muted-foreground">{t(language, "downloads.serviceWorker")}</dt>
+                  <dd className="font-medium text-foreground">
+                    {status.serviceWorkerReady ? t(language, "downloads.active") : t(language, "downloads.inactive")}
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <dt className="text-muted-foreground">{t(language, "downloads.downloadedMushaf")}</dt>
+                  <dd className="font-medium text-foreground">
+                    {formatNumerals(status.downloadedMushafPages, language)} / {formatNumerals(604, language)}
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <dt className="text-muted-foreground">{t(language, "downloads.caches")}</dt>
+                  <dd className="font-medium text-foreground">{status.cacheCount}</dd>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <dt className="text-muted-foreground">{t(language, "downloads.storageUsed")}</dt>
+                  <dd className="font-medium text-foreground">{formatMegabytes(status.usageBytes, language)}</dd>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <dt className="text-muted-foreground">{t(language, "downloads.quota")}</dt>
+                  <dd className="font-medium text-foreground">{formatMegabytes(status.quotaBytes, language)}</dd>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <dt className="text-muted-foreground">{t(language, "downloads.downloadedAudio")}</dt>
+                  <dd className="font-medium text-foreground">
+                    {status.downloadedAudioAssets} · {formatMegabytes(status.downloadedAudioBytes, language)}
+                  </dd>
+                </div>
+              </dl>
+            ) : null}
+
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => void refreshStatus()}
+              disabled={isLoading || isAnyJobActive}
+              className="mt-4 w-full"
+            >
+              <RotateCcw size={18} aria-hidden="true" />
+              {t(language, "downloads.refresh")}
+            </Button>
+          </div>
+        </details>
+
+        {/* Global Feedback Messages */}
+        {errorMessage && (
+          <p className="mt-3 text-center text-sm font-semibold text-destructive" role="alert">
+            {errorMessage}
+          </p>
+        )}
+        {successMessage && (
+          <p className="mt-3 text-center text-label font-semibold text-primary" role="status" aria-live="polite">
+            {successMessage}
+          </p>
+        )}
       </div>
     </div>
   );

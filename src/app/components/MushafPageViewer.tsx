@@ -1206,7 +1206,12 @@ export function MushafPageViewer({
       </h1>
       {/* Live region announcing page changes to assistive technology */}
       <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
-        {t(language, "mushaf.pageLabel", { page: formatNumerals(pageNumber, language) })}
+        {facingPage
+          ? t(language, "mushaf.spreadLabel", {
+              first: formatNumerals(pageNumber, language),
+              second: formatNumerals(facingPage.pageNumber, language),
+            })
+          : t(language, "mushaf.pageLabel", { page: formatNumerals(pageNumber, language) })}
       </div>
       {!useRail && (
         <nav className="sr-only" aria-label={t(language, "mushaf.pageNavigation")}>

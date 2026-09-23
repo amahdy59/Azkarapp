@@ -45,6 +45,7 @@ export function useSessionHandlers({
   setView,
   setActiveTab,
   showConfirm,
+  onResetPartialCounts,
 }: {
   activeCat: CategoryId;
   setActiveCat: (cat: CategoryId) => void;
@@ -87,6 +88,7 @@ export function useSessionHandlers({
     onConfirm: () => void | Promise<void>,
     destructive?: boolean,
   ) => void;
+  onResetPartialCounts?: (ids: string[]) => void;
 }) {
   const [sessionStart, setSessionStart] = useState(Date.now());
   const [isRepeatSession, setIsRepeatSession] = useState(false);
@@ -106,6 +108,9 @@ export function useSessionHandlers({
       t(selectedLang, "common.reset"),
       t(selectedLang, "common.cancel"),
       () => {
+        onResetPartialCounts?.(
+          sessionAzkar(catId, "complete", subCat).map((zikr) => prefixZikrId(catId, zikr.id, subCat)),
+        );
         setCompleted((prev) => {
           const next = { ...prev };
           if (catId === "after_prayer" && subCat) {

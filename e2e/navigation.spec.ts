@@ -49,6 +49,9 @@ test("@cross-browser More keeps Qibla, Masbaha, and Settings easy to reach", asy
     );
     expect(overflow).toBeLessThanOrEqual(1);
     if (viewport.width === 320) {
+      const compassDisclosure = page.locator("details").filter({ hasText: "Live compass" });
+      await compassDisclosure.locator("summary").click();
+      await expect(compassDisclosure).toHaveAttribute("open", "");
       const qiblaSurface = page.locator(".app-screen-surface");
       await expect
         .poll(() =>
@@ -94,6 +97,9 @@ test("Qibla keeps the static bearing and explains Android sensor denial", async 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/#/qibla");
 
+  const compassDisclosure = page.locator("details").filter({ hasText: "Live compass" });
+  await compassDisclosure.locator("summary").click();
+  await expect(compassDisclosure).toHaveAttribute("open", "");
   await page.getByRole("button", { name: "Enable live compass" }).click();
   await expect(page.getByText(/Settings → Site settings → Motion sensors/)).toBeVisible();
   await expect(page.getByRole("button", { name: "Enable live compass" })).toHaveAttribute("aria-pressed", "false");

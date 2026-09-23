@@ -1,5 +1,42 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { getAzkarForMode } from "../src/app/content/azkar";
+
+test("thirty tasbeeh counts survive leaving the collection and reloading", async ({ page }) => {
+  await page.addInitScript(() => {
+    if (localStorage.getItem("azkarapp.onboarding-complete.v1")) return;
+    localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+    localStorage.setItem(
+      "azkarapp.state.v1",
+      JSON.stringify({
+        settings: { language: "en", reduceMotion: true, routineModes: { morning: "complete" } },
+        profile: { displayName: "Guest", isGuest: true },
+      }),
+    );
+  });
+  const index = getAzkarForMode("morning", "complete").findIndex((zikr) => zikr.id === "m-hm-91");
+  expect(index).toBeGreaterThanOrEqual(0);
+  const route = `/#/azkar/morning/${index + 1}`;
+  await page.goto(route);
+  const counter = page.getByTestId("counter-surface");
+  await expect(counter).toHaveAttribute("aria-label", /0 \/ 100$/);
+  for (let count = 0; count < 30; count++) await counter.click();
+  await expect(counter).toHaveAttribute("aria-label", /30 \/ 100$/);
+  await page.getByRole("button", { name: "Back", exact: true }).click();
+  // A direct Reader URL can return either to its collection or Home depending
+  // on whether the app has established an in-app history entry. The persistent
+  // bottom navigation is the stable contract for leaving either destination.
+  await page.getByTestId("nav-home").click();
+  await expect(page).toHaveURL(/#\/home$/);
+  await page.evaluate((hash) => {
+    window.location.hash = hash;
+  }, route.slice(1));
+  await expect(counter).toHaveAttribute("aria-label", /30 \/ 100$/);
+  await page.reload();
+  await expect(counter).toHaveAttribute("aria-label", /30 \/ 100$/);
+  await counter.click();
+  await expect(counter).toHaveAttribute("aria-label", /31 \/ 100$/);
+});
 
 type ReadingDirection = "ltr" | "rtl";
 

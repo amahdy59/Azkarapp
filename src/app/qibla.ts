@@ -31,3 +31,19 @@ export function smoothCompassHeading(previous: number | null, next: number): num
   if (Math.abs(shortestDelta) >= 45) return normalizeDegrees(next);
   return normalizeDegrees(previous + shortestDelta * 0.25);
 }
+
+/** Great-circle distance to the Kaaba in kilometers. */
+export function getKaabaDistance(latitude: number, longitude: number): number {
+  const EARTH_RADIUS_KM = 6371;
+  const toRadians = (degrees: number) => (degrees * Math.PI) / 180;
+  const lat1 = toRadians(latitude);
+  const lat2 = toRadians(KAABA_LATITUDE);
+  const dLat = toRadians(KAABA_LATITUDE - latitude);
+  const dLon = toRadians(KAABA_LONGITUDE - longitude);
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return Math.round(EARTH_RADIUS_KM * c);
+}

@@ -262,4 +262,32 @@ describe("AzkarLibraryScreen", () => {
     fireEvent.click(clearActions[0]);
     expect(input.value).toBe("");
   });
+
+  it("provides horizontal scroll affordances for category filter chips", () => {
+    render(
+      <AzkarLibraryScreen
+        completed={{} as Record<CategoryId, Set<string>>}
+        language="en"
+        direction="ltr"
+        routineModes={{ morning: "core", evening: "core", before_sleep: "core", after_prayer: "core" }}
+        onCategory={() => undefined}
+        onZikr={() => undefined}
+        onSearch={() => undefined}
+        savedZikrIds={new Set()}
+      />,
+    );
+
+    const scrollContainer = screen.getByTestId("library-category-group-scroll");
+    expect(scrollContainer).toBeInTheDocument();
+
+    // Mock scroll dimensions
+    Object.defineProperty(scrollContainer, "scrollWidth", { configurable: true, value: 500 });
+    Object.defineProperty(scrollContainer, "clientWidth", { configurable: true, value: 300 });
+    Object.defineProperty(scrollContainer, "scrollLeft", { configurable: true, value: 50, writable: true });
+
+    fireEvent.scroll(scrollContainer);
+
+    expect(screen.getByTestId("library-scroll-fade-start")).toBeInTheDocument();
+    expect(screen.getByTestId("library-scroll-fade-end")).toBeInTheDocument();
+  });
 });

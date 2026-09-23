@@ -118,6 +118,26 @@ Geolocation is requested only after a user action. Precise coordinates remain de
 
 ## Remote synchronization
 
+### Review remediation (Phase 59)
+
+Cloudflare snapshot writes compare and advance revisions atomically in D1, including
+the first insert. Device creation, pairing/claim, QR generation, and visitor endpoints
+use hashed-IP minute buckets; migration `0002_request_limits.sql` is required before
+deploying this Worker. Its hourly scheduled handler removes expired buckets and pairing
+tokens. Snapshot sanitization excludes `settings.location`, but permits prayer attendance
+records whose `location` is `home` or `mosque`.
+
+Partial zikr counts stay local. After-prayer entries use the same prayer-prefixed keys as
+completed progress. Explicit collection resets clear the matching partial entries; local
+midnight clears daily collections only, retaining situational progress. The mounted reader
+receives a reset identity so its in-memory counter follows these changes.
+
+Mushaf downloads estimate remaining storage conservatively (224 KiB per unfinished page
+plus 15% headroom). Estimates are advisory, not reservations; unsupported estimates fall
+back to normal cache-write error handling. A failed job aborts and drains sibling requests
+before exposing retry/removal controls. Cached page JSON and its font must both exist for
+a page to be reported ready.
+
 Cloudflare is the production sync boundary for device pairing and anonymous visitor
 aggregation. The Worker at `azkarapp-api.amahdy59.workers.dev` uses D1 tables for
 device credentials, one-time five-minute pairing tokens, progress snapshots, and

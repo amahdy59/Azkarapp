@@ -44,6 +44,32 @@ function tapEventOn(target: Element) {
 }
 
 describe("useZikrCounter", () => {
+  it("resets an open reader at the progress day boundary", () => {
+    const z = makeZikr({ id: "boundary", repetitionCount: 33 });
+    const { result, rerender } = renderHook(
+      ({ resetKey, counts }) =>
+        useZikrCounter({
+          z,
+          idx: 0,
+          isDone: false,
+          language: "en",
+          azkarLength: 1,
+          collectionCompletedCount: 0,
+          hapticFeedback: false,
+          vibrate: vi.fn(),
+          onComplete: vi.fn(),
+          onAdvance: vi.fn(),
+          resetKey,
+          initialPartialCounts: counts,
+        }),
+      { initialProps: { resetKey: "2026-09-23", counts: { boundary: 30 } as Record<string, number> } },
+    );
+    expect(result.current.count).toBe(30);
+    rerender({ resetKey: "2026-09-24", counts: {} });
+    expect(result.current.count).toBe(0);
+    act(() => result.current.handleTap());
+    expect(result.current.count).toBe(1);
+  });
   it("counts up and reports completion once the repetition target is reached", () => {
     const { result, onComplete } = setup({});
 
@@ -220,5 +246,44 @@ describe("useZikrCounter", () => {
     const { result } = setup({ isDone: true, z: makeZikr({ repetitionCount: 3 }) });
     expect(result.current.count).toBe(3);
     expect(result.current.complete).toBe(true);
+  });
+
+  it("initializes from initialPartialCounts (30/33 scenario) and restores count on mount", () => {
+    const tasbeeh = makeZikr({ id: "z-tasbeeh", repetitionCount: 33 });
+    const onPartialCountChange = vi.fn();
+    const { result } = setup({
+      z: tasbeeh,
+      initialPartialCounts: { "z-tasbeeh": 30 },
+      onPartialCountChange,
+    });
+
+    expect(result.current.count).toBe(30);
+    expect(result.current.complete).toBe(false);
+
+    act(() => result.current.handleTap());
+    expect(result.current.count).toBe(31);
+    expect(onPartialCountChange).toHaveBeenCalledWith("z-tasbeeh", 31);
+
+    act(() => result.current.handleTap());
+    act(() => result.current.handleTap());
+    expect(result.current.count).toBe(33);
+    expect(result.current.complete).toBe(true);
+    // On completion, partial count is cleared
+    expect(onPartialCountChange).toHaveBeenCalledWith("z-tasbeeh", 0);
+  });
+
+  it("calls onPartialCountChange with 0 when zikr is reset", () => {
+    const tasbeeh = makeZikr({ id: "z-tasbeeh", repetitionCount: 33 });
+    const onPartialCountChange = vi.fn();
+    const { result } = setup({
+      z: tasbeeh,
+      initialPartialCounts: { "z-tasbeeh": 30 },
+      onPartialCountChange,
+    });
+
+    expect(result.current.count).toBe(30);
+    act(() => result.current.handleReset());
+    expect(result.current.count).toBe(0);
+    expect(onPartialCountChange).toHaveBeenCalledWith("z-tasbeeh", 0);
   });
 });

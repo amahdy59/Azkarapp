@@ -190,6 +190,7 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
   quranLastReadingEvent: undefined,
   quranReadingPosition: { page: 1, surahNumber: 1, ayahNumber: 1, juzNumber: 1 },
   quranWirdPlan: { kind: "daily", dailyPages: 4 },
+  partialZikrCounts: {},
 };
 
 function isLanguage(value: string): value is AppLanguage {
@@ -278,6 +279,24 @@ function normalizeSurahReadingPages(value: unknown): Record<string, number> {
       ([zikrId, page]) => zikrId.length > 0 && Number.isInteger(page) && Number(page) >= 1 && Number(page) <= 604,
     ),
   ) as Record<string, number>;
+}
+
+/** Zikr id to in-progress partial tally, dropping anything that is not a positive integer. */
+function normalizePartialZikrCounts(value: unknown): Record<string, number> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  return Object.fromEntries(
+    Object.entries(value).filter(
+      ([zikrId, count]) => zikrId.length > 0 && Number.isInteger(count) && Number(count) >= 1 && Number(count) <= 10000,
+    ),
+  ) as Record<string, number>;
+}
+
+/** Match completed-state rollover: situational collections remain resumable. */
+export function resetDailyPartialCounts(counts: Record<string, number>): Record<string, number> {
+  const dailyIds = new Set(
+    ALL_AZKAR.filter((zikr) => DAILY_ROUTINE_CATEGORY_IDS.includes(zikr.category)).map((zikr) => zikr.id),
+  );
+  return Object.fromEntries(Object.entries(counts).filter(([id]) => !dailyIds.has(id.split(":").at(-1)!)));
 }
 
 function normalizeWirdHistory(value: unknown): Record<string, number[]> {
@@ -862,6 +881,9 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
         ? Math.floor(parsed.dailyWirdGoal)
         : 4,
     ),
+    partialZikrCounts: isNewDay
+      ? resetDailyPartialCounts(normalizePartialZikrCounts(parsed.partialZikrCounts))
+      : normalizePartialZikrCounts(parsed.partialZikrCounts),
     ...(typeof parsed.lastActiveDayKey === "string" ? { lastActiveDayKey: currentDayKey } : {}),
   };
 }
@@ -1209,6 +1231,10 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
       incoming.quranWirdPlan ?? safeBase.quranWirdPlan,
       incoming.dailyWirdGoal ?? safeBase.dailyWirdGoal ?? 4,
     ),
+    partialZikrCounts: {
+      ...normalizePartialZikrCounts(safeBase.partialZikrCounts),
+      ...normalizePartialZikrCounts(incoming.partialZikrCounts),
+    },
   };
 }
 
@@ -1233,5 +1259,6 @@ export function clearPrivateAppData(state: AppStateSnapshot): AppStateSnapshot {
     quranWirdCompletionAnnounced: undefined,
     quranLastReadingEvent: undefined,
     quranReadingPosition: DEFAULT_APP_STATE.quranReadingPosition,
+    partialZikrCounts: {},
   };
 }

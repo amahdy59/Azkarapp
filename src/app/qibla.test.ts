@@ -1,10 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { getQiblaBearing, getQiblaTurn, normalizeDegrees, smoothCompassHeading } from "./qibla";
+import { getKaabaDistance, getQiblaBearing, getQiblaTurn, normalizeDegrees, smoothCompassHeading } from "./qibla";
 
 describe("Qibla direction", () => {
-  it("calculates known bearings without a network request", () => {
+  it("calculates known bearings and distance without a network request", () => {
     expect(getQiblaBearing(30.0444, 31.2357)).toBeCloseTo(136.1, 1);
     expect(getQiblaBearing(51.5072, -0.1276)).toBeCloseTo(119, 1);
+    expect(getKaabaDistance(30.0444, 31.2357)).toBe(1287);
   });
 
   it("normalizes headings and chooses the shortest turn", () => {

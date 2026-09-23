@@ -82,4 +82,52 @@ describe("DailyCompanionsCard", () => {
     expect(screen.getByText("٥ صلوات في المسجد")).toBeInTheDocument();
     expect(screen.getByText("5/5")).toBeInTheDocument();
   });
+
+  it("renders in-progress fractional pages correctly for Arabic and English", () => {
+    const { rerender } = render(
+      <DailyCompanionsCard
+        language="ar"
+        quranWird={false}
+        quranProgress={{ progress: 1, goal: 4 }}
+        mosquePrayers={null}
+        onToggleQuranWird={vi.fn()}
+        onCycleMosquePrayers={vi.fn()}
+      />,
+    );
+
+    // In Arabic: subtitle "١ / ٤ صفحة" and badge "١/٤"
+    expect(screen.getByText("١ / ٤ صفحة")).toBeInTheDocument();
+    expect(screen.getByText("١/٤")).toBeInTheDocument();
+
+    // In English: subtitle "1 / 4 pages" and badge "1/4"
+    rerender(
+      <DailyCompanionsCard
+        language="en"
+        quranWird={false}
+        quranProgress={{ progress: 1, goal: 4 }}
+        mosquePrayers={null}
+        onToggleQuranWird={vi.fn()}
+        onCycleMosquePrayers={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText("1 / 4 pages")).toBeInTheDocument();
+    expect(screen.getByText("1/4")).toBeInTheDocument();
+  });
+
+  it("renders completed state with progress badge when goal is achieved", () => {
+    render(
+      <DailyCompanionsCard
+        language="en"
+        quranWird={true}
+        quranProgress={{ progress: 4, goal: 4 }}
+        mosquePrayers={null}
+        onToggleQuranWird={vi.fn()}
+        onCycleMosquePrayers={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText("Completed")).toBeInTheDocument();
+    expect(screen.getByText("4/4")).toBeInTheDocument();
+  });
 });

@@ -177,8 +177,8 @@ export function ProgressScreen({
   const oasisRoutines = deriveOasisRoutinesFromCompletions(dailyCompletions, currentDayKey);
   const dayHabits = (dailyHabits ?? []).filter((h) => h.dayKey === currentDayKey);
 
-  const quranWirdDone =
-    (wirdHistory?.[currentDayKey]?.length ?? 0) > 0 || dayHabits.some((h) => h.habit === "quran_wird");
+  const hasManualQuranHabit = dayHabits.some((h) => h.habit === "quran_wird");
+  const quranWirdDone = quranWirdPlan?.kind !== "free" && (hasManualQuranHabit || selectedDayPath.quran.complete);
 
   const mosqueAttendanceCount = prayerTracking.filter((r) => r.dayKey === currentDayKey && wasPrayedAtMosque(r)).length;
 
@@ -231,7 +231,18 @@ export function ProgressScreen({
       const dKey = getProgressDayKey(d, progressDayStartHour);
       const routines = deriveOasisRoutinesFromCompletions(dailyCompletions, dKey);
       const hRecords = (dailyHabits ?? []).filter((h) => h.dayKey === dKey);
-      const qDone = (wirdHistory?.[dKey]?.length ?? 0) > 0 || hRecords.some((h) => h.habit === "quran_wird");
+      const dayPath = getDailyPathStatus({
+        dayKey: dKey,
+        dailyCompletions,
+        wirdHistory: wirdHistory ?? {},
+        quranWirdPlan,
+        quranWirdDailyGoals,
+        prayerTracking,
+        mosquePrayerGoal,
+        dailyPathStartDayKey,
+      });
+      const qDone =
+        quranWirdPlan?.kind !== "free" && (hRecords.some((h) => h.habit === "quran_wird") || dayPath.quran.complete);
       const mCount = prayerTracking.filter((r) => r.dayKey === dKey && wasPrayedAtMosque(r)).length;
       const mHab = hRecords.find((h) => h.habit.startsWith("mosque_"))?.habit as "mosque_3" | "mosque_5" | undefined;
       const mRes = mHab ?? (mCount >= 5 ? "mosque_5" : mCount >= 3 ? "mosque_3" : null);
@@ -255,7 +266,20 @@ export function ProgressScreen({
       });
     }
     return days;
-  }, [displayDate, progressDayStartHour, dailyCompletions, dailyHabits, wirdHistory, prayerTracking, now, language]);
+  }, [
+    displayDate,
+    progressDayStartHour,
+    dailyCompletions,
+    dailyHabits,
+    wirdHistory,
+    prayerTracking,
+    now,
+    language,
+    quranWirdPlan,
+    quranWirdDailyGoals,
+    mosquePrayerGoal,
+    dailyPathStartDayKey,
+  ]);
 
   return (
     <ScreenContainer
@@ -410,11 +434,16 @@ export function ProgressScreen({
         </section>
 
         {/* Qur'an is presented before the collection breakdown. */}
-        {activeTab === "day" && (
+        {activeTab === "day" && quranWirdPlan?.kind !== "free" && (
           <div className="mb-5 w-full">
             <DailyCompanionsCard
               language={language}
               quranWird={quranWirdDone}
+              quranProgress={
+                selectedDayPath.quran.active
+                  ? { progress: selectedDayPath.quran.progress, goal: selectedDayPath.quran.goal }
+                  : undefined
+              }
               mosquePrayers={resolvedMosquePrayers}
               onToggleQuranWird={() => onToggleDailyHabit?.(currentDayKey, "quran_wird")}
               onCycleMosquePrayers={() => onCycleMosqueHabit?.(currentDayKey)}

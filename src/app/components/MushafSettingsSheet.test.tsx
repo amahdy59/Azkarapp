@@ -40,6 +40,7 @@ describe("MushafSettingsSheet", () => {
 
     // Layout options (visible when autoSpreadRoom is true)
     expect(screen.getByTestId("mushaf-layout-option-auto")).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByText(/يعرض صفحتين متجاورتين على الشاشات العريضة/)).toBeInTheDocument();
     fireEvent.click(screen.getByTestId("mushaf-layout-option-spread"));
     expect(onSelectLayout).toHaveBeenCalledWith("spread");
 

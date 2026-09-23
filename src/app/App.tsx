@@ -1,5 +1,12 @@
 import { lazy, Suspense, useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { fromCompletedSets, loadAppState, saveAppState, toCompletedSets, type StoredSession } from "./state";
+import {
+  fromCompletedSets,
+  loadAppState,
+  saveAppState,
+  toCompletedSets,
+  resetDailyPartialCounts,
+  type StoredSession,
+} from "./state";
 import { applyAppAppearance } from "./theme";
 import { getAzkarForMode, getAzkarForPrayer, isRoutineCategory, registerLazyCollection } from "./content/azkar";
 import { isPrayerName } from "./content/prayerTimes";
@@ -331,6 +338,23 @@ function AppContent({
   const rememberSurahPage = useCallback((zikrId: string, page: number) => {
     setSurahReadingPages((previous) => (previous[zikrId] === page ? previous : { ...previous, [zikrId]: page }));
   }, []);
+  /** In-progress partial zikr counts across sections and reloads until completion or reset. */
+  const [partialZikrCounts, setPartialZikrCounts] = useState<Record<string, number>>(
+    initialState.partialZikrCounts ?? {},
+  );
+  const [counterResetVersion, setCounterResetVersion] = useState(0);
+  const handlePartialZikrCountChange = useCallback((zikrId: string, count: number) => {
+    setPartialZikrCounts((current) => {
+      if (count <= 0) {
+        if (!(zikrId in current)) return current;
+        const next = { ...current };
+        delete next[zikrId];
+        return next;
+      }
+      if (current[zikrId] === count) return current;
+      return { ...current, [zikrId]: count };
+    });
+  }, []);
   /** Whether the reader is currently showing a surah as Mushaf pages. */
   const [readerInMushafMode, setReaderInMushafMode] = useState(false);
   // Seeded from both sides: the local keys are what the Friday screens actually
@@ -655,6 +679,7 @@ function AppContent({
       quranReadingPosition,
       quranWirdPlan,
       fridayProgress,
+      partialZikrCounts,
     }),
     [
       boldText,
@@ -708,6 +733,7 @@ function AppContent({
       zikrFont,
       themeMode,
       fridayProgress,
+      partialZikrCounts,
     ],
   );
 
@@ -753,6 +779,12 @@ function AppContent({
     setView,
     setActiveTab,
     showConfirm,
+    onResetPartialCounts: (ids) => {
+      setPartialZikrCounts((current) =>
+        Object.fromEntries(Object.entries(current).filter(([id]) => !ids.includes(id))),
+      );
+      setCounterResetVersion((version) => version + 1);
+    },
   });
 
   const openCategory = useCallback(
@@ -893,6 +925,7 @@ function AppContent({
     setQuranLastReadingEvent(state.quranLastReadingEvent);
     setQuranReadingPosition(state.quranReadingPosition ?? { page: state.khatmahPage ?? 1 });
     setQuranWirdPlan(state.quranWirdPlan ?? { kind: "daily", dailyPages: state.dailyWirdGoal ?? 4 });
+    setPartialZikrCounts(state.partialZikrCounts ?? {});
     // Friday is merged rather than replaced. Restoring an account should never
     // erase a deed done on this device before it signed in, and the remote copy
     // is not automatically the newer one.
@@ -978,6 +1011,7 @@ function AppContent({
 
     activeProgressDayRef.current = currentDayKey;
     setCompleted((previous) => resetDailyRoutineProgress(previous));
+    setPartialZikrCounts(resetDailyPartialCounts);
   }, [progressDayStartHour]);
 
   useEffect(() => {
@@ -1789,6 +1823,9 @@ function AppContent({
                   mushafBookmarks={mushafBookmarks}
                   surahReadingPages={surahReadingPages}
                   onSurahPageChange={rememberSurahPage}
+                  partialZikrCounts={partialZikrCounts}
+                  counterResetKey={`${activeProgressDayRef.current}:${counterResetVersion}`}
+                  onPartialZikrCountChange={handlePartialZikrCountChange}
                   onMushafModeChange={setReaderInMushafMode}
                   mushafSettings={{
                     theme: mushafTheme,

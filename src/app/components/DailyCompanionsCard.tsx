@@ -1,10 +1,12 @@
 import { BookOpen, MapPin, Check } from "./icons";
 import { t } from "../i18n";
+import { formatNumerals, formatRatio } from "../formatting";
 import type { AppLanguage } from "../types";
 
 export function DailyCompanionsCard({
   language,
   quranWird,
+  quranProgress,
   mosquePrayers,
   onToggleQuranWird,
   onCycleMosquePrayers,
@@ -13,6 +15,7 @@ export function DailyCompanionsCard({
 }: {
   language: AppLanguage;
   quranWird: boolean;
+  quranProgress?: { progress: number; goal: number };
   mosquePrayers: "mosque_3" | "mosque_5" | null;
   onToggleQuranWird: () => void;
   onCycleMosquePrayers: () => void;
@@ -67,20 +70,33 @@ export function DailyCompanionsCard({
               <span
                 className={`block text-caption font-semibold ${quranWird ? "text-success" : "text-muted-foreground"}`}
               >
-                {quranWird ? t(language, "progress.completed") : t(language, "progress.markComplete")}
+                {quranWird
+                  ? t(language, "progress.completed")
+                  : quranProgress && quranProgress.goal > 0
+                    ? isArabic
+                      ? `${formatRatio(quranProgress.progress, quranProgress.goal, language)} صفحة`
+                      : `${formatRatio(quranProgress.progress, quranProgress.goal, language)} pages`
+                    : t(language, "progress.markComplete")}
               </span>
             </div>
           </div>
 
-          <div
-            className={`flex size-6 items-center justify-center rounded-full border transition-all ${
-              quranWird
-                ? "border-success bg-success text-success-foreground"
-                : "border-border bg-transparent text-transparent"
-            }`}
-            aria-hidden="true"
-          >
-            <Check size={14} strokeWidth={3} />
+          <div className="flex items-center gap-2.5">
+            {quranProgress && quranProgress.goal > 0 && (
+              <span className="text-caption font-bold rounded-lg border border-border/80 bg-muted/60 px-2.5 py-1 text-muted-foreground">
+                {formatNumerals(quranProgress.progress, language)}/{formatNumerals(quranProgress.goal, language)}
+              </span>
+            )}
+            <div
+              className={`flex size-6 items-center justify-center rounded-full border transition-all ${
+                quranWird
+                  ? "border-success bg-success text-success-foreground"
+                  : "border-border bg-transparent text-transparent"
+              }`}
+              aria-hidden="true"
+            >
+              <Check size={14} strokeWidth={3} />
+            </div>
           </div>
         </button>
 

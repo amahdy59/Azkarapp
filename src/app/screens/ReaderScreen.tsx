@@ -4,6 +4,7 @@ import "../../styles/animations/ZikrAnimations.css";
 import { motion, AnimatePresence } from "motion/react";
 import "./ReaderScreen.css";
 import { useZikrCounter } from "../hooks/useZikrCounter";
+import { prefixZikrId } from "../progress";
 import { useCounterClickFeedback } from "../hooks/useCounterClickFeedback";
 import { useSwipeGestures } from "../hooks/useSwipeGestures";
 import { useMediaQuery } from "../hooks/useMediaQuery";
@@ -166,6 +167,9 @@ export function ReaderScreen({
   audioCoverage,
   onRepeatAudio,
   audioModeActive = false,
+  partialZikrCounts,
+  onPartialZikrCountChange,
+  counterResetKey,
 }: {
   catId: CategoryId;
   subCategory?: string;
@@ -224,6 +228,10 @@ export function ReaderScreen({
   onRepeatAudio?: () => void;
   /** The shared player is currently responsible for this zikr's progress. */
   audioModeActive?: boolean;
+  /** Persisted in-progress partial tallies, keyed by zikr id. */
+  partialZikrCounts?: Record<string, number>;
+  onPartialZikrCountChange?: (zikrId: string, count: number) => void;
+  counterResetKey?: string;
 }) {
   const azkar = azkarList ?? getAzkarForMode(catId, routineMode);
   const z = azkar[idx];
@@ -338,6 +346,11 @@ export function ReaderScreen({
     onCount: playClickFeedback,
     onComplete: handleZikrCompletion,
     onAdvance,
+    initialPartialCounts: Object.fromEntries(
+      azkar.map((zikr) => [zikr.id, partialZikrCounts?.[prefixZikrId(catId, zikr.id, subCategory)] ?? 0]),
+    ),
+    onPartialCountChange: (id, count) => onPartialZikrCountChange?.(prefixZikrId(catId, id, subCategory), count),
+    resetKey: `${counterResetKey}:${catId}:${subCategory ?? ""}`,
   });
 
   /* The press, the ripple and the tap all come from one shared definition, so

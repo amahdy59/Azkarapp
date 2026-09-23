@@ -28,6 +28,7 @@ function renderSessionHarness({
 } = {}) {
   const push = vi.fn<(view: View) => void>();
   const pop = vi.fn();
+  const onResetPartialCounts = vi.fn();
   const showConfirm = vi.fn((_: string, __: string, ___: string, ____: string, onConfirm: () => void) => onConfirm());
 
   const hook = renderHook(() => {
@@ -65,6 +66,7 @@ function renderSessionHarness({
       setView,
       setActiveTab,
       showConfirm,
+      onResetPartialCounts,
     });
     return {
       activeTab,
@@ -81,7 +83,7 @@ function renderSessionHarness({
     };
   });
 
-  return { ...hook, pop, push, showConfirm };
+  return { ...hook, pop, push, showConfirm, onResetPartialCounts };
 }
 
 beforeEach(() => {
@@ -92,6 +94,16 @@ beforeEach(() => {
 afterEach(() => vi.useRealTimers());
 
 describe("useSessionHandlers", () => {
+  it("resets only the selected prayer's partial counters after confirmation", () => {
+    const { result, onResetPartialCounts } = renderSessionHarness({
+      activeCat: "after_prayer",
+      activeSubCategory: "fajr",
+    });
+    act(() => result.current.handlers.handleResetCategory("after_prayer", "fajr"));
+    const ids = onResetPartialCounts.mock.calls[0]![0] as string[];
+    expect(ids.length).toBeGreaterThan(0);
+    expect(ids.every((id) => id.startsWith("fajr:"))).toBe(true);
+  });
   it("records a final completion once and caps session history", () => {
     const items = getAzkarForMode("morning", "complete");
     const previous = Array.from({ length: MAX_STORED_SESSIONS }, (_, index) => ({

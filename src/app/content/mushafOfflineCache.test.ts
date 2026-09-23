@@ -37,7 +37,7 @@ describe("mushafOfflineCache", () => {
     expect(open).toHaveBeenCalledWith(MUSHAF_CACHE_NAME);
     expect(open).toHaveBeenCalledWith(FONT_CACHE_NAME);
     expect(fetch).toHaveBeenCalledWith(expect.stringMatching(/data\/mushaf\/1\.json\?v=3$/), {
-      signal: undefined,
+      signal: expect.any(AbortSignal),
     });
 
     await removeDownloadedMushaf();
@@ -61,5 +61,10 @@ describe("mushafOfflineCache", () => {
     );
 
     await expect(downloadMushaf()).rejects.toThrow(/Mushaf font \d+ failed: 503/);
+    // Only the initial eight page/font pairs may start; failure stops further work.
+    expect(vi.mocked(fetch).mock.calls.length).toBeLessThanOrEqual(16);
+    for (const [, options] of vi.mocked(fetch).mock.calls) {
+      expect(options?.signal?.aborted).toBe(true);
+    }
   });
 });

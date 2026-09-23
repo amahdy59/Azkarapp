@@ -1,5 +1,12 @@
 PRAGMA foreign_keys = ON;
 
+CREATE TABLE IF NOT EXISTS request_limits (
+  key TEXT PRIMARY KEY,
+  hits INTEGER NOT NULL,
+  expires_at INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS request_limits_expiry_idx ON request_limits(expires_at);
+
 CREATE TABLE IF NOT EXISTS accounts (
   id TEXT PRIMARY KEY,
   created_at INTEGER NOT NULL
@@ -35,4 +42,3 @@ CREATE TABLE IF NOT EXISTS visitors (
   visitor_hash TEXT PRIMARY KEY,
   first_seen_at INTEGER NOT NULL
 );
-

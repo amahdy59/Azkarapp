@@ -1,4 +1,5 @@
 import type { AppStateSnapshot } from "../app/types";
+import { buildRemoteSyncSnapshot } from "./remoteSyncSnapshot";
 
 export const CLOUDFLARE_DEVICE_SECRET_KEY = "azkarapp.cloudflare-device-secret.v1";
 export const CLOUDFLARE_DEVICE_EVENT = "azkarapp-cloudflare-device";
@@ -33,9 +34,11 @@ export async function loadCloudflareSnapshot() {
 }
 
 export async function saveCloudflareSnapshot(snapshot: AppStateSnapshot, revision = 0) {
-  await request("/v1/sync", {
+  const sanitized = buildRemoteSyncSnapshot(snapshot);
+  const response = await request("/v1/sync", {
     method: "PUT",
     headers: { "if-match": String(revision) },
-    body: JSON.stringify({ snapshot }),
+    body: JSON.stringify({ snapshot: sanitized }),
   });
+  return (await response.json()) as { ok: boolean; revision: number; updatedAt: number };
 }

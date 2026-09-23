@@ -3748,3 +3748,104 @@ null` shape, so a record written before this change still loads and still
 - **Decision:** Keep DEC-191's absolute-first permission request and never listen after an explicit denial. Limit the legacy no-argument retry to a compatibility `TypeError`; other failures remain denied. Explain how to check the site's motion-sensor setting in the browser and label the bearing-only arrow as static. Invalid negative WebKit headings are ignored; when a valid earth-referenced heading arrives, both north marks and Qibla arrow rotate consistently.
 - **Why:** the supplied installed-app screenshot shows the permission gate denying access before sensor events can arrive. Web code cannot change a reader's browser permission. The old generic denial message gave no recovery path, and a fixed compass rose could misrepresent a later valid heading.
 - **Tests/evidence required:** denied/granted/legacy permission paths, invalid WebKit heading, dial transforms, Android-sized browser denial state, full local gates, and physical-device retest after the reader changes browser permission.
+
+## DEC-194 — Cloudflare sync snapshot sanitization and privacy boundary
+
+- **Date:** 2026-09-23
+- **Status:** Approved
+- **Owner:** Product owner (Phase 52 audit remediation)
+- **Related phase:** Phase 52
+- **Context:** The full application state snapshot previously passed directly to Cloudflare sync without a remote-payload filter, which could upload device-local coordinates and private profile details.
+- **Decision:** Implement an authoritative `buildRemoteSyncSnapshot` boundary in `src/lib/remoteSyncSnapshot.ts` that enforces whitelist-based serialization before any Cloudflare upload. Strictly exclude precise coordinates (`latitude`, `longitude`, `cityName`) and private contact details (`email`, `phone`, `accountUserId`, `avatarUrl`), bound sessions to the newest 100 entries, and validate with recursive `assertNoForbiddenSyncFields` contract checks.
+- **Why:** Guarantees compliance with `docs/ARCHITECTURE.md` that geolocation coordinates remain strictly device-local and are never uploaded to any remote service, while keeping cross-device reading and progress sync intact.
+- **Consequences:** Cloudflare D1 snapshots are strictly privacy-safe and devoid of device-local geolocation or private contact identities.
+- **Files/contracts to update:** `src/lib/remoteSyncSnapshot.ts`, `src/lib/remoteSyncSnapshot.test.ts`, `src/lib/cloudflareSync.ts`, `docs/ARCHITECTURE.md`.
+- **Tests/evidence required:** Contract test verifying absence of all forbidden keys, coordinate exclusion, profile sanitization, session history bounding, and full quality suite.
+- **Supersedes:** None
+
+## DEC-195 — Partial zikr counter persistence across unmount and refresh
+
+- **Date:** 2026-09-23
+- **Status:** Approved
+- **Owner:** Product owner (Phase 53 audit remediation)
+- **Related phase:** Phase 53
+- **Context:** Navigating away from a multi-repetition zikr (e.g. 33-count tasbih) or refreshing the browser lost the intermediate in-progress count, forcing the user to restart from 0 unless the entire count was completed.
+- **Decision:** Persist in-progress counts in `partialZikrCounts: Record<string, number>` within `AppStateSnapshot`. Synchronize partial counts via `useZikrCounter` (`initialPartialCounts` and `onPartialCountChange`), clear the key upon completing or resetting the zikr, and flush all partial counts on daily routine rollover (`reconcileDailyProgress`) or explicit private data wipe (`clearPrivateAppData`).
+- **Why:** Delivers calm, predictable devotional counting continuity without losing progress when switching screens, receiving notifications, or reloading the app.
+- **Consequences:** In-progress counts persist across navigation, app restarts, and unmounts, while completing the item cleanly prunes the entry.
+- **Files/contracts to update:** `src/app/types.ts`, `src/app/state.ts`, `src/app/hooks/useZikrCounter.ts`, `src/app/screens/ReaderScreen.tsx`, `src/app/App.tsx`, `docs/agent/phases/PHASE_53_COUNTER_CONTINUITY.md`.
+- **Tests/evidence required:** Unit tests in `src/app/state.test.ts` and `src/app/hooks/useZikrCounter.test.ts`, regression checks in `ReaderScreen.surah.test.tsx`, `ReaderScreen.audio.test.tsx`, and full quality gates.
+- **Supersedes:** None
+
+## DEC-196 — Quran Wird completion consistency across screens
+
+- **Date:** 2026-09-23
+- **Status:** Approved
+- **Owner:** Product owner (Phase 54 audit remediation)
+- **Related phase:** Phase 54
+- **Context:** ProgressScreen marked Quran wird complete if any page was read (`wirdHistory.length > 0`), which ignored the reader's daily target goal (e.g. 4 pages) and contradicted Home and Khatmah overview screens. In addition, DailyCompanionsCard displayed only binary completion without showing fractional page progress.
+- **Decision:** Align ProgressScreen and DailyCompanionsCard with `dailyPath.quran.complete`: if a daily goal is active, completion requires achieving the goal (`progress >= goal`), while reading 1 page completes free reading. When a goal is active and incomplete, DailyCompanionsCard displays fractional progress (e.g. "1 / 4 pages" and "1/4" badge). Manual habit ticks continue to count as completed.
+- **Why:** Unifies reading progress and goal expectations across all screens without confusing or prematurely celebrating unfinished daily goals.
+- **Consequences:** All screens agree on when today's Quran wird is completed; readers clearly see their remaining pages on the DailyCompanionsCard.
+- **Files/contracts to update:** `src/app/components/DailyCompanionsCard.tsx`, `src/app/screens/ProgressScreen.tsx`, `src/app/screens/ProgressScreen.wirdGoal.test.tsx`, `docs/agent/phases/PHASE_54_WIRD_COMPLETION_CONSISTENCY.md`.
+- **Tests/evidence required:** Unit tests in `DailyCompanionsCard.test.tsx`, `ProgressScreen.wirdGoal.test.tsx`, and full quality gates.
+- **Supersedes:** None
+
+## DEC-197 — QR device sync reliability, token lifecycle, and separated controls
+
+- **Date:** 2026-09-23
+- **Status:** Approved
+- **Owner:** Product owner (Phase 55 audit remediation)
+- **Related phase:** Phase 55
+- **Context:** Cloudflare sync backend restricted CORS strictly to port 5173, `PUT /v1/sync` did not return the authoritative revision, expired tokens accumulated indefinitely, orphan account rows lingered after device deletion, and QrSyncPanel merged device connection state, unlink actions, and code generation into a single card without a countdown or unlink confirmation.
+- **Decision:** In `cloudflare/worker.ts`: support any localhost/127.0.0.1 port via regex, return authoritative `{ ok: true, revision: nextRevision }` from `PUT /v1/sync`, update device `last_seen_at` on every sync and pairing request, purge expired tokens automatically, and cascade-delete orphan account/snapshot records when the last device unlinks. On the client: update `revision.current` from the sync response, seed remote snapshot on new device link, and redesign `QrSyncPanel` into separate "This Device" (with active status indicator and unlink confirmation) and "Link Another Device" cards (with 5-minute countdown and expired-code refresh).
+- **Why:** Eliminates sync conflict races, prevents orphaned database records, supports developer workflows on any port, and prevents accidental device unlinking.
+- **Consequences:** Reliable cross-device pairing with clear visual feedback, accurate active session timestamps, and safe unlinking.
+- **Files/contracts to update:** `cloudflare/worker.ts`, `src/lib/cloudflareSync.ts`, `src/app/hooks/useCloudflareDeviceSync.ts`, `src/app/screens/settings/QrSyncPanel.tsx`, `src/app/i18n/en.ts`, `src/app/i18n/ar.ts`, `docs/agent/phases/PHASE_55_QR_DEVICE_PAIRING_RELIABILITY.md`.
+- **Tests/evidence required:** Unit tests in `src/app/screens/settings/QrSyncPanel.test.tsx`, i18n parity check in `src/app/i18n/parity.test.ts`, and full quality gates.
+- **Supersedes:** None
+
+## DEC-198 — Offline downloads job isolation, readiness truth, and diagnostics disclosure
+
+- **Date:** 2026-09-23
+- **Status:** Approved
+- **Owner:** Product owner (Phase 56 audit remediation)
+- **Related phase:** Phase 56
+- **Context:** DownloadsPanel shared a single AbortController between Mushaf and audio downloads, allowing cancellations to collide. Mushaf offline readiness counted JSON pages alone even if corresponding QCF fonts were missing. In addition, low-level browser cache diagnostics dominated the screen above clear reassurance of bundled offline capabilities.
+- **Decision:** Separate `mushafAbortRef` and `audioAbortRef` into independent controllers and disable conflicting download actions while an active job is executing. In `mushafOfflineCache.ts`, report a page as truly ready only when both page JSON and QCF font are verified in cache storage, and propagate cache removal errors without swallowing. Reorganize DownloadsPanel to highlight bundled offline content first, present heavy Mushaf and audio downloads with progress and cancel safeguards second, and tuck technical cache metrics into an expandable disclosure.
+- **Why:** Delivers honest offline readiness reporting, avoids cancel race conditions between download types, and gives readers instant clarity that core content requires zero downloading.
+- **Consequences:** Cancellation of Mushaf downloads does not affect audio jobs or vice-versa; offline readiness reflects genuine font and page availability.
+- **Files/contracts to update:** `src/app/content/mushafOfflineCache.ts`, `src/app/screens/settings/DownloadsPanel.tsx`, `src/app/screens/settings/DownloadsPanel.test.tsx`, `docs/agent/phases/PHASE_56_OFFLINE_DOWNLOADS_ISOLATION.md`.
+- **Tests/evidence required:** Unit tests in `src/app/screens/settings/DownloadsPanel.test.tsx`, `src/app/content/qcfMushaf.test.ts`, and full quality gates.
+- **Supersedes:** None
+
+## DEC-199 — Qiblah task-first redesign: direction, distance, and progressive sensor disclosure
+
+- **Date:** 2026-09-23
+- **Status:** Approved
+- **Owner:** Product owner (Phase 57 audit remediation)
+- **Related phase:** Phase 57
+- **Context:** The Qiblah screen previously prioritized an interactive animated sensor dial above all else, leading to confusing states when device motion sensors (`DeviceOrientation` API) were uncalibrated, missing on desktop/laptops, or restricted by browser permissions. The core prayer goal — finding the exact bearing angle, cardinal direction, and practical alignment — was obscured behind motion sensor diagnostics.
+- **Decision:** Introduce `getKaabaDistance(latitude, longitude)` in `src/app/qibla.ts` calculating great-circle distance to the Kaaba in kilometers. Redesign `QiblaScreen.tsx` with a task-first layout:
+  1. Authoritative destination summary card showing exact bearing angle (e.g. 136°), cardinal direction (e.g. SE / جنوب شرق), and distance to Kaaba in kilometers.
+  2. 3-step practical alignment guide for prayer preparation.
+  3. Live compass sensor moved into progressive disclosure with an explicit toggle and calibration instructions, ensuring sensor absence or permission denial never blocks prayer orientation.
+- **Why:** Solves the reader's primary prayer need immediately and accurately on every platform (desktop, tablet, mobile) regardless of hardware sensor availability, while retaining smooth live compass tracking where supported.
+- **Consequences:** Qiblah orientation is reliable, calm, and usable offline and on desktop without requiring motion hardware.
+- **Files/contracts to update:** `src/app/qibla.ts`, `src/app/qibla.test.ts`, `src/app/screens/QiblaScreen.tsx`, `src/app/screens/QiblaScreen.taskFirst.test.tsx`, `src/app/i18n/en.ts`, `src/app/i18n/ar.ts`, `docs/agent/phases/PHASE_57_QIBLAH_TASK_FIRST.md`.
+- **Tests/evidence required:** Unit tests in `src/app/qibla.test.ts`, `src/app/screens/QiblaScreen.taskFirst.test.tsx`, `src/app/screens/QiblaScreen.test.tsx`, i18n parity check, and full local quality gates.
+- **Supersedes:** None
+
+## DEC-200 — Library scroll affordances, desktop spread explanations, and transition stability
+
+- **Date:** 2026-09-23
+- **Status:** Approved
+- **Owner:** Product owner (Phase 58 audit remediation)
+- **Related phase:** Phase 58
+- **Context:** Mobile readers in `AzkarLibraryScreen` lacked visual affordances when category chips overflowed horizontally off-screen. In `MushafSettingsSheet`, readers had no explanation for how Automatic vs Two-Page layouts operate, and live status regions announced single page labels even during two-page spreads. Additionally, route fallbacks during lazy screen loading lacked vertical stability bounds.
+- **Decision:** Add dynamic start and end gradient fades to `AzkarLibraryScreen`'s category scroll area that react to scroll position in both RTL and LTR. Add localized explanatory hints for Automatic, Single Page, and Two-Page layouts in `MushafSettingsSheet` linked via `aria-describedby`. Update `MushafPageViewer` live regions to announce bilingual two-page spread labels when facing pages are active. Give `ScreenFallback` minimum viewport height stability (`min-h-[50vh] flex-1 w-full`).
+- **Why:** Elevates polish, accessibility, and visual discoverability across mobile reading and wide desktop Mushaf experiences without layout shift.
+- **Consequences:** Clear mobile horizontal scrolling hints, accessible layout feedback, and seamless reader transitions.
+- **Files/contracts to update:** `src/app/screens/AzkarLibraryScreen.tsx`, `src/app/screens/AzkarLibraryScreen.test.tsx`, `src/app/components/MushafSettingsSheet.tsx`, `src/app/components/MushafSettingsSheet.test.tsx`, `src/app/components/MushafPageViewer.tsx`, `src/app/components/ScreenFallback.tsx`, `src/app/i18n/en.ts`, `src/app/i18n/ar.ts`, `docs/agent/phases/PHASE_58_MUSHAF_MOBILE_POLISH.md`.
+- **Tests/evidence required:** Tests in `AzkarLibraryScreen.test.tsx`, `MushafSettingsSheet.test.tsx`, `MushafPageViewer.test.tsx`, i18n parity check, and full local quality gates.
+- **Supersedes:** None

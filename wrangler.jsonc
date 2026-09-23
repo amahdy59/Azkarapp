@@ -3,6 +3,7 @@
   "name": "azkarapp-api",
   "main": "cloudflare/worker.ts",
   "compatibility_date": "2026-09-22",
+  "triggers": { "crons": ["17 * * * *"] },
   "vars": {
     "APP_ORIGIN": "https://wa-zaker.com",
   },

@@ -1,4 +1,4 @@
-import { useDeferredValue, useEffect, useId, useMemo, useRef, useState } from "react";
+import { useCallback, useDeferredValue, useEffect, useId, useMemo, useRef, useState } from "react";
 import { Search, Bookmark, ChevronDown, ChevronNext, Lightbulb, X } from "../components/icons";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { CategoryCard } from "../components/CategoryCard";
@@ -169,9 +169,46 @@ export function AzkarLibraryScreen({
     });
   }, [savedAzkar, normalizedQuery]);
 
+  const groupScrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollStart, setCanScrollStart] = useState(false);
+  const [canScrollEnd, setCanScrollEnd] = useState(false);
+
+  const checkScrollAffordance = useCallback(() => {
+    const el = groupScrollRef.current;
+    if (!el) return;
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    const maxScroll = scrollWidth - clientWidth;
+    if (maxScroll <= 2) {
+      setCanScrollStart(false);
+      setCanScrollEnd(false);
+      return;
+    }
+    const current = Math.abs(scrollLeft);
+    setCanScrollStart(current > 4);
+    setCanScrollEnd(current < maxScroll - 4);
+  }, []);
+
+  useEffect(() => {
+    checkScrollAffordance();
+    const el = groupScrollRef.current;
+    if (!el) return;
+    const handleResize = () => checkScrollAffordance();
+    window.addEventListener("resize", handleResize);
+    let ro: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== "undefined") {
+      ro = new ResizeObserver(handleResize);
+      ro.observe(el);
+    }
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      ro?.disconnect();
+    };
+  }, [checkScrollAffordance, section]);
+
   useEffect(() => {
     selectedGroupRef.current?.scrollIntoView?.({ block: "nearest", inline: "nearest" });
-  }, [selectedGroupId]);
+    checkScrollAffordance();
+  }, [selectedGroupId, checkScrollAffordance]);
 
   return (
     <ScreenContainer dir={direction} className="relative" screenName={t(language, "library.title")}>
@@ -298,40 +335,69 @@ export function AzkarLibraryScreen({
             </DropdownMenu>
 
             {section === "collections" && (
-              <div
-                role="group"
-                className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto no-scrollbar pb-1"
-                aria-label={t(language, "library.title")}
-              >
-                <button
-                  type="button"
-                  ref={selectedGroupId === "all" ? selectedGroupRef : undefined}
-                  aria-pressed={selectedGroupId === "all"}
-                  onClick={() => setSelectedGroupId("all")}
-                  className={`interactive-elem shrink-0 flex min-h-11 items-center justify-center rounded-2xl px-4 py-1.5 text-sm font-bold transition-colors cursor-pointer ${
-                    selectedGroupId === "all"
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "bg-card border border-border-control/50 text-muted-foreground hover:text-foreground hover:bg-muted"
-                  }`}
+              <div className="relative min-w-0 flex-1">
+                <div
+                  ref={groupScrollRef}
+                  onScroll={checkScrollAffordance}
+                  role="group"
+                  data-testid="library-category-group-scroll"
+                  className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto no-scrollbar pb-1"
+                  aria-label={t(language, "library.title")}
                 >
-                  {t(language, "library.all")}
-                </button>
-                {CATEGORY_GROUPS.map((group) => (
                   <button
-                    key={group.id}
                     type="button"
-                    ref={selectedGroupId === group.id ? selectedGroupRef : undefined}
-                    aria-pressed={selectedGroupId === group.id}
-                    onClick={() => setSelectedGroupId(group.id)}
+                    ref={selectedGroupId === "all" ? selectedGroupRef : undefined}
+                    aria-pressed={selectedGroupId === "all"}
+                    onClick={() => setSelectedGroupId("all")}
                     className={`interactive-elem shrink-0 flex min-h-11 items-center justify-center rounded-2xl px-4 py-1.5 text-sm font-bold transition-colors cursor-pointer ${
-                      selectedGroupId === group.id
+                      selectedGroupId === "all"
                         ? "bg-primary text-primary-foreground shadow-sm"
                         : "bg-card border border-border-control/50 text-muted-foreground hover:text-foreground hover:bg-muted"
                     }`}
                   >
-                    {t(language, `library.groups.${group.labelKey}`)}
+                    {t(language, "library.all")}
                   </button>
-                ))}
+                  {CATEGORY_GROUPS.map((group) => (
+                    <button
+                      key={group.id}
+                      type="button"
+                      ref={selectedGroupId === group.id ? selectedGroupRef : undefined}
+                      aria-pressed={selectedGroupId === group.id}
+                      onClick={() => setSelectedGroupId(group.id)}
+                      className={`interactive-elem shrink-0 flex min-h-11 items-center justify-center rounded-2xl px-4 py-1.5 text-sm font-bold transition-colors cursor-pointer ${
+                        selectedGroupId === group.id
+                          ? "bg-primary text-primary-foreground shadow-sm"
+                          : "bg-card border border-border-control/50 text-muted-foreground hover:text-foreground hover:bg-muted"
+                      }`}
+                    >
+                      {t(language, `library.groups.${group.labelKey}`)}
+                    </button>
+                  ))}
+                </div>
+                {canScrollStart && (
+                  <div
+                    data-testid="library-scroll-fade-start"
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-y-0 start-0 w-6 pb-1 transition-opacity"
+                    style={{
+                      background: isArabic
+                        ? "linear-gradient(to left, var(--background), transparent)"
+                        : "linear-gradient(to right, var(--background), transparent)",
+                    }}
+                  />
+                )}
+                {canScrollEnd && (
+                  <div
+                    data-testid="library-scroll-fade-end"
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-y-0 end-0 w-6 pb-1 transition-opacity"
+                    style={{
+                      background: isArabic
+                        ? "linear-gradient(to right, var(--background), transparent)"
+                        : "linear-gradient(to left, var(--background), transparent)",
+                    }}
+                  />
+                )}
               </div>
             )}
           </div>

@@ -377,4 +377,17 @@ Four tiers, defined by width only. `useLayoutMode` and the CSS media queries in 
 
 ## Change control
 
+### Phase 59 utility refinements
+
+Qiblah's primary surface is the locally calculated bearing, direction, and distance to
+the Kaaba, followed by alignment guidance. The sensor dial is optional inside a native
+closed disclosure on supported layouts; closing it stops orientation listeners. Neither
+opening the screen nor opening the disclosure requests location or sensor permission.
+The existing fine-pointer desktop alignment guide remains sensor-free.
+
+Progress settings configure preferences rather than duplicating the full Progress
+dashboard. Recent sessions use a native disclosure. Downloads foreground ready content,
+approximate remaining size, and download/resume/complete states; technical cache information
+is secondary. Explicit free reading never receives a daily completion badge or goal card.
+
 Any typography, direction, reader-control, counter-size, motion timing, modal-height, or shell-width change must update this document and its automated regression coverage in the same change. Visual approval alone does not replace formatting, lint, strict types, unit/build, accessibility, and responsive browser gates.
