@@ -6,6 +6,9 @@ interface Env {
 
 import qrcode from "qrcode-generator";
 
+const VISITOR_ACTIVE_WINDOW_MS = 90_000;
+const VISITOR_RETENTION_MS = 24 * 60 * 60_000;
+
 const json = (value: unknown, init: ResponseInit = {}) =>
   Response.json(value, {
     ...init,
@@ -122,14 +125,17 @@ async function handle(request: Request, env: Env) {
       typeof body.visitorId === "string" && body.visitorId.length >= 1 && body.visitorId.length <= 128
         ? body.visitorId
         : null;
-    const visitorHash = await sha256(
-      visitorId ? `${salt}:${address}:${agent}:${visitorId}` : `${salt}:${address}:${agent}`,
-    );
-    await env.DB.prepare("INSERT OR IGNORE INTO visitors (visitor_hash, first_seen_at) VALUES (?, ?)")
-      .bind(visitorHash, Date.now())
+    const visitorHash = await sha256(visitorId ? `${salt}:${visitorId}` : `${salt}:${address}:${agent}`);
+    const now = Date.now();
+    await env.DB.prepare(
+      "INSERT INTO visitors (visitor_hash, first_seen_at, last_seen_at) VALUES (?, ?, ?) ON CONFLICT(visitor_hash) DO UPDATE SET last_seen_at = excluded.last_seen_at",
+    )
+      .bind(visitorHash, now, now)
       .run();
-    const row = await env.DB.prepare("SELECT COUNT(*) AS total FROM visitors").first<{ total: number }>();
-    return json({ total: row?.total ?? 0 }, { headers: cors(request, env) });
+    const row = await env.DB.prepare("SELECT COUNT(*) AS active FROM visitors WHERE last_seen_at >= ?")
+      .bind(now - VISITOR_ACTIVE_WINDOW_MS)
+      .first<{ active: number }>();
+    return json({ active: row?.active ?? 0 }, { headers: cors(request, env) });
   }
 
   if (path === "/v1/devices" && request.method === "POST") {
@@ -251,6 +257,7 @@ export default {
     await env.DB.batch([
       env.DB.prepare("DELETE FROM request_limits WHERE expires_at <= ?").bind(now),
       env.DB.prepare("DELETE FROM pairing_tokens WHERE expires_at <= ?").bind(now),
+      env.DB.prepare("DELETE FROM visitors WHERE last_seen_at < ?").bind(now - VISITOR_RETENTION_MS),
     ]);
   },
   async fetch(request: Request, env: Env) {

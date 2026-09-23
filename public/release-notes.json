@@ -1,13 +1,13 @@
 {
   "ar": [
-    "تظهر جهة الكعبة الآن بصرياً على دائرة الاتجاه مباشرةً مع الشمال والزاوية والمسافة.",
-    "يحوّل تشغيل الاتجاه المباشر العلامة نفسها إلى إرشاد حي للدوران مع نصائح أوضح للمعايرة.",
-    "يبدأ تجهيز صفحة المصحف المحفوظة وخطها مبكراً لتصل إلى القراءة بسرعة أكبر."
+    "يعرض العدد في الصفحة الرئيسية الزوار الذين يستخدمون التطبيق الآن بدلاً من إجمالي الزيارات السابقة.",
+    "يتجدد العدد تلقائياً أثناء بقاء التطبيق مفتوحاً وعند العودة إليه.",
+    "تتوقف الزيارات المغلقة عن الظهور تلقائياً بعد فترة قصيرة."
   ],
   "en": [
-    "The Kaaba direction is now immediately visible on the direction dial with North, bearing, and distance.",
-    "Live direction turns the same Kaaba target into real-time rotation guidance with clearer calibration help.",
-    "Your saved Mushaf page and its font begin preparing earlier so reading starts faster."
+    "The Home count now shows people currently using the app instead of all previous visitors.",
+    "The number refreshes automatically while the app stays open and when you return to it.",
+    "Closed visits disappear from the count automatically after a short interval."
   ],
-  "release": "2026-09-23-qibla-mushaf"
+  "release": "2026-09-23-active-visitors"
 }

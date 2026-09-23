@@ -64,6 +64,7 @@ import { StatePanel } from "./components/StatePanel";
 import { retryableScreen } from "./components/RetryableScreen";
 import type { PrayerTrackingWrite } from "./components/PrayerTrackerCards";
 import { PwaNotice } from "./components/PwaNotice";
+import { ActiveVisitorPresence } from "./components/VisitorCount";
 import type { AudioController } from "./audio/AudioProvider";
 import type { AudioStatus } from "./audio/audioTypes";
 import { loadAudioModule, EMPTY_AUDIO_COVERAGE, type AudioModule } from "./audio/lazyAudio";
@@ -2269,7 +2270,7 @@ export default function App() {
   }, [audioModule, audioModuleLoading]);
 
   return (
-    <>
+    <ActiveVisitorPresence>
       <AppContent
         audioController={audioController}
         audioModuleLoading={audioModuleLoading}
@@ -2283,6 +2284,6 @@ export default function App() {
           it to reach first paint, and AppContent never gets remounted (and
           its state lost) once the chunk arrives. */}
       {audioModule && <audioModule.AudioProvider onControllerReady={setAudioController} />}
-    </>
+    </ActiveVisitorPresence>
   );
 }

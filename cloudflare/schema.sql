@@ -40,5 +40,7 @@ CREATE INDEX IF NOT EXISTS pairing_tokens_expiry_idx ON pairing_tokens(expires_a
 
 CREATE TABLE IF NOT EXISTS visitors (
   visitor_hash TEXT PRIMARY KEY,
-  first_seen_at INTEGER NOT NULL
+  first_seen_at INTEGER NOT NULL,
+  last_seen_at INTEGER NOT NULL
 );
+CREATE INDEX IF NOT EXISTS visitors_last_seen_idx ON visitors(last_seen_at);

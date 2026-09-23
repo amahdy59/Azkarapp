@@ -140,8 +140,12 @@ back to normal cache-write error handling. A failed job aborts and drains siblin
 before exposing retry/removal controls. Cached page JSON and its font must both exist for
 a page to be reported ready.
 
-Cloudflare is the production sync boundary for device pairing and anonymous visitor
-aggregation. The Worker at `azkarapp-api.amahdy59.workers.dev` uses D1 tables for
+Cloudflare is the production sync boundary for device pairing and anonymous active-visitor
+presence. While Home is visible, the client refreshes its anonymous presence every 30 seconds;
+the Worker counts identifiers seen within the last 90 seconds and removes expired rows after
+24 hours. The result is a resilient rolling estimate of people currently using the app, not an
+all-time visitor total or an exact connection count. The Worker at
+`azkarapp-api.amahdy59.workers.dev` uses D1 tables for
 device credentials, one-time five-minute pairing tokens, progress snapshots, and
 privacy-safe visitor identifiers. Device secrets are stored only as SHA-256 hashes
 in D1; the QR contains a short-lived pairing token and never contains progress or
