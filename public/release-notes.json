@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-22-cloudflare-sync",
   "ar": [
-    "يظهر عدد الزوار في أسفل الصفحة الرئيسية بطريقة لا تكشف بيانات شخصية.",
-    "يمكن ربط جهازين مؤقتًا عبر رمز QR من إعدادات الحساب والبيانات.",
-    "تستمر القراءة والتقدم محليًا حتى عند انقطاع الاتصال، وتتم المزامنة عند توفره."
+    "أصبحت مزامنة التقدم عبر رمز QR تكتمل بموثوقية بين الجهازين المرتبطين.",
+    "انتقل عدد الزوار إلى نهاية محتوى الصفحة الرئيسية بدل ظهوره كشريط منفصل.",
+    "الأجهزة المرتبطة سابقا تستفيد من الإصلاح تلقائيا دون حاجة لإعادة الربط."
   ],
   "en": [
-    "The Home screen now shows a privacy-safe visitor count.",
-    "You can temporarily link two devices with a QR code from Account & data settings.",
-    "Reading and progress remain local offline, then sync when a connection is available."
-  ]
+    "QR sync uploads now complete reliably between linked devices.",
+    "The visitor count moved into the end of the Home content instead of a separate strip.",
+    "Already-linked devices pick up the fix automatically with no need to relink."
+  ],
+  "release": "2026-09-23-sync-repair"
 }
