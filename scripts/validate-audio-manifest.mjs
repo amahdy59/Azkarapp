@@ -1,4 +1,4 @@
-/* global fetch */
+/* global fetch, AbortController, clearTimeout */
 import fs from "node:fs";
 import path from "node:path";
 import { loadTypeScriptModule } from "./load-typescript-module.mjs";
