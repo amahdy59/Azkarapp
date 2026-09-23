@@ -178,13 +178,42 @@ test("tracking uses a circular keyboard focus indicator and mirrors in RTL", asy
   expect(await input.evaluate((element) => getComputedStyle(element).outlineStyle)).toBe("none");
   await input.click();
   await expect(indicator).not.toHaveAttribute("data-checked");
-  await page.waitForTimeout(250);
-  expect(await indicator.evaluate((element) => getComputedStyle(element).boxShadow)).toBe("none");
+  // The unchecked glow fades through a box-shadow transition, so a fixed
+  // sleep races it under load: CI has observed both the full glow and a
+  // mid-fade transparent value at 250ms. Poll until no visible shadow
+  // remains instead of asserting one instant.
+  await expect
+    .poll(
+      () =>
+        indicator.evaluate((element) => {
+          const shadow = getComputedStyle(element).boxShadow;
+          if (shadow === "" || shadow === "none") return true;
+          const colors = shadow.match(/rgba?\([^)]*\)/g) ?? [];
+          return (
+            colors.length > 0 && colors.every((color) => color === "rgba(0, 0, 0, 0)" || /,\s*0(\.0+)?\)$/.test(color))
+          );
+        }),
+      { timeout: 5000 },
+    )
+    .toBe(true);
 
   await page.keyboard.press("Tab");
   await input.focus();
   expect(await input.evaluate((element) => getComputedStyle(element).outlineStyle)).toBe("none");
-  expect(await indicator.evaluate((element) => getComputedStyle(element).boxShadow)).not.toBe("none");
+  // Same transition race in the other direction: the focus ring may not have
+  // painted on the very first frame after focus.
+  await expect
+    .poll(
+      () =>
+        indicator.evaluate((element) => {
+          const shadow = getComputedStyle(element).boxShadow;
+          if (shadow === "" || shadow === "none") return false;
+          const colors = shadow.match(/rgba?\([^)]*\)/g) ?? [];
+          return colors.some((color) => color !== "rgba(0, 0, 0, 0)" && !/,\s*0(\.0+)?\)$/.test(color));
+        }),
+      { timeout: 5000 },
+    )
+    .toBe(true);
 
   const indicatorBox = await indicator.boundingBox();
   const copyBox = await copy.boundingBox();
