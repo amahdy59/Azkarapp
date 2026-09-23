@@ -112,6 +112,29 @@ describe("AzkarLibraryScreen", () => {
     expect(onCategory).toHaveBeenCalledWith("comprehensive_duas");
   });
 
+  it("opens the in-prayer and fasting reference collections from the Library", () => {
+    const onCategory = vi.fn();
+
+    render(
+      <AzkarLibraryScreen
+        completed={{} as Record<CategoryId, Set<string>>}
+        language="en"
+        direction="ltr"
+        routineModes={{ morning: "core", evening: "core", before_sleep: "core", after_prayer: "core" }}
+        onCategory={onCategory}
+        onZikr={() => undefined}
+        onSearch={() => undefined}
+        savedZikrIds={new Set()}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "In-Prayer Supplications, 8 supplications" }));
+    fireEvent.click(screen.getByRole("button", { name: "Fasting & Ramadan, 2 supplications" }));
+
+    expect(onCategory).toHaveBeenNthCalledWith(1, "in_prayer");
+    expect(onCategory).toHaveBeenNthCalledWith(2, "fasting_ramadan");
+  });
+
   it("filters collections in place while typing instead of navigating away", () => {
     const onSearch = vi.fn();
 

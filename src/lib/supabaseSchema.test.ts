@@ -3,7 +3,7 @@ import { CATEGORY_IDS } from "../app/types";
 import authSource from "./auth.ts?raw";
 import schema from "../../supabase/schema.sql?raw";
 import initialAccountMigration from "../../supabase/migrations/202607010000_initial_account_schema.sql?raw";
-import latestCategoryMigration from "../../supabase/migrations/202608020001_expand_collection_categories.sql?raw";
+import latestCategoryMigration from "../../supabase/migrations/20260923174628_add_prayer_fasting_categories.sql?raw";
 import privilegeMigration from "../../supabase/migrations/202609110001_harden_data_api_privileges.sql?raw";
 
 describe("Supabase category contract", () => {

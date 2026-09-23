@@ -3863,3 +3863,27 @@ null` shape, so a record written before this change still loads and still
 - **Files/contracts to update:** `src/app/qibla.ts`, `src/app/screens/QiblaScreen.tsx`, `src/app/content/qcfMushaf.ts`, `src/app/App.tsx`, localization, focused unit/browser tests, architecture, design system, and Phase 60 report.
 - **Tests/evidence required:** Static/live visual rotation, upright Kaaba target, permission fallback, bilingual text alternatives, overview resource warm-up before navigation, responsive screenshots, full local gates, and production smoke verification.
 - **Supersedes:** The hidden-dial presentation detail of DEC-199; it preserves DEC-187, DEC-190, and DEC-191 sensor-permission and heading-integrity rules.
+
+## DEC-202 — Separate in-prayer and year-round fasting reference collections
+
+- **Date:** 2026-09-23
+- **Status:** Approved
+- **Owner:** Product owner
+- **Related phase:** Phase 61
+- **Decision:** Add two offline, searchable Library collections: `أذكار الصلاة / In-Prayer Supplications` in the Daily group, and `الصيام ورمضان / Fasting & Ramadan` in the More group. The in-prayer collection is ordered by prayer stage and labels authentic alternatives as choices, never a single mandatory checklist; post-prayer adhkar remain in their existing category. The fasting collection remains available throughout the year for Ramadan and voluntary fasting, avoids a prescribed spoken daily intention formula, and distinguishes Fajr as the start of fasting and Maghrib as its end.
+- **Why:** Readers need exact, cited Prophetic wording at the point of practice without conflating inside-prayer, post-prayer, Ramadan, or voluntary-fasting guidance.
+- **Consequences:** Every item carries Arabic, English, source reference, source URL, timing, and evidence. Initial scope uses Bukhari/Muslim where available and named grades for Abu Dawud reports; future additions require the same review.
+
+## DEC-203 — Rolling active visitors replace the lifetime total
+
+- **Date:** 2026-09-23
+- **Status:** Approved
+- **Owner:** Product owner (Phase 62 request)
+- **Related phase:** Phase 62
+- **Context:** Home labelled the number simply as visitors, but the Worker returned every anonymous visitor hash ever stored. The requested meaning is the number of people who currently have the app open.
+- **Decision:** Keep one application-shell presence heartbeat per browser visitor. Send it immediately, every 30 seconds while visible, and when the app becomes visible again. Store `last_seen_at` in D1 and return only visitor hashes refreshed in the last 90 seconds. Retain presence rows for no more than 24 hours, use the salted local random identifier without IP or user-agent data when it is available, and label the result “Visitors now” in both languages.
+- **Why:** A short rolling presence window survives ordinary network delay and timer throttling while representing current use far more truthfully than a lifetime total. Shell ownership keeps readers counted after navigating away from Home.
+- **Consequences:** The displayed value is an approximate current-presence count, not an exact WebSocket connection count. Closing or hiding the app can leave a visitor represented for up to 90 seconds; temporary network failure can make them age out.
+- **Files/contracts to update:** `src/app/components/VisitorCount.tsx`, `src/app/App.tsx`, localization, `cloudflare/worker.ts`, D1 schema/migration, architecture documentation, and Phase 62 report.
+- **Tests/evidence required:** Heartbeat/display unit coverage, SQL migration/upsert/window coverage, Worker dry-run, full local gates, and production smoke verification.
+- **Supersedes:** The all-time aggregation behavior delivered in Phase 51; its anonymous identifier and offline-failure behavior remain.

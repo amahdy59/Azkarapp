@@ -1,0 +1,58 @@
+import type { ZikrDraft } from "../types";
+
+export const FASTING_RAMADAN_AZKAR: ZikrDraft[] = [
+  {
+    id: "fasting-introduction",
+    category: "fasting_ramadan",
+    orderIndex: 0,
+    arabicText: "أذكار الصيام ورمضان",
+    transliteration: "",
+    translation: "Fasting and Ramadan",
+    benefit:
+      "A year-round reference for Ramadan and voluntary fasts. It does not prescribe a spoken daily intention formula.",
+    benefitArabic: "مرجع متاح طوال العام لرمضان وصيام التطوع، ولا يشرع صيغة نية يومية منطوقة.",
+    repetitionCount: 1,
+    sourceReference: "Editorial scope note; see the cited evidence on each item.",
+    sourceReferenceArabic: "تنبيه تحريري؛ يُرجع إلى دليل كل عنصر.",
+    isCollectionIntroduction: true,
+  },
+  {
+    id: "fasting-suhur-blessing",
+    category: "fasting_ramadan",
+    orderIndex: 1,
+    arabicText: "تَسَحَّرُوا فَإِنَّ فِي السَّحُورِ بَرَكَةً",
+    transliteration: "Tasahharu fa-inna fis-suhuri barakah.",
+    translation: "Take suhoor, for there is blessing in suhoor.",
+    benefit: "Prophetic encouragement to take the pre-dawn meal; it is a blessing, not a required spoken supplication.",
+    benefitArabic: "حث نبوي على السحور وبيان بركته، وليس دعاءً لفظياً واجباً.",
+    repetitionCount: 1,
+    sourceReference: "Sahih al-Bukhari 1923.",
+    sourceReferenceArabic: "صحيح البخاري ١٩٢٣.",
+    preferredTiming: "Before Fajr on a fasting day.",
+    hadithText: "قال رسول الله ﷺ: «تَسَحَّرُوا فَإِنَّ فِي السَّحُورِ بَرَكَةً».",
+    hadithTextEnglish: "The Messenger of Allah ﷺ said: “Take suhoor, for there is blessing in suhoor.”",
+    attributionType: "said_by_prophet",
+    sourceUrl: "https://sunnah.com/bukhari%3A1923",
+  },
+  {
+    id: "fasting-iftar-supplication",
+    category: "fasting_ramadan",
+    orderIndex: 2,
+    arabicText: "ذَهَبَ الظَّمَأُ وَابْتَلَّتِ الْعُرُوقُ وَثَبَتَ الْأَجْرُ إِنْ شَاءَ اللَّهُ",
+    transliteration: "Dhahaba adh-dhama'u wabtallatil-'uruqu wa thabata al-ajru in sha'a Allah.",
+    translation: "The thirst has gone, the veins are moistened, and the reward is assured, if Allah wills.",
+    benefit: "A reported supplication said when breaking the fast.",
+    benefitArabic: "دعاء مروي يُقال عند الإفطار.",
+    repetitionCount: 1,
+    sourceReference: "Sunan Abi Dawud 2357 (Hasan, al-Albani).",
+    sourceReferenceArabic: "سنن أبي داود ٢٣٥٧ (حسن، الألباني).",
+    preferredTiming: "When breaking a fast at sunset.",
+    hadithText:
+      "كان رسول الله ﷺ إذا أفطر قال: «ذَهَبَ الظَّمَأُ وَابْتَلَّتِ الْعُرُوقُ وَثَبَتَ الْأَجْرُ إِنْ شَاءَ اللَّهُ».",
+    hadithTextEnglish:
+      "When the Messenger of Allah ﷺ broke his fast, he said: “The thirst has gone, the veins are moistened, and the reward is assured, if Allah wills.”",
+    authenticityNote: "Hasan according to Al-Albani.",
+    attributionType: "said_by_prophet",
+    sourceUrl: "https://sunnah.com/abudawud%3A2357",
+  },
+];

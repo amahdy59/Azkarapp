@@ -1,6 +1,8 @@
 import type { CategoryId, RitualGroupId, RoutineCategoryId, RoutineMode, Zikr, ZikrDraft, ZikrGroupId } from "../types";
 import type { PrayerName } from "./prayerTimes";
 import { applyContentReview } from "./contentReview";
+import { FASTING_RAMADAN_AZKAR } from "./fastingRamadan";
+import { IN_PRAYER_AZKAR } from "./inPrayerSupplications";
 
 const MORNING_AZKAR: ZikrDraft[] = [
   {
@@ -3342,6 +3344,8 @@ const ALL_AZKAR = applyContentReview([
   ...HOME_AZKAR,
   ...MOSQUE_AZKAR,
   ...AFTER_PRAYER_AZKAR,
+  ...IN_PRAYER_AZKAR,
+  ...FASTING_RAMADAN_AZKAR,
   ...RESTROOM_AZKAR,
   ...FOOD_DRINK_AZKAR,
   ...CLOTHING_AZKAR,
@@ -3472,6 +3476,8 @@ export {
   HOME_AZKAR,
   MOSQUE_AZKAR,
   AFTER_PRAYER_AZKAR,
+  FASTING_RAMADAN_AZKAR,
+  IN_PRAYER_AZKAR,
   RESTROOM_AZKAR,
   FOOD_DRINK_AZKAR,
   CLOTHING_AZKAR,

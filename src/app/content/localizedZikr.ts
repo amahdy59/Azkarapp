@@ -392,6 +392,16 @@ const ARABIC_PREFERRED_TIMING: Readonly<Record<string, string>> = {
     "تُقال قبل النوم؛ بعد الوضوء والاضطجاع على الشق الأيمن، وتُجعل آخر ما يُقال.",
   "Recited after Fajr prayer.": "تُقال عقب صلاة الفجر.",
   "After every obligatory prayer.": "تُقرأ دبر كل صلاة مكتوبة.",
+  "After the opening takbir, before recitation.": "تُقال بعد تكبيرة الإحرام وقبل القراءة.",
+  "While bowing (ruku').": "تُقال في الركوع.",
+  "On rising from bowing (ruku').": "تُقال عند الرفع من الركوع.",
+  "While prostrating (sujud).": "تُقال في السجود.",
+  "While sitting between the two prostrations.": "تُقال في الجلوس بين السجدتين.",
+  "During the sitting for tashahhud.": "تُقال في الجلوس للتشهد.",
+  "After the final tashahhud, before supplication and salam.": "تُقال بعد التشهد الأخير وقبل الدعاء والسلام.",
+  "After the final tashahhud, before salam.": "تُقال بعد التشهد الأخير وقبل السلام.",
+  "Before Fajr on a fasting day.": "تُقال قبل الفجر في يوم الصيام.",
+  "When breaking a fast at sunset.": "تُقال عند الإفطار وقت الغروب.",
 };
 
 const GENERIC_PREFERRED_TIMINGS = new Set<string>([

@@ -101,6 +101,8 @@ Run the phase files in numerical order unless the decision log explicitly record
 | 58    | `phases/PHASE_58_MUSHAF_MOBILE_POLISH.md`              | Library horizontal affordance, spread explanation, and skeleton stability |
 | 59    | `phases/PHASE_59_REVIEW_REMEDIATION.md`                | Verification-led priority and deferred remediation                        |
 | 60    | `phases/PHASE_60_QIBLA_VISUAL_AND_MUSHAF_SPEED.md`     | Always-visible Kaaba direction and intent-led Mushaf warm-up              |
+| 61    | `phases/PHASE_61_PRAYER_AND_FASTING_COLLECTIONS.md`    | Reviewed in-prayer and year-round fasting reference collections           |
+| 62    | `phases/PHASE_62_ACTIVE_VISITOR_PRESENCE.md`           | Anonymous rolling presence instead of an all-time visitor total           |
 
 Phases 15–20 derive from `docs/audits/DESIGN_CONSISTENCY_AUDIT.md` (2026-08-15) and are
 recorded in `DECISION_LOG.md` as DEC-064. Phase 15 is upstream of 16, 17 and 19 — its root

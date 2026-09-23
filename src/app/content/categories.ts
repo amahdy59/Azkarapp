@@ -11,6 +11,8 @@ export const CATEGORIES: Array<{
   { id: "before_sleep", name: "Before Sleep Azkar", nameArabic: "أذكار النوم", icon: "stars" },
   { id: "waking_up", name: "Waking Up", nameArabic: "أذكار الاستيقاظ", icon: "sun" },
   { id: "after_prayer", name: "After Prayer", nameArabic: "أذكار بعد الصلاة", icon: "book-open" },
+  { id: "in_prayer", name: "In-Prayer Supplications", nameArabic: "أذكار الصلاة", icon: "book-open" },
+  { id: "fasting_ramadan", name: "Fasting & Ramadan", nameArabic: "الصيام ورمضان", icon: "crescent" },
   { id: "comprehensive_duas", name: "Comprehensive Duas", nameArabic: "الأدعية الجامعة", icon: "book-open" },
   { id: "friday_kahf", name: "Surah Al-Kahf", nameArabic: "سورة الكهف", icon: "book-open" },
   { id: "home", name: "Home", nameArabic: "أذكار المنزل", icon: "home" },
@@ -58,7 +60,7 @@ export const CATEGORY_GROUPS: ReadonlyArray<{
   {
     id: "daily",
     labelKey: "daily",
-    categories: ["morning", "evening", "before_sleep", "waking_up", "after_prayer"],
+    categories: ["morning", "evening", "before_sleep", "waking_up", "after_prayer", "in_prayer"],
   },
   { id: "place", labelKey: "place", categories: ["home", "mosque", "travel"] },
   { id: "everyday", labelKey: "everyday", categories: ["food_drink", "restroom", "clothing"] },
@@ -66,6 +68,6 @@ export const CATEGORY_GROUPS: ReadonlyArray<{
   {
     id: "more",
     labelKey: "more",
-    categories: ["comprehensive_duas", "social_community", "natural_events", "miscellaneous"],
+    categories: ["fasting_ramadan", "comprehensive_duas", "social_community", "natural_events", "miscellaneous"],
   },
 ];

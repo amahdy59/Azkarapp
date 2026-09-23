@@ -36,7 +36,7 @@ create table if not exists public.session_history (
   category text not null check (
     category in (
       'morning', 'evening', 'before_sleep', 'waking_up', 'home', 'mosque',
-      'after_prayer', 'restroom', 'food_drink', 'clothing', 'travel',
+      'after_prayer', 'in_prayer', 'fasting_ramadan', 'restroom', 'food_drink', 'clothing', 'travel',
       'distress_anxiety', 'illness_ruqyah', 'social_community',
       'natural_events', 'friday_kahf', 'comprehensive_duas', 'miscellaneous'
     )
@@ -65,7 +65,7 @@ create table if not exists public.daily_collection_completions (
   category text not null check (
     category in (
       'morning', 'evening', 'before_sleep', 'waking_up', 'home', 'mosque',
-      'after_prayer', 'restroom', 'food_drink', 'clothing', 'travel',
+      'after_prayer', 'in_prayer', 'fasting_ramadan', 'restroom', 'food_drink', 'clothing', 'travel',
       'distress_anxiety', 'illness_ruqyah', 'social_community',
       'natural_events', 'friday_kahf', 'comprehensive_duas', 'miscellaneous'
     )

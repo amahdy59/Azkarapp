@@ -11,6 +11,8 @@ export const CATEGORY_IDS = [
   "before_sleep",
   "waking_up",
   "after_prayer",
+  "in_prayer",
+  "fasting_ramadan",
   "comprehensive_duas",
   "friday_kahf",
   "home",
