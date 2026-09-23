@@ -49,9 +49,8 @@ test("@cross-browser More keeps Qibla, Masbaha, and Settings easy to reach", asy
     );
     expect(overflow).toBeLessThanOrEqual(1);
     if (viewport.width === 320) {
-      const compassDisclosure = page.locator("details").filter({ hasText: "Live compass" });
-      await compassDisclosure.locator("summary").click();
-      await expect(compassDisclosure).toHaveAttribute("open", "");
+      await expect(page.getByRole("img", { name: /Visual direction to the Kaaba at 136 degrees/ })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Enable live compass" })).toBeVisible();
       const qiblaSurface = page.locator(".app-screen-surface");
       await expect
         .poll(() =>
@@ -63,6 +62,8 @@ test("@cross-browser More keeps Qibla, Masbaha, and Settings easy to reach", asy
         .toEqual({ canScroll: true, overflowY: "auto" });
       await qiblaSurface.evaluate((element) => element.scrollTo({ top: element.scrollHeight }));
       expect(await qiblaSurface.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
+      const accuracyDisclosure = page.locator("details").filter({ hasText: "Accuracy and calibration tips" });
+      await accuracyDisclosure.locator("summary").click();
       await expect(page.getByText(/Keep the device flat/)).toBeVisible();
     }
   }
@@ -97,13 +98,10 @@ test("Qibla keeps the static bearing and explains Android sensor denial", async 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/#/qibla");
 
-  const compassDisclosure = page.locator("details").filter({ hasText: "Live compass" });
-  await compassDisclosure.locator("summary").click();
-  await expect(compassDisclosure).toHaveAttribute("open", "");
   await page.getByRole("button", { name: "Enable live compass" }).click();
   await expect(page.getByText(/Settings → Site settings → Motion sensors/)).toBeVisible();
   await expect(page.getByRole("button", { name: "Enable live compass" })).toHaveAttribute("aria-pressed", "false");
-  await expect(page.getByText(/Static bearing/)).toBeVisible();
+  await expect(page.getByText("Kaaba direction: 136° clockwise from North")).toBeVisible();
   await expect(page.getByTestId("qibla-arrow")).toHaveAttribute("transform", /^rotate\(136\./);
 });
 

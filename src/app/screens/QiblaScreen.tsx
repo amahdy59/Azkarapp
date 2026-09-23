@@ -99,7 +99,7 @@ function CompassDial({
   const cardinalLabels = language === "ar" ? ["شمال", "شرق", "جنوب", "غرب"] : ["N", "E", "S", "W"];
   return (
     <svg viewBox="0 0 320 320" className="aspect-square w-full" aria-hidden="true">
-      <circle cx="160" cy="160" r="146" fill="var(--card)" stroke="var(--border)" strokeWidth="2" />
+      <circle cx="160" cy="160" r="146" fill="var(--background)" stroke="var(--border)" strokeWidth="2" />
       <circle cx="160" cy="160" r="124" fill="none" stroke="var(--border)" strokeWidth="1" opacity="0.55" />
       <g data-testid="compass-rose" transform={`rotate(${northRotation} 160 160)`}>
         {ticks.map((degrees) => {
@@ -143,10 +143,18 @@ function CompassDial({
         transform={`rotate(${rotation} 160 160)`}
         style={reduceMotion ? undefined : { transition: "transform 180ms ease-out" }}
       >
-        <path d="M160 58 181 168 160 151 139 168Z" fill="var(--primary)" />
+        <path d="M160 67 181 168 160 151 139 168Z" fill="var(--primary)" />
         <path d="M160 262 181 152 160 169 139 152Z" fill="var(--muted-foreground)" opacity="0.55" />
-        <rect x="148" y="42" width="24" height="24" rx="5" fill="var(--primary)" />
-        <path d="M153 49h14v11h-14zM156 46h8v3h-8z" fill="var(--primary-foreground)" />
+        <g
+          data-testid="kaaba-target"
+          transform={`rotate(${-rotation} 160 43)`}
+          style={reduceMotion ? undefined : { transition: "transform 180ms ease-out" }}
+        >
+          <circle cx="160" cy="43" r="23" fill="var(--primary)" opacity="0.14" />
+          <rect x="143" y="27" width="34" height="32" rx="4" fill="var(--foreground)" />
+          <path d="M143 36h34v7h-34z" fill="var(--primary)" />
+          <path d="M165 45h7v14h-7z" fill="var(--primary)" />
+        </g>
       </g>
       <circle cx="160" cy="160" r="12" fill="var(--background)" stroke="var(--primary)" strokeWidth="6" />
     </svg>
@@ -299,8 +307,23 @@ export function QiblaScreen({
             </div>
           ) : (
             <>
-              <MapPin size={40} className="text-primary" aria-hidden="true" />
-              <h2 id="qibla-bearing" className="mt-2 text-center text-title font-extrabold text-foreground">
+              <figure
+                className="w-full"
+                role="img"
+                aria-label={t(language, "qibla.directionVisualLabel", {
+                  degrees: formatNumerals(roundedBearing!, language),
+                })}
+              >
+                <div className="mx-auto w-full max-w-[21rem]">
+                  <CompassDial
+                    rotation={dialRotation}
+                    northRotation={northRotation}
+                    reduceMotion={reduceMotion}
+                    language={language}
+                  />
+                </div>
+              </figure>
+              <h2 id="qibla-bearing" className="mt-1 text-center text-title font-extrabold text-foreground">
                 {t(language, "qibla.bearing", { degrees: formatNumerals(roundedBearing!, language) })}
               </h2>
               <p className="mt-1 text-center text-sm font-semibold text-muted-foreground">
@@ -313,37 +336,30 @@ export function QiblaScreen({
                   })}
                 </p>
               )}
+              <h3 className="mt-3 text-center font-bold text-foreground" aria-live="polite">
+                {guidance ??
+                  t(language, "qibla.staticDirection", {
+                    degrees: formatNumerals(roundedBearing!, language),
+                  })}
+              </h3>
               {!showDesktopGuide && (
-                <div className="mt-4 w-full rounded-2xl border border-border/40 bg-muted/20 p-4">
-                  <h3 className="text-caption font-bold uppercase tracking-wider text-foreground">
-                    {t(language, "qibla.alignmentStepsTitle")}
-                  </h3>
-                  <ol className="mt-2.5 space-y-2 text-xs font-medium text-muted-foreground">
-                    <li className="flex items-start gap-2.5">
-                      <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-micro font-bold text-primary">
-                        {formatNumerals(1, language)}
-                      </span>
-                      <span className="leading-5">{t(language, "qibla.alignmentStep1")}</span>
-                    </li>
-                    <li className="flex items-start gap-2.5">
-                      <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-micro font-bold text-primary">
-                        {formatNumerals(2, language)}
-                      </span>
-                      <span className="leading-5">
-                        {t(language, "qibla.alignmentStep2", {
-                          degrees: formatNumerals(roundedBearing!, language),
-                          cardinal: t(language, `qibla.${cardinalKey(bearing)}`),
-                        })}
-                      </span>
-                    </li>
-                    <li className="flex items-start gap-2.5">
-                      <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-micro font-bold text-primary">
-                        {formatNumerals(3, language)}
-                      </span>
-                      <span className="leading-5">{t(language, "qibla.alignmentStep3")}</span>
-                    </li>
-                  </ol>
-                </div>
+                <Button
+                  className="mt-4 min-h-11 w-full max-w-sm"
+                  variant={compassEnabled ? "outline" : "default"}
+                  onClick={() => void toggleCompass()}
+                  aria-pressed={compassEnabled}
+                >
+                  {compassEnabled ? t(language, "qibla.stopCompass") : t(language, "qibla.startCompass")}
+                </Button>
+              )}
+              {compassStatus && (
+                <p
+                  className="mt-3 text-center text-sm font-semibold text-muted-foreground"
+                  role="status"
+                  aria-live="polite"
+                >
+                  {compassStatus}
+                </p>
               )}
             </>
           )}
@@ -423,19 +439,9 @@ export function QiblaScreen({
               )}
             </section>
           ) : (
-            <details
-              className="rounded-3xl border border-border/50 bg-card p-5 shadow-raised"
-              onToggle={(event) => {
-                if (!event.currentTarget.open) {
-                  setCompassEnabled(false);
-                  setHeading(null);
-                  receivedHeading.current = false;
-                  setCompassStatus(null);
-                }
-              }}
-            >
+            <details className="rounded-3xl border border-border/50 bg-card p-5 shadow-raised">
               <summary className="min-h-11 cursor-pointer content-center font-bold focus-visible:ring-[3px] focus-visible:ring-ring">
-                {t(language, "qibla.liveCompass")}
+                {t(language, "qibla.accuracyTips")}
               </summary>
               <div className="flex items-start gap-3">
                 <span
@@ -446,39 +452,12 @@ export function QiblaScreen({
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="mt-1 text-sm font-semibold leading-6 text-muted-foreground">
-                    {t(language, "qibla.liveCompassHint")}
+                    {t(language, "qibla.calibrationHint")}
                   </p>
                 </div>
               </div>
-              {bearing !== null && (
-                <div className="mx-auto w-full max-w-[22rem]">
-                  <CompassDial
-                    rotation={dialRotation}
-                    northRotation={northRotation}
-                    reduceMotion={reduceMotion}
-                    language={language}
-                  />
-                  <h3 className="text-center font-bold" aria-live="polite">
-                    {guidance ?? t(language, "qibla.compassStatic")}
-                  </h3>
-                </div>
-              )}
-              <Button
-                className="mt-4 min-h-11 w-full"
-                variant={compassEnabled ? "outline" : "default"}
-                onClick={() => void toggleCompass()}
-                aria-pressed={compassEnabled}
-                disabled={bearing === null}
-              >
-                {compassEnabled ? t(language, "qibla.stopCompass") : t(language, "qibla.startCompass")}
-              </Button>
-              {compassStatus && (
-                <p className="mt-3 text-sm font-semibold text-muted-foreground" role="status" aria-live="polite">
-                  {compassStatus}
-                </p>
-              )}
               <p className="mt-3 text-xs font-semibold leading-5 text-muted-foreground">
-                {t(language, "qibla.calibrationHint")}
+                {t(language, "qibla.liveCompassHint")}
               </p>
             </details>
           )}

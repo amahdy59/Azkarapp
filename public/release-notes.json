@@ -1,15 +1,13 @@
 {
   "ar": [
-    "أصبح عداد الذكر الجاري يُحفظ تلقائياً عند التنقل أو تحديث الصفحة دون فقدان التقدم.",
-    "توحدت متابعة ورد القرآن اليومي لعرض عدد الصفحات والتقدم الفعلي بدقة عبر كافة الشاشات.",
-    "تعرض القبلة الآن زاوية الاتجاه الدقيقة والمسافة إلى مكة مع إرشادات عملية لمصلى القبلة.",
-    "فُصلت تنزيلات المصحف والصوتيات دون تداخل مع تحسين تصفح المكتبة وتوضيح تخطيط المصحف."
+    "تظهر جهة الكعبة الآن بصرياً على دائرة الاتجاه مباشرةً مع الشمال والزاوية والمسافة.",
+    "يحوّل تشغيل الاتجاه المباشر العلامة نفسها إلى إرشاد حي للدوران مع نصائح أوضح للمعايرة.",
+    "يبدأ تجهيز صفحة المصحف المحفوظة وخطها مبكراً لتصل إلى القراءة بسرعة أكبر."
   ],
   "en": [
-    "In-progress zikr counts now persist smoothly when switching screens or reloading.",
-    "Quran wird reading progress and daily goals now display unified fractional progress across all screens.",
-    "Qiblah now highlights your exact bearing, cardinal direction, and distance to Mecca with practical alignment steps.",
-    "Offline Quran and audio downloads now operate independently with enhanced library filtering and desktop page layout guidance."
+    "The Kaaba direction is now immediately visible on the direction dial with North, bearing, and distance.",
+    "Live direction turns the same Kaaba target into real-time rotation guidance with clearer calibration help.",
+    "Your saved Mushaf page and its font begin preparing earlier so reading starts faster."
   ],
-  "release": "2026-09-23-audit-fixes"
+  "release": "2026-09-23-qibla-mushaf"
 }

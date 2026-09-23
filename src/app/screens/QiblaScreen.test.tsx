@@ -51,7 +51,9 @@ describe("QiblaScreen", () => {
     expect(screen.getByRole("heading", { name: /Qibla is 136° from north/ })).toBeVisible();
     expect(screen.getByText("Cairo")).toBeVisible();
     expect(screen.getByRole("button", { name: "Enable live compass" })).toHaveAttribute("aria-pressed", "false");
-    expect(screen.getByText(/Static bearing/)).not.toBeVisible();
+    expect(screen.getByRole("img", { name: /Visual direction to the Kaaba at 136 degrees/ })).toBeVisible();
+    expect(screen.getByText("Kaaba direction: 136° clockwise from North")).toBeVisible();
+    expect(screen.getByTestId("kaaba-target")).toBeInTheDocument();
     expect(screen.getByTestId("compass-rose")).toHaveAttribute("transform", "rotate(0 160 160)");
     expect(screen.getByRole("heading", { name: "Qibla" }).closest(".app-screen-surface")).toHaveClass(
       "overflow-y-auto",
@@ -101,7 +103,6 @@ describe("QiblaScreen", () => {
       />,
     );
 
-    await user.click(screen.getByText("Live compass", { selector: "summary" }));
     await user.click(screen.getByRole("button", { name: "Enable live compass" }));
     expect(await screen.findByText(/supported device and a secure connection/)).toBeVisible();
   });
@@ -124,9 +125,7 @@ describe("QiblaScreen", () => {
       />,
     );
 
-    const control = screen.getByRole("button", { name: "Enable live compass" });
-    await user.click(screen.getByText("Live compass", { selector: "summary" }));
-    await user.click(control);
+    await user.click(screen.getByRole("button", { name: "Enable live compass" }));
     expect(requestPermission).toHaveBeenCalledWith(true);
     expect(screen.getByRole("button", { name: "Stop live compass" })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByText(/Waiting for an absolute compass heading/)).toBeVisible();
@@ -153,7 +152,6 @@ describe("QiblaScreen", () => {
       />,
     );
 
-    await user.click(screen.getByText("Live compass", { selector: "summary" }));
     await user.click(screen.getByRole("button", { name: "Enable live compass" }));
 
     expect(requestPermission).toHaveBeenNthCalledWith(1, true);
@@ -174,6 +172,7 @@ describe("QiblaScreen", () => {
     expect(screen.getByRole("heading", { name: "Turn 36° right" })).toBeVisible();
     expect(screen.getByTestId("compass-rose")).toHaveAttribute("transform", "rotate(260 160 160)");
     expect(screen.getByTestId("qibla-arrow")).toHaveAttribute("transform", expect.stringMatching(/^rotate\(36\./));
+    expect(screen.getByTestId("kaaba-target")).toHaveAttribute("transform", expect.stringMatching(/^rotate\(-36\./));
   });
 
   it("keeps the compass off and gives recovery guidance when absolute access is denied", async () => {
@@ -194,7 +193,6 @@ describe("QiblaScreen", () => {
       />,
     );
 
-    await user.click(screen.getByText("Live compass", { selector: "summary" }));
     await user.click(screen.getByRole("button", { name: "Enable live compass" }));
     expect(requestPermission).toHaveBeenCalledTimes(1);
     expect(screen.getByText(/Settings → Site settings → Motion sensors/)).toBeVisible();

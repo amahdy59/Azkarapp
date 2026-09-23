@@ -1,5 +1,6 @@
-const KAABA_LATITUDE = 21.4225;
-const KAABA_LONGITUDE = 39.8262;
+// WGS84 point used by Google Qibla Finder for the Kaaba.
+const KAABA_LATITUDE = 21.4224779;
+const KAABA_LONGITUDE = 39.8251832;
 
 export function normalizeDegrees(value: number): number {
   return ((value % 360) + 360) % 360;

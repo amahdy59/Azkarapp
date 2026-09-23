@@ -8,6 +8,7 @@ import {
   loadQcfFont,
   pageHasQcfGlyphs,
   parseMushafPage,
+  prepareMushafPage,
 } from "./qcfMushaf";
 
 afterEach(() => {
@@ -115,6 +116,27 @@ describe("Mushaf page data", () => {
 
     expect(a).toBe(b);
     expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("prepares the requested page data and font as one navigation-intent task", async () => {
+    const originalFonts = Object.getOwnPropertyDescriptor(document, "fonts");
+    const json = [{ k: "5:1", w: [[1, 8, 0, "يَـٰٓأَيُّهَا", "ﱁ"]] }];
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => json });
+    const load = vi.fn().mockResolvedValue({ family: "qcf-v2-page-513" });
+    class TestFontFace {
+      load = load;
+    }
+
+    vi.stubGlobal("fetch", fetchMock);
+    vi.stubGlobal("FontFace", TestFontFace);
+    Object.defineProperty(document, "fonts", { configurable: true, value: { add: vi.fn() } });
+
+    await expect(prepareMushafPage(513)).resolves.toBe(true);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(load).toHaveBeenCalledTimes(1);
+
+    if (originalFonts) Object.defineProperty(document, "fonts", originalFonts);
+    else Reflect.deleteProperty(document, "fonts");
   });
 });
 

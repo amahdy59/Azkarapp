@@ -27,6 +27,13 @@ test.beforeEach(async ({ page }) => {
 });
 
 test("keeps progress in the Wird overview and turns one semantic page by swipe, key, or button", async ({ page }) => {
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        performance.getEntriesByType("resource").some((entry) => entry.name.includes("/data/mushaf/42.json?v=3")),
+      ),
+    )
+    .toBe(true);
   const progress = page.getByRole("progressbar", { name: /أكملت ٠ من ٤/ });
   await expect(progress).toHaveAttribute("dir", "rtl");
   await expect(page.getByRole("navigation", { name: /التنقل (السفلي|الرئيسي)/ })).toBeVisible();

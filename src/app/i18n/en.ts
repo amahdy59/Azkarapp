@@ -1457,7 +1457,7 @@ const en = {
     locationTimeout: "Location took too long. Move to an open area and try again.",
     locationUnknown: "Location could not be read. Try again or add coordinates in Settings.",
     liveCompass: "Live compass",
-    liveCompassHint: "Rotate your device until the Qibla arrow points straight up.",
+    liveCompassHint: "When live direction is on, rotate your device until the Kaaba marker points straight ahead.",
     startCompass: "Enable live compass",
     stopCompass: "Stop live compass",
     compassWaiting: "Waiting for an absolute compass heading…",
@@ -1467,6 +1467,9 @@ const en = {
     compassDenied:
       "Motion sensors are blocked for this site. Check its sensor permission in your browser settings (Chrome: Settings → Site settings → Motion sensors), then reopen the app and try again. The bearing from north remains available.",
     compassStatic: "Static bearing — the arrow moves only when the live compass receives a heading.",
+    staticDirection: "Kaaba direction: {degrees}° clockwise from North",
+    directionVisualLabel: "Visual direction to the Kaaba at {degrees} degrees clockwise from North",
+    accuracyTips: "Accuracy and calibration tips",
     calibrationHint:
       "Keep the device flat and away from metal or magnets. Sensor readings can be affected by interference.",
     desktopGuideTitle: "Use the bearing on a larger screen",

@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import { QiblaScreen } from "./QiblaScreen";
 
 describe("QiblaScreen Task-First Experience", () => {
-  it("renders distance to Kaaba and 3-step alignment guidance without requiring sensors in English", () => {
+  it("renders a visual Kaaba direction and static fallback without requiring sensors in English", () => {
     render(
       <QiblaScreen
         language="en"
@@ -27,14 +27,12 @@ describe("QiblaScreen Task-First Experience", () => {
     // Distance to Kaaba
     expect(screen.getByText(/1,287 km to the Holy Kaaba/i)).toBeInTheDocument();
 
-    // 3-step alignment guidance
-    expect(screen.getByText("Finding the direction")).toBeInTheDocument();
-    expect(screen.getByText(/Find North \(0°\) using any standard compass app/i)).toBeInTheDocument();
-    expect(screen.getByText(/Turn clockwise to 136° \(South-east\)/i)).toBeInTheDocument();
-    expect(screen.getByText("Align your prayer mat in this direction.")).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: /Visual direction to the Kaaba at 136 degrees/ })).toBeVisible();
+    expect(screen.getByText("Kaaba direction: 136° clockwise from North")).toBeVisible();
+    expect(screen.getByRole("button", { name: "Enable live compass" })).toBeVisible();
   });
 
-  it("renders distance to Kaaba and 3-step alignment guidance with Arabic numerals and localization", () => {
+  it("renders the visual direction with Arabic numerals and localization", () => {
     render(
       <QiblaScreen
         language="ar"
@@ -58,10 +56,8 @@ describe("QiblaScreen Task-First Experience", () => {
     // Distance in Arabic numerals
     expect(screen.getByText(/١[,٬]?٢٨٧ كم إلى الكعبة المشرفة/)).toBeInTheDocument();
 
-    // Arabic steps
-    expect(screen.getByText("خطوات تحديد الاتجاه")).toBeInTheDocument();
-    expect(screen.getByText(/حدّد الشمال \(٠°\) باستخدام أي تطبيق بوصلة/)).toBeInTheDocument();
-    expect(screen.getByText(/استدر مع عقارب الساعة إلى ١٣٦° \(الجنوب الشرقي\)/)).toBeInTheDocument();
-    expect(screen.getByText("اضبط سجادة الصلاة في هذا الاتجاه.")).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: /اتجاه مرئي إلى الكعبة بزاوية ١٣٦ درجة/ })).toBeVisible();
+    expect(screen.getByText("اتجاه الكعبة: ١٣٦° مع عقارب الساعة من الشمال")).toBeVisible();
+    expect(screen.getByRole("button", { name: "تشغيل البوصلة المباشرة" })).toBeVisible();
   });
 });

@@ -109,8 +109,9 @@ const PrayerMomentScreen = retryableScreen(() =>
 const CompletionScreen = retryableScreen(() =>
   import("./screens/CompletionScreen").then((module) => ({ default: module.CompletionScreen })),
 );
+const loadKhatmahReaderModule = () => import("./screens/KhatmahReaderScreen");
 const KhatmahReaderScreen = retryableScreen(() =>
-  import("./screens/KhatmahReaderScreen").then((module) => ({ default: module.KhatmahReaderScreen })),
+  loadKhatmahReaderModule().then((module) => ({ default: module.KhatmahReaderScreen })),
 );
 const QuranWirdScreen = retryableScreen(() =>
   import("./screens/QuranWirdScreen").then((module) => ({ default: module.QuranWirdScreen })),
@@ -148,6 +149,20 @@ const OasisPreviewScreen = retryableScreen(() =>
 const FridaySalawatScreen = retryableScreen(() =>
   import("./screens/FridaySalawatScreen").then((module) => ({ default: module.FridaySalawatScreen })),
 );
+
+function warmMushafReader(page: number) {
+  const connection = (
+    navigator as Navigator & {
+      connection?: { saveData?: boolean; effectiveType?: string };
+    }
+  ).connection;
+  if (connection?.saveData || connection?.effectiveType?.includes("2g")) return;
+
+  void Promise.all([
+    loadKhatmahReaderModule(),
+    import("./content/qcfMushaf").then((module) => module.prepareMushafPage(page)),
+  ]).catch(() => undefined);
+}
 const ProgressShareModal = lazy(() =>
   import("./components/ProgressShareModal").then((module) => ({ default: module.ProgressShareModal })),
 );
@@ -384,6 +399,13 @@ function AppContent({
   const [quranWirdPlan, setQuranWirdPlan] = useState<QuranWirdPlan>(
     initialState.quranWirdPlan ?? { kind: "daily", dailyPages: initialState.dailyWirdGoal ?? 4 },
   );
+
+  // The overview is a strong signal that reading is next. Warm the exact
+  // continuation page and its route while the reader reviews today's plan,
+  // but respect data-saver and constrained 2G connections.
+  useEffect(() => {
+    if (view === "khatmah_overview") warmMushafReader(quranReadingPosition.page);
+  }, [quranReadingPosition.page, view]);
 
   /**
    * Upserts what is recorded about a prayer on the current progress day.
@@ -1453,6 +1475,7 @@ function AppContent({
                   wirdHistory={wirdHistory}
                   onContinueKhatmah={() => {
                     setKhatmahPage(quranReadingPosition.page);
+                    warmMushafReader(quranReadingPosition.page);
                     push("khatmah");
                   }}
                   onResume={(categoryId) => {
@@ -1993,7 +2016,10 @@ function AppContent({
                   quranWirdDailyGoals={quranWirdDailyGoals}
                   lastReadingEvent={quranLastReadingEvent}
                   onBack={pop}
-                  onContinue={() => push("khatmah")}
+                  onContinue={() => {
+                    warmMushafReader(quranReadingPosition.page);
+                    push("khatmah");
+                  }}
                   onPlanChange={(plan) => {
                     setQuranWirdPlan(plan);
                     if (plan.dailyPages > 0) setDailyWirdGoal(plan.dailyPages);

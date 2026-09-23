@@ -337,9 +337,19 @@ export async function discardRetiredCaches(): Promise<string[]> {
   return discarded;
 }
 
+/**
+ * Makes one page fully ready for the reader. The local page JSON and its QCF
+ * font start together, so the slower cross-origin font does not wait behind
+ * parsing work. Callers with strong navigation intent may await this; ordinary
+ * look-ahead uses the non-blocking wrapper below.
+ */
+export async function prepareMushafPage(page: number): Promise<boolean> {
+  if (page < 1 || page > 604) return false;
+  const [, fontReady] = await Promise.all([loadMushafPage(page), loadQcfFont(page)]);
+  return fontReady;
+}
+
 /** Warms a neighbouring page without ever surfacing its failure. */
 export function prefetchMushafPage(page: number) {
-  if (page < 1 || page > 604) return;
-  void loadMushafPage(page).catch(() => undefined);
-  void loadQcfFont(page);
+  void prepareMushafPage(page).catch(() => undefined);
 }

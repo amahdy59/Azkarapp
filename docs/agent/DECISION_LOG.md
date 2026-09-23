@@ -3849,3 +3849,17 @@ null` shape, so a record written before this change still loads and still
 - **Files/contracts to update:** `src/app/screens/AzkarLibraryScreen.tsx`, `src/app/screens/AzkarLibraryScreen.test.tsx`, `src/app/components/MushafSettingsSheet.tsx`, `src/app/components/MushafSettingsSheet.test.tsx`, `src/app/components/MushafPageViewer.tsx`, `src/app/components/ScreenFallback.tsx`, `src/app/i18n/en.ts`, `src/app/i18n/ar.ts`, `docs/agent/phases/PHASE_58_MUSHAF_MOBILE_POLISH.md`.
 - **Tests/evidence required:** Tests in `AzkarLibraryScreen.test.tsx`, `MushafSettingsSheet.test.tsx`, `MushafPageViewer.test.tsx`, i18n parity check, and full local quality gates.
 - **Supersedes:** None
+
+## DEC-201 — One visual Kaaba direction and intent-led Mushaf warm-up
+
+- **Date:** 2026-09-23
+- **Status:** Approved
+- **Owner:** Product owner (Phase 60 request)
+- **Related phase:** Phase 60
+- **Context:** The correct Qibla bearing existed, but its visual target was hidden inside a secondary mobile disclosure and absent from the desktop primary surface. The Mushaf already cached local page data and remote QCF fonts, but route, page, and font work began only after entering the reader, leaving avoidable cold-start latency.
+- **Decision:** Always render one prominent Kaaba target on the north-referenced Qibla dial whenever coordinates exist. Before sensor access it visualizes the locally calculated bearing; after an explicit live-direction action it rotates relative to a valid earth-referenced phone heading and provides textual turn guidance. Keep fine-pointer desktop sensor-free. Treat the Quran Wird overview and direct Home continuation as high-intent signals: concurrently warm the existing lazy reader module, exact saved page JSON, and matching QCF font, while skipping speculative work for Data Saver and 2G-class connections.
+- **Why:** This matches the successful interaction model of established Qibla tools—stable destination, separate North, explicit calibration—while preserving the app's more dependable numeric fallback. Starting only the exact likely Mushaf resources before navigation removes request sequencing from the reader's critical path without downloading the full 604-font set.
+- **Consequences:** Qibla direction is visually useful immediately on phone, tablet, and desktop; supported phones enhance the same visual rather than revealing a second one. Mushaf continuation usually opens from warmed resources, with existing in-flight deduplication, offline caching, and constrained-network behavior intact.
+- **Files/contracts to update:** `src/app/qibla.ts`, `src/app/screens/QiblaScreen.tsx`, `src/app/content/qcfMushaf.ts`, `src/app/App.tsx`, localization, focused unit/browser tests, architecture, design system, and Phase 60 report.
+- **Tests/evidence required:** Static/live visual rotation, upright Kaaba target, permission fallback, bilingual text alternatives, overview resource warm-up before navigation, responsive screenshots, full local gates, and production smoke verification.
+- **Supersedes:** The hidden-dial presentation detail of DEC-199; it preserves DEC-187, DEC-190, and DEC-191 sensor-permission and heading-integrity rules.
