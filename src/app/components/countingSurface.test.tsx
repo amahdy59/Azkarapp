@@ -71,6 +71,17 @@ describe("counting surface", () => {
     expect(onCount).toHaveBeenCalledTimes(1);
   });
 
+  it("renders one fresh canvas ripple and replaces it on rapid taps", () => {
+    const { container } = render(<Surface onCount={vi.fn()} />);
+    const page = screen.getByTestId("page");
+
+    fireEvent.pointerDown(page, { clientX: 5, clientY: 5 });
+    expect(container.querySelectorAll(".tap-ripple")).toHaveLength(1);
+    fireEvent.pointerUp(screen.getByTestId("surface"));
+    fireEvent.pointerDown(page, { clientX: 8, clientY: 8 });
+    expect(container.querySelectorAll(".tap-ripple")).toHaveLength(1);
+  });
+
   it("is the only definition of the press: no screen re-declares its own", () => {
     // The three counting screens had each grown a copy, and they drifted — the
     // reader pressed half as far over twice as long as the other two.

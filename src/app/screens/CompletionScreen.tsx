@@ -8,6 +8,7 @@ import { getAzkarForMode, isRoutineCategory } from "../content/azkar";
 import { formatHijriDate, formatNumerals, numeralFontFamily } from "../formatting";
 import { t } from "../i18n";
 import { shouldReduceMotion, vibrateIfEnabled } from "../motionPreferences";
+import "../../styles/animations/ZikrAnimations.css";
 import { getCategoryStreak, MAIN_CATEGORY_IDS, type GrowthEvent } from "../progress";
 import type { AppLanguage, CategoryId, DailyCollectionCompletion, RoutineMode } from "../types";
 import { reportError } from "../../lib/observability";

@@ -217,6 +217,7 @@ function AppContent({
     () => import.meta.env.DEV && new URLSearchParams(window.location.search).get("audio-review") === "1",
   );
   const [routineModes, setRoutineModes] = useState(initialState.settings.routineModes);
+  const [reduceMotion, setReduceMotion] = useState(initialState.settings.reduceMotion);
 
   const {
     view,
@@ -237,14 +238,21 @@ function AppContent({
     setSearchQuery,
     librarySection,
     setLibrarySection,
+    navigateLibrarySection,
+    progressPeriod,
+    navigateProgressPeriod,
+    settingsPanel,
+    navigateSettingsPanel,
+    backSettingsPanel,
     routeContentLoading,
     routeContentError,
     setRouteContentError,
     push,
+    replace,
     pop,
     handleNavTab,
     hydrateRouteCategory,
-  } = useAppRouting({ routineModes, hasCompletedOnboarding });
+  } = useAppRouting({ routineModes, hasCompletedOnboarding, reduceMotion });
 
   const activeRoutineMode: RoutineMode = isRoutineCategory(activeCat) ? routineModes[activeCat] : "complete";
   const activeAzkarList =
@@ -298,7 +306,6 @@ function AppContent({
   const [zikrFont, setZikrFont] = useState<ZikrFontOption>(initialState.settings.zikrFont ?? "humanist");
   const [highContrast, setHighContrast] = useState(initialState.settings.highContrast);
   const [boldText, setBoldText] = useState(initialState.settings.boldText);
-  const [reduceMotion, setReduceMotion] = useState(initialState.settings.reduceMotion);
   const [reduceTransparency, setReduceTransparency] = useState(initialState.settings.reduceTransparency);
   const [hapticFeedback, setHapticFeedback] = useState(initialState.settings.hapticFeedback);
   const [forceRtl, setForceRtl] = useState(initialState.settings.forceRtl);
@@ -1552,6 +1559,7 @@ function AppContent({
                   direction={layoutDirection}
                   locationSettings={locationSettings}
                   reduceMotion={reduceMotion}
+                  hapticFeedback={hapticFeedback}
                   onBack={pop}
                 />
               )}
@@ -1575,6 +1583,7 @@ function AppContent({
                   savedZikrIds={savedZikrIds}
                   routineModes={routineModes}
                   initialSection={librarySection}
+                  onSectionChange={navigateLibrarySection}
                   onOpenBenefits={() => push("benefits")}
                 />
               )}
@@ -1600,6 +1609,8 @@ function AppContent({
                   mosquePrayerGoal={mosquePrayerGoal}
                   dailyPathStartDayKey={dailyPathStartDayKey}
                   weeklyGoalDays={weeklyGoalDays}
+                  initialPeriod={progressPeriod}
+                  onPeriodChange={navigateProgressPeriod}
                   onPrayerResume={(prayer) => {
                     setActivePrayer(prayer);
                     push("prayer");
@@ -1681,10 +1692,7 @@ function AppContent({
                   direction={layoutDirection}
                   reduceMotion={reduceMotion}
                   hapticFeedback={hapticFeedback}
-                  onBack={() => {
-                    window.history.replaceState({ view: "friday" }, "", "?view=friday");
-                    setView("friday");
-                  }}
+                  onBack={() => replace("friday")}
                 />
               )}
               {view === "category" && !routeContentLoading && !routeContentError && (
@@ -1779,14 +1787,7 @@ function AppContent({
                   textSize={textSize}
                   onTextSizeChange={setTextSize}
                   savedZikrIds={savedZikrIds}
-                  onBack={
-                    activeCat === "friday_kahf"
-                      ? () => {
-                          window.history.replaceState({ view: "friday" }, "", "?view=friday");
-                          setView("friday");
-                        }
-                      : leaveReader
-                  }
+                  onBack={activeCat === "friday_kahf" ? () => replace("friday") : leaveReader}
                   onComplete={(i) => {
                     if (fridayDuaFlow && activeCat === "comprehensive_duas") {
                       updateFridayDuaProgress(i, true);
@@ -1831,10 +1832,7 @@ function AppContent({
                   }}
                   onAdvance={
                     activeCat === "friday_kahf"
-                      ? () => {
-                          window.history.replaceState({ view: "friday" }, "", "?view=friday");
-                          setView("friday");
-                        }
+                      ? () => replace("friday")
                       : fridayDuaFlow && activeCat === "comprehensive_duas"
                         ? (i) => {
                             const effectiveProgress = new Set(fridayDuaCompletedIds);
@@ -1845,8 +1843,7 @@ function AppContent({
                               setActiveIdx(nextIndex);
                               return;
                             }
-                            window.history.replaceState({ view: "friday" }, "", "?view=friday");
-                            setView("friday");
+                            replace("friday");
                             setFridayDuaFlow(false);
                           }
                         : advanceAfterCompletion
@@ -2029,6 +2026,9 @@ function AppContent({
                   onResetPreferences={handleResetPreferences}
                   onClearLocalData={handleClearLocalData}
                   onDeleteAccount={handleDeleteAccount}
+                  initialSub={settingsPanel}
+                  onSubChange={navigateSettingsPanel}
+                  onSubBack={backSettingsPanel}
                 />
               )}
               {view === "search" && (
@@ -2083,6 +2083,7 @@ function AppContent({
                   setKhatmahPage={handleKhatmahPageChange}
                   progressDayStartHour={progressDayStartHour}
                   reduceMotion={reduceMotion}
+                  hapticFeedback={hapticFeedback}
                   mushafTheme={mushafTheme}
                   appTheme={themeMode}
                   setMushafTheme={setMushafTheme}

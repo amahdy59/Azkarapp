@@ -155,6 +155,7 @@ export function BenefitsScreen({
           direction={direction}
           idPrefix="benefits"
           aria-label={t(language, "benefits.sectionsLabel")}
+          indicatorClassName="bg-primary shadow-sm"
           className="grid grid-cols-2 gap-2 rounded-3xl border border-border bg-card p-2"
           itemClassName={(selected) =>
             `min-h-11 rounded-2xl px-3 py-2 text-label font-black transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${

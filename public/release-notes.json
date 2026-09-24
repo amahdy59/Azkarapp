@@ -1,15 +1,15 @@
 {
   "ar": [
-    "تبدأ المسبحة الآن بهدف عددي واضح دائماً، مع أهداف جاهزة وإمكانية اختيار رقم مخصص.",
-    "يمكن البحث عن الذكر الصحيح ورؤية فائدته المختصرة قبل اختياره، مع تأكيد يحمي العدّ الجاري من المسح غير المقصود.",
-    "يعرض قسم التقدم نية الأسبوع بصورة مستقلة عن نشاط الأيام السبعة لتبقى المقارنات واضحة ودقيقة.",
-    "تعرض خريطة السنة جميع أيام كل شهر، وأصبح ملخص المشاركة أوضح في وصف الورد والممارسات الإضافية."
+    "يمكن الآن فتح أقسام المحفوظات وفترات التقدم وصفحات الإعدادات مباشرةً من رابط، مع رجوع المتصفح إلى المكان المتوقع.",
+    "أصبحت روابط التنقل والمجموعات تعمل كرابط حقيقي مع الحفاظ على تجربة التطبيق السريعة.",
+    "أصبحت واجهة الصفحة الرئيسية عند التمرير أكثر هدوءاً ووضوحاً، مع حركة قارئ وتبويبات ومشغل صوت أكثر سلاسة.",
+    "تقدم القبلة والعدادات تأكيداً هادئاً ودقيقاً، ولا تعمل الاهتزازات إلا عند تفعيلها."
   ],
   "en": [
-    "Masbaha now always begins with a clear numeric goal, with useful presets and a custom target option.",
-    "Search the exact remembrance and review its concise benefit before selecting it, with confirmation that protects an active count.",
-    "Progress shows the weekly intention separately from seven-day activity so comparisons stay clear and truthful.",
-    "The year map now includes every day of each month, and private sharing describes routines and additional practice more clearly."
+    "Saved items, Progress periods, and Settings pages now have direct links, with browser Back returning to the expected place.",
+    "Primary navigation and collection destinations now behave as real links while keeping the app experience fast.",
+    "The scrolled Home header is calmer and clearer, while Reader movement, tabs, and the audio player transition more smoothly.",
+    "Qibla alignment and counters provide calm, precise confirmation, and vibration only runs when enabled."
   ],
-  "release": "2026-09-24-masbaha-progress"
+  "release": "2026-09-24-navigation-motion"
 }

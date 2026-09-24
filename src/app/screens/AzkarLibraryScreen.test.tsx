@@ -22,7 +22,7 @@ describe("AzkarLibraryScreen", () => {
       />,
     );
 
-    const collection = screen.getByRole("button", { name: /^Morning Azkar/ });
+    const collection = screen.getByRole("link", { name: /^Morning Azkar/ });
     const benefits = screen.getByTestId("library-benefits-tool");
     expect(collection.compareDocumentPosition(benefits) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(screen.queryByTestId("library-quran-tool")).not.toBeInTheDocument();
@@ -104,7 +104,7 @@ describe("AzkarLibraryScreen", () => {
       />,
     );
 
-    const card = screen.getByRole("button", {
+    const card = screen.getByRole("link", {
       name: "Comprehensive Duas, 0 of 47 complete",
     });
     fireEvent.click(card);
@@ -128,8 +128,8 @@ describe("AzkarLibraryScreen", () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "In-Prayer Supplications, 17 supplications" }));
-    fireEvent.click(screen.getByRole("button", { name: "Fasting & Ramadan, 2 supplications" }));
+    fireEvent.click(screen.getByRole("link", { name: "In-Prayer Supplications, 17 supplications" }));
+    fireEvent.click(screen.getByRole("link", { name: "Fasting & Ramadan, 2 supplications" }));
 
     expect(onCategory).toHaveBeenNthCalledWith(1, "in_prayer");
     expect(onCategory).toHaveBeenNthCalledWith(2, "fasting_ramadan");
@@ -155,13 +155,13 @@ describe("AzkarLibraryScreen", () => {
     expect(input.labels?.[0]).toBeVisible();
     expect(input.labels?.[0]).toHaveTextContent("Search azkar and duas");
 
-    expect(screen.getByRole("button", { name: /^Morning Azkar/ })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /^Morning Azkar/ })).toBeInTheDocument();
 
     // Typing narrows the visible collections and must never leave the Library.
     fireEvent.change(input, { target: { value: " sleep " } });
     expect(onSearch).not.toHaveBeenCalled();
     expect(screen.queryByRole("button", { name: /^Morning Azkar/ })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /^Before Sleep Azkar/ })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /^Before Sleep Azkar/ })).toBeInTheDocument();
     expect(screen.getByTestId("library-filter-status")).toHaveTextContent("1 collection matches “sleep”");
     expect(screen.getByTestId("library-filter-status")).toHaveAttribute("aria-live", "polite");
   });
@@ -195,7 +195,7 @@ describe("AzkarLibraryScreen", () => {
     expect(onSearch).toHaveBeenCalledWith("sleep");
 
     // Matching collections and matching azkar are rendered in-page
-    expect(screen.getByRole("button", { name: /^Before Sleep Azkar/ })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /^Before Sleep Azkar/ })).toBeInTheDocument();
     const matchingZikrCards = screen.getAllByTestId("matching-zikr-card");
     expect(matchingZikrCards.length).toBeGreaterThan(0);
 
@@ -207,7 +207,7 @@ describe("AzkarLibraryScreen", () => {
     const clearBtn = screen.getAllByRole("button", { name: "Clear search" })[0];
     fireEvent.click(clearBtn);
     expect(input.value).toBe("");
-    expect(screen.getByRole("button", { name: /^Morning Azkar/ })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /^Morning Azkar/ })).toBeInTheDocument();
   });
 
   it("starts an empty Arabic query in RTL and uses automatic direction after typing", () => {

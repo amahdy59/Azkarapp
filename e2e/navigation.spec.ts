@@ -10,7 +10,7 @@ async function enterAsEnglishGuest(page: Page) {
 test("@cross-browser Azkar tab opens the library and exposes search", async ({ page }) => {
   await enterAsEnglishGuest(page);
 
-  await page.getByRole("button", { name: "Azkar", exact: true }).click();
+  await page.getByRole("link", { name: "Azkar", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Azkar Library", exact: true })).toBeVisible();
   await expect(page.getByRole("textbox", { name: "Search azkar and duas", exact: true })).toBeVisible();
 
@@ -121,12 +121,32 @@ test("hash routes restore lazy collections, reject invalid positions, and preser
   await expect(page).toHaveURL(/#\/azkar\/evening$/);
 });
 
+test("secondary app state is deep-linkable and browser Back restores Settings root", async ({ page }) => {
+  await enterAsEnglishGuest(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+
+  await page.getByTestId("nav-settings").click();
+  await page.getByTestId("settings-sub-audio").click();
+  await expect(page).toHaveURL(/#\/settings\/audio$/);
+  await expect(page.getByRole("heading", { name: "Audio & recitations", exact: true })).toBeVisible();
+
+  await page.goBack();
+  await expect(page).toHaveURL(/#\/settings$/);
+  await expect(page.getByTestId("settings-sub-audio")).toBeVisible();
+
+  await page.goto("/#/progress/month");
+  await expect(page.getByRole("tab", { name: "Month" })).toHaveAttribute("aria-selected", "true");
+
+  await page.goto("/#/azkar/saved");
+  await expect(page.getByText("Nothing saved yet", { exact: true })).toBeVisible();
+});
+
 test("saved zikr is visible from the first-class Saved library tab", async ({ page }) => {
   await enterAsEnglishGuest(page);
 
   // Enter a fixed collection directly: the Home CTA intentionally changes to
   // Comprehensive Duas during the last third of the night.
-  await page.getByRole("button", { name: "Azkar", exact: true }).click();
+  await page.getByRole("link", { name: "Azkar", exact: true }).click();
   await page.getByTestId("category-card-morning").click();
   await page.getByRole("button", { name: "Start Session", exact: true }).click();
 
@@ -135,7 +155,7 @@ test("saved zikr is visible from the first-class Saved library tab", async ({ pa
   await page.getByRole("button", { name: "Reader options", exact: true }).click();
   await page.getByRole("menuitem", { name: "Save zikr", exact: true }).click();
   await page.getByRole("button", { name: "Back", exact: true }).click();
-  await page.getByRole("button", { name: "Azkar", exact: true }).click();
+  await page.getByRole("link", { name: "Azkar", exact: true }).click();
   const compactSection = page.getByTestId("library-mobile-section");
   if ((page.viewportSize()?.width ?? 0) < 640) {
     await expect(compactSection).toBeVisible();
@@ -144,6 +164,8 @@ test("saved zikr is visible from the first-class Saved library tab", async ({ pa
   } else {
     await page.getByTestId("library-section-saved").click();
   }
+
+  await expect(page).toHaveURL(/#\/azkar\/saved$/);
 
   await expect(page.getByRole("heading", { name: "Saved remembrance", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: /Azkar:/ }).first()).toBeVisible();
@@ -213,7 +235,7 @@ test("collection keeps canonical order and reset stays inside the app canvas", a
   await expect(page.getByTestId("home-primary-cta")).toBeVisible({ timeout: 15_000 });
   await page.getByTestId("home-primary-cta").click();
   await page.getByRole("button", { name: "Back", exact: true }).click();
-  await page.getByRole("button", { name: "Azkar", exact: true }).click();
+  await page.getByRole("link", { name: "Azkar", exact: true }).click();
   await page.getByTestId("category-card-morning").click();
 
   await expect(page.getByText("Collection introduction", { exact: true })).toBeVisible();

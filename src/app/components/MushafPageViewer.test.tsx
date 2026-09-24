@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { MushafPageViewer, AyahMarker, resolveInkAllowance } from "./MushafPageViewer";
 
@@ -108,6 +108,49 @@ describe("MushafPageViewer", () => {
     );
 
     expect(container.querySelector('[data-page-transition="forward"]')).toBeInTheDocument();
+  });
+
+  it("vibrates on a settled page turn only when haptics are enabled", () => {
+    const vibrate = vi.fn();
+    Object.defineProperty(navigator, "vibrate", { configurable: true, value: vibrate });
+    const { rerender } = render(
+      <MushafPageViewer
+        lines={sampleLines}
+        language="ar"
+        pageNumber={3}
+        surahName="سورة البقرة"
+        juzNumber={1}
+        direction="rtl"
+      />,
+    );
+
+    rerender(
+      <MushafPageViewer
+        lines={sampleLines}
+        language="ar"
+        pageNumber={4}
+        surahName="سورة البقرة"
+        juzNumber={1}
+        direction="rtl"
+        pageTransitionDirection="forward"
+        hapticFeedback={false}
+      />,
+    );
+    expect(vibrate).not.toHaveBeenCalled();
+
+    rerender(
+      <MushafPageViewer
+        lines={sampleLines}
+        language="ar"
+        pageNumber={5}
+        surahName="سورة البقرة"
+        juzNumber={1}
+        direction="rtl"
+        pageTransitionDirection="forward"
+        hapticFeedback
+      />,
+    );
+    expect(vibrate).toHaveBeenCalledWith(10);
   });
 
   it("renders official QCF glyphs with semantic text retained for assistive technology", () => {

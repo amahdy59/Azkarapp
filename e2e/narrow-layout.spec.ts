@@ -38,7 +38,7 @@ test("core app screens do not overflow a 320px viewport", async ({ page }) => {
     ).toEqual({ fits: true, hasRemovedIcon: false });
   }
 
-  await page.getByRole("button", { name: "Azkar", exact: true }).click();
+  await page.getByRole("link", { name: "Azkar", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Azkar Library", exact: true })).toBeVisible();
   await expectNoHorizontalOverflow(page, "Azkar Library");
 

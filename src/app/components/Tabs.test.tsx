@@ -12,7 +12,7 @@ type TabValue = (typeof TABS)[number]["value"];
 
 function renderTabs(value: TabValue = "day", direction: "ltr" | "rtl" = "ltr") {
   const onChange = vi.fn();
-  render(
+  const result = render(
     <TabList
       value={value}
       onChange={onChange}
@@ -20,10 +20,11 @@ function renderTabs(value: TabValue = "day", direction: "ltr" | "rtl" = "ltr") {
       direction={direction}
       idPrefix="garden"
       aria-label="View mode"
+      indicatorClassName="bg-primary"
       itemClassName={(selected) => (selected ? "selected" : "unselected")}
     />,
   );
-  return { onChange };
+  return { onChange, ...result };
 }
 
 describe("TabList", () => {
@@ -56,6 +57,11 @@ describe("TabList", () => {
 
     fireEvent.click(screen.getByRole("tab", { name: "Week" }));
     expect(onChange).toHaveBeenCalledWith("week");
+  });
+
+  it("renders a single moving selection indicator", () => {
+    const { container } = renderTabs();
+    expect(container.querySelectorAll("[aria-hidden='true']")).toHaveLength(1);
   });
 
   it("moves to the next tab on ArrowRight in LTR", () => {

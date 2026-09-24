@@ -1,6 +1,7 @@
 import { CatIcon } from "./CatIcon";
 import { Check } from "./icons";
 import { ProgressBar } from "./ProgressBar";
+import type { MouseEvent } from "react";
 
 export interface CategoryCardProps {
   id: string;
@@ -15,6 +16,7 @@ export interface CategoryCardProps {
   occasionalSubtitle?: string;
   ariaLabel: string;
   onClick: () => void;
+  href?: string;
   index?: number;
 }
 
@@ -31,21 +33,16 @@ export function CategoryCard({
   occasionalSubtitle,
   ariaLabel,
   onClick,
+  href,
   index,
 }: CategoryCardProps) {
   const isComplete = completedCount >= totalCount && totalCount > 0;
   const isStarted = completedCount > 0;
 
-  return (
-    <button
-      type="button"
-      data-testid={`category-card-${id}`}
-      dir={direction}
-      onClick={onClick}
-      style={index !== undefined ? { animationDelay: `${index * 45}ms` } : undefined}
-      className={`interactive-elem flex min-h-[82px] w-full items-center gap-4 rounded-3xl border border-border/40 bg-card p-4.5 text-start shadow-raised hover:border-primary/40 hover:shadow-overlay transition-transform focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${index !== undefined ? "stagger-enter" : ""}`}
-      aria-label={ariaLabel}
-    >
+  const className = `interactive-elem flex min-h-[82px] w-full items-center gap-4 rounded-3xl border border-border/40 bg-card p-4.5 text-start no-underline shadow-raised hover:border-primary/40 hover:shadow-overlay transition-transform focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${index !== undefined ? "stagger-enter" : ""}`;
+  const style = index !== undefined ? { animationDelay: `${index * 45}ms` } : undefined;
+  const content = (
+    <>
       <span
         data-slot="category-icon"
         className="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary/10"
@@ -94,6 +91,41 @@ export function CategoryCard({
           </div>
         )}
       </span>
+    </>
+  );
+
+  if (href) {
+    const handleLinkClick = (event: MouseEvent<HTMLAnchorElement>) => {
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+      onClick();
+    };
+    return (
+      <a
+        href={href}
+        data-testid={`category-card-${id}`}
+        dir={direction}
+        onClick={handleLinkClick}
+        style={style}
+        className={className}
+        aria-label={ariaLabel}
+      >
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      data-testid={`category-card-${id}`}
+      dir={direction}
+      onClick={onClick}
+      style={style}
+      className={className}
+      aria-label={ariaLabel}
+    >
+      {content}
     </button>
   );
 }

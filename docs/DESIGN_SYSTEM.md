@@ -321,7 +321,7 @@ Three screens count dhikr — the reader, the Masbaha and Friday's salawat. All 
 | -------------- | ------------------------------------------------------------------------------------- |
 | Press scale    | `--motion-scale-pressed` (0.97), shared with every control                            |
 | Press duration | 90 ms down, 420 ms back through an overshoot — see the table above                    |
-| Ripple         | `.tap-ripple` / `tap-ripple-expand`, 560 ms, from the point of contact, max 4 at once |
+| Ripple         | `.tap-ripple` / `tap-ripple-expand`, 560 ms, from the point of contact, one at a time |
 
 The counter button itself is part of this surface, not an exception to it: it presses to the same depth over the same duration as the page around it, and leaves the same ripple. It previously pressed to 0.985 through a framer-motion `whileTap` while a CSS rule drove the same property with no transition — two mechanisms on one property, and a press half as deep as the page it sits on, so the gesture changed meaning depending on where the thumb landed. CSS owns the press; the ripple is the one `.tap-ripple`.
 
@@ -341,12 +341,15 @@ The press is separate from any entrance animation on the same element: a 300 ms 
 | Settings                   | Toggle thumb and color change together in 200–300 ms; rows use opacity/press feedback; destructive actions do not celebrate.                                                                       |
 | Session completion         | Main check uses the celebration pop/glow once; summary cards enter with a short stagger; primary actions compress on press.                                                                        |
 
+Tabs and segmented controls move one shared active pill over 180 ms instead of independently fading multiple selected backgrounds. Reader content enters from the logical direction of travel and reverses for Previous, including RTL. The compact and expanded audio player share one 240 ms layout transition anchored at the bottom edge. Qibla alignment becomes confirmed only after remaining within ±3° for 350 ms, provides one short optional haptic, and does not re-arm until the heading leaves ±5°. None of these cues loop, and all collapse under either reduced-motion preference.
+
 ### Accessibility and feedback
 
 - Completion uses a visible check, progress state, an assertive live-region announcement, and optional vibration; it never relies on color or vibration alone.
 - Ready-state copy is announced when a new zikr starts. Counter activation supports pointer, Enter, and Space.
 - Never delay navigation for decorative motion except the documented 500 ms completion acknowledgement.
 - Do not add autoplaying, looping, flashing, parallax, or large lateral movement. Haptics must be short, optional, and ignored gracefully when unsupported.
+- Every vibration passes through `vibrateIfEnabled`; visual and semantic confirmation remain complete when haptics are disabled or unavailable.
 
 ## Responsive shell
 

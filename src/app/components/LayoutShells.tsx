@@ -49,6 +49,20 @@ function getNavTabs(language: AppLanguage) {
   ];
 }
 
+const NAV_HREF: Record<NavTab, string> = {
+  home: "#/home",
+  quran: "#/quran-wird",
+  azkar: "#/azkar",
+  progress: "#/progress",
+  settings: "#/settings",
+};
+
+function followInAppLink(event: React.MouseEvent<HTMLAnchorElement>, action: () => void) {
+  if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  event.preventDefault();
+  action();
+}
+
 export function IconButton({
   label,
   className = "",
@@ -158,13 +172,14 @@ export function BottomNav({ active, onChange, isArabic = false }: NavProps) {
         {tabs.map(({ id, label, Icon }) => {
           const on = active === id;
           return (
-            <button
+            <a
               key={id}
+              href={NAV_HREF[id]}
               data-testid={`nav-${id}`}
-              onClick={() => onChange(id)}
+              onClick={(event) => followInAppLink(event, () => onChange(id))}
               aria-label={label}
               aria-current={on ? "page" : undefined}
-              className="relative flex h-full min-h-11 min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-lg transition-[opacity,transform] duration-fast active:scale-95 active:opacity-70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              className="relative flex h-full min-h-11 min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-lg no-underline transition-[opacity,transform] duration-fast active:scale-95 active:opacity-70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
               {/* Persistent non-color active cue. The selected state must not be
                   conveyed by colour alone, and .nav-active-cue below is only a
@@ -184,7 +199,7 @@ export function BottomNav({ active, onChange, isArabic = false }: NavProps) {
               >
                 {label}
               </span>
-            </button>
+            </a>
           );
         })}
       </div>
@@ -215,10 +230,11 @@ export function NavRail({ active, onChange, isArabic = false }: NavProps) {
       {tabs.map(({ id, label, Icon }) => {
         const on = active === id;
         return (
-          <button
+          <a
             key={id}
+            href={NAV_HREF[id]}
             data-testid={`nav-${id}`}
-            onClick={() => onChange(id)}
+            onClick={(event) => followInAppLink(event, () => onChange(id))}
             aria-current={on ? "page" : undefined}
             className="nav-rail-item"
           >
@@ -228,7 +244,7 @@ export function NavRail({ active, onChange, isArabic = false }: NavProps) {
             <span className="nav-rail-label" dir="auto">
               {label}
             </span>
-          </button>
+          </a>
         );
       })}
     </nav>
@@ -304,10 +320,11 @@ export function NavSidebar({
         {tabs.map(({ id, label, Icon }) => {
           const on = active === id;
           return (
-            <button
+            <a
               key={id}
+              href={NAV_HREF[id]}
               data-testid={`nav-${id}`}
-              onClick={() => onChange(id)}
+              onClick={(event) => followInAppLink(event, () => onChange(id))}
               aria-current={on ? "page" : undefined}
               className="nav-sidebar-item"
             >
@@ -317,7 +334,7 @@ export function NavSidebar({
               <span className="font-semibold" dir="auto">
                 {label}
               </span>
-            </button>
+            </a>
           );
         })}
 

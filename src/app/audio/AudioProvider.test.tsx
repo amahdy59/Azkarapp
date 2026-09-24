@@ -316,7 +316,7 @@ describe("AudioProvider integration", () => {
     expect(volume).not.toHaveAttribute("aria-orientation", "vertical");
     fireEvent.change(volume, { target: { value: "0.4" } });
 
-    expect(screen.getByRole("button", { name: /Volume 40%/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Mute audio" })).toBeInTheDocument();
     expect(window.localStorage.getItem("azkar.audio-preferences.v1")).toContain('"volume":0.4');
   });
 

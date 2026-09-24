@@ -26,21 +26,9 @@ import { formatNumerals } from "../../formatting";
 import { RowChevron, RowValue, SettingsRowItem, SettingsSection } from "./SettingsPrimitives";
 
 import { ThemeModeSelector } from "./ThemeModeSelector";
+import type { SettingsRoutePanel } from "../../routing";
 
-export type SettingsSubScreen =
-  | "root"
-  | "reading"
-  | "audio"
-  | "accessibility"
-  | "downloads"
-  | "notifications"
-  | "progress"
-  | "account-data"
-  | "help"
-  | "legal"
-  | "sources"
-  | "whats-new"
-  | "about";
+export type SettingsSubScreen = SettingsRoutePanel;
 
 const iconBackground = "color-mix(in srgb, var(--primary) 12%, transparent)";
 

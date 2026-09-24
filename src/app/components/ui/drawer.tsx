@@ -6,9 +6,12 @@ import { Drawer as DrawerPrimitive } from "vaul";
 import { cn } from "./utils";
 
 function Drawer({
+  modal = true,
   ...props
 }: React.ComponentProps<typeof DrawerPrimitive.Root>) {
-  return <DrawerPrimitive.Root data-slot="drawer" {...props} />;
+  // Keep focus and pointer interaction inside quick drawers on touch browsers.
+  // Callers must opt out explicitly for a genuinely non-modal disclosure.
+  return <DrawerPrimitive.Root data-slot="drawer" modal={modal} {...props} />;
 }
 
 function DrawerTrigger({

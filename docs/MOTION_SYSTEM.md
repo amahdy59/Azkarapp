@@ -106,6 +106,7 @@ The shared screen-transition boundary treats the View Transitions API as optiona
 - Maximum duration for any reduced animation is **100ms**.
 - Implement per-component alternatives instead of a global sledgehammer override where appropriate.
 - JavaScript-driven smooth scrolling and completion effects must use the shared `motionPreferences.ts` gate so both the OS preference and the in-app Reduce Motion setting are honored. Haptics use the same boundary and remain independently controlled by the Haptic Feedback setting.
+- Route view transitions, shared active-tab pills, the audio-player layout morph, and reader direction changes must honor both sources of reduced motion. Qibla alignment uses a finite settle confirmation rather than a looping target animation.
 
 ## 8. Accessibility Requirements
 
@@ -125,3 +126,4 @@ Animations must not degrade the user experience:
 - **No Permanent `will-change`:** Use `will-change` sparingly and remove it when the animation completes.
 - **No Extra Libraries:** Do not add new animation libraries. Use CSS transitions/animations or existing libraries carefully.
 - **Pause When Hidden:** Pause all animations when the application or element is not visible.
+- High-frequency counting surfaces replace the current ripple instead of accumulating ripple nodes. A single response confirms each tap without turning repeated devotion into decorative noise.

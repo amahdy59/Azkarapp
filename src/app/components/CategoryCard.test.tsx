@@ -128,4 +128,29 @@ describe("CategoryCard", () => {
 
     expect(screen.getByRole("button")).toHaveAttribute("dir", "rtl");
   });
+
+  it("renders destinations as real links while preserving in-app navigation", () => {
+    const onClick = vi.fn();
+    render(
+      <CategoryCard
+        id="morning"
+        title="Morning Azkar"
+        icon="sun"
+        direction="ltr"
+        totalCount={10}
+        progressText="0 of 10"
+        ariaLabel="Morning Azkar"
+        href="#/azkar/morning"
+        onClick={onClick}
+      />,
+    );
+
+    const link = screen.getByRole("link", { name: "Morning Azkar" });
+    expect(link).toHaveAttribute("href", "#/azkar/morning");
+    fireEvent.click(link);
+    expect(onClick).toHaveBeenCalledTimes(1);
+
+    fireEvent.click(link, { ctrlKey: true });
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
 });

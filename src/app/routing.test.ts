@@ -22,6 +22,16 @@ describe("routeToHash", () => {
     expect(routeToHash({ view: "reader", categoryId: "before_sleep", index: 4 })).toBe("#/azkar/before-sleep/5");
   });
 
+  it("keeps meaningful secondary destinations bookmarkable", () => {
+    expect(routeToHash({ view: "library", librarySection: "saved" })).toBe("#/azkar/saved");
+    expect(routeToHash({ view: "progress", progressPeriod: "month" })).toBe("#/progress/month");
+    expect(routeToHash({ view: "settings", settingsPanel: "audio" })).toBe("#/settings/audio");
+
+    expect(parseHash("#/azkar/saved")).toEqual({ view: "library", librarySection: "saved" });
+    expect(parseHash("#/progress/year")).toEqual({ view: "progress", progressPeriod: "year" });
+    expect(parseHash("#/settings/accessibility")).toEqual({ view: "settings", settingsPanel: "accessibility" });
+  });
+
   it("encodes the search query so Arabic survives a round trip", () => {
     const hash = routeToHash({ view: "search", query: "الله" });
     expect(parseHash(hash!)).toEqual({ view: "search", query: "الله" });
@@ -70,6 +80,8 @@ describe("parseHash", () => {
     expect(parseHash("#/azkar/not-a-collection")).toBeNull();
     expect(parseHash("#/azkar/morning/0")).toBeNull();
     expect(parseHash("#/azkar/morning/abc")).toBeNull();
+    expect(parseHash("#/progress/decade")).toBeNull();
+    expect(parseHash("#/settings/not-a-panel")).toBeNull();
     expect(parseHash("#/hometae")).toBeNull();
     expect(parseHash("")).toBeNull();
   });

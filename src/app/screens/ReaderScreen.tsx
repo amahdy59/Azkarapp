@@ -29,7 +29,7 @@ import {
   SlidersHorizontal,
 } from "../components/icons";
 import { t } from "../i18n";
-import { shouldReduceMotion } from "../motionPreferences";
+import { shouldReduceMotion, vibrateIfEnabled } from "../motionPreferences";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarForMode, isRoutineCategory } from "../content/azkar";
 import { isLongSurah } from "../content/mushafPages";
@@ -116,12 +116,6 @@ function getReaderZikrTitle(zikr: Zikr, language: AppLanguage): string | null {
   return language === "ar" ? `سورة ${surahName.trim()}` : `Surah ${surahName.trim()}`;
 }
 
-function vibrate(pattern: number | number[]) {
-  if (typeof navigator !== "undefined" && "vibrate" in navigator) {
-    navigator.vibrate(pattern);
-  }
-}
-
 export function ReaderScreen({
   catId,
   subCategory,
@@ -145,9 +139,9 @@ export function ReaderScreen({
   onUncomplete,
   onRoutineModeChange,
   onReset,
-  onAdvance,
-  onNext,
-  onPrev,
+  onAdvance: onAdvanceProp,
+  onNext: onNextProp,
+  onPrev: onPrevProp,
   onSelectZikr,
   completedZikrIds = EMPTY_COMPLETED_ZIKR_IDS,
   onToggleSaved,
@@ -233,6 +227,26 @@ export function ReaderScreen({
   onPartialZikrCountChange?: (zikrId: string, count: number) => void;
   counterResetKey?: string;
 }) {
+  const vibrate = useCallback(
+    (pattern: number | number[]) => vibrateIfEnabled(hapticFeedback, pattern),
+    [hapticFeedback],
+  );
+  const [navigationDelta, setNavigationDelta] = useState<1 | -1>(1);
+  const onNext = useCallback(() => {
+    setNavigationDelta(1);
+    onNextProp();
+  }, [onNextProp]);
+  const onPrev = useCallback(() => {
+    setNavigationDelta(-1);
+    onPrevProp();
+  }, [onPrevProp]);
+  const onAdvance = useCallback(
+    (currentIndex: number) => {
+      setNavigationDelta(1);
+      onAdvanceProp(currentIndex);
+    },
+    [onAdvanceProp],
+  );
   const azkar = azkarList ?? getAzkarForMode(catId, routineMode);
   const z = azkar[idx];
   const category = CATEGORIES.find((item) => item.id === catId);
@@ -947,7 +961,10 @@ export function ReaderScreen({
                   direction={direction}
                   isActive={active}
                   activeRef={activeNavigatorItemRef}
-                  onClickText={onSelectZikr}
+                  onClickText={(targetIndex) => {
+                    setNavigationDelta(targetIndex >= idx ? 1 : -1);
+                    onSelectZikr(targetIndex);
+                  }}
                   ariaLabelOverride={itemLabel}
                 />
               );
@@ -1234,6 +1251,7 @@ export function ReaderScreen({
           title={readerZikrTitle ?? displayCategoryName}
           theme={themeMode === "light" ? "light" : "midnight"}
           reducedMotion={reducedMotion}
+          hapticFeedback={hapticFeedback}
           textScale={mushafTextScale}
           bookmarkedPages={mushafBookmarks}
           onTogglePageBookmark={onToggleMushafBookmark}
@@ -1414,9 +1432,17 @@ export function ReaderScreen({
                         <AnimatePresence mode="wait">
                           <motion.div
                             key={z.id}
-                            initial={reducedMotion ? { opacity: 0 } : { opacity: 0, x: direction === "rtl" ? -20 : 20 }}
+                            initial={
+                              reducedMotion
+                                ? { opacity: 0 }
+                                : { opacity: 0, x: navigationDelta * (direction === "rtl" ? -24 : 24) }
+                            }
                             animate={reducedMotion ? { opacity: 1 } : { opacity: 1, x: 0 }}
-                            exit={reducedMotion ? { opacity: 0 } : { opacity: 0, x: direction === "rtl" ? 20 : -20 }}
+                            exit={
+                              reducedMotion
+                                ? { opacity: 0 }
+                                : { opacity: 0, x: navigationDelta * (direction === "rtl" ? 24 : -24) }
+                            }
                             transition={{ duration: reducedMotion ? 0.1 : 0.3, ease: "easeOut" }}
                             className="reading-measure mx-auto flex min-h-full w-full flex-col py-4"
                           >

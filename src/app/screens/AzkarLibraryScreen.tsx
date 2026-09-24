@@ -28,6 +28,7 @@ import { matchesSearch, normalizeSearchText } from "../content/searchNormalizati
 import { FIELD_LABEL_CLASS } from "../components/FormField";
 import { t } from "../i18n";
 import type { AppLanguage, CategoryId, RoutineCategoryId, RoutineMode, Zikr } from "../types";
+import { categorySlug } from "../routing";
 
 export type LibrarySection = "collections" | "saved";
 type SavedLibraryItem = Pick<Zikr, "id" | "category" | "arabicText" | "translation" | "transliteration"> & {
@@ -70,6 +71,7 @@ export function AzkarLibraryScreen({
   routineModes,
   onOpenBenefits,
   initialSection = "collections",
+  onSectionChange,
 }: {
   completed: Record<CategoryId, Set<string>>;
   language: AppLanguage;
@@ -81,8 +83,15 @@ export function AzkarLibraryScreen({
   routineModes: Record<RoutineCategoryId, RoutineMode>;
   onOpenBenefits?: () => void;
   initialSection?: LibrarySection;
+  onSectionChange?: (section: LibrarySection) => void;
 }) {
   const [section, setSection] = useState<LibrarySection>(initialSection);
+  useEffect(() => setSection(initialSection), [initialSection]);
+
+  const changeSection = (next: LibrarySection) => {
+    setSection(next);
+    onSectionChange?.(next);
+  };
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGroupId, setSelectedGroupId] = useState<string>("all");
   const searchInputId = useId();
@@ -224,10 +233,11 @@ export function AzkarLibraryScreen({
 
             <TabList
               value={section}
-              onChange={setSection}
+              onChange={changeSection}
               direction={direction}
               idPrefix="library-sections"
               aria-label={t(language, "library.title")}
+              indicatorClassName="bg-primary shadow-sm"
               className="hidden min-w-64 grid-cols-2 rounded-2xl border border-border-control/60 bg-card p-1 shadow-xs sm:grid"
               tabs={(["collections", "saved"] as const).map((value) => ({
                 value,
@@ -322,7 +332,10 @@ export function AzkarLibraryScreen({
                 <DropdownMenuLabel className="px-3 py-2 text-xs font-black text-muted-foreground">
                   {t(language, "library.title")}
                 </DropdownMenuLabel>
-                <DropdownMenuRadioGroup value={section} onValueChange={(value) => setSection(value as LibrarySection)}>
+                <DropdownMenuRadioGroup
+                  value={section}
+                  onValueChange={(value) => changeSection(value as LibrarySection)}
+                >
                   <DropdownMenuRadioItem value="collections" className="font-bold">
                     {t(language, "library.collections")}
                   </DropdownMenuRadioItem>
@@ -474,6 +487,7 @@ export function AzkarLibraryScreen({
                               <CategoryCard
                                 key={category.id}
                                 id={category.id}
+                                href={`#/azkar/${categorySlug(category.id)}`}
                                 title={isArabic ? category.nameArabic : category.name}
                                 icon={category.icon}
                                 direction={direction}
@@ -663,6 +677,7 @@ export function AzkarLibraryScreen({
                           <CategoryCard
                             key={category.id}
                             id={category.id}
+                            href={`#/azkar/${categorySlug(category.id)}`}
                             title={isArabic ? category.nameArabic : category.name}
                             icon={category.icon}
                             direction={direction}
@@ -817,7 +832,7 @@ export function AzkarLibraryScreen({
                 actionLabel={t(language, savedAzkar.length === 0 ? "library.browseCollections" : "search.emptyAction")}
                 onAction={() => {
                   if (savedAzkar.length === 0) {
-                    setSection("collections");
+                    changeSection("collections");
                   } else {
                     setSearchQuery("");
                   }

@@ -106,6 +106,7 @@ export function MushafImmersiveReader({
   title,
   theme = "midnight",
   reducedMotion = false,
+  hapticFeedback = false,
   textScale = "medium",
   bookmarkedPages = [],
   onTogglePageBookmark,
@@ -128,6 +129,7 @@ export function MushafImmersiveReader({
   title: string;
   theme?: MushafPageTheme;
   reducedMotion?: boolean;
+  hapticFeedback?: boolean;
   /** The Mushaf reading size, so this view matches the Mushaf proper. */
   textScale?: MushafTextScale;
   /** Pages the reader has marked, so the rail can show and toggle the state. */
@@ -579,6 +581,7 @@ export function MushafImmersiveReader({
             language={language}
             pageNumber={displayPage}
             pageTransitionDirection={slideDir > 0 ? "forward" : "backward"}
+            hapticFeedback={hapticFeedback}
             surahName={surahName}
             juzNumber={juzNumber}
             direction={direction}

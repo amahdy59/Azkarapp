@@ -104,7 +104,7 @@ describe("App Composition and Routing", () => {
 
     expect(await screen.findByRole("main")).toBeInTheDocument();
 
-    const homeTab = await screen.findByRole("button", { name: /home/i });
+    const homeTab = await screen.findByRole("link", { name: /home/i });
     expect(homeTab).toHaveAttribute("aria-current", "page");
   });
 

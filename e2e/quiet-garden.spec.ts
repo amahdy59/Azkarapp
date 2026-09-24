@@ -200,7 +200,7 @@ test("legacy garden visibility preferences no longer hide the current Wird or ad
   await openReturningHome(page);
   await expect(page.getByTestId("today-garden-card")).toBeVisible();
 
-  await page.getByRole("button", { name: "Progress", exact: true }).click();
+  await page.getByRole("link", { name: "Progress", exact: true }).click();
   await expect(page.getByRole("switch", { name: /^Garden progress/ })).toHaveCount(0);
   await expect(page.getByTestId("garden-hidden-state")).toHaveCount(0);
   await expect(page.getByTestId("today-garden-card")).toBeVisible();
@@ -210,7 +210,7 @@ test("month view shows the calendar without the removed summary card", async ({ 
   await seedReturningGardenUser(page, { completedToday: ["morning"] });
   await openReturningHome(page);
 
-  await page.getByRole("button", { name: "Progress", exact: true }).click();
+  await page.getByRole("link", { name: "Progress", exact: true }).click();
   await page.getByRole("tab", { name: "Month", exact: true }).click();
 
   await expect(page.getByTestId("garden-month-calendar")).toBeVisible();
@@ -232,7 +232,7 @@ test("both Home and Progress keep prayer tracking outside the wird card", async 
   }
   await expect(garden.getByRole("button", { name: /After Prayer Azkar/ })).toHaveCount(0);
 
-  await page.getByRole("button", { name: "Progress", exact: true }).click();
+  await page.getByRole("link", { name: "Progress", exact: true }).click();
 
   const progressGarden = page.getByTestId("today-garden-card");
   await expect(progressGarden.getByRole("button", { name: /After Prayer Azkar/ })).toHaveCount(0);
@@ -259,7 +259,7 @@ test("the week grid conveys completion as text, not shape alone", async ({ page 
   await seedReturningGardenUser(page, { completedToday: ["morning"] });
   await openReturningHome(page);
 
-  await page.getByRole("button", { name: "Progress", exact: true }).click();
+  await page.getByRole("link", { name: "Progress", exact: true }).click();
   await page.getByRole("tab", { name: "Week", exact: true }).click();
 
   const table = page.locator("table").first();

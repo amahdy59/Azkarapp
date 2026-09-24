@@ -43,8 +43,8 @@ test("typing in the Library filters in place instead of navigating", async ({ pa
   // Typing narrows the collections and must leave the user on the Library.
   await libraryInput.fill("النوم");
   await expect(page).toHaveURL(/#\/azkar/);
-  await expect(page.getByRole("button", { name: /أذكار النوم/ })).toBeVisible();
-  await expect(page.getByRole("button", { name: /أذكار الصباح/ })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: /أذكار النوم/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /أذكار الصباح/ })).toHaveCount(0);
 });
 
 test("submitting the Library query opens Search and preserves it", async ({ page }) => {

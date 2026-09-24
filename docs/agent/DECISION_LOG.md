@@ -3914,3 +3914,16 @@ null` shape, so a record written before this change still loads and still
 - **Files/contracts to update:** `src/app/screens/CustomCounterScreen.tsx`, `src/app/components/AuthenticZikrPicker.tsx`, `src/app/components/ZikrComponents.tsx`, `src/app/components/ProgressViews.tsx`, `src/app/screens/ProgressScreen.tsx`, localization, focused tests, design system, and Phase 64 report.
 - **Tests/evidence required:** Counter normalization, target preservation, destructive-action confirmation, exact searchable remembrance selection, completed-state re-entry, weekly intention separation, full-month heatmaps, bilingual responsive visual review, and full local release gates.
 - **Supersedes:** Clarifies the target and Progress presentation details of DEC-187 and Phase 45; no other decision is superseded.
+
+## DEC-206 — Linkable secondary state and calm governed microinteractions
+
+- **Date:** 2026-09-24
+- **Status:** Approved
+- **Owner:** Product owner (explicit implementation request)
+- **Related phase:** Phase 65
+- **Decision:** Treat Saved, Progress periods, and Settings panels as typed hash subroutes owned by `useAppRouting`, with predictable push/replace/back behavior. Use semantic links for primary shell and collection destinations while preserving modified-click behavior. Keep counter feedback to one bounded ripple, route all haptics through the optional preference boundary, and make Reader direction, active pills, audio layout morphing, and Qibla alignment finite and reduced-motion safe.
+- **Why:** The review identified real discoverability and continuity gaps, while devotional counting requires confirmation without visual noise. A single routing and motion contract improves sharing, keyboard behavior, browser history, and calm focus without adding architecture or changing reviewed content.
+- **Consequences:** Secondary state survives reload and can be shared. Browser Back remains inside the app. Modified links retain native browser affordances. Haptic and motion cues degrade gracefully when disabled or unsupported.
+- **Files/contracts to update:** Routing, shell links, Reader/Qibla/Mushaf/audio/motion components, focused tests, architecture/design/motion docs, and release notes.
+- **Tests/evidence required:** Focused unit coverage, navigation browser coverage, full quality gates, responsive evidence, and production smoke verification.
+- **Supersedes:** None.

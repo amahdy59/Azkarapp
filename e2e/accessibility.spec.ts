@@ -316,6 +316,8 @@ test("theme emulation (forced colors/high contrast) has no automatically detecta
 
 test("custom counter has no automatically detectable WCAG A/AA violations", async ({ page }) => {
   await enterEnglishGuestMode(page);
+  await page.getByTestId("nav-settings").click();
+  await page.getByTestId("theme-option-light").click();
   await page.goto("/#/counter");
   await expect(page.getByRole("heading", { name: "Masbaha" })).toBeVisible();
   await expectNoWcagViolations(page);
@@ -323,6 +325,9 @@ test("custom counter has no automatically detectable WCAG A/AA violations", asyn
 
 test("More and Qibla have no automatically detectable WCAG A/AA violations", async ({ page }) => {
   await enterEnglishGuestMode(page);
+  await page.getByTestId("nav-settings").click();
+  await page.getByTestId("theme-option-light").click();
+  await page.goto("/#/home");
   if (await page.getByTestId("nav-more").isVisible()) {
     await page.getByTestId("nav-more").click();
     await expect(page.getByRole("heading", { name: "More", exact: true })).toBeVisible();

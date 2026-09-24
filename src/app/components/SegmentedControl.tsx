@@ -1,5 +1,6 @@
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
-import type { ReactNode } from "react";
+import { useId, type ReactNode } from "react";
+import { LayoutGroup, motion, useReducedMotion } from "motion/react";
 
 export interface SegmentedControlOption<T extends string> {
   value: T;
@@ -28,6 +29,7 @@ export function SegmentedControl<T extends string>({
   itemClassName,
   "aria-label": ariaLabel,
   "aria-describedby": ariaDescribedBy,
+  indicatorClassName = "bg-primary/15",
 }: {
   value: T;
   onChange: (value: T) => void;
@@ -38,26 +40,42 @@ export function SegmentedControl<T extends string>({
   itemClassName: (selected: boolean) => string;
   "aria-label": string;
   "aria-describedby"?: string;
+  indicatorClassName?: string;
 }) {
+  const indicatorId = useId();
+  const systemReducedMotion = useReducedMotion();
+  const motionReduced =
+    systemReducedMotion ||
+    (typeof document !== "undefined" && document.documentElement.classList.contains("reduce-motion"));
   return (
-    <RadioGroupPrimitive.Root
-      dir={direction}
-      value={value}
-      onValueChange={(next) => onChange(next as T)}
-      className={className}
-      aria-label={ariaLabel}
-      aria-describedby={ariaDescribedBy}
-    >
-      {options.map((option) => (
-        <RadioGroupPrimitive.Item
-          key={option.value}
-          value={option.value}
-          data-testid={option.testId}
-          className={itemClassName(value === option.value)}
-        >
-          {option.label}
-        </RadioGroupPrimitive.Item>
-      ))}
-    </RadioGroupPrimitive.Root>
+    <LayoutGroup id={indicatorId}>
+      <RadioGroupPrimitive.Root
+        dir={direction}
+        value={value}
+        onValueChange={(next) => onChange(next as T)}
+        className={className}
+        aria-label={ariaLabel}
+        aria-describedby={ariaDescribedBy}
+      >
+        {options.map((option) => (
+          <RadioGroupPrimitive.Item
+            key={option.value}
+            value={option.value}
+            data-testid={option.testId}
+            className={`relative isolate overflow-hidden ${itemClassName(value === option.value)}`}
+          >
+            {value === option.value && (
+              <motion.span
+                layoutId={`${indicatorId}-active-pill`}
+                className={`absolute inset-0 z-0 rounded-[inherit] ${indicatorClassName}`}
+                transition={{ duration: motionReduced ? 0 : 0.18, ease: [0.22, 1, 0.36, 1] }}
+                aria-hidden="true"
+              />
+            )}
+            <span className="relative z-10">{option.label}</span>
+          </RadioGroupPrimitive.Item>
+        ))}
+      </RadioGroupPrimitive.Root>
+    </LayoutGroup>
   );
 }

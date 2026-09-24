@@ -17,6 +17,7 @@ import type { AudioController } from "../audio/AudioProvider";
 import { formatNumerals } from "../formatting";
 import { getAudioVoiceName } from "../audio/audioVoices";
 import { useMediaQuery } from "../hooks/useMediaQuery";
+import { motion, useReducedMotion } from "motion/react";
 
 const COPY = {
   en: {
@@ -320,7 +321,7 @@ function VolumeControl({
       >
         <button
           type="button"
-          aria-label={`${controller.preferences.muted ? copy.unmute : copy.mute} · ${copy.volume} ${formatNumerals(percentage, language)}%`}
+          aria-label={controller.preferences.muted ? copy.unmute : copy.mute}
           onClick={controller.toggleMuted}
           className="flex size-11 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
@@ -370,7 +371,7 @@ function VolumeControl({
     >
       <button
         type="button"
-        aria-label={`${controller.preferences.muted ? copy.unmute : copy.mute} · ${copy.volume} ${formatNumerals(percentage, language)}%`}
+        aria-label={controller.preferences.muted ? copy.unmute : copy.mute}
         aria-expanded={open}
         aria-controls="audio-volume-control"
         onClick={() => (supportsHover ? controller.toggleMuted() : setOpen((value) => !value))}
@@ -442,6 +443,11 @@ export function FloatingAudioPlayer({
   const hasRoomBesideReading = useMediaQuery("(min-width: 768px)");
   const coversReading = overReadingSurface && !hasRoomBesideReading;
   const [isMinimized, setIsMinimized] = useState(true);
+  const systemReducedMotion = useReducedMotion();
+  const motionReduced =
+    systemReducedMotion ||
+    (typeof document !== "undefined" && document.documentElement.classList.contains("reduce-motion"));
+  const shellTransition = { duration: motionReduced ? 0 : 0.24, ease: [0.22, 1, 0.36, 1] as const };
   const wasCoveringReading = useRef(coversReading);
   const [showOptions, setShowOptions] = useState(false);
   const controllerRef = useRef(controller);
@@ -552,7 +558,11 @@ export function FloatingAudioPlayer({
 
   if (isMinimized) {
     return (
-      <section
+      <motion.section
+        layout
+        layoutId="floating-audio-player-shell"
+        transition={shellTransition}
+        style={{ transformOrigin: "bottom center" }}
         aria-label={copy.region}
         dir={direction}
         data-variant="compact"
@@ -665,12 +675,16 @@ export function FloatingAudioPlayer({
             </button>
           </div>
         </div>
-      </section>
+      </motion.section>
     );
   }
 
   return (
-    <section
+    <motion.section
+      layout
+      layoutId="floating-audio-player-shell"
+      transition={shellTransition}
+      style={{ transformOrigin: "bottom center" }}
       aria-label={copy.region}
       dir={direction}
       data-variant="expanded"
@@ -903,6 +917,6 @@ export function FloatingAudioPlayer({
       {/* Whose recitation this is, always on screen rather than behind a
           disclosure — it is an attribution, not a setting. */}
       <p className="mt-3 text-center text-micro font-semibold leading-5 text-muted-foreground/80">{attributionText}</p>
-    </section>
+    </motion.section>
   );
 }

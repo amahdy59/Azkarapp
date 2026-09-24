@@ -1,4 +1,5 @@
 import { useRef, type KeyboardEvent, type ReactNode } from "react";
+import { LayoutGroup, motion, useReducedMotion } from "motion/react";
 
 export interface TabDefinition<T extends string> {
   value: T;
@@ -48,6 +49,7 @@ export function TabList<T extends string>({
   className = "",
   itemClassName,
   "aria-label": ariaLabel,
+  indicatorClassName,
 }: {
   value: T;
   onChange: (value: T) => void;
@@ -58,8 +60,13 @@ export function TabList<T extends string>({
   className?: string;
   itemClassName: (selected: boolean) => string;
   "aria-label": string;
+  indicatorClassName?: string;
 }) {
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const systemReducedMotion = useReducedMotion();
+  const motionReduced =
+    systemReducedMotion ||
+    (typeof document !== "undefined" && document.documentElement.classList.contains("reduce-motion"));
 
   const focusTab = (index: number) => {
     const next = tabs[index];
@@ -88,30 +95,40 @@ export function TabList<T extends string>({
   };
 
   return (
-    <div role="tablist" aria-label={ariaLabel} aria-orientation="horizontal" className={className}>
-      {tabs.map((tab, index) => {
-        const selected = tab.value === value;
-        return (
-          <button
-            key={tab.value}
-            ref={(node) => {
-              tabRefs.current[index] = node;
-            }}
-            type="button"
-            role="tab"
-            id={tabId(idPrefix, tab.value)}
-            aria-selected={selected}
-            aria-controls={tabPanelId(idPrefix, tab.value)}
-            tabIndex={selected ? 0 : -1}
-            data-testid={tab.testId}
-            onClick={() => onChange(tab.value)}
-            onKeyDown={(event) => handleKeyDown(event, index)}
-            className={itemClassName(selected)}
-          >
-            {tab.label}
-          </button>
-        );
-      })}
-    </div>
+    <LayoutGroup id={idPrefix}>
+      <div role="tablist" aria-label={ariaLabel} aria-orientation="horizontal" className={className}>
+        {tabs.map((tab, index) => {
+          const selected = tab.value === value;
+          return (
+            <button
+              key={tab.value}
+              ref={(node) => {
+                tabRefs.current[index] = node;
+              }}
+              type="button"
+              role="tab"
+              id={tabId(idPrefix, tab.value)}
+              aria-selected={selected}
+              aria-controls={tabPanelId(idPrefix, tab.value)}
+              tabIndex={selected ? 0 : -1}
+              data-testid={tab.testId}
+              onClick={() => onChange(tab.value)}
+              onKeyDown={(event) => handleKeyDown(event, index)}
+              className={`relative isolate overflow-hidden ${itemClassName(selected)}`}
+            >
+              {selected && indicatorClassName && (
+                <motion.span
+                  layoutId={`${idPrefix}-active-pill`}
+                  className={`absolute inset-0 z-0 rounded-[inherit] ${indicatorClassName}`}
+                  transition={{ duration: motionReduced ? 0 : 0.18, ease: [0.22, 1, 0.36, 1] }}
+                  aria-hidden="true"
+                />
+              )}
+              <span className="relative z-10">{tab.label}</span>
+            </button>
+          );
+        })}
+      </div>
+    </LayoutGroup>
   );
 }

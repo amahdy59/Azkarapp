@@ -91,6 +91,9 @@ interface SettingsScreenProps {
   onResetPreferences: () => void;
   onClearLocalData: () => void;
   onDeleteAccount: () => void;
+  initialSub?: SettingsSubScreen;
+  onSubChange?: (panel: SettingsSubScreen) => void;
+  onSubBack?: () => void;
 }
 
 export function SettingsScreen({
@@ -150,14 +153,18 @@ export function SettingsScreen({
   onResetPreferences,
   onClearLocalData,
   onDeleteAccount,
+  initialSub,
+  onSubChange,
+  onSubBack,
 }: SettingsScreenProps) {
-  const [sub, setSub] = useState<SettingsSubScreen>(() =>
-    new URLSearchParams(window.location.search).has("pair") ? "account-data" : "root",
+  const [sub, setSub] = useState<SettingsSubScreen>(
+    () => initialSub ?? (new URLSearchParams(window.location.search).has("pair") ? "account-data" : "root"),
   );
   const focusReturnSub = useRef<SettingsSubScreen>("root");
   const goBack = () => {
     const returnSub = focusReturnSub.current;
     setSub("root");
+    onSubBack?.();
     requestAnimationFrame(() => {
       document.querySelector<HTMLElement>(`[data-testid="settings-sub-${returnSub}"]`)?.focus();
     });
@@ -171,7 +178,12 @@ export function SettingsScreen({
   const openSubPanel = (next: SettingsSubScreen) => {
     focusReturnSub.current = next;
     setSub(next);
+    onSubChange?.(next);
   };
+
+  useEffect(() => {
+    if (initialSub) setSub(initialSub);
+  }, [initialSub]);
 
   useEffect(() => {
     if (isTwoPaneLayout || sub === "root") return;
@@ -413,10 +425,10 @@ export function SettingsScreen({
         return (
           <AboutPanel
             language={language}
-            onHelp={() => setSub("help")}
-            onLegal={() => setSub("legal")}
-            onSources={() => setSub("sources")}
-            onWhatsNew={() => setSub("whats-new")}
+            onHelp={() => openSubPanel("help")}
+            onLegal={() => openSubPanel("legal")}
+            onSources={() => openSubPanel("sources")}
+            onWhatsNew={() => openSubPanel("whats-new")}
             onBack={goBack}
           />
         );

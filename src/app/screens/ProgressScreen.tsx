@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { Header, IconButton } from "../components/LayoutShells";
 import { TodayRoutineGarden } from "../components/RoutineGarden";
 import { ScreenContainer } from "../components/ScreenContainer";
@@ -90,6 +90,8 @@ export function ProgressScreen({
   onCycleMosqueHabit,
   onPrayerResume,
   onOpenFriday,
+  initialPeriod = "day",
+  onPeriodChange,
 }: {
   dailyCompletions: DailyCollectionCompletion[];
   progressDayStartHour: number;
@@ -112,11 +114,17 @@ export function ProgressScreen({
   onCycleMosqueHabit?: (dayKey: string) => void;
   onPrayerResume?: (prayer: PrayerName) => void;
   onOpenFriday?: () => void;
+  initialPeriod?: "day" | "week" | "month" | "year";
+  onPeriodChange?: (period: "day" | "week" | "month" | "year") => void;
 }) {
   const now = useNow();
 
-  const [activeTab, setActiveTab] = useState<"day" | "week" | "month" | "year">("day");
+  const [activeTab, setActiveTab] = useState<"day" | "week" | "month" | "year">(initialPeriod);
   const [offset, setOffset] = useState(0);
+  useEffect(() => {
+    setActiveTab(initialPeriod);
+    setOffset(0);
+  }, [initialPeriod]);
 
   const isArabic = language === "ar";
   const displayDate = shiftCalendarDate(now, activeTab, offset, calendarType);
@@ -125,6 +133,7 @@ export function ProgressScreen({
   const handleTabChange = (tab: "day" | "week" | "month" | "year") => {
     setActiveTab(tab);
     setOffset(0);
+    onPeriodChange?.(tab);
   };
 
   const prayerCardModels = buildPrayerCardModels(now, language, locationSettings);
@@ -323,6 +332,7 @@ export function ProgressScreen({
             direction={isArabic ? "rtl" : "ltr"}
             idPrefix="global-progress"
             aria-label={t(language, "garden.viewMode")}
+            indicatorClassName="bg-card shadow-sm"
             className="mb-2 flex rounded-xl bg-muted p-1"
             itemClassName={(selected) =>
               `flex min-h-11 flex-1 items-center justify-center rounded-lg px-1 py-2 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 ${

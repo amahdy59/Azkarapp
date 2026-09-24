@@ -59,9 +59,9 @@ When adding a persisted field:
 
 The application uses a typed `View` state and browser history rather than a route framework. `push`, `pop`, and pop-state handling keep browser navigation synchronized with the displayed screen. Major screens are lazy loaded through `React.lazy` and wrapped by the shared suspense fallback.
 
-`src/app/routing.ts` maps `View` (plus the active collection, zikr index, and search query) to a hash route such as `#/home`, `#/azkar/morning`, `#/azkar/before-sleep/5`, or `#/search/<query>`. Hash routes are used because GitHub Pages cannot rewrite arbitrary paths to `index.html`. The reader index is one-based in the URL so it matches the position shown on screen, and zero-based in state.
+`src/app/routing.ts` maps `View` and route-owned substate to a hash route such as `#/home`, `#/azkar/morning`, `#/azkar/before-sleep/5`, `#/azkar/saved`, `#/progress/month`, `#/settings/audio`, or `#/search/<query>`. Hash routes are used because GitHub Pages cannot rewrite arbitrary paths to `index.html`. The reader index is one-based in the URL so it matches the position shown on screen, and zero-based in state.
 
-There is exactly one writer for the address bar: an effect in `App.tsx` that calls `replaceState` whenever the route-relevant state changes. `push` creates the history entry and that effect writes the URL, so navigation that bypasses `push` (keyboard shortcuts, app shortcuts) still produces a correct URL. Reading back is handled by `parseLocation`, wired to both `popstate` and `hashchange` — the latter is what makes a hand-typed or shared URL work. Direct routes to lazy collections register their content before rendering, and an out-of-range reader position falls back to the collection instead of mounting an undefined zikr.
+`useAppRouting` is the address-bar boundary. Its synchronization effect uses `replaceState` for the currently rendered route, while `push`, `replace`, and the typed secondary-route helpers create or replace history entries before updating view state. Library section, Progress period, and Settings panel changes therefore support reload, sharing, and browser Back without making screen components write the URL. Reading back is handled by `parseLocation`, wired to both `popstate` and `hashchange` — the latter is what makes a hand-typed or shared URL work. Direct routes to lazy collections register their content before rendering, and an out-of-range reader position falls back to the collection instead of mounting an undefined zikr.
 
 Onboarding and auth steps have no hash route on purpose: they are flow states gated by stored progress, not destinations, and `routeToHash` returns null so the URL is left untouched. The single exception is the OAuth return, which arrives as `?view=auth-callback` because `getAuthCallbackUrl` configures the provider redirect that way. Legacy `?view=` links still resolve, so older bookmarks keep working.
 
@@ -73,6 +73,8 @@ Rules:
 
 - New top-level destinations require a `View` member and an `App.tsx` rendering branch.
 - Back actions must preserve predictable browser behavior. `pop()` uses an in-app history depth counter rather than `window.history.length`, so Back can never navigate out of the app.
+- Primary shell destinations and collection cards are semantic links with real hash destinations. Ordinary activation stays in the typed routing boundary; modified activation keeps native open-in-new-tab behavior.
+- Route transitions receive the app-level Reduce Motion preference as well as the operating-system preference.
 - Navigation is hidden on splash, onboarding and auth views at every tier, via a single shared view whitelist.
 - `App.tsx` owns the one `#main-content` landmark; screens must not render their own `<main>`.
 - Focus moves to `#main-content` on every view change (`useViewFocus`), skipping initial load.

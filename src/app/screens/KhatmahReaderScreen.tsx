@@ -138,6 +138,7 @@ export function KhatmahReaderScreen({
   onReadingPositionChange,
   progressDayStartHour,
   reduceMotion = false,
+  hapticFeedback = false,
 }: {
   language: AppLanguage;
   direction: "ltr" | "rtl";
@@ -166,6 +167,7 @@ export function KhatmahReaderScreen({
   onReadingPositionChange?: (position: QuranReadingPosition) => void;
   progressDayStartHour: number;
   reduceMotion?: boolean;
+  hapticFeedback?: boolean;
 }) {
   const currentPage = Math.max(1, Math.min(LAST_PAGE, khatmahPage || 1));
 
@@ -900,6 +902,7 @@ export function KhatmahReaderScreen({
               paperRef={paperRef}
               pageTransitionDirection={pageTransitionDirection}
               reduceMotion={reduceMotion}
+              hapticFeedback={hapticFeedback}
               textScale={mushafTextScale}
               onAyahAction={handleAyahAction}
             />

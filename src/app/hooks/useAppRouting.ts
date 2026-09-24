@@ -1,11 +1,11 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { flushSync } from "react-dom";
 import { parseLocation, routeToHash } from "../routing";
+import type { LibraryRouteSection, ProgressRoutePeriod, RouteState, SettingsRoutePanel } from "../routing";
 import { getAzkarForMode, isRoutineCategory, registerLazyCollection } from "../content/azkar";
 import { reportError } from "../../lib/observability";
 import { startSafeViewTransition } from "../utils/viewTransitions";
 import type { CategoryId, PrayerName, RoutineMode, View, RoutineCategoryId } from "../types";
-import type { LibrarySection } from "../screens/AzkarLibraryScreen";
 
 function categoryFromShortcutUrl(): CategoryId | null {
   const category = new URLSearchParams(window.location.search).get("category");
@@ -39,9 +39,10 @@ export function tabForView(view: View): NavTab {
 interface UseAppRoutingProps {
   routineModes: Record<RoutineCategoryId, RoutineMode>;
   hasCompletedOnboarding: boolean;
+  reduceMotion: boolean;
 }
 
-export function useAppRouting({ routineModes, hasCompletedOnboarding }: UseAppRoutingProps) {
+export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMotion }: UseAppRoutingProps) {
   const initialRoute = useRef(parseLocation(window.location.search, window.location.hash)).current;
   const initialShortcutCategory = useRef(categoryFromShortcutUrl()).current;
 
@@ -56,7 +57,11 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding }: UseAppRo
   /** Which prayer the prayer screen is showing, so `#/prayer/asr` survives a reload. */
   const [activePrayer, setActivePrayer] = useState<PrayerName>(initialRoute?.prayer ?? "fajr");
   const [searchQuery, setSearchQuery] = useState(initialRoute?.query ?? "");
-  const [librarySection, setLibrarySection] = useState<LibrarySection>("collections");
+  const [librarySection, setLibrarySection] = useState<LibraryRouteSection>(
+    initialRoute?.librarySection ?? "collections",
+  );
+  const [progressPeriod, setProgressPeriod] = useState<ProgressRoutePeriod>(initialRoute?.progressPeriod ?? "day");
+  const [settingsPanel, setSettingsPanel] = useState<SettingsRoutePanel>(initialRoute?.settingsPanel ?? "root");
 
   const [routeContentLoading, setRouteContentLoading] = useState(
     () =>
@@ -101,15 +106,28 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding }: UseAppRo
     [routineModes],
   );
 
-  const push = useCallback((to: View) => {
-    window.history.pushState({ view: to }, "", window.location.href);
-    inAppHistoryDepth.current += 1;
-    startSafeViewTransition(() => {
-      flushSync(() => {
-        setView(to);
-      });
-    });
-  }, []);
+  const push = useCallback(
+    (to: View) => {
+      window.history.pushState({ view: to }, "", window.location.href);
+      inAppHistoryDepth.current += 1;
+      startSafeViewTransition(() => {
+        flushSync(() => {
+          setView(to);
+        });
+      }, reduceMotion);
+    },
+    [reduceMotion],
+  );
+
+  const replace = useCallback(
+    (to: View) => {
+      window.history.replaceState({ view: to }, "", window.location.href);
+      startSafeViewTransition(() => {
+        flushSync(() => setView(to));
+      }, reduceMotion);
+    },
+    [reduceMotion],
+  );
 
   const pop = useCallback(() => {
     if (inAppHistoryDepth.current > 0) {
@@ -139,13 +157,16 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding }: UseAppRo
       query: searchQuery,
       page: quranPage,
       prayer: activePrayer,
+      librarySection,
+      progressPeriod,
+      settingsPanel,
     });
     if (!hash) return;
     const target = `${window.location.pathname}${hash}`;
     if (`${window.location.pathname}${window.location.hash}` !== target) {
       window.history.replaceState({ view }, "", target);
     }
-  }, [view, activeCat, activeIdx, searchQuery, quranPage, activePrayer]);
+  }, [view, activeCat, activeIdx, searchQuery, quranPage, activePrayer, librarySection, progressPeriod, settingsPanel]);
 
   const applyRouteFromLocation = useCallback((): boolean => {
     const route = parseLocation(window.location.search, window.location.hash);
@@ -170,11 +191,14 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding }: UseAppRo
         }
         if (route.index !== undefined) setActiveIdx(route.index);
         if (route.query !== undefined) setSearchQuery(route.query);
+        if (route.view === "library") setLibrarySection(route.librarySection ?? "collections");
+        if (route.view === "progress") setProgressPeriod(route.progressPeriod ?? "day");
+        if (route.view === "settings") setSettingsPanel(route.settingsPanel ?? "root");
         setActiveTab(tabForView(route.view));
       });
-    });
+    }, reduceMotion);
     return true;
-  }, [hydrateRouteCategory]);
+  }, [hydrateRouteCategory, reduceMotion]);
 
   useEffect(() => {
     const handlePopState = (e: PopStateEvent) => {
@@ -186,13 +210,13 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding }: UseAppRo
             setView(e.state.view);
             setActiveTab(tabForView(e.state.view));
           });
-        });
+        }, reduceMotion);
       } else {
         startSafeViewTransition(() => {
           flushSync(() => {
             setView(hasCompletedOnboarding ? "home" : "language");
           });
-        });
+        }, reduceMotion);
       }
     };
 
@@ -206,7 +230,50 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding }: UseAppRo
       window.removeEventListener("popstate", handlePopState);
       window.removeEventListener("hashchange", handleHashChange);
     };
-  }, [applyRouteFromLocation, hasCompletedOnboarding]);
+  }, [applyRouteFromLocation, hasCompletedOnboarding, reduceMotion]);
+
+  const pushRouteState = useCallback(
+    (route: RouteState, update: () => void) => {
+      const hash = routeToHash(route);
+      if (!hash) return;
+      const target = `${window.location.pathname}${hash}`;
+      if (`${window.location.pathname}${window.location.hash}` === target) {
+        update();
+        return;
+      }
+      window.history.pushState({ view: route.view }, "", target);
+      inAppHistoryDepth.current += 1;
+      startSafeViewTransition(() => flushSync(update), reduceMotion);
+    },
+    [reduceMotion],
+  );
+
+  const navigateLibrarySection = useCallback(
+    (section: LibraryRouteSection) =>
+      pushRouteState({ view: "library", librarySection: section }, () => setLibrarySection(section)),
+    [pushRouteState],
+  );
+
+  const navigateProgressPeriod = useCallback(
+    (period: ProgressRoutePeriod) =>
+      pushRouteState({ view: "progress", progressPeriod: period }, () => setProgressPeriod(period)),
+    [pushRouteState],
+  );
+
+  const navigateSettingsPanel = useCallback(
+    (panel: SettingsRoutePanel) =>
+      pushRouteState({ view: "settings", settingsPanel: panel }, () => setSettingsPanel(panel)),
+    [pushRouteState],
+  );
+
+  const backSettingsPanel = useCallback(() => {
+    if (inAppHistoryDepth.current > 0) {
+      window.history.back();
+      return;
+    }
+    window.history.replaceState({ view: "settings" }, "", `${window.location.pathname}#/settings`);
+    setSettingsPanel("root");
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -282,8 +349,10 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding }: UseAppRo
         setLibrarySection("collections");
         push("library");
       } else if (tab === "progress") {
+        setProgressPeriod("day");
         push("progress");
       } else if (tab === "settings") {
+        setSettingsPanel("root");
         push("settings");
       }
     },
@@ -309,10 +378,17 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding }: UseAppRo
     setSearchQuery,
     librarySection,
     setLibrarySection,
+    navigateLibrarySection,
+    progressPeriod,
+    navigateProgressPeriod,
+    settingsPanel,
+    navigateSettingsPanel,
+    backSettingsPanel,
     routeContentLoading,
     routeContentError,
     setRouteContentError,
     push,
+    replace,
     pop,
     handleNavTab,
     hydrateRouteCategory,

@@ -1,4 +1,4 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { headingFromOrientation, QiblaScreen } from "./QiblaScreen";
@@ -198,5 +198,43 @@ describe("QiblaScreen", () => {
     expect(screen.getByText(/Settings → Site settings → Motion sensors/)).toBeVisible();
     expect(screen.getByRole("button", { name: "Enable live compass" })).toHaveAttribute("aria-pressed", "false");
     expect(screen.getByTestId("qibla-arrow")).toHaveAttribute("transform", expect.stringMatching(/^rotate\(136\./));
+  });
+
+  it("confirms a stable alignment once and respects the haptic setting", async () => {
+    vi.useFakeTimers();
+    const vibrate = vi.fn();
+    Object.defineProperty(navigator, "vibrate", { configurable: true, value: vibrate });
+    class MockDeviceOrientationEvent extends Event {}
+    vi.stubGlobal("DeviceOrientationEvent", MockDeviceOrientationEvent);
+    Object.defineProperty(window, "isSecureContext", { configurable: true, value: true });
+
+    render(
+      <QiblaScreen
+        language="en"
+        direction="ltr"
+        locationSettings={{ latitude: 30.0444, longitude: 31.2357, calculationMethod: 5, autoDetect: false }}
+        reduceMotion={false}
+        hapticFeedback
+        onBack={() => undefined}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Enable live compass" }));
+    await act(async () => {
+      window.dispatchEvent(
+        Object.assign(new Event("deviceorientation"), {
+          alpha: 0,
+          beta: 0,
+          gamma: 0,
+          absolute: false,
+          webkitCompassHeading: 136,
+        }),
+      );
+    });
+    await act(async () => vi.advanceTimersByTime(350));
+
+    expect(screen.getByRole("heading", { name: "You are facing the Qibla" })).toBeVisible();
+    expect(vibrate).toHaveBeenCalledTimes(1);
+    vi.useRealTimers();
   });
 });

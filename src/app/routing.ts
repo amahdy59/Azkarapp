@@ -18,6 +18,23 @@ import { CATEGORIES } from "./content/categories";
 import { isPrayerName } from "./content/prayerTimes";
 import type { CategoryId, PrayerName, View } from "./types";
 
+export type LibraryRouteSection = "collections" | "saved";
+export type ProgressRoutePeriod = "day" | "week" | "month" | "year";
+export type SettingsRoutePanel =
+  | "root"
+  | "reading"
+  | "audio"
+  | "accessibility"
+  | "downloads"
+  | "notifications"
+  | "progress"
+  | "account-data"
+  | "help"
+  | "legal"
+  | "sources"
+  | "whats-new"
+  | "about";
+
 export interface RouteState {
   view: View;
   /** The prayer a `prayer` route names. */
@@ -27,6 +44,9 @@ export interface RouteState {
   index?: number;
   query?: string;
   page?: number;
+  librarySection?: LibraryRouteSection;
+  progressPeriod?: ProgressRoutePeriod;
+  settingsPanel?: SettingsRoutePanel;
 }
 
 /** Views that map to a stable, linkable path. */
@@ -63,7 +83,13 @@ function categoryFromSlug(slug: string): CategoryId | undefined {
  * URL at all (onboarding and auth steps).
  */
 export function routeToHash(route: RouteState): string | null {
-  const { view, categoryId, index, query, page, prayer } = route;
+  const { view, categoryId, index, query, page, prayer, librarySection, progressPeriod, settingsPanel } = route;
+
+  if (view === "library") return librarySection === "saved" ? "#/azkar/saved" : "#/azkar";
+  if (view === "progress")
+    return progressPeriod && progressPeriod !== "day" ? `#/progress/${progressPeriod}` : "#/progress";
+  if (view === "settings")
+    return settingsPanel && settingsPanel !== "root" ? `#/settings/${settingsPanel}` : "#/settings";
 
   if (view === "category" && categoryId) {
     return `#/azkar/${categorySlug(categoryId)}`;
@@ -106,6 +132,36 @@ export function parseHash(hash: string): RouteState | null {
 
   const path = raw.startsWith("/") ? raw : `/${raw}`;
   const segments = path.split("/").filter(Boolean);
+
+  if (segments[0] === "azkar" && segments[1] === "saved" && segments.length === 2) {
+    return { view: "library", librarySection: "saved" };
+  }
+
+  if (segments[0] === "progress" && segments.length === 2) {
+    const period = segments[1];
+    return period === "week" || period === "month" || period === "year"
+      ? { view: "progress", progressPeriod: period }
+      : null;
+  }
+
+  if (segments[0] === "settings" && segments.length === 2) {
+    const panel = segments[1] as SettingsRoutePanel;
+    const panels: readonly SettingsRoutePanel[] = [
+      "reading",
+      "audio",
+      "accessibility",
+      "downloads",
+      "notifications",
+      "progress",
+      "account-data",
+      "help",
+      "legal",
+      "sources",
+      "whats-new",
+      "about",
+    ];
+    return panels.includes(panel) ? { view: "settings", settingsPanel: panel } : null;
+  }
 
   if (segments[0] === "azkar" && segments.length >= 2) {
     const categoryId = categoryFromSlug(segments[1]!);

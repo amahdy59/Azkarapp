@@ -105,6 +105,7 @@ Run the phase files in numerical order unless the decision log explicitly record
 | 62    | `phases/PHASE_62_ACTIVE_VISITOR_PRESENCE.md`           | Anonymous rolling presence instead of an all-time visitor total           |
 | 63    | `phases/PHASE_63_REVIEW_RECOMMENDATIONS.md`            | Evidence-led recommendations, local restore, audio settings, prayer depth |
 | 64    | `phases/PHASE_64_MASBAHA_AND_PROGRESS_REFINEMENT.md`   | Finite Masbaha goals, reviewed picker, and truthful Progress summaries    |
+| 65    | `phases/PHASE_65_NAVIGATION_AND_MICROINTERACTIONS.md`  | Linkable subroutes and calm, governed interaction feedback                |
 
 Phases 15–20 derive from `docs/audits/DESIGN_CONSISTENCY_AUDIT.md` (2026-08-15) and are
 recorded in `DECISION_LOG.md` as DEC-064. Phase 15 is upstream of 16, 17 and 19 — its root
@@ -114,6 +115,6 @@ may run in parallel.
 
 ## Core rule
 
-Current counter and progress refinement work is recorded in [Phase 64](phases/PHASE_64_MASBAHA_AND_PROGRESS_REFINEMENT.md), including finite Masbaha goals, protected resets, reviewed remembrance selection, and truthful weekly and annual Progress presentation.
+Current navigation and interaction refinement work is recorded in [Phase 65](phases/PHASE_65_NAVIGATION_AND_MICROINTERACTIONS.md), including semantic links, secondary deep links, history-aware settings, governed haptics, and reduced-motion-safe feedback.
 
 The agent must never interpret “perfect the application” as permission to rewrite the entire repository. Perfection is approached through evidence-backed iteration, not one-shot replacement.

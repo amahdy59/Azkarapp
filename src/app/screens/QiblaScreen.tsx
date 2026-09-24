@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Compass, MapPin } from "../components/icons";
+import { Check, Compass, MapPin } from "../components/icons";
 import { Header } from "../components/LayoutShells";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { Button } from "../components/ui/button";
@@ -7,6 +7,7 @@ import { detectUserCoordinates } from "../content/prayerCalculation";
 import { formatNumerals } from "../formatting";
 import { useMediaQuery } from "../hooks/useMediaQuery";
 import { t } from "../i18n";
+import { vibrateIfEnabled } from "../motionPreferences";
 import { getKaabaDistance, getQiblaBearing, getQiblaTurn, normalizeDegrees, smoothCompassHeading } from "../qibla";
 import type { AppLanguage, LocationSettings } from "../types";
 
@@ -89,11 +90,13 @@ function CompassDial({
   northRotation,
   reduceMotion,
   language,
+  aligned = false,
 }: {
   rotation: number;
   northRotation: number;
   reduceMotion: boolean;
   language: AppLanguage;
+  aligned?: boolean;
 }) {
   const ticks = Array.from({ length: 36 }, (_, index) => index * 10);
   const cardinalLabels = language === "ar" ? ["شمال", "شرق", "جنوب", "غرب"] : ["N", "E", "S", "W"];
@@ -150,6 +153,24 @@ function CompassDial({
           transform={`rotate(${-rotation} 160 43)`}
           style={reduceMotion ? undefined : { transition: "transform 180ms ease-out" }}
         >
+          <circle
+            cx="160"
+            cy="43"
+            r="29"
+            fill="none"
+            stroke="var(--primary)"
+            strokeWidth="3"
+            opacity={aligned ? 0.72 : 0}
+            style={
+              reduceMotion
+                ? undefined
+                : {
+                    transition: "opacity 180ms ease-out, transform 220ms cubic-bezier(0.22, 1, 0.36, 1)",
+                    transformOrigin: "160px 43px",
+                    transform: aligned ? "scale(1)" : "scale(0.78)",
+                  }
+            }
+          />
           <circle cx="160" cy="43" r="23" fill="var(--primary)" opacity="0.14" />
           <rect x="143" y="27" width="34" height="32" rx="4" fill="var(--foreground)" />
           <path d="M143 36h34v7h-34z" fill="var(--primary)" />
@@ -166,12 +187,14 @@ export function QiblaScreen({
   direction,
   locationSettings,
   reduceMotion,
+  hapticFeedback = false,
   onBack,
 }: {
   language: AppLanguage;
   direction: "ltr" | "rtl";
   locationSettings?: LocationSettings;
   reduceMotion: boolean;
+  hapticFeedback?: boolean;
   onBack: () => void;
 }) {
   const savedCoordinates = useMemo(
@@ -203,6 +226,25 @@ export function QiblaScreen({
   const dialRotation = turn ?? bearing ?? 0;
   const northRotation = heading === null ? 0 : normalizeDegrees(-heading);
   const roundedBearing = bearing === null ? null : Math.round(bearing);
+  const isAligned = turn !== null && Math.abs(turn) <= 3;
+  const alignmentArmed = useRef(true);
+  const alignmentTimer = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (isAligned && alignmentArmed.current) {
+      alignmentTimer.current = window.setTimeout(() => {
+        vibrateIfEnabled(hapticFeedback, 15);
+        alignmentArmed.current = false;
+      }, 350);
+    } else if (!isAligned) {
+      if (alignmentTimer.current !== null) window.clearTimeout(alignmentTimer.current);
+      alignmentTimer.current = null;
+      if (turn === null || Math.abs(turn) > 5) alignmentArmed.current = true;
+    }
+    return () => {
+      if (alignmentTimer.current !== null) window.clearTimeout(alignmentTimer.current);
+    };
+  }, [hapticFeedback, isAligned, turn]);
 
   useEffect(() => {
     if (!compassEnabled) return;
@@ -320,6 +362,7 @@ export function QiblaScreen({
                     northRotation={northRotation}
                     reduceMotion={reduceMotion}
                     language={language}
+                    aligned={isAligned}
                   />
                 </div>
               </figure>
@@ -336,7 +379,16 @@ export function QiblaScreen({
                   })}
                 </p>
               )}
-              <h3 className="mt-3 text-center font-bold text-foreground" aria-live="polite">
+              <h3
+                className="mt-3 flex min-h-6 items-center justify-center gap-2 text-center font-bold text-foreground"
+                aria-live="polite"
+              >
+                <span
+                  aria-hidden="true"
+                  className={`inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-[opacity,transform] duration-standard ${isAligned ? "scale-100 opacity-100" : "pointer-events-none scale-75 opacity-0"}`}
+                >
+                  <Check size={15} strokeWidth={3} />
+                </span>
                 {guidance ??
                   t(language, "qibla.staticDirection", {
                     degrees: formatNumerals(roundedBearing!, language),

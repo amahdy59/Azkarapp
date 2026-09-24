@@ -1,4 +1,4 @@
-import { useCallback, useState, type CSSProperties, type MouseEvent, type PointerEvent } from "react";
+import { useCallback, useRef, useState, type CSSProperties, type MouseEvent, type PointerEvent } from "react";
 import { tapRippleStyle } from "./ZikrComponents";
 
 /**
@@ -73,6 +73,7 @@ export interface UseCountingSurfaceOptions {
 export function useCountingSurface({ onCount, reduceMotion = false }: UseCountingSurfaceOptions) {
   const [isPressed, setIsPressed] = useState(false);
   const [ripples, setRipples] = useState<CountingRipple[]>([]);
+  const nextRippleId = useRef(0);
 
   const release = useCallback(() => setIsPressed(false), []);
 
@@ -80,7 +81,14 @@ export function useCountingSurface({ onCount, reduceMotion = false }: UseCountin
     (event: PointerEvent<HTMLElement>) => {
       if (reduceMotion || isOwnControl(event.target)) return;
       setIsPressed(true);
-      // Screen tap ripple disabled: tactile press effect is cleaner and eliminates visual distraction over devotional text.
+      const rect = event.currentTarget.getBoundingClientRect();
+      setRipples([
+        {
+          id: ++nextRippleId.current,
+          x: event.clientX - rect.left,
+          y: event.clientY - rect.top,
+        },
+      ]);
     },
     [reduceMotion],
   );

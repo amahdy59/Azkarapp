@@ -17,7 +17,7 @@ import { Bookmark } from "./icons";
 import { formatNumerals } from "../formatting";
 import { getJuzNumberForPage, getSurahDisplayName, getSurahNumberForPage } from "../content/surahInfo";
 import { QuranWordPopover } from "./QuranWordPopover";
-import { shouldReduceMotion } from "../motionPreferences";
+import { shouldReduceMotion, vibrateIfEnabled } from "../motionPreferences";
 import { MushafSurahHeaderArt } from "./MushafSurahHeaderArt";
 import { MushafBismillahArt } from "./MushafBismillahArt";
 import { SURAH_PLACEMENTS } from "../content/mushafSurahPlacements";
@@ -1031,6 +1031,7 @@ export function MushafPageViewer({
   paperRef,
   pageTransitionDirection,
   reduceMotion = false,
+  hapticFeedback = false,
   textScale = "medium",
   facingPage,
   onAyahAction,
@@ -1083,6 +1084,7 @@ export function MushafPageViewer({
   paperStyle?: CSSProperties;
   pageTransitionDirection?: "forward" | "backward";
   reduceMotion?: boolean;
+  hapticFeedback?: boolean;
   /** Reading type size within the fixed fifteen-line geometry. */
   textScale?: MushafTextScale;
   onAyahAction?: (verseKey: string, pageNumber: number) => void;
@@ -1127,14 +1129,8 @@ export function MushafPageViewer({
   }, [facingPage?.pageNumber, pageNumber, pageTransitionDirection, paperRef, reduceMotion]);
 
   useEffect(() => {
-    if (pageTransitionDirection && typeof navigator !== "undefined" && "vibrate" in navigator) {
-      try {
-        navigator.vibrate(10);
-      } catch {
-        // Haptic feedback best-effort
-      }
-    }
-  }, [pageNumber, pageTransitionDirection]);
+    if (pageTransitionDirection) vibrateIfEnabled(hapticFeedback, 10);
+  }, [hapticFeedback, pageNumber, pageTransitionDirection]);
 
   const handlePaperPointerUp = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {

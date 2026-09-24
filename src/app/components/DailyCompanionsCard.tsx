@@ -83,7 +83,7 @@ export function DailyCompanionsCard({
 
           <div className="flex items-center gap-2.5">
             {quranProgress && quranProgress.goal > 0 && (
-              <span className="text-caption font-bold rounded-lg border border-border/80 bg-muted/60 px-2.5 py-1 text-muted-foreground">
+              <span className="rounded-full border border-border/80 bg-muted/60 px-2.5 py-1 text-caption font-bold text-muted-foreground">
                 {formatNumerals(quranProgress.progress, language)}/{formatNumerals(quranProgress.goal, language)}
               </span>
             )}
@@ -127,7 +127,7 @@ export function DailyCompanionsCard({
               </div>
             </div>
 
-            <span className="text-caption font-bold rounded-lg border border-border/80 bg-muted/60 px-2.5 py-1 text-muted-foreground">
+            <span className="rounded-full border border-border/80 bg-muted/60 px-2.5 py-1 text-caption font-bold text-muted-foreground">
               {mosquePrayers === "mosque_5" ? "5/5" : mosquePrayers === "mosque_3" ? "3/5" : "0/5"}
             </span>
           </button>

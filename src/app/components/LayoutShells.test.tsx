@@ -39,9 +39,13 @@ describe("BottomNav", () => {
     expect(screen.getByTestId("nav-settings")).toBeInTheDocument();
 
     expect(screen.getByTestId("nav-home")).toHaveAttribute("aria-current", "page");
+    expect(screen.getByTestId("nav-settings")).toHaveAttribute("href", "#/settings");
     expect(screen.getByTestId("nav-quran")).not.toHaveAttribute("aria-current");
 
     fireEvent.click(screen.getByTestId("nav-settings"));
     expect(handleChange).toHaveBeenCalledWith("settings");
+
+    fireEvent.click(screen.getByTestId("nav-progress"), { ctrlKey: true });
+    expect(handleChange).toHaveBeenCalledTimes(1);
   });
 });

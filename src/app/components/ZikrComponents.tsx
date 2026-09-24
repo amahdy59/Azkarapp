@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import "./ZikrComponents.css";
 import { Check } from "./icons";
 import { counterNumeralFontFamily, formatNumerals } from "../formatting";
@@ -134,6 +134,7 @@ export function ZikrCounterSurface({
   const isArabic = language === "ar";
   const [isPressed, setIsPressed] = useState(false);
   const [ripples, setRipples] = useState<{ id: number; x: number; y: number }[]>([]);
+  const nextRippleId = useRef(0);
   const defaultInstruction = t(language, "reader.tapToCount");
   const activeInstruction = instructionText || defaultInstruction;
   const reducedMotion = shouldReduceMotion(reduceMotion);
@@ -159,10 +160,7 @@ export function ZikrCounterSurface({
     if (!reducedMotion) setIsPressed(true);
     if (reducedMotion) return;
     const rect = event.currentTarget.getBoundingClientRect();
-    setRipples((current) => [
-      ...current.slice(-3),
-      { id: Date.now() + Math.random(), x: event.clientX - rect.left, y: event.clientY - rect.top },
-    ]);
+    setRipples([{ id: ++nextRippleId.current, x: event.clientX - rect.left, y: event.clientY - rect.top }]);
   };
 
   const handlePointerUp = () => {
