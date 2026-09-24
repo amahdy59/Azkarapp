@@ -9,8 +9,7 @@ import { reportError } from "../../../lib/observability";
 import { InformationCard } from "./InformationCard";
 import { SubHeader } from "./SettingsPrimitives";
 import { getAzkarForMode } from "../../content/azkar";
-import { loadAudioPreferences, saveAudioPreferences } from "../../audio/audioPreferences";
-import { getAudioVoices } from "../../audio/audioVoices";
+import { loadAudioPreferences } from "../../audio/audioPreferences";
 import {
   downloadAudioForZikrs,
   estimateAudioDownloadBytes,
@@ -47,20 +46,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
   const [mushafProgress, setMushafProgress] = useState<{ completed: number; total: number } | null>(null);
   const mushafAbortRef = useRef<AbortController | null>(null);
   const audioAbortRef = useRef<AbortController | null>(null);
-  const [audioPreferences, setAudioPreferences] = useState(loadAudioPreferences);
-  const voices = useMemo(() => getAudioVoices(language), [language]);
-
-  /* Persisted immediately rather than on a Save button: every other
-     preference in Settings applies on change, and a lone deferred one
-     reads as a bug. The id is stable, so the stored choice survives a
-     renamed display label. */
-  const handleVoiceChange = useCallback((voiceId: string) => {
-    setAudioPreferences((previous) => {
-      const next = { ...previous, duaVoiceId: voiceId };
-      saveAudioPreferences(next);
-      return next;
-    });
-  }, []);
+  const audioPreferences = useMemo(loadAudioPreferences, []);
 
   const audioCollections = useMemo(
     () =>
@@ -296,27 +282,6 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
           </h2>
           <p className="mt-1 text-xs leading-5 text-muted-foreground">{t(language, "downloads.approvedOnly")}</p>
 
-          <label
-            className="mt-3 flex min-h-11 items-center justify-between gap-3 text-label font-semibold text-foreground"
-            htmlFor="audio-reciter"
-          >
-            <span>{t(language, "downloads.reciterLabel")}</span>
-            <select
-              id="audio-reciter"
-              value={audioPreferences.duaVoiceId}
-              onChange={(event) => handleVoiceChange(event.target.value)}
-              disabled={isAnyJobActive}
-              className="h-11 max-w-[60%] rounded-xl border border-border-control bg-background px-3 text-label font-bold text-foreground disabled:opacity-50"
-              dir={language === "ar" ? "rtl" : "ltr"}
-            >
-              {voices.map((voice) => (
-                <option key={voice.id} value={voice.id}>
-                  {language === "ar" ? voice.nameArabic : voice.nameEnglish}
-                </option>
-              ))}
-            </select>
-          </label>
-
           <div className="mt-4 grid gap-2">
             {audioCollections.map((collection) => {
               const label = t(
@@ -440,6 +405,13 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
                   <dt className="text-muted-foreground">{t(language, "downloads.downloadedAudio")}</dt>
                   <dd className="font-medium text-foreground">
                     {status.downloadedAudioAssets} · {formatMegabytes(status.downloadedAudioBytes, language)}
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <dt className="text-muted-foreground">{t(language, "downloads.downloadedMushafEstimate")}</dt>
+                  <dd className="font-medium text-foreground">
+                    {status.downloadedMushafPages} ·{" "}
+                    {formatMegabytes(status.downloadedMushafPages * MUSHAF_ESTIMATED_PAGE_BYTES, language)}
                   </dd>
                 </div>
               </dl>

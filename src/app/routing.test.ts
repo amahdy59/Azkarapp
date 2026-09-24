@@ -15,7 +15,6 @@ describe("routeToHash", () => {
     expect(routeToHash({ view: "khatmah", page: 50 })).toBe("#/quran/50");
     expect(routeToHash({ view: "khatmah_overview" })).toBe("#/quran-wird");
     expect(routeToHash({ view: "wird_benefits" })).toBe("#/quran-wird/benefits");
-    expect(routeToHash({ view: "oasis_preview" })).toBe("#/oasis-preview");
   });
 
   it("includes the collection and a one-based zikr position", () => {
@@ -51,7 +50,6 @@ describe("parseHash", () => {
       { view: "custom_counter" },
       { view: "khatmah_overview" },
       { view: "wird_benefits" },
-      { view: "oasis_preview" },
       { view: "category", categoryId: "morning" },
       { view: "category", categoryId: "comprehensive_duas" },
     ] as const) {

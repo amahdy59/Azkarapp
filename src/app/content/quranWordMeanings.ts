@@ -308,3 +308,23 @@ export function getQuranWordMeaningEntry(verseKey: string, wordText: string): Qu
 
   return undefined;
 }
+
+export function getAyahWordMeanings(verseKey: string): QuranWordMeaning[] {
+  const parts = verseKey.split(":");
+  if (parts.length < 2) return [];
+  const surah = parts[0];
+  const ayah = parts[1];
+  if (!surah || !ayah) return [];
+  const reviewed = MEANINGS[surah]?.[ayah];
+  const sourced = lazyChapters.get(surah)?.[ayah];
+  const ayahMeanings = reviewed || sourced ? { ...sourced, ...reviewed } : undefined;
+  if (!ayahMeanings) return [];
+
+  return Object.entries(ayahMeanings).map(([word, explanation]) => ({
+    id: `${surah}:${ayah}:${word}`,
+    surahNumber: Number(surah),
+    ayahNumber: Number(ayah),
+    word,
+    explanationArabic: explanation,
+  }));
+}

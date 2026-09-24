@@ -2,12 +2,13 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   ArrowPrevious,
   BarChart3,
+  Bookmark,
   BookOpen,
+  Compass,
   Contrast,
   Globe,
   Home,
   Moon,
-  MoreHorizontal,
   Settings,
   Sparkles,
   Sun,
@@ -19,7 +20,7 @@ import type { AppLanguage, ThemeMode } from "../types";
 
 // ─── Shared nav tab definition ────────────────────────────────────────────────
 
-export type NavTab = "home" | "azkar" | "progress" | "more";
+export type NavTab = "home" | "quran" | "azkar" | "progress" | "settings";
 
 export interface NavProps {
   active: NavTab;
@@ -31,18 +32,20 @@ export interface NavProps {
 }
 
 interface NavSidebarProps extends NavProps {
-  activeUtility?: "quran" | "masbaha" | "settings";
+  activeUtility?: "quran" | "masbaha" | "settings" | "qibla";
   onOpenQuran?: () => void;
   onOpenMasbaha: () => void;
-  onOpenSettings: () => void;
+  onOpenSettings?: () => void;
+  onOpenQibla?: () => void;
 }
 
 function getNavTabs(language: AppLanguage) {
   return [
     { id: "home" as const, label: t(language, "common.home"), Icon: Home },
-    { id: "azkar" as const, label: t(language, "common.azkar"), Icon: BookOpen },
+    { id: "quran" as const, label: t(language, "common.mushaf"), Icon: BookOpen },
+    { id: "azkar" as const, label: t(language, "common.azkar"), Icon: Bookmark },
     { id: "progress" as const, label: t(language, "common.progress"), Icon: BarChart3 },
-    { id: "more" as const, label: t(language, "common.more"), Icon: MoreHorizontal },
+    { id: "settings" as const, label: t(language, "common.settings"), Icon: Settings },
   ];
 }
 
@@ -151,7 +154,7 @@ export function BottomNav({ active, onChange, isArabic = false }: NavProps) {
       aria-label={t(language, "common.bottomNavigation")}
       className="flex h-[calc(4.5rem+env(safe-area-inset-bottom))] shrink-0 bg-card pb-[env(safe-area-inset-bottom)] shadow-sm"
     >
-      <div className="flex min-h-0 flex-1 items-center justify-between px-2 min-[390px]:px-6">
+      <div className="flex min-h-0 flex-1 items-center justify-between px-1 min-[360px]:px-2 min-[390px]:px-4">
         {tabs.map(({ id, label, Icon }) => {
           const on = active === id;
           return (
@@ -168,13 +171,13 @@ export function BottomNav({ active, onChange, isArabic = false }: NavProps) {
                   transient entrance animation that reduced-motion disables. */}
               <span
                 aria-hidden="true"
-                className={`absolute inset-x-3 top-0 h-[3px] rounded-b-full ${on ? "bg-primary" : "bg-transparent"}`}
+                className={`absolute inset-x-2 top-0 h-[3px] rounded-b-full ${on ? "bg-primary" : "bg-transparent"}`}
               />
               <span className={on ? "nav-active-cue" : ""} key={`${id}-${on}`}>
-                <Icon size={24} style={{ color: on ? "var(--primary)" : "var(--card-foreground)" }} />
+                <Icon size={22} style={{ color: on ? "var(--primary)" : "var(--card-foreground)" }} />
               </span>
               <span
-                className={`whitespace-nowrap font-sans text-micro leading-6 min-[360px]:text-micro ${
+                className={`inline-flex min-h-[2em] max-w-full items-center justify-center px-0.5 text-center font-sans text-micro leading-normal whitespace-normal [overflow-wrap:anywhere] ${
                   on ? "font-extrabold text-primary" : "font-semibold text-muted-foreground"
                 }`}
                 dir="auto"
@@ -246,16 +249,18 @@ export function NavSidebar({
   onThemeModeChange,
   onLanguageChange,
   activeUtility,
-  onOpenQuran,
+  onOpenQuran: _onOpenQuran,
   onOpenMasbaha,
-  onOpenSettings,
+  onOpenSettings: _onOpenSettings,
+  onOpenQibla,
 }: NavSidebarProps) {
   const language: AppLanguage = isArabic ? "ar" : "en";
-  const tabs = getNavTabs(language).filter(({ id }) => id !== "more");
+  const tabs = getNavTabs(language);
   const utilityTabs = [
-    { id: "quran" as const, label: t(language, "common.mushaf"), Icon: BookOpen, onClick: onOpenQuran },
     { id: "masbaha" as const, label: t(language, "counter.tasbeehTitle"), Icon: Sparkles, onClick: onOpenMasbaha },
-    { id: "settings" as const, label: t(language, "common.settings"), Icon: Settings, onClick: onOpenSettings },
+    ...(onOpenQibla
+      ? [{ id: "qibla" as const, label: t(language, "qibla.title"), Icon: Compass, onClick: onOpenQibla }]
+      : []),
   ];
 
   const toggleLang = () => {

@@ -12,7 +12,6 @@ async function enterEnglishGuestMode(page: import("@playwright/test").Page) {
   await page.getByTestId("language-option-en").click();
   await page.getByTestId("confirm-language").click();
   await page.getByTestId("onboarding-get-started").click();
-  await page.getByTestId("continue-as-guest").click();
   await page.getByTestId("nav-azkar").click();
   await page.getByTestId("category-card-morning").click();
   await page.getByRole("button", { name: "Start Session", exact: true }).click();
@@ -37,7 +36,6 @@ test("Core Reader keeps the same stable zikr identity as its filtered routine", 
   await page.getByTestId("language-option-en").click();
   await page.getByTestId("confirm-language").click();
   await page.getByTestId("onboarding-get-started").click();
-  await page.getByTestId("continue-as-guest").click();
 
   // Go to Library and click Morning Azkar to enter Category Screen.
   await page.getByTestId("nav-azkar").click();

@@ -258,11 +258,10 @@ test("Home prayer strip keeps all five prayers legible without page overflow", a
   }
 });
 
-test("the More screen masbaha entry fills compact and tablet layouts", async ({ page }) => {
+test("the Home masbaha entry fills compact and tablet layouts", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 568 });
   await openReturningGuest(page);
-  await page.getByTestId("nav-more").click();
-  const entry = page.getByRole("button", { name: "Masbaha" }).first();
+  const entry = page.getByTestId("home-tool-masbaha");
 
   for (const viewport of [
     { width: 320, height: 568, minimumWidth: 260, maximumWidth: 320 },
@@ -300,8 +299,7 @@ test("the OnePlus-class Salawat session keeps its counter controls and hint insi
 test("the custom counter stays bounded on a short phone and isolates focused-control shortcuts", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 568 });
   await openReturningGuest(page);
-  await page.getByTestId("nav-more").click();
-  await page.getByRole("button", { name: "Masbaha" }).first().click();
+  await page.getByTestId("home-tool-masbaha").click();
 
   const screen = page.locator(".app-screen-surface");
   const content = page.getByTestId("custom-counter-content");

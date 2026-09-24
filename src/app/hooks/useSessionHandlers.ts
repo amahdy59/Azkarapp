@@ -7,6 +7,7 @@ import type {
   RoutineMode,
   View,
 } from "../types";
+import type { NavTab } from "../components/LayoutShells";
 import { MAX_STORED_SESSIONS, type StoredSession } from "../state";
 import { getAzkarForMode, getAzkarForPrayer, isRoutineCategory } from "../content/azkar";
 import { isPrayerName } from "../content/prayerTimes";
@@ -79,7 +80,7 @@ export function useSessionHandlers({
   push: (to: View) => void;
   pop: () => void;
   setView: (view: View) => void;
-  setActiveTab: (tab: "home" | "azkar" | "progress" | "more") => void;
+  setActiveTab: (tab: NavTab) => void;
   showConfirm: (
     title: string,
     description: string,

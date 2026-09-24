@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { AyahInteractionSheet } from "./AyahInteractionSheet";
+import { t } from "../i18n";
 
 describe("AyahInteractionSheet", () => {
   afterEach(() => vi.restoreAllMocks());
@@ -70,5 +71,22 @@ describe("AyahInteractionSheet", () => {
     expect(screen.getByRole("button", { name: "Copy ayah" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "Share ayah" })).toBeDisabled();
     expect(screen.getByText("Preparing the canonical Quran text…")).toBeInTheDocument();
+  });
+
+  it("renders word meanings when available for the verse", async () => {
+    render(
+      <AyahInteractionSheet
+        isOpen
+        onClose={vi.fn()}
+        verseKey="2:255"
+        text="ٱللَّهُ لَآ إِلَـٰهَ إِلَّا هُوَ ٱلْحَىُّ ٱلْقَيُّومُ ۚ لَا تَأْخُذُهُۥ سِنَةٌۭ وَلَا نَوْمٌۭ"
+        language="ar"
+        isBookmarked={false}
+        onBookmark={vi.fn()}
+      />,
+    );
+
+    expect(await screen.findByTestId("ayah-meanings-container")).toBeInTheDocument();
+    expect(screen.getByText(t("ar", "reader.wordMeaningsTitle"))).toBeInTheDocument();
   });
 });

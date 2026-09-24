@@ -163,7 +163,10 @@ export function ProgressScreen({
   );
 
   // Current day key for Oasis evaluation
-  const currentDayKey = getProgressDayKey(displayDate, progressDayStartHour);
+  const currentDayKey =
+    activeTab === "day" && offset === 0
+      ? getProgressDayKey(now, progressDayStartHour)
+      : getProgressDayKey(displayDate, progressDayStartHour);
   const selectedDayPath = getDailyPathStatus({
     dayKey: currentDayKey,
     dailyCompletions,

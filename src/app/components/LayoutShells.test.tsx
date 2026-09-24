@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
-import { Header } from "./LayoutShells";
+import { describe, expect, it, vi } from "vitest";
+import { Header, BottomNav } from "./LayoutShells";
 
 describe("Header", () => {
   it("adds the glass surface only after its screen content scrolls", () => {
@@ -24,5 +24,24 @@ describe("Header", () => {
 
     fireEvent.scroll(region, { target: { scrollTop: 0 } });
     expect(header).not.toHaveAttribute("data-scrolled");
+  });
+});
+
+describe("BottomNav", () => {
+  it("renders all 5 primary devotional tabs", () => {
+    const handleChange = vi.fn();
+    render(<BottomNav active="home" onChange={handleChange} isArabic={true} />);
+
+    expect(screen.getByTestId("nav-home")).toBeInTheDocument();
+    expect(screen.getByTestId("nav-quran")).toBeInTheDocument();
+    expect(screen.getByTestId("nav-azkar")).toBeInTheDocument();
+    expect(screen.getByTestId("nav-progress")).toBeInTheDocument();
+    expect(screen.getByTestId("nav-settings")).toBeInTheDocument();
+
+    expect(screen.getByTestId("nav-home")).toHaveAttribute("aria-current", "page");
+    expect(screen.getByTestId("nav-quran")).not.toHaveAttribute("aria-current");
+
+    fireEvent.click(screen.getByTestId("nav-settings"));
+    expect(handleChange).toHaveBeenCalledWith("settings");
   });
 });

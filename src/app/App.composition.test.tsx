@@ -115,8 +115,8 @@ describe("App Composition and Routing", () => {
 
     expect(await screen.findByRole("heading", { name: /settings/i, level: 1 }, { timeout: 5000 })).toBeInTheDocument();
 
-    const moreTab = await screen.findByTestId("nav-more");
-    expect(moreTab).toHaveAttribute("aria-current", "page");
+    const settingsTab = await screen.findByTestId("nav-settings");
+    expect(settingsTab).toHaveAttribute("aria-current", "page");
   });
 
   it("keeps approved Al-Kahf audio actionable and retries audio initialization", async () => {
@@ -143,14 +143,14 @@ describe("App Composition and Routing", () => {
 
     await screen.findByRole("main");
 
-    // Press Alt+4 for More
+    // Press Alt+5 for Settings
+    await user.keyboard("{Alt>}{5}{/Alt}");
+
+    expect(await screen.findByRole("heading", { name: /settings/i, level: 1 }, { timeout: 5000 })).toBeInTheDocument();
+    expect(window.location.hash).toBe("#/settings");
+
+    // Press Alt+4 for progress
     await user.keyboard("{Alt>}{4}{/Alt}");
-
-    expect(await screen.findByRole("heading", { name: /more/i, level: 1 }, { timeout: 5000 })).toBeInTheDocument();
-    expect(window.location.hash).toBe("#/more");
-
-    // Press Alt+3 for progress
-    await user.keyboard("{Alt>}{3}{/Alt}");
 
     expect(await screen.findByRole("heading", { name: /progress/i, level: 1 }, { timeout: 5000 })).toBeInTheDocument();
     expect(window.location.hash).toBe("#/progress");
@@ -162,9 +162,8 @@ describe("App Composition and Routing", () => {
 
     await screen.findByRole("main");
 
-    // Click More tab, then open Settings from the tools screen.
-    await user.click(await screen.findByTestId("nav-more"));
-    await user.click(await screen.findByRole("button", { name: /^Settings/ }));
+    // Click Settings tab directly
+    await user.click(await screen.findByTestId("nav-settings"));
 
     expect(await screen.findByRole("heading", { name: /settings/i, level: 1 }, { timeout: 5000 })).toBeInTheDocument();
     expect(window.location.hash).toBe("#/settings");
@@ -174,12 +173,12 @@ describe("App Composition and Routing", () => {
       window.history.back();
     });
 
-    // One Back step returns to the More screen that opened Settings.
+    // One Back step returns to Home.
     await waitFor(() => {
       expect(screen.queryByRole("heading", { name: /settings/i, level: 1 })).not.toBeInTheDocument();
     });
 
-    const moreTab = await screen.findByTestId("nav-more");
-    expect(moreTab).toHaveAttribute("aria-current", "page");
+    const homeTab = await screen.findByTestId("nav-home");
+    expect(homeTab).toHaveAttribute("aria-current", "page");
   });
 });

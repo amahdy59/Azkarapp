@@ -128,7 +128,7 @@ describe("AzkarLibraryScreen", () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "In-Prayer Supplications, 8 supplications" }));
+    fireEvent.click(screen.getByRole("button", { name: "In-Prayer Supplications, 17 supplications" }));
     fireEvent.click(screen.getByRole("button", { name: "Fasting & Ramadan, 2 supplications" }));
 
     expect(onCategory).toHaveBeenNthCalledWith(1, "in_prayer");

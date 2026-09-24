@@ -3,6 +3,8 @@ export { SettingsRootPanel } from "./SettingsRootPanel";
 export { AccountDataPanel } from "./AccountDataPanel";
 export { QrSyncPanel } from "./QrSyncPanel";
 export { AccessibilityPanel } from "./AccessibilityPanel";
+export { ReadingPanel } from "./ReadingPanel";
+export { AudioSettingsPanel } from "./AudioSettingsPanel";
 export { DownloadsPanel } from "./DownloadsPanel";
 export { NotificationsPanel } from "./NotificationsPanel";
 export { ProgressPanel } from "./ProgressPanel";

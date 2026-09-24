@@ -1,5 +1,6 @@
 import type { AppLanguage, AppStateSnapshot } from "../types";
-import { clearStoredAppData, resetStoredSettings } from "../state";
+import { clearStoredAppData, resetStoredSettings, saveAppState } from "../state";
+import { createAppBackup, parseAppBackup } from "../appBackup";
 import { t } from "../i18n";
 import { deleteCurrentAccount, signOutSupabase } from "../../lib/auth";
 import { isSupabaseConfigured } from "../../lib/supabase";
@@ -54,13 +55,41 @@ export function useSettingsHandlers({
   ) => void;
 }) {
   const handleExportData = () => {
-    const blob = new Blob([JSON.stringify(appStateSnapshot, null, 2)], { type: "application/json" });
+    const blob = new Blob([JSON.stringify(createAppBackup(appStateSnapshot), null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
     link.download = `azkar-data-${new Date().toISOString().slice(0, 10)}.json`;
     link.click();
     window.setTimeout(() => URL.revokeObjectURL(url), 0);
+  };
+
+  const handleRestoreData = (raw: string) => {
+    let restored: AppStateSnapshot;
+    try {
+      restored = parseAppBackup(raw);
+    } catch (error) {
+      throw new Error(
+        t(
+          selectedLang,
+          error instanceof Error && error.message === "unsupported-backup"
+            ? "accountData.restoreUnsupported"
+            : "accountData.restoreInvalid",
+        ),
+        { cause: error },
+      );
+    }
+
+    showConfirm(
+      t(selectedLang, "accountData.restoreConfirmTitle"),
+      t(selectedLang, "accountData.restoreConfirmBody"),
+      t(selectedLang, "accountData.restoreConfirmAction"),
+      t(selectedLang, "common.cancel"),
+      () => {
+        if (!saveAppState(restored)) throw new Error(t(selectedLang, "accountData.restoreSaveError"));
+        window.location.reload();
+      },
+    );
   };
 
   const handleResetPreferences = () => {
@@ -114,6 +143,7 @@ export function useSettingsHandlers({
 
   return {
     handleExportData,
+    handleRestoreData,
     handleResetPreferences,
     handleClearLocalData,
     handleDeleteAccount,

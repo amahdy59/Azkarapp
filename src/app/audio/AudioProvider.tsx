@@ -38,6 +38,8 @@ export interface AudioController {
   toggleMuted: () => void;
   setPlaybackRate: (rate: number) => void;
   setVoice: (voiceId: string) => void;
+  setPreferredDuaVoice: (voiceId: string) => void;
+  setContinueOnNavigation: (enabled: boolean) => void;
   setPlaybackMode: (mode: PlaybackMode) => void;
 }
 
@@ -338,6 +340,20 @@ export function AudioProvider({
 
   useEffect(() => stop, [stop]);
 
+  // Pause playback automatically when external audio devices (headphones/Bluetooth) disconnect
+  useEffect(() => {
+    if (typeof navigator === "undefined" || !navigator.mediaDevices?.addEventListener) return;
+    const handleDeviceChange = () => {
+      if (stateRef.current.status === "playing") {
+        pause();
+      }
+    };
+    navigator.mediaDevices.addEventListener("devicechange", handleDeviceChange);
+    return () => {
+      navigator.mediaDevices.removeEventListener("devicechange", handleDeviceChange);
+    };
+  }, [pause]);
+
   const next = useCallback(() => {
     const current = stateRef.current;
     if (current.plan && current.entryIndex + 1 < current.plan.entries.length) {
@@ -471,6 +487,32 @@ export function AudioProvider({
     [loadAt, updatePreferences],
   );
 
+  const setContinueOnNavigation = useCallback(
+    (enabled: boolean) => {
+      updatePreferences({ ...preferencesRef.current, continueOnNavigation: enabled });
+    },
+    [updatePreferences],
+  );
+
+  const setPreferredDuaVoice = useCallback(
+    (voiceId: string) => {
+      updatePreferences({ ...preferencesRef.current, duaVoiceId: voiceId });
+      const current = stateRef.current;
+      const entry = current.plan?.entries[current.entryIndex];
+      if (current.plan && entry?.contentKind === "dua" && entry.availableVoiceIds.includes(voiceId)) {
+        loadAt(
+          current.plan,
+          current.entryIndex,
+          current.segmentIndex,
+          current.repetitionIndex,
+          current.status === "playing",
+          voiceId,
+        );
+      }
+    },
+    [loadAt, updatePreferences],
+  );
+
   const setPlaybackMode = useCallback(
     (mode: PlaybackMode) => {
       const current = stateRef.current;
@@ -505,6 +547,8 @@ export function AudioProvider({
       toggleMuted,
       setPlaybackRate,
       setVoice,
+      setPreferredDuaVoice,
+      setContinueOnNavigation,
       setPlaybackMode,
     }),
     [
@@ -521,7 +565,9 @@ export function AudioProvider({
       setVolume,
       setPlaybackMode,
       setPlaybackRate,
+      setPreferredDuaVoice,
       setVoice,
+      setContinueOnNavigation,
       skip,
       startPlan,
       state,

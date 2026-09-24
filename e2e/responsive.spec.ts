@@ -38,7 +38,6 @@ test("the production shell does not render simulated device chrome", async ({ pa
   await page.getByTestId("language-option-en").click();
   await page.getByTestId("confirm-language").click();
   await page.getByTestId("onboarding-get-started").click();
-  await page.getByTestId("continue-as-guest").click();
 
   const shell = page.locator(".app-shell");
   const navigation = page.getByRole("navigation", { name: "Bottom Navigation" });
@@ -150,7 +149,6 @@ test("Arabic Home keeps group controls in the approved RTL order and loads the s
   await page.getByTestId("language-option-ar").click();
   await page.getByTestId("confirm-language").click();
   await page.getByTestId("onboarding-get-started").click();
-  await page.getByTestId("continue-as-guest").click();
   for (const testId of ["hijri-date"]) {
     const chip = page.getByTestId(testId);
     await expect(chip).toBeVisible();
@@ -186,7 +184,6 @@ async function enterEnglishGuestMode(page: import("@playwright/test").Page) {
   await page.getByTestId("language-option-en").click();
   await page.getByTestId("confirm-language").click();
   await page.getByTestId("onboarding-get-started").click();
-  await page.getByTestId("continue-as-guest").click();
 }
 
 test("exactly one navigation variant renders at each breakpoint tier", async ({ page }) => {
@@ -296,20 +293,7 @@ test("desktop onboarding keeps related controls within the form measure and clos
   }
 
   await page.getByTestId("onboarding-get-started").click();
-  await expect(page.getByTestId("continue-as-guest")).toBeVisible();
-  await expectFormMeasure();
-
-  const [introBounds, actionBounds] = await Promise.all([
-    page.getByTestId("auth-intro").boundingBox(),
-    page.getByTestId("auth-actions").boundingBox(),
-  ]);
-  expect(introBounds).not.toBeNull();
-  expect(actionBounds).not.toBeNull();
-  if (introBounds && actionBounds) {
-    const gap = actionBounds.y - (introBounds.y + introBounds.height);
-    expect(gap).toBeGreaterThanOrEqual(24);
-    expect(gap).toBeLessThanOrEqual(48);
-  }
+  await expect(page.getByRole("navigation")).toBeVisible();
 });
 
 test("short desktop onboarding keeps Continue visible without a flexible-space gap", async ({ page }) => {

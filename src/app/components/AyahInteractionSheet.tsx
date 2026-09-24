@@ -6,6 +6,7 @@ import type { AppLanguage } from "../types";
 import { getSurahDisplayName } from "../content/surahInfo";
 import { formatNumerals } from "../formatting";
 import { reportError } from "../../lib/observability";
+import { getAyahWordMeanings, loadSurahWordMeanings, type QuranWordMeaning } from "../content/quranWordMeanings";
 
 type Feedback = { message: string; error: boolean } | null;
 
@@ -29,6 +30,26 @@ export function AyahInteractionSheet({
   const descriptionId = useId();
   const [copied, setCopied] = useState(false);
   const [feedback, setFeedback] = useState<Feedback>(null);
+  const [meanings, setMeanings] = useState<QuranWordMeaning[]>([]);
+
+  useEffect(() => {
+    if (!isOpen || !verseKey) {
+      setMeanings([]);
+      return;
+    }
+    const [surah] = verseKey.split(":");
+    if (!surah) return;
+
+    let cancelled = false;
+    void loadSurahWordMeanings(surah).then(() => {
+      if (!cancelled) {
+        setMeanings(getAyahWordMeanings(verseKey));
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen, verseKey]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -133,6 +154,23 @@ export function AyahInteractionSheet({
             </p>
           )}
         </div>
+
+        {meanings.length > 0 && (
+          <div
+            className="mx-5 mb-3 rounded-xl border border-primary/20 bg-primary/5 p-3"
+            data-testid="ayah-meanings-container"
+          >
+            <h4 className="mb-2 text-xs font-bold text-primary">{t(language, "reader.wordMeaningsTitle")}</h4>
+            <div className="space-y-1.5 max-h-28 overflow-y-auto pe-1">
+              {meanings.map((m) => (
+                <div key={m.id} className="text-xs leading-5 flex items-baseline gap-2">
+                  <span className="font-bold text-foreground shrink-0">{m.word}:</span>
+                  <span className="text-muted-foreground">{m.explanationArabic}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="flex flex-col gap-1 px-3">
           <button type="button" onClick={() => void handleCopy()} className={actionClass} disabled={!text}>

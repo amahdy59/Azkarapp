@@ -115,9 +115,7 @@ export type View =
   | "settings"
   // Phase 4
   | "search"
-  | "custom_counter"
-  // Experimental / Preview
-  | "oasis_preview";
+  | "custom_counter";
 
 export type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -297,6 +295,8 @@ export interface UserSettingsState {
   quietProgressEnabled: boolean;
   progressDayStartHour: number;
   calendarType?: "hijri" | "gregorian";
+  /** Regional Hijri calendar offset in days (-2 to +2). Default is 0. */
+  hijriDateOffset?: number;
   routineModes: Record<RoutineCategoryId, RoutineMode>;
   location?: LocationSettings;
 }
@@ -488,4 +488,13 @@ export interface AppStateSnapshot {
    * the app preserves counts mid-routine until completed or explicitly reset.
    */
   partialZikrCounts?: Record<string, number>;
+  /**
+   * Persisted state for custom digital masbaha counter.
+   */
+  masbahaState?: {
+    count: number;
+    target: number;
+    laps: number;
+    selectedZikrId?: string;
+  };
 }

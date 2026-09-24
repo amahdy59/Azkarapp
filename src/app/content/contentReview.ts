@@ -130,6 +130,10 @@ const CANONICAL_KEY_BY_ID: Readonly<Record<string, string>> = {
   "comprehensive-dua-44": "zikr:beneficial-knowledge-provision-accepted-deeds",
   "ap-ref-6": "zikr:help-with-remembrance-gratitude-and-worship",
   "friday-dua-06": "zikr:help-with-remembrance-gratitude-and-worship",
+  "friday-dua-03": "zikr:private-wrongdoing-forgiveness",
+  "in-prayer-before-salam-self-forgiveness": "zikr:private-wrongdoing-forgiveness",
+  "friday-dua-22": "zikr:complete-forgiveness",
+  "in-prayer-sujud-complete-forgiveness": "zikr:complete-forgiveness",
 };
 
 function getAudioBehavior(item: ZikrDraft): ZikrAudioBehavior {

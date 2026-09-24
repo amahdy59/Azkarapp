@@ -1,9 +1,10 @@
-import type { ReactNode } from "react";
+import { useEffect, useRef, useState, type ChangeEvent, type ReactNode } from "react";
 import { Card } from "../../components/Card";
 import { Button } from "../../components/ui/button";
-import { Database, Download, LogOut, RotateCcw, User, Wifi } from "../../components/icons";
+import { Check, Database, Download, LogOut, RotateCcw, Upload, User, Wifi } from "../../components/icons";
 import { t } from "../../i18n";
 import type { AppLanguage } from "../../types";
+import { CLOUDFLARE_DEVICE_EVENT, CLOUDFLARE_DEVICE_SECRET_KEY } from "../../../lib/cloudflareSync";
 import { SectionLabel, SubHeader } from "./SettingsPrimitives";
 import { QrSyncPanel } from "./QrSyncPanel";
 
@@ -19,6 +20,7 @@ export function AccountDataPanel({
   onActivateAccount,
   onSignOut,
   onExportData,
+  onRestoreData,
   onResetPreferences,
   onClearLocalData,
   onDeleteAccount,
@@ -35,6 +37,7 @@ export function AccountDataPanel({
   onActivateAccount: () => void;
   onSignOut: () => void;
   onExportData: () => void;
+  onRestoreData: (raw: string) => void;
   onResetPreferences: () => void;
   onClearLocalData: () => void;
   onDeleteAccount: () => void;
@@ -55,6 +58,36 @@ export function AccountDataPanel({
       }).format(new Date(lastSuccessfulSyncAt))
     : "";
 
+  const [hasCloudflareDevice, setHasCloudflareDevice] = useState(() =>
+    Boolean(typeof window !== "undefined" && window.localStorage?.getItem(CLOUDFLARE_DEVICE_SECRET_KEY)),
+  );
+  const restoreInputRef = useRef<HTMLInputElement>(null);
+  const [restoreError, setRestoreError] = useState("");
+
+  const handleRestoreFile = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    try {
+      setRestoreError("");
+      onRestoreData(await file.text());
+    } catch (error) {
+      setRestoreError(error instanceof Error ? error.message : t(language, "accountData.restoreInvalid"));
+    }
+  };
+
+  useEffect(() => {
+    const handleDeviceChange = () => {
+      setHasCloudflareDevice(Boolean(window.localStorage?.getItem(CLOUDFLARE_DEVICE_SECRET_KEY)));
+    };
+    window.addEventListener(CLOUDFLARE_DEVICE_EVENT, handleDeviceChange);
+    window.addEventListener("storage", handleDeviceChange);
+    return () => {
+      window.removeEventListener(CLOUDFLARE_DEVICE_EVENT, handleDeviceChange);
+      window.removeEventListener("storage", handleDeviceChange);
+    };
+  }, []);
+
   return (
     <div className="slide-in-from-right flex h-full flex-col bg-background/50 backdrop-blur-md">
       <SubHeader title={t(language, "accountData.title")} onBack={onBack} language={language} />
@@ -71,6 +104,15 @@ export function AccountDataPanel({
               <p className="mt-1 text-label leading-5 text-muted-foreground">
                 {t(language, isGuest ? "accountData.guestBody" : "accountData.signedInBody")}
               </p>
+              {hasCloudflareDevice && (
+                <div
+                  className="mt-2.5 flex items-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-3 py-2 text-xs font-semibold text-primary"
+                  role="status"
+                >
+                  <Check size={15} className="shrink-0 text-primary" aria-hidden="true" />
+                  <span>{t(language, "settings.anonymousSyncBadge")}</span>
+                </div>
+              )}
               {!isGuest && (
                 <p className="mt-2 text-xs font-semibold text-foreground">
                   {t(language, "accountData.syncStatus")}: {syncStatusLabel}
@@ -114,6 +156,25 @@ export function AccountDataPanel({
             action={t(language, "accountData.exportAction")}
             onPress={onExportData}
           />
+          <input
+            ref={restoreInputRef}
+            type="file"
+            accept="application/json,.json"
+            hidden
+            onChange={(event) => void handleRestoreFile(event)}
+          />
+          <DataAction
+            icon={<Upload size={20} aria-hidden="true" />}
+            title={t(language, "accountData.restoreTitle")}
+            body={t(language, "accountData.restoreBody")}
+            action={t(language, "accountData.restoreAction")}
+            onPress={() => restoreInputRef.current?.click()}
+          />
+          {restoreError && (
+            <p className="rounded-xl bg-destructive/10 px-3 py-2 text-sm font-semibold text-destructive" role="alert">
+              {restoreError}
+            </p>
+          )}
           <DataAction
             icon={<RotateCcw size={20} aria-hidden="true" />}
             title={t(language, "accountData.preferencesTitle")}

@@ -393,13 +393,20 @@ const ARABIC_PREFERRED_TIMING: Readonly<Record<string, string>> = {
   "Recited after Fajr prayer.": "تُقال عقب صلاة الفجر.",
   "After every obligatory prayer.": "تُقرأ دبر كل صلاة مكتوبة.",
   "After the opening takbir, before recitation.": "تُقال بعد تكبيرة الإحرام وقبل القراءة.",
+  "After the opening takbir in night prayer, before recitation.":
+    "تُقال بعد تكبيرة الإحرام في صلاة الليل وقبل القراءة.",
   "While bowing (ruku').": "تُقال في الركوع.",
+  "An alternative supplication in bowing or prostration.": "دعاء بديل يُقال في الركوع أو السجود.",
   "On rising from bowing (ruku').": "تُقال عند الرفع من الركوع.",
   "While prostrating (sujud).": "تُقال في السجود.",
+  "An alternative supplication while prostrating (sujud).": "دعاء بديل يُقال في السجود.",
+  "An alternative supplication while prostrating (sujud), especially in night prayer.":
+    "دعاء بديل يُقال في السجود، ولا سيما في صلاة الليل.",
   "While sitting between the two prostrations.": "تُقال في الجلوس بين السجدتين.",
   "During the sitting for tashahhud.": "تُقال في الجلوس للتشهد.",
   "After the final tashahhud, before supplication and salam.": "تُقال بعد التشهد الأخير وقبل الدعاء والسلام.",
   "After the final tashahhud, before salam.": "تُقال بعد التشهد الأخير وقبل السلام.",
+  "During Qunut in the Witr prayer.": "تُقال في قنوت صلاة الوتر.",
   "Before Fajr on a fasting day.": "تُقال قبل الفجر في يوم الصيام.",
   "When breaking a fast at sunset.": "تُقال عند الإفطار وقت الغروب.",
 };

@@ -6,7 +6,6 @@ async function enterEnglishGuestMode(page: Page) {
   await page.getByTestId("language-option-en").click();
   await page.getByTestId("confirm-language").click();
   await page.getByTestId("onboarding-get-started").click();
-  await page.getByTestId("continue-as-guest").click();
   // Tier-agnostic: the shell mounts BottomNav, NavRail or NavSidebar by width.
   await expect(page.getByRole("navigation")).toBeVisible();
 }

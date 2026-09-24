@@ -3887,3 +3887,16 @@ null` shape, so a record written before this change still loads and still
 - **Files/contracts to update:** `src/app/components/VisitorCount.tsx`, `src/app/App.tsx`, localization, `cloudflare/worker.ts`, D1 schema/migration, architecture documentation, and Phase 62 report.
 - **Tests/evidence required:** Heartbeat/display unit coverage, SQL migration/upsert/window coverage, Worker dry-run, full local gates, and production smoke verification.
 - **Supersedes:** The all-time aggregation behavior delivered in Phase 51; its anonymous identifier and offline-failure behavior remain.
+
+## DEC-204 — Evidence-led review recommendations and comprehensive in-prayer references
+
+- **Date:** 2026-09-24
+- **Status:** Approved
+- **Owner:** Product owner (explicit implementation request)
+- **Related phase:** Phase 63
+- **Context:** A broad review proposed architectural extraction, a global clock provider, list virtualization, expanded settings, native web capabilities, backup/restore, gentler progress language, and a more complete in-prayer collection. Current inspection showed wake lock, MediaSession actions, lazy screen loading, and visibility-aware minute clocks already existed; the largest collection held only 25 items.
+- **Decision:** Add versioned, normalized local JSON restore; centralize reviewed voice, speed, and navigation-playback preferences in Audio & Recitations settings; move app-level dialogs and overlays into `AppModalHost`; add an approximate Mushaf storage breakdown; and replace the visible historical “Missed” label with “Not recorded.” Expand the in-prayer collection from 8 to 17 sourced entries, preserving stage order and explicitly treating authentic variants as alternatives. Do not add virtualization, a new dependency, or a second global time system without measured evidence.
+- **Why:** This closes concrete user-control and content gaps while preserving offline reliability, accessibility, and existing day-boundary contracts. It avoids speculative complexity where current collection sizes and shared clock behavior do not demonstrate a bottleneck or correctness failure.
+- **Consequences:** Backup files are portable and validated before replacement; audio preferences are discoverable; `App.tsx` loses modal lifecycle detail; the prayer reference includes additional opening, bowing/prostration, rising, sitting, pre-salam, and Witr wording with direct sources. Selective per-Surah deletion remains deferred because page/font cache units do not map safely to a simple Surah delete action.
+- **Tests/evidence required:** Backup round-trip/rejection, file-selection handoff, audio preference persistence, collection ID/source/count invariants, localization parity, full unit/build/browser gates, and production smoke verification.
+- **Supersedes:** Extends DEC-202; no other decision is superseded.

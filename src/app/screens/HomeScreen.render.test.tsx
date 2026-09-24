@@ -250,4 +250,46 @@ describe("HomeScreen document outline", () => {
     const img = scene?.querySelector("img");
     expect(img).toHaveAttribute("src", expect.stringContaining("friday"));
   });
+
+  it("renders devotional tools (Qiblah and Masbaha) and handles clicks", () => {
+    const onOpenQibla = vi.fn();
+    const onOpenMasbaha = vi.fn();
+
+    render(
+      <HomeScreen
+        completed={emptyProgress()}
+        dailyCompletions={[]}
+        quietProgressEnabled={false}
+        progressDayStartHour={4}
+        language="ar"
+        direction="rtl"
+        onResume={vi.fn()}
+        routineModes={routineModes}
+        onOpenQibla={onOpenQibla}
+        onOpenMasbaha={onOpenMasbaha}
+        locationSettings={{
+          latitude: 30.0444,
+          longitude: 31.2357,
+          cityName: "القاهرة",
+          countryCode: "EG",
+          calculationMethod: "Egypt",
+          madhab: "Shafi",
+          higherLatitudes: "None",
+          timeZone: "Africa/Cairo",
+        }}
+      />,
+    );
+
+    const qiblaBtn = screen.getByTestId("home-tool-qibla");
+    expect(qiblaBtn).toBeInTheDocument();
+    expect(screen.getByText("القبلة")).toBeInTheDocument();
+    fireEvent.click(qiblaBtn);
+    expect(onOpenQibla).toHaveBeenCalledTimes(1);
+
+    const masbahaBtn = screen.getByTestId("home-tool-masbaha");
+    expect(masbahaBtn).toBeInTheDocument();
+    expect(screen.getByText("المسبحة")).toBeInTheDocument();
+    fireEvent.click(masbahaBtn);
+    expect(onOpenMasbaha).toHaveBeenCalledTimes(1);
+  });
 });

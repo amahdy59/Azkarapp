@@ -105,6 +105,7 @@ export {
   TrendUp01 as Sprout,
   Type01 as TypeIcon,
   Type01 as Type,
+  Upload01 as Upload,
   User01 as User,
   Users01 as Users,
   Users01,

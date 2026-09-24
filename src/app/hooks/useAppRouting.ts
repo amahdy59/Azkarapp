@@ -26,17 +26,11 @@ export async function loadLazyRouteCategory(categoryId: CategoryId) {
   }
 }
 
-export type NavTab = "home" | "azkar" | "progress" | "more";
+export type NavTab = "home" | "quran" | "azkar" | "progress" | "settings";
 
 export function tabForView(view: View): NavTab {
-  if (
-    view === "more" ||
-    view === "qibla" ||
-    view === "settings" ||
-    view === "custom_counter" ||
-    view === "oasis_preview"
-  )
-    return "more";
+  if (view === "settings") return "settings";
+  if (view === "khatmah_overview" || view === "khatmah") return "quran";
   if (view === "progress") return "progress";
   if (view === "library" || view === "category" || view === "reader") return "azkar";
   return "home";
@@ -246,19 +240,19 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding }: UseAppRo
           setView("home");
         } else if (e.key === "2") {
           e.preventDefault();
+          setActiveTab("quran");
+          setView("khatmah_overview");
+        } else if (e.key === "3") {
+          e.preventDefault();
           setActiveTab("azkar");
           setView("library");
-        } else if (e.key === "3") {
+        } else if (e.key === "4") {
           e.preventDefault();
           setActiveTab("progress");
           setView("progress");
-        } else if (e.key === "4") {
-          e.preventDefault();
-          setActiveTab("more");
-          setView("more");
         } else if (e.key === "5") {
           e.preventDefault();
-          setActiveTab("more");
+          setActiveTab("settings");
           setView("settings");
         }
       }
@@ -282,13 +276,15 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding }: UseAppRo
       setActiveTab(tab);
       if (tab === "home") {
         push("home");
+      } else if (tab === "quran") {
+        push("khatmah_overview");
       } else if (tab === "azkar") {
         setLibrarySection("collections");
         push("library");
       } else if (tab === "progress") {
         push("progress");
-      } else if (tab === "more") {
-        push("more");
+      } else if (tab === "settings") {
+        push("settings");
       }
     },
     [push],

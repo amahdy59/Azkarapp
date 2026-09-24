@@ -1,15 +1,15 @@
 {
   "ar": [
-    "يعرض العدد في الصفحة الرئيسية الزوار الذين يستخدمون التطبيق الآن بدلاً من إجمالي الزيارات السابقة.",
-    "يتجدد العدد تلقائياً أثناء بقاء التطبيق مفتوحاً وعند العودة إليه.",
-    "تضم المكتبة الآن أذكاراً ثابتة مرتبة بحسب مواضع الصلاة مع توضيح الصيغ البديلة.",
-    "أضيف مرجع للصيام ورمضان متاح طوال العام للسحور والإفطار دون افتراض صيغة نية منطوقة."
+    "أصبحت الإعدادات أسهل في البحث والتنقل، مع خيارات واضحة للقراءة والصوت وإمكانية استعادة نسخة احتياطية بعد التحقق منها.",
+    "توفّر الرئيسية وصولاً أسرع إلى القبلة والمسبحة، وتحفظ المسبحة موضعك، ويمكن ضبط التاريخ الهجري ليتوافق مع الرؤية المحلية.",
+    "يمكن الآن فتح خيارات الآية لرؤية معاني كلمات القرآن المتاحة إلى جانب إجراءات النسخ والمشاركة.",
+    "تضم مجموعة أذكار الصلاة الآن ١٧ ذكراً ودعاءً موثقاً تغطي مواضع الصلاة من الاستفتاح إلى قنوت الوتر."
   ],
   "en": [
-    "The Home count now shows people currently using the app instead of all previous visitors.",
-    "The number refreshes automatically while the app stays open and when you return to it.",
-    "The Library now includes sourced supplications arranged by each stage of the prayer, with alternatives clearly explained.",
-    "A year-round Fasting & Ramadan reference now covers suhoor and iftar without prescribing a spoken intention formula."
+    "Settings are easier to search and navigate, with clear reading and audio controls plus validated backup restore.",
+    "Home offers quicker Qibla and Masbaha access, the counter remembers your place, and the Hijri date can match local sighting.",
+    "Quran verse actions can now show available word meanings alongside copy and share options.",
+    "The In-Prayer collection now includes 17 sourced remembrances and supplications from the opening through Witr Qunut."
   ],
-  "release": "2026-09-23-prayer-fasting-presence"
+  "release": "2026-09-24-review-recommendations"
 }

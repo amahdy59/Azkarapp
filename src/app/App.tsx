@@ -58,7 +58,7 @@ import { useViewFocus } from "./hooks/useScreenFocus";
 
 import { NetworkStatus } from "./components/NetworkStatus";
 import { SyncStatus } from "./components/SyncStatus";
-import { ConfirmDialog } from "./components/ConfirmDialog";
+import { AppModalHost } from "./components/AppModalHost";
 import { ScreenFallback } from "./components/ScreenFallback";
 import { StatePanel } from "./components/StatePanel";
 import { retryableScreen } from "./components/RetryableScreen";
@@ -144,9 +144,6 @@ const WirdBenefitsScreen = retryableScreen(() =>
 const FridayModeScreen = retryableScreen(() =>
   import("./screens/FridayModeScreen").then((module) => ({ default: module.FridayModeScreen })),
 );
-const OasisPreviewScreen = retryableScreen(() =>
-  import("./screens/OasisPreviewScreen").then((module) => ({ default: module.OasisPreviewScreen })),
-);
 const FridaySalawatScreen = retryableScreen(() =>
   import("./screens/FridaySalawatScreen").then((module) => ({ default: module.FridaySalawatScreen })),
 );
@@ -164,9 +161,6 @@ function warmMushafReader(page: number) {
     import("./content/qcfMushaf").then((module) => module.prepareMushafPage(page)),
   ]).catch(() => undefined);
 }
-const ProgressShareModal = lazy(() =>
-  import("./components/ProgressShareModal").then((module) => ({ default: module.ProgressShareModal })),
-);
 const SplashScreen = lazy(() =>
   import("./screens/onboarding/SplashScreen").then((module) => ({ default: module.SplashScreen })),
 );
@@ -193,9 +187,6 @@ const AuthCallbackScreen = lazy(() =>
 );
 const ProfileCompletionScreen = lazy(() =>
   import("./screens/auth/RevampedAuthScreens").then((module) => ({ default: module.ProfileCompletionScreen })),
-);
-const AudioContentReviewScreen = lazy(() =>
-  import("./screens/AudioContentReviewScreen").then((module) => ({ default: module.AudioContentReviewScreen })),
 );
 
 // ─── Root App ─────────────────────────────────────────────────────────────────
@@ -262,6 +253,18 @@ function AppContent({
       : getAzkarForMode(activeCat, activeRoutineMode);
   const layoutMode = useLayoutMode();
   useViewFocus(view);
+  const previousAudioViewRef = useRef(view);
+
+  useEffect(() => {
+    if (
+      previousAudioViewRef.current !== view &&
+      audioController?.state.plan &&
+      !audioController.preferences.continueOnNavigation
+    ) {
+      audioController.stop();
+    }
+    previousAudioViewRef.current = view;
+  }, [audioController, view]);
 
   const [selectedLang, setSelectedLang] = useState<AppLanguage>(initialState.settings.language);
   const audioCoverage = useMemo(
@@ -319,6 +322,8 @@ function AppContent({
   const [calendarType, setCalendarType] = useState<"hijri" | "gregorian">(
     initialState.settings.calendarType ?? "hijri",
   );
+  const [hijriDateOffset, setHijriDateOffset] = useState<number>(initialState.settings.hijriDateOffset ?? 0);
+  const [masbahaState, setMasbahaState] = useState(initialState.masbahaState);
   const [dailyCompletions, setDailyCompletions] = useState(initialState.dailyCompletions);
   const [prayerTracking, setPrayerTracking] = useState(initialState.prayerTracking);
   const [dailyHabits, setDailyHabits] = useState(initialState.dailyHabits ?? []);
@@ -677,6 +682,7 @@ function AppContent({
         quietProgressEnabled,
         progressDayStartHour,
         calendarType,
+        hijriDateOffset,
         routineModes,
       },
       profile: { displayName, email, phone, avatarUrl, isGuest, accountUserId },
@@ -703,6 +709,7 @@ function AppContent({
       quranWirdPlan,
       fridayProgress,
       partialZikrCounts,
+      masbahaState,
     }),
     [
       boldText,
@@ -757,6 +764,8 @@ function AppContent({
       themeMode,
       fridayProgress,
       partialZikrCounts,
+      hijriDateOffset,
+      masbahaState,
     ],
   );
 
@@ -910,6 +919,8 @@ function AppContent({
     setDailyPathStartDayKey(state.settings.dailyPathStartDayKey);
     setQuietProgressEnabled(state.settings.quietProgressEnabled);
     setProgressDayStartHour(state.settings.progressDayStartHour);
+    setCalendarType(state.settings.calendarType ?? "hijri");
+    setHijriDateOffset(state.settings.hijriDateOffset ?? 0);
     setRoutineModes(state.settings.routineModes);
     setDisplayName(state.profile.displayName);
     setEmail(state.profile.email);
@@ -949,6 +960,7 @@ function AppContent({
     setQuranReadingPosition(state.quranReadingPosition ?? { page: state.khatmahPage ?? 1 });
     setQuranWirdPlan(state.quranWirdPlan ?? { kind: "daily", dailyPages: state.dailyWirdGoal ?? 4 });
     setPartialZikrCounts(state.partialZikrCounts ?? {});
+    setMasbahaState(state.masbahaState);
     // Friday is merged rather than replaced. Restoring an account should never
     // erase a deed done on this device before it signed in, and the remote copy
     // is not automatically the newer one.
@@ -989,11 +1001,12 @@ function AppContent({
     setActiveTab,
   });
 
-  const { handleExportData, handleResetPreferences, handleClearLocalData, handleDeleteAccount } = useSettingsHandlers({
-    selectedLang,
-    appStateSnapshot,
-    showConfirm,
-  });
+  const { handleExportData, handleRestoreData, handleResetPreferences, handleClearLocalData, handleDeleteAccount } =
+    useSettingsHandlers({
+      selectedLang,
+      appStateSnapshot,
+      showConfirm,
+    });
 
   const handleSplashDone = useCallback(() => {
     setView(hasCompletedOnboarding ? "home" : "language");
@@ -1316,15 +1329,7 @@ function AppContent({
         {showSidebar && (
           <NavSidebar
             active={activeTab}
-            activeUtility={
-              view === "khatmah_overview" || view === "khatmah"
-                ? "quran"
-                : view === "custom_counter"
-                  ? "masbaha"
-                  : view === "settings"
-                    ? "settings"
-                    : undefined
-            }
+            activeUtility={view === "custom_counter" ? "masbaha" : view === "qibla" ? "qibla" : undefined}
             onChange={(tab) => {
               setFridayDuaFlow(false);
               handleNavTab(tab);
@@ -1340,6 +1345,10 @@ function AppContent({
             onOpenSettings={() => {
               setFridayDuaFlow(false);
               push("settings");
+            }}
+            onOpenQibla={() => {
+              setFridayDuaFlow(false);
+              push("qibla");
             }}
             isArabic={isArabic}
             themeMode={themeMode}
@@ -1360,9 +1369,17 @@ function AppContent({
               {view === "splash" && <SplashScreen language={selectedLang} onDone={handleSplashDone} />}
               {view === "onboard1" && (
                 <EnglishOnboarding1Screen
-                  onNext={() => setView("login")}
+                  onNext={() => {
+                    markOnboardingComplete();
+                    setDisplayName("Guest");
+                    setIsGuest(true);
+                    setView("home");
+                    setActiveTab("home");
+                  }}
                   onSkip={() => {
                     markOnboardingComplete();
+                    setDisplayName("Guest");
+                    setIsGuest(true);
                     setView("home");
                     setActiveTab("home");
                   }}
@@ -1371,9 +1388,17 @@ function AppContent({
               {/* Arabic onboarding — shown for Arabic-locale devices */}
               {view === "ar_onboard1" && (
                 <ArOnboarding1Screen
-                  onNext={() => setView("login")}
+                  onNext={() => {
+                    markOnboardingComplete();
+                    setDisplayName("Guest");
+                    setIsGuest(true);
+                    setView("home");
+                    setActiveTab("home");
+                  }}
                   onSkip={() => {
                     markOnboardingComplete();
+                    setDisplayName("Guest");
+                    setIsGuest(true);
                     setView("home");
                     setActiveTab("home");
                   }}
@@ -1497,6 +1522,7 @@ function AppContent({
                   }}
                   language={selectedLang}
                   calendarType={calendarType}
+                  hijriDateOffset={hijriDateOffset}
                   direction={layoutDirection}
                   routineModes={routineModes}
                   onSetRoutineMode={(categoryId, mode) => {
@@ -1505,6 +1531,8 @@ function AppContent({
                   onOpenWirdBenefits={() => push("wird_benefits")}
                   onOpenKhatmah={() => push("khatmah_overview")}
                   onOpenProgress={() => push("progress")}
+                  onOpenQibla={() => push("qibla")}
+                  onOpenMasbaha={() => push("custom_counter")}
                   prayerTracking={prayerTracking}
                   onTogglePrayerTracking={handleTogglePrayerTracking}
                 />
@@ -1940,6 +1968,7 @@ function AppContent({
               )}
               {view === "settings" && (
                 <SettingsScreen
+                  audioController={audioController}
                   themeMode={themeMode}
                   language={selectedLang}
                   zikrFont={zikrFont}
@@ -1968,10 +1997,12 @@ function AppContent({
                   quietProgressEnabled={quietProgressEnabled}
                   progressDayStartHour={progressDayStartHour}
                   calendarType={calendarType}
+                  hijriDateOffset={hijriDateOffset}
                   direction={layoutDirection}
                   onLanguageChange={setSelectedLang}
                   onThemeModeChange={setThemeMode}
                   onCalendarTypeChange={setCalendarType}
+                  onHijriDateOffsetChange={setHijriDateOffset}
                   onTextSizeChange={setTextSize}
                   onShowTranslationChange={setShowTranslation}
                   onShowTransliterationChange={setShowTransliteration}
@@ -1989,6 +2020,7 @@ function AppContent({
                   onActivateAccount={handleOpenAccountAuth}
                   onSignOut={handleSignOut}
                   onExportData={handleExportData}
+                  onRestoreData={handleRestoreData}
                   onResetPreferences={handleResetPreferences}
                   onClearLocalData={handleClearLocalData}
                   onDeleteAccount={handleDeleteAccount}
@@ -2088,15 +2120,8 @@ function AppContent({
                   onBack={pop}
                   hapticFeedback={hapticFeedback}
                   reduceMotion={reduceMotion}
-                />
-              )}
-              {view === "oasis_preview" && (
-                <OasisPreviewScreen
-                  language={selectedLang}
-                  direction={layoutDirection}
-                  dailyCompletions={dailyCompletions}
-                  dayKey={getProgressDayKey(new Date(), progressDayStartHour)}
-                  onBack={pop}
+                  initialMasbahaState={masbahaState}
+                  onSaveMasbahaState={setMasbahaState}
                 />
               )}
             </Suspense>
@@ -2104,26 +2129,20 @@ function AppContent({
         </div>
         {/* end app-main */}
 
-        {/* Share Achievement Modal */}
-        {showShareModal && (
-          <ProgressShareModal
-            dailyCompletions={dailyCompletions}
-            progressDayStartHour={progressDayStartHour}
-            language={selectedLang}
-            onClose={() => setShowShareModal(false)}
-          />
-        )}
-
-        {import.meta.env.DEV && showAudioReview && (
-          <Suspense fallback={<ScreenFallback language={selectedLang} />}>
-            <AudioContentReviewScreen
-              onClose={() => {
-                audioController?.stop();
-                setShowAudioReview(false);
-              }}
-            />
-          </Suspense>
-        )}
+        <AppModalHost
+          language={selectedLang}
+          dailyCompletions={dailyCompletions}
+          progressDayStartHour={progressDayStartHour}
+          showShareModal={showShareModal}
+          onCloseShareModal={() => setShowShareModal(false)}
+          showAudioReview={showAudioReview}
+          onCloseAudioReview={() => setShowAudioReview(false)}
+          audioController={audioController}
+          guestMigrationOpen={guestMigrationOpen}
+          resolveGuestMigration={resolveGuestMigration}
+          pendingConfirm={pendingConfirm}
+          onClearPendingConfirm={() => setPendingConfirm(null)}
+        />
 
         {/* Floating Audio Player */}
         {audioController?.state.plan && (
@@ -2208,36 +2227,6 @@ function AppContent({
           </div>
         )}
       </div>
-
-      {/* Accessible confirmation dialog */}
-      {guestMigrationOpen && (
-        <ConfirmDialog
-          open
-          title={t(selectedLang, "auth.guestProgressTitle")}
-          description={t(selectedLang, "auth.guestProgressBody")}
-          confirmLabel={t(selectedLang, "auth.mergeGuestProgress")}
-          secondaryLabel={t(selectedLang, "auth.discardGuestProgress")}
-          cancelLabel={t(selectedLang, "auth.cancelGuestMigration")}
-          onConfirm={() => resolveGuestMigration("merge")}
-          onSecondary={() => resolveGuestMigration("discard")}
-          onCancel={() => resolveGuestMigration("cancel")}
-        />
-      )}
-      {pendingConfirm && (
-        <ConfirmDialog
-          open={true}
-          title={pendingConfirm.title}
-          description={pendingConfirm.description}
-          confirmLabel={pendingConfirm.confirmLabel}
-          cancelLabel={pendingConfirm.cancelLabel}
-          destructive={pendingConfirm.destructive}
-          onConfirm={async () => {
-            await pendingConfirm.onConfirm();
-            setPendingConfirm(null);
-          }}
-          onCancel={() => setPendingConfirm(null)}
-        />
-      )}
     </div>
   );
 }

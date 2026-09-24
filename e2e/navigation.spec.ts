@@ -5,7 +5,6 @@ async function enterAsEnglishGuest(page: Page) {
   await page.getByTestId("language-option-en").click();
   await page.getByTestId("confirm-language").click();
   await page.getByTestId("onboarding-get-started").click();
-  await page.getByTestId("continue-as-guest").click();
 }
 
 test("@cross-browser Azkar tab opens the library and exposes search", async ({ page }) => {
@@ -23,7 +22,7 @@ test("@cross-browser Azkar tab opens the library and exposes search", async ({ p
   await expect(page.getByRole("heading", { name: "Azkar Library", exact: true })).toBeVisible();
 });
 
-test("@cross-browser More keeps Qibla, Masbaha, and Settings easy to reach", async ({ page }, testInfo) => {
+test("@cross-browser navigation keeps Qibla, Masbaha, and Settings easy to reach", async ({ page }, testInfo) => {
   await enterAsEnglishGuest(page);
 
   for (const viewport of [
@@ -31,19 +30,15 @@ test("@cross-browser More keeps Qibla, Masbaha, and Settings easy to reach", asy
     { width: 834, height: 1112 },
   ]) {
     await page.setViewportSize(viewport);
-    const moreTab = page.getByTestId("nav-more");
-    await moreTab.click();
-    await expect(moreTab).toHaveAttribute("aria-current", "page");
-    await expect(page.getByRole("heading", { name: "More", exact: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: /^Qibla/ })).toBeVisible();
-    await expect(page.getByRole("button", { name: /^Masbaha/ })).toBeVisible();
-    await expect(page.getByRole("button", { name: /^Settings/ })).toBeVisible();
+    await page.getByTestId("nav-home").click();
+    await expect(page.getByTestId("nav-settings")).toBeVisible();
+    await expect(page.getByTestId("home-tool-qibla")).toBeVisible();
+    await expect(page.getByTestId("home-tool-masbaha")).toBeVisible();
 
-    await page.getByRole("button", { name: /^Qibla/ }).click();
+    await page.getByTestId("home-tool-qibla").click();
     await expect(page).toHaveURL(/#\/qibla$/);
     await expect(page.getByRole("heading", { name: "Qibla", exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: /Qibla is 136° from north/ })).toBeVisible();
-    await expect(moreTab).toHaveAttribute("aria-current", "page");
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     );
@@ -66,13 +61,18 @@ test("@cross-browser More keeps Qibla, Masbaha, and Settings easy to reach", asy
       await accuracyDisclosure.locator("summary").click();
       await expect(page.getByText(/Keep the device flat/)).toBeVisible();
     }
+
+    await page.getByTestId("nav-home").click();
+    await page.getByTestId("home-tool-masbaha").click();
+    await expect(page).toHaveURL(/#\/counter$/);
+    await expect(page.getByRole("heading", { name: "Masbaha", exact: true })).toBeVisible();
   }
 
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.getByTestId("nav-quran").click();
   await expect(page.getByTestId("nav-quran")).toHaveAttribute("aria-current", "page");
   await expect(page.getByTestId("nav-more")).toHaveCount(0);
-  await expect(page.getByTestId("nav-qibla")).toHaveCount(0);
+  await expect(page.getByTestId("nav-qibla")).toBeVisible();
   await expect(page.getByTestId("nav-masbaha")).toBeVisible();
   await expect(page.getByTestId("nav-settings")).toBeVisible();
   if (testInfo.project.name.startsWith("desktop-")) {

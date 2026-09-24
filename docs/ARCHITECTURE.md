@@ -18,7 +18,7 @@ flowchart TD
   App --> PWA["Service worker and update lifecycle"]
 ```
 
-`App.tsx` owns the current view, shared preference state, profile/session state, and screen composition. Screens receive explicit typed props. Hooks isolate multi-step behaviors such as authentication, remote synchronization, audio, reminders, and reading sessions.
+`App.tsx` owns the current view, shared preference state, profile/session state, and screen composition. `AppModalHost.tsx` owns application-level share/review overlays and confirmation dialogs so modal lifecycle code does not remain interleaved with route composition. Screens receive explicit typed props. Hooks isolate multi-step behaviors such as authentication, remote synchronization, audio, reminders, and reading sessions.
 
 ## Startup and state lifecycle
 
@@ -115,6 +115,8 @@ Quran persistence deliberately separates the page currently open, one intentiona
 Entering the Quran Wird overview is treated as high-confidence reading intent. Unless the browser reports Data Saver or a 2G-class connection, the application begins loading the Mushaf route, exact continuation-page JSON, and matching QCF page font concurrently while the overview remains interactive. The same warm-up begins immediately before direct Home continuation. It shares the existing in-flight and Cache Storage promises, so the reader never issues duplicate page/font work and offline behavior remains unchanged.
 
 Private-data clearing preserves device preferences while removing account-owned profile, saved, session, and completion data. Sign-out also sweeps private search and retired coordinate-cache namespaces without touching downloads or device preferences. Full local erasure first attempts Supabase sign-out, then removes the Supabase session-token namespace even if that network request fails. Any new account-owned field must participate in `clearPrivateAppData()` and any dependency-owned local token must participate in the explicit erasure boundary.
+
+Local backup export uses a versioned `azkarapp-backup` JSON envelope containing a normalized state snapshot and export timestamp. Restore accepts that envelope plus the earlier raw-state export shape, normalizes every field through `normalizeAppState()`, rejects unrelated or unsupported files, requires explicit confirmation, and only then replaces the local snapshot. Imported data never bypasses the normal persistence boundary.
 
 Geolocation is requested only after a user action. Precise coordinates remain device-local, are never synchronized to Supabase, and are not sent to a prayer-time service. No service-role Supabase credential belongs in the browser.
 

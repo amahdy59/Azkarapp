@@ -5,7 +5,6 @@ async function enterEnglishGuestMode(page: import("@playwright/test").Page) {
   await page.getByTestId("language-option-en").click();
   await page.getByTestId("confirm-language").click();
   await page.getByTestId("onboarding-get-started").click();
-  await page.getByTestId("continue-as-guest").click();
   await expect(page.getByRole("navigation")).toBeVisible();
 }
 

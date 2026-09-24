@@ -6,7 +6,6 @@ async function openArabicLibrary(page: Page) {
   await page.getByTestId("language-option-ar").click();
   await page.getByTestId("confirm-language").click();
   await page.getByTestId("onboarding-get-started").click();
-  await page.getByTestId("continue-as-guest").click();
   await expect(page.getByRole("navigation")).toBeVisible();
 
   await page.getByTestId("nav-azkar").click();

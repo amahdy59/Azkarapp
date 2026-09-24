@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import type { AppLanguage, AppStateSnapshot, View } from "../types";
+import type { NavTab } from "../components/LayoutShells";
 import {
   getCurrentSession,
   loadRemoteState,
@@ -115,7 +116,7 @@ export function useAuthHandlers({
     destructive?: boolean,
   ) => void;
   setView: (view: View) => void;
-  setActiveTab: (tab: "home" | "azkar" | "progress" | "more") => void;
+  setActiveTab: (tab: NavTab) => void;
 }) {
   const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
@@ -146,7 +147,7 @@ export function useAuthHandlers({
   const handleOpenAccountAuth = () => {
     setAuthError("");
     setView("login");
-    setActiveTab("more");
+    setActiveTab("settings");
   };
 
   const handleSendOtp = async (value: string) => {

@@ -1,9 +1,11 @@
 import type { AudioPreferences } from "./audioTypes";
+import { isKnownAudioVoice } from "./audioVoices";
 
 const STORAGE_KEY = "azkar.audio-preferences.v1";
+const DEFAULT_DUA_VOICE_ID = "abdullah-muhammad";
 export const DEFAULT_AUDIO_PREFERENCES: AudioPreferences = {
   quranReciterId: "alafasy",
-  duaVoiceId: "default-dua",
+  duaVoiceId: DEFAULT_DUA_VOICE_ID,
   playbackRate: 1,
   volume: 1,
   muted: false,
@@ -18,7 +20,10 @@ export function loadAudioPreferences(): AudioPreferences {
     return {
       quranReciterId:
         typeof value.quranReciterId === "string" && value.quranReciterId ? value.quranReciterId : "alafasy",
-      duaVoiceId: typeof value.duaVoiceId === "string" && value.duaVoiceId ? value.duaVoiceId : "default-dua",
+      duaVoiceId:
+        typeof value.duaVoiceId === "string" && isKnownAudioVoice(value.duaVoiceId)
+          ? value.duaVoiceId
+          : DEFAULT_DUA_VOICE_ID,
       playbackRate:
         typeof value.playbackRate === "number" && value.playbackRate >= 0.5 && value.playbackRate <= 2
           ? value.playbackRate

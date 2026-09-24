@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { Zap } from "../components/icons";
+import { Compass, Sparkles, Zap } from "../components/icons";
+import { getQiblaBearing } from "../qibla";
 import { PalmTreeMark } from "../components/GardenMarks";
 import { TodayRoutineGarden } from "../components/RoutineGarden";
 import { TranquilityCompletionCard } from "../components/TranquilityCompletionCard";
@@ -247,6 +248,7 @@ export function HomeScreen({
   language,
   direction,
   calendarType = "hijri",
+  hijriDateOffset = 0,
   locationSettings,
   onResume,
   onOpenPrayerAdhkar,
@@ -259,6 +261,8 @@ export function HomeScreen({
   onOpenWirdBenefits,
   onOpenKhatmah,
   onOpenProgress,
+  onOpenQibla,
+  onOpenMasbaha,
   onContinueKhatmah,
   quranReadingPosition,
   quranWirdPlan,
@@ -282,6 +286,7 @@ export function HomeScreen({
   homeVisualEffects?: boolean;
   progressDayStartHour: number;
   calendarType?: "hijri" | "gregorian";
+  hijriDateOffset?: number;
   locationSettings?: LocationSettings;
   onResume: (category: CategoryId) => void;
   /** Opens that prayer's own adhkar, as the prayer screen's card does. */
@@ -295,6 +300,8 @@ export function HomeScreen({
   onOpenWirdBenefits?: () => void;
   onOpenKhatmah?: () => void;
   onOpenProgress?: () => void;
+  onOpenQibla?: () => void;
+  onOpenMasbaha?: () => void;
   prayerTracking?: readonly PrayerTrackingRecord[];
   /* Widened to PrayerTrackingWrite because the prayer panel records where a
      prayer was prayed, not only that it was. The tracker cards below still
@@ -621,7 +628,7 @@ export function HomeScreen({
               }`}
             >
               <time className="truncate" dateTime={now.toISOString()}>
-                {formatDisplayDate(now, language, calendarType)}
+                {formatDisplayDate(now, language, calendarType, hijriDateOffset)}
               </time>
             </div>
             <button
@@ -841,6 +848,85 @@ export function HomeScreen({
               />
             </div>
           )}
+
+          {/* Devotional Tools: Qiblah & Masbaha */}
+          {(onOpenQibla || onOpenMasbaha) && (
+            <div className="px-page">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {onOpenQibla && (
+                  <button
+                    type="button"
+                    onClick={onOpenQibla}
+                    data-testid="home-tool-qibla"
+                    className={`group flex items-center justify-between gap-4 rounded-3xl p-4.5 text-start transition-[background-color,border-color,transform] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                      homeVisualEffects
+                        ? "border border-white/10 bg-black/25 text-white shadow-raised hover:bg-black/35 backdrop-blur-md"
+                        : "border border-border/50 bg-card text-foreground shadow-raised hover:bg-muted"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3.5 min-w-0">
+                      <span
+                        className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary/15 text-primary"
+                        aria-hidden="true"
+                      >
+                        <Compass size={22} />
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <span className="block text-subtitle font-extrabold text-foreground">
+                          {t(language, "qibla.title")}
+                        </span>
+                        <span className="block text-micro font-semibold text-muted-foreground">
+                          {locationSettings?.latitude != null && locationSettings?.longitude != null
+                            ? `${locationSettings.cityName || t(language, "qibla.currentLocation")} · ${formatNumerals(
+                                Math.round(getQiblaBearing(locationSettings.latitude, locationSettings.longitude)),
+                                language,
+                              )}°`
+                            : t(language, "more.qiblaDescription")}
+                        </span>
+                      </div>
+                    </div>
+                    <span className="text-micro font-bold text-primary group-hover:underline shrink-0">
+                      {t(language, "common.open")}
+                    </span>
+                  </button>
+                )}
+
+                {onOpenMasbaha && (
+                  <button
+                    type="button"
+                    onClick={onOpenMasbaha}
+                    data-testid="home-tool-masbaha"
+                    className={`group flex items-center justify-between gap-4 rounded-3xl p-4.5 text-start transition-[background-color,border-color,transform] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                      homeVisualEffects
+                        ? "border border-white/10 bg-black/25 text-white shadow-raised hover:bg-black/35 backdrop-blur-md"
+                        : "border border-border/50 bg-card text-foreground shadow-raised hover:bg-muted"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3.5 min-w-0">
+                      <span
+                        className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary/15 text-primary"
+                        aria-hidden="true"
+                      >
+                        <Sparkles size={22} />
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <span className="block text-subtitle font-extrabold text-foreground">
+                          {t(language, "counter.tasbeehTitle")}
+                        </span>
+                        <span className="block text-micro font-semibold text-muted-foreground">
+                          {t(language, "more.masbahaDescription")}
+                        </span>
+                      </div>
+                    </div>
+                    <span className="text-micro font-bold text-primary group-hover:underline shrink-0">
+                      {t(language, "common.open")}
+                    </span>
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
           <div className="px-page">
             <VisitorCount language={language} />
           </div>

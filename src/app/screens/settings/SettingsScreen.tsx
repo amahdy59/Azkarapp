@@ -4,6 +4,7 @@ import { Header } from "../../components/LayoutShells";
 import { t } from "../../i18n";
 import { shouldReduceMotion } from "../../motionPreferences";
 import { useLayoutMode } from "../../hooks/useLayoutMode";
+import type { AudioController } from "../../audio/AudioProvider";
 import "./SettingsScreen.css";
 import type {
   AppLanguage,
@@ -20,11 +21,13 @@ import {
   AboutPanel,
   AccessibilityPanel,
   AccountDataPanel,
+  AudioSettingsPanel,
   DownloadsPanel,
   HelpPanel,
   LegalPanel,
   NotificationsPanel,
   ProgressPanel,
+  ReadingPanel,
   SettingsRootPanel,
   SourcesPanel,
   WhatsNewPanel,
@@ -32,6 +35,7 @@ import {
 } from "./SettingsPanels";
 
 interface SettingsScreenProps {
+  audioController: AudioController | null;
   themeMode: ThemeMode;
   language: AppLanguage;
   isGuest: boolean;
@@ -58,10 +62,12 @@ interface SettingsScreenProps {
   quietProgressEnabled: boolean;
   progressDayStartHour: number;
   calendarType?: "hijri" | "gregorian";
+  hijriDateOffset?: number;
   direction: "ltr" | "rtl";
   onLanguageChange: (value: AppLanguage) => void;
   onThemeModeChange: (value: ThemeMode) => void;
   onCalendarTypeChange?: (value: "hijri" | "gregorian") => void;
+  onHijriDateOffsetChange?: (value: number) => void;
   zikrFont?: ZikrFontOption;
   onTextSizeChange: (value: TextSizeOption) => void;
   onZikrFontChange: (value: ZikrFontOption) => void;
@@ -81,12 +87,14 @@ interface SettingsScreenProps {
   onActivateAccount: () => void;
   onSignOut: () => void;
   onExportData: () => void;
+  onRestoreData: (raw: string) => void;
   onResetPreferences: () => void;
   onClearLocalData: () => void;
   onDeleteAccount: () => void;
 }
 
 export function SettingsScreen({
+  audioController,
   themeMode,
   language,
   isGuest,
@@ -113,10 +121,12 @@ export function SettingsScreen({
   quietProgressEnabled,
   progressDayStartHour,
   calendarType = "hijri",
+  hijriDateOffset = 0,
   direction,
   onLanguageChange,
   onThemeModeChange,
   onCalendarTypeChange,
+  onHijriDateOffsetChange,
   onTextSizeChange,
   zikrFont,
   onZikrFontChange,
@@ -136,6 +146,7 @@ export function SettingsScreen({
   onActivateAccount,
   onSignOut,
   onExportData,
+  onRestoreData,
   onResetPreferences,
   onClearLocalData,
   onDeleteAccount,
@@ -227,6 +238,10 @@ export function SettingsScreen({
               locationSettings={locationSettings}
               calendarType={calendarType}
               onCalendarTypeChange={onCalendarTypeChange}
+              hijriDateOffset={hijriDateOffset}
+              onHijriDateOffsetChange={onHijriDateOffsetChange}
+              textSize={textSize}
+              zikrFont={zikrFont}
               activeSub={effectiveSub}
             />
           </div>
@@ -264,6 +279,10 @@ export function SettingsScreen({
                 locationSettings={locationSettings}
                 calendarType={calendarType}
                 onCalendarTypeChange={onCalendarTypeChange}
+                hijriDateOffset={hijriDateOffset}
+                onHijriDateOffsetChange={onHijriDateOffsetChange}
+                textSize={textSize}
+                zikrFont={zikrFont}
               />
             </motion.div>
           ) : (
@@ -285,6 +304,24 @@ export function SettingsScreen({
 
   function renderSubPanel(panel: SettingsSubScreen) {
     switch (panel) {
+      case "audio":
+        return <AudioSettingsPanel language={language} controller={audioController} onBack={goBack} />;
+      case "reading":
+        return (
+          <ReadingPanel
+            language={language}
+            direction={direction}
+            textSize={textSize}
+            zikrFont={zikrFont}
+            showTranslation={showTranslation}
+            showTransliteration={showTransliteration}
+            onTextSizeChange={onTextSizeChange}
+            onZikrFontChange={onZikrFontChange}
+            onShowTranslationChange={onShowTranslationChange}
+            onShowTransliterationChange={onShowTransliterationChange}
+            onBack={goBack}
+          />
+        );
       case "accessibility":
         return (
           <AccessibilityPanel
@@ -357,6 +394,7 @@ export function SettingsScreen({
             onActivateAccount={onActivateAccount}
             onSignOut={onSignOut}
             onExportData={onExportData}
+            onRestoreData={onRestoreData}
             onResetPreferences={onResetPreferences}
             onClearLocalData={onClearLocalData}
             onDeleteAccount={onDeleteAccount}

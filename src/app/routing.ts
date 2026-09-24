@@ -45,7 +45,6 @@ const VIEW_PATHS = {
   friday_salawat: "/friday/salawat",
   custom_counter: "/counter",
   completion: "/completion",
-  oasis_preview: "/oasis-preview",
 } as const satisfies Partial<Record<View, string>>;
 
 const PATH_VIEWS = new Map<string, View>(Object.entries(VIEW_PATHS).map(([view, path]) => [path, view as View]));

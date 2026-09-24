@@ -153,6 +153,7 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
     quietProgressEnabled: true,
     progressDayStartHour: DEFAULT_PROGRESS_DAY_START_HOUR,
     calendarType: "hijri",
+    hijriDateOffset: 0,
     routineModes: {
       morning: "complete",
       evening: "complete",
@@ -297,6 +298,17 @@ export function resetDailyPartialCounts(counts: Record<string, number>): Record<
     ALL_AZKAR.filter((zikr) => DAILY_ROUTINE_CATEGORY_IDS.includes(zikr.category)).map((zikr) => zikr.id),
   );
   return Object.fromEntries(Object.entries(counts).filter(([id]) => !dailyIds.has(id.split(":").at(-1)!)));
+}
+
+export function normalizeMasbahaState(value: unknown): AppStateSnapshot["masbahaState"] {
+  if (!value || typeof value !== "object") return undefined;
+  const v = value as Record<string, unknown>;
+  const count = typeof v.count === "number" && Number.isFinite(v.count) && v.count >= 0 ? Math.floor(v.count) : 0;
+  const target = typeof v.target === "number" && Number.isFinite(v.target) && v.target >= 0 ? Math.floor(v.target) : 0;
+  const laps = typeof v.laps === "number" && Number.isFinite(v.laps) && v.laps >= 0 ? Math.floor(v.laps) : 0;
+  const selectedZikrId =
+    typeof v.selectedZikrId === "string" && v.selectedZikrId.length > 0 ? v.selectedZikrId : undefined;
+  return { count, target, laps, ...(selectedZikrId ? { selectedZikrId } : {}) };
 }
 
 function normalizeWirdHistory(value: unknown): Record<string, number[]> {
@@ -812,6 +824,13 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
         settings?.calendarType === "hijri" || settings?.calendarType === "gregorian"
           ? settings.calendarType
           : (DEFAULT_APP_STATE.settings.calendarType ?? "hijri"),
+      hijriDateOffset:
+        typeof settings?.hijriDateOffset === "number" &&
+        Number.isInteger(settings.hijriDateOffset) &&
+        settings.hijriDateOffset >= -2 &&
+        settings.hijriDateOffset <= 2
+          ? settings.hijriDateOffset
+          : (DEFAULT_APP_STATE.settings.hijriDateOffset ?? 0),
       routineModes: normalizeRoutineModes(settings?.routineModes),
       location: normalizeLocation(settings?.location),
     },
@@ -884,6 +903,7 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
     partialZikrCounts: isNewDay
       ? resetDailyPartialCounts(normalizePartialZikrCounts(parsed.partialZikrCounts))
       : normalizePartialZikrCounts(parsed.partialZikrCounts),
+    masbahaState: normalizeMasbahaState(parsed.masbahaState),
     ...(typeof parsed.lastActiveDayKey === "string" ? { lastActiveDayKey: currentDayKey } : {}),
   };
 }
@@ -1166,6 +1186,13 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
         incoming.settings?.calendarType === "hijri" || incoming.settings?.calendarType === "gregorian"
           ? incoming.settings.calendarType
           : (safeBase.settings.calendarType ?? "hijri"),
+      hijriDateOffset:
+        typeof incoming.settings?.hijriDateOffset === "number" &&
+        Number.isInteger(incoming.settings.hijriDateOffset) &&
+        incoming.settings.hijriDateOffset >= -2 &&
+        incoming.settings.hijriDateOffset <= 2
+          ? incoming.settings.hijriDateOffset
+          : (safeBase.settings.hijriDateOffset ?? 0),
       routineModes: normalizeRoutineModes(incoming.settings?.routineModes ?? safeBase.settings.routineModes),
       location: normalizeLocation(incoming.settings?.location, safeBase.settings.location ?? DEFAULT_LOCATION),
     },
@@ -1235,6 +1262,7 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
       ...normalizePartialZikrCounts(safeBase.partialZikrCounts),
       ...normalizePartialZikrCounts(incoming.partialZikrCounts),
     },
+    masbahaState: normalizeMasbahaState(incoming.masbahaState ?? safeBase.masbahaState),
   };
 }
 
@@ -1260,5 +1288,6 @@ export function clearPrivateAppData(state: AppStateSnapshot): AppStateSnapshot {
     quranLastReadingEvent: undefined,
     quranReadingPosition: DEFAULT_APP_STATE.quranReadingPosition,
     partialZikrCounts: {},
+    masbahaState: undefined,
   };
 }

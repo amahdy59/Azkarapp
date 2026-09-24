@@ -24,16 +24,17 @@ export function formatRatio(current: number | string, total: number | string, la
   return `${formatNumerals(current, language)} / ${formatNumerals(total, language)}`;
 }
 
-export function formatHijriDate(date: Date = new Date(), language: AppLanguage = "ar"): string {
+export function formatHijriDate(date: Date = new Date(), language: AppLanguage = "ar", offsetDays = 0): string {
   try {
     const locale = language === "ar" ? "ar-SA-u-ca-islamic-umalqura" : "en-US-u-ca-islamic-umalqura";
+    const adjustedDate = offsetDays !== 0 ? new Date(date.getTime() + offsetDays * 86_400_000) : date;
     const formatter = new Intl.DateTimeFormat(locale, {
       weekday: "long",
       day: "numeric",
       month: "long",
       year: "numeric",
     });
-    const formatted = formatter.format(date);
+    const formatted = formatter.format(adjustedDate);
     // Strip any existing era indicators to prevent duplicate suffixes ("AH AH" / "هـ هـ")
     const cleaned = formatted.replace(/\s*(AH|هـ)+/gi, "").trim();
     return language === "ar" ? `${cleaned} هـ` : `${cleaned} AH`;
@@ -42,9 +43,9 @@ export function formatHijriDate(date: Date = new Date(), language: AppLanguage =
   }
 }
 
-export function formatHijriDateWithTime(date: Date = new Date(), language: AppLanguage = "ar"): string {
+export function formatHijriDateWithTime(date: Date = new Date(), language: AppLanguage = "ar", offsetDays = 0): string {
   try {
-    const dateStr = formatHijriDate(date, language);
+    const dateStr = formatHijriDate(date, language, offsetDays);
     const timeFormatter = new Intl.DateTimeFormat(language === "ar" ? "ar-SA" : "en-US", {
       hour: "numeric",
       minute: "numeric",
@@ -52,7 +53,7 @@ export function formatHijriDateWithTime(date: Date = new Date(), language: AppLa
     const timeStr = timeFormatter.format(date);
     return `${dateStr} ${timeStr}`;
   } catch {
-    return formatHijriDate(date, language);
+    return formatHijriDate(date, language, offsetDays);
   }
 }
 
@@ -71,6 +72,7 @@ export function formatDisplayDate(
   date: Date = new Date(),
   language: AppLanguage = "ar",
   calendarType: "hijri" | "gregorian" = "hijri",
+  offsetDays = 0,
 ): string {
   if (calendarType === "gregorian") {
     try {
@@ -87,5 +89,5 @@ export function formatDisplayDate(
       return date.toLocaleDateString();
     }
   }
-  return formatHijriDate(date, language);
+  return formatHijriDate(date, language, offsetDays);
 }

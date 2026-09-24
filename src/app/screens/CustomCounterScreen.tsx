@@ -42,29 +42,55 @@ const HEADER_ACTION_CLASS =
 const HERO_ACTION_CLASS =
   "flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
 
+export interface MasbahaSavedState {
+  count: number;
+  target: number;
+  laps: number;
+  selectedZikrId?: string;
+}
+
 export function CustomCounterScreen({
   isArabic,
   direction,
   onBack,
   hapticFeedback = true,
   reduceMotion = false,
+  initialMasbahaState,
+  onSaveMasbahaState,
 }: {
   isArabic: boolean;
   direction: "ltr" | "rtl";
   onBack: () => void;
   hapticFeedback?: boolean;
   reduceMotion?: boolean;
+  initialMasbahaState?: MasbahaSavedState;
+  onSaveMasbahaState?: (state: MasbahaSavedState) => void;
 }) {
   const language: AppLanguage = isArabic ? "ar" : "en";
-  const [selectedAuthentic, setSelectedAuthentic] = useState<AuthenticZikrItem>(AUTHENTIC_AZKAR_COLLECTION[0]!);
-  const [target, setTarget] = useState(0);
-  const [count, setCount] = useState(0);
-  const [laps, setLaps] = useState(0);
+  const [selectedAuthentic, setSelectedAuthentic] = useState<AuthenticZikrItem>(() => {
+    if (initialMasbahaState?.selectedZikrId) {
+      const match = AUTHENTIC_AZKAR_COLLECTION.find((item) => item.id === initialMasbahaState.selectedZikrId);
+      if (match) return match;
+    }
+    return AUTHENTIC_AZKAR_COLLECTION[0]!;
+  });
+  const [target, setTarget] = useState(() => initialMasbahaState?.target ?? 0);
+  const [count, setCount] = useState(() => initialMasbahaState?.count ?? 0);
+  const [laps, setLaps] = useState(() => initialMasbahaState?.laps ?? 0);
   const [showReference, setShowReference] = useState(false);
   const [showCompletionDialog, setShowCompletionDialog] = useState(false);
   const { soundEnabled, toggleSound, playClickFeedback } = useCounterClickFeedback();
 
   useWakeLock(true);
+
+  useEffect(() => {
+    onSaveMasbahaState?.({
+      count,
+      target,
+      laps,
+      selectedZikrId: selectedAuthentic.id,
+    });
+  }, [count, target, laps, selectedAuthentic.id, onSaveMasbahaState]);
 
   const activeText = selectedAuthentic.textAr;
   const isTargetMode = target > 0;
@@ -79,10 +105,14 @@ export function CustomCounterScreen({
     const nextCount = count + 1;
     setCount(nextCount);
     playClickFeedback();
-    vibrateIfEnabled(hapticFeedback, 15);
+
     if (isTargetMode && nextCount >= target) {
       setShowCompletionDialog(true);
       vibrateIfEnabled(hapticFeedback, [30, 50, 30, 50, 50]);
+    } else if (nextCount > 0 && nextCount % 33 === 0) {
+      vibrateIfEnabled(hapticFeedback, [25, 30, 25]);
+    } else {
+      vibrateIfEnabled(hapticFeedback, 8);
     }
   }, [count, hapticFeedback, isTargetComplete, isTargetMode, playClickFeedback, target]);
 
