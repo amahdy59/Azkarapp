@@ -90,6 +90,8 @@ export interface ZikrCounterSurfaceProps {
   complete?: boolean;
   justCompleted?: boolean;
   onTap: () => void;
+  /** Keeps a completed tally focusable when its owning screen has a next-step action. */
+  onCompleteTap?: () => void;
   language: AppLanguage;
   instructionText?: string;
   /**
@@ -111,6 +113,7 @@ export function ZikrCounterSurface({
   complete = false,
   justCompleted = false,
   onTap,
+  onCompleteTap,
   language,
   instructionText,
   actionLabel,
@@ -152,7 +155,7 @@ export function ZikrCounterSurface({
       : activeInstruction;
 
   const handlePointerDown = (event: React.PointerEvent<HTMLButtonElement>) => {
-    if (disabled || complete) return;
+    if (disabled || (complete && !onCompleteTap)) return;
     if (!reducedMotion) setIsPressed(true);
     if (reducedMotion) return;
     const rect = event.currentTarget.getBoundingClientRect();
@@ -172,7 +175,11 @@ export function ZikrCounterSurface({
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
-    if (disabled || complete) return;
+    if (disabled) return;
+    if (complete) {
+      onCompleteTap?.();
+      return;
+    }
     onTap();
   };
 
@@ -181,7 +188,7 @@ export function ZikrCounterSurface({
       type="button"
       data-testid={testId}
       data-counter-shape="rectangle"
-      disabled={disabled || complete}
+      disabled={disabled || (complete && !onCompleteTap)}
       onClick={handleClick}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
@@ -190,10 +197,11 @@ export function ZikrCounterSurface({
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
-          if (!disabled && !complete) onTap();
+          if (!disabled && complete) onCompleteTap?.();
+          else if (!disabled) onTap();
         }
       }}
-      aria-disabled={disabled || complete}
+      aria-disabled={disabled || (complete && !onCompleteTap)}
       aria-label={accessibleName}
       data-counter-variant={isSingleAction ? "action" : "tally"}
       className={`adaptive-counter-surface ${isSingleAction ? "adaptive-counter-surface--action" : ""} ${count === 0 && !complete ? "counter-ring-ready" : ""} ${isPressed ? "is-pressed" : ""} ${complete ? "is-complete" : ""} ${justCompleted ? "just-completed" : ""} ${className}`}

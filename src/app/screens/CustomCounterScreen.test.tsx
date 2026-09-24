@@ -13,9 +13,10 @@ describe("CustomCounterScreen Component", () => {
     render(<CustomCounterScreen isArabic={true} direction="rtl" onBack={onBack} />);
 
     expect(screen.getByText("المسبحة")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "التسبيح والتحميد" })).toBeInTheDocument();
-    expect(screen.getByText("سُبْحَانَ اللَّهِ وَبِحَمْدِهِ")).toBeInTheDocument();
-    expect(screen.getAllByTestId("custom-counter-surface")[0]).toHaveClass("adaptive-counter-surface");
+    expect(screen.getByRole("button", { name: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ" })).toBeInTheDocument();
+    expect(screen.getAllByText("سُبْحَانَ اللَّهِ وَبِحَمْدِهِ")).toHaveLength(2);
+    expect(screen.getByTestId("custom-counter-surface")).toHaveTextContent("٠ / ١٠٠");
+    expect(screen.getByTestId("custom-counter-surface")).toHaveClass("adaptive-counter-surface");
   });
 
   it("increments on tap, removes undo, and keeps reset as the single secondary action in the menu", async () => {
@@ -32,6 +33,7 @@ describe("CustomCounterScreen Component", () => {
     // Open More Options and click Reset
     await user.click(screen.getByRole("button", { name: "المزيد من الخيارات" }));
     await user.click(screen.getByRole("menuitem", { name: "إعادة تعيين العداد" }));
+    await user.click(screen.getByRole("button", { name: "إعادة العداد لـ 0" }));
 
     expect(screen.getAllByText("٠")[0]).toBeInTheDocument();
   });
@@ -87,16 +89,59 @@ describe("CustomCounterScreen Component", () => {
     expect(counter).toHaveTextContent("1");
   });
 
-  it("exposes the zikr picker as a labelled dropdown menu", async () => {
+  it("exposes a searchable picker with distinct reviewed zikr labels and benefits", async () => {
     const user = userEvent.setup();
     render(<CustomCounterScreen isArabic={false} direction="ltr" onBack={vi.fn()} />);
 
-    const picker = screen.getByRole("button", { name: /Tasbeeh & Tahmeed/i });
+    const picker = screen.getByRole("button", { name: /Subhanallahi wa bihamdihi/i });
 
     await user.click(picker);
 
-    // Verify that the dropdown menu options are visible (checking another category)
-    expect(screen.getByRole("menuitemradio", { name: /Tahliel & Tawheed/i })).toBeInTheDocument();
+    expect(screen.getByRole("dialog", { name: "Choose a dhikr" })).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: /Subhanallahi wa bihamdihi, Subhanallahil-Azeem/i })).toBeInTheDocument();
+    await user.type(screen.getByRole("searchbox", { name: "Search remembrances" }), "treasure");
+    expect(screen.getByRole("radio", { name: /La hawla wa la quwwata illa billah/i })).toBeInTheDocument();
+    expect(screen.queryByRole("radio", { name: /Sayyid al-Istighfar/i })).not.toBeInTheDocument();
+  });
+
+  it("keeps the current count when the finite target changes", async () => {
+    const user = userEvent.setup();
+    render(<CustomCounterScreen isArabic={false} direction="ltr" onBack={vi.fn()} />);
+
+    fireEvent.click(screen.getByTestId("custom-counter-surface"));
+    await user.click(screen.getByTestId("counter-target-filter"));
+    expect(screen.queryByRole("menuitemradio", { name: "Open" })).not.toBeInTheDocument();
+    await user.click(screen.getByRole("menuitemradio", { name: "33" }));
+
+    expect(screen.getByTestId("custom-counter-surface")).toHaveTextContent("1 / 33");
+  });
+
+  it("protects an in-progress count before changing to another zikr", async () => {
+    const user = userEvent.setup();
+    render(<CustomCounterScreen isArabic={false} direction="ltr" onBack={vi.fn()} />);
+
+    fireEvent.click(screen.getByTestId("custom-counter-surface"));
+    await user.click(screen.getByRole("button", { name: /Subhanallahi wa bihamdihi/i }));
+    await user.click(screen.getByRole("radio", { name: /La hawla wa la quwwata illa billah/i }));
+
+    expect(screen.getByRole("dialog", { name: "Change the selected dhikr?" })).toBeInTheDocument();
+    expect(screen.getByText(/clear the current count of 1/i)).toBeInTheDocument();
+  });
+
+  it("keeps a completed counter focusable so its next-step dialog can be reopened", () => {
+    render(
+      <CustomCounterScreen
+        isArabic={false}
+        direction="ltr"
+        onBack={vi.fn()}
+        initialMasbahaState={{ count: 1, target: 1, laps: 0, selectedZikrId: "auth_sayyid_al_istighfar" }}
+      />,
+    );
+
+    const counter = screen.getByTestId("custom-counter-surface");
+    expect(counter).not.toBeDisabled();
+    fireEvent.click(counter);
+    expect(screen.getByRole("dialog", { name: "Goal Reached!" })).toBeInTheDocument();
   });
 
   it("plays the Web Audio click when an enabled counter is tapped", () => {

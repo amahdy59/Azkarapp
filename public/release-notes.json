@@ -1,15 +1,15 @@
 {
   "ar": [
-    "أصبحت الإعدادات أسهل في البحث والتنقل، مع خيارات واضحة للقراءة والصوت وإمكانية استعادة نسخة احتياطية بعد التحقق منها.",
-    "توفّر الرئيسية وصولاً أسرع إلى القبلة والمسبحة، وتحفظ المسبحة موضعك، ويمكن ضبط التاريخ الهجري ليتوافق مع الرؤية المحلية.",
-    "يمكن الآن فتح خيارات الآية لرؤية معاني كلمات القرآن المتاحة إلى جانب إجراءات النسخ والمشاركة.",
-    "تضم مجموعة أذكار الصلاة الآن ١٧ ذكراً ودعاءً موثقاً تغطي مواضع الصلاة من الاستفتاح إلى قنوت الوتر."
+    "تبدأ المسبحة الآن بهدف عددي واضح دائماً، مع أهداف جاهزة وإمكانية اختيار رقم مخصص.",
+    "يمكن البحث عن الذكر الصحيح ورؤية فائدته المختصرة قبل اختياره، مع تأكيد يحمي العدّ الجاري من المسح غير المقصود.",
+    "يعرض قسم التقدم نية الأسبوع بصورة مستقلة عن نشاط الأيام السبعة لتبقى المقارنات واضحة ودقيقة.",
+    "تعرض خريطة السنة جميع أيام كل شهر، وأصبح ملخص المشاركة أوضح في وصف الورد والممارسات الإضافية."
   ],
   "en": [
-    "Settings are easier to search and navigate, with clear reading and audio controls plus validated backup restore.",
-    "Home offers quicker Qibla and Masbaha access, the counter remembers your place, and the Hijri date can match local sighting.",
-    "Quran verse actions can now show available word meanings alongside copy and share options.",
-    "The In-Prayer collection now includes 17 sourced remembrances and supplications from the opening through Witr Qunut."
+    "Masbaha now always begins with a clear numeric goal, with useful presets and a custom target option.",
+    "Search the exact remembrance and review its concise benefit before selecting it, with confirmation that protects an active count.",
+    "Progress shows the weekly intention separately from seven-day activity so comparisons stay clear and truthful.",
+    "The year map now includes every day of each month, and private sharing describes routines and additional practice more clearly."
   ],
-  "release": "2026-09-24-review-recommendations"
+  "release": "2026-09-24-masbaha-progress"
 }

@@ -84,6 +84,7 @@ export function ProgressScreen({
   quranWirdDailyGoals,
   mosquePrayerGoal,
   dailyPathStartDayKey,
+  weeklyGoalDays,
   onTogglePrayerTracking,
   onToggleDailyHabit,
   onCycleMosqueHabit,
@@ -105,6 +106,7 @@ export function ProgressScreen({
   quranWirdDailyGoals?: Record<string, number>;
   mosquePrayerGoal?: number;
   dailyPathStartDayKey?: string;
+  weeklyGoalDays?: number;
   onTogglePrayerTracking?: (prayer: PrayerName, field: PrayerTrackingField, next: boolean) => void;
   onToggleDailyHabit?: (dayKey: string, habit: DailyHabitId) => void;
   onCycleMosqueHabit?: (dayKey: string) => void;
@@ -469,6 +471,7 @@ export function ProgressScreen({
             onMedia={false}
             activeTab={activeTab}
             displayDate={displayDate}
+            weeklyGoalDays={weeklyGoalDays}
           />
         </div>
 

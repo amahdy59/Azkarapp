@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { X, Share2 } from "../components/icons";
+import { CheckCircle2, Leaf, Share2, X } from "../components/icons";
 import type { AppLanguage } from "../types";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
@@ -34,6 +34,7 @@ export function ShareableCardModal({ palms, golden, green, dateStr, language, on
           text: t(language, "shareModal.text", {
             palms: formatNumerals(palms, language),
             golden: formatNumerals(golden, language),
+            green: formatNumerals(green, language),
           }),
           url: window.location.origin,
         });
@@ -115,21 +116,19 @@ export function ShareableCardModal({ palms, golden, green, dateStr, language, on
               <dd className={`text-subtitle font-black ${palms > 0 ? "text-primary" : "text-muted-foreground/60"}`}>
                 {formatNumerals(palms, language)}
               </dd>
-              <dt className="text-micro font-bold text-muted-foreground">{t(language, "shareModal.palms")}</dt>
+              <dt className="text-micro font-bold text-muted-foreground">{t(language, "shareModal.palmDays")}</dt>
             </div>
             <div className="flex min-w-0 flex-1 flex-col items-center gap-1 border-e border-border p-3">
-              <span className="text-xl" aria-hidden="true">
-                🍂
-              </span>
-              <dd className="text-subtitle font-black text-primary">{formatNumerals(golden, language)}</dd>
-              <dt className="text-micro font-bold text-muted-foreground">{t(language, "shareModal.golden")}</dt>
+              <CheckCircle2 size={24} className="text-success" aria-hidden="true" />
+              <dd className="text-subtitle font-black text-success">{formatNumerals(golden, language)}</dd>
+              <dt className="text-micro font-bold text-muted-foreground">{t(language, "shareModal.dailyRoutines")}</dt>
             </div>
             <div className="flex min-w-0 flex-1 flex-col items-center gap-1 p-3">
-              <span className="text-xl" aria-hidden="true">
-                🌿
-              </span>
-              <dd className="text-subtitle font-black text-success">{formatNumerals(green, language)}</dd>
-              <dt className="text-micro font-bold text-muted-foreground">{t(language, "shareModal.green")}</dt>
+              <Leaf size={24} className="text-info" aria-hidden="true" />
+              <dd className="text-subtitle font-black text-info">{formatNumerals(green, language)}</dd>
+              <dt className="text-micro font-bold text-muted-foreground">
+                {t(language, "shareModal.additionalPractice")}
+              </dt>
             </div>
           </dl>
 

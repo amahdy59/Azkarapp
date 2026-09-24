@@ -71,10 +71,15 @@ test("Counters keyboard navigation and reset", async ({ page }) => {
   await moreOptions.focus();
   await page.keyboard.press("Enter");
 
-  // The Reset menu item directly resets the counter without a confirmation dialog
+  // Destructive resets keep keyboard focus inside a confirmation dialog.
   const resetMenuItem = page.getByRole("menuitem", { name: /Reset/i }).first();
   await expect(resetMenuItem).toBeVisible();
   await resetMenuItem.focus();
+  await page.keyboard.press("Enter");
+
+  const confirmReset = page.getByRole("button", { name: "Reset Counter to 0" });
+  await expect(confirmReset).toBeVisible();
+  await confirmReset.focus();
   await page.keyboard.press("Enter");
 
   // Counter should be back to 0 after reset

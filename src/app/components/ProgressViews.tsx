@@ -13,6 +13,7 @@ import {
 } from "../gardenViews";
 import { getCalendarMonthPeriod, getCalendarYearPeriods, type CalendarType } from "../calendarPeriods";
 import { type GardenSummary } from "../progress";
+import { ProgressBar } from "./ProgressBar";
 import {
   Zap,
   Check,
@@ -715,7 +716,7 @@ function WeekStatusCell({
             <Check size={15} strokeWidth={3} />
           </div>
         ) : (
-          <div aria-hidden="true" className="w-6 h-6 rounded-full border-2 border-primary/50" />
+          <div aria-hidden="true" className="h-6 w-6 rounded-full border-2 border-border-control" />
         )}
       </div>
     </td>
@@ -726,10 +727,14 @@ export function ProgressWeekView({
   language,
   dailyCompletions = [],
   referenceDate = new Date(),
+  weeklyGoalDays,
+  activeDays = 0,
 }: {
   language: AppLanguage;
   dailyCompletions?: import("../types").DailyCollectionCompletion[];
   referenceDate?: Date;
+  weeklyGoalDays?: number;
+  activeDays?: number;
 }) {
   const isArabic = isAr(language);
   const completionIndex = useMemo(() => createDailyCompletionIndex(dailyCompletions), [dailyCompletions]);
@@ -746,6 +751,33 @@ export function ProgressWeekView({
       className="mx-auto flex w-full max-w-[44rem] flex-col gap-4 fade-in xl:max-w-[80rem]"
       dir={isArabic ? "rtl" : "ltr"}
     >
+      {weeklyGoalDays && (
+        <section className="rounded-2xl border border-border bg-card p-4" aria-labelledby="progress-weekly-goal">
+          <div className="mb-3 flex items-baseline justify-between gap-3">
+            <h2 id="progress-weekly-goal" className="text-subtitle font-black text-foreground">
+              {t(language, "progressPanel.weeklyGoal")}
+            </h2>
+            <p className="text-label font-bold text-muted-foreground">
+              {t(language, "progressPanel.goalProgress", {
+                done: formatNumerals(Math.min(activeDays, weeklyGoalDays), language),
+                goal: formatNumerals(weeklyGoalDays, language),
+              })}
+            </p>
+          </div>
+          <ProgressBar
+            value={Math.min(activeDays, weeklyGoalDays)}
+            max={weeklyGoalDays}
+            height={8}
+            trackColor="var(--muted)"
+            direction={isArabic ? "rtl" : "ltr"}
+            aria-label={t(language, "progressPanel.goalProgress", {
+              done: formatNumerals(Math.min(activeDays, weeklyGoalDays), language),
+              goal: formatNumerals(weeklyGoalDays, language),
+            })}
+          />
+        </section>
+      )}
+
       {/* One scan line answers the three common weekly questions without
           presenting three equally dominant cards. */}
       <dl className="grid grid-cols-3 overflow-hidden rounded-2xl border border-border bg-card">
@@ -859,13 +891,7 @@ export function ProgressWeekView({
             <span>{t(language, "progress.complete")}</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="flex items-center justify-center w-5 h-5 rounded-full bg-info/20 border border-info text-info">
-              <span className="text-micro font-black">-</span>
-            </div>
-            <span>{t(language, "progress.partial")}</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-4 h-4 rounded-full border-2 border-primary" />
+            <div className="h-4 w-4 rounded-full border-2 border-border-control" />
             <span>{t(language, "progress.missed")}</span>
           </div>
         </div>
@@ -1156,7 +1182,7 @@ export function ProgressMonthView({
                     {isPalm ? (
                       <Check size={12} strokeWidth={3} className="text-success" />
                     ) : count > 0 ? (
-                      <bdi className="text-[0.5625rem] font-extrabold text-info">{formatRatio(count, 3, language)}</bdi>
+                      <bdi className="text-micro font-extrabold text-info">{formatRatio(count, 3, language)}</bdi>
                     ) : (
                       <span className="text-micro text-muted-foreground/40">-</span>
                     )}
@@ -1410,7 +1436,7 @@ export function ProgressYearView({
                       style={{ height: `${rate}%` }}
                     />
                   </div>
-                  <span className="text-[0.5625rem] font-bold text-muted-foreground mt-1.5 truncate max-w-full text-center">
+                  <span className="mt-1.5 max-w-full truncate text-center text-micro font-bold text-muted-foreground">
                     {monthNames[idx]?.slice(0, isArabic ? 6 : 3)}
                   </span>
                 </div>
@@ -1490,8 +1516,8 @@ export function ProgressYearView({
               </div>
 
               {/* Mini day grid */}
-              <div className="grid grid-cols-7 gap-0.5" aria-hidden="true">
-                {m.dayCells.slice(0, 28).map((cell) => (
+              <div className="grid grid-cols-7 gap-0.5" aria-hidden="true" data-testid={`year-heatmap-${idx}`}>
+                {m.dayCells.map((cell) => (
                   <div
                     key={cell.dayNum}
                     className={`aspect-square rounded-[var(--ds-radius-micro)] ${

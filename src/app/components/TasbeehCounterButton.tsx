@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowLeft, ArrowRight } from "./icons";
+import { ArrowNext } from "./icons";
 import { t } from "../i18n";
 import { vibrateIfEnabled } from "../motionPreferences";
 import type { AppLanguage } from "../types";
@@ -82,19 +82,12 @@ export function TasbeehCounterButton({
           {t(language, "counter.tasbeehTitle")}
         </span>
       </div>
-      {direction === "rtl" ? (
-        <ArrowLeft
-          size={20}
-          className="shrink-0 text-muted-foreground transition-transform duration-standard group-hover:-translate-x-1 group-hover:text-foreground"
-          aria-hidden="true"
-        />
-      ) : (
-        <ArrowRight
-          size={20}
-          className="shrink-0 text-muted-foreground transition-transform duration-standard group-hover:translate-x-1 group-hover:text-foreground"
-          aria-hidden="true"
-        />
-      )}
+      <ArrowNext
+        size={20}
+        data-rtl-flip
+        className="shrink-0 text-muted-foreground transition-transform duration-standard group-hover:translate-x-1 group-hover:text-foreground rtl:group-hover:-translate-x-1"
+        aria-hidden="true"
+      />
     </button>
   );
 }

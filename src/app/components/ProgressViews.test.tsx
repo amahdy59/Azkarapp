@@ -122,6 +122,23 @@ describe("ProgressViews components", () => {
     expect(screen.queryByText("أكثر ورد فاتك")).not.toBeInTheDocument();
   });
 
+  it("shows the saved active-day intention separately from seven-day routine totals", () => {
+    render(
+      <ProgressWeekView
+        language="en"
+        dailyCompletions={mockCompletions}
+        referenceDate={new Date(2026, 7, 5)}
+        weeklyGoalDays={4}
+        activeDays={2}
+      />,
+    );
+
+    expect(screen.getByText("Your seven-day intention")).toBeInTheDocument();
+    expect(screen.getByText("2 of 4 active days")).toBeInTheDocument();
+    expect(screen.queryByText("Partial")).not.toBeInTheDocument();
+    expect(screen.getAllByText(/of 7/).length).toBeGreaterThan(0);
+  });
+
   it("renders ProgressMonthView with calendar matrix in Arabic", () => {
     render(<ProgressMonthView language="ar" targetYear={2026} targetMonth={7} dailyCompletions={mockCompletions} />);
 
@@ -134,6 +151,8 @@ describe("ProgressViews components", () => {
 
     expect(screen.getByText("معدل الاكتمال الشهري")).toBeInTheDocument();
     expect(screen.getByText("نظرة سريعة")).toBeInTheDocument();
+    expect(screen.getByTestId("year-heatmap-0").children).toHaveLength(31);
+    expect(screen.getByTestId("year-heatmap-1").children).toHaveLength(28);
   });
 
   it("renders empty progress periods with recorded zero values and neutral guidance", () => {

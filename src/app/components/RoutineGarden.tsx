@@ -56,6 +56,7 @@ export function TodayRoutineGarden({
   onMedia = true,
   activeTab = "day",
   displayDate = new Date(),
+  weeklyGoalDays,
 }: {
   summary: GardenSummary;
   language: AppLanguage;
@@ -75,6 +76,7 @@ export function TodayRoutineGarden({
   quranWird?: QuranWirdTile;
   activeTab?: "day" | "week" | "month" | "year";
   displayDate?: Date;
+  weeklyGoalDays?: number;
 }) {
   const totalPalms = summary.lifetimePalms;
   const streak = summary.currentUsageStreak ?? 0;
@@ -160,7 +162,13 @@ export function TodayRoutineGarden({
         )}
 
         {activeTab === "week" && (
-          <ProgressWeekView language={language} dailyCompletions={dailyCompletions} referenceDate={displayDate} />
+          <ProgressWeekView
+            language={language}
+            dailyCompletions={dailyCompletions}
+            referenceDate={displayDate}
+            weeklyGoalDays={weeklyGoalDays}
+            activeDays={summary.activeDaysLast7}
+          />
         )}
 
         {activeTab === "month" && (

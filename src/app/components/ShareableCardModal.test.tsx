@@ -38,9 +38,9 @@ describe("ShareableCardModal", () => {
 
     const dialog = screen.getByRole("dialog", { name: "بطاقة مشاركة الإنجاز" });
     expect(dialog).toHaveAttribute("dir", "rtl");
-    expect(screen.getByText("نخيل").tagName).toBe("DT");
-    expect(screen.getByText("ذهبية").tagName).toBe("DT");
-    expect(screen.getByText("خضراء").tagName).toBe("DT");
+    expect(screen.getByText("أيام النخيل").tagName).toBe("DT");
+    expect(screen.getByText("الأوراد اليومية").tagName).toBe("DT");
+    expect(screen.getByText("إضافية").tagName).toBe("DT");
     expect(screen.getByRole("button", { name: "إلغاء" })).toHaveClass("end-3");
   });
 });

@@ -1599,6 +1599,11 @@ function AppContent({
                   quranWirdDailyGoals={quranWirdDailyGoals}
                   mosquePrayerGoal={mosquePrayerGoal}
                   dailyPathStartDayKey={dailyPathStartDayKey}
+                  weeklyGoalDays={weeklyGoalDays}
+                  onPrayerResume={(prayer) => {
+                    setActivePrayer(prayer);
+                    push("prayer");
+                  }}
                 />
               )}
               {(view === "category" || view === "reader") && routeContentLoading && (

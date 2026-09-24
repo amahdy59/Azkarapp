@@ -1,27 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
+import { AuthenticZikrPicker } from "../components/AuthenticZikrPicker";
 import { CounterTargetPicker } from "../components/CounterTargetPicker";
-import {
-  BookOpen,
-  Check,
-  ChevronDown,
-  MoreVertical,
-  Play,
-  RotateCcw,
-  Sparkles,
-  Volume2,
-  VolumeX,
-} from "../components/icons";
+import { Check, Lightbulb, MoreVertical, Play, RotateCcw, Volume2, VolumeX } from "../components/icons";
 import { ReadingScreenChrome } from "../components/ReadingScreenChrome";
 import { Modal } from "../components/ResponsiveSheet";
-import { CountingRipples, useCountingSurface } from "../components/countingSurface";
+import { useCountingSurface } from "../components/countingSurface";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { Button } from "../components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
 import { CounterShortcutHints, ZikrCounterSurface } from "../components/ZikrComponents";
@@ -67,18 +56,23 @@ export function CustomCounterScreen({
   onSaveMasbahaState?: (state: MasbahaSavedState) => void;
 }) {
   const language: AppLanguage = isArabic ? "ar" : "en";
+  const initialSelectedAuthentic =
+    AUTHENTIC_AZKAR_COLLECTION.find((item) => item.id === initialMasbahaState?.selectedZikrId) ??
+    AUTHENTIC_AZKAR_COLLECTION[0]!;
   const [selectedAuthentic, setSelectedAuthentic] = useState<AuthenticZikrItem>(() => {
-    if (initialMasbahaState?.selectedZikrId) {
-      const match = AUTHENTIC_AZKAR_COLLECTION.find((item) => item.id === initialMasbahaState.selectedZikrId);
-      if (match) return match;
-    }
-    return AUTHENTIC_AZKAR_COLLECTION[0]!;
+    return initialSelectedAuthentic;
   });
-  const [target, setTarget] = useState(() => initialMasbahaState?.target ?? 0);
+  const [target, setTarget] = useState(() =>
+    initialMasbahaState?.target && initialMasbahaState.target > 0
+      ? initialMasbahaState.target
+      : initialSelectedAuthentic.recommendedTarget,
+  );
   const [count, setCount] = useState(() => initialMasbahaState?.count ?? 0);
   const [laps, setLaps] = useState(() => initialMasbahaState?.laps ?? 0);
   const [showReference, setShowReference] = useState(false);
   const [showCompletionDialog, setShowCompletionDialog] = useState(false);
+  const [showResetDialog, setShowResetDialog] = useState(false);
+  const [pendingZikr, setPendingZikr] = useState<AuthenticZikrItem | null>(null);
   const { soundEnabled, toggleSound, playClickFeedback } = useCounterClickFeedback();
 
   useWakeLock(true);
@@ -93,9 +87,8 @@ export function CustomCounterScreen({
   }, [count, target, laps, selectedAuthentic.id, onSaveMasbahaState]);
 
   const activeText = selectedAuthentic.textAr;
-  const isTargetMode = target > 0;
-  const isTargetComplete = isTargetMode && count >= target;
-  const progressPercent = isTargetMode ? Math.min(100, Math.round((count / target) * 100)) : 0;
+  const isTargetComplete = count >= target;
+  const progressPercent = Math.min(100, Math.round((count / target) * 100));
 
   const handleTap = useCallback(() => {
     if (isTargetComplete) {
@@ -106,7 +99,7 @@ export function CustomCounterScreen({
     setCount(nextCount);
     playClickFeedback();
 
-    if (isTargetMode && nextCount >= target) {
+    if (nextCount >= target) {
       setShowCompletionDialog(true);
       vibrateIfEnabled(hapticFeedback, [30, 50, 30, 50, 50]);
     } else if (nextCount > 0 && nextCount % 33 === 0) {
@@ -114,7 +107,7 @@ export function CustomCounterScreen({
     } else {
       vibrateIfEnabled(hapticFeedback, 8);
     }
-  }, [count, hapticFeedback, isTargetComplete, isTargetMode, playClickFeedback, target]);
+  }, [count, hapticFeedback, isTargetComplete, playClickFeedback, target]);
 
   const handleReset = useCallback(() => {
     setCount(0);
@@ -122,18 +115,27 @@ export function CustomCounterScreen({
     setShowCompletionDialog(false);
   }, []);
 
-  const handleSelectAuthenticZikr = (item: AuthenticZikrItem) => {
+  const applySelectedZikr = (item: AuthenticZikrItem) => {
     setSelectedAuthentic(item);
-    if (item.recommendedTarget > 0 && target !== 0) setTarget(item.recommendedTarget);
+    setTarget(item.recommendedTarget);
     handleReset();
   };
 
-  const {
-    ripples: canvasRipples,
-    dismissRipple,
-    pressStyle,
-    surfaceProps,
-  } = useCountingSurface({ onCount: handleTap, reduceMotion });
+  const handleSelectAuthenticZikr = (item: AuthenticZikrItem) => {
+    if (item.id === selectedAuthentic.id) return;
+    if (count > 0 || laps > 0) {
+      setPendingZikr(item);
+      return;
+    }
+    applySelectedZikr(item);
+  };
+
+  const { pressStyle, surfaceProps } = useCountingSurface({ onCount: handleTap, reduceMotion });
+
+  const requestReset = useCallback(() => {
+    if (count === 0 && laps === 0) return;
+    setShowResetDialog(true);
+  }, [count, laps]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -155,16 +157,16 @@ export function CustomCounterScreen({
         handleTap();
       } else if (event.key === "r" || event.key === "R" || event.key === "ق") {
         event.preventDefault();
-        handleReset();
+        requestReset();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleReset, handleTap, onBack, showReference]);
+  }, [handleTap, onBack, requestReset, showReference]);
 
   const changeTarget = (nextTarget: number) => {
     setTarget(nextTarget);
-    handleReset();
+    setShowCompletionDialog(count >= nextTarget);
   };
 
   return (
@@ -173,9 +175,6 @@ export function CustomCounterScreen({
       className="relative flex flex-col overflow-y-auto h-full !pb-0 sm:!pt-0"
       screenName={t(language, "counter.tasbeehTitle")}
     >
-      <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden" aria-hidden="true">
-        <CountingRipples ripples={canvasRipples} onDismiss={dismissRipple} />
-      </div>
       <div className="relative z-10 flex min-h-0 flex-1 flex-col">
         <ReadingScreenChrome
           language={language}
@@ -187,49 +186,22 @@ export function CustomCounterScreen({
              skips the bar rather than drawing a track that never moves. */
           progress={{
             value: count,
-            ...(isTargetMode ? { max: target } : {}),
-            percentLabel: isTargetMode
-              ? `${formatNumerals(progressPercent, language)}%`
-              : t(language, "counter.targetOpen"),
-            countLabel: isTargetMode
-              ? `${formatNumerals(count, language)} / ${formatNumerals(target, language)}`
-              : formatNumerals(count, language),
+            max: target,
+            percentLabel: `${formatNumerals(progressPercent, language)}%`,
+            countLabel: `${formatNumerals(count, language)} / ${formatNumerals(target, language)}`,
             ariaLabel: t(language, "counter.targetLabel"),
           }}
           subRow={
             <div className="w-full" data-prevent-count="true">
               <div className="relative z-20 grid grid-cols-2 gap-2 sm:gap-3" data-prevent-count="true">
                 <div className="min-w-0">
-                  <DropdownMenu dir={direction}>
-                    <DropdownMenuTrigger className="interactive-elem flex min-h-[44px] w-full items-center justify-between gap-2 rounded-2xl border border-border-control bg-card px-3 sm:px-4 text-label sm:text-sm font-bold text-foreground shadow-xs transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring overflow-hidden">
-                      <span className="truncate text-start flex-1 whitespace-nowrap">
-                        {isArabic ? selectedAuthentic.categoryNameAr : selectedAuthentic.categoryNameEn}
-                      </span>
-                      <ChevronDown size={16} className="shrink-0 text-muted-foreground" aria-hidden="true" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                      align="start"
-                      className="max-h-[250px] min-w-[var(--radix-dropdown-menu-trigger-width)] overflow-y-auto"
-                    >
-                      <DropdownMenuRadioGroup
-                        value={selectedAuthentic.id}
-                        onValueChange={(id) => {
-                          const item = AUTHENTIC_AZKAR_COLLECTION.find((x) => x.id === id);
-                          if (item) handleSelectAuthenticZikr(item);
-                        }}
-                      >
-                        {AUTHENTIC_AZKAR_COLLECTION.map((item) => (
-                          <DropdownMenuRadioItem
-                            key={item.id}
-                            value={item.id}
-                            className="text-sm font-bold whitespace-nowrap"
-                          >
-                            {isArabic ? item.categoryNameAr : item.categoryNameEn}
-                          </DropdownMenuRadioItem>
-                        ))}
-                      </DropdownMenuRadioGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <AuthenticZikrPicker
+                    items={AUTHENTIC_AZKAR_COLLECTION}
+                    selected={selectedAuthentic}
+                    language={language}
+                    direction={direction}
+                    onSelect={handleSelectAuthenticZikr}
+                  />
                 </div>
 
                 <div className="min-w-0">
@@ -238,6 +210,7 @@ export function CustomCounterScreen({
                     onTargetChange={changeTarget}
                     language={language}
                     direction={direction}
+                    allowOpen={false}
                   />
                 </div>
               </div>
@@ -254,7 +227,7 @@ export function CustomCounterScreen({
                   aria-label={t(language, "counter.virtueReference")}
                   aria-haspopup="dialog"
                 >
-                  <BookOpen size={20} aria-hidden="true" />
+                  <Lightbulb size={20} aria-hidden="true" />
                 </button>
                 <DropdownMenu dir={direction}>
                   <DropdownMenuTrigger className={actionClass} aria-label={t(language, "common.moreOptions")}>
@@ -269,7 +242,7 @@ export function CustomCounterScreen({
                       )}
                       <span>{t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleReset} disabled={count === 0 && laps === 0}>
+                    <DropdownMenuItem onClick={requestReset} disabled={count === 0 && laps === 0}>
                       <RotateCcw size={16} className="text-muted-foreground me-2" aria-hidden="true" />
                       <span>{t(language, "reader.resetCounter")}</span>
                     </DropdownMenuItem>
@@ -302,6 +275,14 @@ export function CustomCounterScreen({
                       >
                         {activeText}
                       </p>
+                      {!isArabic && (
+                        <p
+                          className="mt-3 max-w-[34rem] text-center text-sm font-semibold leading-7 text-muted-foreground"
+                          dir="ltr"
+                        >
+                          {selectedAuthentic.textEn}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -317,6 +298,7 @@ export function CustomCounterScreen({
                           total={target}
                           complete={isTargetComplete}
                           onTap={handleTap}
+                          onCompleteTap={() => setShowCompletionDialog(true)}
                           language={language}
                           instructionText={t(language, "reader.tapAnywhere")}
                           testId="custom-counter-surface"
@@ -386,6 +368,73 @@ export function CustomCounterScreen({
         </Modal>
       )}
 
+      {showResetDialog && (
+        <Modal
+          open
+          onClose={() => setShowResetDialog(false)}
+          title={t(language, "counter.resetConfirmTitle")}
+          direction={direction}
+          language={language}
+          maxWidthClassName="max-w-sm"
+          className="p-6"
+        >
+          <div>
+            <h2 className="pe-10 text-lg font-black text-foreground">{t(language, "counter.resetConfirmTitle")}</h2>
+            <p className="mt-2 text-sm font-medium leading-6 text-muted-foreground">
+              {t(language, "counter.resetConfirmBody", { count: formatNumerals(count, language) })}
+            </p>
+            <div className="mt-5 flex gap-2">
+              <Button variant="outline" onClick={() => setShowResetDialog(false)} className="flex-1">
+                {t(language, "common.cancel")}
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  handleReset();
+                  setShowResetDialog(false);
+                }}
+                className="flex-1"
+              >
+                {t(language, "counter.resetToZero")}
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {pendingZikr && (
+        <Modal
+          open
+          onClose={() => setPendingZikr(null)}
+          title={t(language, "counter.changeDhikrTitle")}
+          direction={direction}
+          language={language}
+          maxWidthClassName="max-w-sm"
+          className="p-6"
+        >
+          <div>
+            <h2 className="pe-10 text-lg font-black text-foreground">{t(language, "counter.changeDhikrTitle")}</h2>
+            <p className="mt-2 text-sm font-medium leading-6 text-muted-foreground">
+              {t(language, "counter.changeDhikrBody", { count: formatNumerals(count, language) })}
+            </p>
+            <div className="mt-5 flex gap-2">
+              <Button variant="outline" onClick={() => setPendingZikr(null)} className="flex-1">
+                {t(language, "common.cancel")}
+              </Button>
+              <Button
+                onClick={() => {
+                  applySelectedZikr(pendingZikr);
+                  setPendingZikr(null);
+                }}
+                className="flex-1"
+              >
+                {t(language, "counter.changeDhikrConfirm")}
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
       {showReference && (
         <Modal
           open
@@ -399,7 +448,7 @@ export function CustomCounterScreen({
           <div className="text-start space-y-3">
             <div className="flex items-center gap-3 pe-10">
               <span className="flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                <Sparkles size={20} aria-hidden="true" />
+                <Lightbulb size={20} aria-hidden="true" />
               </span>
               <h2 className="text-lg font-black text-foreground">{t(language, "counter.virtueReference")}</h2>
             </div>

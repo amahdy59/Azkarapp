@@ -149,4 +149,40 @@ describe("ProgressScreen", () => {
     expect(dayTab).toHaveAttribute("aria-selected", "true");
     expect(screen.getByTestId("oasis-stage-card")).toBeInTheDocument();
   });
+
+  it("opens the focused prayer route from the disclosed prayer cards", () => {
+    const onPrayerResume = vi.fn();
+    render(
+      <ProgressScreen
+        dailyCompletions={mockCompletions}
+        progressDayStartHour={3}
+        calendarType="gregorian"
+        language="en"
+        direction="ltr"
+        onOpenShareModal={vi.fn()}
+        onPrayerResume={onPrayerResume}
+      />,
+    );
+
+    fireEvent.click(screen.getByText("Review prayer and connected practices"));
+    fireEvent.click(screen.getByRole("button", { name: "Open Fajr" }));
+    expect(onPrayerResume).toHaveBeenCalledWith("fajr");
+  });
+
+  it("shows the configured weekly intention on the Week view", () => {
+    render(
+      <ProgressScreen
+        dailyCompletions={mockCompletions}
+        progressDayStartHour={3}
+        calendarType="gregorian"
+        language="en"
+        direction="ltr"
+        onOpenShareModal={vi.fn()}
+        weeklyGoalDays={4}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("tab", { name: "Week" }));
+    expect(screen.getByText("Your seven-day intention")).toBeInTheDocument();
+  });
 });

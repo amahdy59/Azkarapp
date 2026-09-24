@@ -55,7 +55,7 @@ export function DailyCompanionsCard({
           type="button"
           onClick={onToggleQuranWird}
           aria-pressed={quranWird}
-          className="flex w-full min-h-[48px] items-center justify-between px-4 py-3.5 text-start transition-colors hover:bg-muted/40 active:bg-muted/70 sm:px-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          className="flex min-h-12 w-full items-center justify-between px-4 py-3.5 text-start transition-colors hover:bg-muted/40 active:bg-muted/70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-inset sm:px-6"
         >
           <div className="flex items-center gap-3.5">
             <div
@@ -105,7 +105,7 @@ export function DailyCompanionsCard({
           <button
             type="button"
             onClick={onCycleMosquePrayers}
-            className="flex w-full min-h-[48px] items-center justify-between px-4 py-3.5 text-start transition-colors hover:bg-muted/40 active:bg-muted/70 sm:px-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="flex min-h-12 w-full items-center justify-between px-4 py-3.5 text-start transition-colors hover:bg-muted/40 active:bg-muted/70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-inset sm:px-6"
           >
             <div className="flex items-center gap-3.5">
               <div
