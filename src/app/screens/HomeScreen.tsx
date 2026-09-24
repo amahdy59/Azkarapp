@@ -612,12 +612,18 @@ export function HomeScreen({
           <header
             data-testid="home-utility-header"
             data-scrolled={hasScrolledHomeContent || undefined}
-            className={`px-page mx-auto flex w-full max-w-[90rem] items-center justify-between gap-3 pt-[max(1rem,env(safe-area-inset-top))] pb-3 transition-[background-color,backdrop-filter,box-shadow] duration-standard sm:pt-5 ${
+            className={`px-page flex w-full items-center justify-between gap-3 transition-[background-color,backdrop-filter,box-shadow,padding] duration-standard ${
+              hasScrolledHomeContent
+                ? "pt-[max(0.5rem,env(safe-area-inset-top))] pb-1"
+                : "pt-[max(1rem,env(safe-area-inset-top))] pb-3 sm:pt-5"
+            } ${
               homeVisualEffects
                 ? hasScrolledHomeContent
-                  ? "border-b border-white/10 bg-on-media-surface/95 shadow-sm backdrop-blur-md"
+                  ? "border-b border-white/10 bg-on-media-surface/70 shadow-none backdrop-blur-xl"
                   : ""
-                : "border-b border-border bg-background/95 shadow-sm"
+                : hasScrolledHomeContent
+                  ? "border-b border-border bg-background/90 shadow-none"
+                  : "border-b border-border bg-background/95 shadow-sm"
             }`}
             dir="ltr"
           >

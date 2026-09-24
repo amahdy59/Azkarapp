@@ -116,7 +116,7 @@ describe("HomeScreen quick access", () => {
 
     fireEvent.scroll(screen.getByRole("region", { name: "Azkar" }), { target: { scrollTop: 12 } });
     expect(screen.getByTestId("home-utility-header")).toHaveAttribute("data-scrolled", "true");
-    expect(screen.getByTestId("home-utility-header")).toHaveClass("bg-on-media-surface/95");
+    expect(screen.getByTestId("home-utility-header")).toHaveClass("bg-on-media-surface/70", "backdrop-blur-xl");
   });
 
   it("shows the completion card briefly, without actions, then returns to the normal hero", () => {
