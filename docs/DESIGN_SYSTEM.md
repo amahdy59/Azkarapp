@@ -120,6 +120,8 @@ Every input carries a **visible** label. A placeholder is a hint, never a name: 
 - **A number input blurs on wheel.** A wheel over a focused `type="number"` changes its value, so scrolling a settings page with the pointer over a coordinate field would move it silently. `FormField` does this for its own; a raw number input must do it itself.
 - **A visible label, above the control, on every field.** An `aria-label` behind a placeholder passes an accessible-name audit and still leaves the field unnamed on screen — and unnamed entirely once there is a value to check. A heading above a form says what the screen is for; it is not the field's name. One style for all of them: `FIELD_LABEL_CLASS`.
 - **`inputMode` matches the value**, not the type: `decimal` for coordinates, which need a point and a minus sign that `numeric` does not offer.
+- Choice fields use the shared Radix `Select` anatomy rather than a browser-native `<select>`. The trigger consumes the control-radius token, the floating surface consumes the overlay-radius and semantic popover tokens, and every option uses the 12–14 px control radius. This keeps the same labelled combobox/listbox semantics, keyboard behavior, 44 px target floor, direction, selected indicator, and focus treatment while preventing Android and installed-PWA menus from switching to an unrelated operating-system palette.
+- Compact state labels remain pills at every responsive density. Layout variants may change their margin, but must not conditionally remove `rounded-full` or the horizontal/vertical inset that makes the label legible as a status rather than highlighted text.
 
 ## Color roles
 
@@ -134,6 +136,7 @@ Gold should not be the default for small text, low-contrast metadata, every icon
 Semantic tokens are defined for:
 
 - Background and Surface (Opaque, high-contrast cards and reading areas). `bg-card` is opaque by default in every theme. The blurred/translucent treatments (`.glass-card`/`.wird-card`/`.hero-glass`) are explicit opt-ins for content placed over controlled hero imagery; functional glass must use fixed on-media text tokens, measured contrast, a visible border, and the opaque reduced-transparency fallback.
+- Home utility cards placed over the photographic canvas, including Qibla and Masbaha, use `.home-glass-surface` as well as the controlled dark wash. Theme foreground, muted, border, and nested-control tokens must therefore resolve to the on-media palette in Light, Midnight, and Dark modes; a parent `text-white` utility alone is insufficient because semantic child utilities override inherited color.
 - Text strong/default/muted
 - Primary and on-primary
 - Border passive/control

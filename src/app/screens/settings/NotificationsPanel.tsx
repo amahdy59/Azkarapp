@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { FIELD_CONTROL_CLASS, FIELD_LABEL_CLASS, FormField } from "../../components/FormField";
 import { Button } from "../../components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
 import { Bell, CheckCircle2, Info, MapPin } from "../../components/icons";
 import { t } from "../../i18n";
 import { formatNumerals } from "../../formatting";
@@ -397,21 +398,29 @@ export function NotificationsPanel({
             )}
 
             <div className="pt-2">
-              <label htmlFor="calculation-method-select" className="block text-sm font-bold text-foreground mb-1.5">
+              <p id="calculation-method-label" className="mb-1.5 block text-sm font-bold text-foreground">
                 {t(language, "notifications.calculationMethod")}
-              </label>
-              <select
-                id="calculation-method-select"
-                value={locationSettings?.calculationMethod ?? 5}
-                onChange={(e) => void handleMethodChange(Number(e.target.value))}
-                className="w-full h-11 rounded-xl border border-border-control bg-background px-3 text-sm font-semibold text-foreground"
+              </p>
+              <Select
+                value={String(locationSettings?.calculationMethod ?? 5)}
+                onValueChange={(value) => void handleMethodChange(Number(value))}
+                dir={isArabic ? "rtl" : "ltr"}
               >
-                {Object.values(CALCULATION_METHODS).map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {isArabic ? m.nameArabic : m.nameEnglish}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger
+                  id="calculation-method-select"
+                  aria-labelledby="calculation-method-label"
+                  className="font-semibold"
+                >
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.values(CALCULATION_METHODS).map((method) => (
+                    <SelectItem key={method.id} value={String(method.id)}>
+                      {isArabic ? method.nameArabic : method.nameEnglish}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <fieldset className="space-y-2 border-t border-border pt-4">
@@ -665,33 +674,38 @@ export function NotificationsPanel({
             </button>
           </div>
 
-          <label
-            className="mt-4 flex flex-col gap-1.5 text-label font-bold text-foreground"
-            htmlFor="prayer-reminder-lead"
-          >
-            <span>{t(language, "notifications.prayerReminderLead")}</span>
-            <select
-              id="prayer-reminder-lead"
-              value={reminders.prayer.leadMinutes}
+          <div className="mt-4 flex flex-col gap-1.5 text-label font-bold text-foreground">
+            <span id="prayer-reminder-lead-label">{t(language, "notifications.prayerReminderLead")}</span>
+            <Select
+              value={String(reminders.prayer.leadMinutes)}
               disabled={!reminders.prayer.enabled}
-              onChange={(event) =>
+              onValueChange={(value) =>
                 onRemindersChange({
                   ...reminders,
                   prayer: {
                     ...reminders.prayer,
-                    leadMinutes: Number(event.target.value) as PrayerReminderLeadMinutes,
+                    leadMinutes: Number(value) as PrayerReminderLeadMinutes,
                   },
                 })
               }
-              className={FIELD_CONTROL_CLASS}
+              dir={isArabic ? "rtl" : "ltr"}
             >
-              {[10, 15].map((minutes) => (
-                <option key={minutes} value={minutes}>
-                  {t(language, "notifications.minutesBefore", { minutes: formatNumerals(minutes, language) })}
-                </option>
-              ))}
-            </select>
-          </label>
+              <SelectTrigger
+                id="prayer-reminder-lead"
+                aria-labelledby="prayer-reminder-lead-label"
+                className="font-semibold"
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {[10, 15].map((minutes) => (
+                  <SelectItem key={minutes} value={String(minutes)}>
+                    {t(language, "notifications.minutesBefore", { minutes: formatNumerals(minutes, language) })}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </section>
 
         <section aria-labelledby="gentle-reminders-title">

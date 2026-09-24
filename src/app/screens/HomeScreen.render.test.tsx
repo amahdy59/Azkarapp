@@ -282,12 +282,14 @@ describe("HomeScreen document outline", () => {
 
     const qiblaBtn = screen.getByTestId("home-tool-qibla");
     expect(qiblaBtn).toBeInTheDocument();
+    expect(qiblaBtn).toHaveClass("home-glass-surface", "text-on-media");
     expect(screen.getByText("القبلة")).toBeInTheDocument();
     fireEvent.click(qiblaBtn);
     expect(onOpenQibla).toHaveBeenCalledTimes(1);
 
     const masbahaBtn = screen.getByTestId("home-tool-masbaha");
     expect(masbahaBtn).toBeInTheDocument();
+    expect(masbahaBtn).toHaveClass("home-glass-surface", "text-on-media");
     expect(screen.getByText("المسبحة")).toBeInTheDocument();
     fireEvent.click(masbahaBtn);
     expect(onOpenMasbaha).toHaveBeenCalledTimes(1);

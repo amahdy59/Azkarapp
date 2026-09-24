@@ -5,6 +5,7 @@ import { AUDIO_CATALOG } from "../audio/audioManifest";
 import { QURAN_AUDIO_REVIEW_CANDIDATES } from "../audio/audioReviewCandidates";
 import { createArabicTextFingerprint } from "../audio/arabicMatching";
 import { getAudioBaseUrl } from "../audio/resolveAudioAsset";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 
 type ReviewDecision = "unreviewed" | "manually-reviewed" | "approved" | "rejected" | "needs-new-recording";
 type ReviewRecord = { decision: ReviewDecision; notes: string };
@@ -139,18 +140,21 @@ export function AudioContentReviewScreen({ onClose }: { onClose: () => void }) {
                 >
                   Play review recording
                 </button>
-                <select
-                  aria-label={`Review decision for ${zikr.id}`}
+                <Select
                   value={review.decision}
-                  onChange={(event) => updateReview(zikr.id, { decision: event.currentTarget.value as ReviewDecision })}
-                  className="min-h-11 rounded-xl border border-border-control bg-background px-3"
+                  onValueChange={(value) => updateReview(zikr.id, { decision: value as ReviewDecision })}
                 >
-                  <option value="unreviewed">Unreviewed</option>
-                  <option value="manually-reviewed">Manually reviewed</option>
-                  <option value="approved">Approved in review notes</option>
-                  <option value="rejected">Rejected</option>
-                  <option value="needs-new-recording">Needs new recording</option>
-                </select>
+                  <SelectTrigger className="font-semibold" aria-label={`Review decision for ${zikr.id}`}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="unreviewed">Unreviewed</SelectItem>
+                    <SelectItem value="manually-reviewed">Manually reviewed</SelectItem>
+                    <SelectItem value="approved">Approved in review notes</SelectItem>
+                    <SelectItem value="rejected">Rejected</SelectItem>
+                    <SelectItem value="needs-new-recording">Needs new recording</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <label className="mt-3 grid gap-1 text-sm font-bold">
                 Reviewer notes

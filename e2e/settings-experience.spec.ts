@@ -233,15 +233,16 @@ test("prayer reminder lead time is configurable and persisted after opt-in", asy
   const reminderSwitch = page.getByRole("switch", { name: "Prayer-time reminders" });
   await expect(reminderSwitch).toHaveAttribute("aria-checked", "true");
   const lead = page.locator("#prayer-reminder-lead");
-  await lead.selectOption("10");
-  await expect(lead).toHaveValue("10");
+  await lead.click();
+  await page.getByRole("option", { name: "10 minutes before prayer" }).click();
+  await expect(lead).toHaveText("10 minutes before prayer");
 
   await page.reload();
   await page.getByRole("navigation").first().waitFor();
   await openSettings(page);
   await page.getByRole("button", { name: /Prayer Times & Reminders/ }).click();
   await expect(page.getByRole("switch", { name: "Prayer-time reminders" })).toHaveAttribute("aria-checked", "true");
-  await expect(page.locator("#prayer-reminder-lead")).toHaveValue("10");
+  await expect(page.locator("#prayer-reminder-lead")).toHaveText("10 minutes before prayer");
   await expectNoWcagViolations(page);
 });
 

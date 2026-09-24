@@ -301,7 +301,7 @@ function MainDhikrGroupCard({
           /* 32px clear of the name. The column used to space every child
              equally, so this gap could not grow without shoving the
              after-prayer dots down with it. */
-          className={`${compact && !onMedia ? "mt-0.5" : "mt-8 rounded-full px-3 py-1"} inline-flex items-center justify-center whitespace-nowrap text-xs font-bold ${
+          className={`${compact && !onMedia ? "mt-0.5" : "mt-8"} inline-flex items-center justify-center whitespace-nowrap rounded-full px-3 py-1 text-xs font-bold ${
             isCompleted
               ? "bg-success text-success-foreground shadow-sm"
               : showRecommended

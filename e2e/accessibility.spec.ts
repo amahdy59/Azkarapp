@@ -323,6 +323,56 @@ test("custom counter has no automatically detectable WCAG A/AA violations", asyn
   await expectNoWcagViolations(page);
 });
 
+test("Light Home keeps Qibla and Masbaha copy on the on-media palette", async ({ page }) => {
+  await enterEnglishGuestMode(page);
+  await page.getByTestId("nav-settings").click();
+  await page.getByTestId("theme-option-light").click();
+  await page.goto("/#/home");
+
+  for (const testId of ["home-tool-qibla", "home-tool-masbaha"]) {
+    const tool = page.getByTestId(testId);
+    await expect(tool).toBeVisible();
+    await expect(tool).toHaveClass(/home-glass-surface/);
+
+    const colors = await tool.evaluate((element) => {
+      const title = element.querySelector<HTMLElement>(".text-foreground");
+      const detail = element.querySelector<HTMLElement>(".text-muted-foreground");
+      return {
+        title: title ? getComputedStyle(title).color : "",
+        detail: detail ? getComputedStyle(detail).color : "",
+      };
+    });
+    expect(colors.title).toBe("rgb(255, 255, 255)");
+    expect(colors.detail).toBe("rgba(255, 255, 255, 0.9)");
+  }
+});
+
+test("audio voice choices use the rounded themed menu in Light mode", async ({ page }) => {
+  await enterEnglishGuestMode(page);
+  await page.getByTestId("nav-settings").click();
+  await page.getByTestId("theme-option-light").click();
+  await page.goto("/#/settings/audio");
+
+  const trigger = page.getByRole("combobox", { name: "Azkar and dua voice" });
+  await expect(trigger).toBeVisible();
+  await expect(page.locator("select")).toHaveCount(0);
+  await trigger.click();
+
+  const menu = page.locator('[data-slot="select-content"]');
+  const option = page.getByRole("option", { name: "Muhammad Moataz" });
+  await expect(menu).toBeVisible();
+  await expect(option).toBeVisible();
+  expect(parseFloat(await menu.evaluate((element) => getComputedStyle(element).borderRadius))).toBeGreaterThanOrEqual(
+    16,
+  );
+  expect(parseFloat(await option.evaluate((element) => getComputedStyle(element).borderRadius))).toBeGreaterThanOrEqual(
+    12,
+  );
+  await page.keyboard.press("Escape");
+  await expect(menu).toBeHidden();
+  await expectNoWcagViolations(page);
+});
+
 test("More and Qibla have no automatically detectable WCAG A/AA violations", async ({ page }) => {
   await enterEnglishGuestMode(page);
   await page.getByTestId("nav-settings").click();

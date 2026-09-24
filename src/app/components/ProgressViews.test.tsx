@@ -50,6 +50,7 @@ describe("ProgressViews components", () => {
     expect(screen.getByText("أذكار المساء")).toBeInTheDocument();
     expect(screen.getByText("أذكار النوم")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "أذكار الصباح - مكتملة" })).toBeInTheDocument();
+    expect(screen.getByText("مكتملة")).toHaveClass("rounded-full", "px-3", "py-1");
   });
 
   it("adds the recommendation to a routine's name without displacing its status", () => {

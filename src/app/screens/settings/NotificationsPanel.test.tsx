@@ -1,10 +1,15 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import userEvent from "@testing-library/user-event";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_APP_STATE } from "../../state";
 import { NotificationsPanel } from "./NotificationsPanel";
 
 describe("NotificationsPanel", () => {
   const originalNotification = window.Notification;
+
+  beforeEach(() => {
+    Element.prototype.scrollIntoView = vi.fn();
+  });
 
   afterEach(() => {
     if (originalNotification) {
@@ -37,7 +42,8 @@ describe("NotificationsPanel", () => {
     expect(onRemindersChange).not.toHaveBeenCalled();
   });
 
-  it("enables prayer reminders only with permission and saves the selected lead time", () => {
+  it("enables prayer reminders only with permission and saves the selected lead time", async () => {
+    const user = userEvent.setup();
     Object.defineProperty(window, "Notification", {
       configurable: true,
       value: { permission: "granted", requestPermission: vi.fn() },
@@ -74,7 +80,8 @@ describe("NotificationsPanel", () => {
         onBack={vi.fn()}
       />,
     );
-    fireEvent.change(screen.getByRole("combobox", { name: "Reminder time" }), { target: { value: "10" } });
+    await user.click(screen.getByRole("combobox", { name: "Reminder time" }));
+    await user.click(screen.getByRole("option", { name: "10 minutes before prayer" }));
     expect(onRemindersChange).toHaveBeenLastCalledWith(
       expect.objectContaining({ prayer: { enabled: true, leadMinutes: 10 } }),
     );

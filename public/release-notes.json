@@ -1,15 +1,15 @@
 {
   "ar": [
-    "يمكن الآن فتح أقسام المحفوظات وفترات التقدم وصفحات الإعدادات مباشرةً من رابط، مع رجوع المتصفح إلى المكان المتوقع.",
-    "أصبحت روابط التنقل والمجموعات تعمل كرابط حقيقي مع الحفاظ على تجربة التطبيق السريعة.",
-    "أصبحت واجهة الصفحة الرئيسية عند التمرير أكثر هدوءاً ووضوحاً، مع حركة قارئ وتبويبات ومشغل صوت أكثر سلاسة.",
-    "تقدم القبلة والعدادات تأكيداً هادئاً ودقيقاً، ولا تعمل الاهتزازات إلا عند تفعيلها."
+    "تظهر قوائم اختيار الصوت وإعدادات الصلاة الآن بتصميم التطبيق وألوانه بدلاً من قائمة داكنة تابعة للنظام.",
+    "تحافظ علامة «مكتملة» في صفحة التقدم على شكلها الدائري ومساحتها الواضحة في الشاشات الصغيرة.",
+    "أصبحت بطاقتا القبلة والمسبحة واضحتين بالكامل فوق صورة الصفحة الرئيسية عند استخدام الوضع الفاتح.",
+    "تستخدم جميع خيارات القوائم حوافاً مستديرة وحالات تحديد وتركيز متسقة."
   ],
   "en": [
-    "Saved items, Progress periods, and Settings pages now have direct links, with browser Back returning to the expected place.",
-    "Primary navigation and collection destinations now behave as real links while keeping the app experience fast.",
-    "The scrolled Home header is calmer and clearer, while Reader movement, tabs, and the audio player transition more smoothly.",
-    "Qibla alignment and counters provide calm, precise confirmation, and vibration only runs when enabled."
+    "Voice and prayer-setting choices now open in the app's own colors and style instead of a dark system menu.",
+    "Completed labels on Progress keep their rounded pill shape and clear spacing on compact screens.",
+    "Qibla and Masbaha cards are now fully readable over the Home photograph in Light mode.",
+    "Every choice menu now uses consistent rounded items, selection feedback, and focus treatment."
   ],
-  "release": "2026-09-24-navigation-motion"
+  "release": "2026-09-24-visual-remediation"
 }

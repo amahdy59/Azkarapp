@@ -3927,3 +3927,17 @@ null` shape, so a record written before this change still loads and still
 - **Files/contracts to update:** Routing, shell links, Reader/Qibla/Mushaf/audio/motion components, focused tests, architecture/design/motion docs, and release notes.
 - **Tests/evidence required:** Focused unit coverage, navigation browser coverage, full quality gates, responsive evidence, and production smoke verification.
 - **Supersedes:** None.
+
+## DEC-207 — App-owned choice menus and invariant on-media/status geometry
+
+- **Date:** 2026-09-24
+- **Status:** Approved
+- **Owner:** Product owner (explicit screenshot remediation request)
+- **Related phase:** Phase 66
+- **Context:** The previous pass rounded shared Radix items but left four native HTML selects in product and review surfaces. Android therefore continued to show an unrelated dark operating-system menu in Light mode. A compact Progress branch also omitted pill radius and padding, and the Home Qibla/Masbaha glass cards applied Light-theme child foreground tokens over a dark photographic wash.
+- **Decision:** Route all choice dropdowns through the existing shared Radix Select primitive, including audio voice, prayer calculation method, prayer reminder lead time, audio-player voice, and the development review decision. Keep menu surfaces and every item token-driven and rounded. Status labels keep full pill geometry in every density. Any semantic child tokens on Home photography must be scoped by `.home-glass-surface` so Light mode resolves to the on-media palette.
+- **Why:** A dropdown, status, or utility card should retain the app's identity and legibility instead of changing appearance by browser, viewport branch, or theme cascade.
+- **Consequences:** Choice menus now look consistent across installed Android, desktop, RTL, and Light/Dark themes while preserving combobox/listbox keyboard semantics. Compact completion labels remain recognizably rounded, and Home Qibla/Masbaha copy remains readable over photography.
+- **Files/contracts to update:** Shared select/dropdown primitives, affected product choice fields, Progress status anatomy, Home utilities, focused unit/browser tests, design system, phase report, and release notes.
+- **Tests/evidence required:** No native selects in application JSX, themed overlay radius assertions, compact completion-pill assertions, Light Home on-media color assertions, focused WCAG scans, full release gates, and production smoke verification.
+- **Supersedes:** Completes the menu and Light-theme scope of DEC-206; no other decision is superseded.

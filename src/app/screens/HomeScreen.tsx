@@ -866,7 +866,7 @@ export function HomeScreen({
                     data-testid="home-tool-qibla"
                     className={`group flex items-center justify-between gap-4 rounded-3xl p-4.5 text-start transition-[background-color,border-color,transform] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                       homeVisualEffects
-                        ? "border border-white/10 bg-black/25 text-white shadow-raised hover:bg-black/35 backdrop-blur-md"
+                        ? "home-glass-surface border border-white/10 bg-black/25 text-on-media shadow-raised hover:bg-black/35 backdrop-blur-md"
                         : "border border-border/50 bg-card text-foreground shadow-raised hover:bg-muted"
                     }`}
                   >
@@ -904,7 +904,7 @@ export function HomeScreen({
                     data-testid="home-tool-masbaha"
                     className={`group flex items-center justify-between gap-4 rounded-3xl p-4.5 text-start transition-[background-color,border-color,transform] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                       homeVisualEffects
-                        ? "border border-white/10 bg-black/25 text-white shadow-raised hover:bg-black/35 backdrop-blur-md"
+                        ? "home-glass-surface border border-white/10 bg-black/25 text-on-media shadow-raised hover:bg-black/35 backdrop-blur-md"
                         : "border border-border/50 bg-card text-foreground shadow-raised hover:bg-muted"
                     }`}
                   >

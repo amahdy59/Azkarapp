@@ -18,6 +18,7 @@ import { formatNumerals } from "../formatting";
 import { getAudioVoiceName } from "../audio/audioVoices";
 import { useMediaQuery } from "../hooks/useMediaQuery";
 import { motion, useReducedMotion } from "motion/react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 
 const COPY = {
   en: {
@@ -898,20 +899,27 @@ export function FloatingAudioPlayer({
       </div>
 
       {showOptions && currentEntry.availableVoiceIds.length > 1 && (
-        <label className="mt-3 grid gap-1 text-xs font-bold text-muted-foreground">
-          {copy.voice}
-          <select
+        <div className="mt-3 grid gap-1 text-xs font-bold text-muted-foreground">
+          <span id="audio-player-voice-label">{copy.voice}</span>
+          <Select
             value={state.currentVoiceId ?? currentEntry.defaultVoiceId}
-            onChange={(event) => controller.setVoice(event.currentTarget.value)}
-            className="min-h-11 rounded-xl border border-border-control bg-background px-3 text-xs font-bold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            onValueChange={controller.setVoice}
+            dir={language === "ar" ? "rtl" : "ltr"}
           >
-            {currentEntry.availableVoiceIds.map((vId) => (
-              <option key={vId} value={vId}>
-                {getAudioVoiceName(vId, language) ?? currentEntry.segmentsByVoice[vId]?.[0]?.voiceName ?? vId}
-              </option>
-            ))}
-          </select>
-        </label>
+            <SelectTrigger aria-labelledby="audio-player-voice-label" size="sm" className="text-xs font-bold">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {currentEntry.availableVoiceIds.map((voiceId) => (
+                <SelectItem key={voiceId} value={voiceId}>
+                  {getAudioVoiceName(voiceId, language) ??
+                    currentEntry.segmentsByVoice[voiceId]?.[0]?.voiceName ??
+                    voiceId}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       )}
 
       {/* Whose recitation this is, always on screen rather than behind a

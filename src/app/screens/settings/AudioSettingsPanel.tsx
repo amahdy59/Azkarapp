@@ -3,6 +3,7 @@ import type { AudioController } from "../../audio/AudioProvider";
 import { loadAudioPreferences, saveAudioPreferences } from "../../audio/audioPreferences";
 import { getAudioVoices } from "../../audio/audioVoices";
 import { Headphones } from "../../components/icons";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
 import { t } from "../../i18n";
 import type { AppLanguage } from "../../types";
 import { SectionLabel, SettingsToggleRow, SubHeader } from "./SettingsPrimitives";
@@ -49,23 +50,30 @@ export function AudioSettingsPanel({
       <div className="flex-1 overflow-y-auto pb-8">
         <SectionLabel label={t(language, "settings.audioVoice")} />
         <div className="mx-4 mt-2 rounded-3xl border border-border/40 bg-card p-4 shadow-raised">
-          <label className="text-sm font-semibold text-foreground" htmlFor="preferred-audio-voice">
+          <p id="preferred-audio-voice-label" className="text-sm font-semibold text-foreground">
             {t(language, "settings.preferredReciter")}
-          </label>
+          </p>
           <p className="mt-1 text-xs leading-5 text-muted-foreground">{t(language, "settings.preferredReciterHint")}</p>
-          <select
-            id="preferred-audio-voice"
+          <Select
             value={voices.some((voice) => voice.id === preferences.duaVoiceId) ? preferences.duaVoiceId : voices[0]?.id}
-            onChange={(event) => saveVoice(event.target.value)}
-            className="mt-3 h-11 w-full rounded-xl border border-border-control bg-background px-3 text-sm font-bold text-foreground"
+            onValueChange={saveVoice}
             dir={language === "ar" ? "rtl" : "ltr"}
           >
-            {voices.map((voice) => (
-              <option key={voice.id} value={voice.id}>
-                {language === "ar" ? voice.nameArabic : voice.nameEnglish}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger
+              id="preferred-audio-voice"
+              aria-labelledby="preferred-audio-voice-label"
+              className="mt-3 font-bold"
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {voices.map((voice) => (
+                <SelectItem key={voice.id} value={voice.id}>
+                  {language === "ar" ? voice.nameArabic : voice.nameEnglish}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <SectionLabel label={t(language, "settings.playbackSpeed")} />
