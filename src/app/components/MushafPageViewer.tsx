@@ -963,7 +963,6 @@ function MushafPageCanvas({
         anchorEl={activeWord?.anchor ?? null}
         language={language}
         direction={direction}
-        showSource
         onClose={() => setActiveWord(null)}
       />
     </div>

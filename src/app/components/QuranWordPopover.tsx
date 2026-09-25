@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ChevronUp } from "./icons";
-import { QURAN_WORD_MEANING_SOURCE, type QuranWordMeaning } from "../content/quranWordMeanings";
+import { type QuranWordMeaning } from "../content/quranWordMeanings";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
@@ -26,7 +26,6 @@ export function QuranWordPopover({
   language,
   direction,
   onShowAll,
-  showSource = false,
   onClose,
 }: {
   meanings: QuranWordMeaning[] | null;
@@ -34,7 +33,6 @@ export function QuranWordPopover({
   language: AppLanguage;
   direction: "ltr" | "rtl";
   onShowAll?: () => void;
-  showSource?: boolean;
   onClose: () => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -167,16 +165,11 @@ export function QuranWordPopover({
           </span>
         </div>
 
-        <div className="flex min-w-0 items-center justify-between gap-2 border-t border-border/40 pt-2 sm:w-40 sm:flex-col sm:items-stretch sm:justify-center sm:border-s sm:border-t-0 sm:ps-4 sm:pt-0">
+        <div className="flex min-w-0 items-center justify-between gap-2 border-t border-border/40 pt-2 sm:flex-col sm:items-end sm:justify-center sm:border-s sm:border-t-0 sm:ps-4 sm:pt-0">
           <div className="flex min-w-0 flex-col items-start gap-1">
             <bdi className="inline-flex items-center rounded-md bg-muted/60 px-1.5 py-0.5 text-micro font-bold text-muted-foreground">
               {t(language, "reader.ayahLabel", { ayah: formatNumerals(primary.ayahNumber, language) })}
             </bdi>
-            {showSource && (
-              <span className="max-w-full text-micro font-semibold leading-snug text-muted-foreground">
-                {language === "ar" ? QURAN_WORD_MEANING_SOURCE.nameArabic : QURAN_WORD_MEANING_SOURCE.nameEnglish}
-              </span>
-            )}
           </div>
           {onShowAll && (
             <button

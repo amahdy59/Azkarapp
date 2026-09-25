@@ -17,7 +17,10 @@ const routineModes = {
 } as const;
 
 describe("HomeScreen quick access", () => {
-  afterEach(() => vi.useRealTimers());
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.useRealTimers();
+  });
 
   it("replaces the sleep routine card with a focused dua card in the last third of the night", () => {
     vi.useFakeTimers();
@@ -331,5 +334,64 @@ describe("HomeScreen document outline", () => {
     const masbahaBtn = screen.getByTestId("home-tool-masbaha");
     expect(masbahaBtn).toHaveClass("bg-card", "text-foreground");
     expect(masbahaBtn).not.toHaveClass("hero-glass");
+  });
+
+  it("cycles evidence with incremented offset when clicking the reminder refresh button", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 7, 7, 9, 5));
+    const spyContextual = vi.spyOn(dailyEvidence, "getContextualEvidence");
+
+    render(
+      <HomeScreen
+        completed={emptyProgress()}
+        routineModes={routineModes}
+        onResume={vi.fn()}
+        language="ar"
+        direction="rtl"
+        dailyCompletions={[]}
+        prayerTracking={[]}
+      />,
+    );
+
+    const refreshBtn = screen.getByTestId("daily-evidence-refresh");
+    expect(refreshBtn).toBeInTheDocument();
+
+    const initialOffsetCalls = spyContextual.mock.calls.map((call) => call[3]);
+    expect(initialOffsetCalls).toContain(0);
+
+    act(() => {
+      fireEvent.click(refreshBtn);
+    });
+
+    const afterClickCalls = spyContextual.mock.calls.map((call) => call[3]);
+    expect(afterClickCalls).toContain(1);
+  });
+
+  it("rotates evidence slot key automatically when 30 minutes pass", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 7, 7, 9, 5));
+    const spyContextual = vi.spyOn(dailyEvidence, "getContextualEvidence");
+
+    render(
+      <HomeScreen
+        completed={emptyProgress()}
+        routineModes={routineModes}
+        onResume={vi.fn()}
+        language="ar"
+        direction="rtl"
+        dailyCompletions={[]}
+        prayerTracking={[]}
+      />,
+    );
+
+    const initialKey = spyContextual.mock.calls[0]?.[0];
+    expect(initialKey).toContain("-s30-");
+
+    act(() => {
+      vi.advanceTimersByTime(30 * 60 * 1000);
+    });
+
+    const latestKey = spyContextual.mock.calls.at(-1)?.[0];
+    expect(latestKey).not.toBe(initialKey);
   });
 });

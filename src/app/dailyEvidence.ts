@@ -167,6 +167,19 @@ export function getReminderContexts(input: {
 }
 
 /**
+ * Calculates a deterministic time-slot key for rotating reminders.
+ * Standard intervals are 30 minutes. Extended devotional intervals (such as
+ * during Dhuha or before Fajr) linger for 45 minutes to encourage contemplation
+ * and avoid rapid repetition across small pools.
+ */
+export function getReminderSlotKey(dayKey: string, now: Date = new Date(), isExtendedWindow = false): string {
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const intervalMinutes = isExtendedWindow ? 45 : 30;
+  const slot = Math.floor(currentMinutes / intervalMinutes);
+  return `${dayKey}-s${intervalMinutes}-${slot}`;
+}
+
+/**
  * One reviewed item for this moment, stable for the whole day.
  *
  * Keyed on the day and the context together, so moving from the evening pool to
@@ -178,11 +191,13 @@ export function getContextualEvidence(
   dayKey: string,
   language: AppLanguage,
   contexts: readonly ReminderContext[],
+  offset = 0,
 ): { evidence: DailyEvidence; context: ReminderContext } | null {
   for (const context of contexts) {
     const pool = context === "general" ? POOL : POOL.filter((zikr) => zikr.category === context);
     if (pool.length === 0) continue;
-    const zikr = pool[hashDayKey(`${dayKey}|${context}`) % pool.length]!;
+    const baseIndex = hashDayKey(`${dayKey}|${context}`);
+    const zikr = pool[(baseIndex + offset) % pool.length]!;
     // One shaping function, so the Arabic fallbacks cannot diverge between the
     // daily card and this one.
     return { evidence: shapeEvidence(zikr, language), context };
@@ -209,11 +224,13 @@ export function selectLibraryEvidence(
   dayKey: string,
   language: AppLanguage,
   contexts: readonly ReminderContext[],
+  offset = 0,
 ): { evidence: DailyEvidence; context: ReminderContext } | null {
   for (const context of contexts) {
     const pool = library.filter((source) => source.contexts.includes(context));
     if (pool.length === 0) continue;
-    const source = pool[hashDayKey(`${dayKey}|${context}`) % pool.length]!;
+    const baseIndex = hashDayKey(`${dayKey}|${context}`);
+    const source = pool[(baseIndex + offset) % pool.length]!;
     const evidence = shapeLibrarySource(source, verses, language);
     if (evidence) return { evidence, context };
   }

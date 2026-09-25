@@ -5,7 +5,19 @@ import { formatNumerals } from "../formatting";
 import { HomeCard } from "./HomeCard";
 import { ProductImage } from "./ProductImage";
 import { SegmentedControl } from "./SegmentedControl";
-import { ArrowLeft, ArrowRight, Bookmark, BookOpen, Clock, Sparkles, Heart, Sun, MoonStar, Moon } from "./icons";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Bookmark,
+  BookOpen,
+  Clock,
+  Sparkles,
+  Heart,
+  Sun,
+  MoonStar,
+  Moon,
+  RefreshCw,
+} from "./icons";
 import { HadithWeakChainBadge } from "./ZikrComponents";
 
 export type HomeSavedSource = "main" | "comprehensive" | "friday";
@@ -480,11 +492,13 @@ export function DailyEvidenceCard({
   language,
   direction,
   evidence,
+  onRefresh,
   onGlass = false,
 }: {
   language: AppLanguage;
   direction: "ltr" | "rtl";
   evidence: DailyEvidence;
+  onRefresh?: () => void;
   /**
    * Rendered over the hero photograph rather than on the page ground.
    *
@@ -507,23 +521,40 @@ export function DailyEvidenceCard({
       dir={direction}
       className="flex min-h-0 flex-1 flex-col gap-3"
     >
-      <div className="flex items-center gap-2">
-        <span
-          className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${
-            onGlass
-              ? "border border-white/20 bg-on-media-surface/60 text-on-media-accent"
-              : "bg-primary/10 text-primary"
-          }`}
-          aria-hidden="true"
-        >
-          <BookOpen size={18} />
-        </span>
-        <h2
-          id="home-evidence-heading"
-          className={`text-subtitle font-bold ${onGlass ? "text-on-media" : "text-foreground"}`}
-        >
-          {t(language, "home.dailyEvidence")}
-        </h2>
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-2">
+          <span
+            className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${
+              onGlass
+                ? "border border-white/20 bg-on-media-surface/60 text-on-media-accent"
+                : "bg-primary/10 text-primary"
+            }`}
+            aria-hidden="true"
+          >
+            <BookOpen size={18} />
+          </span>
+          <h2
+            id="home-evidence-heading"
+            className={`truncate text-subtitle font-bold ${onGlass ? "text-on-media" : "text-foreground"}`}
+          >
+            {t(language, "home.dailyEvidence")}
+          </h2>
+        </div>
+
+        {onRefresh && (
+          <button
+            type="button"
+            onClick={onRefresh}
+            aria-label={t(language, "home.nextDailyEvidence")}
+            title={t(language, "home.nextDailyEvidence")}
+            data-testid="daily-evidence-refresh"
+            className={`-my-1.5 -me-1.5 flex size-11 shrink-0 items-center justify-center rounded-full transition-transform hover:opacity-80 active:scale-90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring motion-reduce:transition-none ${
+              onGlass ? "text-on-media-muted hover:text-on-media" : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <RefreshCw size={16} aria-hidden="true" />
+          </button>
+        )}
       </div>
 
       {/* The narration leads, in the reader's language where one was reviewed.

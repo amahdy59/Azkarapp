@@ -150,4 +150,12 @@ describe("choosing from the library", () => {
     expect(picked?.evidence.hadithInArabic).toBe(true);
     expect(/[؀-ۿ]/.test(picked!.evidence.benefit)).toBe(true);
   });
+
+  it("cycles through the context pool when offset increments", () => {
+    const first = selectLibraryEvidence(RELEVANT_NOW_LIBRARY, RELEVANT_NOW_VERSES, "2026-09-06", "ar", ["dhuha"], 0);
+    const second = selectLibraryEvidence(RELEVANT_NOW_LIBRARY, RELEVANT_NOW_VERSES, "2026-09-06", "ar", ["dhuha"], 1);
+    expect(first?.evidence.hadith).toBeTruthy();
+    expect(second?.evidence.hadith).toBeTruthy();
+    expect(second?.evidence.hadith).not.toBe(first?.evidence.hadith);
+  });
 });

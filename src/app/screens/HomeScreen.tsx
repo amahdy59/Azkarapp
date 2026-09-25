@@ -4,7 +4,12 @@ import { getQiblaBearing } from "../qibla";
 import { PalmTreeMark } from "../components/GardenMarks";
 import { TodayRoutineGarden } from "../components/RoutineGarden";
 import { TranquilityCompletionCard } from "../components/TranquilityCompletionCard";
-import { getContextualEvidence, getReminderContexts, selectLibraryEvidence } from "../dailyEvidence";
+import {
+  getContextualEvidence,
+  getReminderContexts,
+  getReminderSlotKey,
+  selectLibraryEvidence,
+} from "../dailyEvidence";
 import type { DayMomentContext, PrayerMomentContext, ReminderContext } from "../types";
 import { DailyEvidenceCard, FridayHomeCard, PrayerRoutineCard } from "../components/HomeCards";
 import { PrayerMomentPanel } from "../components/PrayerMomentPanel";
@@ -444,9 +449,25 @@ export function HomeScreen({
     });
   }, [leadingPrayer, locationSettings, now, reminderInfo.categoryId]);
 
+  const isExtendedDevotionalWindow =
+    reminderContexts.includes("dhuha") ||
+    reminderContexts.includes("before_fajr") ||
+    reminderContexts.includes("last_third");
+
+  const reminderSlotKey = useMemo(
+    () => getReminderSlotKey(todayKey, now, isExtendedDevotionalWindow),
+    [isExtendedDevotionalWindow, now, todayKey],
+  );
+
+  const [manualEvidenceOffset, setManualEvidenceOffset] = useState(0);
+
+  useEffect(() => {
+    setManualEvidenceOffset(0);
+  }, [reminderContexts, reminderSlotKey]);
+
   const contextualEvidence = useMemo(
-    () => getContextualEvidence(todayKey, language, reminderContexts),
-    [language, reminderContexts, todayKey],
+    () => getContextualEvidence(reminderSlotKey, language, reminderContexts, manualEvidenceOffset),
+    [language, manualEvidenceOffset, reminderContexts, reminderSlotKey],
   );
 
   /* The reviewed source library is fetched after first paint and never before.
@@ -464,7 +485,14 @@ export function HomeScreen({
       ]);
       if (cancelled) return;
       setLibraryEvidence(
-        selectLibraryEvidence(RELEVANT_NOW_LIBRARY, RELEVANT_NOW_VERSES, todayKey, language, reminderContexts),
+        selectLibraryEvidence(
+          RELEVANT_NOW_LIBRARY,
+          RELEVANT_NOW_VERSES,
+          reminderSlotKey,
+          language,
+          reminderContexts,
+          manualEvidenceOffset,
+        ),
       );
     };
 
@@ -482,7 +510,7 @@ export function HomeScreen({
       if (typeof window.cancelIdleCallback === "function") window.cancelIdleCallback(idle);
       else window.clearTimeout(idle);
     };
-  }, [language, reminderContexts, todayKey]);
+  }, [language, manualEvidenceOffset, reminderContexts, reminderSlotKey]);
 
   /* The library wins only where it is at least as specific as what the corpus
      found. Otherwise a Friday source would displace the Asr one the reader is
@@ -791,6 +819,7 @@ export function HomeScreen({
                             language={language}
                             direction={direction}
                             evidence={dailyEvidence}
+                            onRefresh={() => setManualEvidenceOffset((prev) => prev + 1)}
                             onGlass={homeVisualEffects}
                           />
                         </div>

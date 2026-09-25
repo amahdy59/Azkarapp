@@ -1,4 +1,5 @@
-import { BookOpen, ExternalLink, FileText, Info, MessageChat, Star } from "../../components/icons";
+import { BookOpen, ExternalLink, FileText, Info, MessageChat, Star, Translate } from "../../components/icons";
+import { QURAN_WORD_MEANING_SOURCE } from "../../content/quranWordMeanings";
 import { t } from "../../i18n";
 import type { AppLanguage } from "../../types";
 import { InformationCard } from "./InformationCard";
@@ -15,6 +16,14 @@ export function SourcesPanel({ language, onBack }: { language: AppLanguage; onBa
           icon={<BookOpen size={20} aria-hidden="true" />}
           title={t(language, "sources.approachTitle")}
           body={t(language, "sources.approachBody")}
+        />
+        <InformationCard
+          icon={<Translate size={20} aria-hidden="true" />}
+          title={t(language, "sources.quranWordMeaningsTitle")}
+          body={t(language, "sources.quranWordMeaningsBody")}
+          actionLabel={t(language, "sources.quranWordMeaningsAction")}
+          actionIcon={<ExternalLink size={16} aria-hidden="true" />}
+          onAction={() => window.open(QURAN_WORD_MEANING_SOURCE.url, "_blank", "noopener,noreferrer")}
         />
         <InformationCard
           icon={<Star size={20} aria-hidden="true" />}

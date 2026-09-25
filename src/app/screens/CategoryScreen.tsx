@@ -106,6 +106,7 @@ export function CategoryScreen({
         language={language}
         isArabic={isArabic}
         direction={direction}
+        onClickText={onZikr}
         onToggleZikr={onToggleZikr}
       />
     );

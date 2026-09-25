@@ -60,7 +60,8 @@ test("the interactive word-meaning card is named, reachable, and has no automati
 
   const actionBox = await page.getByTestId("quran-word-popover-all").boundingBox();
   expect(actionBox?.height).toBeGreaterThanOrEqual(44);
-  await expect(card).toContainText("الميسر في غريب القرآن");
+  await expect(card).toContainText("الآية");
+  await expect(card).not.toContainText("الميسر في غريب القرآن");
 
   expect(await scan(page, '[data-testid="quran-word-popover"]')).toEqual([]);
 });

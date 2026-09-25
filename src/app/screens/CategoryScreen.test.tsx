@@ -101,7 +101,7 @@ describe("CategoryScreen comprehensive-dua session", () => {
     const summary = screen.getByTestId("zikr-summary-0");
     const card = summary.closest("[id^='zikr-card-']")!;
     const disclosure = within(card as HTMLElement).getByRole("button", { name: "عرض الذكر كاملاً" });
-    expect(summary.closest("[role='button']")).toBeNull();
+    expect(summary.closest("[aria-expanded]")).toBeNull();
     expect(summary.closest("[data-zikr-content]")).not.toHaveClass("pe-12");
     expect(disclosure).toHaveAttribute("aria-expanded", "false");
     expect(summary).toHaveClass("line-clamp-2");
@@ -117,8 +117,8 @@ describe("CategoryScreen comprehensive-dua session", () => {
     expect(summary).toHaveClass("line-clamp-2");
   });
 
-  it("toggles checkmark completion without triggering card expansion", async () => {
-    const onToggleZikr = vi.fn();
+  it("navigates to zikr counter on card click without triggering expansion", async () => {
+    const onZikr = vi.fn();
     const user = userEvent.setup();
     render(
       <CategoryScreen
@@ -126,8 +126,7 @@ describe("CategoryScreen comprehensive-dua session", () => {
         completed={new Set()}
         isArabic
         direction="rtl"
-        onZikr={() => undefined}
-        onToggleZikr={onToggleZikr}
+        onZikr={onZikr}
         onReset={() => undefined}
         onRepeat={() => undefined}
         onBack={() => undefined}
@@ -137,13 +136,20 @@ describe("CategoryScreen comprehensive-dua session", () => {
     const summary = screen.getByTestId("zikr-summary-0");
     const card = summary.closest("[id^='zikr-card-']")!;
     const disclosure = within(card as HTMLElement).getByRole("button", { name: "عرض الذكر كاملاً" });
-    const checkmarkBtn = screen.getAllByRole("button", { name: /غير مكتمل/ })[0];
 
-    expect(disclosure).toHaveAttribute("aria-expanded", "false");
-    await user.click(checkmarkBtn!);
+    // Uncompleted cards do not show checkmark buttons
+    expect(within(card as HTMLElement).queryByRole("button", { name: /مكتمل/ })).toBeNull();
 
-    expect(onToggleZikr).toHaveBeenCalledWith(0);
+    // Clicking the zikr navigates to its counter page
+    await user.click(summary);
+    expect(onZikr).toHaveBeenCalledWith(0);
     expect(disclosure).toHaveAttribute("aria-expanded", "false");
+
+    // Clicking disclosure expands without navigating to zikr counter
+    onZikr.mockClear();
+    await user.click(disclosure);
+    expect(disclosure).toHaveAttribute("aria-expanded", "true");
+    expect(onZikr).not.toHaveBeenCalled();
   });
 
   it("shows bounded preview with full Mushaf link when long surah is expanded", async () => {
@@ -186,5 +192,22 @@ describe("CategoryScreen comprehensive-dua session", () => {
 
     expect(screen.getAllByText("Recite once").length).toBeGreaterThan(0);
     expect(screen.queryByText("Recite 1 times")).not.toBeInTheDocument();
+  });
+
+  it("shows completed status badge when zikr is marked completed", () => {
+    render(
+      <CategoryScreen
+        catId="morning"
+        completed={new Set(["m-hm-77m"])}
+        isArabic
+        direction="rtl"
+        onZikr={() => undefined}
+        onReset={() => undefined}
+        onRepeat={() => undefined}
+        onBack={() => undefined}
+      />,
+    );
+
+    expect(screen.getByText("مكتمل")).toBeInTheDocument();
   });
 });

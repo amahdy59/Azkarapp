@@ -145,5 +145,31 @@ describe("HomeCards", () => {
 
     expect(screen.getByTestId("home-daily-evidence")).not.toHaveClass("h-full");
     expect(screen.queryByTestId("daily-evidence-open")).toBeNull();
+    expect(screen.queryByTestId("daily-evidence-refresh")).toBeNull();
+  });
+
+  it("renders subtle manual refresh button on DailyEvidenceCard when onRefresh is provided", () => {
+    const onRefresh = vi.fn();
+    render(
+      <DailyEvidenceCard
+        language="ar"
+        direction="rtl"
+        onRefresh={onRefresh}
+        evidence={{
+          hadith: "عَنْ شَدَّادِ بْنِ أَوْسٍ...",
+          hadithInArabic: true,
+          benefit: "سيد الاستغفار",
+          authenticity: "صحيح البخاري",
+          sourceReference: "البخاري 6306",
+          categoryId: "morning",
+          zikrId: "misc-ref-8",
+        }}
+      />,
+    );
+
+    const refreshBtn = screen.getByTestId("daily-evidence-refresh");
+    expect(refreshBtn).toHaveAttribute("aria-label", "عرض تذكير آخر");
+    fireEvent.click(refreshBtn);
+    expect(onRefresh).toHaveBeenCalledTimes(1);
   });
 });

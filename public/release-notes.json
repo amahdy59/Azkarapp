@@ -1,15 +1,13 @@
 {
   "ar": [
-    "أصبحت بطاقات الأذكار أكثر هدوءاً واتساعاً للنص، مع أزرار فتح وإتمام واضحة وسهلة اللمس.",
-    "تعرض شاشة الصلاة على النبي ﷺ والعداد المخصص خيارات واضحة بعد بلوغ الهدف: المتابعة بهدف أعلى أو بدء جولة جديدة أو العودة.",
-    "أصبحت بطاقات القبلة والمسبحة وملخص طريق اليوم أوضح في الثيمات المختلفة وعلى الشاشات الضيقة.",
-    "ينتقل مشغل الصوت بسلاسة بين العرضين المصغر والموسع مع ثبات أماكن الأزرار واحترام تقليل الحركة."
+    "تتجدد تذكيرات الصفحة الرئيسية تلقائياً كل نصف ساعة، مع بقائها لفترة أطول خلال أوقات السحر وصلاة الضحى لتعزيز السكينة والتدبر.",
+    "يمكنك الآن الانتقال إلى تذكير آخر يدوياً في أي وقت عبر زر التحديث الهادئ في بطاقة التذكير.",
+    "أصبحت بطاقات الأذكار ومعاني كلمات المصحف أكثر وضوحاً وسهولة في القراءة والتنقل والتفاعل."
   ],
   "en": [
-    "Dhikr cards are calmer and give the text more room, with clear expand and completion controls that remain easy to tap.",
-    "Friday Salawat and the custom counter now offer clear next steps after a goal: continue higher, begin another round, or return.",
-    "Qibla, Masbaha, and today's-path summaries are clearer across themes and fit narrow screens more reliably.",
-    "The audio player now moves smoothly between compact and expanded views while keeping actions stable and respecting reduced motion."
+    "Home reminders now rotate automatically every half hour, lingering longer during Dhuha and the late-night hours for calm reflection.",
+    "You can now explore another reminder at any time using the subtle refresh button on the reminder card.",
+    "Dhikr cards and Quran word meanings are now clearer, easier to read, and smoother to navigate."
   ],
-  "release": "2026-09-25-review-hardening"
+  "release": "2026-09-25-reminders-and-reading"
 }

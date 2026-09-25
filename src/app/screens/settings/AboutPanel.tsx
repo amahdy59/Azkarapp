@@ -9,6 +9,7 @@ import {
   MessageChat,
   Sparkles,
   Star,
+  Translate,
 } from "../../components/icons";
 import { CrescentMark } from "../../components/CrescentMark";
 import { t } from "../../i18n";
@@ -82,6 +83,17 @@ export function AboutPanel({
               }
               label={t(language, "about.references")}
               sub={t(language, "about.referencesDescription")}
+              hasDivider={true}
+              onPress={onSources}
+            />
+            <AboutRow
+              icon={
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-foreground">
+                  <Translate size={20} className="text-background" />
+                </div>
+              }
+              label={t(language, "about.quranWordMeanings")}
+              sub={t(language, "about.quranWordMeaningsDescription")}
               hasDivider={false}
               onPress={onSources}
             />

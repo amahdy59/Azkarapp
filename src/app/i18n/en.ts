@@ -81,6 +81,7 @@ const en = {
   },
   home: {
     dailyEvidence: "Relevant now",
+    nextDailyEvidence: "Show another reminder",
     estimatedMinutes: "~{count} mins",
     headerStatsAria: "Palms: {palms}, today's leaves: {leaves} of {total}, daily streak: {streak} days",
     timeFor: "Time for",
@@ -593,6 +594,8 @@ const en = {
     sourceDescription: "All azkar verified from authentic sources",
     references: "Hadith references",
     referencesDescription: "Bukhari, Muslim, Tirmidhi & more",
+    quranWordMeanings: "Qur'an Word Meanings",
+    quranWordMeaningsDescription: "Al-Muyassar fi Ghareeb Al-Qur'an — King Fahd Complex",
     support: "Support",
     sendFeedback: "Send feedback",
     faq: "Frequently asked questions",
@@ -753,6 +756,10 @@ const en = {
     reviewTitle: "Editorial safeguards",
     reviewBody:
       "New collections should not be published until Arabic text, count, translation, citation, and authenticity notes have been reviewed together.",
+    quranWordMeaningsTitle: "Al-Muyassar fi Ghareeb Al-Qur'an",
+    quranWordMeaningsBody:
+      "Unfamiliar Qur'anic word meanings are faithfully sourced from 'Al-Muyassar fi Ghareeb Al-Qur'an' published by the King Fahd Glorious Qur'an Printing Complex in Madinah, providing concise glosses during recitation.",
+    quranWordMeaningsAction: "Visit King Fahd Complex",
     interpretationTitle: "Transparent wording",
     interpretationBody:
       "The app separates source references from explanatory benefits and avoids presenting editorial wording as scripture.",

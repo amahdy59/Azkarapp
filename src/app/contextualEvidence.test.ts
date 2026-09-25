@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getContextualEvidence, getReminderContexts } from "./dailyEvidence";
+import { getContextualEvidence, getReminderContexts, getReminderSlotKey } from "./dailyEvidence";
 
 const DAY = "2026-09-06";
 
@@ -64,5 +64,43 @@ describe("choosing what is relevant now", () => {
 
   it("returns nothing rather than guessing when given no contexts", () => {
     expect(getContextualEvidence(DAY, "en", [])).toBeNull();
+  });
+
+  it("supports manual offset to cycle through available evidence deterministically", () => {
+    const base = getContextualEvidence(DAY, "ar", ["general"], 0);
+    const next = getContextualEvidence(DAY, "ar", ["general"], 1);
+    expect(base?.evidence.hadith).toBeTruthy();
+    expect(next?.evidence.hadith).toBeTruthy();
+    expect(next?.evidence.zikrId).not.toBe(base?.evidence.zikrId);
+  });
+});
+
+describe("reminder time slots", () => {
+  it("rotates every 30 minutes in standard windows", () => {
+    const at0915 = new Date(2026, 8, 6, 9, 15);
+    const at0929 = new Date(2026, 8, 6, 9, 29);
+    const at0930 = new Date(2026, 8, 6, 9, 30);
+
+    const slot0915 = getReminderSlotKey(DAY, at0915, false);
+    const slot0929 = getReminderSlotKey(DAY, at0929, false);
+    const slot0930 = getReminderSlotKey(DAY, at0930, false);
+
+    expect(slot0915).toBe(slot0929);
+    expect(slot0930).not.toBe(slot0915);
+  });
+
+  it("lingers for 45 minutes in extended devotional windows such as Dhuha and before Fajr", () => {
+    const at0915 = new Date(2026, 8, 6, 9, 15);
+    const at0940 = new Date(2026, 8, 6, 9, 40);
+    const at1005 = new Date(2026, 8, 6, 10, 5);
+
+    const slot0915 = getReminderSlotKey(DAY, at0915, true);
+    const slot0940 = getReminderSlotKey(DAY, at0940, true);
+    const slot1005 = getReminderSlotKey(DAY, at1005, true);
+
+    // 09:15 (555 min) and 09:40 (580 min) fall into the same 45-minute slot (floor(555/45) = 12, floor(580/45) = 12)
+    expect(slot0915).toBe(slot0940);
+    // 10:05 (605 min) falls into slot 13 (floor(605/45) = 13)
+    expect(slot1005).not.toBe(slot0915);
   });
 });

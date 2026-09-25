@@ -273,7 +273,7 @@ describe("KhatmahReaderScreen difficult words", () => {
     const popover = await screen.findByRole("tooltip");
     expect(popover).toHaveTextContent("المعنى");
     expect(popover).toHaveTextContent("آية ٢٥٥");
-    expect(popover).toHaveTextContent("مجمع الملك فهد");
+    expect(popover).not.toHaveTextContent("مجمع الملك فهد");
 
     await user.click(toggle);
     expect(toggle).toHaveAttribute("aria-checked", "false");

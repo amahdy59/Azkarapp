@@ -81,6 +81,7 @@ const ar = {
   },
   home: {
     dailyEvidence: "تذكير لك الآن",
+    nextDailyEvidence: "عرض تذكير آخر",
     estimatedMinutes: "{count} دقائق تقريباً",
     headerStatsAria: "أشجار النخيل: {palms}، أوراق اليوم: {leaves} من {total}، السلسلة اليومية: {streak} أيام",
     timeFor: "حان وقت",
@@ -589,6 +590,8 @@ const ar = {
     sourceDescription: "كل الأذكار موثقة من مصادر صحيحة",
     references: "مراجع الحديث",
     referencesDescription: "البخاري ومسلم والترمذي وغيرهم",
+    quranWordMeanings: "غريب القرآن",
+    quranWordMeaningsDescription: "الميسر في غريب القرآن — مجمع الملك فهد",
     support: "المساعدة",
     sendFeedback: "إرسال ملاحظات",
     faq: "الأسئلة الشائعة",
@@ -736,6 +739,10 @@ const ar = {
     referencesBody: "افتح «فائدة» في أي ذكر للاطلاع على المحتوى الداعم بالعربية والفائدة التوضيحية والمصدر المراجع.",
     reviewTitle: "ضوابط التحرير",
     reviewBody: "لا ينبغي نشر مجموعة جديدة قبل مراجعة النص العربي والعدد والترجمة والاستشهاد ودرجة الصحة معاً.",
+    quranWordMeaningsTitle: "الميسر في غريب القرآن",
+    quranWordMeaningsBody:
+      "تعتمد معاني الكلمات الغريبة الواردة في الآيات على «الميسر في غريب القرآن» الصادر عن مجمع الملك فهد لطباعة المصحف الشريف بالمدينة المنورة، لتقديم شرح موجز وميسر للمفردات أثناء القراءة.",
+    quranWordMeaningsAction: "زيارة مجمع الملك فهد",
     interpretationTitle: "صياغة شفافة",
     interpretationBody:
       "يفصل التطبيق بين مراجع المصدر والفوائد التوضيحية ولا يقدم الصياغة التحريرية بوصفها نصاً شرعياً.",

@@ -49,6 +49,24 @@ describe("AzkarListItem disclosure", () => {
     expect(screen.getByTestId("zikr-summary-0").closest("[role='button']")).toBeNull();
   });
 
+  it("shows completion badge only when card is completed and omits interactive toggle", () => {
+    vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockReturnValue(64);
+    vi.spyOn(HTMLElement.prototype, "scrollHeight", "get").mockReturnValue(64);
+
+    const { rerender } = render(
+      <AzkarListItem z={zikr} index={0} isCardCompleted={false} language="en" isArabic={false} direction="ltr" />,
+    );
+
+    expect(screen.queryByRole("button", { name: /check/i })).not.toBeInTheDocument();
+    expect(screen.queryByText("Completed")).not.toBeInTheDocument();
+
+    rerender(
+      <AzkarListItem z={zikr} index={0} isCardCompleted={true} language="en" isArabic={false} direction="ltr" />,
+    );
+
+    expect(screen.getByText("Completed")).toBeInTheDocument();
+  });
+
   it("keeps the completion control at the ordinary 44px target size", () => {
     vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockReturnValue(64);
     vi.spyOn(HTMLElement.prototype, "scrollHeight", "get").mockReturnValue(64);

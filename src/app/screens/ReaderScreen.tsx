@@ -23,8 +23,6 @@ import {
   Volume2,
   VolumeX,
   Check,
-  Minus,
-  Plus,
   ChevronDown,
   SlidersHorizontal,
 } from "../components/icons";
@@ -1041,7 +1039,7 @@ export function ReaderScreen({
 
   const renderReaderMenuItems = (layout: "mobile" | "desktop") => (
     <>
-      <DropdownMenuLabel className="px-3 pb-1 pt-2 text-xs font-bold text-muted-foreground">
+      <DropdownMenuLabel className="px-3 pb-1 pt-1.5 text-micro font-bold uppercase tracking-wider text-muted-foreground">
         {t(language, "reader.menuAudio")}
       </DropdownMenuLabel>
       <DropdownMenuGroup>
@@ -1049,9 +1047,9 @@ export function ReaderScreen({
           <DropdownMenuItem
             disabled={!audioAvailable}
             onClick={onPlayAudio}
-            className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
+            className="flex cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-sm font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
           >
-            <Volume2 size={18} />
+            <Volume2 size={16} />
             {audioAvailable ? t(language, "reader.playArabicAudio") : t(language, "reader.arabicAudioUnavailable")}
           </DropdownMenuItem>
         )}
@@ -1059,9 +1057,9 @@ export function ReaderScreen({
           <DropdownMenuItem
             disabled={!englishAudioAvailable}
             onClick={onPlayEnglishAudio}
-            className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
+            className="flex cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-sm font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
           >
-            <Volume2 size={18} />
+            <Volume2 size={16} />
             {englishAudioAvailable
               ? t(language, "reader.playEnglishAudio")
               : t(language, "reader.englishAudioUnavailable")}
@@ -1070,89 +1068,94 @@ export function ReaderScreen({
         {onPlayAllAudio && (
           <DropdownMenuItem
             onClick={onPlayAllAudio}
-            className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted"
+            className="flex cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
           >
-            <Volume2 size={18} />
+            <Volume2 size={16} />
             {t(language, "category.playAllAudio")}
           </DropdownMenuItem>
         )}
         {onRepeatAudio && (
           <DropdownMenuItem
             onClick={onRepeatAudio}
-            className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted"
+            className="flex cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
           >
-            <RotateCcw size={18} />
+            <RotateCcw size={16} />
             {t(language, "reader.repeatPrescribed")}
           </DropdownMenuItem>
         )}
       </DropdownMenuGroup>
 
-      <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
+      <DropdownMenuSeparator className="my-1 h-px bg-border/60" />
 
-      {/* Reading size, in the reader rather than only three taps away in
-          Settings — it is the one preference people reach for mid-session,
-          when the text in front of them is the thing that is too small. It
-          drives the same app-wide setting Settings does, so the two can never
-          disagree; changing it here also resizes the app's chrome. */}
-      <div className="flex items-center justify-between px-3 py-2.5">
-        <span className="text-sm font-semibold text-foreground">{t(language, "settings.textSize")}</span>
-        <div className="flex items-center gap-2 bg-muted rounded-full p-1 border border-border/50">
-          <button
-            type="button"
-            data-testid="reader-text-size-small"
-            className="flex h-8 w-10 items-center justify-center rounded-full text-muted-foreground hover:bg-background hover:text-foreground transition-colors disabled:opacity-30 disabled:hover:bg-transparent"
-            disabled={textSize === "small"}
-            aria-label={t(language, "settings.textSmall")}
-            onClick={(e) => {
-              e.stopPropagation();
-              onTextSizeChange(textSize === "large" ? "medium" : "small");
-            }}
-          >
-            <Minus size={18} />
-          </button>
-          <button
-            type="button"
-            data-testid="reader-text-size-medium"
-            className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-foreground hover:bg-background transition-colors disabled:opacity-40 disabled:hover:bg-transparent font-sans"
-            disabled={textSize === "medium"}
-            aria-label={t(language, "settings.medium")}
-            onClick={(e) => {
-              e.stopPropagation();
-              onTextSizeChange("medium");
-            }}
-          >
-            Aa
-          </button>
-          <button
-            type="button"
-            data-testid="reader-text-size-large"
-            className="flex h-8 w-10 items-center justify-center rounded-full text-muted-foreground hover:bg-background hover:text-foreground transition-colors disabled:opacity-30 disabled:hover:bg-transparent"
-            disabled={textSize === "large"}
-            aria-label={t(language, "settings.textLarge")}
-            onClick={(e) => {
-              e.stopPropagation();
-              onTextSizeChange(textSize === "small" ? "medium" : "large");
-            }}
-          >
-            <Plus size={18} />
-          </button>
+      {/* Reading size: Structured 3-option segmented control */}
+      <div className="px-2.5 py-1">
+        <div className="mb-1.5 flex items-center justify-between px-0.5">
+          <span className="text-micro font-bold uppercase tracking-wider text-muted-foreground">
+            {t(language, "settings.textSize")}
+          </span>
+          <span className="text-xs font-semibold text-primary">
+            {t(
+              language,
+              textSize === "small"
+                ? "settings.textSmall"
+                : textSize === "large"
+                  ? "settings.textLarge"
+                  : "settings.medium",
+            )}
+          </span>
+        </div>
+        <div
+          role="radiogroup"
+          aria-label={t(language, "settings.textSize")}
+          className="grid grid-cols-3 gap-1 rounded-xl border border-border/60 bg-muted/50 p-1"
+        >
+          {(
+            [
+              { value: "small", labelKey: "settings.textSmall" },
+              { value: "medium", labelKey: "settings.medium" },
+              { value: "large", labelKey: "settings.textLarge" },
+            ] as const
+          ).map((option) => {
+            const isSelected = textSize === option.value;
+            return (
+              <button
+                key={option.value}
+                type="button"
+                role="radio"
+                aria-checked={isSelected}
+                data-testid={`reader-text-size-${option.value}`}
+                aria-label={t(language, option.labelKey)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onTextSizeChange(option.value);
+                }}
+                className={`flex h-8 items-center justify-center rounded-lg text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring select-none ${
+                  isSelected
+                    ? "bg-card text-foreground shadow-xs ring-1 ring-border/80"
+                    : "text-muted-foreground hover:bg-background/50 hover:text-foreground"
+                }`}
+              >
+                {t(language, option.labelKey)}
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
+      <DropdownMenuSeparator className="my-1 h-px bg-border/60" />
 
       {/* Save & Share */}
-      <DropdownMenuLabel className="px-3 pb-1 pt-1 text-xs font-bold text-muted-foreground">
+      <DropdownMenuLabel className="px-3 pb-1 pt-1 text-micro font-bold uppercase tracking-wider text-muted-foreground">
         {t(language, "reader.menuActions")}
       </DropdownMenuLabel>
       <DropdownMenuGroup>
         <DropdownMenuItem
           onClick={handleToggleSaved}
-          className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2 text-subtitle font-medium transition-colors hover:bg-muted"
+          className="flex cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
         >
           <Bookmark
             key={String(isSaved)}
-            size={18}
+            size={16}
             className={isSaved ? "favorite-pop fill-current text-primary" : ""}
           />
           {isSaved ? t(language, "reader.unsave") : t(language, "reader.save")}
@@ -1160,31 +1163,31 @@ export function ReaderScreen({
         <DropdownMenuItem
           onClick={() => void handleShare()}
           disabled={isSharing}
-          className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2 text-subtitle font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
+          className="flex cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-sm font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
         >
-          <Share2 size={18} />
+          <Share2 size={16} />
           {t(language, "reader.share")}
         </DropdownMenuItem>
       </DropdownMenuGroup>
 
-      <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
-      <DropdownMenuLabel className="px-3 pb-1 pt-1 text-xs font-bold text-muted-foreground">
+      <DropdownMenuSeparator className="my-1 h-px bg-border/60" />
+      <DropdownMenuLabel className="px-3 pb-1 pt-1 text-micro font-bold uppercase tracking-wider text-muted-foreground">
         {t(language, "reader.menuCounter")}
       </DropdownMenuLabel>
       <DropdownMenuGroup>
         <DropdownMenuItem
           onClick={toggleSound}
           data-testid={`reader-counter-sound-toggle-${layout}`}
-          className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2 text-subtitle font-medium transition-colors hover:bg-muted"
+          className="flex cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
         >
-          {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
+          {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
           {t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={handleResetCounter}
-          className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2 text-subtitle font-medium transition-colors hover:bg-muted"
+          className="flex cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
         >
-          <RotateCcw size={18} />
+          <RotateCcw size={16} />
           {t(language, "reader.resetCounter")}
         </DropdownMenuItem>
       </DropdownMenuGroup>
@@ -1192,15 +1195,15 @@ export function ReaderScreen({
       {/* Mobile only navigation shortcut */}
       {layout === "mobile" && (
         <>
-          <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
-          <DropdownMenuLabel className="px-3 pb-1 pt-1 text-xs font-bold text-muted-foreground">
+          <DropdownMenuSeparator className="my-1 h-px bg-border/60" />
+          <DropdownMenuLabel className="px-3 pb-1 pt-1 text-micro font-bold uppercase tracking-wider text-muted-foreground">
             {t(language, "reader.menuNavigation")}
           </DropdownMenuLabel>
           <DropdownMenuItem
             onClick={onBack}
-            className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2 text-subtitle font-medium transition-colors hover:bg-muted"
+            className="flex cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
           >
-            <List size={18} />
+            <List size={16} />
             {t(language, "reader.viewAllAzkar")}
           </DropdownMenuItem>
         </>
@@ -1346,7 +1349,7 @@ export function ReaderScreen({
                     >
                       <MoreVertical size={18} />
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="min-w-[210px]">
+                    <DropdownMenuContent align="end" className="w-56">
                       {renderReaderMenuItems("desktop")}
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -1549,7 +1552,7 @@ export function ReaderScreen({
                       >
                         <MoreVertical size={20} />
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="min-w-[210px]">
+                      <DropdownMenuContent align="end" className="w-56">
                         {renderReaderMenuItems("mobile")}
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -1677,7 +1680,6 @@ export function ReaderScreen({
         anchorEl={wordMeaningSelection?.anchor ?? null}
         language={language}
         direction={direction}
-        showSource
         onShowAll={() => setWordSheetOpen(true)}
         onClose={() => setWordMeaningSelection(null)}
       />

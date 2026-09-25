@@ -130,26 +130,97 @@ export function AzkarListItem({
       id={`zikr-card-${index}`}
       ref={isActive ? activeRef : undefined}
       aria-current={isActive ? "step" : undefined}
-      className={`relative flex w-full flex-col rounded-2xl border transition-all ${
+      className={`group relative flex w-full flex-col rounded-2xl border transition-[background-color,border-color,box-shadow,opacity] duration-200 ${
         isActive
           ? "border-primary bg-primary/10 shadow-xs"
           : isCardCompleted
-            ? "border-border/40 bg-card/60 opacity-60 grayscale hover:bg-card"
-            : "border-border/40 bg-card/60 hover:bg-card hover:border-primary/35"
+            ? "border-success/30 bg-card/75 hover:border-success/50 hover:bg-card"
+            : "border-border/60 bg-card/75 hover:border-primary/40 hover:bg-card"
       }`}
     >
-      <div className="flex w-full items-center justify-between gap-2 px-3 pt-2" dir={direction}>
-        <span
-          className={`flex h-6 min-w-6 shrink-0 items-center justify-center rounded-md px-1.5 text-xs font-bold transition-colors ${
-            isActive
-              ? "border border-primary/40 bg-primary/15 text-primary shadow-xs"
-              : "bg-muted text-muted-foreground"
-          }`}
-        >
-          {formatNumerals(index + 1, language)}
-        </span>
+      <div className="flex w-full items-center justify-between gap-2 px-3.5 pt-2.5" dir={direction}>
+        <div className="flex min-w-0 items-center gap-2">
+          <span
+            className={`flex h-6 min-w-6 shrink-0 items-center justify-center rounded-md px-1.5 text-xs font-bold transition-colors ${
+              isActive
+                ? "border border-primary/40 bg-primary/15 text-primary shadow-xs"
+                : isCardCompleted
+                  ? "border border-success/30 bg-success/15 text-success"
+                  : "bg-muted text-muted-foreground"
+            }`}
+          >
+            {formatNumerals(index + 1, language)}
+          </span>
 
-        {showDisclosure && (
+          <span className="truncate text-xs font-semibold text-muted-foreground">
+            {targetCount === 1
+              ? t(language, "category.repetitionInstructionOnce")
+              : t(language, "category.repetitionInstruction", { count: formatNumerals(targetCount, language) })}
+          </span>
+        </div>
+
+        {onToggleZikr ? (
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              onToggleZikr(index);
+            }}
+            className="group relative -my-1.5 -me-1.5 flex size-11 shrink-0 items-center justify-center rounded-full transition-transform active:scale-90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            aria-label={
+              isCardCompleted
+                ? t(language, "category.completedToggle", { defaultValue: "Completed — tap to uncheck" })
+                : t(language, "category.remainingToggle", { defaultValue: "Not completed — tap to check" })
+            }
+          >
+            {isCardCompleted ? (
+              <span className="flex size-5 items-center justify-center rounded-full bg-success text-white shadow-xs dark:text-primary-foreground">
+                <Check size={12} strokeWidth={3} aria-hidden="true" />
+              </span>
+            ) : (
+              <span className="size-5 rounded-full border-2 border-border-control transition-colors group-hover:border-primary" />
+            )}
+          </button>
+        ) : isCardCompleted ? (
+          <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-success/30 bg-success/15 px-2 py-0.5 text-xs font-bold text-success shadow-xs dark:text-success">
+            <Check size={12} strokeWidth={3} aria-hidden="true" />
+            <span>{t(language, "category.completed")}</span>
+          </span>
+        ) : null}
+      </div>
+
+      <div id={detailsId} data-zikr-content className="px-3.5 pb-2 pt-1.5" dir={direction}>
+        {onClickText ? (
+          <button
+            type="button"
+            data-zikr-select
+            aria-current={isActive ? "step" : undefined}
+            aria-label={
+              ariaLabelOverride ??
+              `${formatNumerals(index + 1, language)}. ${isArabic ? z.arabicText : z.translation} — ${
+                targetCount === 1
+                  ? t(language, "category.repetitionInstructionOnce")
+                  : t(language, "category.repetitionInstruction", { count: formatNumerals(targetCount, language) })
+              }${isCardCompleted ? ` (${t(language, "category.completed")})` : ""}`
+            }
+            onClick={(event) => {
+              event.stopPropagation();
+              onClickText(index);
+            }}
+            className="block min-h-11 w-full rounded-lg text-start outline-none transition-colors focus-visible:ring-[3px] focus-visible:ring-ring"
+            dir={direction}
+          >
+            {readingContent}
+          </button>
+        ) : (
+          <div className="min-w-0 text-start" dir={direction}>
+            {readingContent}
+          </div>
+        )}
+      </div>
+
+      {showDisclosure && (
+        <div className="flex w-full items-center justify-end px-3.5 pb-2 pt-0" dir={direction}>
           <button
             type="button"
             aria-expanded={expanded}
@@ -171,75 +242,8 @@ export function AzkarListItem({
               className={`transition-transform duration-200 motion-reduce:transition-none ${expanded ? "rotate-180" : ""}`}
             />
           </button>
-        )}
-      </div>
-
-      <div id={detailsId} data-zikr-content className="px-3 pb-2 pt-1" dir={direction}>
-        {onClickText ? (
-          <button
-            type="button"
-            data-zikr-select
-            aria-current={isActive ? "step" : undefined}
-            aria-label={ariaLabelOverride}
-            onClick={(event) => {
-              event.stopPropagation();
-              onClickText(index);
-            }}
-            className="block min-h-11 w-full rounded-lg text-start outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-            dir={direction}
-          >
-            {readingContent}
-          </button>
-        ) : (
-          <div className="min-w-0 text-start" dir={direction}>
-            {readingContent}
-          </div>
-        )}
-
-        <div className="relative mt-1 flex items-center justify-between gap-2" dir={direction}>
-          <span className="text-xs font-semibold text-muted-foreground">
-            {targetCount === 1
-              ? t(language, "category.repetitionInstructionOnce")
-              : t(language, "category.repetitionInstruction", { count: formatNumerals(targetCount, language) })}
-          </span>
-
-          {onToggleZikr ? (
-            <button
-              type="button"
-              onClick={(event) => {
-                event.stopPropagation();
-                onToggleZikr(index);
-              }}
-              className="group relative -my-2 -me-2 flex size-11 shrink-0 items-center justify-center rounded-full transition-transform active:scale-90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-              aria-label={
-                isCardCompleted
-                  ? t(language, "category.completedToggle", { defaultValue: "Completed — tap to uncheck" })
-                  : t(language, "category.remainingToggle", { defaultValue: "Not completed — tap to check" })
-              }
-            >
-              {isCardCompleted ? (
-                <span className="flex size-5 items-center justify-center rounded-full bg-success text-white shadow-xs dark:text-primary-foreground">
-                  <Check size={12} strokeWidth={3} aria-hidden="true" />
-                </span>
-              ) : (
-                <span className="size-5 rounded-full border-2 border-border-control transition-colors group-hover:border-primary" />
-              )}
-            </button>
-          ) : (
-            <span className="relative flex size-5 shrink-0 items-center justify-center" aria-hidden="true">
-              <span
-                className={`flex size-5 items-center justify-center rounded-full border ${
-                  isCardCompleted
-                    ? "border-success bg-success text-white shadow-xs dark:text-primary-foreground"
-                    : "border-border-control text-transparent"
-                }`}
-              >
-                <Check size={12} strokeWidth={3} />
-              </span>
-            </span>
-          )}
         </div>
-      </div>
+      )}
 
       {expanded && showTiming && timingText && (
         <div className="flex flex-col items-start gap-3 border-t border-border/20 bg-muted/10 px-4 pb-4 pt-3">
