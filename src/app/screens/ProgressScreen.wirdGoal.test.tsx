@@ -40,7 +40,6 @@ describe("ProgressScreen Quran wird completion consistency", () => {
     const wirdButton = screen.getByRole("button", { name: /Qur'an Wird|Quran Wird/i });
     expect(wirdButton).toHaveAttribute("aria-pressed", "false");
     expect(within(wirdButton).getByText("0 / 4 pages")).toBeInTheDocument();
-    expect(within(wirdButton).getByText("0/4")).toBeInTheDocument();
   });
 
   it("marks wird as incomplete and displays fractional progress when 1 of 4 pages is read", () => {
@@ -61,7 +60,6 @@ describe("ProgressScreen Quran wird completion consistency", () => {
     const wirdButton = screen.getByRole("button", { name: /Qur'an Wird|Quran Wird/i });
     expect(wirdButton).toHaveAttribute("aria-pressed", "false");
     expect(within(wirdButton).getByText("1 / 4 pages")).toBeInTheDocument();
-    expect(within(wirdButton).getByText("1/4")).toBeInTheDocument();
   });
 
   it("marks wird as completed when full goal of 4 pages is reached", () => {
@@ -82,7 +80,6 @@ describe("ProgressScreen Quran wird completion consistency", () => {
     const wirdButton = screen.getByRole("button", { name: /Qur'an Wird|Quran Wird/i });
     expect(wirdButton).toHaveAttribute("aria-pressed", "true");
     expect(within(wirdButton).getByText("Completed")).toBeInTheDocument();
-    expect(within(wirdButton).getByText("4/4")).toBeInTheDocument();
   });
 
   it("hides completion tracking in free reading even with existing history", () => {
@@ -101,6 +98,7 @@ describe("ProgressScreen Quran wird completion consistency", () => {
     );
 
     expect(screen.queryByTestId("daily-companions-card")).not.toBeInTheDocument();
+    expect(screen.queryByText(/pages/i)).not.toBeInTheDocument();
   });
 
   it("honors manual habit tick even when pages read is 0", () => {

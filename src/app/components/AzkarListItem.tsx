@@ -24,7 +24,7 @@ export interface AzkarListItemProps {
 
 function useClampedTextOverflow(expanded: boolean, content: string) {
   const summaryRef = useRef<HTMLSpanElement>(null);
-  const [overflows, setOverflows] = useState(true);
+  const [overflows, setOverflows] = useState(() => content.length > 140);
 
   useLayoutEffect(() => {
     const summary = summaryRef.current;
@@ -33,7 +33,10 @@ function useClampedTextOverflow(expanded: boolean, content: string) {
     let active = true;
     const measure = () => {
       if (!active || summary.clientHeight === 0) return;
-      setOverflows(summary.scrollHeight > summary.clientHeight + 1);
+      // In CSS, line-clamp-2 with leading-[1.85] and Arabic diacritics (harakat) can have
+      // scrollHeight 1-3px larger than clientHeight without any line being clamped.
+      // A third line adds >= 20px. We use a threshold of 6px to prevent false positives.
+      setOverflows(summary.scrollHeight > summary.clientHeight + 6);
     };
 
     measure();
@@ -119,11 +122,6 @@ export function AzkarListItem({
           {t(language, "reader.readFullSurahInMushaf")}
         </span>
       )}
-      <span className="mt-1 block text-xs font-semibold text-muted-foreground">
-        {targetCount === 1
-          ? t(language, "category.repetitionInstructionOnce")
-          : t(language, "category.repetitionInstruction", { count: formatNumerals(targetCount, language) })}
-      </span>
     </>
   );
 
@@ -140,54 +138,16 @@ export function AzkarListItem({
             : "border-border/40 bg-card/60 hover:bg-card hover:border-primary/35"
       }`}
     >
-      <div className="flex w-full items-center justify-between gap-3 px-3 pt-3" dir={direction}>
-        <div className="flex shrink-0 items-center gap-1.5">
-          <span
-            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border text-sm font-extrabold ${
-              isActive
-                ? "border-primary bg-primary text-primary-foreground shadow-xs"
-                : "border-primary/80 bg-primary/90 text-primary-foreground shadow-xs"
-            }`}
-          >
-            {formatNumerals(index + 1, language)}
-          </span>
-
-          {onToggleZikr ? (
-            <button
-              type="button"
-              onClick={(event) => {
-                event.stopPropagation();
-                onToggleZikr(index);
-              }}
-              className="flex size-11 shrink-0 items-center justify-center rounded-full transition-transform active:scale-90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-              aria-label={
-                isCardCompleted
-                  ? t(language, "category.completedToggle", { defaultValue: "Completed — tap to uncheck" })
-                  : t(language, "category.remainingToggle", { defaultValue: "Not completed — tap to check" })
-              }
-            >
-              {isCardCompleted ? (
-                <span className="flex size-7 items-center justify-center rounded-full bg-success text-white shadow-xs dark:text-primary-foreground">
-                  <Check size={16} strokeWidth={3} aria-hidden="true" />
-                </span>
-              ) : (
-                <span className="size-6 rounded-full border-2 border-muted-foreground/50 transition-colors hover:border-primary" />
-              )}
-            </button>
-          ) : (
-            <span className="flex size-11 shrink-0 items-center justify-center" aria-hidden="true">
-              <span
-                className={`flex size-6 items-center justify-center rounded-full border ${
-                  isCardCompleted
-                    ? "border-success bg-success text-white shadow-xs dark:text-primary-foreground"
-                    : "border-muted-foreground/40 text-transparent"
-                }`}
-              >
-                <Check size={13} strokeWidth={3} />
-              </span>
-            </span>
-          )}
-        </div>
+      <div className="flex w-full items-center justify-between gap-2 px-3 pt-2" dir={direction}>
+        <span
+          className={`flex h-6 min-w-6 shrink-0 items-center justify-center rounded-md px-1.5 text-xs font-bold transition-colors ${
+            isActive
+              ? "border border-primary/40 bg-primary/15 text-primary shadow-xs"
+              : "bg-muted text-muted-foreground"
+          }`}
+        >
+          {formatNumerals(index + 1, language)}
+        </span>
 
         {showDisclosure && (
           <button
@@ -203,10 +163,10 @@ export function AzkarListItem({
               event.stopPropagation();
               toggleExpanded();
             }}
-            className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-border/70 bg-transparent text-muted-foreground transition-[color,background-color,border-color,transform] hover:border-border-control hover:bg-muted hover:text-foreground active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring motion-reduce:transition-none"
+            className="group relative -my-1 -me-1 flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring motion-reduce:transition-none"
           >
             <ChevronDown
-              size={18}
+              size={17}
               aria-hidden="true"
               className={`transition-transform duration-200 motion-reduce:transition-none ${expanded ? "rotate-180" : ""}`}
             />
@@ -214,7 +174,7 @@ export function AzkarListItem({
         )}
       </div>
 
-      <div id={detailsId} data-zikr-content className="px-3 pb-3 pt-2" dir={direction}>
+      <div id={detailsId} data-zikr-content className="px-3 pb-2 pt-1" dir={direction}>
         {onClickText ? (
           <button
             type="button"
@@ -225,7 +185,7 @@ export function AzkarListItem({
               event.stopPropagation();
               onClickText(index);
             }}
-            className="block w-full rounded-lg text-start outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            className="block min-h-11 w-full rounded-lg text-start outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             dir={direction}
           >
             {readingContent}
@@ -235,6 +195,50 @@ export function AzkarListItem({
             {readingContent}
           </div>
         )}
+
+        <div className="relative mt-1 flex items-center justify-between gap-2" dir={direction}>
+          <span className="text-xs font-semibold text-muted-foreground">
+            {targetCount === 1
+              ? t(language, "category.repetitionInstructionOnce")
+              : t(language, "category.repetitionInstruction", { count: formatNumerals(targetCount, language) })}
+          </span>
+
+          {onToggleZikr ? (
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                onToggleZikr(index);
+              }}
+              className="group relative -my-2 -me-2 flex size-11 shrink-0 items-center justify-center rounded-full transition-transform active:scale-90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              aria-label={
+                isCardCompleted
+                  ? t(language, "category.completedToggle", { defaultValue: "Completed — tap to uncheck" })
+                  : t(language, "category.remainingToggle", { defaultValue: "Not completed — tap to check" })
+              }
+            >
+              {isCardCompleted ? (
+                <span className="flex size-5 items-center justify-center rounded-full bg-success text-white shadow-xs dark:text-primary-foreground">
+                  <Check size={12} strokeWidth={3} aria-hidden="true" />
+                </span>
+              ) : (
+                <span className="size-5 rounded-full border-2 border-border-control transition-colors group-hover:border-primary" />
+              )}
+            </button>
+          ) : (
+            <span className="relative flex size-5 shrink-0 items-center justify-center" aria-hidden="true">
+              <span
+                className={`flex size-5 items-center justify-center rounded-full border ${
+                  isCardCompleted
+                    ? "border-success bg-success text-white shadow-xs dark:text-primary-foreground"
+                    : "border-border-control text-transparent"
+                }`}
+              >
+                <Check size={12} strokeWidth={3} />
+              </span>
+            </span>
+          )}
+        </div>
       </div>
 
       {expanded && showTiming && timingText && (

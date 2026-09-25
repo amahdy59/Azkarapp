@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { AuthenticZikrPicker } from "../components/AuthenticZikrPicker";
 import { CounterTargetPicker } from "../components/CounterTargetPicker";
-import { Check, Lightbulb, MoreVertical, Play, RotateCcw, Volume2, VolumeX } from "../components/icons";
+import { ArrowPrevious, Check, Lightbulb, MoreVertical, Play, RotateCcw, Volume2, VolumeX } from "../components/icons";
 import { ReadingScreenChrome } from "../components/ReadingScreenChrome";
 import { Modal } from "../components/ResponsiveSheet";
 import { useCountingSurface } from "../components/countingSurface";
@@ -387,6 +387,19 @@ export function CustomCounterScreen({
               <Button variant="outline" onClick={handleReset} size="lg" className="w-full">
                 <RotateCcw size={18} aria-hidden="true" />
                 {t(language, "counter.resetToZero")}
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  setShowCompletionDialog(false);
+                  onBack();
+                }}
+                size="lg"
+                className="w-full gap-2 text-muted-foreground hover:text-foreground"
+                data-testid="custom-counter-return-btn"
+              >
+                <ArrowPrevious size={18} data-rtl-flip aria-hidden="true" />
+                {t(language, "counter.returnToHub")}
               </Button>
             </div>
           </div>

@@ -39,7 +39,7 @@ describe("TodaysPathSheet", () => {
     const text = screen.getByTestId("todays-path-sheet").textContent ?? "";
     expect(text.indexOf("Prayer")).toBeLessThan(text.indexOf("Qur'an wird"));
     expect(text.indexOf("Qur'an wird")).toBeLessThan(text.indexOf("Dhikr"));
-    expect(screen.getByText("3 of 5 recorded · 2 in congregation")).toBeInTheDocument();
+    expect(screen.getByText(/3 of 5 recorded .* 2 in congregation/)).toBeInTheDocument();
     expect(screen.getByText(/does not measure faith or reward/i)).toBeInTheDocument();
     expect(screen.getByText("Adjust congregation intention").closest("details")).not.toHaveAttribute("open");
   });

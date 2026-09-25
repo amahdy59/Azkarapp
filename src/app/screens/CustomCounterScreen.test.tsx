@@ -201,4 +201,25 @@ describe("CustomCounterScreen Component", () => {
     const arBenefitBtn = screen.getByRole("button", { name: /الفضل والحديث/ });
     expect(arBenefitBtn).toHaveTextContent("الفائدة");
   });
+
+  it("exposes return action on completion dialog", async () => {
+    const user = userEvent.setup();
+    const onBack = vi.fn();
+    render(
+      <CustomCounterScreen
+        isArabic={false}
+        direction="ltr"
+        onBack={onBack}
+        initialMasbahaState={{ count: 32, target: 33, laps: 0 }}
+      />,
+    );
+
+    // One more click reaches target 33
+    fireEvent.click(screen.getByTestId("custom-counter-surface"));
+    expect(screen.getByRole("dialog", { name: /Goal Reached!/i })).toBeInTheDocument();
+    expect(screen.getByTestId("custom-counter-return-btn")).toBeInTheDocument();
+
+    await user.click(screen.getByTestId("custom-counter-return-btn"));
+    expect(onBack).toHaveBeenCalledTimes(1);
+  });
 });

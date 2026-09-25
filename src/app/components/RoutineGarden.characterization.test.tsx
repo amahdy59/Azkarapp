@@ -165,7 +165,22 @@ describe("Home wird card", () => {
 
     expect(screen.queryByText(/Great start!/i)).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "How a palm is earned" }));
-    expect(screen.getByText(/Complete Morning, Evening, and Before Sleep Azkar/i)).toBeInTheDocument();
+    expect(screen.getByText(/Morning, Evening, and Before Sleep/i)).toBeInTheDocument();
+  });
+
+  it("reports intermediate progress accurately when Quran makes four routines", () => {
+    render(
+      <TodayRoutineGarden
+        summary={makeSummary()}
+        language="en"
+        hideTabs
+        visibleCategoryIds={["morning", "evening", "before_sleep"]}
+        quranWird={{ progress: 0, goal: 4, complete: false, active: true, onPress: () => undefined }}
+        onMedia={false}
+      />,
+    );
+
+    expect(screen.getByText(/2 of 4 routines complete/i)).toBeInTheDocument();
   });
 });
 

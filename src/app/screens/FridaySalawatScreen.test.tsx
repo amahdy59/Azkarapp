@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { readFridaySalawatProgress } from "../fridayProgress";
 import { FridaySalawatScreen } from "./FridaySalawatScreen";
 
@@ -21,6 +21,11 @@ describe("FridaySalawatScreen", () => {
 
     expect(counter).toHaveAccessibleName("Completed 10 / 10");
     expect(readFridaySalawatProgress()).toEqual({ count: 10, target: 10 });
+    expect(screen.getByRole("dialog", { name: "Goal Reached!" })).toBeInTheDocument();
+
+    // Dismiss completion modal to access header
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(screen.queryByRole("dialog", { name: "Goal Reached!" })).not.toBeInTheDocument();
 
     // Open More Options Menu
     await user.click(screen.getByRole("button", { name: "More options" }));
@@ -100,5 +105,69 @@ describe("FridaySalawatScreen", () => {
     const arBenefitBtn = screen.getByRole("button", { name: "فضائل ثابتة بأحاديث صحيحة" });
     expect(arBenefitBtn).toHaveTextContent("الفائدة");
     expect(screen.getByText("اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ")).toBeInTheDocument();
+  });
+
+  it("prevents counting beyond specified target, shows completion modal, and supports continuing with a higher target", async () => {
+    const user = userEvent.setup();
+    const onBack = vi.fn();
+    render(<FridaySalawatScreen language="en" direction="ltr" onBack={onBack} />);
+
+    await user.click(screen.getByTestId("counter-target-filter"));
+    await user.click(screen.getByRole("menuitemradio", { name: "10" }));
+    const counter = screen.getByTestId("salawat-counter");
+    const card = screen.getByTestId("reader-card");
+
+    for (let count = 0; count < 10; count += 1) fireEvent.click(counter);
+
+    // Modal is now open
+    expect(screen.getByRole("dialog", { name: "Goal Reached!" })).toBeInTheDocument();
+    expect(screen.getByTestId("salawat-continue-streak-btn")).toBeInTheDocument();
+    expect(screen.getByTestId("salawat-new-round-btn")).toBeInTheDocument();
+    expect(screen.getByTestId("salawat-return-btn")).toBeInTheDocument();
+
+    // Close modal via Escape
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(screen.queryByRole("dialog", { name: "Goal Reached!" })).not.toBeInTheDocument();
+
+    // Tapping canvas or counter does NOT increment beyond 10; it reopens completion modal
+    fireEvent.click(card);
+    expect(readFridaySalawatProgress()).toEqual({ count: 10, target: 10 });
+    expect(screen.getByRole("dialog", { name: "Goal Reached!" })).toBeInTheDocument();
+
+    // Clicking 'Increase target to 33 & continue'
+    await user.click(screen.getByTestId("salawat-continue-streak-btn"));
+    expect(screen.queryByRole("dialog", { name: "Goal Reached!" })).not.toBeInTheDocument();
+    expect(readFridaySalawatProgress()).toEqual({ count: 10, target: 33 });
+
+    // Now user can continue counting beyond 10 towards 33
+    fireEvent.click(card);
+    expect(readFridaySalawatProgress()).toEqual({ count: 11, target: 33 });
+  });
+
+  it("supports starting a new round and returning via completion modal", async () => {
+    const user = userEvent.setup();
+    const onBack = vi.fn();
+    render(<FridaySalawatScreen language="en" direction="ltr" onBack={onBack} />);
+
+    await user.click(screen.getByTestId("counter-target-filter"));
+    await user.click(screen.getByRole("menuitemradio", { name: "10" }));
+    const counter = screen.getByTestId("salawat-counter");
+
+    for (let count = 0; count < 10; count += 1) fireEvent.click(counter);
+    expect(screen.getByRole("dialog", { name: "Goal Reached!" })).toBeInTheDocument();
+
+    // Start new round
+    await user.click(screen.getByTestId("salawat-new-round-btn"));
+    expect(readFridaySalawatProgress()).toEqual({ count: 0, target: 10 });
+    expect(screen.queryByRole("dialog", { name: "Goal Reached!" })).not.toBeInTheDocument();
+
+    // Reach 10 again for round 2
+    for (let count = 0; count < 10; count += 1) fireEvent.click(counter);
+    expect(screen.getByRole("dialog", { name: "Goal Reached!" })).toBeInTheDocument();
+    expect(screen.getByText("Round 2 completed")).toBeInTheDocument();
+
+    // Click Return
+    await user.click(screen.getByTestId("salawat-return-btn"));
+    expect(onBack).toHaveBeenCalledTimes(1);
   });
 });

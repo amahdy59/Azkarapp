@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { Compass, Sparkles, Zap } from "../components/icons";
+import { ArrowNext, Compass, Sparkles, Zap } from "../components/icons";
 import { getQiblaBearing } from "../qibla";
 import { PalmTreeMark } from "../components/GardenMarks";
 import { TodayRoutineGarden } from "../components/RoutineGarden";
@@ -866,13 +866,17 @@ export function HomeScreen({
                     data-testid="home-tool-qibla"
                     className={`group flex items-center justify-between gap-4 rounded-3xl p-4.5 text-start transition-[background-color,border-color,transform] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                       homeVisualEffects
-                        ? "home-glass-surface border border-white/10 bg-black/25 text-on-media shadow-raised hover:bg-black/35 backdrop-blur-md"
-                        : "border border-border/50 bg-card text-foreground shadow-raised hover:bg-muted"
+                        ? "hero-glass home-glass-surface text-on-media hover:border-white/30"
+                        : "border border-border bg-card text-foreground shadow-raised hover:bg-muted"
                     }`}
                   >
                     <div className="flex items-center gap-3.5 min-w-0">
                       <span
-                        className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary/15 text-primary"
+                        className={`flex size-11 shrink-0 items-center justify-center rounded-2xl transition-colors ${
+                          homeVisualEffects
+                            ? "border border-white/20 bg-white/10 text-on-media-accent"
+                            : "border border-primary/30 bg-primary/10 text-primary"
+                        }`}
                         aria-hidden="true"
                       >
                         <Compass size={22} />
@@ -891,8 +895,13 @@ export function HomeScreen({
                         </span>
                       </div>
                     </div>
-                    <span className="text-micro font-bold text-primary group-hover:underline shrink-0">
-                      {t(language, "common.open")}
+                    <span
+                      className={`inline-flex items-center gap-1.5 text-xs font-bold shrink-0 ${
+                        homeVisualEffects ? "text-on-media-accent" : "text-primary"
+                      }`}
+                    >
+                      <span>{t(language, "common.open")}</span>
+                      <ArrowNext size={14} data-rtl-flip aria-hidden="true" className="shrink-0" />
                     </span>
                   </button>
                 )}
@@ -904,13 +913,17 @@ export function HomeScreen({
                     data-testid="home-tool-masbaha"
                     className={`group flex items-center justify-between gap-4 rounded-3xl p-4.5 text-start transition-[background-color,border-color,transform] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                       homeVisualEffects
-                        ? "home-glass-surface border border-white/10 bg-black/25 text-on-media shadow-raised hover:bg-black/35 backdrop-blur-md"
-                        : "border border-border/50 bg-card text-foreground shadow-raised hover:bg-muted"
+                        ? "hero-glass home-glass-surface text-on-media hover:border-white/30"
+                        : "border border-border bg-card text-foreground shadow-raised hover:bg-muted"
                     }`}
                   >
                     <div className="flex items-center gap-3.5 min-w-0">
                       <span
-                        className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary/15 text-primary"
+                        className={`flex size-11 shrink-0 items-center justify-center rounded-2xl transition-colors ${
+                          homeVisualEffects
+                            ? "border border-white/20 bg-white/10 text-on-media-accent"
+                            : "border border-primary/30 bg-primary/10 text-primary"
+                        }`}
                         aria-hidden="true"
                       >
                         <Sparkles size={22} />
@@ -924,8 +937,13 @@ export function HomeScreen({
                         </span>
                       </div>
                     </div>
-                    <span className="text-micro font-bold text-primary group-hover:underline shrink-0">
-                      {t(language, "common.open")}
+                    <span
+                      className={`inline-flex items-center gap-1.5 text-xs font-bold shrink-0 ${
+                        homeVisualEffects ? "text-on-media-accent" : "text-primary"
+                      }`}
+                    >
+                      <span>{t(language, "common.open")}</span>
+                      <ArrowNext size={14} data-rtl-flip aria-hidden="true" className="shrink-0" />
                     </span>
                   </button>
                 )}
@@ -934,7 +952,7 @@ export function HomeScreen({
           )}
 
           <div className="px-page">
-            <VisitorCount language={language} />
+            <VisitorCount language={language} onMedia={homeVisualEffects} />
           </div>
         </div>
       </div>

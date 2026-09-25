@@ -45,6 +45,46 @@ describe("AzkarListItem disclosure", () => {
     const disclosure = screen.getByRole("button", { name: "Expand dhikr" });
     expect(disclosure).toHaveAttribute("aria-expanded", "false");
     expect(disclosure).toHaveAttribute("aria-controls", "zikr-details-0");
+    expect(disclosure).toHaveClass("size-11");
     expect(screen.getByTestId("zikr-summary-0").closest("[role='button']")).toBeNull();
+  });
+
+  it("keeps the completion control at the ordinary 44px target size", () => {
+    vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockReturnValue(64);
+    vi.spyOn(HTMLElement.prototype, "scrollHeight", "get").mockReturnValue(64);
+
+    render(
+      <AzkarListItem
+        z={zikr}
+        index={0}
+        isCardCompleted={false}
+        language="en"
+        isArabic={false}
+        direction="ltr"
+        onToggleZikr={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: "Not completed — tap to check" })).toHaveClass("size-11");
+  });
+
+  it("keeps the wide reader selection target at least 44px tall", () => {
+    vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockReturnValue(64);
+    vi.spyOn(HTMLElement.prototype, "scrollHeight", "get").mockReturnValue(64);
+
+    render(
+      <AzkarListItem
+        z={zikr}
+        index={0}
+        isCardCompleted={false}
+        language="en"
+        isArabic={false}
+        direction="ltr"
+        onClickText={vi.fn()}
+        ariaLabelOverride="Zikr 1 of 1"
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: "Zikr 1 of 1" })).toHaveClass("min-h-11");
   });
 });

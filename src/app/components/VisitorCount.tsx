@@ -53,13 +53,15 @@ export function ActiveVisitorPresence({ children }: { children: ReactNode }) {
   return <ActiveVisitorCountContext.Provider value={count}>{children}</ActiveVisitorCountContext.Provider>;
 }
 
-export function VisitorCount({ language }: { language: AppLanguage }) {
+export function VisitorCount({ language, onMedia = false }: { language: AppLanguage; onMedia?: boolean }) {
   const count = useContext(ActiveVisitorCountContext);
 
   if (count === null) return null;
   return (
     <p
-      className="mt-6 pb-2 text-center text-xs text-muted-foreground"
+      className={`mt-6 pb-2 text-center text-xs transition-colors ${
+        onMedia ? "text-on-media-muted drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)]" : "text-muted-foreground"
+      }`}
       aria-label={t(language, "accountData.visitorCountLabel")}
     >
       {t(language, "accountData.visitorCount", {

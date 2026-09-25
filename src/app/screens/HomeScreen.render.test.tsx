@@ -282,16 +282,54 @@ describe("HomeScreen document outline", () => {
 
     const qiblaBtn = screen.getByTestId("home-tool-qibla");
     expect(qiblaBtn).toBeInTheDocument();
-    expect(qiblaBtn).toHaveClass("home-glass-surface", "text-on-media");
+    expect(qiblaBtn).toHaveClass("hero-glass", "home-glass-surface", "text-on-media");
     expect(screen.getByText("القبلة")).toBeInTheDocument();
     fireEvent.click(qiblaBtn);
     expect(onOpenQibla).toHaveBeenCalledTimes(1);
 
     const masbahaBtn = screen.getByTestId("home-tool-masbaha");
     expect(masbahaBtn).toBeInTheDocument();
-    expect(masbahaBtn).toHaveClass("home-glass-surface", "text-on-media");
+    expect(masbahaBtn).toHaveClass("hero-glass", "home-glass-surface", "text-on-media");
     expect(screen.getByText("المسبحة")).toBeInTheDocument();
     fireEvent.click(masbahaBtn);
     expect(onOpenMasbaha).toHaveBeenCalledTimes(1);
+  });
+
+  it("renders devotional tools as solid cards when homeVisualEffects is false", () => {
+    const onOpenQibla = vi.fn();
+    const onOpenMasbaha = vi.fn();
+
+    render(
+      <HomeScreen
+        completed={emptyProgress()}
+        routineModes={routineModes}
+        onResume={vi.fn()}
+        language="ar"
+        direction="rtl"
+        dailyCompletions={[]}
+        prayerTracking={[]}
+        homeVisualEffects={false}
+        onOpenQibla={onOpenQibla}
+        onOpenMasbaha={onOpenMasbaha}
+        locationSettings={{
+          latitude: 30.0444,
+          longitude: 31.2357,
+          cityName: "Cairo",
+          countryName: "Egypt",
+          calculationMethod: "Egypt",
+          madhab: "Shafi",
+          higherLatitudes: "None",
+          timeZone: "Africa/Cairo",
+        }}
+      />,
+    );
+
+    const qiblaBtn = screen.getByTestId("home-tool-qibla");
+    expect(qiblaBtn).toHaveClass("bg-card", "text-foreground");
+    expect(qiblaBtn).not.toHaveClass("hero-glass");
+
+    const masbahaBtn = screen.getByTestId("home-tool-masbaha");
+    expect(masbahaBtn).toHaveClass("bg-card", "text-foreground");
+    expect(masbahaBtn).not.toHaveClass("hero-glass");
   });
 });

@@ -2,10 +2,10 @@ import { act, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ActiveVisitorPresence, VisitorCount } from "./VisitorCount";
 
-function renderVisitorCount(language: "ar" | "en") {
+function renderVisitorCount(language: "ar" | "en", onMedia = false) {
   return render(
     <ActiveVisitorPresence>
-      <VisitorCount language={language} />
+      <VisitorCount language={language} onMedia={onMedia} />
     </ActiveVisitorPresence>,
   );
 }
@@ -56,5 +56,17 @@ describe("VisitorCount", () => {
       await Promise.resolve();
     });
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+  });
+
+  it("applies on-media styling with high-contrast text and drop shadow when onMedia is true", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => new Response(JSON.stringify({ active: 5 }), { status: 200 })),
+    );
+    renderVisitorCount("en", true);
+    await waitFor(() => expect(screen.getByText("Visitors now: 5")).toBeInTheDocument());
+    const countElement = screen.getByText("Visitors now: 5");
+    expect(countElement).toHaveClass("text-on-media-muted");
+    expect(countElement).not.toHaveClass("text-muted-foreground");
   });
 });

@@ -109,6 +109,7 @@ Run the phase files in numerical order unless the decision log explicitly record
 | 66    | `phases/PHASE_66_VISUAL_REMEDIATION.md`                | Themed dropdowns, rounded statuses, and Light Home utility contrast       |
 | 67    | `phases/PHASE_67_ZIKR_DISCLOSURE_LAYOUT.md`            | Full-width zikr summaries with one stable, overflow-aware disclosure      |
 | 68    | `phases/PHASE_68_AUDIO_PROGRESS_CLARITY.md`            | One visible audio progress control with stable shell actions              |
+| 69    | `phases/PHASE_69_RECENT_CHANGES_REVIEW.md`             | Review-led hardening of recent reading, counter, Home, and audio changes  |
 
 Phases 15–20 derive from `docs/audits/DESIGN_CONSISTENCY_AUDIT.md` (2026-08-15) and are
 recorded in `DECISION_LOG.md` as DEC-064. Phase 15 is upstream of 16, 17 and 19 — its root
@@ -118,6 +119,6 @@ may run in parallel.
 
 ## Core rule
 
-Current audio-player refinement is recorded in [Phase 68](phases/PHASE_68_AUDIO_PROGRESS_CLARITY.md), including one visible progress control, stable Expand/Minimize and Close placement, and bounded keyboard seeking.
+The latest review and hardening work is recorded in [Phase 69](phases/PHASE_69_RECENT_CHANGES_REVIEW.md), including target-size repairs, truthful progress copy, completion-flow corrections, responsive status layout, and motion-governance verification.
 
 The agent must never interpret “perfect the application” as permission to rewrite the entire repository. Perfection is approached through evidence-backed iteration, not one-shot replacement.

@@ -246,6 +246,7 @@ function MainDhikrGroupCard({
     <button
       type="button"
       onClick={onPress}
+      aria-pressed={isCompleted}
       className={`stagger-content group relative flex w-full rounded-2xl border transition-[background-color,border-color] duration-standard focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 ${
         compact
           ? onMedia
@@ -268,18 +269,16 @@ function MainDhikrGroupCard({
       data-recommended-now={showRecommended ? "true" : undefined}
     >
       <div
-        className={`flex shrink-0 items-center justify-center transition-colors ${
-          compact
-            ? onMedia
-              ? "size-14 rounded-full border sm:size-16 lg:size-13 xl:size-14"
-              : "size-10"
-            : "size-16 rounded-full border"
+        className={`flex shrink-0 items-center justify-center rounded-full transition-colors ${
+          compact ? (onMedia ? "size-14 border sm:size-16 lg:size-13 xl:size-14" : "size-11 border") : "size-16 border"
         } ${
           isCompleted
-            ? "border-success/60 bg-success/20 text-success"
+            ? onMedia
+              ? "border-success/60 bg-success/20 text-success"
+              : "border-success/40 bg-success/15 text-success"
             : onMedia
               ? "border-white/20 bg-white/10 text-on-media-accent"
-              : "text-primary"
+              : "border-border/70 bg-muted/40 text-primary"
         }`}
       >
         {icon}
@@ -778,13 +777,11 @@ export function ProgressWeekView({
         </section>
       )}
 
-      {/* One scan line answers the three common weekly questions without
-          presenting three equally dominant cards. */}
       <dl className="grid grid-cols-3 overflow-hidden rounded-2xl border border-border bg-card">
         {/* Most Consistent Routine Card */}
         <div className="flex min-w-0 flex-col items-center justify-center border-e border-border p-3 text-center">
           <Sun size={20} className="text-primary mb-1" />
-          <dt className="mb-0.5 text-xs font-bold text-muted-foreground">
+          <dt className="mb-0.5 text-xs font-bold text-muted-foreground break-words">
             {t(language, "progress.mostConsistentRoutine")}
           </dt>
           <dd className="max-w-full truncate text-sm font-black text-foreground">{bestRoutineName}</dd>
@@ -792,7 +789,9 @@ export function ProgressWeekView({
 
         {/* Best Streak Card */}
         <div className="flex min-w-0 flex-col items-center justify-center border-e border-border p-3 text-center">
-          <dt className="mb-0.5 text-xs font-bold text-muted-foreground">{t(language, "progress.bestStreak")}</dt>
+          <dt className="mb-0.5 text-xs font-bold text-muted-foreground break-words">
+            {t(language, "progress.bestStreak")}
+          </dt>
           <dd className="text-subtitle font-black text-foreground">
             {formatNumerals(weekStats.bestStreakDays, language)} {t(language, "progress.days")}
           </dd>
@@ -801,7 +800,9 @@ export function ProgressWeekView({
         {/* Completed Days Card */}
         <div className="flex min-w-0 flex-col items-center justify-center p-3 text-center">
           <CheckCircle2 size={20} className="text-success mb-1" />
-          <dt className="mb-0.5 text-xs font-bold text-muted-foreground">{t(language, "progress.completedDays")}</dt>
+          <dt className="mb-0.5 text-xs font-bold text-muted-foreground break-words">
+            {t(language, "progress.completedDays")}
+          </dt>
           <dd className="text-subtitle font-black text-foreground">
             {formatNumerals(weekStats.completedDaysCount, language)} {t(language, "progress.ofSeven")}
           </dd>

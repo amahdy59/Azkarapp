@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-async function enterEnglishGuestMode(page: import("@playwright/test").Page) {
+async function _enterEnglishGuestMode(page: import("@playwright/test").Page) {
   await page.addInitScript(() => {
     Object.defineProperty(window, "__audioPlayCalls", { value: 0, writable: true });
     HTMLMediaElement.prototype.play = function () {
@@ -18,7 +18,19 @@ async function enterEnglishGuestMode(page: import("@playwright/test").Page) {
 }
 
 test("unreviewed audio is unavailable and never autoplays", async ({ page }) => {
-  await enterEnglishGuestMode(page);
+  await page.addInitScript(() => {
+    Object.defineProperty(window, "__audioPlayCalls", { value: 0, writable: true });
+    HTMLMediaElement.prototype.play = function () {
+      (window as unknown as { __audioPlayCalls: number }).__audioPlayCalls += 1;
+      return Promise.resolve();
+    };
+  });
+  await page.goto("/");
+  await page.getByTestId("language-option-en").click();
+  await page.getByTestId("confirm-language").click();
+  await page.getByTestId("onboarding-get-started").click();
+  await page.getByTestId("nav-azkar").click();
+  await page.getByTestId("category-card-comprehensive_duas").click();
   const playAll = page.getByRole("button", { name: "Play All Audio" });
   await expect(playAll).toHaveCount(0);
   expect(await page.evaluate(() => (window as unknown as { __audioPlayCalls: number }).__audioPlayCalls)).toBe(0);
@@ -118,10 +130,21 @@ test("Al-Kahf queues an intentional listen press while the audio module loads", 
   await expect(player).toHaveAttribute("data-variant", "compact");
   const compactMinimizeBox = await player.getByRole("button", { name: "توسيع المشغل" }).boundingBox();
   const compactCloseBox = await player.getByRole("button", { name: "إيقاف الصوت وإغلاق المشغل" }).boundingBox();
+  const compactPlayBox = await player.getByRole("button", { name: /^(تشغيل الصوت|إيقاف الصوت مؤقتًا)$/ }).boundingBox();
+  expect(compactPlayBox?.width).toBeGreaterThanOrEqual(44);
+  expect(compactPlayBox?.width).toBeLessThanOrEqual(52);
+
   await expect(player.getByRole("progressbar", { name: "تقدم الاستماع" })).toBeVisible();
   await player.getByRole("button", { name: "توسيع المشغل" }).click();
   await expect(player).toHaveAttribute("data-variant", "expanded");
   await expect(player.getByRole("progressbar", { name: "تقدم الاستماع" })).toHaveCount(0);
+
+  const expandedPlayBox = await player
+    .getByRole("button", { name: /^(تشغيل الصوت|إيقاف الصوت مؤقتًا)$/ })
+    .boundingBox();
+  expect(expandedPlayBox?.width).toBeGreaterThanOrEqual(60);
+  expect(expandedPlayBox?.width).toBeLessThanOrEqual(68);
+
   const expandedMinimizeBox = await player.getByRole("button", { name: "تصغير المشغل" }).boundingBox();
   const expandedCloseBox = await player.getByRole("button", { name: "إيقاف الصوت وإغلاق المشغل" }).boundingBox();
   expect(compactMinimizeBox && compactCloseBox && expandedMinimizeBox && expandedCloseBox).toBeTruthy();

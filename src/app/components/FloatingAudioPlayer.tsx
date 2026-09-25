@@ -457,7 +457,19 @@ export function FloatingAudioPlayer({
   const motionReduced =
     systemReducedMotion ||
     (typeof document !== "undefined" && document.documentElement.classList.contains("reduce-motion"));
-  const shellTransition = { duration: motionReduced ? 0 : 0.24, ease: [0.22, 1, 0.36, 1] as const };
+  const shellTransition = {
+    duration: motionReduced ? 0 : 0.24,
+    ease: [0.22, 1, 0.36, 1] as const,
+  };
+  const playButtonTransition = {
+    duration: motionReduced ? 0 : 0.24,
+    ease: [0.22, 1, 0.36, 1] as const,
+  };
+  const slideOffsetX = direction === "rtl" ? 28 : -28;
+  const textEnterTransition = {
+    duration: motionReduced ? 0 : 0.22,
+    ease: [0, 0, 0.4, 1] as const,
+  };
   const wasCoveringReading = useRef(coversReading);
   const [showOptions, setShowOptions] = useState(false);
   const controllerRef = useRef(controller);
@@ -611,18 +623,28 @@ export function FloatingAudioPlayer({
         </div>
 
         <div className="audio-compact-row flex items-center gap-2">
-          <button
+          <motion.button
+            layoutId="audio-player-expand-collapse-btn"
+            layout="position"
             type="button"
             onClick={() => setIsMinimized(false)}
             aria-label={copy.expand}
+            transition={shellTransition}
             className="flex size-11 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors duration-fast hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           >
             <ChevronUp size={20} aria-hidden="true" />
-          </button>
+          </motion.button>
 
-          <div className="flex min-w-0 flex-1 items-center gap-2 px-1 text-start">
-            <WaveBars playing={isPlaying} />
-            <span className="min-w-0 flex-1">
+          <div className="flex min-w-0 flex-1 items-center gap-2 px-1 text-start overflow-hidden">
+            <motion.div layoutId="audio-wavebars" layout transition={shellTransition}>
+              <WaveBars playing={isPlaying} />
+            </motion.div>
+            <motion.span
+              initial={motionReduced ? false : { opacity: 0, x: slideOffsetX }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ ...textEnterTransition, delay: motionReduced ? 0 : 0.05 }}
+              className="min-w-0 flex-1 block"
+            >
               <span className="block truncate text-label font-black text-foreground">{title}</span>
               <span className="block truncate text-micro font-semibold text-muted-foreground">
                 {reciterDisplayName}
@@ -634,10 +656,16 @@ export function FloatingAudioPlayer({
                   </span>
                 </span>
               </span>
-            </span>
+            </motion.span>
           </div>
 
-          <div className="hidden min-w-32 flex-1 items-center gap-2 md:flex" dir={direction}>
+          <motion.div
+            initial={motionReduced ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: motionReduced ? 0 : 0.25 }}
+            className="hidden min-w-32 flex-1 items-center gap-2 md:flex"
+            dir={direction}
+          >
             <span className="w-10 text-center text-micro font-bold tabular-nums text-muted-foreground">
               {formatTime(state.currentTime, language)}
             </span>
@@ -659,7 +687,7 @@ export function FloatingAudioPlayer({
             <span className="w-10 text-center text-micro font-bold tabular-nums text-muted-foreground">
               {formatTime(state.duration, language)}
             </span>
-          </div>
+          </motion.div>
 
           <div className="flex shrink-0 items-center gap-1">
             <button
@@ -671,14 +699,20 @@ export function FloatingAudioPlayer({
             >
               <JumpBack10Icon className="size-5" />
             </button>
-            <button
+            <motion.button
+              layoutId="audio-primary-play-button"
+              layout
+              style={{ borderRadius: 9999 }}
               type="button"
               onClick={isPlaying ? controller.pause : controller.play}
               aria-label={isPlaying ? copy.pause : copy.play}
-              className="flex size-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-raised transition-[transform,background-color] duration-fast active:scale-95 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              transition={playButtonTransition}
+              className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-raised active:scale-95 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
-              {isPlaying ? <Pause size={22} aria-hidden="true" /> : <Play size={22} aria-hidden="true" />}
-            </button>
+              <motion.span layout="position" className="flex items-center justify-center">
+                {isPlaying ? <Pause size={22} aria-hidden="true" /> : <Play size={22} aria-hidden="true" />}
+              </motion.span>
+            </motion.button>
             <button
               type="button"
               onClick={() => jumpSeconds(10)}
@@ -689,14 +723,17 @@ export function FloatingAudioPlayer({
               <JumpForward10Icon className="size-5" />
             </button>
             <VolumeControl controller={controller} language={language} copy={copy} />
-            <button
+            <motion.button
+              layoutId="audio-player-stop-btn"
+              layout="position"
               type="button"
               onClick={controller.stop}
               aria-label={copy.stop}
+              transition={shellTransition}
               className="flex size-11 items-center justify-center rounded-full text-muted-foreground transition-colors duration-fast hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
               <X size={19} aria-hidden="true" />
-            </button>
+            </motion.button>
           </div>
         </div>
       </motion.section>
@@ -720,34 +757,78 @@ export function FloatingAudioPlayer({
 
       {/* Minimize and close retain the same logical edges in both player sizes. */}
       <div className="flex items-center justify-between">
-        <button
+        <motion.button
+          layoutId="audio-player-expand-collapse-btn"
+          layout="position"
           type="button"
           onClick={() => setIsMinimized(true)}
           aria-label={copy.collapse}
+          transition={shellTransition}
           className="flex size-11 items-center justify-center rounded-xl text-muted-foreground transition-[transform,background-color,color] duration-fast active:scale-95 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           <ChevronDown size={22} aria-hidden="true" />
-        </button>
-        <button
+        </motion.button>
+        <motion.button
+          layoutId="audio-player-stop-btn"
+          layout="position"
           type="button"
           onClick={controller.stop}
           aria-label={copy.stop}
+          transition={shellTransition}
           className="flex size-11 items-center justify-center rounded-xl text-muted-foreground transition-[transform,background-color,color] duration-fast active:scale-95 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           <X size={19} aria-hidden="true" />
-        </button>
+        </motion.button>
       </div>
 
       {/* What is playing, read down the middle: cue, surah, reciter, place. */}
-      <div className="rounded-2xl bg-muted/40 px-3 py-3 text-center">
+      <motion.div
+        initial={motionReduced ? false : { opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: motionReduced ? 0 : 0.24, ease: [0, 0, 0.4, 1] }}
+        className="rounded-2xl bg-muted/40 p-3 text-center overflow-hidden"
+      >
         <div className="flex flex-col items-center">
-          <WaveBars playing={isPlaying} />
-          <h3 className="mt-2 line-clamp-2 text-xl font-black leading-tight text-foreground">{title}</h3>
-          <p className="mt-1 truncate text-label font-semibold text-muted-foreground">{reciterDisplayName}</p>
+          <motion.div layoutId="audio-wavebars" layout transition={shellTransition}>
+            <WaveBars playing={isPlaying} />
+          </motion.div>
+          <motion.h3
+            initial={motionReduced ? false : { opacity: 0, x: slideOffsetX }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{
+              duration: motionReduced ? 0 : 0.24,
+              delay: motionReduced ? 0 : 0.05,
+              ease: [0, 0, 0.4, 1],
+            }}
+            className="mt-2 line-clamp-2 text-xl font-black leading-tight text-foreground"
+          >
+            {title}
+          </motion.h3>
+          <motion.p
+            initial={motionReduced ? false : { opacity: 0, x: slideOffsetX }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{
+              duration: motionReduced ? 0 : 0.22,
+              delay: motionReduced ? 0 : 0.1,
+              ease: [0, 0, 0.4, 1],
+            }}
+            className="mt-1 truncate text-label font-semibold text-muted-foreground"
+          >
+            {reciterDisplayName}
+          </motion.p>
           {positionChip && (
-            <p className="mt-2.5 rounded-full border border-border px-3 py-1 text-xs font-bold text-muted-foreground">
+            <motion.p
+              initial={motionReduced ? false : { opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{
+                duration: motionReduced ? 0 : 0.22,
+                delay: motionReduced ? 0 : 0.14,
+                ease: [0, 0, 0.4, 1],
+              }}
+              className="mt-2.5 rounded-full border border-border px-3 py-1 text-xs font-bold text-muted-foreground"
+            >
               {positionChip}
-            </p>
+            </motion.p>
           )}
           {isBusy && (
             <p className="mt-2 text-xs font-semibold text-primary" role="status">
@@ -755,10 +836,20 @@ export function FloatingAudioPlayer({
             </p>
           )}
         </div>
-      </div>
+      </motion.div>
 
       {/* Timeline / Scrub Bar with Generous 44px Hit Target */}
-      <div className="mt-4 flex items-center gap-3" dir={direction}>
+      <motion.div
+        initial={motionReduced ? false : { opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          duration: motionReduced ? 0 : 0.24,
+          delay: motionReduced ? 0 : 0.08,
+          ease: [0, 0, 0.4, 1],
+        }}
+        className="mt-4 flex items-center gap-3"
+        dir={direction}
+      >
         <span className="w-11 text-center text-xs font-bold tabular-nums text-muted-foreground">
           {formatTime(state.currentTime, language)}
         </span>
@@ -785,10 +876,19 @@ export function FloatingAudioPlayer({
         <span className="w-11 text-center text-xs font-bold tabular-nums text-muted-foreground">
           {formatTime(state.duration, language)}
         </span>
-      </div>
+      </motion.div>
 
       {/* Primary Transport Controls Row */}
-      <div className="mt-1 flex w-full items-start justify-center gap-0.5 sm:gap-2">
+      <motion.div
+        initial={motionReduced ? false : { opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          duration: motionReduced ? 0 : 0.24,
+          delay: motionReduced ? 0 : 0.06,
+          ease: [0, 0, 0.4, 1],
+        }}
+        className="mt-1 flex w-full items-start justify-center gap-0.5 sm:gap-2"
+      >
         {totalTracks > 1 && (
           <TransportButton
             label={copy.previousShort}
@@ -809,14 +909,20 @@ export function FloatingAudioPlayer({
           <JumpBack10Icon className="size-5" />
         </TransportButton>
 
-        <button
+        <motion.button
+          layoutId="audio-primary-play-button"
+          layout
+          style={{ borderRadius: 9999 }}
           type="button"
           onClick={isPlaying ? controller.pause : controller.play}
           aria-label={isPlaying ? copy.pause : copy.play}
-          className="mx-1 mt-1 flex size-16 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-raised transition-[transform,background-color] duration-fast active:scale-95 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          transition={playButtonTransition}
+          className="mx-1 mt-1 flex size-16 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-raised active:scale-95 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
-          {isPlaying ? <Pause size={28} aria-hidden="true" /> : <Play size={28} aria-hidden="true" />}
-        </button>
+          <motion.span layout="position" className="flex items-center justify-center">
+            {isPlaying ? <Pause size={28} aria-hidden="true" /> : <Play size={28} aria-hidden="true" />}
+          </motion.span>
+        </motion.button>
 
         <TransportButton
           label={copy.forward10Short}
@@ -837,7 +943,7 @@ export function FloatingAudioPlayer({
             <SkipForward size={20} className="rtl:rotate-180" aria-hidden="true" />
           </TransportButton>
         )}
-      </div>
+      </motion.div>
 
       {/* Error state */}
       {state.status === "error" && (
@@ -871,7 +977,16 @@ export function FloatingAudioPlayer({
 
       {/* Only contextual options remain here. Restart is already available by
           moving the timeline to its start and Play restarts an ended item. */}
-      <div className="mt-4 flex flex-wrap items-center justify-center gap-2 border-t border-border/70 pt-4">
+      <motion.div
+        initial={motionReduced ? false : { opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          duration: motionReduced ? 0 : 0.28,
+          delay: motionReduced ? 0 : 0.12,
+          ease: [0, 0, 0.4, 1],
+        }}
+        className="mt-4 flex flex-wrap items-center justify-center gap-2 border-t border-border/70 pt-4"
+      >
         {canRepeat && (
           <button
             type="button"
@@ -908,7 +1023,7 @@ export function FloatingAudioPlayer({
             {copy.reciterShort}
           </button>
         )}
-      </div>
+      </motion.div>
 
       {showOptions && currentEntry.availableVoiceIds.length > 1 && (
         <div className="mt-3 grid gap-1 text-xs font-bold text-muted-foreground">
@@ -936,7 +1051,14 @@ export function FloatingAudioPlayer({
 
       {/* Whose recitation this is, always on screen rather than behind a
           disclosure — it is an attribution, not a setting. */}
-      <p className="mt-3 text-center text-micro font-semibold leading-5 text-muted-foreground/80">{attributionText}</p>
+      <motion.p
+        initial={motionReduced ? false : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: motionReduced ? 0 : 0.25, delay: motionReduced ? 0 : 0.16 }}
+        className="mt-3 text-center text-micro font-semibold leading-5 text-muted-foreground/80"
+      >
+        {attributionText}
+      </motion.p>
     </motion.section>
   );
 }

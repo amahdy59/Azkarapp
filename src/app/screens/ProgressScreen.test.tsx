@@ -40,7 +40,7 @@ describe("ProgressScreen", () => {
 
     // Summary Strip in Day view
     expect(screen.getByTestId("progress-summary-strip")).toBeInTheDocument();
-    expect(screen.getByText("سلسلة الحفظ")).toBeInTheDocument();
+    expect(screen.getByText("سلسلة المواظبة")).toBeInTheDocument();
     expect(screen.getByText("النخيل المثمر")).toBeInTheDocument();
 
     // Share action in Header
@@ -54,8 +54,8 @@ describe("ProgressScreen", () => {
     expect(screen.queryByText(/★/)).not.toBeInTheDocument();
 
     // Qur'an and remembrance follow the primary prayer group.
-    expect(screen.getByTestId("daily-companions-card")).toBeInTheDocument();
-    expect(screen.getByText("القرآن والذكر")).toBeInTheDocument();
+    expect(screen.getByTestId("today-garden-card")).toBeInTheDocument();
+    expect(screen.getByText("وردك اليوم")).toBeInTheDocument();
 
     expect(screen.getByTestId("progress-prayer-group")).toBeInTheDocument();
 
@@ -80,8 +80,8 @@ describe("ProgressScreen", () => {
     expect(screen.getByTestId("oasis-stage-card")).toBeInTheDocument();
     expect(screen.getByText("Daily Oasis Stage")).toBeInTheDocument();
     expect(screen.getByText("7-Day Rhythm")).toBeInTheDocument();
-    expect(screen.getByTestId("daily-companions-card")).toBeInTheDocument();
-    expect(screen.getByText("Qur'an and remembrance")).toBeInTheDocument();
+    expect(screen.getByTestId("today-garden-card")).toBeInTheDocument();
+    expect(screen.getByText("Today's Wird")).toBeInTheDocument();
   });
 
   it("records the Quran from its focused group without duplicating mosque tracking", () => {

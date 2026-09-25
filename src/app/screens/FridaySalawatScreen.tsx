@@ -1,10 +1,22 @@
 import { useCallback, useEffect, useState } from "react";
 import { CounterTargetPicker } from "../components/CounterTargetPicker";
-import { ExternalLink, Lightbulb, MoreVertical, RotateCcw, Volume2, VolumeX } from "../components/icons";
+import {
+  ArrowPrevious,
+  Check,
+  ExternalLink,
+  Lightbulb,
+  MoreVertical,
+  Play,
+  RotateCcw,
+  Sparkles,
+  Volume2,
+  VolumeX,
+} from "../components/icons";
 import { ReadingScreenChrome } from "../components/ReadingScreenChrome";
 import { Modal } from "../components/ResponsiveSheet";
 import { CountingRipples, useCountingSurface } from "../components/countingSurface";
 import { ScreenContainer } from "../components/ScreenContainer";
+import { Button } from "../components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -85,6 +97,14 @@ const HERO_ACTION_CLASS =
 const HERO_ACTION_PILL_CLASS =
   "flex min-h-11 items-center gap-2 rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 px-3 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
 
+function getNextSalawatTarget(currentTarget: number): number {
+  const presets = [10, 33, 100, 1000];
+  const next = presets.find((p) => p > currentTarget);
+  if (next) return next;
+  if (currentTarget >= 1000) return currentTarget + 500;
+  return currentTarget + 10;
+}
+
 export function FridaySalawatScreen({
   language,
   direction,
@@ -104,6 +124,8 @@ export function FridaySalawatScreen({
   const copy = COPY[language];
   const [progress, setProgress] = useState(readFridaySalawatProgress);
   const [showBenefits, setShowBenefits] = useState(false);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [rounds, setRounds] = useState(0);
   const complete = progress.count >= progress.target;
   const progressPercent = Math.min(100, Math.round((progress.count / progress.target) * 100));
 
@@ -121,24 +143,42 @@ export function FridaySalawatScreen({
   const { soundEnabled, toggleSound, playClickFeedback } = useCounterClickFeedback();
 
   const increment = useCallback(() => {
-    /* No ceiling. Reaching the target used to stop the counter dead while the
-       screen still read "tap anywhere to count", so the one action this screen
-       exists for silently stopped working at the moment of success. A target is
-       something to reach, not a limit on how much salawat may be sent — the
-       Mushaf takes the same view of reading past the day's wird. */
+    if (complete) {
+      setShowCompletionModal(true);
+      return;
+    }
     playClickFeedback();
-    /* The reader and the Masbaha both answer a count with a short pulse, and
-       reaching the target with a distinct pattern. This counter played the
-       sound and nothing else, so the one screen people tap hundreds of times
-       was the one that felt like nothing was happening. Same durations, so the
-       three do not develop separate vocabularies. */
     const next = progress.count + 1;
-    // The distinct pattern marks arriving at the target, not every tap after it.
-    vibrateIfEnabled(hapticFeedback, next === progress.target ? [30, 50, 30, 50, 50] : 15);
+    const reachedTarget = next >= progress.target;
+    vibrateIfEnabled(hapticFeedback, reachedTarget ? [30, 50, 30, 50, 50] : 15);
     persist(next, progress.target);
-  }, [hapticFeedback, persist, playClickFeedback, progress.count, progress.target]);
+    if (reachedTarget) {
+      setShowCompletionModal(true);
+    }
+  }, [complete, hapticFeedback, persist, playClickFeedback, progress.count, progress.target]);
 
-  const reset = useCallback(() => persist(0, progress.target), [persist, progress.target]);
+  const handleContinueHigherTarget = useCallback(() => {
+    const nextTarget = getNextSalawatTarget(progress.target);
+    persist(progress.count, nextTarget);
+    setShowCompletionModal(false);
+  }, [persist, progress.count, progress.target]);
+
+  const handleStartNewRound = useCallback(() => {
+    setRounds((r) => r + 1);
+    persist(0, progress.target);
+    setShowCompletionModal(false);
+  }, [persist, progress.target]);
+
+  const handleReturn = useCallback(() => {
+    setShowCompletionModal(false);
+    onBack();
+  }, [onBack]);
+
+  const reset = useCallback(() => {
+    persist(0, progress.target);
+    setRounds(0);
+    setShowCompletionModal(false);
+  }, [persist, progress.target]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -151,13 +191,18 @@ export function FridaySalawatScreen({
       if (event.key === "Escape") {
         event.preventDefault();
         if (showBenefits) setShowBenefits(false);
+        else if (showCompletionModal) setShowCompletionModal(false);
         else onBack();
         return;
       }
-      if (focusedControl || showBenefits) return;
+      if (focusedControl || showBenefits || showCompletionModal) return;
       if (event.key === " " || event.code === "Space") {
         event.preventDefault();
-        increment();
+        if (complete) {
+          setShowCompletionModal(true);
+        } else {
+          increment();
+        }
       } else if (event.key === "r" || event.key === "R" || event.key === "ق") {
         event.preventDefault();
         reset();
@@ -165,7 +210,7 @@ export function FridaySalawatScreen({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [increment, onBack, reset, showBenefits]);
+  }, [complete, increment, onBack, reset, showBenefits, showCompletionModal]);
 
   const {
     ripples: canvasRipples,
@@ -202,7 +247,10 @@ export function FridaySalawatScreen({
             <div className="w-full" data-prevent-count="true">
               <CounterTargetPicker
                 activeTarget={progress.target}
-                onTargetChange={(target) => persist(0, target)}
+                onTargetChange={(target) => {
+                  persist(0, target);
+                  setShowCompletionModal(false);
+                }}
                 language={language}
                 direction={direction}
                 allowOpen={false}
@@ -311,6 +359,7 @@ export function FridaySalawatScreen({
                           total={progress.target}
                           complete={complete}
                           onTap={increment}
+                          onCompleteTap={() => setShowCompletionModal(true)}
                           language={language}
                           instructionText={t(language, "reader.tapAnywhere")}
                           testId="salawat-counter"
@@ -340,6 +389,68 @@ export function FridaySalawatScreen({
           </div>
         </div>
       </div>
+
+      {showCompletionModal && (
+        <Modal
+          open
+          onClose={() => setShowCompletionModal(false)}
+          title={t(language, "counter.goalReached")}
+          direction={direction}
+          language={language}
+          maxWidthClassName="max-w-sm"
+          className="p-5 sm:p-6 text-center"
+        >
+          <div>
+            <div className="mx-auto mb-3 flex size-14 items-center justify-center rounded-2xl bg-success/20 text-success">
+              <Check size={32} strokeWidth={3} aria-hidden="true" />
+            </div>
+            <h2 className="mb-1 text-xl font-extrabold text-foreground">{t(language, "counter.goalReached")}</h2>
+            <p className="mb-2 text-sm font-semibold text-muted-foreground">
+              {t(language, "counter.salawatCompletedDetail", { count: formatNumerals(progress.count, language) })}
+            </p>
+            {rounds > 0 && (
+              <p className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
+                <Sparkles size={14} aria-hidden="true" />
+                {t(language, "counter.roundCompleted", { round: formatNumerals(rounds + 1, language) })}
+              </p>
+            )}
+            <div className="mt-4 space-y-2">
+              <Button
+                onClick={handleContinueHigherTarget}
+                size="lg"
+                className="w-full gap-2"
+                data-testid="salawat-continue-streak-btn"
+              >
+                <Sparkles size={18} aria-hidden="true" />
+                {t(language, "counter.continueHigherTargetWithNum", {
+                  target: formatNumerals(getNextSalawatTarget(progress.target), language),
+                })}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleStartNewRound}
+                size="lg"
+                className="w-full gap-2"
+                data-testid="salawat-new-round-btn"
+              >
+                <Play size={18} aria-hidden="true" />
+                {t(language, "counter.newRoundWithNum", { round: formatNumerals(rounds + 2, language) })} (
+                {formatNumerals(progress.target, language)})
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={handleReturn}
+                size="lg"
+                className="w-full gap-2 text-muted-foreground hover:text-foreground"
+                data-testid="salawat-return-btn"
+              >
+                <ArrowPrevious size={18} data-rtl-flip aria-hidden="true" />
+                {t(language, "counter.returnToHub")}
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
 
       {showBenefits && (
         <Modal

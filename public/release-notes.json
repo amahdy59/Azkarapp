@@ -1,15 +1,15 @@
 {
   "ar": [
-    "تظهر الأذكار الطويلة الآن بعرض قراءة كامل مع زر واحد واضح للفتح والطي، وتختفي الزخارف غير اللازمة من الأذكار القصيرة.",
-    "تعرض شاشة صلاة النبي ﷺ والعداد المخصص النص العربي بخط القراءة، مع زر فائدة واضح وترجمة صوتية عند اختيار الإنجليزية.",
-    "يعرض مشغل الصوت مؤشراً واحداً للتقدم، ويمكن تحريك الخط الزمني ٣٠ ثانية بمفتاحي Page Up وPage Down.",
-    "أضيفت أذكار موثقة جديدة لأوقات الصلاة والصيام والسفر والمناسبات اليومية مع مصادرها."
+    "أصبحت بطاقات الأذكار أكثر هدوءاً واتساعاً للنص، مع أزرار فتح وإتمام واضحة وسهلة اللمس.",
+    "تعرض شاشة الصلاة على النبي ﷺ والعداد المخصص خيارات واضحة بعد بلوغ الهدف: المتابعة بهدف أعلى أو بدء جولة جديدة أو العودة.",
+    "أصبحت بطاقات القبلة والمسبحة وملخص طريق اليوم أوضح في الثيمات المختلفة وعلى الشاشات الضيقة.",
+    "ينتقل مشغل الصوت بسلاسة بين العرضين المصغر والموسع مع ثبات أماكن الأزرار واحترام تقليل الحركة."
   ],
   "en": [
-    "Longer adhkar now use the full reading width with one clear expand/collapse control, while short items avoid unnecessary disclosure chrome.",
-    "Friday Salawat and the custom counter use the reading font for Arabic, with a clear Benefit action and transliteration in English.",
-    "The audio player now shows one progress indicator, and Page Up/Page Down seek the timeline by 30 seconds.",
-    "New sourced adhkar cover prayer, fasting, travel, and everyday situations with their references included."
+    "Dhikr cards are calmer and give the text more room, with clear expand and completion controls that remain easy to tap.",
+    "Friday Salawat and the custom counter now offer clear next steps after a goal: continue higher, begin another round, or return.",
+    "Qibla, Masbaha, and today's-path summaries are clearer across themes and fit narrow screens more reliably.",
+    "The audio player now moves smoothly between compact and expanded views while keeping actions stable and respecting reduced motion."
   ],
-  "release": "2026-09-25-audio-and-reading-polish"
+  "release": "2026-09-25-review-hardening"
 }

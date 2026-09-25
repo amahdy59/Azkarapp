@@ -99,7 +99,9 @@ export function ReadingScreenChrome({
                   <span className="text-label font-semibold text-[color:var(--on-media-accent)]">
                     {progress.percentLabel ?? ""}
                   </span>
-                  <span className="text-xs font-bold text-[color:var(--on-media-accent)]">{progress.countLabel}</span>
+                  <span className="text-xs font-bold text-[color:var(--on-media-accent)]" dir="ltr">
+                    {progress.countLabel}
+                  </span>
                 </div>
                 {progress.max !== undefined && (
                   <ProgressBar
@@ -133,7 +135,7 @@ export function ReadingScreenChrome({
             <>
               <div className="mb-2 flex items-center justify-between gap-3 text-xs font-bold text-muted-foreground">
                 <span>{progress.percentLabel ?? ""}</span>
-                <span>{progress.countLabel}</span>
+                <span dir="ltr">{progress.countLabel}</span>
               </div>
               {progress.max !== undefined && (
                 <ProgressBar

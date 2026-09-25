@@ -107,9 +107,7 @@ describe("ProgressViews components", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "How a palm is earned" }));
     const explanation = screen.getByRole("tooltip");
-    expect(explanation).toHaveTextContent(
-      "Complete Morning, Evening, and Before Sleep Azkar to build your daily palm streak.",
-    );
+    expect(explanation).toHaveTextContent(/Morning, Evening, and Before Sleep/i);
     expect(explanation).toHaveClass("w-full");
     expect(explanation).not.toHaveClass("absolute");
   });

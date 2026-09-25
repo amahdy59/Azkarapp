@@ -123,4 +123,22 @@ describe("FloatingAudioPlayer", () => {
     fireEvent.keyDown(timeline, { key: "PageDown" });
     expect(controller.seek).toHaveBeenLastCalledWith(90);
   });
+
+  it("maintains fluid circular play button styling across compact and expanded states", () => {
+    const controller = createController();
+    render(<FloatingAudioPlayer controller={controller} language="en" direction="ltr" />);
+
+    // Compact mode: size-12 button
+    const compactPlay = screen.getByRole("button", { name: "Pause audio" });
+    expect(compactPlay).toHaveClass("size-12", "rounded-full");
+    expect(compactPlay).toHaveStyle({ borderRadius: "9999px" });
+
+    // Expand
+    fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
+
+    // Expanded mode: size-16 button with circular radius preserved for fluid scaling
+    const expandedPlay = screen.getByRole("button", { name: "Pause audio" });
+    expect(expandedPlay).toHaveClass("size-16", "rounded-full");
+    expect(expandedPlay).toHaveStyle({ borderRadius: "9999px" });
+  });
 });

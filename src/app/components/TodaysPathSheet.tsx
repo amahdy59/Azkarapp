@@ -1,6 +1,7 @@
 import { Modal } from "./ResponsiveSheet";
 import { TrackingCheckMark } from "./PrayerTrackerCards";
-import { Building, BookOpen, Translate } from "./icons";
+import { Zap } from "./icons";
+import { PalmTreeMark } from "./GardenMarks";
 import { t } from "../i18n";
 import { formatNumerals } from "../formatting";
 import type { DailyPathStatus } from "../dailyPath";
@@ -18,14 +19,12 @@ import type { AppLanguage } from "../types";
  * someone chose, not scoring them.
  */
 function Pillar({
-  icon,
   title,
   detail,
   complete,
   inactive,
   onGlass = false,
 }: {
-  icon: React.ReactNode;
   title: string;
   detail: string;
   complete: boolean;
@@ -54,20 +53,6 @@ function Pillar({
           {detail}
         </p>
       </div>
-      <span
-        aria-hidden="true"
-        className={`flex size-11 shrink-0 items-center justify-center rounded-full border ${
-          complete
-            ? onGlass
-              ? "border-white/20 bg-white/15 text-white"
-              : "border-primary/50 bg-primary/15 text-primary"
-            : onGlass
-              ? "border-white/20 bg-white/10 text-white/80"
-              : "border-border bg-muted/40 text-muted-foreground"
-        }`}
-      >
-        {icon}
-      </span>
     </div>
   );
 }
@@ -107,8 +92,45 @@ export function TodaysPathSheet({
       onGlass={onGlass}
     >
       <div className="flex flex-col gap-3 px-5 py-4">
+        {/* Streak and Palm Status Header */}
+        <div
+          className={`flex flex-col items-stretch gap-3 rounded-2xl border p-3.5 min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between ${
+            onGlass ? "border-white/20 bg-white/10 text-white" : "border-border bg-muted/40"
+          }`}
+        >
+          <div className="flex items-center gap-2.5 min-w-0">
+            <Zap className="size-5 text-primary shrink-0" aria-hidden="true" />
+            <div className="min-w-0">
+              <p className={`text-sm font-black leading-tight ${onGlass ? "text-white" : "text-foreground"}`}>
+                {t(language, "progress.activeStreakSummary")}
+              </p>
+              <p className={`mt-0.5 text-xs font-semibold ${onGlass ? "text-white/80" : "text-muted-foreground"}`}>
+                {t(language, status.streakQualified ? "dailyPath.streakSecured" : "dailyPath.streakPending")}
+              </p>
+            </div>
+          </div>
+          <div
+            className={`flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-full border px-3 py-1 text-center text-xs font-black ${
+              onGlass ? "border-white/20 bg-white/10 text-white" : "border-border bg-card text-foreground"
+            }`}
+          >
+            <PalmTreeMark
+              size={16}
+              filled={status.palmEarned}
+              className={status.palmEarned ? "text-primary" : "text-muted-foreground/50"}
+            />
+            <span>
+              {status.palmEarned
+                ? t(language, "dailyPath.palmEarned")
+                : t(language, "dailyPath.palmProgress", {
+                    done: count(status.achievedPillarCount),
+                    total: count(status.activePillarCount),
+                  })}
+            </span>
+          </div>
+        </div>
+
         <Pillar
-          icon={<Building size={20} />}
           title={t(language, "dailyPath.prayer")}
           detail={t(language, "dailyPath.prayerSummary", {
             recorded: count(status.salah.recordedCount),
@@ -119,7 +141,6 @@ export function TodaysPathSheet({
         />
 
         <Pillar
-          icon={<BookOpen size={20} />}
           title={t(language, "dailyPath.quran")}
           detail={
             status.quran.active
@@ -132,7 +153,6 @@ export function TodaysPathSheet({
         />
 
         <Pillar
-          icon={<Translate size={20} />}
           title={t(language, "dailyPath.dhikr")}
           detail={t(language, "dailyPath.ofThree", { done: count(status.dhikr.completedCount) })}
           complete={status.dhikr.fullComplete}

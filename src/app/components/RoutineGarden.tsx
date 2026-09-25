@@ -82,19 +82,25 @@ export function TodayRoutineGarden({
   const streak = summary.currentUsageStreak ?? 0;
   // Fallback to internal navigation if not hidden (e.g. for HomeScreen where it uses its own simple label)
 
-  const completedCount = summary.today.completedCategories.length + (quranWird?.complete ? 1 : 0);
-  const totalCount = 3 + (quranWird ? 1 : 0);
+  const targetCategoryIds = visibleCategoryIds ?? ["morning", "evening", "before_sleep"];
+  const completedCount =
+    targetCategoryIds.filter((cat) => summary.today.completedCategories.includes(cat)).length +
+    (quranWird?.complete ? 1 : 0);
+  const totalCount = targetCategoryIds.length + (quranWird ? 1 : 0);
   const dynamicSubtitle = t(
     language,
     completedCount === 0
       ? "garden.todayPromptEmpty"
-      : completedCount === 1
-        ? "garden.todayPromptOne"
+      : completedCount >= totalCount
+        ? "garden.todayPromptComplete"
         : completedCount === totalCount - 1
           ? "garden.todayPromptTwo"
-          : completedCount >= totalCount
-            ? "garden.todayPromptComplete"
-            : "garden.todayPromptOne",
+          : completedCount === 1
+            ? "garden.todayPromptOne"
+            : "garden.todayPromptProgress",
+    completedCount > 1 && completedCount < totalCount - 1
+      ? { done: formatNumerals(completedCount, language), total: formatNumerals(totalCount, language) }
+      : undefined,
   );
 
   return (
