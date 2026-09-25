@@ -179,4 +179,26 @@ describe("CustomCounterScreen Component", () => {
     expect(oscillator.stop).toHaveBeenCalledWith(1.07);
     expect(oscillator.stop).toHaveBeenCalledWith(1.045);
   });
+
+  it("follows reader look and feel with Lightbulb benefit button and Uthmanic typography", async () => {
+    const user = userEvent.setup();
+    const { unmount } = render(<CustomCounterScreen isArabic={false} direction="ltr" onBack={vi.fn()} />);
+
+    const benefitButton = screen.getByRole("button", { name: /Virtue & Reference/i });
+    expect(benefitButton).toBeInTheDocument();
+    expect(benefitButton).toHaveTextContent("Benefit");
+
+    const zikrText = screen.getByText("سُبْحَانَ اللَّهِ وَبِحَمْدِهِ");
+    expect(zikrText).toHaveClass("zikr-text", "font-medium");
+    expect(zikrText).toHaveStyle({ fontFamily: "var(--font-zikr)" });
+
+    await user.click(benefitButton);
+    expect(screen.getByRole("dialog", { name: /Virtue & Reference/i })).toBeInTheDocument();
+
+    unmount();
+
+    render(<CustomCounterScreen isArabic={true} direction="rtl" onBack={vi.fn()} />);
+    const arBenefitBtn = screen.getByRole("button", { name: /الفضل والحديث/ });
+    expect(arBenefitBtn).toHaveTextContent("الفائدة");
+  });
 });

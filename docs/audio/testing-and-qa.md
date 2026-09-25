@@ -19,7 +19,9 @@ Automated tests cover exact/no-fallback lookup, Arabic fingerprints, canonical r
 - Use keyboard only: start, expand/minimize, play/pause, previous/next, seek with arrow keys, speed/voice, volume/mute, Retry/Skip/Stop.
 - Verify the volume slider opens on hover and keyboard focus with a fine pointer, stays open while the pointer crosses from speaker to slider, opens on click with touch input, reports a vertical orientation and percentage, and restores its persisted level.
 - Verify collections with multiple reviewed recordings expose Play All on both overview and Reader, disclose partial coverage, and advance through the frozen queue.
-- Verify compact progress and both native slider tracks remain inside the player bounds, use CSS-rendered tracks/thumbs, retain 44px interaction height, and mirror their fill in RTL without reversing media time.
+- Verify exactly one playback-progress indicator is visible at a time: the passive strip on compact phones, and the native seek timeline on wider compact and expanded layouts. Confirm slider tracks remain inside the player bounds, use CSS-rendered tracks/thumbs, retain 44px interaction height, and mirror their fill in RTL without reversing media time.
+- Focus the seek timeline and verify Page Up/Page Down move by 30 seconds, Home/End remain available, and native arrow-key seeking still follows interface direction.
+- Expand and minimize in both directions and confirm Expand/Minimize and Close remain on their established opposite logical edges.
 - Verify visible focus and 44px targets at narrow width, 200%, and 400% zoom.
 - At 320px, expand a multi-item queue in Arabic and English. Confirm the player has no horizontal overflow and Previous, Rewind, Forward, and Next remain fully inside its bounds.
 - Verify English fills timeline progress left-to-right and Arabic fills it right-to-left without horizontal overflow.

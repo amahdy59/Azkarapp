@@ -71,4 +71,34 @@ describe("FridaySalawatScreen", () => {
     await user.click(screen.getByTestId("counter-target-filter"));
     expect(counter).toHaveAccessibleName(/1 \/ 100/);
   });
+
+  it("follows the reader look and feel with Lightbulb benefit button, Uthmanic typography, and bilingual support", async () => {
+    const user = userEvent.setup();
+    const { unmount } = render(<FridaySalawatScreen language="en" direction="ltr" onBack={() => undefined} />);
+
+    // Benefit pill label
+    const benefitButton = screen.getByRole("button", { name: "Authentic benefits" });
+    expect(benefitButton).toBeInTheDocument();
+    expect(benefitButton).toHaveTextContent("Benefit");
+
+    // Arabic text is primary and styled with Uthmanic font
+    const zikrText = screen.getByText("اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ");
+    expect(zikrText).toHaveClass("zikr-text", "font-medium");
+    expect(zikrText).toHaveStyle({ fontFamily: "var(--font-zikr)" });
+
+    // English transliteration is rendered below it
+    expect(screen.getByText("Allahumma salli wa sallim ‘ala Nabiyyina Muhammad")).toBeInTheDocument();
+
+    // Modal has Lightbulb icon
+    await user.click(benefitButton);
+    expect(screen.getByRole("dialog", { name: "Authentic benefits" })).toBeInTheDocument();
+
+    unmount();
+
+    // Arabic mode
+    render(<FridaySalawatScreen language="ar" direction="rtl" onBack={() => undefined} />);
+    const arBenefitBtn = screen.getByRole("button", { name: "فضائل ثابتة بأحاديث صحيحة" });
+    expect(arBenefitBtn).toHaveTextContent("الفائدة");
+    expect(screen.getByText("اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ")).toBeInTheDocument();
+  });
 });

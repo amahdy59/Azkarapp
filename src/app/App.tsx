@@ -1290,7 +1290,8 @@ function AppContent({
   // On tablet (medium) and larger, we preserve navigation even during active reading.
   const showBottomNavArea =
     showBottomNav &&
-    ((layoutMode === "compact" && view !== "reader" && view !== "custom_counter") || layoutMode === "medium");
+    ((layoutMode === "compact" && view !== "reader" && view !== "custom_counter" && view !== "friday_salawat") ||
+      layoutMode === "medium");
   const showRail = showBottomNav && layoutMode === "expanded";
   const showSidebar = showBottomNav && layoutMode === "large";
 
@@ -1692,6 +1693,7 @@ function AppContent({
                   direction={layoutDirection}
                   reduceMotion={reduceMotion}
                   hapticFeedback={hapticFeedback}
+                  textSize={textSize}
                   onBack={() => replace("friday")}
                 />
               )}
@@ -2126,6 +2128,7 @@ function AppContent({
                   onBack={pop}
                   hapticFeedback={hapticFeedback}
                   reduceMotion={reduceMotion}
+                  textSize={textSize}
                   initialMasbahaState={masbahaState}
                   onSaveMasbahaState={setMasbahaState}
                 />
@@ -2157,7 +2160,7 @@ function AppContent({
               controller={audioController}
               language={selectedLang}
               direction={layoutDirection}
-              overReadingSurface={view === "reader"}
+              overReadingSurface={view === "reader" || view === "custom_counter" || view === "friday_salawat"}
             />
           </Suspense>
         )}

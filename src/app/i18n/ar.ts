@@ -942,6 +942,7 @@ const ar = {
     reciterAbdulbasit: "عبد الباسط",
   },
   category: {
+    repetitionInstructionOnce: "تُقال مرة واحدة",
     repetitionInstruction: "تُقال {count} مرات",
     completeSubtitle: "{done} / {total}",
     remainingSubtitle: "{remaining} / {total} ذكر المتبقي",

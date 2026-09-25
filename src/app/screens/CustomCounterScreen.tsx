@@ -20,16 +20,22 @@ import { useCounterClickFeedback } from "../hooks/useCounterClickFeedback";
 import { t } from "../i18n";
 import { vibrateIfEnabled } from "../motionPreferences";
 import { useWakeLock } from "../hooks/useWakeLock";
-import type { AppLanguage } from "../types";
+import { getReadingFontSize } from "./readingTypography";
+import type { AppLanguage, TextSizeOption } from "../types";
 
 const HEADER_ACTION_CLASS =
   "flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full text-foreground/80 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40";
+
+const HEADER_ACTION_PILL_CLASS = `${HEADER_ACTION_CLASS} w-auto gap-1.5 px-2.5`;
 
 /* The wide band is a fixed navy surface, so its controls take on-media colours
    rather than theme ones. Reusing the compact class there is what produced
    white-on-white the last time these two treatments were conflated. */
 const HERO_ACTION_CLASS =
   "flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
+
+const HERO_ACTION_PILL_CLASS =
+  "flex min-h-11 items-center gap-2 rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 px-3 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
 
 export interface MasbahaSavedState {
   count: number;
@@ -44,6 +50,7 @@ export function CustomCounterScreen({
   onBack,
   hapticFeedback = true,
   reduceMotion = false,
+  textSize = "medium",
   initialMasbahaState,
   onSaveMasbahaState,
 }: {
@@ -52,6 +59,7 @@ export function CustomCounterScreen({
   onBack: () => void;
   hapticFeedback?: boolean;
   reduceMotion?: boolean;
+  textSize?: TextSizeOption;
   initialMasbahaState?: MasbahaSavedState;
   onSaveMasbahaState?: (state: MasbahaSavedState) => void;
 }) {
@@ -217,17 +225,26 @@ export function CustomCounterScreen({
             </div>
           }
           actions={(tier) => {
-            const actionClass = tier === "wide" ? HERO_ACTION_CLASS : HEADER_ACTION_CLASS;
+            const isWide = tier === "wide";
+            const actionClass = isWide ? HERO_ACTION_CLASS : HEADER_ACTION_CLASS;
+            const pillClass = isWide ? HERO_ACTION_PILL_CLASS : HEADER_ACTION_PILL_CLASS;
             return (
               <div className="flex items-center gap-1.5">
                 <button
                   type="button"
                   onClick={() => setShowReference(true)}
-                  className={actionClass}
+                  className={pillClass}
                   aria-label={t(language, "counter.virtueReference")}
+                  title={t(language, "counter.virtueReference")}
                   aria-haspopup="dialog"
                 >
-                  <Lightbulb size={20} aria-hidden="true" />
+                  <Lightbulb size={18} aria-hidden="true" />
+                  <span
+                    className={isWide ? "text-label font-extrabold" : "text-xs font-extrabold min-[600px]:text-label"}
+                    aria-hidden="true"
+                  >
+                    {t(language, "reader.referencesButton")}
+                  </span>
                 </button>
                 <DropdownMenu dir={direction}>
                   <DropdownMenuTrigger className={actionClass} aria-label={t(language, "common.moreOptions")}>
@@ -269,9 +286,17 @@ export function CustomCounterScreen({
                   <div className="reading-measure mx-auto flex min-h-full w-full flex-col py-4">
                     <div style={pressStyle} className="my-auto w-full flex flex-col items-center justify-center">
                       <p
-                        className="zikr-text max-w-[34rem] text-center text-xl font-extrabold leading-[2] text-foreground sm:text-2xl"
+                        className="zikr-text max-w-[34rem] text-center font-medium leading-[2.1] text-foreground"
                         dir="rtl"
                         lang="ar"
+                        style={{
+                          fontFamily: "var(--font-zikr)",
+                          fontSize: getReadingFontSize({
+                            textSize,
+                            arabicLength: activeText.length,
+                            longSurah: false,
+                          }),
+                        }}
                       >
                         {activeText}
                       </p>
@@ -288,7 +313,7 @@ export function CustomCounterScreen({
                 </div>
               </div>
 
-              <footer className="shrink-0 pb-3 pt-2">
+              <footer className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">
                 <div data-testid="reader-counter-stack">
                   <div className="px-3 pb-1" data-testid="counter-panel">
                     <div className="adaptive-counter-row flex w-full items-center justify-center gap-2.5">

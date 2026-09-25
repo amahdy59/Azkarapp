@@ -1,15 +1,15 @@
 {
   "ar": [
-    "تظهر قوائم اختيار الصوت وإعدادات الصلاة الآن بتصميم التطبيق وألوانه بدلاً من قائمة داكنة تابعة للنظام.",
-    "تحافظ علامة «مكتملة» في صفحة التقدم على شكلها الدائري ومساحتها الواضحة في الشاشات الصغيرة.",
-    "أصبحت بطاقتا القبلة والمسبحة واضحتين بالكامل فوق صورة الصفحة الرئيسية عند استخدام الوضع الفاتح.",
-    "تستخدم جميع خيارات القوائم حوافاً مستديرة وحالات تحديد وتركيز متسقة."
+    "تظهر الأذكار الطويلة الآن بعرض قراءة كامل مع زر واحد واضح للفتح والطي، وتختفي الزخارف غير اللازمة من الأذكار القصيرة.",
+    "تعرض شاشة صلاة النبي ﷺ والعداد المخصص النص العربي بخط القراءة، مع زر فائدة واضح وترجمة صوتية عند اختيار الإنجليزية.",
+    "يعرض مشغل الصوت مؤشراً واحداً للتقدم، ويمكن تحريك الخط الزمني ٣٠ ثانية بمفتاحي Page Up وPage Down.",
+    "أضيفت أذكار موثقة جديدة لأوقات الصلاة والصيام والسفر والمناسبات اليومية مع مصادرها."
   ],
   "en": [
-    "Voice and prayer-setting choices now open in the app's own colors and style instead of a dark system menu.",
-    "Completed labels on Progress keep their rounded pill shape and clear spacing on compact screens.",
-    "Qibla and Masbaha cards are now fully readable over the Home photograph in Light mode.",
-    "Every choice menu now uses consistent rounded items, selection feedback, and focus treatment."
+    "Longer adhkar now use the full reading width with one clear expand/collapse control, while short items avoid unnecessary disclosure chrome.",
+    "Friday Salawat and the custom counter use the reading font for Arabic, with a clear Benefit action and transliteration in English.",
+    "The audio player now shows one progress indicator, and Page Up/Page Down seek the timeline by 30 seconds.",
+    "New sourced adhkar cover prayer, fasting, travel, and everyday situations with their references included."
   ],
-  "release": "2026-09-24-visual-remediation"
+  "release": "2026-09-25-audio-and-reading-polish"
 }

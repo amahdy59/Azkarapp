@@ -47,6 +47,9 @@ const SHARED_ZIKR_ALIASES: Readonly<Record<string, string>> = {
   "ap-tasbeeh-allahuakbar": "s-hm-106-allahu-akbar",
   "fd-ref-1": "pur-ref-1",
   "clo-ref-4": "pur-ref-1",
+  "tr-ref-7": "m-hm-97",
+  "fasting-iftar-host": "fd-ref-7",
+  "sc-ref-10": "pur-ref-6",
 };
 
 /** Explicit identities only. No text similarity or citation matching is used. */
@@ -134,6 +137,12 @@ const CANONICAL_KEY_BY_ID: Readonly<Record<string, string>> = {
   "in-prayer-before-salam-self-forgiveness": "zikr:private-wrongdoing-forgiveness",
   "friday-dua-22": "zikr:complete-forgiveness",
   "in-prayer-sujud-complete-forgiveness": "zikr:complete-forgiveness",
+  "tr-ref-7": "zikr:perfect-words-refuge",
+  "fasting-iftar-host": "zikr:fd-ref-7",
+  "sc-ref-10": "zikr:pur-ref-6",
+  "da-ref-7": "zikr:friday-dua-33",
+  "fasting-laylat-al-qadr": "zikr:friday-dua-35",
+  "misc-ref-13": "zikr:comprehensive-dua-42",
 };
 
 function getAudioBehavior(item: ZikrDraft): ZikrAudioBehavior {

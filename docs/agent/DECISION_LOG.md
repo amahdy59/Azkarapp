@@ -3941,3 +3941,31 @@ null` shape, so a record written before this change still loads and still
 - **Files/contracts to update:** Shared select/dropdown primitives, affected product choice fields, Progress status anatomy, Home utilities, focused unit/browser tests, design system, phase report, and release notes.
 - **Tests/evidence required:** No native selects in application JSX, themed overlay radius assertions, compact completion-pill assertions, Light Home on-media color assertions, focused WCAG scans, full release gates, and production smoke verification.
 - **Supersedes:** Completes the menu and Light-theme scope of DEC-206; no other decision is superseded.
+
+## DEC-208 — Stable full-width zikr disclosure cards
+
+- **Date:** 2026-09-25
+- **Status:** Approved
+- **Owner:** Product owner (explicit implementation request)
+- **Related phase:** Phase 67
+- **Context:** Collection cards positioned a circular chevron over the text and reserved a 48px trailing inset for every line. Long devotional summaries therefore wrapped early and left an empty vertical column. On collection screens, the text region and chevron were also two keyboard-focusable controls for the same disclosure action.
+- **Decision:** Give each zikr card one stable utility row with number and completion at logical start and a quiet 44px disclosure at logical end. Render the devotional summary on a separate full-width row without a permanent control gutter. Only the native disclosure button expands or collapses; show it when the two-line summary overflows or expansion reveals additional content. Preserve the wide Reader navigator's text selection as a separate named action. Keep the reveal calm: rotate the chevron, preserve reduced-motion behavior, and do not mask devotional text, add decorative dividers, or animate card height. Use singular repetition copy for a count of one.
+- **Why:** The text regains its reading measure, the disclosure target remains stationary, keyboard users encounter one action per purpose, short cards lose false affordances, and Arabic/English layouts mirror through logical direction without obscuring sacred text.
+- **Consequences:** Collection cards gain a compact utility row and may be slightly taller, but long text wraps less and the card anatomy remains stable when expanded. Resize/font changes remeasure overflow locally without persistence, network access, or a runtime dependency.
+- **Files/contracts to update:** `src/app/components/AzkarListItem.tsx`, bilingual localization, focused unit/browser tests, design system, phase report, and agent index.
+- **Tests/evidence required:** Native disclosure semantics, no duplicate text disclosure, completion isolation, overflow-aware visibility, long-surah expansion, singular copy, RTL/LTR responsive screenshots, focused tests, and repository quality gates.
+- **Supersedes:** Refines the collection-disclosure presentation recorded in the responsive-shell contract; no prior product decision is otherwise superseded.
+
+## DEC-209 — One visible audio progress control with stable shell actions
+
+- **Date:** 2026-09-25
+- **Status:** Approved
+- **Owner:** Product owner (explicit implementation request)
+- **Related phase:** Phase 68
+- **Context:** Compact desktop and expanded playback could show a passive session-progress bar beside an interactive seek timeline. In a single-item plan both represented the same value, while the duplicated bars made the actionable control less obvious. The owner also required Expand/Minimize and Close to retain their positions across player forms.
+- **Decision:** Render exactly one visible playback-progress indicator at every responsive state. Compact phones retain the inset passive strip because no scrubber fits there; wider compact layouts hide it and use the native timeline; expanded playback uses only that timeline. Keep Expand/Minimize and Close on their existing opposite logical edges without changing their DOM order or control rows. Page Up and Page Down move the focused timeline by 30 seconds while native fine seeking and Home/End remain intact.
+- **Why:** One progress affordance removes redundant information without sacrificing mobile status or desktop seeking. Stable shell actions preserve muscle memory, and a bounded large keyboard step makes long recitations practical without replacing native slider semantics.
+- **Consequences:** Expanded playback no longer exposes aggregate queue progress as a second bar; queue position remains visible in its existing track chip. No playback-plan, queue, completion, persistence, media-session, or reviewed-content behavior changes.
+- **Files/contracts to update:** `FloatingAudioPlayer`, focused provider/component/browser tests, audio architecture and QA, design-system audio contract, phase report, and agent index.
+- **Tests/evidence required:** One visible progress indicator at phone/desktop compact and expanded widths, Page Up/Page Down seek bounds, stable logical action edges in RTL/LTR, focused tests, and repository quality gates.
+- **Supersedes:** Refines only the progress-presentation details of DEC-140, DEC-172, and DEC-173; their controller, direction, layout, and continuous-listening decisions remain intact.

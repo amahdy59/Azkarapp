@@ -55,4 +55,93 @@ export const FASTING_RAMADAN_AZKAR: ZikrDraft[] = [
     attributionType: "said_by_prophet",
     sourceUrl: "https://sunnah.com/abudawud%3A2357",
   },
+  {
+    id: "fasting-affront-response",
+    category: "fasting_ramadan",
+    orderIndex: 3,
+    arabicText: "إِنِّي صَائِمٌ، إِنِّي صَائِمٌ",
+    transliteration: "Inni sa'im, inni sa'im.",
+    translation: "I am fasting, I am fasting.",
+    benefit:
+      "What the fasting person says if someone reviles or insults them, restraining anger and guarding the fast.",
+    benefitArabic: "ما يقوله الصائم إذا سابه أحد أو شاتمه أو قاتله، كفاً للغضب وحفظاً للصيام.",
+    repetitionCount: 2,
+    sourceReference: "Sahih al-Bukhari 1894; Sahih Muslim 1151.",
+    sourceReferenceArabic: "صحيح البخاري ١٨٩٤؛ صحيح مسلم ١١٥١.",
+    preferredTiming: "When insulted, reviled, or provoked while fasting.",
+    hadithText:
+      "قال رسول الله ﷺ: «وَإِذَا كَانَ يَوْمُ صَوْمِ أَحَدِكُمْ فَلَا يَرْفُثْ وَلَا يَصْخَبْ، فَإِنْ سَابَّهُ أَحَدٌ أَوْ قَاتَلَهُ فَلْيَقُلْ: إِنِّي امْرُؤٌ صَائِمٌ».",
+    hadithTextEnglish:
+      "The Messenger of Allah ﷺ said: “When any of you is fasting on a day, he should neither indulge in obscenity nor raise his voice. If someone reviles him or fights him, let him say: ‘I am a fasting person.’”",
+    authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
+    attributionType: "said_by_prophet",
+    sourceUrl: "https://sunnah.com/bukhari%3A1894",
+  },
+  {
+    id: "fasting-laylat-al-qadr",
+    category: "fasting_ramadan",
+    orderIndex: 4,
+    arabicText: "اللَّهُمَّ إِنَّكَ عَفُوٌّ تُحِبُّ الْعَفْوَ فَاعْفُ عَنِّي",
+    transliteration: "Allahumma innaka 'afuwwun tuhibbul-'afwa fa'fu 'anni.",
+    translation: "O Allah, You are Most Forgiving and You love forgiveness, so forgive me.",
+    benefit:
+      "Supplication taught by the Prophet ﷺ to Aisha (may Allah be pleased with her) for Laylat al-Qadr (The Night of Decree).",
+    benefitArabic: "دعاء ليلة القدر الذي علّمه النبي ﷺ لأم المؤمنين عائشة رضي الله عنها.",
+    repetitionCount: 1,
+    sourceReference: "Jami` at-Tirmidhi 3513 (Hasan Sahih).",
+    sourceReferenceArabic: "جامع الترمذي ٣٥١٣ (حسن صحيح).",
+    preferredTiming: "During the last ten nights of Ramadan, especially on odd nights.",
+    hadithText:
+      "عَنْ عَائِشَةَ رضي الله عنها قَالَتْ: قُلْتُ: يَا رَسُولَ اللَّهِ، أَرَأَيْتَ إِنْ عَلِمْتُ أَيَّ لَيْلَةٍ لَيْلَةُ الْقَدْرِ مَا أَقُولُ فِيهَا؟ قَالَ: «قُولِي: اللَّهُمَّ إِنَّكَ عَفُوٌّ تُحِبُّ الْعَفْوَ فَاعْفُ عَنِّي».",
+    hadithTextEnglish:
+      "‘Aisha (may Allah be pleased with her) narrated: I asked: “O Messenger of Allah! If I know which night is the Night of Decree, what should I say in it?” He said: “Say: O Allah, You are Most Forgiving and You love forgiveness, so forgive me.”",
+    authenticityNote: "Sahih according to Al-Albani.",
+    attributionType: "said_by_prophet",
+    sourceUrl: "https://sunnah.com/tirmidhi%3A3513",
+  },
+  {
+    id: "fasting-witr-completion",
+    category: "fasting_ramadan",
+    orderIndex: 5,
+    arabicText: "سُبْحَانَ الْمَلِكِ الْقُدُّوسِ",
+    transliteration: "Subhanal-Malikil-Quddus.",
+    translation: "Glory be to the Sovereign, the Most Holy.",
+    benefit:
+      "Said three times upon concluding the Witr prayer during nightly prayers (Tahajjud and Tarawih), raising the voice on the third.",
+    benefitArabic: "يُقال ثلاثاً عقب التسليم من الوتر في قيام الليل والتراويح، ويرفع صوته ويمد بها في الثالثة.",
+    repetitionCount: 3,
+    sourceReference: "Sunan an-Nasa'i 1699, 1732 (Sahih, al-Albani).",
+    sourceReferenceArabic: "سنن النسائي ١٦٩٩، ١٧٣٢ (صحيح، الألباني).",
+    preferredTiming: "Immediately following the salam of Witr prayer.",
+    hadithText:
+      "عَنْ أُبَيِّ بْنِ كَعْبٍ رضي الله عنه قَالَ: كَانَ رَسُولُ اللَّهِ ﷺ إِذَا سَلَّمَ فِي الْوِتْرِ قَالَ: «سُبْحَانَ الْمَلِكِ الْقُدُّوسِ» ثَلَاثَ مَرَّاتٍ، يَمُدُّ فِي الثَّالِثَةِ وَيَرْفَعُ صَوْتَهُ.",
+    hadithTextEnglish:
+      "Ubayy ibn Ka‘b (may Allah be pleased with him) narrated: When the Messenger of Allah ﷺ said salam at the end of Witr, he said: “Subhanal-Malikil-Quddus” three times, elongating the third and raising his voice.",
+    authenticityNote: "Sahih according to Al-Albani.",
+    attributionType: "said_by_prophet",
+    sourceUrl: "https://sunnah.com/nasai%3A1699",
+  },
+  {
+    id: "fasting-iftar-host",
+    category: "fasting_ramadan",
+    orderIndex: 6,
+    arabicText:
+      "أَفْطَرَ عِنْدَكُمُ الصَّائِمُونَ، وَأَكَلَ طَعَامَكُمُ الْأَبْرَارُ، وَصَلَّتْ عَلَيْكُمُ الْمَلَائِكَةُ",
+    transliteration: "Aftara 'indakumus-sa'imun, wa akala ta'amakumul-abrar, wa sallat 'alaykumul-mala'ikah.",
+    translation:
+      "May fasting people break their fast with you, may the righteous eat your food, and may the angels send blessings upon you.",
+    benefit: "Supplication for the host when breaking fast at someone’s home.",
+    benefitArabic: "دعاء للمضيف إذا أفطر الصائم عند أهل بيت.",
+    repetitionCount: 1,
+    sourceReference: "Sunan Abi Dawud 3854 (Sahih, al-Albani).",
+    sourceReferenceArabic: "سنن أبي داود ٣٨٥٤ (صحيح، الألباني).",
+    preferredTiming: "After finishing an iftar meal provided by a host.",
+    hadithText:
+      "أَنَّ النَّبِيَّ ﷺ جَاءَ إِلَى سَعْدِ بْنِ عُبَادَةَ، فَجَاءَ بِخُبْزٍ وَزَيْتٍ فَأَكَلَ، ثُمَّ قَالَ النَّبِيُّ ﷺ: «أَفْطَرَ عِنْدَكُمُ الصَّائِمُونَ، وَأَكَلَ طَعَامَكُمُ الْأَبْرَارُ، وَصَلَّتْ عَلَيْكُمُ الْمَلَائِكَةُ».",
+    hadithTextEnglish:
+      "The Prophet ﷺ came to Sa‘d ibn ‘Ubadah who brought bread and oil, and he ate. Then the Prophet ﷺ said: “May the fasting people break their fast with you, may the righteous eat your food, and may the angels send blessings upon you.”",
+    authenticityNote: "Sahih according to Al-Albani.",
+    attributionType: "said_by_prophet",
+    sourceUrl: "https://sunnah.com/abudawud%3A3854",
+  },
 ];

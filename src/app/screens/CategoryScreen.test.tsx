@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { registerLazyCollection } from "../content/azkar";
@@ -99,7 +99,10 @@ describe("CategoryScreen comprehensive-dua session", () => {
     );
 
     const summary = screen.getByTestId("zikr-summary-0");
-    const disclosure = summary.closest("[role='button']");
+    const card = summary.closest("[id^='zikr-card-']")!;
+    const disclosure = within(card as HTMLElement).getByRole("button", { name: "عرض الذكر كاملاً" });
+    expect(summary.closest("[role='button']")).toBeNull();
+    expect(summary.closest("[data-zikr-content]")).not.toHaveClass("pe-12");
     expect(disclosure).toHaveAttribute("aria-expanded", "false");
     expect(summary).toHaveClass("line-clamp-2");
 
@@ -109,9 +112,7 @@ describe("CategoryScreen comprehensive-dua session", () => {
     expect(screen.getByTestId("zikr-summary-0")).toBe(summary);
     expect(summary).not.toHaveClass("line-clamp-2");
 
-    // Collapses back via chevron toggle button
-    const chevron = screen.getByRole("button", { name: "طي الذكر" });
-    await user.click(chevron);
+    await user.click(within(card as HTMLElement).getByRole("button", { name: "طي الذكر" }));
     expect(disclosure).toHaveAttribute("aria-expanded", "false");
     expect(summary).toHaveClass("line-clamp-2");
   });
@@ -134,7 +135,8 @@ describe("CategoryScreen comprehensive-dua session", () => {
     );
 
     const summary = screen.getByTestId("zikr-summary-0");
-    const disclosure = summary.closest("[role='button']");
+    const card = summary.closest("[id^='zikr-card-']")!;
+    const disclosure = within(card as HTMLElement).getByRole("button", { name: "عرض الذكر كاملاً" });
     const checkmarkBtn = screen.getAllByRole("button", { name: /غير مكتمل/ })[0];
 
     expect(disclosure).toHaveAttribute("aria-expanded", "false");
@@ -161,9 +163,28 @@ describe("CategoryScreen comprehensive-dua session", () => {
 
     // Find the long surah (As-Sajda is at index 6 in before_sleep)
     const surahSummary = screen.getByTestId("zikr-summary-6");
-    const disclosure = surahSummary.closest("[role='button']");
+    const card = surahSummary.closest("[id^='zikr-card-']")!;
+    const disclosure = within(card as HTMLElement).getByRole("button", { name: "عرض الذكر كاملاً" });
     await user.click(disclosure!);
 
     expect(screen.getByText("اقرأ السورة كاملة في المصحف")).toBeInTheDocument();
+  });
+
+  it("uses singular repetition copy", () => {
+    render(
+      <CategoryScreen
+        catId="morning"
+        completed={new Set()}
+        isArabic={false}
+        direction="ltr"
+        onZikr={() => undefined}
+        onReset={() => undefined}
+        onRepeat={() => undefined}
+        onBack={() => undefined}
+      />,
+    );
+
+    expect(screen.getAllByText("Recite once").length).toBeGreaterThan(0);
+    expect(screen.queryByText("Recite 1 times")).not.toBeInTheDocument();
   });
 });

@@ -1655,6 +1655,51 @@ const WAKING_UP_AZKAR: ZikrDraft[] = [
       "‘Ubadah ibn al-Samit (may Allah be pleased with him) reported from the Prophet ﷺ that he said: “Whoever wakes in the night and says: There is no god but Allah alone, with no partner; His is the dominion and His is the praise, and He is capable of all things. Praise be to Allah; glory be to Allah; there is no god but Allah; Allah is greatest; and there is no power and no strength except with Allah — then says: O Allah, forgive me, or makes some other supplication, he is answered. And if he performs ablution and prays, his prayer is accepted.”",
     authenticityNote: "Sahih al-Bukhari.",
   },
+  {
+    id: "wu-hm-3",
+    category: "waking_up",
+    orderIndex: 2,
+    arabicText: "الْحَمْدُ لِلَّهِ الَّذِي عَافَانِي فِي جَسَدِي، وَرَدَّ عَلَيَّ رُوحِي، وَأَذِنَ لِي بِذِكْرِهِ.",
+    transliteration: "Alhamdu lillahilladhi 'afani fi jasadi, wa radda 'alayya ruhi, wa adhina li bi-dhikrih.",
+    translation:
+      "All praise is for Allah who restored health to my body, returned my soul to me, and permitted me to remember Him.",
+    benefit: "Prophetic praise upon waking in good health and being granted life to remember Allah.",
+    benefitArabic: "حمد لله عند الاستيقاظ على معافاة البدن ورد الروح والإذن بذكره سبحانه.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Jami` at-Tirmidhi 3401 (Hasan).",
+    sourceReferenceArabic: "جامع الترمذي ٣٤٠١ (حسن).",
+    hadithText:
+      "عَنْ أَبِي هُرَيْرَةَ رضي الله عنه عَنِ النَّبِيِّ ﷺ قَالَ: «إِذَا اسْتَيْقَظَ أَحَدُكُمْ فَلْيَقُلِ: الْحَمْدُ لِلَّهِ الَّذِي عَافَانِي فِي جَسَدِي، وَرَدَّ عَلَيَّ رُوحِي، وَأَذِنَ لِي بِذِكْرِهِ».",
+    hadithTextEnglish:
+      "Abu Hurayrah (may Allah be pleased with him) reported from the Prophet ﷺ that he said: “When one of you wakes up, let him say: All praise is for Allah who restored health to my body, returned my soul to me, and permitted me to remember Him.”",
+    authenticityNote: "Hasan according to Al-Albani.",
+    sourceUrl: "https://sunnah.com/tirmidhi%3A3401",
+  },
+  {
+    id: "wu-hm-4",
+    category: "waking_up",
+    orderIndex: 3,
+    arabicText:
+      "﴿إِنَّ فِي خَلْقِ السَّمَاوَاتِ وَالْأَرْضِ وَاخْتِلَافِ اللَّيْلِ وَالنَّهَارِ لَآيَاتٍ لِأُولِي الْأَلْبَابِ * الَّذِينَ يَذْكُرُونَ اللَّهَ قِيَامًا وَقُعُودًا وَعَلَىٰ جُنُوبِهِمْ وَيَتَفَكَّرُونَ فِي خَلْقِ السَّمَاوَاتِ وَالْأَرْضِ رَبَّنَا مَا خَلَقْتَ هَٰذَا بَاطِلًا سُبْحَانَكَ فَقِنَا عَذَابَ النَّارِ﴾",
+    transliteration:
+      "Inna fi khalqis-samawati wal-ardi wakhtilafil-layli wan-nahari la-ayatin li-ulil-albab. Alladhina yadhkurunallaha qiyaman wa qu'udan wa 'ala junubihim wa yatafakkaruna fi khalqis-samawati wal-ard, Rabbana ma khalaqta hadha batilan subhanaka faqina 'adhaban-nar.",
+    translation:
+      "Indeed, in the creation of the heavens and the earth and the alternation of the night and the day are signs for those of understanding—who remember Allah while standing or sitting or [lying] on their sides and give thought to the creation of the heavens and the earth: “Our Lord, You did not create this aimlessly; exalted are You; then protect us from the punishment of the Fire.”",
+    benefit:
+      "Prophetic Sunnah to recite the concluding ten verses of Surah Aal-Imran (190-200) upon waking at night for Tahajjud prayer.",
+    benefitArabic: "سنة نبوية عند الاستيقاظ لقيام الليل بقراءة الآيات العشر الخواتيم من سورة آل عمران.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Sahih al-Bukhari 4569; Sahih Muslim 763; Hisn al-Muslim 4.",
+    sourceReferenceArabic: "صحيح البخاري ٤٥٦٩؛ صحيح مسلم ٧٦٣؛ حصن المسلم ٤.",
+    hadithText:
+      "عَنِ ابْنِ عَبَّاسٍ رضي الله عنهما قَالَ: اسْتَيْقَظَ النَّبِيُّ ﷺ فَجَلَسَ يَمْسَحُ النَّوْمَ عَنْ وَجْهِهِ بِيَدِهِ، ثُمَّ قَرَأَ الْعَشْرَ الْآيَاتِ الْخَوَاتِمَ مِنْ سُورَةِ آلِ عِمْرَانَ.",
+    hadithTextEnglish:
+      "Ibn ‘Abbas (may Allah be pleased with them both) said: The Prophet ﷺ woke up, sat up wiping sleep from his face with his hand, then recited the last ten verses of Surah Aal-Imran.",
+    authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
+    sourceUrl: "https://sunnah.com/bukhari%3A4569",
+  },
 ];
 
 const HOME_AZKAR: ZikrDraft[] = [
@@ -1699,6 +1744,51 @@ const HOME_AZKAR: ZikrDraft[] = [
      *  above. Shown to the reader rather than silently resolved either way. */
     authenticityLevel: "weak",
   },
+  {
+    id: "home-hm-17",
+    category: "home",
+    orderIndex: 2,
+    arabicText: "بِسْمِ اللَّهِ، وَالسَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ",
+    transliteration: "Bismillah, was-salamu 'alaykum wa rahmatullahi wa barakatuh.",
+    translation: "In the name of Allah, and peace be upon you, and the mercy of Allah and His blessings.",
+    benefit:
+      "Mentioning the name of Allah upon entering home and greeting family prevents Satan from taking lodging or food.",
+    benefitArabic: "ذكر اسم الله تعالى عند دخول البيت وإلقاء السلام على الأهل يمنع الشيطان من المبيت والطعام.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Sahih Muslim 2018.",
+    sourceReferenceArabic: "صحيح مسلم ٢٠١٨.",
+    hadithText:
+      "عَنْ جَابِرِ بْنِ عَبْدِ اللَّهِ رضي الله عنهما أَنَّهُ سَمِعَ النَّبِيَّ ﷺ يَقُولُ: «إِذَا دَخَلَ الرَّجُلُ بَيْتَهُ، فَذَكَرَ اللَّهَ عِنْدَ دُخُولِهِ وَعِنْدَ طَعَامِهِ، قَالَ الشَّيْطَانُ: لَا مَبِيتَ لَكُمْ، وَلَا عَشَاءَ».",
+    hadithTextEnglish:
+      "Jabir ibn ‘Abdillah reported that he heard the Prophet ﷺ saying: “When a person enters his house and mentions Allah when entering and when eating, Satan says (to his companions): ‘You have no place to spend the night and no evening meal.’”",
+    authenticityNote: "Sahih Muslim.",
+    sourceUrl: "https://sunnah.com/muslim%3A2018",
+  },
+  {
+    id: "home-hm-18",
+    category: "home",
+    orderIndex: 3,
+    arabicText:
+      "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ أَنْ أَضِلَّ أَوْ أُضَلَّ، أَوْ أَزِلَّ أَوْ أُزَلَّ، أَوْ أَظْلِمَ أَوْ أُظْلَمَ، أَوْ أَجْهَلَ أَوْ يُجْهَلَ عَلَيَّ.",
+    transliteration:
+      "Allahumma inni a'udhu bika an adilla aw udall, aw azilla aw uzall, aw azlima aw uzlam, aw ajhala aw yujhala 'alayy.",
+    translation:
+      "O Allah, I seek refuge in You lest I should stray or be led astray, or stumble or be made to stumble, or oppress or be oppressed, or behave ignorantly or be treated with ignorance.",
+    benefit: "The Prophet ﷺ never left his home without raising his gaze to the sky and reciting this supplication.",
+    benefitArabic:
+      "ما كان النبي ﷺ يخرج من بيته إلا رفع بصره إلى السماء وقال هذا الدعاء تعوذاً من الضلال والظلم والزلل.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Sunan Abi Dawud 5094; Jami` at-Tirmidhi 3427 (Sahih).",
+    sourceReferenceArabic: "سنن أبي داود ٥٠٩٤؛ جامع الترمذي ٣٤٢٧ (صحيح).",
+    hadithText:
+      "عَنْ أُمِّ سَلَمَةَ رضي الله عنها قَالَتْ: مَا خَرَجَ النَّبِيُّ ﷺ مِنْ بَيْتِي قَطُّ إِلَّا رَفَعَ بَصَرَهُ إِلَى السَّمَاءِ فَقَالَ: «اللَّهُمَّ إِنِّي أَعُوذُ بِكَ أَنْ أَضِلَّ أَوْ أُضَلَّ، أَوْ أَزِلَّ أَوْ أُزَلَّ، أَوْ أَظْلِمَ أَوْ أُظْلَمَ، أَوْ أَجْهَلَ أَوْ يُجْهَلَ عَلَيَّ».",
+    hadithTextEnglish:
+      "Umm Salamah (may Allah be pleased with her) said: The Prophet ﷺ never left my house without raising his gaze to the heaven and saying: “O Allah, I seek refuge in You lest I should stray or be led astray, or slip or be tripped, or oppress or be oppressed, or act ignorantly or have ignorance acted against me.”",
+    authenticityNote: "Sahih according to Al-Albani.",
+    sourceUrl: "https://sunnah.com/abudawud%3A5094",
+  },
 ];
 
 const MOSQUE_AZKAR: ZikrDraft[] = [
@@ -1707,15 +1797,17 @@ const MOSQUE_AZKAR: ZikrDraft[] = [
     category: "mosque",
     orderIndex: 0,
     arabicText:
-      "أَعُوذُ بِاللَّهِ الْعَظِيمِ، وَبِوَجْهِهِ الْكَرِيمِ، وَسُلْطَانِهِ الْقَدِيمِ، مِنَ الشَّيْطَانِ الرَّجِيمِ... بِسْمِ اللَّهِ، وَالصَّلاَةُ وَالسَّلاَمُ عَلَى رَسُولِ اللَّهِ... اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ.",
+      "أَعُوذُ بِاللَّهِ الْعَظِيمِ، وَبِوَجْهِهِ الْكَرِيمِ، وَسُلْطَانِهِ الْقَدِيمِ، مِنَ الشَّيْطَانِ الرَّجِيمِ. بِسْمِ اللَّهِ، وَالصَّلَاةُ وَالسَّلَامُ عَلَى رَسُولِ اللَّهِ. اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ.",
     transliteration:
-      "Aʿūdhu billāhil-ʿAẓīm, wa bi-wajhihil-karīm, wa sulṭānihil-qadīm, minash-shayṭānir-rajīm... Bismillāhi, waṣ-ṣalātu was-salāmu ʿalā rasūlillāh... Allāhummaf-taḥ lī abwāba raḥmatik.",
+      "A‘ūdhu billāhil-‘Aẓīm, wa bi-wajhihil-karīm, wa sulṭānihil-qadīm, minash-shayṭānir-rajīm. Bismillāhi, waṣ-ṣalātu was-salāmu ‘alā rasūlillāh. Allāhummaftaḥ lī abwāba raḥmatik.",
     translation:
       "I seek refuge in Almighty Allah, by His Noble Face, by His primordial power, from Satan the outcast. In the Name of Allah, and blessings and peace be upon the Messenger of Allah. O Allah, open before me the doors of Your mercy.",
     benefit: "Upon entering the mosque. He will be protected from Satan for the rest of the day.",
+    benefitArabic: "يُقال عند دخول المسجد؛ يُحفظ قائله من وساوس الشيطان ونزغاته سائر اليوم.",
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Abu Dawud; Muslim 1/494; Hisn al-Muslim 20.",
+    sourceReferenceArabic: "أبو داود؛ صحيح مسلم ١/٤٩٤؛ حصن المسلم ٢٠.",
     hadithText:
       "عَنْ عَبْدِ اللَّهِ بْنِ عَمْرِو بْنِ الْعَاصِ رضي الله عنه عَنِ النَّبِيِّ ﷺ أَنَّهُ كَانَ إِذَا دَخَلَ الْمَسْجِدَ قَالَ: «أَعُوذُ بِاللَّهِ الْعَظِيمِ، وَبِوَجْهِهِ الْكَرِيمِ، وَسُلْطَانِهِ الْقَدِيمِ، مِنَ الشَّيْطَانِ الرَّجِيمِ». قَالَ: فَإِذَا قَالَ ذَلِكَ، قَالَ الشَّيْطَانُ: حُفِظَ مِنِّي سَائِرَ الْيَوْمِ.",
     hadithTextEnglish:
@@ -1733,14 +1825,60 @@ const MOSQUE_AZKAR: ZikrDraft[] = [
     translation:
       "In the Name of Allah, and peace and blessings be upon the Messenger of Allah. O Allah, I ask for Your favor, O Allah, protect me from Satan the outcast.",
     benefit: "To be said upon leaving the mosque.",
+    benefitArabic: "يُقال عند الخروج من المسجد سؤالاً لفضل الله وتوكلاً عليه وحفظاً من الشيطان.",
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Muslim 1/494; Ibn Majah; Hisn al-Muslim 21.",
+    sourceReferenceArabic: "صحيح مسلم ١/٤٩٤؛ سنن ابن ماجه؛ حصن المسلم ٢١.",
     hadithText:
       "عَنْ أَبِي أُسَيْدٍ رضي الله عنه قَالَ: قَالَ رَسُولُ اللَّهِ ﷺ: «إِذَا دَخَلَ أَحَدُكُمُ الْمَسْجِدَ فَلْيَقُلْ: اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ، وَإِذَا خَرَجَ فَلْيَقُلْ: اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ».",
     hadithTextEnglish:
       "Abu Usayd (may Allah be pleased with him) said: The Messenger of Allah ﷺ said: “When one of you enters the mosque, let him say: O Allah, open for me the gates of Your mercy. And when he leaves, let him say: O Allah, I ask You of Your bounty.”",
     authenticityNote: "Sahih Muslim.",
+  },
+  {
+    id: "msq-hm-22",
+    category: "mosque",
+    orderIndex: 2,
+    arabicText:
+      "اللَّهُمَّ اجْعَلْ فِي قَلْبِي نُورًا، وَفِي بَصَرِي نُورًا، وَفِي سَمْعِي نُورًا، وَعَنْ يَمِينِي نُورًا، وَعَنْ يَسَارِي نُورًا، وَفَوْقِي نُورًا، وَتَحْتِي نُورًا، وَأَمَامِي نُورًا، وَخَلْفِي نُورًا، وَاجْعَلْ لِي نُورًا.",
+    transliteration:
+      "Allahummaj-'al fi qalbi nura, wa fi basari nura, wa fi sam'i nura, wa 'an yamini nura, wa 'an yasari nura, wa fawqi nura, wa tahti nura, wa amami nura, wa khalfi nura, waj-'al li nura.",
+    translation:
+      "O Allah, place light in my heart, light in my sight, light in my hearing, light on my right, light on my left, light above me, light below me, light before me, light behind me, and make for me light.",
+    benefit:
+      "Supplication while walking to the mosque for congregational prayer, seeking comprehensive divine light in all faculties and directions.",
+    benefitArabic: "دعاء الذهاب إلى المسجد لصلاة الجماعة، يسأل العبد ربه نوراً تاماً محيطاً به في جوارحه وجهاته.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Sahih Muslim 763; Sahih al-Bukhari 6316; Hisn al-Muslim 19.",
+    sourceReferenceArabic: "صحيح مسلم ٧٦٣؛ صحيح البخاري ٦٣١٦؛ حصن المسلم ١٩.",
+    hadithText:
+      "عَنِ ابْنِ عَبَّاسٍ رضي الله عنهما أَنَّ النَّبِيَّ ﷺ خَرَجَ إِلَى الصَّلَاةِ وَهُوَ يَقُولُ: «اللَّهُمَّ اجْعَلْ فِي قَلْبِي نُورًا، وَفِي لِسَانِي نُورًا، وَفِي سَمْعِي نُورًا، وَفِي بَصَرِي نُورًا، وَمِنْ فَوْقِي نُورًا، وَمِنْ تَحْتِي نُورًا، وَعَنْ يَمِينِي نُورًا، وَعَنْ شِمَالِي نُورًا، وَمِنْ أَمَامِي نُورًا، وَمِنْ خَلْفِي نُورًا، وَاجْعَلْ فِي نَفْسِي نُورًا، وَأَعْظِمْ لِي نُورًا».",
+    hadithTextEnglish:
+      "Ibn ‘Abbas (may Allah be pleased with them both) narrated that the Prophet ﷺ went out to prayer saying: “O Allah, place light in my heart, light on my tongue, light in my hearing, light in my sight, light above me, light below me, light on my right, light on my left, light in front of me, light behind me, light in my soul, and magnify for me light.”",
+    authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
+    sourceUrl: "https://sunnah.com/muslim%3A763",
+  },
+  {
+    id: "msq-hm-23",
+    category: "mosque",
+    orderIndex: 3,
+    arabicText: "إِذَا دَخَلَ أَحَدُكُمُ الْمَسْجِدَ فَلَا يَجْلِسْ حَتَّى يُصَلِّيَ رَكْعَتَيْنِ.",
+    transliteration: "Idha dakhala ahadukumul-masjida fala yajlis hatta yusalliya rak'atayn.",
+    translation: "When one of you enters the mosque, he should not sit down until he prays two rak'ahs.",
+    benefit: "Prophetic Sunnah to offer two rak'ahs upon entering the mosque before sitting down (Tahiyyat al-Masjid).",
+    benefitArabic: "سنة نبوية مؤكدة بأداء ركعتي تحية المسجد عند الدخول قبل الجلوس تعظيماً لبيت الله.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Sahih al-Bukhari 1163; Sahih Muslim 714.",
+    sourceReferenceArabic: "صحيح البخاري ١١٦٣؛ صحيح مسلم ٧١٤.",
+    hadithText:
+      "عَنْ أَبِي قَتَادَةَ السَّلَمِيِّ رضي الله عنه أَنَّ رَسُولَ اللَّهِ ﷺ قَالَ: «إِذَا دَخَلَ أَحَدُكُمُ الْمَسْجِدَ فَلْيَرْكَعْ رَكْعَتَيْنِ قَبْلَ أَنْ يَجْلِسَ».",
+    hadithTextEnglish:
+      "Abu Qatadah as-Sulami (may Allah be pleased with him) reported that the Messenger of Allah ﷺ said: “When one of you enters the mosque, let him pray two rak'ahs before he sits down.”",
+    authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
+    sourceUrl: "https://sunnah.com/bukhari%3A1163",
   },
 ];
 
@@ -2116,16 +2254,18 @@ const RESTROOM_AZKAR: ZikrDraft[] = [
     transliteration:
       "Ashhadu an la ilaha illallahu wahdahu la sharika lahu wa ashhadu anna Muhammadan 'abduhu wa Rasuluh",
     translation:
-      "I bear witness that there is no god but Allah, alone with no partner, and I bear witness that Muhammad is His slave and Messenger.",
-    benefit: "Recited after completing wudu — opens all eight gates of Paradise.",
+      "I bear witness that there is no god but Allah alone, with no partner, and I bear witness that Muhammad is His servant and His Messenger.",
+    benefit: "Recited after completing wudu — opens all eight gates of Paradise to enter from whichever one pleases.",
+    benefitArabic: "دعاء الفراغ من الوضوء؛ تُفتح لقائله أبواب الجنة الثمانية يدخل من أيها شاء.",
     repetitionCount: 1,
     countLabel: "1",
-    sourceReference: "Sahih Muslim 234; Hisn al-Muslim 9.",
+    sourceReference: "Sahih Muslim 234; Jami` at-Tirmidhi 55; Hisn al-Muslim 9.",
+    sourceReferenceArabic: "صحيح مسلم ٢٣٤؛ جامع الترمذي ٥٥؛ حصن المسلم ٩.",
     hadithText:
-      "عن عمر بن الخطاب رضي الله عنه قال: قال رسول الله ﷺ: «ما منكم من أحد يتوضأ فيسبغ الوضوء ثم يقول: أشهد أن لا إله إلا الله وحده لا شريك له، وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ، إلا فتحت له أبواب الجنة الثمانية».",
+      "عَنْ عُمَرَ بْنِ الْخَطَّابِ رضي الله عنه قَالَ: قَالَ رَسُولُ اللَّهِ ﷺ: «مَا مِنْكُمْ مِنْ أَحَدٍ يَتَوَضَّأُ فَيُبْلِغُ -أَوْ فَيُسْبِغُ- الْوُضُوءَ ثُمَّ يَقُولُ: أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَأَنَّ مُحَمَّدًا عَبْدُ اللَّهِ وَرَسُولُهُ، إِلَّا فُتِحَتْ لَهُ أَبْوَابُ الْجَنَّةِ الثَّمَانِيَةُ يَدْخُلُ مِنْ أَيِّهَا شَاءَ»، وَزَادَ التِّرْمِذِيُّ: «اللَّهُمَّ اجْعَلْنِي مِنَ التَّوَّابِينَ وَاجْعَلْنِي مِنَ الْمُتَطَهِّرِينَ».",
     hadithTextEnglish:
-      "‘Umar ibn al-Khattab (may Allah be pleased with him) said: The Messenger of Allah ﷺ said: “There is not one of you who performs ablution and does it thoroughly, then says: I bear witness that there is no god but Allah alone, with no partner, and I bear witness that Muhammad is His servant and His Messenger — except that the eight gates of Paradise are opened for him.”",
-    authenticityNote: "Sahih Muslim.",
+      "‘Umar ibn al-Khattab (may Allah be pleased with him) said: The Messenger of Allah ﷺ said: “There is not one of you who performs ablution and does it thoroughly, then says: I bear witness that there is no god but Allah alone, with no partner, and I bear witness that Muhammad is His servant and His Messenger — except that the eight gates of Paradise are opened for him to enter from whichever he wills.” At-Tirmidhi added: “O Allah, make me among those who constantly repent and make me among those who purify themselves.”",
+    authenticityNote: "Sahih according to Al-Albani.",
   },
   {
     id: "pur-ref-6",
@@ -2191,12 +2331,13 @@ const FOOD_DRINK_AZKAR: ZikrDraft[] = [
     benefit: "Recited after eating.",
     repetitionCount: 1,
     countLabel: "1",
-    sourceReference: "Sunan Abu Dawud 3850; Jami' at-Tirmidhi 3457; Hisn al-Muslim 179.",
+    sourceReference: "Sunan Abu Dawud 3850; Jami' at-Tirmidhi 3457; Hisn al-Muslim 180.",
+    sourceReferenceArabic: "سنن أبي داود ٣٨٥٠؛ جامع الترمذي ٣٤٥٧؛ حصن المسلم ١٨٠.",
     hadithText:
-      "عن أبي سعيد الخدري رضي الله عنه أن النبي ﷺ كان إذا فرغ من طعامه قال: «الحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا وَجَعَلَنَا مُسْلِمِينَ».",
+      "عن أبي سعيد الخدري رضي الله عنه أن النبي ﷺ كان إذا فرغ من طعامه قال: «الحمد لله الذي أطعمنا وسقانا وجعلنا مسلمين».",
     hadithTextEnglish:
-      "Abu Sa‘id al-Khudri (may Allah be pleased with him) reported that when the Prophet ﷺ finished his food he would say: “Praise be to Allah, who has fed us and given us drink and made us Muslims.”",
-    authenticityNote: "Sahih (Abu Dawud & At-Tirmidhi).",
+      "Abu Sa‘id al-Khudri (may Allah be pleased with him) reported that when the Prophet ﷺ finished his meal, he would say: “Praise be to Allah Who fed us, gave us drink, and made us Muslims.”",
+    authenticityNote: "Hasan (Abu Dawud & At-Tirmidhi).",
   },
   {
     id: "fd-ref-4",
@@ -2269,6 +2410,48 @@ const FOOD_DRINK_AZKAR: ZikrDraft[] = [
     hadithTextEnglish:
       "Anas ibn Malik (may Allah be pleased with him) reported that the Prophet ﷺ came to Sa‘d ibn ‘Ubadah, who brought bread and oil, and he ate. Then the Prophet ﷺ said: “May the fasting break their fast with you, may the righteous eat your food, and may the angels send blessings upon you.”",
     authenticityNote: "Sahih (Abu Dawud).",
+  },
+  {
+    id: "fd-ref-8",
+    category: "food_drink",
+    orderIndex: 7,
+    arabicText: "اللَّهُمَّ بَارِكْ لَنَا فِيهِ وَزِدْنَا مِنْهُ",
+    transliteration: "Allahumma barik lana fihi wa zidna minh.",
+    translation: "O Allah, bless it for us and increase it for us.",
+    benefit: "Supplication when drinking milk; milk is uniquely sufficient for both sustenance and thirst.",
+    benefitArabic: "دعاء شرب اللبن والحليب؛ فإن اللبن يُجزئ عن الطعام والشراب جميعاً.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Sunan Abu Dawud 3730; Jami' at-Tirmidhi 3455; Hisn al-Muslim 181.",
+    sourceReferenceArabic: "سنن أبي داود ٣٧٣٠؛ جامع الترمذي ٣٤٥٥؛ حصن المسلم ١٨١.",
+    hadithText:
+      "عَنِ ابْنِ عَبَّاسٍ رضي الله عنهما قَالَ: قَالَ رَسُولُ اللَّهِ ﷺ: «مَنْ سَقَاهُ اللَّهُ لَبَنًا فَلْيَقُلْ: اللَّهُمَّ بَارِكْ لَنَا فِيهِ وَزِدْنَا مِنْهُ، فَإِنَّهُ لَيْسَ شَيْءٌ يُجْزِئُ مَكَانَ الطَّعَامِ وَالشَّرَابِ غَيْرُ اللَّبَنِ».",
+    hadithTextEnglish:
+      "Ibn ‘Abbas (may Allah be pleased with them both) narrated that the Messenger of Allah ﷺ said: “Whomever Allah gives milk to drink, let him say: O Allah, bless it for us and give us more of it, for nothing suffices for food and drink except milk.”",
+    authenticityNote: "Hasan according to Al-Albani.",
+    sourceUrl: "https://sunnah.com/abudawud%3A3730",
+  },
+  {
+    id: "fd-ref-9",
+    category: "food_drink",
+    orderIndex: 8,
+    arabicText:
+      "الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنِي هَذَا الطَّعَامَ وَرَزَقَنِيهِ مِنْ غَيْرِ حَوْلٍ مِنِّي وَلَا قُوَّةٍ",
+    transliteration: "Alhamdu lillahilladhi at'amani hadhat-ta'ama wa razaqanihi min ghayri hawlin minni wa la quwwah.",
+    translation:
+      "All praise is for Allah Who fed me this food and provided it for me without any might or power on my part.",
+    benefit: "Whoever recites this upon completing a meal will have his past sins forgiven.",
+    benefitArabic: "من قال هذا عند الفراغ من طعامه غُفر له ما تقدم من ذنبه.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Sunan Abu Dawud 4023; Jami' at-Tirmidhi 3458; Hisn al-Muslim 179.",
+    sourceReferenceArabic: "سنن أبي داود ٤٠٢٣؛ جامع الترمذي ٣٤٥٨؛ حصن المسلم ١٧٩.",
+    hadithText:
+      "عَنْ مُعَاذِ بْنِ أَنَسٍ رضي الله عنه أَنَّ رَسُولَ اللَّهِ ﷺ قَالَ: «مَنْ أَكَلَ طَعَامًا فَقَالَ: الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنِي هَذَا وَرَزَقَنِيهِ مِنْ غَيْرِ حَوْلٍ مِنِّي وَلَا قُوَّةٍ، غُفِرَ لَهُ مَا تَقَدَّمَ مِنْ ذَنْبِهِ».",
+    hadithTextEnglish:
+      "Mu‘adh ibn Anas (may Allah be pleased with him) reported that the Messenger of Allah ﷺ said: “Whoever eats food and says: Praise be to Allah Who has fed me this and provided it for me without any might or power from myself — his past sins will be forgiven.”",
+    authenticityNote: "Hasan according to Al-Albani.",
+    sourceUrl: "https://sunnah.com/abudawud%3A4023",
   },
 ];
 
@@ -2358,42 +2541,85 @@ const TRAVEL_AZKAR: ZikrDraft[] = [
       "Allahu Akbar, Allahu Akbar, Allahu Akbar. Subhanalladhi sakhkhara lana hadha wa ma kunna lahu muqrinina wa inna ila Rabbina lamunqalibun. Allahumma inna nas'aluka fi safarina hadhal-birra wat-taqwa, wa minal-'amali ma tarda, Allahumma hawwin 'alayna safarana hadha watwi 'anna bu'dah, Allahumma antas-Sahibu fis-safari, wal-khalifatu fil-ahl, Allahumma inni a'udhu bika min wa'tha'is-safari, wa ka'abatil-manzari, wa su'il-munqalabi fil-mali wal-ahl.",
     translation:
       "Allah is the Greatest (3×). Glory be to Him Who has subjected this to us, and we could never have it by our efforts, and surely to our Lord we will return. O Allah, we ask You on this journey of ours for righteousness, piety, and deeds that please You. O Allah, make this journey easy for us and shorten its distance. O Allah, You are the Companion on the journey and the Guardian over the family. O Allah, I seek refuge in You from the hardship of travel, a depressing sight, and an ill-fated return in wealth and family.",
-    benefit: "Recited when mounting a transport and setting out on travel — full supplication from Sahih Muslim.",
+    benefit:
+      "Prophetic supplication recited when mounting transport and setting out on travel — full narration from Sahih Muslim.",
+    benefitArabic: "دعاء ركوب الدابة ووسائل السفر والخروج في الرحلة؛ يستعين به المسافر بربه في سفره وأهله وماله وولده.",
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sahih Muslim 1342; Sunan Abu Dawud 2599; Hisn al-Muslim 75–76.",
+    sourceReferenceArabic: "صحيح مسلم ١٣٤٢؛ سنن أبي داود ٢٥٩٩؛ حصن المسلم ٧٥–٧٦.",
     hadithText:
-      "عَنِ ابْنِ عُمَرَ رضي الله عنهما أَنَّ رَسُولَ اللَّهِ ﷺ كَانَ إِذَا اسْتَوَى عَلَى بَعِيرِهِ خَارِجًا إِلَى سَفَرٍ، كَبَّرَ ثَلاَثًا، ثُمَّ قَالَ: «سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ، وَإِنَّا إِلَى رَبِّنَا لَمُنْقَلِبُونَ، اللَّهُمَّ إِنَّا نَسْأَلُكَ فِي سَفَرِنَا هَذَا الْبِرَّ وَالتَّقْوَى، وَمِنَ الْعَمَلِ مَا تَرْضَى، اللَّهُمَّ هَوِّنْ عَلَيْنَا سَفَرَنَا هَذَا، وَاطْوِ عَنَّا بُعْدَهُ، اللَّهُمَّ أَنْتَ الصَّاحِبُ فِي السَّفَرِ، وَالْخَلِيفَةُ فِي الْأَهْلِ، اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ وَعْثَاءِ السَّفَرِ، وَكَآبَةِ الْمَنْظَرِ، وَسُوءِ الْمُنْقَلَبِ فِي الْمَالِ وَالْأَهْلِ وَالْوَلَدِ» إِلَى آخِرِ الدُّعَاءِ.",
+      "عَنِ ابْنِ عُمَرَ رضي الله عنهما أَنَّ رَسُولَ اللَّهِ ﷺ كَانَ إِذَا اسْتَوَى عَلَى بَعِيرِهِ خَارِجًا إِلَى سَفَرٍ، كَبَّرَ ثَلاَثًا، ثُمَّ قَالَ: «سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ، وَإِنَّا إِلَى رَبِّنَا لَمُنْقَلِبُونَ، اللَّهُمَّ إِنَّا نَسْأَلُكَ فِي سَفَرِنَا هَذَا الْبِرَّ وَالتَّقْوَى، وَمِنَ الْعَمَلِ مَا تَرْضَى، اللَّهُمَّ هَوِّنْ عَلَيْنَا سَفَرَنَا هَذَا، وَاطْوِ عَنَّا بُعْدَهُ، اللَّهُمَّ أَنْتَ الصَّاحِبُ فِي السَّفَرِ، وَالْخَلِيفَةُ فِي الْأَهْلِ، اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ وَعْثَاءِ السَّفَرِ، وَكَآبَةِ الْمَنْظَرِ، وَسُوءِ الْمُنْقَلَبِ فِي الْمَالِ وَالْأَهْلِ وَالْوَلَدِ».",
     hadithTextEnglish:
-      "Ibn ‘Umar (may Allah be pleased with them both) reported that when the Messenger of Allah ﷺ had settled upon his camel setting out on a journey, he would say “Allah is greatest” three times, then say: “Glory be to Him who has subjected this to us, and we could never have brought it under control; and to our Lord we are surely returning. O Allah, we ask You on this journey of ours for righteousness and mindfulness of You, and for deeds that please You. O Allah, make this journey of ours easy for us and fold up its distance for us. O Allah, You are the Companion on the journey and the Guardian over the family. O Allah, I seek refuge in You from the hardship of travel, from a sight that brings sorrow, and from an ill return in property, family and children” — to the end of the supplication.",
+      "Ibn ‘Umar (may Allah be pleased with them both) reported that when the Messenger of Allah ﷺ mounted his camel setting out on a journey, he would say Allahu Akbar three times, then say: “Glory be to Him who has subjected this to us... O Allah, we ask You on this journey of ours for righteousness and mindfulness of You, and for deeds that please You. O Allah, make this journey of ours easy for us and fold up its distance for us. O Allah, You are the Companion on the journey and the Guardian over the family. O Allah, I seek refuge in You from the hardship of travel, from a sight that brings sorrow, and from an ill return in property, family and children.”",
     authenticityNote: "Sahih Muslim.",
-    notes: "sourceUrl: https://sunnah.com/muslim:1342a",
+    sourceUrl: "https://sunnah.com/muslim%3A1342a",
   },
   {
-    id: "tr-ref-4",
+    id: "tr-ref-2",
     category: "travel",
     orderIndex: 1,
-    arabicText:
-      "آيِبُونَ تائِبُونَ عَابِدُونَ لِرَبِّنَا حَامِدُونَ\n\nاللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ وَعْثَاءِ السَّفَرِ، وَكَآبَةِ الْمَنْقَلَبِ، وَسُوءِ الْمَنْظَرِ فِي الْمَالِ وَالْأَهْلِ",
-    transliteration:
-      "A'ibuna ta'ibuna 'abiduna li-Rabbina hamidun. Allahumma inni a'udhu bika min wa'tha'is-safari, wa ka'abatil-munqalabi, wa su'il-manzari fil-mali wal-ahl.",
-    translation:
-      "We return, repentant, worshipping, and praising our Lord. O Allah, I seek refuge in You from the hardship of travel, a depressing sight, and an ill-fated return in wealth and family.",
-    benefit: "Recited when returning from travel to home or city.",
+    arabicText: "اللَّهُ أَكْبَرُ (عِنْدَ الصُّعُودِ)، سُبْحَانَ اللَّهِ (عِنْدَ النُّزُولِ)",
+    transliteration: "Allahu Akbar (when ascending), Subhanallah (when descending).",
+    translation: "Allah is the Greatest (when ascending heights), Glory be to Allah (when descending valleys).",
+    benefit:
+      "Sunnah of the Companions during travel: saying Takbir upon rising to elevations and Tasbih upon descending.",
+    benefitArabic: "سنة السفر بالتكبير عند صعود المرتفعات والتسبيح عند النزول في المنحدرات والأودية.",
     repetitionCount: 1,
     countLabel: "1",
-    sourceReference: "Sahih Muslim 1343; Sahih al-Bukhari 3084; Hisn al-Muslim 77–78.",
+    sourceReference: "Sahih al-Bukhari 2993; Hisn al-Muslim 79.",
+    sourceReferenceArabic: "صحيح البخاري ٢٩٩٣؛ حصن المسلم ٧٩.",
     hadithText:
-      "عَنِ ابْنِ عُمَرَ رضي الله عنهما أَنَّ رَسُولَ اللَّهِ ﷺ كَانَ إِذَا قَفَلَ مِنْ حَجٍّ أَوْ عُمْرَةٍ أَوْ غَزْوٍ كُلَّمَا أَوْفَى عَلَى ثَنِيَّةٍ أَوْ فَدْفَدٍ يُكَبِّرُ، ثُمَّ يَقُولُ: «لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، آيِبُونَ تَائِبُونَ عَابِدُونَ لِرَبِّنَا حَامِدُونَ صَدَقَ اللَّهُ وَعْدَهُ، وَنَصَرَ عَبْدَهُ، وَهَزَمَ الْأَحْزَابَ وَحْدَهُ».",
+      "عَنْ جَابِرِ بْنِ عَبْدِ اللَّهِ رضي الله عنهما قَالَ: «كُنَّا إِذَا صَعِدْنَا كَبَّرْنَا، وَإِذَا نَزَلْنَا سَبَّحْنَا».",
     hadithTextEnglish:
-      "Ibn ‘Umar (may Allah be pleased with them both) reported that when the Messenger of Allah ﷺ returned from Hajj, ‘Umrah or an expedition, each time he came up over a rise or a high piece of ground he would say “Allah is greatest”, then say: “There is no god but Allah alone, with no partner; His is the dominion and His is the praise, and He is capable of all things. We return, repenting, worshipping, praising our Lord. Allah kept His promise, gave victory to His servant, and defeated the confederates alone.”",
-    authenticityNote: "Sahih Muslim and Sahih al-Bukhari.",
-    notes: "sourceUrl: https://sunnah.com/muslim:1343b",
+      "Jabir ibn ‘Abdillah (may Allah be pleased with them both) said: “Whenever we went up high ground we said Allahu Akbar, and whenever we descended we said Subhanallah.”",
+    authenticityNote: "Sahih al-Bukhari.",
+    sourceUrl: "https://sunnah.com/bukhari%3A2993",
+  },
+  {
+    id: "tr-ref-3",
+    category: "travel",
+    orderIndex: 2,
+    arabicText: "أَسْتَوْدِعُكُمُ اللَّهَ الَّذِي لَا تَضِيعُ وَدَائِعُهُ",
+    transliteration: "Astawdi'ukumullahalladhi la tadi'u wada'i'uh.",
+    translation: "I place you in the trust of Allah, whose trusts are never lost.",
+    benefit: "Supplication of the departing traveler when bidding farewell to family and those staying behind.",
+    benefitArabic: "دعاء المسافر لمن يودّعه من الأهل والمقيمين مستودعاً إياهم عند حفظ الله الذي لا تضيع ودائعه.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Sunan Ibn Majah 2825; Musnad Ahmad 8690; Hisn al-Muslim 78.",
+    sourceReferenceArabic: "سنن ابن ماجه ٢٨٢٥؛ مسند أحمد ٨٦٩٠؛ حصن المسلم ٧٨.",
+    hadithText:
+      "عَنْ أَبِي هُرَيْرَةَ رضي الله عنه قَالَ: وَدَّعَنِي رَسُولُ اللَّهِ ﷺ فَقَالَ: «أَسْتَوْدِعُكَ اللَّهَ الَّذِي لَا تَضِيعُ وَدَائِعُهُ».",
+    hadithTextEnglish:
+      "Abu Hurayrah (may Allah be pleased with him) reported: The Messenger of Allah ﷺ bade me farewell saying: “I place you in the trust of Allah, whose trusts are never lost.”",
+    authenticityNote: "Sahih according to Al-Albani.",
+    sourceUrl: "https://sunnah.com/ibnmajah%3A2825",
+  },
+  {
+    id: "tr-ref-5",
+    category: "travel",
+    orderIndex: 3,
+    arabicText: "أَسْتَوْدِعُ اللَّهَ دِينَكَ، وَأَمَانَتَكَ، وَخَوَاتِيمَ عَمَلِكَ",
+    transliteration: "Astawdi'ullaha dinaka, wa amanataka, wa khawatima 'amalik.",
+    translation: "I place in Allah's trust your religion, your commitments, and the conclusions of your deeds.",
+    benefit: "Supplication of the resident when bidding farewell to a traveler setting out on a journey.",
+    benefitArabic: "دعاء المقيم للمسافر عند توديعه بحفظ دينه وأمانته وخاتمة أعماله.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Sunan Abu Dawud 2600; Jami' at-Tirmidhi 3443; Hisn al-Muslim 77.",
+    sourceReferenceArabic: "سنن أبي داود ٢٦٠٠؛ جامع الترمذي ٣٤٤٣؛ حصن المسلم ٧٧.",
+    hadithText:
+      "عَنِ ابْنِ عُمَرَ رضي الله عنهما قَالَ: كَانَ رَسُولُ اللَّهِ ﷺ إِذَا وَدَّعَ رَجُلًا أَخَذَ بِيَدِهِ فَلَا يَدَعُهَا حَتَّى يَكُونَ الرَّجُلُ هُوَ يَدَعُ يَدَهُ، ثُمَّ يَقُولُ: «أَسْتَوْدِعُ اللَّهَ دِينَكَ، وَأَمَانَتَكَ، وَخَوَاتِيمَ عَمَلِكَ».",
+    hadithTextEnglish:
+      "Ibn ‘Umar reported: When the Messenger of Allah ﷺ bade farewell to someone, he would take his hand and say: “I entrust to Allah your religion, your trust, and the end of your deeds.”",
+    authenticityNote: "Sahih according to Al-Albani.",
+    sourceUrl: "https://sunnah.com/abudawud%3A2600",
   },
   {
     id: "tr-ref-6",
     category: "travel",
-    orderIndex: 2,
+    orderIndex: 4,
     arabicText:
       "اللَّهُمَّ رَبَّ السَّمَاوَاتِ السَّبْعِ وَمَا أَظْلَلْنَ، وَرَبَّ الْأَرَضِينَ السَّبْعِ وَمَا أَقْلَلْنَ، وَرَبَّ الشَّيَاطِينِ وَمَا أَضْلَلْنَ، وَرَبَّ الرِّيَاحِ وَمَا ذَرَيْنَ، فَإِنَّا نَسْأَلُكَ خَيْرَ هَذِهِ الْقَرْيَةِ وَخَيْرَ أَهْلِهَا وَخَيْرَ مَا فِيهَا، وَنَعُوذُ بِكَ مِنْ شَرِّهَا وَشَرِّ أَهْلِهَا وَشَرِّ مَا فِيهَا",
     transliteration:
@@ -2401,15 +2627,107 @@ const TRAVEL_AZKAR: ZikrDraft[] = [
     translation:
       "O Allah, Lord of the seven heavens and all they overshadow, Lord of the seven earths and all they carry, Lord of the devils and all they lead astray, Lord of the winds and all they scatter: We ask You for the good of this town, the good of its people, and the good within it; and we seek refuge in You from its evil, the evil of its people, and the evil within it.",
     benefit: "Recited when entering a town, city, or new destination.",
+    benefitArabic: "دعاء دخول القرية أو البلدة أو المدينة التي يقصدها المسافر.",
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sahih Ibn Hibban 2697; Al-Hakim 1/442; Hisn al-Muslim 80.",
+    sourceReferenceArabic: "صحيح ابن حبان ٢٦٩٧؛ المستدرك ١/٤٤٢؛ حصن المسلم ٨٠.",
     hadithText:
       "عَنْ صُهَيْبٍ رضي الله عنه أَنَّ النَّبِيَّ ﷺ لَمْ يَرَ قَرْيَةً يُرِيدُ دُخُولَهَا إِلاَّ قَالَ حِينَ يَرَاهَا: «اللَّهُمَّ رَبَّ السَّمَاوَاتِ السَّبْعِ وَمَا أَظْلَلْنَ، وَرَبَّ الأَرَضِينَ السَّبْعِ وَمَا أَقْلَلْنَ، وَرَبَّ الشَّيَاطِينِ وَمَا أَضْلَلْنَ، وَرَبَّ الرِّيَاحِ وَمَا ذَرَيْنَ، فَإِنَّا نَسْأَلُكَ خَيْرَ هَذِهِ الْقَرْيَةِ وَخَيْرَ أَهْلِهَا، وَنَعُوذُ بِكَ مِنْ شَرِّهَا وَشَرِّ أَهْلِهَا وَشَرِّ مَا فِيهَا» الدُّعَاءَ.",
     hadithTextEnglish:
-      "Suhayb (may Allah be pleased with him) reported that the Prophet ﷺ never saw a town he meant to enter without saying, on seeing it: “O Allah, Lord of the seven heavens and all they overshadow, Lord of the seven earths and all they carry, Lord of the devils and all they lead astray, Lord of the winds and all they scatter — we ask You for the good of this town and the good of its people, and we seek refuge in You from its evil, the evil of its people and the evil of what is in it” — the supplication.",
+      "Suhayb (may Allah be pleased with him) reported that the Prophet ﷺ never saw a town he meant to enter without saying, on seeing it: “O Allah, Lord of the seven heavens and all they overshadow... we ask You for the good of this town and the good of its people, and we seek refuge in You from its evil...”",
     authenticityNote: "Graded Hasan by Al-Albani; Sahih Ibn Hibban.",
-    notes: "sourceUrl: https://sunnah.com/hisn%3A80",
+    sourceUrl: "https://sunnah.com/hisn%3A80",
+  },
+  {
+    id: "tr-ref-7",
+    category: "travel",
+    orderIndex: 5,
+    arabicText: "أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ",
+    transliteration: "A'udhu bi-kalimatil-lahit-tammati min sharri ma khalaq.",
+    translation: "I seek refuge in the perfect words of Allah from the evil of what He has created.",
+    benefit:
+      "Whoever stops at a lodging or resting place during journey and says this, nothing will harm him until he departs.",
+    benefitArabic: "دعاء النزول في منزل أو استراحة في السفر؛ لا يضر قائله شيء حتى يرتحل من منزله ذلك.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Sahih Muslim 2708; Hisn al-Muslim 81.",
+    sourceReferenceArabic: "صحيح مسلم ٢٧٠٨؛ حصن المسلم ٨١.",
+    hadithText:
+      "عَنْ خَوْلَةَ بِنْتِ حَكِيمٍ السُّلَمِيَّةِ رضي الله عنها قَالَتْ: سَمِعْتُ رَسُولَ اللَّهِ ﷺ يَقُولُ: «مَنْ نَزَلَ مَنْزِلًا ثُمَّ قَالَ: أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ، لَمْ يَضُرَّهُ شَيْءٌ حَتَّى يَرْتَحِلَ مِنْ مَنْزِلِهِ ذَلِكَ».",
+    hadithTextEnglish:
+      "Khawlah bint Hakim said: I heard the Messenger of Allah ﷺ saying: “Whoever stops at a place and says: I seek refuge in the perfect words of Allah from the evil of what He has created, nothing will harm him until he departs from that place.”",
+    authenticityNote: "Sahih Muslim.",
+    sourceUrl: "https://sunnah.com/muslim%3A2708",
+  },
+  {
+    id: "tr-ref-8",
+    category: "travel",
+    orderIndex: 6,
+    arabicText:
+      "سَمِعَ سَامِعٌ بِحَمْدِ اللَّهِ وَحُسْنِ بَلَائِهِ عَلَيْنَا، رَبَّنَا صَاحِبْنَا وَأَفْضِلْ عَلَيْنَا، عَائِذًا بِاللَّهِ مِنَ النَّارِ",
+    transliteration:
+      "Sami'a sami'un bi-hamdillahi wa husni bala'ihi 'alayna. Rabbana sahibna wa afdil 'alayna, 'a'idhan billahi minan-nar.",
+    translation:
+      "May a listener bear witness to our praise of Allah and His good favor upon us. Our Lord, accompany us and bestow Your favors upon us; seeking refuge in Allah from the Fire.",
+    benefit: "Prophetic supplication recited during travel at the time of pre-dawn (Sahar).",
+    benefitArabic: "دعاء المسافر إذا كان في وقت السحر وقبل طلوع الفجر.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Sahih Muslim 2718; Hisn al-Muslim 82.",
+    sourceReferenceArabic: "صحيح مسلم ٢٧١٨؛ حصن المسلم ٨٢.",
+    hadithText:
+      "عَنْ أَبِي هُرَيْرَةَ رضي الله عنه أَنَّ النَّبِيَّ ﷺ كَانَ إِذَا كَانَ فِي سَفَرٍ وَأَسْحَرَ يَقُولُ: «سَمِعَ سَامِعٌ بِحَمْدِ اللَّهِ وَحُسْنِ بَلَائِهِ عَلَيْنَا، رَبَّنَا صَاحِبْنَا وَأَفْضِلْ عَلَيْنَا، عَائِذًا بِاللَّهِ مِنَ النَّارِ».",
+    hadithTextEnglish:
+      "Abu Hurayrah reported that when the Prophet ﷺ was on a journey at pre-dawn, he would say: “May a listener hear our praising Allah and His good testing of us. Our Lord, accompany us and show favor to us, while we seek refuge in Allah from the Fire.”",
+    authenticityNote: "Sahih Muslim.",
+    sourceUrl: "https://sunnah.com/muslim%3A2718",
+  },
+  {
+    id: "tr-ref-4",
+    category: "travel",
+    orderIndex: 7,
+    arabicText:
+      "آيِبُونَ تائِبُونَ عَابِدُونَ لِرَبِّنَا حَامِدُونَ\n\nاللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ وَعْثَاءِ السَّفَرِ، وَكَآبَةِ الْمَنْقَلَبِ، وَسُوءِ الْمَنْظَرِ فِي الْمَالِ وَالْأَهْلِ",
+    transliteration:
+      "A'ibuna ta'ibuna 'abiduna li-Rabbina hamidun. Allahumma inni a'udhu bika min wa'tha'is-safari, wa ka'abatil-munqalabi, wa su'il-manzari fil-mali wal-ahl.",
+    translation:
+      "We return, repenting, worshipping, and praising our Lord. O Allah, I seek refuge in You from the hardship of travel, a depressing return, and an ill-fated sight in wealth and family.",
+    benefit: "Recited when returning from travel to one's home — narration from Sahih Muslim.",
+    benefitArabic: "دعاء القفول والرجوع من السفر في صحيح مسلم؛ تجديد للتوبة والحمد والاستعاذة.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Sahih Muslim 1342; Hisn al-Muslim 76.",
+    sourceReferenceArabic: "صحيح مسلم ١٣٤٢؛ حصن المسلم ٧٦.",
+    hadithText:
+      "عَنِ ابْنِ عُمَرَ رضي الله عنهما أَنَّ رَسُولَ اللَّهِ ﷺ كَانَ إِذَا رَجَعَ مِنْ سَفَرٍ قَالَهُنَّ وَزَادَ فِيهِنَّ: «آيِبُونَ تَائِبُونَ عَابِدُونَ لِرَبِّنَا حَامِدُونَ»، وَفِي رِوَايَةٍ: «اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ وَعْثَاءِ السَّفَرِ، وَكَآبَةِ الْمُنْقَلَبِ، وَسُوءِ الْمَنْظَرِ فِي الْمَالِ وَالْأَهْلِ».",
+    hadithTextEnglish:
+      "Ibn ‘Umar reported that when the Messenger of Allah ﷺ returned from a journey, he would say the words of the travel supplication and add: “We return repenting, worshipping, and praising our Lord...”",
+    authenticityNote: "Sahih Muslim.",
+    sourceUrl: "https://sunnah.com/muslim%3A1342a",
+  },
+  {
+    id: "tr-ref-9",
+    category: "travel",
+    orderIndex: 8,
+    arabicText:
+      "اللَّهُ أَكْبَرُ، اللَّهُ أَكْبَرُ، اللَّهُ أَكْبَرُ، لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، آيِبُونَ تَائِبُونَ عَابِدُونَ لِرَبِّنَا حَامِدُونَ، صَدَقَ اللَّهُ وَعْدَهُ، وَنَصَرَ عَبْدَهُ، وَهَزَمَ الْأَحْزَابَ وَحْدَهُ",
+    transliteration:
+      "Allahu Akbar, Allahu Akbar, Allahu Akbar. La ilaha illallahu wahdahu la sharika lah, lahul-mulku wa lahul-hamd, wa huwa 'ala kulli shay'in qadir. A'ibuna ta'ibuna 'abiduna li-Rabbina hamidun. Sadaqallahu wa'dah, wa nasara 'abdah, wa hazamal-ahzaba wahdah.",
+    translation:
+      "Allah is the Greatest (3×). There is no god but Allah alone, with no partner. His is the dominion and His is all praise, and He is capable of all things. We return, repenting, worshipping, and praising our Lord. Allah fulfilled His promise, granted victory to His servant, and defeated the confederates alone.",
+    benefit: "Prophetic supplication upon returning from an expedition, Hajj, or journey at elevated ground.",
+    benefitArabic: "دعاء الرجوع والقفول من السفر عند مشارف البلدة أو التلال المرتفعة في صحيحي البخاري ومسلم.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Sahih al-Bukhari 1797, 3084; Sahih Muslim 1344; Hisn al-Muslim 77–78.",
+    sourceReferenceArabic: "صحيح البخاري ١٧٩٧، ٣٠٨٤؛ صحيح مسلم ١٣٤٤؛ حصن المسلم ٧٧–٧٨.",
+    hadithText:
+      "عَنِ ابْنِ عُمَرَ رضي الله عنهما أَنَّ رَسُولَ اللَّهِ ﷺ كَانَ إِذَا قَفَلَ مِنْ جَيْشٍ أَوْ سَرِيَّةٍ أَوْ حَجٍّ أَوْ عُمْرَةٍ، كَبَّرَ عَلَى كُلِّ شَرَفٍ مِنَ الْأَرْضِ ثَلَاثَ تَكْبِيرَاتٍ، ثُمَّ قَالَ: «لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، آيِبُونَ تَائِبُونَ عَابِدُونَ لِرَبِّنَا حَامِدُونَ، صَدَقَ اللَّهُ وَعْدَهُ، وَنَصَرَ عَبْدَهُ، وَهَزَمَ الْأَحْزَابَ وَحْدَهُ».",
+    hadithTextEnglish:
+      "Ibn ‘Umar reported that whenever the Messenger of Allah ﷺ returned from an expedition, Hajj, or ‘Umrah, he would say Allahu Akbar three times on every elevated place, and then say: “There is no god but Allah alone, with no partner; His is the dominion and His is the praise, and He is capable of all things. We return repenting, worshipping, and praising our Lord. Allah fulfilled His promise, granted victory to His servant, and defeated the confederates alone.”",
+    authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
+    sourceUrl: "https://sunnah.com/bukhari%3A1797",
   },
 ];
 
@@ -2512,20 +2830,67 @@ const DISTRESS_ANXIETY_AZKAR: ZikrDraft[] = [
     category: "distress_anxiety",
     orderIndex: 5,
     arabicText:
-      "اللَّهُمَّ إِنِّي عَبدُكَ وَابنُ عَبدِكَ وَابنُ أَمَتِكَ نَاصِيَتِي بِيَدِكَ مَاضٍ فِيَّ حُكمُكَ عَدلٌ فِيَّ قَضَاؤُكَ...",
+      "اللَّهُمَّ إِنِّي عَبْدُكَ، ابْنُ عَبْدِكَ، ابْنُ أَمَتِكَ، نَاصِيَتِي بِيَدِكَ، مَاضٍ فِيَّ حُكْمُكَ، عَدْلٌ فِيَّ قَضَاؤُكَ، أَسْأَلُكَ بِكُلِّ اسْمٍ هُوَ لَكَ، سَمَّيْتَ بِهِ نَفْسَكَ، أَوْ أَنْزَلْتَهُ فِي كِتَابِكَ، أَوْ عَلَّمْتَهُ أَحَدًا مِنْ خَلْقِكَ، أَوِ اسْتَأْثَرْتَ بِهِ فِي عِلْمِ الْغَيْبِ عِنْدَكَ، أَنْ تَجْعَلَ الْقُرْآنَ رَبِيعَ قَلْبِي، وَنُورَ صَدْرِي، وَجَلَاءَ حُزْنِي، وَذَهَابَ هَمِّي.",
     transliteration:
-      "Allahumma inni 'abduka wabnu 'abdika wabnu amatika nasiyati biyadika madin fiyya hukmuka 'adlun fiyya qada'uk",
+      "Allāhumma innī ‘abduk, ibnu ‘abdik, ibnu amatik, nāṣiyatī biyadik, māḍin fiyya ḥukmuk, ‘adlun fiyya qaḍā’uk. As’aluka bikulli ismin huwa lak, sammayta bihi nafsak, aw anzaltahu fī kitābik, aw ‘allamtahu aḥadan min khalqik, aw ista’tharta bihi fī ‘ilmil-ghaybi ‘indak, an taj‘alal-Qur’āna rabī‘a qalbī, wa nūra ṣadrī, wa jalā’a ḥuznī, wa dhahāba hammī.",
     translation:
-      "O Allah, I am Your servant, son of Your servant, son of Your maidservant. My forelock is in Your hand, Your command over me is executed and Your decree is just.",
-    benefit: "Removes anxiety and replaces sorrow with joy.",
+      "O Allah, I am Your servant, the son of Your servant and the son of Your maidservant. My forelock is in Your hand; Your command over me is executed and Your decree concerning me is just. I ask You by every name belonging to You—by which You named Yourself, revealed in Your Book, taught any of Your creation, or kept with You in knowledge of the unseen—to make the Qur’an the spring of my heart, the light of my chest, the remover of my sadness, and the reliever of my distress.",
+    benefit: "Removes grief and anxiety and replaces sorrow with joy and relief.",
+    benefitArabic: "يُذهب الله به الهم والحزن ويُبدل صاحبه مكانه فرجاً وانشراحاً.",
     repetitionCount: 1,
     countLabel: "1",
-    sourceReference: "Musnad Ahmad 1/391; Ibn Hibban; Hisn al-Muslim 125.",
+    sourceReference: "Musnad Ahmad 3712; Sahih Ibn Hibban 972; Hisn al-Muslim 120.",
+    sourceReferenceArabic: "مسند أحمد ٣٧١٢؛ صحيح ابن حبان ٩٧٢؛ حصن المسلم ١٢٠.",
     hadithText:
       "عن عبد الله بن مسعود رضي الله عنه قال: قال رسول الله ﷺ: «ما أصاب أحداً قط هم ولا حزن فقال: اللهم إني عبدك وابن عبدك وابن أمتك، نَاصِيَتِي بِيَدِكَ، مَاضٍ فِيَّ حُكْمُكَ، عَدْلٌ فِيَّ قَضَاؤُكَ، أَسْأَلُكَ بِكُلِّ اسْمٍ هُوَ لَكَ سَمَّيْتَ بِهِ نَفْسَكَ، أَوْ عَلَّمْتَهُ أَحَدًا مِنْ خَلْقِكَ، أَوْ أَنْزَلْتَهُ فِي كِتَابِكَ، أَوِ اسْتَأْثَرْتَ بِهِ فِي عِلْمِ الْغَيْبِ عِنْدَكَ، أَنْ تَجْعَلَ الْقُرْآنَ رَبِيعَ قَلْبِي، وَنُورَ صَدْرِي، وَجَلَاءَ حُزْنِي، وَذَهَابَ هَمِّي، إلا أذهب الله همه وأبدله مكانه فرجاً».",
     hadithTextEnglish:
-      "‘Abdullah ibn Mas‘ud (may Allah be pleased with him) said: The Messenger of Allah ﷺ said: “No one is ever struck by anxiety or grief and says: O Allah, I am Your servant, son of Your servant, son of Your maidservant. My forelock is in Your hand. Your judgement upon me is carried out, Your decree concerning me is just. I ask You by every name that is Yours, by which You have named Yourself, or taught to any of Your creation, or sent down in Your Book, or kept to Yourself in the knowledge of the unseen — that You make the Qur’an the springtime of my heart, the light of my breast, the lifting of my sorrow and the passing of my anxiety — except that Allah takes away his anxiety and gives him relief in its place.”",
+      "‘Abdullah ibn Mas‘ud (may Allah be pleased with him) said: The Messenger of Allah ﷺ said: “No one is ever struck by anxiety or grief and says: O Allah, I am Your servant, son of Your servant, son of Your maidservant... except that Allah takes away his anxiety and gives him relief in its place.”",
     authenticityNote: "Authenticated by Ibn Hibban and al-Albani.",
+    sourceUrl: "https://sunnah.com/hisn%3A120",
+  },
+  {
+    id: "da-ref-7",
+    category: "distress_anxiety",
+    orderIndex: 6,
+    arabicText: "اللَّهُمَّ اكْفِنِي بِحَلَالِكَ عَنْ حَرَامِكَ، وَأَغْنِنِي بِفَضْلِكَ عَمَّنْ سِوَاكَ",
+    transliteration: "Allahummak-fini bi-halalika 'an haramik, wa aghnini bi-fadlika 'amman siwak.",
+    translation:
+      "O Allah, suffice me with what You have made lawful against what You have made unlawful, and enrich me with Your bounty above all others.",
+    benefit: "Supplication for settling debt and relieving financial hardship, even if debts were like a mountain.",
+    benefitArabic: "دعاء قضاء الدين وتفريج الكرب المالي، ولو كان على العبد مثل جبل صِير ديناً أداه الله عنه.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Jami` at-Tirmidhi 3563; Hisn al-Muslim 136.",
+    sourceReferenceArabic: "جامع الترمذي ٣٥٦٣؛ حصن المسلم ١٣٦.",
+    hadithText:
+      "عَنْ عَلِيٍّ رضي الله عنه أَنَّ مُكَاتَبًا جَاءَهُ فَقَالَ: إِنِّي عَجَزْتُ عَنْ كِتَابَتِي فَأَعِنِّي. قَالَ: أَلَا أُعَلِّمُكَ كَلِمَاتٍ عَلَّمَنِيهِنَّ رَسُولُ اللَّهِ ﷺ لَوْ كَانَ عَلَيْكَ مِثْلُ جَبَلِ صِيرٍ دَيْنًا أَدَّاهُ اللَّهُ عَنْكَ؟ قَالَ: «قُلِ: اللَّهُمَّ اكْفِنِي بِحَلَالِكَ عَنْ حَرَامِكَ، وَأَغْنِنِي بِفَضْلِكَ عَمَّنْ سِوَاكَ».",
+    hadithTextEnglish:
+      "‘Ali (may Allah be pleased with him) said: “Shall I not teach you words that the Messenger of Allah ﷺ taught me, which, if you had a debt like Mount Seer, Allah would pay it for you? Say: O Allah! Suffice me with Your lawful against Your prohibited, and make me independent of all those besides You by Your grace.”",
+    authenticityNote: "Hasan according to Al-Albani.",
+    sourceUrl: "https://sunnah.com/tirmidhi%3A3563",
+  },
+  {
+    id: "da-ref-8",
+    category: "distress_anxiety",
+    orderIndex: 7,
+    arabicText:
+      "لَا إِلَهَ إِلَّا اللَّهُ الْعَظِيمُ الْحَلِيمُ، لَا إِلَهَ إِلَّا اللَّهُ رَبُّ الْعَرْشِ الْعَظِيمِ، لَا إِلَهَ إِلَّا اللَّهُ رَبُّ السَّمَاوَاتِ وَرَبُّ الْأَرْضِ وَرَبُّ الْعَرْشِ الْكَرِيمِ",
+    transliteration:
+      "La ilaha illallahul-'Azimul-Halim, la ilaha illallahu Rabbul-'Arshil-'Azim, la ilaha illallahu Rabbus-samawati wa Rabbul-ardi wa Rabbul-'Arshil-Karim.",
+    translation:
+      "There is no god but Allah, the Magnificent, the Forbearing. There is no god but Allah, Lord of the Magnificent Throne. There is no god but Allah, Lord of the heavens, Lord of the earth, and Lord of the Noble Throne.",
+    benefit: "The Prophetic supplication at times of severe distress and calamity (Dua al-Karb).",
+    benefitArabic: "دعاء الكرب العظيم الذي كان النبي ﷺ يدعو به عند الشدائد والنوازل.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Sahih al-Bukhari 6346; Sahih Muslim 2730; Hisn al-Muslim 121.",
+    sourceReferenceArabic: "صحيح البخاري ٦٣٤٦؛ صحيح مسلم ٢٧٣٠؛ حصن المسلم ١٢١.",
+    hadithText:
+      "عَنِ ابْنِ عَبَّاسٍ رضي الله عنهما أَنَّ رَسُولَ اللَّهِ ﷺ كَانَ يَقُولُ عِنْدَ الْكَرْبِ: «لَا إِلَهَ إِلَّا اللَّهُ الْعَظِيمُ الْحَلِيمُ، لَا إِلَهَ إِلَّا اللَّهُ رَبُّ الْعَرْشِ الْعَظِيمِ، لَا إِلَهَ إِلَّا اللَّهُ رَبُّ السَّمَاوَاتِ وَرَبُّ الْأَرْضِ وَرَبُّ الْعَرْشِ الْكَرِيمِ».",
+    hadithTextEnglish:
+      "Ibn ‘Abbas (may Allah be pleased with them both) narrated that the Messenger of Allah ﷺ used to say at times of distress: “There is no god but Allah, the Immense, the Clement; there is no god but Allah, Lord of the Mighty Throne; there is no god but Allah, Lord of the heavens, Lord of the earth, and Lord of the Noble Throne.”",
+    authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
+    sourceUrl: "https://sunnah.com/bukhari%3A6346",
   },
 ];
 
@@ -2537,15 +2902,19 @@ const ILLNESS_RUQYAH_AZKAR: ZikrDraft[] = [
     arabicText: "أَعُوذُ بِعِزَّةِ اللَّهِ وَقُدرَتِهِ مِن شَرِّ مَا أَجِدُ وَأُحَاذِرُ",
     transliteration: "A'udhu bi-'izzatillahi wa qudratihi min sharri ma ajidu wa uhadhir",
     translation: "I seek refuge in Allah's might and power from the evil of what I feel and fear.",
-    benefit: "Place hand on painful area and repeat 7 times.",
+    benefit: "Place hand on the painful area, say Bismillah three times, and repeat this supplication seven times.",
+    benefitArabic:
+      "يضع يده على الموضع الذي يؤلمه من جسده ويقول: بسم الله ثلاثاً، ويقول سبع مرات: أعوذ بالله وقدرته من شر ما أجد وأحاذر.",
     repetitionCount: 7,
     countLabel: "7",
     sourceReference: "Sahih Muslim 2202; Hisn al-Muslim 131.",
+    sourceReferenceArabic: "صحيح مسلم ٢٢٠٢؛ حصن المسلم ١٣١.",
     hadithText:
-      "عن عثمان بن أبي العاص رضي الله عنه أنه شكى إلى رسول الله ﷺ وجعاً، فقال له رسول الله ﷺ: «ضع يدك على الذي يلمس من جسدك وقل: باسم الله ثلاثاً، وقل سبع مرات: أَعُوذُ بِعِزَّةِ اللَّهِ وَقُدرَتِهِ مِن شَرِّ مَا أَجِدُ وَأُحَاذِرُ».",
+      "عن عثمان بن أبي العاص رضي الله عنه أنه شكى إلى رسول الله ﷺ وجعاً، فقال له رسول الله ﷺ: «ضع يدك على الذي يلمس من جسدك وقل: باسم الله ثلاثاً، وقل سبع مرات: أَعُوذُ بِاللَّهِ وَقُدرَتِهِ مِن شَرِّ مَا أَجِدُ وَأُحَاذِرُ».",
     hadithTextEnglish:
-      "‘Uthman ibn Abi al-‘As (may Allah be pleased with him) complained to the Messenger of Allah ﷺ of a pain, and the Messenger of Allah ﷺ said to him: “Place your hand on the part of your body that hurts and say: In the name of Allah — three times; and say seven times: I seek refuge in the might of Allah and His power from the evil of what I find and what I fear.”",
+      "‘Uthman ibn Abi al-‘As (may Allah be pleased with him) complained to the Messenger of Allah ﷺ of a pain, and the Messenger of Allah ﷺ said to him: “Place your hand on the part of your body that hurts and say: In the name of Allah — three times; and say seven times: I seek refuge in Allah and His power from the evil of what I find and what I fear.”",
     authenticityNote: "Sahih Muslim.",
+    sourceUrl: "https://sunnah.com/muslim%3A2202",
   },
   {
     id: "ir-ref-2",
@@ -2558,9 +2927,11 @@ const ILLNESS_RUQYAH_AZKAR: ZikrDraft[] = [
     translation:
       "O Allah, Lord of mankind, remove the harm and heal him, for You are the Healer. There is no healing except Your healing.",
     benefit: "Ruqyah dua for visiting a sick person.",
+    benefitArabic: "دعاء رقية المريض وعيادته بطلب الشفاء التام من رب الناس.",
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sahih al-Bukhari 7/131; Sahih Muslim 2191; Hisn al-Muslim 129.",
+    sourceReferenceArabic: "صحيح البخاري ٧/١٣١؛ صحيح مسلم ٢١٩١؛ حصن المسلم ١٢٩.",
     hadithText:
       "عن عائشة رضي الله عنها أن النبي ﷺ كان يعوذ بعض أهله يمسح بيمينه ويقول: «اللَّهُمَّ رَبَّ النَّاسِ أَذهِبِ البَأسَ اشفِهِ وَأَنتَ الشَّافِي، لَا شَافِيَ إِلَّا أَنْتَ، شِفَاءً لَا يُغَادِرُ سَقَمًا».",
     hadithTextEnglish:
@@ -2578,9 +2949,11 @@ const ILLNESS_RUQYAH_AZKAR: ZikrDraft[] = [
     translation:
       "In the name of Allah He will cure you, from every disease He will heal you, from the evil of the envier when he envies and from every evil eye.",
     benefit: "Prophetic ruqyah for healing and protection.",
+    benefitArabic: "رقية جبريل عليه السلام للنبي ﷺ للشفاء من كل داء وحسد وعين.",
     repetitionCount: 3,
     countLabel: "3",
     sourceReference: "Sahih Muslim 2186; Hisn al-Muslim 130.",
+    sourceReferenceArabic: "صحيح مسلم ٢١٨٦؛ حصن المسلم ١٣٠.",
     hadithText:
       "عن عائشة رضي الله عنها أن رسول الله ﷺ كان إذا اشتكى رقاه جبريل عليه السلام فقال: «بِاسمِ اللَّهِ يُبرِيكَ وَمِن كُلِّ دَاءٍ يَشفِيكَ، مِنْ شَرِّ حَاسِدٍ إِذَا حَسَدَ، وَشَرِّ كُلِّ ذِي عَيْنٍ».",
     hadithTextEnglish:
@@ -2595,9 +2968,11 @@ const ILLNESS_RUQYAH_AZKAR: ZikrDraft[] = [
     transliteration: "As'alullahal-'Azima Rabbal-'Arshil-'Azimi an yashfiyak",
     translation: "I ask Allah the Magnificent, Lord of the Magnificent Throne, to cure you.",
     benefit: "Recited 7 times when visiting the sick.",
+    benefitArabic: "يُقال ٧ مرات عند عيادة المريض مالم يحضره أجله فيعافيه الله.",
     repetitionCount: 7,
     countLabel: "7",
     sourceReference: "Sunan Abu Dawud 3106; Jami' at-Tirmidhi 2083; Hisn al-Muslim 128.",
+    sourceReferenceArabic: "سنن أبي داود ٣١٠٦؛ جامع الترمذي ٢٠٨٣؛ حصن المسلم ١٢٨.",
     hadithText:
       "عن ابن عباس رضي الله عنهما عن النبي ﷺ قال: «من عاد مريضاً لم يحضر أجله فقال عنده سبع مرار: أسأل الله العظيم رب العرش العظيم أن يشفيك إلا عافاه الله من ذلك المرض».",
     hadithTextEnglish:
@@ -2608,18 +2983,24 @@ const ILLNESS_RUQYAH_AZKAR: ZikrDraft[] = [
     id: "ir-ref-5",
     category: "illness_ruqyah",
     orderIndex: 4,
-    arabicText: "قُل هُوَ اللَّهُ أَحَدٌ / قُل أَعُوذُ بِرَبِّ الفَلَقِ / قُل أَعُوذُ بِرَبِّ النَّاسِ",
-    transliteration: "Al-Ikhlas, Al-Falaq, and An-Nas (Surahs 112, 113, 114)",
-    translation: "The Three Quls — blown gently into cupped hands and wiped over the body for Ruqyah.",
-    benefit: "Prophetic practice before sleep or when feeling ill.",
+    arabicText:
+      "﴿قُلْ هُوَ اللَّهُ أَحَدٌ ۝ اللَّهُ الصَّمَدُ ۝ لَمْ يَلِدْ وَلَمْ يُولَدْ ۝ وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ﴾\n\n﴿قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ ۝ مِن شَرِّ مَا خَلَقَ ۝ وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ ۝ وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ ۝ وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ﴾\n\n﴿قُلْ أَعُوذُ بِرَبِّ النَّاسِ ۝ مَلِكِ النَّاسِ ۝ إِلَٰهِ النَّاسِ ۝ مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ ۝ الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ ۝ مِنَ الْجِنَّةِ وَالنَّاسِ﴾",
+    transliteration: "Surah Al-Ikhlas, Surah Al-Falaq, and Surah An-Nas.",
+    translation:
+      "The Three Quls (Surahs 112, 113, 114) — recited into cupped hands and wiped over the body for Ruqyah.",
+    benefit:
+      "Prophetic practice before sleep or when feeling ill: reciting the Three Quls into hands and wiping over the body.",
+    benefitArabic: "سنة نبوية قبل النوم وعند المرض بجمع الكفين والنفث فيهما بالمعوذات ومسح الجسد.",
     repetitionCount: 3,
     countLabel: "3",
     sourceReference: "Sahih al-Bukhari 5017; Sahih Muslim 2192; Hisn al-Muslim 132.",
+    sourceReferenceArabic: "صحيح البخاري ٥٠١٧؛ صحيح مسلم ٢١٩٢؛ حصن المسلم ١٣٢.",
     hadithText:
       "عن عائشة رضي الله عنها أن النبي ﷺ كان إذا أوى إلى فراشه كل ليلة جمع كفيه ثم نفث فيهما فقرأ فيهما: قل هو الله أحد وقل أعوذ برب الفلق وقل أعوذ برب الناس، ثم يمسح بهما ما استطاع من جسده، يبدأ بهما على رأسه ووجهه وما أقبل من جسده، يفعل ذلك ثلاث مرات.",
     hadithTextEnglish:
       "‘A’ishah (may Allah be pleased with her) reported that when the Prophet ﷺ went to his bed each night, he would cup his hands together, breathe into them, and recite into them: “Say: He is Allah, One”, “Say: I seek refuge in the Lord of daybreak”, and “Say: I seek refuge in the Lord of mankind”. Then he would wipe with them as much of his body as he could, beginning with his head, his face and the front of his body, doing that three times.",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
+    sourceUrl: "https://sunnah.com/bukhari%3A5017",
   },
   {
     id: "ir-ref-6",
@@ -2632,14 +3013,37 @@ const ILLNESS_RUQYAH_AZKAR: ZikrDraft[] = [
     translation:
       "In the name of Allah I perform ruqyah for you, from everything that harms you, from the evil of every soul or envious eye.",
     benefit: "Ruqyah Jibril recited for the Prophet ﷺ.",
+    benefitArabic: "رقية نبوية مباركة من كل ما يؤذي ومن كل نفس أو عين حاسد.",
     repetitionCount: 3,
     countLabel: "3",
     sourceReference: "Sahih Muslim 2186; Hisn al-Muslim 133.",
+    sourceReferenceArabic: "صحيح مسلم ٢١٨٦؛ حصن المسلم ١٣٣.",
     hadithText:
       "عن أبي سعيد الخدري رضي الله عنه أن جبريل أتى النبي ﷺ فقال: يا محمد اشتكيت؟ فقال: نعم، قال: «بِسمِ اللَّهِ أَرقِيكَ مِن كُلِّ شَيءٍ يُؤذِيكَ، مِنْ شَرِّ كُلِّ نَفْسٍ أَوْ عَيْنِ حَاسِدٍ، اللَّهُ يَشْفِيكَ، بِاسْمِ اللَّهِ أَرْقِيكَ».",
     hadithTextEnglish:
       "Abu Sa‘id al-Khudri (may Allah be pleased with him) reported that Jibril came to the Prophet ﷺ and said: Muhammad, are you ill? He said: Yes. He said: “In the name of Allah I recite over you, from everything that harms you, from the evil of every soul or envious eye. May Allah heal you. In the name of Allah I recite over you.”",
     authenticityNote: "Sahih Muslim.",
+  },
+  {
+    id: "ir-ref-7",
+    category: "illness_ruqyah",
+    orderIndex: 6,
+    arabicText: "لَا إِلَهَ إِلَّا اللَّهُ",
+    transliteration: "La ilaha illallah.",
+    translation: "There is no god but Allah.",
+    benefit:
+      "Exhorting the dying to say La ilaha illallah; whoever's last words are La ilaha illallah enters Paradise.",
+    benefitArabic: "تلقين المحتضر لا إله إلا الله؛ فمن كان آخر كلامه من الدنيا لا إله إلا الله دخل الجنة.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Sahih Muslim 916, 917; Sunan Abi Dawud 3116; Hisn al-Muslim 138.",
+    sourceReferenceArabic: "صحيح مسلم ٩١٦، ٩١٧؛ سنن أبي داود ٣١١٦؛ حصن المسلم ١٣٨.",
+    hadithText:
+      "عَنْ أَبِي سَعِيدٍ الْخُدْرِيِّ رضي الله عنه قَالَ: قَالَ رَسُولُ اللَّهِ ﷺ: «لَقِّنُوا مَوْتَاكُمْ لَا إِلَهَ إِلَّا اللَّهُ»، وَعَنْ مُعَاذِ بْنِ جَبَلٍ رضي الله عنه قَالَ: قَالَ رَسُولُ اللَّهِ ﷺ: «مَنْ كَانَ آخِرُ كَلَامِهِ لَا إِلَهَ إِلَّا اللَّهُ دَخَلَ الْجَنَّةَ».",
+    hadithTextEnglish:
+      "Abu Sa‘id al-Khudri reported that the Messenger of Allah ﷺ said: “Exhort your dying ones to say: There is no god but Allah.” And Mu‘adh ibn Jabal reported that the Messenger of Allah ﷺ said: “He whose last words are: There is no god but Allah, will enter Paradise.”",
+    authenticityNote: "Sahih Muslim.",
+    sourceUrl: "https://sunnah.com/muslim%3A916",
   },
 ];
 
@@ -2799,6 +3203,118 @@ const SOCIAL_COMMUNITY_AZKAR: ZikrDraft[] = [
       "Umm Salamah (may Allah be pleased with her) said: The Messenger of Allah ﷺ came in upon Abu Salamah when his eyes were fixed in death, and he closed them. Then he said: “O Allah, forgive Abu Salamah, raise his rank among those who are guided, be a successor to what he left behind among those who remain, forgive us and him, Lord of the worlds, make his grave spacious for him, and give him light within it.”",
     authenticityNote: "Sahih Muslim.",
   },
+  {
+    id: "sc-ref-10",
+    category: "social_community",
+    orderIndex: 9,
+    arabicText:
+      "سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ، أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا أَنْتَ، أَسْتَغْفِرُكَ وَأَتُوبُ إِلَيْكَ",
+    transliteration: "Subhanakallahumma wa bihamdika, ashhadu an la ilaha illa Anta, astaghfiruka wa atubu ilayk.",
+    translation:
+      "Glory be to You, O Allah, and praise be to You. I bear witness that there is no god but You. I seek Your forgiveness and repent to You.",
+    benefit: "Expiation of any unintentional idle talk or shortcomings in a gathering or sitting (Kafarat al-Majlis).",
+    benefitArabic: "كفارة المجلس؛ ما من جالس في مجلس يكثر فيه لغطه فيقوله إلا غفر الله له ما كان في مجلسه.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Jami` at-Tirmidhi 3433; Sunan Abi Dawud 4859; Hisn al-Muslim 196.",
+    sourceReferenceArabic: "جامع الترمذي ٣٤٣٣؛ سنن أبي داود ٤٨٥٩؛ حصن المسلم ١٩٦.",
+    hadithText:
+      "عَنْ أَبِي هُرَيْرَةَ رضي الله عنه قَالَ: قَالَ رَسُولُ اللَّهِ ﷺ: «مَنْ جَلَسَ فِي مَجْلِسٍ فَكَثُرَ فِيهِ لَغَطُهُ، فَقَالَ قَبْلَ أَنْ يَقُومَ مِنْ مَجْلِسِهِ ذَلِكَ: سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ، أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا أَنْتَ، أَسْتَغْفِرُكَ وَأَتُوبُ إِلَيْكَ، إِلَّا غُفِرَ لَهُ مَا كَانَ فِي مَجْلِسِهِ ذَلِكَ».",
+    hadithTextEnglish:
+      "Abu Hurayrah (may Allah be pleased with him) reported that the Messenger of Allah ﷺ said: “Whoever sits in a gathering where there is much idle talk, and says before standing up: ‘Glory be to You, O Allah, and praise be to You; I testify that there is no god but You; I seek Your forgiveness and repent to You’ — whatever occurred in that gathering will be forgiven for him.”",
+    authenticityNote: "Sahih according to Al-Albani.",
+    sourceUrl: "https://sunnah.com/tirmidhi%3A3433",
+  },
+  {
+    id: "sc-ref-11",
+    category: "social_community",
+    orderIndex: 10,
+    arabicText: "بِسْمِ اللَّهِ، اللَّهُمَّ جَنِّبْنَا الشَّيْطَانَ، وَجَنِّبِ الشَّيْطَانَ مَا رَزَقْتَنَا",
+    transliteration: "Bismillahi, Allahumma jannibnash-shaytana, wa jannibish-shaytana ma razaqtana.",
+    translation:
+      "In the name of Allah. O Allah, keep Satan away from us, and keep Satan away from what You bestow upon us.",
+    benefit:
+      "Supplication before marital intimacy / sexual intercourse with one's wife; if a child is decreed from that union, Satan will never harm them.",
+    benefitArabic: "دعاء الجماع وإتيان الزوجة؛ فإن يُقَدَّر بينهما ولد لم يضره الشيطان أبداً.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Sahih al-Bukhari 6388; Sahih Muslim 1434; Hisn al-Muslim 190.",
+    sourceReferenceArabic: "صحيح البخاري ٦٣٨٨؛ صحيح مسلم ١٤٣٤؛ حصن المسلم ١٩٠.",
+    hadithText:
+      "عَنِ ابْنِ عَبَّاسٍ رضي الله عنهما قَالَ: قَالَ النَّبِيُّ ﷺ: «لَوْ أَنَّ أَحَدَكُمْ إِذَا أَرَادَ أَنْ يَأْتِيَ أَهْلَهُ قَالَ: بِاسْمِ اللَّهِ، اللَّهُمَّ جَنِّبْنَا الشَّيْطَانَ وَجَنِّبِ الشَّيْطَانَ مَا رَزَقْتَنَا، فَإِنَّهُ إِنْ يُقَدَّرْ بَيْنَهُمَا وَلَدٌ فِي ذَلِكَ لَمْ يَضُرَّهُ شَيْطَانٌ أَبَدًا».",
+    hadithTextEnglish:
+      "Ibn ‘Abbas (may Allah be pleased with them both) narrated that the Prophet ﷺ said: “If any of you, when intending to have marital relations with his wife, says: ‘In the name of Allah, O Allah, protect us from Satan and protect whatever You provide for us from Satan’ — then if a child is decreed for them from that, Satan will never be able to harm him.”",
+    authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
+    sourceUrl: "https://sunnah.com/bukhari%3A6388",
+  },
+  {
+    id: "sc-ref-12",
+    category: "social_community",
+    orderIndex: 11,
+    arabicText:
+      "أُعِيذُكَ بِكَلِمَاتِ اللَّهِ التَّامَّةِ، مِنْ كُلِّ شَيْطَانٍ وَهَامَّةٍ، وَمِنْ كُلِّ عَيْنٍ لَامَّةٍ",
+    transliteration: "U'idhuka bi-kalimatil-lahit-tammah, min kulli shaytanin wa hammah, wa min kulli 'aynin lammah.",
+    translation:
+      "I seek protection for you in the perfect words of Allah, from every devil and poisonous creature, and from every envious eye.",
+    benefit:
+      "Prophetic supplication for seeking Allah's protection for newborn children from evil, malice, and the evil eye.",
+    benefitArabic: "تعويذ نبوي للأولاد والأطفال بحفظ الله التام من الشياطين والهوام وكل عين لامة.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Sahih al-Bukhari 3371; Hisn al-Muslim 146.",
+    sourceReferenceArabic: "صحيح البخاري ٣٣٧١؛ حصن المسلم ١٤٦.",
+    hadithText:
+      "عَنِ ابْنِ عَبَّاسٍ رضي الله عنهما قَالَ: كَانَ النَّبِيُّ ﷺ يُعَوِّذُ الْحَسَنَ وَالْحُسَيْنَ: «أُعِيذُكُمَا بِكَلِمَاتِ اللَّهِ التَّامَّةِ، مِنْ كُلِّ شَيْطَانٍ وَهَامَّةٍ، وَمِنْ كُلِّ عَيْنٍ لَامَّةٍ» وَيَقُولُ: «إِنَّ أَبَاكُمَا كَانَ يُعَوِّذُ بِهَا إِسْمَاعِيلَ وَإِسْحَاقَ».",
+    hadithTextEnglish:
+      "Ibn ‘Abbas (may Allah be pleased with them both) narrated that the Prophet ﷺ used to seek refuge for Al-Hasan and Al-Husayn: “I seek refuge for you both in the perfect words of Allah, from every devil and poisonous reptile, and from every evil eye.” And he would say: “Your forefather used to seek refuge with them for Isma‘il and Ishaq.”",
+    authenticityNote: "Sahih al-Bukhari.",
+    sourceUrl: "https://sunnah.com/bukhari%3A3371",
+  },
+  {
+    id: "sc-ref-13",
+    category: "social_community",
+    orderIndex: 12,
+    arabicText:
+      "الْحَمْدُ لِلَّهِ الَّذِي عَافَانِي مِمَّا ابْتَلَاكَ بِهِ، وَفَضَّلَنِي عَلَى كَثِيرٍ مِمَّنْ خَلَقَ تَفْضِيلًا",
+    transliteration:
+      "Alhamdu lillahilladhi 'afani mimmabtalaaka bihi, wa faddalani 'ala kathirin mimman khalaqa tafdila.",
+    translation:
+      "All praise is for Allah who spared me from what He afflicted you with, and favored me over much of what He created.",
+    benefit:
+      "Whoever sees an afflicted person and recites this quietly will be shielded from that trial for the rest of their life.",
+    benefitArabic: "من رأى مبتلى فقالها سراً عافاه الله من ذلك البلاء كائناً ما كان ما عاش.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Jami` at-Tirmidhi 3431; Hisn al-Muslim 198.",
+    sourceReferenceArabic: "جامع الترمذي ٣٤٣١؛ حصن المسلم ١٩٨.",
+    hadithText:
+      "عَنِ ابْنِ عُمَرَ رضي الله عنهما أَنَّ رَسُولَ اللَّهِ ﷺ قَالَ: «مَنْ رَأَى مُبْتَلًى فَقَالَ: الْحَمْدُ لِلَّهِ الَّذِي عَافَانِي مِمَّا ابْتَلَاكَ بِهِ، وَفَضَّلَنِي عَلَى كَثِيرٍ مِمَّنْ خَلَقَ تَفْضِيلًا، لَمْ يُصِبْهُ ذَلِكَ الْبَلَاءُ كَائِنًا مَا كَانَ مَا عَاشَ».",
+    hadithTextEnglish:
+      "Ibn ‘Umar reported that the Messenger of Allah ﷺ said: “Whoever sees an afflicted person and says: ‘Praise be to Allah Who spared me from what He has afflicted you with, and has favored me over many of those He created’ — that affliction will not strike him as long as he lives.”",
+    authenticityNote: "Hasan according to Al-Albani.",
+    sourceUrl: "https://sunnah.com/tirmidhi%3A3431",
+  },
+  {
+    id: "sc-ref-14",
+    category: "social_community",
+    orderIndex: 13,
+    arabicText: "مَا شَاءَ اللَّهُ لَا قُوَّةَ إِلَّا بِاللَّهِ، اللَّهُمَّ بَارِكْ فِيهِ",
+    transliteration: "Ma sha' Allah, la quwwata illa billah, Allahumma barik fih.",
+    translation: "What Allah wills; there is no power except by Allah. O Allah, bless it.",
+    benefit:
+      "Supplication upon admiring one's own possessions or someone else's blessing, invoking Barakah and repelling the evil eye.",
+    benefitArabic: "ما يقوله المرء إذا رأى ما يعجبه من ماله أو ولده أو أخيه طلباً للبركة ودفعاً للعين والحسد.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Muwatta Malik 1746; Musnad Ahmad 15700.",
+    sourceReferenceArabic: "موطأ مالك ١٧٤٦؛ مسند أحمد ١٥٧٠٠.",
+    hadithText:
+      "قَالَ رَسُولُ اللَّهِ ﷺ: «إِذَا رَأَى أَحَدُكُمْ مِنْ أَخِيهِ، أَوْ مِنْ نَفْسِهِ، أَوْ مِنْ مَالِهِ مَا يُعْجِبُهُ فَلْيُبَرِّكْهُ، فَإِنَّ الْعَيْنَ حَقٌّ».",
+    hadithTextEnglish:
+      "The Messenger of Allah ﷺ said: “When one of you sees in his brother, in himself, or in his wealth something that pleases him, let him pray for blessings for it, for the evil eye is real.”",
+    authenticityNote: "Sahih according to Al-Albani.",
+    sourceUrl: "https://sunnah.com/ahmad%3A15700",
+  },
 ];
 
 const NATURAL_EVENTS_AZKAR: ZikrDraft[] = [
@@ -2809,16 +3325,20 @@ const NATURAL_EVENTS_AZKAR: ZikrDraft[] = [
     arabicText:
       "اللَّهُمَّ إِنِّي أَسأَلُكَ خَيرَهَا وَخَيرَ مَا فِيهَا وَأَعُوذُ بِكَ مِن شَرِّهَا وَشَرِّ مَا فِيهَا",
     transliteration: "Allahumma inni as'aluka khayraha wa khayra ma fiha wa a'udhu bika min sharriha wa sharri ma fiha",
-    translation: "O Allah, I ask You for its good and what good is in it, and I seek refuge in You from its evil.",
+    translation:
+      "O Allah, I ask You for its good and what good is in it, and I seek refuge in You from its evil and what evil is in it.",
     benefit: "Recited when strong winds blow.",
+    benefitArabic: "دعاء هبوب الريح والعواصف؛ يسأل الله خيرها ويتعوذ به من شرها وما أرسلت به.",
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sahih Muslim 899; Hisn al-Muslim 170.",
+    sourceReferenceArabic: "صحيح مسلم ٨٩٩؛ حصن المسلم ١٧٠.",
     hadithText:
       "عن عائشة رضي الله عنها قالت: كان النبي ﷺ إذا عصفت الريح قال: «اللَّهُمَّ إِنِّي أَسأَلُكَ خَيرَهَا وَخَيرَ مَا فِيهَا، وَخَيْرَ مَا أُرْسِلَتْ بِهِ، وَأَعُوذُ بِكَ مِنْ شَرِّهَا، وَشَرِّ مَا فِيهَا، وَشَرِّ مَا أُرْسِلَتْ بِهِ».",
     hadithTextEnglish:
       "‘A’ishah (may Allah be pleased with her) said: When the wind blew hard, the Prophet ﷺ would say: “O Allah, I ask You for its good, the good that is in it, and the good it was sent with; and I seek refuge in You from its evil, the evil that is in it, and the evil it was sent with.”",
     authenticityNote: "Sahih Muslim.",
+    sourceUrl: "https://sunnah.com/muslim%3A899",
   },
   {
     id: "ne-ref-2",
@@ -2906,6 +3426,29 @@ const NATURAL_EVENTS_AZKAR: ZikrDraft[] = [
     hadithTextEnglish:
       "‘A’ishah (may Allah be pleased with her) said: The sun was eclipsed in the time of the Messenger of Allah ﷺ, and he led the people in prayer. He stood and made the standing long, then bowed and made the bowing long, then stood again and made the standing long, though shorter than the first, then bowed and made the bowing long, though shorter than the first, then prostrated and made the prostration long; and he did in the second cycle as he had done in the first. Then he finished, and the sun had cleared. He addressed the people, praised Allah and extolled Him, then said: “The sun and the moon are two signs among the signs of Allah. They are not eclipsed for the death of anyone, nor for his life. So when you see that, call upon Allah, magnify Him, pray, and give in charity.”",
     authenticityNote: "Sahih.",
+  },
+  {
+    id: "ne-ref-7",
+    category: "natural_events",
+    orderIndex: 6,
+    arabicText:
+      "اللَّهُمَّ حَوَالَيْنَا وَلَا عَلَيْنَا، اللَّهُمَّ عَلَى الْآكَامِ وَالظِّرَابِ، وَبُطُونِ الْأَوْدِيَةِ، وَمَنَابِتِ الشَّجَرِ",
+    transliteration:
+      "Allahumma hawalayna wa la 'alayna, Allahumma 'alal-akami waz-zirabi, wa butunil-awdiyati, wa manabitish-shajar.",
+    translation:
+      "O Allah, around us and not upon us. O Allah, upon the plateaus, the hills, the bottoms of the valleys, and where the trees grow.",
+    benefit: "Supplication when rain becomes torrential and damage or flooding is feared (al-Istisah).",
+    benefitArabic: "دعاء الاستصحاء وصرف المطر إذا كثر وخيف منه الضرر على البيوت والأنفس.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Sahih al-Bukhari 1014; Sahih Muslim 897; Hisn al-Muslim 175.",
+    sourceReferenceArabic: "صحيح البخاري ١٠١٤؛ صحيح مسلم ٨٩٧؛ حصن المسلم ١٧٥.",
+    hadithText:
+      "عَنْ أَنَسِ بْنِ مَالِكٍ رضي الله عنه أَنَّ رَسُولَ اللَّهِ ﷺ دَعَا لَمَّا كَثُرَ الْمَطَرُ فَقَالَ: «اللَّهُمَّ حَوَالَيْنَا وَلَا عَلَيْنَا، اللَّهُمَّ عَلَى الْآكَامِ وَالظِّرَابِ، وَبُطُونِ الْأَوْدِيَةِ، وَمَنَابِتِ الشَّجَرِ».",
+    hadithTextEnglish:
+      "Anas ibn Malik (may Allah be pleased with him) reported that the Messenger of Allah ﷺ supplicated when rain was torrential: “O Allah, around us and not upon us. O Allah, on the plateaus, the hills, the valley floors, and where the trees grow.”",
+    authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
+    sourceUrl: "https://sunnah.com/bukhari%3A1014",
   },
 ];
 
@@ -3042,12 +3585,14 @@ const MISCELLANEOUS_AZKAR: ZikrDraft[] = [
     transliteration:
       "Allahumma anta Rabbi la ilaha illa anta khalaqtani wa ana 'abduka wa ana 'ala 'ahdika wa wa'dika mastata'tu, a'udhu bika min sharri ma sana'tu, abu'u laka bi-ni'matika 'alayya wa abu'u bi-dhanbi faghfir li fa-innahu la yaghfirudh-dhunuba illa ant",
     translation:
-      "Sayyid al-Istighfar: O Allah, You are my Lord. None has the right to be worshipped but You. You created me and I am Your servant...",
+      "Sayyid al-Istighfar: O Allah, You are my Lord. None has the right to be worshipped but You. You created me and I am Your servant, and I hold to Your covenant and Your promise as much as I am able. I seek refuge in You from the evil of what I have done. I acknowledge before You Your favor upon me, and I acknowledge my sin, so forgive me, for none forgives sins except You.",
     benefit:
       "The Master Supplication for Forgiveness. Whoever recites it with conviction during day or night and dies will enter Paradise.",
+    benefitArabic: "سيد الاستغفار؛ من قاله موقناً به فمات من يومه أو ليلته فهو من أهل الجنة.",
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sahih al-Bukhari 6306; Hisn al-Muslim 69.",
+    sourceReferenceArabic: "صحيح البخاري ٦٣٠٦؛ حصن المسلم ٦٩.",
     hadithText:
       "عن شداد بن أوس رضي الله عنه عن النبي ﷺ قال: «سَيِّدُ الِاسْتِغْفَارِ أَنْ تَقُولَ: اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ لَكَ بِذَنْبِي فَاغْفِرْ لِي، فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ». قَالَ: «وَمَنْ قَالَهَا مِنَ النَّهَارِ مُوقِنًا بِهَا فَمَاتَ مِنْ يَوْمِهِ قَبْلَ أَنْ يُمْسِيَ فَهُوَ مِنْ أَهْلِ الْجَنَّةِ، وَمَنْ قَالَهَا مِنَ اللَّيْلِ وَهُوَ مُوقِنٌ بِهَا فَمَاتَ قَبْلَ أَنْ يُصْبِحَ فَهُوَ مِنْ أَهْلِ الْجَنَّةِ».",
     hadithTextEnglish:
@@ -3064,14 +3609,126 @@ const MISCELLANEOUS_AZKAR: ZikrDraft[] = [
     translation:
       "In the name of Allah with Whose name nothing is harmed on earth nor in the heavens, and He is the All-Hearing, All-Knowing.",
     benefit: "Whoever recites it 3 times, nothing will harm him.",
+    benefitArabic: "من قالها ثلاثاً في الصباح والمساء لم يضره شيء.",
     repetitionCount: 3,
     countLabel: "3",
     sourceReference: "Sunan Abu Dawud 5088; Jami' at-Tirmidhi 3388; Hisn al-Muslim 70.",
+    sourceReferenceArabic: "سنن أبي داود ٥٠٨٨؛ جامع الترمذي ٣٣٨٨؛ حصن المسلم ٧٠.",
     hadithText:
       "عن عثمان بن عفان رضي الله عنه قال: قال رسول الله ﷺ: «ما من عبد يقول في صباح كل يوم ومساء كل ليلة: بسم الله الذي لا يضر مع اسمه شيء في الأرض ولا في السماء وهو السميع العليم ثلاث مرات لم يضره شيء».",
     hadithTextEnglish:
       "‘Uthman ibn ‘Affan (may Allah be pleased with him) said: The Messenger of Allah ﷺ said: “No servant says, on the morning of every day and the evening of every night: In the name of Allah, with whose name nothing on earth or in heaven can cause harm, and He is the All-Hearing, the All-Knowing — three times — and anything then harms him.”",
     authenticityNote: "Sahih (Abu Dawud & At-Tirmidhi).",
+  },
+  {
+    id: "misc-ref-10",
+    category: "miscellaneous",
+    orderIndex: 9,
+    arabicText:
+      "اللَّهُمَّ إِنِّي أَسْتَخِيرُكَ بِعِلْمِكَ، وَأَسْتَقْدِرُكَ بِقُدْرَتِكَ، وَأَسْأَلُكَ مِنْ فَضْلِكَ الْعَظِيمِ، فَإِنَّكَ تَقْدِرُ وَلَا أَقْدِرُ، وَتَعْلَمُ وَلَا أَعْلَمُ، وَأَنْتَ عَلَّامُ الْغُيُوبِ. اللَّهُمَّ إِنْ كُنْتَ تَعْلَمُ أَنَّ هَذَا الْأَمْرَ خَيْرٌ لِي فِي دِينِي وَمَعَاشِي وَعَاقِبَةِ أَمْرِي، فَاقْدُرْهُ لِي وَيَسِّرْهُ لِي ثُمَّ بَارِكْ لِي فِيهِ، وَإِنْ كُنْتَ تَعْلَمُ أَنَّ هَذَا الْأَمْرَ شَرٌّ لِي فِي دِينِي وَمَعَاشِي وَعَاقِبَةِ أَمْرِي، فَاصْرِفْهُ عَنِّي وَاصْرِفْنِي عَنْهُ، وَاقْدُرْ لِيَ الْخَيْرَ حَيْثُ كَانَ ثُمَّ أَرْضِنِي بِهِ.",
+    transliteration:
+      "Allahumma inni astakhiruka bi-'ilmika wa astaqdiruka bi-qudratika wa as'aluka min fadlikal-'azim, fa-innaka taqdiru wa la aqdir, wa ta'lamu wa la a'lam, wa Anta 'Allamul-ghuyub. Allahumma in kunta ta'lamu anna hadhal-amra khayrun li fi dini wa ma'ashi wa 'aqibati amri faqdurhu li wa yassirhu li thumma barik li fih. Wa in kunta ta'lamu anna hadhal-amra sharrun li fi dini wa ma'ashi wa 'aqibati amri fasrifhu 'anni wasrifni 'anhu waqdur liyal-khayra haythu kana thumma ardini bih.",
+    translation:
+      "O Allah, I seek Your counsel through Your knowledge, and I seek power through Your power, and I ask You from Your great favor; for You have power and I have none, and You know and I do not know, and You are the Knower of the unseen. O Allah, if You know that this matter is good for me in my religion, my livelihood, and the end of my affair, then decree it for me, facilitate it for me, and then bless me in it. And if You know that this matter is bad for me in my religion, my livelihood, and the end of my affair, then turn it away from me and turn me away from it, and decree for me what is good wherever it may be, and make me pleased with it.",
+    benefit: "The Prophetic supplication of Istikharah, taught by the Prophet ﷺ to seek Allah's guidance in decisions.",
+    benefitArabic: "دعاء صلاة الاستخارة النبوي لسؤال الله التوفيق والتيسير في القرارات والأمور كلها.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Sahih al-Bukhari 1162; Hisn al-Muslim 93.",
+    sourceReferenceArabic: "صحيح البخاري ١١٦٢؛ حصن المسلم ٩٣.",
+    hadithText:
+      "عَنْ جَابِرِ بْنِ عَبْدِ اللَّهِ رضي الله عنهما قَالَ: كَانَ رَسُولُ اللَّهِ ﷺ يُعَلِّمُنَا الِاسْتِخَارَةَ فِي الْأُمُورِ كُلِّهَا كَمَا يُعَلِّمُنَا السُّورَةَ مِنَ الْقُرْآنِ، يَقُولُ: «إِذَا هَمَّ أَحَدُكُمْ بِالْأَمْرِ فَلْيَرْكَعْ رَكْعَتَيْنِ مِنْ غَيْرِ الْفَرِيضَةِ ثُمَّ لِيَقُلْ: اللَّهُمَّ إِنِّي أَسْتَخِيرُكَ بِعِلْمِكَ...» الحديث.",
+    hadithTextEnglish:
+      "Jabir ibn ‘Abdullah narrated: The Messenger of Allah ﷺ used to teach us Istikharah in all matters just as he taught us a surah from the Qur'an. He said: “If any of you intends to undertake an affair, let him pray two non-obligatory rak'ahs and then say: O Allah, I seek Your counsel through Your knowledge...”",
+    authenticityNote: "Sahih al-Bukhari.",
+    sourceUrl: "https://sunnah.com/bukhari%3A1162",
+  },
+  {
+    id: "misc-ref-11",
+    category: "miscellaneous",
+    orderIndex: 10,
+    arabicText:
+      "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، يُحْيِي وَيُمِيتُ، وَهُوَ حَيٌّ لَا يَمُوتُ، بِيَدِهِ الْخَيْرُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+    transliteration:
+      "La ilaha illallahu wahdahu la sharika lah, lahul-mulku wa lahul-hamd, yuhyi wa yumit, wa huwa hayyun la yamut, biyadihil-khayr, wa huwa 'ala kulli shay'in qadir.",
+    translation:
+      "None has the right to be worshipped except Allah alone, without partner. To Him belongs the dominion and to Him belongs praise. He gives life and causes death, and He is Living and never dies. In His hand is all good, and He is over all things capable.",
+    benefit:
+      "Said when entering the market: one million good deeds recorded, one million sins erased, and elevated one million degrees.",
+    benefitArabic: "دعاء دخول السوق؛ يكتب الله لقائله ألف ألف حسنة ويمحو عنه ألف ألف سيئة ويرفع له ألف ألف درجة.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Jami` at-Tirmidhi 3428; Hisn al-Muslim 200.",
+    sourceReferenceArabic: "جامع الترمذي ٣٤٢٨؛ حصن المسلم ٢٠٠.",
+    hadithText:
+      "عَنْ عُمَرَ بْنِ الْخَطَّابِ رضي الله عنه أَنَّ رَسُولَ اللَّهِ ﷺ قَالَ: «مَنْ دَخَلَ السُّوقَ فَقَالَ: لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، يُحْيِي وَيُمِيتُ، وَهُوَ حَيٌّ لَا يَمُوتُ، بِيَدِهِ الْخَيْرُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، كَتَبَ اللَّهُ لَهُ أَلْفَ أَلْفِ حَسَنَةٍ، وَمَحَا عَنْهُ أَلْفَ أَلْفِ سَيِّئَةٍ، وَرَفَعَ لَهُ أَلْفَ أَلْفِ دَرَجَةٍ».",
+    hadithTextEnglish:
+      "‘Umar ibn al-Khattab narrated that the Messenger of Allah ﷺ said: “Whoever enters the market and says: ‘There is no god but Allah alone, without partner; His is the kingdom, and His is the praise; He gives life and causes death, and He is Ever-Living and never dies; in His Hand is all good, and He is capable of all things’ — Allah writes for him one million good deeds, erases from him one million sins, and raises him one million degrees.”",
+    authenticityNote: "Hasan according to Al-Albani.",
+    sourceUrl: "https://sunnah.com/tirmidhi%3A3428",
+  },
+  {
+    id: "misc-ref-12",
+    category: "miscellaneous",
+    orderIndex: 11,
+    arabicText:
+      "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ أَنْ أُشْرِكَ بِكَ وَأَنَا أَعْلَمُ، وَأَسْتَغْفِرُكَ لِمَا لَا أَعْلَمُ",
+    transliteration: "Allahumma inni a'udhu bika an ushrika bika wa ana a'lam, wa astaghfiruka lima la a'lam.",
+    translation:
+      "O Allah, I seek refuge in You from knowingly associating any partner with You, and I ask Your forgiveness for that which I do not know.",
+    benefit: "Supplication to safeguard the heart from ostentation and subtle association of partners (minor Shirk).",
+    benefitArabic: "دعاء الحماية من الشرك الخفي والرياء وسؤال المغفرة مما لا يعلمه العبد.",
+    repetitionCount: 3,
+    countLabel: "3",
+    sourceReference: "Al-Adab Al-Mufrad 716; Musnad Ahmad 19606; Hisn al-Muslim 203.",
+    sourceReferenceArabic: "الأدب المفرد ٧١٦؛ مسند أحمد ١٩٦٠٦؛ حصن المسلم ٢٠٣.",
+    hadithText:
+      "عَنْ مَعْقِلِ بْنِ يَسَارٍ رضي الله عنه عَنْ أَبِي بَكْرٍ الصِّدِّيقِ رضي الله عنه قَالَ: قَالَ رَسُولُ اللَّهِ ﷺ: «الشِّرْكُ فِيكُمْ أَخْفَى مِنْ دَبِيبِ النَّمْلِ، وَلَكِنْ سَأَدُلُّكَ عَلَى شَيْءٍ إِذَا فَعَلْتَهُ أَذْهَبَ عَنْكَ صِغَارَ الشِّرْكِ وَكِبَارَهُ: تَقُولُ: اللَّهُمَّ إِنِّي أَعُوذُ بِكَ أَنْ أُشْرِكَ بِكَ وَأَنَا أَعْلَمُ، وَأَسْتَغْفِرُكَ لِمَا لَا أَعْلَمُ، تَقُولُهَا ثَلَاثَ مَرَّاتٍ».",
+    hadithTextEnglish:
+      "Abu Bakr as-Siddiq narrated that the Messenger of Allah ﷺ said: “Shirk in you is more subtle than the creeping of ants, but I will guide you to something that, if you do it, will remove minor and major shirk from you: Say: O Allah, I seek refuge in You from associating anything with You while I know, and I seek Your forgiveness for what I do not know — three times.”",
+    authenticityNote: "Sahih according to Al-Albani.",
+    sourceUrl: "https://sunnah.com/adab%3A716",
+  },
+  {
+    id: "misc-ref-13",
+    category: "miscellaneous",
+    orderIndex: 12,
+    arabicText: "رَبِّ اغْفِرْ لِي وَتُبْ عَلَيَّ، إِنَّكَ أَنْتَ التَّوَّابُ الرَّحِيمُ",
+    transliteration: "Rabbigh-fir li wa tub 'alayya, innaka Antat-Tawwabur-Rahim.",
+    translation:
+      "My Lord, forgive me and accept my repentance; indeed, You are the Accepter of Repentance, the Merciful.",
+    benefit: "The Companions counted the Prophet ﷺ saying this one hundred times in a single gathering.",
+    benefitArabic: "استغفار نبوي كان يعدّه الصحابة للنبي ﷺ في المجلس الواحد مائة مرة.",
+    repetitionCount: 100,
+    countLabel: "100",
+    sourceReference: "Sunan Abu Dawud 1516; Jami' at-Tirmidhi 3434; Hisn al-Muslim 208.",
+    sourceReferenceArabic: "سنن أبي داود ١٥١٦؛ جامع الترمذي ٣٤٣٤؛ حصن المسلم ٢٠٨.",
+    hadithText:
+      "عَنِ ابْنِ عُمَرَ رضي الله عنهما قَالَ: إِنْ كُنَّا لَنَعُدُّ لِرَسُولِ اللَّهِ ﷺ فِي الْمَجْلِسِ الْوَاحِدِ مِائَةَ مَرَّةٍ: «رَبِّ اغْفِرْ لِي وَتُبْ عَلَيَّ، إِنَّكَ أَنْتَ التَّوَّابُ الرَّحِيمُ».",
+    hadithTextEnglish:
+      "Ibn ‘Umar said: We counted the Messenger of Allah ﷺ saying a hundred times in a single gathering: “My Lord, forgive me and accept my repentance; surely You are the One who accepts repentance, the Merciful.”",
+    authenticityNote: "Sahih according to Al-Albani.",
+    sourceUrl: "https://sunnah.com/abudawud%3A1516",
+  },
+  {
+    id: "misc-ref-14",
+    category: "miscellaneous",
+    orderIndex: 13,
+    arabicText: "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ",
+    transliteration: "A'udhu billahi minash-shaytanir-rajim.",
+    translation: "I seek refuge in Allah from Satan the accursed.",
+    benefit: "The Prophetic remedy for extinguishing rage and anger.",
+    benefitArabic: "علاج الغضب النبوي بالاستعاذة بالله من وساوس الشيطان ونزغاته.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Sahih al-Bukhari 6115; Sahih Muslim 2610; Hisn al-Muslim 201.",
+    sourceReferenceArabic: "صحيح البخاري ٦١١٥؛ صحيح مسلم ٢٦١٠؛ حصن المسلم ٢٠١.",
+    hadithText:
+      "عَنْ سُلَيْمَانَ بْنِ صُرَدٍ رضي الله عنه قَالَ: اسْتَبَّ رَجُلَانِ عِنْدَ النَّبِيِّ ﷺ فَجَعَلَ أَحَدُهُمَا يَغْضَبُ وَيَحْمَرُّ وَجْهُهُ، فَقَالَ النَّبِيُّ ﷺ: «إِنِّي لَأَعْلَمُ كَلِمَةً لَوْ قَالَهَا لَذَهَبَ عَنْهُ مَا يَجِدُ: أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ».",
+    hadithTextEnglish:
+      "Sulayman ibn Surad said: Two men reviled each other in the presence of the Prophet ﷺ and one became angry and his face turned red. The Prophet ﷺ said: “I know a word that if he were to say it, what he feels would leave him: I seek refuge in Allah from Satan the accursed.”",
+    authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
+    sourceUrl: "https://sunnah.com/bukhari%3A6115",
   },
 ];
 

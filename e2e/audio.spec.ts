@@ -121,6 +121,7 @@ test("Al-Kahf queues an intentional listen press while the audio module loads", 
   await expect(player.getByRole("progressbar", { name: "تقدم الاستماع" })).toBeVisible();
   await player.getByRole("button", { name: "توسيع المشغل" }).click();
   await expect(player).toHaveAttribute("data-variant", "expanded");
+  await expect(player.getByRole("progressbar", { name: "تقدم الاستماع" })).toHaveCount(0);
   const expandedMinimizeBox = await player.getByRole("button", { name: "تصغير المشغل" }).boundingBox();
   const expandedCloseBox = await player.getByRole("button", { name: "إيقاف الصوت وإغلاق المشغل" }).boundingBox();
   expect(compactMinimizeBox && compactCloseBox && expandedMinimizeBox && expandedCloseBox).toBeTruthy();
@@ -158,6 +159,9 @@ test("desktop audio dock stays inside the main canvas and reveals volume on hove
 
   const player = page.getByRole("region", { name: "مشغل الصوت" });
   const compactProgress = player.getByTestId("audio-compact-progress");
+  const timeline = player.getByRole("slider", { name: "تقديم أو تأخير الصوت" });
+  await expect(compactProgress).toBeHidden();
+  await expect(timeline).toBeVisible();
   const volume = player.getByRole("button", { name: /كتم الصوت/ });
   await volume.hover();
   const volumeSlider = player.getByRole("slider", { name: "مستوى الصوت" });
@@ -184,11 +188,11 @@ test("desktop audio dock stays inside the main canvas and reveals volume on hove
     expect(playerBox.x + playerBox.width).toBeLessThanOrEqual(mainBox.x + mainBox.width + 1);
   }
 
-  const progressBox = await compactProgress.boundingBox();
-  expect(progressBox && playerBox).toBeTruthy();
-  if (progressBox && playerBox) {
-    expect(progressBox.x).toBeGreaterThan(playerBox.x);
-    expect(progressBox.x + progressBox.width).toBeLessThan(playerBox.x + playerBox.width);
+  const timelineBox = await timeline.boundingBox();
+  expect(timelineBox && playerBox).toBeTruthy();
+  if (timelineBox && playerBox) {
+    expect(timelineBox.x).toBeGreaterThan(playerBox.x);
+    expect(timelineBox.x + timelineBox.width).toBeLessThan(playerBox.x + playerBox.width);
   }
 });
 

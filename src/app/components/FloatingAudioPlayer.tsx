@@ -1,4 +1,12 @@
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type ReactNode,
+} from "react";
 import {
   ChevronDown,
   ChevronUp,
@@ -119,6 +127,7 @@ const COPY = {
  * people did with the select anyway.
  */
 const PLAYBACK_RATES = [0.8, 1, 1.25, 1.5, 2] as const;
+const LARGE_SEEK_SECONDS = 30;
 
 function nextPlaybackRate(current: number) {
   const index = PLAYBACK_RATES.findIndex((rate) => rate === current);
@@ -473,6 +482,16 @@ export function FloatingAudioPlayer({
     controllerRef.current.seek(Math.max(0, Math.min(currentTime + delta, duration || 0)));
   }, []);
 
+  const handleTimelineKeyDown = useCallback(
+    (event: ReactKeyboardEvent<HTMLInputElement>) => {
+      if (event.key !== "PageUp" && event.key !== "PageDown") return;
+      event.preventDefault();
+      event.stopPropagation();
+      jumpSeconds(event.key === "PageUp" ? LARGE_SEEK_SECONDS : -LARGE_SEEK_SECONDS);
+    },
+    [jumpSeconds],
+  );
+
   useEffect(() => {
     const handleWindowKeyDown = (e: globalThis.KeyboardEvent) => {
       const activeElement = document.activeElement as HTMLElement | null;
@@ -573,10 +592,12 @@ export function FloatingAudioPlayer({
           {liveMessage}
         </div>
 
-        {/* How far into the recitation, on the card's own top edge. */}
+        {/* Phones use this quiet progress strip because the compact timeline
+            does not fit. Wider compact layouts show the interactive timeline
+            instead, so only one progress indicator is visible at a time. */}
         <div
           data-testid="audio-compact-progress"
-          className="absolute inset-x-3 top-0.5 h-1 overflow-hidden rounded-full bg-muted"
+          className="absolute inset-x-3 top-0.5 h-1 overflow-hidden rounded-full bg-muted md:hidden"
           role="progressbar"
           aria-label={copy.sessionProgress}
           aria-valuemin={0}
@@ -628,7 +649,9 @@ export function FloatingAudioPlayer({
               value={Math.min(state.currentTime, state.duration || 0)}
               disabled={state.duration <= 0}
               onChange={(event) => controller.seek(Number(event.currentTarget.value))}
+              onKeyDown={handleTimelineKeyDown}
               aria-label={copy.seek}
+              aria-keyshortcuts="PageUp PageDown"
               aria-valuetext={accessibleTime(state.currentTime, state.duration, language)}
               style={{ "--audio-range-fill": progressBackground(progressPercent, direction) } as CSSProperties}
               className="audio-timeline-range h-11 min-w-0 flex-1 cursor-pointer appearance-none accent-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
@@ -732,19 +755,6 @@ export function FloatingAudioPlayer({
             </p>
           )}
         </div>
-        <div
-          className="mt-3 h-1.5 overflow-hidden rounded-full bg-muted"
-          role="progressbar"
-          aria-label={copy.sessionProgress}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={Math.round(sessionProgressPercent)}
-        >
-          <div
-            className="h-full rounded-full bg-primary transition-[width] duration-fast"
-            style={{ width: `${sessionProgressPercent}%` }}
-          />
-        </div>
       </div>
 
       {/* Timeline / Scrub Bar with Generous 44px Hit Target */}
@@ -761,7 +771,9 @@ export function FloatingAudioPlayer({
             value={Math.min(state.currentTime, state.duration || 0)}
             disabled={state.duration <= 0}
             onChange={(event) => controller.seek(Number(event.currentTarget.value))}
+            onKeyDown={handleTimelineKeyDown}
             aria-label={copy.seek}
+            aria-keyshortcuts="PageUp PageDown"
             aria-valuetext={accessibleTime(state.currentTime, state.duration, language)}
             /* The played part of the track is drawn here rather than in a
                stylesheet: a range input needs one gradient per browser engine

@@ -76,9 +76,29 @@ export const IN_PRAYER_AZKAR: ZikrDraft[] = [
     sourceUrl: "https://sunnah.com/hisn%3A33",
   },
   {
-    id: "in-prayer-ruku-sujud-forgiveness",
+    id: "in-prayer-ruku-submission",
     category: "in_prayer",
     orderIndex: 4,
+    arabicText:
+      "اللَّهُمَّ لَكَ رَكَعْتُ، وَبِكَ آمَنْتُ، وَلَكَ أَسْلَمْتُ، خَشَعَ لَكَ سَمْعِي وَبَصَرِي، وَمُخِّي وَعَظْمِي وَعَصَبِي",
+    transliteration:
+      "Allahumma laka raka'tu, wa bika amantu, wa laka aslamtu, khasha'a laka sam'i wa basari, wa mukhki wa 'azmi wa 'asabi.",
+    translation:
+      "O Allah, unto You I bow, in You I believe, and unto You I submit. Submissive to You are my hearing, my sight, my marrow, my bones, and my nerves.",
+    benefit: "An authentic, deeply submissive Prophetic supplication in bowing.",
+    benefitArabic: "دعاء خضوع وتعظيم نبوي ثابت في الركوع.",
+    repetitionCount: 1,
+    sourceReference: "Sahih Muslim 771.",
+    sourceReferenceArabic: "صحيح مسلم ٧٧١.",
+    preferredTiming: "While bowing (ruku').",
+    authenticityNote: "Sahih Muslim.",
+    attributionType: "said_by_prophet",
+    sourceUrl: "https://sunnah.com/muslim%3A771",
+  },
+  {
+    id: "in-prayer-ruku-sujud-forgiveness",
+    category: "in_prayer",
+    orderIndex: 5,
     arabicText: "سُبْحَانَكَ اللَّهُمَّ رَبَّنَا وَبِحَمْدِكَ، اللَّهُمَّ اغْفِرْ لِي",
     transliteration: "Subhanaka Allahumma Rabbana wa bihamdika, Allahummaghfir li.",
     translation: "Glory and praise be to You, O Allah our Lord. O Allah, forgive me.",
@@ -94,7 +114,7 @@ export const IN_PRAYER_AZKAR: ZikrDraft[] = [
   {
     id: "in-prayer-ruku-sujud-holy",
     category: "in_prayer",
-    orderIndex: 5,
+    orderIndex: 6,
     arabicText: "سُبُّوحٌ قُدُّوسٌ، رَبُّ الْمَلَائِكَةِ وَالرُّوحِ",
     transliteration: "Subbuhun Quddusun, Rabbul-mala'ikati war-ruh.",
     translation: "All-Glorious, All-Holy, Lord of the angels and the Spirit.",
@@ -109,9 +129,26 @@ export const IN_PRAYER_AZKAR: ZikrDraft[] = [
     sourceUrl: "https://sunnah.com/abudawud/2/482",
   },
   {
+    id: "in-prayer-ruku-sujud-majesty",
+    category: "in_prayer",
+    orderIndex: 7,
+    arabicText: "سُبْحَانَ ذِي الْجَبَرُوتِ وَالْمَلَكُوتِ وَالْكِبْرِيَاءِ وَالْعَظَمَةِ",
+    transliteration: "Subhana dhil-jabaruti wal-malakuti wal-kibriya'i wal-'azamah.",
+    translation: "Glory be to the Possessor of absolute power, the dominion, grandeur, and supreme majesty.",
+    benefit: "A powerful glorification reported in both bowing and prostration during night prayer.",
+    benefitArabic: "تسبيح عظيم ثابت في الركوع والسجود في صلاة الليل.",
+    repetitionCount: 1,
+    sourceReference: "Sunan Abi Dawud 873; Sunan an-Nasa'i 1049.",
+    sourceReferenceArabic: "سنن أبي داود ٨٧٣؛ وسنن النسائي ١٠٤٩.",
+    preferredTiming: "While bowing or prostrating, especially in night prayer.",
+    authenticityNote: "Sahih according to Al-Albani.",
+    attributionType: "said_by_prophet",
+    sourceUrl: "https://sunnah.com/abudawud%3A873",
+  },
+  {
     id: "in-prayer-rising-praise",
     category: "in_prayer",
-    orderIndex: 6,
+    orderIndex: 8,
     arabicText: "سَمِعَ اللَّهُ لِمَنْ حَمِدَهُ، رَبَّنَا وَلَكَ الْحَمْدُ",
     transliteration: "Sami'a Allahu liman hamidah. Rabbana wa lakal-hamd.",
     translation: "Allah hears the one who praises Him. Our Lord, all praise is for You.",
@@ -128,7 +165,7 @@ export const IN_PRAYER_AZKAR: ZikrDraft[] = [
   {
     id: "in-prayer-rising-abundant-praise",
     category: "in_prayer",
-    orderIndex: 7,
+    orderIndex: 9,
     arabicText: "رَبَّنَا وَلَكَ الْحَمْدُ، حَمْدًا كَثِيرًا طَيِّبًا مُبَارَكًا فِيهِ",
     transliteration: "Rabbana wa lakal-hamdu, hamdan kathiran tayyiban mubarakan fih.",
     translation: "Our Lord, all praise is Yours—abundant, good, and blessed praise.",
@@ -144,7 +181,7 @@ export const IN_PRAYER_AZKAR: ZikrDraft[] = [
   {
     id: "in-prayer-sujud-tasbih",
     category: "in_prayer",
-    orderIndex: 8,
+    orderIndex: 10,
     arabicText: "سُبْحَانَ رَبِّيَ الْأَعْلَى",
     transliteration: "Subhana Rabbiyal-A'la.",
     translation: "Glory be to my Lord, the Most High.",
@@ -158,9 +195,30 @@ export const IN_PRAYER_AZKAR: ZikrDraft[] = [
     sourceUrl: "https://sunnah.com/hisn%3A41",
   },
   {
+    id: "in-prayer-sujud-submission",
+    category: "in_prayer",
+    orderIndex: 11,
+    arabicText:
+      "اللَّهُمَّ لَكَ سَجَدْتُ، وَبِكَ آمَنْتُ، وَلَكَ أَسْلَمْتُ، سَجَدَ وَجْهِي لِلَّذِي خَلَقَهُ وَصَوَّرَهُ، وَشَقَّ سَمْعَهُ وَبَصَرَهُ، تَبَارَكَ اللَّهُ أَحْسَنُ الْخَالِقِينَ",
+    transliteration:
+      "Allahumma laka sajadtu, wa bika amantu, wa laka aslamtu, sajada wajhi lilladhi khalaqahu wa sawwarahu, wa shaqqa sam'ahu wa basarahu, tabarakallahu ahsanul-khaliqin.",
+    translation:
+      "O Allah, unto You I prostrate, in You I believe, and to You I surrender. My face has prostrated to the One Who created it and fashioned it, and brought forth its hearing and sight. Blessed be Allah, the Best of creators.",
+    benefit:
+      "A profound Prophetic supplication of prostration affirming complete submission and praise to the Creator.",
+    benefitArabic: "دعاء سجود نبوي جليل يجمع بين الاستسلام لله وحمده على نعمة الخلق والسمع والبصر.",
+    repetitionCount: 1,
+    sourceReference: "Sahih Muslim 771.",
+    sourceReferenceArabic: "صحيح مسلم ٧٧١.",
+    preferredTiming: "While prostrating (sujud).",
+    authenticityNote: "Sahih Muslim.",
+    attributionType: "said_by_prophet",
+    sourceUrl: "https://sunnah.com/muslim%3A771",
+  },
+  {
     id: "in-prayer-sujud-complete-forgiveness",
     category: "in_prayer",
-    orderIndex: 9,
+    orderIndex: 12,
     arabicText:
       "اللَّهُمَّ اغْفِرْ لِي ذَنْبِي كُلَّهُ، دِقَّهُ وَجِلَّهُ، وَأَوَّلَهُ وَآخِرَهُ، وَعَلَانِيَتَهُ وَسِرَّهُ",
     transliteration:
@@ -178,7 +236,7 @@ export const IN_PRAYER_AZKAR: ZikrDraft[] = [
   {
     id: "in-prayer-sujud-refuge",
     category: "in_prayer",
-    orderIndex: 10,
+    orderIndex: 13,
     arabicText:
       "اللَّهُمَّ أَعُوذُ بِرِضَاكَ مِنْ سَخَطِكَ، وَبِمُعَافَاتِكَ مِنْ عُقُوبَتِكَ، وَأَعُوذُ بِكَ مِنْكَ، لَا أُحْصِي ثَنَاءً عَلَيْكَ، أَنْتَ كَمَا أَثْنَيْتَ عَلَى نَفْسِكَ",
     transliteration:
@@ -195,9 +253,29 @@ export const IN_PRAYER_AZKAR: ZikrDraft[] = [
     sourceUrl: "https://sunnah.com/muslim%3A486",
   },
   {
+    id: "in-prayer-sujud-tilawah",
+    category: "in_prayer",
+    orderIndex: 14,
+    arabicText:
+      "سَجَدَ وَجْهِي لِلَّذِي خَلَقَهُ، وَشَقَّ سَمْعَهُ وَبَصَرَهُ، بِحَوْلِهِ وَقُوَّتِهِ، فَتَبَارَكَ اللَّهُ أَحْسَنُ الْخَالِقِينَ",
+    transliteration:
+      "Sajada wajhi lilladhi khalaqahu, wa shaqqa sam'ahu wa basarahu, bi-hawlihi wa quwwatih, fa-tabarakallahu ahsanul-khaliqin.",
+    translation:
+      "My face has prostrated to the One Who created it and brought forth its hearing and sight by His might and power. Blessed be Allah, the Best of creators.",
+    benefit: "Authentic supplication when performing the prostration of Quran recitation (Sujud at-Tilawah).",
+    benefitArabic: "دعاء ثابت عند سجود التلاوة في الصلاة أو خارجها.",
+    repetitionCount: 1,
+    sourceReference: "Sunan Abi Dawud 1414; Jami' at-Tirmidhi 580.",
+    sourceReferenceArabic: "سنن أبي داود ١٤١٤؛ وجامع الترمذي ٥٨٠.",
+    preferredTiming: "During the prostration of recitation (sujud at-tilawah).",
+    authenticityNote: "Sahih (Abu Dawud & At-Tirmidhi).",
+    attributionType: "said_by_prophet",
+    sourceUrl: "https://sunnah.com/abudawud%3A1414",
+  },
+  {
     id: "in-prayer-between-prostrations",
     category: "in_prayer",
-    orderIndex: 11,
+    orderIndex: 15,
     arabicText: "اللَّهُمَّ اغْفِرْ لِي وَارْحَمْنِي وَعَافِنِي وَاهْدِنِي وَارْزُقْنِي",
     transliteration: "Allahummaghfir li warhamni wa 'afini wahdini warzuqni.",
     translation: "O Allah, forgive me, have mercy on me, grant me well-being, guide me, and provide for me.",
@@ -214,7 +292,7 @@ export const IN_PRAYER_AZKAR: ZikrDraft[] = [
   {
     id: "in-prayer-between-prostrations-brief",
     category: "in_prayer",
-    orderIndex: 12,
+    orderIndex: 16,
     arabicText: "رَبِّ اغْفِرْ لِي، رَبِّ اغْفِرْ لِي",
     transliteration: "Rabbighfir li, Rabbighfir li.",
     translation: "My Lord, forgive me. My Lord, forgive me.",
@@ -231,7 +309,7 @@ export const IN_PRAYER_AZKAR: ZikrDraft[] = [
   {
     id: "in-prayer-tashahhud",
     category: "in_prayer",
-    orderIndex: 13,
+    orderIndex: 17,
     arabicText:
       "التَّحِيَّاتُ لِلَّهِ وَالصَّلَوَاتُ وَالطَّيِّبَاتُ، السَّلَامُ عَلَيْكَ أَيُّهَا النَّبِيُّ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ، السَّلَامُ عَلَيْنَا وَعَلَى عِبَادِ اللَّهِ الصَّالِحِينَ، أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ",
     transliteration:
@@ -250,7 +328,7 @@ export const IN_PRAYER_AZKAR: ZikrDraft[] = [
   {
     id: "in-prayer-ibrahimiyyah",
     category: "in_prayer",
-    orderIndex: 14,
+    orderIndex: 18,
     arabicText:
       "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ كَمَا صَلَّيْتَ عَلَى آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ، اللَّهُمَّ بَارِكْ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ كَمَا بَارَكْتَ عَلَى آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ",
     transliteration:
@@ -269,7 +347,7 @@ export const IN_PRAYER_AZKAR: ZikrDraft[] = [
   {
     id: "in-prayer-before-salam-refuge",
     category: "in_prayer",
-    orderIndex: 15,
+    orderIndex: 19,
     arabicText:
       "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ عَذَابِ جَهَنَّمَ، وَمِنْ عَذَابِ الْقَبْرِ، وَمِنْ فِتْنَةِ الْمَحْيَا وَالْمَمَاتِ، وَمِنْ شَرِّ فِتْنَةِ الْمَسِيحِ الدَّجَّالِ",
     transliteration:
@@ -288,7 +366,7 @@ export const IN_PRAYER_AZKAR: ZikrDraft[] = [
   {
     id: "in-prayer-before-salam-self-forgiveness",
     category: "in_prayer",
-    orderIndex: 16,
+    orderIndex: 20,
     arabicText:
       "اللَّهُمَّ إِنِّي ظَلَمْتُ نَفْسِي ظُلْمًا كَثِيرًا، وَلَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ، فَاغْفِرْ لِي مَغْفِرَةً مِنْ عِنْدِكَ، وَارْحَمْنِي، إِنَّكَ أَنْتَ الْغَفُورُ الرَّحِيمُ",
     transliteration:
@@ -305,9 +383,50 @@ export const IN_PRAYER_AZKAR: ZikrDraft[] = [
     sourceUrl: "https://sunnah.com/bukhari%3A834",
   },
   {
+    id: "in-prayer-before-salam-comprehensive",
+    category: "in_prayer",
+    orderIndex: 21,
+    arabicText:
+      "اللَّهُمَّ بِعِلْمِكَ الْغَيْبَ، وَقُدْرَتِكَ عَلَى الْخَلْقِ، أَحْيِنِي مَا عَلِمْتَ الْحَيَاةَ خَيْرًا لِي، وَتَوَفَّنِي إِذَا عَلِمْتَ الْوَفَاةَ خَيْرًا لِي، اللَّهُمَّ وَأَسْأَلُكَ خَشْيَتَكَ فِي الْغَيْبِ وَالشَّهَادَةِ، وَأَسْأَلُكَ كَلِمَةَ الْحَقِّ فِي الرِّضَا وَالْغَضَبِ، وَأَسْأَلُكَ الْقَصْدَ فِي الْفَقْرِ وَالْغِنَى، وَأَسْأَلُكَ نَعِيمًا لَا يَنْفَدُ، وَأَسْأَلُكَ قُرَّةَ عَيْنٍ لَا تَنْقَطِعُ، وَأَسْأَلُكَ الرِّضَا بَعْدَ الْقَضَاءِ، وَأَسْأَلُكَ بَرْدَ الْعَيْشِ بَعْدَ الْمَوْتِ، وَأَسْأَلُكَ لَذَّةَ النَّظَرِ إِلَى وَجْهِكَ، وَالشَّوْقَ إِلَى لِقَائِكَ، فِي غَيْرِ ضَرَّاءَ مُضِرَّةٍ، وَلَا فِتْنَةٍ مُضِلَّةٍ، اللَّهُمَّ زَيِّنَّا بِزِينَةِ الْإِيمَانِ، وَاجْعَلْنَا هُدَاةً مُهْتَدِينَ",
+    transliteration:
+      "Allahumma bi-'ilmikal-ghayba, wa qudratika 'alal-khalqi, ahyini ma 'alimtal-hayata khayran li, wa tawaffani idha 'alimtal-wafata khayran li. Allahumma wa as'aluka khashyataka fil-ghaybi wash-shahadah, wa as'aluka kalimatal-haqqi fir-rida wal-ghadab, wa as'alukal-qasda fil-faqri wal-ghina, wa as'aluka na'iman la yanfad, wa as'aluka qurrata 'aynin la tanqati', wa as'alukar-rida ba'dal-qada', wa as'aluka bardal-'ayshi ba'dal-mawt, wa as'aluka ladhdhatan-nazari ila wajhik, wash-shawqa ila liqa'ik, fi ghayri darra'a mudirrah, wa la fitnatin mudillah. Allahumma zayyinna bi-zinatil-iman, waj'alna hudatan muhtadin.",
+    translation:
+      "O Allah, by Your knowledge of the unseen and Your power over creation, grant me life as long as You know life is good for me, and cause me to die when death is good for me. I ask You for fear of You in secret and in the open, for the word of truth in pleasure and anger, for moderation in poverty and wealth, for bliss that never ends, for the coolness of eyes that never ceases, for contentment after decree, for the coolness of life after death, for the delight of gazing upon Your Face, and for the longing to meet You, without harmful adversity or misguiding trial. O Allah, adorn us with the beauty of faith and make us guides who are rightly guided.",
+    benefit:
+      "A profoundly comprehensive Prophetic supplication narrated by 'Ammar ibn Yasir, recited before the final salam.",
+    benefitArabic: "دعاء جامع عظيم أثره عمار بن ياسر عن النبي ﷺ قبل السلام من الصلاة.",
+    repetitionCount: 1,
+    sourceReference: "Sunan an-Nasa'i 1305; Musnad Ahmad 4/264.",
+    sourceReferenceArabic: "سنن النسائي ١٣٠٥؛ ومسند أحمد ٤/٢٦٤.",
+    preferredTiming: "After the final tashahhud, before salam.",
+    authenticityNote: "Sahih (al-Albani).",
+    attributionType: "said_by_prophet",
+    sourceUrl: "https://sunnah.com/nasai%3A1305",
+  },
+  {
+    id: "in-prayer-before-salam-forgiveness",
+    category: "in_prayer",
+    orderIndex: 22,
+    arabicText:
+      "اللَّهُمَّ اغْفِرْ لِي مَا قَدَّمْتُ وَمَا أَخَّرْتُ، وَمَا أَسْرَرْتُ وَمَا أَعْلَنْتُ، وَمَا أَسْرَفْتُ، وَمَا أَنْتَ أَعْلَمُ بِهِ مِنِّي، أَنْتَ الْمُقَدِّمُ وَأَنْتَ الْمُؤَخِّرُ، لَا إِلَهَ إِلَّا أَنْتَ",
+    transliteration:
+      "Allahummaghfir li ma qaddamtu wa ma akhkhartu, wa ma asrartu wa ma a'lantu, wa ma asraftu, wa ma Anta a'lamu bihi minni, Antal-Muqaddimu wa Antal-Mu'akhkhiru, la ilaha illa Ant.",
+    translation:
+      "O Allah, forgive me what I have sent forward and what I have held back, what I have concealed and what I have made public, where I have exceeded, and what You know better than I. You are the Advancer and You are the Delayer; none is worthy of worship except You.",
+    benefit: "An established Prophetic supplication recited at the conclusion of prayer before salam.",
+    benefitArabic: "دعاء استغفار نبوي ثابت كان يقوله ﷺ آخر ما يقول بين التشهد والتسليم.",
+    repetitionCount: 1,
+    sourceReference: "Sahih Muslim 771.",
+    sourceReferenceArabic: "صحيح مسلم ٧٧١.",
+    preferredTiming: "After the final tashahhud, before salam.",
+    authenticityNote: "Sahih Muslim.",
+    attributionType: "said_by_prophet",
+    sourceUrl: "https://sunnah.com/muslim%3A771",
+  },
+  {
     id: "in-prayer-witr-qunut",
     category: "in_prayer",
-    orderIndex: 17,
+    orderIndex: 23,
     arabicText:
       "اللَّهُمَّ اهْدِنِي فِيمَنْ هَدَيْتَ، وَعَافِنِي فِيمَنْ عَافَيْتَ، وَتَوَلَّنِي فِيمَنْ تَوَلَّيْتَ، وَبَارِكْ لِي فِيمَا أَعْطَيْتَ، وَقِنِي شَرَّ مَا قَضَيْتَ، إِنَّكَ تَقْضِي وَلَا يُقْضَى عَلَيْكَ، وَإِنَّهُ لَا يَذِلُّ مَنْ وَالَيْتَ، وَلَا يَعِزُّ مَنْ عَادَيْتَ، تَبَارَكْتَ رَبَّنَا وَتَعَالَيْتَ",
     transliteration:

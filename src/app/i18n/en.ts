@@ -961,6 +961,7 @@ const en = {
     reciterAbdulbasit: "Abdulbasit",
   },
   category: {
+    repetitionInstructionOnce: "Recite once",
     repetitionInstruction: "Recite {count} times",
     completeSubtitle: "{done} of {total} complete",
     remainingSubtitle: "{remaining} of {total} remaining",

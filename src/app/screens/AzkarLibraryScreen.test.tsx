@@ -128,8 +128,8 @@ describe("AzkarLibraryScreen", () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole("link", { name: "In-Prayer Supplications, 17 supplications" }));
-    fireEvent.click(screen.getByRole("link", { name: "Fasting & Ramadan, 2 supplications" }));
+    fireEvent.click(screen.getByRole("link", { name: "In-Prayer Supplications, 23 supplications" }));
+    fireEvent.click(screen.getByRole("link", { name: "Fasting & Ramadan, 6 supplications" }));
 
     expect(onCategory).toHaveBeenNthCalledWith(1, "in_prayer");
     expect(onCategory).toHaveBeenNthCalledWith(2, "fasting_ramadan");

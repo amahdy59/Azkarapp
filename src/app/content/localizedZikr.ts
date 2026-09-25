@@ -409,6 +409,13 @@ const ARABIC_PREFERRED_TIMING: Readonly<Record<string, string>> = {
   "During Qunut in the Witr prayer.": "تُقال في قنوت صلاة الوتر.",
   "Before Fajr on a fasting day.": "تُقال قبل الفجر في يوم الصيام.",
   "When breaking a fast at sunset.": "تُقال عند الإفطار وقت الغروب.",
+  "While bowing or prostrating, especially in night prayer.": "تُقال في الركوع أو السجود، ولا سيما في صلاة الليل.",
+  "During the prostration of recitation (sujud at-tilawah).": "تُقال في سجود التلاوة.",
+  "When insulted, reviled, or provoked while fasting.": "تُقال عند السب أو المشاتمة أو الاستفزاز أثناء الصيام.",
+  "During the last ten nights of Ramadan, especially on odd nights.":
+    "تُقال في العشر الأواخر من رمضان، ولا سيما في الليالي الوترية تحرياً لليلة القدر.",
+  "Immediately following the salam of Witr prayer.": "تُقال عقب التسليم من صلاة الوتر مباشرة.",
+  "After finishing an iftar meal provided by a host.": "تُقال عند الفراغ من طعام الإفطار عند الداعي أو المضيف.",
 };
 
 const GENERIC_PREFERRED_TIMINGS = new Set<string>([

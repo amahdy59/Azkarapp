@@ -294,7 +294,7 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
         return;
       }
 
-      if (e.key === "/" && view !== "reader" && view !== "custom_counter") {
+      if (e.key === "/" && view !== "reader" && view !== "custom_counter" && view !== "friday_salawat") {
         e.preventDefault();
         setView("search");
         return;

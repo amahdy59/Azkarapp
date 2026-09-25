@@ -155,7 +155,7 @@ test("wide Reader keeps a one-third RTL collection navigator and supports direct
     expect(navigatorBox.x + navigatorBox.width).toBeLessThanOrEqual(readerBox.x);
   }
 
-  const items = navigator.locator('[id^="zikr-card-"]').locator('[role="button"][aria-controls]');
+  const items = navigator.locator("[data-zikr-select]");
   expect(await items.count()).toBeGreaterThan(1);
   await items.nth(1).click();
   await expect(items.nth(1)).toHaveAttribute("aria-current", "step");
