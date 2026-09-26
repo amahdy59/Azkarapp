@@ -94,6 +94,22 @@
   max-height: calc(100dvh - 5.5rem);
 }
 
+/* Docked audio player inside reader canvas: contained within the reader area */
+.floating-audio-player--docked {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  margin: 0 !important;
+}
+
+.floating-audio-player--docked.floating-audio-player--compact {
+  inset: auto 0.5rem 0.5rem 0.5rem !important;
+  width: auto !important;
+  height: auto !important;
+}
+
 /* Native range inputs keep their real keyboard, pointer and accessibility
    behavior. Explicit CSS tracks and thumbs make their geometry consistent
    across engines without bitmap artwork or a scripted slider. */

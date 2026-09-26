@@ -1,15 +1,15 @@
 {
   "ar": [
-    "قائمة لاختيار القارئ بسهولة من بين 4 قراء مباشرة من مشغل الصوت.",
-    "تصحيح ومطابقة كافة التسجيلات الصوتية لأذكار الصباح والمساء وبعد الصلاة.",
-    "عرض المشغل بملء بطاقة الذكر في القارئ مع الحفاظ على القوائم الجانبية وسلاسة القراءة.",
-    "مزامنة دقيقة وسلسة لشريط التقدم ومؤشر الاستماع دون قفزات."
+    "إعادة تنظيم مساحة مشغل الصوت بالكامل ليمتد رأسياً حتى شريط التقدم دون أي تداخل مع قائمة بطاقات الأذكار.",
+    "دمج أدوات التحكم في سرعة القراءة والتكرار ومستوى الصوت بجانب أزرار التشغيل لتوفير المساحة وتسهيل الوصول.",
+    "تكبير مساحة عرض نص الذكر والترجمة الإنجليزية بخط أوضح وتمرير مريح داخل البطاقة.",
+    "محاذاة متناسقة وتجاوب تام للمشغل وبطاقات الأذكار عبر كافة مقاسات الشاشات وسطح المكتب."
   ],
   "en": [
-    "Easy reciter selection from a dropdown menu of 4 reciters directly in the player.",
-    "Corrected and verified audio mappings for all morning, evening, and after-prayer azkar.",
-    "Full-card in-place player within the reader while preserving side navigation.",
-    "Smooth and synchronized timeline scrub bar and progress indicator."
+    "Expanded the audio player vertically to reach below the progress bar without overlapping the zikr list sidebar.",
+    "Integrated playback speed, repeat, and volume controls alongside the transport buttons for quick access and space efficiency.",
+    "Enlarged reading canvas for Arabic devotional text and English translation with comfortable in-card scrolling.",
+    "Balanced responsive layout and seamless card alignment across all mobile, tablet, and desktop screens."
   ],
-  "release": "2026-09-26-reciter-and-reader-audio"
+  "release": "2026-09-26-audio-player-layout"
 }

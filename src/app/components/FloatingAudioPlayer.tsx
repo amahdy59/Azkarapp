@@ -143,11 +143,11 @@ function WaveBars({ playing }: { playing: boolean }) {
     return <span className="size-2 shrink-0 rounded-full bg-muted-foreground/50" aria-hidden="true" />;
   }
   return (
-    <span className="flex h-3.5 shrink-0 items-end gap-0.5" aria-hidden="true">
+    <span className="flex h-4 shrink-0 items-end gap-1" aria-hidden="true">
       {[
         { height: "h-3", delay: "0ms" },
         { height: "h-2", delay: "150ms" },
-        { height: "h-3.5", delay: "300ms" },
+        { height: "h-4", delay: "300ms" },
         { height: "h-1.5", delay: "450ms" },
       ].map((bar) => (
         <span
@@ -188,10 +188,10 @@ function TransportButton({
       onClick={onClick}
       disabled={disabled}
       aria-label={ariaLabel}
-      className="flex min-w-11 max-w-[4.25rem] flex-1 flex-col items-center gap-1 rounded-2xl px-1 py-2 text-muted-foreground transition-[transform,background-color,color] duration-fast hover:bg-muted hover:text-foreground active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-30 disabled:active:scale-100"
+      className="flex min-w-11 shrink-0 flex-col items-center gap-1 rounded-xl px-1.5 py-1 text-muted-foreground transition-colors duration-fast hover:bg-muted hover:text-foreground active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-30"
     >
       {children}
-      <span className="text-micro font-semibold leading-4">{label}</span>
+      <span className="text-micro font-semibold">{label}</span>
     </button>
   );
 }
@@ -245,18 +245,18 @@ function VolumeControl({
       <div
         role="toolbar"
         aria-label={volumeLabel}
-        className="flex min-h-11 items-center gap-1 rounded-full border border-border px-1"
+        className="flex min-h-11 items-center gap-1 rounded-full border border-border px-2"
       >
         <button
           type="button"
           aria-label={muteLabel}
           onClick={controller.toggleMuted}
-          className="flex size-11 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="flex size-10 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           {controller.preferences.muted || controller.preferences.volume === 0 ? (
-            <VolumeX size={20} aria-hidden="true" />
+            <VolumeX size={18} aria-hidden="true" />
           ) : (
-            <Volume2 size={20} aria-hidden="true" />
+            <Volume2 size={18} aria-hidden="true" />
           )}
         </button>
         <input
@@ -273,7 +273,7 @@ function VolumeControl({
               "--audio-range-fill": progressBackground(percentage, language === "ar" ? "rtl" : "ltr"),
             } as CSSProperties
           }
-          className="audio-timeline-range h-11 w-20 cursor-pointer appearance-none accent-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:w-28"
+          className="audio-timeline-range h-9 w-14 cursor-pointer appearance-none accent-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         />
       </div>
     );
@@ -315,7 +315,7 @@ function VolumeControl({
             setOpen((value) => !value);
           }
         }}
-        className="flex size-11 items-center justify-center rounded-full text-muted-foreground transition-[background-color,color,transform] duration-fast hover:bg-muted hover:text-foreground active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        className="flex size-11 items-center justify-center rounded-full text-muted-foreground transition-colors duration-fast hover:bg-muted hover:text-foreground active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
         {controller.preferences.muted || controller.preferences.volume === 0 ? (
           <VolumeX size={20} aria-hidden="true" />
@@ -592,7 +592,7 @@ export function FloatingAudioPlayer({
         onTouchEnd={(e) => e.stopPropagation()}
         className={
           dockedInReader
-            ? "floating-audio-player floating-audio-player--compact absolute inset-x-2 bottom-[env(safe-area-inset-bottom)] sm:inset-x-3 md:bottom-2 z-30 rounded-2xl border border-primary/30 bg-card px-2.5 py-2 shadow-overlay dark:border-white/15"
+            ? "floating-audio-player floating-audio-player--compact floating-audio-player--docked absolute inset-x-2 bottom-[env(safe-area-inset-bottom)] sm:inset-x-3 md:bottom-2 z-30 rounded-2xl border border-primary/30 bg-card px-2.5 py-2 shadow-overlay dark:border-white/15"
             : `floating-audio-player floating-audio-player--compact fixed z-40 rounded-t-2xl border border-b-0 border-primary/30 bg-card px-2.5 py-2 shadow-overlay dark:border-white/15 ${overReadingSurface ? "floating-audio-player--reading" : ""}`
         }
       >
@@ -738,8 +738,8 @@ export function FloatingAudioPlayer({
       onTouchEnd={(e) => e.stopPropagation()}
       className={
         dockedInReader
-          ? "floating-audio-player floating-audio-player--expanded absolute inset-0 z-30 flex h-full w-full flex-col justify-between overflow-x-hidden overflow-y-auto overscroll-contain bg-card px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 shadow-overlay sm:px-6 lg:px-8 md:rounded-3xl md:border md:border-border/80"
-          : `floating-audio-player floating-audio-player--expanded fixed z-40 inset-0 flex h-full w-full flex-col justify-between overflow-x-hidden overflow-y-auto overscroll-contain bg-card px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2 shadow-overlay sm:px-6 lg:px-8 ${overReadingSurface ? "floating-audio-player--reading" : ""}`
+          ? "floating-audio-player floating-audio-player--expanded floating-audio-player--docked absolute inset-0 z-30 flex h-full w-full flex-col justify-between overflow-x-hidden overflow-y-auto overscroll-contain bg-card px-3 pb-3 pt-2 sm:px-6 shadow-overlay md:rounded-3xl md:border md:border-border/80"
+          : `floating-audio-player floating-audio-player--expanded fixed z-40 inset-0 flex h-full w-full flex-col justify-between overflow-x-hidden overflow-y-auto overscroll-contain bg-card px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 sm:px-6 shadow-overlay ${overReadingSurface ? "floating-audio-player--reading" : ""}`
       }
     >
       <div className="sr-only" aria-live="polite" aria-atomic="true">
@@ -752,7 +752,7 @@ export function FloatingAudioPlayer({
           type="button"
           onClick={() => setIsMinimized(true)}
           aria-label={t(language, "audioPlayer.collapse")}
-          className="flex size-11 items-center justify-center rounded-xl text-muted-foreground transition-[transform,background-color,color] duration-fast active:scale-95 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="flex size-11 items-center justify-center rounded-xl text-muted-foreground transition-colors duration-fast active:scale-95 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           <ChevronDown size={22} aria-hidden="true" />
         </button>
@@ -760,14 +760,14 @@ export function FloatingAudioPlayer({
           type="button"
           onClick={controller.stop}
           aria-label={t(language, "audioPlayer.stop")}
-          className="flex size-11 items-center justify-center rounded-xl text-muted-foreground transition-[transform,background-color,color] duration-fast active:scale-95 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="flex size-11 items-center justify-center rounded-xl text-muted-foreground transition-colors duration-fast active:scale-95 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           <X size={19} aria-hidden="true" />
         </button>
       </div>
 
       {/* What is playing: title, reciter dropdown, followed by the full scrollable Zikr text within the zikr card */}
-      <div className="my-2 flex min-h-0 flex-1 flex-col rounded-3xl border border-border/50 bg-muted/30 p-3 sm:p-5 overflow-hidden">
+      <div className="my-2 flex min-h-0 flex-1 flex-col rounded-3xl border border-border/50 bg-muted/20 p-3 sm:p-4 overflow-hidden">
         <motion.div
           key={currentEntry.entryId}
           initial={motionReduced ? false : { opacity: 0, y: 4 }}
@@ -776,15 +776,13 @@ export function FloatingAudioPlayer({
           className="flex min-h-0 flex-1 flex-col items-center"
         >
           <div className="shrink-0 flex flex-col items-center text-center">
-            <div>
+            <div className="flex items-center justify-center gap-2">
               <WaveBars playing={isPlaying} />
+              {showSeparateTitle && (
+                <h3 className="line-clamp-1 text-sm sm:text-base font-black leading-snug text-foreground">{title}</h3>
+              )}
             </div>
-            {showSeparateTitle && (
-              <h3 className="mt-1.5 line-clamp-2 text-base sm:text-lg font-black leading-snug text-foreground">
-                {title}
-              </h3>
-            )}
-            <div className="mt-1.5 flex max-w-full items-center justify-center">
+            <div className="mt-1 flex flex-wrap items-center justify-center gap-2">
               <Select
                 value={displayedVoiceId}
                 onValueChange={(nextVoiceId) => {
@@ -797,9 +795,9 @@ export function FloatingAudioPlayer({
                   aria-label={t(language, "audioPlayer.voice")}
                   data-testid="audio-reciter-select"
                   size="sm"
-                  className="min-h-11 w-auto max-w-full gap-2 rounded-full border-border/80 bg-background/70 px-3.5 py-1.5 text-label font-bold text-foreground shadow-none transition-colors hover:bg-muted focus-visible:ring-[3px] focus-visible:ring-ring"
+                  className="h-9 w-auto max-w-full gap-2 rounded-full border-border/80 bg-background/80 px-3 py-1 text-xs font-bold text-foreground shadow-none transition-colors hover:bg-muted focus-visible:ring-[3px] focus-visible:ring-ring"
                 >
-                  <Headphones size={15} className="shrink-0 text-primary" aria-hidden="true" />
+                  <Headphones size={14} className="shrink-0 text-primary" aria-hidden="true" />
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent align="center">
@@ -810,14 +808,15 @@ export function FloatingAudioPlayer({
                   ))}
                 </SelectContent>
               </Select>
+
+              {positionChip && (
+                <span className="flex h-9 items-center rounded-full border border-border/70 bg-background/80 px-3 py-1 text-micro font-bold text-muted-foreground">
+                  {positionChip}
+                </span>
+              )}
             </div>
-            {positionChip && (
-              <p className="mt-2 rounded-full border border-border px-3 py-0.5 text-xs font-bold text-muted-foreground">
-                {positionChip}
-              </p>
-            )}
             {isBusy && (
-              <p className="mt-1.5 text-xs font-semibold text-primary" role="status">
+              <p className="mt-1 text-xs font-semibold text-primary" role="status">
                 {state.status === "buffering"
                   ? t(language, "audioPlayer.buffering")
                   : t(language, "audioPlayer.loading")}
@@ -826,11 +825,14 @@ export function FloatingAudioPlayer({
           </div>
 
           {/* Full Zikr Text Area: written within the area of the Zikr name */}
-          <div className="mt-3 flex min-h-0 w-full flex-1 flex-col items-center overflow-y-auto border-t border-border/50 px-2 py-3 sm:px-6 sm:py-4 select-text">
-            <div className="my-auto flex w-full max-w-[42rem] flex-col items-center justify-center text-center">
+          <div
+            className="mt-2 flex min-h-0 w-full flex-1 flex-col items-center overflow-y-auto border-t border-border/40 px-3 py-3 sm:px-6 select-text"
+            style={{ scrollbarGutter: "stable" }}
+          >
+            <div className="my-auto flex w-full max-w-2xl flex-col items-center justify-center text-center py-1">
               <p
                 data-testid="audio-player-zikr-text"
-                className="zikr-text text-center font-medium leading-[2.1] text-foreground text-lg sm:text-2xl"
+                className="zikr-text text-center font-medium leading-relaxed text-foreground text-2xl md:text-3xl"
                 dir="rtl"
                 lang="ar"
                 style={{ fontFamily: "var(--font-zikr)" }}
@@ -839,7 +841,7 @@ export function FloatingAudioPlayer({
               </p>
               {isEnglishMode && currentEntry.translation && (
                 <p
-                  className="mt-4 border-t border-border/50 pt-3 text-center text-sm sm:text-base leading-relaxed text-muted-foreground"
+                  className="mt-3 border-t border-border/40 pt-2 text-center text-base leading-relaxed text-muted-foreground max-w-2xl"
                   dir="ltr"
                   lang="en"
                 >
@@ -853,9 +855,9 @@ export function FloatingAudioPlayer({
 
       {/* Bottom Transport Controller Area: docked at the bottom where the counter normally sits */}
       <div className="mx-auto w-full max-w-2xl shrink-0 pt-1">
-        {/* Timeline / Scrub Bar with Generous 44px Hit Target */}
-        <div className="flex items-center gap-3" dir={direction}>
-          <span className="w-11 text-center text-xs font-bold tabular-nums text-muted-foreground">
+        {/* Timeline / Scrub Bar with Generous Hit Target */}
+        <div className="flex items-center gap-2 sm:gap-3 px-1" dir={direction}>
+          <span className="w-10 text-center text-micro font-bold tabular-nums text-muted-foreground">
             {formatTime(state.currentTime, language)}
           </span>
           <div className="relative flex min-w-0 flex-1 items-center h-11">
@@ -878,71 +880,108 @@ export function FloatingAudioPlayer({
               className="audio-timeline-range h-11 w-full cursor-pointer appearance-none accent-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             />
           </div>
-          <span className="w-11 text-center text-xs font-bold tabular-nums text-muted-foreground">
+          <span className="w-10 text-center text-micro font-bold tabular-nums text-muted-foreground">
             {formatTime(state.duration, language)}
           </span>
         </div>
 
-        {/* Primary Transport Controls Row */}
-        <div className="mt-1 flex w-full items-start justify-center gap-0.5 sm:gap-2">
-          {totalTracks > 1 && (
-            <TransportButton
-              label={t(language, "audioPlayer.previousShort")}
-              ariaLabel={t(language, "audioPlayer.previous")}
-              onClick={controller.previous}
-              disabled={state.entryIndex === 0}
+        {/* Primary Transport Controls Row with Speed, Repeat & Volume Integrated */}
+        <div className="mt-1 flex w-full flex-wrap items-center justify-between gap-1 sm:gap-2 px-1" dir={direction}>
+          {/* Start Actions: Speed and Repeat */}
+          <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+            <button
+              type="button"
+              onClick={() => controller.setPlaybackRate(nextPlaybackRate(state.playbackRate))}
+              className={`${PILL_CLASS} min-h-11 px-3 text-xs ${state.playbackRate === 1 ? PILL_IDLE : PILL_ACTIVE}`}
+              aria-label={`${t(language, "audioPlayer.speedShort")}: ${formatNumerals(state.playbackRate, language)}×`}
             >
-              <SkipBack size={20} className="rtl:rotate-180" aria-hidden="true" />
-            </TransportButton>
-          )}
+              <span className="hidden sm:inline">{t(language, "audioPlayer.speedShort")} </span>
+              <span dir="ltr" className="font-black tabular-nums text-primary">
+                {formatNumerals(state.playbackRate, language)}×
+              </span>
+            </button>
 
-          <TransportButton
-            label={t(language, "audioPlayer.back10Short")}
-            ariaLabel={t(language, "audioPlayer.jumpBack10")}
-            onClick={() => jumpSeconds(-10)}
-            disabled={state.duration <= 0}
-          >
-            <JumpBack10Icon className="size-5" />
-          </TransportButton>
+            {canRepeat && (
+              <button
+                type="button"
+                aria-pressed={repeatEnabled}
+                onClick={() => controller.setPlaybackMode(repeatEnabled ? "play-once" : "repeat-prescribed-count")}
+                className={`${PILL_CLASS} min-h-11 px-3 text-xs ${repeatEnabled ? PILL_ACTIVE : PILL_IDLE}`}
+                aria-label={t(language, "audioPlayer.repeatShort")}
+                title={t(language, "audioPlayer.repeatShort")}
+              >
+                <RotateCcw size={15} aria-hidden="true" />
+                <span className="hidden sm:inline">{t(language, "audioPlayer.repeatShort")}</span>
+              </button>
+            )}
+          </div>
 
-          <button
-            style={{ borderRadius: 9999 }}
-            type="button"
-            onClick={isPlaying ? controller.pause : controller.play}
-            aria-label={isPlaying ? t(language, "audioPlayer.pause") : t(language, "audioPlayer.play")}
-            className="mx-1 mt-1 flex size-16 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-raised transition-transform duration-fast active:scale-95 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-          >
-            <span className="flex items-center justify-center">
-              {isPlaying ? <Pause size={28} aria-hidden="true" /> : <Play size={28} aria-hidden="true" />}
-            </span>
-          </button>
+          {/* Center: Playback Transport Buttons */}
+          <div className="flex shrink-0 items-center justify-center gap-1">
+            {totalTracks > 1 && (
+              <TransportButton
+                label={t(language, "audioPlayer.previousShort")}
+                ariaLabel={t(language, "audioPlayer.previous")}
+                onClick={controller.previous}
+                disabled={state.entryIndex === 0}
+              >
+                <SkipBack size={20} className="rtl:rotate-180" aria-hidden="true" />
+              </TransportButton>
+            )}
 
-          <TransportButton
-            label={t(language, "audioPlayer.forward10Short")}
-            ariaLabel={t(language, "audioPlayer.jumpForward10")}
-            onClick={() => jumpSeconds(10)}
-            disabled={state.duration <= 0}
-          >
-            <JumpForward10Icon className="size-5" />
-          </TransportButton>
-
-          {totalTracks > 1 && (
             <TransportButton
-              label={t(language, "audioPlayer.nextShort")}
-              ariaLabel={t(language, "audioPlayer.next")}
-              onClick={controller.next}
-              disabled={state.entryIndex === totalTracks - 1}
+              label={t(language, "audioPlayer.back10Short")}
+              ariaLabel={t(language, "audioPlayer.jumpBack10")}
+              onClick={() => jumpSeconds(-10)}
+              disabled={state.duration <= 0}
             >
-              <SkipForward size={20} className="rtl:rotate-180" aria-hidden="true" />
+              <JumpBack10Icon className="size-5" />
             </TransportButton>
-          )}
+
+            <button
+              style={{ borderRadius: 9999 }}
+              type="button"
+              onClick={isPlaying ? controller.pause : controller.play}
+              aria-label={isPlaying ? t(language, "audioPlayer.pause") : t(language, "audioPlayer.play")}
+              className="mx-1 flex size-16 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-raised transition-transform duration-fast active:scale-95 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            >
+              <span className="flex items-center justify-center">
+                {isPlaying ? <Pause size={28} aria-hidden="true" /> : <Play size={28} aria-hidden="true" />}
+              </span>
+            </button>
+
+            <TransportButton
+              label={t(language, "audioPlayer.forward10Short")}
+              ariaLabel={t(language, "audioPlayer.jumpForward10")}
+              onClick={() => jumpSeconds(10)}
+              disabled={state.duration <= 0}
+            >
+              <JumpForward10Icon className="size-5" />
+            </TransportButton>
+
+            {totalTracks > 1 && (
+              <TransportButton
+                label={t(language, "audioPlayer.nextShort")}
+                ariaLabel={t(language, "audioPlayer.next")}
+                onClick={controller.next}
+                disabled={state.entryIndex === totalTracks - 1}
+              >
+                <SkipForward size={20} className="rtl:rotate-180" aria-hidden="true" />
+              </TransportButton>
+            )}
+          </div>
+
+          {/* End: Volume Control */}
+          <div className="flex shrink-0 items-center justify-end">
+            <VolumeControl controller={controller} language={language} inline />
+          </div>
         </div>
 
         {/* Error state */}
         {state.status === "error" && (
-          <div className="mt-3 rounded-2xl border border-destructive/30 bg-destructive/10 p-3.5" role="alert">
+          <div className="mt-2 rounded-2xl border border-destructive/30 bg-destructive/10 p-3" role="alert">
             <p className="text-label font-semibold text-destructive">{getErrorMessage(state.error?.code, language)}</p>
-            <div className="mt-2.5 flex flex-wrap gap-2">
+            <div className="mt-2 flex flex-wrap gap-2">
               <button
                 type="button"
                 onClick={controller.retry}
@@ -968,38 +1007,8 @@ export function FloatingAudioPlayer({
           </div>
         )}
 
-        {/* Only contextual options remain here. Restart is already available by
-            moving the timeline to its start and Play restarts an ended item. */}
-        <div className="mt-3 flex flex-wrap items-center justify-center gap-2 border-t border-border/70 pt-3">
-          {canRepeat && (
-            <button
-              type="button"
-              aria-pressed={repeatEnabled}
-              onClick={() => controller.setPlaybackMode(repeatEnabled ? "play-once" : "repeat-prescribed-count")}
-              className={`${PILL_CLASS} ${repeatEnabled ? PILL_ACTIVE : PILL_IDLE}`}
-            >
-              <RotateCcw size={16} aria-hidden="true" />
-              {t(language, "audioPlayer.repeatShort")}
-            </button>
-          )}
-
-          <button
-            type="button"
-            onClick={() => controller.setPlaybackRate(nextPlaybackRate(state.playbackRate))}
-            className={`${PILL_CLASS} ${state.playbackRate === 1 ? PILL_IDLE : PILL_ACTIVE}`}
-          >
-            {t(language, "audioPlayer.speedShort")}
-            <span dir="ltr" className="font-black tabular-nums text-primary">
-              {formatNumerals(state.playbackRate, language)}×
-            </span>
-          </button>
-
-          <VolumeControl controller={controller} language={language} inline />
-        </div>
-
-        {/* Whose recitation this is, always on screen rather than behind a
-            disclosure — it is an attribution, not a setting. */}
-        <p className="mt-2 text-center text-micro font-semibold leading-5 text-muted-foreground/80">
+        {/* Attribution */}
+        <p className="mt-1 text-center text-micro font-semibold leading-relaxed text-muted-foreground/80">
           {attributionText}
         </p>
       </div>

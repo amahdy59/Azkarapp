@@ -206,4 +206,22 @@ describe("FloatingAudioPlayer", () => {
     expect(timeline).toHaveAttribute("step", "any");
     expect(timeline.getAttribute("style")).toContain("calc(0.5625rem + (100% - 1.125rem) * 0.2000)");
   });
+
+  it("applies floating-audio-player--docked class when dockedInReader is set for both compact and expanded states", () => {
+    const controller = createController();
+    render(<FloatingAudioPlayer controller={controller} language="en" direction="ltr" dockedInReader />);
+
+    const compactRegion = screen.getByRole("region", { name: "Audio player" });
+    expect(compactRegion).toHaveClass("floating-audio-player--docked");
+
+    fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
+    const expandedRegion = screen.getByRole("region", { name: "Audio player" });
+    expect(expandedRegion).toHaveClass("floating-audio-player--docked");
+    expect(expandedRegion).toHaveClass("floating-audio-player--expanded");
+
+    // Unified controls: speed button and volume slider are present beside transport controls
+    expect(screen.getByRole("button", { name: /Speed: 1×/ })).toBeInTheDocument();
+    expect(screen.getByRole("slider", { name: "Volume" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Pause audio" })).toBeInTheDocument();
+  });
 });

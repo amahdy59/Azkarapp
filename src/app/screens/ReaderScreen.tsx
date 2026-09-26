@@ -827,7 +827,7 @@ export function ReaderScreen({
       <nav
         aria-label={t(language, "reader.viewAllAzkar")}
         className={`hidden h-full min-h-0 shrink-0 flex-col overflow-hidden border-s border-border/60 bg-card/85 backdrop-blur-sm shadow-md transition-all duration-300 min-[1200px]:flex ${
-          isSidebarOpen ? "w-[34%] min-w-[20rem]" : "w-0 !min-w-0 !p-0 !border-0 pointer-events-none opacity-0"
+          isSidebarOpen ? "w-[34%] min-w-[20rem] max-w-md" : "w-0 !min-w-0 !p-0 !border-0 pointer-events-none opacity-0"
         }`}
         data-testid="reader-collection-navigator"
       >
@@ -1294,7 +1294,9 @@ export function ReaderScreen({
                 the same "always-dark brand band" role. */}
               <div
                 data-testid="reader-desktop-hero"
-                className="relative w-full flex shrink-0 flex-col items-center gap-2 overflow-hidden rounded-b-3xl px-6 pb-4 pt-3 text-center"
+                className={`relative w-full flex shrink-0 flex-col items-center gap-2 overflow-hidden rounded-b-3xl px-6 ${
+                  audioModeActive ? "pb-3 pt-2.5" : "pb-4 pt-3"
+                } text-center`}
                 style={{
                   background:
                     "radial-gradient(120% 140% at 50% 10%, rgba(232,180,32,0.18), transparent 60%), var(--brand-hero)",
@@ -1366,7 +1368,7 @@ export function ReaderScreen({
                     direction={direction}
                     aria-label={t(language, "reader.groupProgress")}
                   />
-                  {!showSurahChrome && readerZikrTitle && (
+                  {!audioModeActive && !showSurahChrome && readerZikrTitle && (
                     <div className="mt-1.5 flex w-full items-center justify-between gap-3">
                       <h2
                         className="min-w-0 truncate text-start text-sm font-extrabold leading-relaxed text-[color:var(--on-media)]"
@@ -1378,7 +1380,7 @@ export function ReaderScreen({
                       </h2>
                     </div>
                   )}
-                  {!longSurah && allWordMeanings.length > 0 && (
+                  {!audioModeActive && !longSurah && allWordMeanings.length > 0 && (
                     <div className="mt-1.5 flex w-full items-center justify-end gap-2">
                       <button
                         type="button"
@@ -1401,7 +1403,11 @@ export function ReaderScreen({
 
               {/* Wide-desktop card: reading content, side navigation, counter,
                 and keyboard guidance. Page-level actions stay in the hero. */}
-              <div className="relative mx-4 mb-4 mt-4 flex min-h-0 flex-1 overflow-hidden bg-transparent">
+              <div
+                className={`relative mx-4 ${
+                  audioModeActive ? "my-2" : "my-4"
+                } flex min-h-0 flex-1 overflow-hidden bg-transparent`}
+              >
                 <div
                   className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden cursor-pointer"
                   data-testid="reader-card"
