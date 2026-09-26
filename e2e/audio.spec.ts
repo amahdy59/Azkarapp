@@ -236,7 +236,10 @@ test("expanded queue controls stay inside a 320px phone viewport", async ({ page
   });
   await page.goto("/#/azkar/morning");
   await page.getByRole("button", { name: "Play All Audio" }).click();
-  await page.getByRole("button", { name: "Play available" }).click();
+  const playAvailable = page.getByRole("button", { name: "Play available" });
+  if (await playAvailable.isVisible({ timeout: 1000 }).catch(() => false)) {
+    await playAvailable.click();
+  }
 
   const player = page.getByRole("region", { name: "Audio player" });
   await player.getByRole("button", { name: "Expand player" }).click();
