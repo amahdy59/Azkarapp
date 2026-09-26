@@ -1,13 +1,15 @@
 {
   "ar": [
     "إتاحة التسجيلات الصوتية بالترجمة الإنجليزية لجميع أذكار الصباح بصوت جورج الهادئ والواضح.",
-    "إمكانية الاستماع الكامل لكل أذكار الصباح باللغة الإنجليزية متضمنة آية الكرسي والمعوذات.",
-    "تشغيل فوري وسلس لكامل ورد الصباح بنقرة واحدة مع الانتقال التلقائي بين الأذكار."
+    "إتاحة التسجيلات الصوتية بالترجمة الإنجليزية لكامل مجموعة الأدعية الجامعة.",
+    "تشغيل فوري وسلس لكافة أذكار الصباح والأدعية مع الانتقال التلقائي بين الأذكار.",
+    "تحسين تزامن الصوت وجودة القراءة في تجربة الاستماع الإنجليزية."
   ],
   "en": [
     "Complete English translation audio narrated by George is now available for all Morning Azkar.",
-    "Seamless listening experience covering every morning remembrance, including Ayat al-Kursi and the three Quls.",
-    "Instant one-tap playback for the entire morning routine with automatic progression between remembrances."
+    "Full English translation audio now covers the entire Comprehensive Du'as collection.",
+    "Seamless one-tap playback across morning remembrances and comprehensive supplications.",
+    "Enhanced audio synchronization and narration quality throughout the English experience."
   ],
-  "release": "2026-09-26-morning-english-audio"
+  "release": "2026-09-26-english-audio-expansion"
 }

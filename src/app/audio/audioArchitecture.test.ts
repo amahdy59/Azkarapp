@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ALL_AZKAR, getAzkarForMode } from "../content/azkar";
+import { COMPREHENSIVE_DUAS } from "../content/comprehensiveDuas";
 import type { Zikr } from "../types";
 import { createArabicTextFingerprint, normalizeArabicForAudioMatching } from "./arabicMatching";
 import { DEFAULT_AUDIO_PREFERENCES } from "./audioPreferences";
@@ -252,6 +253,36 @@ describe("explicit audio content architecture", () => {
       const titles = getZikrPlaybackTitles(zikr);
       expect(bannedGenericTitles.has(titles.titleArabic)).toBe(false);
       expect(bannedGenericTitles.has(titles.titleEnglish)).toBe(false);
+    }
+  });
+
+  it("provides full English translation audio coverage for all morning azkar", () => {
+    const morningAzkar = getAzkarForMode("morning", "complete");
+    expect(morningAzkar.length).toBeGreaterThan(0);
+
+    for (const zikr of morningAzkar) {
+      const resolution = resolveAudioAsset(zikr, { baseUrl: "https://pub-6e537fd865454e599c23a2bcfc22136e.r2.dev" });
+      expect(resolution.available, `Expected audio for ${zikr.id} to be available, but got: ${resolution.reason}`).toBe(
+        true,
+      );
+      if (resolution.available) {
+        expect(resolution.availableVoiceIds).toContain("english-george");
+      }
+    }
+  });
+
+  it("provides full English translation audio coverage for comprehensive duas collection", () => {
+    const duas = COMPREHENSIVE_DUAS.filter((item) => !item.isCollectionIntroduction);
+    expect(duas).toHaveLength(47);
+
+    for (const dua of duas) {
+      const resolution = resolveAudioAsset(dua, { baseUrl: "https://pub-6e537fd865454e599c23a2bcfc22136e.r2.dev" });
+      expect(resolution.available, `Expected audio for ${dua.id} to be available, but got: ${resolution.reason}`).toBe(
+        true,
+      );
+      if (resolution.available) {
+        expect(resolution.availableVoiceIds).toContain("english-george");
+      }
     }
   });
 });
