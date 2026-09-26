@@ -2,9 +2,109 @@ import type { AppLanguage, RoutineMode, Zikr, ZikrAudioMode } from "../types";
 import { AUDIO_CATALOG } from "./audioManifest";
 import { DEFAULT_AUDIO_PREFERENCES } from "./audioPreferences";
 import { getPreferredVoiceId, getVoiceIdForLanguage, resolveAudioAsset } from "./resolveAudioAsset";
-import type { AudioCatalog, AudioCoverage, AudioPreferences, PlaybackEntry, PlaybackPlan } from "./audioTypes";
+import type {
+  AudioAsset,
+  AudioCatalog,
+  AudioCoverage,
+  AudioPreferences,
+  PlaybackEntry,
+  PlaybackPlan,
+} from "./audioTypes";
 
 type PlanContext = PlaybackPlan["context"];
+
+const GENERIC_ARABIC_TITLES = new Set(["أذكار مشتركة", "أذكار الصباح", "أذكار المساء", "أذكار النوم", "ذِكْر"]);
+
+const GENERIC_ENGLISH_TITLES = new Set([
+  "Shared Dhikr",
+  "Morning Azkar",
+  "Evening Azkar",
+  "Before Sleep Azkar",
+  "Dhikr",
+]);
+
+function extractArabicIncipit(arabicText: string): string {
+  const cleaned = arabicText.replace(/[﴿﴾]/g, "").replace(/\s+/g, " ").trim();
+  if (!cleaned) return "ذِكْر";
+  const withoutPrelude = cleaned
+    .replace(/^أَعُوذُ\s+بِاللَّهِ\s+مِنَ\s+الشَّيْطَانِ\s+الرَّجِيمِ[.\s،؛]*/u, "")
+    .replace(/^(بِسْمِ\s+اللَّهِ\s+الرَّحْمَٰنِ\s+الرَّحِيمِ|بِسْمِ\s+اللَّهِ\s+الرَّحْمَنِ\s+الرَّحِيمِ)[.\s،؛]*/u, "")
+    .trim();
+  const source = withoutPrelude || cleaned;
+  const firstClause = source.split(/[،؛.!\n؟]/u)[0]?.trim() || source;
+  if (firstClause.length <= 68) return firstClause;
+  const words = firstClause.split(" ");
+  let acc = "";
+  for (const word of words) {
+    const candidate = acc ? `${acc} ${word}` : word;
+    if (candidate.length > 62 && acc) break;
+    acc = candidate;
+  }
+  return acc ? `${acc}…` : `${firstClause.slice(0, 62)}…`;
+}
+
+function extractEnglishIncipit(translation: string): string {
+  const cleaned = translation
+    .replace(/^["'“”‘’]+|["'“”‘’]+$/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!cleaned) return "Dhikr";
+  const firstClause = cleaned.split(/[.;!?\n—–]/)[0]?.trim() || cleaned;
+  if (firstClause.length <= 72) return firstClause.replace(/[,:]+$/, "");
+  const words = firstClause.split(" ");
+  let acc = "";
+  for (const word of words) {
+    const candidate = acc ? `${acc} ${word}` : word;
+    if (candidate.length > 66 && acc) break;
+    acc = candidate;
+  }
+  return acc ? `${acc.replace(/[,:]+$/, "")}…` : `${firstClause.slice(0, 66)}…`;
+}
+
+export function getZikrPlaybackTitles(
+  zikr: Pick<
+    Zikr,
+    | "arabicText"
+    | "translation"
+    | "surahNameArabic"
+    | "surahNameEnglish"
+    | "canonicalKey"
+    | "benefit"
+    | "authenticityNote"
+  >,
+  asset?: Partial<Pick<AudioAsset, "titleArabic" | "titleEnglish">>,
+): { titleArabic: string; titleEnglish: string } {
+  const surahAr =
+    zikr.surahNameArabic?.trim() || (zikr.canonicalKey === "ayat_al_kursi" ? "الْبَقَرَة (آيَةُ الْكُرْسِيِّ)" : "");
+  const surahEn =
+    zikr.surahNameEnglish?.trim() || (zikr.canonicalKey === "ayat_al_kursi" ? "Al-Baqarah (Ayat al-Kursi)" : "");
+  const rawAssetAr = asset?.titleArabic?.trim() ?? "";
+  const rawAssetEn = asset?.titleEnglish?.trim() ?? "";
+
+  let titleArabic: string;
+  if (surahAr) {
+    titleArabic = /^(سورة|سُورَةُ)\s/u.test(surahAr) ? surahAr : `سورة ${surahAr}`;
+  } else if (zikr.arabicText?.trim()) {
+    titleArabic = extractArabicIncipit(zikr.arabicText);
+  } else if (rawAssetAr && !GENERIC_ARABIC_TITLES.has(rawAssetAr)) {
+    titleArabic = rawAssetAr;
+  } else {
+    titleArabic = "ذِكْر";
+  }
+
+  let titleEnglish: string;
+  if (surahEn) {
+    titleEnglish = /^surah\s/i.test(surahEn) ? surahEn : `Surah ${surahEn}`;
+  } else if (zikr.translation?.trim()) {
+    titleEnglish = extractEnglishIncipit(zikr.translation);
+  } else if (rawAssetEn && !GENERIC_ENGLISH_TITLES.has(rawAssetEn)) {
+    titleEnglish = rawAssetEn;
+  } else {
+    titleEnglish = "Dhikr";
+  }
+
+  return { titleArabic, titleEnglish };
+}
 
 const createPlanId = () =>
   typeof crypto !== "undefined" && "randomUUID" in crypto
@@ -90,13 +190,14 @@ export function buildPlaybackPlan({
       zikr.audioBehavior.supportedModes.includes("repeat-prescribed-count") &&
       (zikr.ritualGroupId !== "three_quls" || completeRitual);
     const repetitions = mode === "repeat-prescribed-count" && canRepeat ? zikr.repetitionCount : 1;
+    const { titleArabic, titleEnglish } = getZikrPlaybackTitles(zikr, resolution.asset);
     entries.push({
       entryId: `${zikr.id}:${entries.length + 1}`,
       zikrId: zikr.id,
       canonicalKey: zikr.canonicalKey,
       audioAssetId: resolution.asset.id,
-      titleArabic: resolution.asset.titleArabic,
-      titleEnglish: resolution.asset.titleEnglish,
+      titleArabic,
+      titleEnglish,
       contentKind: resolution.asset.contentKind,
       repetitions,
       prescribedRepetitions: zikr.repetitionCount,

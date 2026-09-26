@@ -39,77 +39,78 @@ These files already exist and must not be ignored:
 
 Run the phase files in numerical order unless the decision log explicitly records a justified change.
 
-| Phase | File                                                   | Result                                                                    |
-| ----- | ------------------------------------------------------ | ------------------------------------------------------------------------- |
-| 00    | `phases/PHASE_00_REPOSITORY_AUDIT.md`                  | Verified current-state map and conflict register                          |
-| 01    | `phases/PHASE_01_BASELINE_CAPTURE.md`                  | Reproducible visual, accessibility, performance and behavior baseline     |
-| 02    | `phases/PHASE_02_DESIGN_FOUNDATIONS.md`                | Approved tokens and global interaction foundations                        |
-| 03    | `phases/PHASE_03_SHARED_COMPONENTS.md`                 | Reusable component primitives and states                                  |
-| 04    | `phases/PHASE_04_SHELL_NAVIGATION.md`                  | Responsive application shell and navigation                               |
-| 05    | `phases/PHASE_05_HOME.md`                              | Focused time-aware home page                                              |
-| 06    | `phases/PHASE_06_LIBRARY.md`                           | Scannable, searchable azkar library                                       |
-| 07    | `phases/PHASE_07_READER.md`                            | Accessible and calm core reading session                                  |
-| 08    | `phases/PHASE_08_PROGRESS.md`                          | Useful, non-punitive progress experience                                  |
-| 09    | `phases/PHASE_09_SETTINGS.md`                          | Clear settings IA and controls                                            |
-| 10    | `phases/PHASE_10_SYSTEM_STATES.md`                     | Loading, empty, error, offline, update and sync states                    |
-| 11    | `phases/PHASE_11_RESPONSIVE_I18N.md`                   | Full viewport, language and direction validation                          |
-| 12    | `phases/PHASE_12_ACCESSIBILITY_REMEDIATION.md`         | WCAG-focused remediation and manual evidence                              |
-| 13    | `phases/PHASE_13_RELEASE_HARDENING.md`                 | Performance, security, PWA and release readiness                          |
-| 14    | `phases/PHASE_14_CI_CD_FIX.md`                         | Stable CI/CD and green deployment pipeline                                |
-| 15    | `phases/PHASE_15_CSS_DELIVERY_REPAIR.md`               | Design-system primitives reach the compiled stylesheet                    |
-| 16    | `phases/PHASE_16_ELEVATION_AND_SURFACES.md`            | Elevation works in every theme; one definition per surface                |
-| 17    | `phases/PHASE_17_MENU_UNIFICATION.md`                  | One menu appearance, anatomy and direction rule                           |
-| 18    | `phases/PHASE_18_BUILD_WEIGHT.md`                      | Only referenced assets ship; the budget gate can see them                 |
-| 19    | `phases/PHASE_19_TOKEN_DISCIPLINE.md`                  | Colour, radius and spacing back on scale, with lint enforcement           |
-| 20    | `phases/PHASE_20_MOTION_AND_STRUCTURE.md`              | Real motion system and navigable stylesheets                              |
-| 23    | `phases/PHASE_23_PRAYER_HOME_AND_REMINDERS.md`         | Responsive prayer dashboard and efficient opt-in reminders                |
-| 24    | `phases/PHASE_24_KAHF_AUDIO_AND_PRAYER_NAV.md`         | Recoverable Al-Kahf playback and prayer-detail navigation                 |
-| 24B   | `phases/PHASE_24B_INSTALLED_AUDIO_AND_PRAYER_NOTCH.md` | Immediate installed-app update discovery and in-place prayer disclosure   |
-| 25A   | `phases/PHASE_25A_PUSH_SECURITY_FOUNDATION.md`         | Reproducible RLS baseline before server-backed push subscriptions         |
-| 26    | `phases/PHASE_26_HOME_PRAYER_COMPOSITION.md`           | Focused Home IA and one integrated prayer-detail surface                  |
-| 27    | `phases/PHASE_27_PRODUCTION_VISUAL_AUDIT.md`           | Fresh production visual audit across responsive matrix                    |
-| 28    | `phases/PHASE_28_BEFORE_SLEEP_AUDIO.md`                | Verified owner-supplied audio for exact before-sleep content              |
-| 29    | `phases/PHASE_29_CORE_SLEEP_SAJDAH.md`                 | As-Sajdah in both sleep modes with verified audio and honest recovery     |
-| 30    | `phases/PHASE_30_HOME_GLASS_AND_PRAYER_WIDTH.md`       | Visible Home glass depth and half-width tablet/desktop prayer detail      |
-| 31    | `phases/PHASE_31_ADAPTIVE_AUDIO_PLAYER.md`             | Responsive audio dock, RTL timeline, and input-aware volume control       |
-| 32    | `phases/PHASE_32_HOME_GLASS_AND_AUDIO_POLISH.md`       | Transparent Home composition and reachable native audio controls          |
-| 33    | `phases/PHASE_33_MORE_AND_QIBLA.md`                    | Four-item navigation with accessible local Qibla guidance                 |
-| 34    | `phases/PHASE_34_AZKAR_LIBRARY_HIERARCHY.md`           | Collections-first Library and unambiguous benefit/reference actions       |
-| 35    | `phases/PHASE_35_RESPONSIVE_UTILITY_AND_LISTENING.md`  | Filled Home composition, direct desktop utilities, and synced listening   |
-| 36    | `phases/PHASE_36_ENGLISH_AUDIO_SEPARATION.md`          | Verified English audio inventory and language-locked playback controls    |
-| 37    | `phases/PHASE_37_READER_COLLECTION_NAVIGATOR.md`       | Wide collection navigation and in-place compact disclosure                |
-| 38    | `phases/PHASE_38_QIBLA_RESPONSIVE_RELEVANCE.md`        | Reachable mobile Qibla and practical desktop bearing guidance             |
-| 39    | `phases/PHASE_39_SINGLE_PAGE_MUSHAF.md`                | One full-screen Mushaf page and focused navigation at every width         |
-| 40    | `phases/PHASE_40_AUDIO_DOCK_REFINEMENT.md`             | Stable audio controls, bottom docking, and visible listening progress     |
-| 41    | `phases/PHASE_41_LIBRARY_FILTER_DISCLOSURE.md`         | Compact mobile filters and responsive Library hierarchy                   |
-| 42    | `phases/PHASE_42_MUSHAF_DESKTOP_RAIL.md`               | Right-side wide-screen Mushaf tools with mobile corner controls           |
-| 43    | `phases/PHASE_43_MUSHAF_RESPONSIVE_REFINEMENT.md`      | Borderless pages, focused tools, and optional comfortable spreads         |
-| 44    | `phases/PHASE_44_MOBILE_QIBLA_RELIABILITY.md`          | Reliable absolute mobile compass headings without relative drift          |
-| 45    | `phases/PHASE_45_PROGRESS_PRIORITY_AND_DISCLOSURE.md`  | Prayer-first progress hierarchy with calmer progressive disclosure        |
-| 46    | `phases/PHASE_46_AUDIO_PLAYER_HARDENING.md`            | Narrow-screen containment and truthful background media controls          |
-| 47    | `phases/PHASE_47_QIBLA_AND_IOS_SHELL.md`               | Explicit compass opt-in and single-owner bottom safe area                 |
-| 48    | `phases/PHASE_48_QIBLA_COMPAT_AND_PROGRESS_CLARITY.md` | Safari compass compatibility and summary-first Progress views             |
-| 49    | `phases/PHASE_49_HOME_WIRD_DENSITY.md`                 | Compact responsive Home Wird cards without smaller content                |
-| 50    | `phases/PHASE_50_QIBLA_PERMISSION_RECOVERY.md`         | Honest installed-app compass denial and reliable live-dial semantics      |
-| 51    | `phases/PHASE_51_CLOUDFLARE_SYNC_AND_VISITORS.md`      | Edge persistence, peer sync, and anonymous active visitor analytics       |
-| 52    | `phases/PHASE_52_SYNC_PRIVACY_BOUNDARY.md`             | Strict remote sync sanitization excluding coordinates and PII             |
-| 53    | `phases/PHASE_53_COUNTER_CONTINUITY.md`                | Partial zikr count persistence across unmount and refresh                 |
-| 54    | `phases/PHASE_54_WIRD_COMPLETION_CONSISTENCY.md`       | Unified Quran wird completion logic and fractional progress visibility    |
-| 55    | `phases/PHASE_55_QR_DEVICE_PAIRING_RELIABILITY.md`     | Localhost CORS regex, revision tracking, auto-purge, and pairing UX       |
-| 56    | `phases/PHASE_56_OFFLINE_DOWNLOADS_ISOLATION.md`       | Independent Mushaf/Audio downloads, font verification, and UX hierarchy   |
-| 57    | `phases/PHASE_57_QIBLAH_TASK_FIRST.md`                 | Task-first Qiblah direction, Kaaba distance, and progressive compass      |
-| 58    | `phases/PHASE_58_MUSHAF_MOBILE_POLISH.md`              | Library horizontal affordance, spread explanation, and skeleton stability |
-| 59    | `phases/PHASE_59_REVIEW_REMEDIATION.md`                | Verification-led priority and deferred remediation                        |
-| 60    | `phases/PHASE_60_QIBLA_VISUAL_AND_MUSHAF_SPEED.md`     | Always-visible Kaaba direction and intent-led Mushaf warm-up              |
-| 61    | `phases/PHASE_61_PRAYER_AND_FASTING_COLLECTIONS.md`    | Reviewed in-prayer and year-round fasting reference collections           |
-| 62    | `phases/PHASE_62_ACTIVE_VISITOR_PRESENCE.md`           | Anonymous rolling presence instead of an all-time visitor total           |
-| 63    | `phases/PHASE_63_REVIEW_RECOMMENDATIONS.md`            | Evidence-led recommendations, local restore, audio settings, prayer depth |
-| 64    | `phases/PHASE_64_MASBAHA_AND_PROGRESS_REFINEMENT.md`   | Finite Masbaha goals, reviewed picker, and truthful Progress summaries    |
-| 65    | `phases/PHASE_65_NAVIGATION_AND_MICROINTERACTIONS.md`  | Linkable subroutes and calm, governed interaction feedback                |
-| 66    | `phases/PHASE_66_VISUAL_REMEDIATION.md`                | Themed dropdowns, rounded statuses, and Light Home utility contrast       |
-| 67    | `phases/PHASE_67_ZIKR_DISCLOSURE_LAYOUT.md`            | Full-width zikr summaries with one stable, overflow-aware disclosure      |
-| 68    | `phases/PHASE_68_AUDIO_PROGRESS_CLARITY.md`            | One visible audio progress control with stable shell actions              |
-| 69    | `phases/PHASE_69_RECENT_CHANGES_REVIEW.md`             | Review-led hardening of recent reading, counter, Home, and audio changes  |
+| Phase | File                                                     | Result                                                                                   |
+| ----- | -------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| 00    | `phases/PHASE_00_REPOSITORY_AUDIT.md`                    | Verified current-state map and conflict register                                         |
+| 01    | `phases/PHASE_01_BASELINE_CAPTURE.md`                    | Reproducible visual, accessibility, performance and behavior baseline                    |
+| 02    | `phases/PHASE_02_DESIGN_FOUNDATIONS.md`                  | Approved tokens and global interaction foundations                                       |
+| 03    | `phases/PHASE_03_SHARED_COMPONENTS.md`                   | Reusable component primitives and states                                                 |
+| 04    | `phases/PHASE_04_SHELL_NAVIGATION.md`                    | Responsive application shell and navigation                                              |
+| 05    | `phases/PHASE_05_HOME.md`                                | Focused time-aware home page                                                             |
+| 06    | `phases/PHASE_06_LIBRARY.md`                             | Scannable, searchable azkar library                                                      |
+| 07    | `phases/PHASE_07_READER.md`                              | Accessible and calm core reading session                                                 |
+| 08    | `phases/PHASE_08_PROGRESS.md`                            | Useful, non-punitive progress experience                                                 |
+| 09    | `phases/PHASE_09_SETTINGS.md`                            | Clear settings IA and controls                                                           |
+| 10    | `phases/PHASE_10_SYSTEM_STATES.md`                       | Loading, empty, error, offline, update and sync states                                   |
+| 11    | `phases/PHASE_11_RESPONSIVE_I18N.md`                     | Full viewport, language and direction validation                                         |
+| 12    | `phases/PHASE_12_ACCESSIBILITY_REMEDIATION.md`           | WCAG-focused remediation and manual evidence                                             |
+| 13    | `phases/PHASE_13_RELEASE_HARDENING.md`                   | Performance, security, PWA and release readiness                                         |
+| 14    | `phases/PHASE_14_CI_CD_FIX.md`                           | Stable CI/CD and green deployment pipeline                                               |
+| 15    | `phases/PHASE_15_CSS_DELIVERY_REPAIR.md`                 | Design-system primitives reach the compiled stylesheet                                   |
+| 16    | `phases/PHASE_16_ELEVATION_AND_SURFACES.md`              | Elevation works in every theme; one definition per surface                               |
+| 17    | `phases/PHASE_17_MENU_UNIFICATION.md`                    | One menu appearance, anatomy and direction rule                                          |
+| 18    | `phases/PHASE_18_BUILD_WEIGHT.md`                        | Only referenced assets ship; the budget gate can see them                                |
+| 19    | `phases/PHASE_19_TOKEN_DISCIPLINE.md`                    | Colour, radius and spacing back on scale, with lint enforcement                          |
+| 20    | `phases/PHASE_20_MOTION_AND_STRUCTURE.md`                | Real motion system and navigable stylesheets                                             |
+| 23    | `phases/PHASE_23_PRAYER_HOME_AND_REMINDERS.md`           | Responsive prayer dashboard and efficient opt-in reminders                               |
+| 24    | `phases/PHASE_24_KAHF_AUDIO_AND_PRAYER_NAV.md`           | Recoverable Al-Kahf playback and prayer-detail navigation                                |
+| 24B   | `phases/PHASE_24B_INSTALLED_AUDIO_AND_PRAYER_NOTCH.md`   | Immediate installed-app update discovery and in-place prayer disclosure                  |
+| 25A   | `phases/PHASE_25A_PUSH_SECURITY_FOUNDATION.md`           | Reproducible RLS baseline before server-backed push subscriptions                        |
+| 26    | `phases/PHASE_26_HOME_PRAYER_COMPOSITION.md`             | Focused Home IA and one integrated prayer-detail surface                                 |
+| 27    | `phases/PHASE_27_PRODUCTION_VISUAL_AUDIT.md`             | Fresh production visual audit across responsive matrix                                   |
+| 28    | `phases/PHASE_28_BEFORE_SLEEP_AUDIO.md`                  | Verified owner-supplied audio for exact before-sleep content                             |
+| 29    | `phases/PHASE_29_CORE_SLEEP_SAJDAH.md`                   | As-Sajdah in both sleep modes with verified audio and honest recovery                    |
+| 30    | `phases/PHASE_30_HOME_GLASS_AND_PRAYER_WIDTH.md`         | Visible Home glass depth and half-width tablet/desktop prayer detail                     |
+| 31    | `phases/PHASE_31_ADAPTIVE_AUDIO_PLAYER.md`               | Responsive audio dock, RTL timeline, and input-aware volume control                      |
+| 32    | `phases/PHASE_32_HOME_GLASS_AND_AUDIO_POLISH.md`         | Transparent Home composition and reachable native audio controls                         |
+| 33    | `phases/PHASE_33_MORE_AND_QIBLA.md`                      | Four-item navigation with accessible local Qibla guidance                                |
+| 34    | `phases/PHASE_34_AZKAR_LIBRARY_HIERARCHY.md`             | Collections-first Library and unambiguous benefit/reference actions                      |
+| 35    | `phases/PHASE_35_RESPONSIVE_UTILITY_AND_LISTENING.md`    | Filled Home composition, direct desktop utilities, and synced listening                  |
+| 36    | `phases/PHASE_36_ENGLISH_AUDIO_SEPARATION.md`            | Verified English audio inventory and language-locked playback controls                   |
+| 37    | `phases/PHASE_37_READER_COLLECTION_NAVIGATOR.md`         | Wide collection navigation and in-place compact disclosure                               |
+| 38    | `phases/PHASE_38_QIBLA_RESPONSIVE_RELEVANCE.md`          | Reachable mobile Qibla and practical desktop bearing guidance                            |
+| 39    | `phases/PHASE_39_SINGLE_PAGE_MUSHAF.md`                  | One full-screen Mushaf page and focused navigation at every width                        |
+| 40    | `phases/PHASE_40_AUDIO_DOCK_REFINEMENT.md`               | Stable audio controls, bottom docking, and visible listening progress                    |
+| 41    | `phases/PHASE_41_LIBRARY_FILTER_DISCLOSURE.md`           | Compact mobile filters and responsive Library hierarchy                                  |
+| 42    | `phases/PHASE_42_MUSHAF_DESKTOP_RAIL.md`                 | Right-side wide-screen Mushaf tools with mobile corner controls                          |
+| 43    | `phases/PHASE_43_MUSHAF_RESPONSIVE_REFINEMENT.md`        | Borderless pages, focused tools, and optional comfortable spreads                        |
+| 44    | `phases/PHASE_44_MOBILE_QIBLA_RELIABILITY.md`            | Reliable absolute mobile compass headings without relative drift                         |
+| 45    | `phases/PHASE_45_PROGRESS_PRIORITY_AND_DISCLOSURE.md`    | Prayer-first progress hierarchy with calmer progressive disclosure                       |
+| 46    | `phases/PHASE_46_AUDIO_PLAYER_HARDENING.md`              | Narrow-screen containment and truthful background media controls                         |
+| 47    | `phases/PHASE_47_QIBLA_AND_IOS_SHELL.md`                 | Explicit compass opt-in and single-owner bottom safe area                                |
+| 48    | `phases/PHASE_48_QIBLA_COMPAT_AND_PROGRESS_CLARITY.md`   | Safari compass compatibility and summary-first Progress views                            |
+| 49    | `phases/PHASE_49_HOME_WIRD_DENSITY.md`                   | Compact responsive Home Wird cards without smaller content                               |
+| 50    | `phases/PHASE_50_QIBLA_PERMISSION_RECOVERY.md`           | Honest installed-app compass denial and reliable live-dial semantics                     |
+| 51    | `phases/PHASE_51_CLOUDFLARE_SYNC_AND_VISITORS.md`        | Edge persistence, peer sync, and anonymous active visitor analytics                      |
+| 52    | `phases/PHASE_52_SYNC_PRIVACY_BOUNDARY.md`               | Strict remote sync sanitization excluding coordinates and PII                            |
+| 53    | `phases/PHASE_53_COUNTER_CONTINUITY.md`                  | Partial zikr count persistence across unmount and refresh                                |
+| 54    | `phases/PHASE_54_WIRD_COMPLETION_CONSISTENCY.md`         | Unified Quran wird completion logic and fractional progress visibility                   |
+| 55    | `phases/PHASE_55_QR_DEVICE_PAIRING_RELIABILITY.md`       | Localhost CORS regex, revision tracking, auto-purge, and pairing UX                      |
+| 56    | `phases/PHASE_56_OFFLINE_DOWNLOADS_ISOLATION.md`         | Independent Mushaf/Audio downloads, font verification, and UX hierarchy                  |
+| 57    | `phases/PHASE_57_QIBLAH_TASK_FIRST.md`                   | Task-first Qiblah direction, Kaaba distance, and progressive compass                     |
+| 58    | `phases/PHASE_58_MUSHAF_MOBILE_POLISH.md`                | Library horizontal affordance, spread explanation, and skeleton stability                |
+| 59    | `phases/PHASE_59_REVIEW_REMEDIATION.md`                  | Verification-led priority and deferred remediation                                       |
+| 60    | `phases/PHASE_60_QIBLA_VISUAL_AND_MUSHAF_SPEED.md`       | Always-visible Kaaba direction and intent-led Mushaf warm-up                             |
+| 61    | `phases/PHASE_61_PRAYER_AND_FASTING_COLLECTIONS.md`      | Reviewed in-prayer and year-round fasting reference collections                          |
+| 62    | `phases/PHASE_62_ACTIVE_VISITOR_PRESENCE.md`             | Anonymous rolling presence instead of an all-time visitor total                          |
+| 63    | `phases/PHASE_63_REVIEW_RECOMMENDATIONS.md`              | Evidence-led recommendations, local restore, audio settings, prayer depth                |
+| 64    | `phases/PHASE_64_MASBAHA_AND_PROGRESS_REFINEMENT.md`     | Finite Masbaha goals, reviewed picker, and truthful Progress summaries                   |
+| 65    | `phases/PHASE_65_NAVIGATION_AND_MICROINTERACTIONS.md`    | Linkable subroutes and calm, governed interaction feedback                               |
+| 66    | `phases/PHASE_66_VISUAL_REMEDIATION.md`                  | Themed dropdowns, rounded statuses, and Light Home utility contrast                      |
+| 67    | `phases/PHASE_67_ZIKR_DISCLOSURE_LAYOUT.md`              | Full-width zikr summaries with one stable, overflow-aware disclosure                     |
+| 68    | `phases/PHASE_68_AUDIO_PROGRESS_CLARITY.md`              | One visible audio progress control with stable shell actions                             |
+| 69    | `phases/PHASE_69_RECENT_CHANGES_REVIEW.md`               | Review-led hardening of recent reading, counter, Home, and audio changes                 |
+| 70    | `phases/PHASE_70_UX_A11Y_AND_EFFICIENCY_IMPROVEMENTS.md` | Audit-driven UX, WCAG 2.2 AA target/focus, search highlight, and efficiency improvements |
 
 Phases 15–20 derive from `docs/audits/DESIGN_CONSISTENCY_AUDIT.md` (2026-08-15) and are
 recorded in `DECISION_LOG.md` as DEC-064. Phase 15 is upstream of 16, 17 and 19 — its root
@@ -119,6 +120,6 @@ may run in parallel.
 
 ## Core rule
 
-The latest review and hardening work is recorded in [Phase 69](phases/PHASE_69_RECENT_CHANGES_REVIEW.md), including target-size repairs, truthful progress copy, completion-flow corrections, responsive status layout, and motion-governance verification.
+The latest review and hardening work is recorded in [Phase 70](phases/PHASE_70_UX_A11Y_AND_EFFICIENCY_IMPROVEMENTS.md), including 44px target-size enforcement, uniform 3px keyboard focus indicators, Arabic-safe search match highlighting, bulk recent-search clearing, hybrid touch/mouse volume controls, and shared search index caching.
 
 The agent must never interpret “perfect the application” as permission to rewrite the entire repository. Perfection is approached through evidence-backed iteration, not one-shot replacement.

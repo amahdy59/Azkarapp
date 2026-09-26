@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, startTransition, type CSSProperties } from "react";
-import { ArrowPrevious, Bookmark, CheckCircle2, ChevronDown, MoreVertical, Translate } from "./icons";
+import { ArrowLeft, ArrowRight, Bookmark, CheckCircle2, ChevronDown, MoreVertical, Translate } from "./icons";
 import { useSwipeGestures } from "../hooks/useSwipeGestures";
 import { PAPER_ASPECT, spreadStart, useMushafShell } from "./mushafShell";
 import { MushafToolRail, MUSHAF_RAIL_WIDTH, type SurahAudioControl } from "./MushafToolRail";
@@ -9,7 +9,6 @@ import { MushafKeyboardShortcutList } from "./MushafKeyboardShortcuts";
 import { MushafQuickMenu } from "./MushafQuickMenu";
 import { ResponsiveSheet } from "./ResponsiveSheet";
 import { t } from "../i18n";
-import { formatNumerals } from "../formatting";
 import type {
   AppLanguage,
   MushafLayout,
@@ -30,7 +29,8 @@ import {
   prefetchMushafPage,
   type MushafVerseData,
 } from "../content/qcfMushaf";
-import { getJuzNumberForPage, getSurahDisplayName } from "../content/surahInfo";
+import { SURAHS, getJuzNumberForPage, getSurahDisplayName, getSurahNumberForPage } from "../content/surahInfo";
+import { SURAH_PLACEMENTS } from "../content/mushafSurahPlacements";
 import { loadSurahWordMeanings, type QuranWordMeaning, type WordMeaningSelection } from "../content/quranWordMeanings";
 import { MushafPageViewer } from "./MushafPageViewer";
 import { AyahInteractionSheet } from "./AyahInteractionSheet";
@@ -146,12 +146,20 @@ export function MushafImmersiveReader({
   onComplete?: () => void;
   onReadExternally?: () => void;
 }) {
+  const [customPages, setCustomPages] = useState<number[] | null>(null);
+  useEffect(() => {
+    setCustomPages(null);
+  }, [zikr.id]);
+
   const pageNumbers = useMemo(() => {
+    if (customPages && customPages.length > 0) {
+      return customPages;
+    }
     if (zikr.mushafPages && zikr.mushafPages.length > 0) {
       return zikr.mushafPages.map((p) => p.page);
     }
     return [1];
-  }, [zikr.mushafPages]);
+  }, [customPages, zikr.mushafPages]);
 
   /**
    * Where the reader is in the surah, owned by the screen above.
@@ -163,12 +171,14 @@ export function MushafImmersiveReader({
    */
   const [pageIndex, slideDir] = pageTuple;
   const [showWordMeanings, setShowWordMeanings] = useState(false);
-  const [isFocusMode, setIsFocusMode] = useState(false);
   const [isIndexOpen, setIsIndexOpen] = useState(false);
+  const [indexTab, setIndexTab] = useState<"surahs" | "juzs" | "jump" | "bookmarks">("surahs");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
+  const [isFocusMode, setIsFocusMode] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isQuickMenuOpen, setIsQuickMenuOpen] = useState(false);
+  const ArrowPrevious = direction === "rtl" ? ArrowRight : ArrowLeft;
   const [activeAyah, setActiveAyah] = useState<{ verseKey: string; text: string | null; pageNumber: number } | null>(
     null,
   );
@@ -269,8 +279,7 @@ export function MushafImmersiveReader({
 
   // Keyboard navigation: physical direction (ArrowLeft/PageDown = next page,
   // ArrowRight/PageUp = previous), Home/End jump to the surah's first and last
-  // page, F toggles focus mode, and Escape steps back one layer at a time
-  // (focus mode first, then the surah) so nested ayah sheets close in order.
+  // page, and Escape steps back when no nested ayah sheet is open.
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (activeAyah) return;
@@ -279,15 +288,13 @@ export function MushafImmersiveReader({
       // does not. Excluding buttons made the page keys dead from the moment
       // this view opened, because it now autofocuses a control on the rail.
       // The Mushaf's own guard has always been this one.
-      if (target?.closest("input, textarea, select, [contenteditable='true'], [role='menu'], [role='listbox']")) return;
       if (e.key === "Escape") {
-        // Radix owned this while it was a dialog. Layered as the Mushaf layers
-        // it: giving up the surah entirely from a keypress meant to undo the
-        // last thing you did is a surprise you cannot take back without losing
-        // your place.
         e.preventDefault();
-        if (isFocusMode) setIsFocusMode(false);
-        else onClose();
+        if (isFocusMode) {
+          setIsFocusMode(false);
+          return;
+        }
+        onClose();
         return;
       }
       if (e.key === "ArrowLeft" || e.key === "PageDown") {
@@ -374,10 +381,18 @@ export function MushafImmersiveReader({
 
   const { surahName, juzNumber } = useMemo(() => {
     const juz = getJuzNumberForPage(displayPage);
-    if (!pageData || pageData.length === 0) return { surahName: title, juzNumber: juz };
-    const [surah] = (pageData[0]?.k || "1:1").split(":");
-    return { surahName: getSurahDisplayName(surah || "1", language), juzNumber: juz };
-  }, [displayPage, language, pageData, title]);
+    if (!pageData || pageData.length === 0) {
+      return {
+        surahName: customPages ? getSurahDisplayName(getSurahNumberForPage(displayPage), language) : title,
+        juzNumber: juz,
+      };
+    }
+    const canonicalSurah = String(getSurahNumberForPage(displayPage));
+    const hasCanonicalSurah = pageData.some((v) => v.k.startsWith(`${canonicalSurah}:`));
+    const [firstSurah] = (pageData[0]?.k || "1:1").split(":");
+    const surah = hasCanonicalSurah ? canonicalSurah : firstSurah || "1";
+    return { surahName: getSurahDisplayName(surah, language), juzNumber: juz };
+  }, [customPages, displayPage, language, pageData, title]);
 
   const atStart = hasSpread ? rightNumber <= pageNumbers[0]! : pageIndex <= 0;
   const atEnd = hasSpread ? leftNumber >= pageNumbers[pageNumbers.length - 1]! : pageIndex >= pageCount - 1;
@@ -408,7 +423,10 @@ export function MushafImmersiveReader({
       isPageBookmarked={bookmarkedPages.includes(displayPage)}
       isFullscreen={isFullscreen}
       onBack={onClose}
-      onOpenIndex={() => setIsIndexOpen(true)}
+      onOpenIndex={() => {
+        setIndexTab("surahs");
+        setIsIndexOpen(true);
+      }}
       onPrevious={() => paginate(-1)}
       onNext={() => paginate(1)}
       onToggleWordMeanings={() => setShowWordMeanings((value) => !value)}
@@ -434,7 +452,7 @@ export function MushafImmersiveReader({
         onClick={onClose}
         data-testid="mushaf-immersive-close"
         aria-label={t(language, "common.back")}
-        className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border/60 bg-card/90 text-foreground shadow-sm backdrop-blur-md transition-all active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border/60 bg-card/90 text-foreground shadow-xs backdrop-blur-md transition-[color,background-color,border-color,transform] active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
         <ArrowPrevious size={20} />
       </button>
@@ -447,7 +465,7 @@ export function MushafImmersiveReader({
         onClick={() => setIsQuickMenuOpen(true)}
         data-testid="mushaf-immersive-more"
         aria-label={t(language, "mushaf.moreActions")}
-        className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border/60 bg-card/90 text-foreground shadow-sm backdrop-blur-md transition-all active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border/60 bg-card/90 text-foreground shadow-xs backdrop-blur-md transition-[color,background-color,border-color,transform] active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
         <MoreVertical size={20} />
       </button>
@@ -458,21 +476,24 @@ export function MushafImmersiveReader({
       <button
         type="button"
         dir={direction}
-        onClick={() => setIsIndexOpen(true)}
+        onClick={() => {
+          setIndexTab("surahs");
+          setIsIndexOpen(true);
+        }}
         data-testid="mushaf-furniture-surah-btn"
+        aria-label={t(language, "mushaf.indexTitle")}
+        title={t(language, "mushaf.indexTitle")}
         style={{ maxWidth: "calc(100vw - 7.5rem)" }}
-        className="flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-full border border-border bg-card px-3 text-foreground shadow-sm backdrop-blur transition-all active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+        className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
-        <span className="truncate font-bold text-sm leading-none">{surahName}</span>
-        <span className="text-muted-foreground opacity-40 text-xs select-none">·</span>
-        <span className="shrink-0 text-xs text-muted-foreground font-medium leading-none">
-          {t(language, "common.juz")} {formatNumerals(juzNumber, language)}
+        <span className="inline-flex h-8 max-w-full items-center justify-center gap-1 rounded-full border border-border/80 bg-card/90 px-3 text-foreground shadow-xs backdrop-blur-md transition-colors group-hover:bg-muted group-active:bg-muted">
+          <span className="arabic-ui truncate text-xs font-bold leading-none">{surahName}</span>
+          <ChevronDown
+            size={13}
+            className="ms-0.5 shrink-0 select-none text-muted-foreground opacity-70"
+            aria-hidden="true"
+          />
         </span>
-        <ChevronDown
-          size={14}
-          className="text-muted-foreground shrink-0 opacity-70 select-none ms-0.5"
-          aria-hidden="true"
-        />
       </button>
     ) : undefined;
 
@@ -486,7 +507,7 @@ export function MushafImmersiveReader({
         data-testid="mushaf-immersive-word-meanings"
         aria-label={t(language, "mushaf.difficultWordsInvite")}
         title={t(language, "mushaf.difficultWordsInvite")}
-        className={`flex size-11 shrink-0 items-center justify-center rounded-full border shadow-sm backdrop-blur-md transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+        className={`flex size-11 shrink-0 items-center justify-center rounded-full border shadow-xs backdrop-blur-md transition-[color,background-color,border-color,transform] active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
           showWordMeanings
             ? "border-primary bg-primary text-primary-foreground"
             : "border-border/60 bg-card/90 text-foreground hover:bg-muted"
@@ -504,7 +525,7 @@ export function MushafImmersiveReader({
           onClick={onComplete}
           data-testid="mushaf-immersive-return"
           aria-label={t(language, "reader.immersiveComplete")}
-          className="flex h-11 items-center gap-1.5 rounded-full border border-primary bg-primary px-3.5 text-xs font-black text-primary-foreground shadow-sm backdrop-blur-md transition-all active:scale-95 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="flex h-11 items-center gap-1.5 rounded-full border border-primary bg-primary px-3.5 text-xs font-black text-primary-foreground shadow-xs backdrop-blur-md transition-[color,background-color,border-color,transform] active:scale-95 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           <CheckCircle2 size={18} aria-hidden="true" />
           <span className="truncate">{t(language, "reader.immersiveComplete")}</span>
@@ -516,7 +537,7 @@ export function MushafImmersiveReader({
           data-testid="mushaf-immersive-bookmark"
           aria-label={t(language, "mushaf.bookmarkCurrentPage")}
           title={t(language, "mushaf.bookmarkCurrentPage")}
-          className={`flex size-11 shrink-0 items-center justify-center rounded-full border shadow-sm backdrop-blur-md transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+          className={`flex size-11 shrink-0 items-center justify-center rounded-full border shadow-xs backdrop-blur-md transition-[color,background-color,border-color,transform] active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
             isPageBookmarked
               ? "border-primary bg-primary text-primary-foreground"
               : "border-border/60 bg-card/90 text-foreground hover:bg-muted"
@@ -594,14 +615,22 @@ export function MushafImmersiveReader({
             topCenterControl={mobileTopCenter}
             bottomLeftControl={mobileBottomLeft}
             bottomRightControl={mobileBottomRight}
-            onSurahClick={() => setIsIndexOpen(true)}
-            onJuzClick={() => setIsIndexOpen(true)}
-            onPageClick={() => setIsIndexOpen(true)}
+            onSurahClick={() => {
+              setIndexTab("surahs");
+              setIsIndexOpen(true);
+            }}
+            onJuzClick={() => {
+              setIndexTab("juzs");
+              setIsIndexOpen(true);
+            }}
+            onPageClick={() => {
+              setIndexTab("jump");
+              setIsIndexOpen(true);
+            }}
             onEdgeTap={(edge) => {
               if (edge === "left") paginate(1);
               else paginate(-1);
             }}
-            onCenterTap={() => setIsFocusMode((v) => !v)}
             progressBar={progressBar}
             paperRef={paperRef}
             reduceMotion={reducedMotion}
@@ -653,15 +682,16 @@ export function MushafImmersiveReader({
         isPageBookmarked={isPageBookmarked}
         onOpenIndex={() => {
           setIsQuickMenuOpen(false);
+          setIndexTab("surahs");
           setIsIndexOpen(true);
         }}
         onOpenBookmarks={() => {
           setIsQuickMenuOpen(false);
+          setIndexTab("bookmarks");
           setIsIndexOpen(true);
         }}
         onToggleWordMeanings={() => setShowWordMeanings((v) => !v)}
         onTogglePageBookmark={() => onTogglePageBookmark?.(displayPage)}
-        onEnterFocusMode={() => setIsFocusMode(true)}
         onOpenSettings={() => {
           setIsQuickMenuOpen(false);
           setIsSettingsOpen(true);
@@ -676,13 +706,30 @@ export function MushafImmersiveReader({
         currentPage={displayPage}
         onSelectPage={(page) => {
           const index = pageNumbers.indexOf(page);
-          if (index >= 0) setPageTuple([index, index >= pageIndex ? 1 : -1]);
+          if (index >= 0) {
+            setPageTuple([index, index >= pageIndex ? 1 : -1]);
+          } else {
+            const surahIdx = SURAHS.findIndex(
+              (s, idx) => page >= s.startPage && (idx === SURAHS.length - 1 || page < SURAHS[idx + 1]!.startPage),
+            );
+            const surahMeta = surahIdx >= 0 ? SURAHS[surahIdx]! : undefined;
+            const startP = surahMeta ? surahMeta.startPage : page;
+            const nextPlacement = surahMeta && surahMeta.number < 114 ? SURAH_PLACEMENTS[surahMeta.number + 1] : null;
+            const endP = nextPlacement
+              ? Math.max(startP, nextPlacement.line > 1 ? nextPlacement.page : nextPlacement.page - 1)
+              : 604;
+            const nextPages: number[] = [];
+            for (let p = startP; p <= endP; p++) nextPages.push(p);
+            setCustomPages(nextPages);
+            const nextIdx = Math.max(0, nextPages.indexOf(page));
+            setPageTuple([nextIdx, 1]);
+          }
           setIsIndexOpen(false);
         }}
         language={language}
         direction={direction}
         bookmarks={[...bookmarkedPages]}
-        initialTab="jump"
+        initialTab={indexTab}
         // The span is the whole difference from the Mushaf's own index.
         pageRange={{ first: pageNumbers[0]!, last: pageNumbers[pageNumbers.length - 1]! }}
       />

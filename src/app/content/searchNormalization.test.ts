@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { matchesSearch, normalizeSearchText } from "./searchNormalization";
+import { matchesSearch, normalizeSearchText, searchKeyFor, splitHighlightedSearchTokens } from "./searchNormalization";
 
 describe("normalizeSearchText", () => {
   it("strips diacritics so typed Arabic matches vocalized content", () => {
@@ -52,5 +52,30 @@ describe("matchesSearch", () => {
 
   it("still matches Latin translations case-insensitively", () => {
     expect(matchesSearch("In Your name, O Allah, I die and I live.", normalizeSearchText("YOUR NAME"))).toBe(true);
+  });
+});
+
+describe("searchKeyFor and splitHighlightedSearchTokens", () => {
+  it("caches normalized zikr keys by id", () => {
+    const key = searchKeyFor(
+      {
+        id: "test-zikr-key-cache",
+        arabicText: "بِاسْمِكَ اللَّهُمَّ",
+        translation: "In Your name",
+        transliteration: "Bismika Allahumma",
+      },
+      "Test Label",
+    );
+    expect(key).toContain("باسمك اللهم");
+    expect(key).toContain("test label");
+  });
+
+  it("splits whole words while preserving vocalized Arabic tokens intact", () => {
+    const runs = splitHighlightedSearchTokens("الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا", "احيانا");
+    expect(runs).toEqual([
+      { text: "الْحَمْدُ لِلَّهِ الَّذِي ", matched: false },
+      { text: "أَحْيَانَا", matched: true },
+      { text: " بَعْدَ مَا أَمَاتَنَا", matched: false },
+    ]);
   });
 });

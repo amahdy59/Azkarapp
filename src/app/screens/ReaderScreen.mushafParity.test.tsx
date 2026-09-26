@@ -104,17 +104,17 @@ describe("the surah view is the Mushaf", () => {
     expect(document.body.textContent).toContain("حجم النص");
   });
 
-  it("scopes the index to the surah, so it cannot navigate out of it", () => {
+  it("opens the surah list from the index button and scopes page jump to the current surah", () => {
     renderKahf();
     fireEvent.click(screen.getByRole("button", { name: "فهرس المصحف الشريف" }));
-    // Al-Kahf runs 293-304. The surah and juz tabs would carry the reader out
-    // of the surah they opened, so a scoped index does not offer them.
+    expect(screen.getByRole("tab", { name: /السور/ })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByText("الكهف")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("tab", { name: /صفحة/ }));
+    // Al-Kahf runs 293-304.
     const input = screen.getByLabelText(/أدخل رقم الصفحة/) as HTMLInputElement;
     expect(input.getAttribute("min")).toBe("293");
     expect(input.getAttribute("max")).toBe("304");
-    expect(screen.queryByRole("tab", { name: /السور/ })).toBeNull();
-    // The label states the span too — it read "(١-٦٠٤)" while the field refused
-    // anything outside the surah, inviting a number it would ignore.
     expect(input.labels?.[0]?.textContent).toContain("٢٩٣");
   });
 
@@ -326,21 +326,25 @@ describe("the phone layout integrates controls directly into the Mushaf canvas",
     expect(document.querySelector('[data-mushaf-chrome="footer"]')).toBeNull();
   });
 
-  it("makes tapping the surah name in the cartouche open the navigator", () => {
+  it("makes tapping the surah name in the cartouche open the navigator onto the surahs list", () => {
     setViewport(390, 844);
     renderKahf();
     const surahBtn = screen.getByTestId("mushaf-furniture-surah-btn");
     fireEvent.click(surahBtn);
     expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /السور/ })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByText("الكهف")).toBeInTheDocument();
   });
 
-  it("makes tapping the page number in the folio open the jump modal", () => {
+  it("makes tapping the page number in the folio open the jump modal onto page selection", () => {
     setViewport(390, 844);
     renderKahf();
     const pageBtn = screen.getByTestId("mushaf-furniture-page-btn");
     expect(pageBtn).toHaveTextContent("٢٩٣");
     fireEvent.click(pageBtn);
     expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /صفحة/ })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByLabelText(/أدخل رقم الصفحة/)).toBeInTheDocument();
   });
 
   it("toggles word meanings from the bottom-right corner", () => {

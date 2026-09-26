@@ -2,10 +2,10 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it, vi } from "vitest";
-import { COUNTING_PRESS, CountingRipples, useCountingSurface } from "./countingSurface";
+import { COUNTING_PRESS, useCountingSurface } from "./countingSurface";
 
 function Surface({ onCount, reduceMotion }: { onCount: () => void; reduceMotion?: boolean }) {
-  const { surfaceProps, pressStyle, ripples, dismissRipple } = useCountingSurface({ onCount, reduceMotion });
+  const { surfaceProps, pressStyle } = useCountingSurface({ onCount, reduceMotion });
   return (
     <div data-testid="surface" {...surfaceProps}>
       <div data-testid="pressed" style={pressStyle}>
@@ -14,7 +14,6 @@ function Surface({ onCount, reduceMotion }: { onCount: () => void; reduceMotion?
         </button>
         <span data-testid="page">page</span>
       </div>
-      <CountingRipples ripples={ripples} onDismiss={dismissRipple} />
     </div>
   );
 }
@@ -59,7 +58,7 @@ describe("counting surface", () => {
     expect(onCount).toHaveBeenCalledTimes(1);
   });
 
-  it("still counts with reduced motion, but does not press or ripple", () => {
+  it("still counts with reduced motion, but does not press", () => {
     const onCount = vi.fn();
     const { container } = render(<Surface onCount={onCount} reduceMotion />);
 
@@ -71,15 +70,15 @@ describe("counting surface", () => {
     expect(onCount).toHaveBeenCalledTimes(1);
   });
 
-  it("renders one fresh canvas ripple and replaces it on rapid taps", () => {
+  it("does not render tap ripple circles on pointer down", () => {
     const { container } = render(<Surface onCount={vi.fn()} />);
     const page = screen.getByTestId("page");
 
     fireEvent.pointerDown(page, { clientX: 5, clientY: 5 });
-    expect(container.querySelectorAll(".tap-ripple")).toHaveLength(1);
+    expect(container.querySelectorAll(".tap-ripple")).toHaveLength(0);
     fireEvent.pointerUp(screen.getByTestId("surface"));
     fireEvent.pointerDown(page, { clientX: 8, clientY: 8 });
-    expect(container.querySelectorAll(".tap-ripple")).toHaveLength(1);
+    expect(container.querySelectorAll(".tap-ripple")).toHaveLength(0);
   });
 
   it("is the only definition of the press: no screen re-declares its own", () => {
@@ -118,16 +117,6 @@ describe("counting surface", () => {
     // back slowly through a curve that overshoots 1 before settling.
     expect(release).toBeGreaterThan(press * 2);
     expect(tokens).toMatch(/--motion-ease-release:\s*cubic-bezier\(0\.34,\s*1\.56,/);
-  });
-
-  it("leaves the ripple animation to the stylesheet that defines it", () => {
-    const { container } = render(<CountingRipples ripples={[{ id: 1, x: 10, y: 20 }]} onDismiss={() => {}} />);
-    const ripple = container.querySelector(".tap-ripple") as HTMLElement;
-    expect(ripple).not.toBeNull();
-    // An inline `animation` here used to name keyframes that exist nowhere, which
-    // overrode the real rule on `.tap-ripple`: the ripple never drew, and because
-    // `animationend` never fired its nodes were never released.
-    expect(ripple.style.animation).toBe("");
   });
 
   it("presses a compact control deep enough to be seen at all", () => {

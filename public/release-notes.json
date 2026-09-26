@@ -1,13 +1,13 @@
 {
   "ar": [
-    "تتجدد تذكيرات الصفحة الرئيسية تلقائياً كل نصف ساعة، مع بقائها لفترة أطول خلال أوقات السحر وصلاة الضحى لتعزيز السكينة والتدبر.",
-    "يمكنك الآن الانتقال إلى تذكير آخر يدوياً في أي وقت عبر زر التحديث الهادئ في بطاقة التذكير.",
-    "أصبحت بطاقات الأذكار ومعاني كلمات المصحف أكثر وضوحاً وسهولة في القراءة والتنقل والتفاعل."
+    "يعرض مشغل الصوت الآن الأسماء الدقيقة والمحددة للسور والآيات والأذكار بدلاً من التصنيفات العامة.",
+    "مزامنة تلقائية وفورية بين القارئ والمشغل؛ فعند اختيار أي ذكر ينتقل الصوت إليه مباشرة، وعند اكتمال تلاوة المقطع ينتقل القارئ تلقائياً إلى الذكر التالي.",
+    "حركات وانتقالات أكثر هدوءاً وسلاسة عند تقليب الأذكار وفتح أو طي مشغل الصوت."
   ],
   "en": [
-    "Home reminders now rotate automatically every half hour, lingering longer during Dhuha and the late-night hours for calm reflection.",
-    "You can now explore another reminder at any time using the subtle refresh button on the reminder card.",
-    "Dhikr cards and Quran word meanings are now clearer, easier to read, and smoother to navigate."
+    "The audio player now displays precise Surah and verse titles instead of generic category labels.",
+    "Instant two-way sync between reader and audio: selecting any dhikr switches the audio immediately, and finishing a recitation automatically advances the screen to the next dhikr.",
+    "Calmer and smoother transitions when navigating between adhkar and when expanding or collapsing the audio player."
   ],
-  "release": "2026-09-25-reminders-and-reading"
+  "release": "2026-09-26-audio-reader-sync"
 }

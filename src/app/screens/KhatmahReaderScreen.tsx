@@ -13,7 +13,7 @@ import type {
   ThemeMode,
 } from "../types";
 import {
-  ArrowLeft,
+  ArrowPrevious,
   CheckCircle2,
   ChevronDown,
   X,
@@ -29,7 +29,12 @@ import { AyahInteractionSheet } from "../components/AyahInteractionSheet";
 import { MushafSettingsSheet } from "../components/MushafSettingsSheet";
 import { MUSHAF_RAIL_WIDTH, MushafToolRail } from "../components/MushafToolRail";
 import { MushafQuickMenu } from "../components/MushafQuickMenu";
-import { getSurahDisplayName, getSurahShortName, getJuzNumberForPage } from "../content/surahInfo";
+import {
+  getSurahDisplayName,
+  getSurahShortName,
+  getJuzNumberForPage,
+  getSurahNumberForPage,
+} from "../content/surahInfo";
 import { loadSurahWordMeanings } from "../content/quranWordMeanings";
 import { formatNumerals } from "../formatting";
 import { getProgressDayKey } from "../progress";
@@ -493,10 +498,13 @@ export function KhatmahReaderScreen({
   const { surahName, surahShortName, juzNumber } = useMemo(() => {
     const juz = getJuzNumberForPage(displayPage);
     if (!pageData || pageData.length === 0) return { surahName: "", surahShortName: "", juzNumber: juz };
-    const [surah] = (pageData[0]?.k || "1:1").split(":");
+    const canonicalSurah = String(getSurahNumberForPage(displayPage));
+    const hasCanonicalSurah = pageData.some((v) => v.k.startsWith(`${canonicalSurah}:`));
+    const [firstSurah] = (pageData[0]?.k || "1:1").split(":");
+    const surah = hasCanonicalSurah ? canonicalSurah : firstSurah || "1";
     return {
-      surahName: getSurahDisplayName(surah || "1", language),
-      surahShortName: getSurahShortName(surah || "1", language),
+      surahName: getSurahDisplayName(surah, language),
+      surahShortName: getSurahShortName(surah, language),
       juzNumber: juz,
     };
   }, [pageData, displayPage, language]);
@@ -644,9 +652,9 @@ export function KhatmahReaderScreen({
         onClick={onBack}
         data-testid="mushaf-top-left-back"
         aria-label={t(language, "common.back")}
-        className="flex size-11 shrink-0 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border/60 bg-card/90 text-foreground shadow-xs backdrop-blur-md transition-[color,background-color,border-color,transform] active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
-        <ArrowLeft size={20} aria-hidden="true" />
+        <ArrowPrevious size={20} aria-hidden="true" />
       </button>
     ) : undefined;
 
@@ -658,7 +666,7 @@ export function KhatmahReaderScreen({
         data-testid="mushaf-more-actions"
         aria-label={t(language, "mushaf.moreActions")}
         title={t(language, "mushaf.moreActions")}
-        className="flex size-11 shrink-0 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border/60 bg-card/90 text-foreground shadow-xs backdrop-blur-md transition-[color,background-color,border-color,transform] active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
         <MoreVertical size={20} aria-hidden="true" />
       </button>
@@ -677,14 +685,16 @@ export function KhatmahReaderScreen({
         aria-label={t(language, "mushaf.indexTitle")}
         title={t(language, "mushaf.indexTitle")}
         style={{ maxWidth: "calc(100vw - 7.5rem)" }}
-        className="flex h-11 shrink-0 items-center justify-center gap-1 rounded-lg px-2 text-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer"
+        className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
-        <span className="truncate font-bold text-sm leading-none">{surahShortName}</span>
-        <ChevronDown
-          size={14}
-          className="text-muted-foreground shrink-0 opacity-70 select-none ms-0.5"
-          aria-hidden="true"
-        />
+        <span className="inline-flex h-8 max-w-full items-center justify-center gap-1 rounded-full border border-border/80 bg-card/90 px-3 text-foreground shadow-xs backdrop-blur-md transition-colors group-hover:bg-muted group-active:bg-muted">
+          <span className="arabic-ui truncate text-xs font-bold leading-none">{surahName}</span>
+          <ChevronDown
+            size={13}
+            className="ms-0.5 shrink-0 select-none text-muted-foreground opacity-70"
+            aria-hidden="true"
+          />
+        </span>
       </button>
     ) : undefined;
 
@@ -698,8 +708,10 @@ export function KhatmahReaderScreen({
         data-testid="mushaf-page-bookmark"
         aria-label={t(language, "mushaf.bookmarkCurrentPage")}
         title={t(language, "mushaf.bookmarkCurrentPage")}
-        className={`relative flex size-11 shrink-0 items-center justify-center rounded-lg transition-colors active:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-          isPageBookmarked ? "text-primary" : "text-foreground hover:bg-muted"
+        className={`relative flex size-11 shrink-0 items-center justify-center rounded-full border shadow-xs backdrop-blur-md transition-[color,background-color,border-color,transform] active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+          isPageBookmarked
+            ? "border-primary bg-primary text-primary-foreground"
+            : "border-border/60 bg-card/90 text-foreground hover:bg-muted"
         }`}
       >
         <Bookmark size={19} className={isPageBookmarked ? "fill-current" : undefined} aria-hidden="true" />
@@ -718,14 +730,13 @@ export function KhatmahReaderScreen({
         data-testid="mushaf-difficult-words-switch"
         aria-label={t(language, "mushaf.difficultWordsInvite")}
         title={t(language, "mushaf.difficultWordsInvite")}
-        className={`relative flex size-11 shrink-0 items-center justify-center rounded-lg transition-colors active:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-60 ${
-          showWordMeanings ? "text-primary" : "text-foreground hover:bg-muted"
+        className={`relative flex size-11 shrink-0 items-center justify-center rounded-full border shadow-xs backdrop-blur-md transition-[color,background-color,border-color,transform] active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-60 ${
+          showWordMeanings
+            ? "border-primary bg-primary text-primary-foreground"
+            : "border-border/60 bg-card/90 text-foreground hover:bg-muted"
         }`}
       >
         <Translate size={19} className={showWordMeanings ? "stroke-[2.5]" : undefined} aria-hidden="true" />
-        {showWordMeanings && (
-          <span className="absolute bottom-1.5 size-1.5 rounded-full bg-current" aria-hidden="true" />
-        )}
       </button>
     ) : undefined;
   /**
@@ -897,7 +908,6 @@ export function KhatmahReaderScreen({
               }}
               onPrevious={() => paginate(-1)}
               onNext={() => paginate(1)}
-              onCenterTap={undefined}
               progressBar={wirdProgressBar}
               paperRef={paperRef}
               pageTransitionDirection={pageTransitionDirection}
@@ -1026,10 +1036,8 @@ export function KhatmahReaderScreen({
         }}
         onToggleWordMeanings={() => void toggleWordMeanings()}
         onTogglePageBookmark={togglePageBookmark}
-        onEnterFocusMode={() => setIsFocusMode(true)}
         onOpenSettings={() => setIsOptionsMenuOpen(true)}
         showPageTools={false}
-        showFocusAction={false}
         showIndexAction={false}
       />
 

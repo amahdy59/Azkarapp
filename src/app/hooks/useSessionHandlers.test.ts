@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { getAzkarForMode, getAzkarForPrayer } from "../content/azkar";
 import type { GrowthEvent } from "../progress";
 import { DEFAULT_APP_STATE, MAX_STORED_SESSIONS, toCompletedSets, type StoredSession } from "../state";
-import type { CategoryId, DailyCollectionCompletion, RoutineMode, View } from "../types";
+import type { CategoryId, DailyCollectionCompletion, NavTab, RoutineMode, View } from "../types";
 import { useSessionHandlers } from "./useSessionHandlers";
 
 const FIXED_NOW = new Date("2026-08-12T09:00:00.000Z");
@@ -42,7 +42,7 @@ function renderSessionHarness({
     const [savedIds, setSavedIds] = useState(new Set<string>());
     const [routineModes, setRoutineModes] = useState(DEFAULT_APP_STATE.settings.routineModes);
     const [view, setView] = useState<View>("reader");
-    const [activeTab, setActiveTab] = useState<"home" | "azkar" | "progress" | "more">("azkar");
+    const [activeTab, setActiveTab] = useState<NavTab>("azkar");
     const handlers = useSessionHandlers({
       activeCat: category,
       setActiveCat: setCategory,

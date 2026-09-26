@@ -62,6 +62,7 @@ function createController(): AudioController {
     currentEntry: entry,
     currentSegment: segment,
     startPlan: vi.fn(() => true),
+    selectEntry: vi.fn(() => true),
     play: vi.fn(),
     pause: vi.fn(),
     stop: vi.fn(),
@@ -140,5 +141,39 @@ describe("FloatingAudioPlayer", () => {
     const expandedPlay = screen.getByRole("button", { name: "Pause audio" });
     expect(expandedPlay).toHaveClass("size-16", "rounded-full");
     expect(expandedPlay).toHaveStyle({ borderRadius: "9999px" });
+  });
+
+  it("opens the volume popover on touch tap even when hover media query matches", () => {
+    Object.defineProperty(window, "matchMedia", {
+      configurable: true,
+      writable: true,
+      value: vi.fn().mockImplementation((query: string) => ({
+        matches: query === "(hover: hover) and (pointer: fine)",
+        media: query,
+        onchange: null,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    });
+
+    const controller = createController();
+    render(<FloatingAudioPlayer controller={controller} language="en" direction="ltr" />);
+
+    const muteButton = screen.getByRole("button", { name: "Mute audio" });
+
+    // Simulate a touch tap on a hybrid device
+    fireEvent.pointerDown(muteButton, { pointerType: "touch" });
+    fireEvent.click(muteButton);
+
+    expect(controller.toggleMuted).not.toHaveBeenCalled();
+    expect(screen.getByTestId("audio-volume-popover")).toBeInTheDocument();
+
+    // Simulate a mouse click on the same hybrid device
+    fireEvent.pointerDown(muteButton, { pointerType: "mouse" });
+    fireEvent.click(muteButton);
+    expect(controller.toggleMuted).toHaveBeenCalledTimes(1);
   });
 });

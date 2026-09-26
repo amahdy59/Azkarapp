@@ -92,7 +92,7 @@ export function NextPrayerWidget({
       onClick={() => {
         document.getElementById("prayer-tracker-card")?.scrollIntoView({ behavior: "smooth" });
       }}
-      className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/30 px-3 py-1.5 text-xs font-bold text-white shadow-md backdrop-blur-md transition-transform hover:bg-black/40 active:scale-95 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/20 bg-black/30 px-3 py-1.5 text-xs font-bold text-white shadow-md backdrop-blur-md transition-transform hover:bg-black/40 active:scale-95 cursor-pointer outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       aria-label={`${t(language, "home.nextPrayer")} ${nextPrayerName} ${formattedTime}. ${formattedCountdown}`}
     >
       <Clock className="size-4 opacity-90" aria-hidden="true" />

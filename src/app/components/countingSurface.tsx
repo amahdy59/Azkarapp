@@ -1,5 +1,4 @@
-import { useCallback, useRef, useState, type CSSProperties, type MouseEvent, type PointerEvent } from "react";
-import { tapRippleStyle } from "./ZikrComponents";
+import { useCallback, useState, type CSSProperties, type MouseEvent, type PointerEvent } from "react";
 
 /**
  * What counting feels like, defined once.
@@ -30,8 +29,6 @@ function motionToken(name: string, fallback: string): string {
 export const COUNTING_PRESS = {
   /** Matches --motion-scale-pressed. */
   scale: 0.97,
-  /** Matches the tap-ripple-expand keyframes in ZikrComponents.css. */
-  rippleMs: 560,
 } as const;
 
 /**
@@ -46,12 +43,6 @@ function isOwnControl(target: EventTarget | null): boolean {
   return target instanceof Element && Boolean(target.closest(OWNS_ITS_OWN_TAP));
 }
 
-export interface CountingRipple {
-  id: number;
-  x: number;
-  y: number;
-}
-
 export interface UseCountingSurfaceOptions {
   /**
    * Called for a tap that landed on the page rather than on a control. The
@@ -59,21 +50,18 @@ export interface UseCountingSurfaceOptions {
    * own to ignore it — the reader skips a tap that finished a text selection.
    */
   onCount: (event: MouseEvent<HTMLElement>) => void;
-  /** Suppresses the press and the ripple; the count still registers. */
+  /** Suppresses the press scale; the count still registers. */
   reduceMotion?: boolean;
 }
 
 /**
  * Wires a whole screen as a counting surface.
  *
- * Spread `surfaceProps` onto the element that should accept taps, apply
- * `pressStyle` to whatever should shrink under the thumb, and render
- * {@link CountingRipples} inside a positioned ancestor.
+ * Spread `surfaceProps` onto the element that should accept taps and apply
+ * `pressStyle` to whatever should shrink under the thumb.
  */
 export function useCountingSurface({ onCount, reduceMotion = false }: UseCountingSurfaceOptions) {
   const [isPressed, setIsPressed] = useState(false);
-  const [ripples, setRipples] = useState<CountingRipple[]>([]);
-  const nextRippleId = useRef(0);
 
   const release = useCallback(() => setIsPressed(false), []);
 
@@ -81,14 +69,6 @@ export function useCountingSurface({ onCount, reduceMotion = false }: UseCountin
     (event: PointerEvent<HTMLElement>) => {
       if (reduceMotion || isOwnControl(event.target)) return;
       setIsPressed(true);
-      const rect = event.currentTarget.getBoundingClientRect();
-      setRipples([
-        {
-          id: ++nextRippleId.current,
-          x: event.clientX - rect.left,
-          y: event.clientY - rect.top,
-        },
-      ]);
     },
     [reduceMotion],
   );
@@ -101,10 +81,6 @@ export function useCountingSurface({ onCount, reduceMotion = false }: UseCountin
     [onCount],
   );
 
-  const dismissRipple = useCallback((id: number) => {
-    setRipples((current) => current.filter((ripple) => ripple.id !== id));
-  }, []);
-
   const pressStyle: CSSProperties = {
     transform: isPressed && !reduceMotion ? `scale(var(--motion-scale-pressed, ${COUNTING_PRESS.scale}))` : "scale(1)",
     // Down fast, back slowly through an overshoot — the asymmetry is what makes
@@ -116,8 +92,6 @@ export function useCountingSurface({ onCount, reduceMotion = false }: UseCountin
 
   return {
     isPressed,
-    ripples,
-    dismissRipple,
     pressStyle,
     surfaceProps: {
       onClick: handleClick,
@@ -129,35 +103,4 @@ export function useCountingSurface({ onCount, reduceMotion = false }: UseCountin
       onPointerLeave: release,
     },
   };
-}
-
-/**
- * The expanding marks a counting tap leaves behind.
- *
- * This renders the same `.tap-ripple` the counter button does, so a tap on the
- * page and a tap on the number leave the same mark. It previously carried an
- * inline `animation: ripple …` naming keyframes that exist nowhere in the app —
- * which overrode the real animation on `.tap-ripple`, so the page ripple never
- * drew, and because `animationend` never fired the nodes were never released.
- */
-export function CountingRipples({
-  ripples,
-  onDismiss,
-}: {
-  ripples: readonly CountingRipple[];
-  onDismiss: (id: number) => void;
-}) {
-  return (
-    <>
-      {ripples.map((ripple) => (
-        <span
-          key={ripple.id}
-          className="tap-ripple"
-          aria-hidden="true"
-          style={{ ...tapRippleStyle, left: ripple.x, top: ripple.y }}
-          onAnimationEnd={() => onDismiss(ripple.id)}
-        />
-      ))}
-    </>
-  );
 }

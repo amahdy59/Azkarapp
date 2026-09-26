@@ -108,7 +108,7 @@ function ReferenceContent({
       <div
         role="region"
         aria-label={t(language, "reader.referencesButton")}
-        className="reference-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-4 outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        className="reference-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-4 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
         tabIndex={0}
         dir={direction}
       >

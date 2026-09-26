@@ -62,17 +62,6 @@
   }
 }
 
-@keyframes tap-ripple-expand {
-  from {
-    opacity: 0.48;
-    transform: scale(0.5);
-  }
-  to {
-    opacity: 0;
-    transform: scale(32);
-  }
-}
-
 @keyframes adaptive-counter-pulse {
   0% {
     opacity: 0.5;
@@ -128,10 +117,6 @@
     border-color 200ms ease,
     box-shadow 200ms ease,
     background-color 200ms ease;
-}
-
-.tap-ripple {
-  animation: tap-ripple-expand 560ms ease-out both;
 }
 
 .adaptive-counter-surface:hover:not(:disabled) {
@@ -327,9 +312,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .tap-ripple {
-    display: none;
-  }
   .counter-progress-fill,
   .adaptive-counter-nav {
     transition-duration: 0.01ms;

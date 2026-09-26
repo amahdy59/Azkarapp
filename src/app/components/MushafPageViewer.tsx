@@ -321,7 +321,7 @@ const MushafTextLine = memo(function MushafTextLine({
                   e.preventDefault();
                   onAyahAction?.(w.verseKey);
                 }}
-                className={`relative inline shrink-0 cursor-pointer appearance-none rounded-sm border-0 bg-primary/10 p-0 text-primary underline decoration-dotted underline-offset-4 transition-colors [font:inherit] hover:bg-primary/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                className={`relative inline shrink-0 cursor-pointer appearance-none rounded-sm border-0 bg-primary/10 p-0 text-primary underline decoration-dotted underline-offset-4 transition-colors [font:inherit] hover:bg-primary/20 focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                   highlightedVerseKey === w.verseKey ? "ring-2 ring-primary/55" : ""
                 }`}
                 style={{ lineHeight: "inherit", verticalAlign: "baseline" }}
@@ -594,7 +594,7 @@ function PageFurnitureHead({
             onJuzClick();
           }}
           data-testid="mushaf-furniture-juz-btn"
-          className="mushaf-page-furniture__juz arabic-ui min-w-0 shrink truncate cursor-pointer rounded-full px-2 py-0.5 transition-colors hover:bg-foreground/10 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="mushaf-page-furniture__juz arabic-ui min-h-11 min-w-0 shrink cursor-pointer truncate rounded-full px-2 py-0.5 transition-colors hover:bg-foreground/10 active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           {t(language, "mushaf.juzLabel", { juz: formatNumerals(juzNumber, language) })}
         </button>
@@ -612,12 +612,17 @@ function PageFurnitureHead({
               onSurahClick();
             }}
             data-testid="mushaf-furniture-surah-btn"
-            className="mushaf-page-furniture__cartouche arabic-ui truncate cursor-pointer rounded-full px-2.5 py-0.5 transition-colors hover:bg-foreground/10 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="mushaf-page-furniture__cartouche group flex h-11 min-w-11 cursor-pointer items-center justify-center rounded-full px-1 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           >
-            {getSurahDisplayName(surahNumber, language)}
+            <span className="arabic-ui inline-flex h-8 max-w-full items-center justify-center truncate rounded-full border border-border/80 bg-card/90 px-3 text-xs font-bold leading-none text-foreground shadow-xs backdrop-blur-md transition-colors group-hover:bg-muted group-active:bg-muted">
+              {getSurahDisplayName(surahNumber, language)}
+            </span>
           </button>
         ) : (
-          <span className="mushaf-page-furniture__cartouche arabic-ui truncate" aria-hidden="true">
+          <span
+            className="mushaf-page-furniture__cartouche arabic-ui inline-flex h-8 items-center justify-center truncate rounded-full border border-border/80 bg-card/90 px-3 text-xs font-bold leading-none text-foreground shadow-xs"
+            aria-hidden="true"
+          >
             {getSurahDisplayName(surahNumber, language)}
           </span>
         ))}
@@ -651,8 +656,17 @@ function PageFurnitureFoot({
     return () => window.clearTimeout(timer);
   }, [pageNumber]);
 
+  const pillClassName = `inline-flex h-8 min-w-[2.75rem] items-center justify-center rounded-full border px-3 text-xs font-bold tabular-nums shadow-xs backdrop-blur-md transition-colors duration-300 ${
+    highlighted
+      ? "border-primary/50 bg-card text-primary font-black"
+      : "border-border/80 bg-card/90 text-foreground group-hover:bg-muted group-active:bg-muted"
+  }`;
+
   return (
-    <div className="mushaf-page-furniture mushaf-page-furniture--foot flex shrink-0 items-end justify-center" dir="rtl">
+    <div
+      className="mushaf-page-furniture mushaf-page-furniture--foot flex shrink-0 items-center justify-center"
+      dir="rtl"
+    >
       {onPageClick ? (
         <button
           type="button"
@@ -662,20 +676,13 @@ function PageFurnitureFoot({
           }}
           data-testid="mushaf-furniture-page-btn"
           aria-label={t(language, "mushaf.pagePosition", { position: formatNumerals(pageNumber, language) })}
-          className={`mushaf-page-furniture__folio tabular-nums cursor-pointer transition-colors duration-300 hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-            highlighted ? "text-primary font-black" : ""
-          }`}
+          className="mushaf-page-furniture__folio group cursor-pointer rounded-full transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
-          {formatNumerals(pageNumber, language)}
+          <span className={pillClassName}>{formatNumerals(pageNumber, language)}</span>
         </button>
       ) : (
-        <span
-          className={`mushaf-page-furniture__folio tabular-nums transition-all duration-300 ${
-            highlighted ? "text-primary font-black" : ""
-          }`}
-          aria-hidden="true"
-        >
-          {formatNumerals(pageNumber, language)}
+        <span className="mushaf-page-furniture__folio" aria-hidden="true">
+          <span className={pillClassName}>{formatNumerals(pageNumber, language)}</span>
         </span>
       )}
     </div>
@@ -1044,7 +1051,6 @@ export function MushafPageViewer({
   bottomLeftControl,
   bottomRightControl,
   onEdgeTap,
-  onCenterTap,
   onPrevious,
   onNext,
 }: {
@@ -1097,7 +1103,6 @@ export function MushafPageViewer({
   bottomLeftControl?: ReactNode;
   bottomRightControl?: ReactNode;
   onEdgeTap?: (edge: "left" | "right") => void;
-  onCenterTap?: () => void;
   onPrevious?: () => void;
   onNext?: () => void;
 }) {
@@ -1145,11 +1150,9 @@ export function MushafPageViewer({
         onEdgeTap?.("left");
       } else if (ratio > 0.78) {
         onEdgeTap?.("right");
-      } else {
-        onCenterTap?.();
       }
     },
-    [onCenterTap, onEdgeTap],
+    [onEdgeTap],
   );
 
   // Theme styling classes. `--mushaf-ink-stroke` gives the glyphs a hairline of

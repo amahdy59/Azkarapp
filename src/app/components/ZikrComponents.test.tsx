@@ -17,30 +17,21 @@ describe("ZikrCounterSurface", () => {
     expect(fill).toHaveStyle({ inlineSize: "25%", borderInlineEndWidth: "2px" });
   });
 
-  it("renders a one-shot decorative ripple from the pointer position", () => {
+  it("applies pressed feedback on pointer down without rendering tap ripples", () => {
     const onTap = vi.fn();
     const { container } = render(
       <ZikrCounterSurface count={0} total={33} onTap={onTap} language="en" testId="shared-counter" />,
     );
     const counter = screen.getByTestId("shared-counter");
-    vi.spyOn(counter, "getBoundingClientRect").mockReturnValue({
-      left: 10,
-      top: 20,
-      right: 230,
-      bottom: 96,
-      width: 220,
-      height: 76,
-      x: 10,
-      y: 20,
-      toJSON: () => undefined,
-    });
 
     fireEvent.pointerDown(counter, { clientX: 40, clientY: 55 });
-    const ripple = container.querySelector(".tap-ripple");
-    expect(ripple).toHaveStyle({ left: "30px", top: "35px" });
+    expect(counter).toHaveClass("is-pressed");
+    expect(container.querySelector(".tap-ripple")).toBeNull();
+
+    fireEvent.pointerUp(counter);
+    expect(counter).not.toHaveClass("is-pressed");
 
     fireEvent.click(counter);
     expect(onTap).toHaveBeenCalledOnce();
-    expect(ripple).toHaveClass("tap-ripple");
   });
 });

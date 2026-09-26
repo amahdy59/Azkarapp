@@ -386,4 +386,50 @@ describe("AudioProvider integration", () => {
 
     Object.defineProperty(window.navigator, "mediaSession", { configurable: true, value: undefined });
   });
+
+  it("switches directly to a selected entry in a multi-track plan", async () => {
+    vi.stubGlobal("Audio", FakeAudio);
+    const multiPlan: PlaybackPlan = {
+      ...plan,
+      id: "multi-plan",
+      context: { category: "before_sleep", routineMode: "complete", source: "full-session" },
+      entries: [
+        plan.entries[0]!,
+        {
+          ...plan.entries[0]!,
+          entryId: "entry-2",
+          zikrId: "zikr-2",
+          titleArabic: "سورة الإخلاص",
+          titleEnglish: "Surah Al-Ikhlas",
+        },
+      ],
+    };
+
+    function MultiHarness() {
+      const controller = useAudioController()!;
+      return (
+        <>
+          <button type="button" onClick={() => controller.startPlan(multiPlan)}>
+            Start multi
+          </button>
+          <button type="button" onClick={() => controller.selectEntry(1)}>
+            Select second
+          </button>
+          {controller.state.plan && <FloatingAudioPlayer controller={controller} language="en" />}
+        </>
+      );
+    }
+
+    render(
+      <AudioProvider>
+        <MultiHarness />
+      </AudioProvider>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Start multi" }));
+    expect(await screen.findByText("Ayat al-Kursi")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Select second" }));
+    expect(await screen.findByText("Surah Al-Ikhlas")).toBeInTheDocument();
+  });
 });

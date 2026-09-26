@@ -148,8 +148,12 @@ describe("account sign-out boundary", () => {
       }),
     );
 
-    act(() => result.current.handleSignOut());
-    await act(async () => confirm?.());
+    await act(async () => {
+      await result.current.handleSignOut();
+    });
+    await act(async () => {
+      await confirm?.();
+    });
 
     expect(authMocks.signOutSupabase).toHaveBeenCalledOnce();
     expect(applyStateSnapshot).toHaveBeenCalledOnce();

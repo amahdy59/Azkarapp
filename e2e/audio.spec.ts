@@ -261,3 +261,66 @@ test("expanded queue controls stay inside a 320px phone viewport", async ({ page
   expect(geometry.scrollWidth).toBeLessThanOrEqual(geometry.clientWidth);
   expect(geometry.controlsInside).toBe(true);
 });
+
+test("synchronizes Reader navigation with audio tracks, shows proper track titles, and advances Reader when a track ends", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.addInitScript(() => {
+    window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+    window.localStorage.setItem(
+      "azkarapp.state.v1",
+      JSON.stringify({
+        settings: {
+          language: "ar",
+          themeMode: "midnight",
+          reduceMotion: true,
+          routineModes: {
+            morning: "complete",
+            evening: "complete",
+            before_sleep: "complete",
+            after_prayer: "complete",
+          },
+        },
+        profile: { displayName: "Guest", isGuest: true },
+        completed: { morning: [], evening: [], before_sleep: [], friday_kahf: [] },
+        sessions: [],
+      }),
+    );
+    Object.defineProperty(window, "__latestAudio", { value: null, writable: true });
+    HTMLMediaElement.prototype.play = function () {
+      (window as unknown as { __latestAudio: HTMLAudioElement }).__latestAudio = this as HTMLAudioElement;
+      this.dispatchEvent(new Event("playing"));
+      return Promise.resolve();
+    };
+  });
+
+  await page.goto("/#/azkar/before-sleep");
+  await page.getByRole("button", { name: "تشغيل الصوتي للكل" }).click();
+  await page.getByRole("button", { name: "تشغيل المتاح" }).click();
+
+  const reader = page.getByTestId("reader-screen");
+  const player = page.getByRole("region", { name: "مشغل الصوت" });
+
+  // 1. Starts on Ayat al-Kursi (s-hm-100) and displays proper surah/verse title (never generic fallback)
+  await expect(reader).toHaveAttribute("data-zikr-id", "s-hm-100");
+  await expect(player).toContainText("سورة الْبَقَرَة (آيَةُ الْكُرْسِيِّ)");
+  await expect(player).not.toContainText("أذكار مشتركة");
+  await expect(player).toContainText("المقطع ١ / ١٧");
+
+  // 2. Moving to another zikr in the Reader updates the active audio track
+  // In desktop reader collection navigator, select Surah Al-Ikhlas (index 2 / s-hm-99-ikhlas)
+  await page.locator("#zikr-card-2 button[data-zikr-select]").click();
+  await expect(reader).toHaveAttribute("data-zikr-id", "s-hm-99-ikhlas");
+  await expect(player).toContainText("سورة الْإِخْلَاص");
+  await expect(player).toContainText("المقطع ٢ / ١٧");
+
+  // 3. When current audio track finishes ("ended"), Reader screen updates to the zikr currently being recited
+  await page.evaluate(() => {
+    const audio = (window as unknown as { __latestAudio: HTMLAudioElement | null }).__latestAudio;
+    audio?.dispatchEvent(new Event("ended"));
+  });
+  await expect(reader).toHaveAttribute("data-zikr-id", "s-hm-99-falaq");
+  await expect(player).toContainText("سورة الْفَلَق");
+  await expect(player).toContainText("المقطع ٣ / ١٧");
+});

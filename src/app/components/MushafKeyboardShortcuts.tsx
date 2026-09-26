@@ -17,7 +17,6 @@ export const MUSHAF_SHORTCUTS = [
   ["← / Page Down", "common.next"],
   ["Home", "mushaf.keyFirstPage"],
   ["End", "mushaf.keyLastPage"],
-  ["F", "mushaf.focusMode"],
   ["Space", "mushaf.listenSurah"],
   ["Esc", "common.back"],
 ] as const;

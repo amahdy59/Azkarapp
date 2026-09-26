@@ -52,7 +52,9 @@ function WordMeaningContent({
             <h2 className="text-lg font-extrabold text-foreground leading-snug">
               {t(language, "reader.wordMeaningTitle")}
             </h2>
-            <p className="text-xs font-medium text-muted-foreground">{t(language, "reader.wordMeaningsTitle")}</p>
+            <p id="quran-word-meaning-description" className="text-xs font-medium text-muted-foreground">
+              {t(language, "reader.wordMeaningsTitle")}
+            </p>
           </div>
         </div>
         <button
@@ -69,7 +71,7 @@ function WordMeaningContent({
       <div
         role="region"
         aria-label={t(language, "reader.wordMeaningTitle")}
-        className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-4 outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-4 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
         tabIndex={0}
         dir={direction}
       >
@@ -189,8 +191,17 @@ function StepButton({
       aria-label={label}
       className="flex min-h-11 items-center gap-2 rounded-full border border-border bg-card px-4 text-label font-bold text-foreground transition-colors enabled:hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
     >
-      <Icon size={16} aria-hidden="true" />
-      <span className="hidden sm:inline">{label}</span>
+      {back ? (
+        <>
+          <Icon size={16} aria-hidden="true" />
+          <span className="hidden sm:inline">{label}</span>
+        </>
+      ) : (
+        <>
+          <span className="hidden sm:inline">{label}</span>
+          <Icon size={16} aria-hidden="true" />
+        </>
+      )}
     </button>
   );
 }

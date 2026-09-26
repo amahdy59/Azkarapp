@@ -27,97 +27,7 @@ import { getAudioVoiceName } from "../audio/audioVoices";
 import { useMediaQuery } from "../hooks/useMediaQuery";
 import { motion, useReducedMotion } from "motion/react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-
-const COPY = {
-  en: {
-    region: "Audio player",
-    play: "Play audio",
-    pause: "Pause audio",
-    previous: "Previous item",
-    next: "Next item",
-    jumpBack10: "Rewind 10 seconds",
-    jumpForward10: "Forward 10 seconds",
-    stop: "Stop audio and close player",
-    seek: "Seek audio",
-    volume: "Volume",
-    mute: "Mute audio",
-    unmute: "Unmute audio",
-    options: "Audio options",
-    speed: "Playback speed",
-    voice: "Voice or reciter",
-    playOnce: "Play once",
-    repeat: "Repeat prescribed count",
-    retry: "Retry",
-    skip: "Skip this item",
-    buffering: "Buffering audio",
-    loading: "Loading audio",
-    ended: "Queue complete",
-    trackChanged: "Track changed",
-    repetitionCompleted: "Audio repetition completed",
-    queueCompleted: "Audio queue completed",
-    expand: "Expand player",
-    collapse: "Minimize player",
-    recitationBy: "Recitation by",
-    previousShort: "Previous",
-    nextShort: "Next",
-    back10Short: "Rewind",
-    forward10Short: "Forward",
-    track: "Track",
-    repetitionChip: "Repetition",
-    sessionProgress: "Listening progress",
-    speedShort: "Speed",
-    reciterShort: "Reciter",
-    repeatShort: "Repeat",
-    errorBlocked: "Playback was blocked. Press Play again.",
-    errorOffline: "This recording is not downloaded and the device is offline.",
-    errorDecode: "This recording could not be decoded.",
-    errorUnavailable: "The recording could not be loaded. Check the connection and try again.",
-  },
-  ar: {
-    region: "مشغل الصوت",
-    play: "تشغيل الصوت",
-    pause: "إيقاف الصوت مؤقتًا",
-    previous: "الذكر السابق",
-    next: "الذكر التالي",
-    jumpBack10: "تأخير ١٠ ثوانٍ",
-    jumpForward10: "تقديم ١٠ ثوانٍ",
-    stop: "إيقاف الصوت وإغلاق المشغل",
-    seek: "تقديم أو تأخير الصوت",
-    volume: "مستوى الصوت",
-    mute: "كتم الصوت",
-    unmute: "إلغاء كتم الصوت",
-    options: "خيارات الصوت",
-    speed: "سرعة التشغيل",
-    voice: "الصوت أو القارئ",
-    playOnce: "تشغيل مرة واحدة",
-    repeat: "تكرار العدد المحدد",
-    retry: "إعادة المحاولة",
-    skip: "تخطي هذا الذكر",
-    buffering: "جارٍ تحميل الصوت",
-    loading: "جارٍ تجهيز الصوت",
-    ended: "اكتمل التشغيل",
-    trackChanged: "تم تغيير المقطع",
-    repetitionCompleted: "اكتمل تكرار الصوت",
-    queueCompleted: "اكتملت قائمة الصوت",
-    expand: "توسيع المشغل",
-    collapse: "تصغير المشغل",
-    recitationBy: "تلاوة القارئ",
-    previousShort: "السابق",
-    nextShort: "التالي",
-    back10Short: "تأخير",
-    forward10Short: "تقديم",
-    track: "المقطع",
-    repetitionChip: "تكرار",
-    sessionProgress: "تقدم الاستماع",
-    speedShort: "السرعة",
-    reciterShort: "القارئ",
-    repeatShort: "التكرار",
-    errorBlocked: "تعذر بدء التشغيل. اضغط زر التشغيل مرة أخرى.",
-    errorOffline: "هذا التسجيل غير محمّل والجهاز غير متصل بالإنترنت.",
-    errorDecode: "تعذر فك ترميز هذا التسجيل.",
-    errorUnavailable: "تعذر تحميل التسجيل. تحقق من الاتصال ثم أعد المحاولة.",
-  },
-} as const;
+import { t } from "../i18n";
 
 /**
  * The speeds worth offering, in the order the control walks through them.
@@ -134,11 +44,11 @@ function nextPlaybackRate(current: number) {
   return PLAYBACK_RATES[(index + 1) % PLAYBACK_RATES.length] ?? 1;
 }
 
-function getErrorMessage(code: string | undefined, copy: (typeof COPY)[AppLanguage]) {
-  if (code === "playback-blocked") return copy.errorBlocked;
-  if (code === "offline-not-cached") return copy.errorOffline;
-  if (code === "decode") return copy.errorDecode;
-  return copy.errorUnavailable;
+function getErrorMessage(code: string | undefined, language: AppLanguage) {
+  if (code === "playback-blocked") return t(language, "audioPlayer.errorBlocked");
+  if (code === "offline-not-cached") return t(language, "audioPlayer.errorOffline");
+  if (code === "decode") return t(language, "audioPlayer.errorDecode");
+  return t(language, "audioPlayer.errorUnavailable");
 }
 
 function formatTime(seconds: number, language: AppLanguage) {
@@ -299,19 +209,20 @@ function progressBackground(progress: number, direction: "rtl" | "ltr") {
 function VolumeControl({
   controller,
   language,
-  copy,
   inline = false,
 }: {
   controller: AudioController;
   language: AppLanguage;
-  copy: (typeof COPY)[AppLanguage];
   inline?: boolean;
 }) {
   const supportsHover = useMediaQuery("(hover: hover) and (pointer: fine)");
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+  const lastPointerTypeRef = useRef<string>("mouse");
   const level = controller.preferences.muted ? 0 : controller.preferences.volume;
   const percentage = Math.round(level * 100);
+  const volumeLabel = t(language, "audioPlayer.volume");
+  const muteLabel = controller.preferences.muted ? t(language, "audioPlayer.unmute") : t(language, "audioPlayer.mute");
 
   useEffect(() => {
     if (inline || !open) return;
@@ -326,12 +237,12 @@ function VolumeControl({
     return (
       <div
         role="toolbar"
-        aria-label={copy.volume}
+        aria-label={volumeLabel}
         className="flex min-h-11 items-center gap-1 rounded-full border border-border px-1"
       >
         <button
           type="button"
-          aria-label={controller.preferences.muted ? copy.unmute : copy.mute}
+          aria-label={muteLabel}
           onClick={controller.toggleMuted}
           className="flex size-11 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
@@ -348,7 +259,7 @@ function VolumeControl({
           step={0.05}
           value={level}
           onChange={(event) => controller.setVolume(Number(event.currentTarget.value))}
-          aria-label={copy.volume}
+          aria-label={volumeLabel}
           aria-valuetext={`${formatNumerals(percentage, language)}%`}
           style={
             {
@@ -365,9 +276,11 @@ function VolumeControl({
     <div
       ref={rootRef}
       role="toolbar"
-      aria-label={copy.volume}
+      aria-label={volumeLabel}
       className="relative flex shrink-0"
-      onPointerEnter={() => supportsHover && setOpen(true)}
+      onPointerEnter={(event) => {
+        if (supportsHover && event.pointerType === "mouse") setOpen(true);
+      }}
       onFocusCapture={() => supportsHover && setOpen(true)}
       onBlurCapture={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false);
@@ -381,10 +294,20 @@ function VolumeControl({
     >
       <button
         type="button"
-        aria-label={controller.preferences.muted ? copy.unmute : copy.mute}
+        aria-label={muteLabel}
         aria-expanded={open}
         aria-controls="audio-volume-control"
-        onClick={() => (supportsHover ? controller.toggleMuted() : setOpen((value) => !value))}
+        onPointerDown={(event) => {
+          lastPointerTypeRef.current = event.pointerType || "mouse";
+        }}
+        onClick={() => {
+          const isTouchOrPen = lastPointerTypeRef.current === "touch" || lastPointerTypeRef.current === "pen";
+          if (supportsHover && !isTouchOrPen) {
+            controller.toggleMuted();
+          } else {
+            setOpen((value) => !value);
+          }
+        }}
         className="flex size-11 items-center justify-center rounded-full text-muted-foreground transition-[background-color,color,transform] duration-fast hover:bg-muted hover:text-foreground active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
         {controller.preferences.muted || controller.preferences.volume === 0 ? (
@@ -413,7 +336,7 @@ function VolumeControl({
               step={0.05}
               value={level}
               onChange={(event) => controller.setVolume(Number(event.currentTarget.value))}
-              aria-label={copy.volume}
+              aria-label={volumeLabel}
               aria-valuetext={`${formatNumerals(percentage, language)}%`}
               style={
                 {
@@ -458,17 +381,12 @@ export function FloatingAudioPlayer({
     systemReducedMotion ||
     (typeof document !== "undefined" && document.documentElement.classList.contains("reduce-motion"));
   const shellTransition = {
-    duration: motionReduced ? 0 : 0.24,
+    duration: motionReduced ? 0 : 0.2,
     ease: [0.22, 1, 0.36, 1] as const,
   };
-  const playButtonTransition = {
-    duration: motionReduced ? 0 : 0.24,
+  const trackMetaTransition = {
+    duration: motionReduced ? 0 : 0.16,
     ease: [0.22, 1, 0.36, 1] as const,
-  };
-  const slideOffsetX = direction === "rtl" ? 28 : -28;
-  const textEnterTransition = {
-    duration: motionReduced ? 0 : 0.22,
-    ease: [0, 0, 0.4, 1] as const,
   };
   const wasCoveringReading = useRef(coversReading);
   const [showOptions, setShowOptions] = useState(false);
@@ -537,7 +455,6 @@ export function FloatingAudioPlayer({
 
   if (!state.plan || !currentEntry) return null;
 
-  const copy = COPY[language];
   const isPlaying = state.status === "playing";
   const isBusy = state.status === "loading" || state.status === "buffering";
   const totalTracks = state.plan.entries.length;
@@ -556,17 +473,17 @@ export function FloatingAudioPlayer({
           ? (currentSegment.attributionArabic ?? currentSegment.attribution)
           : currentSegment.attribution
       }`
-    : `${copy.recitationBy} ${reciterDisplayName}`;
+    : `${t(language, "audioPlayer.recitationBy")} ${reciterDisplayName}`;
 
   const liveMessage =
     state.status === "error"
-      ? getErrorMessage(state.error?.code, copy)
+      ? getErrorMessage(state.error?.code, language)
       : state.announcement === "queue-completed"
-        ? copy.queueCompleted
+        ? t(language, "audioPlayer.queueCompleted")
         : state.announcement === "repetition-completed"
-          ? copy.repetitionCompleted
+          ? t(language, "audioPlayer.repetitionCompleted")
           : state.announcement === "track-changed"
-            ? `${copy.trackChanged}: ${title}`
+            ? `${t(language, "audioPlayer.trackChanged")}: ${title}`
             : "";
 
   const repeatEnabled = currentEntry.repetitions > 1;
@@ -583,19 +500,18 @@ export function FloatingAudioPlayer({
 
   const positionChip =
     totalTracks > 1
-      ? `${copy.track} ${queuePosition}`
+      ? `${t(language, "audioPlayer.track")} ${queuePosition}`
       : repetitionPosition
-        ? `${copy.repetitionChip} ${repetitionPosition}`
+        ? `${t(language, "audioPlayer.repetitionChip")} ${repetitionPosition}`
         : null;
 
   if (isMinimized) {
     return (
       <motion.section
-        layout
-        layoutId="floating-audio-player-shell"
+        initial={motionReduced ? false : { opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={shellTransition}
-        style={{ transformOrigin: "bottom center" }}
-        aria-label={copy.region}
+        aria-label={t(language, "audioPlayer.region")}
         dir={direction}
         data-variant="compact"
         className={`floating-audio-player floating-audio-player--compact fixed z-40 rounded-t-2xl border border-b-0 border-primary/30 bg-card px-2.5 py-2 shadow-overlay dark:border-white/15 ${overReadingSurface ? "floating-audio-player--reading" : ""}`}
@@ -611,7 +527,7 @@ export function FloatingAudioPlayer({
           data-testid="audio-compact-progress"
           className="absolute inset-x-3 top-0.5 h-1 overflow-hidden rounded-full bg-muted md:hidden"
           role="progressbar"
-          aria-label={copy.sessionProgress}
+          aria-label={t(language, "audioPlayer.sessionProgress")}
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={Math.round(sessionProgressPercent)}
@@ -623,26 +539,24 @@ export function FloatingAudioPlayer({
         </div>
 
         <div className="audio-compact-row flex items-center gap-2">
-          <motion.button
-            layoutId="audio-player-expand-collapse-btn"
-            layout="position"
+          <button
             type="button"
             onClick={() => setIsMinimized(false)}
-            aria-label={copy.expand}
-            transition={shellTransition}
+            aria-label={t(language, "audioPlayer.expand")}
             className="flex size-11 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors duration-fast hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           >
             <ChevronUp size={20} aria-hidden="true" />
-          </motion.button>
+          </button>
 
           <div className="flex min-w-0 flex-1 items-center gap-2 px-1 text-start overflow-hidden">
-            <motion.div layoutId="audio-wavebars" layout transition={shellTransition}>
+            <div>
               <WaveBars playing={isPlaying} />
-            </motion.div>
+            </div>
             <motion.span
-              initial={motionReduced ? false : { opacity: 0, x: slideOffsetX }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ ...textEnterTransition, delay: motionReduced ? 0 : 0.05 }}
+              key={currentEntry.entryId}
+              initial={motionReduced ? false : { opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={trackMetaTransition}
               className="min-w-0 flex-1 block"
             >
               <span className="block truncate text-label font-black text-foreground">{title}</span>
@@ -659,13 +573,7 @@ export function FloatingAudioPlayer({
             </motion.span>
           </div>
 
-          <motion.div
-            initial={motionReduced ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: motionReduced ? 0 : 0.25 }}
-            className="hidden min-w-32 flex-1 items-center gap-2 md:flex"
-            dir={direction}
-          >
+          <div className="hidden min-w-32 flex-1 items-center gap-2 md:flex" dir={direction}>
             <span className="w-10 text-center text-micro font-bold tabular-nums text-muted-foreground">
               {formatTime(state.currentTime, language)}
             </span>
@@ -678,7 +586,7 @@ export function FloatingAudioPlayer({
               disabled={state.duration <= 0}
               onChange={(event) => controller.seek(Number(event.currentTarget.value))}
               onKeyDown={handleTimelineKeyDown}
-              aria-label={copy.seek}
+              aria-label={t(language, "audioPlayer.seek")}
               aria-keyshortcuts="PageUp PageDown"
               aria-valuetext={accessibleTime(state.currentTime, state.duration, language)}
               style={{ "--audio-range-fill": progressBackground(progressPercent, direction) } as CSSProperties}
@@ -687,53 +595,47 @@ export function FloatingAudioPlayer({
             <span className="w-10 text-center text-micro font-bold tabular-nums text-muted-foreground">
               {formatTime(state.duration, language)}
             </span>
-          </motion.div>
+          </div>
 
           <div className="flex shrink-0 items-center gap-1">
             <button
               type="button"
               onClick={() => jumpSeconds(-10)}
               disabled={state.duration <= 0}
-              aria-label={copy.jumpBack10}
+              aria-label={t(language, "audioPlayer.jumpBack10")}
               className="hidden size-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-30 md:flex"
             >
               <JumpBack10Icon className="size-5" />
             </button>
-            <motion.button
-              layoutId="audio-primary-play-button"
-              layout
+            <button
               style={{ borderRadius: 9999 }}
               type="button"
               onClick={isPlaying ? controller.pause : controller.play}
-              aria-label={isPlaying ? copy.pause : copy.play}
-              transition={playButtonTransition}
-              className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-raised active:scale-95 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              aria-label={isPlaying ? t(language, "audioPlayer.pause") : t(language, "audioPlayer.play")}
+              className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-raised transition-transform duration-fast active:scale-95 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
-              <motion.span layout="position" className="flex items-center justify-center">
+              <span className="flex items-center justify-center">
                 {isPlaying ? <Pause size={22} aria-hidden="true" /> : <Play size={22} aria-hidden="true" />}
-              </motion.span>
-            </motion.button>
+              </span>
+            </button>
             <button
               type="button"
               onClick={() => jumpSeconds(10)}
               disabled={state.duration <= 0}
-              aria-label={copy.jumpForward10}
+              aria-label={t(language, "audioPlayer.jumpForward10")}
               className="hidden size-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-30 md:flex"
             >
               <JumpForward10Icon className="size-5" />
             </button>
-            <VolumeControl controller={controller} language={language} copy={copy} />
-            <motion.button
-              layoutId="audio-player-stop-btn"
-              layout="position"
+            <VolumeControl controller={controller} language={language} />
+            <button
               type="button"
               onClick={controller.stop}
-              aria-label={copy.stop}
-              transition={shellTransition}
+              aria-label={t(language, "audioPlayer.stop")}
               className="flex size-11 items-center justify-center rounded-full text-muted-foreground transition-colors duration-fast hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
               <X size={19} aria-hidden="true" />
-            </motion.button>
+            </button>
           </div>
         </div>
       </motion.section>
@@ -742,11 +644,10 @@ export function FloatingAudioPlayer({
 
   return (
     <motion.section
-      layout
-      layoutId="floating-audio-player-shell"
+      initial={motionReduced ? false : { opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={shellTransition}
-      style={{ transformOrigin: "bottom center" }}
-      aria-label={copy.region}
+      aria-label={t(language, "audioPlayer.region")}
       dir={direction}
       data-variant="expanded"
       className={`floating-audio-player floating-audio-player--expanded fixed z-40 overflow-x-hidden overflow-y-auto overscroll-contain rounded-t-3xl border border-b-0 border-primary/20 bg-card px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2 shadow-overlay sm:max-w-2xl sm:px-5 lg:max-w-4xl dark:border-white/10 ${overReadingSurface ? "floating-audio-player--reading" : ""}`}
@@ -757,99 +658,53 @@ export function FloatingAudioPlayer({
 
       {/* Minimize and close retain the same logical edges in both player sizes. */}
       <div className="flex items-center justify-between">
-        <motion.button
-          layoutId="audio-player-expand-collapse-btn"
-          layout="position"
+        <button
           type="button"
           onClick={() => setIsMinimized(true)}
-          aria-label={copy.collapse}
-          transition={shellTransition}
+          aria-label={t(language, "audioPlayer.collapse")}
           className="flex size-11 items-center justify-center rounded-xl text-muted-foreground transition-[transform,background-color,color] duration-fast active:scale-95 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           <ChevronDown size={22} aria-hidden="true" />
-        </motion.button>
-        <motion.button
-          layoutId="audio-player-stop-btn"
-          layout="position"
+        </button>
+        <button
           type="button"
           onClick={controller.stop}
-          aria-label={copy.stop}
-          transition={shellTransition}
+          aria-label={t(language, "audioPlayer.stop")}
           className="flex size-11 items-center justify-center rounded-xl text-muted-foreground transition-[transform,background-color,color] duration-fast active:scale-95 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           <X size={19} aria-hidden="true" />
-        </motion.button>
+        </button>
       </div>
 
       {/* What is playing, read down the middle: cue, surah, reciter, place. */}
-      <motion.div
-        initial={motionReduced ? false : { opacity: 0, scale: 0.98 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: motionReduced ? 0 : 0.24, ease: [0, 0, 0.4, 1] }}
-        className="rounded-2xl bg-muted/40 p-3 text-center overflow-hidden"
-      >
-        <div className="flex flex-col items-center">
-          <motion.div layoutId="audio-wavebars" layout transition={shellTransition}>
+      <div className="rounded-2xl bg-muted/40 p-3 text-center overflow-hidden">
+        <motion.div
+          key={currentEntry.entryId}
+          initial={motionReduced ? false : { opacity: 0, y: 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={trackMetaTransition}
+          className="flex flex-col items-center"
+        >
+          <div>
             <WaveBars playing={isPlaying} />
-          </motion.div>
-          <motion.h3
-            initial={motionReduced ? false : { opacity: 0, x: slideOffsetX }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{
-              duration: motionReduced ? 0 : 0.24,
-              delay: motionReduced ? 0 : 0.05,
-              ease: [0, 0, 0.4, 1],
-            }}
-            className="mt-2 line-clamp-2 text-xl font-black leading-tight text-foreground"
-          >
-            {title}
-          </motion.h3>
-          <motion.p
-            initial={motionReduced ? false : { opacity: 0, x: slideOffsetX }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{
-              duration: motionReduced ? 0 : 0.22,
-              delay: motionReduced ? 0 : 0.1,
-              ease: [0, 0, 0.4, 1],
-            }}
-            className="mt-1 truncate text-label font-semibold text-muted-foreground"
-          >
-            {reciterDisplayName}
-          </motion.p>
+          </div>
+          <h3 className="mt-2 line-clamp-2 text-xl font-black leading-tight text-foreground">{title}</h3>
+          <p className="mt-1 truncate text-label font-semibold text-muted-foreground">{reciterDisplayName}</p>
           {positionChip && (
-            <motion.p
-              initial={motionReduced ? false : { opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{
-                duration: motionReduced ? 0 : 0.22,
-                delay: motionReduced ? 0 : 0.14,
-                ease: [0, 0, 0.4, 1],
-              }}
-              className="mt-2.5 rounded-full border border-border px-3 py-1 text-xs font-bold text-muted-foreground"
-            >
+            <p className="mt-2.5 rounded-full border border-border px-3 py-1 text-xs font-bold text-muted-foreground">
               {positionChip}
-            </motion.p>
+            </p>
           )}
           {isBusy && (
             <p className="mt-2 text-xs font-semibold text-primary" role="status">
-              {state.status === "buffering" ? copy.buffering : copy.loading}
+              {state.status === "buffering" ? t(language, "audioPlayer.buffering") : t(language, "audioPlayer.loading")}
             </p>
           )}
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
 
       {/* Timeline / Scrub Bar with Generous 44px Hit Target */}
-      <motion.div
-        initial={motionReduced ? false : { opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{
-          duration: motionReduced ? 0 : 0.24,
-          delay: motionReduced ? 0 : 0.08,
-          ease: [0, 0, 0.4, 1],
-        }}
-        className="mt-4 flex items-center gap-3"
-        dir={direction}
-      >
+      <div className="mt-4 flex items-center gap-3" dir={direction}>
         <span className="w-11 text-center text-xs font-bold tabular-nums text-muted-foreground">
           {formatTime(state.currentTime, language)}
         </span>
@@ -863,7 +718,7 @@ export function FloatingAudioPlayer({
             disabled={state.duration <= 0}
             onChange={(event) => controller.seek(Number(event.currentTarget.value))}
             onKeyDown={handleTimelineKeyDown}
-            aria-label={copy.seek}
+            aria-label={t(language, "audioPlayer.seek")}
             aria-keyshortcuts="PageUp PageDown"
             aria-valuetext={accessibleTime(state.currentTime, state.duration, language)}
             /* The played part of the track is drawn here rather than in a
@@ -876,23 +731,14 @@ export function FloatingAudioPlayer({
         <span className="w-11 text-center text-xs font-bold tabular-nums text-muted-foreground">
           {formatTime(state.duration, language)}
         </span>
-      </motion.div>
+      </div>
 
       {/* Primary Transport Controls Row */}
-      <motion.div
-        initial={motionReduced ? false : { opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{
-          duration: motionReduced ? 0 : 0.24,
-          delay: motionReduced ? 0 : 0.06,
-          ease: [0, 0, 0.4, 1],
-        }}
-        className="mt-1 flex w-full items-start justify-center gap-0.5 sm:gap-2"
-      >
+      <div className="mt-1 flex w-full items-start justify-center gap-0.5 sm:gap-2">
         {totalTracks > 1 && (
           <TransportButton
-            label={copy.previousShort}
-            ariaLabel={copy.previous}
+            label={t(language, "audioPlayer.previousShort")}
+            ariaLabel={t(language, "audioPlayer.previous")}
             onClick={controller.previous}
             disabled={state.entryIndex === 0}
           >
@@ -901,32 +747,29 @@ export function FloatingAudioPlayer({
         )}
 
         <TransportButton
-          label={copy.back10Short}
-          ariaLabel={copy.jumpBack10}
+          label={t(language, "audioPlayer.back10Short")}
+          ariaLabel={t(language, "audioPlayer.jumpBack10")}
           onClick={() => jumpSeconds(-10)}
           disabled={state.duration <= 0}
         >
           <JumpBack10Icon className="size-5" />
         </TransportButton>
 
-        <motion.button
-          layoutId="audio-primary-play-button"
-          layout
+        <button
           style={{ borderRadius: 9999 }}
           type="button"
           onClick={isPlaying ? controller.pause : controller.play}
-          aria-label={isPlaying ? copy.pause : copy.play}
-          transition={playButtonTransition}
-          className="mx-1 mt-1 flex size-16 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-raised active:scale-95 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          aria-label={isPlaying ? t(language, "audioPlayer.pause") : t(language, "audioPlayer.play")}
+          className="mx-1 mt-1 flex size-16 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-raised transition-transform duration-fast active:scale-95 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
-          <motion.span layout="position" className="flex items-center justify-center">
+          <span className="flex items-center justify-center">
             {isPlaying ? <Pause size={28} aria-hidden="true" /> : <Play size={28} aria-hidden="true" />}
-          </motion.span>
-        </motion.button>
+          </span>
+        </button>
 
         <TransportButton
-          label={copy.forward10Short}
-          ariaLabel={copy.jumpForward10}
+          label={t(language, "audioPlayer.forward10Short")}
+          ariaLabel={t(language, "audioPlayer.jumpForward10")}
           onClick={() => jumpSeconds(10)}
           disabled={state.duration <= 0}
         >
@@ -935,41 +778,41 @@ export function FloatingAudioPlayer({
 
         {totalTracks > 1 && (
           <TransportButton
-            label={copy.nextShort}
-            ariaLabel={copy.next}
+            label={t(language, "audioPlayer.nextShort")}
+            ariaLabel={t(language, "audioPlayer.next")}
             onClick={controller.next}
             disabled={state.entryIndex === totalTracks - 1}
           >
             <SkipForward size={20} className="rtl:rotate-180" aria-hidden="true" />
           </TransportButton>
         )}
-      </motion.div>
+      </div>
 
       {/* Error state */}
       {state.status === "error" && (
         <div className="mt-3 rounded-2xl border border-destructive/30 bg-destructive/10 p-3.5" role="alert">
-          <p className="text-label font-semibold text-destructive">{getErrorMessage(state.error?.code, copy)}</p>
+          <p className="text-label font-semibold text-destructive">{getErrorMessage(state.error?.code, language)}</p>
           <div className="mt-2.5 flex flex-wrap gap-2">
             <button
               type="button"
               onClick={controller.retry}
               className="min-h-11 rounded-xl bg-primary px-4 text-xs font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
-              {copy.retry}
+              {t(language, "audioPlayer.retry")}
             </button>
             <button
               type="button"
               onClick={controller.skip}
               className="min-h-11 rounded-xl border border-border px-4 text-xs font-bold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
-              {copy.skip}
+              {t(language, "audioPlayer.skip")}
             </button>
             <button
               type="button"
               onClick={controller.stop}
               className="min-h-11 rounded-xl border border-destructive/40 px-4 text-xs font-bold text-destructive focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
-              {copy.stop}
+              {t(language, "audioPlayer.stop")}
             </button>
           </div>
         </div>
@@ -977,16 +820,7 @@ export function FloatingAudioPlayer({
 
       {/* Only contextual options remain here. Restart is already available by
           moving the timeline to its start and Play restarts an ended item. */}
-      <motion.div
-        initial={motionReduced ? false : { opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{
-          duration: motionReduced ? 0 : 0.28,
-          delay: motionReduced ? 0 : 0.12,
-          ease: [0, 0, 0.4, 1],
-        }}
-        className="mt-4 flex flex-wrap items-center justify-center gap-2 border-t border-border/70 pt-4"
-      >
+      <div className="mt-4 flex flex-wrap items-center justify-center gap-2 border-t border-border/70 pt-4">
         {canRepeat && (
           <button
             type="button"
@@ -995,7 +829,7 @@ export function FloatingAudioPlayer({
             className={`${PILL_CLASS} ${repeatEnabled ? PILL_ACTIVE : PILL_IDLE}`}
           >
             <RotateCcw size={16} aria-hidden="true" />
-            {copy.repeatShort}
+            {t(language, "audioPlayer.repeatShort")}
           </button>
         )}
 
@@ -1004,13 +838,13 @@ export function FloatingAudioPlayer({
           onClick={() => controller.setPlaybackRate(nextPlaybackRate(state.playbackRate))}
           className={`${PILL_CLASS} ${state.playbackRate === 1 ? PILL_IDLE : PILL_ACTIVE}`}
         >
-          {copy.speedShort}
+          {t(language, "audioPlayer.speedShort")}
           <span dir="ltr" className="font-black tabular-nums text-primary">
             {formatNumerals(state.playbackRate, language)}×
           </span>
         </button>
 
-        <VolumeControl controller={controller} language={language} copy={copy} inline />
+        <VolumeControl controller={controller} language={language} inline />
 
         {currentEntry.availableVoiceIds.length > 1 && (
           <button
@@ -1020,14 +854,14 @@ export function FloatingAudioPlayer({
             className={`${PILL_CLASS} ${showOptions ? PILL_ACTIVE : PILL_IDLE}`}
           >
             <Headphones size={16} aria-hidden="true" />
-            {copy.reciterShort}
+            {t(language, "audioPlayer.reciterShort")}
           </button>
         )}
-      </motion.div>
+      </div>
 
       {showOptions && currentEntry.availableVoiceIds.length > 1 && (
         <div className="mt-3 grid gap-1 text-xs font-bold text-muted-foreground">
-          <span id="audio-player-voice-label">{copy.voice}</span>
+          <span id="audio-player-voice-label">{t(language, "audioPlayer.voice")}</span>
           <Select
             value={state.currentVoiceId ?? currentEntry.defaultVoiceId}
             onValueChange={controller.setVoice}
@@ -1051,14 +885,7 @@ export function FloatingAudioPlayer({
 
       {/* Whose recitation this is, always on screen rather than behind a
           disclosure — it is an attribution, not a setting. */}
-      <motion.p
-        initial={motionReduced ? false : { opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: motionReduced ? 0 : 0.25, delay: motionReduced ? 0 : 0.16 }}
-        className="mt-3 text-center text-micro font-semibold leading-5 text-muted-foreground/80"
-      >
-        {attributionText}
-      </motion.p>
+      <p className="mt-3 text-center text-micro font-semibold leading-5 text-muted-foreground/80">{attributionText}</p>
     </motion.section>
   );
 }

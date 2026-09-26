@@ -1,19 +1,10 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import "./ZikrComponents.css";
 import { Check } from "./icons";
 import { counterNumeralFontFamily, formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { shouldReduceMotion } from "../motionPreferences";
 import type { AppLanguage } from "../types";
-
-export const tapRippleStyle: React.CSSProperties = {
-  position: "absolute",
-  width: "1rem",
-  height: "1rem",
-  margin: "-0.5rem",
-  borderRadius: 999,
-  background: "color-mix(in srgb, var(--primary) 28%, transparent)",
-};
 
 export function RepBadge({ label, done, language }: { label: string; done: boolean; language: AppLanguage }) {
   return (
@@ -133,8 +124,6 @@ export function ZikrCounterSurface({
   const isSingleAction = total === 1;
   const isArabic = language === "ar";
   const [isPressed, setIsPressed] = useState(false);
-  const [ripples, setRipples] = useState<{ id: number; x: number; y: number }[]>([]);
-  const nextRippleId = useRef(0);
   const defaultInstruction = t(language, "reader.tapToCount");
   const activeInstruction = instructionText || defaultInstruction;
   const reducedMotion = shouldReduceMotion(reduceMotion);
@@ -155,12 +144,9 @@ export function ZikrCounterSurface({
       ? `${activeInstruction} ${localizedRatio}`
       : activeInstruction;
 
-  const handlePointerDown = (event: React.PointerEvent<HTMLButtonElement>) => {
+  const handlePointerDown = () => {
     if (disabled || (complete && !onCompleteTap)) return;
     if (!reducedMotion) setIsPressed(true);
-    if (reducedMotion) return;
-    const rect = event.currentTarget.getBoundingClientRect();
-    setRipples([{ id: ++nextRippleId.current, x: event.clientX - rect.left, y: event.clientY - rect.top }]);
   };
 
   const handlePointerUp = () => {
@@ -207,19 +193,6 @@ export function ZikrCounterSurface({
       {/* Keyed on the face it shows so React swaps the node — the number face
           and the completed face each play a 180ms fade/rise instead of
           snapping, which is also what carries the eye to the next zikr. */}
-      {ripples.map((ripple) => (
-        <span
-          key={ripple.id}
-          className="tap-ripple"
-          style={{
-            ...tapRippleStyle,
-            left: ripple.x,
-            top: ripple.y,
-          }}
-          aria-hidden="true"
-          onAnimationEnd={() => setRipples((current) => current.filter((item) => item.id !== ripple.id))}
-        />
-      ))}
       <div className="adaptive-counter-content counter-face-swap" key={complete ? "complete" : "counting"}>
         {complete ? (
           <div

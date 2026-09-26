@@ -483,7 +483,7 @@
 
 .mushaf-page-furniture__cartouche {
   border: 0;
-  border-radius: 0.5rem;
+  border-radius: 9999px;
   padding: 0.3em 0.55em;
 }
 
@@ -494,9 +494,8 @@
   align-items: center;
   justify-content: center;
   border: 0;
-  border-bottom: 1px solid currentcolor;
-  border-radius: 0.5rem;
-  padding: 0.3em 0.85em;
+  border-radius: 9999px;
+  padding: 0;
 }
 
 /* The folio belongs below the final ayah line, never inside its ink area. Its
@@ -508,6 +507,7 @@
   z-index: 20;
   height: 2.75rem;
   padding: 0;
+  opacity: 1;
   transform: none;
 }
 

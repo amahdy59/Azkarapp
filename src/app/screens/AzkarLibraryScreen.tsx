@@ -24,7 +24,7 @@ import {
 import { CATEGORIES, CATEGORY_GROUPS, isOccasionalCategory } from "../content/categories";
 import { COMPREHENSIVE_DUAS } from "../content/comprehensiveDuas";
 import { formatNumerals } from "../formatting";
-import { matchesSearch, normalizeSearchText } from "../content/searchNormalization";
+import { matchesSearch, normalizeSearchText, searchKeyFor } from "../content/searchNormalization";
 import { FIELD_LABEL_CLASS } from "../components/FormField";
 import { t } from "../i18n";
 import type { AppLanguage, CategoryId, RoutineCategoryId, RoutineMode, Zikr } from "../types";
@@ -37,28 +37,6 @@ type SavedLibraryItem = Pick<Zikr, "id" | "category" | "arabicText" | "translati
 
 const COMPREHENSIVE_DUA_ITEMS = COMPREHENSIVE_DUAS.filter((dua) => !dua.isCollectionIntroduction);
 const SEARCHABLE_AZKAR: Zikr[] = [...ALL_AZKAR.filter((z) => !z.isCollectionIntroduction), ...COMPREHENSIVE_DUA_ITEMS];
-
-const searchKeyCache = new Map<string, string>();
-
-function searchKeyFor(zikr: Zikr): string {
-  const cached = searchKeyCache.get(zikr.id);
-  if (cached !== undefined) return cached;
-  const key = normalizeSearchText(
-    [
-      zikr.arabicText,
-      zikr.translation,
-      zikr.transliteration,
-      zikr.surahNameArabic ?? "",
-      zikr.surahNameEnglish ?? "",
-      zikr.sourceReference ?? "",
-      zikr.benefit ?? "",
-      zikr.benefitArabic ?? "",
-      ZIKR_LABELS[zikr.id] ?? "",
-    ].join(" | "),
-  );
-  searchKeyCache.set(zikr.id, key);
-  return key;
-}
 
 export function AzkarLibraryScreen({
   completed,
@@ -166,7 +144,7 @@ export function AzkarLibraryScreen({
       if (targetCategoryIds && !targetCategoryIds.has(zikr.category)) {
         return false;
       }
-      return searchKeyFor(zikr).includes(normalizedQuery);
+      return searchKeyFor(zikr, ZIKR_LABELS[zikr.id] ?? "").includes(normalizedQuery);
     });
   }, [normalizedQuery, selectedGroupId]);
 
@@ -293,7 +271,7 @@ export function AzkarLibraryScreen({
                   <button
                     type="button"
                     onClick={() => setSearchQuery("")}
-                    className="-me-2.5 flex size-11 min-h-11 min-w-11 shrink-0 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+                    className="-me-2.5 flex size-11 min-h-11 min-w-11 shrink-0 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer"
                     aria-label={t(language, "search.clearAriaLabel")}
                   >
                     <X size={16} aria-hidden="true" />
@@ -443,7 +421,7 @@ export function AzkarLibraryScreen({
                       <button
                         type="button"
                         onClick={() => setSearchQuery("")}
-                        className="interactive-elem shrink-0 text-xs font-bold text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+                        className="interactive-elem inline-flex min-h-11 shrink-0 items-center rounded-lg px-2 text-xs font-bold text-primary hover:underline focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer"
                       >
                         {t(language, "library.clearSearch")}
                       </button>

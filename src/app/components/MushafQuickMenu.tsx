@@ -11,7 +11,6 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
-  Eye,
   List,
   Pause,
   Play,
@@ -22,7 +21,7 @@ import {
  * The Mushaf's secondary actions, off the page.
  *
  * A phone has room for the page and about four controls. Everything else —
- * the index, saved places, study mode, focus, settings — belongs behind one
+ * the index, saved places, study mode, settings — belongs behind one
  * button rather than crowded into a bar the reader looks past anyway.
  */
 
@@ -54,14 +53,11 @@ export interface MushafQuickMenuProps {
   onOpenBookmarks: () => void;
   onToggleWordMeanings: () => void;
   onTogglePageBookmark: () => void;
-  onEnterFocusMode: () => void;
   onOpenSettings: () => void;
   onReadExternally?: () => void;
   surahAudio?: SurahAudioControl;
   /** The full-screen Mushaf already exposes these as permanent corner controls. */
   showPageTools?: boolean;
-  /** Focus mode is intentionally absent when the page is already the whole screen. */
-  showFocusAction?: boolean;
   /** The surah-name control already opens the index in the full-screen reader. */
   showIndexAction?: boolean;
 }
@@ -81,12 +77,10 @@ export function MushafQuickMenu({
   onOpenBookmarks,
   onToggleWordMeanings,
   onTogglePageBookmark,
-  onEnterFocusMode,
   onOpenSettings,
   onReadExternally,
   surahAudio,
   showPageTools = true,
-  showFocusAction = true,
   showIndexAction = true,
 }: MushafQuickMenuProps) {
   const items: QuickMenuItem[] = [
@@ -164,18 +158,6 @@ export function MushafQuickMenu({
             pressed: showWordMeanings,
             disabled: isLoadingWordMeanings,
             testId: "mushaf-quick-word-meanings",
-          },
-        ]
-      : []),
-    ...(showFocusAction
-      ? [
-          {
-            id: "focus",
-            label: t(language, "mushaf.focusMode"),
-            detail: t(language, "mushaf.focusModeHint"),
-            icon: <Eye size={19} aria-hidden="true" />,
-            onSelect: onEnterFocusMode,
-            testId: "mushaf-quick-focus",
           },
         ]
       : []),

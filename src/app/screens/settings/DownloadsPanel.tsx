@@ -298,7 +298,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
                   type="button"
                   disabled={collection.byteSize === 0 || isAnyJobActive}
                   onClick={() => void downloadCollection(collection)}
-                  className="flex min-h-11 items-center justify-between gap-3 rounded-xl border border-border bg-background px-3 text-start font-semibold text-foreground disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="flex min-h-11 items-center justify-between gap-3 rounded-xl border border-border bg-background px-3 text-start font-semibold text-foreground disabled:opacity-50 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 >
                   <span className="flex items-center gap-2">
                     <Download size={18} aria-hidden="true" />
@@ -361,7 +361,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
 
         {/* Card 4: Technical Diagnostics in an expandable disclosure */}
         <details className="rounded-2xl border border-border/60 bg-card p-4 transition-colors">
-          <summary className="flex cursor-pointer select-none items-center justify-between text-subtitle font-semibold text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+          <summary className="flex min-h-11 cursor-pointer select-none items-center justify-between rounded-lg text-subtitle font-semibold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
             <span className="flex items-center gap-2">
               <Database size={18} className="text-primary" aria-hidden="true" />
               {t(language, "downloads.statusTitle")}

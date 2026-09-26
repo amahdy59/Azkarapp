@@ -24,7 +24,8 @@ export interface AudioController {
   preferences: AudioPreferences;
   currentEntry: PlaybackEntry | null;
   currentSegment: ResolvedAudioSegment | null;
-  startPlan: (plan: PlaybackPlan) => boolean;
+  startPlan: (plan: PlaybackPlan, options?: { initialEntryIndex?: number; autoPlay?: boolean }) => boolean;
+  selectEntry: (entryIndex: number, autoPlay?: boolean) => boolean;
   play: () => void;
   pause: () => void;
   stop: () => void;
@@ -86,7 +87,7 @@ export function AudioProvider({
   }, []);
 
   useEffect(() => {
-    if (!("mediaSession" in navigator)) return;
+    if (!("mediaSession" in navigator) || !navigator.mediaSession) return;
     const entry = state.plan?.entries[state.entryIndex];
     if (!entry) {
       navigator.mediaSession.metadata = null;
@@ -114,13 +115,13 @@ export function AudioProvider({
   }, [state.currentVoiceId, state.entryIndex, state.plan]);
 
   useEffect(() => {
-    if (!("mediaSession" in navigator)) return;
+    if (!("mediaSession" in navigator) || !navigator.mediaSession) return;
     navigator.mediaSession.playbackState =
       state.status === "playing" ? "playing" : state.status === "idle" || state.status === "ended" ? "none" : "paused";
   }, [state.status]);
 
   useEffect(() => {
-    if (!("mediaSession" in navigator) || !navigator.mediaSession.setPositionState) return;
+    if (!("mediaSession" in navigator) || !navigator.mediaSession?.setPositionState) return;
     if (Number.isFinite(state.duration) && state.duration > 0) {
       try {
         navigator.mediaSession.setPositionState({
@@ -277,6 +278,8 @@ export function AudioProvider({
         } catch (error) {
           dispatch({ type: "error", generation, error: mapPlayError(error) });
         }
+      } else if (stateRef.current.status === "loading") {
+        dispatch({ type: "status", status: "paused", generation });
       }
     },
     [advanceAfterEnded, chooseVoice, dispatch, getAudio],
@@ -284,9 +287,23 @@ export function AudioProvider({
   loadAtRef.current = loadAt;
 
   const startPlan = useCallback(
-    (plan: PlaybackPlan) => {
+    (plan: PlaybackPlan, options?: { initialEntryIndex?: number; autoPlay?: boolean }) => {
       if (plan.entries.length === 0) return false;
-      loadAt(plan, 0, 0, 0, true);
+      const rawIndex = options?.initialEntryIndex ?? 0;
+      const entryIndex = rawIndex >= 0 && rawIndex < plan.entries.length ? rawIndex : 0;
+      const autoPlay = options?.autoPlay ?? true;
+      loadAt(plan, entryIndex, 0, 0, autoPlay);
+      return true;
+    },
+    [loadAt],
+  );
+
+  const selectEntry = useCallback(
+    (entryIndex: number, autoPlay?: boolean) => {
+      const current = stateRef.current;
+      if (!current.plan || entryIndex < 0 || entryIndex >= current.plan.entries.length) return false;
+      const shouldPlay = autoPlay ?? ["playing", "buffering", "loading"].includes(current.status);
+      loadAt(current.plan, entryIndex, 0, 0, shouldPlay);
       return true;
     },
     [loadAt],
@@ -420,7 +437,7 @@ export function AudioProvider({
   }, [getAudio, updatePreferences]);
 
   useEffect(() => {
-    if (!("mediaSession" in navigator)) return;
+    if (!("mediaSession" in navigator) || !navigator.mediaSession) return;
     const setHandler = (action: MediaSessionAction, handler: MediaSessionActionHandler) => {
       try {
         navigator.mediaSession.setActionHandler(action, handler);
@@ -534,6 +551,7 @@ export function AudioProvider({
       currentEntry,
       currentSegment,
       startPlan,
+      selectEntry,
       play,
       pause,
       stop,
@@ -562,6 +580,7 @@ export function AudioProvider({
       replay,
       retry,
       seek,
+      selectEntry,
       setVolume,
       setPlaybackMode,
       setPlaybackRate,

@@ -9,7 +9,7 @@ import { IconButton } from "../components/LayoutShells";
 import { FIELD_LABEL_CLASS } from "../components/FormField";
 import { t } from "../i18n";
 
-import { normalizeSearchText } from "../content/searchNormalization";
+import { normalizeSearchText, searchKeyFor, splitHighlightedSearchTokens } from "../content/searchNormalization";
 
 // ─── Recent-search persistence ────────────────────────────────────────────────
 // Stored per-language so Arabic and English histories don't overwrite each other.
@@ -38,6 +38,18 @@ function saveRecents(language: AppLanguage, recents: string[]): void {
   }
 }
 
+function renderHighlightedText(text: string, query: string) {
+  return splitHighlightedSearchTokens(text, query).map((segment, index) =>
+    segment.matched ? (
+      <mark key={index} className="bg-transparent font-bold text-primary underline">
+        {segment.text}
+      </mark>
+    ) : (
+      segment.text
+    ),
+  );
+}
+
 // ─── CategoryBadge ────────────────────────────────────────────────────────────
 export function CategoryBadge({ catId, language }: { catId: CategoryId; language: AppLanguage }) {
   const isArabic = language === "ar";
@@ -59,23 +71,6 @@ export function CategoryBadge({ catId, language }: { catId: CategoryId; language
 }
 
 // ─── SearchScreen ─────────────────────────────────────────────────────────────
-/**
- * Normalized haystack per zikr, built once and reused across keystrokes.
- * Normalizing the whole corpus on every render would be wasteful; the corpus is
- * static so the key can be cached by zikr id.
- */
-const searchKeyCache = new Map<string, string>();
-
-function searchKeyFor(zikr: (typeof ALL_AZKAR)[number]): string {
-  const cached = searchKeyCache.get(zikr.id);
-  if (cached !== undefined) return cached;
-  const key = normalizeSearchText(
-    [zikr.arabicText, zikr.translation, zikr.transliteration, ZIKR_LABELS[zikr.id] ?? ""].join(" | "),
-  );
-  searchKeyCache.set(zikr.id, key);
-  return key;
-}
-
 export function SearchScreen({
   onBack,
   onZikr,
@@ -101,7 +96,10 @@ export function SearchScreen({
     if (deferredQuery.length < 2) return [];
     const normalizedQuery = normalizeSearchText(deferredQuery);
     if (!normalizedQuery) return [];
-    return ALL_AZKAR.filter((zikr) => !zikr.isCollectionIntroduction && searchKeyFor(zikr).includes(normalizedQuery));
+    return ALL_AZKAR.filter(
+      (zikr) =>
+        !zikr.isCollectionIntroduction && searchKeyFor(zikr, ZIKR_LABELS[zikr.id] ?? "").includes(normalizedQuery),
+    );
   }, [deferredQuery]);
 
   const handleSubmit = (term: string) => {
@@ -122,6 +120,11 @@ export function SearchScreen({
       saveRecents(language, next);
       return next;
     });
+  };
+
+  const handleClearAllRecents = () => {
+    setRecents([]);
+    saveRecents(language, []);
   };
 
   // Result count label — English distinguishes singular/plural; Arabic uses a single template.
@@ -161,7 +164,7 @@ export function SearchScreen({
               <button
                 type="button"
                 onClick={() => setQ("")}
-                className="-me-3 flex h-11 w-11 shrink-0 items-center justify-center text-muted-foreground"
+                className="-me-3 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 aria-label={t(language, "search.clearAriaLabel")}
               >
                 <X size={16} aria-hidden="true" />
@@ -180,23 +183,32 @@ export function SearchScreen({
         {/* Recent searches — shown when input is empty and there is history */}
         {!q && recents.length > 0 && (
           <div className="mb-6">
-            <p className="mb-3 text-label text-muted-foreground font-semibold font-sans leading-[18px]">
-              {t(language, "search.recentTitle")}
-            </p>
+            <div className="mb-3 flex items-center justify-between gap-2">
+              <p className="text-label text-muted-foreground font-semibold font-sans leading-[18px]">
+                {t(language, "search.recentTitle")}
+              </p>
+              <button
+                type="button"
+                onClick={handleClearAllRecents}
+                className="inline-flex min-h-11 items-center rounded-lg px-2 text-xs font-bold text-primary hover:underline focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              >
+                {t(language, "search.clearAllRecents")}
+              </button>
+            </div>
             <div className="flex flex-wrap gap-2">
               {recents.map((term) => (
                 <div key={term} className="flex items-center rounded-full bg-secondary text-secondary-foreground">
                   <button
                     type="button"
                     onClick={() => setQ(term)}
-                    className="min-h-11 px-4 text-label font-medium font-sans leading-[20px] text-start transition-[color,background-color,border-color,transform] active:scale-95"
+                    className="min-h-11 rounded-full px-4 text-label font-medium font-sans leading-[20px] text-start transition-[color,background-color,border-color,transform] active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                   >
                     {term}
                   </button>
                   <button
                     type="button"
                     onClick={() => handleRemoveRecent(term)}
-                    className="flex items-center justify-center w-11 h-11 text-secondary-foreground/70 hover:text-secondary-foreground"
+                    className="flex items-center justify-center w-11 h-11 rounded-full text-secondary-foreground/70 hover:text-secondary-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                     aria-label={t(language, "search.removeAriaLabel", { term })}
                   >
                     <X size={12} />
@@ -233,9 +245,10 @@ export function SearchScreen({
                 const category = CATEGORIES.find((item) => item.id === z.category)!;
                 const label = (isArabic ? z.arabicText.split("\n")[0] : z.translation) ?? z.id;
                 const subtitle = isArabic ? category.nameArabic : z.transliteration;
-                const accessibleTitle = isArabic
-                  ? (z.surahNameArabic ?? label.slice(0, 48))
-                  : (z.surahNameEnglish ?? ZIKR_LABELS[z.id] ?? label.split(".")[0] ?? label);
+                const rawEnglishTitle = (z.surahNameEnglish || ZIKR_LABELS[z.id] || label.split(".")[0] || label || "")
+                  .slice(0, 64)
+                  .trim();
+                const accessibleTitle = isArabic ? (z.surahNameArabic ?? label.slice(0, 48)) : rawEnglishTitle;
                 return (
                   <button
                     key={z.id}
@@ -248,15 +261,15 @@ export function SearchScreen({
                       title: accessibleTitle,
                       category: isArabic ? category.nameArabic : category.name,
                     })}
-                    className="flex min-h-[72px] w-full items-center justify-between rounded-3xl border border-border/40 bg-card px-4 py-3 shadow-raised hover:border-primary/40 transition-[color,background-color,border-color,box-shadow]"
+                    className="flex min-h-[72px] w-full items-center justify-between rounded-3xl border border-border/40 bg-card px-4 py-3 shadow-raised hover:border-primary/40 transition-[color,background-color,border-color,box-shadow] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                   >
                     <div className="flex min-w-0 flex-1 flex-col items-start gap-1">
                       <p
-                        className="w-full truncate text-start font-sans text-title font-semibold leading-[24px] text-foreground"
+                        className={`w-full truncate text-start ${isArabic ? "zikr-text" : "font-sans"} text-title font-semibold leading-[24px] text-foreground`}
                         dir={isArabic ? "rtl" : "ltr"}
                         lang={isArabic ? "ar" : "en"}
                       >
-                        {label}
+                        {renderHighlightedText(label, deferredQuery)}
                       </p>
                       <p
                         // Two lines rather than one: Arabic previews lose their
@@ -265,7 +278,7 @@ export function SearchScreen({
                         dir={isArabic ? "rtl" : "ltr"}
                         lang={isArabic ? "ar" : "en"}
                       >
-                        {subtitle}
+                        {renderHighlightedText(subtitle, deferredQuery)}
                       </p>
                     </div>
                     <div className="ms-2">

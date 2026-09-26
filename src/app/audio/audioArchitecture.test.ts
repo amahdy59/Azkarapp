@@ -3,7 +3,7 @@ import { ALL_AZKAR, getAzkarForMode } from "../content/azkar";
 import type { Zikr } from "../types";
 import { createArabicTextFingerprint, normalizeArabicForAudioMatching } from "./arabicMatching";
 import { DEFAULT_AUDIO_PREFERENCES } from "./audioPreferences";
-import { buildPlaybackPlan, getAudioCoverage } from "./buildPlaybackPlan";
+import { buildPlaybackPlan, getAudioCoverage, getZikrPlaybackTitles } from "./buildPlaybackPlan";
 import { APPROVED_AUDIO_ASSIGNMENTS } from "./audioAssignments";
 import { QURAN_AUDIO_REVIEW_CANDIDATES, REJECTED_LEGACY_AUDIO_MATCHES } from "./audioReviewCandidates";
 import { resolveAudioAsset } from "./resolveAudioAsset";
@@ -216,5 +216,42 @@ describe("explicit audio content architecture", () => {
       },
     };
     expect(validateAudioCatalog(invalidCatalog, zikrs).map((issue) => issue.code)).toContain("quran-range");
+  });
+
+  it("derives descriptive zikr track titles and never falls back to generic collection labels", () => {
+    const bannedGenericTitles = new Set([
+      "أذكار مشتركة",
+      "أذكار المساء",
+      "أذكار الصباح",
+      "أذكار النوم",
+      "أذكار بعد الصلاة",
+      "Shared Dhikr",
+      "Evening Adhkar",
+      "Morning Adhkar",
+      "Before Sleep Adhkar",
+      "After Prayer Adhkar",
+    ]);
+
+    const beforeSleepPlan = buildPlaybackPlan({
+      zikrs: getAzkarForMode("before_sleep", "complete"),
+      context: { category: "before_sleep", routineMode: "complete", source: "full-session" },
+    });
+
+    const ayatAlKursiEntry = beforeSleepPlan.entries.find((entry) => entry.zikrId === "s-hm-100");
+    expect(ayatAlKursiEntry?.titleArabic).toBe("سورة الْبَقَرَة (آيَةُ الْكُرْسِيِّ)");
+    expect(ayatAlKursiEntry?.titleEnglish).toBe("Surah Al-Baqarah (Ayat al-Kursi)");
+
+    for (const entry of beforeSleepPlan.entries) {
+      expect(bannedGenericTitles.has(entry.titleArabic)).toBe(false);
+      expect(bannedGenericTitles.has(entry.titleEnglish)).toBe(false);
+      expect(entry.titleArabic.length).toBeGreaterThan(2);
+      expect(entry.titleEnglish.length).toBeGreaterThan(2);
+    }
+
+    for (const zikr of ALL_AZKAR) {
+      const titles = getZikrPlaybackTitles(zikr);
+      expect(bannedGenericTitles.has(titles.titleArabic)).toBe(false);
+      expect(bannedGenericTitles.has(titles.titleEnglish)).toBe(false);
+    }
   });
 });

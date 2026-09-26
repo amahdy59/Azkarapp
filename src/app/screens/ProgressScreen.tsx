@@ -178,44 +178,65 @@ export function ProgressScreen({
     activeTab === "day" && offset === 0
       ? getProgressDayKey(now, progressDayStartHour)
       : getProgressDayKey(displayDate, progressDayStartHour);
-  const selectedDayPath = getDailyPathStatus({
-    dayKey: currentDayKey,
+
+  const { selectedDayPath, quranWirdDone, resolvedMosquePrayers, oasisLevel, levelDetails } = useMemo(() => {
+    const pathStatus = getDailyPathStatus({
+      dayKey: currentDayKey,
+      dailyCompletions,
+      wirdHistory: wirdHistory ?? {},
+      quranWirdPlan,
+      quranWirdDailyGoals,
+      prayerTracking,
+      mosquePrayerGoal,
+      dailyPathStartDayKey,
+    });
+    const routines = deriveOasisRoutinesFromCompletions(dailyCompletions, currentDayKey);
+    const dayHabits = (dailyHabits ?? []).filter((h) => h.dayKey === currentDayKey);
+
+    const hasManualQuranHabit = dayHabits.some((h) => h.habit === "quran_wird");
+    const quranDone = quranWirdPlan?.kind !== "free" && (hasManualQuranHabit || pathStatus.quran.complete);
+
+    const mosqueAttendanceCount = prayerTracking.filter(
+      (r) => r.dayKey === currentDayKey && wasPrayedAtMosque(r),
+    ).length;
+
+    const mosqueHabit = dayHabits.find((h) => h.habit.startsWith("mosque_"))?.habit as
+      "mosque_3" | "mosque_5" | undefined;
+    const mosquePrayers: "mosque_3" | "mosque_5" | null =
+      mosqueHabit ?? (mosqueAttendanceCount >= 5 ? "mosque_5" : mosqueAttendanceCount >= 3 ? "mosque_3" : null);
+
+    const activeHabit =
+      dayHabits.some((h) => h.habit === "active") ||
+      routines.morning ||
+      routines.evening ||
+      routines.beforeSleep ||
+      routines.afterPrayerCount > 0;
+
+    const habits: OasisHabits = {
+      quranWird: quranDone,
+      mosquePrayers,
+      active: activeHabit,
+    };
+
+    const level = calculateOasisLevel(routines, habits);
+    return {
+      selectedDayPath: pathStatus,
+      quranWirdDone: quranDone,
+      resolvedMosquePrayers: mosquePrayers,
+      oasisLevel: level,
+      levelDetails: OASIS_LEVEL_DETAILS[level],
+    };
+  }, [
+    currentDayKey,
     dailyCompletions,
-    wirdHistory: wirdHistory ?? {},
-    quranWirdPlan,
-    quranWirdDailyGoals,
-    prayerTracking,
-    mosquePrayerGoal,
+    dailyHabits,
     dailyPathStartDayKey,
-  });
-  const oasisRoutines = deriveOasisRoutinesFromCompletions(dailyCompletions, currentDayKey);
-  const dayHabits = (dailyHabits ?? []).filter((h) => h.dayKey === currentDayKey);
-
-  const hasManualQuranHabit = dayHabits.some((h) => h.habit === "quran_wird");
-  const quranWirdDone = quranWirdPlan?.kind !== "free" && (hasManualQuranHabit || selectedDayPath.quran.complete);
-
-  const mosqueAttendanceCount = prayerTracking.filter((r) => r.dayKey === currentDayKey && wasPrayedAtMosque(r)).length;
-
-  const mosqueHabit = dayHabits.find((h) => h.habit.startsWith("mosque_"))?.habit as
-    "mosque_3" | "mosque_5" | undefined;
-  const resolvedMosquePrayers: "mosque_3" | "mosque_5" | null =
-    mosqueHabit ?? (mosqueAttendanceCount >= 5 ? "mosque_5" : mosqueAttendanceCount >= 3 ? "mosque_3" : null);
-
-  const activeHabit =
-    dayHabits.some((h) => h.habit === "active") ||
-    oasisRoutines.morning ||
-    oasisRoutines.evening ||
-    oasisRoutines.beforeSleep ||
-    oasisRoutines.afterPrayerCount > 0;
-
-  const oasisHabits: OasisHabits = {
-    quranWird: quranWirdDone,
-    mosquePrayers: resolvedMosquePrayers,
-    active: activeHabit,
-  };
-
-  const oasisLevel = calculateOasisLevel(oasisRoutines, oasisHabits);
-  const levelDetails = OASIS_LEVEL_DETAILS[oasisLevel];
+    mosquePrayerGoal,
+    prayerTracking,
+    quranWirdDailyGoals,
+    quranWirdPlan,
+    wirdHistory,
+  ]);
 
   // 7-day progression history ending on displayDate
   const weekDaysStatus = useMemo(() => {
@@ -550,7 +571,7 @@ export function ProgressScreen({
                     <div
                       key={day.dayKey}
                       role="listitem"
-                      className={`flex flex-col items-center justify-center rounded-xl p-1.5 sm:p-2 transition-all ${
+                      className={`flex flex-col items-center justify-center rounded-xl p-1.5 sm:p-2 transition-colors ${
                         day.isToday
                           ? "border-2 border-primary bg-primary/10 shadow-sm"
                           : "border border-border/40 bg-muted/20 hover:bg-muted/40"

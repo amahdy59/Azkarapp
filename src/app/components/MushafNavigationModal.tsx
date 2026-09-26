@@ -5,7 +5,8 @@ import type { AppLanguage, QuranVerseBookmark } from "../types";
 import { t } from "../i18n";
 import { formatNumerals } from "../formatting";
 import { SURAHS, JUZS, searchSurahs, getJuzNumberForPage, getSurahDisplayName } from "../content/surahInfo";
-import { X, Search, Bookmark, ChevronRight, ChevronLeft } from "./icons";
+import { SURAH_PLACEMENTS } from "../content/mushafSurahPlacements";
+import { X, Search, Bookmark } from "./icons";
 import { TabList, tabPanelProps, type TabDefinition } from "./Tabs";
 import { prefetchMushafPage } from "../content/qcfMushaf";
 
@@ -36,12 +37,7 @@ export function MushafNavigationModal({
   /** Which tab an opening lands on, so "Bookmarks" opens bookmarks. */
   initialTab?: NavigationTab;
   /**
-   * Limits the index to one span of the Mushaf.
-   *
-   * A surah reading is still the Mushaf, but its index is not: the surah and
-   * juz tabs would carry the reader out of the surah they opened, and a page
-   * number outside the span has nothing to show. With a range the index offers
-   * the pages of that span and the bookmarks inside it, and nothing that leaves.
+   * Optional page span for the current surah context.
    */
   pageRange?: { first: number; last: number };
 }) {
@@ -56,8 +52,8 @@ export function MushafNavigationModal({
   // The caller names the tab when it opens the sheet; reopening from the same
   // entry point must land there again, not on whatever was left showing.
   useEffect(() => {
-    if (isOpen) setActiveTab(pageRange && initialTab !== "bookmarks" ? "jump" : initialTab);
-  }, [initialTab, isOpen, pageRange]);
+    if (isOpen) setActiveTab(initialTab);
+  }, [initialTab, isOpen]);
 
   const filteredSurahs = useMemo(() => {
     return searchSurahs(searchQuery, language);
@@ -77,6 +73,11 @@ export function MushafNavigationModal({
     onClose();
   };
 
+  const isArabic = language === "ar";
+  const firstPage = pageRange?.first ?? 1;
+  const lastPage = pageRange?.last ?? 604;
+  const inRange = (page: number) => page >= firstPage && page <= lastPage;
+
   const handleInputSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const num = parseInt(inputPage, 10);
@@ -85,62 +86,36 @@ export function MushafNavigationModal({
     }
   };
 
-  const isArabic = language === "ar";
-  const chevron = isArabic ? <ChevronLeft size={18} /> : <ChevronRight size={18} />;
-  const firstPage = pageRange?.first ?? 1;
-  const lastPage = pageRange?.last ?? 604;
-  const inRange = (page: number) => page >= firstPage && page <= lastPage;
+  const currentSurahIdx = useMemo(() => {
+    const idx = SURAHS.findIndex(
+      (s, i) => currentPage >= s.startPage && (i === SURAHS.length - 1 || currentPage < SURAHS[i + 1]!.startPage),
+    );
+    return idx >= 0 ? idx : 0;
+  }, [currentPage]);
 
-  // A bookmark on page 300 is not reachable from inside Al-Mulk, so a scoped
-  // index does not offer it.
+  const quickPages = useMemo(() => {
+    const surahMeta = SURAHS[currentSurahIdx]!;
+    const start = pageRange ? pageRange.first : surahMeta.startPage;
+    const nextPlacement = surahMeta.number < 114 ? SURAH_PLACEMENTS[surahMeta.number + 1] : null;
+    const end = pageRange
+      ? pageRange.last
+      : nextPlacement
+        ? Math.max(start, nextPlacement.line > 1 ? nextPlacement.page : nextPlacement.page - 1)
+        : 604;
+    const list: number[] = [];
+    for (let p = start; p <= end; p++) list.push(p);
+    return list;
+  }, [currentSurahIdx, pageRange]);
+
   const bookmarks = pageRange ? allBookmarks.filter(inRange) : allBookmarks;
   const verseBookmarks = pageRange ? allVerseBookmarks.filter((b) => inRange(b.page)) : allVerseBookmarks;
 
-  const tabs: ReadonlyArray<TabDefinition<NavigationTab>> = (
-    pageRange
-      ? [
-          { value: "jump" as const, label: <span>{t(language, "mushaf.tabJump")}</span> },
-          {
-            value: "bookmarks" as const,
-            label: <span>{t(language, "mushaf.tabBookmarks")}</span>,
-          },
-        ]
-      : [
-          {
-            value: "surahs",
-            label: (
-              <>
-                <span>{t(language, "mushaf.tabSurahs")}</span>
-                <span className="hidden text-xs opacity-70 sm:inline">({formatNumerals(114, language)})</span>
-              </>
-            ),
-          },
-          {
-            value: "juzs",
-            label: (
-              <>
-                <span>{t(language, "mushaf.tabJuzs")}</span>
-                <span className="hidden text-xs opacity-70 sm:inline">({formatNumerals(30, language)})</span>
-              </>
-            ),
-          },
-          { value: "jump", label: <span>{t(language, "mushaf.tabJump")}</span> },
-          {
-            value: "bookmarks",
-            label: (
-              <>
-                <Bookmark size={15} aria-hidden="true" />
-                <span>{t(language, "mushaf.tabBookmarks")}</span>
-                {(bookmarks.length > 0 || verseBookmarks.length > 0) && (
-                  <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-xs">
-                    {formatNumerals(bookmarks.length + verseBookmarks.length, language)}
-                  </span>
-                )}
-              </>
-            ),
-          },
-        ]
-  ) as ReadonlyArray<TabDefinition<NavigationTab>>;
+  const tabs: ReadonlyArray<TabDefinition<NavigationTab>> = [
+    { value: "surahs", label: <span>{t(language, "mushaf.tabSurahs")}</span> },
+    { value: "juzs", label: <span>{t(language, "mushaf.tabJuzs")}</span> },
+    { value: "jump", label: <span>{t(language, "mushaf.tabJump")}</span> },
+    { value: "bookmarks", label: <span>{t(language, "mushaf.tabBookmarks")}</span> },
+  ];
 
   return (
     <Dialog.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -151,7 +126,7 @@ export function MushafNavigationModal({
           className="fixed inset-x-2 bottom-2 top-2 z-50 flex w-auto max-w-xl flex-col overflow-hidden rounded-2xl border border-border bg-card text-card-foreground shadow-overlay animate-in fade-in zoom-in-95 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:h-[min(620px,88dvh)] sm:w-full sm:-translate-x-1/2 sm:-translate-y-1/2"
         >
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-border px-5 py-3.5 bg-muted/40">
+          <div className="flex items-center justify-between border-b border-border bg-card px-4 py-3 sm:px-5">
             <Dialog.Title className="arabic-ui text-base font-bold text-foreground sm:text-lg">
               {t(language, "mushaf.indexTitle")}
             </Dialog.Title>
@@ -159,7 +134,7 @@ export function MushafNavigationModal({
             <Dialog.Close asChild>
               <button
                 type="button"
-                className="flex size-11 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                className="flex size-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 aria-label={t(language, "common.close")}
               >
                 <X size={20} />
@@ -168,9 +143,6 @@ export function MushafNavigationModal({
           </div>
 
           {/* Navigation Tabs */}
-          {/* Four tabs share the width rather than overflowing it. They used to
-              scroll sideways, which on a 390px phone left the last one cut off
-              at the edge with nothing to say it was there. */}
           <TabList
             value={activeTab}
             onChange={setActiveTab}
@@ -178,9 +150,9 @@ export function MushafNavigationModal({
             direction={direction}
             idPrefix="mushaf-index"
             aria-label={t(language, "mushaf.indexTitle")}
-            className="flex border-b border-border bg-muted/20 px-1 pt-2 sm:px-3"
+            className="flex border-b border-border bg-card px-2 sm:px-4"
             itemClassName={(selected) =>
-              `flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1 border-b-2 px-1 py-2 text-label font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring sm:gap-1.5 sm:px-3 sm:text-sm ${
+              `flex min-h-11 min-w-0 flex-1 items-center justify-center whitespace-nowrap border-b-2 px-2 py-2.5 text-label font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring sm:text-sm ${
                 selected
                   ? "border-primary text-primary"
                   : "border-transparent text-muted-foreground hover:text-foreground"
@@ -188,19 +160,15 @@ export function MushafNavigationModal({
             }
           />
 
-          {/* The filter sits outside the scrolling area, not stuck to the top of
-              it. Sticky positioning left the list visible in the strip above the
-              input as it scrolled past — and on a phone with the keyboard open
-              the results had nowhere to go. Nothing scrolls behind this row
-              because nothing scrolls under it. */}
+          {/* Search Bar */}
           {activeTab === "surahs" && (
-            <div className="shrink-0 border-b border-border/60 bg-card px-4 py-3">
-              <label htmlFor="surah-search" className={`mb-1.5 block ${FIELD_LABEL_CLASS}`}>
+            <div className="shrink-0 border-b border-border/60 bg-card px-4 py-2.5">
+              <label htmlFor="surah-search" className="sr-only">
                 {t(language, "mushaf.searchSurahs")}
               </label>
               <div className="relative flex items-center">
-                <span className="absolute start-3 text-muted-foreground pointer-events-none">
-                  <Search size={18} />
+                <span className="pointer-events-none absolute start-3.5 text-muted-foreground">
+                  <Search size={16} aria-hidden="true" />
                 </span>
                 <input
                   id="surah-search"
@@ -208,7 +176,7 @@ export function MushafNavigationModal({
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={t(language, "mushaf.searchSurahs")}
-                  className="min-h-11 w-full rounded-xl border border-border bg-input-background ps-9 pe-10 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                  className="min-h-11 w-full rounded-xl border border-border bg-input-background ps-10 pe-10 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                 />
                 {searchQuery && (
                   <button
@@ -228,79 +196,61 @@ export function MushafNavigationModal({
           {/* Tab Content */}
           <div
             {...tabPanelProps("mushaf-index", activeTab)}
-            className="min-h-0 flex-1 overflow-y-auto p-4 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
+            className="min-h-0 flex-1 overflow-y-auto p-3.5 sm:p-4 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
           >
             {/* Surahs Tab */}
             {activeTab === "surahs" && (
-              <div className="flex flex-col gap-3">
-                {/* Surahs List */}
-                <div className="flex flex-col gap-1.5 mt-1">
-                  {filteredSurahs.map((surah) => {
-                    const isCurrent =
-                      currentPage >= surah.startPage &&
-                      (surah.number === 114 || currentPage < (SURAHS[surah.number]?.startPage ?? 605));
-                    return (
-                      <button
-                        key={surah.number}
-                        type="button"
-                        onClick={() => handleJump(surah.startPage)}
-                        onMouseEnter={() => prefetchMushafPage(surah.startPage)}
-                        onPointerDown={() => prefetchMushafPage(surah.startPage)}
-                        className={`flex items-center justify-between p-3 rounded-xl border transition-colors text-start group ${
-                          isCurrent
-                            ? "bg-primary/10 border-primary/40 shadow-xs"
-                            : "bg-card hover:bg-muted border-border/60 hover:border-border"
-                        }`}
-                        style={{ contentVisibility: "auto", containIntrinsicSize: "4.5rem" }}
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-xs font-bold font-sans text-primary">
-                            {formatNumerals(surah.number, language)}
+              <div className="flex flex-col gap-1.5">
+                {filteredSurahs.map((surah) => {
+                  const isCurrent =
+                    currentPage >= surah.startPage &&
+                    (surah.number === 114 || currentPage < (SURAHS[surah.number]?.startPage ?? 605));
+                  return (
+                    <button
+                      key={surah.number}
+                      type="button"
+                      onClick={() => handleJump(surah.startPage)}
+                      onMouseEnter={() => prefetchMushafPage(surah.startPage)}
+                      onPointerDown={() => prefetchMushafPage(surah.startPage)}
+                      className={`group flex min-h-12 items-center justify-between gap-3 rounded-xl border px-3.5 py-2 text-start transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                        isCurrent
+                          ? "border-primary bg-muted/60 shadow-xs"
+                          : "border-border/60 bg-card hover:border-border hover:bg-muted/50"
+                      }`}
+                      style={{ contentVisibility: "auto", containIntrinsicSize: "3.25rem" }}
+                    >
+                      <div className="flex min-w-0 items-center gap-3">
+                        <span
+                          className={`flex size-9 shrink-0 items-center justify-center rounded-lg text-xs font-bold tabular-nums font-sans ${
+                            isCurrent ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"
+                          }`}
+                        >
+                          {formatNumerals(surah.number, language)}
+                        </span>
+                        <div className="flex min-w-0 items-baseline gap-2 text-start">
+                          <span className="arabic-ui truncate text-base font-bold leading-snug text-foreground">
+                            {surah.nameArabic}
                           </span>
-                          <div>
-                            <div className="arabic-ui text-title font-bold text-foreground transition-colors group-hover:text-primary">
-                              {surah.nameArabic}
-                            </div>
-                            <div className="text-xs text-muted-foreground flex items-center gap-2 mt-0.5">
-                              {!isArabic && (
-                                <>
-                                  <span>{surah.nameEnglish}</span>
-                                  <span>·</span>
-                                </>
-                              )}
-                              <span>
-                                {surah.revelationType === "meccan"
-                                  ? t(language, "mushaf.meccan")
-                                  : t(language, "mushaf.medinan")}
-                              </span>
-                              <span>·</span>
-                              <span>
-                                {t(language, "mushaf.ayahCount", {
-                                  count: formatNumerals(surah.versesCount, language),
-                                })}
-                              </span>
-                            </div>
-                          </div>
+                          {!isArabic && (
+                            <span className="truncate text-xs font-medium text-muted-foreground">
+                              {surah.nameEnglish}
+                            </span>
+                          )}
                         </div>
+                      </div>
 
-                        <div className="flex items-center gap-2 shrink-0">
-                          <span className="text-xs font-bold px-2 py-1 rounded-md bg-muted text-muted-foreground">
-                            {t(language, "mushaf.pageLabel", { page: formatNumerals(surah.startPage, language) })}
-                          </span>
-                          <span className="text-muted-foreground group-hover:text-primary transition-transform">
-                            {chevron}
-                          </span>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
+                      <span className="shrink-0 rounded-full border border-border/60 bg-muted/60 px-2.5 py-1 text-xs font-semibold tabular-nums text-muted-foreground">
+                        {t(language, "mushaf.pageLabel", { page: formatNumerals(surah.startPage, language) })}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             )}
 
             {/* Juzs Tab */}
             {activeTab === "juzs" && (
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-1.5">
                 {JUZS.map((juz) => {
                   const isCurrent = getJuzNumberForPage(currentPage) === juz.number;
                   const surahName = getSurahDisplayName(juz.startSurahNumber, language);
@@ -311,37 +261,37 @@ export function MushafNavigationModal({
                       onClick={() => handleJump(juz.startPage)}
                       onMouseEnter={() => prefetchMushafPage(juz.startPage)}
                       onPointerDown={() => prefetchMushafPage(juz.startPage)}
-                      className={`flex items-center justify-between p-3.5 rounded-xl border transition-colors text-start group ${
+                      className={`group flex items-center justify-between gap-3 rounded-xl border px-3.5 py-2.5 text-start transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                         isCurrent
-                          ? "bg-primary/10 border-primary/40 shadow-xs"
-                          : "bg-card hover:bg-muted border-border/60 hover:border-border"
+                          ? "border-primary bg-muted/60 shadow-xs"
+                          : "border-border/60 bg-card hover:border-border hover:bg-muted/50"
                       }`}
                     >
-                      <div className="flex items-center gap-3">
-                        <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-xs font-bold font-sans text-primary">
+                      <div className="flex min-w-0 items-center gap-3">
+                        <span
+                          className={`flex size-9 shrink-0 items-center justify-center rounded-lg text-xs font-bold tabular-nums font-sans ${
+                            isCurrent ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"
+                          }`}
+                        >
                           {formatNumerals(juz.number, language)}
                         </span>
-                        <div>
-                          <div className="arabic-ui text-base font-bold text-foreground transition-colors group-hover:text-primary">
+                        <div className="flex min-w-0 flex-col items-start text-start">
+                          <div className="arabic-ui truncate text-base font-bold leading-snug text-foreground">
                             {isArabic ? juz.nameArabic : juz.nameEnglish}
                           </div>
-                          <div className="text-xs text-muted-foreground mt-0.5">
-                            <span>{surahName}</span> :{" "}
+                          <div className="mt-0.5 truncate text-xs text-muted-foreground">
+                            <span>{surahName}</span>
+                            <span aria-hidden="true"> · </span>
                             <span>
-                              {t(language, "reader.ayahs")} {formatNumerals(juz.startAyah, language)}
+                              {t(language, "reader.ayahLabel", { ayah: formatNumerals(juz.startAyah, language) })}
                             </span>
                           </div>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2 shrink-0">
-                        <span className="text-xs font-bold px-2.5 py-1 rounded-md bg-muted text-muted-foreground">
-                          {t(language, "mushaf.pageLabel", { page: formatNumerals(juz.startPage, language) })}
-                        </span>
-                        <span className="text-muted-foreground group-hover:text-primary transition-transform">
-                          {chevron}
-                        </span>
-                      </div>
+                      <span className="shrink-0 rounded-full border border-border/60 bg-muted/60 px-2.5 py-1 text-xs font-semibold tabular-nums text-muted-foreground">
+                        {t(language, "mushaf.pageLabel", { page: formatNumerals(juz.startPage, language) })}
+                      </span>
                     </button>
                   );
                 })}
@@ -350,8 +300,8 @@ export function MushafNavigationModal({
 
             {/* Jump to Page Tab */}
             {activeTab === "jump" && (
-              <div className="flex flex-col gap-6 py-2">
-                <form onSubmit={handleInputSubmit} className="flex flex-col gap-3">
+              <div className="flex flex-col gap-5 py-1">
+                <form onSubmit={handleInputSubmit} className="flex flex-col gap-2.5">
                   <label htmlFor="page-jump-input" className={FIELD_LABEL_CLASS}>
                     {pageRange
                       ? t(language, "mushaf.enterPageNumberInRange", {
@@ -364,55 +314,48 @@ export function MushafNavigationModal({
                     <input
                       id="page-jump-input"
                       type="number"
-                      // The control states the span it accepts. Leaving 1-604
-                      // here while the handler refused anything outside the
-                      // surah meant the field invited a number it would ignore.
                       min={firstPage}
                       max={lastPage}
                       value={inputPage}
                       onChange={(e) => setInputPage(e.target.value)}
                       inputMode="numeric"
                       onWheel={(event) => event.currentTarget.blur()}
-                      className="flex-1 rounded-xl bg-input-background border border-border px-4 py-2.5 text-base font-bold text-foreground text-center focus:outline-none focus:ring-2 focus:ring-ring"
+                      className="min-h-11 flex-1 rounded-xl border border-border bg-input-background px-4 py-2.5 text-center text-base font-bold tabular-nums text-foreground focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                     />
                     <button
                       type="submit"
-                      className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-sm hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      className="min-h-11 rounded-xl bg-primary px-6 py-2.5 text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                     >
                       {t(language, "mushaf.jumpButton")}
                     </button>
                   </div>
                 </form>
 
-                {/* Quick Landmarks */}
-                <div className="flex flex-col gap-2">
-                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-                    {t(language, "mushaf.tabSurahs")}
+                {/* Direct Page Selection Grid */}
+                <div className="flex flex-col gap-2.5">
+                  <span className="arabic-ui text-xs font-bold text-muted-foreground">
+                    {getSurahDisplayName(SURAHS[currentSurahIdx]!.number, language)}
                   </span>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {[
-                      { name: "الفاتحة", en: "Al-Fatihah", page: 1 },
-                      { name: "البقرة", en: "Al-Baqarah", page: 2 },
-                      { name: "الكهف", en: "Al-Kahf", page: 293 },
-                      { name: "يس", en: "Ya-Sin", page: 440 },
-                      { name: "الرحمن", en: "Ar-Rahman", page: 531 },
-                      { name: "الملك", en: "Al-Mulk", page: 562 },
-                      { name: "جزء عم", en: "Juz 'Amma", page: 582 },
-                    ].map((item) => (
-                      <button
-                        key={item.page}
-                        type="button"
-                        onClick={() => handleJump(item.page)}
-                        className="flex flex-col items-start p-2.5 rounded-xl border border-border/70 hover:border-primary/50 bg-muted/30 hover:bg-primary/5 transition-colors text-start"
-                      >
-                        <span className="arabic-ui text-sm font-bold text-foreground">
-                          {isArabic ? item.name : item.en}
-                        </span>
-                        <span className="text-xs text-muted-foreground mt-0.5">
-                          {t(language, "mushaf.pageLabel", { page: formatNumerals(item.page, language) })}
-                        </span>
-                      </button>
-                    ))}
+                  <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
+                    {quickPages.map((p) => {
+                      const isCurrentPage = p === currentPage;
+                      return (
+                        <button
+                          key={p}
+                          type="button"
+                          onClick={() => handleJump(p)}
+                          onMouseEnter={() => prefetchMushafPage(p)}
+                          onPointerDown={() => prefetchMushafPage(p)}
+                          className={`flex min-h-11 items-center justify-center rounded-xl border px-3 py-2 text-sm font-bold tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                            isCurrentPage
+                              ? "border-primary bg-primary text-primary-foreground shadow-xs"
+                              : "border-border/70 bg-muted/40 text-foreground hover:border-border hover:bg-muted"
+                          }`}
+                        >
+                          {formatNumerals(p, language)}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
@@ -420,9 +363,9 @@ export function MushafNavigationModal({
 
             {/* Bookmarks Tab */}
             {activeTab === "bookmarks" && (
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-1.5">
                 {bookmarks.length === 0 && verseBookmarks.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground gap-3">
+                  <div className="flex flex-col items-center justify-center gap-3 py-12 text-center text-muted-foreground">
                     <Bookmark size={36} className="opacity-40" />
                     <p className="text-sm font-medium">{t(language, "mushaf.noBookmarks")}</p>
                   </div>
@@ -435,24 +378,18 @@ export function MushafNavigationModal({
                           key={page}
                           type="button"
                           onClick={() => handleJump(page)}
-                          className="flex items-center justify-between p-3.5 rounded-xl border border-border/70 hover:border-primary bg-card hover:bg-muted transition-colors text-start group"
+                          className="group flex min-h-12 items-center justify-between gap-3 rounded-xl border border-border/60 bg-card px-3.5 py-2 text-start transition-colors hover:border-border hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                         >
-                          <div className="flex items-center gap-3">
-                            <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                          <div className="flex min-w-0 items-center gap-3">
+                            <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-foreground">
                               <Bookmark size={16} />
                             </span>
-                            <div>
-                              <div className="font-bold text-base text-foreground group-hover:text-primary transition-colors">
-                                {t(language, "mushaf.pageLabel", { page: formatNumerals(page, language) })}
-                              </div>
-                              <div className="text-xs text-muted-foreground">
-                                {t(language, "common.juz")} {formatNumerals(juzNum, language)}
-                              </div>
-                            </div>
+                            <span className="truncate text-base font-bold text-foreground">
+                              {t(language, "mushaf.pageLabel", { page: formatNumerals(page, language) })}
+                            </span>
                           </div>
-
-                          <span className="text-muted-foreground group-hover:text-primary transition-transform">
-                            {chevron}
+                          <span className="shrink-0 rounded-full border border-border/60 bg-muted/60 px-2.5 py-1 text-xs font-semibold tabular-nums text-muted-foreground">
+                            {t(language, "common.juz")} {formatNumerals(juzNum, language)}
                           </span>
                         </button>
                       );
@@ -468,27 +405,21 @@ export function MushafNavigationModal({
                             onSelectVerseBookmark?.(bookmark);
                             handleJump(bookmark.page);
                           }}
-                          className="flex items-center justify-between p-3.5 rounded-xl border border-border/70 hover:border-primary bg-card hover:bg-muted transition-colors text-start group"
+                          className="group flex min-h-12 items-center justify-between gap-3 rounded-xl border border-border/60 bg-card px-3.5 py-2 text-start transition-colors hover:border-border hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                         >
-                          <div className="flex items-center gap-3">
-                            <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                              <Bookmark size={16} className="fill-primary" />
+                          <div className="flex min-w-0 items-center gap-3">
+                            <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-foreground">
+                              <Bookmark size={16} className="fill-current" />
                             </span>
-                            <div>
-                              <div className="font-bold text-base text-foreground group-hover:text-primary transition-colors">
-                                {surahName} -{" "}
-                                {t(language, "reader.ayahLabel", { ayah: formatNumerals(ayah || "", language) })}
-                              </div>
-                              <div className="text-xs text-muted-foreground">
-                                {t(language, "mushaf.pageLabel", {
-                                  page: formatNumerals(bookmark.page, language),
-                                })}
-                              </div>
-                            </div>
+                            <span className="truncate text-base font-bold text-foreground">
+                              {surahName} -{" "}
+                              {t(language, "reader.ayahLabel", { ayah: formatNumerals(ayah || "", language) })}
+                            </span>
                           </div>
-
-                          <span className="text-muted-foreground group-hover:text-primary transition-transform">
-                            {chevron}
+                          <span className="shrink-0 rounded-full border border-border/60 bg-muted/60 px-2.5 py-1 text-xs font-semibold tabular-nums text-muted-foreground">
+                            {t(language, "mushaf.pageLabel", {
+                              page: formatNumerals(bookmark.page, language),
+                            })}
                           </span>
                         </button>
                       );

@@ -1,7 +1,6 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import "../../styles/animations/ZikrAnimations.css";
-import { motion, AnimatePresence } from "motion/react";
 import "./ReaderScreen.css";
 import { useZikrCounter } from "../hooks/useZikrCounter";
 import { prefixZikrId } from "../progress";
@@ -40,7 +39,7 @@ import { ReaderReferenceSheet } from "../components/ReaderReferenceSheet";
 import { IconButton } from "../components/LayoutShells";
 import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content/localizedZikr";
 import { prepareZikrShareCardFonts, shareZikrCard, type ZikrShareCardStatus } from "../share/zikrShareCard";
-import { CountingRipples, useCountingSurface } from "../components/countingSurface";
+import { useCountingSurface } from "../components/countingSurface";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { Header } from "../components/LayoutShells";
 import { QuranPrelude, QuranSurahHeader } from "../components/QuranChrome";
@@ -229,18 +228,14 @@ export function ReaderScreen({
     (pattern: number | number[]) => vibrateIfEnabled(hapticFeedback, pattern),
     [hapticFeedback],
   );
-  const [navigationDelta, setNavigationDelta] = useState<1 | -1>(1);
   const onNext = useCallback(() => {
-    setNavigationDelta(1);
     onNextProp();
   }, [onNextProp]);
   const onPrev = useCallback(() => {
-    setNavigationDelta(-1);
     onPrevProp();
   }, [onPrevProp]);
   const onAdvance = useCallback(
     (currentIndex: number) => {
-      setNavigationDelta(1);
       onAdvanceProp(currentIndex);
     },
     [onAdvanceProp],
@@ -365,16 +360,9 @@ export function ReaderScreen({
     resetKey: `${counterResetKey}:${catId}:${subCategory ?? ""}`,
   });
 
-  /* The press, the ripple and the tap all come from one shared definition, so
-     counting a zikr feels the same here as it does in the Masbaha and on
-     Friday. This screen had drifted to half the travel over twice the time,
-     which on the surface people tap most read as nothing happening at all. */
-  const {
-    ripples: canvasRipples,
-    dismissRipple,
-    pressStyle,
-    surfaceProps,
-  } = useCountingSurface({
+  /* The press and the tap come from one shared definition, so counting a zikr
+     feels the same here as it does in the Masbaha and on Friday. */
+  const { pressStyle, surfaceProps } = useCountingSurface({
     onCount: handleSurfaceTap,
     // A long surah is read and scrolled rather than tapped, so its canvas must
     // not answer a tap it is not going to count.
@@ -859,7 +847,7 @@ export function ReaderScreen({
                   <button
                     type="button"
                     data-testid="routine-mode-filter"
-                    className="flex min-h-[44px] flex-1 items-center justify-between rounded-lg border border-input bg-card px-3 text-start text-sm font-bold text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="flex min-h-[44px] flex-1 items-center justify-between rounded-lg border border-input bg-card px-3 text-start text-sm font-bold text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                   >
                     <span className="flex items-center gap-2">
                       <SlidersHorizontal size={14} className="text-muted-foreground" />
@@ -884,7 +872,7 @@ export function ReaderScreen({
             <button
               type="button"
               onClick={() => toggleCompleteAll(!isFullyComplete)}
-              className={`flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-lg px-4 text-sm font-bold shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+              className={`flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-lg px-4 text-sm font-bold shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                 isFullyComplete
                   ? "border border-success/30 bg-success/15 text-success hover:bg-success/20 dark:text-success"
                   : "border border-primary bg-primary text-primary-foreground hover:bg-primary/90"
@@ -901,7 +889,7 @@ export function ReaderScreen({
               <button
                 type="button"
                 onClick={onReset}
-                className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 rounded-lg border border-input bg-card px-3 text-sm font-bold text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 rounded-lg border border-input bg-card px-3 text-sm font-bold text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 aria-label={t(language, "category.resetProgress")}
                 title={t(language, "category.resetProgress")}
               >
@@ -913,7 +901,7 @@ export function ReaderScreen({
               <button
                 type="button"
                 onClick={onPlayAllAudio}
-                className="flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/10 px-3 text-sm font-bold text-primary shadow-xs transition-[color,background-color,border-color,box-shadow,transform] hover:bg-primary/20 active:scale-95 dark:text-primary"
+                className="flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/10 px-3 text-sm font-bold text-primary shadow-xs transition-[color,background-color,border-color,box-shadow,transform] hover:bg-primary/20 active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring dark:text-primary"
                 aria-label={t(language, "category.playAllAudio")}
                 title={
                   audioCoverage
@@ -960,7 +948,6 @@ export function ReaderScreen({
                   isActive={active}
                   activeRef={activeNavigatorItemRef}
                   onClickText={(targetIndex) => {
-                    setNavigationDelta(targetIndex >= idx ? 1 : -1);
                     onSelectZikr(targetIndex);
                   }}
                   ariaLabelOverride={itemLabel}
@@ -1129,7 +1116,7 @@ export function ReaderScreen({
                   e.stopPropagation();
                   onTextSizeChange(option.value);
                 }}
-                className={`flex h-8 items-center justify-center rounded-lg text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring select-none ${
+                className={`flex min-h-11 items-center justify-center rounded-lg text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring select-none ${
                   isSelected
                     ? "bg-card text-foreground shadow-xs ring-1 ring-border/80"
                     : "text-muted-foreground hover:bg-background/50 hover:text-foreground"
@@ -1281,9 +1268,6 @@ export function ReaderScreen({
         />
       )}
 
-      <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden" aria-hidden="true">
-        <CountingRipples ripples={canvasRipples} onDismiss={dismissRipple} />
-      </div>
       {/* Polite, not assertive: this region carries counting progress (every
           tenth repetition, the halfway mark) and the completion message. None
           of that is urgent enough to cut off whatever the screen reader is
@@ -1428,37 +1412,19 @@ export function ReaderScreen({
                         role="region"
                         tabIndex={0}
                         aria-label={t(language, "reader.readingText")}
-                        className={`reader-text-scroll h-full min-h-0 w-full overflow-y-auto ps-6 pe-7 md:px-20 py-4 outline-none focus-visible:outline-none focus:ring-0 [scrollbar-gutter:stable] ${
-                          justCompleted ? "zikr-step-exit" : "zikr-step-enter"
-                        }`}
+                        className="reader-text-scroll h-full min-h-0 w-full overflow-y-auto ps-6 pe-7 md:px-20 py-4 outline-none focus-visible:outline-none focus:ring-0 [scrollbar-gutter:stable]"
                       >
-                        <AnimatePresence mode="wait">
-                          <motion.div
-                            key={z.id}
-                            initial={
-                              reducedMotion
-                                ? { opacity: 0 }
-                                : { opacity: 0, x: navigationDelta * (direction === "rtl" ? -24 : 24) }
-                            }
-                            animate={reducedMotion ? { opacity: 1 } : { opacity: 1, x: 0 }}
-                            exit={
-                              reducedMotion
-                                ? { opacity: 0 }
-                                : { opacity: 0, x: navigationDelta * (direction === "rtl" ? 24 : -24) }
-                            }
-                            transition={{ duration: reducedMotion ? 0.1 : 0.3, ease: "easeOut" }}
-                            className="reading-measure mx-auto flex min-h-full w-full flex-col py-4"
-                          >
-                            <div style={dragStyle} className="flex w-full flex-1 flex-col">
-                              <div
-                                style={pressStyle}
-                                className={`${longSurah ? "mb-auto mt-2" : "my-auto"} w-full flex flex-col items-center justify-center ${justCompleted ? "zikr-step-exit" : "zikr-step-enter"}`}
-                              >
-                                {renderReadingContent()}
-                              </div>
+                        <div className="reading-measure mx-auto flex min-h-full w-full flex-col py-4">
+                          <div style={dragStyle} className="flex w-full flex-1 flex-col">
+                            <div
+                              key={z.id}
+                              style={pressStyle}
+                              className={`${longSurah ? "mb-auto mt-2" : "my-auto"} w-full flex flex-col items-center justify-center ${justCompleted ? "zikr-step-exit" : "zikr-step-enter"}`}
+                            >
+                              {renderReadingContent()}
                             </div>
-                          </motion.div>
-                        </AnimatePresence>
+                          </div>
+                        </div>
                       </div>
                       {renderSideNavigation()}
                     </div>
@@ -1626,9 +1592,7 @@ export function ReaderScreen({
                 role="region"
                 tabIndex={0}
                 aria-label={t(language, "reader.readingText")}
-                className={`reader-text-scroll flex-1 overflow-y-auto min-h-0 w-full outline-none focus:outline-none focus-visible:outline-none focus:ring-0 ${
-                  justCompleted ? "zikr-step-exit" : "zikr-step-enter"
-                }`}
+                className="reader-text-scroll flex-1 overflow-y-auto min-h-0 w-full outline-none focus:outline-none focus-visible:outline-none focus:ring-0"
               >
                 {/* Inner wrapper vertically centers short/medium Zikrs safely via my-auto; long Surahs start at top to scroll naturally */}
                 {/* The drag and the press apply here too. They used to hang off
@@ -1705,7 +1669,7 @@ export function ReaderScreen({
           <button
             type="button"
             onClick={handleUndoReset}
-            className="interactive-elem flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl bg-primary/20 hover:bg-primary/30 px-3.5 py-2 text-sm font-bold text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+            className="interactive-elem flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl bg-primary/20 hover:bg-primary/30 px-3.5 py-2 text-sm font-bold text-primary transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer"
           >
             {t(language, "common.undo")}
           </button>

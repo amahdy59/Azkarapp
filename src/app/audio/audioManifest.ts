@@ -93,8 +93,8 @@ export const AUDIO_ASSETS: Readonly<Record<string, AudioAsset>> = Object.freeze(
   },
   "evening-e-hm-76a": {
     id: "evening-e-hm-76a",
-    titleArabic: "أذكار المساء",
-    titleEnglish: "Evening Azkar",
+    titleArabic: "سورة الإِخْلاَص",
+    titleEnglish: "Surah Al-Ikhlas",
     contentKind: "dua",
     kind: "single",
     canonicalArabicText:
@@ -132,8 +132,8 @@ export const AUDIO_ASSETS: Readonly<Record<string, AudioAsset>> = Object.freeze(
   },
   "evening-e-hm-76b": {
     id: "evening-e-hm-76b",
-    titleArabic: "أذكار المساء",
-    titleEnglish: "Evening Azkar",
+    titleArabic: "سورة الفَلَق",
+    titleEnglish: "Surah Al-Falaq",
     contentKind: "dua",
     kind: "single",
     canonicalArabicText:
@@ -171,8 +171,8 @@ export const AUDIO_ASSETS: Readonly<Record<string, AudioAsset>> = Object.freeze(
   },
   "evening-e-hm-76c": {
     id: "evening-e-hm-76c",
-    titleArabic: "أذكار المساء",
-    titleEnglish: "Evening Azkar",
+    titleArabic: "سورة النَّاس",
+    titleEnglish: "Surah An-Nas",
     contentKind: "dua",
     kind: "single",
     canonicalArabicText:
@@ -1640,8 +1640,8 @@ export const AUDIO_ASSETS: Readonly<Record<string, AudioAsset>> = Object.freeze(
 
   "m-hm-75": {
     id: "m-hm-75",
-    titleArabic: "أذكار مشتركة",
-    titleEnglish: "Shared Dhikr",
+    titleArabic: "سورة البَقَرَة (آيَةُ الكُرْسِيِّ)",
+    titleEnglish: "Surah Al-Baqarah (Ayah Al-Kursi)",
     contentKind: "dua",
     kind: "single",
     canonicalArabicText: `ٱللَّهُ لَآ إِلَٰهَ إِلَّا هُوَ ٱلْحَىُّ ٱلْقَيُّومُ ۚ لَا تَأْخُذُهُۥ سِنَةٌۭ وَلَا نَوْمٌۭ ۚ لَّهُۥ مَا فِى ٱلسَّمَٰوَٰتِ وَمَا فِى ٱلْأَرْضِ ۗ مَن ذَا ٱلَّذِى يَشْفَعُ عِندَهُۥٓ إِلَّا بِإِذْنِهِۦ ۚ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ ۖ وَلَا يُحِيطُونَ بِشَىْءٍۢ مِّنْ عِلْمِهِۦٓ إِلَّا بِمَا شَآءَ ۚ وَسِعَ كُرْسِيُّهُ ٱلسَّمَٰوَٰتِ وَٱلْأَرْضَ ۖ وَلَا يَـُٔودُهُۥ حِفْظُهُمَا ۚ وَهُوَ ٱلْعَلِىُّ ٱلْعَظِيمُ ﴿٢٥٥﴾`,
@@ -1677,8 +1677,8 @@ export const AUDIO_ASSETS: Readonly<Record<string, AudioAsset>> = Object.freeze(
   },
   "m-hm-76a": {
     id: "m-hm-76a",
-    titleArabic: "أذكار مشتركة",
-    titleEnglish: "Shared Dhikr",
+    titleArabic: "سورة الإِخْلاَص",
+    titleEnglish: "Surah Al-Ikhlas",
     contentKind: "dua",
     kind: "single",
     canonicalArabicText: `قُلْ هُوَ ٱللَّهُ أَحَدٌ ﴿١﴾ ٱللَّهُ ٱلصَّمَدُ ﴿٢﴾ لَمْ يَلِدْ وَلَمْ يُولَدْ ﴿٣﴾ وَلَمْ يَكُن لَّهُۥ كُفُوًا أَحَدٌۢ ﴿٤﴾`,
@@ -1714,8 +1714,8 @@ export const AUDIO_ASSETS: Readonly<Record<string, AudioAsset>> = Object.freeze(
   },
   "m-hm-76b": {
     id: "m-hm-76b",
-    titleArabic: "أذكار مشتركة",
-    titleEnglish: "Shared Dhikr",
+    titleArabic: "سورة الفَلَق",
+    titleEnglish: "Surah Al-Falaq",
     contentKind: "dua",
     kind: "single",
     canonicalArabicText: `قُلْ أَعُوذُ بِرَبِّ ٱلْفَلَقِ ﴿١﴾ مِن شَرِّ مَا خَلَقَ ﴿٢﴾ وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ ﴿٣﴾ وَمِن شَرِّ ٱلنَّفَّٰثَٰتِ فِى ٱلْعُقَدِ ﴿٤﴾ وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ ﴿٥﴾`,
@@ -1751,8 +1751,8 @@ export const AUDIO_ASSETS: Readonly<Record<string, AudioAsset>> = Object.freeze(
   },
   "m-hm-76c": {
     id: "m-hm-76c",
-    titleArabic: "أذكار مشتركة",
-    titleEnglish: "Shared Dhikr",
+    titleArabic: "سورة النَّاس",
+    titleEnglish: "Surah An-Nas",
     contentKind: "dua",
     kind: "single",
     canonicalArabicText: `قُلْ أَعُوذُ بِرَبِّ ٱلنَّاسِ ﴿١﴾ مَلِكِ ٱلنَّاسِ ﴿٢﴾ إِلَٰهِ ٱلنَّاسِ ﴿٣﴾ مِن شَرِّ ٱلْوَسْوَاسِ ٱلْخَنَّاسِ ﴿٤﴾ ٱلَّذِى يُوَسْوِسُ فِى صُدُورِ ٱلنَّاسِ ﴿٥﴾ مِنَ ٱلْجِنَّةِ وَٱلنَّاسِ ﴿٦﴾`,

@@ -14,7 +14,7 @@ import {
 } from "../components/icons";
 import { ReadingScreenChrome } from "../components/ReadingScreenChrome";
 import { Modal } from "../components/ResponsiveSheet";
-import { CountingRipples, useCountingSurface } from "../components/countingSurface";
+import { useCountingSurface } from "../components/countingSurface";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { Button } from "../components/ui/button";
 import {
@@ -212,12 +212,7 @@ export function FridaySalawatScreen({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [complete, increment, onBack, reset, showBenefits, showCompletionModal]);
 
-  const {
-    ripples: canvasRipples,
-    dismissRipple,
-    pressStyle,
-    surfaceProps,
-  } = useCountingSurface({ onCount: increment, reduceMotion });
+  const { pressStyle, surfaceProps } = useCountingSurface({ onCount: increment, reduceMotion });
 
   return (
     <ScreenContainer
@@ -225,10 +220,6 @@ export function FridaySalawatScreen({
       className="relative flex flex-col overflow-y-auto h-full !pb-0 sm:!pt-0"
       screenName={copy.title}
     >
-      <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden" aria-hidden="true">
-        <CountingRipples ripples={canvasRipples} onDismiss={dismissRipple} />
-      </div>
-
       <div className="relative z-10 flex min-h-0 flex-1 flex-col">
         <ReadingScreenChrome
           language={language}

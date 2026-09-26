@@ -34,4 +34,40 @@ describe("SearchScreen", () => {
     fireEvent.change(input, { target: { value: "English" } });
     expect(input).toHaveAttribute("dir", "auto");
   });
+
+  it("clears all recent searches in a single action", () => {
+    localStorage.setItem("azkarapp_recent_searches_en", JSON.stringify(["morning", "forgive"]));
+    render(<SearchScreen language="en" direction="ltr" onBack={() => undefined} onZikr={() => undefined} />);
+
+    expect(screen.getByRole("button", { name: "morning" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "forgive" })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Clear all" }));
+
+    expect(screen.queryByRole("button", { name: "morning" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "forgive" })).not.toBeInTheDocument();
+    expect(JSON.parse(localStorage.getItem("azkarapp_recent_searches_en") ?? "[]")).toEqual([]);
+  });
+
+  it("renders Arabic result previews with zikr-text typography and whole-word match highlighting", () => {
+    render(
+      <SearchScreen
+        language="ar"
+        direction="rtl"
+        initialQuery="احيانا"
+        onBack={() => undefined}
+        onZikr={() => undefined}
+      />,
+    );
+
+    const results = screen.getAllByTestId("search-result");
+    expect(results.length).toBeGreaterThan(0);
+
+    const firstPreview = results[0]?.querySelector("p.zikr-text");
+    expect(firstPreview).toBeInTheDocument();
+
+    const highlighted = firstPreview?.querySelector("mark");
+    expect(highlighted).toBeInTheDocument();
+    expect(highlighted?.textContent).toContain("أَحْيَانَا");
+  });
 });

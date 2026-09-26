@@ -864,14 +864,120 @@ function AppContent({
     if (view !== "category" && view !== "reader") setRouteContentError(null);
   }, [view, setRouteContentError]);
 
+  const lastSyncedAudioTrackRef = useRef<string | null>(null);
+  const lastSyncedReaderZikrKeyRef = useRef<string | null>(null);
+  const pausedForUnavailableAudioRef = useRef(false);
+
   useEffect(() => {
-    if (!audioController) return;
-    const plan = audioController.state.plan;
-    const playingZikrId = plan?.entries[audioController.state.entryIndex]?.zikrId;
-    if (view !== "reader" || !plan || plan.context.category !== activeCat || !playingZikrId) return;
-    const matchingIndex = activeAzkarList.findIndex((zikr) => zikr.id === playingZikrId);
-    if (matchingIndex >= 0 && matchingIndex !== activeIdx) setActiveIdx(matchingIndex);
-  }, [activeAzkarList, activeCat, activeIdx, audioController, view, setActiveIdx]);
+    const plan = audioController?.state.plan ?? null;
+    const entryIndex = audioController?.state.entryIndex ?? 0;
+    const playingEntry = plan?.entries[entryIndex] ?? null;
+    const playingZikrId = playingEntry?.zikrId ?? null;
+    const audioTrackKey = plan && playingZikrId ? `${plan.id}:${entryIndex}:${playingZikrId}` : null;
+
+    if (
+      view !== "reader" ||
+      !audioController ||
+      !plan ||
+      plan.context.category !== activeCat ||
+      (plan.context.subCategory ?? undefined) !== (activeSubCategory ?? undefined)
+    ) {
+      lastSyncedAudioTrackRef.current = audioTrackKey;
+      const currentZikr = activeAzkarList[activeIdx];
+      lastSyncedReaderZikrKeyRef.current = currentZikr
+        ? `${activeCat}:${activeSubCategory ?? ""}:${activeIdx}:${currentZikr.id}`
+        : null;
+      pausedForUnavailableAudioRef.current = false;
+      return;
+    }
+
+    const currentZikr = activeAzkarList[activeIdx];
+    const readerZikrKey = currentZikr ? `${activeCat}:${activeSubCategory ?? ""}:${activeIdx}:${currentZikr.id}` : null;
+
+    const audioTrackChanged = audioTrackKey !== lastSyncedAudioTrackRef.current;
+    const readerZikrChanged = readerZikrKey !== lastSyncedReaderZikrKeyRef.current;
+
+    lastSyncedAudioTrackRef.current = audioTrackKey;
+    lastSyncedReaderZikrKeyRef.current = readerZikrKey;
+
+    if (!currentZikr || !playingZikrId) return;
+
+    // 1. Audio track changed (e.g., track finished and advanced, or user used player Next/Previous):
+    //    keep the Reader screen aligned with the zikr currently being recited.
+    if (audioTrackChanged) {
+      pausedForUnavailableAudioRef.current = false;
+      if (playingZikrId !== currentZikr.id) {
+        const matchingIndex = activeAzkarList.findIndex((zikr) => zikr.id === playingZikrId);
+        if (matchingIndex >= 0 && matchingIndex !== activeIdx) {
+          const matchedZikr = activeAzkarList[matchingIndex];
+          if (matchedZikr) {
+            lastSyncedReaderZikrKeyRef.current = `${activeCat}:${activeSubCategory ?? ""}:${matchingIndex}:${matchedZikr.id}`;
+          }
+          setActiveIdx(matchingIndex);
+        }
+      }
+      return;
+    }
+
+    // 2. User moved to another zikr in the Reader (Next/Prev/Navigator/Swipe/Completion):
+    //    update the active audio track to match the newly selected zikr.
+    if (readerZikrChanged && playingZikrId !== currentZikr.id) {
+      const wasPlaying =
+        ["playing", "loading", "buffering"].includes(audioController.state.status) ||
+        pausedForUnavailableAudioRef.current;
+      const targetEntryIndex = plan.entries.findIndex((entry) => entry.zikrId === currentZikr.id);
+
+      if (targetEntryIndex >= 0) {
+        pausedForUnavailableAudioRef.current = false;
+        const targetEntry = plan.entries[targetEntryIndex];
+        if (targetEntry) {
+          lastSyncedAudioTrackRef.current = `${plan.id}:${targetEntryIndex}:${targetEntry.zikrId}`;
+        }
+        audioController.selectEntry(targetEntryIndex, wasPlaying);
+        return;
+      }
+
+      if (plan.context.source === "single" && buildPlaybackPlan) {
+        const audioLanguage: AppLanguage = audioController.state.currentVoiceId === "english-george" ? "en" : "ar";
+        const nextPlan = buildPlaybackPlan({
+          zikrs: [currentZikr],
+          context: {
+            ...plan.context,
+            category: activeCat,
+            routineMode: activeRoutineMode,
+            subCategory: activeSubCategory,
+            fridayDuaFlow,
+          },
+          mode: playingEntry?.repetitions && playingEntry.repetitions > 1 ? "repeat-prescribed-count" : "play-once",
+          preferences: audioController.preferences,
+          audioLanguage,
+        });
+        if (nextPlan.entries.length > 0) {
+          pausedForUnavailableAudioRef.current = false;
+          const nextEntry = nextPlan.entries[0]!;
+          lastSyncedAudioTrackRef.current = `${nextPlan.id}:0:${nextEntry.zikrId}`;
+          audioController.startPlan(nextPlan, { initialEntryIndex: 0, autoPlay: wasPlaying });
+          return;
+        }
+      }
+
+      if (["playing", "loading", "buffering"].includes(audioController.state.status)) {
+        pausedForUnavailableAudioRef.current = true;
+        audioController.pause();
+      }
+    }
+  }, [
+    activeAzkarList,
+    activeCat,
+    activeIdx,
+    activeRoutineMode,
+    activeSubCategory,
+    audioController,
+    buildPlaybackPlan,
+    fridayDuaFlow,
+    setActiveIdx,
+    view,
+  ]);
 
   const audioCompletionSequence = audioController?.state.completionSequence ?? 0;
   useEffect(() => {
@@ -888,9 +994,39 @@ function AppContent({
     if (context.fridayDuaFlow && context.category === "comprehensive_duas") {
       updateFridayDuaProgress(completedIndex, true);
     }
-    if (getEffectiveCompletedForSubcategory(completed, context.category, context.subCategory).has(zikrId)) return;
+    const alreadyCompleted = getEffectiveCompletedForSubcategory(completed, context.category, context.subCategory).has(
+      zikrId,
+    );
+    if (!alreadyCompleted) {
+      toggleZikrCompletion(context.category, completedIndex, context.subCategory, context.routineMode);
+    }
 
-    toggleZikrCompletion(context.category, completedIndex, context.subCategory, context.routineMode);
+    // When a single-zikr playback or the final item in a queue finishes while the
+    // user is reading that zikr, advance the Reader to the next incomplete zikr
+    // just as completing the counter manually does.
+    if (
+      audioController?.state.status === "ended" &&
+      view === "reader" &&
+      context.category === activeCat &&
+      (context.subCategory ?? undefined) === (activeSubCategory ?? undefined) &&
+      activeIdx === completedIndex
+    ) {
+      if (context.category === "friday_kahf") {
+        replace("friday");
+      } else if (context.fridayDuaFlow && context.category === "comprehensive_duas") {
+        const effectiveProgress = new Set(fridayDuaCompletedIds);
+        effectiveProgress.add(zikrId);
+        const nextIndex = getNextIncompleteZikrIndex(planAzkar, effectiveProgress, completedIndex);
+        if (nextIndex !== null) {
+          setActiveIdx(nextIndex);
+        } else {
+          replace("friday");
+          setFridayDuaFlow(false);
+        }
+      } else {
+        advanceAfterCompletion(completedIndex);
+      }
+    }
     // completionSequence is the event identity; the plan freezes the category
     // context so navigation cannot redirect completion to another session.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1259,10 +1395,23 @@ function AppContent({
         preferences: audioController.preferences,
         audioLanguage: selectedLang,
       });
-      const firstZikrId = plan.entries[0]?.zikrId;
-      if (!firstZikrId || !audioController.startPlan(plan)) return;
-      const firstIndex = azkar.findIndex((zikr) => zikr.id === firstZikrId);
-      openReader(activeCat, Math.max(0, firstIndex));
+      const currentZikrId = view === "reader" ? activeZikr?.id : undefined;
+      const initialEntryIndex = currentZikrId
+        ? Math.max(
+            0,
+            plan.entries.findIndex((entry) => entry.zikrId === currentZikrId),
+          )
+        : 0;
+      const targetZikrId = plan.entries[initialEntryIndex]?.zikrId;
+      if (!targetZikrId || !audioController.startPlan(plan, { initialEntryIndex })) return;
+      const targetIndex = azkar.findIndex((zikr) => zikr.id === targetZikrId);
+      if (view === "reader") {
+        if (targetIndex >= 0 && targetIndex !== activeIdx) {
+          setActiveIdx(targetIndex);
+        }
+        return;
+      }
+      openReader(activeCat, Math.max(0, targetIndex), undefined, activeSubCategory);
     };
 
     if (audioCoverage.unavailable > 0) {
