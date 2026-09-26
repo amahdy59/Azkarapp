@@ -312,4 +312,31 @@ describe("explicit audio content architecture", () => {
       }
     }
   });
+
+  it("maps shared morning and evening adhkar to their matching Arabic recordings", () => {
+    const bismiAllahZikr = ALL_AZKAR.find((item) => item.id === "e-hm-86")!;
+    const bismiAllahRes = resolveAudioAsset(bismiAllahZikr, {
+      baseUrl: "https://pub-6e537fd865454e599c23a2bcfc22136e.r2.dev",
+    });
+    expect(bismiAllahRes.available).toBe(true);
+    if (bismiAllahRes.available) {
+      expect(bismiAllahRes.segmentsByVoice["abdullah-muhammad"]?.[0]?.url).toContain(
+        "dua/m-hm-88/abdullah-muhammad/v1/m-hm-88.mp3",
+      );
+      expect(bismiAllahRes.segmentsByVoice["english-george"]?.[0]?.url).toContain(
+        "dua/e-hm-86/english-george/v1/e-hm-86.mp3",
+      );
+    }
+
+    const aafiniZikr = ALL_AZKAR.find((item) => item.id === "e-hm-82")!;
+    const aafiniRes = resolveAudioAsset(aafiniZikr, {
+      baseUrl: "https://pub-6e537fd865454e599c23a2bcfc22136e.r2.dev",
+    });
+    expect(aafiniRes.available).toBe(true);
+    if (aafiniRes.available) {
+      expect(aafiniRes.segmentsByVoice["abdullah-muhammad"]?.[0]?.url).toContain(
+        "dua/m-hm-86/abdullah-muhammad/v1/m-hm-86.mp3",
+      );
+    }
+  });
 });

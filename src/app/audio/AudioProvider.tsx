@@ -13,11 +13,39 @@ import { audioReducer, createInitialAudioState, type AudioAction } from "./audio
 import { mapMediaError, mapPlayError } from "./audioErrors";
 import { loadAudioPreferences, saveAudioPreferences } from "./audioPreferences";
 import { withPlaybackMode } from "./buildPlaybackPlan";
+import { resolveAudioAssetById } from "./resolveAudioAsset";
 import type { AudioPreferences, PlaybackEntry, PlaybackPlan, ResolvedAudioSegment } from "./audioTypes";
 import { getNextPlaybackPosition } from "./playbackProgression";
 import { getAudioVoiceName } from "./audioVoices";
 
 type PlaybackMode = "play-once" | "repeat-prescribed-count";
+
+function enrichEntryVoices(entry: PlaybackEntry): PlaybackEntry {
+  const fromCatalog = resolveAudioAssetById(entry.audioAssetId);
+  if (!fromCatalog) return entry;
+  const availableVoiceIds = Array.from(new Set([...entry.availableVoiceIds, ...fromCatalog.availableVoiceIds]));
+  const nextArabicText = entry.arabicText ?? fromCatalog.asset.canonicalArabicText;
+  if (availableVoiceIds.length === entry.availableVoiceIds.length && nextArabicText === entry.arabicText) return entry;
+  return {
+    ...entry,
+    ...(nextArabicText ? { arabicText: nextArabicText } : {}),
+    segmentsByVoice: {
+      ...fromCatalog.segmentsByVoice,
+      ...entry.segmentsByVoice,
+    },
+    availableVoiceIds,
+  };
+}
+
+function enrichPlanVoices(plan: PlaybackPlan): PlaybackPlan {
+  let changed = false;
+  const entries = plan.entries.map((entry) => {
+    const next = enrichEntryVoices(entry);
+    if (next !== entry) changed = true;
+    return next;
+  });
+  return changed ? { ...plan, entries } : plan;
+}
 
 export interface AudioController {
   state: ReturnType<typeof createInitialAudioState>;
@@ -487,13 +515,17 @@ export function AudioProvider({
     (voiceId: string) => {
       const current = stateRef.current;
       const entry = current.plan?.entries[current.entryIndex];
-      if (!current.plan || !entry?.availableVoiceIds.includes(voiceId)) return;
       updatePreferences({
         ...preferencesRef.current,
-        ...(entry.contentKind === "quran" ? { quranReciterId: voiceId } : { duaVoiceId: voiceId }),
+        duaVoiceId: voiceId,
+        ...(entry?.contentKind === "quran" ? { quranReciterId: voiceId } : {}),
       });
+      if (!current.plan || !entry) return;
+      const nextPlan = enrichPlanVoices(current.plan);
+      const nextEntry = nextPlan.entries[current.entryIndex];
+      if (!nextEntry?.availableVoiceIds.includes(voiceId)) return;
       loadAt(
-        current.plan,
+        nextPlan,
         current.entryIndex,
         current.segmentIndex,
         current.repetitionIndex,
@@ -515,10 +547,12 @@ export function AudioProvider({
     (voiceId: string) => {
       updatePreferences({ ...preferencesRef.current, duaVoiceId: voiceId });
       const current = stateRef.current;
-      const entry = current.plan?.entries[current.entryIndex];
-      if (current.plan && entry?.contentKind === "dua" && entry.availableVoiceIds.includes(voiceId)) {
+      if (!current.plan) return;
+      const nextPlan = enrichPlanVoices(current.plan);
+      const entry = nextPlan.entries[current.entryIndex];
+      if (entry?.contentKind === "dua" && entry.availableVoiceIds.includes(voiceId)) {
         loadAt(
-          current.plan,
+          nextPlan,
           current.entryIndex,
           current.segmentIndex,
           current.repetitionIndex,
@@ -540,7 +574,8 @@ export function AudioProvider({
     [loadAt],
   );
 
-  const currentEntry = state.plan?.entries[state.entryIndex] ?? null;
+  const rawEntry = state.plan?.entries[state.entryIndex] ?? null;
+  const currentEntry = useMemo(() => (rawEntry ? enrichEntryVoices(rawEntry) : null), [rawEntry]);
   const currentSegment =
     (state.currentVoiceId ? currentEntry?.segmentsByVoice[state.currentVoiceId]?.[state.segmentIndex] : undefined) ??
     null;

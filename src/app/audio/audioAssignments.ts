@@ -109,7 +109,7 @@ export const APPROVED_AUDIO_ASSIGNMENTS: Readonly<Record<string, string>> = Obje
   "m-hm-81m": "m-hm-81m-english",
   "m-hm-89m": "m-hm-89m-english",
   "m-hm-90m": "m-hm-90m-english",
-  "m-hm-94": "m-hm-94-english",
+  "m-hm-94": "m-hm-94",
   "misc-ref-1": "misc-ref-1-english",
   "comprehensive-dua-39": "misc-ref-1-english",
   "misc-ref-4": "misc-ref-4-english",

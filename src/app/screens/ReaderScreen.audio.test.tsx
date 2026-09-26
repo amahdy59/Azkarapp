@@ -393,4 +393,89 @@ describe("ReaderScreen audio identity", () => {
     fireEvent.click(screen.getByTestId("reader-card"));
     expect(onComplete).toHaveBeenCalledOnce();
   });
+
+  it("renders docked audioPlayer inside reader card on both desktop and mobile", () => {
+    // Desktop check
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn().mockImplementation((query: string) => ({
+        matches: query.includes("min-width: 768px"),
+        media: query,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      })),
+    );
+
+    const { rerender } = render(
+      <ReaderScreen
+        catId="morning"
+        idx={0}
+        routineMode="core"
+        isArabic
+        direction="rtl"
+        themeMode="light"
+        isDone={false}
+        collectionCompletedCount={0}
+        hapticFeedback={false}
+        showTranslation={false}
+        showTransliteration={false}
+        textSize="medium"
+        onTextSizeChange={() => undefined}
+        savedZikrIds={new Set()}
+        onBack={() => undefined}
+        onComplete={() => undefined}
+        onAdvance={() => undefined}
+        onNext={() => undefined}
+        onPrev={() => undefined}
+        onSelectZikr={() => undefined}
+        onToggleSaved={() => undefined}
+        audioAvailable
+        audioPlayer={<div data-testid="docked-test-player">Audio Player</div>}
+      />,
+    );
+
+    expect(screen.getByTestId("docked-test-player")).toBeInTheDocument();
+    // Desktop sidebar remains present and interactive
+    expect(screen.getByTestId("reader-collection-navigator")).toBeInTheDocument();
+
+    // Mobile check
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn().mockImplementation((query: string) => ({
+        matches: false,
+        media: query,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      })),
+    );
+
+    rerender(
+      <ReaderScreen
+        catId="morning"
+        idx={0}
+        routineMode="core"
+        isArabic
+        direction="rtl"
+        themeMode="light"
+        isDone={false}
+        collectionCompletedCount={0}
+        hapticFeedback={false}
+        showTranslation={false}
+        showTransliteration={false}
+        textSize="medium"
+        onTextSizeChange={() => undefined}
+        savedZikrIds={new Set()}
+        onBack={() => undefined}
+        onComplete={() => undefined}
+        onAdvance={() => undefined}
+        onNext={() => undefined}
+        onPrev={() => undefined}
+        onToggleSaved={() => undefined}
+        audioAvailable
+        audioPlayer={<div data-testid="docked-test-player">Audio Player</div>}
+      />,
+    );
+
+    expect(screen.getByTestId("docked-test-player")).toBeInTheDocument();
+  });
 });

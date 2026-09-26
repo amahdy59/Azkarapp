@@ -1,15 +1,15 @@
 {
   "ar": [
-    "إتاحة التسجيلات الصوتية بالترجمة الإنجليزية لجميع أذكار الصباح بصوت جورج الهادئ والواضح.",
-    "إتاحة التسجيلات الصوتية بالترجمة الإنجليزية لكامل مجموعة الأدعية الجامعة.",
-    "تشغيل فوري وسلس لكافة أذكار الصباح والأدعية مع الانتقال التلقائي بين الأذكار.",
-    "تحسين تزامن الصوت وجودة القراءة في تجربة الاستماع الإنجليزية."
+    "قائمة لاختيار القارئ بسهولة من بين 4 قراء مباشرة من مشغل الصوت.",
+    "تصحيح ومطابقة كافة التسجيلات الصوتية لأذكار الصباح والمساء وبعد الصلاة.",
+    "عرض المشغل بملء بطاقة الذكر في القارئ مع الحفاظ على القوائم الجانبية وسلاسة القراءة.",
+    "مزامنة دقيقة وسلسة لشريط التقدم ومؤشر الاستماع دون قفزات."
   ],
   "en": [
-    "Complete English translation audio narrated by George is now available for all Morning Azkar.",
-    "Full English translation audio now covers the entire Comprehensive Du'as collection.",
-    "Seamless one-tap playback across morning remembrances and comprehensive supplications.",
-    "Enhanced audio synchronization and narration quality throughout the English experience."
+    "Easy reciter selection from a dropdown menu of 4 reciters directly in the player.",
+    "Corrected and verified audio mappings for all morning, evening, and after-prayer azkar.",
+    "Full-card in-place player within the reader while preserving side navigation.",
+    "Smooth and synchronized timeline scrub bar and progress indicator."
   ],
-  "release": "2026-09-26-english-audio-expansion"
+  "release": "2026-09-26-reciter-and-reader-audio"
 }

@@ -23,7 +23,7 @@ import {
 import type { AppLanguage } from "../types";
 import type { AudioController } from "../audio/AudioProvider";
 import { formatNumerals } from "../formatting";
-import { getAudioVoiceName } from "../audio/audioVoices";
+import { getAudioVoiceName, getAudioVoices } from "../audio/audioVoices";
 import { useMediaQuery } from "../hooks/useMediaQuery";
 import { motion, useReducedMotion } from "motion/react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
@@ -203,7 +203,14 @@ const PILL_IDLE = "border-border text-foreground hover:bg-muted";
 const PILL_ACTIVE = "border-primary bg-primary/15 text-primary";
 
 function progressBackground(progress: number, direction: "rtl" | "ltr") {
-  return `linear-gradient(to ${direction === "rtl" ? "left" : "right"}, var(--primary) ${progress}%, var(--muted) ${progress}%)`;
+  const clamped = Number.isFinite(progress) ? Math.min(100, Math.max(0, progress)) : 0;
+  const stop =
+    clamped <= 0
+      ? "0%"
+      : clamped >= 100
+        ? "100%"
+        : `calc(0.5625rem + (100% - 1.125rem) * ${(clamped / 100).toFixed(4)})`;
+  return `linear-gradient(to ${direction === "rtl" ? "left" : "right"}, var(--primary) ${stop}, var(--muted) ${stop})`;
 }
 
 function VolumeControl({
@@ -357,6 +364,7 @@ export function FloatingAudioPlayer({
   language,
   direction = language === "ar" ? "rtl" : "ltr",
   overReadingSurface = false,
+  dockedInReader = false,
 }: {
   controller: AudioController;
   language: AppLanguage;
@@ -370,6 +378,11 @@ export function FloatingAudioPlayer({
    * still one tap away, and a reader who expands it is left alone.
    */
   overReadingSurface?: boolean;
+  /**
+   * Docked inside the Reader's Zikr area. Takes up the exact space of the Zikr card
+   * without covering desktop side navigation or progress menus.
+   */
+  dockedInReader?: boolean;
 }) {
   const { state, currentEntry, currentSegment } = controller;
   /* A tablet or desktop has room for the player beside the page. */
@@ -389,11 +402,15 @@ export function FloatingAudioPlayer({
     ease: [0.22, 1, 0.36, 1] as const,
   };
   const wasCoveringReading = useRef(coversReading);
-  const [showOptions, setShowOptions] = useState(false);
+  const [selectedVoiceOverride, setSelectedVoiceOverride] = useState<string | null>(null);
   const controllerRef = useRef(controller);
   controllerRef.current = controller;
   const timingRef = useRef({ currentTime: state.currentTime, duration: state.duration });
   timingRef.current = { currentTime: state.currentTime, duration: state.duration };
+
+  useEffect(() => {
+    setSelectedVoiceOverride(null);
+  }, [currentEntry?.entryId, state.currentVoiceId]);
 
   useEffect(() => {
     // Only on the way in: opening the Mushaf while a surah plays should fold
@@ -414,12 +431,38 @@ export function FloatingAudioPlayer({
 
   const handleTimelineKeyDown = useCallback(
     (event: ReactKeyboardEvent<HTMLInputElement>) => {
-      if (event.key !== "PageUp" && event.key !== "PageDown") return;
-      event.preventDefault();
-      event.stopPropagation();
-      jumpSeconds(event.key === "PageUp" ? LARGE_SEEK_SECONDS : -LARGE_SEEK_SECONDS);
+      if (event.key === "PageUp" || event.key === "PageDown") {
+        event.preventDefault();
+        event.stopPropagation();
+        jumpSeconds(event.key === "PageUp" ? LARGE_SEEK_SECONDS : -LARGE_SEEK_SECONDS);
+        return;
+      }
+      if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+        event.preventDefault();
+        event.stopPropagation();
+        const isForward = direction === "rtl" ? event.key === "ArrowLeft" : event.key === "ArrowRight";
+        jumpSeconds(isForward ? 5 : -5);
+        return;
+      }
+      if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+        event.preventDefault();
+        event.stopPropagation();
+        jumpSeconds(event.key === "ArrowUp" ? 5 : -5);
+        return;
+      }
+      if (event.key === "Home") {
+        event.preventDefault();
+        event.stopPropagation();
+        controllerRef.current.seek(0);
+        return;
+      }
+      if (event.key === "End") {
+        event.preventDefault();
+        event.stopPropagation();
+        controllerRef.current.seek(timingRef.current.duration || 0);
+      }
     },
-    [jumpSeconds],
+    [direction, jumpSeconds],
   );
 
   useEffect(() => {
@@ -464,8 +507,33 @@ export function FloatingAudioPlayer({
       ? `${formatNumerals(state.repetitionIndex + 1, language)} / ${formatNumerals(currentEntry.repetitions, language)}`
       : null;
   const title = language === "ar" ? currentEntry.titleArabic : currentEntry.titleEnglish;
-  const voiceId = state.currentVoiceId ?? currentEntry.defaultVoiceId;
-  const reciterDisplayName = getAudioVoiceName(voiceId, language) ?? currentSegment?.voiceName ?? voiceId;
+  const activeVoiceId = state.currentVoiceId ?? currentEntry.defaultVoiceId;
+  const displayedVoiceId = selectedVoiceOverride ?? activeVoiceId;
+  const reciterDisplayName =
+    getAudioVoiceName(displayedVoiceId, language) ??
+    currentEntry.segmentsByVoice[displayedVoiceId]?.[0]?.voiceName ??
+    currentSegment?.voiceName ??
+    displayedVoiceId;
+
+  const mainVoices = getAudioVoices(language);
+  const mainVoiceIds = new Set(mainVoices.map((voice) => voice.id));
+  const extraVoiceIds = Array.from(new Set([activeVoiceId, ...currentEntry.availableVoiceIds])).filter(
+    (id) => Boolean(id) && !mainVoiceIds.has(id),
+  );
+  const reciterOptions = [
+    ...mainVoices.map((voice) => ({
+      id: voice.id,
+      label: language === "ar" ? voice.nameArabic : voice.nameEnglish,
+    })),
+    ...extraVoiceIds.map((id) => ({
+      id,
+      label:
+        getAudioVoiceName(id, language) ??
+        currentEntry.segmentsByVoice[id]?.[0]?.voiceName ??
+        (id === activeVoiceId ? currentSegment?.voiceName : undefined) ??
+        id,
+    })),
+  ];
 
   const attributionText = currentSegment
     ? `${language === "ar" ? (currentSegment.sourceNameArabic ?? currentSegment.sourceName) : currentSegment.sourceName} · ${
@@ -505,6 +573,10 @@ export function FloatingAudioPlayer({
         ? `${t(language, "audioPlayer.repetitionChip")} ${repetitionPosition}`
         : null;
 
+  const zikrArabicText = currentEntry.arabicText?.trim() || currentEntry.titleArabic;
+  const isEnglishMode = language === "en" || displayedVoiceId === "english-george";
+  const showSeparateTitle = !currentEntry.arabicText || currentEntry.arabicText.trim() !== title.trim();
+
   if (isMinimized) {
     return (
       <motion.section
@@ -514,7 +586,15 @@ export function FloatingAudioPlayer({
         aria-label={t(language, "audioPlayer.region")}
         dir={direction}
         data-variant="compact"
-        className={`floating-audio-player floating-audio-player--compact fixed z-40 rounded-t-2xl border border-b-0 border-primary/30 bg-card px-2.5 py-2 shadow-overlay dark:border-white/15 ${overReadingSurface ? "floating-audio-player--reading" : ""}`}
+        onClick={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
+        onTouchMove={(e) => e.stopPropagation()}
+        onTouchEnd={(e) => e.stopPropagation()}
+        className={
+          dockedInReader
+            ? "floating-audio-player floating-audio-player--compact absolute inset-x-2 bottom-[env(safe-area-inset-bottom)] sm:inset-x-3 md:bottom-2 z-30 rounded-2xl border border-primary/30 bg-card px-2.5 py-2 shadow-overlay dark:border-white/15"
+            : `floating-audio-player floating-audio-player--compact fixed z-40 rounded-t-2xl border border-b-0 border-primary/30 bg-card px-2.5 py-2 shadow-overlay dark:border-white/15 ${overReadingSurface ? "floating-audio-player--reading" : ""}`
+        }
       >
         <div className="sr-only" aria-live="polite" aria-atomic="true">
           {liveMessage}
@@ -543,35 +623,37 @@ export function FloatingAudioPlayer({
             type="button"
             onClick={() => setIsMinimized(false)}
             aria-label={t(language, "audioPlayer.expand")}
-            className="flex size-11 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors duration-fast hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            className="group flex min-w-0 flex-1 items-center gap-2 rounded-xl px-1 py-1 text-start transition-colors duration-fast hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           >
-            <ChevronUp size={20} aria-hidden="true" />
-          </button>
+            <span className="flex size-11 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors duration-fast group-hover:text-foreground">
+              <ChevronUp size={20} aria-hidden="true" />
+            </span>
 
-          <div className="flex min-w-0 flex-1 items-center gap-2 px-1 text-start overflow-hidden">
-            <div>
-              <WaveBars playing={isPlaying} />
-            </div>
-            <motion.span
-              key={currentEntry.entryId}
-              initial={motionReduced ? false : { opacity: 0, y: 4 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={trackMetaTransition}
-              className="min-w-0 flex-1 block"
-            >
-              <span className="block truncate text-label font-black text-foreground">{title}</span>
-              <span className="block truncate text-micro font-semibold text-muted-foreground">
-                {reciterDisplayName}
-                {positionChip ? ` · ${positionChip}` : ""}
-                <span className="md:hidden">
-                  {" · "}
-                  <span dir="ltr" className="tabular-nums">
-                    {formatTime(state.currentTime, language)} / {formatTime(state.duration, language)}
+            <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
+              <div>
+                <WaveBars playing={isPlaying} />
+              </div>
+              <motion.span
+                key={currentEntry.entryId}
+                initial={motionReduced ? false : { opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={trackMetaTransition}
+                className="min-w-0 flex-1 block"
+              >
+                <span className="block truncate text-label font-black text-foreground">{title}</span>
+                <span className="block truncate text-micro font-semibold text-muted-foreground">
+                  {reciterDisplayName}
+                  {positionChip ? ` · ${positionChip}` : ""}
+                  <span className="md:hidden">
+                    {" · "}
+                    <span dir="ltr" className="tabular-nums">
+                      {formatTime(state.currentTime, language)} / {formatTime(state.duration, language)}
+                    </span>
                   </span>
                 </span>
-              </span>
-            </motion.span>
-          </div>
+              </motion.span>
+            </div>
+          </button>
 
           <div className="hidden min-w-32 flex-1 items-center gap-2 md:flex" dir={direction}>
             <span className="w-10 text-center text-micro font-bold tabular-nums text-muted-foreground">
@@ -581,7 +663,7 @@ export function FloatingAudioPlayer({
               type="range"
               min={0}
               max={Math.max(0, state.duration)}
-              step={1}
+              step="any"
               value={Math.min(state.currentTime, state.duration || 0)}
               disabled={state.duration <= 0}
               onChange={(event) => controller.seek(Number(event.currentTarget.value))}
@@ -650,14 +732,22 @@ export function FloatingAudioPlayer({
       aria-label={t(language, "audioPlayer.region")}
       dir={direction}
       data-variant="expanded"
-      className={`floating-audio-player floating-audio-player--expanded fixed z-40 overflow-x-hidden overflow-y-auto overscroll-contain rounded-t-3xl border border-b-0 border-primary/20 bg-card px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2 shadow-overlay sm:max-w-2xl sm:px-5 lg:max-w-4xl dark:border-white/10 ${overReadingSurface ? "floating-audio-player--reading" : ""}`}
+      onClick={(e) => e.stopPropagation()}
+      onTouchStart={(e) => e.stopPropagation()}
+      onTouchMove={(e) => e.stopPropagation()}
+      onTouchEnd={(e) => e.stopPropagation()}
+      className={
+        dockedInReader
+          ? "floating-audio-player floating-audio-player--expanded absolute inset-0 z-30 flex h-full w-full flex-col justify-between overflow-x-hidden overflow-y-auto overscroll-contain bg-card px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 shadow-overlay sm:px-6 lg:px-8 md:rounded-3xl md:border md:border-border/80"
+          : `floating-audio-player floating-audio-player--expanded fixed z-40 inset-0 flex h-full w-full flex-col justify-between overflow-x-hidden overflow-y-auto overscroll-contain bg-card px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2 shadow-overlay sm:px-6 lg:px-8 ${overReadingSurface ? "floating-audio-player--reading" : ""}`
+      }
     >
       <div className="sr-only" aria-live="polite" aria-atomic="true">
         {liveMessage}
       </div>
 
       {/* Minimize and close retain the same logical edges in both player sizes. */}
-      <div className="flex items-center justify-between">
+      <div className="flex shrink-0 items-center justify-between">
         <button
           type="button"
           onClick={() => setIsMinimized(true)}
@@ -676,216 +766,243 @@ export function FloatingAudioPlayer({
         </button>
       </div>
 
-      {/* What is playing, read down the middle: cue, surah, reciter, place. */}
-      <div className="rounded-2xl bg-muted/40 p-3 text-center overflow-hidden">
+      {/* What is playing: title, reciter dropdown, followed by the full scrollable Zikr text within the zikr card */}
+      <div className="my-2 flex min-h-0 flex-1 flex-col rounded-3xl border border-border/50 bg-muted/30 p-3 sm:p-5 overflow-hidden">
         <motion.div
           key={currentEntry.entryId}
           initial={motionReduced ? false : { opacity: 0, y: 4 }}
           animate={{ opacity: 1, y: 0 }}
           transition={trackMetaTransition}
-          className="flex flex-col items-center"
+          className="flex min-h-0 flex-1 flex-col items-center"
         >
-          <div>
-            <WaveBars playing={isPlaying} />
+          <div className="shrink-0 flex flex-col items-center text-center">
+            <div>
+              <WaveBars playing={isPlaying} />
+            </div>
+            {showSeparateTitle && (
+              <h3 className="mt-1.5 line-clamp-2 text-base sm:text-lg font-black leading-snug text-foreground">
+                {title}
+              </h3>
+            )}
+            <div className="mt-1.5 flex max-w-full items-center justify-center">
+              <Select
+                value={displayedVoiceId}
+                onValueChange={(nextVoiceId) => {
+                  setSelectedVoiceOverride(nextVoiceId);
+                  controller.setVoice(nextVoiceId);
+                }}
+                dir={language === "ar" ? "rtl" : "ltr"}
+              >
+                <SelectTrigger
+                  aria-label={t(language, "audioPlayer.voice")}
+                  data-testid="audio-reciter-select"
+                  size="sm"
+                  className="min-h-11 w-auto max-w-full gap-2 rounded-full border-border/80 bg-background/70 px-3.5 py-1.5 text-label font-bold text-foreground shadow-none transition-colors hover:bg-muted focus-visible:ring-[3px] focus-visible:ring-ring"
+                >
+                  <Headphones size={15} className="shrink-0 text-primary" aria-hidden="true" />
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent align="center">
+                  {reciterOptions.map((option) => (
+                    <SelectItem key={option.id} value={option.id}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {positionChip && (
+              <p className="mt-2 rounded-full border border-border px-3 py-0.5 text-xs font-bold text-muted-foreground">
+                {positionChip}
+              </p>
+            )}
+            {isBusy && (
+              <p className="mt-1.5 text-xs font-semibold text-primary" role="status">
+                {state.status === "buffering"
+                  ? t(language, "audioPlayer.buffering")
+                  : t(language, "audioPlayer.loading")}
+              </p>
+            )}
           </div>
-          <h3 className="mt-2 line-clamp-2 text-xl font-black leading-tight text-foreground">{title}</h3>
-          <p className="mt-1 truncate text-label font-semibold text-muted-foreground">{reciterDisplayName}</p>
-          {positionChip && (
-            <p className="mt-2.5 rounded-full border border-border px-3 py-1 text-xs font-bold text-muted-foreground">
-              {positionChip}
-            </p>
-          )}
-          {isBusy && (
-            <p className="mt-2 text-xs font-semibold text-primary" role="status">
-              {state.status === "buffering" ? t(language, "audioPlayer.buffering") : t(language, "audioPlayer.loading")}
-            </p>
-          )}
+
+          {/* Full Zikr Text Area: written within the area of the Zikr name */}
+          <div className="mt-3 flex min-h-0 w-full flex-1 flex-col items-center overflow-y-auto border-t border-border/50 px-2 py-3 sm:px-6 sm:py-4 select-text">
+            <div className="my-auto flex w-full max-w-[42rem] flex-col items-center justify-center text-center">
+              <p
+                data-testid="audio-player-zikr-text"
+                className="zikr-text text-center font-medium leading-[2.1] text-foreground text-lg sm:text-2xl"
+                dir="rtl"
+                lang="ar"
+                style={{ fontFamily: "var(--font-zikr)" }}
+              >
+                {zikrArabicText}
+              </p>
+              {isEnglishMode && currentEntry.translation && (
+                <p
+                  className="mt-4 border-t border-border/50 pt-3 text-center text-sm sm:text-base leading-relaxed text-muted-foreground"
+                  dir="ltr"
+                  lang="en"
+                >
+                  {currentEntry.translation}
+                </p>
+              )}
+            </div>
+          </div>
         </motion.div>
       </div>
 
-      {/* Timeline / Scrub Bar with Generous 44px Hit Target */}
-      <div className="mt-4 flex items-center gap-3" dir={direction}>
-        <span className="w-11 text-center text-xs font-bold tabular-nums text-muted-foreground">
-          {formatTime(state.currentTime, language)}
-        </span>
-        <div className="relative flex min-w-0 flex-1 items-center h-11">
-          <input
-            type="range"
-            min={0}
-            max={Math.max(0, state.duration)}
-            step={1}
-            value={Math.min(state.currentTime, state.duration || 0)}
-            disabled={state.duration <= 0}
-            onChange={(event) => controller.seek(Number(event.currentTarget.value))}
-            onKeyDown={handleTimelineKeyDown}
-            aria-label={t(language, "audioPlayer.seek")}
-            aria-keyshortcuts="PageUp PageDown"
-            aria-valuetext={accessibleTime(state.currentTime, state.duration, language)}
-            /* The played part of the track is drawn here rather than in a
-               stylesheet: a range input needs one gradient per browser engine
-               to fill, and the value is already in hand. */
-            style={{ "--audio-range-fill": progressBackground(progressPercent, direction) } as CSSProperties}
-            className="audio-timeline-range h-11 w-full cursor-pointer appearance-none accent-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-          />
-        </div>
-        <span className="w-11 text-center text-xs font-bold tabular-nums text-muted-foreground">
-          {formatTime(state.duration, language)}
-        </span>
-      </div>
-
-      {/* Primary Transport Controls Row */}
-      <div className="mt-1 flex w-full items-start justify-center gap-0.5 sm:gap-2">
-        {totalTracks > 1 && (
-          <TransportButton
-            label={t(language, "audioPlayer.previousShort")}
-            ariaLabel={t(language, "audioPlayer.previous")}
-            onClick={controller.previous}
-            disabled={state.entryIndex === 0}
-          >
-            <SkipBack size={20} className="rtl:rotate-180" aria-hidden="true" />
-          </TransportButton>
-        )}
-
-        <TransportButton
-          label={t(language, "audioPlayer.back10Short")}
-          ariaLabel={t(language, "audioPlayer.jumpBack10")}
-          onClick={() => jumpSeconds(-10)}
-          disabled={state.duration <= 0}
-        >
-          <JumpBack10Icon className="size-5" />
-        </TransportButton>
-
-        <button
-          style={{ borderRadius: 9999 }}
-          type="button"
-          onClick={isPlaying ? controller.pause : controller.play}
-          aria-label={isPlaying ? t(language, "audioPlayer.pause") : t(language, "audioPlayer.play")}
-          className="mx-1 mt-1 flex size-16 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-raised transition-transform duration-fast active:scale-95 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-        >
-          <span className="flex items-center justify-center">
-            {isPlaying ? <Pause size={28} aria-hidden="true" /> : <Play size={28} aria-hidden="true" />}
+      {/* Bottom Transport Controller Area: docked at the bottom where the counter normally sits */}
+      <div className="mx-auto w-full max-w-2xl shrink-0 pt-1">
+        {/* Timeline / Scrub Bar with Generous 44px Hit Target */}
+        <div className="flex items-center gap-3" dir={direction}>
+          <span className="w-11 text-center text-xs font-bold tabular-nums text-muted-foreground">
+            {formatTime(state.currentTime, language)}
           </span>
-        </button>
-
-        <TransportButton
-          label={t(language, "audioPlayer.forward10Short")}
-          ariaLabel={t(language, "audioPlayer.jumpForward10")}
-          onClick={() => jumpSeconds(10)}
-          disabled={state.duration <= 0}
-        >
-          <JumpForward10Icon className="size-5" />
-        </TransportButton>
-
-        {totalTracks > 1 && (
-          <TransportButton
-            label={t(language, "audioPlayer.nextShort")}
-            ariaLabel={t(language, "audioPlayer.next")}
-            onClick={controller.next}
-            disabled={state.entryIndex === totalTracks - 1}
-          >
-            <SkipForward size={20} className="rtl:rotate-180" aria-hidden="true" />
-          </TransportButton>
-        )}
-      </div>
-
-      {/* Error state */}
-      {state.status === "error" && (
-        <div className="mt-3 rounded-2xl border border-destructive/30 bg-destructive/10 p-3.5" role="alert">
-          <p className="text-label font-semibold text-destructive">{getErrorMessage(state.error?.code, language)}</p>
-          <div className="mt-2.5 flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={controller.retry}
-              className="min-h-11 rounded-xl bg-primary px-4 text-xs font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-            >
-              {t(language, "audioPlayer.retry")}
-            </button>
-            <button
-              type="button"
-              onClick={controller.skip}
-              className="min-h-11 rounded-xl border border-border px-4 text-xs font-bold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-            >
-              {t(language, "audioPlayer.skip")}
-            </button>
-            <button
-              type="button"
-              onClick={controller.stop}
-              className="min-h-11 rounded-xl border border-destructive/40 px-4 text-xs font-bold text-destructive focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-            >
-              {t(language, "audioPlayer.stop")}
-            </button>
+          <div className="relative flex min-w-0 flex-1 items-center h-11">
+            <input
+              type="range"
+              min={0}
+              max={Math.max(0, state.duration)}
+              step="any"
+              value={Math.min(state.currentTime, state.duration || 0)}
+              disabled={state.duration <= 0}
+              onChange={(event) => controller.seek(Number(event.currentTarget.value))}
+              onKeyDown={handleTimelineKeyDown}
+              aria-label={t(language, "audioPlayer.seek")}
+              aria-keyshortcuts="PageUp PageDown"
+              aria-valuetext={accessibleTime(state.currentTime, state.duration, language)}
+              /* The played part of the track is drawn here rather than in a
+                 stylesheet: a range input needs one gradient per browser engine
+                 to fill, and the value is already in hand. */
+              style={{ "--audio-range-fill": progressBackground(progressPercent, direction) } as CSSProperties}
+              className="audio-timeline-range h-11 w-full cursor-pointer appearance-none accent-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            />
           </div>
-        </div>
-      )}
-
-      {/* Only contextual options remain here. Restart is already available by
-          moving the timeline to its start and Play restarts an ended item. */}
-      <div className="mt-4 flex flex-wrap items-center justify-center gap-2 border-t border-border/70 pt-4">
-        {canRepeat && (
-          <button
-            type="button"
-            aria-pressed={repeatEnabled}
-            onClick={() => controller.setPlaybackMode(repeatEnabled ? "play-once" : "repeat-prescribed-count")}
-            className={`${PILL_CLASS} ${repeatEnabled ? PILL_ACTIVE : PILL_IDLE}`}
-          >
-            <RotateCcw size={16} aria-hidden="true" />
-            {t(language, "audioPlayer.repeatShort")}
-          </button>
-        )}
-
-        <button
-          type="button"
-          onClick={() => controller.setPlaybackRate(nextPlaybackRate(state.playbackRate))}
-          className={`${PILL_CLASS} ${state.playbackRate === 1 ? PILL_IDLE : PILL_ACTIVE}`}
-        >
-          {t(language, "audioPlayer.speedShort")}
-          <span dir="ltr" className="font-black tabular-nums text-primary">
-            {formatNumerals(state.playbackRate, language)}×
+          <span className="w-11 text-center text-xs font-bold tabular-nums text-muted-foreground">
+            {formatTime(state.duration, language)}
           </span>
-        </button>
+        </div>
 
-        <VolumeControl controller={controller} language={language} inline />
+        {/* Primary Transport Controls Row */}
+        <div className="mt-1 flex w-full items-start justify-center gap-0.5 sm:gap-2">
+          {totalTracks > 1 && (
+            <TransportButton
+              label={t(language, "audioPlayer.previousShort")}
+              ariaLabel={t(language, "audioPlayer.previous")}
+              onClick={controller.previous}
+              disabled={state.entryIndex === 0}
+            >
+              <SkipBack size={20} className="rtl:rotate-180" aria-hidden="true" />
+            </TransportButton>
+          )}
 
-        {currentEntry.availableVoiceIds.length > 1 && (
+          <TransportButton
+            label={t(language, "audioPlayer.back10Short")}
+            ariaLabel={t(language, "audioPlayer.jumpBack10")}
+            onClick={() => jumpSeconds(-10)}
+            disabled={state.duration <= 0}
+          >
+            <JumpBack10Icon className="size-5" />
+          </TransportButton>
+
+          <button
+            style={{ borderRadius: 9999 }}
+            type="button"
+            onClick={isPlaying ? controller.pause : controller.play}
+            aria-label={isPlaying ? t(language, "audioPlayer.pause") : t(language, "audioPlayer.play")}
+            className="mx-1 mt-1 flex size-16 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-raised transition-transform duration-fast active:scale-95 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          >
+            <span className="flex items-center justify-center">
+              {isPlaying ? <Pause size={28} aria-hidden="true" /> : <Play size={28} aria-hidden="true" />}
+            </span>
+          </button>
+
+          <TransportButton
+            label={t(language, "audioPlayer.forward10Short")}
+            ariaLabel={t(language, "audioPlayer.jumpForward10")}
+            onClick={() => jumpSeconds(10)}
+            disabled={state.duration <= 0}
+          >
+            <JumpForward10Icon className="size-5" />
+          </TransportButton>
+
+          {totalTracks > 1 && (
+            <TransportButton
+              label={t(language, "audioPlayer.nextShort")}
+              ariaLabel={t(language, "audioPlayer.next")}
+              onClick={controller.next}
+              disabled={state.entryIndex === totalTracks - 1}
+            >
+              <SkipForward size={20} className="rtl:rotate-180" aria-hidden="true" />
+            </TransportButton>
+          )}
+        </div>
+
+        {/* Error state */}
+        {state.status === "error" && (
+          <div className="mt-3 rounded-2xl border border-destructive/30 bg-destructive/10 p-3.5" role="alert">
+            <p className="text-label font-semibold text-destructive">{getErrorMessage(state.error?.code, language)}</p>
+            <div className="mt-2.5 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={controller.retry}
+                className="min-h-11 rounded-xl bg-primary px-4 text-xs font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              >
+                {t(language, "audioPlayer.retry")}
+              </button>
+              <button
+                type="button"
+                onClick={controller.skip}
+                className="min-h-11 rounded-xl border border-border px-4 text-xs font-bold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              >
+                {t(language, "audioPlayer.skip")}
+              </button>
+              <button
+                type="button"
+                onClick={controller.stop}
+                className="min-h-11 rounded-xl border border-destructive/40 px-4 text-xs font-bold text-destructive focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              >
+                {t(language, "audioPlayer.stop")}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Only contextual options remain here. Restart is already available by
+            moving the timeline to its start and Play restarts an ended item. */}
+        <div className="mt-3 flex flex-wrap items-center justify-center gap-2 border-t border-border/70 pt-3">
+          {canRepeat && (
+            <button
+              type="button"
+              aria-pressed={repeatEnabled}
+              onClick={() => controller.setPlaybackMode(repeatEnabled ? "play-once" : "repeat-prescribed-count")}
+              className={`${PILL_CLASS} ${repeatEnabled ? PILL_ACTIVE : PILL_IDLE}`}
+            >
+              <RotateCcw size={16} aria-hidden="true" />
+              {t(language, "audioPlayer.repeatShort")}
+            </button>
+          )}
+
           <button
             type="button"
-            aria-expanded={showOptions}
-            onClick={() => setShowOptions(!showOptions)}
-            className={`${PILL_CLASS} ${showOptions ? PILL_ACTIVE : PILL_IDLE}`}
+            onClick={() => controller.setPlaybackRate(nextPlaybackRate(state.playbackRate))}
+            className={`${PILL_CLASS} ${state.playbackRate === 1 ? PILL_IDLE : PILL_ACTIVE}`}
           >
-            <Headphones size={16} aria-hidden="true" />
-            {t(language, "audioPlayer.reciterShort")}
+            {t(language, "audioPlayer.speedShort")}
+            <span dir="ltr" className="font-black tabular-nums text-primary">
+              {formatNumerals(state.playbackRate, language)}×
+            </span>
           </button>
-        )}
-      </div>
 
-      {showOptions && currentEntry.availableVoiceIds.length > 1 && (
-        <div className="mt-3 grid gap-1 text-xs font-bold text-muted-foreground">
-          <span id="audio-player-voice-label">{t(language, "audioPlayer.voice")}</span>
-          <Select
-            value={state.currentVoiceId ?? currentEntry.defaultVoiceId}
-            onValueChange={controller.setVoice}
-            dir={language === "ar" ? "rtl" : "ltr"}
-          >
-            <SelectTrigger aria-labelledby="audio-player-voice-label" size="sm" className="text-xs font-bold">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {currentEntry.availableVoiceIds.map((voiceId) => (
-                <SelectItem key={voiceId} value={voiceId}>
-                  {getAudioVoiceName(voiceId, language) ??
-                    currentEntry.segmentsByVoice[voiceId]?.[0]?.voiceName ??
-                    voiceId}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <VolumeControl controller={controller} language={language} inline />
         </div>
-      )}
 
-      {/* Whose recitation this is, always on screen rather than behind a
-          disclosure — it is an attribution, not a setting. */}
-      <p className="mt-3 text-center text-micro font-semibold leading-5 text-muted-foreground/80">{attributionText}</p>
+        {/* Whose recitation this is, always on screen rather than behind a
+            disclosure — it is an attribution, not a setting. */}
+        <p className="mt-2 text-center text-micro font-semibold leading-5 text-muted-foreground/80">
+          {attributionText}
+        </p>
+      </div>
     </motion.section>
   );
 }

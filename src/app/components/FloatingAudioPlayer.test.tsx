@@ -176,4 +176,34 @@ describe("FloatingAudioPlayer", () => {
     fireEvent.click(muteButton);
     expect(controller.toggleMuted).toHaveBeenCalledTimes(1);
   });
+
+  it("turns the reciter name into a dropdown menu for the 4 main reciters while displaying the current or selected reciter", () => {
+    const controller = createController();
+    controller.state.currentVoiceId = "abdullah-muhammad";
+    render(<FloatingAudioPlayer controller={controller} language="ar" direction="rtl" />);
+    fireEvent.click(screen.getByRole("button", { name: "توسيع المشغل" }));
+
+    const reciterTrigger = screen.getByTestId("audio-reciter-select");
+    expect(reciterTrigger).toHaveTextContent("عبد الله محمد");
+
+    fireEvent.click(reciterTrigger);
+    expect(screen.getByRole("option", { name: "عبد الله محمد" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "جورج (الترجمة الإنجليزية)" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "محمد شرعي" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "محمد معتز" })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("option", { name: "محمد شرعي" }));
+    expect(controller.setVoice).toHaveBeenCalledWith("muhammad-alshara");
+    expect(screen.getByTestId("audio-reciter-select")).toHaveTextContent("محمد شرعي");
+  });
+
+  it("keeps the timeline slider continuous (step=any) and aligns the progress fill with the thumb center", () => {
+    const controller = createController();
+    render(<FloatingAudioPlayer controller={controller} language="en" direction="ltr" />);
+    fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
+
+    const timeline = screen.getByRole("slider", { name: "Seek audio" });
+    expect(timeline).toHaveAttribute("step", "any");
+    expect(timeline.getAttribute("style")).toContain("calc(0.5625rem + (100% - 1.125rem) * 0.2000)");
+  });
 });

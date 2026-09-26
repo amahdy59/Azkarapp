@@ -109,6 +109,7 @@
 }
 
 .audio-timeline-range::-webkit-slider-thumb {
+  box-sizing: border-box;
   width: 1.125rem;
   height: 1.125rem;
   margin-top: -0.3125rem;
@@ -126,8 +127,9 @@
 }
 
 .audio-timeline-range::-moz-range-thumb {
-  width: 0.875rem;
-  height: 0.875rem;
+  box-sizing: border-box;
+  width: 1.125rem;
+  height: 1.125rem;
   border: 2px solid var(--card);
   border-radius: 9999px;
   background: var(--primary);
@@ -474,7 +476,7 @@
 
 .mushaf-page-furniture {
   height: 5.2%;
-  min-height: 0;
+  min-height: 2.75rem;
   font-size: clamp(8px, min(2.4cqi, 1.5cqh), 13px);
   font-weight: 700;
   line-height: 1;
@@ -498,15 +500,17 @@
   padding: 0;
 }
 
-/* The folio belongs below the final ayah line, never inside its ink area. Its
-   band reserves separation, then settles toward the permanent lower controls. */
+/* The folio belongs below the final ayah line, never inside its ink area, and
+   stays in-flow inside the page frame so it never protrudes past the canvas to
+   cause unwanted vertical scrolling on desktop or mobile viewports. */
 .mushaf-page-furniture--foot {
-  position: absolute;
-  inset-inline: 0;
-  bottom: calc(-2.875rem - env(safe-area-inset-bottom));
+  position: relative;
   z-index: 20;
-  height: 2.75rem;
-  padding: 0;
+  height: 2.875rem;
+  min-height: 2.875rem;
+  padding-top: 0.125rem;
+  padding-bottom: 0;
+  padding-inline: 0;
   opacity: 1;
   transform: none;
 }

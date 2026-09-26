@@ -250,13 +250,19 @@ test("fits a two-page desktop spread with a focused rail and returns to one page
   await expect(page.getByTestId("mushaf-difficult-words-switch")).toBeVisible();
   await expect(page.getByTestId("mushaf-rail-more")).toBeVisible();
   await expect(page.getByTestId("mushaf-focus-enter")).toHaveCount(0);
-  const desktopGeometry = await page.evaluate(() => ({
-    viewportHeight: window.innerHeight,
-    documentHeight: document.documentElement.scrollHeight,
-    bodyHeight: document.body.scrollHeight,
-  }));
+  const desktopGeometry = await page.evaluate(() => {
+    const paper = document.querySelector<HTMLElement>(".mushaf-paper")!;
+    return {
+      viewportHeight: window.innerHeight,
+      documentHeight: document.documentElement.scrollHeight,
+      bodyHeight: document.body.scrollHeight,
+      paperClientHeight: paper.clientHeight,
+      paperScrollHeight: paper.scrollHeight,
+    };
+  });
   expect(desktopGeometry.documentHeight).toBeLessThanOrEqual(desktopGeometry.viewportHeight);
   expect(desktopGeometry.bodyHeight).toBeLessThanOrEqual(desktopGeometry.viewportHeight);
+  expect(desktopGeometry.paperScrollHeight).toBeLessThanOrEqual(desktopGeometry.paperClientHeight);
 
   await page.getByTestId("mushaf-rail-index").click();
   await page.getByRole("tab", { name: "صفحة" }).click();

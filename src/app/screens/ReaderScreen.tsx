@@ -161,6 +161,7 @@ export function ReaderScreen({
   partialZikrCounts,
   onPartialZikrCountChange,
   counterResetKey,
+  audioPlayer,
 }: {
   catId: CategoryId;
   subCategory?: string;
@@ -223,6 +224,7 @@ export function ReaderScreen({
   partialZikrCounts?: Record<string, number>;
   onPartialZikrCountChange?: (zikrId: string, count: number) => void;
   counterResetKey?: string;
+  audioPlayer?: React.ReactNode;
 }) {
   const vibrate = useCallback(
     (pattern: number | number[]) => vibrateIfEnabled(hapticFeedback, pattern),
@@ -1206,7 +1208,7 @@ export function ReaderScreen({
          which pushed the page down and left a strip of shell above a surface
          that is supposed to be the page itself. */
       edgeToEdge={showMushaf}
-      className="reader-swipe-surface relative !pb-0 sm:!pt-0"
+      className={`reader-swipe-surface relative !pb-0 sm:!pt-0 ${showMushaf ? "overflow-hidden" : ""}`}
       data-testid="reader-screen"
       data-zikr-index={idx}
       data-zikr-id={z.id}
@@ -1441,6 +1443,7 @@ export function ReaderScreen({
                       ))}
                   </div>
                 </div>
+                {audioPlayer}
               </div>
             </div>
 
@@ -1625,6 +1628,7 @@ export function ReaderScreen({
                     {renderCounterStack()}
                   </div>
                 ))}
+              {audioPlayer}
             </div>
           </>
         ))}

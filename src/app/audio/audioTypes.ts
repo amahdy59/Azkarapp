@@ -102,6 +102,9 @@ export interface PlaybackEntry {
   audioAssetId: string;
   titleArabic: string;
   titleEnglish: string;
+  arabicText?: string;
+  translation?: string;
+  transliteration?: string;
   contentKind: AudioContentKind;
   repetitions: number;
   prescribedRepetitions: number;

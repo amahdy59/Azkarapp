@@ -12,23 +12,16 @@ function joinAudioUrl(baseUrl: string, relativePath: string): string {
   return `${baseUrl}/${relativePath.replace(/^\/+/, "")}`;
 }
 
-export function resolveAudioAsset(
-  zikr: Zikr,
+export function resolveAudioAssetById(
+  assetId: string,
   options: { catalog?: AudioCatalog; baseUrl?: string } = {},
-): AudioResolution {
+): Pick<Extract<AudioResolution, { available: true }>, "asset" | "segmentsByVoice" | "availableVoiceIds"> | null {
   const catalog = options.catalog ?? AUDIO_CATALOG;
-  const assetId = catalog.assignments[zikr.id];
-  if (!assetId || zikr.audioAssetId !== assetId) return { available: false, reason: "unassigned" };
-
   const asset = catalog.assets[assetId];
-  if (!asset) return { available: false, reason: "asset-missing" };
-  if (asset.reviewStatus !== "approved") return { available: false, reason: "not-approved" };
-  if (asset.normalizedTextHash !== createArabicTextFingerprint(zikr.arabicText)) {
-    return { available: false, reason: "text-mismatch" };
-  }
+  if (!asset || asset.reviewStatus !== "approved") return null;
 
   const baseUrl = (options.baseUrl ?? getAudioBaseUrl()).replace(/\/+$/, "");
-  if (!baseUrl) return { available: false, reason: "base-url-missing" };
+  if (!baseUrl) return null;
 
   const voices = new Set(
     asset.segments.flatMap((segment) =>
@@ -45,7 +38,7 @@ export function resolveAudioAsset(
       segment.variants.some((variant) => variant.voiceId === voiceId && variant.reviewStatus === "approved"),
     ),
   );
-  if (!availableVoiceIds.includes(asset.defaultVoiceId)) return { available: false, reason: "variant-unavailable" };
+  if (!availableVoiceIds.includes(asset.defaultVoiceId)) return null;
 
   const segmentsByVoice = Object.fromEntries(
     availableVoiceIds.map((voiceId) => [
@@ -78,7 +71,31 @@ export function resolveAudioAsset(
     ]),
   );
 
-  return { available: true, asset, segmentsByVoice, availableVoiceIds };
+  return { asset, segmentsByVoice, availableVoiceIds };
+}
+
+export function resolveAudioAsset(
+  zikr: Zikr,
+  options: { catalog?: AudioCatalog; baseUrl?: string } = {},
+): AudioResolution {
+  const catalog = options.catalog ?? AUDIO_CATALOG;
+  const assetId = catalog.assignments[zikr.id];
+  if (!assetId || zikr.audioAssetId !== assetId) return { available: false, reason: "unassigned" };
+
+  const asset = catalog.assets[assetId];
+  if (!asset) return { available: false, reason: "asset-missing" };
+  if (asset.reviewStatus !== "approved") return { available: false, reason: "not-approved" };
+  if (asset.normalizedTextHash !== createArabicTextFingerprint(zikr.arabicText)) {
+    return { available: false, reason: "text-mismatch" };
+  }
+
+  const baseUrl = (options.baseUrl ?? getAudioBaseUrl()).replace(/\/+$/, "");
+  if (!baseUrl) return { available: false, reason: "base-url-missing" };
+
+  const resolved = resolveAudioAssetById(assetId, options);
+  if (!resolved) return { available: false, reason: "variant-unavailable" };
+
+  return { available: true, ...resolved };
 }
 
 export function getPreferredVoiceId(

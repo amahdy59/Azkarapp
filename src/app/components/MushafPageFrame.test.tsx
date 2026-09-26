@@ -78,4 +78,14 @@ describe("the Mushaf page frame", () => {
 
     expect(layout).not.toContain(".theme-oled .mushaf-page-frame");
   });
+
+  it("keeps the page footer in-flow inside the frame so it never protrudes past the canvas to cause scrolling", () => {
+    const foot = layout.slice(
+      layout.indexOf(".mushaf-page-furniture--foot {"),
+      layout.indexOf(".reader-swipe-surface {"),
+    );
+    expect(foot).toContain("position: relative");
+    expect(foot).not.toContain("position: absolute");
+    expect(foot).not.toContain("bottom: calc(-");
+  });
 });

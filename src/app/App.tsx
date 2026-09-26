@@ -1282,6 +1282,13 @@ function AppContent({
     ].includes(view);
   const azkar = activeAzkarList;
   const activeZikr = azkar[activeIdx];
+  const isAudioPlayerDockedInReader =
+    view === "reader" &&
+    !readerInMushafMode &&
+    Boolean(audioController?.state.plan) &&
+    audioController?.state.plan?.context.category === activeCat &&
+    (!audioController?.state.plan?.context.subCategory ||
+      audioController?.state.plan?.context.subCategory === activeSubCategory);
   const [queuedAudioZikrId, setQueuedAudioZikrId] = useState<string | null>(null);
   /**
    * A reviewed assignment is enough to expose the listen action while the
@@ -2076,6 +2083,19 @@ function AppContent({
                     audioController.currentEntry?.zikrId === activeZikr.id &&
                     ["loading", "ready", "playing", "paused", "buffering"].includes(audioController.state.status)
                   }
+                  audioPlayer={
+                    isAudioPlayerDockedInReader && audioController ? (
+                      <Suspense fallback={null}>
+                        <FloatingAudioPlayer
+                          controller={audioController}
+                          language={selectedLang}
+                          direction={layoutDirection}
+                          overReadingSurface
+                          dockedInReader
+                        />
+                      </Suspense>
+                    ) : undefined
+                  }
                 />
               )}
               {view === "prayer" && (
@@ -2303,7 +2323,7 @@ function AppContent({
         />
 
         {/* Floating Audio Player */}
-        {audioController?.state.plan && (
+        {!isAudioPlayerDockedInReader && audioController?.state.plan && (
           <Suspense fallback={null}>
             <FloatingAudioPlayer
               controller={audioController}

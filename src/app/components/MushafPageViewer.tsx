@@ -663,10 +663,7 @@ function PageFurnitureFoot({
   }`;
 
   return (
-    <div
-      className="mushaf-page-furniture mushaf-page-furniture--foot flex shrink-0 items-center justify-center"
-      dir="rtl"
-    >
+    <div className="mushaf-page-furniture mushaf-page-furniture--foot flex shrink-0 items-end justify-center" dir="rtl">
       {onPageClick ? (
         <button
           type="button"
@@ -808,7 +805,7 @@ function MushafPageCanvas({
         ...(hasFloatingControls
           ? {
               paddingTop: "calc(3.25rem + env(safe-area-inset-top))",
-              paddingBottom: "calc(2.875rem + env(safe-area-inset-bottom))",
+              paddingBottom: "max(0.6rem, env(safe-area-inset-bottom))",
             }
           : {}),
       }}
@@ -837,7 +834,7 @@ function MushafPageCanvas({
             )}
             <div
               data-mushaf-column=""
-              className="grid h-[84%] min-h-0 w-full flex-none self-center"
+              className="grid h-[84%] min-h-0 w-full self-center"
               style={{
                 gridTemplateRows: "repeat(8, minmax(0, 1fr))",
                 fontFamily: useQcfGlyphs ? `qcf-v2-page-${pageNumber}, var(--font-mushaf)` : "var(--font-mushaf)",
