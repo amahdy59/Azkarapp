@@ -71,6 +71,7 @@ describe("explicit audio content architecture", () => {
   it("links reviewed before-sleep recordings", () => {
     const expectedAssignments = [
       "s-hm-100",
+      "s-hm-101",
       "s-hm-109",
       "s-hm-99-falaq",
       "s-hm-99-ikhlas",
@@ -278,6 +279,32 @@ describe("explicit audio content architecture", () => {
     for (const dua of duas) {
       const resolution = resolveAudioAsset(dua, { baseUrl: "https://pub-6e537fd865454e599c23a2bcfc22136e.r2.dev" });
       expect(resolution.available, `Expected audio for ${dua.id} to be available, but got: ${resolution.reason}`).toBe(
+        true,
+      );
+      if (resolution.available) {
+        expect(resolution.availableVoiceIds).toContain("english-george");
+      }
+    }
+  });
+
+  it("provides English translation audio for Al-Baqarah (285-286) and shared canonical twins", () => {
+    const expectedEnglishIds = [
+      "s-hm-101",
+      "ap-tasbeeh-tawhid",
+      "in-prayer-sujud-complete-forgiveness",
+      "in-prayer-before-salam-self-forgiveness",
+      "fasting-laylat-al-qadr",
+      "tr-ref-7",
+      "da-ref-7",
+      "sc-ref-10",
+      "misc-ref-13",
+    ];
+
+    for (const id of expectedEnglishIds) {
+      const zikr = ALL_AZKAR.find((item) => item.id === id)!;
+      expect(zikr, `Expected zikr ${id} to exist`).toBeDefined();
+      const resolution = resolveAudioAsset(zikr, { baseUrl: "https://pub-6e537fd865454e599c23a2bcfc22136e.r2.dev" });
+      expect(resolution.available, `Expected audio for ${id} to be available, but got: ${resolution.reason}`).toBe(
         true,
       );
       if (resolution.available) {

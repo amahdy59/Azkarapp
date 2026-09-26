@@ -185,4 +185,13 @@ export const APPROVED_AUDIO_ASSIGNMENTS: Readonly<Record<string, string>> = Obje
   "comprehensive-dua-45": "comprehensive-dua-45-english",
   "comprehensive-dua-46": "comprehensive-dua-46-english",
   "comprehensive-dua-47": "comprehensive-dua-47-english",
+  "s-hm-101": "s-hm-101-english",
+  "ap-tasbeeh-tawhid": "ap-tasbeeh-tawhid",
+  "in-prayer-sujud-complete-forgiveness": "friday-dua-22-english",
+  "in-prayer-before-salam-self-forgiveness": "friday-dua-03-english",
+  "fasting-laylat-al-qadr": "friday-dua-35-english",
+  "tr-ref-7": "m-hm-97",
+  "da-ref-7": "friday-dua-33-english",
+  "sc-ref-10": "pur-ref-6-english",
+  "misc-ref-13": "comprehensive-dua-42-english",
 });
