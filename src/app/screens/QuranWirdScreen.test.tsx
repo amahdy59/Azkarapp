@@ -162,4 +162,123 @@ describe("QuranWirdScreen", () => {
       expect(radio.closest("label")?.querySelector("span")).toHaveClass("text-right");
     }
   });
+
+  it("configures a repeating wird plan for juz, surah, or custom page range", () => {
+    const props = renderScreen();
+    cleanup();
+    const onPlanChange = vi.fn();
+    render(<QuranWirdScreen {...props} onPlanChange={onPlanChange} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+    fireEvent.click(screen.getByRole("radio", { name: /Daily fixed section/i }));
+
+    // Juz scope defaults to the reader's current position (Juz 2: pages 22-41)
+    const juzSelect = screen.getByRole("combobox", { name: /Juz/i });
+    expect(juzSelect).toBeInTheDocument();
+    expect(juzSelect).toHaveValue("2");
+
+    // Change to Juz 1
+    fireEvent.change(juzSelect, { target: { value: "1" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save plan" }));
+
+    expect(onPlanChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: "repeating",
+        repeatScope: "juz",
+        repeatNumber: 1,
+        repeatStartPage: 1,
+        repeatEndPage: 21,
+        dailyPages: 21,
+      }),
+    );
+
+    // Now test custom scope
+    fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+    fireEvent.click(screen.getByRole("radio", { name: /Daily fixed section/i }));
+    fireEvent.click(screen.getByRole("button", { name: "Custom range" }));
+    const startInput = screen.getByLabelText("From page");
+    const endInput = screen.getByLabelText("To page");
+    fireEvent.change(startInput, { target: { value: "10" } });
+    fireEvent.change(endInput, { target: { value: "25" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save plan" }));
+
+    expect(onPlanChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: "repeating",
+        repeatScope: "custom",
+        repeatStartPage: 10,
+        repeatEndPage: 25,
+        dailyPages: 16,
+      }),
+    );
+  });
+
+  it("displays repeating plan with restart action, accurate progress, and week completion", () => {
+    const today = getProgressDayKey(new Date(), 4);
+    const onContinue = vi.fn();
+    const props = renderScreen();
+    cleanup();
+
+    // Juz 1: pages 1 to 21 (21 pages). Suppose user read 5 pages in range and 10 pages outside range (e.g. 50..59)
+    render(
+      <QuranWirdScreen
+        {...props}
+        onContinue={onContinue}
+        plan={{
+          kind: "repeating",
+          repeatScope: "juz",
+          repeatNumber: 1,
+          repeatStartPage: 1,
+          repeatEndPage: 21,
+          dailyPages: 21,
+          startedDayKey: today,
+        }}
+        wirdHistory={{
+          [today]: [1, 2, 3, 4, 5, 50, 51, 52, 53, 54],
+        }}
+      />,
+    );
+
+    // Range display and context
+    expect(screen.getByText("Pages 1–21")).toBeInTheDocument();
+    expect(screen.getAllByText(/Juz 1/).length).toBeGreaterThanOrEqual(1);
+
+    // Progress should only count the 5 pages in range, not the 10 outside
+    expect(screen.getByText("5 of 21 completed")).toBeInTheDocument();
+
+    // "Start section again" action
+    const startAgainBtn = screen.getByRole("button", { name: /Start section again/i });
+    expect(startAgainBtn).toBeInTheDocument();
+    fireEvent.click(startAgainBtn);
+    expect(onContinue).toHaveBeenCalledWith(1);
+
+    // Regular continue reading
+    fireEvent.click(screen.getByRole("button", { name: /Continue reading/i }));
+    expect(onContinue).toHaveBeenCalledWith();
+
+    // Now test when 100% of the repeating section is read
+    cleanup();
+    const all21Pages = Array.from({ length: 21 }, (_, i) => i + 1);
+    render(
+      <QuranWirdScreen
+        {...props}
+        onContinue={onContinue}
+        plan={{
+          kind: "repeating",
+          repeatScope: "juz",
+          repeatNumber: 1,
+          repeatStartPage: 1,
+          repeatEndPage: 21,
+          dailyPages: 21,
+          startedDayKey: today,
+        }}
+        wirdHistory={{
+          [today]: all21Pages,
+        }}
+      />,
+    );
+
+    expect(screen.getByText("21 of 21 completed")).toBeInTheDocument();
+    expect(screen.getByText("Today's Wird complete")).toBeInTheDocument();
+  });
 });

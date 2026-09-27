@@ -1,15 +1,15 @@
 {
   "ar": [
-    "يظهر ورد اليوم قبل الدليل المطوّل على الشاشات الصغيرة لتصل إلى مهمتك التالية بسرعة.",
-    "تظهر أسماء الصلوات كاملة حتى على الهواتف بعرض 320 بكسل دون اختصار مربك.",
-    "أصبح سجل البحث يتعافى تلقائياً من البيانات التالفة، مع عناوين صحيحة لصفحات البحث والإعدادات.",
-    "أصبح بدء التطبيق أخف وأسرع مع بقاء القراءة والحفظ والتقدم متاحة دون اتصال."
+    "يمكنك الآن تحديد ورد مكرر يومي لقراءة جزء أو سورة بعينها أو نطاق صفحات محدد كل يوم وإتمامه باستمرار.",
+    "زر جديد للبدء من أول الورد المكرر بسهولة عند العودة لإعادة قراءة السورة أو الجزء.",
+    "احتساب دقيق لصفحات الورد اليومي مع عزل القراءات الجانبية حتى لا تُحسب ضمن الورد الثابت.",
+    "عرض الأسبوع يوثق إنجاز الورد اليومي بوضوح وفق ما قرأته من نطاقك المختار."
   ],
   "en": [
-    "Today's Wird now appears before the longer evidence card on small screens, keeping the next task close.",
-    "Prayer names stay complete even on 320px phones instead of being shortened with an ellipsis.",
-    "Recent search history now recovers safely from damaged data, and Search and Settings show accurate page titles.",
-    "App startup is substantially lighter while reading, saved items, and progress continue to work offline."
+    "You can now set a daily repeating wird for a fixed Juz, Surah, or custom page range that resets every day.",
+    "A new quick restart button lets you begin your fixed section from the first page whenever you wish to recite it again.",
+    "Daily reading progress accurately tracks pages within your selected section while isolating other reading.",
+    "The weekly view clearly records your wird completion based on reading the full repeating range each day."
   ],
-  "release": "2026-09-27-audit-remediation"
+  "release": "2026-09-27-wird-repeating-plan"
 }

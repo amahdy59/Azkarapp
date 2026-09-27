@@ -89,7 +89,7 @@ export function TrackingCheckMark({ checked, onGlass = false }: { checked: boole
     <span
       aria-hidden="true"
       data-checked={checked ? "true" : undefined}
-      className={`tracking-check pointer-events-none flex size-7 shrink-0 items-center justify-center rounded-full border-2 transition-[background-color,border-color,transform,box-shadow] duration-standard ease-standard peer-enabled:peer-active:scale-90 ${
+      className={`tracking-check pointer-events-none flex size-6 shrink-0 items-center justify-center rounded-full border-2 transition-[background-color,border-color,transform,box-shadow] duration-standard ease-standard peer-enabled:peer-active:scale-90 ${
         checked
           ? "border-primary bg-primary text-primary-foreground shadow-[0_2px_8px_-2px_var(--primary)]"
           : onGlass
@@ -97,7 +97,7 @@ export function TrackingCheckMark({ checked, onGlass = false }: { checked: boole
             : "border-border-control text-transparent peer-enabled:peer-hover:border-primary peer-enabled:peer-hover:bg-primary/10"
       }`}
     >
-      <Check size={16} strokeWidth={3} />
+      <Check size={14} strokeWidth={3} />
     </span>
   );
 }

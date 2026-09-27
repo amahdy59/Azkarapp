@@ -74,7 +74,7 @@ export function PrayerActionsCard({
     >
       {/* Header: Prayer Icon + Heading + More Info Button */}
       <div className="flex items-center justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-2.5">
+        <div className="flex min-w-0 flex-1 items-center gap-2.5">
           <span
             aria-hidden="true"
             className={`flex size-9 shrink-0 items-center justify-center rounded-full ${
@@ -113,8 +113,8 @@ export function PrayerActionsCard({
         </button>
       </div>
 
-      {/* Main Checklist: 1 line per item, floating frosted glass pill */}
-      <ol className="flex flex-col gap-2">
+      {/* Main Checklist: 1 line per item, clean aligned rows without fill/stroke */}
+      <ol className="flex flex-col gap-1">
         {actions.map((action) => {
           const ItemIcon = action.Icon;
           const inputId = `prayer-action-${prayer}-${action.id}`;
@@ -124,13 +124,13 @@ export function PrayerActionsCard({
             <li
               key={action.id}
               data-testid={action.testId}
-              className={`group/item relative flex min-h-14 items-center justify-between gap-3 rounded-2xl px-4 py-3 transition-colors duration-fast ${
+              className={`group/item relative -mx-2 flex min-h-11 items-center justify-between gap-3 rounded-xl px-2 py-1 transition-colors duration-fast ${
                 onGlass
-                  ? "border border-white/20 bg-on-media-surface/60 text-white hover:border-white/40 hover:bg-on-media-surface/60"
-                  : "border border-border/60 bg-card hover:bg-muted/40 text-foreground"
+                  ? "text-white hover:bg-white/10 active:bg-white/15"
+                  : "text-foreground hover:bg-muted/50 active:bg-muted/70"
               }`}
             >
-              {/* Overlay transparent checkbox spanning full row for accessibility & 48px hit target */}
+              {/* Overlay transparent checkbox spanning full row for accessibility & 44px+ hit target */}
               <input
                 id={inputId}
                 type="checkbox"
@@ -146,17 +146,15 @@ export function PrayerActionsCard({
                   }
                 }}
                 aria-labelledby={labelId}
-                className="tracking-choice peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-2xl opacity-0 disabled:cursor-not-allowed"
+                className="tracking-choice peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-xl opacity-0 disabled:cursor-not-allowed"
               />
 
-              {/* Start: Icon on far right (RTL) / far left (LTR) + 1-line label */}
-              <div className="flex min-w-0 flex-1 items-center gap-3">
+              {/* Start: Icon centered in 36px optical column matching header + 1-line label */}
+              <div className="flex min-w-0 flex-1 items-center gap-2.5">
                 <span
                   aria-hidden="true"
-                  className={`flex size-9 shrink-0 items-center justify-center rounded-full ${
-                    onGlass
-                      ? "border border-white/15 bg-on-media-surface/60 text-on-media-accent"
-                      : "border border-border/60 bg-muted text-primary"
+                  className={`flex size-9 shrink-0 items-center justify-center ${
+                    onGlass ? "text-on-media-accent" : "text-muted-foreground"
                   }`}
                 >
                   <ItemIcon size={19} />

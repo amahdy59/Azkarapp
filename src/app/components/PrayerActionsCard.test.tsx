@@ -310,7 +310,7 @@ describe("PrayerActionsCard", () => {
     expect(screen.getByTestId("prayer-open-adhkar")).toHaveTextContent("Start Azkar");
   });
 
-  it("renders with unified frosted sub-surface styling and floating layout when onGlass is true", () => {
+  it("renders with clean aligned rows without fill/stroke when onGlass is true", () => {
     render(
       <PrayerActionsCard
         prayer="dhuhr"
@@ -329,7 +329,11 @@ describe("PrayerActionsCard", () => {
 
     const row = screen.getByTestId("prayer-action-location");
     expect(row).not.toHaveClass("backdrop-blur-md");
-    expect(row).toHaveClass("bg-on-media-surface/60");
+    expect(row).not.toHaveClass("bg-on-media-surface/60");
+    expect(row).not.toHaveClass("border");
+    expect(row).toHaveClass("px-2");
+    expect(row).toHaveClass("-mx-2");
+    expect(row).toHaveClass("text-white");
 
     const heading = screen.getByRole("heading", { level: 3 });
     expect(heading).toHaveClass("text-on-media-accent");

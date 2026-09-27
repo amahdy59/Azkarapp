@@ -242,6 +242,24 @@ describe("app state persistence", () => {
       kind: "free",
       dailyPages: 0,
     });
+    expect(
+      normalizeAppState({
+        quranWirdPlan: {
+          kind: "repeating",
+          repeatStartPage: 1,
+          repeatEndPage: 20,
+          repeatScope: "juz",
+          repeatNumber: 1,
+        },
+      }).quranWirdPlan,
+    ).toEqual({
+      kind: "repeating",
+      dailyPages: 20,
+      repeatStartPage: 1,
+      repeatEndPage: 20,
+      repeatScope: "juz",
+      repeatNumber: 1,
+    });
   });
 
   it("normalizes and merges Quran reading days without losing concurrent pages", () => {

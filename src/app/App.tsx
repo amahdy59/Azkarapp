@@ -2225,8 +2225,12 @@ function AppContent({
                   quranWirdDailyGoals={quranWirdDailyGoals}
                   lastReadingEvent={quranLastReadingEvent}
                   onBack={pop}
-                  onContinue={() => {
-                    warmMushafReader(quranReadingPosition.page);
+                  onContinue={(targetPage?: number) => {
+                    const page = typeof targetPage === "number" ? targetPage : quranReadingPosition.page;
+                    if (typeof targetPage === "number" && targetPage !== quranReadingPosition.page) {
+                      setQuranReadingPosition((current) => ({ ...current, page: targetPage }));
+                    }
+                    warmMushafReader(page);
                     push("khatmah");
                   }}
                   onPlanChange={(plan) => {

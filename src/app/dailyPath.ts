@@ -1,5 +1,5 @@
 import { MAIN_CATEGORY_IDS } from "./progress";
-import { getQuranWirdGoal } from "./screens/quranWirdGoal";
+import { getQuranWirdDayProgress } from "./screens/quranWirdGoal";
 import { trackedLocation } from "./prayerMoment";
 import { PRAYER_NAMES } from "./content/prayerTimes";
 import type { CategoryId, DailyCollectionCompletion, PrayerTrackingRecord, QuranWirdPlan } from "./types";
@@ -101,14 +101,6 @@ function completedCategories(completions: readonly DailyCollectionCompletion[], 
   return new Set(completions.filter((record) => record.dayKey === dayKey).map((record) => record.category));
 }
 
-/** The goal that day was actually held to, not the one set since. */
-function goalForDay(input: DailyPathInput): number {
-  const recorded = input.quranWirdDailyGoals?.[input.dayKey];
-  if (typeof recorded === "number") return recorded;
-  if (!input.quranWirdPlan) return 0;
-  return getQuranWirdGoal(input.quranWirdPlan, input.wirdHistory, input.dayKey).dailyGoal;
-}
-
 export function getDailyPathStatus(input: DailyPathInput): DailyPathStatus {
   const done = completedCategories(input.dailyCompletions, input.dayKey);
   const [morning, evening, beforeSleep] = MAIN_CATEGORY_IDS.map((category) => done.has(category)) as [
@@ -118,9 +110,10 @@ export function getDailyPathStatus(input: DailyPathInput): DailyPathStatus {
   ];
   const completedCount = [morning, evening, beforeSleep].filter(Boolean).length;
 
-  const goal = goalForDay(input);
-  // Unique pages: the same page opened twice is one page read.
-  const progress = new Set(input.wirdHistory[input.dayKey] ?? []).size;
+  const qDay = getQuranWirdDayProgress(input.quranWirdPlan, input.wirdHistory, input.dayKey);
+  const recorded = input.quranWirdDailyGoals?.[input.dayKey];
+  const goal = typeof recorded === "number" ? recorded : qDay.goal;
+  const progress = qDay.read;
   const quranActive = goal > 0;
 
   const target = input.mosquePrayerGoal && input.mosquePrayerGoal > 0 ? input.mosquePrayerGoal : null;

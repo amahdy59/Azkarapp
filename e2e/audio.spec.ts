@@ -327,3 +327,57 @@ test("synchronizes Reader navigation with audio tracks, shows proper track title
   await expect(player).toContainText("سورة الْفَلَق");
   await expect(player).toContainText("المقطع ٣ / ١٧");
 });
+
+test("expanded audio player on home screen stays within the desktop canvas and page bounds", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.addInitScript(() => {
+    window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+    window.localStorage.setItem(
+      "azkarapp.state.v1",
+      JSON.stringify({
+        settings: { language: "ar", themeMode: "midnight", reduceMotion: true },
+        profile: { displayName: "Guest", isGuest: true },
+        completed: { morning: [], evening: [], before_sleep: [], friday_kahf: [] },
+        sessions: [],
+      }),
+    );
+    HTMLMediaElement.prototype.play = () => Promise.resolve();
+  });
+
+  // Start audio from an azkar screen
+  await page.goto("/#/azkar/friday-kahf/1");
+  await page.getByRole("button", { name: "الاستماع للسورة", exact: true }).click();
+
+  const player = page.getByRole("region", { name: "مشغل الصوت" });
+  await expect(player).toBeVisible();
+
+  // Navigate back to the Home screen
+  await page.getByTestId("nav-home").click();
+  await expect(player).toBeVisible();
+  await expect(player).toHaveAttribute("data-variant", "compact");
+
+  // Expand the audio player while on the Home screen
+  await player.getByRole("button", { name: "توسيع المشغل" }).click();
+  await expect(player).toHaveAttribute("data-variant", "expanded");
+
+  // Verify bounding boxes: must stay within the main canvas and not overflow left or right
+  const [mainBox, playerBox] = await Promise.all([page.locator(".app-main").boundingBox(), player.boundingBox()]);
+  expect(mainBox && playerBox).toBeTruthy();
+  if (mainBox && playerBox) {
+    expect(playerBox.x).toBeGreaterThanOrEqual(mainBox.x);
+    expect(playerBox.x + playerBox.width).toBeLessThanOrEqual(mainBox.x + mainBox.width + 1);
+  }
+
+  // The stop/close button on the logical end (left in RTL) must be fully visible and inside the viewport
+  const closeButton = player.getByRole("button", { name: "إيقاف الصوت وإغلاق المشغل" });
+  await expect(closeButton).toBeVisible();
+  const closeBox = await closeButton.boundingBox();
+  expect(closeBox).toBeTruthy();
+  if (closeBox) {
+    expect(closeBox.x).toBeGreaterThanOrEqual(0);
+    if (playerBox) {
+      expect(closeBox.x).toBeGreaterThanOrEqual(playerBox.x);
+      expect(closeBox.x + closeBox.width).toBeLessThanOrEqual(playerBox.x + playerBox.width);
+    }
+  }
+});

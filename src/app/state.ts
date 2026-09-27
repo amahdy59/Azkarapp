@@ -355,7 +355,8 @@ function normalizeQuranWirdPlan(value: unknown, fallbackGoal: number): QuranWird
     plan.kind === "custom" ||
     plan.kind === "hijriMonth" ||
     plan.kind === "gregorianMonth" ||
-    plan.kind === "free"
+    plan.kind === "free" ||
+    plan.kind === "repeating"
       ? plan.kind
       : "daily";
   const dailyPages =
@@ -392,6 +393,44 @@ function normalizeQuranWirdPlan(value: unknown, fallbackGoal: number): QuranWird
       ? plan.targetPage
       : undefined;
   const timed = kind === "custom" || kind === "khatmah30" || kind === "hijriMonth" || kind === "gregorianMonth";
+
+  if (kind === "repeating") {
+    const rawStart =
+      typeof plan.repeatStartPage === "number" &&
+      Number.isInteger(plan.repeatStartPage) &&
+      plan.repeatStartPage >= 1 &&
+      plan.repeatStartPage <= 604
+        ? plan.repeatStartPage
+        : 1;
+    const rawEnd =
+      typeof plan.repeatEndPage === "number" &&
+      Number.isInteger(plan.repeatEndPage) &&
+      plan.repeatEndPage >= 1 &&
+      plan.repeatEndPage <= 604
+        ? plan.repeatEndPage
+        : 604;
+    const repeatStartPage = Math.min(rawStart, rawEnd);
+    const repeatEndPage = Math.max(rawStart, rawEnd);
+    const repeatScope =
+      plan.repeatScope === "juz" || plan.repeatScope === "surah" || plan.repeatScope === "custom"
+        ? plan.repeatScope
+        : undefined;
+    const repeatNumber =
+      typeof plan.repeatNumber === "number" && Number.isInteger(plan.repeatNumber) && plan.repeatNumber >= 1
+        ? plan.repeatNumber
+        : undefined;
+    const rangePages = repeatEndPage - repeatStartPage + 1;
+    return {
+      kind: "repeating",
+      dailyPages: rangePages,
+      repeatStartPage,
+      repeatEndPage,
+      ...(repeatScope ? { repeatScope } : {}),
+      ...(repeatNumber !== undefined ? { repeatNumber } : {}),
+      ...(startedDayKey ? { startedDayKey } : {}),
+    };
+  }
+
   return {
     kind,
     dailyPages: kind === "free" ? 0 : kind === "khatmah30" ? 21 : dailyPages,

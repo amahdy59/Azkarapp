@@ -112,6 +112,7 @@ Run the phase files in numerical order unless the decision log explicitly record
 | 69    | `phases/PHASE_69_RECENT_CHANGES_REVIEW.md`               | Review-led hardening of recent reading, counter, Home, and audio changes                 |
 | 70    | `phases/PHASE_70_UX_A11Y_AND_EFFICIENCY_IMPROVEMENTS.md` | Audit-driven UX, WCAG 2.2 AA target/focus, search highlight, and efficiency improvements |
 | 71    | `phases/PHASE_71_AUDIT_REMEDIATION.md`                   | Responsive task priority, robust persistence, service boundaries, and startup reduction  |
+| 72    | `phases/PHASE_72_WIRD_PLANNING_REDESIGN.md`              | Daily repeating Quran Wird plan architecture, isolated tracking, and intuitive restart   |
 
 Phases 15–20 derive from `docs/audits/DESIGN_CONSISTENCY_AUDIT.md` (2026-08-15) and are
 recorded in `DECISION_LOG.md` as DEC-064. Phase 15 is upstream of 16, 17 and 19 — its root
@@ -121,6 +122,6 @@ may run in parallel.
 
 ## Core rule
 
-The latest review and hardening work is recorded in [Phase 71](phases/PHASE_71_AUDIT_REMEDIATION.md), including compact Home task priority, complete prayer labels, resilient recent-search normalization, truthful route titles, concise zikr action names, centralized Cloudflare browser access, and a smaller startup graph.
+The latest review and hardening work is recorded in [Phase 72](phases/PHASE_72_WIRD_PLANNING_REDESIGN.md), adding support for daily repeating Quran sections (fixed Juz, Surah, or custom page range) with binary daily completion upon reading 100% of the section, isolated progress calculation, and one-tap section restart.
 
 The agent must never interpret “perfect the application” as permission to rewrite the entire repository. Perfection is approached through evidence-backed iteration, not one-shot replacement.

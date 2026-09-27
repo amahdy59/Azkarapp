@@ -218,10 +218,62 @@ describe("FloatingAudioPlayer", () => {
     const expandedRegion = screen.getByRole("region", { name: "Audio player" });
     expect(expandedRegion).toHaveClass("floating-audio-player--docked");
     expect(expandedRegion).toHaveClass("floating-audio-player--expanded");
-
     // Unified controls: speed button and volume slider are present beside transport controls
     expect(screen.getByRole("button", { name: /Speed: 1×/ })).toBeInTheDocument();
     expect(screen.getByRole("slider", { name: "Volume" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Pause audio" })).toBeInTheDocument();
+  });
+
+  it("renders repeat button beside timeline when supported and toggles repeat mode", () => {
+    const controller = createController();
+    const repeatableEntry: PlaybackEntry = {
+      ...entry,
+      supportedModes: ["play-once", "repeat-prescribed-count"],
+      repetitions: 3,
+      prescribedRepetitions: 3,
+    };
+    controller.currentEntry = repeatableEntry;
+
+    render(<FloatingAudioPlayer controller={controller} language="en" direction="ltr" />);
+    fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
+
+    const repeatBtn = screen.getByRole("button", { name: "Repeat" });
+    expect(repeatBtn).toBeInTheDocument();
+    expect(repeatBtn).toHaveAttribute("aria-pressed", "true");
+
+    fireEvent.click(repeatBtn);
+    expect(controller.setPlaybackMode).toHaveBeenCalledWith("play-once");
+  });
+
+  it("renders Quranic verses with ornamental ayah badges in expanded zikr text", () => {
+    const controller = createController();
+    const quranEntry: PlaybackEntry = {
+      ...entry,
+      arabicText: "﴿تَبَارَكَ الَّذِي بِيَدِهِ الْمُلْكُ ﴿١﴾ الَّذِي خَلَقَ الْمَوْتَ ﴿٢﴾",
+    };
+    controller.currentEntry = quranEntry;
+
+    render(<FloatingAudioPlayer controller={controller} language="ar" direction="rtl" />);
+    fireEvent.click(screen.getByRole("button", { name: "توسيع المشغل" }));
+
+    const zikrText = screen.getByTestId("audio-player-zikr-text");
+    expect(zikrText).toHaveTextContent("تَبَارَكَ الَّذِي بِيَدِهِ الْمُلْكُ");
+    expect(zikrText).toHaveTextContent("١");
+    expect(zikrText).toHaveTextContent("الَّذِي خَلَقَ الْمَوْتَ");
+    expect(zikrText).toHaveTextContent("٢");
+  });
+
+  it("maintains symmetric transport layout with jump controls around the central play button", () => {
+    const controller = createController();
+    render(<FloatingAudioPlayer controller={controller} language="en" direction="ltr" />);
+    fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
+
+    const back10 = screen.getByRole("button", { name: "Rewind 10 seconds" });
+    const forward10 = screen.getByRole("button", { name: "Forward 10 seconds" });
+    const playPause = screen.getByRole("button", { name: "Pause audio" });
+
+    expect(back10).toBeInTheDocument();
+    expect(playPause).toBeInTheDocument();
+    expect(forward10).toBeInTheDocument();
   });
 });

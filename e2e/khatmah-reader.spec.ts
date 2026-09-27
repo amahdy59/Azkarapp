@@ -177,7 +177,7 @@ test("offers clear RTL reading choices and free reading without progress trackin
   await page.getByRole("button", { name: "تعديل" }).click();
 
   const radios = page.getByRole("radio");
-  await expect(radios).toHaveCount(4);
+  await expect(radios).toHaveCount(5);
   await expect(page.getByRole("combobox")).toHaveCount(0);
   await expect(page.getByRole("radio", { name: /صفحات كل يوم/ })).toBeChecked();
 

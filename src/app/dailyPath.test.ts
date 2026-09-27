@@ -90,6 +90,31 @@ describe("the Qur'an pillar", () => {
     expect(result.quran.active).toBe(false);
     expect(result.quran.complete).toBe(false);
   });
+
+  it("evaluates a repeating plan based strictly on pages within the defined range read today", () => {
+    const repeatingPlan = {
+      kind: "repeating" as const,
+      dailyPages: 20,
+      repeatStartPage: 1,
+      repeatEndPage: 20,
+      repeatScope: "juz" as const,
+      repeatNumber: 1,
+    };
+    // Partial (10 of 20 read in range, plus pages 30 and 40 outside range)
+    const partial = status({
+      quranWirdPlan: repeatingPlan,
+      wirdHistory: { [DAY]: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 30, 40] },
+    });
+    expect(partial.quran).toMatchObject({ goal: 20, progress: 10, complete: false, active: true });
+
+    // Completed (all 20 pages read in range today)
+    const fullRange = Array.from({ length: 20 }, (_, i) => i + 1);
+    const complete = status({
+      quranWirdPlan: repeatingPlan,
+      wirdHistory: { [DAY]: fullRange },
+    });
+    expect(complete.quran).toMatchObject({ goal: 20, progress: 20, complete: true, active: true });
+  });
 });
 
 describe("the mosque pillar", () => {

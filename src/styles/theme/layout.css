@@ -89,25 +89,18 @@
 }
 
 .floating-audio-player--expanded {
-  inset-inline: 0;
+  inset: 0;
   margin-inline: auto;
-  max-height: calc(100dvh - 5.5rem);
 }
 
 /* Docked audio player inside reader canvas: contained within the reader area */
 .floating-audio-player--docked {
-  position: absolute !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  max-height: 100% !important;
-  margin: 0 !important;
+  position: absolute;
+  inset: 0;
 }
 
 .floating-audio-player--docked.floating-audio-player--compact {
-  inset: auto 0.5rem 0.5rem 0.5rem !important;
-  width: auto !important;
-  height: auto !important;
+  inset: auto 0.5rem 0.5rem;
 }
 
 /* Native range inputs keep their real keyboard, pointer and accessibility
@@ -194,6 +187,7 @@
   }
 
   .floating-audio-player--expanded {
+    inset: 0.75rem;
     max-height: calc(100dvh - 1.5rem);
   }
 

@@ -169,12 +169,12 @@ describe("MushafNavigationModal", () => {
       />,
     );
 
-    // Surah Al-Mulk spans 562-564 (including 564 where Al-Qalam starts on line 6).
-    const page564Btn = screen.getByRole("button", { name: "٥٦٤" });
-    expect(page564Btn).toBeInTheDocument();
-    fireEvent.click(page564Btn);
+    // Quick jump grid shows multiples of 5; select page 565.
+    const page565Btn = screen.getByRole("button", { name: "٥٦٥" });
+    expect(page565Btn).toBeInTheDocument();
+    fireEvent.click(page565Btn);
 
-    expect(handleSelectPage).toHaveBeenCalledWith(564);
+    expect(handleSelectPage).toHaveBeenCalledWith(565);
     expect(handleClose).toHaveBeenCalled();
   });
 });

@@ -161,6 +161,66 @@ function WaveBars({ playing }: { playing: boolean }) {
 }
 
 /**
+ * Renders Arabic Quran text with inline ayah number badges.
+ *
+ * Splits on the ornate Quranic ayah markers ﴿١﴾ or Unicode ayah stop ۝ (U+06DD)
+ * which exist in reviewed devotional and Quran content. The badge is purely decorative
+ * — screen-readers hear the natural prose text without stuttering.
+ */
+function MushafAyahText({ text, className }: { text: string; className?: string }) {
+  const AYAH_REGEX = /(?:﴿([0-9٠-٩]+)﴾|[\u06DD]([0-9٠-٩]+)?)/gu;
+  const elements: ReactNode[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  let autoAyahIndex = 1;
+
+  while ((match = AYAH_REGEX.exec(text)) !== null) {
+    const rawVerse = text
+      .slice(lastIndex, match.index)
+      .replace(/^[﴿\s]+/, "")
+      .trim();
+    if (rawVerse) {
+      elements.push(<span key={`v-${lastIndex}`}>{rawVerse} </span>);
+    }
+    const ayahNumber = match[1] || match[2] || String(autoAyahIndex);
+    autoAyahIndex++;
+    elements.push(
+      <span
+        key={`a-${match.index}`}
+        aria-hidden="true"
+        className="mx-1 inline-flex size-6 shrink-0 select-none items-center justify-center rounded-full border border-primary/30 bg-primary/15 text-micro font-bold text-primary align-middle"
+        style={{ fontFamily: "var(--font-arabic, sans-serif)" }}
+      >
+        {ayahNumber}
+      </span>,
+    );
+    lastIndex = match.index + match[0].length;
+  }
+
+  const trailing = text
+    .slice(lastIndex)
+    .replace(/[﴾\s]+$/, "")
+    .trim();
+  if (trailing) {
+    elements.push(<span key={`v-${lastIndex}`}>{trailing}</span>);
+  }
+
+  if (elements.length === 0) {
+    return (
+      <span className={className} dir="rtl" lang="ar">
+        {text}
+      </span>
+    );
+  }
+
+  return (
+    <span className={className} dir="rtl" lang="ar">
+      {elements}
+    </span>
+  );
+}
+
+/**
  * A transport control with its name under it.
  *
  * Five unlabeled glyphs in a row asked the reader to tell a rewind from a
@@ -195,12 +255,6 @@ function TransportButton({
     </button>
   );
 }
-
-/** One shape for every option control under the transport row. */
-const PILL_CLASS =
-  "flex min-h-11 items-center justify-center gap-2 rounded-full border px-4 text-label font-bold transition-colors duration-fast focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
-const PILL_IDLE = "border-border text-foreground hover:bg-muted";
-const PILL_ACTIVE = "border-primary bg-primary/15 text-primary";
 
 function progressBackground(progress: number, direction: "rtl" | "ltr") {
   const clamped = Number.isFinite(progress) ? Math.min(100, Math.max(0, progress)) : 0;
@@ -423,6 +477,41 @@ export function FloatingAudioPlayer({
     // Recovery actions must never be hidden behind the compact player.
     if (state.status === "error") setIsMinimized(false);
   }, [state.status]);
+
+  /** Scrollable container for the zikr card text area. */
+  const zikrScrollRef = useRef<HTMLDivElement>(null);
+  const isUserInteractingRef = useRef(false);
+  const interactionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleScrollInteraction = useCallback(() => {
+    isUserInteractingRef.current = true;
+    if (interactionTimerRef.current) {
+      clearTimeout(interactionTimerRef.current);
+    }
+    interactionTimerRef.current = setTimeout(() => {
+      isUserInteractingRef.current = false;
+    }, 2500);
+  }, []);
+
+  // Proportional auto-scroll of the zikr text while audio is playing.
+  // Scroll is a linear approximation of playback position through the text.
+  useEffect(() => {
+    const el = zikrScrollRef.current;
+    const { currentTime, duration, status } = state;
+    if (!el || isMinimized || status !== "playing" || isUserInteractingRef.current) return;
+    if (!duration || duration <= 0) return;
+    const ratio = Math.min(1, Math.max(0, currentTime / duration));
+    const maxScroll = el.scrollHeight - el.clientHeight;
+    if (maxScroll <= 0) return;
+    const target = Math.round(ratio * maxScroll);
+    if (Math.abs(el.scrollTop - target) < 8) return;
+
+    if (motionReduced) {
+      el.scrollTop = target;
+    } else {
+      el.scrollTo({ top: target, behavior: "smooth" });
+    }
+  }, [state, isMinimized, motionReduced]);
 
   const jumpSeconds = useCallback((delta: number) => {
     const { currentTime, duration } = timingRef.current;
@@ -739,7 +828,7 @@ export function FloatingAudioPlayer({
       className={
         dockedInReader
           ? "floating-audio-player floating-audio-player--expanded floating-audio-player--docked absolute inset-0 z-30 flex h-full w-full flex-col justify-between overflow-x-hidden overflow-y-auto overscroll-contain bg-card px-3 pb-3 pt-2 sm:px-6 shadow-overlay md:rounded-3xl md:border md:border-border/80"
-          : `floating-audio-player floating-audio-player--expanded fixed z-40 inset-0 flex h-full w-full flex-col justify-between overflow-x-hidden overflow-y-auto overscroll-contain bg-card px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 sm:px-6 shadow-overlay ${overReadingSurface ? "floating-audio-player--reading" : ""}`
+          : `floating-audio-player floating-audio-player--expanded fixed z-40 flex flex-col justify-between overflow-x-hidden overflow-y-auto overscroll-contain bg-card px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 sm:px-6 shadow-overlay md:rounded-3xl md:border md:border-border/80 ${overReadingSurface ? "floating-audio-player--reading" : ""}`
       }
     >
       <div className="sr-only" aria-live="polite" aria-atomic="true">
@@ -826,22 +915,28 @@ export function FloatingAudioPlayer({
 
           {/* Full Zikr Text Area: written within the area of the Zikr name */}
           <div
+            ref={zikrScrollRef}
+            onPointerDown={handleScrollInteraction}
+            onTouchStart={handleScrollInteraction}
+            onWheel={handleScrollInteraction}
             className="mt-2 flex min-h-0 w-full flex-1 flex-col items-center overflow-y-auto border-t border-border/40 px-3 py-3 sm:px-6 select-text"
             style={{ scrollbarGutter: "stable" }}
           >
             <div className="my-auto flex w-full max-w-2xl flex-col items-center justify-center text-center py-1">
               <p
                 data-testid="audio-player-zikr-text"
-                className="zikr-text text-center font-medium leading-relaxed text-foreground text-2xl md:text-3xl"
+                className={`zikr-text text-center font-medium leading-loose text-foreground ${
+                  zikrArabicText.length > 250 ? "text-base sm:text-lg md:text-xl" : "text-lg sm:text-xl md:text-2xl"
+                }`}
                 dir="rtl"
                 lang="ar"
                 style={{ fontFamily: "var(--font-zikr)" }}
               >
-                {zikrArabicText}
+                <MushafAyahText text={zikrArabicText} />
               </p>
               {isEnglishMode && currentEntry.translation && (
                 <p
-                  className="mt-3 border-t border-border/40 pt-2 text-center text-base leading-relaxed text-muted-foreground max-w-2xl"
+                  className="mt-3 border-t border-border/40 pt-2 text-center text-sm sm:text-base leading-relaxed text-muted-foreground max-w-2xl"
                   dir="ltr"
                   lang="en"
                 >
@@ -855,7 +950,7 @@ export function FloatingAudioPlayer({
 
       {/* Bottom Transport Controller Area: docked at the bottom where the counter normally sits */}
       <div className="mx-auto w-full max-w-2xl shrink-0 pt-1">
-        {/* Timeline / Scrub Bar with Generous Hit Target */}
+        {/* Timeline / Scrub Bar with Repeat Control Beside Progress */}
         <div className="flex items-center gap-2 sm:gap-3 px-1" dir={direction}>
           <span className="w-10 text-center text-micro font-bold tabular-nums text-muted-foreground">
             {formatTime(state.currentTime, language)}
@@ -873,9 +968,6 @@ export function FloatingAudioPlayer({
               aria-label={t(language, "audioPlayer.seek")}
               aria-keyshortcuts="PageUp PageDown"
               aria-valuetext={accessibleTime(state.currentTime, state.duration, language)}
-              /* The played part of the track is drawn here rather than in a
-                 stylesheet: a range input needs one gradient per browser engine
-                 to fill, and the value is already in hand. */
               style={{ "--audio-range-fill": progressBackground(progressPercent, direction) } as CSSProperties}
               className="audio-timeline-range h-11 w-full cursor-pointer appearance-none accent-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             />
@@ -883,98 +975,98 @@ export function FloatingAudioPlayer({
           <span className="w-10 text-center text-micro font-bold tabular-nums text-muted-foreground">
             {formatTime(state.duration, language)}
           </span>
+          {canRepeat && (
+            <button
+              type="button"
+              aria-pressed={repeatEnabled}
+              onClick={() => controller.setPlaybackMode(repeatEnabled ? "play-once" : "repeat-prescribed-count")}
+              className={`flex size-9 shrink-0 items-center justify-center rounded-full border transition-colors duration-fast focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                repeatEnabled
+                  ? "border-primary bg-primary/15 text-primary"
+                  : "border-border text-muted-foreground hover:bg-muted hover:text-foreground"
+              }`}
+              aria-label={t(language, "audioPlayer.repeatShort")}
+              title={t(language, "audioPlayer.repeatShort")}
+            >
+              <RotateCcw size={15} aria-hidden="true" />
+            </button>
+          )}
         </div>
 
-        {/* Primary Transport Controls Row with Speed, Repeat & Volume Integrated */}
-        <div className="mt-1 flex w-full flex-wrap items-center justify-between gap-1 sm:gap-2 px-1" dir={direction}>
-          {/* Start Actions: Speed and Repeat */}
-          <div className="flex shrink-0 items-center gap-1 sm:gap-2">
-            <button
-              type="button"
-              onClick={() => controller.setPlaybackRate(nextPlaybackRate(state.playbackRate))}
-              className={`${PILL_CLASS} min-h-11 px-3 text-xs ${state.playbackRate === 1 ? PILL_IDLE : PILL_ACTIVE}`}
-              aria-label={`${t(language, "audioPlayer.speedShort")}: ${formatNumerals(state.playbackRate, language)}×`}
-            >
-              <span className="hidden sm:inline">{t(language, "audioPlayer.speedShort")} </span>
-              <span dir="ltr" className="font-black tabular-nums text-primary">
-                {formatNumerals(state.playbackRate, language)}×
-              </span>
-            </button>
+        {/* Audio Settings Row: Speed & Volume positioned side by side, perfectly stable */}
+        <div className="mt-1 flex items-center justify-center gap-2 sm:gap-3 px-1" dir={direction}>
+          <button
+            type="button"
+            onClick={() => controller.setPlaybackRate(nextPlaybackRate(state.playbackRate))}
+            className="flex min-h-11 items-center justify-center gap-2 rounded-full border border-border bg-card px-3 text-xs font-bold text-foreground transition-colors duration-fast hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            aria-label={`${t(language, "audioPlayer.speedShort")}: ${formatNumerals(state.playbackRate, language)}×`}
+          >
+            <span className="text-muted-foreground">{t(language, "audioPlayer.speedShort")}</span>
+            <span dir="ltr" className="font-black tabular-nums text-primary">
+              {formatNumerals(state.playbackRate, language)}×
+            </span>
+          </button>
 
-            {canRepeat && (
-              <button
-                type="button"
-                aria-pressed={repeatEnabled}
-                onClick={() => controller.setPlaybackMode(repeatEnabled ? "play-once" : "repeat-prescribed-count")}
-                className={`${PILL_CLASS} min-h-11 px-3 text-xs ${repeatEnabled ? PILL_ACTIVE : PILL_IDLE}`}
-                aria-label={t(language, "audioPlayer.repeatShort")}
-                title={t(language, "audioPlayer.repeatShort")}
-              >
-                <RotateCcw size={15} aria-hidden="true" />
-                <span className="hidden sm:inline">{t(language, "audioPlayer.repeatShort")}</span>
-              </button>
-            )}
-          </div>
+          <VolumeControl controller={controller} language={language} inline />
+        </div>
 
-          {/* Center: Playback Transport Buttons */}
-          <div className="flex shrink-0 items-center justify-center gap-1">
-            {totalTracks > 1 && (
-              <TransportButton
-                label={t(language, "audioPlayer.previousShort")}
-                ariaLabel={t(language, "audioPlayer.previous")}
-                onClick={controller.previous}
-                disabled={state.entryIndex === 0}
-              >
-                <SkipBack size={20} className="rtl:rotate-180" aria-hidden="true" />
-              </TransportButton>
-            )}
-
+        {/* Primary Universal Audio Controller Row: Strict Symmetry Maintained */}
+        <div className="mt-1 flex items-center justify-center gap-2 sm:gap-3 px-1" dir={direction}>
+          {totalTracks > 1 ? (
             <TransportButton
-              label={t(language, "audioPlayer.back10Short")}
-              ariaLabel={t(language, "audioPlayer.jumpBack10")}
-              onClick={() => jumpSeconds(-10)}
-              disabled={state.duration <= 0}
+              label={t(language, "audioPlayer.previousShort")}
+              ariaLabel={t(language, "audioPlayer.previous")}
+              onClick={controller.previous}
+              disabled={state.entryIndex === 0}
             >
-              <JumpBack10Icon className="size-5" />
+              <SkipBack size={20} className="rtl:rotate-180" aria-hidden="true" />
             </TransportButton>
+          ) : (
+            <div className="min-w-11 shrink-0" aria-hidden="true" />
+          )}
 
-            <button
-              style={{ borderRadius: 9999 }}
-              type="button"
-              onClick={isPlaying ? controller.pause : controller.play}
-              aria-label={isPlaying ? t(language, "audioPlayer.pause") : t(language, "audioPlayer.play")}
-              className="mx-1 flex size-16 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-raised transition-transform duration-fast active:scale-95 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-            >
-              <span className="flex items-center justify-center">
-                {isPlaying ? <Pause size={28} aria-hidden="true" /> : <Play size={28} aria-hidden="true" />}
-              </span>
-            </button>
+          <TransportButton
+            label={t(language, "audioPlayer.back10Short")}
+            ariaLabel={t(language, "audioPlayer.jumpBack10")}
+            onClick={() => jumpSeconds(-10)}
+            disabled={state.duration <= 0}
+          >
+            <JumpBack10Icon className="size-5" />
+          </TransportButton>
 
+          <button
+            style={{ borderRadius: 9999 }}
+            type="button"
+            onClick={isPlaying ? controller.pause : controller.play}
+            aria-label={isPlaying ? t(language, "audioPlayer.pause") : t(language, "audioPlayer.play")}
+            className="mx-1 flex size-16 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-raised transition-transform duration-fast active:scale-95 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          >
+            <span className="flex items-center justify-center">
+              {isPlaying ? <Pause size={28} aria-hidden="true" /> : <Play size={28} aria-hidden="true" />}
+            </span>
+          </button>
+
+          <TransportButton
+            label={t(language, "audioPlayer.forward10Short")}
+            ariaLabel={t(language, "audioPlayer.jumpForward10")}
+            onClick={() => jumpSeconds(10)}
+            disabled={state.duration <= 0}
+          >
+            <JumpForward10Icon className="size-5" />
+          </TransportButton>
+
+          {totalTracks > 1 ? (
             <TransportButton
-              label={t(language, "audioPlayer.forward10Short")}
-              ariaLabel={t(language, "audioPlayer.jumpForward10")}
-              onClick={() => jumpSeconds(10)}
-              disabled={state.duration <= 0}
+              label={t(language, "audioPlayer.nextShort")}
+              ariaLabel={t(language, "audioPlayer.next")}
+              onClick={controller.next}
+              disabled={state.entryIndex === totalTracks - 1}
             >
-              <JumpForward10Icon className="size-5" />
+              <SkipForward size={20} className="rtl:rotate-180" aria-hidden="true" />
             </TransportButton>
-
-            {totalTracks > 1 && (
-              <TransportButton
-                label={t(language, "audioPlayer.nextShort")}
-                ariaLabel={t(language, "audioPlayer.next")}
-                onClick={controller.next}
-                disabled={state.entryIndex === totalTracks - 1}
-              >
-                <SkipForward size={20} className="rtl:rotate-180" aria-hidden="true" />
-              </TransportButton>
-            )}
-          </div>
-
-          {/* End: Volume Control */}
-          <div className="flex shrink-0 items-center justify-end">
-            <VolumeControl controller={controller} language={language} inline />
-          </div>
+          ) : (
+            <div className="min-w-11 shrink-0" aria-hidden="true" />
+          )}
         </div>
 
         {/* Error state */}

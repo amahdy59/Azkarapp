@@ -120,4 +120,52 @@ describe("ProgressScreen Quran wird completion consistency", () => {
     expect(wirdButton).toHaveAttribute("aria-pressed", "true");
     expect(within(wirdButton).getByText("Completed")).toBeInTheDocument();
   });
+
+  it("marks repeating wird as complete only when all pages in repeat range are read today", () => {
+    const repeatingPlan: QuranWirdPlan = {
+      kind: "repeating",
+      dailyPages: 20,
+      repeatStartPage: 1,
+      repeatEndPage: 20,
+      repeatScope: "juz",
+      repeatNumber: 1,
+      startedDayKey: dayKey,
+    };
+
+    const { rerender } = render(
+      <ProgressScreen
+        dailyCompletions={completions}
+        dailyHabits={[]}
+        wirdHistory={{ [dayKey]: [1, 2, 3] }}
+        quranWirdPlan={repeatingPlan}
+        progressDayStartHour={3}
+        calendarType="gregorian"
+        language="en"
+        direction="ltr"
+        onOpenShareModal={vi.fn()}
+      />,
+    );
+
+    const wirdButton = screen.getByRole("button", { name: /Qur'an Wird|Quran Wird/i });
+    expect(wirdButton).toHaveAttribute("aria-pressed", "false");
+    expect(within(wirdButton).getByText("3 / 20 pages")).toBeInTheDocument();
+
+    const fullRange = Array.from({ length: 20 }, (_, i) => i + 1);
+    rerender(
+      <ProgressScreen
+        dailyCompletions={completions}
+        dailyHabits={[]}
+        wirdHistory={{ [dayKey]: fullRange }}
+        quranWirdPlan={repeatingPlan}
+        progressDayStartHour={3}
+        calendarType="gregorian"
+        language="en"
+        direction="ltr"
+        onOpenShareModal={vi.fn()}
+      />,
+    );
+
+    expect(wirdButton).toHaveAttribute("aria-pressed", "true");
+    expect(within(wirdButton).getByText("Completed")).toBeInTheDocument();
+  });
 });

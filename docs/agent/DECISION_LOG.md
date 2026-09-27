@@ -3981,3 +3981,17 @@ null` shape, so a record written before this change still loads and still
 - **Why:** These changes close observed user-facing and crash risks, establish enforceable ownership boundaries, and reduce the measured initial route without changing content, persistence shape, sync payloads, or offline reading behavior.
 - **Consequences:** Search and Settings titles stay current; corrupt local history is harmless; narrow Home foregrounds the next task; UI components no longer know Cloudflare keys or endpoints; and initial-route gzip falls from 253,465 to 147,450 bytes. Content additions must update the identity index in the same reviewed change, with tests preventing drift.
 - **Tests/evidence required:** Focused normalization, accessible-name, title, pairing, visitor, progress, and corpus-index tests; 320px responsive geometry; updated bundle baseline; full local gates; screenshots; deployment workflow monitoring; and production smoke verification.
+
+---
+
+## DEC-211 — Daily repeating Quran Wird plan architecture and isolated progress tracking
+
+- **Date:** 2026-09-27
+- **Status:** Approved
+- **Owner:** Product owner (explicit request to support daily repeating juz, surah, or custom page ranges)
+- **Related phase:** Phase 72
+- **Context:** Users who recite a specific section daily (e.g. Juz 1, Surah Al-Baqarah, or a fixed set of pages) had no way to mark it complete each day without advancing a continuous khatmah or resorting to untracked free reading. They needed daily resetting completion when 100% of their chosen section was read today, a quick way to restart the section, and clear weekly tracking signals.
+- **Decision:** Introduce a `"repeating"` plan kind to `QuranWirdPlan` with `repeatStartPage`, `repeatEndPage`, `repeatScope`, and `repeatNumber`. Unify day progress under `getQuranWirdDayProgress()` which strictly measures unique pages read within the repeating range on the active day. Isolate outside readings so incidental recitation does not contribute to completing the repeating wird. Provide a dedicated "Start section again" action to jump to the beginning of the section. Keep week view binary completion based on 100% completion of the section.
+- **Why:** Delivers a focused, intuitive devotional experience for readers with daily fixed routines while preserving existing continuous khatmah pacing, free reading, and offline-first state without data migration risks.
+- **Consequences:** Repeating wird routines automatically reset each day; completion signals in Daily Path, Reader banner, and Home cards reflect exact range completion; existing plans remain unaffected.
+- **Tests/evidence required:** Unit tests for goal and range counting, normalization tests, daily path tests, screen component tests, e2e tests, full merge gates.

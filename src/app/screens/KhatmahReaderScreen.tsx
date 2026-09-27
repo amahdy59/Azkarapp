@@ -39,7 +39,7 @@ import { loadSurahWordMeanings } from "../content/quranWordMeanings";
 import { formatNumerals } from "../formatting";
 import { getProgressDayKey } from "../progress";
 import { useNow } from "../hooks/useNow";
-import { effectiveDailyGoal } from "./quranWirdGoal";
+import { getQuranWirdDayProgress } from "./quranWirdGoal";
 import {
   getCachedMushafPage,
   isQcfFontReady,
@@ -300,16 +300,17 @@ export function KhatmahReaderScreen({
 
   const now = useNow();
   const todayKey = getProgressDayKey(now, progressDayStartHour);
-  const todayPagesRead = useMemo(() => wirdHistory[todayKey] ?? [], [todayKey, wirdHistory]);
+  const _todayPagesRead = useMemo(() => wirdHistory[todayKey] ?? [], [todayKey, wirdHistory]);
 
-  // The goal the reader chose on the overview, computed by the same function
-  // that screen uses so the two can never disagree about today's target.
-  const wirdGoal = useMemo(
-    () => (quranWirdPlan ? effectiveDailyGoal(quranWirdPlan, wirdHistory, todayKey) : 0),
+  // The goal and progress computed by the shared function so the reader,
+  // overview, Home card, and Daily Path can never disagree about today's target.
+  const wirdProgress = useMemo(
+    () => getQuranWirdDayProgress(quranWirdPlan, wirdHistory, todayKey),
     [quranWirdPlan, todayKey, wirdHistory],
   );
-  const wirdRead = Math.min(todayPagesRead.length, wirdGoal || todayPagesRead.length);
-  const wirdComplete = wirdGoal > 0 && wirdRead >= wirdGoal;
+  const wirdGoal = wirdProgress.goal;
+  const wirdRead = Math.min(wirdProgress.read, wirdGoal || wirdProgress.read);
+  const wirdComplete = wirdProgress.complete;
   const wirdLabel = t(language, "mushaf.todayProgress", {
     read: formatNumerals(wirdRead, language),
     goal: formatNumerals(wirdGoal, language),
@@ -652,9 +653,11 @@ export function KhatmahReaderScreen({
         onClick={onBack}
         data-testid="mushaf-top-left-back"
         aria-label={t(language, "common.back")}
-        className="flex size-11 shrink-0 items-center justify-center rounded-full bg-card/90 text-foreground shadow-xs backdrop-blur-md transition-[color,background-color,transform] active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
-        <ArrowLeft size={20} aria-hidden="true" />
+        <span className="inline-flex h-8 min-w-[2.75rem] items-center justify-center gap-1 rounded-full border border-border/80 bg-card/90 px-3 text-foreground shadow-xs backdrop-blur-md transition-colors group-hover:bg-muted group-active:bg-muted">
+          <ArrowLeft size={16} aria-hidden="true" />
+        </span>
       </button>
     ) : undefined;
 
@@ -666,9 +669,11 @@ export function KhatmahReaderScreen({
         data-testid="mushaf-more-actions"
         aria-label={t(language, "mushaf.moreActions")}
         title={t(language, "mushaf.moreActions")}
-        className="flex size-11 shrink-0 items-center justify-center rounded-full bg-card/90 text-foreground shadow-xs backdrop-blur-md transition-[color,background-color,transform] active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
-        <MoreVertical size={20} aria-hidden="true" />
+        <span className="inline-flex h-8 min-w-[2.75rem] items-center justify-center gap-1 rounded-full border border-border/80 bg-card/90 px-3 text-foreground shadow-xs backdrop-blur-md transition-colors group-hover:bg-muted group-active:bg-muted">
+          <MoreVertical size={16} aria-hidden="true" />
+        </span>
       </button>
     ) : undefined;
 
@@ -708,13 +713,17 @@ export function KhatmahReaderScreen({
         data-testid="mushaf-page-bookmark"
         aria-label={t(language, "mushaf.bookmarkCurrentPage")}
         title={t(language, "mushaf.bookmarkCurrentPage")}
-        className={`relative flex size-11 shrink-0 items-center justify-center rounded-full shadow-xs backdrop-blur-md transition-[color,background-color,transform] active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-          isPageBookmarked
-            ? "bg-primary text-primary-foreground hover:bg-primary/90"
-            : "bg-card/90 text-foreground hover:bg-muted"
-        }`}
+        className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
-        <Bookmark size={20} className={isPageBookmarked ? "fill-current" : undefined} aria-hidden="true" />
+        <span
+          className={`inline-flex h-8 min-w-[2.75rem] items-center justify-center gap-1 rounded-full border px-3 shadow-xs backdrop-blur-md transition-colors ${
+            isPageBookmarked
+              ? "border-primary/50 bg-primary text-primary-foreground group-hover:bg-primary/90"
+              : "border-border/80 bg-card/90 text-foreground group-hover:bg-muted group-active:bg-muted"
+          }`}
+        >
+          <Bookmark size={16} className={isPageBookmarked ? "fill-current" : undefined} aria-hidden="true" />
+        </span>
       </button>
     ) : undefined;
 
@@ -730,13 +739,17 @@ export function KhatmahReaderScreen({
         data-testid="mushaf-difficult-words-switch"
         aria-label={t(language, "mushaf.difficultWordsInvite")}
         title={t(language, "mushaf.difficultWordsInvite")}
-        className={`relative flex size-11 shrink-0 items-center justify-center rounded-full shadow-xs backdrop-blur-md transition-[color,background-color,transform] active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-60 ${
-          showWordMeanings
-            ? "bg-primary text-primary-foreground hover:bg-primary/90"
-            : "bg-card/90 text-foreground hover:bg-muted"
-        }`}
+        className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-60"
       >
-        <Translate size={20} aria-hidden="true" />
+        <span
+          className={`inline-flex h-8 min-w-[2.75rem] items-center justify-center gap-1 rounded-full border px-3 shadow-xs backdrop-blur-md transition-colors ${
+            showWordMeanings
+              ? "border-primary/50 bg-primary text-primary-foreground group-hover:bg-primary/90"
+              : "border-border/80 bg-card/90 text-foreground group-hover:bg-muted group-active:bg-muted"
+          }`}
+        >
+          <Translate size={16} aria-hidden="true" />
+        </span>
       </button>
     ) : undefined;
   /**

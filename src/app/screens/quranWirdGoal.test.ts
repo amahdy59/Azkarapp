@@ -67,4 +67,44 @@ describe("Quran Wird goal calculation", () => {
       remainingPages: 604,
     });
   });
+
+  describe("repeating plan", () => {
+    const repeatingPlan: QuranWirdPlan = {
+      kind: "repeating",
+      dailyPages: 20,
+      repeatStartPage: 1,
+      repeatEndPage: 20,
+      repeatScope: "juz",
+      repeatNumber: 1,
+      startedDayKey: "2026-09-01",
+    };
+
+    it("calculates daily goal as the total pages in the repeating range", () => {
+      const result = getQuranWirdGoal(repeatingPlan, {}, "2026-09-27");
+      expect(result.dailyGoal).toBe(20);
+      expect(result.expired).toBe(false);
+      expect(result.remainingPages).toBe(20);
+    });
+
+    it("tracks only pages read within the defined repeating range today", () => {
+      const history = {
+        // Yesterday's reading has no effect on today's wird completion
+        "2026-09-26": [1, 2, 3, 4, 5],
+        // Today read 5 pages in range, and 2 pages outside range (e.g. 50, 51)
+        "2026-09-27": [1, 2, 3, 4, 5, 50, 51],
+      };
+      const progress = getQuranWirdGoal(repeatingPlan, history, "2026-09-27");
+      expect(progress.dailyGoal).toBe(20);
+      expect(progress.remainingPages).toBe(15);
+    });
+
+    it("marks completion when 100% of pages in the repeating range are read today", () => {
+      const fullJuzPages = Array.from({ length: 20 }, (_, i) => i + 1);
+      const history = {
+        "2026-09-27": fullJuzPages,
+      };
+      const result = getQuranWirdGoal(repeatingPlan, history, "2026-09-27");
+      expect(result.remainingPages).toBe(0);
+    });
+  });
 });

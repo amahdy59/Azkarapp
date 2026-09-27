@@ -1228,7 +1228,7 @@ export function MushafPageViewer({
           </button>
         </nav>
       )}
-      {isBookmarked && (
+      {isBookmarked && !topCenterControl && (
         <div
           className={`pointer-events-none absolute end-4 z-20 flex items-center justify-center text-primary drop-shadow-md ${
             headerContent && !useRail ? "top-14" : "top-2"
@@ -1254,12 +1254,23 @@ export function MushafPageViewer({
       {topCenterControl && (
         <div
           data-testid="mushaf-control-top-center"
-          className="pointer-events-auto absolute left-1/2 -translate-x-1/2 z-30 flex items-center justify-center"
+          dir="ltr"
+          className="pointer-events-auto absolute left-1/2 -translate-x-1/2 z-30 flex items-center justify-center gap-1.5"
           style={{
             top: "max(0.6rem, env(safe-area-inset-top))",
             maxWidth: "calc(100vw - 7.5rem)",
           }}
         >
+          {isBookmarked && (
+            <span
+              className="inline-flex h-8 items-center justify-center gap-1 rounded-full border border-primary/50 bg-card/90 px-2 text-primary shadow-xs backdrop-blur-md"
+              role="img"
+              aria-label={t(language, "mushaf.bookmarkSaved")}
+              title={t(language, "mushaf.bookmarkSaved")}
+            >
+              <Bookmark size={15} className="fill-primary text-primary" aria-hidden="true" />
+            </span>
+          )}
           {topCenterControl}
         </div>
       )}

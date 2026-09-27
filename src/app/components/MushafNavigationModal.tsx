@@ -5,7 +5,6 @@ import type { AppLanguage, QuranVerseBookmark } from "../types";
 import { t } from "../i18n";
 import { formatNumerals } from "../formatting";
 import { SURAHS, JUZS, searchSurahs, getJuzNumberForPage, getSurahDisplayName } from "../content/surahInfo";
-import { SURAH_PLACEMENTS } from "../content/mushafSurahPlacements";
 import { X, Search, Bookmark } from "./icons";
 import { TabList, tabPanelProps, type TabDefinition } from "./Tabs";
 import { prefetchMushafPage } from "../content/qcfMushaf";
@@ -86,26 +85,16 @@ export function MushafNavigationModal({
     }
   };
 
-  const currentSurahIdx = useMemo(() => {
-    const idx = SURAHS.findIndex(
-      (s, i) => currentPage >= s.startPage && (i === SURAHS.length - 1 || currentPage < SURAHS[i + 1]!.startPage),
-    );
-    return idx >= 0 ? idx : 0;
-  }, [currentPage]);
-
   const quickPages = useMemo(() => {
-    const surahMeta = SURAHS[currentSurahIdx]!;
-    const start = pageRange ? pageRange.first : surahMeta.startPage;
-    const nextPlacement = surahMeta.number < 114 ? SURAH_PLACEMENTS[surahMeta.number + 1] : null;
-    const end = pageRange
-      ? pageRange.last
-      : nextPlacement
-        ? Math.max(start, nextPlacement.line > 1 ? nextPlacement.page : nextPlacement.page - 1)
-        : 604;
+    const start = pageRange ? pageRange.first : 1;
+    const end = pageRange ? pageRange.last : 604;
     const list: number[] = [];
-    for (let p = start; p <= end; p++) list.push(p);
+    if (start % 5 !== 0) list.push(start);
+    const firstMultiple = Math.ceil(start / 5) * 5;
+    for (let p = firstMultiple; p <= end; p += 5) list.push(p);
+    if (end % 5 !== 0 && !list.includes(end)) list.push(end);
     return list;
-  }, [currentSurahIdx, pageRange]);
+  }, [pageRange]);
 
   const bookmarks = pageRange ? allBookmarks.filter(inRange) : allBookmarks;
   const verseBookmarks = pageRange ? allVerseBookmarks.filter((b) => inRange(b.page)) : allVerseBookmarks;
@@ -333,9 +322,7 @@ export function MushafNavigationModal({
 
                 {/* Direct Page Selection Grid */}
                 <div className="flex flex-col gap-2.5">
-                  <span className="arabic-ui text-xs font-bold text-muted-foreground">
-                    {getSurahDisplayName(SURAHS[currentSurahIdx]!.number, language)}
-                  </span>
+                  <span className="text-xs font-bold text-muted-foreground">{t(language, "mushaf.quickJump")}</span>
                   <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
                     {quickPages.map((p) => {
                       const isCurrentPage = p === currentPage;

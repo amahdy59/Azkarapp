@@ -381,7 +381,8 @@ export type MushafToolbarSide = "right" | "left";
  */
 export type MushafTextScale = "small" | "medium" | "large";
 
-export type QuranWirdPlanKind = "khatmah30" | "daily" | "custom" | "hijriMonth" | "gregorianMonth" | "free";
+export type QuranWirdPlanKind =
+  "khatmah30" | "daily" | "custom" | "hijriMonth" | "gregorianMonth" | "free" | "repeating";
 
 /** The last verified page the reader opened, with enough context for a useful resume label. */
 export interface QuranReadingPosition {
@@ -411,6 +412,14 @@ export interface QuranWirdPlan {
   startedDayKey?: string;
   startPage?: number;
   targetPage?: number;
+  /** Fixed starting page for daily repeating wird. */
+  repeatStartPage?: number;
+  /** Fixed ending page for daily repeating wird. */
+  repeatEndPage?: number;
+  /** Scope chosen for the repeating wird: juz, surah, or custom page range. */
+  repeatScope?: "juz" | "surah" | "custom";
+  /** Juz number (1-30) or Surah number (1-114) when scoped. */
+  repeatNumber?: number;
 }
 
 export interface AppStateSnapshot {

@@ -8,6 +8,13 @@ export interface QuranWirdGoalResult {
   remainingPages: number;
 }
 
+export interface QuranWirdDayProgress {
+  goal: number;
+  read: number;
+  remaining: number;
+  complete: boolean;
+}
+
 /** Days left, including today, before the chosen calendar month ends. */
 export function getReadingMonthDuration(now: Date, calendar: "hijri" | "gregorian") {
   if (calendar === "gregorian") {
@@ -59,6 +66,22 @@ export function getQuranWirdGoal(
   if (plan.kind === "free") {
     return { dailyGoal: 0, expired: false, remainingPages: TOTAL_MUSHAF_PAGES };
   }
+  if (plan.kind === "repeating") {
+    const startPage = plan.repeatStartPage ?? 1;
+    const targetPage = plan.repeatEndPage ?? TOTAL_MUSHAF_PAGES;
+    const dailyGoal = Math.max(1, targetPage - startPage + 1);
+    const todayPages = new Set(history[activeDayKey] ?? []);
+    let readToday = 0;
+    for (let p = startPage; p <= targetPage; p++) {
+      if (todayPages.has(p)) readToday++;
+    }
+    const remainingPages = Math.max(0, dailyGoal - readToday);
+    return {
+      dailyGoal,
+      expired: false,
+      remainingPages,
+    };
+  }
   if (plan.kind === "daily" || !plan.durationDays || !plan.startedDayKey) {
     return { dailyGoal: plan.dailyPages, expired: false, remainingPages: TOTAL_MUSHAF_PAGES };
   }
@@ -92,4 +115,50 @@ export function effectiveDailyGoal(
   activeDayKey: string,
 ): number {
   return getQuranWirdGoal(plan, history, activeDayKey).dailyGoal;
+}
+
+/**
+ * Returns unified today progress and completion across all plan kinds.
+ * For repeating plans, pages read are strictly measured within the defined repeat range.
+ */
+export function getQuranWirdDayProgress(
+  plan: QuranWirdPlan | undefined,
+  history: Record<string, number[]>,
+  activeDayKey: string,
+): QuranWirdDayProgress {
+  if (!plan) {
+    const read = new Set(history[activeDayKey] ?? []).size;
+    return { goal: 0, read, remaining: 0, complete: false };
+  }
+  if (plan.kind === "free") {
+    const read = new Set(history[activeDayKey] ?? []).size;
+    return { goal: 0, read, remaining: 0, complete: read > 0 };
+  }
+  if (plan.kind === "repeating") {
+    const startPage = plan.repeatStartPage ?? 1;
+    const targetPage = plan.repeatEndPage ?? TOTAL_MUSHAF_PAGES;
+    const goal = Math.max(1, targetPage - startPage + 1);
+    const todayPages = new Set(history[activeDayKey] ?? []);
+    let read = 0;
+    for (let p = startPage; p <= targetPage; p++) {
+      if (todayPages.has(p)) read++;
+    }
+    const remaining = Math.max(0, goal - read);
+    return {
+      goal,
+      read,
+      remaining,
+      complete: goal > 0 && read >= goal,
+    };
+  }
+
+  const goal = getQuranWirdGoal(plan, history, activeDayKey).dailyGoal;
+  const read = new Set(history[activeDayKey] ?? []).size;
+  const remaining = Math.max(0, goal - read);
+  return {
+    goal,
+    read,
+    remaining,
+    complete: goal > 0 && read >= goal,
+  };
 }

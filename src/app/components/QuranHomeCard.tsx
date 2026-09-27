@@ -2,7 +2,7 @@ import { BookOpen, ArrowNext, CheckCircle2, Calendar } from "./icons";
 import { t } from "../i18n";
 import type { AppLanguage, QuranReadingPosition, QuranWirdPlan } from "../types";
 import { getSurahDisplayName } from "../content/surahInfo";
-import { getQuranWirdGoal } from "../screens/quranWirdGoal";
+import { getQuranWirdGoal, getQuranWirdDayProgress } from "../screens/quranWirdGoal";
 import { getProgressDayKey } from "../progress";
 import { formatNumerals } from "../formatting";
 import { HomeCard } from "./HomeCard";
@@ -72,12 +72,11 @@ export function QuranHomeCard({
 
   // Returning user state
   const todayKey = getProgressDayKey(now, progressDayStartHour);
-  const completedPages = wirdHistory[todayKey] ?? [];
-  const read = completedPages.length;
+  const wirdProgress = getQuranWirdDayProgress(plan, wirdHistory, todayKey);
   const goalResult = getQuranWirdGoal(plan, wirdHistory, todayKey);
-  const goal = goalResult.dailyGoal;
-
-  const isComplete = read >= goal && goal > 0;
+  const goal = wirdProgress.goal;
+  const read = wirdProgress.read;
+  const isComplete = wirdProgress.complete;
 
   return (
     <div className={`px-page mt-2 mb-2 ${textAlignment}`} dir={direction}>

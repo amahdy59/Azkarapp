@@ -1536,7 +1536,10 @@ export function ReaderScreen({
               />
             </div>
 
-            <div className="shrink-0 px-5 pb-3 pt-2 reader-column" data-testid="reader-session-chrome">
+            <div
+              className={`shrink-0 px-5 ${audioModeActive ? "pb-2 pt-2" : "pb-3 pt-2"} reader-column`}
+              data-testid="reader-session-chrome"
+            >
               <div className="mb-2 flex items-center justify-between gap-3 text-xs font-bold text-muted-foreground">
                 <span>{t(language, "reader.collectionPercentComplete", { percent: localizedReadingPercent })}</span>
                 <span>
@@ -1557,7 +1560,7 @@ export function ReaderScreen({
               />
               {/* See the desktop heading: only surah names render, and the 10px
                 margin keeps harakat clear of the progress track. */}
-              {!showSurahChrome && readerZikrTitle && (
+              {!audioModeActive && !showSurahChrome && readerZikrTitle && (
                 <div className="mt-2.5 flex w-full items-center justify-between gap-3">
                   <h2
                     className="min-w-0 truncate whitespace-nowrap text-start text-sm font-extrabold leading-relaxed text-foreground"
@@ -1569,7 +1572,7 @@ export function ReaderScreen({
                   </h2>
                 </div>
               )}
-              {!longSurah && allWordMeanings.length > 0 && (
+              {!audioModeActive && !longSurah && allWordMeanings.length > 0 && (
                 <div className="mt-2 flex w-full items-center justify-end gap-2">
                   <button
                     type="button"
