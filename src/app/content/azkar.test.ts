@@ -10,11 +10,19 @@ import {
   getRoutineStepCount,
 } from "./azkar";
 import { QURAN_PASSAGES } from "./quranPassages";
+import { ALL_STATIC_ZIKR_IDS, CATEGORY_ZIKR_IDS } from "./azkarIds";
 
 describe("azkar content totals", () => {
   const eagerCategories = CATEGORIES.filter(
     (category) => category.id !== "comprehensive_duas" && category.id !== "friday_kahf",
   );
+
+  it("keeps the lightweight startup identity index aligned with the reviewed corpus", () => {
+    expect([...ALL_STATIC_ZIKR_IDS].sort()).toEqual(ALL_AZKAR.map((zikr) => zikr.id).sort());
+    for (const category of eagerCategories) {
+      expect(CATEGORY_ZIKR_IDS[category.id] ?? []).toEqual(getAzkarByCategory(category.id).map((zikr) => zikr.id));
+    }
+  });
 
   it("derives every category total from its content collection", () => {
     for (const category of eagerCategories) {

@@ -977,6 +977,7 @@ const ar = {
     errorUnavailable: "تعذر تحميل التسجيل. تحقق من الاتصال ثم أعد المحاولة.",
   },
   category: {
+    openZikrInReader: "فتح الذكر رقم {number} في القارئ",
     repetitionInstructionOnce: "تُقال مرة واحدة",
     repetitionInstruction: "تُقال {count} مرات",
     completeSubtitle: "{done} / {total}",

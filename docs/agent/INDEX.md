@@ -111,6 +111,7 @@ Run the phase files in numerical order unless the decision log explicitly record
 | 68    | `phases/PHASE_68_AUDIO_PROGRESS_CLARITY.md`              | One visible audio progress control with stable shell actions                             |
 | 69    | `phases/PHASE_69_RECENT_CHANGES_REVIEW.md`               | Review-led hardening of recent reading, counter, Home, and audio changes                 |
 | 70    | `phases/PHASE_70_UX_A11Y_AND_EFFICIENCY_IMPROVEMENTS.md` | Audit-driven UX, WCAG 2.2 AA target/focus, search highlight, and efficiency improvements |
+| 71    | `phases/PHASE_71_AUDIT_REMEDIATION.md`                   | Responsive task priority, robust persistence, service boundaries, and startup reduction  |
 
 Phases 15–20 derive from `docs/audits/DESIGN_CONSISTENCY_AUDIT.md` (2026-08-15) and are
 recorded in `DECISION_LOG.md` as DEC-064. Phase 15 is upstream of 16, 17 and 19 — its root
@@ -120,6 +121,6 @@ may run in parallel.
 
 ## Core rule
 
-The latest review and hardening work is recorded in [Phase 70](phases/PHASE_70_UX_A11Y_AND_EFFICIENCY_IMPROVEMENTS.md), including 44px target-size enforcement, uniform 3px keyboard focus indicators, Arabic-safe search match highlighting, bulk recent-search clearing, hybrid touch/mouse volume controls, and shared search index caching.
+The latest review and hardening work is recorded in [Phase 71](phases/PHASE_71_AUDIT_REMEDIATION.md), including compact Home task priority, complete prayer labels, resilient recent-search normalization, truthful route titles, concise zikr action names, centralized Cloudflare browser access, and a smaller startup graph.
 
 The agent must never interpret “perfect the application” as permission to rewrite the entire repository. Perfection is approached through evidence-backed iteration, not one-shot replacement.

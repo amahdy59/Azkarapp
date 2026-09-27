@@ -3969,3 +3969,15 @@ null` shape, so a record written before this change still loads and still
 - **Files/contracts to update:** `FloatingAudioPlayer`, focused provider/component/browser tests, audio architecture and QA, design-system audio contract, phase report, and agent index.
 - **Tests/evidence required:** One visible progress indicator at phone/desktop compact and expanded widths, Page Up/Page Down seek bounds, stable logical action edges in RTL/LTR, focused tests, and repository quality gates.
 - **Supersedes:** Refines only the progress-presentation details of DEC-140, DEC-172, and DEC-173; their controller, direction, layout, and continuous-listening decisions remain intact.
+
+## DEC-210 — Audit remediation uses explicit browser and startup boundaries
+
+- **Date:** 2026-09-27
+- **Status:** Approved
+- **Owner:** Product owner (explicit “apply recommendations” request)
+- **Related phase:** Phase 71
+- **Context:** The evidence-led audit found stale Search/Settings titles, untrusted recent-search arrays, compact Home priority and prayer-label failures, raw Cloudflare fetch/storage work inside presentation components, and only 808 gzip bytes of initial-route budget headroom because startup validation loaded the complete devotional corpus.
+- **Decision:** Normalize recent searches by runtime type, bounds, trimming, and deduplication; require custom full-surface routes to use the shared title hook; put Today's Wird before long evidence on compact Home and keep complete prayer names at 320px; use concise zikr selection names with the visible text as description; move device pairing and anonymous presence access behind `cloudflareSync.ts`; and validate startup progress/saved ids through a lightweight ordered identity index whose membership and order are contract-tested against the reviewed corpus. Keep Settings' large application-facing prop contract in a dedicated type module as the first incremental extraction rather than rewriting application state.
+- **Why:** These changes close observed user-facing and crash risks, establish enforceable ownership boundaries, and reduce the measured initial route without changing content, persistence shape, sync payloads, or offline reading behavior.
+- **Consequences:** Search and Settings titles stay current; corrupt local history is harmless; narrow Home foregrounds the next task; UI components no longer know Cloudflare keys or endpoints; and initial-route gzip falls from 253,465 to 147,450 bytes. Content additions must update the identity index in the same reviewed change, with tests preventing drift.
+- **Tests/evidence required:** Focused normalization, accessible-name, title, pairing, visitor, progress, and corpus-index tests; 320px responsive geometry; updated bundle baseline; full local gates; screenshots; deployment workflow monitoring; and production smoke verification.

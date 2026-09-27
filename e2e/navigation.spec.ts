@@ -75,6 +75,8 @@ test("@cross-browser navigation keeps Qibla, Masbaha, and Settings easy to reach
   await expect(page.getByTestId("nav-qibla")).toBeVisible();
   await expect(page.getByTestId("nav-masbaha")).toBeVisible();
   await expect(page.getByTestId("nav-settings")).toBeVisible();
+  await page.getByTestId("nav-settings").click();
+  await expect(page).toHaveTitle("Settings - wa-zaker");
   if (testInfo.project.name.startsWith("desktop-")) {
     await page.goto("/#/qibla");
     await expect(page.getByRole("heading", { name: "Qibla", exact: true })).toBeVisible();

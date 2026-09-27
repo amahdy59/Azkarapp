@@ -110,6 +110,15 @@ describe("PrayerTrackerCards", () => {
     fireEvent.click(screen.getByRole("button", { name: /Open Fajr/i }));
     expect(onOpen).toHaveBeenCalledWith("fajr");
   });
+
+  it("keeps long English prayer names visible instead of ellipsizing them", () => {
+    stubViewport([]);
+    renderRow("asr");
+
+    const heading = screen.getByRole("heading", { name: "Maghrib" });
+    expect(heading).toHaveClass("whitespace-nowrap");
+    expect(heading).not.toHaveClass("truncate");
+  });
 });
 
 /**

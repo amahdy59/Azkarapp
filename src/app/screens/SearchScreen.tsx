@@ -8,6 +8,7 @@ import { StatePanel } from "../components/StatePanel";
 import { IconButton } from "../components/LayoutShells";
 import { FIELD_LABEL_CLASS } from "../components/FormField";
 import { t } from "../i18n";
+import { useScreenFocus } from "../hooks/useScreenFocus";
 
 import { normalizeSearchText, searchKeyFor, splitHighlightedSearchTokens } from "../content/searchNormalization";
 
@@ -19,12 +20,25 @@ function recentsKey(language: AppLanguage): string {
   return `azkarapp_recent_searches_${language}`;
 }
 
+export function normalizeRecentSearches(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return [
+    ...new Set(
+      value.flatMap((item) => {
+        if (typeof item !== "string") return [];
+        const normalized = item.trim().slice(0, 120);
+        return normalized ? [normalized] : [];
+      }),
+    ),
+  ].slice(0, MAX_RECENTS);
+}
+
 function loadRecents(language: AppLanguage): string[] {
   try {
     const stored = localStorage.getItem(recentsKey(language));
     if (!stored) return [];
     const parsed: unknown = JSON.parse(stored);
-    return Array.isArray(parsed) ? (parsed as string[]).slice(0, MAX_RECENTS) : [];
+    return normalizeRecentSearches(parsed);
   } catch {
     return [];
   }
@@ -32,7 +46,7 @@ function loadRecents(language: AppLanguage): string[] {
 
 function saveRecents(language: AppLanguage, recents: string[]): void {
   try {
-    localStorage.setItem(recentsKey(language), JSON.stringify(recents.slice(0, MAX_RECENTS)));
+    localStorage.setItem(recentsKey(language), JSON.stringify(normalizeRecentSearches(recents)));
   } catch {
     // ignore storage errors
   }
@@ -85,6 +99,7 @@ export function SearchScreen({
   initialQuery?: string;
 }) {
   const isArabic = language === "ar";
+  useScreenFocus(t(language, "search.inputAriaLabel"));
   const searchInputId = useId();
   const [q, setQ] = useState(() => initialQuery.trim());
   const deferredQuery = useDeferredValue(q.trim());

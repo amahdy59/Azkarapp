@@ -1,8 +1,13 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
-import { SearchScreen } from "./SearchScreen";
+import { beforeEach, describe, expect, it } from "vitest";
+import { normalizeRecentSearches, SearchScreen } from "./SearchScreen";
 
 describe("SearchScreen", () => {
+  beforeEach(() => {
+    localStorage.clear();
+    document.documentElement.lang = "en";
+  });
+
   it("preserves an initial query and exposes a visible associated label", () => {
     render(
       <SearchScreen
@@ -47,6 +52,27 @@ describe("SearchScreen", () => {
     expect(screen.queryByRole("button", { name: "morning" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "forgive" })).not.toBeInTheDocument();
     expect(JSON.parse(localStorage.getItem("azkarapp_recent_searches_en") ?? "[]")).toEqual([]);
+  });
+
+  it("recovers from malformed recent-search data without rendering invalid values", () => {
+    localStorage.setItem(
+      "azkarapp_recent_searches_en",
+      JSON.stringify([null, 17, {}, "  morning  ", "", "morning", "forgive"]),
+    );
+
+    render(<SearchScreen language="en" direction="ltr" onBack={() => undefined} onZikr={() => undefined} />);
+
+    expect(screen.getAllByRole("button", { name: "morning" })).toHaveLength(1);
+    expect(screen.getByRole("button", { name: "forgive" })).toBeInTheDocument();
+  });
+
+  it("bounds and normalizes persisted recent searches", () => {
+    expect(normalizeRecentSearches([" a ", "a", "b", "c", "d", "e", "f", null])).toEqual(["a", "b", "c", "d", "e"]);
+  });
+
+  it("updates the document title for the search route", () => {
+    render(<SearchScreen language="en" direction="ltr" onBack={() => undefined} onZikr={() => undefined} />);
+    expect(document.title).toBe("Search azkar and duas - wa-zaker");
   });
 
   it("renders Arabic result previews with zikr-text typography and whole-word match highlighting", () => {

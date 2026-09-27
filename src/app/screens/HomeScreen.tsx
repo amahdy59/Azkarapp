@@ -766,7 +766,7 @@ export function HomeScreen({
                       {hasPrimaryContext && (
                         <div
                           data-testid="home-primary-card"
-                          className={`grid min-w-0 ${hasContextCompanion ? "md:col-span-1" : "md:col-span-2"}`}
+                          className={`order-1 grid min-w-0 md:order-none ${hasContextCompanion ? "md:col-span-1" : "md:col-span-2"}`}
                         >
                           {showCompletionCard ? (
                             <div className="h-full">
@@ -813,7 +813,7 @@ export function HomeScreen({
                       {dailyEvidence ? (
                         <div
                           data-testid="home-context-companion"
-                          className={`flex min-w-0 ${hasPrimaryContext ? "md:col-span-1" : "md:col-span-2"}`}
+                          className={`order-3 flex min-w-0 md:order-none ${hasPrimaryContext ? "md:col-span-1" : "md:col-span-2"}`}
                         >
                           <DailyEvidenceCard
                             language={language}
@@ -830,7 +830,7 @@ export function HomeScreen({
                   {/* Today's Wird needs the full row: its three routine tiles must
                       respond to their own available width, not the viewport. */}
                   {quietProgressEnabled && (
-                    <div data-testid="home-wird-row" className="min-w-0 md:col-span-2">
+                    <div data-testid="home-wird-row" className="order-2 min-w-0 md:order-none md:col-span-2">
                       <TodayRoutineGarden
                         summary={gardenSummary}
                         language={language}

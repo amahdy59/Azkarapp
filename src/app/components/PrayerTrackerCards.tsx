@@ -231,7 +231,7 @@ function PrayerCard({
           aria-expanded={selected}
           aria-controls="home-expanded-prayer"
           aria-label={t(language, "prayerTracking.openPrayer", { prayer: name })}
-          className="relative z-10 flex min-h-[7.5rem] min-w-0 flex-col items-center justify-center rounded-3xl px-1 py-1.5 outline-none transition-colors focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring sm:min-h-[8.5rem] sm:px-3 sm:py-3"
+          className="relative z-10 flex min-h-[7.5rem] min-w-0 flex-col items-center justify-center rounded-3xl px-0 py-1.5 outline-none transition-colors focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring sm:min-h-[8.5rem] sm:px-3 sm:py-3"
         >
           {isCurrent && (
             <span className="mb-1 rounded-full bg-primary px-2.5 py-0.5 text-micro font-black text-primary-foreground sm:text-xs">
@@ -248,7 +248,7 @@ function PrayerCard({
           </span>
           <h3
             id={`prayer-card-heading-${prayer}`}
-            className={`mt-1 min-w-0 max-w-full truncate text-xs font-black leading-tight sm:text-subtitle ${
+            className={`mt-1 min-w-0 max-w-full whitespace-nowrap text-micro font-black leading-tight min-[360px]:text-xs sm:text-subtitle ${
               onGlass
                 ? isCurrent
                   ? "text-on-media-accent"
@@ -349,7 +349,7 @@ function PrayerCard({
         <span className="mt-1.5 flex items-center gap-1">
           <h3
             id={`prayer-card-heading-${prayer}`}
-            className={`text-subtitle font-black ${onGlass ? "text-on-media" : "text-foreground"}`}
+            className={`whitespace-nowrap text-subtitle font-black ${onGlass ? "text-on-media" : "text-foreground"}`}
             dir="auto"
           >
             {name}

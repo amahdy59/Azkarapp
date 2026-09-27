@@ -1,35 +1,15 @@
 import { useEffect, useState } from "react";
 import { Button } from "../../components/ui/button";
 import type { AppLanguage } from "../../types";
-import { CLOUDFLARE_DEVICE_EVENT, CLOUDFLARE_DEVICE_SECRET_KEY } from "../../../lib/cloudflareSync";
+import {
+  claimCloudflarePairing,
+  CLOUDFLARE_DEVICE_EVENT,
+  createCloudflarePairing,
+  hasCloudflareDevice,
+  unlinkCloudflareDevice,
+} from "../../../lib/cloudflareSync";
 import { t } from "../../i18n";
 import { formatNumerals } from "../../formatting";
-
-const API_URL = import.meta.env.VITE_CLOUDFLARE_API_URL || "https://azkarapp-api.amahdy59.workers.dev";
-
-async function api(path: string, init?: RequestInit) {
-  const secret = localStorage.getItem(CLOUDFLARE_DEVICE_SECRET_KEY);
-  const headers = new Headers(init?.headers);
-  headers.set("content-type", "application/json");
-  if (secret) headers.set("authorization", `Bearer ${secret}`);
-  const response = await fetch(`${API_URL}${path}`, { ...init, headers });
-  // A revoked/expired credential is already unlinked remotely.
-  if (init?.method === "DELETE" && response.status === 401) return {};
-  const data = (await response.json().catch(() => ({}))) as Record<string, unknown>;
-  if (!response.ok) throw new Error(typeof data.error === "string" ? data.error : "request_failed");
-  return data;
-}
-
-async function ensureDevice() {
-  const existing = localStorage.getItem(CLOUDFLARE_DEVICE_SECRET_KEY);
-  if (existing) return existing;
-  const result = await api("/v1/devices", { method: "POST", body: "{}" });
-  const secret = String(result.secret ?? "");
-  if (!secret) throw new Error("device_failed");
-  localStorage.setItem(CLOUDFLARE_DEVICE_SECRET_KEY, secret);
-  window.dispatchEvent(new Event(CLOUDFLARE_DEVICE_EVENT));
-  return secret;
-}
 
 function formatMinutesSeconds(totalSeconds: number, language: AppLanguage) {
   const mins = Math.floor(totalSeconds / 60);
@@ -39,7 +19,7 @@ function formatMinutesSeconds(totalSeconds: number, language: AppLanguage) {
 }
 
 export function QrSyncPanel({ language }: { language: AppLanguage }) {
-  const [isLinked, setIsLinked] = useState<boolean>(() => Boolean(localStorage.getItem(CLOUDFLARE_DEVICE_SECRET_KEY)));
+  const [isLinked, setIsLinked] = useState<boolean>(hasCloudflareDevice);
   const [confirmingUnlink, setConfirmingUnlink] = useState(false);
   const [qr, setQr] = useState<string>();
   const [expiresAt, setExpiresAt] = useState<number | null>(null);
@@ -50,7 +30,7 @@ export function QrSyncPanel({ language }: { language: AppLanguage }) {
 
   useEffect(() => {
     const handleDeviceChange = () => {
-      setIsLinked(Boolean(localStorage.getItem(CLOUDFLARE_DEVICE_SECRET_KEY)));
+      setIsLinked(hasCloudflareDevice());
     };
     window.addEventListener(CLOUDFLARE_DEVICE_EVENT, handleDeviceChange);
     window.addEventListener("storage", handleDeviceChange);
@@ -85,14 +65,11 @@ export function QrSyncPanel({ language }: { language: AppLanguage }) {
     if (pending) return;
     setPending(true);
     try {
-      await ensureDevice();
-      setIsLinked(true);
-      const result = await api("/v1/pairings", { method: "POST", body: "{}" });
-      const token = String(result.token ?? "");
-      setPairingToken(token);
-      const image = await api(`/v1/pairings/qr?token=${encodeURIComponent(token)}`);
-      setQr(String(image.dataUrl ?? ""));
-      setExpiresAt(Date.now() + 5 * 60_000);
+      const pairing = await createCloudflarePairing();
+      setIsLinked(hasCloudflareDevice());
+      setPairingToken(pairing.token);
+      setQr(pairing.dataUrl);
+      setExpiresAt(pairing.expiresAt);
       setMessage(t(language, "accountData.qrSyncCreated"));
     } catch {
       setMessage(t(language, "accountData.qrSyncCreateError"));
@@ -105,14 +82,8 @@ export function QrSyncPanel({ language }: { language: AppLanguage }) {
     if (pending || !pairingToken.trim()) return;
     setPending(true);
     try {
-      const result = await api("/v1/pairings/claim", {
-        method: "POST",
-        body: JSON.stringify({ token: pairingToken.trim() }),
-      });
-      if (typeof result.secret !== "string" || !result.secret) throw new Error("invalid_device");
-      localStorage.setItem(CLOUDFLARE_DEVICE_SECRET_KEY, result.secret);
+      await claimCloudflarePairing(pairingToken.trim());
       setIsLinked(true);
-      window.dispatchEvent(new Event(CLOUDFLARE_DEVICE_EVENT));
       setMessage(t(language, "accountData.qrSyncLinked"));
     } catch {
       setMessage(t(language, "accountData.qrSyncExpired"));
@@ -125,11 +96,9 @@ export function QrSyncPanel({ language }: { language: AppLanguage }) {
     if (pending) return;
     setPending(true);
     try {
-      await api("/v1/devices/current", { method: "DELETE" });
-      localStorage.removeItem(CLOUDFLARE_DEVICE_SECRET_KEY);
+      await unlinkCloudflareDevice();
       setIsLinked(false);
       setConfirmingUnlink(false);
-      window.dispatchEvent(new Event(CLOUDFLARE_DEVICE_EVENT));
       setQr(undefined);
       setExpiresAt(null);
       setPairingToken("");

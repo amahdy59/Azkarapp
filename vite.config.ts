@@ -316,20 +316,15 @@ export default defineConfig(({ mode }) => {
           manualChunks(id) {
             if (id.includes("node_modules/react-dom") || id.includes("node_modules/react/")) return "vendor";
             /*
-             * The corpus is its own chunk because two very different parts of
-             * the app need it.
+             * The corpus is its own chunk because several lazy reading
+             * surfaces and the audio planner need it.
              *
              * Unnamed, Rollup folded `content/azkar.ts` into the `audio`
-             * chunk below — and `state.ts`, which the entry loads to read the
-             * stored appearance, imports the corpus to validate saved ids. So
-             * the entry statically imported the audio chunk, and every visitor
-             * downloaded the audio manifest and player before asking for a
-             * sound: 121 kB gzip of the 250 kB initial budget, with the
-             * lazy-audio module and the modulePreload filter above both
-             * carefully deferring a chunk that had already been fetched.
-             * Naming it here separates what the entry truly needs (the azkar)
-             * from what it does not (audio), and takes the initial route from
-             * ~250 kB gzip to ~196 kB.
+             * chunk below. Naming it here prevents the audio manifest and
+             * player from leaking into unrelated routes. Startup validation
+             * uses the small, contract-tested azkarIds index instead, so the
+             * corpus itself also remains outside the entry graph until the
+             * lazy application shell requests a reading surface.
              */
             if (id.endsWith("/src/app/content/azkar.ts")) return "content";
             if (id.includes("node_modules/motion")) return "motion";

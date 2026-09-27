@@ -69,6 +69,24 @@ test("the Home Wird keeps semantic order while mirroring Arabic placement and ex
   });
   expect(mobileCardPresentation).toEqual({ titleSize: "18px", subtitleSize: "12px", overflow: 0 });
 
+  const [mobileWirdBox, mobileCompanionBox] = await Promise.all([
+    page.getByTestId("home-wird-row").boundingBox(),
+    page.getByTestId("home-context-companion").boundingBox(),
+  ]);
+  expect(mobileWirdBox && mobileCompanionBox).toBeTruthy();
+  if (mobileWirdBox && mobileCompanionBox) {
+    expect(mobileWirdBox.y).toBeLessThan(mobileCompanionBox.y);
+  }
+
+  const maghribLabel = page.locator("#prayer-card-heading-maghrib");
+  await expect(maghribLabel).toHaveText("Maghrib");
+  expect(
+    await maghribLabel.evaluate((element) => ({
+      overflow: element.scrollWidth - element.clientWidth,
+      textOverflow: getComputedStyle(element).textOverflow,
+    })),
+  ).toEqual({ overflow: 0, textOverflow: "clip" });
+
   await openReturningGuest(page, "ar");
   await page.setViewportSize({ width: 834, height: 900 });
   await page.waitForFunction(() => window.innerWidth === 834);

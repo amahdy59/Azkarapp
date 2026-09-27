@@ -27,7 +27,7 @@ import {
   normalizeDailyCompletions,
   isProgressDayKey,
 } from "./progress";
-import { ALL_AZKAR, getAzkarByCategory } from "./content/azkar";
+import { ALL_STATIC_ZIKR_IDS, CATEGORY_ZIKR_IDS } from "./content/azkarIds";
 import { CALCULATION_METHODS, DEFAULT_LOCATION } from "./content/prayerCalculation";
 
 export type { AppLanguage, AppStateSnapshot, CategoryId, StoredSession } from "./types";
@@ -294,9 +294,7 @@ function normalizePartialZikrCounts(value: unknown): Record<string, number> {
 
 /** Match completed-state rollover: situational collections remain resumable. */
 export function resetDailyPartialCounts(counts: Record<string, number>): Record<string, number> {
-  const dailyIds = new Set(
-    ALL_AZKAR.filter((zikr) => DAILY_ROUTINE_CATEGORY_IDS.includes(zikr.category)).map((zikr) => zikr.id),
-  );
+  const dailyIds = new Set(DAILY_ROUTINE_CATEGORY_IDS.flatMap((category) => CATEGORY_ZIKR_IDS[category] ?? []));
   return Object.fromEntries(Object.entries(counts).filter(([id]) => !dailyIds.has(id.split(":").at(-1)!)));
 }
 
@@ -622,7 +620,7 @@ function normalizeCompletedIds(values: unknown, category: CategoryId) {
     return [];
   }
 
-  const zikrIds = getAzkarByCategory(category).map((zikr) => zikr.id);
+  const zikrIds = [...(CATEGORY_ZIKR_IDS[category] ?? [])];
   const acceptsLazyIds = zikrIds.length === 0;
   const legacyZikrIds = LEGACY_ROUTINE_ORDER[category] ?? zikrIds;
   const validIds = new Set(zikrIds);
@@ -653,7 +651,7 @@ function dedupeSavedZikrIds(values: unknown): string[] {
     ...new Set(
       values.filter(
         (value): value is string =>
-          typeof value === "string" && (ALL_AZKAR.some((zikr) => zikr.id === value) || isLazyZikrId(value)),
+          typeof value === "string" && (ALL_STATIC_ZIKR_IDS.has(value) || isLazyZikrId(value)),
       ),
     ),
   ].sort();

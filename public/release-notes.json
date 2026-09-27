@@ -1,15 +1,15 @@
 {
   "ar": [
-    "إزالة إطار الحدود من أزرار زوايا شاشة المصحف لتظهر بتصميم هادئ وانسيابي يطفو بنعومة على الصفحة.",
-    "تعديل اتجاه سهم الرجوع في الزاوية العلوية ليشير للخارج متوافقاً مع حركة الخروج الطبيعية للقارئ.",
-    "توحيد مقاسات أيقونات الزوايا كالعلامة المرجعية ومعاني الكلمات لضمان تناسق بصري تام.",
-    "تحسين تجربة القراءة وتفاعل الأزرار العائمة عبر شاشات الهواتف والأجهزة اللوحية."
+    "يظهر ورد اليوم قبل الدليل المطوّل على الشاشات الصغيرة لتصل إلى مهمتك التالية بسرعة.",
+    "تظهر أسماء الصلوات كاملة حتى على الهواتف بعرض 320 بكسل دون اختصار مربك.",
+    "أصبح سجل البحث يتعافى تلقائياً من البيانات التالفة، مع عناوين صحيحة لصفحات البحث والإعدادات.",
+    "أصبح بدء التطبيق أخف وأسرع مع بقاء القراءة والحفظ والتقدم متاحة دون اتصال."
   ],
   "en": [
-    "Removed button border strokes from the four Mushaf corner controls for a calm, seamless floating aesthetic.",
-    "Oriented the top corner back arrow outwards to match intuitive return navigation away from the reading canvas.",
-    "Standardized corner icon sizing across bookmarks, word meanings, and options for visual consistency.",
-    "Smoothed mobile corner control interactions and responsive layout across phones and tablets."
+    "Today's Wird now appears before the longer evidence card on small screens, keeping the next task close.",
+    "Prayer names stay complete even on 320px phones instead of being shortened with an ellipsis.",
+    "Recent search history now recovers safely from damaged data, and Search and Settings show accurate page titles.",
+    "App startup is substantially lighter while reading, saved items, and progress continue to work offline."
   ],
-  "release": "2026-09-27-mushaf-corner-controls"
+  "release": "2026-09-27-audit-remediation"
 }

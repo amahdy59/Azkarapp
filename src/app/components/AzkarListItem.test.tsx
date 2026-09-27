@@ -105,4 +105,25 @@ describe("AzkarListItem disclosure", () => {
 
     expect(screen.getByRole("button", { name: "Zikr 1 of 1" })).toHaveClass("min-h-11");
   });
+
+  it("names the default selection action concisely and describes it with the visible devotional text", () => {
+    vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockReturnValue(64);
+    vi.spyOn(HTMLElement.prototype, "scrollHeight", "get").mockReturnValue(64);
+
+    render(
+      <AzkarListItem
+        z={zikr}
+        index={0}
+        isCardCompleted={false}
+        language="en"
+        isArabic={false}
+        direction="ltr"
+        onClickText={vi.fn()}
+      />,
+    );
+
+    const action = screen.getByRole("button", { name: "Open dhikr 1 in the reader" });
+    expect(action).toHaveAttribute("aria-describedby", "zikr-summary-0");
+    expect(screen.getByTestId("zikr-summary-0")).toHaveTextContent("Glory be to Allah");
+  });
 });

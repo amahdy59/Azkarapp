@@ -996,6 +996,7 @@ const en = {
     errorUnavailable: "The recording could not be loaded. Check the connection and try again.",
   },
   category: {
+    openZikrInReader: "Open dhikr {number} in the reader",
     repetitionInstructionOnce: "Recite once",
     repetitionInstruction: "Recite {count} times",
     completeSubtitle: "{done} of {total} complete",

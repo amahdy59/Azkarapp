@@ -20,7 +20,7 @@ Every pull request must pass the pinned-toolchain check, `pnpm install --frozen-
 
 Dependency updates must be resolved with the pnpm release declared by `packageManager`. A package that is younger than `minimumReleaseAge` must not enter the lockfile through a local-policy bypass. Select an eligible reviewed release, wait for the quarantine to expire, or record an explicit security exception before changing `minimumReleaseAgeExclude`.
 
-Current per-file production budgets are 450 KiB JavaScript, 120 KiB CSS, and 1 MiB for another asset, with compressed ceilings of 130 KiB per JavaScript file and 20 KiB per CSS file. The complete initial route graph, derived from Vite's build manifest, must remain below 200 KiB gzip including HTML, static JavaScript imports, and CSS. Reducing a budget is encouraged; any increase requires a fresh production measurement and justification in the pull request.
+Current per-file production budgets are 480 KiB JavaScript, 164 KiB CSS, and 1 MiB for another asset, with compressed ceilings of 140 KiB per JavaScript file and 28 KiB per CSS file. The complete initial route graph, derived from Vite's build manifest, must remain below 250 KiB gzip including HTML, static JavaScript imports, and CSS. The recorded baseline is tighter than these backstops and must be updated downward after a material reduction; any increase requires a fresh production measurement and justification in the same change.
 
 ## Architecture rules
 

@@ -1,4 +1,4 @@
-import { getAzkarByCategory } from "./content/azkar";
+import { CATEGORY_ZIKR_IDS } from "./content/azkarIds";
 import { CATEGORY_IDS, type CategoryId, type DailyCollectionCompletion, type StoredSession } from "./types";
 
 export { CATEGORY_IDS } from "./types";
@@ -517,7 +517,7 @@ export function resetStaleCompletedCollections(
       const catDayKey = getProgressDayKey(now, boundaryHour, category);
       const isCompletedToday = normalized.some((r) => r.dayKey === catDayKey && r.category === category);
       const categoryProgress = completed[category] ?? new Set<string>();
-      const isFull = getAzkarByCategory(category).every((zikr) => categoryProgress.has(zikr.id));
+      const isFull = (CATEGORY_ZIKR_IDS[category] ?? []).every((zikrId) => categoryProgress.has(zikrId));
       return [category, isFull && !isCompletedToday ? new Set<string>() : new Set(categoryProgress)];
     }),
   ) as Record<CategoryId, Set<string>>;

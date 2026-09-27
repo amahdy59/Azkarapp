@@ -169,6 +169,24 @@ case deploy manually with wrangler as described in the README.
 
 Supabase is optional. Without its environment variables, guest/local mode remains functional.
 
+The Cloudflare browser boundary is `src/lib/cloudflareSync.ts`. It owns the API origin,
+credential and anonymous-visitor storage, request parsing, device creation, pairing,
+unlinking, snapshot calls, and presence heartbeats. Settings and Home presentation code
+must not call `fetch` or read these storage keys directly; it consumes the typed client
+through focused component hooks/effects and continues to fail quietly when presence is
+unavailable.
+
+Startup state normalization uses the lightweight, contract-tested identity index in
+`src/app/content/azkarIds.ts`. This keeps the reviewed devotional corpus out of the static
+entry graph while preserving saved-id validation, legacy numeric progress migration, and
+daily reset behavior. The corpus test must prove both membership and category order match
+`azkar.ts`; content changes update both in the same reviewed change.
+
+`ScreenContainer` owns screen titles for ordinary routes. Full-surface routes that cannot
+use that container, currently Search and Settings, call `useScreenFocus` directly. Every
+navigable screen must therefore update `document.title` without adding a second landmark
+or live region.
+
 Authentication is provider-neutral:
 
 - Google and Apple use Supabase OAuth with PKCE and the query-string callback view.

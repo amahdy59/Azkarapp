@@ -84,6 +84,7 @@ export function AzkarListItem({
     (isArabic && (z.hasSeekRefuge || z.hasBasmalah || z.isSurah)) || Boolean(showTiming && timingText) || longSurah;
   const showDisclosure = expanded || overflows || hasExpandedOnlyContent;
   const detailsId = `zikr-details-${index}`;
+  const summaryId = `zikr-summary-${index}`;
 
   const toggleExpanded = () => {
     if (isControlled && onToggleExpand) {
@@ -107,7 +108,8 @@ export function AzkarListItem({
       )}
       <span
         ref={summaryRef}
-        data-testid={`zikr-summary-${index}`}
+        id={summaryId}
+        data-testid={summaryId}
         className={`${isArabic ? "zikr-text" : "font-sans"} text-title font-bold leading-[1.85] text-foreground whitespace-pre-line ${
           expanded ? `block ${longSurah ? "max-h-64 overflow-y-auto pe-1" : ""}` : "line-clamp-2"
         }`}
@@ -195,13 +197,10 @@ export function AzkarListItem({
             type="button"
             data-zikr-select
             aria-current={isActive ? "step" : undefined}
+            aria-describedby={ariaLabelOverride ? undefined : summaryId}
             aria-label={
               ariaLabelOverride ??
-              `${formatNumerals(index + 1, language)}. ${isArabic ? z.arabicText : z.translation} — ${
-                targetCount === 1
-                  ? t(language, "category.repetitionInstructionOnce")
-                  : t(language, "category.repetitionInstruction", { count: formatNumerals(targetCount, language) })
-              }${isCardCompleted ? ` (${t(language, "category.completed")})` : ""}`
+              t(language, "category.openZikrInReader", { number: formatNumerals(index + 1, language) })
             }
             onClick={(event) => {
               event.stopPropagation();
