@@ -48,6 +48,7 @@ Redesign the Quran Wird planning and tracking experience to support users who re
 - `src/app/i18n/ar.ts`
 - `src/app/i18n/en.ts`
 - `src/app/screens/QuranWirdScreen.tsx`
+- `src/app/screens/HomeScreen.tsx`
 - `e2e/khatmah-reader.spec.ts`
 - `public/release-notes.json`
 - `docs/agent/DECISION_LOG.md`
@@ -62,17 +63,22 @@ Redesign the Quran Wird planning and tracking experience to support users who re
 - `src/app/screens/ProgressScreen.wirdGoal.test.tsx`: Added tests verifying repeating wird completion requires 100% range pages.
 - `src/app/screens/QuranWirdScreen.test.tsx`: Added comprehensive tests for configuring repeating plans (Juz, Surah, Custom), restarting sections, Today progress display, and week view completion.
 - `e2e/khatmah-reader.spec.ts`: Updated radio count expectation to 5 to account for the new repeating plan option.
+- `e2e/counter-feedback.spec.ts`: Verified mobile context order with expanded prayer moment.
 
 ## Quality Gates & Verification
 
-| Gate                  | Command                                                                                 | Result                                            |
-| --------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| Typecheck             | `pnpm typecheck`                                                                        | PASS (0 errors)                                   |
-| Formatting & Lint     | `pnpm check`                                                                            | PASS (all stages passed in 134.2s)                |
-| Unit Tests & Coverage | `pnpm test:coverage`                                                                    | PASS (1167 passed, 161 test files)                |
-| E2E Tests             | `npx playwright test e2e/home-prayer-moment.spec.ts:170 e2e/khatmah-reader.spec.ts:175` | PASS (4/4 passed across desktop, mobile, tablet)  |
-| Bundle & Pages Build  | `pnpm build:pages`                                                                      | PASS (Bundle budget passed, CSS utilities passed) |
-| Release Notes Check   | `pnpm run check:release-notes`                                                          | PASS                                              |
+| Gate                  | Command                                        | Result                                             |
+| --------------------- | ---------------------------------------------- | -------------------------------------------------- |
+| Typecheck             | `pnpm typecheck`                               | PASS (0 errors)                                    |
+| Formatting & Lint     | `pnpm check`                                   | PASS (all stages passed in 114.1s)                 |
+| Unit Tests & Coverage | `pnpm test:coverage`                           | PASS (1167 passed, 161 test files)                 |
+| Fast E2E Tests        | `pnpm test:e2e:fast`                           | PASS (23 passed in 2.0m)                           |
+| Full E2E Suite        | `pnpm test:e2e`                                | PASS (400 passed, 1 skipped in 20.4m)              |
+| Bundle & Pages Build  | `pnpm build:pages`                             | PASS (Bundle budget passed, CSS utilities passed)  |
+| Release Notes Check   | `pnpm run check:release-notes`                 | PASS                                               |
+| GitHub Actions CI     | `Quality` (`36338641917`)                      | PASS (verify, build, audit passed in 15m28s)       |
+| GitHub Pages Deploy   | `Deploy GitHub Pages` (`36338641882`)          | PASS (build in 15m40s, deploy in 8s, verify in 4s) |
+| Production Smoke Test | `curl -I https://amahdy59.github.io/Azkarapp/` | HTTP 200 OK (fresh deployment verified live)       |
 
 ## Remaining risks or known limitations
 
