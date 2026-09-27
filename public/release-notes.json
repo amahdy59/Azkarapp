@@ -1,15 +1,15 @@
 {
   "ar": [
-    "إعادة تنظيم مساحة مشغل الصوت بالكامل ليمتد رأسياً حتى شريط التقدم دون أي تداخل مع قائمة بطاقات الأذكار.",
-    "دمج أدوات التحكم في سرعة القراءة والتكرار ومستوى الصوت بجانب أزرار التشغيل لتوفير المساحة وتسهيل الوصول.",
-    "تكبير مساحة عرض نص الذكر والترجمة الإنجليزية بخط أوضح وتمرير مريح داخل البطاقة.",
-    "محاذاة متناسقة وتجاوب تام للمشغل وبطاقات الأذكار عبر كافة مقاسات الشاشات وسطح المكتب."
+    "إزالة إطار الحدود من أزرار زوايا شاشة المصحف لتظهر بتصميم هادئ وانسيابي يطفو بنعومة على الصفحة.",
+    "تعديل اتجاه سهم الرجوع في الزاوية العلوية ليشير للخارج متوافقاً مع حركة الخروج الطبيعية للقارئ.",
+    "توحيد مقاسات أيقونات الزوايا كالعلامة المرجعية ومعاني الكلمات لضمان تناسق بصري تام.",
+    "تحسين تجربة القراءة وتفاعل الأزرار العائمة عبر شاشات الهواتف والأجهزة اللوحية."
   ],
   "en": [
-    "Expanded the audio player vertically to reach below the progress bar without overlapping the zikr list sidebar.",
-    "Integrated playback speed, repeat, and volume controls alongside the transport buttons for quick access and space efficiency.",
-    "Enlarged reading canvas for Arabic devotional text and English translation with comfortable in-card scrolling.",
-    "Balanced responsive layout and seamless card alignment across all mobile, tablet, and desktop screens."
+    "Removed button border strokes from the four Mushaf corner controls for a calm, seamless floating aesthetic.",
+    "Oriented the top corner back arrow outwards to match intuitive return navigation away from the reading canvas.",
+    "Standardized corner icon sizing across bookmarks, word meanings, and options for visual consistency.",
+    "Smoothed mobile corner control interactions and responsive layout across phones and tablets."
   ],
-  "release": "2026-09-26-audio-player-layout"
+  "release": "2026-09-27-mushaf-corner-controls"
 }

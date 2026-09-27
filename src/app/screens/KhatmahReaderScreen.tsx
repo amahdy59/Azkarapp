@@ -13,7 +13,7 @@ import type {
   ThemeMode,
 } from "../types";
 import {
-  ArrowPrevious,
+  ArrowLeft,
   CheckCircle2,
   ChevronDown,
   X,
@@ -652,9 +652,9 @@ export function KhatmahReaderScreen({
         onClick={onBack}
         data-testid="mushaf-top-left-back"
         aria-label={t(language, "common.back")}
-        className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border/60 bg-card/90 text-foreground shadow-xs backdrop-blur-md transition-[color,background-color,border-color,transform] active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        className="flex size-11 shrink-0 items-center justify-center rounded-full bg-card/90 text-foreground shadow-xs backdrop-blur-md transition-[color,background-color,transform] active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
-        <ArrowPrevious size={20} aria-hidden="true" />
+        <ArrowLeft size={20} aria-hidden="true" />
       </button>
     ) : undefined;
 
@@ -666,7 +666,7 @@ export function KhatmahReaderScreen({
         data-testid="mushaf-more-actions"
         aria-label={t(language, "mushaf.moreActions")}
         title={t(language, "mushaf.moreActions")}
-        className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border/60 bg-card/90 text-foreground shadow-xs backdrop-blur-md transition-[color,background-color,border-color,transform] active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        className="flex size-11 shrink-0 items-center justify-center rounded-full bg-card/90 text-foreground shadow-xs backdrop-blur-md transition-[color,background-color,transform] active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
         <MoreVertical size={20} aria-hidden="true" />
       </button>
@@ -708,13 +708,13 @@ export function KhatmahReaderScreen({
         data-testid="mushaf-page-bookmark"
         aria-label={t(language, "mushaf.bookmarkCurrentPage")}
         title={t(language, "mushaf.bookmarkCurrentPage")}
-        className={`relative flex size-11 shrink-0 items-center justify-center rounded-full border shadow-xs backdrop-blur-md transition-[color,background-color,border-color,transform] active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+        className={`relative flex size-11 shrink-0 items-center justify-center rounded-full shadow-xs backdrop-blur-md transition-[color,background-color,transform] active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
           isPageBookmarked
-            ? "border-primary bg-primary text-primary-foreground"
-            : "border-border/60 bg-card/90 text-foreground hover:bg-muted"
+            ? "bg-primary text-primary-foreground hover:bg-primary/90"
+            : "bg-card/90 text-foreground hover:bg-muted"
         }`}
       >
-        <Bookmark size={19} className={isPageBookmarked ? "fill-current" : undefined} aria-hidden="true" />
+        <Bookmark size={20} className={isPageBookmarked ? "fill-current" : undefined} aria-hidden="true" />
       </button>
     ) : undefined;
 
@@ -730,13 +730,13 @@ export function KhatmahReaderScreen({
         data-testid="mushaf-difficult-words-switch"
         aria-label={t(language, "mushaf.difficultWordsInvite")}
         title={t(language, "mushaf.difficultWordsInvite")}
-        className={`relative flex size-11 shrink-0 items-center justify-center rounded-full border shadow-xs backdrop-blur-md transition-[color,background-color,border-color,transform] active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-60 ${
+        className={`relative flex size-11 shrink-0 items-center justify-center rounded-full shadow-xs backdrop-blur-md transition-[color,background-color,transform] active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-60 ${
           showWordMeanings
-            ? "border-primary bg-primary text-primary-foreground"
-            : "border-border/60 bg-card/90 text-foreground hover:bg-muted"
+            ? "bg-primary text-primary-foreground hover:bg-primary/90"
+            : "bg-card/90 text-foreground hover:bg-muted"
         }`}
       >
-        <Translate size={19} className={showWordMeanings ? "stroke-[2.5]" : undefined} aria-hidden="true" />
+        <Translate size={20} aria-hidden="true" />
       </button>
     ) : undefined;
   /**

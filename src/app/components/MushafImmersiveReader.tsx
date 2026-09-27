@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, startTransition, type CSSProperties } from "react";
-import { ArrowLeft, ArrowRight, Bookmark, CheckCircle2, ChevronDown, MoreVertical, Translate } from "./icons";
+import { ArrowLeft, Bookmark, CheckCircle2, ChevronDown, MoreVertical, Translate } from "./icons";
 import { useSwipeGestures } from "../hooks/useSwipeGestures";
 import { PAPER_ASPECT, spreadStart, useMushafShell } from "./mushafShell";
 import { MushafToolRail, MUSHAF_RAIL_WIDTH, type SurahAudioControl } from "./MushafToolRail";
@@ -178,7 +178,6 @@ export function MushafImmersiveReader({
   const [isFocusMode, setIsFocusMode] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isQuickMenuOpen, setIsQuickMenuOpen] = useState(false);
-  const ArrowPrevious = direction === "rtl" ? ArrowRight : ArrowLeft;
   const [activeAyah, setActiveAyah] = useState<{ verseKey: string; text: string | null; pageNumber: number } | null>(
     null,
   );
@@ -452,9 +451,9 @@ export function MushafImmersiveReader({
         onClick={onClose}
         data-testid="mushaf-immersive-close"
         aria-label={t(language, "common.back")}
-        className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border/60 bg-card/90 text-foreground shadow-xs backdrop-blur-md transition-[color,background-color,border-color,transform] active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        className="flex size-11 shrink-0 items-center justify-center rounded-full bg-card/90 text-foreground shadow-xs backdrop-blur-md transition-[color,background-color,transform] active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
-        <ArrowPrevious size={20} />
+        <ArrowLeft size={20} aria-hidden="true" />
       </button>
     ) : undefined;
 
@@ -465,7 +464,7 @@ export function MushafImmersiveReader({
         onClick={() => setIsQuickMenuOpen(true)}
         data-testid="mushaf-immersive-more"
         aria-label={t(language, "mushaf.moreActions")}
-        className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border/60 bg-card/90 text-foreground shadow-xs backdrop-blur-md transition-[color,background-color,border-color,transform] active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        className="flex size-11 shrink-0 items-center justify-center rounded-full bg-card/90 text-foreground shadow-xs backdrop-blur-md transition-[color,background-color,transform] active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
         <MoreVertical size={20} />
       </button>
@@ -507,13 +506,13 @@ export function MushafImmersiveReader({
         data-testid="mushaf-immersive-word-meanings"
         aria-label={t(language, "mushaf.difficultWordsInvite")}
         title={t(language, "mushaf.difficultWordsInvite")}
-        className={`flex size-11 shrink-0 items-center justify-center rounded-full border shadow-xs backdrop-blur-md transition-[color,background-color,border-color,transform] active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+        className={`flex size-11 shrink-0 items-center justify-center rounded-full shadow-xs backdrop-blur-md transition-[color,background-color,transform] active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
           showWordMeanings
-            ? "border-primary bg-primary text-primary-foreground"
-            : "border-border/60 bg-card/90 text-foreground hover:bg-muted"
+            ? "bg-primary text-primary-foreground hover:bg-primary/90"
+            : "bg-card/90 text-foreground hover:bg-muted"
         }`}
       >
-        <Translate size={19} aria-hidden="true" />
+        <Translate size={20} aria-hidden="true" />
       </button>
     ) : undefined;
 
@@ -525,7 +524,7 @@ export function MushafImmersiveReader({
           onClick={onComplete}
           data-testid="mushaf-immersive-return"
           aria-label={t(language, "reader.immersiveComplete")}
-          className="flex h-11 items-center gap-1.5 rounded-full border border-primary bg-primary px-3.5 text-xs font-black text-primary-foreground shadow-xs backdrop-blur-md transition-[color,background-color,border-color,transform] active:scale-95 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="flex h-11 items-center gap-1.5 rounded-full bg-primary px-3.5 text-xs font-black text-primary-foreground shadow-xs backdrop-blur-md transition-[color,background-color,transform] active:scale-95 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           <CheckCircle2 size={18} aria-hidden="true" />
           <span className="truncate">{t(language, "reader.immersiveComplete")}</span>
@@ -537,13 +536,13 @@ export function MushafImmersiveReader({
           data-testid="mushaf-immersive-bookmark"
           aria-label={t(language, "mushaf.bookmarkCurrentPage")}
           title={t(language, "mushaf.bookmarkCurrentPage")}
-          className={`flex size-11 shrink-0 items-center justify-center rounded-full border shadow-xs backdrop-blur-md transition-[color,background-color,border-color,transform] active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+          className={`flex size-11 shrink-0 items-center justify-center rounded-full shadow-xs backdrop-blur-md transition-[color,background-color,transform] active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
             isPageBookmarked
-              ? "border-primary bg-primary text-primary-foreground"
-              : "border-border/60 bg-card/90 text-foreground hover:bg-muted"
+              ? "bg-primary text-primary-foreground hover:bg-primary/90"
+              : "bg-card/90 text-foreground hover:bg-muted"
           }`}
         >
-          <Bookmark size={19} className={isPageBookmarked ? "fill-current" : undefined} aria-hidden="true" />
+          <Bookmark size={20} className={isPageBookmarked ? "fill-current" : undefined} aria-hidden="true" />
         </button>
       )
     ) : undefined;

@@ -207,11 +207,26 @@ describe("KhatmahReaderScreen wird progress", () => {
     const article = await screen.findByRole("article", { name: "صفحة ٤٢" });
     expect(article).toHaveAttribute("data-theme", "dark");
     expect(article).toHaveAttribute("data-mushaf-chrome-mode", "clean");
-    // Corner controls placed cleanly over the page
-    expect(screen.getByTestId("mushaf-more-actions")).toBeInTheDocument();
-    expect(screen.getByTestId("mushaf-top-left-back")).toBeInTheDocument();
-    expect(screen.getByTestId("mushaf-page-bookmark")).toBeInTheDocument();
-    expect(screen.getByTestId("mushaf-difficult-words-switch")).toBeInTheDocument();
+    // Corner controls placed cleanly over the page without border strokes
+    const backBtn = screen.getByTestId("mushaf-top-left-back");
+    const moreBtn = screen.getByTestId("mushaf-more-actions");
+    const bookmarkBtn = screen.getByTestId("mushaf-page-bookmark");
+    const wordsBtn = screen.getByTestId("mushaf-difficult-words-switch");
+
+    expect(backBtn).toBeInTheDocument();
+    expect(moreBtn).toBeInTheDocument();
+    expect(bookmarkBtn).toBeInTheDocument();
+    expect(wordsBtn).toBeInTheDocument();
+
+    expect(backBtn.className).not.toMatch(/\bborder\b/);
+    expect(moreBtn.className).not.toMatch(/\bborder\b/);
+    expect(bookmarkBtn.className).not.toMatch(/\bborder\b/);
+    expect(wordsBtn.className).not.toMatch(/\bborder\b/);
+
+    const backSvg = backBtn.querySelector("svg");
+    expect(backSvg).toBeInTheDocument();
+    expect(backSvg).not.toHaveAttribute("data-rtl-flip");
+
     expect(screen.queryByTestId("mushaf-settings-trigger")).not.toBeInTheDocument();
   });
 

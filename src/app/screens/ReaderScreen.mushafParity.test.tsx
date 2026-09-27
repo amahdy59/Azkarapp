@@ -304,10 +304,24 @@ describe("the phone layout integrates controls directly into the Mushaf canvas",
     expect(document.querySelector('[data-mushaf-chrome="header"]')).toBeNull();
     expect(document.querySelector('[data-mushaf-chrome="footer"]')).toBeNull();
 
-    expect(screen.getByTestId("mushaf-immersive-close")).toBeInTheDocument();
-    expect(screen.getByTestId("mushaf-immersive-more")).toBeInTheDocument();
-    expect(screen.getByTestId("mushaf-immersive-word-meanings")).toBeInTheDocument();
-    expect(screen.getByTestId("mushaf-immersive-bookmark")).toBeInTheDocument();
+    const closeBtn = screen.getByTestId("mushaf-immersive-close");
+    const moreBtn = screen.getByTestId("mushaf-immersive-more");
+    const meaningsBtn = screen.getByTestId("mushaf-immersive-word-meanings");
+    const bookmarkBtn = screen.getByTestId("mushaf-immersive-bookmark");
+
+    expect(closeBtn).toBeInTheDocument();
+    expect(moreBtn).toBeInTheDocument();
+    expect(meaningsBtn).toBeInTheDocument();
+    expect(bookmarkBtn).toBeInTheDocument();
+
+    expect(closeBtn.className).not.toMatch(/\bborder\b/);
+    expect(moreBtn.className).not.toMatch(/\bborder\b/);
+    expect(meaningsBtn.className).not.toMatch(/\bborder\b/);
+    expect(bookmarkBtn.className).not.toMatch(/\bborder\b/);
+
+    const closeSvg = closeBtn.querySelector("svg");
+    expect(closeSvg).toBeInTheDocument();
+    expect(closeSvg).not.toHaveAttribute("data-rtl-flip");
   });
 
   it("names the surah being read in the cartouche", () => {
