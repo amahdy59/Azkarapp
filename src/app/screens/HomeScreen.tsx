@@ -756,7 +756,7 @@ export function HomeScreen({
                       data-testid="home-context-stack"
                       className={
                         expandedPrayer
-                          ? `flex min-w-0 flex-col gap-4 lg:gap-5 ${
+                          ? `contents md:flex md:min-w-0 md:flex-col md:gap-4 lg:gap-5 ${
                               direction === "rtl" ? "md:col-start-2 md:row-start-1" : "md:col-start-1 md:row-start-1"
                             }`
                           : "contents"
