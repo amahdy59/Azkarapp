@@ -4,6 +4,7 @@ import {
   OASIS_LEVEL_DETAILS,
   getPresetOasisState,
   deriveOasisRoutinesFromCompletions,
+  calculateDailyThimar,
 } from "./oasisModel";
 import type { DailyCollectionCompletion } from "../types";
 
@@ -153,5 +154,31 @@ describe("oasisModel", () => {
       const { routines, habits } = getPresetOasisState(level as 0 | 1 | 2 | 3 | 4 | 5);
       expect(calculateOasisLevel(routines, habits)).toBe(level);
     }
+  });
+
+  describe("calculateDailyThimar", () => {
+    it("returns 0 thimar when no awrad are done", () => {
+      const res = calculateDailyThimar({ morning: false, evening: false, beforeSleep: false }, { quranWird: false });
+      expect(res.totalEarned).toBe(0);
+      expect(res.isComplete).toBe(false);
+    });
+
+    it("awards 5 thimar per completed routine", () => {
+      const single = calculateDailyThimar({ morning: true, evening: false, beforeSleep: false }, { quranWird: false });
+      expect(single.morning).toBe(5);
+      expect(single.totalEarned).toBe(5);
+      expect(single.isComplete).toBe(false);
+
+      const withQuran = calculateDailyThimar(
+        { morning: true, evening: false, beforeSleep: false },
+        { quranWird: true },
+      );
+      expect(withQuran.totalEarned).toBe(10);
+      expect(withQuran.quran).toBe(5);
+
+      const full = calculateDailyThimar({ morning: true, evening: true, beforeSleep: true }, { quranWird: true });
+      expect(full.totalEarned).toBe(20);
+      expect(full.isComplete).toBe(true);
+    });
   });
 });

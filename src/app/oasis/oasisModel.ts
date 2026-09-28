@@ -37,6 +37,39 @@ export interface OasisDayState {
   isToday: boolean;
 }
 
+export const THIMAR_PER_ROUTINE = 5;
+export const TOTAL_DAILY_THIMAR = 20;
+
+export interface DailyThimarSummary {
+  morning: number;
+  evening: number;
+  quran: number;
+  beforeSleep: number;
+  totalEarned: number;
+  target: number;
+  isComplete: boolean;
+}
+
+export function calculateDailyThimar(
+  routines: { morning: boolean; evening: boolean; beforeSleep: boolean },
+  habits: { quranWird?: boolean },
+): DailyThimarSummary {
+  const morning = routines.morning ? THIMAR_PER_ROUTINE : 0;
+  const evening = routines.evening ? THIMAR_PER_ROUTINE : 0;
+  const quran = habits.quranWird ? THIMAR_PER_ROUTINE : 0;
+  const beforeSleep = routines.beforeSleep ? THIMAR_PER_ROUTINE : 0;
+  const totalEarned = morning + evening + quran + beforeSleep;
+  return {
+    morning,
+    evening,
+    quran,
+    beforeSleep,
+    totalEarned,
+    target: TOTAL_DAILY_THIMAR,
+    isComplete: totalEarned >= TOTAL_DAILY_THIMAR,
+  };
+}
+
 /**
  * Calculates the oasis progression level (0–5) from completed routines and daily habits.
  *

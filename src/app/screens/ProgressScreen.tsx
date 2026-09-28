@@ -27,7 +27,6 @@ import {
   type OasisHabits,
 } from "../oasis/oasisModel";
 import { DropletMark, SeedlingMark, BranchMark, PalmTreeMark, OasisMark } from "../components/GardenMarks";
-import { DailyCompanionsCard } from "../components/DailyCompanionsCard";
 import { Share2, Sparkles, Zap } from "../components/icons";
 import type {
   AppLanguage,
@@ -87,9 +86,10 @@ export function ProgressScreen({
   weeklyGoalDays,
   onTogglePrayerTracking,
   onToggleDailyHabit,
-  onCycleMosqueHabit,
+  onCycleMosqueHabit: _onCycleMosqueHabit,
   onPrayerResume,
   onOpenFriday,
+  onOpenKhatmah,
   initialPeriod = "day",
   onPeriodChange,
 }: {
@@ -114,6 +114,7 @@ export function ProgressScreen({
   onCycleMosqueHabit?: (dayKey: string) => void;
   onPrayerResume?: (prayer: PrayerName) => void;
   onOpenFriday?: () => void;
+  onOpenKhatmah?: () => void;
   initialPeriod?: "day" | "week" | "month" | "year";
   onPeriodChange?: (period: "day" | "week" | "month" | "year") => void;
 }) {
@@ -179,7 +180,7 @@ export function ProgressScreen({
       ? getProgressDayKey(now, progressDayStartHour)
       : getProgressDayKey(displayDate, progressDayStartHour);
 
-  const { selectedDayPath, quranWirdDone, resolvedMosquePrayers, oasisLevel, levelDetails } = useMemo(() => {
+  const { selectedDayPath, quranWirdDone, oasisLevel, levelDetails } = useMemo(() => {
     const pathStatus = getDailyPathStatus({
       dayKey: currentDayKey,
       dailyCompletions,
@@ -469,26 +470,7 @@ export function ProgressScreen({
           )}
         </section>
 
-        {/* Qur'an is presented before the collection breakdown. */}
-        {activeTab === "day" && quranWirdPlan?.kind !== "free" && (
-          <div className="mb-5 w-full">
-            <DailyCompanionsCard
-              language={language}
-              quranWird={quranWirdDone}
-              quranProgress={
-                selectedDayPath.quran.active
-                  ? { progress: selectedDayPath.quran.progress, goal: selectedDayPath.quran.goal }
-                  : undefined
-              }
-              mosquePrayers={resolvedMosquePrayers}
-              onToggleQuranWird={() => onToggleDailyHabit?.(currentDayKey, "quran_wird")}
-              onCycleMosquePrayers={() => onCycleMosqueHabit?.(currentDayKey)}
-              showMosque={false}
-            />
-          </div>
-        )}
-
-        {/* The selected period's dhikr answer follows prayer and Qur'an. */}
+        {/* The selected period's wird answer (Azkar + Quran) follows prayer. */}
         <div className="mb-5 w-full">
           <TodayRoutineGarden
             summary={activeGardenSummary}
@@ -499,6 +481,32 @@ export function ProgressScreen({
             onOpenShareModal={onOpenShareModal}
             onSelectCategory={onSelectCategory}
             visibleCategoryIds={WIRD_CATEGORY_IDS}
+            quranWird={
+              quranWirdPlan?.kind !== "free"
+                ? {
+                    progress: selectedDayPath.quran.progress,
+                    goal: selectedDayPath.quran.goal,
+                    complete: quranWirdDone,
+                    active: selectedDayPath.quran.active,
+                    onPress: onOpenKhatmah ?? (() => onToggleDailyHabit?.(currentDayKey, "quran_wird")),
+                    onToggleComplete: () => onToggleDailyHabit?.(currentDayKey, "quran_wird"),
+                  }
+                : undefined
+            }
+            isQuranDoneForDay={(dayKey) => {
+              const habitsForDay = (dailyHabits ?? []).filter((h) => h.dayKey === dayKey);
+              const manual = habitsForDay.some((h) => h.habit === "quran_wird");
+              const dayPages = (wirdHistory ?? {})[dayKey] ?? [];
+              const read = new Set(dayPages).size;
+              const recordedGoal = (quranWirdDailyGoals ?? {})[dayKey];
+              const goal =
+                typeof recordedGoal === "number"
+                  ? recordedGoal
+                  : quranWirdPlan?.kind === "daily"
+                    ? quranWirdPlan.dailyPages
+                    : 0;
+              return manual || (goal > 0 && read >= goal);
+            }}
             onMedia={false}
             activeTab={activeTab}
             displayDate={displayDate}

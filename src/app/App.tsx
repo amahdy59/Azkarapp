@@ -1772,6 +1772,7 @@ function AppContent({
                     setActivePrayer(prayer);
                     push("prayer");
                   }}
+                  onOpenKhatmah={() => push("khatmah_overview")}
                 />
               )}
               {(view === "category" || view === "reader") && routeContentLoading && (

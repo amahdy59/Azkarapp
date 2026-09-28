@@ -171,10 +171,9 @@ export function getDailyPathStatus(input: DailyPathInput): DailyPathStatus {
     };
   }
 
-  /* Two pillars, or every one there is when fewer are set up — otherwise a
-     reader who has only ever done dhikr could never keep a streak, which would
-     be a new rule punishing them for not adopting the others. */
-  const streakThreshold = Math.min(2, activePillarCount);
+  /* Any single completed routine or configured pillar maintains the streak.
+     Consistency measures returning and showing up, not perfection. */
+  const streakQualified = completedCount > 0 || quran.complete || (salah.configured && salah.complete);
   return {
     dayKey: input.dayKey,
     policyVersion,
@@ -183,8 +182,8 @@ export function getDailyPathStatus(input: DailyPathInput): DailyPathStatus {
     salah,
     activePillarCount,
     achievedPillarCount,
-    streakQualified: achievedPillarCount >= streakThreshold,
+    streakQualified,
     // Full dhikr, and every pillar that asks anything of the day.
-    palmEarned: dhikr.fullComplete && achievedPillarCount === activePillarCount,
+    palmEarned: dhikr.fullComplete && (!quran.active || quran.complete) && (!salah.configured || salah.complete),
   };
 }

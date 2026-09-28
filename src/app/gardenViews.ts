@@ -22,6 +22,7 @@ export interface WeekDayRecord {
   morningStatus: RoutineStatus;
   eveningStatus: RoutineStatus;
   sleepStatus: RoutineStatus;
+  quranStatus?: RoutineStatus;
   completedCount: number;
   isPalm: boolean;
 }
@@ -31,6 +32,7 @@ export interface WeekGardenStats {
   morningCompletedCount: number;
   eveningCompletedCount: number;
   sleepCompletedCount: number;
+  quranCompletedCount?: number;
   completedDaysCount: number;
   mostMissedRoutine: CategoryId | null;
   bestStreakDays: number;
@@ -95,6 +97,7 @@ export function getWeekGardenStats(
   index: DailyCompletionIndex,
   referenceDate: Date,
   language: AppLanguage,
+  isQuranDoneForDay?: (dayKey: string) => boolean,
 ): WeekGardenStats {
   const isArabic = language === "ar";
   const todayKey = formatDayKey(new Date());
@@ -109,6 +112,7 @@ export function getWeekGardenStats(
   let morningCompletedCount = 0;
   let eveningCompletedCount = 0;
   let sleepCompletedCount = 0;
+  let quranCompletedCount = 0;
   let completedDaysCount = 0;
   let currentRun = 0;
   let bestStreakDays = 0;
@@ -126,12 +130,17 @@ export function getWeekGardenStats(
     const hasMorning = categories.has("morning");
     const hasEvening = categories.has("evening");
     const hasSleep = categories.has("before_sleep");
+    const hasQuran = isQuranDoneForDay ? isQuranDoneForDay(dayKey) : false;
 
     if (hasMorning) morningCompletedCount++;
     if (hasEvening) eveningCompletedCount++;
     if (hasSleep) sleepCompletedCount++;
+    if (hasQuran) quranCompletedCount++;
 
-    const isPalm = hasMorning && hasEvening && hasSleep;
+    const isPalm = isQuranDoneForDay
+      ? hasMorning && hasEvening && hasSleep && hasQuran
+      : hasMorning && hasEvening && hasSleep;
+
     if (isPalm) {
       completedDaysCount++;
       currentRun++;
@@ -148,7 +157,8 @@ export function getWeekGardenStats(
       morningStatus: hasMorning ? "complete" : "missed",
       eveningStatus: hasEvening ? "complete" : isToday ? "partial" : "missed",
       sleepStatus: hasSleep ? "complete" : isToday ? "partial" : "missed",
-      completedCount: [hasMorning, hasEvening, hasSleep].filter(Boolean).length,
+      quranStatus: isQuranDoneForDay ? (hasQuran ? "complete" : isToday ? "partial" : "missed") : undefined,
+      completedCount: [hasMorning, hasEvening, hasSleep, isQuranDoneForDay ? hasQuran : false].filter(Boolean).length,
       isPalm,
     });
   }
@@ -171,6 +181,7 @@ export function getWeekGardenStats(
     morningCompletedCount,
     eveningCompletedCount,
     sleepCompletedCount,
+    quranCompletedCount: isQuranDoneForDay ? quranCompletedCount : undefined,
     completedDaysCount,
     mostMissedRoutine,
     bestStreakDays,

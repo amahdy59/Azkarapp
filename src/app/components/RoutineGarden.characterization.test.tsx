@@ -180,7 +180,9 @@ describe("Home wird card", () => {
       />,
     );
 
-    expect(screen.getByText(/2 of 4 routines complete/i)).toBeInTheDocument();
+    expect(screen.getByText("2 / 4")).toBeInTheDocument();
+    expect(screen.getByTestId("thimar-progress-badge")).toHaveTextContent(/10\s*\/\s*20/);
+    expect(screen.getByText(/Halfway through your daily path \(10 fruits\)/i)).toBeInTheDocument();
   });
 });
 

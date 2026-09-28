@@ -58,6 +58,7 @@ export interface QuranWirdTile {
   complete: boolean;
   active: boolean;
   onPress: () => void;
+  onToggleComplete?: () => void;
 }
 
 // ─── Rich Wird Category Card (glassmorphic home routine card) ────────────────
@@ -160,8 +161,11 @@ function WirdCategoryCard({
         </span>
 
         {isCompleted && (
-          <span className="flex size-7 items-center justify-center rounded-full bg-success text-success-foreground shadow-md">
-            <Check size={14} strokeWidth={3} aria-hidden="true" />
+          <span
+            className="flex size-7 items-center justify-center rounded-full bg-success text-success-foreground shadow-md"
+            aria-hidden="true"
+          >
+            <Check size={14} strokeWidth={3} />
           </span>
         )}
       </div>
@@ -330,8 +334,11 @@ function MainDhikrGroupCard({
       </div>
 
       {isCompleted ? (
-        <span className="absolute end-3 top-3 flex size-6 items-center justify-center rounded-full border border-success bg-success text-success-foreground shadow-md sm:-end-1.5 sm:top-auto sm:bottom-3">
-          <Check size={13} strokeWidth={3} aria-hidden="true" />
+        <span
+          className="absolute end-3 top-3 flex size-6 items-center justify-center rounded-full border border-success bg-success text-success-foreground shadow-md sm:-end-1.5 sm:top-auto sm:bottom-3"
+          aria-hidden="true"
+        >
+          <Check size={13} strokeWidth={3} />
         </span>
       ) : null}
     </button>
@@ -451,7 +458,7 @@ export function ProgressDayView({
       dir={isArabic ? "rtl" : "ltr"}
     >
       <HomeCard onGlass={onGlass} className={`flex-col ${onGlass ? "flex-1" : ""}`}>
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
               {onGlass && isHomeSubset && (
@@ -500,16 +507,36 @@ export function ProgressDayView({
             ) : null}
           </div>
 
-          <div
-            className={`flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-label font-black ${
-              onGlass
-                ? "border-white/20 bg-on-media-surface/60 text-on-media"
-                : "border-border-control bg-muted text-foreground"
-            }`}
-          >
-            {/* Isolated: a bare ratio between Arabic siblings gets reordered
-                by the bidi algorithm and starts reading as "3 / 0". */}
-            <bdi>{formatRatio(completedCount, totalCount, language)}</bdi>
+          <div className="flex flex-wrap items-center gap-2 sm:shrink-0">
+            <div
+              className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-label font-black ${
+                onGlass
+                  ? "border-white/20 bg-on-media-surface/60 text-on-media"
+                  : "border-border-control bg-muted text-foreground"
+              }`}
+            >
+              {/* Isolated: a bare ratio between Arabic siblings gets reordered
+                  by the bidi algorithm and starts reading as "3 / 0". */}
+              <bdi>{formatRatio(completedCount, totalCount, language)}</bdi>
+            </div>
+            <div
+              data-testid="thimar-progress-badge"
+              className={`flex shrink-0 items-center gap-1 rounded-full border px-2.5 py-1.5 text-label font-bold ${
+                onGlass
+                  ? "border-white/20 bg-on-media-surface/60 text-on-media"
+                  : "border-primary/30 bg-primary/10 text-primary"
+              }`}
+              title={t(language, "progress.todayThimarProgress", {
+                earned: formatNumerals(completedCount * 5, language),
+                total: formatNumerals(totalCount * 5, language),
+              })}
+            >
+              <span aria-hidden="true">🌱</span>
+              <bdi>
+                {formatNumerals(completedCount * 5, language)}/{formatNumerals(totalCount * 5, language)}{" "}
+                {t(language, "progress.thimarUnit")}
+              </bdi>
+            </div>
           </div>
         </div>
 
@@ -635,10 +662,9 @@ export function ProgressDayView({
               completedLabel={t(language, "progress.completed")}
               pendingLabel={
                 quranWird.active
-                  ? t(language, "mushaf.wirdProgress", {
-                      read: formatNumerals(quranWird.progress, language),
-                      goal: formatNumerals(quranWird.goal, language),
-                    })
+                  ? isArabic
+                    ? `${formatRatio(quranWird.progress, quranWird.goal, language)} صفحة`
+                    : `${formatRatio(quranWird.progress, quranWird.goal, language)} pages`
                   : t(language, "mushaf.freeReadingActive")
               }
               onPress={quranWird.onPress}
@@ -728,19 +754,21 @@ export function ProgressWeekView({
   referenceDate = new Date(),
   weeklyGoalDays,
   activeDays = 0,
+  isQuranDoneForDay,
 }: {
   language: AppLanguage;
   dailyCompletions?: import("../types").DailyCollectionCompletion[];
   referenceDate?: Date;
   weeklyGoalDays?: number;
   activeDays?: number;
+  isQuranDoneForDay?: (dayKey: string) => boolean;
 }) {
   const isArabic = isAr(language);
   const completionIndex = useMemo(() => createDailyCompletionIndex(dailyCompletions), [dailyCompletions]);
 
   const weekStats = useMemo(
-    () => getWeekGardenStats(completionIndex, referenceDate, language),
-    [completionIndex, referenceDate, language],
+    () => getWeekGardenStats(completionIndex, referenceDate, language, isQuranDoneForDay),
+    [completionIndex, referenceDate, language, isQuranDoneForDay],
   );
 
   const bestRoutineName = getCategoryName(weekStats.bestRoutine, language);
@@ -841,6 +869,14 @@ export function ProgressWeekView({
                     <span>{t(language, "progress.eveningShort")}</span>
                   </div>
                 </th>
+                {weekStats.days.some((d) => d.quranStatus !== undefined) && (
+                  <th scope="col" className="py-2.5 px-2 text-label font-bold text-muted-foreground">
+                    <div className="flex items-center justify-center gap-1">
+                      <BookOpen size={15} className="text-primary" />
+                      <span>{t(language, "progress.quranShort")}</span>
+                    </div>
+                  </th>
+                )}
                 <th scope="col" className="py-2.5 px-2 text-label font-bold text-muted-foreground">
                   <div className="flex items-center justify-center gap-1">
                     <MoonStar size={15} className="text-sleep" />
@@ -871,6 +907,14 @@ export function ProgressWeekView({
                     label={t(language, "progress.eveningShort")}
                     language={language}
                   />
+
+                  {day.quranStatus !== undefined && (
+                    <WeekStatusCell
+                      done={day.quranStatus === "complete"}
+                      label={t(language, "progress.quranShort")}
+                      language={language}
+                    />
+                  )}
 
                   <WeekStatusCell
                     done={day.sleepStatus === "complete"}

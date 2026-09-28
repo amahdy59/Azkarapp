@@ -1,15 +1,15 @@
 {
   "ar": [
-    "يمكنك الآن تحديد ورد مكرر يومي لقراءة جزء أو سورة بعينها أو نطاق صفحات محدد كل يوم وإتمامه باستمرار.",
-    "زر جديد للبدء من أول الورد المكرر بسهولة عند العودة لإعادة قراءة السورة أو الجزء.",
-    "احتساب دقيق لصفحات الورد اليومي مع عزل القراءات الجانبية حتى لا تُحسب ضمن الورد الثابت.",
-    "عرض الأسبوع يوثق إنجاز الورد اليومي بوضوح وفق ما قرأته من نطاقك المختار."
+    "إدراج ورد القرآن الكريم ضمن باقة «وردك اليوم» الرئيسية إلى جانب أذكار الصباح والمساء والنوم.",
+    "نظام ثمار الواحة الجديد: ٥ ثمار لكل ورد لإتمام ٢٠ ثمرة يومياً ونيل نخلة اليوم.",
+    "صون التتابع برحمة: إنجاز أي ورد واحد من الأوراد الأربعة يحفظ تتابعك اليومي تلقائياً.",
+    "إضافة عمود ورد القرآن في مصفوفة الالتزام الأسبوعي لمتابعة أورادك كاملة في شاشة واحدة."
   ],
   "en": [
-    "You can now set a daily repeating wird for a fixed Juz, Surah, or custom page range that resets every day.",
-    "A new quick restart button lets you begin your fixed section from the first page whenever you wish to recite it again.",
-    "Daily reading progress accurately tracks pages within your selected section while isolating other reading.",
-    "The weekly view clearly records your wird completion based on reading the full repeating range each day."
+    "Quran recitation is now integrated into 'Today's Wird' alongside morning, evening, and sleep azkar.",
+    "New Oasis Thimar progression: earn 5 fruits per routine toward 20 daily fruits to win today's palm.",
+    "Gentle streak preservation: completing any single routine from your daily wird maintains your active streak.",
+    "Added a dedicated Quran wird column to the weekly commitment matrix to view all routines together."
   ],
-  "release": "2026-09-27-wird-fixed-section"
+  "release": "2026-09-28-quran-wird-thimar"
 }

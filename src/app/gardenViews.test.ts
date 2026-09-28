@@ -297,6 +297,27 @@ describe("garden view selectors", () => {
     expect(today?.eveningStatus).toBe("partial");
     expect(today?.sleepStatus).toBe("partial");
   });
+
+  it("evaluates quran status and completes palm when quran is included", () => {
+    const records = [
+      { dayKey: "2024-02-03", category: "morning" as const, timeZone: "UTC" },
+      { dayKey: "2024-02-03", category: "evening" as const, timeZone: "UTC" },
+      { dayKey: "2024-02-03", category: "before_sleep" as const, timeZone: "UTC" },
+    ];
+    const index = createDailyCompletionIndex(records);
+    // Without Quran completed
+    const statsWithout = getWeekGardenStats(index, new Date(2024, 1, 3), "ar", () => false);
+    const dayWithout = statsWithout.days.find((d) => d.dayKey === "2024-02-03");
+    expect(dayWithout?.quranStatus).toBe("missed");
+    expect(dayWithout?.isPalm).toBe(false);
+
+    // With Quran completed
+    const statsWith = getWeekGardenStats(index, new Date(2024, 1, 3), "ar", (key) => key === "2024-02-03");
+    const dayWith = statsWith.days.find((d) => d.dayKey === "2024-02-03");
+    expect(dayWith?.quranStatus).toBe("complete");
+    expect(dayWith?.isPalm).toBe(true);
+    expect(statsWith.quranCompletedCount).toBe(1);
+  });
 });
 
 afterEach(() => {

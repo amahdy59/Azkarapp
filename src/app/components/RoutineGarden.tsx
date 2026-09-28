@@ -57,6 +57,7 @@ export function TodayRoutineGarden({
   activeTab = "day",
   displayDate = new Date(),
   weeklyGoalDays,
+  isQuranDoneForDay,
 }: {
   summary: GardenSummary;
   language: AppLanguage;
@@ -77,6 +78,7 @@ export function TodayRoutineGarden({
   activeTab?: "day" | "week" | "month" | "year";
   displayDate?: Date;
   weeklyGoalDays?: number;
+  isQuranDoneForDay?: (dayKey: string) => boolean;
 }) {
   const totalPalms = summary.lifetimePalms;
   const streak = summary.currentUsageStreak ?? 0;
@@ -87,6 +89,9 @@ export function TodayRoutineGarden({
     targetCategoryIds.filter((cat) => summary.today.completedCategories.includes(cat)).length +
     (quranWird?.complete ? 1 : 0);
   const totalCount = targetCategoryIds.length + (quranWird ? 1 : 0);
+  const earnedThimar = completedCount * 5;
+  const targetThimar = totalCount * 5;
+
   const dynamicSubtitle = t(
     language,
     completedCount === 0
@@ -95,12 +100,17 @@ export function TodayRoutineGarden({
         ? "garden.todayPromptComplete"
         : completedCount === totalCount - 1
           ? "garden.todayPromptTwo"
-          : completedCount === 1
-            ? "garden.todayPromptOne"
-            : "garden.todayPromptProgress",
-    completedCount > 1 && completedCount < totalCount - 1
-      ? { done: formatNumerals(completedCount, language), total: formatNumerals(totalCount, language) }
-      : undefined,
+          : completedCount === 2 && totalCount === 4
+            ? "garden.todayPromptHalf"
+            : completedCount === 1
+              ? "garden.todayPromptOne"
+              : "garden.todayPromptProgress",
+    {
+      done: formatNumerals(completedCount, language),
+      total: formatNumerals(totalCount, language),
+      thimar: formatNumerals(earnedThimar, language),
+      targetThimar: formatNumerals(targetThimar, language),
+    },
   );
 
   return (
@@ -174,6 +184,7 @@ export function TodayRoutineGarden({
             referenceDate={displayDate}
             weeklyGoalDays={weeklyGoalDays}
             activeDays={summary.activeDaysLast7}
+            isQuranDoneForDay={isQuranDoneForDay}
           />
         )}
 

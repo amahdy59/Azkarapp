@@ -160,20 +160,21 @@ describe("what qualifies a day", () => {
   const plan = { kind: "daily" as const, dailyPages: 2 };
   const configured = { quranWirdPlan: plan, mosquePrayerGoal: 2 };
 
-  it("does not qualify on one pillar of three", () => {
-    const result = status({ ...configured, dailyCompletions: [completion("morning"), completion("evening")] });
-    expect(result.achievedPillarCount).toBe(1);
+  it("does not qualify when nothing has been completed", () => {
+    const result = status({ ...configured, dailyCompletions: [] });
     expect(result.streakQualified).toBe(false);
   });
 
-  it("qualifies on two of three", () => {
-    const result = status({
-      ...configured,
-      dailyCompletions: [completion("morning"), completion("evening")],
-      wirdHistory: { [DAY]: [1, 2] },
-    });
-    expect(result.streakQualified).toBe(true);
-    expect(result.palmEarned).toBe(false);
+  it("qualifies on any single routine or wird", () => {
+    // Single collection qualifies
+    const withMorning = status({ ...configured, dailyCompletions: [completion("morning")] });
+    expect(withMorning.streakQualified).toBe(true);
+    expect(withMorning.palmEarned).toBe(false);
+
+    // Quran alone qualifies
+    const withQuran = status({ ...configured, wirdHistory: { [DAY]: [1, 2] } });
+    expect(withQuran.streakQualified).toBe(true);
+    expect(withQuran.palmEarned).toBe(false);
   });
 
   it("earns a palm only with all three collections and every configured pillar", () => {
