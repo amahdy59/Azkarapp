@@ -868,3 +868,44 @@ test("a highlighted Qur'an word is the same size as the ayah around it", async (
   // The highlight is still carried by weight and colour, not by size.
   expect(Number(metrics.wordWeight)).toBeGreaterThan(500);
 });
+
+test("the show all zikr button in reader menu navigates to the category collection view", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await openReturningGuestHome(page, "ar");
+
+  // On nav-azkar tab, click evening azkar
+  await page.getByTestId("category-card-evening").click();
+  await page.getByTestId("start-session-button").click();
+  await expect(page).toHaveURL(/#\/azkar\/evening\/1$/);
+
+  // Open the 3-dots menu in reader
+  await page.getByRole("button", { name: "خيارات القارئ" }).click();
+
+  // Click "عرض جميع الأذكار"
+  const viewAllButton = page.getByTestId("reader-view-all-azkar");
+  await expect(viewAllButton).toBeVisible();
+  await viewAllButton.click();
+
+  // Ensure it navigates to the list of zikr pages (CategoryScreen)
+  await expect(page).toHaveURL(/#\/azkar\/evening$/);
+  await expect(page.getByTestId("category-overview")).toBeVisible();
+  await expect(page.getByTestId("start-session-button")).toBeVisible();
+});
+
+test("the show all zikr button navigates to category when reader opened directly without history", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/#/azkar/evening/1");
+  await expect(page.getByTestId("reader-screen")).toBeVisible();
+
+  // Open the 3-dots menu in reader
+  await page.getByRole("button", { name: /خيارات القارئ|Reader options/i }).click();
+
+  // Click "عرض جميع الأذكار" / "View All Azkar"
+  const viewAllButton = page.getByTestId("reader-view-all-azkar");
+  await expect(viewAllButton).toBeVisible();
+  await viewAllButton.click();
+
+  // Ensure it navigates to CategoryScreen
+  await expect(page).toHaveURL(/#\/azkar\/evening$/);
+  await expect(page.getByTestId("category-overview")).toBeVisible();
+});

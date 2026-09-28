@@ -819,7 +819,7 @@ function MushafPageCanvas({
           }`}
         >
           <div
-            className="mushaf-opening__content relative z-10 flex h-full w-full flex-col justify-center p-3 sm:p-5"
+            className="mushaf-opening__content relative z-10 flex h-full w-full flex-col justify-between p-3 sm:p-5"
             style={{ maxWidth: "min(100%, calc(100cqh * 2 / 3))" }}
             data-testid="mushaf-opening-content"
           >
@@ -834,7 +834,7 @@ function MushafPageCanvas({
             )}
             <div
               data-mushaf-column=""
-              className="grid h-[84%] min-h-0 w-full self-center"
+              className="grid h-[54%] min-h-0 w-full self-center my-auto"
               style={{
                 gridTemplateRows: "repeat(8, minmax(0, 1fr))",
                 fontFamily: useQcfGlyphs ? `qcf-v2-page-${pageNumber}, var(--font-mushaf)` : "var(--font-mushaf)",

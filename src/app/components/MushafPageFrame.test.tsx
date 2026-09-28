@@ -24,7 +24,7 @@ describe("the Mushaf page frame", () => {
     expect(viewer).not.toContain("MushafOpeningFrameArt");
     expect(viewer).toContain("mushaf-opening__content");
     expect(viewer).toContain("gridTemplateRows:");
-    expect(viewer).toContain('className="grid h-[84%]');
+    expect(viewer).toContain('className="grid h-[54%]');
   });
 
   it("uses the documented crisp page-turn distance and duration", () => {

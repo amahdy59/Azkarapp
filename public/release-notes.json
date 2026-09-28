@@ -1,15 +1,13 @@
 {
   "ar": [
-    "إدراج ورد القرآن الكريم ضمن باقة «وردك اليوم» الرئيسية إلى جانب أذكار الصباح والمساء والنوم.",
-    "نظام ثمار الواحة الجديد: ٥ ثمار لكل ورد لإتمام ٢٠ ثمرة يومياً ونيل نخلة اليوم.",
-    "صون التتابع برحمة: إنجاز أي ورد واحد من الأوراد الأربعة يحفظ تتابعك اليومي تلقائياً.",
-    "إضافة عمود ورد القرآن في مصفوفة الالتزام الأسبوعي لمتابعة أورادك كاملة في شاشة واحدة."
+    "يمكنك الآن فتح قائمة أذكار المجموعة مباشرةً من قائمة القارئ، سواء بدأت الجلسة من المجموعة أو من رابط مباشر.",
+    "يعرض مشغل الصوت الموسّع نص الذكر بأكبر حجم مناسب للمساحة، مع إبقاء النصوص الطويلة قابلة للتمرير.",
+    "أصبح تخطيط صفحتي فاتحة الكتاب وبداية البقرة أكثر توازناً، بمسافات أهدأ حول الآيات والعناوين."
   ],
   "en": [
-    "Quran recitation is now integrated into 'Today's Wird' alongside morning, evening, and sleep azkar.",
-    "New Oasis Thimar progression: earn 5 fruits per routine toward 20 daily fruits to win today's palm.",
-    "Gentle streak preservation: completing any single routine from your daily wird maintains your active streak.",
-    "Added a dedicated Quran wird column to the weekly commitment matrix to view all routines together."
+    "You can now open a collection's full azkar list directly from the reader menu, whether the session began from the collection or a direct link.",
+    "The expanded audio player now fits devotional text at the largest comfortable size while keeping long passages scrollable.",
+    "The opening Al-Fatihah and Al-Baqarah pages now use calmer, more balanced spacing around verses and headings."
   ],
-  "release": "2026-09-28-quran-wird-thimar"
+  "release": "2026-09-28-reader-audio-polish"
 }

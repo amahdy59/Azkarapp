@@ -478,4 +478,45 @@ describe("ReaderScreen audio identity", () => {
 
     expect(screen.getByTestId("docked-test-player")).toBeInTheDocument();
   });
+
+  it("calls onViewAllAzkar when the view all azkar menu option is clicked", async () => {
+    const onViewAllAzkar = vi.fn();
+    const onBack = vi.fn();
+    render(
+      <ReaderScreen
+        catId="evening"
+        idx={0}
+        routineMode="complete"
+        isArabic
+        direction="rtl"
+        themeMode="light"
+        isDone={false}
+        collectionCompletedCount={0}
+        hapticFeedback={false}
+        showTranslation={false}
+        showTransliteration={false}
+        textSize="medium"
+        onTextSizeChange={() => undefined}
+        savedZikrIds={new Set()}
+        onBack={onBack}
+        onViewAllAzkar={onViewAllAzkar}
+        onComplete={() => undefined}
+        onAdvance={() => undefined}
+        onNext={() => undefined}
+        onPrev={() => undefined}
+        onToggleSaved={() => undefined}
+        audioAvailable={false}
+      />,
+    );
+
+    const menuButton = screen.getAllByRole("button", { name: /خيارات القارئ|Reader options/i })[0]!;
+    fireEvent.pointerDown(menuButton, { button: 0, ctrlKey: false });
+
+    const viewAllButton = await screen.findByTestId("reader-view-all-azkar");
+    expect(viewAllButton).toBeInTheDocument();
+    fireEvent.click(viewAllButton);
+
+    expect(onViewAllAzkar).toHaveBeenCalledOnce();
+    expect(onBack).not.toHaveBeenCalled();
+  });
 });

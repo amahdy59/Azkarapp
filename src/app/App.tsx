@@ -787,6 +787,7 @@ function AppContent({
     resumeCategory,
     repeatCategory,
     leaveReader,
+    viewAllAzkar,
     toggleSavedZikr,
     markComplete,
     toggleZikrCompletion,
@@ -815,6 +816,8 @@ function AppContent({
     setRoutineModes,
     push,
     pop,
+    replace,
+    view,
     setView,
     setActiveTab,
     showConfirm,
@@ -838,6 +841,17 @@ function AppContent({
     },
     [hydrateRouteCategory, openCategoryWithoutHydration, push, setActiveCat, setActiveTab],
   );
+
+  const handleViewAllAzkar = useCallback(async () => {
+    if (activeCat === "friday_kahf") {
+      replace("friday");
+      return;
+    }
+    if (isLazyRouteCategory(activeCat)) {
+      await hydrateRouteCategory(activeCat, "category");
+    }
+    viewAllAzkar(activeCat, activeSubCategory);
+  }, [activeCat, activeSubCategory, hydrateRouteCategory, replace, viewAllAzkar]);
 
   const updateFridayDuaProgress = useCallback((index: number, shouldComplete: boolean) => {
     const zikrId = getAzkarForMode("comprehensive_duas")[index]?.id;
@@ -1947,6 +1961,7 @@ function AppContent({
                   onTextSizeChange={setTextSize}
                   savedZikrIds={savedZikrIds}
                   onBack={activeCat === "friday_kahf" ? () => replace("friday") : leaveReader}
+                  onViewAllAzkar={handleViewAllAzkar}
                   onComplete={(i) => {
                     if (fridayDuaFlow && activeCat === "comprehensive_duas") {
                       updateFridayDuaProgress(i, true);

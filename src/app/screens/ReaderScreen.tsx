@@ -132,6 +132,7 @@ export function ReaderScreen({
   onTextSizeChange,
   savedZikrIds,
   onBack,
+  onViewAllAzkar,
   onComplete,
   onUncomplete,
   onRoutineModeChange,
@@ -181,6 +182,8 @@ export function ReaderScreen({
   onTextSizeChange: (value: TextSizeOption) => void;
   savedZikrIds: Set<string>;
   onBack: () => void;
+  /** Opens the category list of all azkar in the current collection. */
+  onViewAllAzkar?: () => void;
   onComplete: (idx: number) => void;
   /** Clears a recorded completion so an accidental tap is recoverable. */
   onUncomplete?: (idx: number) => void;
@@ -1181,22 +1184,19 @@ export function ReaderScreen({
         </DropdownMenuItem>
       </DropdownMenuGroup>
 
-      {/* Mobile only navigation shortcut */}
-      {layout === "mobile" && (
-        <>
-          <DropdownMenuSeparator className="my-1 h-px bg-border/60" />
-          <DropdownMenuLabel className="px-3 pb-1 pt-1 text-micro font-bold uppercase tracking-wider text-muted-foreground">
-            {t(language, "reader.menuNavigation")}
-          </DropdownMenuLabel>
-          <DropdownMenuItem
-            onClick={onBack}
-            className="flex cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
-          >
-            <List size={16} />
-            {t(language, "reader.viewAllAzkar")}
-          </DropdownMenuItem>
-        </>
-      )}
+      {/* Navigation shortcut to view all azkar */}
+      <DropdownMenuSeparator className="my-1 h-px bg-border/60" />
+      <DropdownMenuLabel className="px-3 pb-1 pt-1 text-micro font-bold uppercase tracking-wider text-muted-foreground">
+        {t(language, "reader.menuNavigation")}
+      </DropdownMenuLabel>
+      <DropdownMenuItem
+        onClick={onViewAllAzkar ?? onBack}
+        data-testid="reader-view-all-azkar"
+        className="flex cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
+      >
+        <List size={16} />
+        {t(language, "reader.viewAllAzkar")}
+      </DropdownMenuItem>
     </>
   );
 

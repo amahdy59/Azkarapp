@@ -29,6 +29,22 @@ describe("getDueReminder", () => {
     expect(getDuePrayerReminder(reminders, undefined, date, (key) => key === "prayer:asr")).toBeNull();
   });
 
+  it("reminds exactly 10 minutes before prayer when 10 min lead is configured", () => {
+    const reminders = {
+      ...DEFAULT_APP_STATE.settings.reminders,
+      prayer: { enabled: true, leadMinutes: 10 as const },
+    };
+    const date = new Date(2026, 6, 17, 12);
+    const dhuhr = getEstimatedPrayerTimes(date).dhuhr.split(":").map(Number);
+    date.setHours(dhuhr[0]!, dhuhr[1]! - 10, 30, 0);
+
+    expect(getDuePrayerReminder(reminders, undefined, date)).toEqual({
+      kind: "prayer",
+      prayer: "dhuhr",
+      leadMinutes: 10,
+    });
+  });
+
   it("returns a configured reminder inside its delivery window", () => {
     const reminders = {
       ...DEFAULT_APP_STATE.settings.reminders,
@@ -53,6 +69,22 @@ describe("getDueReminder", () => {
     ];
 
     expect(getDueReminder(reminders, dailyCompletions, morningTime, 4)).toBeNull();
+  });
+
+  it("skips evening and sleep reminders when completed today", () => {
+    const reminders = {
+      ...DEFAULT_APP_STATE.settings.reminders,
+      evening: { enabled: true, time: "18:30" },
+      before_sleep: { enabled: true, time: "22:00" },
+      onlyWhenIncomplete: true,
+    };
+    const dailyCompletions = [
+      { category: "evening" as const, dayKey: "2026-07-17", timeZone: "Africa/Cairo" },
+      { category: "before_sleep" as const, dayKey: "2026-07-17", timeZone: "Africa/Cairo" },
+    ];
+
+    expect(getDueReminder(reminders, dailyCompletions, new Date(2026, 6, 17, 18, 30, 15), 4)).toBeNull();
+    expect(getDueReminder(reminders, dailyCompletions, new Date(2026, 6, 17, 22, 0, 15), 4)).toBeNull();
   });
 
   it("supports a user-chosen before-sleep routine anchor", () => {

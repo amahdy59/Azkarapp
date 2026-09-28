@@ -19,15 +19,18 @@ function renderSessionHarness({
   completed = createCompleted(),
   dailyCompletions = [],
   sessions = [],
+  initialView = "reader",
 }: {
   activeCat?: CategoryId;
   activeSubCategory?: string;
   completed?: Record<CategoryId, Set<string>>;
   dailyCompletions?: DailyCollectionCompletion[];
   sessions?: StoredSession[];
+  initialView?: View;
 } = {}) {
   const push = vi.fn<(view: View) => void>();
   const pop = vi.fn();
+  const replace = vi.fn<(view: View) => void>();
   const onResetPartialCounts = vi.fn();
   const showConfirm = vi.fn((_: string, __: string, ___: string, ____: string, onConfirm: () => void) => onConfirm());
 
@@ -41,7 +44,7 @@ function renderSessionHarness({
     const [sessionState, setSessionState] = useState(sessions);
     const [savedIds, setSavedIds] = useState(new Set<string>());
     const [routineModes, setRoutineModes] = useState(DEFAULT_APP_STATE.settings.routineModes);
-    const [view, setView] = useState<View>("reader");
+    const [view, setView] = useState<View>(initialView);
     const [activeTab, setActiveTab] = useState<NavTab>("azkar");
     const handlers = useSessionHandlers({
       activeCat: category,
@@ -63,6 +66,8 @@ function renderSessionHarness({
       setRoutineModes,
       push,
       pop,
+      replace,
+      view,
       setView,
       setActiveTab,
       showConfirm,
@@ -83,7 +88,7 @@ function renderSessionHarness({
     };
   });
 
-  return { ...hook, pop, push, showConfirm, onResetPartialCounts };
+  return { ...hook, pop, push, replace, showConfirm, onResetPartialCounts };
 }
 
 beforeEach(() => {
@@ -225,5 +230,32 @@ describe("useSessionHandlers", () => {
     act(() => result.current.handlers.handleResetCategory("morning"));
     expect(showConfirm).toHaveBeenCalledOnce();
     expect(result.current.completed.morning.size).toBe(0);
+  });
+
+  it("navigates to category via replace when reader was opened from another view", () => {
+    const { result, replace, pop } = renderSessionHarness({ initialView: "home" });
+
+    // Opened from home screen
+    act(() => result.current.handlers.openReader("evening", 0));
+    expect(result.current.category).toBe("evening");
+
+    // Clicking viewAllAzkar
+    act(() => result.current.handlers.viewAllAzkar());
+    expect(replace).toHaveBeenCalledWith("category");
+    expect(pop).not.toHaveBeenCalled();
+    expect(result.current.activeTab).toBe("azkar");
+  });
+
+  it("navigates to category via pop when reader was opened from category view", () => {
+    const { result, replace, pop } = renderSessionHarness({ initialView: "category", activeCat: "evening" });
+
+    // Opened from category screen
+    act(() => result.current.handlers.openReader("evening", 3));
+
+    // Clicking viewAllAzkar
+    act(() => result.current.handlers.viewAllAzkar());
+    expect(pop).toHaveBeenCalledOnce();
+    expect(replace).not.toHaveBeenCalled();
+    expect(result.current.activeTab).toBe("azkar");
   });
 });

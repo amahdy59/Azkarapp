@@ -276,4 +276,30 @@ describe("FloatingAudioPlayer", () => {
     expect(playPause).toBeInTheDocument();
     expect(forward10).toBeInTheDocument();
   });
+
+  it("increases the spacing between the title and the pills below by 4px (mt-2)", () => {
+    const controller = createController();
+    render(<FloatingAudioPlayer controller={controller} language="ar" direction="rtl" />);
+    fireEvent.click(screen.getByRole("button", { name: "توسيع المشغل" }));
+
+    const reciterSelect = screen.getByTestId("audio-reciter-select");
+    const pillsRow = reciterSelect.parentElement;
+    expect(pillsRow).toHaveClass("mt-2");
+  });
+
+  it("maximizes font size for devotional text in expanded mode", () => {
+    const controller = createController();
+    const shortEntry: PlaybackEntry = {
+      ...entry,
+      arabicText: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",
+    };
+    controller.currentEntry = shortEntry;
+
+    render(<FloatingAudioPlayer controller={controller} language="ar" direction="rtl" />);
+    fireEvent.click(screen.getByRole("button", { name: "توسيع المشغل" }));
+
+    const zikrText = screen.getByTestId("audio-player-zikr-text");
+    expect(zikrText).toHaveStyle({ fontFamily: "var(--font-zikr)" });
+    expect(zikrText.style.fontSize).toBe("32px");
+  });
 });

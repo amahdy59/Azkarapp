@@ -58,6 +58,22 @@ function formatTime(seconds: number, language: AppLanguage) {
   return formatNumerals(`${minutes}:${remainder.toString().padStart(2, "0")}`, language);
 }
 
+function getEstimatedMaxFontSize(textLength: number, hasTranslation: boolean): number {
+  if (hasTranslation) {
+    if (textLength < 60) return 22;
+    if (textLength < 140) return 19;
+    if (textLength < 250) return 17;
+    return 15;
+  }
+  if (textLength < 40) return 32;
+  if (textLength < 80) return 28;
+  if (textLength < 140) return 25;
+  if (textLength < 220) return 22;
+  if (textLength < 320) return 20;
+  if (textLength < 450) return 18;
+  return 16;
+}
+
 function accessibleTime(current: number, duration: number, language: AppLanguage) {
   const describe = (seconds: number) => {
     const safe = Number.isFinite(seconds) && seconds > 0 ? Math.floor(seconds) : 0;
@@ -585,6 +601,98 @@ export function FloatingAudioPlayer({
     return () => window.removeEventListener("keydown", handleWindowKeyDown, true);
   }, [direction, isMinimized, jumpSeconds, state.status]);
 
+  const currentVoiceId = selectedVoiceOverride ?? state.currentVoiceId ?? currentEntry?.defaultVoiceId;
+  const zikrArabicText = currentEntry ? currentEntry.arabicText?.trim() || currentEntry.titleArabic : "";
+  const isEnglishMode = language === "en" || currentVoiceId === "english-george";
+  const hasTranslation = Boolean(isEnglishMode && currentEntry?.translation);
+
+  const contentRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLParagraphElement>(null);
+  const [maxFontSize, setMaxFontSize] = useState<number>(() =>
+    getEstimatedMaxFontSize(zikrArabicText.length, hasTranslation),
+  );
+  const [isOverflowing, setIsOverflowing] = useState(false);
+
+  useEffect(() => {
+    setMaxFontSize(getEstimatedMaxFontSize(zikrArabicText.length, hasTranslation));
+  }, [currentEntry?.entryId, zikrArabicText, hasTranslation]);
+
+  useEffect(() => {
+    if (isMinimized || !currentEntry) return;
+
+    const container = zikrScrollRef.current;
+    const content = contentRef.current;
+    const textEl = textRef.current;
+    if (!container || !content || !textEl) return;
+
+    let rafId: number | null = null;
+
+    const calculateFit = () => {
+      const clientHeight = container.clientHeight;
+      const clientWidth = container.clientWidth;
+      if (clientHeight <= 0 || clientWidth <= 0) return;
+
+      const style = window.getComputedStyle(container);
+      const padTop = parseFloat(style.paddingTop) || 0;
+      const padBottom = parseFloat(style.paddingBottom) || 0;
+      const padLeft = parseFloat(style.paddingLeft) || 0;
+      const padRight = parseFloat(style.paddingRight) || 0;
+
+      // 8px safety clearance to prevent subpixel rounding from triggering a scrollbar
+      const availableHeight = clientHeight - padTop - padBottom - 8;
+      const availableWidth = clientWidth - padLeft - padRight - 4;
+
+      if (availableHeight <= 0 || availableWidth <= 0) return;
+
+      const MIN_SIZE = 15;
+      const MAX_SIZE = 34;
+
+      let low = MIN_SIZE;
+      let high = MAX_SIZE;
+      let best = MIN_SIZE;
+
+      while (low <= high) {
+        const mid = Math.floor((low + high) / 2);
+        textEl.style.fontSize = `${mid}px`;
+
+        const fits = content.offsetHeight <= availableHeight && content.scrollWidth <= availableWidth;
+
+        if (fits) {
+          best = mid;
+          low = mid + 1;
+        } else {
+          high = mid - 1;
+        }
+      }
+
+      textEl.style.fontSize = `${best}px`;
+      const overflows = content.offsetHeight > availableHeight;
+      setIsOverflowing(overflows);
+      setMaxFontSize(best);
+    };
+
+    rafId = requestAnimationFrame(calculateFit);
+
+    const handleResize = () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(calculateFit);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    let resizeObserver: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== "undefined") {
+      resizeObserver = new ResizeObserver(handleResize);
+      resizeObserver.observe(container);
+    }
+
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      window.removeEventListener("resize", handleResize);
+      if (resizeObserver) resizeObserver.disconnect();
+    };
+  }, [isMinimized, currentEntry, zikrArabicText, hasTranslation]);
+
   if (!state.plan || !currentEntry) return null;
 
   const isPlaying = state.status === "playing";
@@ -662,8 +770,6 @@ export function FloatingAudioPlayer({
         ? `${t(language, "audioPlayer.repetitionChip")} ${repetitionPosition}`
         : null;
 
-  const zikrArabicText = currentEntry.arabicText?.trim() || currentEntry.titleArabic;
-  const isEnglishMode = language === "en" || displayedVoiceId === "english-george";
   const showSeparateTitle = !currentEntry.arabicText || currentEntry.arabicText.trim() !== title.trim();
 
   if (isMinimized) {
@@ -871,7 +977,7 @@ export function FloatingAudioPlayer({
                 <h3 className="line-clamp-1 text-sm sm:text-base font-black leading-snug text-foreground">{title}</h3>
               )}
             </div>
-            <div className="mt-1 flex flex-wrap items-center justify-center gap-2">
+            <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
               <Select
                 value={displayedVoiceId}
                 onValueChange={(nextVoiceId) => {
@@ -922,15 +1028,17 @@ export function FloatingAudioPlayer({
             className="mt-2 flex min-h-0 w-full flex-1 flex-col items-center overflow-y-auto border-t border-border/40 px-3 py-3 sm:px-6 select-text"
             style={{ scrollbarGutter: "stable" }}
           >
-            <div className="my-auto flex w-full max-w-2xl flex-col items-center justify-center text-center py-1">
+            <div
+              ref={contentRef}
+              className={`${isOverflowing ? "w-full max-w-2xl py-2" : "my-auto w-full max-w-2xl py-1"} flex flex-col items-center justify-center text-center`}
+            >
               <p
+                ref={textRef}
                 data-testid="audio-player-zikr-text"
-                className={`zikr-text text-center font-medium leading-loose text-foreground ${
-                  zikrArabicText.length > 250 ? "text-base sm:text-lg md:text-xl" : "text-lg sm:text-xl md:text-2xl"
-                }`}
+                className="zikr-text text-center font-medium leading-loose text-foreground"
                 dir="rtl"
                 lang="ar"
-                style={{ fontFamily: "var(--font-zikr)" }}
+                style={{ fontFamily: "var(--font-zikr)", fontSize: `${maxFontSize}px` }}
               >
                 <MushafAyahText text={zikrArabicText} />
               </p>

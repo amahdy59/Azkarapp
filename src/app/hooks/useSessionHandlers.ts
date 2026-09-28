@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import type {
   AppLanguage,
   CategoryId,
@@ -43,6 +43,8 @@ export function useSessionHandlers({
   setRoutineModes,
   push,
   pop,
+  replace,
+  view,
   setView,
   setActiveTab,
   showConfirm,
@@ -79,6 +81,8 @@ export function useSessionHandlers({
   setRoutineModes: React.Dispatch<React.SetStateAction<Record<RoutineCategoryId, RoutineMode>>>;
   push: (to: View) => void;
   pop: () => void;
+  replace?: (to: View) => void;
+  view?: View;
   setView: (view: View) => void;
   setActiveTab: (tab: NavTab) => void;
   showConfirm: (
@@ -91,6 +95,7 @@ export function useSessionHandlers({
   ) => void;
   onResetPartialCounts?: (ids: string[]) => void;
 }) {
+  const readerOpenedFromCategoryRef = useRef(false);
   const [sessionStart, setSessionStart] = useState(Date.now());
   const [isRepeatSession, setIsRepeatSession] = useState(false);
   const [repeatCompleted, setRepeatCompleted] = useState<Set<number>>(() => new Set());
@@ -126,11 +131,15 @@ export function useSessionHandlers({
     );
   };
 
-  const openCategory = (catId: CategoryId) => {
+  const openCategory = (catId: CategoryId, subCat?: string) => {
     setIsRepeatSession(false);
     setRepeatCompleted(new Set());
+    readerOpenedFromCategoryRef.current = false;
     setActiveTab("azkar");
     setActiveCat(catId);
+    if (subCat !== undefined) {
+      setActiveSubCategory(subCat);
+    }
     push("category");
   };
 
@@ -138,6 +147,7 @@ export function useSessionHandlers({
     if (modeOverride && isRoutineCategory(catId)) {
       setRoutineModes((previous) => ({ ...previous, [catId]: modeOverride }));
     }
+    readerOpenedFromCategoryRef.current = view === "category" && activeCat === catId;
     setActiveCat(catId);
     setActiveSubCategory(subCat);
     setActiveIdx(i);
@@ -162,7 +172,26 @@ export function useSessionHandlers({
   const leaveReader = () => {
     setIsRepeatSession(false);
     setRepeatCompleted(new Set());
+    readerOpenedFromCategoryRef.current = false;
     pop();
+  };
+
+  const viewAllAzkar = (catId: CategoryId = activeCat, subCat: string | undefined = activeSubCategory) => {
+    setIsRepeatSession(false);
+    setRepeatCompleted(new Set());
+    setActiveTab("azkar");
+    setActiveCat(catId);
+    if (subCat !== undefined) {
+      setActiveSubCategory(subCat);
+    }
+    if (readerOpenedFromCategoryRef.current) {
+      readerOpenedFromCategoryRef.current = false;
+      pop();
+    } else if (replace) {
+      replace("category");
+    } else {
+      push("category");
+    }
   };
 
   const toggleSavedZikr = useCallback(
@@ -326,6 +355,7 @@ export function useSessionHandlers({
   };
 
   const goHome = () => {
+    readerOpenedFromCategoryRef.current = false;
     setView("home");
     setActiveTab("home");
   };
@@ -340,6 +370,7 @@ export function useSessionHandlers({
     resumeCategory,
     repeatCategory,
     leaveReader,
+    viewAllAzkar,
     toggleSavedZikr,
     markComplete,
     toggleZikrCompletion,
