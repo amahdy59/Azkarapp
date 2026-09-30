@@ -1,13 +1,13 @@
 {
   "ar": [
-    "يمكنك الآن فتح قائمة أذكار المجموعة مباشرةً من قائمة القارئ، سواء بدأت الجلسة من المجموعة أو من رابط مباشر.",
-    "يعرض مشغل الصوت الموسّع نص الذكر بأكبر حجم مناسب للمساحة، مع إبقاء النصوص الطويلة قابلة للتمرير.",
-    "أصبح تخطيط صفحتي فاتحة الكتاب وبداية البقرة أكثر توازناً، بمسافات أهدأ حول الآيات والعناوين."
+    "توفير تسجيلات صوتية كاملة بصوت القارئ عبد الله محمد لأذكار الصباح، وأذكار الاستيقاظ، وأذكار النوم، والأدعية الجامعة.",
+    "إمكانية الاستماع للأدعية النبوية الجامعة وأذكار اليوم والليلة مع دعم المزامنة والتشغيل دون اتصال بالإنترنت.",
+    "تحسين سرعة تحميل الصوتيات في التطبيق مع الحفاظ على خفة الحزمة وسلاستها."
   ],
   "en": [
-    "You can now open a collection's full azkar list directly from the reader menu, whether the session began from the collection or a direct link.",
-    "The expanded audio player now fits devotional text at the largest comfortable size while keeping long passages scrollable.",
-    "The opening Al-Fatihah and Al-Baqarah pages now use calmer, more balanced spacing around verses and headings."
+    "Added complete audio recitations by Abdullah Muhammad for morning azkar, waking up azkar, sleep azkar, and comprehensive duas.",
+    "Listen to comprehensive prophetic supplications and daily path adhkar with full offline audio playback support.",
+    "Improved audio loading performance throughout the app while keeping bundle sizes light and responsive."
   ],
-  "release": "2026-09-28-reader-audio-polish"
+  "release": "2026-10-01-abdullah-muhammad-audio"
 }

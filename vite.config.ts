@@ -328,6 +328,8 @@ export default defineConfig(({ mode }) => {
              */
             if (id.endsWith("/src/app/content/azkar.ts")) return "content";
             if (id.includes("node_modules/motion")) return "motion";
+            if (id.endsWith("/src/app/audio/audioAssetsCore.ts")) return "audio-core";
+            if (id.endsWith("/src/app/audio/audioAssetsDuas.ts")) return "audio-duas";
             if (id.endsWith("/src/app/audio/AudioProvider.tsx") || id.endsWith("/src/app/audio/buildPlaybackPlan.ts")) {
               return "audio";
             }

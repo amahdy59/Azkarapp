@@ -300,7 +300,10 @@ test("synchronizes Reader navigation with audio tracks, shows proper track title
 
   await page.goto("/#/azkar/before-sleep");
   await page.getByRole("button", { name: "تشغيل الصوتي للكل" }).click();
-  await page.getByRole("button", { name: "تشغيل المتاح" }).click();
+  const playAvailable = page.getByRole("button", { name: "تشغيل المتاح" });
+  if (await playAvailable.isVisible().catch(() => false)) {
+    await playAvailable.click();
+  }
 
   const reader = page.getByTestId("reader-screen");
   const player = page.getByRole("region", { name: "مشغل الصوت" });
@@ -309,14 +312,14 @@ test("synchronizes Reader navigation with audio tracks, shows proper track title
   await expect(reader).toHaveAttribute("data-zikr-id", "s-hm-100");
   await expect(player).toContainText("سورة الْبَقَرَة (آيَةُ الْكُرْسِيِّ)");
   await expect(player).not.toContainText("أذكار مشتركة");
-  await expect(player).toContainText("المقطع ١ / ١٧");
+  await expect(player).toContainText("المقطع ١ / ١٨");
 
   // 2. Moving to another zikr in the Reader updates the active audio track
   // In desktop reader collection navigator, select Surah Al-Ikhlas (index 2 / s-hm-99-ikhlas)
   await page.locator("#zikr-card-2 button[data-zikr-select]").click();
   await expect(reader).toHaveAttribute("data-zikr-id", "s-hm-99-ikhlas");
   await expect(player).toContainText("سورة الْإِخْلَاص");
-  await expect(player).toContainText("المقطع ٢ / ١٧");
+  await expect(player).toContainText("المقطع ٣ / ١٨");
 
   // 3. When current audio track finishes ("ended"), Reader screen updates to the zikr currently being recited
   await page.evaluate(() => {
@@ -325,7 +328,7 @@ test("synchronizes Reader navigation with audio tracks, shows proper track title
   });
   await expect(reader).toHaveAttribute("data-zikr-id", "s-hm-99-falaq");
   await expect(player).toContainText("سورة الْفَلَق");
-  await expect(player).toContainText("المقطع ٣ / ١٧");
+  await expect(player).toContainText("المقطع ٤ / ١٨");
 });
 
 test("expanded audio player on home screen stays within the desktop canvas and page bounds", async ({ page }) => {
