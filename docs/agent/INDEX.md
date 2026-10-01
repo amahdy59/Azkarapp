@@ -124,6 +124,8 @@ may run in parallel.
 
 [Phase 73](phases/PHASE_73_PRAYER_INFORMATION_CLARITY.md) records the owner-requested prayer-information clarity and reminder-first Home ordering. Phase 72 remains the Quran Wird planning contract.
 
+[Phase 74](phases/PHASE_74_RELEASE_REVIEW.md) records the latest Reader/audio review and push-readiness checks.
+
 ## Core rule
 
 The latest review and hardening work is recorded in [Phase 72](phases/PHASE_72_WIRD_PLANNING_REDESIGN.md), adding support for daily repeating Quran sections (fixed Juz, Surah, or custom page range) with binary daily completion upon reading 100% of the section, isolated progress calculation, and one-tap section restart.

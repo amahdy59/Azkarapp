@@ -249,6 +249,15 @@ describe("PrayerActionsCard", () => {
     );
 
     // Individual Sunnah breakdown
+    const list = screen.getByTestId("prayer-info-points");
+    expect(list).toHaveClass("list-disc", "ps-5");
+    expect(list).not.toHaveClass("list-none");
+    const items = list.querySelectorAll(":scope > li");
+    for (const item of items) {
+      expect(item).not.toHaveClass("border-border/80");
+      expect(item).not.toHaveClass("bg-muted/30");
+    }
+
     expect(modal).toHaveTextContent("قبل الصلاة");
     expect(modal).toHaveTextContent("أربع ركعات");
     expect(modal).toHaveTextContent("بعد الصلاة");

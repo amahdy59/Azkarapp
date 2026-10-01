@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ReaderScreen } from "./ReaderScreen";
 import { getAzkarForMode, registerLazyCollection } from "../content/azkar";
@@ -73,11 +73,16 @@ describe("ReaderScreen audio identity", () => {
     // Collapsing sidebar using toggle button
     const toggleBtn = screen.getByTestId("reader-sidebar-toggle");
     fireEvent.click(toggleBtn);
-    expect(navigator).toHaveClass("w-0");
+    expect(navigator).toHaveAttribute("hidden");
+    expect(screen.queryByRole("button", { name: /ذكر ٢ من/ })).not.toBeInTheDocument();
 
     // Expanding sidebar using toggle button
     fireEvent.click(toggleBtn);
     expect(navigator).toHaveClass("w-[34%]");
+    expect(navigator).not.toHaveAttribute("hidden");
+    fireEvent.click(within(navigator).getByRole("button", { name: toggleBtn.getAttribute("aria-label")! }));
+    expect(navigator).toHaveAttribute("hidden");
+    expect(toggleBtn).toHaveFocus();
   });
 
   it("renders a compact horizontal text size segmented control in the more options menu", async () => {
@@ -225,10 +230,12 @@ describe("ReaderScreen audio identity", () => {
     );
 
     expect(screen.getByTestId("reader-screen")).toHaveAttribute("data-zikr-id", "m-hm-75");
-    // Header chrome is two actions: Benefit and the overflow control. Share,
-    // save and the counter-sound toggle all live inside that overflow menu.
-    expect(screen.getByRole("button", { name: "Benefit" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Reader options" })).toBeInTheDocument();
+    // On screens with a counter, header chrome is only the overflow control.
+    // Benefit is positioned beside the counter in the bottom dock.
+    const headerActions = screen.getByTestId("reader-actions");
+    expect(within(headerActions).queryByRole("button", { name: "Benefit" })).not.toBeInTheDocument();
+    expect(within(headerActions).getByRole("button", { name: "Reader options" })).toBeInTheDocument();
+    expect(screen.getByTestId("reader-benefit-dock-button")).toBeInTheDocument();
     for (const name of ["Share zikr", "Save zikr", "Counter sound"]) {
       expect(screen.queryByRole("button", { name })).toBeNull();
     }
@@ -518,5 +525,109 @@ describe("ReaderScreen audio identity", () => {
 
     expect(onViewAllAzkar).toHaveBeenCalledOnce();
     expect(onBack).not.toHaveBeenCalled();
+  });
+
+  it("presents the 5-slot dock with stable Previous, Audio, Counter, Benefit, and Next controls in reading mode", () => {
+    const onPlayAudio = vi.fn();
+    render(
+      <ReaderScreen
+        catId="morning"
+        idx={0}
+        routineMode="core"
+        isArabic
+        direction="rtl"
+        themeMode="light"
+        isDone={false}
+        collectionCompletedCount={0}
+        hapticFeedback={false}
+        showTranslation={false}
+        showTransliteration={false}
+        textSize="medium"
+        onTextSizeChange={() => undefined}
+        savedZikrIds={new Set()}
+        onBack={() => undefined}
+        onComplete={() => undefined}
+        onAdvance={() => undefined}
+        onNext={() => undefined}
+        onPrev={() => undefined}
+        onToggleSaved={() => undefined}
+        audioAvailable
+        onPlayAudio={onPlayAudio}
+      />,
+    );
+
+    const dock = screen.getByTestId("reader-dock");
+    expect(dock).toBeInTheDocument();
+
+    const audioDockBtn = screen.getByTestId("reader-audio-dock-button");
+    expect(audioDockBtn).toBeInTheDocument();
+    expect(audioDockBtn).not.toBeDisabled();
+    fireEvent.click(audioDockBtn);
+    expect(onPlayAudio).toHaveBeenCalled();
+
+    expect(screen.getByTestId("counter-surface")).toBeInTheDocument();
+    expect(screen.getByTestId("reader-benefit-dock-button")).toBeInTheDocument();
+  });
+
+  it("morphs center slot into compact audio player when audioModeActive with stable outer slots", () => {
+    const onPlayAudio = vi.fn();
+    const MockAudioPlayer = (props: {
+      dockSlots?: {
+        prev?: React.ReactNode;
+        audio?: React.ReactNode;
+        benefit?: React.ReactNode;
+        next?: React.ReactNode;
+      };
+    }) => (
+      <div data-testid="mock-audio-player">
+        <div data-testid="mock-prev">{props.dockSlots?.prev}</div>
+        <div data-testid="mock-audio">{props.dockSlots?.audio}</div>
+        <button type="button" aria-label="إغلاق الصوت والعودة للعداد">
+          Close
+        </button>
+        <div data-testid="mock-benefit">{props.dockSlots?.benefit}</div>
+        <div data-testid="mock-next">{props.dockSlots?.next}</div>
+      </div>
+    );
+
+    render(
+      <ReaderScreen
+        catId="morning"
+        idx={0}
+        routineMode="core"
+        isArabic
+        direction="rtl"
+        themeMode="light"
+        isDone={false}
+        collectionCompletedCount={0}
+        hapticFeedback={false}
+        showTranslation={false}
+        showTransliteration={false}
+        textSize="medium"
+        onTextSizeChange={() => undefined}
+        savedZikrIds={new Set()}
+        onBack={() => undefined}
+        onComplete={() => undefined}
+        onAdvance={() => undefined}
+        onNext={() => undefined}
+        onPrev={() => undefined}
+        onToggleSaved={() => undefined}
+        audioAvailable
+        audioModeActive
+        audioPlayer={<MockAudioPlayer />}
+        onPlayAudio={onPlayAudio}
+      />,
+    );
+
+    // Counter surface is replaced by compact audio player
+    expect(screen.queryByTestId("counter-surface")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("reader-counter-stack")).not.toBeInTheDocument();
+
+    // Mock audio player was cloned and rendered with all 5 dock slots
+    expect(screen.getByTestId("mock-audio-player")).toBeInTheDocument();
+    expect(screen.getByTestId("mock-prev")).toBeInTheDocument();
+    expect(screen.getByTestId("mock-audio")).toBeInTheDocument();
+    expect(screen.getByTestId("mock-benefit")).toBeInTheDocument();
+    expect(screen.getByTestId("mock-next")).toBeInTheDocument();
   });
 });

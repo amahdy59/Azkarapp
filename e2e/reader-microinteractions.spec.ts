@@ -106,7 +106,7 @@ async function openFirstMorningZikr(page: Page) {
  * the header bar on a narrow one.
  */
 
-test("the Reader counter keeps one rectangular shape across phone, tablet, and desktop", async ({ page }) => {
+test("the Reader counter keeps one rectangular shape across phone, tablet, and desktop", async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 320, height: 844 });
   await openFirstMorningZikr(page);
 
@@ -131,10 +131,17 @@ test("the Reader counter keeps one rectangular shape across phone, tablet, and d
         expect(box.x + box.width).toBeLessThanOrEqual(viewport.width);
       }
     }).toPass();
+    for (const control of await page.getByTestId("counter-panel").getByRole("button").all()) {
+      if (!(await control.isVisible())) continue;
+      const bounds = await control.boundingBox();
+      expect(bounds?.x).toBeGreaterThanOrEqual(0);
+      expect((bounds?.x ?? 0) + (bounds?.width ?? 0)).toBeLessThanOrEqual(viewport.width);
+    }
+    await page.screenshot({ path: testInfo.outputPath(`reader-en-${viewport.width}.png`) });
   }
 });
 
-test("wide Reader keeps a one-third RTL collection navigator and supports direct jumps", async ({ page }) => {
+test("wide Reader keeps a one-third RTL collection navigator and supports direct jumps", async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 1600, height: 900 });
   await openReturningGuestHome(page, "ar");
   await page.getByTestId("category-card-morning").click();
@@ -160,6 +167,7 @@ test("wide Reader keeps a one-third RTL collection navigator and supports direct
   await items.nth(1).click();
   await expect(items.nth(1)).toHaveAttribute("aria-current", "step");
   await expect(page).toHaveURL(/\/morning\/2$/);
+  await page.screenshot({ path: testInfo.outputPath("reader-ar-desktop.png") });
 
   await page.setViewportSize({ width: 1100, height: 800 });
   await expect(navigator).toBeHidden();
@@ -239,12 +247,14 @@ test("desktop and tablet place navigation at the card sides and shortcuts below 
   // Page-level actions live in the hero toolbar on this tier, not in a second
   // row under the counter.
   await expect(page.getByTestId("reader-actions")).toHaveCount(0);
-  // Two actions, the same pair as on phones: Benefit and the overflow menu.
-  // Save, share and sound used to sit out here as three more icons.
+  // On counter screens Benefit lives in the bottom dock beside the counter,
+  // so the hero toolbar is reduced to the overflow menu only.
   const heroActions = page.getByTestId("reader-hero-actions");
-  await expect(heroActions.getByRole("button", { name: "Benefit", exact: true })).toBeVisible();
+  await expect(heroActions.getByRole("button", { name: "Benefit", exact: true })).toHaveCount(0);
   await expect(heroActions.getByRole("button", { name: "Reader options", exact: true })).toBeVisible();
-  await expect(heroActions.getByRole("button")).toHaveCount(2);
+  await expect(heroActions.getByRole("button")).toHaveCount(1);
+  // Benefit is accessible via the dock button.
+  await expect(page.getByTestId("reader-benefit-dock-button")).toBeVisible();
   await expect(desktopHero.getByRole("button", { name: "Share zikr", exact: true })).toHaveCount(0);
 });
 
@@ -394,14 +404,14 @@ test("the full reader canvas counts taps while controls and the reference sheet 
   const counterSurface = page.getByTestId("counter-surface");
   await expect(counterSurface).toHaveAttribute("aria-label", /0 \/ 1$/);
 
-  // Save lives in the overflow menu on every tier now — the header carries at
-  // most two actions, Benefit and the menu, so there is no width branch.
+  // Save lives in the overflow menu on every tier now — the header carries
+  // only the overflow menu on counter screens (Benefit moved to the dock).
   await expect(page.getByRole("button", { name: "Save zikr", exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "Reader options", exact: true }).click();
   await page.getByRole("menuitem", { name: "Save zikr", exact: true }).click();
   await expect(counterSurface).toHaveAttribute("aria-label", /0 \/ 1$/);
 
-  await page.getByRole("button", { name: "Benefit", exact: true }).click();
+  await page.getByTestId("reader-benefit-dock-button").click();
   const sheet = page.getByTestId("reference-sheet");
   await sheet.click();
   await sheet.getByRole("button", { name: "Close benefit", exact: true }).click();
@@ -481,22 +491,24 @@ test("reader actions stay inside a 320 px app canvas", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 700 });
   await openFirstMorningZikr(page);
 
-  // Phone chrome is one header row (Benefit, More) with no bottom action bar
-  // and no tab bar, so the reading surface owns the viewport. Share moved into
-  // the menu: at 320px a third 44px target was the difference between the
-  // collection name fitting and being truncated.
+  // Phone chrome: Benefit moved to the bottom counter dock, so the header
+  // row has only the overflow menu. The counter dock hosts Benefit beside
+  // the tap target, keeping the reading surface clear.
   await expect(page.getByTestId("reader-actions")).toBeVisible();
-  await expect(page.getByTestId("reader-actions").getByRole("button")).toHaveCount(2);
+  await expect(page.getByTestId("reader-actions").getByRole("button")).toHaveCount(1);
+  await expect(page.getByTestId("reader-benefit-dock-button")).toBeVisible();
   await expect(page.getByTestId("nav-azkar")).toHaveCount(0);
 
   const readerBox = await page.getByTestId("reader-screen").boundingBox();
   const actionBoxes = await Promise.all(
-    ["Benefit", "Reader options"].map((name) => page.getByRole("button", { name, exact: true }).boundingBox()),
+    ["Reader options"].map((name) => page.getByRole("button", { name, exact: true }).boundingBox()),
   );
+  // Also check the dock benefit button fits within the reader canvas.
+  const dockBenefitBox = await page.getByTestId("reader-benefit-dock-button").boundingBox();
   expect(readerBox).not.toBeNull();
   if (!readerBox) return;
 
-  for (const actionBox of actionBoxes) {
+  for (const actionBox of [...actionBoxes, dockBenefitBox]) {
     expect(actionBox).not.toBeNull();
     if (!actionBox) continue;
     expect(actionBox.x).toBeGreaterThanOrEqual(readerBox.x);
@@ -505,28 +517,38 @@ test("reader actions stay inside a 320 px app canvas", async ({ page }) => {
   }
 });
 
-test("Benefit keeps its visible label on phone, tablet, and desktop", async ({ page }) => {
+test("Benefit is reachable via the counter dock on counter screens", async ({ page }) => {
+  // On standard counter-based azkar (waking_up), Benefit lives in the
+  // counter dock as a round icon button. Its accessible name still reads
+  // "Benefit" so keyboard and assistive-technology users are unaffected.
   await page.setViewportSize({ width: 320, height: 700 });
   await openFirstMorningZikr(page);
 
-  const phoneReference = page.getByRole("button", { name: "Benefit", exact: true });
-  await expect(phoneReference).toBeVisible();
-  await expect(phoneReference.getByText("Benefit", { exact: true })).toBeVisible();
+  const dockButton = page.getByTestId("reader-benefit-dock-button");
+  await expect(dockButton).toBeVisible();
+  await expect(dockButton).toHaveAttribute("aria-label", "Benefit");
+  // Confirm it is NOT also present in the header.
+  await expect(page.getByTestId("reader-actions").getByRole("button", { name: "Benefit", exact: true })).toHaveCount(0);
 
+  // Tablet viewport: dock button still present and accessible.
   await page.setViewportSize({ width: 600, height: 800 });
-  await expect(
-    page.getByRole("button", { name: "Benefit", exact: true }).getByText("Benefit", { exact: true }),
-  ).toBeVisible();
+  await expect(dockButton).toBeVisible();
+  await expect(dockButton).toHaveAttribute("aria-label", "Benefit");
 
+  // Desktop viewport: dock button visible; hero toolbar has only overflow menu.
   await page.setViewportSize({ width: 1200, height: 800 });
-  await expect(page.getByTestId("reader-hero-actions").getByText("Benefit", { exact: true })).toBeVisible();
+  await expect(dockButton).toBeVisible();
+  await expect(
+    page.getByTestId("reader-hero-actions").getByRole("button", { name: "Benefit", exact: true }),
+  ).toHaveCount(0);
 });
 
 test("reference sheet matches the approved hierarchy and stays usable on short screens", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 560 });
   await openFirstMorningZikr(page);
 
-  const trigger = page.getByRole("button", { name: "Benefit", exact: true });
+  // Benefit is in the counter dock on counter screens; use its test id.
+  const trigger = page.getByTestId("reader-benefit-dock-button");
   await trigger.click();
 
   const sheet = page.getByTestId("reference-sheet");
@@ -584,7 +606,9 @@ test("reference sheet rises from the bottom edge of the centered app canvas", as
   await page.setViewportSize({ width: 390, height: 800 });
   await openFirstMorningZikr(page);
 
-  await page.getByRole("button", { name: "Benefit", exact: true }).click();
+  // Benefit lives in the counter dock on this screen.
+  await page.getByTestId("reader-benefit-dock-button").click();
+
   // Wait for slide-up sheet-enter transition to complete
   await page.waitForTimeout(300);
   const reader = page.getByTestId("reader-screen");
@@ -690,7 +714,9 @@ test("reference dialog traps focus, restores it on close, and closes on Escape",
   await page.setViewportSize({ width: 1110, height: 835 });
   await openFirstMorningZikr(page);
 
-  const trigger = page.getByRole("button", { name: "Benefit", exact: true });
+  // Benefit is in the counter dock on this screen; the testid is stable across
+  // all viewports and does not depend on the header/hero split.
+  const trigger = page.getByTestId("reader-benefit-dock-button");
   await trigger.click();
 
   const sheet = page.getByTestId("reference-sheet");
@@ -766,21 +792,24 @@ test("resetting the counter clears an accidental completion from stored progress
   await expect.poll(stored).toHaveLength(0);
 });
 
-/** The header carries the Benefit button and the overflow menu, nothing else. */
+/** The header carries the overflow menu only on counter screens; Benefit moves to the dock. */
 function readerHeaderActions(page: Page) {
   // The phone header row and the wide-desktop hero toolbar are the same
   // contract under different test ids; exactly one of them is mounted.
   return page.getByTestId("reader-actions").or(page.getByTestId("reader-hero-actions"));
 }
 
-test("the reader header carries exactly two actions on every tier", async ({ page }) => {
+test("the reader header carries exactly one action on counter screens", async ({ page }) => {
   await openFirstMorningZikr(page);
 
   const actions = readerHeaderActions(page);
   await expect(actions).toBeVisible();
-  await expect(actions.getByRole("button")).toHaveCount(2);
-  await expect(actions.getByRole("button", { name: "Benefit", exact: true })).toBeVisible();
+  // Benefit moved to the counter dock, so only the overflow menu remains.
+  await expect(actions.getByRole("button")).toHaveCount(1);
+  await expect(actions.getByRole("button", { name: "Benefit", exact: true })).toHaveCount(0);
   await expect(actions.getByRole("button", { name: "Reader options", exact: true })).toBeVisible();
+  // Benefit is accessible in the dock.
+  await expect(page.getByTestId("reader-benefit-dock-button")).toBeVisible();
 
   // The three that moved are reachable, just not as header chrome.
   await expect(page.getByRole("button", { name: "Share zikr", exact: true })).toHaveCount(0);
@@ -834,6 +863,16 @@ test("the reader's text-size control resizes the zikr and never goes below the f
   expect(measured.small, "smallest step must stay legible").toBeGreaterThanOrEqual(21.3);
   expect(measured.medium).toBeGreaterThan(measured.small);
   expect(measured.large).toBeGreaterThan(measured.medium);
+  const large = page.getByTestId("reader-text-size-large");
+  if (!(await large.isVisible())) await page.getByRole("button", { name: "Reader options", exact: true }).click();
+  await large.focus();
+  // Radix defers roving focus; hold the key through the selection event.
+  await page.keyboard.down("ArrowLeft");
+  await expect(page.getByTestId("reader-text-size-medium")).toBeFocused();
+  await expect
+    .poll(() => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--font-size").trim()))
+    .toBe("16px");
+  await page.keyboard.up("ArrowLeft");
 });
 
 test("a highlighted Qur'an word is the same size as the ayah around it", async ({ page }) => {

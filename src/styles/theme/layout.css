@@ -95,12 +95,13 @@
 
 /* Docked audio player inside reader canvas: contained within the reader area */
 .floating-audio-player--docked {
-  position: absolute;
-  inset: 0;
+  position: relative;
+  inset: auto;
+  width: 100%;
 }
 
 .floating-audio-player--docked.floating-audio-player--compact {
-  inset: auto 0.5rem 0.5rem;
+  inset: auto;
 }
 
 /* Native range inputs keep their real keyboard, pointer and accessibility

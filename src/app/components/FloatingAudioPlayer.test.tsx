@@ -287,7 +287,7 @@ describe("FloatingAudioPlayer", () => {
     expect(pillsRow).toHaveClass("mt-2");
   });
 
-  it("maximizes font size for devotional text in expanded mode", () => {
+  it("keeps exact devotional text on the scalable reading type scale", () => {
     const controller = createController();
     const shortEntry: PlaybackEntry = {
       ...entry,
@@ -299,7 +299,104 @@ describe("FloatingAudioPlayer", () => {
     fireEvent.click(screen.getByRole("button", { name: "توسيع المشغل" }));
 
     const zikrText = screen.getByTestId("audio-player-zikr-text");
-    expect(zikrText).toHaveStyle({ fontFamily: "var(--font-zikr)" });
-    expect(zikrText.style.fontSize).toBe("32px");
+    expect(zikrText).toHaveClass("zikr-text", "text-xl", "sm:text-2xl");
+    expect(zikrText.style.fontSize).toBe("");
+    expect(zikrText.textContent).toBe(shortEntry.arabicText);
+  });
+
+  it("shows audio attribution info in a popover when info button is pressed", () => {
+    const controller = createController();
+    render(<FloatingAudioPlayer controller={controller} language="ar" direction="rtl" />);
+    fireEvent.click(screen.getByRole("button", { name: "توسيع المشغل" }));
+
+    const trigger = screen.getByTestId("audio-attribution-trigger");
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+    expect(screen.queryByTestId("audio-attribution-popover")).not.toBeInTheDocument();
+
+    fireEvent.click(trigger);
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+    const popover = screen.getByTestId("audio-attribution-popover");
+    expect(popover).toBeInTheDocument();
+    expect(popover).toHaveTextContent("Test source · Test attribution");
+
+    fireEvent.click(trigger);
+    expect(screen.queryByTestId("audio-attribution-popover")).not.toBeInTheDocument();
+  });
+
+  it("renders 5-part dock slots in compact mode and invokes stop and onClose when close is clicked", () => {
+    const controller = createController();
+    const onClose = vi.fn();
+    render(
+      <FloatingAudioPlayer
+        controller={controller}
+        language="ar"
+        direction="rtl"
+        dockSlots={{
+          prev: <button type="button">السابق</button>,
+          audio: <button type="button">صوت</button>,
+          benefit: <button type="button">الفائدة</button>,
+          next: <button type="button">التالي</button>,
+        }}
+        onClose={onClose}
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: "السابق" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "فتح مشغل الصوت" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "الفائدة" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "التالي" })).toBeInTheDocument();
+
+    const closeBtn = screen.getByRole("button", { name: "إغلاق الصوت والعودة للعداد" });
+    expect(closeBtn).toBeInTheDocument();
+    fireEvent.click(closeBtn);
+    expect(controller.stop).toHaveBeenCalled();
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it("expands from compact dock and collapses back when collapse is clicked or Escape is pressed", () => {
+    const controller = createController();
+    render(
+      <FloatingAudioPlayer
+        controller={controller}
+        language="ar"
+        direction="rtl"
+        dockSlots={{
+          prev: <button type="button">السابق</button>,
+          audio: <button type="button">صوت</button>,
+          benefit: <button type="button">الفائدة</button>,
+          next: <button type="button">التالي</button>,
+        }}
+      />,
+    );
+
+    const expandBtn = screen.getByRole("button", { name: "توسيع المشغل" });
+    fireEvent.click(expandBtn);
+
+    // Expanded state
+    const region = screen.getByRole("region", { name: "مشغل الصوت" });
+    expect(region).toHaveAttribute("data-variant", "expanded");
+
+    // Press Escape to collapse
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.getByRole("region", { name: "مشغل الصوت" })).toHaveAttribute("data-variant", "compact");
+  });
+
+  it("hides software volume control on iOS devices", () => {
+    const controller = createController();
+    const originalUserAgent = navigator.userAgent;
+    try {
+      Object.defineProperty(navigator, "userAgent", {
+        value: "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15",
+        configurable: true,
+      });
+      render(<FloatingAudioPlayer controller={controller} language="en" direction="ltr" />);
+      fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
+      expect(screen.queryByRole("slider", { name: "Volume" })).toBeNull();
+    } finally {
+      Object.defineProperty(navigator, "userAgent", {
+        value: originalUserAgent,
+        configurable: true,
+      });
+    }
   });
 });

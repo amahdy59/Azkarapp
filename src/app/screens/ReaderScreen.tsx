@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { cloneElement, isValidElement, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import "../../styles/animations/ZikrAnimations.css";
 import "./ReaderScreen.css";
 import { useZikrCounter } from "../hooks/useZikrCounter";
@@ -24,6 +24,9 @@ import {
   Check,
   ChevronDown,
   SlidersHorizontal,
+  Headphones,
+  X,
+  PanelLeftIcon,
 } from "../components/icons";
 import { t } from "../i18n";
 import { shouldReduceMotion, vibrateIfEnabled } from "../motionPreferences";
@@ -54,6 +57,7 @@ import { QuranWordPopover } from "../components/QuranWordPopover";
 import { getQuranWordMeanings, type WordMeaningSelection } from "../content/quranWordMeanings";
 import { formatNumerals } from "../formatting";
 import { AzkarListItem } from "../components/AzkarListItem";
+import { SegmentedControl } from "../components/SegmentedControl";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -261,6 +265,7 @@ export function ReaderScreen({
   const showSurahChrome = Boolean(z?.isSurah) && !longSurah;
   const [immersiveOpen, setImmersiveOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const sidebarToggleRef = useRef<HTMLButtonElement>(null);
 
   /**
    * The Mushaf position, held here rather than inside the view.
@@ -550,6 +555,9 @@ export function ReaderScreen({
         e.preventDefault();
         setHasOpenedBenefit(true);
         setBenefitOpen(true);
+      } else if ((e.key === "[" || e.key === "]" || e.key === "ج" || e.key === "د") && onSelectZikr) {
+        e.preventDefault();
+        setIsSidebarOpen((prev) => !prev);
       }
     };
 
@@ -562,6 +570,7 @@ export function ReaderScreen({
     onPrev,
     onNext,
     onBack,
+    onSelectZikr,
     handleTap,
     handleResetCounter,
     handleToggleSaved,
@@ -765,7 +774,7 @@ export function ReaderScreen({
     </article>
   );
 
-  const renderNavigationButton = (kind: "prev" | "next") => {
+  const renderNavigationButton = (kind: "prev" | "next", inDock = false) => {
     const isPrevious = kind === "prev";
     const disabled = isPrevious ? idx === 0 : idx === azkar.length - 1;
     const label = t(language, isPrevious ? "reader.prev" : "reader.next");
@@ -784,18 +793,22 @@ export function ReaderScreen({
         disabled={disabled}
         title={label}
         aria-label={label}
-        className="adaptive-counter-nav"
+        className={
+          inDock
+            ? "flex size-12 shrink-0 items-center justify-center rounded-full border border-border/80 bg-card text-foreground shadow-sm transition-all duration-fast hover:bg-muted active:scale-95 disabled:opacity-25 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            : "adaptive-counter-nav flex size-12 shrink-0 items-center justify-center rounded-full border border-border/80 bg-card/90 backdrop-blur-xs text-foreground shadow-sm transition-all duration-fast hover:bg-muted active:scale-95 disabled:opacity-25 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        }
       >
         {isPrevious ? (
           direction === "rtl" ? (
-            <ChevronRight size={22} />
+            <ChevronRight size={20} />
           ) : (
-            <ChevronLeft size={22} />
+            <ChevronLeft size={20} />
           )
         ) : direction === "rtl" ? (
-          <ChevronLeft size={22} />
+          <ChevronLeft size={20} />
         ) : (
-          <ChevronRight size={22} />
+          <ChevronRight size={20} />
         )}
       </button>
     );
@@ -806,8 +819,8 @@ export function ReaderScreen({
       className="pointer-events-none absolute inset-x-4 top-1/2 z-10 hidden -translate-y-1/2 items-center justify-between md:flex"
       data-testid="reader-side-navigation"
     >
-      <div className="pointer-events-auto">{renderNavigationButton("prev")}</div>
-      <div className="pointer-events-auto">{renderNavigationButton("next")}</div>
+      <div className="pointer-events-auto">{renderNavigationButton("prev", false)}</div>
+      <div className="pointer-events-auto">{renderNavigationButton("next", false)}</div>
     </div>
   );
 
@@ -828,16 +841,33 @@ export function ReaderScreen({
 
     return (
       <nav
+        id="reader-collection-navigator"
+        hidden={!isSidebarOpen}
         aria-label={t(language, "reader.viewAllAzkar")}
         className={`hidden h-full min-h-0 shrink-0 flex-col overflow-hidden border-s border-border/60 bg-card/85 backdrop-blur-sm shadow-md transition-all duration-300 min-[1200px]:flex ${
-          isSidebarOpen ? "w-[34%] min-w-[20rem] max-w-md" : "w-0 !min-w-0 !p-0 !border-0 pointer-events-none opacity-0"
+          isSidebarOpen ? "w-[34%] min-w-[20rem] max-w-md" : "!hidden"
         }`}
         data-testid="reader-collection-navigator"
       >
         <div className="shrink-0 border-b border-border/60 px-4 py-4">
-          <div className="flex items-center gap-2">
-            <List size={19} className="shrink-0 text-primary" aria-hidden="true" />
-            <h2 className="text-subtitle font-extrabold text-foreground">{t(language, "reader.viewAllAzkar")}</h2>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <List size={19} className="shrink-0 text-primary" aria-hidden="true" />
+              <h2 className="text-subtitle font-extrabold text-foreground">{t(language, "reader.viewAllAzkar")}</h2>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setIsSidebarOpen(false);
+                sidebarToggleRef.current?.focus();
+              }}
+              aria-label={t(language, "reader.collapseSidebar")}
+              title={t(language, "reader.collapseSidebar")}
+              data-testid="reader-sidebar-close"
+              className="flex size-11 shrink-0 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            >
+              <X size={18} aria-hidden="true" />
+            </button>
           </div>
           <p className="mt-1 text-xs font-semibold text-muted-foreground">
             {t(language, "reader.progressSummary", {
@@ -965,8 +995,62 @@ export function ReaderScreen({
     );
   };
 
+  const renderAudioDockButton = () => {
+    return (
+      <button
+        type="button"
+        disabled={!audioAvailable}
+        onClick={(e) => {
+          e.stopPropagation();
+          onPlayAudio?.();
+        }}
+        aria-label={
+          audioModeActive
+            ? t(language, "audioPlayer.openFullPlayer")
+            : audioAvailable
+              ? t(language, "audioPlayer.play")
+              : t(language, "reader.arabicAudioUnavailable")
+        }
+        title={
+          audioModeActive
+            ? t(language, "audioPlayer.openFullPlayer")
+            : audioAvailable
+              ? t(language, "audioPlayer.play")
+              : t(language, "reader.arabicAudioUnavailable")
+        }
+        data-testid="reader-audio-dock-button"
+        className={`flex size-12 shrink-0 items-center justify-center rounded-full border transition-all duration-fast active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-25 ${
+          audioModeActive
+            ? "border-primary bg-primary text-primary-foreground shadow-raised"
+            : "border-border/80 bg-card text-foreground shadow-sm hover:bg-muted"
+        }`}
+      >
+        <Headphones size={20} aria-hidden="true" />
+      </button>
+    );
+  };
+
+  const renderBenefitDockButton = () => (
+    <button
+      type="button"
+      onClick={(e) => {
+        e.stopPropagation();
+        setHasOpenedBenefit(true);
+        setBenefitOpen(true);
+      }}
+      aria-haspopup="dialog"
+      aria-label={t(language, "reader.referencesButton")}
+      title={t(language, "reader.referencesButton")}
+      data-testid="reader-benefit-dock-button"
+      className="flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-xl border border-border/80 bg-card px-3 text-primary shadow-sm transition-colors duration-fast hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+    >
+      <Lightbulb size={20} aria-hidden="true" />
+      <span className="text-label font-bold">{t(language, "reader.referencesButton")}</span>
+    </button>
+  );
+
   const renderCounterPanel = () => (
-    <div className="px-3 pb-1" data-testid="counter-panel">
+    <div className="w-full px-3 pb-1" data-testid="counter-panel">
       <div className="adaptive-counter-row flex w-full items-center justify-center gap-2.5">
         <div className="md:hidden">{renderNavigationButton("prev")}</div>
         <div className="flex min-w-0 flex-1 justify-center">
@@ -1020,14 +1104,44 @@ export function ReaderScreen({
     />
   );
 
-  const renderCounterStack = () => (
-    <div data-testid="reader-counter-stack">
-      {renderCounterPanel()}
-      {/* A phone has no keys to show shortcuts for, and the row cost every
-          reader 35px of the screen to serve the ones holding a keyboard. */}
-      <div className="hidden md:block">{renderKeyboardShortcutsHint()}</div>
-    </div>
-  );
+  const renderDock = () => {
+    if (audioModeActive && audioPlayer) {
+      if (isValidElement(audioPlayer) && typeof audioPlayer.type !== "string") {
+        return cloneElement(audioPlayer as React.ReactElement<Record<string, unknown>>, {
+          dockSlots: {
+            prev: renderNavigationButton("prev", true),
+            audio: renderAudioDockButton(),
+            benefit: renderBenefitDockButton(),
+            next: renderNavigationButton("next", true),
+          },
+          onClose: () => {
+            setTimeout(() => {
+              const counter = document.querySelector<HTMLElement>('[data-testid="counter-surface"]');
+              counter?.focus();
+            }, 50);
+          },
+        });
+      }
+      return audioPlayer;
+    }
+
+    if (audioModeActive) {
+      return null;
+    }
+
+    return (
+      <div data-testid="reader-counter-stack">
+        <div className="reader-dock flex w-full flex-col items-center gap-2" data-testid="reader-dock">
+          <div className="flex w-full items-center justify-center gap-3">
+            {renderAudioDockButton()}
+            {renderBenefitDockButton()}
+          </div>
+          {renderCounterPanel()}
+        </div>
+        <div className="hidden md:block">{renderKeyboardShortcutsHint()}</div>
+      </div>
+    );
+  };
 
   const renderReaderMenuItems = (layout: "mobile" | "desktop") => (
     <>
@@ -1096,42 +1210,22 @@ export function ReaderScreen({
             )}
           </span>
         </div>
-        <div
-          role="radiogroup"
+        <SegmentedControl
+          value={textSize}
+          onChange={onTextSizeChange}
+          direction={direction}
           aria-label={t(language, "settings.textSize")}
           className="grid grid-cols-3 gap-1 rounded-xl border border-border/60 bg-muted/50 p-1"
-        >
-          {(
-            [
-              { value: "small", labelKey: "settings.textSmall" },
-              { value: "medium", labelKey: "settings.medium" },
-              { value: "large", labelKey: "settings.textLarge" },
-            ] as const
-          ).map((option) => {
-            const isSelected = textSize === option.value;
-            return (
-              <button
-                key={option.value}
-                type="button"
-                role="radio"
-                aria-checked={isSelected}
-                data-testid={`reader-text-size-${option.value}`}
-                aria-label={t(language, option.labelKey)}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onTextSizeChange(option.value);
-                }}
-                className={`flex min-h-11 items-center justify-center rounded-lg text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring select-none ${
-                  isSelected
-                    ? "bg-card text-foreground shadow-xs ring-1 ring-border/80"
-                    : "text-muted-foreground hover:bg-background/50 hover:text-foreground"
-                }`}
-              >
-                {t(language, option.labelKey)}
-              </button>
-            );
-          })}
-        </div>
+          indicatorClassName="bg-card"
+          options={[
+            { value: "small", label: t(language, "settings.textSmall"), testId: "reader-text-size-small" },
+            { value: "medium", label: t(language, "settings.medium"), testId: "reader-text-size-medium" },
+            { value: "large", label: t(language, "settings.textLarge"), testId: "reader-text-size-large" },
+          ]}
+          itemClassName={(selected) =>
+            `flex min-h-11 items-center justify-center rounded-lg text-xs font-bold transition-colors focus-visible:ring-[3px] focus-visible:ring-ring ${selected ? "text-foreground shadow-xs ring-1 ring-border/80" : "text-muted-foreground hover:bg-background/50 hover:text-foreground"}`
+          }
+        />
       </div>
 
       <DropdownMenuSeparator className="my-1 h-px bg-border/60" />
@@ -1294,9 +1388,7 @@ export function ReaderScreen({
                 the same "always-dark brand band" role. */}
               <div
                 data-testid="reader-desktop-hero"
-                className={`relative w-full flex shrink-0 flex-col items-center gap-2 overflow-hidden rounded-b-3xl px-6 ${
-                  audioModeActive ? "pb-3 pt-2.5" : "pb-4 pt-3"
-                } text-center`}
+                className="relative w-full flex shrink-0 flex-col items-center gap-2 overflow-hidden rounded-b-3xl px-6 pb-4 pt-3 text-center"
                 style={{
                   background:
                     "radial-gradient(120% 140% at 50% 10%, rgba(232,180,32,0.18), transparent 60%), var(--brand-hero)",
@@ -1310,23 +1402,25 @@ export function ReaderScreen({
                   <ArrowPrevious size={20} />
                 </IconButton>
 
-                {/* Hero actions: Reference, Overflow menu. Exactly two actions on all tiers. */}
+                {/* Hero actions: Reference (for surahs without bottom dock), Overflow menu. */}
                 <div className="absolute end-4 top-4 flex items-center gap-2" data-testid="reader-hero-actions">
-                  <button
-                    type="button"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      setHasOpenedBenefit(true);
-                      setBenefitOpen(true);
-                    }}
-                    aria-haspopup="dialog"
-                    aria-label={t(language, "reader.referencesButton")}
-                    title={t(language, "reader.referencesButton")}
-                    className="flex min-h-11 items-center gap-2 rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 px-3 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                  >
-                    <Lightbulb size={18} aria-hidden="true" />
-                    <span className="text-label font-extrabold">{t(language, "reader.referencesButton")}</span>
-                  </button>
+                  {longSurah && (
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        setHasOpenedBenefit(true);
+                        setBenefitOpen(true);
+                      }}
+                      aria-haspopup="dialog"
+                      aria-label={t(language, "reader.referencesButton")}
+                      title={t(language, "reader.referencesButton")}
+                      className="flex min-h-11 items-center gap-2 rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 px-3 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                    >
+                      <Lightbulb size={18} aria-hidden="true" />
+                      <span className="text-label font-extrabold">{t(language, "reader.referencesButton")}</span>
+                    </button>
+                  )}
 
                   <DropdownMenu dir={direction}>
                     <DropdownMenuTrigger
@@ -1368,7 +1462,7 @@ export function ReaderScreen({
                     direction={direction}
                     aria-label={t(language, "reader.groupProgress")}
                   />
-                  {!audioModeActive && !showSurahChrome && readerZikrTitle && (
+                  {!showSurahChrome && readerZikrTitle && (
                     <div className="mt-1.5 flex w-full items-center justify-between gap-3">
                       <h2
                         className="min-w-0 truncate text-start text-sm font-extrabold leading-relaxed text-[color:var(--on-media)]"
@@ -1380,7 +1474,7 @@ export function ReaderScreen({
                       </h2>
                     </div>
                   )}
-                  {!audioModeActive && !longSurah && allWordMeanings.length > 0 && (
+                  {!longSurah && allWordMeanings.length > 0 && (
                     <div className="mt-1.5 flex w-full items-center justify-end gap-2">
                       <button
                         type="button"
@@ -1403,11 +1497,7 @@ export function ReaderScreen({
 
               {/* Wide-desktop card: reading content, side navigation, counter,
                 and keyboard guidance. Page-level actions stay in the hero. */}
-              <div
-                className={`relative mx-4 ${
-                  audioModeActive ? "my-2" : "my-4"
-                } flex min-h-0 flex-1 overflow-hidden bg-transparent`}
-              >
+              <div className="relative mx-4 my-4 flex min-h-0 flex-1 overflow-hidden bg-transparent">
                 <div
                   className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden cursor-pointer"
                   data-testid="reader-card"
@@ -1437,44 +1527,27 @@ export function ReaderScreen({
                       {renderSideNavigation()}
                     </div>
 
-                    {!longSurah &&
-                      (audioModeActive ? (
-                        <footer
-                          data-testid="reader-audio-spacer-desktop"
-                          className="shrink-0 h-[5.5rem] pb-3 pt-2 pointer-events-none"
-                          aria-hidden="true"
-                        />
-                      ) : (
-                        <footer className="shrink-0 pb-3 pt-2">{renderCounterStack()}</footer>
-                      ))}
+                    {!longSurah && <footer className="shrink-0 pb-3 pt-2">{renderDock()}</footer>}
+                    {(!audioModeActive || longSurah) && audioPlayer}
                   </div>
                 </div>
-                {audioPlayer}
               </div>
             </div>
 
             {/* Desktop Sidebar Toggle Button */}
-            <div className="hidden min-[1200px]:flex items-center shrink-0 z-20 -mx-5 pointer-events-none">
+            <div className="hidden min-[1200px]:flex items-start pt-6 shrink-0 z-20 -mx-5 pointer-events-none">
               <button
                 type="button"
                 onClick={() => setIsSidebarOpen((prev) => !prev)}
                 aria-expanded={isSidebarOpen}
+                aria-controls="reader-collection-navigator"
                 aria-label={isSidebarOpen ? t(language, "reader.collapseSidebar") : t(language, "reader.expandSidebar")}
                 title={isSidebarOpen ? t(language, "reader.collapseSidebar") : t(language, "reader.expandSidebar")}
                 data-testid="reader-sidebar-toggle"
-                className="pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full border border-border/80 bg-card shadow-md text-foreground transition-[color,background-color,transform] hover:bg-muted hover:scale-105 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                ref={sidebarToggleRef}
+                className="pointer-events-auto flex h-11 w-11 items-center justify-center rounded-xl border border-border/80 bg-card shadow-sm text-foreground transition-colors duration-fast hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
               >
-                {isSidebarOpen ? (
-                  direction === "rtl" ? (
-                    <ChevronLeft size={20} />
-                  ) : (
-                    <ChevronRight size={20} />
-                  )
-                ) : direction === "rtl" ? (
-                  <ChevronRight size={20} />
-                ) : (
-                  <ChevronLeft size={20} />
-                )}
+                <PanelLeftIcon size={18} aria-hidden="true" />
               </button>
             </div>
 
@@ -1496,23 +1569,25 @@ export function ReaderScreen({
                   // a per-zikr primary. Both share the header's ghost
                   // icon-button treatment so the row reads as one set.
                   <div className="flex items-center gap-1" data-testid="reader-actions">
-                    <button
-                      type="button"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        setHasOpenedBenefit(true);
-                        setBenefitOpen(true);
-                      }}
-                      aria-haspopup="dialog"
-                      className={`${READER_HEADER_ACTION_CLASS} w-auto gap-1.5 px-2.5`}
-                      aria-label={t(language, "reader.referencesButton")}
-                      title={t(language, "reader.referencesButton")}
-                    >
-                      <Lightbulb size={18} aria-hidden="true" />
-                      <span className="text-xs font-extrabold min-[600px]:text-label">
-                        {t(language, "reader.referencesButton")}
-                      </span>
-                    </button>
+                    {longSurah && (
+                      <button
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          setHasOpenedBenefit(true);
+                          setBenefitOpen(true);
+                        }}
+                        aria-haspopup="dialog"
+                        className={`${READER_HEADER_ACTION_CLASS} w-auto gap-1.5 px-2.5`}
+                        aria-label={t(language, "reader.referencesButton")}
+                        title={t(language, "reader.referencesButton")}
+                      >
+                        <Lightbulb size={18} aria-hidden="true" />
+                        <span className="text-xs font-extrabold min-[600px]:text-label">
+                          {t(language, "reader.referencesButton")}
+                        </span>
+                      </button>
+                    )}
 
                     <DropdownMenu dir={direction}>
                       {/* The share-card fonts used to be prefetched on the share
@@ -1536,10 +1611,7 @@ export function ReaderScreen({
               />
             </div>
 
-            <div
-              className={`shrink-0 px-5 ${audioModeActive ? "pb-2 pt-2" : "pb-3 pt-2"} reader-column`}
-              data-testid="reader-session-chrome"
-            >
+            <div className="shrink-0 px-5 pb-3 pt-2 reader-column" data-testid="reader-session-chrome">
               <div className="mb-2 flex items-center justify-between gap-3 text-xs font-bold text-muted-foreground">
                 <span>{t(language, "reader.collectionPercentComplete", { percent: localizedReadingPercent })}</span>
                 <span>
@@ -1560,7 +1632,7 @@ export function ReaderScreen({
               />
               {/* See the desktop heading: only surah names render, and the 10px
                 margin keeps harakat clear of the progress track. */}
-              {!audioModeActive && !showSurahChrome && readerZikrTitle && (
+              {!showSurahChrome && readerZikrTitle && (
                 <div className="mt-2.5 flex w-full items-center justify-between gap-3">
                   <h2
                     className="min-w-0 truncate whitespace-nowrap text-start text-sm font-extrabold leading-relaxed text-foreground"
@@ -1572,7 +1644,7 @@ export function ReaderScreen({
                   </h2>
                 </div>
               )}
-              {!audioModeActive && !longSurah && allWordMeanings.length > 0 && (
+              {!longSurah && allWordMeanings.length > 0 && (
                 <div className="mt-2 flex w-full items-center justify-end gap-2">
                   <button
                     type="button"
@@ -1625,19 +1697,10 @@ export function ReaderScreen({
               {/* The screen sets !pb-0 and the tab bar is hidden here, so the
                 counter itself owns the bottom inset — otherwise it would sit
                 flush against the home indicator. */}
-              {!longSurah &&
-                (audioModeActive ? (
-                  <div
-                    data-testid="reader-audio-spacer-mobile"
-                    className="shrink-0 h-[5.5rem] pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 pointer-events-none"
-                    aria-hidden="true"
-                  />
-                ) : (
-                  <div className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">
-                    {renderCounterStack()}
-                  </div>
-                ))}
-              {audioPlayer}
+              {!longSurah && (
+                <div className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">{renderDock()}</div>
+              )}
+              {(!audioModeActive || longSurah) && audioPlayer}
             </div>
           </>
         ))}

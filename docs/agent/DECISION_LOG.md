@@ -4004,3 +4004,11 @@ null` shape, so a record written before this change still loads and still
 - **Decision:** Use an icon-only 44px prayer information action, show Sunnah points first with logical RTL/LTR bullet alignment, and disclose supporting evidence progressively without changing reviewed content. Place the contextual reminder before the Wird tracker.
 - **Supersedes:** DEC-210 compact Home ordering only.
 - **Verification:** Prayer card interaction tests and responsive Home browser coverage, followed by repository gates.
+
+## DEC-213 — Remove shortened listening during release review
+
+- **Date:** 2026-10-01
+- **Status:** Approved
+- **Owner:** Product owner (explicit response during latest-changes review)
+- **Decision:** Remove the pending shorter-listening setting. Preserve reviewed repetition counts and the existing Play Once/prescribed-repeat distinction. Review fixes must retain exact devotional text, shared counter styling, 44px controls, prayer bullets, and proper dialog focus behavior.
+- **Verification:** Audio/controller and Reader/prayer regressions, responsive browser tests, and the unchanged local release gates.

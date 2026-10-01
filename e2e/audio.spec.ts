@@ -219,7 +219,7 @@ test("desktop audio dock stays inside the main canvas and reveals volume on hove
   }
 });
 
-test("expanded queue controls stay inside a 320px phone viewport", async ({ page }) => {
+test("expanded queue controls stay inside a 320px phone viewport", async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 320, height: 568 });
   await page.addInitScript(() => {
     window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
@@ -263,6 +263,29 @@ test("expanded queue controls stay inside a 320px phone viewport", async ({ page
   });
   expect(geometry.scrollWidth).toBeLessThanOrEqual(geometry.clientWidth);
   expect(geometry.controlsInside).toBe(true);
+  const dialog = page.getByRole("dialog", { name: "Audio player" });
+  await expect(dialog).toBeVisible();
+  const textViewport = dialog.getByRole("region", { name: "Now playing" });
+  expect((await textViewport.boundingBox())?.height).toBeGreaterThanOrEqual(44);
+  for (let step = 0; step < 16; step++) {
+    await page.keyboard.press("Tab");
+    expect(await dialog.evaluate((node) => node.contains(document.activeElement))).toBe(true);
+  }
+  const voice = dialog.getByTestId("audio-reciter-select");
+  await voice.click();
+  await expect(page.getByRole("listbox")).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeVisible();
+  await expect(page.getByRole("listbox")).toHaveCount(0);
+  for (const button of await dialog.getByRole("button").all()) {
+    const bounds = await button.boundingBox();
+    expect(bounds?.width).toBeGreaterThanOrEqual(44);
+    expect(bounds?.height).toBeGreaterThanOrEqual(44);
+  }
+  await dialog.screenshot({ path: testInfo.outputPath("audio-expanded-320-en.png") });
+  await page.keyboard.press("Escape");
+  await expect(dialog).toHaveCount(0);
+  await expect(player.getByRole("button", { name: "Expand player" })).toBeFocused();
 });
 
 test("synchronizes Reader navigation with audio tracks, shows proper track titles, and advances Reader when a track ends", async ({

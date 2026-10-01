@@ -1,13 +1,13 @@
 {
-  "release": "2026-10-01-prayer-information",
+  "release": "2026-10-01-reader-audio-review",
   "ar": [
-    "عرض معلومات سنن الصلاة في نقاط واضحة تدعم القراءة من اليمين إلى اليسار.",
-    "إمكانية فتح الأحاديث والمراجع عند الحاجة مع إبقاء ملخص السنن مختصراً.",
-    "توفير مساحة في بطاقات الصلاة بأيقونة معلومات، وإظهار التذكير قبل متابع الورد اليومي."
+    "الاستماع وفتح الفائدة من أدوات واضحة بجوار منطقة العد، مع الحفاظ على حجم العداد المعتاد.",
+    "فتح مشغل الصوت مع تنقل آمن بلوحة المفاتيح والعودة بسهولة إلى القراءة.",
+    "نصوص التسجيلات واضحة وقابلة لتكبير الخط والتمرير، وأزرار الصلاة والصوت أسهل استخداماً على الشاشات الصغيرة."
   ],
   "en": [
-    "Prayer Sunnah information now uses clear points with right-to-left support.",
-    "Expand hadith evidence and references when needed while keeping the Sunnah summary concise.",
-    "Prayer cards save space with an information icon, and the reminder appears before the daily Wird tracker."
+    "Open listening and benefits from clear Reader tools while keeping the familiar counter size.",
+    "Use the expanded audio player with keyboard navigation and return easily to reading.",
+    "Recording text scales and scrolls comfortably, with easier prayer and audio controls on small screens."
   ]
 }

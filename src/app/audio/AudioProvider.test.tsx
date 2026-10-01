@@ -335,6 +335,7 @@ describe("AudioProvider integration", () => {
     expect(timeline).toHaveValue("0");
 
     fireEvent.click(screen.getByRole("button", { name: "توسيع المشغل" }));
+    fireEvent.click(screen.getByTestId("audio-attribution-trigger"));
     expect(screen.getByText("المصدر · تلاوة القارئ")).toBeInTheDocument();
     expect(screen.queryByText("Source · Attribution")).not.toBeInTheDocument();
   });

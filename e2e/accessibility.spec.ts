@@ -282,7 +282,7 @@ test("visible core-flow controls meet the 44px product touch-target standard", a
   await expect(page.getByTestId("reader-screen")).toBeVisible();
   await expectVisibleInteractiveTargetsAtLeast44px(page, "Reader");
 
-  await page.getByRole("button", { name: "Benefit", exact: true }).click();
+  await page.getByTestId("reader-benefit-dock-button").click();
   const benefitSheet = page.getByTestId("reference-sheet");
   await expect(benefitSheet).toBeVisible();
   await expect(benefitSheet.getByRole("heading", { name: "Hadith text", exact: true })).toHaveCount(1);

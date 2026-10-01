@@ -405,4 +405,8 @@ Any typography, direction, reader-control, counter-size, motion timing, modal-he
 
 ### Home prayer information clarity
 
-Prayer information uses a localized 44px icon button. The popup presents native RTL/LTR bullet points for before/after prayer first, with wrapping count and Sunnah-rank labels. Reviewed descriptions remain intact; longer hadith evidence and the general Rawatib explanation use native keyboard-accessible disclosures. Home places its contextual reminder before Today’s Wird in both visual and DOM order, superseding the compact ordering in DEC-210 at the owner’s request.
+Prayer information uses a localized 44px icon button. The popup presents native RTL/LTR bullet points for before/after prayer first, with wrapping count and Sunnah-rank labels. Reviewed descriptions remain intact; longer hadith evidence and the general Rawatib explanation use native keyboard-accessible disclosures. Home places its contextual reminder before Today’s Wird in both visual and DOM order, superseding the compact ordering in DEC-210 at the owner's request.
+
+### Reader and audio review
+
+The Reader places listening and the visibly labelled Benefit action in a utility row above the established rectangular counter and Previous/Next controls. The manual counter keeps its shared geometry and type scale. Audio ownership replaces that counter row with compact transport controls; all actions retain 44px targets. The expanded player uses the shared portaled modal, scalable reading type, exact reviewed text, and user-controlled scrolling. Collapse restores focus to Expand; Stop restores counter focus. Closing the wide collection navigator hides its controls from keyboard navigation and returns focus to the sidebar toggle.
