@@ -3995,3 +3995,12 @@ null` shape, so a record written before this change still loads and still
 - **Why:** Delivers a focused, intuitive devotional experience for readers with daily fixed routines while preserving existing continuous khatmah pacing, free reading, and offline-first state without data migration risks.
 - **Consequences:** Repeating wird routines automatically reset each day; completion signals in Daily Path, Reader banner, and Home cards reflect exact range completion; existing plans remain unaffected.
 - **Tests/evidence required:** Unit tests for goal and range counting, normalization tests, daily path tests, screen component tests, e2e tests, full merge gates.
+
+## DEC-212 — Concise prayer information and reminder-first Home
+
+- **Date:** 2026-10-01
+- **Status:** Approved
+- **Owner:** Product owner (explicit screenshot request)
+- **Decision:** Use an icon-only 44px prayer information action, show Sunnah points first with logical RTL/LTR bullet alignment, and disclose supporting evidence progressively without changing reviewed content. Place the contextual reminder before the Wird tracker.
+- **Supersedes:** DEC-210 compact Home ordering only.
+- **Verification:** Prayer card interaction tests and responsive Home browser coverage, followed by repository gates.

@@ -1,13 +1,13 @@
 {
+  "release": "2026-10-01-prayer-information",
   "ar": [
-    "توفير تسجيلات صوتية كاملة بصوت القارئ عبد الله محمد لأذكار الصباح، وأذكار الاستيقاظ، وأذكار النوم، والأدعية الجامعة.",
-    "إمكانية الاستماع للأدعية النبوية الجامعة وأذكار اليوم والليلة مع دعم المزامنة والتشغيل دون اتصال بالإنترنت.",
-    "تحسين سرعة تحميل الصوتيات في التطبيق مع الحفاظ على خفة الحزمة وسلاستها."
+    "عرض معلومات سنن الصلاة في نقاط واضحة تدعم القراءة من اليمين إلى اليسار.",
+    "إمكانية فتح الأحاديث والمراجع عند الحاجة مع إبقاء ملخص السنن مختصراً.",
+    "توفير مساحة في بطاقات الصلاة بأيقونة معلومات، وإظهار التذكير قبل متابع الورد اليومي."
   ],
   "en": [
-    "Added complete audio recitations by Abdullah Muhammad for morning azkar, waking up azkar, sleep azkar, and comprehensive duas.",
-    "Listen to comprehensive prophetic supplications and daily path adhkar with full offline audio playback support.",
-    "Improved audio loading performance throughout the app while keeping bundle sizes light and responsive."
-  ],
-  "release": "2026-10-01-abdullah-muhammad-audio"
+    "Prayer Sunnah information now uses clear points with right-to-left support.",
+    "Expand hadith evidence and references when needed while keeping the Sunnah summary concise.",
+    "Prayer cards save space with an information icon, and the reminder appears before the daily Wird tracker."
+  ]
 }

@@ -69,13 +69,17 @@ test("the Home Wird keeps semantic order while mirroring Arabic placement and ex
   });
   expect(mobileCardPresentation).toEqual({ titleSize: "18px", subtitleSize: "12px", overflow: 0 });
 
-  const [mobileWirdBox, mobileCompanionBox] = await Promise.all([
+  const [mobileWirdBox, mobileCompanionBox, mobilePrimaryBox] = await Promise.all([
     page.getByTestId("home-wird-row").boundingBox(),
     page.getByTestId("home-context-companion").boundingBox(),
+    page.getByTestId("home-primary-card").boundingBox(),
   ]);
-  expect(mobileWirdBox && mobileCompanionBox).toBeTruthy();
+  expect(mobileWirdBox && mobileCompanionBox && mobilePrimaryBox).toBeTruthy();
+  if (mobilePrimaryBox && mobileCompanionBox) {
+    expect(mobilePrimaryBox.y + mobilePrimaryBox.height).toBeLessThanOrEqual(mobileCompanionBox.y);
+  }
   if (mobileWirdBox && mobileCompanionBox) {
-    expect(mobileWirdBox.y).toBeLessThan(mobileCompanionBox.y);
+    expect(mobileCompanionBox.y + mobileCompanionBox.height).toBeLessThanOrEqual(mobileWirdBox.y);
   }
 
   const maghribLabel = page.locator("#prayer-card-heading-maghrib");
@@ -394,4 +398,46 @@ test("the tonal texture is non-Home only and yields to reduced transparency", as
 
   await page.evaluate(() => document.body.classList.add("reduce-transparency"));
   expect(await appShell.evaluate((element) => getComputedStyle(element, "::after").display)).toBe("none");
+});
+
+test("prayer information keeps concise RTL and LTR points with keyboard evidence disclosure", async ({
+  page,
+}, testInfo) => {
+  await page.clock.setFixedTime(new Date("2026-09-05T14:00:00+03:00"));
+  for (const language of ["ar", "en"] as const) {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await openReturningGuest(page, language);
+    await page.getByTestId("prayer-card-dhuhr").getByRole("button").click();
+    const info = page.getByTestId("prayer-actions-more-info");
+    await expect(info).toHaveText("");
+    const box = await info.boundingBox();
+    expect(box?.width).toBeGreaterThanOrEqual(44);
+    expect(box?.height).toBeGreaterThanOrEqual(44);
+    await info.click();
+    const modal = page.getByTestId("prayer-actions-info-modal");
+    const points = modal.getByTestId("prayer-info-points");
+    await expect(points.locator(":scope > li")).toHaveCount(2);
+    expect(
+      await points.evaluate((element) => ({
+        direction: getComputedStyle(element).direction,
+        marker: getComputedStyle(element).listStyleType,
+      })),
+    ).toEqual({ direction: language === "ar" ? "rtl" : "ltr", marker: "disc" });
+    const evidence = points.locator("details").first();
+    await expect(evidence).not.toHaveAttribute("open", "");
+    await evidence.locator("summary").focus();
+    await page.keyboard.press("Enter");
+    await expect(evidence).toHaveAttribute("open", "");
+    await expect(evidence.locator("blockquote")).toBeVisible();
+    await page.keyboard.press("Enter");
+    for (const width of [320, 390, 1440]) {
+      await page.setViewportSize({ width, height: 844 });
+      expect(await modal.evaluate((element) => element.scrollWidth - element.clientWidth)).toBeLessThanOrEqual(1);
+      expect(await points.evaluate((element) => element.scrollWidth - element.clientWidth)).toBeLessThanOrEqual(1);
+    }
+    await page.setViewportSize({ width: 390, height: 844 });
+    await modal.screenshot({ path: testInfo.outputPath("prayer-info-" + language + ".png") });
+    await page.keyboard.press("Escape");
+    await expect(info).toBeFocused();
+  }
 });

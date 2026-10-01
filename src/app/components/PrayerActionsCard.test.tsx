@@ -29,6 +29,15 @@ describe("PrayerActionsCard", () => {
     const infoButton = screen.getByTestId("prayer-actions-more-info");
     expect(infoButton).toHaveAttribute("aria-label", "معلومات عن سنن صلاة الظهر");
 
+    expect(infoButton).toHaveTextContent("");
+    expect(infoButton).toHaveClass("size-11");
+    expect(infoButton).toHaveAttribute("aria-haspopup", "dialog");
+    fireEvent.click(infoButton);
+    expect(screen.getByTestId("prayer-info-points").querySelectorAll(":scope > li")).toHaveLength(2);
+    expect(screen.getByTestId("prayer-info-points").parentElement).toHaveAttribute("dir", "rtl");
+    expect(screen.getByTestId("rawatib-virtue-banner")).not.toHaveAttribute("open");
+    fireEvent.click(screen.getByTestId("modal-close-button"));
+
     // Checklist rows (4 for Dhuhr)
     expect(screen.getByTestId("prayer-action-location")).toHaveTextContent("صليت الظهر جماعة");
     expect(screen.getByTestId("prayer-action-dhuhr-sunnah-before")).toHaveTextContent("أربع ركعات قبل الظهر");
