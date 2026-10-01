@@ -146,7 +146,7 @@ const CANONICAL_KEY_BY_ID: Readonly<Record<string, string>> = {
 };
 
 function getAudioBehavior(item: ZikrDraft): ZikrAudioBehavior {
-  const prescribedRepeatIsSuitable = item.repetitionCount > 1 && item.repetitionCount <= 10;
+  const prescribedRepeatIsSuitable = item.repetitionCount > 1;
   return {
     defaultMode: "play-once",
     supportedModes: prescribedRepeatIsSuitable

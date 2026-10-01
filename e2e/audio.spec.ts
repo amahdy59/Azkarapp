@@ -1,5 +1,67 @@
 import { expect, test } from "@playwright/test";
 
+test("100-count istighfar offers prescribed repeat and shows each repetition", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.addInitScript(() => {
+    localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+    localStorage.setItem(
+      "azkarapp.state.v1",
+      JSON.stringify({
+        settings: { language: "en", reduceMotion: true, routineModes: { morning: "complete" } },
+        profile: { displayName: "Guest", isGuest: true },
+      }),
+    );
+    // Deterministic media events exercise controller repetition without CDN timing.
+    class TestAudio extends EventTarget {
+      src = "";
+      currentTime = 0;
+      duration = 10;
+      volume = 1;
+      muted = false;
+      playbackRate = 1;
+      paused = true;
+      ended = false;
+      constructor() {
+        super();
+        Object.assign(window, { repetitionAudio: this });
+      }
+      load() {
+        this.dispatchEvent(new Event("loadedmetadata"));
+        this.dispatchEvent(new Event("canplay"));
+      }
+      play() {
+        this.paused = false;
+        this.dispatchEvent(new Event("playing"));
+        return Promise.resolve();
+      }
+      pause() {
+        this.paused = true;
+        this.dispatchEvent(new Event("pause"));
+      }
+      removeAttribute() {
+        this.src = "";
+      }
+    }
+    Object.defineProperty(window, "Audio", { value: TestAudio });
+  });
+  await page.goto("/#/azkar/morning/24");
+  await expect(page.getByTestId("reader-screen")).toHaveAttribute("data-zikr-id", "m-hm-96");
+  await page.getByRole("button", { name: "Reader options", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Repeat prescribed count", exact: true }).click();
+  const player = page.getByRole("region", { name: "Audio player", exact: true });
+  await player.getByRole("button", { name: "Expand player" }).click();
+  await expect(player.getByRole("button", { name: "Repeat", exact: true })).toHaveAttribute("aria-pressed", "true");
+  await expect(player).toContainText("1 / 100");
+  await page.evaluate(() =>
+    (window as unknown as { repetitionAudio: EventTarget }).repetitionAudio.dispatchEvent(new Event("ended")),
+  );
+  await expect(player).toContainText("2 / 100");
+  await player.getByRole("button", { name: "Repeat", exact: true }).click();
+  await expect(player.getByRole("button", { name: "Repeat", exact: true })).toHaveAttribute("aria-pressed", "false");
+  await player.getByRole("button", { name: "Stop audio and close player" }).click();
+  await expect(page.getByTestId("counter-surface")).toBeFocused();
+});
+
 async function _enterEnglishGuestMode(page: import("@playwright/test").Page) {
   await page.addInitScript(() => {
     Object.defineProperty(window, "__audioPlayCalls", { value: 0, writable: true });
@@ -263,28 +325,23 @@ test("expanded queue controls stay inside a 320px phone viewport", async ({ page
   });
   expect(geometry.scrollWidth).toBeLessThanOrEqual(geometry.clientWidth);
   expect(geometry.controlsInside).toBe(true);
-  const dialog = page.getByRole("dialog", { name: "Audio player" });
-  await expect(dialog).toBeVisible();
-  const textViewport = dialog.getByRole("region", { name: "Now playing" });
+  await expect(page.getByRole("dialog", { name: "Audio player" })).toHaveCount(0);
+  const textViewport = player.getByRole("region", { name: "Now playing" });
   expect((await textViewport.boundingBox())?.height).toBeGreaterThanOrEqual(44);
-  for (let step = 0; step < 16; step++) {
-    await page.keyboard.press("Tab");
-    expect(await dialog.evaluate((node) => node.contains(document.activeElement))).toBe(true);
-  }
-  const voice = dialog.getByTestId("audio-reciter-select");
+  const voice = player.getByTestId("audio-reciter-select");
   await voice.click();
   await expect(page.getByRole("listbox")).toBeVisible();
   await page.keyboard.press("Escape");
-  await expect(dialog).toBeVisible();
+  await expect(player).toHaveAttribute("data-variant", "expanded");
   await expect(page.getByRole("listbox")).toHaveCount(0);
-  for (const button of await dialog.getByRole("button").all()) {
+  for (const button of await player.getByRole("button").all()) {
     const bounds = await button.boundingBox();
     expect(bounds?.width).toBeGreaterThanOrEqual(44);
     expect(bounds?.height).toBeGreaterThanOrEqual(44);
   }
-  await dialog.screenshot({ path: testInfo.outputPath("audio-expanded-320-en.png") });
+  await player.screenshot({ path: testInfo.outputPath("audio-expanded-320-en.png") });
   await page.keyboard.press("Escape");
-  await expect(dialog).toHaveCount(0);
+  await expect(player).toHaveAttribute("data-variant", "compact");
   await expect(player.getByRole("button", { name: "Expand player" })).toBeFocused();
 });
 

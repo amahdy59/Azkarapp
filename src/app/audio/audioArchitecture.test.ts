@@ -202,6 +202,27 @@ describe("explicit audio content architecture", () => {
     expect(plan.entries.every((entry) => entry.repetitions === 1 && !entry.ritualGroupId)).toBe(true);
   });
 
+  it("allows the full reviewed count for high-count azkar while keeping Play Once the default", () => {
+    const highCount = ALL_AZKAR.filter((zikr) => zikr.repetitionCount > 10);
+    expect(highCount.find((zikr) => zikr.id === "m-hm-96")?.repetitionCount).toBe(100);
+    expect(highCount.length).toBeGreaterThan(0);
+    const { catalog, zikrs } = catalogFor(highCount);
+    const options = {
+      zikrs,
+      catalog,
+      baseUrl: "https://audio.example.test",
+      context: { category: "morning" as const, routineMode: "complete" as const, source: "full-session" as const },
+    };
+    const once = buildPlaybackPlan(options);
+    const repeated = buildPlaybackPlan({ ...options, mode: "repeat-prescribed-count" });
+    expect(once.entries.every((entry) => entry.repetitions === 1)).toBe(true);
+    expect(repeated.entries).toHaveLength(highCount.length);
+    repeated.entries.forEach((entry, index) => {
+      expect(entry.repetitions).toBe(highCount[index]!.repetitionCount);
+      expect(entry.prescribedRepetitions).toBe(highCount[index]!.repetitionCount);
+    });
+  });
+
   it("fails validation for an incomplete Quran range", () => {
     const zikr = ALL_AZKAR.find((item) => item.id === "m-hm-76a")!;
     const { catalog, zikrs } = catalogFor([zikr]);

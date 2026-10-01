@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { AudioController } from "../audio/AudioProvider";
 import { createInitialAudioState } from "../audio/audioReducer";
@@ -245,6 +245,17 @@ describe("FloatingAudioPlayer", () => {
     expect(controller.setPlaybackMode).toHaveBeenCalledWith("play-once");
   });
 
+  it("shows the repetition count as well as the track position in a high-count queue", () => {
+    const controller = createController();
+    controller.currentEntry = { ...entry, repetitions: 100, prescribedRepetitions: 100 };
+    controller.state.plan = { ...plan, entries: [controller.currentEntry, entry] };
+    controller.state.repetitionIndex = 48;
+    render(<FloatingAudioPlayer controller={controller} language="en" direction="ltr" />);
+    fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
+    expect(screen.getByRole("region", { name: "Audio player" })).toHaveTextContent("1 / 2");
+    expect(screen.getByRole("region", { name: "Audio player" })).toHaveTextContent("49 / 100");
+  });
+
   it("renders Quranic verses with ornamental ayah badges in expanded zikr text", () => {
     const controller = createController();
     const quranEntry: PlaybackEntry = {
@@ -304,23 +315,41 @@ describe("FloatingAudioPlayer", () => {
     expect(zikrText.textContent).toBe(shortEntry.arabicText);
   });
 
-  it("shows audio attribution info in a popover when info button is pressed", () => {
-    const controller = createController();
-    render(<FloatingAudioPlayer controller={controller} language="ar" direction="rtl" />);
+  it("keeps attribution in the reciter menu without a separate info action", async () => {
+    render(<FloatingAudioPlayer controller={createController()} language="ar" direction="rtl" />);
     fireEvent.click(screen.getByRole("button", { name: "توسيع المشغل" }));
+    expect(screen.queryByTestId("audio-attribution-trigger")).not.toBeInTheDocument();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("audio-reciter-select"));
+    expect(screen.getByTestId("audio-recording-source")).toHaveTextContent("Test source · Test attribution");
+    const selectedVoice = screen.getByTestId("audio-recording-source").closest('[role="option"]');
+    await waitFor(() => expect(selectedVoice).toHaveFocus());
+    expect(selectedVoice).toHaveAccessibleDescription(/Test source · Test attribution/);
+  });
 
-    const trigger = screen.getByTestId("audio-attribution-trigger");
-    expect(trigger).toHaveAttribute("aria-expanded", "false");
-    expect(screen.queryByTestId("audio-attribution-popover")).not.toBeInTheDocument();
-
-    fireEvent.click(trigger);
-    expect(trigger).toHaveAttribute("aria-expanded", "true");
-    const popover = screen.getByTestId("audio-attribution-popover");
-    expect(popover).toBeInTheDocument();
-    expect(popover).toHaveTextContent("Test source · Test attribution");
-
-    fireEvent.click(trigger);
-    expect(screen.queryByTestId("audio-attribution-popover")).not.toBeInTheDocument();
+  it("replaces only the reader canvas and restores covered controls and focus on collapse", () => {
+    render(
+      <div>
+        <button type="button">Reader header</button>
+        <div data-testid="reader-card">
+          <div data-testid="reading-content">
+            <button type="button">Reading action</button>
+          </div>
+          <div>
+            <FloatingAudioPlayer controller={createController()} language="en" direction="ltr" dockedInReader />
+          </div>
+        </div>
+      </div>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
+    expect(screen.getByTestId("reading-content")).toHaveAttribute("inert");
+    expect(screen.queryByRole("button", { name: "Reading action" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Reader header" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Minimize player" })).toHaveFocus();
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(screen.getByTestId("reading-content")).not.toHaveAttribute("inert");
+    expect(screen.getByRole("button", { name: "Reading action" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Expand player" })).toHaveFocus();
   });
 
   it("renders 5-part dock slots in compact mode and invokes stop and onClose when close is clicked", () => {

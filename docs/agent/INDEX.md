@@ -131,3 +131,5 @@ may run in parallel.
 The latest review and hardening work is recorded in [Phase 72](phases/PHASE_72_WIRD_PLANNING_REDESIGN.md), adding support for daily repeating Quran sections (fixed Juz, Surah, or custom page range) with binary daily completion upon reading 100% of the section, isolated progress calculation, and one-tap section restart.
 
 The agent must never interpret “perfect the application” as permission to rewrite the entire repository. Perfection is approached through evidence-backed iteration, not one-shot replacement.
+
+[Phase 75](phases/PHASE_75_INTEGRATED_AUDIO_PLAYER.md) records the owner-requested integrated expanded audio surface, replacing the modal presentation under DEC-214.

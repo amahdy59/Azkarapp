@@ -1,0 +1,186 @@
+/* The one audio player follows the same responsive shell as the screen it
+   controls. Compact/mobile layouts clear the bottom navigation; expanded
+   layouts use the main canvas and never cover the rail or sidebar. */
+.floating-audio-player {
+  inset-inline: 0.5rem;
+  bottom: calc(4.5rem + env(safe-area-inset-bottom) + 0.5rem);
+}
+
+.app-main-view {
+  position: relative;
+}
+
+.audio-player-surface {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  overflow: hidden;
+  background: var(--background);
+  cursor: auto;
+}
+
+.audio-player-surface--viewport {
+  position: fixed;
+  top: env(safe-area-inset-top);
+}
+
+.audio-expanded-layout {
+  display: grid;
+  grid-template-rows: auto minmax(12rem, 1fr) auto;
+  height: 100%;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 0.5rem max(1rem, env(safe-area-inset-left)) max(0.75rem, env(safe-area-inset-bottom))
+    max(1rem, env(safe-area-inset-right));
+}
+
+.audio-expanded-header {
+  width: 100%;
+}
+
+.audio-expanded-controls {
+  padding-inline: 0.25rem;
+}
+
+.audio-expanded-text {
+  min-height: 6rem;
+}
+
+/* The player meets the session header, rather than floating inside the card gutters. */
+.reader-canvas-wrap:has(.audio-player-surface) {
+  margin: 0;
+}
+
+/* Short, wide windows keep readable text beside a compact transport column. */
+@media (min-width: 37.5rem) and (max-height: 34rem) {
+  .audio-expanded-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(16rem, 0.75fr);
+    grid-template-rows: auto minmax(9.5rem, 1fr);
+    column-gap: 1rem;
+    padding-block: 0.25rem max(0.25rem, env(safe-area-inset-bottom));
+  }
+
+  .audio-expanded-header {
+    grid-column: 1 / -1;
+  }
+
+  .audio-expanded-controls {
+    align-self: center;
+    border-top: 0;
+    border-inline-start: 1px solid var(--border);
+    padding-inline-start: 1rem;
+    padding-block-start: 0;
+  }
+
+  .audio-expanded-options,
+  .audio-expanded-transport {
+    margin-top: 0;
+  }
+
+  .audio-expanded-meta > div:first-child {
+    display: none;
+  }
+
+  .audio-expanded-text {
+    margin-top: 0.25rem;
+    padding-block: 0.5rem;
+  }
+}
+
+/* Docked audio player inside reader canvas: contained within the reader area */
+.floating-audio-player--docked {
+  position: relative;
+  inset: auto;
+  width: 100%;
+}
+
+.floating-audio-player--docked.floating-audio-player--compact {
+  inset: auto;
+}
+
+/* Native range inputs keep their real keyboard, pointer and accessibility
+   behavior. Explicit CSS tracks and thumbs make their geometry consistent
+   across engines without bitmap artwork or a scripted slider. */
+.audio-timeline-range {
+  --audio-range-fill: var(--muted);
+  background: transparent;
+}
+
+.audio-timeline-range::-webkit-slider-runnable-track {
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: var(--audio-range-fill);
+}
+
+.audio-timeline-range::-webkit-slider-thumb {
+  box-sizing: border-box;
+  width: 1.125rem;
+  height: 1.125rem;
+  margin-top: -0.3125rem;
+  appearance: none;
+  border: 2px solid var(--card);
+  border-radius: 9999px;
+  background: var(--primary);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.35);
+}
+
+.audio-timeline-range::-moz-range-track {
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: var(--audio-range-fill);
+}
+
+.audio-timeline-range::-moz-range-thumb {
+  box-sizing: border-box;
+  width: 1.125rem;
+  height: 1.125rem;
+  border: 2px solid var(--card);
+  border-radius: 9999px;
+  background: var(--primary);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.35);
+}
+
+.audio-timeline-range:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.app-shell.app-shell--navigation-hidden .floating-audio-player {
+  bottom: env(safe-area-inset-bottom);
+}
+
+.floating-audio-player--reading {
+  /* Mobile reading hides the tab bar independently of the global navigation
+     flag. Dock to the actual reading surface so no phantom nav-sized gap is
+     left below either player state. */
+  bottom: env(safe-area-inset-bottom);
+}
+
+@media (min-width: 37.5rem) {
+  .floating-audio-player {
+    inset-inline: 0.75rem;
+  }
+}
+
+@media (min-width: 56.25rem) {
+  .audio-compact-row {
+    display: grid;
+    grid-template-columns: auto minmax(8rem, 0.65fr) minmax(10rem, 1.35fr) auto;
+  }
+
+  .floating-audio-player {
+    bottom: 0.75rem;
+    inset-inline-end: 0.75rem;
+  }
+
+  .app-shell:not(.app-shell--navigation-hidden) .floating-audio-player {
+    inset-inline-start: calc(var(--nav-rail-width) + 0.75rem);
+  }
+}
+
+@media (min-width: 75rem) {
+  .app-shell:not(.app-shell--navigation-hidden) .floating-audio-player {
+    inset-inline-start: calc(var(--nav-sidebar-width) + 0.75rem);
+  }
+}

@@ -149,6 +149,17 @@ function Harness({ language = "en" }: { language?: "ar" | "en" }) {
       <button type="button" onClick={() => controller.startPlan(englishPlan)}>
         Start English
       </button>
+      <button
+        type="button"
+        onClick={() =>
+          controller.startPlan({
+            ...repeatPlan,
+            entries: [{ ...repeatPlan.entries[0]!, repetitions: 100, prescribedRepetitions: 100 }],
+          })
+        }
+      >
+        Start 100 repetitions
+      </button>
       <output>{controller.state.status}</output>
       <output data-testid="completed-audio-entry">{controller.state.completedEntryId ?? ""}</output>
       <output data-testid="audio-completion-sequence">{controller.state.completionSequence}</output>
@@ -199,6 +210,26 @@ describe("AudioProvider integration", () => {
     expect(screen.getByTestId("audio-completion-sequence")).toHaveTextContent("1");
     FakeAudio.latest!.dispatchEvent(new Event("ended"));
     await waitFor(() => expect(screen.getByTestId("audio-completion-sequence")).toHaveTextContent("2"));
+  });
+
+  it("plays all 100 repetitions and records completion only after the last recording ends", async () => {
+    vi.stubGlobal("Audio", FakeAudio);
+    render(
+      <AudioProvider>
+        <Harness />
+      </AudioProvider>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Start 100 repetitions" }));
+    fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
+    for (let count = 1; count < 100; count++) {
+      FakeAudio.latest!.dispatchEvent(new Event("ended"));
+    }
+    await waitFor(() => expect(screen.getByRole("region", { name: "Audio player" })).toHaveTextContent("100 / 100"));
+    expect(screen.getByTestId("completed-audio-entry")).toBeEmptyDOMElement();
+    expect(screen.getByTestId("audio-completion-sequence")).toHaveTextContent("0");
+    FakeAudio.latest!.dispatchEvent(new Event("ended"));
+    await waitFor(() => expect(screen.getByTestId("audio-completion-sequence")).toHaveTextContent("1"));
+    expect(screen.getByTestId("completed-audio-entry")).toHaveTextContent("zikr");
   });
 
   it("starts only after a user action and keeps the player visible while paused", async () => {
@@ -335,8 +366,8 @@ describe("AudioProvider integration", () => {
     expect(timeline).toHaveValue("0");
 
     fireEvent.click(screen.getByRole("button", { name: "توسيع المشغل" }));
-    fireEvent.click(screen.getByTestId("audio-attribution-trigger"));
-    expect(screen.getByText("المصدر · تلاوة القارئ")).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("audio-reciter-select"));
+    expect(screen.getByTestId("audio-recording-source")).toHaveTextContent("المصدر · تلاوة القارئ");
     expect(screen.queryByText("Source · Attribution")).not.toBeInTheDocument();
   });
 

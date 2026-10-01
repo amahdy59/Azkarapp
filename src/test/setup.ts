@@ -21,6 +21,10 @@ if (typeof Element.prototype.releasePointerCapture === "undefined") {
 if (typeof Element.prototype.hasPointerCapture === "undefined") {
   Element.prototype.hasPointerCapture = () => false;
 }
+// Radix Select scrolls the focused option into view; jsdom has no layout API.
+if (typeof Element.prototype.scrollIntoView === "undefined") {
+  Element.prototype.scrollIntoView = () => {};
+}
 
 afterEach(() => {
   cleanup();

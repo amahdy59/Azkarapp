@@ -1497,7 +1497,7 @@ export function ReaderScreen({
 
               {/* Wide-desktop card: reading content, side navigation, counter,
                 and keyboard guidance. Page-level actions stay in the hero. */}
-              <div className="relative mx-4 my-4 flex min-h-0 flex-1 overflow-hidden bg-transparent">
+              <div className="reader-canvas-wrap relative mx-4 my-4 flex min-h-0 flex-1 overflow-hidden bg-transparent">
                 <div
                   className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden cursor-pointer"
                   data-testid="reader-card"

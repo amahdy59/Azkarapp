@@ -4012,3 +4012,14 @@ null` shape, so a record written before this change still loads and still
 - **Owner:** Product owner (explicit response during latest-changes review)
 - **Decision:** Remove the pending shorter-listening setting. Preserve reviewed repetition counts and the existing Play Once/prescribed-repeat distinction. Review fixes must retain exact devotional text, shared counter styling, 44px controls, prayer bullets, and proper dialog focus behavior.
 - **Verification:** Audio/controller and Reader/prayer regressions, responsive browser tests, and the unchanged local release gates.
+
+## DEC-214 — Expanded listening belongs to the reading canvas
+
+- **Date:** 2026-10-01
+- **Status:** Approved
+- **Owner:** Product owner (explicit screenshot request; local implementation only, do not push)
+- **Decision:** Remove the redundant audio info action and replace the expanded modal with a flat listening surface that fills the Reader canvas below the session header. Preserve the reciter dropdown and its recording attribution, native sliders, full reviewed text, stable controls, and surrounding navigation. Adapt short landscape windows with text beside controls. Covered reading controls become inert; Escape and collapse restore access and focus without trapping the shell.
+- **Supersedes:** DEC-172's expanded bottom-sheet/panel presentation and Phase 74's modal presentation only. Playback, content, progress, and persistence contracts remain intact.
+- **Verification:** Focus/cleanup unit regressions, Arabic/English phone/tablet/desktop and short-landscape geometry, native text scrolling, nested-menu Escape, touch targets, axe scans, and local quality gates. No commit or push requested.
+
+- **Follow-up authorized in this session:** Remove the implementation-only repeat eligibility cutoff at ten. High-count azkar, including the existing 100-count istighfar entry, expose prescribed repeat without altering reviewed words or counts. Play Once remains the default. Completion still requires the last natural ending of the selected run.

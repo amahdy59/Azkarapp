@@ -1,13 +1,13 @@
 {
-  "release": "2026-10-01-reader-audio-review",
+  "release": "2026-10-01-integrated-audio",
   "ar": [
-    "الاستماع وفتح الفائدة من أدوات واضحة بجوار منطقة العد، مع الحفاظ على حجم العداد المعتاد.",
-    "فتح مشغل الصوت مع تنقل آمن بلوحة المفاتيح والعودة بسهولة إلى القراءة.",
-    "نصوص التسجيلات واضحة وقابلة لتكبير الخط والتمرير، وأزرار الصلاة والصوت أسهل استخداماً على الشاشات الصغيرة."
+    "مشغل الصوت الموسع يملأ مساحة القراءة حتى شريط التقدم، مع عرض مريح على الهاتف والتابلت والكمبيوتر.",
+    "اختيار القارئ ومعلومات مصدر التسجيل في قائمة واحدة، مع أدوات أوضح وتنقل أسهل بلوحة المفاتيح.",
+    "تكرار الأذكار بحسب عددها المحدد، بما في ذلك الاستغفار مائة مرة، مع إظهار رقم التكرار أثناء الاستماع."
   ],
   "en": [
-    "Open listening and benefits from clear Reader tools while keeping the familiar counter size.",
-    "Use the expanded audio player with keyboard navigation and return easily to reading.",
-    "Recording text scales and scrolls comfortably, with easier prayer and audio controls on small screens."
+    "The expanded audio player fills the reading area up to the progress bar, with layouts for phones, tablets, and desktops.",
+    "Choose a reciter and read recording credits in one menu, with clearer controls and easier keyboard navigation.",
+    "Repeat azkar for their prescribed count, including 100-count istighfar, and see the current repetition while listening."
   ]
 }
