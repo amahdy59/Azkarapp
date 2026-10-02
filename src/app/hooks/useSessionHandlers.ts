@@ -24,6 +24,7 @@ import { t } from "../i18n";
 
 export function useSessionHandlers({
   activeCat,
+  activeRoutineMode,
   setActiveCat,
   activeSubCategory,
   setActiveSubCategory,
@@ -51,6 +52,8 @@ export function useSessionHandlers({
   onResetPartialCounts,
 }: {
   activeCat: CategoryId;
+  /** Current reading context can differ from the saved preference for a shared link. */
+  activeRoutineMode?: RoutineMode;
   setActiveCat: (cat: CategoryId) => void;
   activeSubCategory?: string;
   setActiveSubCategory: (subCat?: string) => void;
@@ -99,7 +102,12 @@ export function useSessionHandlers({
   const [sessionStart, setSessionStart] = useState(Date.now());
   const [isRepeatSession, setIsRepeatSession] = useState(false);
   const [repeatCompleted, setRepeatCompleted] = useState<Set<number>>(() => new Set());
-  const modeFor = (catId: CategoryId): RoutineMode => (isRoutineCategory(catId) ? routineModes[catId] : "complete");
+  const modeFor = (catId: CategoryId): RoutineMode =>
+    catId === activeCat && activeRoutineMode
+      ? activeRoutineMode
+      : isRoutineCategory(catId)
+        ? routineModes[catId]
+        : "complete";
   const sessionAzkar = (
     catId: CategoryId,
     mode = modeFor(catId),

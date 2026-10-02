@@ -53,6 +53,8 @@ Apply the sharing audit recommendations to both individual azkar and collections
 
 Shared links also carry transient validated routine/prayer context, preventing a recipient's different saved routine from changing which zikr a position names. Existing links remain compatible.
 
+The same temporary mode reaches completion, advance, reset and collection-ledger handlers, and stays active through the completion screen. Explicitly choosing a routine mode clears the override and preserves the current item by identity where available, otherwise returning to the first item. Regression tests verify completion is stored for the displayed zikr, the correct completion level is recorded, reload remains stable and the recipient's saved preference stays unchanged until an explicit selection.
+
 ## Files changed
 
 - Sharing layout, renderer, archive and dispatcher under `src/app/share/`, including their tests.
@@ -81,17 +83,19 @@ Corpus reconstruction and geometry across all formats; whitespace/diacritic pres
 
 ## Commands run
 
-| Command                                                                                                | Result                                                                                                                                               |
-| ------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `pnpm install --frozen-lockfile`                                                                       | Passed.                                                                                                                                              |
-| `pnpm test:run src/app/share src/app/components/CollectionShareModal.test.tsx src/app/routing.test.ts` | Passed: 8 files, 67 tests.                                                                                                                           |
-| `pnpm check`                                                                                           | Passed all ten stages against completed code in 321.7s; mandatory pre-push hook repeats.                                                             |
-| `pnpm test:e2e`                                                                                        | 447 passed, one existing skip; nine server connection failures corrected by the fresh WebKit run. Full suite repeats in the mandatory pre-push gate. |
-| `pnpm build:pages`                                                                                     | Passed, including bundle and CSS utility gates.                                                                                                      |
-| `pnpm exec playwright test --project=mobile-webkit-smoke`                                              | Passed: 13/13.                                                                                                                                       |
-| `pnpm audit:prod`                                                                                      | Passed: no known vulnerabilities.                                                                                                                    |
+| Command                                                                                                                                                                              | Result                                                                                                                                                         |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm install --frozen-lockfile`                                                                                                                                                     | Passed.                                                                                                                                                        |
+| `pnpm test:run src/app/hooks/useAppRouting.test.tsx src/app/hooks/useSessionHandlers.test.ts src/app/share src/app/components/CollectionShareModal.test.tsx src/app/routing.test.ts` | Passed: 10 files, 80 tests.                                                                                                                                    |
+| `pnpm check`                                                                                                                                                                         | Passed all ten stages; correction gate passed in 151.4s. Final type/lint/format checks and focused 80-test suite also passed; mandatory pre-push hook repeats. |
+| `pnpm test:e2e`                                                                                                                                                                      | 447 passed, one existing skip; nine server connection failures corrected by the fresh WebKit run. Full suite repeats in the mandatory pre-push gate.           |
+| `pnpm build:pages`                                                                                                                                                                   | Passed, including bundle and CSS utility gates.                                                                                                                |
+| `pnpm exec playwright test --project=mobile-webkit-smoke`                                                                                                                            | Passed: 13/13.                                                                                                                                                 |
+| `pnpm audit:prod`                                                                                                                                                                    | Passed: no known vulnerabilities.                                                                                                                              |
 
 Earlier verification failures were repaired, not skipped: select popup stacking, missing mocks, duplicate-heading test ambiguity, scoped keyboard semantics and unused imports. A targeted browser run also recorded two retries during concurrent heavy checks; the final full run is reported separately.
+
+The initial push was deliberately cancelled before reaching GitHub when the final review found session handlers had not received the temporary reading mode. The correction and completion-identity regression are included in a separate coherent commit. The mandatory release gates restart against that completed candidate.
 
 ## Visual/manual evidence
 

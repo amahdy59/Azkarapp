@@ -200,7 +200,7 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
   ]);
 
   useEffect(() => {
-    if (view !== "reader" && view !== "category") setSharedContext(undefined);
+    if (view !== "reader" && view !== "category" && view !== "completion") setSharedContext(undefined);
   }, [view]);
 
   const applyRouteFromLocation = useCallback((): boolean => {

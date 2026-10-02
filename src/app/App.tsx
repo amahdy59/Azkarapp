@@ -262,6 +262,21 @@ function AppContent({
     activeCat === "after_prayer" && isPrayerName(activeSubCategory)
       ? getAzkarForPrayer(activeSubCategory, activeRoutineMode)
       : getAzkarForMode(activeCat, activeRoutineMode);
+  const changeActiveRoutineMode = (mode: RoutineMode) => {
+    if (!isRoutineCategory(activeCat)) return;
+    if (sharedRoutineMode) {
+      const currentId = activeAzkarList[activeIdx]?.id;
+      const nextItems = getAzkarForMode(activeCat, mode);
+      setActiveIdx(
+        Math.max(
+          0,
+          nextItems.findIndex((item) => item.id === currentId),
+        ),
+      );
+    }
+    clearSharedRoutineMode();
+    setRoutineModes((previous) => ({ ...previous, [activeCat]: mode }));
+  };
   const layoutMode = useLayoutMode();
   useViewFocus(view);
   const previousAudioViewRef = useRef(view);
@@ -798,6 +813,7 @@ function AppContent({
     goHome,
   } = useSessionHandlers({
     activeCat,
+    activeRoutineMode,
     setActiveCat,
     activeSubCategory,
     setActiveSubCategory,
@@ -1923,12 +1939,7 @@ function AppContent({
                   }
                   audioCoverage={audioCoverage}
                   routineMode={activeRoutineMode}
-                  onRoutineModeChange={(mode) => {
-                    clearSharedRoutineMode();
-                    if (isRoutineCategory(activeCat)) {
-                      setRoutineModes((previous) => ({ ...previous, [activeCat]: mode }));
-                    }
-                  }}
+                  onRoutineModeChange={changeActiveRoutineMode}
                 />
               )}
               {view === "reader" && !routeContentLoading && !routeContentError && activeZikr && (
@@ -1975,12 +1986,7 @@ function AppContent({
                     }
                     markComplete(i);
                   }}
-                  onRoutineModeChange={(mode) => {
-                    clearSharedRoutineMode();
-                    if (isRoutineCategory(activeCat)) {
-                      setRoutineModes((previous) => ({ ...previous, [activeCat]: mode }));
-                    }
-                  }}
+                  onRoutineModeChange={changeActiveRoutineMode}
                   onReset={() => {
                     if (fridayDuaFlow && activeCat === "comprehensive_duas") {
                       showConfirm(

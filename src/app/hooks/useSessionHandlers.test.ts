@@ -16,6 +16,8 @@ function createCompleted(overrides: Partial<Record<CategoryId, Set<string>>> = {
 function renderSessionHarness({
   activeCat = "morning",
   activeSubCategory,
+  activeRoutineMode,
+  savedMorningMode = DEFAULT_APP_STATE.settings.routineModes.morning,
   completed = createCompleted(),
   dailyCompletions = [],
   sessions = [],
@@ -23,6 +25,8 @@ function renderSessionHarness({
 }: {
   activeCat?: CategoryId;
   activeSubCategory?: string;
+  activeRoutineMode?: RoutineMode;
+  savedMorningMode?: RoutineMode;
   completed?: Record<CategoryId, Set<string>>;
   dailyCompletions?: DailyCollectionCompletion[];
   sessions?: StoredSession[];
@@ -43,11 +47,15 @@ function renderSessionHarness({
     const [growthEvent, setGrowthEvent] = useState<GrowthEvent | null>(null);
     const [sessionState, setSessionState] = useState(sessions);
     const [savedIds, setSavedIds] = useState(new Set<string>());
-    const [routineModes, setRoutineModes] = useState(DEFAULT_APP_STATE.settings.routineModes);
+    const [routineModes, setRoutineModes] = useState({
+      ...DEFAULT_APP_STATE.settings.routineModes,
+      morning: savedMorningMode,
+    });
     const [view, setView] = useState<View>(initialView);
     const [activeTab, setActiveTab] = useState<NavTab>("azkar");
     const handlers = useSessionHandlers({
       activeCat: category,
+      activeRoutineMode,
       setActiveCat: setCategory,
       activeSubCategory: subCategory,
       setActiveSubCategory: setSubCategory,
@@ -99,6 +107,35 @@ beforeEach(() => {
 afterEach(() => vi.useRealTimers());
 
 describe("useSessionHandlers", () => {
+  it("records the completion level of a shared collection while preserving saved preferences", () => {
+    const full = getAzkarForMode("morning", "complete");
+    const { result } = renderSessionHarness({
+      savedMorningMode: "core",
+      activeRoutineMode: "complete",
+      completed: createCompleted({ morning: new Set(full.slice(0, -1).map((item) => item.id)) }),
+    });
+    act(() => result.current.handlers.markComplete(full.length - 1));
+    expect(result.current.completed.morning).toContain(full.at(-1)!.id);
+    expect(result.current.dailyCompletions[0]?.completionLevel).toBe("complete");
+    expect(result.current.sessions[0]?.completionLevel).toBe("complete");
+    expect(result.current.routineModes.morning).toBe("core");
+  });
+  it("records the shared reading identity and advances without changing the saved routine", () => {
+    const full = getAzkarForMode("morning", "complete");
+    const core = getAzkarForMode("morning", "core");
+    const index = full.findIndex((item, i) => core[i]?.id !== item.id);
+    expect(index).toBeGreaterThanOrEqual(0);
+    const { result } = renderSessionHarness({ savedMorningMode: "core", activeRoutineMode: "complete" });
+    act(() => result.current.handlers.markComplete(index));
+    expect(result.current.completed.morning).toEqual(new Set([full[index]!.id]));
+    act(() => result.current.handlers.toggleZikrCompletion("morning", index));
+    expect(result.current.completed.morning.size).toBe(0);
+    act(() => result.current.handlers.toggleZikrCompletion("morning", index));
+    expect(result.current.completed.morning).toEqual(new Set([full[index]!.id]));
+    act(() => result.current.handlers.advanceAfterCompletion(index));
+    expect(result.current.index).toBe(index + 1);
+    expect(result.current.routineModes.morning).toBe("core");
+  });
   it("resets only the selected prayer's partial counters after confirmation", () => {
     const { result, onResetPartialCounts } = renderSessionHarness({
       activeCat: "after_prayer",

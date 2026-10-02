@@ -265,6 +265,8 @@ Core reading, counting, local progress, settings, and astronomical prayer-time c
 
 Shared azkar routes may carry validated `mode=core|complete` and, for after-prayer collections, `prayer=<name>` inside the hash query. Routing applies this reading context transiently, including on reload, so a sender's numeric position has the same meaning for a recipient with different saved preferences. An explicit routine-mode change or leaving the reading flow clears the override. Existing context-free routes retain their behavior; sharing never rewrites the recipient's persisted routine preferences.
 
+The active reading mode also reaches `useSessionHandlers`, so completion identity, advance/reset behavior and collection completion levels use the same list as the reader. The saved routine remains the default for other categories and ordinary navigation.
+
 ## Testing strategy
 
 | Layer                          | Expected coverage                              |

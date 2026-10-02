@@ -240,11 +240,26 @@ test("shared reader links preserve content across recipient routine preferences"
     await expect(destination.getByTestId("reader-screen")).toHaveAttribute("data-zikr-id", expectedId!);
     await destination.reload();
     await expect(destination.getByTestId("reader-screen")).toHaveAttribute("data-zikr-id", expectedId!);
+    const counter = destination.getByTestId("counter-surface");
+    const label = await counter.getAttribute("aria-label");
+    const prescribed = Number(label?.match(/0\s*\/\s*(\d+)$/u)?.[1]);
+    expect(prescribed).toBeGreaterThan(0);
+    for (let repetition = 0; repetition < prescribed; repetition += 1) await counter.click();
+    await expect
+      .poll(() => destination.evaluate(() => JSON.parse(localStorage.getItem("azkarapp.state.v1")!).completed.morning))
+      .toContain(expectedId!);
     expect(
       await destination.evaluate(
         () => JSON.parse(localStorage.getItem("azkarapp.state.v1")!).settings.routineModes.morning,
       ),
     ).toBe("core");
+    await destination.getByTestId("routine-mode-filter").click();
+    await destination.getByRole("menuitemradio", { name: /^Core/u }).click();
+    await expect(destination.getByTestId("reader-screen")).toBeVisible();
+    await expect(destination).not.toHaveURL(/mode=/u);
+    const selectedCoreId = await destination.getByTestId("reader-screen").getAttribute("data-zikr-id");
+    await destination.reload();
+    await expect(destination.getByTestId("reader-screen")).toHaveAttribute("data-zikr-id", selectedCoreId!);
   } finally {
     await recipient.close();
   }
