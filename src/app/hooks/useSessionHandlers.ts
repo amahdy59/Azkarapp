@@ -108,6 +108,9 @@ export function useSessionHandlers({
       : isRoutineCategory(catId)
         ? routineModes[catId]
         : "complete";
+  const readingContext = `${activeCat}:${activeSubCategory ?? ""}:${modeFor(activeCat)}`;
+  const latestReadingContext = useRef(readingContext);
+  latestReadingContext.current = readingContext;
   const sessionAzkar = (
     catId: CategoryId,
     mode = modeFor(catId),
@@ -336,6 +339,9 @@ export function useSessionHandlers({
   };
 
   const advanceAfterCompletion = (idx: number) => {
+    // The counter advances after a short delay. A routine or collection change
+    // must invalidate callbacks that were scheduled against the previous list.
+    if (latestReadingContext.current !== readingContext) return;
     const azkar = sessionAzkar(activeCat);
     const zikrId = azkar[idx]?.id;
     if (!zikrId) {

@@ -38,63 +38,66 @@ function renderSessionHarness({
   const onResetPartialCounts = vi.fn();
   const showConfirm = vi.fn((_: string, __: string, ___: string, ____: string, onConfirm: () => void) => onConfirm());
 
-  const hook = renderHook(() => {
-    const [category, setCategory] = useState<CategoryId>(activeCat);
-    const [subCategory, setSubCategory] = useState<string | undefined>(activeSubCategory);
-    const [index, setIndex] = useState(0);
-    const [completionState, setCompletionState] = useState(completed);
-    const [completionRecords, setCompletionRecords] = useState(dailyCompletions);
-    const [growthEvent, setGrowthEvent] = useState<GrowthEvent | null>(null);
-    const [sessionState, setSessionState] = useState(sessions);
-    const [savedIds, setSavedIds] = useState(new Set<string>());
-    const [routineModes, setRoutineModes] = useState({
-      ...DEFAULT_APP_STATE.settings.routineModes,
-      morning: savedMorningMode,
-    });
-    const [view, setView] = useState<View>(initialView);
-    const [activeTab, setActiveTab] = useState<NavTab>("azkar");
-    const handlers = useSessionHandlers({
-      activeCat: category,
-      activeRoutineMode,
-      setActiveCat: setCategory,
-      activeSubCategory: subCategory,
-      setActiveSubCategory: setSubCategory,
-      activeIdx: index,
-      setActiveIdx: setIndex,
-      completed: completionState,
-      setCompleted: setCompletionState,
-      dailyCompletions: completionRecords,
-      setDailyCompletions: setCompletionRecords,
-      setLastGrowthEvent: setGrowthEvent,
-      setSessions: setSessionState,
-      setSavedZikrIds: setSavedIds,
-      progressDayStartHour: 4,
-      selectedLang: "en",
-      routineModes,
-      setRoutineModes,
-      push,
-      pop,
-      replace,
-      view,
-      setView,
-      setActiveTab,
-      showConfirm,
-      onResetPartialCounts,
-    });
-    return {
-      activeTab,
-      category,
-      completed: completionState,
-      dailyCompletions: completionRecords,
-      growthEvent,
-      handlers,
-      index,
-      routineModes,
-      savedIds,
-      sessions: sessionState,
-      view,
-    };
-  });
+  const hook = renderHook(
+    ({ readingMode }) => {
+      const [category, setCategory] = useState<CategoryId>(activeCat);
+      const [subCategory, setSubCategory] = useState<string | undefined>(activeSubCategory);
+      const [index, setIndex] = useState(0);
+      const [completionState, setCompletionState] = useState(completed);
+      const [completionRecords, setCompletionRecords] = useState(dailyCompletions);
+      const [growthEvent, setGrowthEvent] = useState<GrowthEvent | null>(null);
+      const [sessionState, setSessionState] = useState(sessions);
+      const [savedIds, setSavedIds] = useState(new Set<string>());
+      const [routineModes, setRoutineModes] = useState({
+        ...DEFAULT_APP_STATE.settings.routineModes,
+        morning: savedMorningMode,
+      });
+      const [view, setView] = useState<View>(initialView);
+      const [activeTab, setActiveTab] = useState<NavTab>("azkar");
+      const handlers = useSessionHandlers({
+        activeCat: category,
+        activeRoutineMode: readingMode,
+        setActiveCat: setCategory,
+        activeSubCategory: subCategory,
+        setActiveSubCategory: setSubCategory,
+        activeIdx: index,
+        setActiveIdx: setIndex,
+        completed: completionState,
+        setCompleted: setCompletionState,
+        dailyCompletions: completionRecords,
+        setDailyCompletions: setCompletionRecords,
+        setLastGrowthEvent: setGrowthEvent,
+        setSessions: setSessionState,
+        setSavedZikrIds: setSavedIds,
+        progressDayStartHour: 4,
+        selectedLang: "en",
+        routineModes,
+        setRoutineModes,
+        push,
+        pop,
+        replace,
+        view,
+        setView,
+        setActiveTab,
+        showConfirm,
+        onResetPartialCounts,
+      });
+      return {
+        activeTab,
+        category,
+        completed: completionState,
+        dailyCompletions: completionRecords,
+        growthEvent,
+        handlers,
+        index,
+        routineModes,
+        savedIds,
+        sessions: sessionState,
+        view,
+      };
+    },
+    { initialProps: { readingMode: activeRoutineMode } },
+  );
 
   return { ...hook, pop, push, replace, showConfirm, onResetPartialCounts };
 }
@@ -107,6 +110,20 @@ beforeEach(() => {
 afterEach(() => vi.useRealTimers());
 
 describe("useSessionHandlers", () => {
+  it("ignores a delayed advance from the previous shared routine", () => {
+    const { result, rerender, pop } = renderSessionHarness({
+      savedMorningMode: "core",
+      activeRoutineMode: "complete",
+    });
+    const delayedAdvance = result.current.handlers.advanceAfterCompletion;
+    rerender({ readingMode: "core" });
+    act(() => delayedAdvance(getAzkarForMode("morning", "complete").length - 2));
+    expect(result.current.index).toBe(0);
+    expect(result.current.view).toBe("reader");
+    expect(pop).not.toHaveBeenCalled();
+    act(() => result.current.handlers.advanceAfterCompletion(0));
+    expect(result.current.index).toBe(1);
+  });
   it("records the completion level of a shared collection while preserving saved preferences", () => {
     const full = getAzkarForMode("morning", "complete");
     const { result } = renderSessionHarness({

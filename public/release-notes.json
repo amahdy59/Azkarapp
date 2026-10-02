@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-03-sharing-v2",
+  "release": "2026-10-03-sharing-v3",
   "ar": [
-    "اختر تصميمًا زيتونيًا أو ذهبيًا أو بنفسجيًا ومقاسًا مناسبًا لمشاركة ذكر واحد أو مجموعة من الأذكار.",
-    "شارك النص كاملًا بخط مقروء؛ تمتد المقاطع الطويلة عبر بطاقات مرقمة مع المصادر وعدد التكرار.",
-    "كبّر المعاينة، واختر إضافة المعنى أو النطق أو الفائدة أو رمز الرابط قبل مشاركة الصور.",
-    "شارك النص وروابط تفتح الذكر الصحيح دون تغيير تفضيلات القراءة المحفوظة، واحفظ الصور والنص في ملف واحد."
+    "صمّم مشاركة ذكر واحد أو مجموعة بألوان زيتونية أو ذهبية أو بنفسجية، مع مقاسات للمنشورات والقصص.",
+    "اقرأ النص كاملًا في بطاقات واضحة ومرقمة، مع استمرار المقاطع الطويلة وإظهار المصادر والتكرار.",
+    "راجع الصور وكبّرها قبل المشاركة، وأضف المعنى أو النطق أو الفائدة أو رمز الرابط حسب رغبتك.",
+    "أرسل رابطًا يحافظ على هوية الذكر وتقدّم قراءته دون تغيير التفضيلات المحفوظة، أو احفظ الصور والنص معًا."
   ],
   "en": [
-    "Choose olive, gold or lavender artwork and an image size for sharing one zikr or a collection.",
-    "Share complete readable passages across numbered cards with their sources and repetition counts.",
-    "Enlarge the preview and select meaning, pronunciation, benefits or a link QR code before sharing images.",
-    "Share text and links to the exact zikr without changing saved reading preferences, or save images and text in one archive."
+    "Style a single zikr or a collection in olive, gold or lavender, with sizes for posts and stories.",
+    "Read complete passages on clear numbered cards, including continued sections, sources and repetition counts.",
+    "Review and enlarge images before sharing, with optional meaning, pronunciation, benefits and a link QR code.",
+    "Send links that preserve the zikr identity and reading progress without changing saved preferences, or save images and text together."
   ]
 }

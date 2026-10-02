@@ -105,6 +105,10 @@ The preliminary full browser run recorded 447 passes, one existing skip and nine
 
 The next complete gate exposed a test setup error in the new recipient regression: its identity, completion-storage and saved-preference assertions passed on mobile, then it waited for a routine selector that exists only in the desktop reader sidebar. The run was stopped before pushing. The test now retains those assertions at each supplied device width and resizes to desktop before explicitly changing the routine preference. No product assertion or coverage was removed; the targeted recipient test and complete mandatory release gates are rerun.
 
+The corrected test also exposed a genuine timing race: the counter's delayed advance could retain the previous shared routine after an immediate explicit mode change. Session handlers now reject delayed advances belonging to an earlier category, prayer or routine context. A unit regression verifies the stale callback cannot move the reader while a current-context advance still works. The browser recipient regression is repeated three times across desktop, phone and tablet before the final full gate.
+
+That final focused unit subset passed all 81 tests in ten files. The repeated recipient browser regression passed 9/9 in 24.0s without retries. Final mandatory pre-push gates and deployment verification are recorded with the release evidence after completion.
+
 ## Documentation updated
 
 README capabilities, architecture ownership and shared-route context, design/typography/feedback contracts, design coverage and active phase index.
