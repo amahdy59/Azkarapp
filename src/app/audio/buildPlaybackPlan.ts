@@ -150,7 +150,7 @@ export function getAudioCoverage(
 export function buildPlaybackPlan({
   zikrs,
   context,
-  mode = "play-once",
+  mode = "repeat-prescribed-count",
   catalog = AUDIO_CATALOG,
   baseUrl,
   preferences = DEFAULT_AUDIO_PREFERENCES,
@@ -186,10 +186,17 @@ export function buildPlaybackPlan({
     const completeRitual =
       !zikr.ritualGroupId ||
       expectedRitualCounts.get(zikr.ritualGroupId) === availableRitualCounts.get(zikr.ritualGroupId);
-    const canRepeat =
+    let canRepeat =
       zikr.audioBehavior.supportedModes.includes("repeat-prescribed-count") &&
       (zikr.ritualGroupId !== "three_quls" || completeRitual);
-    const repetitions = mode === "repeat-prescribed-count" && canRepeat ? zikr.repetitionCount : 1;
+    const defaultVoiceId = selectedVoiceId ?? getPreferredVoiceId(resolution, preferences);
+    const defaultSegments = resolution.segmentsByVoice[defaultVoiceId] ?? Object.values(resolution.segmentsByVoice)[0];
+    const embeddedRepetitions = defaultSegments?.[0]?.embeddedRepetitions ?? 1;
+    canRepeat = canRepeat && zikr.repetitionCount % embeddedRepetitions === 0;
+    const repetitions =
+      mode === "repeat-prescribed-count" && canRepeat
+        ? Math.max(1, Math.ceil(zikr.repetitionCount / embeddedRepetitions))
+        : 1;
     const { titleArabic, titleEnglish } = getZikrPlaybackTitles(zikr, resolution.asset);
     entries.push({
       entryId: `${zikr.id}:${entries.length + 1}`,
@@ -204,10 +211,12 @@ export function buildPlaybackPlan({
       contentKind: resolution.asset.contentKind,
       repetitions,
       prescribedRepetitions: zikr.repetitionCount,
+      playbackMode: mode === "repeat-prescribed-count" && canRepeat ? "repeat-prescribed-count" : "play-once",
+      ...(embeddedRepetitions > 1 ? { embeddedRepetitions } : {}),
       repetitionUnit: zikr.ritualGroupId === "three_quls" && completeRitual ? "ritual-round" : "zikr",
       ...(zikr.ritualGroupId && completeRitual ? { ritualGroupId: zikr.ritualGroupId } : {}),
-      supportedModes: [...zikr.audioBehavior.supportedModes],
-      defaultVoiceId: selectedVoiceId ?? getPreferredVoiceId(resolution, preferences),
+      supportedModes: canRepeat ? [...zikr.audioBehavior.supportedModes] : ["play-once"],
+      defaultVoiceId,
       segmentsByVoice: selectedVoiceId
         ? Object.fromEntries(
             Object.entries(resolution.segmentsByVoice).filter(([voiceId]) =>
@@ -234,19 +243,37 @@ export function withPlaybackMode(
     id: createPlanId(),
     createdAt: Date.now(),
     context: { ...plan.context },
-    entries: plan.entries.map((entry) => ({
-      ...entry,
-      availableVoiceIds: [...entry.availableVoiceIds],
-      supportedModes: [...entry.supportedModes],
-      segmentsByVoice: Object.fromEntries(
-        Object.entries(entry.segmentsByVoice).map(([voiceId, segments]) => [voiceId, [...segments]]),
-      ),
-      repetitions:
+    entries: plan.entries.map((entry) => {
+      const embeddedRepetitions = entry.embeddedRepetitions ?? 1;
+      const repetitions =
         mode === "repeat-prescribed-count" && entry.supportedModes.includes("repeat-prescribed-count")
-          ? entry.prescribedRepetitions
-          : 1,
-    })),
+          ? Math.max(1, Math.ceil(entry.prescribedRepetitions / embeddedRepetitions))
+          : 1;
+      return {
+        ...entry,
+        playbackMode: mode === "repeat-prescribed-count" && entry.supportedModes.includes(mode) ? mode : "play-once",
+        availableVoiceIds: [...entry.availableVoiceIds],
+        supportedModes: [...entry.supportedModes],
+        segmentsByVoice: Object.fromEntries(
+          Object.entries(entry.segmentsByVoice).map(([voiceId, segments]) => [voiceId, [...segments]]),
+        ),
+        repetitions,
+      };
+    }),
   });
+}
+
+export function withPlaybackVoice(entry: PlaybackEntry, voiceId: string): PlaybackEntry {
+  const embeddedRepetitions = entry.segmentsByVoice[voiceId]?.[0]?.embeddedRepetitions ?? 1;
+  const repeated = entry.playbackMode === "repeat-prescribed-count" || (!entry.playbackMode && entry.repetitions > 1);
+  const exactCount = entry.prescribedRepetitions % embeddedRepetitions === 0;
+  return {
+    ...entry,
+    embeddedRepetitions,
+    playbackMode: repeated && exactCount ? "repeat-prescribed-count" : "play-once",
+    supportedModes: exactCount ? [...entry.supportedModes] : ["play-once"],
+    repetitions: repeated && exactCount ? Math.max(1, entry.prescribedRepetitions / embeddedRepetitions) : 1,
+  };
 }
 
 export function routineContext(

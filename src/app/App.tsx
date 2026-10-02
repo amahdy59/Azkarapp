@@ -1338,7 +1338,7 @@ function AppContent({
     (
       items: typeof azkar,
       source: "single" | "full-session",
-      repeatPrescribed = false,
+      repeatPrescribed = true,
       audioLanguage: AppLanguage = selectedLang,
     ) => {
       if (!audioController || !buildPlaybackPlan) return false;
@@ -1367,7 +1367,7 @@ function AppContent({
       return;
     }
     if (!audioController || !buildPlaybackPlan) return;
-    void startAudio([activeZikr], "single", false, "ar");
+    void startAudio([activeZikr], "single", true, "ar");
     setQueuedAudioZikrId(null);
   }, [activeZikr, audioController, buildPlaybackPlan, queuedAudioZikrId, startAudio]);
 
@@ -1398,7 +1398,7 @@ function AppContent({
       audioController.play();
       return;
     }
-    void startAudio([activeZikr], "single", false, "ar");
+    void startAudio([activeZikr], "single", true, "ar");
   };
 
   const startPlayAllAudio = () => {
@@ -2074,13 +2074,13 @@ function AppContent({
                   }
                   onPlayAudio={
                     activeZikrHasArabicAudio && activeZikr
-                      ? () => void startAudio([activeZikr], "single", false, "ar")
+                      ? () => void startAudio([activeZikr], "single", true, "ar")
                       : undefined
                   }
                   englishAudioAvailable={activeZikrHasEnglishAudio}
                   onPlayEnglishAudio={
                     activeZikrHasEnglishAudio && activeZikr
-                      ? () => void startAudio([activeZikr], "single", false, "en")
+                      ? () => void startAudio([activeZikr], "single", true, "en")
                       : undefined
                   }
                   onPlayAllAudio={

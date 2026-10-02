@@ -706,8 +706,9 @@ function MushafPageCanvas({
   spreadSide,
   textScale,
   showPageIdentity,
-  hasTopCenterControl = false,
+  hasTopCenterControl: _hasTopCenterControl = false,
   hasFloatingControls = false,
+  isFloatingLayout = false,
   onAyahAction,
   highlightedVerseKey,
   onSurahClick,
@@ -735,13 +736,15 @@ function MushafPageCanvas({
   showPageIdentity: boolean;
   hasTopCenterControl?: boolean;
   hasFloatingControls?: boolean;
+  isFloatingLayout?: boolean;
   onAyahAction?: (verseKey: string, pageNumber: number) => void;
   highlightedVerseKey?: string | null;
   onSurahClick?: () => void;
   onJuzClick?: () => void;
   onPageClick?: () => void;
 }) {
-  const showPageFurnitureHead = Boolean(spreadSide) || (showPageIdentity && !hasTopCenterControl);
+  const isFloating = isFloatingLayout ?? hasFloatingControls ?? false;
+  const showPageFurnitureHead = Boolean(spreadSide) || (!isFloating && showPageIdentity);
   const [activeWord, setActiveWord] = useState<ActiveWord | null>(null);
 
   useEffect(() => {
@@ -798,14 +801,14 @@ function MushafPageCanvas({
     <div
       ref={canvasRef}
       className={`relative ${spreadSide ? "mushaf-spread__page" : "flex-1"} mushaf-page-canvas min-h-0 min-w-0 px-1 sm:px-5 ${
-        hasFloatingControls ? "" : "py-1 sm:py-2"
+        isFloating ? "" : "py-1 sm:py-2"
       }`}
       style={{
         containerType: "size",
-        ...(hasFloatingControls
+        ...(isFloating
           ? {
               paddingTop: "calc(3.25rem + env(safe-area-inset-top))",
-              paddingBottom: "max(0.6rem, env(safe-area-inset-bottom))",
+              paddingBottom: "calc(max(0.6rem, env(safe-area-inset-bottom)))",
             }
           : {}),
       }}
@@ -815,7 +818,7 @@ function MushafPageCanvas({
       {isOpening ? (
         <div
           className={`mushaf-opening relative flex h-full w-full items-center justify-center ${
-            hasFloatingControls ? "p-1.5 sm:p-3" : "p-2 sm:p-4"
+            isFloating ? "p-1.5 sm:p-3" : "p-2 sm:p-4"
           }`}
         >
           <div
@@ -1048,6 +1051,7 @@ export function MushafPageViewer({
   bottomLeftControl,
   bottomRightControl,
   onEdgeTap,
+  onCenterTap,
   onPrevious,
   onNext,
 }: {
@@ -1100,6 +1104,7 @@ export function MushafPageViewer({
   bottomLeftControl?: ReactNode;
   bottomRightControl?: ReactNode;
   onEdgeTap?: (edge: "left" | "right") => void;
+  onCenterTap?: () => void;
   onPrevious?: () => void;
   onNext?: () => void;
 }) {
@@ -1147,9 +1152,11 @@ export function MushafPageViewer({
         onEdgeTap?.("left");
       } else if (ratio > 0.78) {
         onEdgeTap?.("right");
+      } else {
+        onCenterTap?.();
       }
     },
-    [onEdgeTap],
+    [onCenterTap, onEdgeTap],
   );
 
   // Theme styling classes. `--mushaf-ink-stroke` gives the glyphs a hairline of
@@ -1176,9 +1183,9 @@ export function MushafPageViewer({
   /* A spread needs each half to name itself; so does any layout where the
      chrome is not carrying the surah above the paper. */
   const showPageIdentity = Boolean(facingPage) || useRail || !headerContent;
+  const isFloatingLayout = !useRail && !headerContent;
   const hasFloatingControls =
-    !useRail &&
-    !headerContent &&
+    isFloatingLayout &&
     Boolean(topLeftControl || topRightControl || topCenterControl || bottomLeftControl || bottomRightControl);
 
   return (
@@ -1374,6 +1381,7 @@ export function MushafPageViewer({
             showPageIdentity={showPageIdentity}
             hasTopCenterControl={Boolean(topCenterControl)}
             hasFloatingControls={hasFloatingControls}
+            isFloatingLayout={isFloatingLayout}
             onAyahAction={onAyahAction}
             highlightedVerseKey={highlightedVerseKey}
             onSurahClick={onSurahClick}
@@ -1395,7 +1403,8 @@ export function MushafPageViewer({
                 spreadSide="left"
                 textScale={textScale}
                 showPageIdentity={showPageIdentity}
-                hasFloatingControls={hasFloatingControls}
+                hasFloatingControls={false}
+                isFloatingLayout={false}
                 onAyahAction={onAyahAction}
                 highlightedVerseKey={highlightedVerseKey}
                 onSurahClick={onSurahClick}

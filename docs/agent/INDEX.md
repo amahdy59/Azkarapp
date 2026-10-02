@@ -133,3 +133,5 @@ The latest review and hardening work is recorded in [Phase 72](phases/PHASE_72_W
 The agent must never interpret “perfect the application” as permission to rewrite the entire repository. Perfection is approached through evidence-backed iteration, not one-shot replacement.
 
 [Phase 75](phases/PHASE_75_INTEGRATED_AUDIO_PLAYER.md) records the owner-requested integrated expanded audio surface, replacing the modal presentation under DEC-214.
+
+[Phase 76](phases/PHASE_76_PENDING_CHANGES_RELEASE.md) records the review, repair, and authorized release of pending sharing, Mushaf, and audio changes under DEC-215.

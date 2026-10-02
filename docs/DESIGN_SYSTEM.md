@@ -1,5 +1,7 @@
 # Azkar design system
 
+Collection sharing offers daylight/midnight PNG previews, page navigation, native sharing, image copying where supported, and download fallback. Dialog controls retain 44px targets and reachable scrolling on short windows. Generation failures expose a visible retry; complete devotional text is never silently cut off. Expanded audio retains the reciter/source menu in landscape. Mushaf centre taps toggle focus mode alongside the existing button and keyboard alternatives.
+
 This is the implementation source of truth for visual and interaction decisions. New screens and refactors must follow this file together with `QUALITY_CHECKLIST.md`. If an older mockup conflicts with a decision recorded here, this document and the current approved Figma modes take precedence.
 
 ## Authoritative references

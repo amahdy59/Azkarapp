@@ -12,7 +12,7 @@ import {
 import { audioReducer, createInitialAudioState, type AudioAction } from "./audioReducer";
 import { mapMediaError, mapPlayError } from "./audioErrors";
 import { loadAudioPreferences, saveAudioPreferences } from "./audioPreferences";
-import { withPlaybackMode } from "./buildPlaybackPlan";
+import { withPlaybackMode, withPlaybackVoice } from "./buildPlaybackPlan";
 import { resolveAudioAssetById } from "./resolveAudioAsset";
 import type { AudioPreferences, PlaybackEntry, PlaybackPlan, ResolvedAudioSegment } from "./audioTypes";
 import { getNextPlaybackPosition } from "./playbackProgression";
@@ -221,9 +221,18 @@ export function AudioProvider({
       autoPlay: boolean,
       requestedVoice?: string,
     ) => {
-      const entry = plan.entries[entryIndex];
+      let entry = plan.entries[entryIndex];
       if (!entry) return;
       const voiceId = chooseVoice(entry, requestedVoice);
+      const nextEntry = withPlaybackVoice(entry, voiceId);
+      if (nextEntry.embeddedRepetitions !== entry.embeddedRepetitions || nextEntry.repetitions !== entry.repetitions) {
+        repetitionIndex = Math.min(
+          nextEntry.repetitions - 1,
+          Math.floor((repetitionIndex * (entry.embeddedRepetitions ?? 1)) / (nextEntry.embeddedRepetitions ?? 1)),
+        );
+        plan = { ...plan, entries: plan.entries.map((item, index) => (index === entryIndex ? nextEntry : item)) };
+        entry = nextEntry;
+      }
       const segment = entry.segmentsByVoice[voiceId]?.[segmentIndex];
       if (!segment) return;
 

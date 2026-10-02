@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { KhatmahReaderScreen } from "./KhatmahReaderScreen";
@@ -528,5 +528,30 @@ describe("KhatmahReaderScreen wird completion notice", () => {
     completedReader({ wirdCompletionAnnouncedDayKey: day });
     await screen.findByRole("article", { name: /Page 42/ });
     expect(screen.queryByTestId("mushaf-wird-complete")).not.toBeInTheDocument();
+  });
+
+  it("toggles focus mode with f key and exits with Escape or focus handle", async () => {
+    setViewport(820, 1180);
+    renderReader({ mushafTheme: "dark" });
+    await screen.findByRole("article", { name: "صفحة ٤٢" });
+
+    expect(screen.getByTestId("mushaf-top-left-back")).toBeInTheDocument();
+    expect(screen.queryByTestId("mushaf-focus-exit")).toBeNull();
+
+    // Press 'f' to toggle focus mode
+    fireEvent.keyDown(document.body, { key: "f" });
+    expect(screen.queryByTestId("mushaf-top-left-back")).toBeNull();
+    expect(screen.getByTestId("mushaf-focus-exit")).toBeInTheDocument();
+
+    // Click focus exit handle
+    fireEvent.click(screen.getByTestId("mushaf-focus-exit"));
+    expect(screen.getByTestId("mushaf-top-left-back")).toBeInTheDocument();
+    expect(screen.queryByTestId("mushaf-focus-exit")).toBeNull();
+
+    // Press 'f' again and exit with Escape
+    fireEvent.keyDown(document.body, { key: "f" });
+    expect(screen.queryByTestId("mushaf-top-left-back")).toBeNull();
+    fireEvent.keyDown(document.body, { key: "Escape" });
+    expect(screen.getByTestId("mushaf-top-left-back")).toBeInTheDocument();
   });
 });

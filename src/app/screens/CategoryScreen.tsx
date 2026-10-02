@@ -1,6 +1,16 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useState } from "react";
-import { ArrowNext, Check, ChevronDown, RefreshCw, RotateCcw, SlidersHorizontal, Volume2 } from "../components/icons";
+import {
+  ArrowNext,
+  Check,
+  ChevronDown,
+  RefreshCw,
+  RotateCcw,
+  Share2,
+  SlidersHorizontal,
+  Volume2,
+} from "../components/icons";
+import { CollectionShareModal } from "../components/CollectionShareModal";
 import { t } from "../i18n";
 import "../../styles/animations/ZikrAnimations.css";
 import { CATEGORIES } from "../content/categories";
@@ -72,6 +82,7 @@ export function CategoryScreen({
   const resumeIdx = azkar.findIndex((zikr) => !completed.has(zikr.id));
   const language = isArabic ? "ar" : "en";
   const [preparationSteps, setPreparationSteps] = useState<Set<string>>(() => new Set());
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const orderedAzkar = azkar.map((z, i) => ({ z, index: i }));
 
   const stepProgress = (items: typeof orderedAzkar) => {
@@ -283,6 +294,20 @@ export function CategoryScreen({
                 </button>
               </>
             )}
+
+            {azkar.length > 0 && (
+              <button
+                type="button"
+                data-testid="share-collection-button"
+                onClick={() => setIsShareModalOpen(true)}
+                className="order-5 flex h-11 items-center justify-center gap-1.5 rounded-btn border border-border bg-card px-3.5 text-label font-bold text-foreground shadow-xs transition-[color,background-color,border-color,box-shadow,transform] hover:bg-muted active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                aria-label={t(language, "shareStoryPack.actionButtonAria")}
+                title={t(language, "shareStoryPack.actionButton")}
+              >
+                <Share2 size={16} aria-hidden="true" />
+                <span>{t(language, "shareStoryPack.actionButton")}</span>
+              </button>
+            )}
           </div>
         </div>
 
@@ -405,6 +430,14 @@ export function CategoryScreen({
             routineMode={routineMode}
             language={language}
             renderZikrCard={({ z, index }, isCompleted) => renderZikrCard({ z, index }, isCompleted)}
+          />
+
+          <CollectionShareModal
+            open={isShareModalOpen}
+            onClose={() => setIsShareModalOpen(false)}
+            collectionTitle={isArabic ? cat.nameArabic : cat.name}
+            items={azkar}
+            language={language}
           />
         </div>
       </div>

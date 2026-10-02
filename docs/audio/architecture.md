@@ -1,5 +1,9 @@
 # Audio architecture
 
+DEC-215 (2026-10-02) makes prescribed repetition the default for new listening runs; Play Once remains selectable. A recording can declare its embedded repetition count. Playback loops and displayed counts account for the selected voice's value, including when changing voices mid-run. Completion still requires the final natural ending. These facts supersede older default-mode descriptions below.
+
+Manifest 6 invalidates downloads from the earlier catalog, and resolved URLs include the recorded checksum to prevent browser HTTP caches from serving bytes replaced at existing host paths. Future recording uploads must still use fresh versioned paths. Prescribed repeat is unavailable for a recording whose embedded count cannot divide the prescribed count exactly; the player never rounds up and over-recites.
+
 Azkar uses explicit content identity and an approved asset registry. Playback never examines ID fragments, citations, first words, or similar text.
 
 ## Boundaries

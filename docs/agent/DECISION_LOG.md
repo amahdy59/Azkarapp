@@ -4023,3 +4023,12 @@ null` shape, so a record written before this change still loads and still
 - **Verification:** Focus/cleanup unit regressions, Arabic/English phone/tablet/desktop and short-landscape geometry, native text scrolling, nested-menu Escape, touch targets, axe scans, and local quality gates. No commit or push requested.
 
 - **Follow-up authorized in this session:** Remove the implementation-only repeat eligibility cutoff at ten. High-count azkar, including the existing 100-count istighfar entry, expose prescribed repeat without altering reviewed words or counts. Play Once remains the default. Completion still requires the last natural ending of the selected run.
+
+## DEC-215 — Prescribed repetition default and pending release review
+
+- **Date:** 2026-10-02
+- **Status:** Approved
+- **Owner:** Product owner, explicit release-review response: "Approve prescribed repetition as the new default".
+- **Decision:** New listening runs default to the existing prescribed count. Play Once remains selectable. Embedded repetitions belong to the selected recording and must be recalculated when its voice changes. Religious text and prescribed counts stay unchanged.
+- **Supersedes:** The Play Once default in DEC-213/214 only. The current request authorizes committing, pushing, and verifying all pending changes, superseding the earlier local-only release restriction.
+- **Verification:** Audio plan/provider regressions, complete quality/browser gates, Pages build, both GitHub workflows, and production smoke verification.

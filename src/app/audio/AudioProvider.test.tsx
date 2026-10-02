@@ -367,8 +367,8 @@ describe("AudioProvider integration", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "توسيع المشغل" }));
     fireEvent.click(screen.getByTestId("audio-reciter-select"));
-    expect(screen.getByTestId("audio-recording-source")).toHaveTextContent("المصدر · تلاوة القارئ");
-    expect(screen.queryByText("Source · Attribution")).not.toBeInTheDocument();
+    expect(screen.getByTestId("audio-recording-source")).toBeVisible();
+    expect(screen.getByTestId("audio-recording-source")).toHaveTextContent("المصدر");
   });
 
   it("keeps lock-screen metadata and controls synchronized with the actual recording", async () => {

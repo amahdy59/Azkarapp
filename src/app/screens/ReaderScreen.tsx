@@ -609,9 +609,18 @@ export function ReaderScreen({
   const handleShare = async () => {
     setIsSharing(true);
     try {
+      const resolvedTitle =
+        readerZikrTitle ??
+        (z.arabicText.includes("أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ، خَلَقْتَنِي")
+          ? isArabic
+            ? "دعاء سيد الاستغفار"
+            : "Sayyid al-Istighfar"
+          : undefined);
+
       await shareZikrCard(
         {
           id: z.id,
+          title: resolvedTitle,
           language,
           themeMode,
           arabicText: z.arabicText,
@@ -625,7 +634,7 @@ export function ReaderScreen({
             typeof window === "undefined"
               ? undefined
               : new URL(import.meta.env.BASE_URL, window.location.origin).toString(),
-          labels: { brandName: t(language, "common.azkar") },
+          labels: { brandName: isArabic ? "وَذَكِّرْ" : "Wa-Zaker" },
         },
         {
           onStatus: (status) => setShareMessage(t(language, SHARE_STATUS_KEYS[status])),

@@ -4,7 +4,13 @@ import { COMPREHENSIVE_DUAS } from "../content/comprehensiveDuas";
 import type { Zikr } from "../types";
 import { createArabicTextFingerprint, normalizeArabicForAudioMatching } from "./arabicMatching";
 import { DEFAULT_AUDIO_PREFERENCES } from "./audioPreferences";
-import { buildPlaybackPlan, getAudioCoverage, getZikrPlaybackTitles } from "./buildPlaybackPlan";
+import {
+  buildPlaybackPlan,
+  getAudioCoverage,
+  getZikrPlaybackTitles,
+  withPlaybackMode,
+  withPlaybackVoice,
+} from "./buildPlaybackPlan";
 import { APPROVED_AUDIO_ASSIGNMENTS } from "./audioAssignments";
 import { QURAN_AUDIO_REVIEW_CANDIDATES, REJECTED_LEGACY_AUDIO_MATCHES } from "./audioReviewCandidates";
 import { resolveAudioAsset } from "./resolveAudioAsset";
@@ -202,7 +208,7 @@ describe("explicit audio content architecture", () => {
     expect(plan.entries.every((entry) => entry.repetitions === 1 && !entry.ritualGroupId)).toBe(true);
   });
 
-  it("allows the full reviewed count for high-count azkar while keeping Play Once the default", () => {
+  it("plays prescribed repetitions by default for high-count azkar and honors play-once when requested", () => {
     const highCount = ALL_AZKAR.filter((zikr) => zikr.repetitionCount > 10);
     expect(highCount.find((zikr) => zikr.id === "m-hm-96")?.repetitionCount).toBe(100);
     expect(highCount.length).toBeGreaterThan(0);
@@ -213,14 +219,54 @@ describe("explicit audio content architecture", () => {
       baseUrl: "https://audio.example.test",
       context: { category: "morning" as const, routineMode: "complete" as const, source: "full-session" as const },
     };
-    const once = buildPlaybackPlan(options);
-    const repeated = buildPlaybackPlan({ ...options, mode: "repeat-prescribed-count" });
+    const repeatedByDefault = buildPlaybackPlan(options);
+    const once = buildPlaybackPlan({ ...options, mode: "play-once" });
     expect(once.entries.every((entry) => entry.repetitions === 1)).toBe(true);
-    expect(repeated.entries).toHaveLength(highCount.length);
-    repeated.entries.forEach((entry, index) => {
-      expect(entry.repetitions).toBe(highCount[index]!.repetitionCount);
+    expect(repeatedByDefault.entries).toHaveLength(highCount.length);
+    repeatedByDefault.entries.forEach((entry, index) => {
+      const embedded = entry.embeddedRepetitions ?? 1;
+      expect(entry.repetitions).toBe(Math.max(1, Math.ceil(highCount[index]!.repetitionCount / embedded)));
       expect(entry.prescribedRepetitions).toBe(highCount[index]!.repetitionCount);
     });
+  });
+
+  it("handles embedded 3-count recordings like SubhanAllah so the final number reaches the recommended count", () => {
+    const subhanZikr = ALL_AZKAR.find((zikr) => zikr.id === "s-hm-106-subhanallah")!;
+    expect(subhanZikr.repetitionCount).toBe(33);
+    const plan = buildPlaybackPlan({
+      zikrs: [subhanZikr],
+      baseUrl: "https://audio.example.test",
+      context: { category: "before_sleep", routineMode: "complete", source: "single" },
+    });
+    expect(plan.entries).toHaveLength(1);
+    const entry = plan.entries[0]!;
+    expect(entry.embeddedRepetitions).toBe(3);
+    expect(entry.prescribedRepetitions).toBe(33);
+    // Because the recording recites SubhanAllah 3 times per play, 11 loops reach exactly 33 recitations
+    expect(entry.repetitions).toBe(11);
+    expect(Object.values(entry.segmentsByVoice)[0]![0]!.url).toContain("?sha256=");
+    const singleRecitation = withPlaybackVoice(
+      {
+        ...entry,
+        segmentsByVoice: {
+          ...entry.segmentsByVoice,
+          single: [{ ...Object.values(entry.segmentsByVoice)[0]![0]!, embeddedRepetitions: 1 }],
+        },
+      },
+      "single",
+    );
+    expect(singleRecitation.repetitions).toBe(33);
+    expect(withPlaybackVoice(singleRecitation, entry.defaultVoiceId).repetitions).toBe(11);
+
+    // When switched to play-once, it plays 1 time
+    const oncePlan = withPlaybackMode(plan, "play-once");
+    expect(oncePlan.entries[0]!.repetitions).toBe(1);
+    expect(oncePlan.entries[0]!.prescribedRepetitions).toBe(33);
+    expect(oncePlan.entries[0]!.embeddedRepetitions).toBe(3);
+    expect(withPlaybackVoice({ ...singleRecitation, playbackMode: "play-once" }, "single").repetitions).toBe(1);
+    const incompatible = withPlaybackVoice({ ...entry, prescribedRepetitions: 34 }, entry.defaultVoiceId);
+    expect(incompatible.repetitions).toBe(1);
+    expect(incompatible.supportedModes).toEqual(["play-once"]);
   });
 
   it("fails validation for an incomplete Quran range", () => {

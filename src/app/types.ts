@@ -71,7 +71,7 @@ export type ZikrGroupId =
 export type RitualGroupId = "three_quls" | "tasbih_fatimah";
 export type ZikrAudioMode = "play-once" | "repeat-prescribed-count" | "repeat-custom";
 export interface ZikrAudioBehavior {
-  defaultMode: "play-once";
+  defaultMode: ZikrAudioMode;
   supportedModes: ZikrAudioMode[];
   repetitionUnit?: "zikr" | "ritual-round";
   recommendedMaxAutoRepeat?: number;

@@ -50,6 +50,16 @@ export function validateAudioCatalog(catalog: AudioCatalog, zikrs: readonly Zikr
         });
       }
       for (const variant of segment.variants) {
+        if (
+          variant.embeddedRepetitions !== undefined &&
+          (!Number.isInteger(variant.embeddedRepetitions) || variant.embeddedRepetitions < 1)
+        ) {
+          issues.push({
+            code: "invalid-embedded-repetitions",
+            message: `${variant.id} has invalid embedded repetitions.`,
+            assetId,
+          });
+        }
         const source = catalog.sources[variant.sourceId];
         if (!source) issues.push({ code: "missing-source", message: `${variant.id} has no source record.`, assetId });
         if (source && !source.attribution.trim()) {

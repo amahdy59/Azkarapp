@@ -643,6 +643,7 @@ export function MushafImmersiveReader({
               if (edge === "left") paginate(1);
               else paginate(-1);
             }}
+            onCenterTap={() => setIsFocusMode((prev) => !prev)}
             progressBar={progressBar}
             paperRef={paperRef}
             reduceMotion={reducedMotion}

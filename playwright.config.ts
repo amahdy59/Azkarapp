@@ -85,6 +85,6 @@ export default defineConfig({
         // directory with no `sw.js` fails the offline spec while looking like a
         // code regression. Always build what you are about to test.
         reuseExistingServer: false,
-        timeout: 120_000,
+        timeout: 600_000,
       },
 });

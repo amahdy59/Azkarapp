@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { MushafPageViewer, AyahMarker, resolveInkAllowance } from "./MushafPageViewer";
 
 describe("AyahMarker", () => {
@@ -414,5 +414,107 @@ describe("MushafPageViewer opening pages consistency (pages 1 & 2)", () => {
     expect(bismillah).toBeInTheDocument();
     expect(bismillah).toHaveAttribute("role", "img");
     expect(screen.getByText("الٓمٓ")).toBeInTheDocument();
+  });
+});
+
+describe("MushafPageViewer invariant layout and center tap", () => {
+  const sampleLines = [
+    [
+      { verseKey: "2:6", position: 1, isEnd: 0, text: "إِنَّ" },
+      { verseKey: "2:6", position: 2, isEnd: 0, text: "ٱلَّذِينَ" },
+      { verseKey: "2:6", position: 3, isEnd: 0, text: "كَفَرُوا۟" },
+      { verseKey: "2:6", position: 4, isEnd: 1, text: "٦" },
+    ],
+  ];
+
+  it("preserves identical canvas padding and structure whether floating controls are mounted or hidden", () => {
+    const { container: withControls } = render(
+      <MushafPageViewer
+        lines={sampleLines}
+        language="ar"
+        pageNumber={3}
+        surahName="سورة البقرة"
+        juzNumber={1}
+        direction="rtl"
+        topLeftControl={<button type="button">Back</button>}
+        topRightControl={<button type="button">More</button>}
+        topCenterControl={<button type="button">Index</button>}
+        bottomLeftControl={<button type="button">Bookmark</button>}
+        bottomRightControl={<button type="button">Meanings</button>}
+      />,
+    );
+
+    const canvasWithControls = withControls.querySelector(".mushaf-page-canvas") as HTMLElement;
+    expect(canvasWithControls).toBeInTheDocument();
+    expect(canvasWithControls.style.paddingTop).toBe("calc(3.25rem + env(safe-area-inset-top))");
+    expect(canvasWithControls.style.paddingBottom).toMatch(/^calc\(max\(0\.6rem,\s*env\(safe-area-inset-bottom\)\)\)$/);
+    expect(canvasWithControls.querySelector("[data-testid='mushaf-furniture-surah']")).toBeNull();
+
+    const { container: withoutControls } = render(
+      <MushafPageViewer
+        lines={sampleLines}
+        language="ar"
+        pageNumber={3}
+        surahName="سورة البقرة"
+        juzNumber={1}
+        direction="rtl"
+      />,
+    );
+
+    const canvasWithoutControls = withoutControls.querySelector(".mushaf-page-canvas") as HTMLElement;
+    expect(canvasWithoutControls).toBeInTheDocument();
+    // Layout and line geometry remain 100% constant in focus mode / hidden controls mode
+    expect(canvasWithoutControls.style.paddingTop).toBe(canvasWithControls.style.paddingTop);
+    expect(canvasWithoutControls.style.paddingBottom).toBe(canvasWithControls.style.paddingBottom);
+    expect(canvasWithoutControls.querySelector("[data-testid='mushaf-furniture-surah']")).toBeNull();
+  });
+
+  it("fires onCenterTap on middle click, and onEdgeTap on edge clicks", () => {
+    const onCenterTap = vi.fn();
+    const onEdgeTap = vi.fn();
+
+    const { container } = render(
+      <MushafPageViewer
+        lines={sampleLines}
+        language="ar"
+        pageNumber={3}
+        surahName="سورة البقرة"
+        juzNumber={1}
+        direction="rtl"
+        onCenterTap={onCenterTap}
+        onEdgeTap={onEdgeTap}
+      />,
+    );
+
+    const paper = container.querySelector(".mushaf-paper") as HTMLElement;
+    expect(paper).toBeInTheDocument();
+
+    // Mock bounding rect: width = 1000, left = 0
+    vi.spyOn(paper, "getBoundingClientRect").mockReturnValue({
+      left: 0,
+      top: 0,
+      width: 1000,
+      height: 1000,
+      right: 1000,
+      bottom: 1000,
+      x: 0,
+      y: 0,
+      toJSON: () => {},
+    });
+
+    // Tap in center (x = 500, ratio = 0.5)
+    fireEvent.pointerUp(paper, { clientX: 500, pointerType: "touch", button: 0 });
+    expect(onCenterTap).toHaveBeenCalledTimes(1);
+    expect(onEdgeTap).not.toHaveBeenCalled();
+
+    // Tap on left edge (x = 100, ratio = 0.1 < 0.22)
+    fireEvent.pointerUp(paper, { clientX: 100, pointerType: "touch", button: 0 });
+    expect(onEdgeTap).toHaveBeenCalledWith("left");
+    expect(onCenterTap).toHaveBeenCalledTimes(1);
+
+    // Tap on right edge (x = 900, ratio = 0.9 > 0.78)
+    fireEvent.pointerUp(paper, { clientX: 900, pointerType: "touch", button: 0 });
+    expect(onEdgeTap).toHaveBeenCalledWith("right");
+    expect(onCenterTap).toHaveBeenCalledTimes(1);
   });
 });

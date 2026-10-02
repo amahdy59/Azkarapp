@@ -66,6 +66,30 @@ describe("zikr share-card content", () => {
     ]);
   });
 
+  it("resolves built-in vocabulary for Sayyid al-Istighfar and accepts explicit word meanings", () => {
+    const sayyidSections = getZikrShareCardSections({
+      id: "sayyid",
+      language: "ar",
+      arabicText: "اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ",
+      benefit: "سيد الاستغفار أعظم ما يستغفر به العبد.",
+    });
+
+    const keys = sayyidSections.map((s) => s.key);
+    expect(keys).toContain("wordMeanings");
+    const meaningSection = sayyidSections.find((s) => s.key === "wordMeanings");
+    expect(meaningSection?.text).toContain("أَبُوءُ");
+    expect(meaningSection?.label).toBe("معاني المفردات");
+
+    const customSections = getZikrShareCardSections({
+      id: "custom",
+      language: "ar",
+      arabicText: "سُبْحَانَ اللَّهِ",
+      wordMeanings: [{ word: "سُبْحَانَ", meaning: "تنزيه الله وتقديسه عن كل نقص" }],
+    });
+    expect(customSections.map((s) => s.key)).toContain("wordMeanings");
+    expect(customSections.find((s) => s.key === "wordMeanings")?.text).toContain("سُبْحَانَ");
+  });
+
   it("creates safe, stable PNG names", () => {
     expect(getZikrShareCardFileName(ENGLISH_CARD)).toBe("azkar-morning-01.png");
     expect(getZikrShareCardFileName({ ...ENGLISH_CARD, fileName: "My shared zikr.png" })).toBe("My-shared-zikr.png");
@@ -97,6 +121,7 @@ describe("share-card PNG generation", () => {
     const context = {
       arc: vi.fn(),
       beginPath: vi.fn(),
+      bezierCurveTo: vi.fn(),
       closePath: vi.fn(),
       createLinearGradient: vi.fn(() => gradient),
       createRadialGradient: vi.fn(() => gradient),
@@ -108,8 +133,12 @@ describe("share-card PNG generation", () => {
       moveTo: vi.fn(),
       quadraticCurveTo: vi.fn(),
       restore: vi.fn(),
+      rotate: vi.fn(),
+      roundRect: vi.fn(),
       save: vi.fn(),
+      scale: vi.fn(),
       stroke: vi.fn(),
+      translate: vi.fn(),
     } as unknown as CanvasRenderingContext2D;
     const canvas = {
       width: 0,
@@ -130,5 +159,48 @@ describe("share-card PNG generation", () => {
     expect(generated.file).toBeInstanceOf(File);
     expect(generated.file.name).toBe("azkar-morning-01.png");
     expect(generated.file.type).toBe("image/png");
+  });
+
+  it("supports 9:16 story (1080x1920) and 1:1 square (1080x1080) formats", () => {
+    const gradient = { addColorStop: vi.fn() };
+    const context = {
+      arc: vi.fn(),
+      beginPath: vi.fn(),
+      bezierCurveTo: vi.fn(),
+      closePath: vi.fn(),
+      createLinearGradient: vi.fn(() => gradient),
+      createRadialGradient: vi.fn(() => gradient),
+      fill: vi.fn(),
+      fillRect: vi.fn(),
+      fillText: vi.fn(),
+      lineTo: vi.fn(),
+      measureText: vi.fn((text: string) => ({ width: Array.from(text).length * 14 })),
+      moveTo: vi.fn(),
+      quadraticCurveTo: vi.fn(),
+      restore: vi.fn(),
+      rotate: vi.fn(),
+      roundRect: vi.fn(),
+      save: vi.fn(),
+      scale: vi.fn(),
+      stroke: vi.fn(),
+      translate: vi.fn(),
+    } as unknown as CanvasRenderingContext2D;
+    const canvas = {
+      width: 0,
+      height: 0,
+      getContext: vi.fn(() => context),
+      toDataURL: vi.fn(() => "data:image/png;base64,aGVsbG8="),
+    } as unknown as HTMLCanvasElement;
+    const originalCreateElement = document.createElement.bind(document);
+    vi.spyOn(document, "createElement").mockImplementation(((tagName: string) =>
+      tagName === "canvas" ? canvas : originalCreateElement(tagName)) as typeof document.createElement);
+
+    const storyCard = generateZikrShareCard({ ...ENGLISH_CARD, format: "story" });
+    expect(storyCard.width).toBe(1080);
+    expect(storyCard.height).toBe(1920);
+
+    const squareCard = generateZikrShareCard({ ...ENGLISH_CARD, format: "square" });
+    expect(squareCard.width).toBe(1080);
+    expect(squareCard.height).toBe(1080);
   });
 });

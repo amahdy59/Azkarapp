@@ -84,6 +84,8 @@ Rules:
 
 ## Presentation boundaries
 
+Collection sharing stays in the screen/share boundary. Canvas generation preserves complete Arabic text, divides overfull groups into additional slides, and fails visibly with retry when a single item cannot fit. Native file sharing falls back to PNG downloads. This transient state is never persisted or synchronized.
+
 - `screens/` composes pages and coordinates user interaction.
 - `components/` owns reusable visual and behavioral patterns.
 - `components/ui/` contains vendored or low-level primitives.

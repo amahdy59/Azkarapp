@@ -5,7 +5,7 @@ import type { AudioCatalog, AudioAsset, AudioSourceRecord } from "./audioTypes";
 import { validateAudioCatalog } from "./validateAudioCatalog";
 import { FRIDAY_KAHF } from "../content/fridayKahf";
 
-export const AUDIO_MANIFEST_VERSION = 5;
+export const AUDIO_MANIFEST_VERSION = 6;
 
 export const AUDIO_SOURCES: Readonly<Record<string, AudioSourceRecord>> = Object.freeze({
   "internal-upload": {

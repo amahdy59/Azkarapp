@@ -63,9 +63,10 @@ export function resolveAudioAssetById(
             sourceNameArabic: source.nameArabic,
             attribution: source.attribution,
             attributionArabic: source.attributionArabic,
-            url: joinAudioUrl(baseUrl, variant.relativePath),
+            url: `${joinAudioUrl(baseUrl, variant.relativePath)}?sha256=${variant.sha256}`,
             durationMs: variant.durationMs,
             mimeType: variant.mimeType,
+            ...(variant.embeddedRepetitions ? { embeddedRepetitions: variant.embeddedRepetitions } : {}),
           };
         }),
     ]),

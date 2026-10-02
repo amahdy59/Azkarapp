@@ -557,13 +557,20 @@ export function KhatmahReaderScreen({
       else if (e.key === "ArrowRight" || e.key === "PageUp") paginate(-1);
       else if (e.key === "Home") setKhatmahPage(1);
       else if (e.key === "End") setKhatmahPage(LAST_PAGE);
-      else if (e.key === "Escape") onBack();
-      else handled = false;
+      else if (e.key === "Escape") {
+        if (isFocusMode) {
+          setIsFocusMode(false);
+        } else {
+          onBack();
+        }
+      } else if (e.key === "f" || e.key === "F") {
+        setIsFocusMode((prev) => !prev);
+      } else handled = false;
       if (handled) e.preventDefault();
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeAyah, isIndexOpen, isOptionsMenuOpen, isQuickMenuOpen, onBack, paginate, setKhatmahPage]);
+  }, [activeAyah, isFocusMode, isIndexOpen, isOptionsMenuOpen, isQuickMenuOpen, onBack, paginate, setKhatmahPage]);
 
   // Pointer-driven page turn. The transform is written straight to the node, so
   // dragging costs no React render at all — the previous implementation ran a
@@ -782,6 +789,7 @@ export function KhatmahReaderScreen({
       onToggleWordMeanings={() => void toggleWordMeanings()}
       onTogglePageBookmark={togglePageBookmark}
       onToggleFullscreen={toggleFullscreen}
+      onEnterFocusMode={() => setIsFocusMode(true)}
       onOpenSettings={() => setIsOptionsMenuOpen(true)}
       onOpenMore={() => setIsQuickMenuOpen(true)}
     />
@@ -919,6 +927,7 @@ export function KhatmahReaderScreen({
                 if (edge === "left") paginate(1);
                 else paginate(-1);
               }}
+              onCenterTap={() => setIsFocusMode((prev) => !prev)}
               onPrevious={() => paginate(-1)}
               onNext={() => paginate(1)}
               progressBar={wirdProgressBar}

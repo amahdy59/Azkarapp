@@ -37,6 +37,7 @@ export interface AudioVariant {
   sha256: string;
   sourceId: string;
   reviewStatus: AudioReviewStatus;
+  embeddedRepetitions?: number;
 }
 
 export interface AudioSegment {
@@ -93,6 +94,7 @@ export interface ResolvedAudioSegment {
   url: string;
   durationMs: number;
   mimeType: AudioVariant["mimeType"];
+  embeddedRepetitions?: number;
 }
 
 export interface PlaybackEntry {
@@ -108,7 +110,9 @@ export interface PlaybackEntry {
   contentKind: AudioContentKind;
   repetitions: number;
   prescribedRepetitions: number;
+  embeddedRepetitions?: number;
   repetitionUnit: "zikr" | "ritual-round";
+  playbackMode?: "play-once" | "repeat-prescribed-count";
   ritualGroupId?: RitualGroupId;
   supportedModes: ZikrAudioMode[];
   defaultVoiceId: string;

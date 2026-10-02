@@ -78,10 +78,6 @@
     margin-top: 0;
   }
 
-  .audio-expanded-meta > div:first-child {
-    display: none;
-  }
-
   .audio-expanded-text {
     margin-top: 0.25rem;
     padding-block: 0.5rem;

@@ -470,9 +470,17 @@ export function FloatingAudioPlayer({
   const isBusy = state.status === "loading" || state.status === "buffering";
   const totalTracks = state.plan.entries.length;
   const queuePosition = `${formatNumerals(state.entryIndex + 1, language)} / ${formatNumerals(totalTracks, language)}`;
+  const isRepeated = currentEntry.repetitions > 1;
+  const embedded = currentEntry.embeddedRepetitions ?? 1;
+  const currentCount =
+    embedded > 1
+      ? Math.min(currentEntry.prescribedRepetitions, (state.repetitionIndex + 1) * embedded)
+      : state.repetitionIndex + 1;
+  const totalCount = embedded > 1 ? currentEntry.prescribedRepetitions : currentEntry.repetitions;
+
   const repetitionPosition =
-    currentEntry.repetitions > 1
-      ? `${formatNumerals(state.repetitionIndex + 1, language)} / ${formatNumerals(currentEntry.repetitions, language)}`
+    isRepeated && totalCount > 1
+      ? `${formatNumerals(currentCount, language)} / ${formatNumerals(totalCount, language)}`
       : null;
   const title = language === "ar" ? currentEntry.titleArabic : currentEntry.titleEnglish;
   const activeVoiceId = state.currentVoiceId ?? currentEntry.defaultVoiceId;
@@ -482,6 +490,13 @@ export function FloatingAudioPlayer({
     currentEntry.segmentsByVoice[displayedVoiceId]?.[0]?.voiceName ??
     currentSegment?.voiceName ??
     displayedVoiceId;
+  const attributionText = currentSegment
+    ? `${language === "ar" ? (currentSegment.sourceNameArabic ?? currentSegment.sourceName) : currentSegment.sourceName} · ${
+        language === "ar"
+          ? (currentSegment.attributionArabic ?? currentSegment.attribution)
+          : currentSegment.attribution
+      }`
+    : `${t(language, "audioPlayer.recitationBy")} ${reciterDisplayName}`;
 
   const mainVoices = getAudioVoices(language);
   const mainVoiceIds = new Set(mainVoices.map((voice) => voice.id));
@@ -502,14 +517,6 @@ export function FloatingAudioPlayer({
         id,
     })),
   ];
-
-  const attributionText = currentSegment
-    ? `${language === "ar" ? (currentSegment.sourceNameArabic ?? currentSegment.sourceName) : currentSegment.sourceName} · ${
-        language === "ar"
-          ? (currentSegment.attributionArabic ?? currentSegment.attribution)
-          : currentSegment.attribution
-      }`
-    : `${t(language, "audioPlayer.recitationBy")} ${reciterDisplayName}`;
 
   const liveMessage =
     state.status === "error"
@@ -540,8 +547,6 @@ export function FloatingAudioPlayer({
   ]
     .filter(Boolean)
     .join(" · ");
-
-  const showSeparateTitle = !currentEntry.arabicText || currentEntry.arabicText.trim() !== title.trim();
 
   const renderCompact = () => {
     if (dockSlots) {
@@ -686,7 +691,7 @@ export function FloatingAudioPlayer({
             />
           </div>
 
-          <div className="audio-compact-row flex items-center justify-between gap-2 sm:gap-3 px-3.5 sm:px-5 py-2 sm:py-2.5">
+          <div className="audio-compact-row flex items-center justify-between gap-2 sm:gap-3 px-3.5 sm:px-5 py-3 sm:py-3.5">
             <button
               type="button"
               onClick={() => setIsMinimized(false)}
@@ -826,7 +831,7 @@ export function FloatingAudioPlayer({
           className="audio-expanded-layout"
         >
           {/* Minimize and close retain the same logical edges in both player sizes. */}
-          <div className="audio-expanded-header flex shrink-0 items-center justify-between">
+          <div className="audio-expanded-header relative flex shrink-0 items-center justify-between">
             <button
               ref={collapseButtonRef}
               type="button"
@@ -836,6 +841,11 @@ export function FloatingAudioPlayer({
             >
               <ChevronDown size={22} aria-hidden="true" />
             </button>
+            {/* Title centered absolutely so it never pushes the icon buttons */}
+            <div className="pointer-events-none absolute inset-x-11 flex items-center justify-center gap-1.5 px-2">
+              <WaveBars playing={isPlaying} />
+              <span className="line-clamp-1 text-sm font-bold text-foreground text-center">{title}</span>
+            </div>
             <button
               type="button"
               onClick={() => {
@@ -860,14 +870,6 @@ export function FloatingAudioPlayer({
               className="flex min-h-0 flex-1 flex-col items-center"
             >
               <div className="audio-expanded-meta w-full shrink-0 flex flex-col items-center px-3 text-center">
-                <div className="flex items-center justify-center gap-2">
-                  <WaveBars playing={isPlaying} />
-                  {showSeparateTitle && (
-                    <h3 className="line-clamp-2 text-sm sm:text-base font-bold leading-relaxed text-foreground">
-                      {title}
-                    </h3>
-                  )}
-                </div>
                 <div className="mt-2 flex w-full flex-wrap items-center justify-center gap-2">
                   <Select
                     open={voiceMenuOpen}
@@ -906,11 +908,9 @@ export function FloatingAudioPlayer({
                             className="data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground data-[highlighted]:[&_span]:text-accent-foreground"
                             tabIndex={option.id === displayedVoiceId ? 0 : -1}
                             aria-label={option.label}
-                            aria-describedby={option.id === displayedVoiceId ? "audio-recording-source" : undefined}
                             description={
                               option.id === displayedVoiceId ? (
                                 <span
-                                  id="audio-recording-source"
                                   data-testid="audio-recording-source"
                                   className="mt-1 block max-w-72 whitespace-normal text-xs font-normal leading-relaxed"
                                 >

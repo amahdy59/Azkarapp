@@ -1,4 +1,5 @@
 import type { AppLanguage, ThemeMode } from "../types";
+import { DAYLIGHT_BOTANICAL_PALETTE, MIDNIGHT_BOTANICAL_PALETTE, drawCardCornerBotanicals } from "./canvasBotanicals";
 
 export const ZIKR_SHARE_CARD_WIDTH = 1080;
 export const ZIKR_SHARE_CARD_HEIGHT = 2920;
@@ -23,21 +24,32 @@ export type ZikrShareCardStatus =
 
 export type ZikrShareMethod = "shared" | "copied" | "downloaded" | "cancelled";
 
+export interface WordMeaningItem {
+  word: string;
+  meaning: string;
+}
+
 export interface ZikrShareCardLabels {
   brandName?: string;
   benefit?: string;
   translation?: string;
   transliteration?: string;
   source?: string;
+  wordMeanings?: string;
   repetitions?: (count: number) => string;
   footer?: string;
 }
 
+export type ZikrShareCardFormat = "story" | "square" | "tall";
+
 export interface ZikrShareCardInput {
   /** Stable content ID, used only to make a safe download filename. */
   id?: string;
+  /** Explicit title rendered at the top inside the card, e.g. "دعاء سيد الاستغفار" */
+  title?: string;
   language: AppLanguage;
   themeMode?: ThemeMode;
+  format?: ZikrShareCardFormat;
   arabicText: string;
   /** Rendered only on the English card. */
   translation?: string;
@@ -52,13 +64,16 @@ export interface ZikrShareCardInput {
   appUrl?: string;
   fileName?: string;
   labels?: ZikrShareCardLabels;
+  /** Optional word meanings / vocabulary displayed when card space permits. */
+  wordMeanings?: string | WordMeaningItem[];
 }
 
 export interface GeneratedZikrShareCard {
   blob: Blob;
   file: File;
-  width: typeof ZIKR_SHARE_CARD_WIDTH;
-  height: typeof ZIKR_SHARE_CARD_HEIGHT;
+  dataUrl?: string;
+  width: number;
+  height: number;
   altText: string;
   fallbackText: string;
 }
@@ -74,7 +89,7 @@ export interface ShareZikrCardOptions {
 }
 
 export interface ShareCardSection {
-  key: "arabic" | "translation" | "transliteration" | "benefit" | "source";
+  key: "arabic" | "translation" | "transliteration" | "benefit" | "source" | "wordMeanings";
   label: string;
   text: string;
   direction: "ltr" | "rtl";
@@ -160,7 +175,7 @@ const PALETTES: Record<ThemeMode, CardPalette> = {
 };
 
 const ARABIC_ZIKR_FONT = '"IBM Plex Sans Arabic", "Noto Sans Arabic Variable", sans-serif';
-const ARABIC_UI_FONT = '"Noto Sans Arabic Variable", "Noto Sans Arabic", sans-serif';
+const ARABIC_UI_FONT = '"IBM Plex Sans Arabic", "Noto Sans Arabic Variable", sans-serif';
 const LATIN_UI_FONT = '"Noto Sans Arabic Variable", system-ui, sans-serif';
 
 type ResolvedZikrShareCardLabels = Required<Omit<ZikrShareCardLabels, "repetitions">> & {
@@ -169,22 +184,54 @@ type ResolvedZikrShareCardLabels = Required<Omit<ZikrShareCardLabels, "repetitio
 
 const DEFAULT_LABELS: Record<AppLanguage, ResolvedZikrShareCardLabels> = {
   ar: {
-    brandName: "أذكار",
+    brandName: "وَذَكِّرْ",
     benefit: "فائدة",
     translation: "المعنى",
     transliteration: "النطق",
     source: "المصدر",
-    repetitions: (count) => `عدد التكرار: ${new Intl.NumberFormat("ar-EG").format(count)}`,
-    footer: "لحظة ذكر، أينما كنت",
+    wordMeanings: "معاني المفردات",
+    repetitions: (count) =>
+      count === 1 ? "مرة واحدة" : `عدد التكرار: ${new Intl.NumberFormat("ar-EG").format(count)}`,
+    footer: "",
   },
   en: {
-    brandName: "Azkar",
+    brandName: "Wa-Zaker",
     benefit: "Benefit",
     translation: "Meaning",
     transliteration: "Pronunciation",
     source: "Source",
-    repetitions: (count) => `Repeat ${new Intl.NumberFormat("en").format(count)}×`,
-    footer: "A quiet moment of remembrance",
+    wordMeanings: "Vocabulary",
+    repetitions: (count) => (count === 1 ? "1 time" : `Repeat ${new Intl.NumberFormat("en").format(count)}×`),
+    footer: "",
+  },
+};
+
+export const COMMON_ZIKR_VOCABULARY: Record<string, { ar: WordMeaningItem[]; en: WordMeaningItem[] }> = {
+  // Sayyid al-Istighfar key phrase
+  "أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ، خَلَقْتَنِي": {
+    ar: [
+      { word: "أَبُوءُ", meaning: "أُقِرُّ وَأَعْتَرِفُ" },
+      { word: "عَهْدِكَ", meaning: "الالتزام بالإيمان والتوحيد والطاعة" },
+      { word: "مَا اسْتَطَعْتُ", meaning: "بحسب طاقتي ووُسعي البشري" },
+    ],
+    en: [
+      { word: "Abū'u", meaning: "I acknowledge and confess" },
+      { word: "'Ahdika", meaning: "My covenant of faith and obedience" },
+      { word: "Mastata'tu", meaning: "To the best of my human capability" },
+    ],
+  },
+  // Ayat al-Kursi key phrase
+  "اللَّهُ لَا إِلَهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ": {
+    ar: [
+      { word: "الْقَيُّومُ", meaning: "القائم بنفسه المقيم لكل ما سواه" },
+      { word: "سِنَةٌ", meaning: "نُعاس وغفوة خفيفة تسبق النوم" },
+      { word: "يَئُودُهُ", meaning: "يُثقله أو يشقّ عليه حفظهما" },
+    ],
+    en: [
+      { word: "Al-Qayyūm", meaning: "The Self-Sustaining, Sustainer of all existence" },
+      { word: "Sinah", meaning: "Drowsiness or slumber" },
+      { word: "Ya'ūduh", meaning: "Burdens or tires Him" },
+    ],
   },
 };
 
@@ -198,6 +245,46 @@ export class ZikrShareCardError extends Error {
   }
 }
 
+export function getCleanCardTitle(input: ZikrShareCardInput): string | undefined {
+  if (input.title?.trim()) {
+    return cleanRawTitle(input.title.trim(), input.language);
+  }
+
+  // Detect Ayat al-Kursi
+  if (input.arabicText.includes("اللَّهُ لَا إِلَهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ")) {
+    return input.language === "ar" ? "آية الكرسي" : "Ayat al-Kursi";
+  }
+
+  // Detect Sayyid al-Istighfar
+  if (input.arabicText.includes("أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ، خَلَقْتَنِي")) {
+    return input.language === "ar" ? "دعاء سيد الاستغفار" : "Sayyid al-Istighfar";
+  }
+
+  if (input.categoryLabel?.trim()) {
+    return cleanRawTitle(input.categoryLabel.trim(), input.language);
+  }
+
+  return undefined;
+}
+
+function cleanRawTitle(raw: string, language: AppLanguage): string {
+  // Strip group numbering like (1/25), 1/25, #1, (١ من ٢٥)
+  const cleaned = raw
+    .replace(/\(?[\d\u0660-\u0669]+[/／][\d\u0660-\u0669]+\)?/g, "")
+    .replace(/\(?[\d\u0660-\u0669]+\s*(?:من|of)\s*[\d\u0660-\u0669]+\)?/gi, "")
+    .replace(/#[\d\u0660-\u0669]+/g, "")
+    .trim();
+
+  // Split on separators like - or – or — or • or :
+  const parts = cleaned.split(/[-–—•:؛]/);
+  let primary = parts[0]?.trim() || cleaned;
+
+  if (language === "ar" && primary === "سيد الاستغفار") {
+    primary = "دعاء سيد الاستغفار";
+  }
+  return primary;
+}
+
 function resolvedLabels(input: ZikrShareCardInput) {
   const defaults = DEFAULT_LABELS[input.language];
   return {
@@ -209,6 +296,30 @@ function resolvedLabels(input: ZikrShareCardInput) {
 
 function containsArabicScript(value: string) {
   return /[\u0600-\u06ff\ufb50-\ufdff\ufe70-\ufeff]/u.test(value);
+}
+
+export function getResolvedWordMeanings(input: ZikrShareCardInput): string | undefined {
+  if (input.wordMeanings) {
+    if (typeof input.wordMeanings === "string") {
+      return input.wordMeanings.trim() || undefined;
+    }
+    if (Array.isArray(input.wordMeanings) && input.wordMeanings.length > 0) {
+      return input.wordMeanings
+        .map((item) => (input.language === "ar" ? `«${item.word}»: ${item.meaning}` : `${item.word}: ${item.meaning}`))
+        .join("   •   ");
+    }
+  }
+
+  for (const [needle, vocab] of Object.entries(COMMON_ZIKR_VOCABULARY)) {
+    if (input.arabicText.includes(needle)) {
+      const items = input.language === "ar" ? vocab.ar : vocab.en;
+      return items
+        .map((item) => (input.language === "ar" ? `«${item.word}»: ${item.meaning}` : `${item.word}: ${item.meaning}`))
+        .join("   •   ");
+    }
+  }
+
+  return undefined;
 }
 
 /** Returns only sections that are appropriate for the selected app language. */
@@ -251,6 +362,16 @@ export function getZikrShareCardSections(input: ZikrShareCardInput): ShareCardSe
       key: "source",
       label: labels.source,
       text: source,
+      direction: input.language === "ar" ? "rtl" : "ltr",
+    });
+  }
+
+  const meanings = getResolvedWordMeanings(input);
+  if (meanings && (input.language === "en" || containsArabicScript(meanings))) {
+    sections.push({
+      key: "wordMeanings",
+      label: labels.wordMeanings,
+      text: meanings,
       direction: input.language === "ar" ? "rtl" : "ltr",
     });
   }
@@ -427,27 +548,6 @@ function drawCrescent(ctx: CanvasRenderingContext2D, centerX: number, centerY: n
   ctx.fill();
 }
 
-function drawChip(
-  ctx: CanvasRenderingContext2D,
-  text: string,
-  centerX: number,
-  y: number,
-  palette: CardPalette,
-  direction: "ltr" | "rtl",
-) {
-  ctx.font = `700 25px ${direction === "rtl" ? ARABIC_UI_FONT : LATIN_UI_FONT}`;
-  const width = Math.min(430, Math.max(128, ctx.measureText(text).width + 58));
-  fillRoundedRect(ctx, centerX - width / 2, y, width, 52, 26, palette.surfaceRaised);
-  ctx.strokeStyle = palette.border;
-  ctx.lineWidth = 1.5;
-  strokeRoundedRect(ctx, centerX - width / 2, y, width, 52, 26, palette.border);
-  ctx.direction = direction;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillStyle = palette.secondary;
-  ctx.fillText(text, centerX, y + 27, width - 24);
-}
-
 function sectionStyle(section: ShareCardSection, palette: CardPalette): TextSectionStyle {
   const common = {
     key: section.key,
@@ -517,20 +617,40 @@ function sectionStyle(section: ShareCardSection, palette: CardPalette): TextSect
         fontWeight: 500,
         textColor: palette.muted,
       };
+    case "wordMeanings":
+      return {
+        ...common,
+        textAlign: section.direction === "rtl" ? "right" : "left",
+        maxFontSize: 24,
+        minFontSize: 18,
+        lineHeightRatio: 1.55,
+        maxLines: 4,
+        fontFamily: section.direction === "rtl" ? ARABIC_UI_FONT : LATIN_UI_FONT,
+        fontWeight: 500,
+        textColor: palette.secondary,
+      };
   }
 }
 
-function layoutSections(
+interface LayoutGroupResult {
+  layouts: LaidOutSection[];
+  totalHeight: number;
+  sectionGap: number;
+  scale: number;
+}
+
+function layoutSectionGroup(
   ctx: CanvasRenderingContext2D,
   sections: ShareCardSection[],
   palette: CardPalette,
   maxWidth: number,
   maxHeight: number,
-) {
+  minAllowedScale = 0.54,
+): LayoutGroupResult {
   const styles = sections.map((section) => sectionStyle(section, palette));
   const sectionGap = 44;
 
-  for (let scale = 1; scale >= 0.54; scale -= 0.025) {
+  for (let scale = 1; scale >= minAllowedScale; scale -= 0.025) {
     const layouts: LaidOutSection[] = styles.map((style) => {
       const fontSize = Math.max(style.minFontSize, Math.round(style.maxFontSize * scale));
       const lineHeight = Math.round(fontSize * style.lineHeightRatio);
@@ -549,18 +669,26 @@ function layoutSections(
     const totalHeight =
       layouts.reduce((sum, layout) => sum + layout.height, 0) + Math.max(0, layouts.length - 1) * sectionGap;
     if (totalHeight <= maxHeight) {
-      return { layouts, totalHeight, sectionGap };
+      return { layouts, totalHeight, sectionGap, scale };
     }
 
-    if (scale <= 0.55) {
+    if (scale <= 0.55 && minAllowedScale <= 0.55) {
       let fittedHeight = totalHeight;
-      const trimPriority: ShareCardSection["key"][] = ["transliteration", "translation", "source", "benefit", "arabic"];
+      const trimPriority: ShareCardSection["key"][] = [
+        "wordMeanings",
+        "transliteration",
+        "translation",
+        "source",
+        "benefit",
+        "arabic",
+      ];
       const minimumLines: Record<ShareCardSection["key"], number> = {
         arabic: 3,
         translation: 2,
         transliteration: 2,
         benefit: 1,
         source: 1,
+        wordMeanings: 1,
       };
 
       while (fittedHeight > maxHeight) {
@@ -584,11 +712,51 @@ function layoutSections(
         fittedHeight -= candidate.lineHeight;
       }
 
-      return { layouts, totalHeight: fittedHeight, sectionGap };
+      return { layouts, totalHeight: fittedHeight, sectionGap, scale };
     }
   }
 
-  return { layouts: [] as LaidOutSection[], totalHeight: 0, sectionGap };
+  return { layouts: [] as LaidOutSection[], totalHeight: Number.POSITIVE_INFINITY, sectionGap, scale: minAllowedScale };
+}
+
+function layoutSections(
+  ctx: CanvasRenderingContext2D,
+  sections: ShareCardSection[],
+  palette: CardPalette,
+  maxWidth: number,
+  maxHeight: number,
+) {
+  const wordMeaningsSection = sections.find((s) => s.key === "wordMeanings");
+  const coreSections = sections.filter((s) => s.key !== "wordMeanings");
+
+  // Step 1: Layout core sections first to check baseline font scaling and remaining space
+  const coreResult = layoutSectionGroup(ctx, coreSections, palette, maxWidth, maxHeight);
+
+  // If there's no wordMeanings section to consider, return core layout directly
+  if (!wordMeaningsSection) {
+    return coreResult;
+  }
+
+  // CRITICAL USER CONSTRAINT:
+  // "this is only if space allows it. I like the font sizing of the zikr."
+  // Only include word meanings if:
+  // 1) The core sections already scale comfortably (scale >= 0.85)
+  // 2) There is at least 150px of spare height left in the card
+  const spareHeight = maxHeight - coreResult.totalHeight;
+  if (coreResult.scale < 0.85 || spareHeight < 150) {
+    // Space is too constrained (e.g. square card or very long zikr)
+    // Omit word meanings so the zikr font size stays large and uncompromised!
+    return coreResult;
+  }
+
+  // Step 2: Try layout with word meanings, enforcing that scale cannot drop below 0.85
+  const fullResult = layoutSectionGroup(ctx, sections, palette, maxWidth, maxHeight, 0.85);
+  if (fullResult.totalHeight > 0 && fullResult.totalHeight <= maxHeight) {
+    return fullResult;
+  }
+
+  // Fall back to core layout if adding word meanings would force font shrinkage
+  return coreResult;
 }
 
 function drawSection(
@@ -604,7 +772,7 @@ function drawSection(
     ctx.direction = section.direction;
     ctx.textAlign = section.direction === "rtl" ? "right" : "left";
     ctx.textBaseline = "top";
-    ctx.fillStyle = section.key === "benefit" ? palette.teal : palette.primary;
+    ctx.fillStyle = section.key === "benefit" || section.key === "wordMeanings" ? palette.teal : palette.primary;
     ctx.font = `700 24px ${section.fontFamily}`;
     ctx.fillText(section.label, section.direction === "rtl" ? x + width : x, cursorY, width);
     cursorY += 48;
@@ -632,9 +800,13 @@ export function renderZikrShareCard(input: ZikrShareCardInput) {
     throw new ZikrShareCardError("canvasUnavailable", "Share cards require a browser Canvas implementation.");
   }
 
+  const format = input.format ?? "tall";
+  const cardWidth = ZIKR_SHARE_CARD_WIDTH;
+  const cardHeight = format === "story" ? 1920 : format === "square" ? 1080 : ZIKR_SHARE_CARD_HEIGHT;
+
   const canvas = document.createElement("canvas");
-  canvas.width = ZIKR_SHARE_CARD_WIDTH;
-  canvas.height = ZIKR_SHARE_CARD_HEIGHT;
+  canvas.width = cardWidth;
+  canvas.height = cardHeight;
   const ctx = canvas.getContext("2d");
   if (!ctx) {
     throw new ZikrShareCardError("canvasUnavailable", "The browser could not create the share-card canvas.");
@@ -644,24 +816,28 @@ export function renderZikrShareCard(input: ZikrShareCardInput) {
   const labels = resolvedLabels(input);
   const direction = input.language === "ar" ? "rtl" : "ltr";
 
-  const background = ctx.createLinearGradient(0, 0, ZIKR_SHARE_CARD_WIDTH, ZIKR_SHARE_CARD_HEIGHT);
+  const background = ctx.createLinearGradient(0, 0, cardWidth, cardHeight);
   background.addColorStop(0, palette.background);
   background.addColorStop(1, palette.backgroundEnd);
   ctx.fillStyle = background;
-  ctx.fillRect(0, 0, ZIKR_SHARE_CARD_WIDTH, ZIKR_SHARE_CARD_HEIGHT);
+  ctx.fillRect(0, 0, cardWidth, cardHeight);
+
+  // Decorative corner foliage
+  const botanicalPalette = input.themeMode === "light" ? DAYLIGHT_BOTANICAL_PALETTE : MIDNIGHT_BOTANICAL_PALETTE;
+  drawCardCornerBotanicals(ctx, cardWidth, cardHeight, botanicalPalette);
 
   const glow = ctx.createRadialGradient(880, 190, 20, 880, 190, 610);
   glow.addColorStop(0, `${palette.primary}32`);
   glow.addColorStop(1, `${palette.primary}00`);
   ctx.fillStyle = glow;
-  ctx.fillRect(0, 0, ZIKR_SHARE_CARD_WIDTH, 900);
+  ctx.fillRect(0, 0, cardWidth, Math.min(900, cardHeight));
 
   ctx.save();
   ctx.globalAlpha = 0.14;
   ctx.fillStyle = palette.primary;
   for (let index = 0; index < 18; index += 1) {
     const x = 52 + ((index * 137) % 980);
-    const y = 34 + ((index * 211) % 470);
+    const y = 34 + ((index * 211) % (cardHeight * 0.25));
     const radius = index % 4 === 0 ? 3.5 : 2;
     ctx.beginPath();
     ctx.arc(x, y, radius, 0, Math.PI * 2);
@@ -669,22 +845,20 @@ export function renderZikrShareCard(input: ZikrShareCardInput) {
   }
   ctx.restore();
 
-  drawCrescent(ctx, ZIKR_SHARE_CARD_WIDTH / 2, 102, palette);
+  const crescentY = format === "square" ? 44 : 80;
+  drawCrescent(ctx, cardWidth / 2, crescentY, palette);
   ctx.direction = direction;
   ctx.textAlign = "center";
   ctx.textBaseline = "top";
   ctx.fillStyle = palette.foreground;
-  ctx.font = `700 46px ${direction === "rtl" ? ARABIC_UI_FONT : LATIN_UI_FONT}`;
-  ctx.fillText(labels.brandName, ZIKR_SHARE_CARD_WIDTH / 2, 176);
+  const brandFontSize = format === "square" ? 38 : 46;
+  ctx.font = `700 ${brandFontSize}px ${direction === "rtl" ? ARABIC_UI_FONT : LATIN_UI_FONT}`;
+  const brandY = format === "square" ? 88 : 142;
+  ctx.fillText(labels.brandName, cardWidth / 2, brandY);
 
-  const chips: string[] = [];
-  if (input.categoryLabel?.trim()) chips.push(input.categoryLabel.trim());
-  if (typeof input.repetitionCount === "number" && input.repetitionCount > 0) {
-    chips.push(labels.repetitions(input.repetitionCount));
-  }
-  if (chips.length) {
-    drawChip(ctx, chips.join("  •  "), ZIKR_SHARE_CARD_WIDTH / 2, 250, palette, direction);
-  }
+  const contentCardTop = format === "square" ? 152 : format === "story" ? 228 : CONTENT_CARD_TOP;
+  const contentCardBottom = format === "square" ? 984 : format === "story" ? 1800 : CONTENT_CARD_BOTTOM;
+  const contentCardHeight = contentCardBottom - contentCardTop;
 
   ctx.save();
   ctx.shadowColor = "rgba(0, 0, 0, 0.24)";
@@ -693,9 +867,9 @@ export function renderZikrShareCard(input: ZikrShareCardInput) {
   fillRoundedRect(
     ctx,
     CARD_MARGIN,
-    CONTENT_CARD_TOP,
-    ZIKR_SHARE_CARD_WIDTH - CARD_MARGIN * 2,
-    CONTENT_CARD_BOTTOM - CONTENT_CARD_TOP,
+    contentCardTop,
+    cardWidth - CARD_MARGIN * 2,
+    contentCardHeight,
     46,
     palette.surface,
   );
@@ -704,26 +878,55 @@ export function renderZikrShareCard(input: ZikrShareCardInput) {
   strokeRoundedRect(
     ctx,
     CARD_MARGIN,
-    CONTENT_CARD_TOP,
-    ZIKR_SHARE_CARD_WIDTH - CARD_MARGIN * 2,
-    CONTENT_CARD_BOTTOM - CONTENT_CARD_TOP,
+    contentCardTop,
+    cardWidth - CARD_MARGIN * 2,
+    contentCardHeight,
     46,
     palette.border,
   );
-  fillRoundedRect(
-    ctx,
-    CARD_MARGIN + 24,
-    CONTENT_CARD_TOP + 22,
-    ZIKR_SHARE_CARD_WIDTH - CARD_MARGIN * 2 - 48,
-    8,
-    4,
-    palette.primary,
-  );
 
   const contentX = CARD_MARGIN + CONTENT_PADDING_X;
-  const contentWidth = ZIKR_SHARE_CARD_WIDTH - 2 * (CARD_MARGIN + CONTENT_PADDING_X);
-  const contentTop = CONTENT_CARD_TOP + CONTENT_PADDING_Y + 20;
-  const contentBottom = CONTENT_CARD_BOTTOM - CONTENT_PADDING_Y;
+  const contentWidth = cardWidth - 2 * (CARD_MARGIN + CONTENT_PADDING_X);
+  const contentBottom = contentCardBottom - CONTENT_PADDING_Y;
+
+  // Integrated Card Header: Clean Zikr Title inside the card
+  const cleanTitle = getCleanCardTitle(input);
+  let contentTop = contentCardTop + CONTENT_PADDING_Y + 10;
+
+  if (cleanTitle) {
+    const titleY =
+      format === "square" ? contentCardTop + 68 : format === "story" ? contentCardTop + 84 : contentCardTop + 96;
+    const titleFontSize = format === "square" ? 28 : format === "story" ? 34 : 36;
+    ctx.direction = direction;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+    ctx.fillStyle = palette.primary;
+    ctx.font = `700 ${titleFontSize}px ${direction === "rtl" ? ARABIC_UI_FONT : LATIN_UI_FONT}`;
+    ctx.fillText(cleanTitle, cardWidth / 2, titleY);
+
+    const hasReps = typeof input.repetitionCount === "number" && input.repetitionCount > 1;
+    let dividerY = titleY + titleFontSize + (format === "square" ? 18 : 22);
+
+    if (hasReps) {
+      const repY = titleY + titleFontSize + 12;
+      ctx.fillStyle = palette.muted;
+      ctx.font = `600 18px ${direction === "rtl" ? ARABIC_UI_FONT : LATIN_UI_FONT}`;
+      ctx.fillText(labels.repetitions(input.repetitionCount!), cardWidth / 2, repY);
+      dividerY = repY + 30;
+    }
+
+    // Elegant divider under the integrated title
+    const divider = ctx.createLinearGradient(contentX, dividerY, contentX + contentWidth, dividerY);
+    divider.addColorStop(0, `${palette.border}00`);
+    divider.addColorStop(0.2, palette.border);
+    divider.addColorStop(0.8, palette.border);
+    divider.addColorStop(1, `${palette.border}00`);
+    ctx.fillStyle = divider;
+    ctx.fillRect(contentX, dividerY, contentWidth, 1.5);
+
+    contentTop = dividerY + (format === "square" ? 24 : 32);
+  }
+
   const sections = getZikrShareCardSections(input);
   const sectionLayout = layoutSections(ctx, sections, palette, contentWidth, contentBottom - contentTop);
   let cursorY = contentTop + Math.max(0, (contentBottom - contentTop - sectionLayout.totalHeight) / 2);
@@ -743,26 +946,27 @@ export function renderZikrShareCard(input: ZikrShareCardInput) {
     cursorY += section.height + sectionLayout.sectionGap;
   });
 
-  ctx.direction = direction;
+  // Footer: Clean website link below the card (replacing tagline as requested)
+  const rawUrl = input.appUrl?.trim() || "wazaker.app";
+  const displayUrl = rawUrl.replace(/^https?:\/\//i, "").replace(/\/$/, "");
+
+  const footerUrlY = format === "square" ? 1014 : format === "story" ? 1836 : 2780;
+  const accentBarY = format === "square" ? 1050 : format === "story" ? 1874 : 2830;
+
+  ctx.direction = "ltr";
   ctx.textAlign = "center";
   ctx.textBaseline = "top";
-  ctx.fillStyle = palette.secondary;
-  ctx.font = `600 28px ${direction === "rtl" ? ARABIC_UI_FONT : LATIN_UI_FONT}`;
-  ctx.fillText(labels.footer, ZIKR_SHARE_CARD_WIDTH / 2, 2720, 850);
-
-  if (input.appUrl?.trim()) {
-    ctx.direction = "ltr";
-    ctx.fillStyle = palette.muted;
-    ctx.font = `500 22px ${LATIN_UI_FONT}`;
-    ctx.fillText(input.appUrl.trim(), ZIKR_SHARE_CARD_WIDTH / 2, 2782, 850);
-  }
+  ctx.fillStyle = palette.muted;
+  const urlFontSize = format === "square" ? 19 : 22;
+  ctx.font = `600 ${urlFontSize}px ${LATIN_UI_FONT}`;
+  ctx.fillText(displayUrl, cardWidth / 2, footerUrlY);
 
   ctx.fillStyle = palette.primary;
-  fillRoundedRect(ctx, ZIKR_SHARE_CARD_WIDTH / 2 - 34, 2852, 68, 6, 3, palette.primary);
+  fillRoundedRect(ctx, cardWidth / 2 - 32, accentBarY, 64, 5, 2.5, palette.primary);
   return canvas;
 }
 
-function dataUrlToBlob(dataUrl: string) {
+export function dataUrlToBlob(dataUrl: string) {
   const separatorIndex = dataUrl.indexOf(",");
   if (separatorIndex < 0 || !dataUrl.startsWith("data:image/png;base64,")) {
     throw new ZikrShareCardError("encodingFailed", "The share card could not be encoded as a PNG.");
@@ -789,8 +993,9 @@ export function generateZikrShareCard(input: ZikrShareCardInput): GeneratedZikrS
   return {
     blob,
     file,
-    width: ZIKR_SHARE_CARD_WIDTH,
-    height: ZIKR_SHARE_CARD_HEIGHT,
+    dataUrl,
+    width: canvas.width,
+    height: canvas.height,
     altText: getZikrShareFallbackText(input),
     fallbackText: getZikrShareFallbackText(input),
   };
@@ -800,9 +1005,10 @@ export function generateZikrShareCard(input: ZikrShareCardInput): GeneratedZikrS
 export async function prepareZikrShareCardFonts() {
   if (typeof document === "undefined" || !document.fonts) return;
   await Promise.allSettled([
-    document.fonts.load(`600 62px ${ARABIC_ZIKR_FONT}`, "اللَّهُمَّ"),
-    document.fonts.load(`700 46px ${ARABIC_UI_FONT}`, "أذكار"),
-    document.fonts.load(`700 46px ${LATIN_UI_FONT}`, "Azkar"),
+    document.fonts.load(`600 62px ${ARABIC_ZIKR_FONT}`, "اللَّهُمَّ أَنْتَ رَبِّي"),
+    document.fonts.load(`700 46px ${ARABIC_UI_FONT}`, "وَذَكِّرْ"),
+    document.fonts.load(`700 46px ${LATIN_UI_FONT}`, "Wa-Zaker"),
+    document.fonts.ready,
   ]);
 }
 
@@ -850,6 +1056,7 @@ export async function shareZikrCard(input: ZikrShareCardInput, options: ShareZik
   const notify = options.onStatus;
   try {
     notify?.("generating");
+    await prepareZikrShareCardFonts();
     const generated = generateZikrShareCard(input);
 
     if (typeof navigator !== "undefined" && canShareFile(navigator, generated.file)) {

@@ -83,3 +83,25 @@ test("the prayer virtue dialog has no automatically detectable WCAG A/AA violati
 
   expect(await scan(page, '[data-testid="prayer-virtue-modal"]')).toEqual([]);
 });
+
+test("the collection share modal has no automatically detectable WCAG A/AA violations", async ({ page }, testInfo) => {
+  await seed(page, "/#/azkar");
+  await page.getByTestId("category-card-morning").click();
+  await expect(page.getByTestId("category-overview")).toBeVisible();
+
+  const shareBtn = page.getByTestId("share-collection-button");
+  await expect(shareBtn).toBeVisible();
+  await shareBtn.click();
+
+  const modal = page.getByTestId("collection-share-modal");
+  await expect(modal).toBeVisible();
+  await expect(modal.getByRole("img")).toBeVisible();
+  for (const button of await modal.getByRole("button").all()) {
+    const box = await button.boundingBox();
+    expect(box!.width).toBeGreaterThanOrEqual(44);
+    expect(box!.height).toBeGreaterThanOrEqual(44);
+  }
+  await page.screenshot({ path: testInfo.outputPath("collection-sharing.png") });
+
+  expect(await scan(page, '[data-testid="collection-share-modal"]')).toEqual([]);
+});

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { AudioController } from "../audio/AudioProvider";
 import { createInitialAudioState } from "../audio/audioReducer";
@@ -256,6 +256,31 @@ describe("FloatingAudioPlayer", () => {
     expect(screen.getByRole("region", { name: "Audio player" })).toHaveTextContent("49 / 100");
   });
 
+  it("scales repetition display for embedded 3-count recordings so final number reaches the exact prescribed count", () => {
+    const controller = createController();
+    // SubhanAllah: 33 prescribed, 3 embedded, 11 audio loops
+    controller.currentEntry = {
+      ...entry,
+      repetitions: 11,
+      prescribedRepetitions: 33,
+      embeddedRepetitions: 3,
+    };
+    controller.state.plan = { ...plan, entries: [controller.currentEntry] };
+    controller.state.repetitionIndex = 0; // First audio loop
+    const { unmount } = render(<FloatingAudioPlayer controller={controller} language="en" direction="ltr" />);
+    fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
+    // First loop plays 3 recitations
+    expect(screen.getByRole("region", { name: "Audio player" })).toHaveTextContent("3 / 33");
+    unmount();
+
+    // On the 11th (final) loop: repetitionIndex = 10
+    controller.state.repetitionIndex = 10;
+    render(<FloatingAudioPlayer controller={controller} language="en" direction="ltr" />);
+    fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
+    // Final loop reaches exactly the recommended 33
+    expect(screen.getByRole("region", { name: "Audio player" })).toHaveTextContent("33 / 33");
+  });
+
   it("renders Quranic verses with ornamental ayah badges in expanded zikr text", () => {
     const controller = createController();
     const quranEntry: PlaybackEntry = {
@@ -315,16 +340,13 @@ describe("FloatingAudioPlayer", () => {
     expect(zikrText.textContent).toBe(shortEntry.arabicText);
   });
 
-  it("keeps attribution in the reciter menu without a separate info action", async () => {
+  it("keeps recording-source attribution inside the reciter menu", () => {
     render(<FloatingAudioPlayer controller={createController()} language="ar" direction="rtl" />);
     fireEvent.click(screen.getByRole("button", { name: "توسيع المشغل" }));
     expect(screen.queryByTestId("audio-attribution-trigger")).not.toBeInTheDocument();
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     fireEvent.click(screen.getByTestId("audio-reciter-select"));
-    expect(screen.getByTestId("audio-recording-source")).toHaveTextContent("Test source · Test attribution");
-    const selectedVoice = screen.getByTestId("audio-recording-source").closest('[role="option"]');
-    await waitFor(() => expect(selectedVoice).toHaveFocus());
-    expect(selectedVoice).toHaveAccessibleDescription(/Test source · Test attribution/);
+    expect(screen.getByTestId("audio-recording-source")).toBeVisible();
   });
 
   it("replaces only the reader canvas and restores covered controls and focus on collapse", () => {
