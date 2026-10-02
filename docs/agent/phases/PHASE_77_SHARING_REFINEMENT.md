@@ -103,6 +103,8 @@ Evidence is preserved in `docs/agent/evidence/phase77-sharing/`: olive and laven
 
 The preliminary full browser run recorded 447 passes, one existing skip and nine late WebKit failures caused by `page.goto: Could not connect to server`. A fresh unchanged WebKit run passed all 13 checks. These infrastructure failures remain reported; the mandatory pre-push hook reruns the entire suite before the commit can reach `main`. That final run uses the supported `E2E_BASE_URL` override against the same final built artifact served on a separate local port (4277), isolating it from the shared default preview port. No tests or assertions are skipped by this override.
 
+The next complete gate exposed a test setup error in the new recipient regression: its identity, completion-storage and saved-preference assertions passed on mobile, then it waited for a routine selector that exists only in the desktop reader sidebar. The run was stopped before pushing. The test now retains those assertions at each supplied device width and resizes to desktop before explicitly changing the routine preference. No product assertion or coverage was removed; the targeted recipient test and complete mandatory release gates are rerun.
+
 ## Documentation updated
 
 README capabilities, architecture ownership and shared-route context, design/typography/feedback contracts, design coverage and active phase index.
