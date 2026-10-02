@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-02",
+  "release": "2026-10-03",
   "ar": [
-    "شارك مجموعات الأذكار كبطاقات صور بتصميم نهاري أو ليلي، واحفظ بطاقة واحدة أو المجموعة كاملة.",
-    "تشغيل الأذكار صوتياً بعدد مراتها الموصى بها تلقائياً افتراضياً بدلاً من التشغيل لمرة واحدة فقط.",
-    "مشغل صوت أوضح وأسهل للمس، مع بقاء اختيار القارئ ومصدر التسجيل متاحين في الوضع الأفقي.",
-    "فعّل وضع التركيز في المصحف بلمسة وسط الصفحة، واستخدم Escape لإظهار الأدوات قبل مغادرة القراءة."
+    "شارك ذكرًا واحدًا أو مجموعة كاملة ببطاقات زيتونية أو ذهبية أو بنفسجية، واختر المقاس المناسب لك.",
+    "النصوص الطويلة تمتد عبر بطاقات متابعة بخط واضح، مع الاحتفاظ بالمصادر وعدد التكرار.",
+    "عاين الصور قبل مشاركتها، وأضف المعنى أو النطق أو الفائدة أو رمز الرابط حسب اختيارك.",
+    "شارك النص أو الرابط مباشرة، واحفظ الصور والنص كاملًا في ملف واحد مع رسائل أوضح عند الإلغاء أو التعذر."
   ],
   "en": [
-    "Share azkar collections as daylight or midnight image cards, and save one card or the whole set.",
-    "Audio playback now recites azkar according to their recommended repetition count by default instead of playing once.",
-    "Clearer audio controls with easier touch targets and accessible reciter selection and recording credits in landscape.",
-    "Tap the centre of a Mushaf page to enter focus mode, and use Escape to restore tools before leaving the reader."
+    "Share one zikr or a whole collection in olive, gold or lavender cards, with a choice of image sizes.",
+    "Long texts continue across readable cards while keeping their sources and repetition counts.",
+    "Preview images before sharing, and choose whether to include meaning, pronunciation, benefits or a link QR code.",
+    "Share the full text or exact link, save images and text in one archive, and get clearer cancellation and failure messages."
   ]
 }

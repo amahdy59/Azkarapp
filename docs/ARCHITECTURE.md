@@ -84,7 +84,11 @@ Rules:
 
 ## Presentation boundaries
 
-Collection sharing stays in the screen/share boundary. Canvas generation preserves complete Arabic text, divides overfull groups into additional slides, and fails visibly with retry when a single item cannot fit. Native file sharing falls back to PNG downloads. This transient state is never persisted or synchronized.
+Sharing stays in the screen/share boundary. Collection and single-zikr previews share one transient modal. `shareLayout.ts` measures actual font metrics at fixed readable sizes, preserves raw text and Arabic grapheme boundaries, groups up to four short items, and creates explicitly numbered continuations for long passages. Arabic direction is independent of UI language. Available reviewed citations are mandatory; concise citations repeat on each continuation. Exports never represent visual splits as Mushaf page boundaries.
+
+The renderer creates Story, Square, Portrait and Tall PNGs with local fonts, controlled olive/gold/lavender palettes and optional exact-route QR links. Preview generation is sequential, publishes the first image promptly, yields between images and supports cancellation. The preview owner releases object URLs on regeneration and close. Parent clock renders do not restart generation. Selected meaning, pronunciation and benefit text is complete; no export silently ellipsizes sacred or supporting text. Legacy direct single-card generation rejects overflow explicitly.
+
+Native sharing is invoked directly from an action after preview generation, preserving transient activation. Actions serialize concurrent submissions. Unsupported image sharing is labelled Save; rejected share/copy actions remain visible without silently changing their meaning. Cancellation does not download. Bulk saving creates one uncompressed ZIP (PNGs are already compressed), containing numbered images plus full text and citations, without runtime dependencies. Text and link sharing remain available, and links use the existing hash routes beneath the deployment base. Sharing never persists or synchronizes settings, content selections or images.
 
 - `screens/` composes pages and coordinates user interaction.
 - `components/` owns reusable visual and behavioral patterns.
@@ -258,6 +262,8 @@ Core reading, counting, local progress, settings, and astronomical prayer-time c
 - `NetworkStatus` announces an offline transition, collapses to an expandable indicator after five seconds, and briefly confirms reconnection. `SyncStatus` remains a separate account concern and never exposes backend messages.
 - Authentication and synchronization branch on stable service error codes where available. User copy is localized and safe; privacy-limited observability receives only error class/name and source.
 - Async actions disable duplicate submission while pending. Success and cancellation use narrow polite status regions; failures use narrow alerts. The crash boundary remains reserved for unrecoverable application errors.
+
+Shared azkar routes may carry validated `mode=core|complete` and, for after-prayer collections, `prayer=<name>` inside the hash query. Routing applies this reading context transiently, including on reload, so a sender's numeric position has the same meaning for a recipient with different saved preferences. An explicit routine-mode change or leaving the reading flow clears the override. Existing context-free routes retain their behavior; sharing never rewrites the recipient's persisted routine preferences.
 
 ## Testing strategy
 

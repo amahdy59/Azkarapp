@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { flushSync } from "react-dom";
 import { parseLocation, routeToHash } from "../routing";
 import type { LibraryRouteSection, ProgressRoutePeriod, RouteState, SettingsRoutePanel } from "../routing";
-import { getAzkarForMode, isRoutineCategory, registerLazyCollection } from "../content/azkar";
+import { getAzkarForMode, getAzkarForPrayer, isRoutineCategory, registerLazyCollection } from "../content/azkar";
 import { reportError } from "../../lib/observability";
 import { startSafeViewTransition } from "../utils/viewTransitions";
 import type { CategoryId, PrayerName, RoutineMode, View, RoutineCategoryId } from "../types";
@@ -51,7 +51,14 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
 
   const [activeTab, setActiveTab] = useState<NavTab>(() => tabForView(initialRoute?.view ?? "home"));
   const [activeCat, setActiveCat] = useState<CategoryId>(initialRoute?.categoryId ?? "morning");
-  const [activeSubCategory, setActiveSubCategory] = useState<string | undefined>(undefined);
+  const [activeSubCategory, setActiveSubCategory] = useState<string | undefined>(initialRoute?.subCategory);
+  const [sharedContext, setSharedContext] = useState(() =>
+    initialRoute?.routineMode && initialRoute.categoryId
+      ? { categoryId: initialRoute.categoryId, mode: initialRoute.routineMode }
+      : undefined,
+  );
+  const sharedRoutineMode = sharedContext?.categoryId === activeCat ? sharedContext.mode : undefined;
+  const clearSharedRoutineMode = useCallback(() => setSharedContext(undefined), []);
   const [activeIdx, setActiveIdx] = useState(initialRoute?.index ?? 0);
   const [quranPage, setQuranPage] = useState<number | undefined>(initialRoute?.page);
   /** Which prayer the prayer screen is showing, so `#/prayer/asr` survives a reload. */
@@ -78,7 +85,12 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
   const inAppHistoryDepth = useRef(0);
 
   const hydrateRouteCategory = useCallback(
-    async (categoryId: CategoryId, targetView: View, targetIndex = 0) => {
+    async (
+      categoryId: CategoryId,
+      targetView: View,
+      targetIndex = 0,
+      context?: Pick<RouteState, "routineMode" | "subCategory">,
+    ) => {
       const loadId = ++routeLoadId.current;
       setRouteContentLoading(true);
       setRouteContentError(null);
@@ -86,8 +98,13 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
         await loadLazyRouteCategory(categoryId);
         if (loadId !== routeLoadId.current) return;
 
-        const mode = isRoutineCategory(categoryId) ? routineModes[categoryId as RoutineCategoryId] : "complete";
-        const items = getAzkarForMode(categoryId, mode);
+        const mode =
+          context?.routineMode ??
+          (isRoutineCategory(categoryId) ? routineModes[categoryId as RoutineCategoryId] : "complete");
+        const items =
+          categoryId === "after_prayer" && context?.subCategory
+            ? getAzkarForPrayer(context.subCategory, mode)
+            : getAzkarForMode(categoryId, mode);
         if (targetView === "reader" && (targetIndex < 0 || targetIndex >= items.length)) {
           setActiveIdx(0);
           setView("category");
@@ -139,7 +156,7 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
 
   useEffect(() => {
     if (initialRoute?.categoryId && (initialRoute.view === "reader" || isLazyRouteCategory(initialRoute.categoryId))) {
-      void hydrateRouteCategory(initialRoute.categoryId, initialRoute.view, initialRoute.index);
+      void hydrateRouteCategory(initialRoute.categoryId, initialRoute.view, initialRoute.index, initialRoute);
     }
   }, [hydrateRouteCategory, initialRoute]);
 
@@ -160,13 +177,31 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
       librarySection,
       progressPeriod,
       settingsPanel,
+      routineMode: sharedRoutineMode,
+      subCategory: activeCat === "after_prayer" ? (activeSubCategory as PrayerName | undefined) : undefined,
     });
     if (!hash) return;
     const target = `${window.location.pathname}${hash}`;
     if (`${window.location.pathname}${window.location.hash}` !== target) {
       window.history.replaceState({ view }, "", target);
     }
-  }, [view, activeCat, activeIdx, searchQuery, quranPage, activePrayer, librarySection, progressPeriod, settingsPanel]);
+  }, [
+    view,
+    activeCat,
+    activeIdx,
+    searchQuery,
+    quranPage,
+    activePrayer,
+    librarySection,
+    progressPeriod,
+    settingsPanel,
+    sharedRoutineMode,
+    activeSubCategory,
+  ]);
+
+  useEffect(() => {
+    if (view !== "reader" && view !== "category") setSharedContext(undefined);
+  }, [view]);
 
   const applyRouteFromLocation = useCallback((): boolean => {
     const route = parseLocation(window.location.search, window.location.hash);
@@ -175,12 +210,16 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
     startSafeViewTransition(() => {
       flushSync(() => {
         setView(route.view);
+        setSharedContext(
+          route.categoryId && route.routineMode ? { categoryId: route.categoryId, mode: route.routineMode } : undefined,
+        );
         if (route.page !== undefined) setQuranPage(route.page);
         if (route.prayer) setActivePrayer(route.prayer);
         if (route.categoryId) {
           setActiveCat(route.categoryId);
+          setActiveSubCategory(route.subCategory);
           if (route.view === "reader" || isLazyRouteCategory(route.categoryId)) {
-            void hydrateRouteCategory(route.categoryId, route.view, route.index);
+            void hydrateRouteCategory(route.categoryId, route.view, route.index, route);
           } else {
             routeLoadId.current += 1;
             setRouteContentLoading(false);
@@ -371,6 +410,8 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
     activePrayer,
     setActivePrayer,
     activeIdx,
+    sharedRoutineMode,
+    clearSharedRoutineMode,
     setActiveIdx,
     quranPage,
     setQuranPage,

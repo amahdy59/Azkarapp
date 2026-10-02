@@ -2,6 +2,21 @@ import { describe, expect, it } from "vitest";
 import { parseHash, parseLocation, routeToHash } from "./routing";
 
 describe("routeToHash", () => {
+  it("round trips temporary routine and prayer context without changing legacy routes", () => {
+    const route = {
+      view: "reader" as const,
+      categoryId: "after_prayer" as const,
+      index: 3,
+      routineMode: "complete" as const,
+      subCategory: "fajr" as const,
+    };
+    expect(parseHash(routeToHash(route)!)).toEqual(route);
+    expect(parseHash("#/azkar/morning/4?mode=invalid&prayer=invalid")).toEqual({
+      view: "reader",
+      categoryId: "morning",
+      index: 3,
+    });
+  });
   it("maps the primary destinations to stable paths", () => {
     expect(routeToHash({ view: "home" })).toBe("#/home");
     expect(routeToHash({ view: "more" })).toBe("#/more");

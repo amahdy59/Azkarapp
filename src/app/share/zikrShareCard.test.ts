@@ -202,5 +202,10 @@ describe("share-card PNG generation", () => {
     const squareCard = generateZikrShareCard({ ...ENGLISH_CARD, format: "square" });
     expect(squareCard.width).toBe(1080);
     expect(squareCard.height).toBe(1080);
+    vi.mocked(canvas.toDataURL).mockClear();
+    expect(() =>
+      generateZikrShareCard({ ...ENGLISH_CARD, format: "square", arabicText: "اللَّهُمَّ ".repeat(1000) }),
+    ).toThrow(/continuation|complete|long/iu);
+    expect(canvas.toDataURL).not.toHaveBeenCalled();
   });
 });

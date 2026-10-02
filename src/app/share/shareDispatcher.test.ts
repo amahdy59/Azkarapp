@@ -136,4 +136,14 @@ describe("shareDispatcher", () => {
     expect(success).toBe(true);
     expect(write).toHaveBeenCalled();
   });
+  it("does not silently download after a rejected native share when fallback is disabled", async () => {
+    vi.stubGlobal("navigator", {
+      share: vi.fn().mockRejectedValue(new DOMException("Denied", "NotAllowedError")),
+      canShare: () => true,
+    });
+    const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
+    await expect(shareSingleFile(dummyFile1, { downloadFallback: false })).rejects.toThrow("Denied");
+    await expect(shareMultipleFiles([dummyFile1, dummyFile2], { downloadFallback: false })).rejects.toThrow("Denied");
+    expect(click).not.toHaveBeenCalled();
+  });
 });

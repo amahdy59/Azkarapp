@@ -237,7 +237,7 @@ export const COMMON_ZIKR_VOCABULARY: Record<string, { ar: WordMeaningItem[]; en:
 
 export class ZikrShareCardError extends Error {
   constructor(
-    public readonly code: "canvasUnavailable" | "encodingFailed" | "clipboardUnavailable",
+    public readonly code: "canvasUnavailable" | "encodingFailed" | "clipboardUnavailable" | "textTooLong",
     message: string,
   ) {
     super(message);
@@ -904,7 +904,7 @@ export function renderZikrShareCard(input: ZikrShareCardInput) {
     ctx.font = `700 ${titleFontSize}px ${direction === "rtl" ? ARABIC_UI_FONT : LATIN_UI_FONT}`;
     ctx.fillText(cleanTitle, cardWidth / 2, titleY);
 
-    const hasReps = typeof input.repetitionCount === "number" && input.repetitionCount > 1;
+    const hasReps = typeof input.repetitionCount === "number" && input.repetitionCount >= 1;
     let dividerY = titleY + titleFontSize + (format === "square" ? 18 : 22);
 
     if (hasReps) {
@@ -929,6 +929,12 @@ export function renderZikrShareCard(input: ZikrShareCardInput) {
 
   const sections = getZikrShareCardSections(input);
   const sectionLayout = layoutSections(ctx, sections, palette, contentWidth, contentBottom - contentTop);
+  if (
+    sectionLayout.layouts.some((section) => section.truncated) ||
+    sectionLayout.totalHeight > contentBottom - contentTop
+  ) {
+    throw new ZikrShareCardError("textTooLong", "Complete text requires continuation cards.");
+  }
   let cursorY = contentTop + Math.max(0, (contentBottom - contentTop - sectionLayout.totalHeight) / 2);
 
   sectionLayout.layouts.forEach((section, index) => {

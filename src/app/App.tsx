@@ -252,9 +252,12 @@ function AppContent({
     pop,
     handleNavTab,
     hydrateRouteCategory,
+    sharedRoutineMode,
+    clearSharedRoutineMode,
   } = useAppRouting({ routineModes, hasCompletedOnboarding, reduceMotion });
 
-  const activeRoutineMode: RoutineMode = isRoutineCategory(activeCat) ? routineModes[activeCat] : "complete";
+  const activeRoutineMode: RoutineMode =
+    sharedRoutineMode ?? (isRoutineCategory(activeCat) ? routineModes[activeCat] : "complete");
   const activeAzkarList =
     activeCat === "after_prayer" && isPrayerName(activeSubCategory)
       ? getAzkarForPrayer(activeSubCategory, activeRoutineMode)
@@ -1921,6 +1924,7 @@ function AppContent({
                   audioCoverage={audioCoverage}
                   routineMode={activeRoutineMode}
                   onRoutineModeChange={(mode) => {
+                    clearSharedRoutineMode();
                     if (isRoutineCategory(activeCat)) {
                       setRoutineModes((previous) => ({ ...previous, [activeCat]: mode }));
                     }
@@ -1972,6 +1976,7 @@ function AppContent({
                     markComplete(i);
                   }}
                   onRoutineModeChange={(mode) => {
+                    clearSharedRoutineMode();
                     if (isRoutineCategory(activeCat)) {
                       setRoutineModes((previous) => ({ ...previous, [activeCat]: mode }));
                     }

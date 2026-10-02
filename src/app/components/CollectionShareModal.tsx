@@ -1,399 +1,607 @@
-import { useCallback, useEffect, useId, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { Modal } from "./ResponsiveSheet";
 import { Button } from "./ui/button";
-import { Check, ChevronNext, ChevronPrevious, Copy, Download, Moon, Share2, Sun } from "./icons";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { ChevronNext, ChevronPrevious, Download, Share2 } from "./icons";
 import { t } from "../i18n";
-import type { AppLanguage, ThemeMode, Zikr } from "../types";
+import type { AppLanguage, ThemeMode, Zikr, RoutineMode, PrayerName } from "../types";
+import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content/localizedZikr";
 import {
   generateAllCollectionStoryPages,
+  releaseSharePages,
   type GeneratedCollectionStoryCard,
-  type StoryCardItem,
 } from "../share/collectionShareCard";
 import {
   canCopyImage,
+  canShareMultipleFiles,
   copyImageToClipboard,
   downloadFile,
-  downloadFilesSequentially,
   shareMultipleFiles,
   shareSingleFile,
 } from "../share/shareDispatcher";
+import { createShareArchive } from "../share/shareArchive";
+import {
+  defaultShareAppearance,
+  getShareText,
+  getShareUrl,
+  type ShareAppearance,
+  type ShareFormat,
+  type ShareItem,
+} from "../share/shareLayout";
 import { formatNumerals } from "../formatting";
 
 export interface CollectionShareModalProps {
   open: boolean;
   onClose: () => void;
   collectionTitle: string;
+  collectionTitleArabic?: string;
+  collectionTitleEnglish?: string;
   collectionSubtitle?: string;
+  categoryId?: string;
+  readerIndex?: number;
+  routineMode?: RoutineMode;
+  prayer?: PrayerName;
+  single?: boolean;
   items: Zikr[];
   language: AppLanguage;
   themeMode?: ThemeMode;
+  shareItems?: ShareItem[];
 }
 
 export function CollectionShareModal({
   open,
   onClose,
   collectionTitle,
+  collectionTitleArabic,
+  collectionTitleEnglish,
   collectionSubtitle,
+  categoryId,
+  readerIndex,
+  routineMode,
+  prayer,
+  single = false,
   items,
   language,
   themeMode = "light",
+  shareItems,
 }: CollectionShareModalProps) {
   const direction = language === "ar" ? "rtl" : "ltr";
-  const [selectedTheme, setSelectedTheme] = useState<"light" | "midnight">(() =>
-    themeMode === "midnight" || themeMode === "dark" ? "midnight" : "light",
-  );
-  const [activePageIndex, setActivePageIndex] = useState<number>(0);
-  const [pages, setPages] = useState<GeneratedCollectionStoryCard[] | null>(null);
-  const [isGenerating, setIsGenerating] = useState<boolean>(false);
-  const [generationFailed, setGenerationFailed] = useState(false);
-  const [retryGeneration, setRetryGeneration] = useState(0);
-  const [copiedRecently, setCopiedRecently] = useState<boolean>(false);
-  const [statusMessage, setStatusMessage] = useState<string>("");
-  const statusId = useId();
+  const [appearance, setAppearance] = useState<ShareAppearance>(() => defaultShareAppearance(categoryId, themeMode));
+  const [format, setFormat] = useState<ShareFormat>("story");
+  const [meaning, setMeaning] = useState(language === "en");
+  const [pronunciation, setPronunciation] = useState(false);
+  const [benefit, setBenefit] = useState(false);
+  const [qr, setQr] = useState(false);
+  const [mode, setMode] = useState<"image" | "text" | "link">("image");
+  const [inspect, setInspect] = useState(false);
+  const [pages, setPages] = useState<GeneratedCollectionStoryCard[]>([]);
+  const [active, setActive] = useState(0);
+  const [generating, setGenerating] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const [retry, setRetry] = useState(0);
+  const [busy, setBusy] = useState(false);
+  const [status, setStatus] = useState("");
+  const [error, setError] = useState(false);
+  const operationLock = useRef(false);
   const descriptionId = useId();
+  const formatId = useId();
+  const themeId = useId();
+  const url = categoryId
+    ? getShareUrl(categoryId, single ? readerIndex : undefined, undefined, { routineMode, prayer })
+    : undefined;
+  const exportLanguage: AppLanguage = meaning ? "en" : "ar";
+  // Screen composition can recreate arrays on its minute/audio clock. Only changed
+  // content should restart an expensive export, never a parent render alone.
+  const itemsJson = JSON.stringify({ items, shareItems });
+  const stableInput = useMemo(() => JSON.parse(itemsJson) as { items: Zikr[]; shareItems?: ShareItem[] }, [itemsJson]);
+  const title = (exportLanguage === "ar" ? collectionTitleArabic : collectionTitleEnglish) ?? collectionTitle;
+  const content = useMemo(() => ({ meaning, pronunciation, benefit }), [meaning, pronunciation, benefit]);
+  const exportItems = useMemo<ShareItem[]>(
+    () =>
+      stableInput.shareItems ??
+      stableInput.items.map((z) => ({
+        id: z.id,
+        arabicText: z.arabicText,
+        title: exportLanguage === "ar" ? z.surahNameArabic : z.surahNameEnglish,
+        translation: z.translation,
+        transliteration: z.transliteration,
+        benefit: getLocalizedZikrBenefit(z, exportLanguage),
+        sourceReference: getLocalizedSourceReference(z, exportLanguage),
+        repetitionCount: z.repetitionCount,
+      })),
+    [stableInput, exportLanguage],
+  );
+  const text = getShareText(exportItems, exportLanguage, content, title, url);
+  const current = pages[active];
+  const total = current?.totalPages ?? pages.length;
+  const ready = Boolean(current);
+  const allReady = ready && !generating;
+  const subtitleKey =
+    categoryId === "morning"
+      ? "morningSubtitle"
+      : categoryId === "evening"
+        ? "eveningSubtitle"
+        : categoryId === "before_sleep"
+          ? "sleepSubtitle"
+          : "generalSubtitle";
 
-  // Reset or regenerate when opening or changing theme
   useEffect(() => {
-    if (!open || items.length === 0) {
-      return;
-    }
-
-    let isMounted = true;
-    setIsGenerating(true);
-    setActivePageIndex(0);
-    setGenerationFailed(false);
-    setPages(null);
-    setStatusMessage(t(language, "shareStoryPack.generating"));
-
-    const storyItems: StoryCardItem[] = items.map((z) => ({
-      id: z.id,
-      arabicText: z.arabicText,
-      benefitArabic: z.benefitArabic,
-      repetitionCount: z.repetitionCount,
-      surahNameArabic: z.surahNameArabic,
-    }));
-
+    if (!open || !exportItems.length) return;
+    const controller = new AbortController();
+    let ownedPages: GeneratedCollectionStoryCard[] = [];
+    setGenerating(true);
+    setFailed(false);
+    setPages([]);
+    setActive(0);
+    setStatus("");
     generateAllCollectionStoryPages({
-      collectionTitle,
-      collectionSubtitle,
-      allItems: storyItems,
-      themeMode: selectedTheme,
-      language,
+      collectionTitle: title,
+      collectionSubtitle: single ? collectionSubtitle : t(exportLanguage, `shareStudio.${subtitleKey}`),
+      allItems: exportItems,
+      appearance,
+      format,
+      content,
+      single,
+      url,
+      qr,
+      language: exportLanguage,
+      signal: controller.signal,
+      onPage: (page) => {
+        if (!controller.signal.aborted) setPages((previous) => [...previous, page]);
+      },
     })
-      .then((generatedPages) => {
-        if (!isMounted) return;
-        setPages(generatedPages);
-        setActivePageIndex((prev) => Math.min(prev, generatedPages.length - 1));
-        setIsGenerating(false);
-        setStatusMessage("");
+      .then((result) => {
+        ownedPages = result;
+        if (controller.signal.aborted) {
+          releaseSharePages(result);
+          return;
+        }
+        setPages(result);
+        setGenerating(false);
       })
       .catch(() => {
-        if (!isMounted) return;
-        setIsGenerating(false);
-        setGenerationFailed(true);
-        setStatusMessage(t(language, "shareStoryPack.shareError"));
+        if (controller.signal.aborted) return;
+        setPages([]);
+        setGenerating(false);
+        setFailed(true);
       });
-
     return () => {
-      isMounted = false;
+      controller.abort();
+      releaseSharePages(ownedPages);
     };
-  }, [open, selectedTheme, collectionTitle, collectionSubtitle, items, language, retryGeneration]);
+  }, [
+    open,
+    exportItems,
+    title,
+    collectionSubtitle,
+    exportLanguage,
+    subtitleKey,
+    appearance,
+    format,
+    content,
+    single,
+    url,
+    qr,
+    retry,
+  ]);
 
-  const totalPages = pages?.length ?? 1;
-  const currentCard = pages ? pages[activePageIndex] : null;
-
-  const goToPreviousPage = useCallback(() => {
-    setActivePageIndex((prev) => Math.max(0, prev - 1));
-  }, []);
-
-  const goToNextPage = useCallback(() => {
-    setActivePageIndex((prev) => Math.min(totalPages - 1, prev + 1));
-  }, [totalPages]);
-
-  // Keyboard navigation: Left/Right arrows flip between pages
-  useEffect(() => {
-    if (!open) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft") {
-        if (direction === "rtl") {
-          goToNextPage();
-        } else {
-          goToPreviousPage();
-        }
-      } else if (e.key === "ArrowRight") {
-        if (direction === "rtl") {
-          goToPreviousPage();
-        } else {
-          goToNextPage();
-        }
+  const run = async (action: () => Promise<void> | void) => {
+    if (operationLock.current) return;
+    operationLock.current = true;
+    setBusy(true);
+    setError(false);
+    setStatus("");
+    try {
+      await action();
+    } catch {
+      setError(true);
+      setStatus(t(language, "shareStudio.actionError"));
+    } finally {
+      operationLock.current = false;
+      setBusy(false);
+    }
+  };
+  const notify = (value: "sharing" | "downloading" | "shared" | "downloaded" | "cancelled") =>
+    setStatus(t(language, `shareStudio.${value}`));
+  const save = () => {
+    if (current) {
+      downloadFile(current.file);
+      setStatus(t(language, "shareStudio.downloaded"));
+    }
+  };
+  const copyText = async (value: string) => {
+    if (!navigator.clipboard?.writeText) throw new Error("Clipboard unavailable");
+    await navigator.clipboard.writeText(value);
+    setStatus(t(language, "shareStudio.copied"));
+  };
+  const shareText = async (value: string, link = false) => {
+    if (typeof navigator.share !== "function") {
+      await copyText(value);
+      return;
+    }
+    try {
+      await navigator.share(link ? { title, url: value } : { title, text: value });
+      setStatus(t(language, "shareStudio.shared"));
+    } catch (cause) {
+      if (cause instanceof DOMException && cause.name === "AbortError") {
+        setStatus(t(language, "shareStudio.cancelled"));
+        return;
       }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [open, direction, goToNextPage, goToPreviousPage]);
-
-  // Share current active card (Primary action for social status)
-  const handleShareCurrent = async () => {
-    if (!currentCard) return;
-    try {
-      await shareSingleFile(currentCard.file, {
-        title: `${collectionTitle} (${activePageIndex + 1}/${totalPages})`,
-        onStatus: (status) => {
-          if (status === "sharing") setStatusMessage(t(language, "shareStoryPack.openingShare"));
-          if (status === "shared") setStatusMessage(t(language, "shareStoryPack.sharedSuccess"));
-          if (status === "downloading") setStatusMessage(t(language, "shareStoryPack.downloading"));
-          if (status === "downloaded") setStatusMessage(t(language, "shareStoryPack.downloadSuccess"));
-          if (status === "cancelled") setStatusMessage(t(language, "shareStoryPack.shareCancelled"));
-        },
-      });
-    } catch {
-      setStatusMessage(t(language, "shareStoryPack.shareError"));
+      throw cause;
     }
   };
-
-  // Share all cards together
-  const handleShareAll = async () => {
-    if (!pages || pages.length === 0) return;
-    try {
-      const files = pages.map((p) => p.file);
-      await shareMultipleFiles(files, {
-        title: collectionTitle,
-        onStatus: (status) => {
-          if (status === "sharing") setStatusMessage(t(language, "shareStoryPack.openingShare"));
-          if (status === "shared") setStatusMessage(t(language, "shareStoryPack.sharedSuccess"));
-          if (status === "downloading") setStatusMessage(t(language, "shareStoryPack.downloading"));
-          if (status === "downloaded") setStatusMessage(t(language, "shareStoryPack.downloadSuccess"));
-          if (status === "cancelled") setStatusMessage(t(language, "shareStoryPack.shareCancelled"));
-        },
-      });
-    } catch {
-      setStatusMessage(t(language, "shareStoryPack.shareError"));
-    }
+  const currentNative = current && canShareMultipleFiles([current.file]);
+  const onPreviewKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    if (event.key === "Home") setActive(0);
+    else if (event.key === "End") setActive(pages.length - 1);
+    else
+      setActive((value) =>
+        Math.min(
+          pages.length - 1,
+          Math.max(0, value + ((event.key === "ArrowLeft") === (direction === "rtl") ? 1 : -1)),
+        ),
+      );
   };
 
-  // Download active card PNG
-  const handleDownloadCurrent = () => {
-    if (!currentCard) return;
-    downloadFile(currentCard.file);
-    setStatusMessage(t(language, "shareStoryPack.downloadSuccess"));
-  };
-
-  // Copy active card PNG to clipboard
-  const handleCopyCurrent = async () => {
-    if (!currentCard) return;
-    const success = await copyImageToClipboard(currentCard.blob);
-    if (success) {
-      setCopiedRecently(true);
-      setStatusMessage(t(language, "shareStoryPack.copySuccess"));
-      setTimeout(() => setCopiedRecently(false), 2500);
-    } else {
-      // Fallback to downloading
-      handleDownloadCurrent();
-    }
-  };
-
-  // Download all cards sequentially
-  const handleDownloadAll = async () => {
-    if (!pages || pages.length === 0) return;
-    setStatusMessage(t(language, "shareStoryPack.downloading"));
-    await downloadFilesSequentially(pages.map((p) => p.file));
-    setStatusMessage(t(language, "shareStoryPack.downloadSuccess"));
-  };
+  const selectClass = "flex flex-col gap-2 text-sm font-semibold";
+  const pageLabel = t(language, "shareStoryPack.pageCount", {
+    current: formatNumerals(active + 1, language),
+    total: formatNumerals(total || 1, language),
+  });
 
   return (
     <Modal
       open={open}
       onClose={onClose}
-      title={t(language, "shareStoryPack.modalTitle")}
+      title={t(language, single ? "shareStudio.singleTitle" : "shareStoryPack.modalTitle")}
       direction={direction}
       language={language}
-      maxWidthClassName="max-w-[460px]"
-      className="p-5 flex flex-col gap-3.5 overflow-y-auto"
       describedById={descriptionId}
       testId="collection-share-modal"
+      maxWidthClassName={inspect ? "max-w-5xl" : "max-w-xl"}
+      className="overflow-y-auto p-5 gap-4"
     >
-      {/* Header Info */}
-      <div className="text-center pt-1">
-        <h2 className="text-base font-extrabold text-foreground">{t(language, "shareStoryPack.modalTitle")}</h2>
-        <DialogPrimitive.Description id={descriptionId} className="text-xs text-muted-foreground mt-1 font-medium">
-          {t(language, "shareStoryPack.modalSubtitle")}
+      <div className="pe-12">
+        <p className="text-lg font-bold" aria-hidden="true">
+          {t(language, single ? "shareStudio.singleTitle" : "shareStoryPack.modalTitle")}
+        </p>
+        <DialogPrimitive.Description id={descriptionId} className="mt-1 text-sm text-muted-foreground">
+          {t(language, "shareStudio.description")}
         </DialogPrimitive.Description>
       </div>
-
-      {/* Theme Picker */}
-      <div className="flex items-center justify-center gap-2 bg-muted/60 p-1.5 rounded-full border border-border/70 self-center">
-        <button
-          type="button"
-          onClick={() => setSelectedTheme("light")}
-          className={`flex min-h-11 items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-            selectedTheme === "light"
-              ? "bg-card text-foreground shadow-xs border border-border/80"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-          aria-pressed={selectedTheme === "light"}
-        >
-          <Sun size={15} className="text-primary" aria-hidden="true" />
-          <span>{t(language, "shareStoryPack.themeDaylight")}</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setSelectedTheme("midnight")}
-          className={`flex min-h-11 items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-            selectedTheme === "midnight"
-              ? "bg-card text-foreground shadow-xs border border-border/80"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-          aria-pressed={selectedTheme === "midnight"}
-        >
-          <Moon size={15} className="text-primary" aria-hidden="true" />
-          <span>{t(language, "shareStoryPack.themeMidnight")}</span>
-        </button>
+      <div role="group" aria-label={t(language, "shareStudio.method")} className="grid grid-cols-3 gap-2">
+        {(["image", "text", "link"] as const).map((value) => (
+          <Button
+            key={value}
+            variant={mode === value ? "default" : "outline"}
+            aria-pressed={mode === value}
+            onClick={() => setMode(value)}
+            disabled={busy || (value === "link" && !url)}
+            className="min-h-11"
+          >
+            {t(language, `shareStudio.${value}`)}
+          </Button>
+        ))}
       </div>
-
-      {/* Slide Preview Canvas */}
-      <div className="relative flex shrink-0 flex-col items-center justify-center h-[340px] w-full rounded-2xl bg-muted/30 border border-border/50 overflow-hidden p-2">
-        {generationFailed ? (
-          <div className="flex flex-col items-center gap-3 text-center">
-            <p role="alert">{t(language, "shareStoryPack.shareError")}</p>
-            <Button onClick={() => setRetryGeneration((value) => value + 1)}>{t(language, "common.tryAgain")}</Button>
+      {mode === "image" && (
+        <>
+          <div className="grid grid-cols-2 gap-3">
+            <div className={selectClass}>
+              <label id={themeId}>{t(language, "shareStoryPack.themeLabel")}</label>
+              <Select
+                value={appearance}
+                onValueChange={(value) => setAppearance(value as ShareAppearance)}
+                disabled={busy}
+                dir={direction}
+              >
+                <SelectTrigger aria-labelledby={themeId}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="z-[110]">
+                  {(["olive", "gold", "lavender"] as const).map((value) => (
+                    <SelectItem key={value} value={value}>
+                      {t(language, `shareStudio.${value}`)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className={selectClass}>
+              <label id={formatId}>{t(language, "shareStudio.format")}</label>
+              <Select
+                value={format}
+                onValueChange={(value) => setFormat(value as ShareFormat)}
+                disabled={busy}
+                dir={direction}
+              >
+                <SelectTrigger aria-labelledby={formatId}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="z-[110]">
+                  {(["story", "square", "portrait", "tall"] as const).map((value) => (
+                    <SelectItem key={value} value={value}>
+                      {t(language, `shareStudio.${value}`)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-        ) : isGenerating || !currentCard ? (
-          <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
-            <div
-              className="h-9 w-9 rounded-full border-3 border-primary/20 border-t-primary animate-spin"
-              aria-hidden="true"
+        </>
+      )}
+      {mode !== "link" && (
+        <details className="rounded-2xl border border-border px-3">
+          <summary className="flex min-h-11 cursor-pointer items-center font-semibold text-sm">
+            {t(language, "shareStudio.contentOptions")}
+          </summary>
+          <div className="pb-2">
+            {[
+              {
+                key: "meaning",
+                value: meaning,
+                set: setMeaning,
+                available: exportItems.some((item) => item.translation),
+              },
+              {
+                key: "pronunciation",
+                value: pronunciation,
+                set: setPronunciation,
+                available: exportItems.some((item) => item.transliteration),
+              },
+              { key: "benefit", value: benefit, set: setBenefit, available: exportItems.some((item) => item.benefit) },
+              { key: "qr", value: qr, set: setQr, available: mode === "image" && Boolean(url) },
+            ]
+              .filter((option) => option.available)
+              .map((option) => (
+                <label key={option.key} className="flex min-h-11 cursor-pointer items-center gap-3 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={option.value}
+                    onChange={(event) => option.set(event.target.checked)}
+                    disabled={busy}
+                    className="size-5 accent-primary"
+                  />
+                  <span>{t(language, `shareStudio.${option.key}`)}</span>
+                </label>
+              ))}
+            <p className="text-xs text-muted-foreground">{t(language, "shareStudio.sourceAlways")}</p>
+          </div>
+        </details>
+      )}
+      {mode === "image" ? (
+        <>
+          <div role="group" aria-label={t(language, "shareStudio.preview")}>
+            {failed ? (
+              <div className="py-10 text-center">
+                <p role="alert">{t(language, "shareStoryPack.shareError")}</p>
+                <Button className="mt-3" onClick={() => setRetry((value) => value + 1)}>
+                  {t(language, "common.tryAgain")}
+                </Button>
+              </div>
+            ) : current ? (
+              <button
+                type="button"
+                onKeyDown={onPreviewKeyDown}
+                onClick={() => setInspect((value) => !value)}
+                aria-label={t(language, inspect ? "shareStudio.closeInspect" : "shareStudio.inspect")}
+                aria-pressed={inspect}
+                className={`flex w-full items-center justify-center rounded-2xl border border-border bg-muted/30 p-2 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${inspect ? "h-[65vh]" : "h-[min(48vh,420px)]"}`}
+              >
+                <img
+                  src={current.dataUrl}
+                  alt={current.altText}
+                  width={current.width}
+                  height={current.height}
+                  className="h-full max-w-full w-auto object-contain rounded-xl"
+                />
+              </button>
+            ) : (
+              <p role="status" className="py-12 text-center text-sm">
+                {t(language, "shareStoryPack.generating")}
+              </p>
+            )}
+            {ready && (
+              <div className="mt-3 flex items-center justify-between gap-3">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  disabled={active <= 0 || busy}
+                  aria-label={t(language, "shareStoryPack.previousPage")}
+                  onKeyDown={onPreviewKeyDown}
+                  onClick={() => setActive((value) => value - 1)}
+                  className="size-11"
+                >
+                  <ChevronPrevious data-rtl-flip aria-hidden="true" />
+                </Button>
+                <span aria-live="polite" aria-atomic="true" className="text-sm font-semibold">
+                  {pageLabel}
+                </span>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  disabled={active >= pages.length - 1 || busy}
+                  aria-label={t(language, "shareStoryPack.nextPage")}
+                  onKeyDown={onPreviewKeyDown}
+                  onClick={() => setActive((value) => value + 1)}
+                  className="size-11"
+                >
+                  <ChevronNext data-rtl-flip aria-hidden="true" />
+                </Button>
+              </div>
+            )}
+          </div>
+          {generating && ready && (
+            <p role="status" className="text-sm text-muted-foreground">
+              {t(language, "shareStudio.remaining")}
+            </p>
+          )}
+          {current?.layout && (
+            <details className="rounded-2xl border border-border px-3">
+              <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold">
+                {t(language, "shareStudio.readCard")}
+              </summary>
+              <div className="pb-3 space-y-4">
+                {current.layout.fragments.map((fragment, index) => (
+                  <div key={`${fragment.item.id}-${index}`}>
+                    {fragment.parts > 1 && (
+                      <p className="text-xs text-muted-foreground">
+                        {t(language, "shareStudio.continuation", { current: fragment.part, total: fragment.parts })}
+                      </p>
+                    )}
+                    {[...fragment.sections, ...(fragment.citation ? [fragment.citation] : [])].map(
+                      (section, sectionIndex) => (
+                        <p
+                          key={`${section.key}-${sectionIndex}`}
+                          lang={section.direction === "rtl" ? "ar" : "en"}
+                          dir={section.direction}
+                          className={`whitespace-pre-wrap break-words text-base leading-relaxed ${section.direction === "rtl" ? "zikr-text" : ""}`}
+                        >
+                          {section.key !== "arabic" && (
+                            <strong className="block text-sm">{t(exportLanguage, `shareStudio.${section.key}`)}</strong>
+                          )}
+                          {section.text}
+                        </p>
+                      ),
+                    )}
+                  </div>
+                ))}
+              </div>
+            </details>
+          )}
+          <div className="flex flex-col gap-2">
+            <Button
+              disabled={!ready || busy}
+              aria-busy={busy}
+              onClick={() =>
+                void run(async () => {
+                  if (!current) return;
+                  if (!currentNative) {
+                    save();
+                    return;
+                  }
+                  await shareSingleFile(current.file, { title, downloadFallback: false, onStatus: notify });
+                })
+              }
+              className="min-h-12"
+            >
+              {currentNative ? <Share2 aria-hidden="true" /> : <Download aria-hidden="true" />}
+              {t(language, currentNative ? "shareStoryPack.shareCurrent" : "shareStoryPack.downloadSingle")}
+            </Button>
+            {currentNative && (
+              <Button variant="outline" disabled={!ready || busy} onClick={() => void run(save)} className="min-h-11">
+                <Download aria-hidden="true" />
+                {t(language, "shareStoryPack.downloadSingle")}
+              </Button>
+            )}
+            <details className="rounded-2xl border border-border px-3">
+              <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold">
+                {t(language, "shareStudio.more")}
+              </summary>
+              <div className="grid gap-2 pb-3">
+                {canCopyImage() && (
+                  <Button
+                    variant="outline"
+                    disabled={!ready || busy}
+                    onClick={() =>
+                      void run(async () => {
+                        if (!current) return;
+                        if (!(await copyImageToClipboard(current.blob))) {
+                          setError(true);
+                          setStatus(t(language, "shareStudio.copyFailed"));
+                          return;
+                        }
+                        setStatus(t(language, "shareStoryPack.copySuccess"));
+                      })
+                    }
+                    className="min-h-11"
+                  >
+                    {t(language, "shareStoryPack.copySingle")}
+                  </Button>
+                )}
+                {total > 1 && (
+                  <>
+                    <Button
+                      variant="outline"
+                      disabled={!allReady || busy || !canShareMultipleFiles(pages.map((page) => page.file))}
+                      onClick={() =>
+                        void run(async () => {
+                          await shareMultipleFiles(
+                            pages.map((page) => page.file),
+                            { title, downloadFallback: false, onStatus: notify },
+                          );
+                        })
+                      }
+                      className="min-h-11"
+                    >
+                      {t(language, "shareStoryPack.shareAll")}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      disabled={!allReady || busy}
+                      onClick={() =>
+                        void run(async () => {
+                          const archive = await createShareArchive(
+                            pages.map((page) => page.file),
+                            text,
+                          );
+                          downloadFile(archive);
+                          setStatus(t(language, "shareStudio.downloaded"));
+                        })
+                      }
+                      className="min-h-11"
+                    >
+                      {t(language, "shareStudio.archive")}
+                    </Button>
+                    <p className="text-xs text-muted-foreground">{t(language, "shareStudio.bulkHint")}</p>
+                  </>
+                )}
+              </div>
+            </details>
+          </div>
+        </>
+      ) : (
+        <>
+          <label className="flex flex-col gap-2 text-sm font-semibold">
+            {t(language, mode === "text" ? "shareStudio.textPreview" : "shareStudio.linkPreview")}
+            <textarea
+              readOnly
+              value={mode === "text" ? text : (url ?? "")}
+              dir="auto"
+              rows={mode === "text" ? 9 : 3}
+              className="w-full resize-y rounded-xl border border-border bg-background p-3 text-base leading-relaxed font-normal"
             />
-            <p className="text-xs font-bold text-muted-foreground">{t(language, "shareStoryPack.generating")}</p>
-          </div>
-        ) : (
-          <img
-            src={currentCard.dataUrl}
-            alt={currentCard.altText}
-            className="h-full w-auto aspect-[9/16] object-contain rounded-xl shadow-md border border-border/60 transition-transform duration-fast"
-          />
-        )}
-      </div>
-
-      {/* Pagination Carousel Navigation */}
-      <div className="flex items-center justify-between px-1">
-        <button
-          type="button"
-          disabled={activePageIndex <= 0 || isGenerating}
-          onClick={goToPreviousPage}
-          className="flex h-11 w-11 items-center justify-center rounded-full border border-border/80 bg-card text-foreground shadow-xs disabled:opacity-30 disabled:pointer-events-none hover:bg-muted focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none"
-          aria-label={t(language, "shareStoryPack.previousPage")}
-        >
-          <ChevronPrevious size={20} data-rtl-flip aria-hidden="true" />
-        </button>
-
-        <span
-          className="text-xs font-bold text-muted-foreground px-3.5 py-1.5 rounded-full bg-muted/50 border border-border/40 tabular-nums"
-          dir="auto"
-        >
-          {t(language, "shareStoryPack.pageCount", {
-            current: formatNumerals(activePageIndex + 1, language),
-            total: formatNumerals(totalPages, language),
-          })}
-        </span>
-
-        <button
-          type="button"
-          disabled={activePageIndex >= totalPages - 1 || isGenerating}
-          onClick={goToNextPage}
-          className="flex h-11 w-11 items-center justify-center rounded-full border border-border/80 bg-card text-foreground shadow-xs disabled:opacity-30 disabled:pointer-events-none hover:bg-muted focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none"
-          aria-label={t(language, "shareStoryPack.nextPage")}
-        >
-          <ChevronNext size={20} data-rtl-flip aria-hidden="true" />
-        </button>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="flex flex-col gap-2 pt-1">
-        {/* Primary Action: Share Current Card */}
-        <Button
-          type="button"
-          size="lg"
-          disabled={isGenerating || !currentCard}
-          onClick={() => void handleShareCurrent()}
-          className="w-full h-11 rounded-xl bg-primary text-primary-foreground font-bold shadow-sm flex items-center justify-center gap-2 focus-visible:ring-[3px] focus-visible:ring-ring"
-        >
-          <Share2 size={18} aria-hidden="true" />
-          <span>{t(language, "shareStoryPack.shareCurrent")}</span>
-        </Button>
-
-        {/* Secondary Action: Share All Cards */}
-        {totalPages > 1 && (
+          </label>
           <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            disabled={isGenerating || !pages}
-            onClick={() => void handleShareAll()}
-            className="w-full min-h-11 rounded-xl border-border/80 font-bold text-foreground hover:bg-muted/70 flex items-center justify-center gap-2 focus-visible:ring-[3px] focus-visible:ring-ring"
+            disabled={busy || (mode === "link" && !url)}
+            onClick={() => void run(() => shareText(mode === "text" ? text : (url ?? ""), mode === "link"))}
+            className="min-h-12"
           >
-            <Share2 size={16} aria-hidden="true" />
-            <span>{t(language, "shareStoryPack.shareAll")}</span>
+            {t(language, typeof navigator.share === "function" ? "shareStudio.share" : "shareStudio.copy")}
           </Button>
-        )}
-
-        {/* Quick Utilities Row: Save Image | Copy Image | Download All */}
-        <div className="flex items-center gap-2 pt-0.5">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            disabled={isGenerating || !currentCard}
-            onClick={handleDownloadCurrent}
-            className="flex-1 min-h-11 rounded-xl border-border/80 text-xs font-bold text-muted-foreground hover:text-foreground flex items-center justify-center gap-1.5 focus-visible:ring-[3px] focus-visible:ring-ring"
-          >
-            <Download size={15} aria-hidden="true" />
-            <span>{t(language, "shareStoryPack.downloadSingle")}</span>
-          </Button>
-
-          {canCopyImage() && (
+          {typeof navigator.share === "function" && (
             <Button
-              type="button"
               variant="outline"
-              size="sm"
-              disabled={isGenerating || !currentCard}
-              onClick={() => void handleCopyCurrent()}
-              className="flex-1 min-h-11 rounded-xl border-border/80 text-xs font-bold text-muted-foreground hover:text-foreground flex items-center justify-center gap-1.5 focus-visible:ring-[3px] focus-visible:ring-ring"
+              disabled={busy}
+              onClick={() => void run(() => copyText(mode === "text" ? text : (url ?? "")))}
+              className="min-h-11"
             >
-              {copiedRecently ? (
-                <>
-                  <Check size={15} className="text-success" aria-hidden="true" />
-                  <span className="text-success">{t(language, "shareStoryPack.copySingle")}</span>
-                </>
-              ) : (
-                <>
-                  <Copy size={15} aria-hidden="true" />
-                  <span>{t(language, "shareStoryPack.copySingle")}</span>
-                </>
-              )}
+              {t(language, "shareStudio.copy")}
             </Button>
           )}
-
-          {totalPages > 1 && (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={isGenerating || !pages}
-              onClick={() => void handleDownloadAll()}
-              className="flex-1 min-h-11 rounded-xl border-border/80 text-xs font-bold text-muted-foreground hover:text-foreground flex items-center justify-center gap-1.5 focus-visible:ring-[3px] focus-visible:ring-ring"
-            >
-              <Download size={15} aria-hidden="true" />
-              <span>{t(language, "shareStoryPack.downloadAll")}</span>
-            </Button>
-          )}
-        </div>
-      </div>
-
-      {/* Status Live Region */}
-      <div id={statusId} role="status" aria-live="polite" className="sr-only">
-        {statusMessage}
+        </>
+      )}
+      <p className="text-xs text-muted-foreground">{t(language, "shareStudio.destinationHint")}</p>
+      <div
+        role={error ? "alert" : "status"}
+        aria-live={error ? "assertive" : "polite"}
+        aria-atomic="true"
+        className="text-sm text-foreground"
+      >
+        {status}
       </div>
     </Modal>
   );

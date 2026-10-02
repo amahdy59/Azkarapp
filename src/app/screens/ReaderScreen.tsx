@@ -1,5 +1,15 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
-import { cloneElement, isValidElement, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  lazy,
+  Suspense,
+  cloneElement,
+  isValidElement,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import "../../styles/animations/ZikrAnimations.css";
 import "./ReaderScreen.css";
 import { useZikrCounter } from "../hooks/useZikrCounter";
@@ -40,8 +50,7 @@ import { CounterShortcutHints, ZikrCounterSurface } from "../components/ZikrComp
 import { ToggleTrack } from "../components/SettingsRow";
 import { ReaderReferenceSheet } from "../components/ReaderReferenceSheet";
 import { IconButton } from "../components/LayoutShells";
-import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content/localizedZikr";
-import { prepareZikrShareCardFonts, shareZikrCard, type ZikrShareCardStatus } from "../share/zikrShareCard";
+import { prepareZikrShareCardFonts } from "../share/zikrShareCard";
 import { useCountingSurface } from "../components/countingSurface";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { Header } from "../components/LayoutShells";
@@ -80,17 +89,9 @@ const READER_HEADER_ACTION_CLASS =
 
 const QURAN_CARD_IMAGE = `${import.meta.env.BASE_URL || "/"}assets/cards/wird-quran.jpg`;
 
-const SHARE_STATUS_KEYS: Record<ZikrShareCardStatus, string> = {
-  generating: "reader.shareCardGenerating",
-  openingShareSheet: "reader.shareCardOpening",
-  shared: "reader.shareCardShared",
-  copying: "reader.shareCardCopying",
-  copied: "reader.shareCardCopied",
-  downloading: "reader.shareCardDownloading",
-  downloaded: "reader.shareCardDownloaded",
-  cancelled: "reader.shareCardCancelled",
-  error: "reader.shareCardError",
-};
+const SharingPreview = lazy(() =>
+  import("../components/CollectionShareModal").then((module) => ({ default: module.CollectionShareModal })),
+);
 
 const EMPTY_COMPLETED_ZIKR_IDS: ReadonlySet<string> = new Set();
 
@@ -297,7 +298,7 @@ export function ReaderScreen({
   const [hasOpenedBenefit, setHasOpenedBenefit] = useState(false);
   const [showDifficultWords, setShowDifficultWords] = useState(false);
   const [shareMessage, setShareMessage] = useState("");
-  const [isSharing, setIsSharing] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const [wordMeaningSelection, setWordMeaningSelection] = useState<WordMeaningSelection | null>(null);
   /* The popover answers the tap; the sheet is the deliberate "all meanings"
      step, so the same selection drives both and only this flag differs. */
@@ -308,7 +309,6 @@ export function ReaderScreen({
   const closeReference = useCallback(() => setBenefitOpen(false), []);
   const { soundEnabled, toggleSound, playClickFeedback } = useCounterClickFeedback();
 
-  const shareTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const readerMainRef = useRef<HTMLDivElement | null>(null);
   const readingScrollRef = useRef<HTMLDivElement | null>(null);
   const restoreReadingFocusOnAdvanceRef = useRef(false);
@@ -428,14 +428,6 @@ export function ReaderScreen({
   const onTouchStart = immersiveOpen ? undefined : baseTouchStart;
   const onTouchMove = immersiveOpen ? undefined : baseTouchMove;
   const onTouchEnd = immersiveOpen ? undefined : baseTouchEnd;
-
-  useEffect(() => {
-    return () => {
-      if (shareTimer.current) {
-        clearTimeout(shareTimer.current);
-      }
-    };
-  }, []);
 
   useEffect(() => {
     setWordMeaningSelection(null);
@@ -606,50 +598,7 @@ export function ReaderScreen({
   const readerZikrTitle = getReaderZikrTitle(z, language);
   const localizedReadingPercent = formatNumerals(readingPercent, language);
 
-  const handleShare = async () => {
-    setIsSharing(true);
-    try {
-      const resolvedTitle =
-        readerZikrTitle ??
-        (z.arabicText.includes("أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ، خَلَقْتَنِي")
-          ? isArabic
-            ? "دعاء سيد الاستغفار"
-            : "Sayyid al-Istighfar"
-          : undefined);
-
-      await shareZikrCard(
-        {
-          id: z.id,
-          title: resolvedTitle,
-          language,
-          themeMode,
-          arabicText: z.arabicText,
-          translation: language === "en" ? z.translation : undefined,
-          transliteration: language === "en" ? z.transliteration : undefined,
-          benefit: getLocalizedZikrBenefit(z, language),
-          sourceReference: getLocalizedSourceReference(z, language),
-          categoryLabel: displayCategoryName,
-          repetitionCount: z.repetitionCount,
-          appUrl:
-            typeof window === "undefined"
-              ? undefined
-              : new URL(import.meta.env.BASE_URL, window.location.origin).toString(),
-          labels: { brandName: isArabic ? "وَذَكِّرْ" : "Wa-Zaker" },
-        },
-        {
-          onStatus: (status) => setShareMessage(t(language, SHARE_STATUS_KEYS[status])),
-        },
-      );
-    } catch {
-      // The share helper has already announced a localized error state.
-    } finally {
-      setIsSharing(false);
-      if (shareTimer.current) {
-        clearTimeout(shareTimer.current);
-      }
-      shareTimer.current = setTimeout(() => setShareMessage(""), 2600);
-    }
-  };
+  const handleShare = () => setShareOpen(true);
 
   let displayArabicText = z.arabicText;
   if (z.hasBasmalah || z.isSurah) {
@@ -1257,7 +1206,7 @@ export function ReaderScreen({
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => void handleShare()}
-          disabled={isSharing}
+          disabled={shareOpen}
           className="flex cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-sm font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
         >
           <Share2 size={16} />
@@ -1714,6 +1663,25 @@ export function ReaderScreen({
           </>
         ))}
 
+      {shareOpen && (
+        <Suspense fallback={null}>
+          <SharingPreview
+            open
+            onClose={() => setShareOpen(false)}
+            single
+            collectionTitle={readerZikrTitle ?? displayCategoryName}
+            collectionTitleArabic={z.surahNameArabic ?? CATEGORIES.find((c) => c.id === catId)?.nameArabic}
+            collectionTitleEnglish={z.surahNameEnglish ?? CATEGORIES.find((c) => c.id === catId)?.name}
+            categoryId={catId}
+            readerIndex={idx}
+            routineMode={routineMode}
+            prayer={isPrayerName(subCategory) ? subCategory : undefined}
+            items={[z]}
+            language={language}
+            themeMode={themeMode}
+          />
+        </Suspense>
+      )}
       {hasOpenedBenefit && (
         <ReaderReferenceSheet
           open={benefitOpen}

@@ -4032,3 +4032,12 @@ null` shape, so a record written before this change still loads and still
 - **Decision:** New listening runs default to the existing prescribed count. Play Once remains selectable. Embedded repetitions belong to the selected recording and must be recalculated when its voice changes. Religious text and prescribed counts stay unchanged.
 - **Supersedes:** The Play Once default in DEC-213/214 only. The current request authorizes committing, pushing, and verifying all pending changes, superseding the earlier local-only release restriction.
 - **Verification:** Audio plan/provider regressions, complete quality/browser gates, Pages build, both GitHub workflows, and production smoke verification.
+
+## DEC-216 — Apply sharing audit recommendations
+
+- **Date:** 2026-10-03
+- **Status:** Approved
+- **Owner:** Product owner: "apply all recommendations", with UX, visual design and accessibility requirements.
+- **Decision:** Apply the sharing audit's thirty recommendations within Phase 77. Use complete measured continuation cards and a shared preview for single zikr and collections; preserve reviewed words, benefits, translations and counts. Provide coordinated olive/gold/lavender artwork, Story/Square/Portrait/Tall formats, explicit optional content, mandatory available citations, accessible text, exact links/optional QR, serialized native sharing and explicit fallbacks. ZIP saving uses existing platform APIs and no new dependency. Story becomes the preview default; the earlier tall single-card format remains available.
+- **Verification:** Corpus/text reconstruction and geometry, browser Arabic/English/offline/keyboard/narrow-screen/accessibility, existing PWA upgrade tests, full local gates, release notes and production deployment. Real phone social destinations, compression/QR scans, cutouts and human screen-reader sessions remain pending and must not be claimed as completed.
+- **Exact-link context:** Validated routine and prayer parameters travel in the hash query and apply transiently, preserving the recipient's saved preferences. This closes the position mismatch between Complete/Core and prayer-specific lists without replacing the router.
