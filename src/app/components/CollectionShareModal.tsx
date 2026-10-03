@@ -609,7 +609,7 @@ export function CollectionShareModal({
                   >
                     <span
                       aria-hidden="true"
-                      className={`h-5 w-12 rounded border ${value === "olive" ? "bg-share-olive-surface border-share-olive-accent" : value === "gold" ? "bg-share-gold-surface border-share-gold-accent" : "bg-share-lavender-surface border-share-lavender-accent"}`}
+                      className="h-5 w-12 rounded border" style={{ backgroundColor: value === "olive" ? "#f6f1e7" : value === "gold" ? "#091426" : "#111527", borderColor: value === "olive" ? "#315b42" : value === "gold" ? "#efd18a" : "#d5c5f4" }}
                     />
                     {t(language, `shareStudio.${value}`)}
                   </Button>
@@ -824,3 +824,4 @@ export function CollectionShareModal({
     </Modal>
   );
 }
+

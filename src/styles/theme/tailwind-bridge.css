@@ -6,12 +6,6 @@
    between parts, or reordering the imports, can change which declaration wins. */
 
 @theme inline {
-  --color-share-olive-surface: #f6f1e7;
-  --color-share-olive-accent: #315b42;
-  --color-share-gold-surface: #091426;
-  --color-share-gold-accent: #efd18a;
-  --color-share-lavender-surface: #111527;
-  --color-share-lavender-accent: #d5c5f4;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -182,3 +176,4 @@
     outline-offset: 2px;
   }
 }
+
