@@ -858,7 +858,9 @@ const en = {
     extraProgress: "+{count} extra",
     nextMilestoneHint: "Next: {current} of {target}",
     explanation:
-      "Complete Morning, Evening, and Before Sleep Azkar to earn your daily palm and nurture your oasis. Consistent daily remembrance grows your oasis and bears fruit.",
+      "A palm is planted in your oasis when you complete all core daily azkar (Morning, Evening, and Before Sleep).",
+    explanationWithQuran:
+      "A palm is planted in your oasis when you complete all of today's awrad (Morning, Evening, and Before Sleep azkar, and Qur'an wird).",
     explanationLabel: "How a palm is earned",
     private: "Private by default and never shared as a ranking.",
     shown: "Garden shown",
@@ -1605,7 +1607,9 @@ const en = {
     resetConfirmTitle: "Reset this count?",
     resetConfirmBody: "This will clear your current count of {count} and all completed laps.",
     changeDhikrTitle: "Change the selected dhikr?",
-    changeDhikrBody: "Changing dhikr will clear the current count of {count} so recitations are not mixed.",
+    changeDhikrBody:
+      "You can save your progress to continue later today, or clear the current count of {count} and reset.",
+    saveAndSwitch: "Save & switch",
     changeDhikrConfirm: "Change and reset",
     tasbeehTitle: "Masbaha",
     sound: "Counter sound",

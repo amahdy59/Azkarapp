@@ -187,7 +187,7 @@ test("three completed main collections stay concise and explain the palm on dema
   await garden.getByRole("button", { name: "How a palm is earned" }).click();
   const tooltip = garden.getByRole("tooltip");
   await expect(tooltip).toHaveText(
-    "Complete Morning, Evening, and Before Sleep Azkar to earn your daily palm and nurture your oasis. Consistent daily remembrance grows your oasis and bears fruit.",
+    "A palm is planted in your oasis when you complete all of today's awrad (Morning, Evening, and Before Sleep azkar, and Qur'an wird).",
   );
   await tooltip.scrollIntoViewIfNeeded();
   await expect(tooltip).toBeInViewport();

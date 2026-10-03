@@ -533,8 +533,10 @@ export function ProgressDayView({
             >
               <span aria-hidden="true">🌱</span>
               <bdi>
-                {formatNumerals(completedCount * 5, language)}/{formatNumerals(totalCount * 5, language)}{" "}
-                {t(language, "progress.thimarUnit")}
+                {t(language, "progress.todayThimarProgress", {
+                  earned: formatNumerals(completedCount * 5, language),
+                  total: formatNumerals(totalCount * 5, language),
+                })}
               </bdi>
             </div>
           </div>
@@ -550,7 +552,7 @@ export function ProgressDayView({
             }`}
             dir={isArabic ? "rtl" : "ltr"}
           >
-            {t(language, "garden.explanation")}
+            {t(language, quranWird ? "garden.explanationWithQuran" : "garden.explanation")}
           </div>
         )}
 
