@@ -886,7 +886,7 @@ export function HomeScreen({
           )}
 
           <div className="px-page">
-            <SituationalShortcuts language={language} onOpen={onResume} />
+            <SituationalShortcuts language={language} onOpen={onResume} onGlass={homeVisualEffects} />
           </div>
 
           {/* Devotional Tools: Qiblah & Masbaha */}

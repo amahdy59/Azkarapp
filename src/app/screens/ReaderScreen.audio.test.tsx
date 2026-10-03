@@ -21,6 +21,46 @@ afterEach(() => {
 });
 
 describe("ReaderScreen audio identity", () => {
+  it.each(["morning", "evening", "before_sleep"] as const)(
+    "uses the concise Ayah Al-Kursi heading in %s without changing source metadata",
+    (catId) => {
+      const azkar = getAzkarForMode(catId, "complete");
+      const idx = azkar.findIndex((zikr) => zikr.canonicalKey === "quran-002-255");
+      expect(idx).toBeGreaterThanOrEqual(0);
+      const sourceName = azkar[idx].surahNameArabic;
+      render(
+        <ReaderScreen
+          catId={catId}
+          idx={idx}
+          routineMode="complete"
+          isArabic
+          direction="rtl"
+          themeMode="light"
+          isDone={false}
+          collectionCompletedCount={0}
+          hapticFeedback={false}
+          showTranslation={false}
+          showTransliteration={false}
+          textSize="medium"
+          onTextSizeChange={() => undefined}
+          savedZikrIds={new Set()}
+          onBack={() => undefined}
+          onComplete={() => undefined}
+          onAdvance={() => undefined}
+          onNext={() => undefined}
+          onPrev={() => undefined}
+          onToggleSaved={() => undefined}
+          audioAvailable={false}
+        />,
+      );
+      expect(screen.getByRole("heading", { name: "آية الكرسي", level: 2 })).toBeInTheDocument();
+      expect(azkar[idx].surahNameArabic).toBe(sourceName);
+      const toggle = screen.getByRole("switch", { name: "تظليل الكلمات الغريبة" });
+      fireEvent.click(toggle);
+      expect(toggle).toHaveAttribute("aria-checked", "true");
+    },
+  );
+
   it("provides a direct, progress-aware collection navigator on wide screens", () => {
     vi.stubGlobal(
       "matchMedia",
@@ -236,7 +276,8 @@ describe("ReaderScreen audio identity", () => {
     expect(within(headerActions).queryByRole("button", { name: "Benefit" })).not.toBeInTheDocument();
     expect(within(headerActions).getByRole("button", { name: "Reader options" })).toBeInTheDocument();
     expect(screen.getByTestId("reader-benefit-dock-button")).toBeInTheDocument();
-    for (const name of ["Share zikr", "Save zikr", "Counter sound"]) {
+    expect(screen.getByRole("button", { name: "Share zikr" })).toBeVisible();
+    for (const name of ["Save zikr", "Counter sound"]) {
       expect(screen.queryByRole("button", { name })).toBeNull();
     }
   });
@@ -567,6 +608,8 @@ describe("ReaderScreen audio identity", () => {
 
     expect(screen.getByTestId("counter-surface")).toBeInTheDocument();
     expect(screen.getByTestId("reader-benefit-dock-button")).toBeInTheDocument();
+    expect(screen.getByTestId("reader-share-dock-button")).toHaveTextContent("مشاركة");
+    expect(screen.getByTestId("reader-support-actions").querySelectorAll("button")).toHaveLength(3);
   });
 
   it("morphs center slot into compact audio player when audioModeActive with stable outer slots", () => {

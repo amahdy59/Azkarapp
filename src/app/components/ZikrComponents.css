@@ -91,6 +91,49 @@
    `!important`: that ZikrComponents.tsx set width and height inline from a
    measured size. It does not, and there are no breakpoint overrides left — the
    counter is one size everywhere. */
+.reader-dock {
+  --devotional-control-radius: 999px;
+}
+
+.reader-dock button {
+  border-radius: var(--devotional-control-radius);
+}
+
+.devotional-footer {
+  width: 100%;
+  max-width: 25rem;
+  margin-inline: auto;
+  padding-inline: 12px;
+}
+
+.reader-dock .devotional-secondary-action,
+.adaptive-counter-nav.devotional-secondary-action {
+  background: var(--card);
+  border-color: color-mix(in srgb, var(--border-control) 55%, transparent);
+  box-shadow: none;
+  backdrop-filter: none;
+  transition:
+    background-color var(--motion-duration-press) var(--motion-ease-standard),
+    border-color var(--motion-duration-press) var(--motion-ease-standard),
+    transform var(--motion-duration-release) var(--motion-ease-release);
+}
+
+.reader-dock .devotional-secondary-action:hover:not(:disabled),
+.adaptive-counter-nav.devotional-secondary-action:hover:not(:disabled) {
+  background: var(--muted);
+  border-color: color-mix(in srgb, var(--primary) 25%, var(--border-control));
+}
+
+.reader-dock .devotional-secondary-action:focus-visible,
+.adaptive-counter-nav.devotional-secondary-action:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.reader-dock .devotional-secondary-action:active:not(:disabled) {
+  transform: scale(var(--motion-scale-pressed));
+}
+
 .adaptive-counter-surface {
   position: relative;
   display: flex;
@@ -103,13 +146,11 @@
   user-select: none;
   isolation: isolate;
   cursor: pointer;
-  color: var(--foreground);
-  background: var(--card);
-  border: 1px solid var(--border-control);
-  border-radius: 24px;
-  box-shadow:
-    0 10px 40px -10px color-mix(in srgb, var(--foreground) 15%, transparent),
-    0 0 0 1px color-mix(in srgb, var(--foreground) 2%, transparent);
+  color: var(--primary-foreground);
+  background: var(--primary);
+  border: 1px solid var(--primary);
+  border-radius: var(--devotional-control-radius, 999px);
+  box-shadow: 0 4px 12px -4px color-mix(in srgb, var(--primary) 25%, transparent);
   /* The release. Same tokens as every other control, so the counter is part of
      the app's press rather than an exception with its own timing. */
   transition:
@@ -132,7 +173,7 @@
     border-color 200ms ease,
     box-shadow 200ms ease,
     background-color 200ms ease;
-  background: color-mix(in srgb, var(--primary) 6%, var(--card));
+  background: color-mix(in srgb, var(--primary-foreground) 6%, var(--primary));
   box-shadow: 0 2px 8px color-mix(in srgb, var(--foreground) 4%, transparent);
 }
 
@@ -147,27 +188,13 @@
   cursor: default;
 }
 
-/* One counter, at one size, on every screen and every viewport.
-   There were four sizes: 220x76 in the reader, 288x88 on the Masbaha and
-   salawat, 320x104 / 288x96 at 48rem and 448x144 at 64rem — plus a number that
-   grew to 3rem on the Masbaha alone. The same control read as a different
-   component depending on where you met it.
-   It does not step with the viewport either. The reader's own contract test
-   pins this shape across phone, tablet and desktop, and it is right to: a
-   counter that resizes as the window does is the same inconsistency measured
-   on the other axis. The surface is a readout, not the tap target — on every
-   one of these screens the whole page counts — so it has no reason to grow. */
-/* The single-action face is a bar, not a box: it carries a phrase rather than a
-   score, and it gives back the height the tally did not need. */
-.adaptive-counter-surface--action {
-  width: min(20rem, 100%);
-  height: 56px;
-}
-
+/* Shared compact tally size across devotional screens. Minimum height permits
+   enlarged text to grow without clipping; single-action labels use 48px. */
 .adaptive-counter-surface {
   width: 220px;
   max-width: 100%;
-  height: 76px;
+  min-height: 48px;
+  height: auto;
 }
 
 .counter-outline-progress {
@@ -184,12 +211,13 @@
   inset-block: 0;
   inset-inline-start: 0;
   max-inline-size: 100%;
-  background: color-mix(in srgb, var(--primary) 24%, var(--card));
-  border-inline-end: 2px solid var(--primary);
+  background: color-mix(in srgb, var(--primary-foreground) 8%, var(--primary));
+  border-inline-end: 2px solid color-mix(in srgb, var(--primary-foreground) 40%, transparent);
   transition: inline-size 260ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .adaptive-counter-content {
+  min-width: 0;
   position: relative;
   z-index: 1;
   display: flex;
@@ -198,7 +226,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 14px 18px;
+  padding: 8px 12px;
 }
 
 .adaptive-counter-pulse {
@@ -213,16 +241,16 @@
 
 .adaptive-counter-nav {
   display: flex;
-  width: 52px;
-  height: 64px;
-  min-width: 52px;
+  width: auto;
+  min-height: 48px;
+  min-width: 44px;
   align-items: center;
   justify-content: center;
   border: 1px solid var(--border-control);
-  border-radius: 24px;
+  border-radius: var(--devotional-control-radius, 999px);
   color: var(--foreground);
   background: var(--card);
-  box-shadow: 0 2px 8px color-mix(in srgb, var(--foreground) 4%, transparent);
+  box-shadow: none;
   transition:
     height 420ms cubic-bezier(0.22, 1, 0.36, 1),
     border-radius 420ms cubic-bezier(0.22, 1, 0.36, 1),
@@ -235,7 +263,6 @@
 .adaptive-counter-nav:hover:not(:disabled) {
   background: var(--muted);
   border-color: color-mix(in srgb, var(--primary) 40%, var(--border-control));
-  transform: translateY(-1px);
 }
 .adaptive-counter-nav:active:not(:disabled) {
   transform: scale(0.94);
@@ -245,7 +272,7 @@
   box-shadow: 0 0 0 3px var(--ring);
 }
 .adaptive-counter-nav:disabled {
-  opacity: 0.25;
+  opacity: 0.5;
 }
 
 .counter-ring-ready::after {
@@ -284,15 +311,14 @@
 
 .counter-check-mark {
   display: flex;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   flex: none;
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  color: var(--primary-foreground);
-  background: var(--primary);
-  box-shadow: 0 0 0 5px color-mix(in srgb, var(--primary) 12%, transparent);
+  color: var(--primary);
+  background: var(--primary-foreground);
 }
 
 .counter-face-swap {
@@ -303,7 +329,7 @@
   font-weight: 800;
   line-height: 1;
   letter-spacing: 0.01em;
-  color: var(--primary);
+  color: var(--primary-foreground);
 }
 .counter-complete-cue .counter-check-mark svg path {
   stroke-dasharray: 48;
@@ -331,4 +357,14 @@
     opacity: 1;
     transform: none;
   }
+}
+
+.adaptive-counter-surface--action {
+  min-height: 48px;
+}
+
+.counter-tap-hint {
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--primary) 4%, var(--card));
+  color: var(--foreground);
 }

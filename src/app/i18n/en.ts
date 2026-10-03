@@ -1264,6 +1264,7 @@ const en = {
     qcfUnavailable: "The local Quran font is shown until the Madinah page font is available.",
   },
   reader: {
+    ayahAlKursi: "Ayah Al-Kursi",
     shortcutHelp: "Open keyboard help",
     characterShortcuts: "Enable single-key shortcuts for this visit",
     shortcutSafety:
@@ -1336,6 +1337,7 @@ const en = {
     mushafAccept: "May Allah accept from us and from you",
     mushafReturn: "Return to Azkar",
     translationButton: "English",
+    shareAction: "Share",
     referencesButton: "Benefit",
     openBenefit: "Open benefit",
     closeReference: "Close benefit",

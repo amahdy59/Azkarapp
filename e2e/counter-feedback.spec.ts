@@ -341,7 +341,7 @@ test("the custom counter stays bounded on a short phone and isolates focused-con
   if (counterBox) {
     expect(counterBox.width).toBeGreaterThanOrEqual(200);
     expect(counterBox.width).toBeLessThanOrEqual(320);
-    expect(counterBox.height).toBeGreaterThanOrEqual(70);
+    expect(Math.round(counterBox.height)).toBe(48);
     expect(counterBox.x).toBeGreaterThanOrEqual(0);
     expect(counterBox.x + counterBox.width).toBeLessThanOrEqual(320);
   }
@@ -375,7 +375,7 @@ test("custom counter content keeps its reading-width bound on desktop", async ({
   expect(counterBox).not.toBeNull();
   if (counterBox) {
     expect(counterBox.width).toBeGreaterThanOrEqual(200);
-    expect(counterBox.height).toBeGreaterThanOrEqual(70);
+    expect(Math.round(counterBox.height)).toBe(48);
   }
 });
 

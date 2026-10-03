@@ -16,6 +16,7 @@ export const ISOLATED_SUITES = [
   "src/app/audio/travelPreparation.test.ts",
   "src/app/components/AppErrorBoundary.test.tsx",
   "src/app/components/CollectionShareModal.test.tsx",
+  "src/app/components/ReadingScreenChrome.test.tsx",
   "src/app/content/qcfMushaf.test.ts",
   "src/app/hooks/useAuthHandlers.test.ts",
   "src/app/hooks/usePwaLifecycle.test.ts",

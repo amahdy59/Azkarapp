@@ -4059,3 +4059,32 @@ null` shape, so a record written before this change still loads and still
 - **Excluded:** Speaker-based haptics, automatic counting, invented ritual combinations, grace-day quotas, decorative sound/number/sky effects, and generic Arabic typography changes. Badges and a canonical Mushaf ruler remain optional research ideas, not this implementation's acceptance criteria.
 - **Authority:** DEC-216-H's local-only restriction remains; no commit, push, or deployment. Preserve unrelated pending edits.
 - **Verification:** Focused unit tests, Arabic/English narrow/tablet/desktop browser checks, axe scans, screenshots, and repository quality gates. Automated evidence does not establish full manual accessibility compliance.
+
+### DEC-217 follow-up — Mobile help and situational material
+
+- **Date:** 2026-10-03
+- **Status:** Approved by the owner's screenshot follow-up.
+- **Decision:** Hide ordinary counter keyboard instructions below 768px on Reader, Masbaha, and Friday Salawat. Preserve shortcuts for attached keyboards. Match the situational card to Home's shared glass material when visual effects are enabled and to the selected theme's opaque surface when Reduce Transparency is enabled. Preserve localized semantic links, native modified activation, visible focus, and generous targets.
+- **Authority:** Local changes only; no commit, push, or deployment. Preserve the owner's existing Reader and translation edits.
+
+## Devotional footer redesign — owner-authorized local implementation
+
+- Date: 2026-10-03.
+- Authority: The owner requested implementation of the reviewed counter/actions redesign across Reader, Masbaha, and Salawat, then explicitly requested repair of issues and no push.
+- Decision: Implement the compact shared tally, smaller labelled direction-aware Reader navigation, and visible Reader Benefit/Listen/Share support actions. Keep action sets specific to each screen and preserve reviewed content, audio completion ownership, manual advancement rules, and persistence. Use BookOpen for Reader evidence, retain Lightbulb for virtue/Benefits surfaces.
+- Verification: unit regressions, responsive Arabic/English geometry and screenshots, keyboard and axe checks, existing WebKit enlarged-text help regression, full local quality and browser gates.
+- Release: no commit, push, or deployment. Keep concurrent session changes intact.
+
+- Owner refinement (2026-10-03): align the counter and Previous/Next at 56px minimum height; reduce tally numerals to 24px; use the shared control radius, equal labelled navigation widths, and symmetric 8px action padding. Increase the row gap from 8px to 12px. Preserve enlarged-text growth.
+
+- Owner visual refinement: increase all devotional footer button radii to 20px and soften Reader secondary-action borders, preserving the aligned 56px row and established themes.
+
+- Owner reference refinement (2026-10-03): use the supplied mockup for footer iconography (Lightbulb, Headphones, Share01 upward arrow) through the existing icon export layer. This supersedes the earlier footer BookOpen choice; reviewed evidence content remains unchanged. Place Previous/Next glyphs at their outer edges, mirrored for Arabic/English. Use pill-shaped corners across footer controls and reduce the shared counter/navigation minimum height to 48px with 24px tally type and 8px vertical padding. Keep 12px between rows and allow enlarged text to grow.
+
+- Owner guidance-strip request (2026-10-03): replace plain counting guidance with the supplied rounded tinted strip and tapping-hand icon. Implementation recommendation: keep compact guidance available in ordinary counting views; do not introduce a first-use dismissal state or extra information control. Retain localized mode-specific wording and the long-surah counter-only rule.
+
+## Coordinated footer hierarchy and release — 2026-10-03
+
+The owner approved all recommendations in the final visual/UX/accessibility review: relocate counting guidance inside the reading surface above actions; unify footer width/insets; emphasize the primary counter; quiet secondary surfaces; harmonize label/icon typography and states; preserve 48px lower controls, pill corners, 12px row gaps, keyboard focus, reduced motion, and enlarged-text growth. No religious content, counting persistence, or audio ownership changes are authorized by this visual scope.
+
+The owner's later instruction explicitly authorizes committing and pushing all recent local improvements, repairing necessary failures, monitoring workflows, and verifying production. This supersedes the earlier no-push instruction. Other-session changes remain included and preserved. The checkout was fast-forwarded to origin/main with a retained recovery stash; the keyboard-help sizing conflict combines the dynamic viewport height with upstream desktop auto-sizing.

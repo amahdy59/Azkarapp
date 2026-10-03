@@ -20,10 +20,11 @@ import { useMediaQuery } from "../hooks/useMediaQuery";
 import { useWakeLock } from "../hooks/useWakeLock";
 import { isCounterShortcutBlocked } from "../keyboardShortcuts";
 import {
-  Lightbulb,
   BookOpen,
   ArrowPrevious,
   Share2,
+  ShareExport,
+  Lightbulb,
   MoreVertical,
   RotateCcw,
   List,
@@ -48,7 +49,7 @@ import type { AppLanguage, CategoryId, RoutineMode, MushafTextScale, TextSizeOpt
 import { isPrayerName } from "../content/prayerTimes";
 import { ProgressBar } from "../components/ProgressBar";
 import { CounterKeyboardHelp } from "../components/CounterKeyboardHelp";
-import { CounterShortcutHints, ZikrCounterSurface } from "../components/ZikrComponents";
+import { CounterShortcutHints, CounterTapHint, ZikrCounterSurface } from "../components/ZikrComponents";
 import { ToggleTrack } from "../components/SettingsRow";
 import { ReaderReferenceSheet } from "../components/ReaderReferenceSheet";
 import { IconButton } from "../components/LayoutShells";
@@ -108,10 +109,11 @@ const EMPTY_COMPLETED_ZIKR_IDS: ReadonlySet<string> = new Set();
  * anything, and both cost vertical space above the canvas and an extra stop in
  * the screen-reader running order.
  *
- * A real surah name is different: it names a passage the text itself does not,
- * so it is the only case that earns the heading.
+ * A reviewed passage name identifies the reading without repeating its text.
+ * Ayah Al-Kursi uses its concise UI name rather than the full surah label.
  */
 function getReaderZikrTitle(zikr: Zikr, language: AppLanguage): string | null {
+  if (zikr.canonicalKey === "quran-002-255") return t(language, "reader.ayahAlKursi");
   const surahName = language === "ar" ? zikr.surahNameArabic : zikr.surahNameEnglish;
   if (!surahName?.trim()) return null;
   /* A surah is named "سورة الكهف", not "الكهف". The bare name reads as a noun
@@ -793,20 +795,25 @@ export function ReaderScreen({
         aria-label={label}
         className={
           inDock
-            ? "flex size-12 shrink-0 items-center justify-center rounded-full border border-border/80 bg-card text-foreground shadow-sm transition-all duration-fast hover:bg-muted active:scale-95 disabled:opacity-25 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-            : "adaptive-counter-nav flex size-12 shrink-0 items-center justify-center rounded-full border border-border/80 bg-card/90 backdrop-blur-xs text-foreground shadow-sm transition-all duration-fast hover:bg-muted active:scale-95 disabled:opacity-25 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            ? "flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1 rounded-xl px-2 border border-border/60 bg-card text-foreground shadow-sm transition-all duration-fast hover:bg-muted active:scale-95 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            : "adaptive-counter-nav devotional-secondary-action flex min-h-12 min-w-11 min-[360px]:!w-[5.5rem] shrink-0 items-center justify-center min-[360px]:justify-between gap-1 rounded-xl px-2 border border-border/60 bg-card/90 backdrop-blur-xs text-foreground shadow-sm transition-all duration-fast hover:bg-muted active:scale-95 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         }
       >
         {isPrevious ? (
           direction === "rtl" ? (
-            <ChevronRight size={20} />
+            <ChevronRight size={18} className="shrink-0" aria-hidden="true" />
           ) : (
-            <ChevronLeft size={20} />
+            <ChevronLeft size={18} className="shrink-0" aria-hidden="true" />
           )
         ) : direction === "rtl" ? (
-          <ChevronLeft size={20} />
+          <ChevronLeft size={18} className="order-2 shrink-0" aria-hidden="true" />
         ) : (
-          <ChevronRight size={20} />
+          <ChevronRight size={18} className="order-2 shrink-0" aria-hidden="true" />
+        )}
+        {!inDock && (
+          <span className="min-w-0 flex-1 hidden min-[360px]:inline text-center text-label font-semibold [overflow-wrap:anywhere]">
+            {label}
+          </span>
         )}
       </button>
     );
@@ -1018,13 +1025,16 @@ export function ReaderScreen({
               : t(language, "reader.arabicAudioUnavailable")
         }
         data-testid="reader-audio-dock-button"
-        className={`flex size-12 shrink-0 items-center justify-center rounded-full border transition-all duration-fast active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-25 ${
+        className={`${audioModeActive ? "" : "devotional-secondary-action"} flex min-h-11 min-w-[5rem] flex-1 items-center justify-center gap-1.5 rounded-xl px-2 border transition-all duration-fast active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-50 ${
           audioModeActive
             ? "border-primary bg-primary text-primary-foreground shadow-raised"
-            : "border-border/80 bg-card text-foreground shadow-sm hover:bg-muted"
+            : "border-border/60 bg-card text-foreground shadow-sm hover:bg-muted"
         }`}
       >
-        <Headphones size={20} aria-hidden="true" />
+        <Headphones size={20} className="shrink-0" aria-hidden="true" />
+        <span className="min-w-0 text-label font-semibold [overflow-wrap:anywhere]">
+          {t(language, "reader.menuAudio")}
+        </span>
       </button>
     );
   };
@@ -1041,17 +1051,19 @@ export function ReaderScreen({
       aria-label={t(language, "reader.referencesButton")}
       title={t(language, "reader.referencesButton")}
       data-testid="reader-benefit-dock-button"
-      className="flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-xl border border-border/80 bg-card px-3 text-primary shadow-sm transition-colors duration-fast hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+      className="devotional-secondary-action flex min-h-11 min-w-[5rem] flex-1 items-center justify-center gap-1.5 rounded-xl border border-border/60 bg-card px-2 text-foreground shadow-sm transition-colors duration-fast hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
     >
       <Lightbulb size={20} aria-hidden="true" />
-      <span className="text-label font-bold">{t(language, "reader.referencesButton")}</span>
+      <span className="min-w-0 text-label font-semibold [overflow-wrap:anywhere]">
+        {t(language, "reader.referencesButton")}
+      </span>
     </button>
   );
 
   const renderCounterPanel = () => (
-    <div className="w-full px-3 pb-1" data-testid="counter-panel">
-      <div className="adaptive-counter-row flex w-full items-center justify-center gap-2.5">
-        <div className="md:hidden">{renderNavigationButton("prev")}</div>
+    <div className="w-full pb-1" data-testid="counter-panel">
+      <div className="adaptive-counter-row flex w-full items-stretch justify-center gap-2">
+        <div className="flex md:hidden">{renderNavigationButton("prev")}</div>
         <div className="flex min-w-0 flex-1 justify-center">
           <ZikrCounterSurface
             count={count}
@@ -1063,24 +1075,15 @@ export function ReaderScreen({
             instructionText={counterInstruction}
             /* A full surah is counted only on this control, so its own face
                carries the mode instruction; anything else counts from the
-               canvas, and the face states the action while the line beneath
+               canvas, and the face states the action while reading guidance
                says where to tap. */
             actionLabel={longSurah ? counterInstruction : t(language, "reader.tapWhenFinished")}
             testId="counter-surface"
             reduceMotion={reduceMotion}
           />
         </div>
-        <div className="md:hidden">{renderNavigationButton("next")}</div>
+        <div className="flex md:hidden">{renderNavigationButton("next")}</div>
       </div>
-      {/* Every counter carries its guidance, whatever the repetition count.
-          Hiding the line for a one-off zikr also removed its height, so the
-          counter itself sat at a different place on the screen from one zikr
-          to the next — the control people aim at moved under their thumb.
-          A surah, whose counter already states the instruction on its face,
-          keeps the height without printing the same sentence twice. */}
-      <p className="mt-3 min-h-5 text-center text-sm font-medium text-muted-foreground">
-        {longSurah ? "" : counterInstruction}
-      </p>
     </div>
   );
 
@@ -1133,10 +1136,29 @@ export function ReaderScreen({
 
     return (
       <div data-testid="reader-counter-stack">
-        <div className="reader-dock flex w-full flex-col items-center gap-2" data-testid="reader-dock">
-          <div className="flex w-full items-center justify-center gap-3">
-            {renderAudioDockButton()}
+        <div className="reader-dock devotional-footer flex flex-col items-center gap-3" data-testid="reader-dock">
+          <div className="flex w-full flex-wrap items-center justify-center gap-2" data-testid="reader-support-actions">
             {renderBenefitDockButton()}
+            {renderAudioDockButton()}
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                // Safari pointer activation does not focus buttons by default;
+                // give the sharing dialog a concrete focus-return target.
+                event.currentTarget.focus({ preventScroll: true });
+                handleShare();
+              }}
+              aria-haspopup="dialog"
+              aria-label={t(language, "reader.share")}
+              data-testid="reader-share-dock-button"
+              className="devotional-secondary-action flex min-h-11 min-w-[5rem] flex-1 items-center justify-center gap-1.5 rounded-xl border border-border/60 bg-card px-2 text-foreground shadow-sm hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            >
+              <ShareExport size={20} aria-hidden="true" />
+              <span className="min-w-0 text-label font-semibold [overflow-wrap:anywhere]">
+                {t(language, "reader.shareAction")}
+              </span>
+            </button>
           </div>
           {renderCounterPanel()}
         </div>
@@ -1448,7 +1470,7 @@ export function ReaderScreen({
                       title={t(language, "reader.referencesButton")}
                       className="flex min-h-11 items-center gap-2 rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 px-3 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                     >
-                      <Lightbulb size={18} aria-hidden="true" />
+                      <BookOpen size={18} aria-hidden="true" />
                       <span className="text-label font-extrabold">{t(language, "reader.referencesButton")}</span>
                     </button>
                   )}
@@ -1493,34 +1515,34 @@ export function ReaderScreen({
                     direction={direction}
                     aria-label={t(language, "reader.groupProgress")}
                   />
-                  {!showSurahChrome && readerZikrTitle && (
-                    <div className="mt-1.5 flex w-full items-center justify-between gap-3">
-                      <h2
-                        className="min-w-0 truncate text-start text-sm font-extrabold leading-relaxed text-[color:var(--on-media)]"
-                        dir="auto"
-                        title={readerZikrTitle}
-                        data-testid="reader-zikr-title"
-                      >
-                        {readerZikrTitle}
-                      </h2>
-                    </div>
-                  )}
-                  {!longSurah && allWordMeanings.length > 0 && (
-                    <div className="mt-1.5 flex w-full items-center justify-end gap-2">
-                      <button
-                        type="button"
-                        role="switch"
-                        aria-checked={showDifficultWords}
-                        onClick={() => setShowDifficultWords((v) => !v)}
-                        className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-on-media rounded-full py-1"
-                        aria-label={t(language, "settings.showDifficultWords")}
-                        title={t(language, "settings.showDifficultWords")}
-                      >
-                        <span className="text-xs font-bold text-on-media">
-                          {t(language, "settings.showDifficultWords")}
-                        </span>
-                        <ToggleTrack checked={showDifficultWords} />
-                      </button>
+                  {((!showSurahChrome && readerZikrTitle) || (!longSurah && allWordMeanings.length > 0)) && (
+                    <div className="mt-1.5 flex w-full flex-wrap items-center justify-between gap-x-3 gap-y-1">
+                      {!showSurahChrome && readerZikrTitle && (
+                        <h2
+                          className="min-w-0 truncate text-start text-sm font-extrabold leading-relaxed text-[color:var(--on-media)]"
+                          dir="auto"
+                          title={readerZikrTitle}
+                          data-testid="reader-zikr-title"
+                        >
+                          {readerZikrTitle}
+                        </h2>
+                      )}
+                      {!longSurah && allWordMeanings.length > 0 && (
+                        <button
+                          type="button"
+                          role="switch"
+                          aria-checked={showDifficultWords}
+                          onClick={() => setShowDifficultWords((v) => !v)}
+                          className="ms-auto flex min-h-11 items-center gap-2 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-on-media rounded-full py-1"
+                          aria-label={t(language, "settings.showDifficultWords")}
+                          title={t(language, "settings.showDifficultWords")}
+                        >
+                          <span className="text-xs font-bold text-on-media">
+                            {t(language, "settings.showDifficultWords")}
+                          </span>
+                          <ToggleTrack checked={showDifficultWords} />
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>
@@ -1558,7 +1580,8 @@ export function ReaderScreen({
                       {renderSideNavigation()}
                     </div>
 
-                    {!longSurah && <footer className="shrink-0 pb-3 pt-2">{renderDock()}</footer>}
+                    {!longSurah && !audioModeActive && <CounterTapHint text={counterInstruction} />}
+                    {!longSurah && <footer className="shrink-0 pb-3 pt-3">{renderDock()}</footer>}
                     {(!audioModeActive || longSurah) && audioPlayer}
                   </div>
                 </div>
@@ -1617,7 +1640,7 @@ export function ReaderScreen({
                         aria-label={t(language, "reader.referencesButton")}
                         title={t(language, "reader.referencesButton")}
                       >
-                        <Lightbulb size={18} aria-hidden="true" />
+                        <BookOpen size={18} aria-hidden="true" />
                         <span className="text-xs font-extrabold min-[600px]:text-label">
                           {t(language, "reader.referencesButton")}
                         </span>
@@ -1663,42 +1686,42 @@ export function ReaderScreen({
               <ProgressBar
                 value={readingProgressValue}
                 max={azkar.length}
-                height={6}
+                height={8}
                 trackColor="var(--card)"
                 fillColor="var(--primary)"
                 direction={direction}
                 aria-label={t(language, "reader.groupProgress")}
               />
-              {/* See the desktop heading: only surah names render, and the 10px
+              {/* See the desktop heading: passage names render, and the 10px
                 margin keeps harakat clear of the progress track. */}
-              {!showSurahChrome && readerZikrTitle && (
-                <div className="mt-2.5 flex w-full items-center justify-between gap-3">
-                  <h2
-                    className="min-w-0 truncate whitespace-nowrap text-start text-sm font-extrabold leading-relaxed text-foreground"
-                    dir="auto"
-                    title={readerZikrTitle}
-                    data-testid="reader-zikr-title"
-                  >
-                    {readerZikrTitle}
-                  </h2>
-                </div>
-              )}
-              {!longSurah && allWordMeanings.length > 0 && (
-                <div className="mt-2 flex w-full items-center justify-end gap-2">
-                  <button
-                    type="button"
-                    role="switch"
-                    aria-checked={showDifficultWords}
-                    onClick={() => setShowDifficultWords((v) => !v)}
-                    className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring rounded-full py-1"
-                    aria-label={t(language, "settings.showDifficultWords")}
-                    title={t(language, "settings.showDifficultWords")}
-                  >
-                    <span className="text-xs font-bold text-muted-foreground">
-                      {t(language, "settings.showDifficultWords")}
-                    </span>
-                    <ToggleTrack checked={showDifficultWords} />
-                  </button>
+              {((!showSurahChrome && readerZikrTitle) || (!longSurah && allWordMeanings.length > 0)) && (
+                <div className="mt-2.5 flex w-full flex-wrap items-center justify-between gap-x-3 gap-y-1">
+                  {!showSurahChrome && readerZikrTitle && (
+                    <h2
+                      className="min-w-0 truncate whitespace-nowrap text-start text-sm font-extrabold leading-relaxed text-foreground"
+                      dir="auto"
+                      title={readerZikrTitle}
+                      data-testid="reader-zikr-title"
+                    >
+                      {readerZikrTitle}
+                    </h2>
+                  )}
+                  {!longSurah && allWordMeanings.length > 0 && (
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={showDifficultWords}
+                      onClick={() => setShowDifficultWords((v) => !v)}
+                      className="ms-auto flex min-h-11 items-center gap-2 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring rounded-full py-1"
+                      aria-label={t(language, "settings.showDifficultWords")}
+                      title={t(language, "settings.showDifficultWords")}
+                    >
+                      <span className="text-xs font-bold text-muted-foreground">
+                        {t(language, "settings.showDifficultWords")}
+                      </span>
+                      <ToggleTrack checked={showDifficultWords} />
+                    </button>
+                  )}
                 </div>
               )}
             </div>
@@ -1733,6 +1756,7 @@ export function ReaderScreen({
                 </div>
               </div>
 
+              {!longSurah && !audioModeActive && <CounterTapHint text={counterInstruction} />}
               {/* The screen sets !pb-0 and the tab bar is hidden here, so the
                 counter itself owns the bottom inset — otherwise it would sit
                 flush against the home indicator. */}

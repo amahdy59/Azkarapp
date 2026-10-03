@@ -3,24 +3,111 @@ import { expect, test, type Page } from "@playwright/test";
 import { getAzkarForMode } from "../src/app/content/azkar";
 import { formatNumerals } from "../src/app/formatting";
 
-async function returningReader(page: Page, language: "ar" | "en") {
-  await page.addInitScript((language) => {
-    localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
-    localStorage.setItem(
-      "azkarapp.state.v1",
-      JSON.stringify({
-        settings: {
-          language,
-          themeMode: "dark",
-          reduceMotion: true,
-          hapticFeedback: false,
-          homeVisualEffects: false,
-          routineModes: { after_prayer: "core" },
-        },
-        profile: { displayName: "Guest", isGuest: true },
-      }),
-    );
-  }, language);
+async function returningReader(
+  page: Page,
+  language: "ar" | "en",
+  materialSettings: { themeMode?: "light" | "midnight" | "dark"; reduceTransparency?: boolean } = {},
+) {
+  await page.addInitScript(
+    ({ language, materialSettings }) => {
+      localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+      localStorage.setItem(
+        "azkarapp.state.v1",
+        JSON.stringify({
+          settings: {
+            language,
+            themeMode: "dark",
+            reduceMotion: true,
+            hapticFeedback: false,
+            homeVisualEffects: false,
+            routineModes: { after_prayer: "core" },
+            ...materialSettings,
+          },
+          profile: { displayName: "Guest", isGuest: true },
+        }),
+      );
+    },
+    { language, materialSettings },
+  );
+}
+
+test("keyboard instructions follow the shared breakpoint on every counter @cross-browser", async ({ page }) => {
+  await returningReader(page, "en");
+  for (const route of ["/#/azkar/evening/1", "/#/counter", "/#/friday/salawat"]) {
+    await page.goto(route);
+    const help = page.getByRole("button", { name: "Keyboard shortcuts", exact: true });
+    for (const width of [320, 767, 768, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      if (width < 768) {
+        await expect(help).not.toBeVisible();
+      } else {
+        await expect(help).toBeVisible();
+      }
+    }
+  }
+});
+
+for (const language of ["ar", "en"] as const) {
+  for (const themeMode of ["light", "midnight", "dark"] as const) {
+    for (const reduceTransparency of [false, true]) {
+      test(`situational material follows ${themeMode} ${reduceTransparency ? "opaque" : "glass"} in ${language} @cross-browser`, async ({
+        page,
+      }) => {
+        await returningReader(page, language, { themeMode, reduceTransparency });
+        await page.goto("/#/home");
+        for (const width of [320, 820, 1440]) {
+          await page.setViewportSize({ width, height: 900 });
+          const card = page.getByTestId("situational-shortcuts");
+          await card.scrollIntoViewIfNeeded();
+          const material = await card.evaluate((element) => {
+            const style = getComputedStyle(element);
+            const reference = getComputedStyle(document.querySelector('[data-testid="home-tool-qibla"]')!);
+            return {
+              background: style.backgroundColor,
+              blur: style.backdropFilter,
+              color: style.color,
+              referenceBackground: reference.backgroundColor,
+              referenceBlur: reference.backdropFilter,
+              referenceColor: reference.color,
+            };
+          });
+          expect(material.background).toBe(material.referenceBackground);
+          expect(material.blur).toBe(material.referenceBlur);
+          expect(material.color).toBe(material.referenceColor);
+          if (reduceTransparency) expect(material.blur).toBe("none");
+          else expect(material.blur).toContain("blur(");
+          const firstLink = card.getByRole("link").first();
+          await firstLink.focus();
+          const focus = await firstLink.evaluate((element) => {
+            const style = getComputedStyle(element);
+            return { outline: style.outlineWidth, shadow: style.boxShadow };
+          });
+          expect(focus.outline !== "0px" || focus.shadow !== "none").toBe(true);
+          const targets = await card.getByRole("link").evaluateAll((links) =>
+            links.map((link) => {
+              const bounds = link.getBoundingClientRect();
+              return { width: bounds.width, height: bounds.height };
+            }),
+          );
+          expect(targets).toHaveLength(6);
+          for (const bounds of targets) {
+            expect(bounds.width).toBeGreaterThanOrEqual(44);
+            expect(bounds.height).toBeGreaterThanOrEqual(44);
+          }
+          expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+          const result = await new AxeBuilder({ page })
+            .include('[data-testid="situational-shortcuts"]')
+            .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+            .analyze();
+          expect(result.violations).toEqual([]);
+          if (width === 320)
+            await page.screenshot({
+              path: `output/playwright/phase78/material-${language}-${themeMode}-${reduceTransparency ? "opaque" : "glass"}.png`,
+            });
+        }
+      });
+    }
+  }
 }
 
 for (const language of ["ar", "en"] as const) {
@@ -80,6 +167,7 @@ for (const language of ["ar", "en"] as const) {
 
 test("keyboard help disables character actions while preserving native counting", async ({ page }) => {
   await returningReader(page, "en");
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/#/counter");
   const counter = page.getByTestId("custom-counter-surface");
   await expect(counter).toBeVisible();
@@ -119,11 +207,15 @@ test("keyboard help remains reachable with enlarged text on a short Arabic phone
   await returningReader(page, "ar");
   await page.setViewportSize({ width: 320, height: 480 });
   await page.goto("/#/counter");
-  await page.getByRole("button", { name: "اختصارات لوحة المفاتيح", exact: true }).click();
+  await expect(page.getByTestId("custom-counter-surface")).toBeVisible();
+  await expect(page.getByRole("button", { name: "اختصارات لوحة المفاتيح", exact: true })).not.toBeVisible();
+  await page.locator("#main-content").focus();
+  await page.keyboard.press("?");
   const dialog = page.getByTestId("counter-keyboard-help");
   await expect(dialog).toBeVisible();
-  await page.evaluate(() => {
+  await page.evaluate(async () => {
     document.documentElement.style.fontSize = "200%";
+    await document.fonts.ready;
   });
   const bounds = (await dialog.boundingBox())!;
   expect(bounds.x).toBeGreaterThanOrEqual(0);
@@ -139,11 +231,29 @@ test("keyboard help remains reachable with enlarged text on a short Arabic phone
   const closeBounds = (await dialog.getByRole("button", { name: "إغلاق", exact: true }).boundingBox())!;
   expect(titleBounds.y).toBeGreaterThanOrEqual(closeBounds.y + closeBounds.height);
   const checkbox = dialog.getByRole("checkbox");
-  await checkbox.scrollIntoViewIfNeeded();
+  // Use native focus to reach the setting, and compare DOM rectangles in one
+  // coordinate system. WebKit locator bounds differ for scrolled descendants.
+  await checkbox.focus();
+  await expect(checkbox).toBeFocused();
   await expect(checkbox).toBeVisible();
-  const checkboxBounds = (await checkbox.boundingBox())!;
-  expect(checkboxBounds.y).toBeGreaterThanOrEqual(closeBounds.y + closeBounds.height);
-  expect(checkboxBounds.y + checkboxBounds.height).toBeLessThanOrEqual(bounds.y + bounds.height);
+  await expect
+    .poll(() =>
+      checkbox.evaluate((input) => {
+        const scrollport = input.parentElement!.parentElement!;
+        const modal = input.closest('[role="dialog"]')!;
+        const close = modal.querySelector('[data-testid="modal-close-button"]')!;
+        const inputBounds = input.getBoundingClientRect();
+        const scrollBounds = scrollport.getBoundingClientRect();
+        const modalBounds = modal.getBoundingClientRect();
+        const closeBounds = close.getBoundingClientRect();
+        return {
+          insideScrollport: inputBounds.top >= scrollBounds.top && inputBounds.bottom <= scrollBounds.bottom,
+          belowClose: inputBounds.top >= closeBounds.bottom,
+          insideDialog: inputBounds.bottom <= modalBounds.bottom,
+        };
+      }),
+    )
+    .toEqual({ insideScrollport: true, belowClose: true, insideDialog: true });
   expect(await dialog.locator("label").evaluate((label) => label.scrollWidth <= label.clientWidth)).toBe(true);
   await page.screenshot({ path: "output/playwright/phase78/keyboard-help-ar-enlarged.png" });
   await dialog.getByRole("button", { name: "إغلاق", exact: true }).click();

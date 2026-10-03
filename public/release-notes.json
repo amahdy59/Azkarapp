@@ -1,13 +1,15 @@
 {
-  "release": "2026-10-03-keyboard-help-fit",
+  "release": "2026-10-03c",
   "ar": [
-    "تبقى نافذة اختصارات لوحة المفاتيح داخل الشاشة على الهواتف القصيرة.",
-    "مرّر محتوى المساعدة للوصول إلى خيار الاختصارات عند تكبير النص.",
-    "يبقى زر إغلاق المساعدة ظاهرًا أثناء قراءة محتواها."
+    "اقرأ وعدّ الأذكار بأزرار أصغر ومتناسقة، مع تعليمات واضحة فوق عناصر التحكم.",
+    "اعثر بسهولة على الفائدة والاستماع والمشاركة، مع أسهم تنقّل أوضح.",
+    "تابع تقدّم القراءة بشريط أوضح، مع تحسين عنوان آية الكرسي ومحاذاة خيار الكلمات الصعبة.",
+    "تظهر بطاقات الصفحة الرئيسية بمظهر متناسق عبر السمات، مع إرشادات لوحة مفاتيح ملائمة للشاشة."
   ],
   "en": [
-    "Keyboard help stays within the screen on short phones.",
-    "Scroll the help content to reach the shortcut setting with enlarged text.",
-    "The help close button stays visible while reading its content."
+    "Read and count with compact, consistent controls and clear guidance above them.",
+    "Find Benefit, Listen, and Share more easily, with clearer navigation arrows.",
+    "Follow reading progress with a clearer bar and improved Ayah Al-Kursi title and word-help alignment.",
+    "Home cards now match across themes, with keyboard guidance suited to your screen."
   ]
 }

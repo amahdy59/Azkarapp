@@ -1,10 +1,25 @@
 import React, { useState } from "react";
 import "./ZikrComponents.css";
-import { Check } from "./icons";
+import { Check, HandTap } from "./icons";
 import { counterNumeralFontFamily, formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { shouldReduceMotion } from "../motionPreferences";
 import type { AppLanguage } from "../types";
+
+/** Quiet counting guidance belongs to the reading surface, above its actions. */
+export function CounterTapHint({ text }: { text: string }) {
+  return (
+    <div className="devotional-guidance mx-auto w-full max-w-[25rem] shrink-0 px-3 pt-2">
+      <p
+        data-testid="counter-tap-hint"
+        className="counter-tap-hint flex min-h-11 items-center justify-center gap-2 px-3 py-2 text-center text-label font-medium"
+      >
+        <HandTap size={24} className="shrink-0 text-muted-foreground" />
+        <span>{text}</span>
+      </p>
+    </div>
+  );
+}
 
 export function RepBadge({ label, done, language }: { label: string; done: boolean; language: AppLanguage }) {
   return (
@@ -207,22 +222,30 @@ export function ZikrCounterSurface({
             </span>
           </div>
         ) : isSingleAction ? (
-          <span className="text-title font-bold leading-none text-foreground" dir="auto">
+          <span
+            className="min-w-0 max-w-full text-title font-bold leading-none text-current [overflow-wrap:anywhere]"
+            dir="auto"
+          >
             {actionLabel || activeInstruction}
           </span>
         ) : (
           <p
-            className="text-display font-black leading-none text-foreground"
+            className="text-2xl font-black leading-none text-current"
             dir="ltr"
             style={{
               fontFamily: counterNumeralFontFamily(language),
               fontVariantNumeric: "tabular-nums lining-nums",
             }}
           >
-            <span className="counter-number" key={count}>
+            <bdi className="counter-number" dir="ltr" key={count}>
               {localizedCount}
-            </span>
-            {total > 0 && <span> / {localizedTotal}</span>}
+            </bdi>
+            {total > 0 && (
+              <span>
+                {" "}
+                / <bdi dir="ltr">{localizedTotal}</bdi>
+              </span>
+            )}
           </p>
         )}
       </div>
@@ -293,7 +316,7 @@ export function CounterShortcutHints({
         data-testid={testId}
         dir="ltr"
         lang={language}
-        className="mx-auto mt-1 hidden w-fit max-w-full flex-wrap items-center justify-center gap-3 rounded-full border border-border/40 bg-muted/60 px-4 py-1.5 text-xs font-medium text-muted-foreground md:flex"
+        className="mx-auto mt-4 hidden w-fit max-w-full flex-wrap items-center justify-center gap-3 rounded-full border border-border/40 bg-muted/60 px-4 py-1.5 text-xs font-medium text-muted-foreground md:flex"
       >
         {shortcuts.map((shortcut, index) => (
           <React.Fragment key={shortcut.label}>

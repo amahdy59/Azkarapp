@@ -1242,6 +1242,7 @@ const ar = {
     qcfUnavailable: "يُعرض الخط القرآني المحلي حتى يتوفر خط صفحة المدينة.",
   },
   reader: {
+    ayahAlKursi: "آية الكرسي",
     shortcutHelp: "فتح دليل اختصارات لوحة المفاتيح",
     characterShortcuts: "تفعيل اختصارات المفتاح الواحد خلال هذه الزيارة",
     shortcutSafety:
@@ -1321,6 +1322,7 @@ const ar = {
     mushafAccept: "تقبل الله منا ومنكم صالح الأعمال",
     mushafReturn: "العودة إلى الأذكار",
     translationButton: "English",
+    shareAction: "مشاركة",
     referencesButton: "\u0627\u0644\u0641\u0627\u0626\u062f\u0629",
     openBenefit: "\u0641\u062a\u062d \u0627\u0644\u0641\u0627\u0626\u062f\u0629",
     closeReference: "\u0625\u063a\u0644\u0627\u0642 \u0627\u0644\u0641\u0627\u0626\u062f\u0629",

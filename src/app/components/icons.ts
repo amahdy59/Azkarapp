@@ -91,6 +91,7 @@ export {
   SearchMd as SearchIcon,
   Settings01 as Settings,
   Share07 as Share2,
+  Share01 as ShareExport,
   Signal03 as Signal,
   SkipBack,
   SkipForward,
@@ -128,6 +129,29 @@ export {
 } from "@untitledui/icons";
 
 import { createElement, type SVGProps } from "react";
+
+/** Devotional tap gesture: a pointing hand and touch ripple, matching line icons. */
+export function HandTap({ size = 24, ...props }: { size?: number } & SVGProps<SVGSVGElement>) {
+  return createElement(
+    "svg",
+    {
+      width: size,
+      height: size,
+      viewBox: "0 0 24 24",
+      fill: "none",
+      stroke: "currentColor",
+      strokeWidth: 1.8,
+      strokeLinecap: "round",
+      strokeLinejoin: "round",
+      "aria-hidden": true,
+      ...props,
+    },
+    createElement("path", { d: "M7 9a5 5 0 1 1 8 0" }),
+    createElement("path", {
+      d: "M9 15V7a2 2 0 0 1 4 0v6l1-1a1.5 1.5 0 0 1 2.5 1l1-1a1.5 1.5 0 0 1 2.5 1v4c0 3-2 5-5 5h-2c-1.5 0-2.5-.6-3.5-1.8L5 16.5a1.8 1.8 0 0 1 2.5-2.5L9 15Z",
+    }),
+  );
+}
 
 export function Mosque({
   size = 20,

@@ -33,7 +33,7 @@ export function CounterKeyboardHelp({
 
   return (
     <>
-      <Button type="button" variant="ghost" onClick={() => setOpen(true)} className="mx-auto mt-1 flex">
+      <Button type="button" variant="ghost" onClick={() => setOpen(true)} className="mx-auto mt-1 hidden md:flex">
         {t(language, "reader.keyboardShortcuts")}
       </Button>
       <Modal
@@ -43,7 +43,7 @@ export function CounterKeyboardHelp({
         language={language}
         direction={direction}
         testId="counter-keyboard-help"
-        className="h-[85vh] p-5 sm:h-auto sm:p-6"
+        className="h-[85dvh] p-5 sm:h-auto sm:p-6"
       >
         <div aria-hidden="true" className="h-12 shrink-0 sm:hidden" />
         <div className="min-h-0 flex-1 overflow-y-auto">
@@ -66,6 +66,19 @@ export function CounterKeyboardHelp({
             <input
               type="checkbox"
               checked={enabled}
+              onFocus={(event) => {
+                const input = event.currentTarget;
+                // Safari can finish native focus scrolling before enlarged text
+                // reflows. Keep the focused setting inside its own scrollport.
+                requestAnimationFrame(() => {
+                  const scrollport = input.parentElement?.parentElement;
+                  if (!scrollport || !input.isConnected) return;
+                  const control = input.getBoundingClientRect();
+                  const visible = scrollport.getBoundingClientRect();
+                  if (control.bottom > visible.bottom) scrollport.scrollTop += control.bottom - visible.bottom + 8;
+                  else if (control.top < visible.top) scrollport.scrollTop -= visible.top - control.top + 8;
+                });
+              }}
               onChange={(event) => setCharacterShortcutsEnabled(event.target.checked)}
               className="size-5 shrink-0 accent-primary focus-visible:ring-[3px] focus-visible:ring-ring"
             />

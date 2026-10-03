@@ -1,3 +1,4 @@
+import { useId } from "react";
 import { CATEGORIES } from "../content/categories";
 import { t } from "../i18n";
 import { routeToHash } from "../routing";
@@ -9,17 +10,20 @@ const QUICK_CATEGORIES = ["home", "travel", "distress_anxiety", "mosque", "food_
 export function SituationalShortcuts({
   language,
   onOpen,
+  onGlass = false,
 }: {
   language: AppLanguage;
   onOpen: (category: CategoryId) => void;
+  onGlass?: boolean;
 }) {
+  const titleId = useId();
   return (
     <section
-      aria-labelledby="situational-shortcuts-title"
-      className="rounded-3xl border border-border bg-card p-4 text-foreground"
+      aria-labelledby={titleId}
+      className={`rounded-3xl border p-4 text-foreground ${onGlass ? "hero-glass home-glass-surface" : "border-border bg-card shadow-raised"}`}
       data-testid="situational-shortcuts"
     >
-      <h2 id="situational-shortcuts-title" className="text-subtitle font-extrabold">
+      <h2 id={titleId} className="text-subtitle font-extrabold">
         {t(language, "home.situationalTitle")}
       </h2>
       <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -29,7 +33,7 @@ export function SituationalShortcuts({
             <a
               key={id}
               href={routeToHash({ view: "reader", categoryId: id, index: 0 })!}
-              className="flex min-h-12 items-center rounded-xl border border-border px-3 py-2 text-sm font-semibold hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              className={`flex min-h-12 items-center rounded-xl border border-border px-3 py-2 text-sm font-semibold hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] ${onGlass ? "focus-visible:ring-on-media" : "focus-visible:ring-ring"}`}
               onClick={(event) => {
                 if (event.button !== 0 || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
                 event.preventDefault();

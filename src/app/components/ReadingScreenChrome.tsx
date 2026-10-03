@@ -141,7 +141,7 @@ export function ReadingScreenChrome({
                 <ProgressBar
                   value={progress.value}
                   max={progress.max}
-                  height={6}
+                  height={8}
                   trackColor="var(--card)"
                   fillColor="var(--primary)"
                   direction={direction}

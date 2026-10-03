@@ -40,6 +40,68 @@ test("thirty tasbeeh counts survive leaving the collection and reloading", async
 
 type ReadingDirection = "ltr" | "rtl";
 
+for (const language of ["ar", "en"] as const) {
+  test(`Ayah Al-Kursi title and word toggle share a row in ${language}`, async ({ page }) => {
+    await page.addInitScript((language) => {
+      localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+      localStorage.setItem(
+        "azkarapp.state.v1",
+        JSON.stringify({
+          settings: { language, themeMode: "light", reduceMotion: true, routineModes: { morning: "complete" } },
+          profile: { displayName: "Guest", isGuest: true },
+        }),
+      );
+    }, language);
+    const index = getAzkarForMode("morning", "complete").findIndex((zikr) => zikr.id === "m-hm-75");
+    for (const width of [320, 390, 820, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto(`/#/azkar/morning/${index + 1}`);
+      const heading = page.getByTestId("reader-zikr-title");
+      const toggle = page.getByRole("switch", {
+        name: language === "ar" ? "تظليل الكلمات الغريبة" : "Highlight difficult words",
+      });
+      await expect(heading).toHaveText(language === "ar" ? "آية الكرسي" : "Ayah Al-Kursi");
+      await expect(toggle).toBeVisible();
+      const titleBounds = (await heading.boundingBox())!;
+      const toggleBounds = (await toggle.boundingBox())!;
+      if (language === "en" && width === 320) {
+        // The longer English control label needs the documented wrap fallback.
+        expect(toggleBounds.y).toBeGreaterThanOrEqual(titleBounds.y + titleBounds.height);
+      } else {
+        expect(
+          Math.abs(titleBounds.y + titleBounds.height / 2 - toggleBounds.y - toggleBounds.height / 2),
+        ).toBeLessThan(2);
+      }
+      expect(toggleBounds.height).toBeGreaterThanOrEqual(44);
+      expect(
+        titleBounds.x + titleBounds.width <= toggleBounds.x ||
+          toggleBounds.x + toggleBounds.width <= titleBounds.x ||
+          titleBounds.y + titleBounds.height <= toggleBounds.y,
+      ).toBe(true);
+      await toggle.click();
+      await expect(toggle).toHaveAttribute("aria-checked", "true");
+      await toggle.press("Space");
+      await expect(toggle).toHaveAttribute("aria-checked", "false");
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+      await page.screenshot({ path: `output/playwright/reader-title/${language}-${width}.png` });
+    }
+    await page.setViewportSize({ width: 320, height: 900 });
+    await page.evaluate(() => {
+      document.documentElement.style.fontSize = "200%";
+    });
+    await expect(page.getByTestId("reader-zikr-title")).toBeVisible();
+    const enlargedToggle = page.getByRole("switch", {
+      name: language === "ar" ? "تظليل الكلمات الغريبة" : "Highlight difficult words",
+    });
+    await expect(enlargedToggle).toBeVisible();
+    const bounds = (await enlargedToggle.boundingBox())!;
+    expect(bounds.x).toBeGreaterThanOrEqual(0);
+    expect(bounds.x + bounds.width).toBeLessThanOrEqual(320);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+    await page.screenshot({ path: `output/playwright/reader-title/${language}-320-enlarged.png` });
+  });
+}
+
 async function openReturningGuestHome(page: Page, language: "en" | "ar") {
   await page.addInitScript((selectedLanguage) => {
     window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
@@ -124,7 +186,7 @@ test("the Reader counter keeps one rectangular shape across phone, tablet, and d
       const box = await counter.boundingBox();
       expect(box).not.toBeNull();
       if (box) {
-        expect(Math.round(box.height)).toBe(76);
+        expect(Math.round(box.height)).toBe(48);
         expect(box.width).toBeLessThanOrEqual(220);
         expect(box.width).toBeGreaterThanOrEqual(160);
         expect(box.x).toBeGreaterThanOrEqual(0);
@@ -811,8 +873,9 @@ test("the reader header carries exactly one action on counter screens", async ({
   // Benefit is accessible in the dock.
   await expect(page.getByTestId("reader-benefit-dock-button")).toBeVisible();
 
-  // The three that moved are reachable, just not as header chrome.
-  await expect(page.getByRole("button", { name: "Share zikr", exact: true })).toHaveCount(0);
+  // Sharing is visible in the support row, while the header remains compact.
+  await expect(page.getByTestId("reader-share-dock-button")).toBeVisible();
+  await expect(actions.getByRole("button", { name: "Share zikr", exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "Reader options", exact: true }).click();
   for (const name of ["Save zikr", "Share zikr"]) {
     await expect(page.getByRole("menuitem", { name, exact: true })).toBeVisible();

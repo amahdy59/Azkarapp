@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
 import { CounterKeyboardHelp } from "../components/CounterKeyboardHelp";
-import { CounterShortcutHints, ZikrCounterSurface } from "../components/ZikrComponents";
+import { CounterShortcutHints, CounterTapHint, ZikrCounterSurface } from "../components/ZikrComponents";
 import { AUTHENTIC_AZKAR_COLLECTION, type AuthenticZikrItem } from "../content/authenticAzkar";
 import { formatNumerals } from "../formatting";
 import { useCounterClickFeedback } from "../hooks/useCounterClickFeedback";
@@ -415,9 +415,13 @@ export function CustomCounterScreen({
                 </div>
               </div>
 
-              <footer className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">
+              <CounterTapHint text={t(language, "reader.tapAnywhere")} />
+              <footer className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
                 <div data-testid="reader-counter-stack">
-                  <div className="reader-dock flex w-full flex-col items-center gap-2" data-testid="reader-dock">
+                  <div
+                    className="reader-dock devotional-footer flex flex-col items-center gap-3"
+                    data-testid="reader-dock"
+                  >
                     <div className="flex w-full items-center justify-center gap-3">
                       <button
                         type="button"
@@ -429,13 +433,13 @@ export function CustomCounterScreen({
                         aria-label={t(language, "counter.virtueReference")}
                         title={t(language, "counter.virtueReference")}
                         data-testid="custom-counter-benefit-dock-button"
-                        className="flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-xl border border-border/80 bg-card px-3 text-primary shadow-sm transition-colors duration-fast hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                        className="devotional-secondary-action flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-border/60 bg-card px-2 text-foreground transition-colors duration-fast hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                       >
                         <Lightbulb size={20} aria-hidden="true" />
-                        <span className="text-label font-bold">{t(language, "reader.referencesButton")}</span>
+                        <span className="text-label font-semibold">{t(language, "reader.referencesButton")}</span>
                       </button>
                     </div>
-                    <div className="w-full px-3 pb-1" data-testid="counter-panel">
+                    <div className="w-full pb-1" data-testid="counter-panel">
                       <div className="adaptive-counter-row flex w-full items-center justify-center gap-2.5">
                         <div className="flex min-w-0 flex-1 justify-center">
                           <ZikrCounterSurface
@@ -451,9 +455,6 @@ export function CustomCounterScreen({
                           />
                         </div>
                       </div>
-                      <p className="mt-3 min-h-5 text-center text-sm font-medium text-muted-foreground">
-                        {t(language, "reader.tapAnywhere")}
-                      </p>
                     </div>
                   </div>
                   <div>
