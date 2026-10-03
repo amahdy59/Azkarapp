@@ -948,3 +948,25 @@ test("the show all zikr button navigates to category when reader opened directly
   await expect(page).toHaveURL(/#\/azkar\/evening$/);
   await expect(page.getByTestId("category-overview")).toBeVisible();
 });
+
+test("mobile reader does not show a dividing border under the header when scrolling reading text", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await openFirstMorningZikr(page);
+
+  const header = page.getByTestId("shared-screen-header");
+  await expect(header).toBeVisible();
+  await expect(header).not.toHaveAttribute("data-scrolled");
+  await expect(header).toHaveClass(/border-transparent/);
+
+  const readingRegion = page.getByRole("region", { name: "Reading text" });
+  await expect(readingRegion).toBeVisible();
+
+  await readingRegion.evaluate((element) => {
+    element.scrollTop = 80;
+    element.dispatchEvent(new Event("scroll"));
+  });
+
+  await expect(header).not.toHaveAttribute("data-scrolled");
+  await expect(header).toHaveClass(/border-transparent/);
+  await expect(header).not.toHaveClass(/border-border/);
+});

@@ -36,6 +36,7 @@ function renderSessionHarness({
   const pop = vi.fn();
   const replace = vi.fn<(view: View) => void>();
   const onResetPartialCounts = vi.fn();
+  const onResetSurahPages = vi.fn();
   const showConfirm = vi.fn((_: string, __: string, ___: string, ____: string, onConfirm: () => void) => onConfirm());
 
   const hook = renderHook(
@@ -81,6 +82,7 @@ function renderSessionHarness({
         setActiveTab,
         showConfirm,
         onResetPartialCounts,
+        onResetSurahPages,
       });
       return {
         activeTab,
@@ -99,7 +101,7 @@ function renderSessionHarness({
     { initialProps: { readingMode: activeRoutineMode } },
   );
 
-  return { ...hook, pop, push, replace, showConfirm, onResetPartialCounts };
+  return { ...hook, pop, push, replace, showConfirm, onResetPartialCounts, onResetSurahPages };
 }
 
 beforeEach(() => {
@@ -311,5 +313,17 @@ describe("useSessionHandlers", () => {
     expect(pop).toHaveBeenCalledOnce();
     expect(replace).not.toHaveBeenCalled();
     expect(result.current.activeTab).toBe("azkar");
+  });
+
+  it("resets long surah pages on category reset for before_sleep", () => {
+    const { result, onResetSurahPages } = renderSessionHarness({ activeCat: "before_sleep" });
+    act(() => result.current.handlers.handleResetCategory("before_sleep"));
+    expect(onResetSurahPages).toHaveBeenCalledWith(["s-hm-110a", "s-hm-110b"]);
+  });
+
+  it("resets long surah pages on repeatCategory for before_sleep", () => {
+    const { result, onResetSurahPages } = renderSessionHarness({ activeCat: "before_sleep" });
+    act(() => result.current.handlers.repeatCategory("before_sleep"));
+    expect(onResetSurahPages).toHaveBeenCalledWith(["s-hm-110a", "s-hm-110b"]);
   });
 });

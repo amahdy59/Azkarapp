@@ -34,3 +34,16 @@
 .reading-measure {
   max-width: var(--content-reading);
 }
+
+/* Hidden chrome is removed from both layout and keyboard/accessibility order.
+   Reading, counter, Previous/Next, and an explicit exit remain available. */
+[data-reading-focus="true"] [data-reading-chrome],
+[data-reading-focus="true"] [data-reading-shortcuts] {
+  display: none;
+}
+
+[data-reading-focus="true"] [data-testid="reader-card"] {
+  border-color: transparent;
+  box-shadow: none;
+  background: var(--background);
+}

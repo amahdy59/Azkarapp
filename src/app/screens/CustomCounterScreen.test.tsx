@@ -8,6 +8,22 @@ describe("CustomCounterScreen Component", () => {
   beforeEach(() => window.localStorage.clear());
   afterEach(() => vi.unstubAllGlobals());
 
+  it("opens the existing guided after-prayer reader without mutating the current tally", () => {
+    const onOpenAfterPrayer = vi.fn();
+    render(
+      <CustomCounterScreen
+        isArabic={false}
+        direction="ltr"
+        onBack={vi.fn()}
+        onOpenAfterPrayer={onOpenAfterPrayer}
+        initialMasbahaState={{ count: 12, target: 100, laps: 0 }}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Read guided after-prayer azkar" }));
+    expect(onOpenAfterPrayer).toHaveBeenCalledOnce();
+    expect(screen.getByTestId("custom-counter-surface")).toHaveTextContent("12 / 100");
+  });
+
   it("renders correctly in Arabic with initial state", () => {
     const onBack = vi.fn();
     render(<CustomCounterScreen isArabic={true} direction="rtl" onBack={onBack} />);
@@ -126,6 +142,69 @@ describe("CustomCounterScreen Component", () => {
 
     expect(screen.getByRole("dialog", { name: "Change the selected dhikr?" })).toBeInTheDocument();
     expect(screen.getByText(/clear the current count of 1/i)).toBeInTheDocument();
+  });
+
+  it("saves progress across azkar and restores it when switching back with Save & switch", async () => {
+    const user = userEvent.setup();
+    render(<CustomCounterScreen isArabic={false} direction="ltr" onBack={vi.fn()} />);
+
+    // Count 3 on initial zikr
+    const counter = screen.getByTestId("custom-counter-surface");
+    fireEvent.click(counter);
+    fireEvent.click(counter);
+    fireEvent.click(counter);
+    expect(counter).toHaveTextContent("3 / 100");
+
+    // Open picker and pick another zikr
+    await user.click(screen.getByRole("button", { name: /Subhanallahi wa bihamdihi/i }));
+    await user.click(screen.getByRole("radio", { name: /La hawla wa la quwwata illa billah/i }));
+
+    // Dialog appears with Save & switch
+    expect(screen.getByRole("dialog", { name: "Change the selected dhikr?" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Save & switch" }));
+
+    // Now on new zikr with count 0
+    expect(counter).toHaveTextContent("0 / 100");
+
+    // Count 2 on the new zikr
+    fireEvent.click(counter);
+    fireEvent.click(counter);
+    expect(counter).toHaveTextContent("2 / 100");
+
+    // Open picker again - verify original zikr shows saved count badge
+    await user.click(screen.getByRole("button", { name: /La hawla wa la quwwata illa billah/i }));
+    expect(screen.getByText("3 / 100")).toBeInTheDocument();
+
+    // Select original zikr
+    await user.click(screen.getAllByRole("radio", { name: /Subhanallahi wa bihamdihi/i })[0]!);
+    await user.click(screen.getByRole("button", { name: "Save & switch" }));
+
+    // Count is restored to 3!
+    expect(counter).toHaveTextContent("3 / 100");
+  });
+
+  it("resets count when switching with Change and reset", async () => {
+    const user = userEvent.setup();
+    render(<CustomCounterScreen isArabic={false} direction="ltr" onBack={vi.fn()} />);
+
+    const counter = screen.getByTestId("custom-counter-surface");
+    fireEvent.click(counter);
+    fireEvent.click(counter);
+    expect(counter).toHaveTextContent("2 / 100");
+
+    await user.click(screen.getByRole("button", { name: /Subhanallahi wa bihamdihi/i }));
+    await user.click(screen.getByRole("radio", { name: /La hawla wa la quwwata illa billah/i }));
+
+    // Click Change and reset
+    await user.click(screen.getByRole("button", { name: "Change and reset" }));
+    expect(counter).toHaveTextContent("0 / 100");
+
+    // Switch back to original zikr (from count 0, so no prompt)
+    await user.click(screen.getByRole("button", { name: /La hawla wa la quwwata illa billah/i }));
+    await user.click(screen.getAllByRole("radio", { name: /Subhanallahi wa bihamdihi/i })[0]!);
+
+    // Original count was wiped by reset, so starts at 0
+    expect(counter).toHaveTextContent("0 / 100");
   });
 
   it("keeps a completed counter focusable so its next-step dialog can be reopened", () => {

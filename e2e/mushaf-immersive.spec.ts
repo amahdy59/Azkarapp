@@ -178,4 +178,41 @@ test.describe("immersive mushaf mode", () => {
     await expect(page.getByTestId("mushaf-immersive")).toBeHidden();
     await expect(appNav).toHaveCount(1);
   });
+
+  test("aligns bottom completion button on mobile and restarts surah from the beginning on revisit", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await openReaderAt(page, "/#/azkar/friday-kahf/1");
+    await expectMushafShowing(page);
+
+    // Jump to the last page (page 304)
+    await page.keyboard.press("End");
+    const firstPage = currentPages(page).first();
+    await expect(firstPage).toHaveAttribute("data-mushaf-page", "304");
+
+    const returnBtn = page.getByTestId("mushaf-immersive-return");
+    const rightBtn = page.getByTestId("mushaf-immersive-word-meanings");
+    await expect(returnBtn).toBeVisible();
+    await expect(rightBtn).toBeVisible();
+
+    // Verify alignment: bottoms and heights must match closely
+    const returnBox = (await returnBtn.boundingBox())!;
+    const rightBox = (await rightBtn.boundingBox())!;
+    expect(returnBox).not.toBeNull();
+    expect(rightBox).not.toBeNull();
+    expect(Math.abs(returnBox.height - rightBox.height)).toBeLessThanOrEqual(1);
+    expect(Math.abs(returnBox.y + returnBox.height - (rightBox.y + rightBox.height))).toBeLessThanOrEqual(1);
+
+    // Complete reading
+    await returnBtn.click();
+
+    // Reopen Al-Kahf
+    await page.goto("/#/azkar/friday-kahf/1");
+    await expectMushafShowing(page);
+
+    // When revisiting, it must start from page 293 (the beginning of Al-Kahf), not page 304!
+    const reopenedPage = currentPages(page).first();
+    await expect(reopenedPage).toHaveAttribute("data-mushaf-page", "293");
+  });
 });

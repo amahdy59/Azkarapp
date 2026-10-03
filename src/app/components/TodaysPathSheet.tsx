@@ -1,6 +1,6 @@
 import { Modal } from "./ResponsiveSheet";
 import { TrackingCheckMark } from "./PrayerTrackerCards";
-import { Zap } from "./icons";
+import { ChevronDown, Zap } from "./icons";
 import { PalmTreeMark } from "./GardenMarks";
 import { t } from "../i18n";
 import { formatNumerals } from "../formatting";
@@ -160,10 +160,17 @@ export function TodaysPathSheet({
         />
 
         <details
-          className={`rounded-2xl border ${onGlass ? "border-white/20 bg-white/10 text-white" : "border-border bg-card"}`}
+          className={`group rounded-2xl border transition-colors ${onGlass ? "border-white/20 bg-white/10 text-white" : "border-border bg-card"}`}
         >
-          <summary className="min-h-11 cursor-pointer px-3.5 py-3 text-label font-black focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
-            {t(language, "dailyPath.adjustCongregationGoal")}
+          <summary className="flex min-h-11 cursor-pointer select-none items-center justify-between px-3.5 py-3 text-label font-black transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+            <span>{t(language, "dailyPath.adjustCongregationGoal")}</span>
+            <ChevronDown
+              size={16}
+              className={`shrink-0 transition-transform duration-standard group-open:rotate-180 ${
+                onGlass ? "text-white/80" : "text-muted-foreground"
+              }`}
+              aria-hidden="true"
+            />
           </summary>
           <fieldset className={`border-t p-3.5 ${onGlass ? "border-white/20" : "border-border"}`}>
             <legend className="sr-only">{t(language, "dailyPath.mosqueGoal")}</legend>

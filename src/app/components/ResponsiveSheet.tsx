@@ -105,7 +105,7 @@ export function Modal({
           // exit the reading session underneath it.
           onEscapeKeyDown={(event) => event.stopPropagation()}
           className={`fixed left-1/2 top-1/2 z-[100] flex w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col ${maxWidthClassName} max-h-[85vh] overflow-hidden rounded-3xl outline-none animate-in fade-in-0 zoom-in-95 duration-standard ${
-            onGlass ? "hero-glass text-white" : "border border-border/60 bg-card shadow-overlay"
+            onGlass ? "hero-glass home-glass-surface text-white" : "border border-border/60 bg-card shadow-overlay"
           } ${className}`.trim()}
         >
           <DialogPrimitive.Title className="sr-only">{title}</DialogPrimitive.Title>
@@ -115,10 +115,10 @@ export function Modal({
               onClick={onClose}
               aria-label={t(lang, "common.close")}
               data-testid="modal-close-button"
-              className={`absolute top-3 end-3 z-30 flex size-10 min-h-[44px] min-w-[44px] items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+              className={`absolute top-3 end-3 z-30 flex size-10 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border transition-colors duration-fast focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring active:scale-95 ${
                 onGlass
-                  ? "text-white/80 hover:bg-white/15 hover:text-white"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  ? "border-white/20 bg-white/10 text-white hover:border-white/30 hover:bg-white/20 hover:text-white"
+                  : "border-border/60 bg-muted/60 text-muted-foreground hover:border-border hover:bg-muted hover:text-foreground"
               }`}
             >
               <X size={20} aria-hidden="true" />
@@ -279,7 +279,9 @@ export function ResponsiveSheet({
         aria-describedby={describedById}
         dir={direction}
         className={`fixed inset-x-0 bottom-0 z-[100] mx-auto flex w-full max-w-lg flex-col rounded-t-3xl outline-none focus-visible:outline-none max-h-[88vh] pb-safe ${
-          onGlass ? "hero-glass text-white" : "border-t border-border/40 bg-background shadow-overlay"
+          onGlass
+            ? "hero-glass home-glass-surface text-white"
+            : "border-t border-border/40 bg-background shadow-overlay"
         } ${drawerClassName}`.trim()}
       >
         <DrawerTitle className="sr-only">{title}</DrawerTitle>
@@ -289,10 +291,10 @@ export function ResponsiveSheet({
             onClick={onClose}
             aria-label={t(lang, "common.close")}
             data-testid="modal-close-button"
-            className={`absolute top-3 end-3 z-30 flex size-10 min-h-[44px] min-w-[44px] items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+            className={`absolute top-3 end-3 z-30 flex size-10 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border transition-colors duration-fast focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring active:scale-95 ${
               onGlass
-                ? "text-white/80 hover:bg-white/15 hover:text-white"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                ? "border-white/20 bg-white/10 text-white hover:border-white/30 hover:bg-white/20 hover:text-white"
+                : "border-border/60 bg-muted/60 text-muted-foreground hover:border-border hover:bg-muted hover:text-foreground"
             }`}
           >
             <X size={20} aria-hidden="true" />

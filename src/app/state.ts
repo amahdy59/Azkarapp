@@ -306,7 +306,69 @@ export function normalizeMasbahaState(value: unknown): AppStateSnapshot["masbaha
   const laps = typeof v.laps === "number" && Number.isFinite(v.laps) && v.laps >= 0 ? Math.floor(v.laps) : 0;
   const selectedZikrId =
     typeof v.selectedZikrId === "string" && v.selectedZikrId.length > 0 ? v.selectedZikrId : undefined;
-  return { count, target, laps, ...(selectedZikrId ? { selectedZikrId } : {}) };
+  const dayKey = typeof v.dayKey === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v.dayKey) ? v.dayKey : undefined;
+
+  let items: Record<string, { count: number; target: number; laps: number; dayKey?: string }> | undefined = undefined;
+  if (v.items && typeof v.items === "object" && !Array.isArray(v.items)) {
+    const parsedItems: Record<string, { count: number; target: number; laps: number; dayKey?: string }> = {};
+    for (const [id, item] of Object.entries(v.items)) {
+      if (id.length > 0 && item && typeof item === "object") {
+        const itemObj = item as Record<string, unknown>;
+        const itemCount =
+          typeof itemObj.count === "number" && Number.isFinite(itemObj.count) && itemObj.count >= 0
+            ? Math.floor(itemObj.count)
+            : 0;
+        const itemTarget =
+          typeof itemObj.target === "number" && Number.isFinite(itemObj.target) && itemObj.target >= 0
+            ? Math.floor(itemObj.target)
+            : 0;
+        const itemLaps =
+          typeof itemObj.laps === "number" && Number.isFinite(itemObj.laps) && itemObj.laps >= 0
+            ? Math.floor(itemObj.laps)
+            : 0;
+        const itemDayKey =
+          typeof itemObj.dayKey === "string" && /^\d{4}-\d{2}-\d{2}$/.test(itemObj.dayKey) ? itemObj.dayKey : undefined;
+        parsedItems[id] = {
+          count: itemCount,
+          target: itemTarget,
+          laps: itemLaps,
+          ...(itemDayKey ? { dayKey: itemDayKey } : {}),
+        };
+      }
+    }
+    if (Object.keys(parsedItems).length > 0) {
+      items = parsedItems;
+    }
+  }
+
+  return {
+    count,
+    target,
+    laps,
+    ...(selectedZikrId ? { selectedZikrId } : {}),
+    ...(dayKey ? { dayKey } : {}),
+    ...(items ? { items } : {}),
+  };
+}
+
+export function resetDailyMasbahaState(
+  state: NonNullable<AppStateSnapshot["masbahaState"]>,
+  currentDayKey: string,
+): AppStateSnapshot["masbahaState"] {
+  const isDifferentDay = Boolean(state.dayKey && state.dayKey !== currentDayKey);
+  const nextItems: Record<string, { count: number; target: number; laps: number; dayKey?: string }> = {};
+  for (const [id, item] of Object.entries(state.items ?? {})) {
+    if (item.dayKey === currentDayKey) {
+      nextItems[id] = item;
+    }
+  }
+  return {
+    ...state,
+    count: isDifferentDay ? 0 : state.count,
+    laps: isDifferentDay ? 0 : state.laps,
+    dayKey: currentDayKey,
+    ...(Object.keys(nextItems).length > 0 ? { items: nextItems } : { items: undefined }),
+  };
 }
 
 function normalizeWirdHistory(value: unknown): Record<string, number[]> {
@@ -940,7 +1002,11 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
     partialZikrCounts: isNewDay
       ? resetDailyPartialCounts(normalizePartialZikrCounts(parsed.partialZikrCounts))
       : normalizePartialZikrCounts(parsed.partialZikrCounts),
-    masbahaState: normalizeMasbahaState(parsed.masbahaState),
+    masbahaState: (() => {
+      const normalized = normalizeMasbahaState(parsed.masbahaState);
+      if (!normalized) return undefined;
+      return isNewDay ? resetDailyMasbahaState(normalized, currentDayKey) : normalized;
+    })(),
     ...(typeof parsed.lastActiveDayKey === "string" ? { lastActiveDayKey: currentDayKey } : {}),
   };
 }
@@ -1299,7 +1365,18 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
       ...normalizePartialZikrCounts(safeBase.partialZikrCounts),
       ...normalizePartialZikrCounts(incoming.partialZikrCounts),
     },
-    masbahaState: normalizeMasbahaState(incoming.masbahaState ?? safeBase.masbahaState),
+    masbahaState: (() => {
+      const baseM = safeBase.masbahaState;
+      const incM = incoming.masbahaState;
+      if (!baseM && !incM) return undefined;
+      const active = incM ?? baseM!;
+      const baseItems = baseM?.items ?? {};
+      const incItems = incM?.items ?? {};
+      return normalizeMasbahaState({
+        ...active,
+        items: { ...baseItems, ...incItems },
+      });
+    })(),
   };
 }
 

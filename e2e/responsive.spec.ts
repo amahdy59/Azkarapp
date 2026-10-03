@@ -446,7 +446,7 @@ test("the Library keeps mobile category pills and compacts only the section swit
   }
 });
 
-test("shared screen headers gain a glass surface after scrolling without changing Home", async ({ page }) => {
+test("shared screen headers stay opaque after scrolling without changing Home", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 700 });
   await enterEnglishGuestMode(page);
 
@@ -464,7 +464,11 @@ test("shared screen headers gain a glass surface after scrolling without changin
     surface.dispatchEvent(new Event("scroll"));
   });
   await expect(header).toHaveAttribute("data-scrolled", "true");
-  await expect(header).toHaveClass(/scroll-glass-header/);
+  await expect(header).toHaveClass(/bg-background/);
+  await expect(header).toHaveCSS(
+    "background-color",
+    await page.locator(".app-screen-surface").evaluate((surface) => getComputedStyle(surface).backgroundColor),
+  );
 
   const [surfaceBox, headerBox] = await Promise.all([
     page.locator(".app-screen-surface").boundingBox(),
@@ -476,6 +480,58 @@ test("shared screen headers gain a glass surface after scrolling without changin
     expect(Math.abs(headerBox.y - surfaceBox.y)).toBeLessThanOrEqual(1);
   }
 });
+
+for (const language of ["ar", "en"] as const) {
+  test(`ordinary headers cover the scrollport in ${language} across themes @cross-browser`, async ({
+    page,
+  }, testInfo) => {
+    const width = page.viewportSize()!.width;
+    await page.setViewportSize({ width, height: width < 600 ? 600 : 420 });
+    await page.addInitScript((language) => {
+      localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+      localStorage.setItem(
+        "azkarapp.state.v1",
+        JSON.stringify({ settings: { language, themeMode: "light", reduceMotion: true } }),
+      );
+    }, language);
+
+    for (const theme of ["light", "midnight", "dark"]) {
+      for (const route of ["quran-wird", "qibla", "friday"]) {
+        await page.goto(`/#/${route}`);
+        const header = page.getByTestId("shared-screen-header");
+        await expect(header).toBeVisible();
+        await page.evaluate((theme) => {
+          const root = document.documentElement;
+          root.classList.remove("theme-light", "theme-midnight", "theme-dark", "dark", "light-mode");
+          root.classList.add(`theme-${theme}`);
+          if (theme !== "light") root.classList.add("dark");
+        }, theme);
+        const surface = page.locator(".app-screen-surface");
+        await surface.evaluate((element) => {
+          const owner =
+            element.scrollHeight > element.clientHeight
+              ? element
+              : Array.from(element.querySelectorAll<HTMLElement>("div")).find(
+                  (child) => getComputedStyle(child).overflowY === "auto" && child.scrollHeight > child.clientHeight,
+                );
+          if (!owner) throw new Error("Expected scrollable screen content");
+          owner.scrollTop = 160;
+        });
+        await expect(header).toHaveAttribute("data-scrolled", "true");
+        await expect(header).toHaveCSS(
+          "background-color",
+          await surface.evaluate((element) => getComputedStyle(element).backgroundColor),
+        );
+        await expect(header).toHaveCSS("backdrop-filter", "none");
+        const top = await surface.evaluate((element) => element.getBoundingClientRect().top);
+        await expect.poll(async () => (await header.boundingBox())?.y).toBeCloseTo(top, 0);
+        if (theme === "light" && route === "quran-wird") {
+          await page.screenshot({ path: testInfo.outputPath(`wird-scrolled-${language}.png`) });
+        }
+      }
+    }
+  });
+}
 
 test("status banners get a full-width area above the nav, not an implicit row", async ({ page }) => {
   await page.setViewportSize({ width: 1000, height: 800 });

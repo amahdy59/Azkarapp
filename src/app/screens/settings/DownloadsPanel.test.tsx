@@ -13,6 +13,7 @@ vi.mock("../../audio/audioOfflineCache", () => ({
   downloadAudioForZikrs: audioMocks.download,
   estimateAudioDownloadBytes: () => 1024,
   getDownloadedAudioSummary: audioMocks.summary,
+  getAudioDownloadStatus: vi.fn().mockResolvedValue({ completed: 0, total: 4, remainingBytes: 4096 }),
   removeDownloadedAudio: audioMocks.remove,
 }));
 vi.mock("../../content/mushafOfflineCache", () => ({
@@ -94,5 +95,40 @@ describe("DownloadsPanel", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Download complete Mushaf" }));
     expect(await screen.findByRole("alert")).toHaveTextContent(/space/i);
     expect(downloadMushaf).not.toHaveBeenCalled();
+  });
+
+  it("reports individual travel failures while preserving successful download groups", async () => {
+    Object.defineProperty(navigator, "storage", {
+      configurable: true,
+      value: { estimate: vi.fn().mockResolvedValue({ usage: 0, quota: 1024 * 1024 * 1024 }) },
+    });
+    const { downloadMushaf } = await import("../../content/mushafOfflineCache");
+    vi.mocked(downloadMushaf).mockRejectedValue(new Error("network"));
+    audioMocks.download.mockResolvedValue({ assetCount: 1, byteSize: 1024 });
+    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    const prepare = screen.getByRole("button", { name: "Prepare offline reading and audio" });
+    await waitFor(() => expect(prepare).toBeEnabled());
+    fireEvent.click(prepare);
+    expect(await screen.findByRole("alert")).toHaveTextContent("Completed downloads are kept");
+    expect(screen.getByRole("alert")).toHaveTextContent("Complete Mushaf offline");
+    expect(audioMocks.download).toHaveBeenCalledTimes(4);
+    expect(audioMocks.download.mock.calls[3]?.[0]).not.toHaveLength(0);
+  });
+
+  it("does not claim travel readiness when there are no verified audio recordings", async () => {
+    const { getMushafDownloadStatus } = await import("../../content/mushafOfflineCache");
+    const { getAudioDownloadStatus } = await import("../../audio/audioOfflineCache");
+    vi.mocked(getMushafDownloadStatus).mockResolvedValueOnce({
+      downloadedPages: 604,
+      downloadedFonts: 604,
+      totalPages: 604,
+      isComplete: true,
+    });
+    vi.mocked(getAudioDownloadStatus).mockResolvedValueOnce({ completed: 0, total: 0, remainingBytes: 0 });
+    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Prepare offline reading and audio" })).toBeEnabled(),
+    );
+    expect(screen.getByTestId("travel-readiness")).toHaveTextContent("not complete yet");
   });
 });

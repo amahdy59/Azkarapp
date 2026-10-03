@@ -20,6 +20,7 @@ import {
   prefixZikrId,
   type GrowthEvent,
 } from "../progress";
+import { isLongSurah } from "../content/mushafPages";
 import { t } from "../i18n";
 
 export function useSessionHandlers({
@@ -50,6 +51,7 @@ export function useSessionHandlers({
   setActiveTab,
   showConfirm,
   onResetPartialCounts,
+  onResetSurahPages,
 }: {
   activeCat: CategoryId;
   /** Current reading context can differ from the saved preference for a shared link. */
@@ -97,6 +99,7 @@ export function useSessionHandlers({
     destructive?: boolean,
   ) => void;
   onResetPartialCounts?: (ids: string[]) => void;
+  onResetSurahPages?: (ids: string[]) => void;
 }) {
   const readerOpenedFromCategoryRef = useRef(false);
   const [sessionStart, setSessionStart] = useState(Date.now());
@@ -128,6 +131,12 @@ export function useSessionHandlers({
         onResetPartialCounts?.(
           sessionAzkar(catId, "complete", subCat).map((zikr) => prefixZikrId(catId, zikr.id, subCat)),
         );
+        const surahIds = sessionAzkar(catId, "complete", subCat)
+          .filter(isLongSurah)
+          .map((zikr) => zikr.id);
+        if (surahIds.length > 0) {
+          onResetSurahPages?.(surahIds);
+        }
         setCompleted((prev) => {
           const next = { ...prev };
           if (catId === "after_prayer" && subCat) {
@@ -177,6 +186,12 @@ export function useSessionHandlers({
   const repeatCategory = (catId: CategoryId, subCat?: string) => {
     setIsRepeatSession(true);
     setRepeatCompleted(new Set());
+    const surahIds = sessionAzkar(catId, modeFor(catId), subCat)
+      .filter(isLongSurah)
+      .map((zikr) => zikr.id);
+    if (surahIds.length > 0) {
+      onResetSurahPages?.(surahIds);
+    }
     openReader(catId, 0, undefined, subCat);
   };
 

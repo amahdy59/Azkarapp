@@ -13,20 +13,21 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
+import { CounterKeyboardHelp } from "../components/CounterKeyboardHelp";
 import { CounterShortcutHints, ZikrCounterSurface } from "../components/ZikrComponents";
 import { AUTHENTIC_AZKAR_COLLECTION, type AuthenticZikrItem } from "../content/authenticAzkar";
 import { formatNumerals } from "../formatting";
 import { useCounterClickFeedback } from "../hooks/useCounterClickFeedback";
 import { t } from "../i18n";
 import { vibrateIfEnabled } from "../motionPreferences";
+import { getProgressDayKey } from "../progress";
 import { useWakeLock } from "../hooks/useWakeLock";
+import { isCounterShortcutBlocked } from "../keyboardShortcuts";
 import { getReadingFontSize } from "./readingTypography";
 import type { AppLanguage, TextSizeOption } from "../types";
 
 const HEADER_ACTION_CLASS =
   "flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full text-foreground/80 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40";
-
-const HEADER_ACTION_PILL_CLASS = `${HEADER_ACTION_CLASS} w-auto gap-1.5 px-2.5`;
 
 /* The wide band is a fixed navy surface, so its controls take on-media colours
    rather than theme ones. Reusing the compact class there is what produced
@@ -34,49 +35,79 @@ const HEADER_ACTION_PILL_CLASS = `${HEADER_ACTION_CLASS} w-auto gap-1.5 px-2.5`;
 const HERO_ACTION_CLASS =
   "flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
 
-const HERO_ACTION_PILL_CLASS =
-  "flex min-h-11 items-center gap-2 rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 px-3 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
+export interface MasbahaZikrItemState {
+  count: number;
+  target: number;
+  laps: number;
+  dayKey?: string;
+}
 
 export interface MasbahaSavedState {
   count: number;
   target: number;
   laps: number;
   selectedZikrId?: string;
+  dayKey?: string;
+  items?: Record<string, MasbahaZikrItemState>;
 }
 
 export function CustomCounterScreen({
   isArabic,
   direction,
   onBack,
+  onOpenAfterPrayer,
   hapticFeedback = true,
   reduceMotion = false,
   textSize = "medium",
   initialMasbahaState,
   onSaveMasbahaState,
+  progressDayStartHour,
 }: {
   isArabic: boolean;
   direction: "ltr" | "rtl";
   onBack: () => void;
+  onOpenAfterPrayer?: () => void;
   hapticFeedback?: boolean;
   reduceMotion?: boolean;
   textSize?: TextSizeOption;
   initialMasbahaState?: MasbahaSavedState;
   onSaveMasbahaState?: (state: MasbahaSavedState) => void;
+  progressDayStartHour?: number;
 }) {
   const language: AppLanguage = isArabic ? "ar" : "en";
+  const currentDayKey = getProgressDayKey(new Date(), progressDayStartHour);
+
   const initialSelectedAuthentic =
     AUTHENTIC_AZKAR_COLLECTION.find((item) => item.id === initialMasbahaState?.selectedZikrId) ??
     AUTHENTIC_AZKAR_COLLECTION[0]!;
-  const [selectedAuthentic, setSelectedAuthentic] = useState<AuthenticZikrItem>(() => {
-    return initialSelectedAuthentic;
+  const [selectedAuthentic, setSelectedAuthentic] = useState<AuthenticZikrItem>(() => initialSelectedAuthentic);
+
+  const [savedItems, setSavedItems] = useState<Record<string, MasbahaZikrItemState>>(() => {
+    const rawItems = initialMasbahaState?.items ?? {};
+    const filtered: Record<string, MasbahaZikrItemState> = {};
+    for (const [id, item] of Object.entries(rawItems)) {
+      if (!item.dayKey || item.dayKey === currentDayKey) {
+        filtered[id] = item;
+      }
+    }
+    return filtered;
   });
+
+  const isDifferentDay = Boolean(initialMasbahaState?.dayKey && initialMasbahaState.dayKey !== currentDayKey);
+  const initialZikrSaved = !isDifferentDay
+    ? (initialMasbahaState?.items?.[initialSelectedAuthentic.id] ??
+      (initialMasbahaState?.selectedZikrId === initialSelectedAuthentic.id || !initialMasbahaState?.selectedZikrId
+        ? initialMasbahaState
+        : undefined))
+    : undefined;
+
   const [target, setTarget] = useState(() =>
-    initialMasbahaState?.target && initialMasbahaState.target > 0
-      ? initialMasbahaState.target
+    initialZikrSaved?.target && initialZikrSaved.target > 0
+      ? initialZikrSaved.target
       : initialSelectedAuthentic.recommendedTarget,
   );
-  const [count, setCount] = useState(() => initialMasbahaState?.count ?? 0);
-  const [laps, setLaps] = useState(() => initialMasbahaState?.laps ?? 0);
+  const [count, setCount] = useState(() => (isDifferentDay ? 0 : (initialZikrSaved?.count ?? 0)));
+  const [laps, setLaps] = useState(() => (isDifferentDay ? 0 : (initialZikrSaved?.laps ?? 0)));
   const [showReference, setShowReference] = useState(false);
   const [showCompletionDialog, setShowCompletionDialog] = useState(false);
   const [showResetDialog, setShowResetDialog] = useState(false);
@@ -86,13 +117,33 @@ export function CustomCounterScreen({
   useWakeLock(true);
 
   useEffect(() => {
+    const activeItemState: MasbahaZikrItemState | undefined =
+      count > 0 || laps > 0
+        ? {
+            count,
+            target,
+            laps,
+            dayKey: currentDayKey,
+          }
+        : undefined;
+
+    const currentItems: Record<string, MasbahaZikrItemState> = {
+      ...savedItems,
+      ...(activeItemState ? { [selectedAuthentic.id]: activeItemState } : {}),
+    };
+    if (!activeItemState) {
+      delete currentItems[selectedAuthentic.id];
+    }
+
     onSaveMasbahaState?.({
       count,
       target,
       laps,
       selectedZikrId: selectedAuthentic.id,
+      dayKey: currentDayKey,
+      items: Object.keys(currentItems).length > 0 ? currentItems : undefined,
     });
-  }, [count, target, laps, selectedAuthentic.id, onSaveMasbahaState]);
+  }, [count, target, laps, selectedAuthentic.id, savedItems, currentDayKey, onSaveMasbahaState]);
 
   const activeText = selectedAuthentic.textAr;
   const isTargetComplete = count >= target;
@@ -121,12 +172,42 @@ export function CustomCounterScreen({
     setCount(0);
     setLaps(0);
     setShowCompletionDialog(false);
-  }, []);
+    setSavedItems((previous) => {
+      const next = { ...previous };
+      delete next[selectedAuthentic.id];
+      return next;
+    });
+  }, [selectedAuthentic.id]);
 
-  const applySelectedZikr = (item: AuthenticZikrItem) => {
+  const switchToZikr = (item: AuthenticZikrItem, preserveCurrent: boolean) => {
+    const nextSavedItems: Record<string, MasbahaZikrItemState> = { ...savedItems };
+
+    if (preserveCurrent && (count > 0 || laps > 0)) {
+      nextSavedItems[selectedAuthentic.id] = {
+        count,
+        target,
+        laps,
+        dayKey: currentDayKey,
+      };
+    } else {
+      delete nextSavedItems[selectedAuthentic.id];
+    }
+
+    setSavedItems(nextSavedItems);
+
+    const savedForNew = nextSavedItems[item.id];
+    if (savedForNew && (!savedForNew.dayKey || savedForNew.dayKey === currentDayKey)) {
+      setCount(savedForNew.count);
+      setTarget(savedForNew.target > 0 ? savedForNew.target : item.recommendedTarget);
+      setLaps(savedForNew.laps);
+    } else {
+      setCount(0);
+      setTarget(item.recommendedTarget);
+      setLaps(0);
+    }
+
     setSelectedAuthentic(item);
-    setTarget(item.recommendedTarget);
-    handleReset();
+    setShowCompletionDialog(false);
   };
 
   const handleSelectAuthenticZikr = (item: AuthenticZikrItem) => {
@@ -135,7 +216,17 @@ export function CustomCounterScreen({
       setPendingZikr(item);
       return;
     }
-    applySelectedZikr(item);
+    switchToZikr(item, false);
+  };
+
+  const handleSaveAndSwitch = (item: AuthenticZikrItem) => {
+    switchToZikr(item, true);
+    setPendingZikr(null);
+  };
+
+  const handleResetAndSwitch = (item: AuthenticZikrItem) => {
+    switchToZikr(item, false);
+    setPendingZikr(null);
   };
 
   const { pressStyle, surfaceProps } = useCountingSurface({ onCount: handleTap, reduceMotion });
@@ -147,6 +238,12 @@ export function CustomCounterScreen({
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && !event.defaultPrevented && showReference) {
+        event.preventDefault();
+        setShowReference(false);
+        return;
+      }
+      if (isCounterShortcutBlocked(event)) return;
       const activeElement = document.activeElement;
       if (event.key === "Escape") {
         event.preventDefault();
@@ -175,6 +272,22 @@ export function CustomCounterScreen({
   const changeTarget = (nextTarget: number) => {
     setTarget(nextTarget);
     setShowCompletionDialog(count >= nextTarget);
+    if (count > 0 || laps > 0) {
+      setSavedItems((previous) => ({
+        ...previous,
+        [selectedAuthentic.id]: {
+          count,
+          target: nextTarget,
+          laps,
+          dayKey: currentDayKey,
+        },
+      }));
+    }
+  };
+
+  const liveSavedItems = {
+    ...savedItems,
+    ...(count > 0 || laps > 0 ? { [selectedAuthentic.id]: { count, target, laps } } : {}),
   };
 
   return (
@@ -208,6 +321,7 @@ export function CustomCounterScreen({
                     selected={selectedAuthentic}
                     language={language}
                     direction={direction}
+                    savedItems={liveSavedItems}
                     onSelect={handleSelectAuthenticZikr}
                   />
                 </div>
@@ -222,30 +336,18 @@ export function CustomCounterScreen({
                   />
                 </div>
               </div>
+              {onOpenAfterPrayer && (
+                <Button type="button" variant="outline" onClick={onOpenAfterPrayer} className="mt-3 w-full">
+                  {t(language, "counter.guidedAfterPrayer")}
+                </Button>
+              )}
             </div>
           }
           actions={(tier) => {
             const isWide = tier === "wide";
             const actionClass = isWide ? HERO_ACTION_CLASS : HEADER_ACTION_CLASS;
-            const pillClass = isWide ? HERO_ACTION_PILL_CLASS : HEADER_ACTION_PILL_CLASS;
             return (
               <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => setShowReference(true)}
-                  className={pillClass}
-                  aria-label={t(language, "counter.virtueReference")}
-                  title={t(language, "counter.virtueReference")}
-                  aria-haspopup="dialog"
-                >
-                  <Lightbulb size={18} aria-hidden="true" />
-                  <span
-                    className={isWide ? "text-label font-extrabold" : "text-xs font-extrabold min-[600px]:text-label"}
-                    aria-hidden="true"
-                  >
-                    {t(language, "reader.referencesButton")}
-                  </span>
-                </button>
                 <DropdownMenu dir={direction}>
                   <DropdownMenuTrigger className={actionClass} aria-label={t(language, "common.moreOptions")}>
                     <MoreVertical size={20} aria-hidden="true" />
@@ -315,27 +417,46 @@ export function CustomCounterScreen({
 
               <footer className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">
                 <div data-testid="reader-counter-stack">
-                  <div className="px-3 pb-1" data-testid="counter-panel">
-                    <div className="adaptive-counter-row flex w-full items-center justify-center gap-2.5">
-                      <div className="flex min-w-0 flex-1 justify-center">
-                        <ZikrCounterSurface
-                          count={count}
-                          total={target}
-                          complete={isTargetComplete}
-                          onTap={handleTap}
-                          onCompleteTap={() => setShowCompletionDialog(true)}
-                          language={language}
-                          instructionText={t(language, "reader.tapAnywhere")}
-                          testId="custom-counter-surface"
-                          reduceMotion={reduceMotion}
-                        />
-                      </div>
+                  <div className="reader-dock flex w-full flex-col items-center gap-2" data-testid="reader-dock">
+                    <div className="flex w-full items-center justify-center gap-3">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowReference(true);
+                        }}
+                        aria-haspopup="dialog"
+                        aria-label={t(language, "counter.virtueReference")}
+                        title={t(language, "counter.virtueReference")}
+                        data-testid="custom-counter-benefit-dock-button"
+                        className="flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-xl border border-border/80 bg-card px-3 text-primary shadow-sm transition-colors duration-fast hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                      >
+                        <Lightbulb size={20} aria-hidden="true" />
+                        <span className="text-label font-bold">{t(language, "reader.referencesButton")}</span>
+                      </button>
                     </div>
-                    <p className="mt-3 min-h-5 text-center text-sm font-medium text-muted-foreground">
-                      {t(language, "reader.tapAnywhere")}
-                    </p>
+                    <div className="w-full px-3 pb-1" data-testid="counter-panel">
+                      <div className="adaptive-counter-row flex w-full items-center justify-center gap-2.5">
+                        <div className="flex min-w-0 flex-1 justify-center">
+                          <ZikrCounterSurface
+                            count={count}
+                            total={target}
+                            complete={isTargetComplete}
+                            onTap={handleTap}
+                            onCompleteTap={() => setShowCompletionDialog(true)}
+                            language={language}
+                            instructionText={t(language, "reader.tapAnywhere")}
+                            testId="custom-counter-surface"
+                            reduceMotion={reduceMotion}
+                          />
+                        </div>
+                      </div>
+                      <p className="mt-3 min-h-5 text-center text-sm font-medium text-muted-foreground">
+                        {t(language, "reader.tapAnywhere")}
+                      </p>
+                    </div>
                   </div>
-                  <div className="hidden md:block">
+                  <div>
                     <CounterShortcutHints
                       language={language}
                       direction={direction}
@@ -345,6 +466,14 @@ export function CustomCounterScreen({
                         { keys: ["Space"], label: t(language, "counter.count") },
                         { keys: ["R"], label: t(language, "counter.reset") },
                       ]}
+                    />
+                    <CounterKeyboardHelp
+                      shortcuts={[
+                        { keys: ["Space"], label: t(language, "counter.count") },
+                        { keys: ["R"], label: t(language, "counter.reset") },
+                      ]}
+                      language={language}
+                      direction={direction}
                     />
                   </div>
                 </div>
@@ -455,19 +584,22 @@ export function CustomCounterScreen({
             <p className="mt-2 text-sm font-medium leading-6 text-muted-foreground">
               {t(language, "counter.changeDhikrBody", { count: formatNumerals(count, language) })}
             </p>
-            <div className="mt-5 flex gap-2">
-              <Button variant="outline" onClick={() => setPendingZikr(null)} className="flex-1">
-                {t(language, "common.cancel")}
+            <div className="mt-5 space-y-2">
+              <Button onClick={() => handleSaveAndSwitch(pendingZikr)} className="w-full">
+                {t(language, "counter.saveAndSwitch")}
               </Button>
-              <Button
-                onClick={() => {
-                  applySelectedZikr(pendingZikr);
-                  setPendingZikr(null);
-                }}
-                className="flex-1"
-              >
-                {t(language, "counter.changeDhikrConfirm")}
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => setPendingZikr(null)} className="flex-1">
+                  {t(language, "common.cancel")}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => handleResetAndSwitch(pendingZikr)}
+                  className="flex-1 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                >
+                  {t(language, "counter.changeDhikrConfirm")}
+                </Button>
+              </div>
             </div>
           </div>
         </Modal>

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Card } from "../../components/Card";
 import { Button } from "../../components/ui/button";
-import { CloudOff, Database, Download, RotateCcw, X } from "../../components/icons";
+import { ChevronDown, CloudOff, Database, Download, RotateCcw, X } from "../../components/icons";
 import { t } from "../../i18n";
 import type { AppLanguage } from "../../types";
 import { formatNumerals } from "../../formatting";
@@ -14,10 +14,12 @@ import {
   downloadAudioForZikrs,
   estimateAudioDownloadBytes,
   getDownloadedAudioSummary,
+  getAudioDownloadStatus,
   removeDownloadedAudio,
 } from "../../audio/audioOfflineCache";
 import { downloadMushaf, getMushafDownloadStatus, removeDownloadedMushaf } from "../../content/mushafOfflineCache";
 import { hasDownloadSpace, isStorageQuotaError, MUSHAF_ESTIMATED_PAGE_BYTES } from "../../content/downloadStorage";
+import { prepareTravelDownloads } from "../../audio/travelPreparation";
 
 type OfflineStatus = {
   cacheCount: number;
@@ -27,6 +29,9 @@ type OfflineStatus = {
   downloadedAudioAssets: number;
   downloadedAudioBytes: number;
   downloadedMushafPages: number;
+  travelAudioCompleted: number;
+  travelAudioTotal: number;
+  travelAudioRemainingBytes: number;
 };
 
 function formatMegabytes(bytes: number | undefined, language: AppLanguage) {
@@ -46,6 +51,13 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
   const [mushafProgress, setMushafProgress] = useState<{ completed: number; total: number } | null>(null);
   const mushafAbortRef = useRef<AbortController | null>(null);
   const audioAbortRef = useRef<AbortController | null>(null);
+  const travelAbortRef = useRef<AbortController | null>(null);
+  const [travelProgress, setTravelProgress] = useState<{ completed: number; total: number } | null>(null);
+  const [travelJobProgress, setTravelJobProgress] = useState<{
+    group: number;
+    completed: number;
+    total: number;
+  } | null>(null);
   const audioPreferences = useMemo(loadAudioPreferences, []);
 
   const audioCollections = useMemo(
@@ -57,17 +69,28 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
     [audioPreferences],
   );
 
+  // Keep the optional Quran corpus lazy until the Downloads panel is opened.
+  const travelAudioCollections = useMemo(
+    () =>
+      import("../../content/fridayKahf").then(({ FRIDAY_KAHF }) => [
+        ...audioCollections.map((collection) => collection.zikrs),
+        FRIDAY_KAHF,
+      ]),
+    [audioCollections],
+  );
+
   const refreshStatus = useCallback(async () => {
     try {
       setErrorMessage("");
       setSuccessMessage("");
       setIsLoading(true);
 
-      const [registration, cacheNames, storage, mushafStatus] = await Promise.all([
+      const [registration, cacheNames, storage, mushafStatus, audioStatus] = await Promise.all([
         "serviceWorker" in navigator ? navigator.serviceWorker.getRegistration() : Promise.resolve(undefined),
         "caches" in window ? caches.keys() : Promise.resolve([]),
         navigator.storage?.estimate ? navigator.storage.estimate() : Promise.resolve({} as StorageEstimate),
         getMushafDownloadStatus(),
+        travelAudioCollections.then((collections) => getAudioDownloadStatus(collections.flat(), audioPreferences)),
       ]);
 
       const audioSummary = getDownloadedAudioSummary();
@@ -79,6 +102,9 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
         downloadedAudioAssets: audioSummary.assetCount,
         downloadedAudioBytes: audioSummary.byteSize,
         downloadedMushafPages: mushafStatus.downloadedPages,
+        travelAudioCompleted: audioStatus.completed,
+        travelAudioTotal: audioStatus.total,
+        travelAudioRemainingBytes: audioStatus.remainingBytes,
       });
     } catch (error) {
       reportError(error, "offline-storage-status");
@@ -86,13 +112,14 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
     } finally {
       setIsLoading(false);
     }
-  }, [language]);
+  }, [language, travelAudioCollections, audioPreferences]);
 
   useEffect(() => {
     void refreshStatus();
     return () => {
       mushafAbortRef.current?.abort();
       audioAbortRef.current?.abort();
+      travelAbortRef.current?.abort();
     };
   }, [refreshStatus]);
 
@@ -186,7 +213,55 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
     }
   };
 
-  const isAnyJobActive = downloadProgress !== null || mushafProgress !== null;
+  const prepareTravel = async () => {
+    if (travelAbortRef.current || !status) return;
+    const controller = new AbortController();
+    travelAbortRef.current = controller;
+    setErrorMessage("");
+    setSuccessMessage("");
+    setTravelProgress({ completed: 0, total: 5 });
+    try {
+      const bytes =
+        Math.max(0, 604 - status.downloadedMushafPages) * MUSHAF_ESTIMATED_PAGE_BYTES +
+        status.travelAudioRemainingBytes;
+      if (!(await hasDownloadSpace(bytes))) throw new DOMException("Storage full", "QuotaExceededError");
+      const result = await prepareTravelDownloads(await travelAudioCollections, audioPreferences, {
+        signal: controller.signal,
+        onProgress: (completed, total) => setTravelProgress({ completed, total }),
+        onJobProgress: (group, completed, total) => setTravelJobProgress({ group, completed, total }),
+      });
+      await refreshStatus();
+      if (result.failures > 0) {
+        const labels = [
+          "downloads.mushafTitle",
+          "downloads.morningCore",
+          "downloads.eveningCore",
+          "downloads.beforeSleepCore",
+          "downloads.kahf",
+        ];
+        setErrorMessage(
+          `${t(language, "downloads.travelPartial")} ${result.failedJobs.map((index) => t(language, labels[index]!)).join("، ")}`,
+        );
+      } else setSuccessMessage(t(language, "downloads.travelChecked"));
+    } catch (error) {
+      await refreshStatus();
+      if (controller.signal.aborted) setSuccessMessage(t(language, "downloads.travelCancelled"));
+      else {
+        reportError(error, "travel-download");
+        setErrorMessage(t(language, isStorageQuotaError(error) ? "downloads.storageFull" : "downloads.travelPartial"));
+      }
+    } finally {
+      travelAbortRef.current = null;
+      setTravelProgress(null);
+      setTravelJobProgress(null);
+    }
+  };
+
+  const isAnyJobActive = downloadProgress !== null || mushafProgress !== null || travelProgress !== null;
+  const travelReady =
+    status?.downloadedMushafPages === 604 &&
+    status.travelAudioTotal > 0 &&
+    status.travelAudioCompleted === status.travelAudioTotal;
 
   return (
     <div className="slide-in-from-right flex h-full flex-col bg-background/50 backdrop-blur-md">
@@ -198,6 +273,101 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
           title={t(language, "downloads.bundledTitle")}
           body={t(language, "downloads.bundledBody")}
         />
+
+        <Card as="section" padding="lg" aria-labelledby="travel-download-title" aria-busy={travelProgress !== null}>
+          <h2 id="travel-download-title" className="text-subtitle font-extrabold text-foreground">
+            {t(language, "downloads.travelTitle")}
+          </h2>
+          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{t(language, "downloads.travelBody")}</p>
+          <p className="mt-3 text-sm font-semibold" data-testid="travel-readiness">
+            {t(language, travelReady ? "downloads.travelReady" : "downloads.travelNotReady")}
+          </p>
+          {status && (
+            <p className="mt-1 text-sm text-muted-foreground">
+              {t(language, "downloads.travelCoverage", {
+                pages: formatNumerals(status.downloadedMushafPages, language),
+                completed: formatNumerals(status.travelAudioCompleted, language),
+                total: formatNumerals(status.travelAudioTotal, language),
+              })}
+            </p>
+          )}
+          <p className="mt-1 text-xs text-muted-foreground">
+            {t(language, "downloads.estimatedRemaining", {
+              size: formatMegabytes(
+                status
+                  ? Math.max(0, 604 - status.downloadedMushafPages) * MUSHAF_ESTIMATED_PAGE_BYTES +
+                      status.travelAudioRemainingBytes
+                  : undefined,
+                language,
+              ),
+            })}
+          </p>
+          <Button
+            type="button"
+            onClick={() => void prepareTravel()}
+            disabled={isLoading || !status || isAnyJobActive || travelReady}
+            className="mt-4 w-full"
+          >
+            <Download size={18} aria-hidden="true" />
+            {t(language, "downloads.prepareTravel")}
+          </Button>
+          {travelProgress && (
+            <div className="mt-3">
+              <progress
+                className="w-full"
+                max={travelProgress.total}
+                value={travelProgress.completed}
+                aria-label={t(language, "downloads.travelProgressLabel")}
+              />
+              <p className="mt-1 text-sm" role="status">
+                {t(language, "downloads.travelProgress", {
+                  completed: formatNumerals(travelProgress.completed, language),
+                  total: formatNumerals(travelProgress.total, language),
+                })}
+              </p>
+              {travelJobProgress && (
+                <div className="mt-2">
+                  <p className="text-sm">
+                    {t(
+                      language,
+                      [
+                        "downloads.mushafTitle",
+                        "downloads.morningCore",
+                        "downloads.eveningCore",
+                        "downloads.beforeSleepCore",
+                        "downloads.kahf",
+                      ][travelJobProgress.group]!,
+                    )}{" "}
+                    ·{" "}
+                    {t(language, "downloads.progressValue", {
+                      percent: formatNumerals(
+                        Math.round((100 * travelJobProgress.completed) / Math.max(1, travelJobProgress.total)),
+                        language,
+                      ),
+                    })}
+                  </p>
+                  <progress
+                    className="w-full"
+                    value={travelJobProgress.completed}
+                    max={Math.max(1, travelJobProgress.total)}
+                    aria-label={t(
+                      language,
+                      travelJobProgress.group === 0 ? "downloads.mushafProgressLabel" : "downloads.progressLabel",
+                    )}
+                  />
+                </div>
+              )}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => travelAbortRef.current?.abort()}
+                className="mt-2 w-full"
+              >
+                {t(language, "downloads.cancelDownload")}
+              </Button>
+            </div>
+          )}
+        </Card>
 
         {/* Card 2: Complete Offline Mushaf */}
         <Card as="section" padding="lg" aria-labelledby="mushaf-download-title">
@@ -222,6 +392,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
           )}
           <Button
             type="button"
+            variant="outline"
             onClick={() => void downloadCompleteMushaf()}
             disabled={isAnyJobActive || status?.downloadedMushafPages === 604}
             className="mt-4 w-full"
@@ -360,15 +531,22 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
         </Card>
 
         {/* Card 4: Technical Diagnostics in an expandable disclosure */}
-        <details className="rounded-2xl border border-border/60 bg-card p-4 transition-colors">
-          <summary className="flex min-h-11 cursor-pointer select-none items-center justify-between rounded-lg text-subtitle font-semibold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+        <details className="group rounded-2xl border border-border/60 bg-card p-4 transition-colors">
+          <summary className="flex min-h-11 cursor-pointer select-none items-center justify-between rounded-lg text-subtitle font-semibold text-foreground transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
             <span className="flex items-center gap-2">
               <Database size={18} className="text-primary" aria-hidden="true" />
               {t(language, "downloads.statusTitle")}
             </span>
-            <span className="text-xs font-semibold text-muted-foreground">
-              {status?.serviceWorkerReady ? t(language, "downloads.active") : t(language, "downloads.inactive")}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-muted-foreground">
+                {status?.serviceWorkerReady ? t(language, "downloads.active") : t(language, "downloads.inactive")}
+              </span>
+              <ChevronDown
+                size={16}
+                className="shrink-0 text-muted-foreground transition-transform duration-standard group-open:rotate-180"
+                aria-hidden="true"
+              />
+            </div>
           </summary>
           <div className="mt-3 border-t border-border/60 pt-3">
             {isLoading ? (

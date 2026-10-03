@@ -80,6 +80,7 @@ const en = {
     retry: "Retry saving",
   },
   home: {
+    situationalTitle: "Azkar for everyday moments",
     dailyEvidence: "Relevant now",
     nextDailyEvidence: "Show another reminder",
     estimatedMinutes: "~{count} mins",
@@ -538,6 +539,20 @@ const en = {
     prayerReminderBody: "{prayer} prayer is in {minutes} minutes.",
   },
   downloads: {
+    travelTitle: "Prepare for travel",
+    travelBody:
+      "Download the complete Mushaf and available approved recordings for Morning Core, Evening Core, Before-Sleep Core, and Al-Kahf in your selected voice. Some entries have no recording. Completed downloads are kept when you cancel or retry.",
+    prepareTravel: "Prepare offline reading and audio",
+    travelReady: "Selected travel downloads are ready",
+    travelNotReady: "Travel downloads are not complete yet",
+    travelCoverage: "{pages} / 604 Mushaf pages · {completed} / {total} available recordings verified",
+    travelPartial:
+      "Some downloads could not finish. Completed downloads are kept. Reconnect or free space, then try again.",
+    travelChecked: "Preparation finished. Verified availability is shown above.",
+    travelCancelled: "Preparation cancelled. Completed collections and Mushaf pages are kept.",
+    travelProgressLabel: "Travel preparation progress",
+    travelProgress: "{completed} of {total} download groups checked",
+    kahf: "Surah Al-Kahf",
     storageFull:
       "There is not enough storage. Remove some downloads and try again. Pages already saved remain available.",
     mushafReady: "{count} of 604 pages available offline",
@@ -858,7 +873,9 @@ const en = {
     extraProgress: "+{count} extra",
     nextMilestoneHint: "Next: {current} of {target}",
     explanation:
-      "Complete Morning, Evening, and Before Sleep Azkar to earn your daily palm and nurture your oasis. Consistent daily remembrance grows your oasis and bears fruit.",
+      "A palm is planted in your oasis when you complete all core daily azkar (Morning, Evening, and Before Sleep).",
+    explanationWithQuran:
+      "A palm is planted in your oasis when you complete all of today's awrad (Morning, Evening, and Before Sleep azkar, and Qur'an wird).",
     explanationLabel: "How a palm is earned",
     private: "Private by default and never shared as a ranking.",
     shown: "Garden shown",
@@ -1247,6 +1264,12 @@ const en = {
     qcfUnavailable: "The local Quran font is shown until the Madinah page font is available.",
   },
   reader: {
+    shortcutHelp: "Open keyboard help",
+    characterShortcuts: "Enable single-key shortcuts for this visit",
+    shortcutSafety:
+      "Turn this off to disable letter, symbol, and question-mark shortcuts. Space and arrow keys still work on the reading surface. Controls keep their own keyboard behavior.",
+    enterFocus: "Focus on reading",
+    exitFocus: "Exit reading focus",
     interactionSheetAria: "Ayah actions",
     shareAyah: "Share ayah",
     bookmarkAyah: "Bookmark ayah",
@@ -1581,6 +1604,7 @@ const en = {
     sensorToggleHint: "Optionally use your device's orientation sensor for real-time turn guidance.",
   },
   counter: {
+    guidedAfterPrayer: "Read guided after-prayer azkar",
     custom: "Custom",
     customTargetHint: "Enter your preferred target count (e.g., 50, 500, 70):",
     chooseDhikr: "Choose a dhikr",
@@ -1605,7 +1629,9 @@ const en = {
     resetConfirmTitle: "Reset this count?",
     resetConfirmBody: "This will clear your current count of {count} and all completed laps.",
     changeDhikrTitle: "Change the selected dhikr?",
-    changeDhikrBody: "Changing dhikr will clear the current count of {count} so recitations are not mixed.",
+    changeDhikrBody:
+      "You can save your progress to continue later today, or clear the current count of {count} and reset.",
+    saveAndSwitch: "Save & switch",
     changeDhikrConfirm: "Change and reset",
     tasbeehTitle: "Masbaha",
     sound: "Counter sound",

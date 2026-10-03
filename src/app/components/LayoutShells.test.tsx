@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { Header, BottomNav } from "./LayoutShells";
 
 describe("Header", () => {
-  it("adds the glass surface only after its screen content scrolls", () => {
+  it("keeps an opaque surface and adds a divider after nested content scrolls", () => {
     render(
       <div className="app-screen-surface">
         <Header title="Progress" />
@@ -16,14 +16,57 @@ describe("Header", () => {
     const header = screen.getByTestId("shared-screen-header");
     const region = screen.getByTestId("scroll-region");
     expect(header).not.toHaveAttribute("data-scrolled");
-    expect(header).toHaveClass("bg-transparent");
+    expect(header).toHaveClass("bg-background");
 
     fireEvent.scroll(region, { target: { scrollTop: 12 } });
     expect(header).toHaveAttribute("data-scrolled", "true");
-    expect(header).toHaveClass("scroll-glass-header", "backdrop-blur-md");
+    expect(header).toHaveClass("bg-background", "border-border", "shadow-sm");
 
     fireEvent.scroll(region, { target: { scrollTop: 0 } });
     expect(header).not.toHaveAttribute("data-scrolled");
+    expect(header).toHaveClass("bg-background");
+  });
+
+  it("does not elevate or add a divider on scroll when elevateOnScroll is false", () => {
+    render(
+      <div className="app-screen-surface">
+        <Header title="Reader" elevateOnScroll={false} />
+        <div data-testid="scroll-region">
+          <div>Content</div>
+        </div>
+      </div>,
+    );
+
+    const header = screen.getByTestId("shared-screen-header");
+    const region = screen.getByTestId("scroll-region");
+    expect(header).not.toHaveAttribute("data-scrolled");
+    expect(header).toHaveClass("border-transparent");
+
+    fireEvent.scroll(region, { target: { scrollTop: 20 } });
+    expect(header).not.toHaveAttribute("data-scrolled");
+    expect(header).toHaveClass("border-transparent");
+    expect(header).not.toHaveClass("border-border");
+  });
+
+  it("ignores scroll events from reader-text-scroll elements", () => {
+    render(
+      <div className="app-screen-surface">
+        <Header title="Reader" />
+        <div className="reader-text-scroll" data-testid="reader-scroll-region">
+          <div>Devotional reading text</div>
+        </div>
+      </div>,
+    );
+
+    const header = screen.getByTestId("shared-screen-header");
+    const readerRegion = screen.getByTestId("reader-scroll-region");
+    expect(header).not.toHaveAttribute("data-scrolled");
+    expect(header).toHaveClass("border-transparent");
+
+    fireEvent.scroll(readerRegion, { target: { scrollTop: 50 } });
+    expect(header).not.toHaveAttribute("data-scrolled");
+    expect(header).toHaveClass("border-transparent");
+    expect(header).not.toHaveClass("border-border");
   });
 });
 

@@ -154,7 +154,7 @@ describe("Home wird card", () => {
   });
 
   it("keeps the Home title concise and explains how to earn a palm on demand", () => {
-    render(
+    const { unmount } = render(
       <TodayRoutineGarden
         summary={makeSummary()}
         language="en"
@@ -165,7 +165,25 @@ describe("Home wird card", () => {
 
     expect(screen.queryByText(/Great start!/i)).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "How a palm is earned" }));
-    expect(screen.getByText(/Morning, Evening, and Before Sleep/i)).toBeInTheDocument();
+    expect(screen.getByText(/core daily azkar \(Morning, Evening, and Before Sleep\)/i)).toBeInTheDocument();
+    unmount();
+
+    // With Quran wird present: explains that all awrad (azkar + Quran) are required
+    render(
+      <TodayRoutineGarden
+        summary={makeSummary()}
+        language="ar"
+        hideTabs
+        visibleCategoryIds={["morning", "evening", "before_sleep"]}
+        quranWird={{ progress: 0, goal: 4, complete: false, active: true, onPress: () => undefined }}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "كيف تُضاف النخلة" }));
+    expect(
+      screen.getByText("تُغرس لك نخلة في واحتك عند إتمام جميع أوراد اليوم (أذكار الصباح والمساء والنوم ووِرد القرآن)."),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId("thimar-progress-badge")).toHaveTextContent("١٠ من ٢٠ ثمرة");
   });
 
   it("reports intermediate progress accurately when Quran makes four routines", () => {
@@ -181,7 +199,7 @@ describe("Home wird card", () => {
     );
 
     expect(screen.getByText("2 / 4")).toBeInTheDocument();
-    expect(screen.getByTestId("thimar-progress-badge")).toHaveTextContent(/10\s*\/\s*20/);
+    expect(screen.getByTestId("thimar-progress-badge")).toHaveTextContent(/10\s*of\s*20/);
     expect(screen.getByText(/Halfway through your daily path \(10 fruits\)/i)).toBeInTheDocument();
   });
 });

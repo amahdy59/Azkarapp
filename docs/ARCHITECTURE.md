@@ -282,6 +282,10 @@ The active reading mode also reaches `useSessionHandlers`, so completion identit
 
 ## Extension checklist
 
+Phase 78 adds presentation-only situational links and guided after-prayer access through existing routing/session callbacks. Reading focus is screen-local. Character-shortcut preferences live in a visit-local external store (`keyboardShortcuts.ts`) and never enter persistence or sync. Shared keyboard help uses the existing Modal boundary; counting screens share native-control/modal/modifier guards.
+
+`audio/travelPreparation.ts` coordinates independent Mushaf and audio jobs without owning cache/storage access. `audioOfflineCache.ts` verifies cached selected-voice bytes before reporting readiness or skipping them on retry. Downloads lazily loads Al-Kahf, displays advisory storage estimates, and preserves completed jobs after failure/cancellation. No new dependencies, reviewed content, synchronized fields, or prayer calculations are introduced.
+
 Before adding a feature:
 
 - Identify its owning layer and state owner.

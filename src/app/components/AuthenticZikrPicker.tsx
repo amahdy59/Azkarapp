@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import type { AuthenticZikrItem } from "../content/authenticAzkar";
 import type { AppLanguage } from "../types";
+import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { FormField } from "./FormField";
 import { Check, ChevronDown, Lightbulb, Search } from "./icons";
@@ -17,12 +18,14 @@ export function AuthenticZikrPicker({
   selected,
   language,
   direction,
+  savedItems,
   onSelect,
 }: {
   items: readonly AuthenticZikrItem[];
   selected: AuthenticZikrItem;
   language: AppLanguage;
   direction: "ltr" | "rtl";
+  savedItems?: Record<string, { count: number; target: number; laps?: number }>;
   onSelect: (item: AuthenticZikrItem) => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -122,9 +125,17 @@ export function AuthenticZikrPicker({
                         <Check size={14} strokeWidth={3} />
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block text-sm font-black leading-7 text-foreground" dir="auto">
-                          {text}
-                        </span>
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="block text-sm font-black leading-7 text-foreground" dir="auto">
+                            {text}
+                          </span>
+                          {savedItems?.[item.id] && savedItems[item.id]!.count > 0 && (
+                            <span className="shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary">
+                              {formatNumerals(savedItems[item.id]!.count, language)} /{" "}
+                              {formatNumerals(savedItems[item.id]!.target, language)}
+                            </span>
+                          )}
+                        </div>
                         <span className="mt-1 flex items-start gap-2 text-xs font-semibold leading-5 text-muted-foreground">
                           <Lightbulb size={15} className="mt-0.5 shrink-0 text-primary" aria-hidden="true" />
                           <span className="line-clamp-2" dir="auto">

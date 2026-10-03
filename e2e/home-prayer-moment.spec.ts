@@ -220,4 +220,15 @@ test("tracking uses a circular keyboard focus indicator and mirrors in RTL", asy
   expect(indicatorBox).not.toBeNull();
   expect(copyBox).not.toBeNull();
   expect(indicatorBox!.x).toBeLessThan(copyBox!.x);
+
+  const infoButton = page.getByTestId("prayer-actions-more-info");
+  const infoCircle = infoButton.locator("span[aria-hidden='true']");
+  const infoCircleBox = await infoCircle.boundingBox();
+  expect(infoCircleBox).not.toBeNull();
+  expect(infoCircleBox!.width).toBeCloseTo(indicatorBox!.width, 0);
+  expect(infoCircleBox!.height).toBeCloseTo(indicatorBox!.height, 0);
+
+  const infoCenterX = infoCircleBox!.x + infoCircleBox!.width / 2;
+  const indicatorCenterX = indicatorBox!.x + indicatorBox!.width / 2;
+  expect(Math.abs(infoCenterX - indicatorCenterX)).toBeLessThanOrEqual(1);
 });

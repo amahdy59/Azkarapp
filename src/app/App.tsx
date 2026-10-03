@@ -5,6 +5,7 @@ import {
   saveAppState,
   toCompletedSets,
   resetDailyPartialCounts,
+  resetDailyMasbahaState,
   type StoredSession,
 } from "./state";
 import { applyAppAppearance } from "./theme";
@@ -588,6 +589,12 @@ function AppContent({
     }
     setCompleted((previous) => ({ ...previous, friday_kahf: new Set() }));
     setFridayDuaCompletedIds(new Set());
+    setSurahReadingPages((previous) => {
+      if (!previous["friday-kahf"]) return previous;
+      const next = { ...previous };
+      delete next["friday-kahf"];
+      return next;
+    });
     return false;
   }, []);
 
@@ -845,6 +852,11 @@ function AppContent({
         Object.fromEntries(Object.entries(current).filter(([id]) => !ids.includes(id))),
       );
       setCounterResetVersion((version) => version + 1);
+    },
+    onResetSurahPages: (ids) => {
+      setSurahReadingPages((current) =>
+        Object.fromEntries(Object.entries(current).filter(([id]) => !ids.includes(id))),
+      );
     },
   });
 
@@ -1224,6 +1236,14 @@ function AppContent({
     activeProgressDayRef.current = currentDayKey;
     setCompleted((previous) => resetDailyRoutineProgress(previous));
     setPartialZikrCounts(resetDailyPartialCounts);
+    setMasbahaState((previous) => (previous ? resetDailyMasbahaState(previous, currentDayKey) : previous));
+    setSurahReadingPages((current) => {
+      if (!current["s-hm-110a"] && !current["s-hm-110b"]) return current;
+      const next = { ...current };
+      delete next["s-hm-110a"];
+      delete next["s-hm-110b"];
+      return next;
+    });
   }, [progressDayStartHour]);
 
   useEffect(() => {
@@ -1860,6 +1880,12 @@ function AppContent({
                       const nextIndex = sameWeek ? getFirstIncompleteZikrIndex(kahf, completed.friday_kahf) : 0;
                       if (nextIndex === null) {
                         setCompleted((previous) => ({ ...previous, friday_kahf: new Set() }));
+                        setSurahReadingPages((previous) => {
+                          if (!previous["friday-kahf"]) return previous;
+                          const next = { ...previous };
+                          delete next["friday-kahf"];
+                          return next;
+                        });
                         openReader("friday_kahf", 0);
                         return;
                       }
@@ -2326,11 +2352,13 @@ function AppContent({
                   isArabic={selectedLang === "ar"}
                   direction={layoutDirection}
                   onBack={pop}
+                  onOpenAfterPrayer={() => resumeCategory("after_prayer")}
                   hapticFeedback={hapticFeedback}
                   reduceMotion={reduceMotion}
                   textSize={textSize}
                   initialMasbahaState={masbahaState}
                   onSaveMasbahaState={setMasbahaState}
+                  progressDayStartHour={progressDayStartHour}
                 />
               )}
             </Suspense>

@@ -31,6 +31,7 @@ describe("PrayerActionsCard", () => {
 
     expect(infoButton).toHaveTextContent("");
     expect(infoButton).toHaveClass("size-11");
+    expect(infoButton).toHaveClass("border");
     expect(infoButton).toHaveAttribute("aria-haspopup", "dialog");
     fireEvent.click(infoButton);
     expect(screen.getByTestId("prayer-info-points").querySelectorAll(":scope > li")).toHaveLength(2);

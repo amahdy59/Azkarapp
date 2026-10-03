@@ -286,30 +286,32 @@ export function CounterShortcutHints({
   if (shortcuts.length === 0) return null;
 
   return (
-    <div
-      role="group"
-      aria-label={ariaLabel}
-      data-testid={testId}
-      dir="ltr"
-      lang={language}
-      className="mx-auto mt-1 hidden w-fit max-w-full flex-wrap items-center justify-center gap-3 rounded-full border border-border/40 bg-muted/60 px-4 py-1.5 text-xs font-medium text-muted-foreground md:flex"
-    >
-      {shortcuts.map((shortcut, index) => (
-        <React.Fragment key={shortcut.label}>
-          {index > 0 && <span className="h-3 w-px bg-border/60" aria-hidden="true" />}
-          <span className="flex items-center gap-1" dir={direction}>
-            {shortcut.keys.map((key) => (
-              <kbd
-                key={key}
-                className="rounded border border-border bg-card px-1.5 py-0.5 font-mono text-micro font-bold text-foreground shadow-2xs"
-              >
-                {key}
-              </kbd>
-            ))}
-            <span>{shortcut.label}</span>
-          </span>
-        </React.Fragment>
-      ))}
-    </div>
+    <>
+      <div
+        role="group"
+        aria-label={ariaLabel}
+        data-testid={testId}
+        dir="ltr"
+        lang={language}
+        className="mx-auto mt-1 hidden w-fit max-w-full flex-wrap items-center justify-center gap-3 rounded-full border border-border/40 bg-muted/60 px-4 py-1.5 text-xs font-medium text-muted-foreground md:flex"
+      >
+        {shortcuts.map((shortcut, index) => (
+          <React.Fragment key={shortcut.label}>
+            {index > 0 && <span className="h-3 w-px bg-border/60" aria-hidden="true" />}
+            <span className="flex items-center gap-1" dir={direction}>
+              {shortcut.keys.map((key) => (
+                <kbd
+                  key={key}
+                  className="rounded border border-border bg-card px-1.5 py-0.5 font-mono text-micro font-bold text-foreground shadow-2xs"
+                >
+                  {key}
+                </kbd>
+              ))}
+              <span>{shortcut.label}</span>
+            </span>
+          </React.Fragment>
+        ))}
+      </div>
+    </>
   );
 }

@@ -453,7 +453,7 @@ export function MushafImmersiveReader({
         aria-label={t(language, "common.back")}
         className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
-        <span className="inline-flex h-8 min-w-[2.75rem] items-center justify-center gap-1 rounded-full border border-border/80 bg-card/90 px-3 text-foreground shadow-xs backdrop-blur-md transition-colors group-hover:bg-muted group-active:bg-muted">
+        <span className="inline-flex h-8 min-w-[2.75rem] items-center justify-center gap-1 rounded-full border border-border/80 bg-card/90 px-3 text-foreground  backdrop-blur-md transition-colors group-hover:bg-muted group-active:bg-muted">
           <ArrowLeft size={16} aria-hidden="true" />
         </span>
       </button>
@@ -468,7 +468,7 @@ export function MushafImmersiveReader({
         aria-label={t(language, "mushaf.moreActions")}
         className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
-        <span className="inline-flex h-8 min-w-[2.75rem] items-center justify-center gap-1 rounded-full border border-border/80 bg-card/90 px-3 text-foreground shadow-xs backdrop-blur-md transition-colors group-hover:bg-muted group-active:bg-muted">
+        <span className="inline-flex h-8 min-w-[2.75rem] items-center justify-center gap-1 rounded-full border border-border/80 bg-card/90 px-3 text-foreground  backdrop-blur-md transition-colors group-hover:bg-muted group-active:bg-muted">
           <MoreVertical size={16} />
         </span>
       </button>
@@ -489,7 +489,7 @@ export function MushafImmersiveReader({
         style={{ maxWidth: "calc(100vw - 7.5rem)" }}
         className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
-        <span className="inline-flex h-8 max-w-full items-center justify-center gap-1 rounded-full border border-border/80 bg-card/90 px-3 text-foreground shadow-xs backdrop-blur-md transition-colors group-hover:bg-muted group-active:bg-muted">
+        <span className="inline-flex h-8 max-w-full items-center justify-center gap-1 rounded-full border border-border/80 bg-card/90 px-3 text-foreground  backdrop-blur-md transition-colors group-hover:bg-muted group-active:bg-muted">
           <span className="arabic-ui truncate text-xs font-bold leading-none">{surahName}</span>
           <ChevronDown
             size={13}
@@ -513,7 +513,7 @@ export function MushafImmersiveReader({
         className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
         <span
-          className={`inline-flex h-8 min-w-[2.75rem] items-center justify-center gap-1 rounded-full border px-3 shadow-xs backdrop-blur-md transition-colors ${
+          className={`inline-flex h-8 min-w-[2.75rem] items-center justify-center gap-1 rounded-full border px-3  backdrop-blur-md transition-colors ${
             showWordMeanings
               ? "border-primary/50 bg-primary text-primary-foreground group-hover:bg-primary/90"
               : "border-border/80 bg-card/90 text-foreground group-hover:bg-muted group-active:bg-muted"
@@ -532,10 +532,12 @@ export function MushafImmersiveReader({
           onClick={onComplete}
           data-testid="mushaf-immersive-return"
           aria-label={t(language, "reader.immersiveComplete")}
-          className="flex h-8 items-center gap-1.5 rounded-full bg-primary px-3.5 text-xs font-black text-primary-foreground shadow-xs backdrop-blur-md transition-[color,background-color,transform] active:scale-95 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="group flex h-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
-          <CheckCircle2 size={16} aria-hidden="true" />
-          <span className="truncate">{t(language, "reader.immersiveComplete")}</span>
+          <span className="inline-flex h-8 items-center gap-1.5 rounded-full bg-primary px-3 text-xs font-black text-primary-foreground  backdrop-blur-md transition-[color,background-color] hover:bg-primary/90">
+            <CheckCircle2 size={16} aria-hidden="true" />
+            <span className="truncate">{t(language, "reader.immersiveComplete")}</span>
+          </span>
         </button>
       ) : (
         <button
@@ -547,7 +549,7 @@ export function MushafImmersiveReader({
           className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           <span
-            className={`inline-flex h-8 min-w-[2rem] items-center justify-center gap-1 rounded-full border px-3 shadow-xs backdrop-blur-md transition-colors ${
+            className={`inline-flex h-8 min-w-[2rem] items-center justify-center gap-1 rounded-full border px-3  backdrop-blur-md transition-colors ${
               isPageBookmarked
                 ? "border-primary/50 bg-primary text-primary-foreground group-hover:bg-primary/90"
                 : "border-border/80 bg-card/90 text-foreground group-hover:bg-muted group-active:bg-muted"

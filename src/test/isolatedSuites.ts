@@ -12,6 +12,8 @@
  */
 export const ISOLATED_SUITES = [
   "src/app/App.composition.test.tsx",
+  "src/app/audio/audioOfflineCache.resume.test.ts",
+  "src/app/audio/travelPreparation.test.ts",
   "src/app/components/AppErrorBoundary.test.tsx",
   "src/app/components/CollectionShareModal.test.tsx",
   "src/app/content/qcfMushaf.test.ts",

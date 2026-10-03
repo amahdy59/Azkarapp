@@ -27,7 +27,7 @@ import {
   type OasisHabits,
 } from "../oasis/oasisModel";
 import { DropletMark, SeedlingMark, BranchMark, PalmTreeMark, OasisMark } from "../components/GardenMarks";
-import { Share2, Sparkles, Zap } from "../components/icons";
+import { ChevronDown, Share2, Sparkles, Zap } from "../components/icons";
 import type {
   AppLanguage,
   CategoryId,
@@ -519,10 +519,10 @@ export function ProgressScreen({
         {activeTab === "day" && (
           <details
             data-testid="oasis-stage-card"
-            className="mb-5 w-full overflow-hidden rounded-2xl border border-border bg-card text-foreground"
+            className="group mb-5 w-full overflow-hidden rounded-2xl border border-border bg-card text-foreground transition-colors"
             dir={isArabic ? "rtl" : "ltr"}
           >
-            <summary className="min-h-11 cursor-pointer px-4 py-3 text-start focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+            <summary className="flex min-h-11 cursor-pointer select-none items-center justify-between px-4 py-3 text-start transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
               <span className="flex min-w-0 items-center gap-3">
                 <span className="flex size-9 shrink-0 items-center justify-center" aria-hidden="true">
                   {renderTierMark(oasisLevel, 28)}
@@ -536,6 +536,11 @@ export function ProgressScreen({
                   </span>
                 </span>
               </span>
+              <ChevronDown
+                size={18}
+                className="shrink-0 text-muted-foreground transition-transform duration-standard group-open:rotate-180"
+                aria-hidden="true"
+              />
             </summary>
 
             <div className="border-t border-border px-4 pb-4 pt-3 sm:px-5">

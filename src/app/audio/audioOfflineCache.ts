@@ -78,6 +78,43 @@ export function estimateAudioDownloadBytes(zikrs: readonly Zikr[], preferences: 
   return getDownloadVariants(zikrs, preferences).reduce((total, item) => total + item.variant.byteSize, 0);
 }
 
+async function isVerifiedCachedAudio(cache: Cache, item: ReturnType<typeof getDownloadVariants>[number]) {
+  const response = await cache.match(item.url);
+  if (
+    !response ||
+    response.status !== 200 ||
+    response.headers.get("content-type")?.split(";")[0]?.trim() !== item.variant.mimeType
+  )
+    return false;
+  try {
+    await verifyDownload(await response.arrayBuffer(), item.variant);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Readiness comes from complete, checksummed bytes, never registry totals alone. */
+export async function getAudioDownloadStatus(zikrs: readonly Zikr[], preferences: AudioPreferences) {
+  const variants = getDownloadVariants(zikrs, preferences);
+  let completedBytes = 0;
+  let completed = 0;
+  if ("caches" in window) {
+    const cache = await caches.open(AUDIO_CACHE_NAME);
+    for (const item of variants) {
+      if (await isVerifiedCachedAudio(cache, item)) {
+        completed += 1;
+        completedBytes += item.variant.byteSize;
+      }
+    }
+  }
+  return {
+    completed,
+    total: variants.length,
+    remainingBytes: variants.reduce((sum, item) => sum + item.variant.byteSize, 0) - completedBytes,
+  };
+}
+
 export async function downloadAudioForZikrs(
   zikrs: readonly Zikr[],
   preferences: AudioPreferences,
@@ -94,17 +131,20 @@ export async function downloadAudioForZikrs(
   try {
     for (const item of downloads) {
       options.signal?.throwIfAborted();
-      const response = await fetch(item.url, { cache: "no-store", credentials: "omit", signal: options.signal });
-      if (response.status !== 200 || !response.ok) throw new Error(`Audio download failed: ${item.variant.id}`);
-      const contentType = response.headers.get("content-type")?.split(";")[0]?.trim();
-      if (contentType !== item.variant.mimeType) throw new Error(`Unexpected audio MIME type: ${item.variant.id}`);
-      const buffer = await response.arrayBuffer();
-      await verifyDownload(buffer, item.variant);
-      const headers = new Headers(response.headers);
-      headers.set("content-length", String(buffer.byteLength));
-      headers.set("content-type", item.variant.mimeType);
-      await cache.put(item.url, new Response(buffer, { status: 200, headers }));
-      storedUrls.push(item.url);
+      const alreadyCached = await isVerifiedCachedAudio(cache, item);
+      if (!alreadyCached) {
+        const response = await fetch(item.url, { cache: "no-store", credentials: "omit", signal: options.signal });
+        if (response.status !== 200 || !response.ok) throw new Error(`Audio download failed: ${item.variant.id}`);
+        const contentType = response.headers.get("content-type")?.split(";")[0]?.trim();
+        if (contentType !== item.variant.mimeType) throw new Error(`Unexpected audio MIME type: ${item.variant.id}`);
+        const buffer = await response.arrayBuffer();
+        await verifyDownload(buffer, item.variant);
+        const headers = new Headers(response.headers);
+        headers.set("content-length", String(buffer.byteLength));
+        headers.set("content-type", item.variant.mimeType);
+        await cache.put(item.url, new Response(buffer, { status: 200, headers }));
+        storedUrls.push(item.url);
+      }
       completedBytes += item.variant.byteSize;
       options.onProgress?.(completedBytes, totalBytes);
 
