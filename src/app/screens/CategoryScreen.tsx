@@ -436,6 +436,11 @@ export function CategoryScreen({
             open={isShareModalOpen}
             onClose={() => setIsShareModalOpen(false)}
             collectionTitle={isArabic ? cat.nameArabic : cat.name}
+            collectionTitleArabic={cat.nameArabic}
+            collectionTitleEnglish={cat.name}
+            categoryId={catId}
+            routineMode={routineMode}
+            prayer={prayer}
             items={azkar}
             language={language}
           />

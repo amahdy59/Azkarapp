@@ -59,6 +59,7 @@ export async function shareSingleFile(
   options: {
     title?: string;
     text?: string;
+    downloadFallback?: boolean;
     onStatus?: (status: "sharing" | "downloading" | "shared" | "downloaded" | "cancelled") => void;
   } = {},
 ): Promise<MultiShareResult> {
@@ -81,10 +82,12 @@ export async function shareSingleFile(
         options.onStatus?.("cancelled");
         return { method: "cancelled", fileCount: 1 };
       }
+      if (options.downloadFallback === false) throw err;
     }
   }
 
   // Fallback to downloading
+  if (options.downloadFallback === false) throw new Error("File sharing unavailable.");
   options.onStatus?.("downloading");
   downloadFile(file);
   options.onStatus?.("downloaded");
@@ -129,6 +132,7 @@ export async function shareMultipleFiles(
   options: {
     title?: string;
     text?: string;
+    downloadFallback?: boolean;
     onStatus?: (status: "sharing" | "downloading" | "shared" | "downloaded" | "cancelled") => void;
   } = {},
 ): Promise<MultiShareResult> {
@@ -152,10 +156,12 @@ export async function shareMultipleFiles(
         return { method: "cancelled", fileCount: files.length };
       }
       // If native sharing fails unexpectedly, fall through to download
+      if (options.downloadFallback === false) throw err;
     }
   }
 
   // Desktop or unsupported browser fallback
+  if (options.downloadFallback === false) throw new Error("Multi-file sharing unavailable.");
   options.onStatus?.("downloading");
   await downloadFilesSequentially(files);
   options.onStatus?.("downloaded");

@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   COLLECTION_STORY_HEIGHT,
   COLLECTION_STORY_WIDTH,
@@ -69,8 +69,29 @@ function createMockCanvas() {
 afterEach(() => {
   vi.restoreAllMocks();
 });
+beforeEach(() => {
+  vi.spyOn(URL, "createObjectURL").mockReturnValue("blob:preview");
+  vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});
+});
 
 describe("collectionShareCard", () => {
+  it("releases progressive preview URLs when generation is cancelled", async () => {
+    const { canvas } = createMockCanvas();
+    const originalCreateElement = document.createElement.bind(document);
+    vi.spyOn(document, "createElement").mockImplementation(((tagName: string) =>
+      tagName === "canvas" ? canvas : originalCreateElement(tagName)) as typeof document.createElement);
+    const controller = new AbortController();
+    await expect(
+      generateAllCollectionStoryPages({
+        collectionTitle: "أذكار الصباح",
+        allItems: Array.from({ length: 25 }, (_, i) => ({ id: `item-${i}`, arabicText: "اللَّهُمَّ اغفر لنا" })),
+        signal: controller.signal,
+        onPage: () => controller.abort(),
+      }),
+    ).rejects.toMatchObject({ name: "AbortError" });
+    expect(URL.createObjectURL).toHaveBeenCalledTimes(1);
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:preview");
+  });
   it("rejects oversized devotional text instead of silently cutting it off", () => {
     const { canvas } = createMockCanvas();
     const originalCreateElement = document.createElement.bind(document);
@@ -116,10 +137,10 @@ describe("collectionShareCard", () => {
     expect(result.totalPages).toBe(5);
     expect(result.file).toBeInstanceOf(File);
     expect(result.file.type).toBe("image/png");
-    expect(result.file.name).toContain("page-1-of-5.png");
+    expect(result.file.name).toContain("001-of-5");
   });
 
-  it("generates all 5 pages concurrently for a full collection", async () => {
+  it("measures complete text rather than forcing it into a requested five pages", async () => {
     const { canvas } = createMockCanvas();
     const originalCreateElement = document.createElement.bind(document);
     vi.spyOn(document, "createElement").mockImplementation(((tagName: string) =>
@@ -143,12 +164,15 @@ describe("collectionShareCard", () => {
       targetPages: 5,
     });
 
-    expect(pages).toHaveLength(5);
-    expect(pages.map((p) => p.pageNumber)).toEqual([1, 2, 3, 4, 5]);
-    expect(pages.every((p) => p.totalPages === 5)).toBe(true);
+    expect(pages).toHaveLength(7);
+    expect(pages.map((p) => p.pageNumber)).toEqual([1, 2, 3, 4, 5, 6, 7]);
+    expect(pages.every((p) => p.totalPages === 7)).toBe(true);
+    expect(pages.flatMap((page) => page.layout.fragments.map((fragment) => fragment.item.id))).toEqual(
+      items.map((item) => item.id),
+    );
   });
 
-  it("partitions into 3-4 cards per group dynamically when targetPages is omitted", async () => {
+  it("uses no more than four short readable cards per slide", async () => {
     const { canvas } = createMockCanvas();
     const originalCreateElement = document.createElement.bind(document);
     vi.spyOn(document, "createElement").mockImplementation(((tagName: string) =>
@@ -171,9 +195,9 @@ describe("collectionShareCard", () => {
       allItems: items,
     });
 
-    // 25 items with 3-4 items per page = 7 pages
     expect(pages).toHaveLength(7);
     expect(pages.map((p) => p.pageNumber)).toEqual([1, 2, 3, 4, 5, 6, 7]);
     expect(pages.every((p) => p.totalPages === 7)).toBe(true);
+    expect(pages.every((page) => page.layout.fragments.length <= 4)).toBe(true);
   });
 });

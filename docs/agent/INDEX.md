@@ -135,3 +135,5 @@ The agent must never interpret “perfect the application” as permission to re
 [Phase 75](phases/PHASE_75_INTEGRATED_AUDIO_PLAYER.md) records the owner-requested integrated expanded audio surface, replacing the modal presentation under DEC-214.
 
 [Phase 76](phases/PHASE_76_PENDING_CHANGES_RELEASE.md) records the review, repair, and authorized release of pending sharing, Mushaf, and audio changes under DEC-215.
+
+[Phase 77](phases/PHASE_77_SHARING_REFINEMENT.md) is the active owner-approved sharing refinement: complete text, measured readable exports, coordinated designs, accessible previews and resilient sharing under DEC-216.

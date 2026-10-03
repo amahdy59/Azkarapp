@@ -16,7 +16,7 @@
 
 import { CATEGORIES } from "./content/categories";
 import { isPrayerName } from "./content/prayerTimes";
-import type { CategoryId, PrayerName, View } from "./types";
+import type { CategoryId, PrayerName, RoutineMode, View } from "./types";
 
 export type LibraryRouteSection = "collections" | "saved";
 export type ProgressRoutePeriod = "day" | "week" | "month" | "year";
@@ -47,6 +47,9 @@ export interface RouteState {
   librarySection?: LibraryRouteSection;
   progressPeriod?: ProgressRoutePeriod;
   settingsPanel?: SettingsRoutePanel;
+  /** Temporary reading context for shared links; never a persisted preference. */
+  routineMode?: RoutineMode;
+  subCategory?: PrayerName;
 }
 
 /** Views that map to a stable, linkable path. */
@@ -84,6 +87,10 @@ function categoryFromSlug(slug: string): CategoryId | undefined {
  */
 export function routeToHash(route: RouteState): string | null {
   const { view, categoryId, index, query, page, prayer, librarySection, progressPeriod, settingsPanel } = route;
+  const context = new URLSearchParams();
+  if (route.routineMode) context.set("mode", route.routineMode);
+  if (categoryId === "after_prayer" && route.subCategory) context.set("prayer", route.subCategory);
+  const suffix = context.size ? `?${context}` : "";
 
   if (view === "library") return librarySection === "saved" ? "#/azkar/saved" : "#/azkar";
   if (view === "progress")
@@ -92,12 +99,12 @@ export function routeToHash(route: RouteState): string | null {
     return settingsPanel && settingsPanel !== "root" ? `#/settings/${settingsPanel}` : "#/settings";
 
   if (view === "category" && categoryId) {
-    return `#/azkar/${categorySlug(categoryId)}`;
+    return `#/azkar/${categorySlug(categoryId)}${suffix}`;
   }
 
   if (view === "reader" && categoryId) {
     // One-based so the URL matches how the reader labels the zikr on screen.
-    return `#/azkar/${categorySlug(categoryId)}/${(index ?? 0) + 1}`;
+    return `#/azkar/${categorySlug(categoryId)}/${(index ?? 0) + 1}${suffix}`;
   }
 
   if (view === "prayer" && prayer) {
@@ -127,7 +134,10 @@ export function routeToHash(route: RouteState): string | null {
 
 /** Parses a hash such as `#/azkar/morning/5` or `#/quran/50`. Returns null when unrecognised. */
 export function parseHash(hash: string): RouteState | null {
-  const raw = hash.replace(/^#/, "");
+  const [raw = "", contextQuery = ""] = hash.replace(/^#/, "").split("?");
+  const contextParams = new URLSearchParams(contextQuery);
+  const mode = contextParams.get("mode");
+  const prayerContext = contextParams.get("prayer") ?? undefined;
   if (!raw || raw === "/") return null;
 
   const path = raw.startsWith("/") ? raw : `/${raw}`;
@@ -168,12 +178,23 @@ export function parseHash(hash: string): RouteState | null {
     if (!categoryId) return null;
 
     if (segments.length === 2) {
-      return { view: "category", categoryId };
+      return {
+        view: "category",
+        categoryId,
+        ...(mode === "core" || mode === "complete" ? { routineMode: mode } : {}),
+        ...(categoryId === "after_prayer" && isPrayerName(prayerContext) ? { subCategory: prayerContext } : {}),
+      };
     }
 
     const oneBased = Number(segments[2]);
     if (!Number.isInteger(oneBased) || oneBased < 1) return null;
-    return { view: "reader", categoryId, index: oneBased - 1 };
+    return {
+      view: "reader",
+      categoryId,
+      index: oneBased - 1,
+      ...(mode === "core" || mode === "complete" ? { routineMode: mode } : {}),
+      ...(categoryId === "after_prayer" && isPrayerName(prayerContext) ? { subCategory: prayerContext } : {}),
+    };
   }
 
   if (segments[0] === "prayer" && segments.length >= 2) {

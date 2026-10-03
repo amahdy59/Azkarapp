@@ -20,6 +20,7 @@ const DEVICE_MATRIX_SPECS = [
   "progress-responsive.spec.ts",
   "reader-microinteractions.spec.ts",
   "responsive.spec.ts",
+  "sharing-refinement.spec.ts",
 ];
 
 const fullMatrix = process.env.E2E_FULL_MATRIX === "1";
