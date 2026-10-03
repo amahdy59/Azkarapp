@@ -6,6 +6,7 @@ import type { Zikr } from "../types";
 // Mock canvas and share functions
 vi.mock("../share/collectionShareCard", () => ({
   releaseSharePages: vi.fn(),
+  getCompatibleShareFormats: vi.fn().mockResolvedValue(["story", "square", "portrait", "tall"]),
   generateAllCollectionStoryPages: vi.fn().mockResolvedValue([
     {
       pageNumber: 1,
@@ -52,6 +53,83 @@ const SAMPLE_ITEMS: Zikr[] = [
 ];
 
 describe("CollectionShareModal", () => {
+  it("keeps full text available when no image format fits", async () => {
+    const { getCompatibleShareFormats } = await import("../share/collectionShareCard");
+    vi.mocked(getCompatibleShareFormats).mockResolvedValueOnce([]);
+    render(
+      <CollectionShareModal
+        open
+        onClose={vi.fn()}
+        collectionTitle="Morning"
+        categoryId="morning"
+        items={SAMPLE_ITEMS}
+        language="en"
+      />,
+    );
+    await screen.findByRole("alert");
+    fireEvent.click(screen.getAllByRole("button", { name: "Text", exact: true })[0]!);
+    expect((screen.getByRole("textbox") as HTMLTextAreaElement).value).toContain(SAMPLE_ITEMS[0]!.arabicText);
+    expect(screen.getByRole("button", { name: "Copy", exact: true })).toBeEnabled();
+  });
+  it("offers compatible sizes and text instead of splitting an oversized item", async () => {
+    const { getCompatibleShareFormats, generateAllCollectionStoryPages } = await import("../share/collectionShareCard");
+    vi.mocked(getCompatibleShareFormats).mockResolvedValueOnce(["tall"]);
+    vi.mocked(generateAllCollectionStoryPages).mockClear();
+    render(
+      <CollectionShareModal
+        open
+        onClose={vi.fn()}
+        collectionTitle="Morning"
+        categoryId="morning"
+        items={SAMPLE_ITEMS}
+        language="en"
+      />,
+    );
+    expect(await screen.findByRole("alert")).toHaveTextContent(/complete/i);
+    expect(generateAllCollectionStoryPages).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Tall reading image" }));
+    await screen.findByRole("img");
+    expect(generateAllCollectionStoryPages).toHaveBeenCalledWith(expect.objectContaining({ format: "tall" }));
+  });
+  it("keeps English labels independent from the optional meaning", async () => {
+    const { generateAllCollectionStoryPages } = await import("../share/collectionShareCard");
+    render(
+      <CollectionShareModal
+        open
+        onClose={vi.fn()}
+        collectionTitle="Morning"
+        items={[{ ...SAMPLE_ITEMS[0]!, translation: "All praise belongs to Allah." }]}
+        language="en"
+      />,
+    );
+    await screen.findByRole("img");
+    expect(generateAllCollectionStoryPages).toHaveBeenLastCalledWith(
+      expect.objectContaining({ language: "en", content: expect.objectContaining({ meaning: false }) }),
+    );
+    fireEvent.click(screen.getByText("Customize content"));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Include reviewed English meaning" }));
+    await waitFor(() =>
+      expect(generateAllCollectionStoryPages).toHaveBeenLastCalledWith(
+        expect.objectContaining({ language: "en", content: expect.objectContaining({ meaning: true }) }),
+      ),
+    );
+  });
+  it("checks native support using only the chosen files", async () => {
+    const { canShareMultipleFiles, shareSingleFile } = await import("../share/shareDispatcher");
+    vi.mocked(shareSingleFile).mockClear();
+    render(
+      <CollectionShareModal open onClose={vi.fn()} collectionTitle="Morning" items={SAMPLE_ITEMS} language="en" />,
+    );
+    await screen.findByRole("img");
+    fireEvent.click(screen.getByRole("button", { name: "Selected cards", exact: true }));
+    expect(screen.getByRole("button", { name: "Save image" })).toBeDisabled();
+    fireEvent.click(screen.getByRole("checkbox", { name: "Select card 2" }));
+    expect(canShareMultipleFiles).toHaveBeenLastCalledWith([expect.objectContaining({ name: "p2.png" })]);
+    fireEvent.click(screen.getByRole("button", { name: "Share selected" }));
+    await waitFor(() =>
+      expect(shareSingleFile).toHaveBeenCalledWith(expect.objectContaining({ name: "p2.png" }), expect.anything()),
+    );
+  });
   it("shows a recoverable generation error and never leaves a loading spinner", async () => {
     const { generateAllCollectionStoryPages } = await import("../share/collectionShareCard");
     vi.mocked(generateAllCollectionStoryPages).mockRejectedValueOnce(new RangeError("Too long"));
@@ -119,13 +197,15 @@ describe("CollectionShareModal", () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole("combobox", { name: "مظهر البطاقات" }));
-    fireEvent.click(screen.getByRole("option", { name: "ذهبي · مسائي" }));
+    await screen.findByRole("img");
+    fireEvent.click(screen.getByRole("button", { name: "ذهبي · مسائي" }));
 
-    expect(generateAllCollectionStoryPages).toHaveBeenCalledWith(
-      expect.objectContaining({
-        appearance: "gold",
-      }),
+    await waitFor(() =>
+      expect(generateAllCollectionStoryPages).toHaveBeenCalledWith(
+        expect.objectContaining({
+          appearance: "gold",
+        }),
+      ),
     );
   });
 

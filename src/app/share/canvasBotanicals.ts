@@ -124,13 +124,14 @@ export function drawCardCornerBotanicals(
   canvasWidth: number,
   canvasHeight: number,
   palette: BotanicalThemePalette,
+  opposingOnly = false,
 ) {
   // Top-Right corner
   drawOliveSprig(ctx, canvasWidth + 20, -10, Math.PI / 2, 1.25, palette);
   // Top-Left corner
-  drawOliveSprig(ctx, -20, -10, 0, 1.25, palette);
+  if (!opposingOnly) drawOliveSprig(ctx, -20, -10, 0, 1.25, palette);
   // Bottom-Right corner
-  drawOliveSprig(ctx, canvasWidth + 20, canvasHeight + 10, Math.PI, 1.2, palette);
+  if (!opposingOnly) drawOliveSprig(ctx, canvasWidth + 20, canvasHeight + 10, Math.PI, 1.2, palette);
   // Bottom-Left corner
   drawOliveSprig(ctx, -20, canvasHeight + 10, -Math.PI / 2, 1.2, palette);
 }

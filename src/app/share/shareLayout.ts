@@ -1,5 +1,7 @@
-import type { AppLanguage, ThemeMode, RoutineMode, PrayerName } from "../types";
+import type { AppLanguage, ThemeMode, RoutineMode, PrayerName, Zikr } from "../types";
 import { t } from "../i18n";
+import { isLongSurah } from "../content/mushafPages";
+import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content/localizedZikr";
 
 export type ShareFormat = "story" | "square" | "portrait" | "tall";
 export type ShareAppearance = "olive" | "gold" | "lavender";
@@ -11,9 +13,11 @@ export const SHARE_DIMENSIONS: Record<ShareFormat, { width: number; height: numb
 };
 export const SHARE_ARABIC_FONT = '"IBM Plex Sans Arabic", "Noto Sans Arabic Variable", sans-serif';
 export const SHARE_UI_FONT = '"Noto Sans Arabic Variable", system-ui, sans-serif';
+/** Export pixels: keep the first text's ink exactly four pixels below the badge. */
+export const SHARE_PILL = { top: 28, height: 50, gap: 4, textTop: 82, bottom: 36 } as const;
 
 export interface ShareSection {
-  key: "arabic" | "translation" | "transliteration" | "benefit" | "source";
+  key: "arabic" | "translation" | "transliteration" | "benefit" | "source" | "reading";
   text: string;
   direction: "rtl" | "ltr";
 }
@@ -26,11 +30,48 @@ export interface ShareItem {
   benefit?: string;
   sourceReference?: string;
   repetitionCount?: number;
+  reminder?: boolean;
+  readingUrl?: string;
+  language?: AppLanguage;
+}
+export function getMushafShareUrl(page: number, baseUrl?: string): string {
+  const url = new URL(baseUrl ?? new URL(import.meta.env.BASE_URL, window.location.origin).toString());
+  url.hash = `/quran/${page}`;
+  return url.toString();
+}
+
+/** Export policy is shared by images, accessible text and archives. Reviewed data stays untouched. */
+export function toShareItem(zikr: Zikr, language: AppLanguage, baseUrl?: string): ShareItem {
+  const reminder = isLongSurah(zikr);
+  return {
+    id: zikr.id,
+    arabicText: reminder ? "" : zikr.arabicText,
+    title: language === "ar" ? zikr.surahNameArabic : zikr.surahNameEnglish,
+    translation: reminder ? undefined : zikr.translation,
+    transliteration: reminder ? undefined : zikr.transliteration,
+    benefit: getLocalizedZikrBenefit(zikr, language),
+    sourceReference: getLocalizedSourceReference(zikr, language),
+    repetitionCount: zikr.repetitionCount,
+    reminder,
+    readingUrl: reminder ? getMushafShareUrl(zikr.mushafPages![0]!.page, baseUrl) : undefined,
+    language,
+  };
+}
+
+export class ShareFitError extends RangeError {
+  constructor(
+    public readonly itemId: string,
+    public readonly format: ShareFormat,
+  ) {
+    super("The complete item does not fit this image size.");
+    this.name = "ShareFitError";
+  }
 }
 export interface ShareContentOptions {
   meaning?: boolean;
   pronunciation?: boolean;
   benefit?: boolean;
+  qr?: boolean;
 }
 export interface MeasuredSection extends ShareSection {
   lines: string[];
@@ -45,6 +86,7 @@ export interface ShareFragment {
   parts: number;
   height: number;
   citation?: MeasuredSection;
+  heading?: Omit<MeasuredSection, "key">;
 }
 export interface ShareLayoutPage {
   fragments: ShareFragment[];
@@ -61,14 +103,14 @@ export interface ShareGeometry {
   textWidth: number;
 }
 
-export function shareGeometry(format: ShareFormat): ShareGeometry {
+export function shareGeometry(format: ShareFormat, qr = false, single = false): ShareGeometry {
   const height = SHARE_DIMENSIONS[format].height;
   const story = format === "story" || format === "tall";
   return {
-    top: story ? 344 : 230,
-    bottom: height - (story ? 400 : 180),
-    footer: height - (story ? 354 : 144),
-    titleY: story ? 174 : 74,
+    top: story ? (single ? 310 : 400) : single ? 172 : 270,
+    bottom: height - (story ? (qr ? 410 : 350) : qr ? 330 : 250),
+    footer: height - (story ? 240 : 140),
+    titleY: story ? 254 : 124,
     titleSize: story ? 60 : 52,
     width: 952,
     textWidth: 856,
@@ -82,12 +124,12 @@ export function defaultShareAppearance(category?: string, theme?: ThemeMode): Sh
 }
 
 export function getShareSections(item: ShareItem, options: ShareContentOptions = {}): ShareSection[] {
-  const sections: ShareSection[] = [{ key: "arabic", text: item.arabicText, direction: "rtl" }];
+  const sections: ShareSection[] = item.reminder ? [] : [{ key: "arabic", text: item.arabicText, direction: "rtl" }];
   if (options.meaning && item.translation?.trim())
     sections.push({ key: "translation", text: item.translation, direction: "ltr" });
   if (options.pronunciation && item.transliteration?.trim())
     sections.push({ key: "transliteration", text: item.transliteration, direction: "ltr" });
-  if (options.benefit && item.benefit?.trim())
+  if ((options.benefit || item.reminder) && item.benefit?.trim())
     sections.push({
       key: "benefit",
       text: item.benefit,
@@ -98,6 +140,12 @@ export function getShareSections(item: ShareItem, options: ShareContentOptions =
       key: "source",
       text: item.sourceReference,
       direction: /[\u0600-\u06ff]/u.test(item.sourceReference) ? "rtl" : "ltr",
+    });
+  if (item.reminder)
+    sections.push({
+      key: "reading",
+      text: t(item.language ?? "ar", "shareStudio.readMushaf"),
+      direction: item.language === "en" ? "ltr" : "rtl",
     });
   return sections;
 }
@@ -137,16 +185,19 @@ export function measureShareSection(
   section: ShareSection,
   single: boolean,
   width: number,
+  primary = false,
 ): MeasuredSection {
-  const fontSize = section.key === "arabic" ? (single ? 64 : 52) : section.key === "source" ? 32 : 36;
-  const lineHeight = Math.ceil(fontSize * (section.key === "arabic" ? 1.65 : 1.5));
+  const fontSize = section.key === "arabic" ? (single ? 64 : 52) : primary ? 52 : section.key === "source" ? 32 : 36;
+  const lineHeight = Math.ceil(
+    fontSize * (section.key === "arabic" || (primary && section.direction === "rtl") ? 1.65 : 1.5),
+  );
   ctx.font = `${section.key === "arabic" ? 500 : 400} ${fontSize}px ${section.direction === "rtl" ? SHARE_ARABIC_FONT : SHARE_UI_FONT}`;
   const lines = wrapShareText(section.text, (value) => ctx.measureText(value).width, width);
   const labelHeight = section.key === "arabic" ? 0 : 44;
   return { ...section, lines, fontSize, lineHeight, height: lines.length * lineHeight + labelHeight };
 }
 
-/** Fit actual font measurements at a fixed readable size. Never trim a selected section. */
+/** Complete items are indivisible. Reject incompatible sizes before encoding any image. */
 export function layoutSharePages(
   ctx: CanvasRenderingContext2D,
   items: readonly ShareItem[],
@@ -154,53 +205,39 @@ export function layoutSharePages(
   content: ShareContentOptions = {},
   single = false,
 ): ShareLayoutPage[] {
-  const geometry = shareGeometry(format);
+  const geometry = shareGeometry(format, content.qr, single);
   const capacity = geometry.bottom - geometry.top;
   const sectionGap = 20;
   const fragments: ShareFragment[] = [];
   for (const item of items) {
+    let heading: ShareFragment["heading"];
+    if (item.title?.trim()) {
+      const direction = /[\u0600-\u06ff]/u.test(item.title) ? "rtl" : "ltr";
+      ctx.font = `600 40px ${direction === "rtl" ? SHARE_ARABIC_FONT : SHARE_UI_FONT}`;
+      const lines = wrapShareText(item.title, (value) => ctx.measureText(value).width, geometry.textWidth);
+      heading = { text: item.title, direction, lines, fontSize: 40, lineHeight: 66, height: lines.length * 66 + 16 };
+    }
     const measured = getShareSections(item, content).map((section) =>
-      measureShareSection(ctx, section, single, geometry.textWidth),
+      measureShareSection(
+        ctx,
+        section,
+        single,
+        geometry.textWidth,
+        Boolean(item.reminder && section.key === "benefit"),
+      ),
     );
     const source = measured.find((section) => section.key === "source");
-    // Repeat concise exact attribution on every continuation. An exceptionally
-    // long reviewed citation continues as ordinary text rather than being clipped.
-    const citation = source && source.height <= capacity / 4 ? source : undefined;
+    const citation = source;
     const sections = measured.filter((section) => section !== citation);
-    const overhead = 152 + (citation ? citation.height + 20 : 0);
-    const itemFragments: ShareFragment[] = [];
-    let fragment: ShareFragment = { item, sections: [], part: 1, parts: 1, height: overhead, citation };
-    const finish = () => {
-      if (fragment.sections.length) itemFragments.push(fragment);
-      fragment = { item, sections: [], part: 1, parts: 1, height: overhead, citation };
-    };
-    for (const section of sections) {
-      let offset = 0;
-      while (offset < section.lines.length) {
-        const labelHeight = section.key === "arabic" ? 0 : 44;
-        const gap = fragment.sections.length ? sectionGap : 0;
-        const count = Math.min(
-          section.lines.length - offset,
-          Math.floor((capacity - fragment.height - gap - labelHeight) / section.lineHeight),
-        );
-        if (count <= 0) {
-          finish();
-          continue;
-        }
-        const lines = section.lines.slice(offset, offset + count);
-        const height = lines.length * section.lineHeight + labelHeight;
-        fragment.sections.push({ ...section, text: lines.join(""), lines, height });
-        fragment.height += gap + height;
-        offset += count;
-        if (offset < section.lines.length) finish();
-      }
-    }
-    finish();
-    itemFragments.forEach((part, index) => {
-      part.part = index + 1;
-      part.parts = itemFragments.length;
-      fragments.push(part);
-    });
+    const height =
+      SHARE_PILL.textTop +
+      SHARE_PILL.bottom +
+      (heading?.height ?? 0) +
+      measured.reduce((sum, section) => sum + section.height, 0) +
+      Math.max(0, measured.length - 1) * sectionGap;
+    const itemCapacity = item.reminder ? shareGeometry(format, true).bottom - geometry.top : capacity;
+    if (height > itemCapacity) throw new ShareFitError(item.id, format);
+    fragments.push({ item, sections, part: 1, parts: 1, height, citation, heading });
   }
   const groups: ShareFragment[][] = [];
   let group: ShareFragment[] = [];
@@ -212,10 +249,10 @@ export function layoutSharePages(
     if (
       group.length &&
       (single ||
+        fragment.item.reminder ||
+        group.some((part) => part.item.reminder) ||
         group.length >= maxItems ||
-        height + gap + fragment.height > capacity ||
-        fragment.parts > 1 ||
-        group[0]!.parts > 1)
+        height + gap + fragment.height > capacity)
     ) {
       groups.push(group);
       group = [];
@@ -240,12 +277,15 @@ export function getShareText(
     ...items.map((item) =>
       [
         item.title,
-        t(language, "shareStudio.repetitions", {
-          count: new Intl.NumberFormat(language === "ar" ? "ar-EG" : "en").format(item.repetitionCount ?? 1),
-        }),
+        item.reminder
+          ? t(language, "shareStudio.reminder")
+          : t(language, "shareStudio.repetitions", {
+              count: new Intl.NumberFormat(language === "ar" ? "ar-EG" : "en").format(item.repetitionCount ?? 1),
+            }),
         ...getShareSections(item, content).map((section) =>
           section.key === "arabic" ? section.text : `${t(language, `shareStudio.${section.key}`)}\n${section.text}`,
         ),
+        item.readingUrl,
       ]
         .filter(Boolean)
         .join("\n\n"),

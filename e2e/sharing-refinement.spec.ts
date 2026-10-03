@@ -1,7 +1,8 @@
+import { getAzkarForMode } from "../src/app/content/azkar";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
-async function openSharing(page: Page, language = "ar", route = "morning") {
+async function openSharing(page: Page, language = "ar", route = "morning", recoverFit = false) {
   await page.addInitScript(
     ({ language }) => {
       localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
@@ -18,8 +19,61 @@ async function openSharing(page: Page, language = "ar", route = "morning") {
         }),
       );
       const original = CanvasRenderingContext2D.prototype.fillText;
+      const originalRect = CanvasRenderingContext2D.prototype.roundRect;
+      const artwork = new WeakMap<
+        CanvasRenderingContext2D,
+        { brandBottom?: number; wordmarkBottom?: number; panelBottom: number }
+      >();
+      const artworkChecks: { kind: string; clearance: number }[] = [];
+      (window as unknown as { artworkChecks: unknown[] }).artworkChecks = artworkChecks;
+      const pills = new WeakMap<
+        CanvasRenderingContext2D,
+        { top: number; height: number; centered?: number; gap?: number }
+      >();
+      const pillEvidence: { top: number; height: number; centered?: number; gap?: number }[] = [];
+      (window as unknown as { pillEvidence: unknown[] }).pillEvidence = pillEvidence;
+      CanvasRenderingContext2D.prototype.roundRect = function (x, y, width, height, radii) {
+        if (this.canvas.width === 1080 && width === 952) {
+          const bounds = artwork.get(this) ?? { panelBottom: 0 };
+          bounds.panelBottom = Math.max(bounds.panelBottom, y + height);
+          artwork.set(this, bounds);
+        }
+        if (this.canvas.width === 1080 && height === 50) {
+          const pill = { top: y, height };
+          pills.set(this, pill);
+          pillEvidence.push(pill);
+        }
+        return originalRect.call(this, x, y, width, height, radii);
+      };
       (window as unknown as { shareMeasurements: unknown[] }).shareMeasurements = [];
       CanvasRenderingContext2D.prototype.fillText = function (text, x, y, maxWidth) {
+        if (this.canvas.width === 1080) {
+          const bounds = this.measureText(text);
+          const state = artwork.get(this) ?? { panelBottom: 0 };
+          if (text === "وَذَكِّرْ") state.wordmarkBottom = y + bounds.actualBoundingBoxDescent;
+          if (text === "WA ZAKER") {
+            artworkChecks.push({
+              kind: "wordmark",
+              clearance: y - bounds.actualBoundingBoxAscent - state.wordmarkBottom!,
+            });
+            state.brandBottom = y + bounds.actualBoundingBoxDescent;
+          } else if (state.brandBottom !== undefined && state.panelBottom === 0 && /(?:52|60)px/u.test(this.font)) {
+            artworkChecks.push({ kind: "header", clearance: y - bounds.actualBoundingBoxAscent - state.brandBottom });
+            state.brandBottom = undefined;
+          }
+          if (text === "wa-zaker.com" || /^(?:Card |بطاقة )/u.test(text))
+            artworkChecks.push({ kind: "footer", clearance: y - bounds.actualBoundingBoxAscent - state.panelBottom });
+          artwork.set(this, state);
+        }
+        const pill = pills.get(this);
+        if (pill) {
+          const bounds = this.measureText(text);
+          if (/30px/u.test(this.font) && /^(?:التكرار|Repeat)/u.test(text)) {
+            pill.centered = y + (bounds.actualBoundingBoxDescent - bounds.actualBoundingBoxAscent) / 2;
+          } else if (pill.centered !== undefined && pill.gap === undefined && /(?:28|52|64)px/u.test(this.font)) {
+            pill.gap = y - bounds.actualBoundingBoxAscent - (pill.top + pill.height);
+          }
+        }
         if (this.canvas.width === 1080 && /(?:52|64)px/u.test(this.font)) {
           const bounds = this.measureText(text);
           (window as unknown as { shareMeasurements: unknown[] }).shareMeasurements.push({
@@ -42,7 +96,14 @@ async function openSharing(page: Page, language = "ar", route = "morning") {
   await page.goto(`./#/azkar/${route}`);
   await page.getByTestId("share-collection-button").click();
   const modal = page.getByTestId("collection-share-modal");
-  await expect(modal.getByRole("img")).toBeVisible();
+  if (recoverFit) {
+    await expect(modal.getByRole("img").first().or(modal.getByRole("alert")).first()).toBeVisible();
+    if (await modal.getByRole("alert").isVisible())
+      await modal
+        .getByRole("button", { name: language === "ar" ? "صورة قراءة طويلة" : "Tall reading image", exact: true })
+        .click();
+  }
+  await expect(modal.getByRole("img").first()).toBeVisible();
   return modal;
 }
 
@@ -73,11 +134,27 @@ test("sharing preview supports readable Arabic, sources and accessible controls 
       ).shareMeasurements,
   );
   expect(measures.length).toBeGreaterThan(0);
+  const pills = await page.evaluate(
+    () =>
+      (window as unknown as { pillEvidence: { top: number; height: number; centered: number; gap: number }[] })
+        .pillEvidence,
+  );
+  expect(pills.length).toBeGreaterThan(0);
+  const artworkChecks = await page.evaluate(
+    () => (window as unknown as { artworkChecks: { kind: string; clearance: number }[] }).artworkChecks,
+  );
+  expect(artworkChecks.some((check) => check.kind === "header")).toBe(true);
+  expect(artworkChecks.some((check) => check.kind === "footer")).toBe(true);
+  for (const check of artworkChecks) expect(check.clearance).toBeGreaterThanOrEqual(check.kind === "wordmark" ? 6 : 8);
+  for (const pill of pills) {
+    expect(pill.centered).toBeCloseTo(pill.top + pill.height / 2, 1);
+    expect(pill.gap).toBeCloseTo(4, 1);
+  }
   for (const measure of measures) {
     expect(measure.width).toBeLessThanOrEqual(858);
     expect(measure.direction).toBe("rtl");
     expect(measure.alignment).toBe("right");
-    expect(measure.y + measure.descent).toBeLessThanOrEqual(measure.canvasHeight - 400);
+    expect(measure.y + measure.descent).toBeLessThanOrEqual(measure.canvasHeight - 280);
     expect(measure.x - measure.width).toBeGreaterThanOrEqual(110);
   }
   const results = await new AxeBuilder({ page })
@@ -93,7 +170,7 @@ test("sharing preview supports readable Arabic, sources and accessible controls 
     }
   }
   await modal.evaluate((element) => {
-    element.scrollTop = 0;
+    element.querySelector<HTMLElement>('[data-testid="sharing-scroll"]')!.scrollTop = 0;
   });
   await page.screenshot({ path: testInfo.outputPath("sharing-collection.png") });
 });
@@ -108,12 +185,20 @@ test("sharing works offline with English meaning and exact text/link alternative
   await expect(modal.getByRole("textbox")).toHaveValue(/#\/azkar\/morning\?mode=complete$/u);
   await modal.getByRole("button", { name: "Image", exact: true }).click();
   await modal.getByRole("combobox", { name: "Image size" }).click();
-  await page.getByRole("option", { name: "Square · 1:1", exact: true }).click();
-  await expect(modal.getByRole("img")).toHaveAttribute("height", "1080");
+  await expect(page.getByRole("option", { name: "Square · 1:1", exact: true })).toBeDisabled();
+  await page.getByRole("option", { name: "Tall reading image", exact: true }).click();
+  await expect(modal.getByRole("img").first()).toHaveAttribute("height", "2920");
   await expect(modal.getByText("Preparing the remaining cards…")).toHaveCount(0);
+  await modal.getByText("Customize content", { exact: true }).click();
+  await modal.getByRole("checkbox", { name: "Include reviewed English meaning" }).check();
+  await expect(modal.getByRole("img").first()).toBeVisible();
+  await expect(modal.getByText("Preparing the remaining cards…")).toHaveCount(0);
+  await modal.getByRole("button", { name: "Text", exact: true }).click();
+  await expect(modal.getByRole("textbox")).toHaveValue(/We have entered the morning/u);
+  await modal.getByRole("button", { name: "Image", exact: true }).click();
   const download = page.waitForEvent("download");
   await modal.getByRole("button", { name: "Save image", exact: true }).click();
-  expect((await download).suggestedFilename()).toMatch(/square-001-of-\d+/u);
+  expect((await download).suggestedFilename()).toMatch(/tall-001-of-\d+/u);
   await page.context().setOffline(false);
 });
 
@@ -132,7 +217,7 @@ test("single zikr shares through the same preview without affecting its counter 
   await page.getByRole("menuitem", { name: /مشاركة/u }).click();
   const modal = page.getByTestId("collection-share-modal");
   await expect(modal).toHaveAccessibleName("مشاركة هذا الذكر");
-  await expect(modal.getByRole("img")).toBeVisible();
+  await expect(modal.getByRole("img").first()).toBeVisible();
   await modal.getByRole("button", { name: "رابط", exact: true }).click();
   await expect(modal.getByRole("textbox")).toHaveValue(/#\/azkar\/morning\/4\?mode=complete$/u);
   await modal.getByRole("button", { name: "صورة", exact: true }).click();
@@ -140,7 +225,7 @@ test("single zikr shares through the same preview without affecting its counter 
   await modal.getByRole("button", { name: "حفظ هذه الصورة", exact: true }).click();
   await (await imageDownload).saveAs(testInfo.outputPath("single-zikr.png"));
   await modal.evaluate((element) => {
-    element.scrollTop = 0;
+    element.querySelector<HTMLElement>('[data-testid="sharing-scroll"]')!.scrollTop = 0;
   });
   await page.screenshot({ path: testInfo.outputPath("sharing-single.png") });
   await page.keyboard.press("Escape");
@@ -148,34 +233,43 @@ test("single zikr shares through the same preview without affecting its counter 
   await expect(reader).toHaveAttribute("data-zikr-index", "3");
 });
 
-test("all designs, continuation cards and ZIP saving are usable on a narrow screen", async ({ page }, testInfo) => {
+test("complete cards, compatible formats and ZIP saving are usable on a narrow screen", async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 320, height: 700 });
-  const modal = await openSharing(page, "ar", "before-sleep");
-  await modal.getByRole("combobox", { name: "مظهر البطاقات" }).click();
-  await expect(page.getByRole("option", { name: "بنفسجي · ليلي" })).toHaveAttribute("data-state", "checked");
-  await page.keyboard.press("Escape");
+  const modal = await openSharing(page, "ar", "before-sleep", true);
+  await expect(modal.getByRole("button", { name: "بنفسجي · ليلي" })).toHaveAttribute("aria-pressed", "true");
   for (const [option, height] of [
-    ["مربع · ١:١", 1080],
-    ["منشور · ٤:٥", 1350],
     ["صورة قراءة طويلة", 2920],
     ["حالة · ٩:١٦", 1920],
   ] as const) {
     await modal.getByRole("combobox", { name: "مقاس الصورة" }).click();
-    await page.getByRole("option", { name: option, exact: true }).click();
-    await expect(modal.getByRole("img")).toHaveAttribute("height", String(height));
+    await expect(page.getByRole("option", { name: "مربع · ١:١", exact: true })).toBeDisabled();
+    const choice = page.getByRole("option", { name: option, exact: true });
+    if (await choice.isDisabled()) {
+      await expect(choice).toBeDisabled();
+      await page.keyboard.press("Escape");
+      await expect(modal.getByRole("img").first()).toHaveAttribute("height", "2920");
+      await expect(
+        modal.getByText("المقاسات غير المتاحة لا تتسع للمحتوى كاملًا. اختر الصورة الطويلة أو النص أو الرابط.", {
+          exact: true,
+        }),
+      ).toBeVisible();
+      continue;
+    }
+    await choice.click();
+    await expect(modal.getByRole("img").first()).toHaveAttribute("height", String(height));
     await expect(modal.getByText("جارٍ تجهيز بقية البطاقات…")).toHaveCount(0);
   }
-  await modal.getByText("خيارات مشاركة إضافية", { exact: true }).click();
   const imageDownload = page.waitForEvent("download");
   await modal.getByRole("button", { name: "حفظ هذه الصورة", exact: true }).click();
   await (await imageDownload).saveAs(testInfo.outputPath("lavender-collection.png"));
   const download = page.waitForEvent("download");
-  await modal.getByRole("button", { name: "تحميل الصور والنص كاملًا · ZIP" }).click();
+  await modal.getByRole("button", { name: "المجموعة كاملة", exact: true }).click();
+  await modal.getByRole("button", { name: "حفظ الصور · ZIP" }).click();
   expect((await download).suggestedFilename()).toBe("azkar-cards.zip");
   const overflow = await modal.evaluate((element) => element.scrollWidth > element.clientWidth + 1);
   expect(overflow).toBe(false);
   await modal.evaluate((element) => {
-    element.scrollTop = 0;
+    element.querySelector<HTMLElement>('[data-testid="sharing-scroll"]')!.scrollTop = 0;
   });
   await page.screenshot({ path: testInfo.outputPath("sharing-narrow.png") });
 });
@@ -183,10 +277,10 @@ test("all designs, continuation cards and ZIP saving are usable on a narrow scre
 test("gold cards support QR, keyboard navigation and enlarged text", async ({ page }, testInfo) => {
   const modal = await openSharing(page, "en", "evening");
   await expect(modal.getByText("Preparing the remaining cards…")).toHaveCount(0);
-  await modal.getByText("Content and QR options", { exact: true }).click();
+  await modal.getByText("Customize content", { exact: true }).click();
   await modal.getByRole("checkbox", { name: "Add a QR link" }).check();
   await expect(modal.getByText("Preparing the remaining cards…")).toHaveCount(0);
-  const preview = modal.getByRole("button", { name: "Enlarge preview" });
+  const preview = modal.getByRole("button", { name: "Enlarge preview" }).first();
   await preview.focus();
   await page.keyboard.press("End");
   await expect(modal.getByRole("button", { name: "Next card" })).toBeDisabled();
@@ -205,9 +299,74 @@ test("gold cards support QR, keyboard navigation and enlarged text", async ({ pa
     .analyze();
   expect(results.violations).toEqual([]);
   await modal.evaluate((element) => {
-    element.scrollTop = 0;
+    element.querySelector<HTMLElement>('[data-testid="sharing-scroll"]')!.scrollTop = 0;
   });
   await page.screenshot({ path: testInfo.outputPath("sharing-enlarged.png") });
+});
+
+test("long surahs share sourced reminders with exact Mushaf links @cross-browser", async ({ page }, testInfo) => {
+  await openSharing(page, "en", "before-sleep", true);
+  const items = getAzkarForMode("before_sleep", "complete");
+  for (const id of ["s-hm-110a", "s-hm-110b"]) {
+    await page.getByTestId("modal-close-button").click();
+    const index = items.findIndex((item) => item.id === id);
+    const item = items[index]!;
+    await page.goto(`./#/azkar/before-sleep/${index + 1}`);
+    await expect(page.getByTestId("reader-screen")).toHaveAttribute("data-zikr-id", id);
+    await page.getByRole("button", { name: "Reader options", exact: true }).first().click();
+    await page.getByRole("menuitem", { name: /Share/u }).click();
+    const modal = page.getByTestId("collection-share-modal");
+    await expect(modal.getByRole("img").first()).toBeVisible();
+    await expect(modal.getByRole("img").first()).toHaveJSProperty("naturalHeight", 1350);
+    await modal.getByText("Read the text on this card", { exact: true }).click();
+    await expect(modal.getByRole("heading", { name: item.surahNameEnglish, exact: true })).toBeVisible();
+    const download = page.waitForEvent("download");
+    await modal.getByRole("button", { name: "Save image", exact: true }).click();
+    await (await download).saveAs(testInfo.outputPath(`${id}-reminder.png`));
+    await modal.getByRole("button", { name: "Text", exact: true }).click();
+    const text = await modal.getByRole("textbox").inputValue();
+    expect(text).toContain(item.surahNameEnglish);
+    expect(text).toContain("Read the complete surah in the Mushaf");
+    expect(text).not.toContain(item.arabicText);
+    expect(text).not.toContain(item.arabicText.slice(0, 80));
+    await modal.getByRole("button", { name: "Link", exact: true }).click();
+    await expect(modal.getByRole("textbox")).toHaveValue(new RegExp(`#/quran/${item.mushafPages![0]!.page}$`, "u"));
+  }
+});
+
+test("selection, theme changes and persistent actions preserve user control", async ({ page }, testInfo) => {
+  const modal = await openSharing(page, "en");
+  await expect(modal.getByText("Preparing the remaining cards…")).toHaveCount(0);
+  await modal.getByRole("button", { name: "Next card", exact: true }).click();
+  const previousAlt = await modal.getByRole("img").first().getAttribute("alt");
+  await modal.getByRole("button", { name: "Olive · Daylight", exact: true }).click();
+  await expect(modal.getByText("Preparing the remaining cards…")).toHaveCount(0);
+  await expect(modal.getByRole("img").first()).toHaveAttribute("alt", previousAlt!);
+  await modal.getByRole("button", { name: "Selected cards", exact: true }).click();
+  const actions = modal.getByTestId("sharing-actions");
+  await expect(actions.getByRole("button").first()).toBeDisabled();
+  await modal.getByRole("checkbox", { name: "Select card 2", exact: true }).check();
+  const download = page.waitForEvent("download");
+  await actions.getByRole("button", { name: "Save image", exact: true }).click();
+  expect((await download).suggestedFilename()).toMatch(/002-of-/u);
+  await page.setViewportSize({ width: 320, height: 700 });
+  await page.evaluate(() => {
+    document.documentElement.style.fontSize = "200%";
+  });
+  const box = await actions.boundingBox();
+  expect(box!.y).toBeGreaterThanOrEqual(0);
+  expect(box!.y + box!.height).toBeLessThanOrEqual(700);
+  for (const name of ["Image", "Text", "Link"]) {
+    const button = modal.getByRole("button", { name, exact: true });
+    expect(await button.evaluate((element) => element.scrollWidth <= element.clientWidth + 1)).toBe(true);
+  }
+  for (let index = 0; index < 12; index += 1) {
+    await page.keyboard.press("Tab");
+    expect(await modal.evaluate((element) => element.contains(document.activeElement))).toBe(true);
+  }
+  await page.screenshot({ path: testInfo.outputPath("sharing-selection-200percent.png") });
+  await page.keyboard.press("Escape");
+  await expect(modal).not.toBeVisible();
 });
 
 test("shared reader links preserve content across recipient routine preferences", async ({ page, browser }) => {

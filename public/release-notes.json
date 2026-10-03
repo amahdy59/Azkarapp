@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-03-sharing-v3",
+  "release": "2026-10-03-sharing-polish-v1",
   "ar": [
-    "صمّم مشاركة ذكر واحد أو مجموعة بألوان زيتونية أو ذهبية أو بنفسجية، مع مقاسات للمنشورات والقصص.",
-    "اقرأ النص كاملًا في بطاقات واضحة ومرقمة، مع استمرار المقاطع الطويلة وإظهار المصادر والتكرار.",
-    "راجع الصور وكبّرها قبل المشاركة، وأضف المعنى أو النطق أو الفائدة أو رمز الرابط حسب رغبتك.",
-    "أرسل رابطًا يحافظ على هوية الذكر وتقدّم قراءته دون تغيير التفضيلات المحفوظة، أو احفظ الصور والنص معًا."
+    "شارك ذكرًا واحدًا أو مجموعة ببطاقات أكثر ترتيبًا، مع هوية واضحة في الرأس وتذييل متوازن.",
+    "اعرض النصوص الطويلة كاملة على بطاقات متتابعة، مع إبقاء الذكر الواحد في بطاقة واحدة متى أمكن.",
+    "استفد من تخطيط محسّن للمقاسات المختلفة، مع عنوان داخل البطاقة، عدّاد مقروء، ومصدر واضح.",
+    "استخدم رمز QR ورابط الموقع بشكل مستقل مع محاذاة مركزية ثابتة وتباين مناسب للقراءة."
   ],
   "en": [
-    "Style a single zikr or a collection in olive, gold or lavender, with sizes for posts and stories.",
-    "Read complete passages on clear numbered cards, including continued sections, sources and repetition counts.",
-    "Review and enlarge images before sharing, with optional meaning, pronunciation, benefits and a link QR code.",
-    "Send links that preserve the zikr identity and reading progress without changing saved preferences, or save images and text together."
+    "Share a single zikr or collection with a clearer card hierarchy, branded header and balanced footer.",
+    "Keep long passages complete across sequential cards while fitting a single zikr on one card whenever possible.",
+    "Use improved layouts for each format, with an in-card title, readable count badge and clear source treatment.",
+    "Keep the QR code and website link independent from the centered footer for consistent alignment and readability."
   ]
 }

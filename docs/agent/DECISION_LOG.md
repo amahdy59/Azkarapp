@@ -4041,3 +4041,24 @@ null` shape, so a record written before this change still loads and still
 - **Decision:** Apply the sharing audit's thirty recommendations within Phase 77. Use complete measured continuation cards and a shared preview for single zikr and collections; preserve reviewed words, benefits, translations and counts. Provide coordinated olive/gold/lavender artwork, Story/Square/Portrait/Tall formats, explicit optional content, mandatory available citations, accessible text, exact links/optional QR, serialized native sharing and explicit fallbacks. ZIP saving uses existing platform APIs and no new dependency. Story becomes the preview default; the earlier tall single-card format remains available.
 - **Verification:** Corpus/text reconstruction and geometry, browser Arabic/English/offline/keyboard/narrow-screen/accessibility, existing PWA upgrade tests, full local gates, release notes and production deployment. Real phone social destinations, compression/QR scans, cutouts and human screen-reader sessions remain pending and must not be claimed as completed.
 - **Exact-link context:** Validated routine and prayer parameters travel in the hash query and apply transiently, preserving the recipient's saved preferences. This closes the position mismatch between Complete/Core and prayer-specific lists without replacing the router.
+
+## DEC-217 — Complete sharing cards and long-surah reminders
+
+- **Date:** 2026-10-03
+- **Status:** Approved
+- **Owner:** Product owner: "OK. let's apply all recommendations" following the eighteen-item sharing review.
+- **Decision:** Every zikr and all selected supporting content stay on one card. Reject incompatible sizes explicitly; never split, clip, shrink sacred text or silently omit optional content. Reviewed multi-page surahs, including Al-Mulk/Tabarak and As-Sajdah, share a standalone name/benefit/source reminder and exact Mushaf QR instead of verses across image, Text and ZIP. Add visible sharing scope, independent export language, theme swatches, preview-first layout, a persistent action footer, current-item continuity and payload-specific native fallback.
+- **Supersedes:** DEC-216's continuation-card policy only. Reviewed reading text and other offline, persistence, counting, routing and source contracts remain intact.
+- **Release restriction:** The owner's earlier "don't push changes yet" remains active. This implementation, verification and sample evidence stay local; no commit, push or deployment.
+- **Verification:** Atomic corpus/content tests, reminder and QR regressions, selected-payload tests, browser sharing matrix, 320px/200% text/keyboard/axe checks, quality gate and Pages build. Physical destination/compression/QR and human screen-reader checks remain pending.
+
+## DEC-218 — Branded sharing artwork and precise visible-ink spacing
+
+- **Date:** 2026-10-03
+- **Status:** Approved
+- **Owner:** Product owner agrees to the header/footer recommendations and requests centered count pills, a 2–4px text gap and visually appealing accessible cards.
+- **Decision:** Add a scalable vector crescent and Arabic/English brand header, prominent content title, connected panel placement, two opposing botanical corners, subtle tonal wash and perimeter frame. Center count/reminder text using actual glyph metrics and keep a 4px export-space gap to the first visible text. Use a navy-on-ivory wa-zaker.com footer badge and localized QR caption; single-card sets omit numbering. Standalone surah reminders default to Portrait; Story remains selectable and the default for regular zikr/collections.
+- **Content/destination integrity:** Preserve reviewed words, counts, benefits, citations and atomic fit recovery. Website lettering is the supplied brand identity; exact QR/Text/Link destinations remain the configured app URLs, including local previews. Recreate the small header reference in procedural vector/typographic form rather than upscaling its low-resolution PNG. No dependency or runtime external asset.
+- **Release restriction:** No commit, push or deployment; provide updated actual samples locally.
+- **Verification:** Actual Arabic/English glyph bounds and spacing, reminder format, renderer/layout regressions, browser sharing matrix, quality gate, Pages build and visual inspection. Physical share destinations and human screen-reader evidence remain pending.
+- **Owner follow-up:** Put the zikr title at the padded top of its own content panel, measure and wrap it without hiding words, then place the count/reminder pill and complete text below. Single cards omit a duplicate external title; collection names remain above their groups. Footer labels, numbering and website badge always align to the canvas center, independently of the absolutely placed QR.

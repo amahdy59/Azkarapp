@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import {
   ArrowNext,
   Check,
@@ -10,7 +10,6 @@ import {
   SlidersHorizontal,
   Volume2,
 } from "../components/icons";
-import { CollectionShareModal } from "../components/CollectionShareModal";
 import { t } from "../i18n";
 import "../../styles/animations/ZikrAnimations.css";
 import { CATEGORIES } from "../content/categories";
@@ -38,6 +37,10 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
+
+const CollectionShareModal = lazy(() =>
+  import("../components/CollectionShareModal").then((module) => ({ default: module.CollectionShareModal })),
+);
 
 export function CategoryScreen({
   catId,
@@ -432,18 +435,22 @@ export function CategoryScreen({
             renderZikrCard={({ z, index }, isCompleted) => renderZikrCard({ z, index }, isCompleted)}
           />
 
-          <CollectionShareModal
-            open={isShareModalOpen}
-            onClose={() => setIsShareModalOpen(false)}
-            collectionTitle={isArabic ? cat.nameArabic : cat.name}
-            collectionTitleArabic={cat.nameArabic}
-            collectionTitleEnglish={cat.name}
-            categoryId={catId}
-            routineMode={routineMode}
-            prayer={prayer}
-            items={azkar}
-            language={language}
-          />
+          {isShareModalOpen && (
+            <Suspense fallback={null}>
+              <CollectionShareModal
+                open={isShareModalOpen}
+                onClose={() => setIsShareModalOpen(false)}
+                collectionTitle={isArabic ? cat.nameArabic : cat.name}
+                collectionTitleArabic={cat.nameArabic}
+                collectionTitleEnglish={cat.name}
+                categoryId={catId}
+                routineMode={routineMode}
+                prayer={prayer}
+                items={azkar}
+                language={language}
+              />
+            </Suspense>
+          )}
         </div>
       </div>
     </ScreenContainer>

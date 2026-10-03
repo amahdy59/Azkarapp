@@ -75,6 +75,65 @@ beforeEach(() => {
 });
 
 describe("collectionShareCard", () => {
+  for (const qr of [false, true]) {
+    it(`puts the single zikr title inside its panel and keeps the website centered (QR ${qr})`, () => {
+      const { canvas, context } = createMockCanvas();
+      const originalCreateElement = document.createElement.bind(document);
+      vi.spyOn(document, "createElement").mockImplementation(((tagName: string) =>
+        tagName === "canvas" ? canvas : originalCreateElement(tagName)) as typeof document.createElement);
+      renderCollectionStoryPage({
+        ...SAMPLE_PAGE,
+        collectionTitle: "عنوان الذكر",
+        single: true,
+        qr,
+        items: [{ id: "short", title: "عنوان الذكر", arabicText: "سبحان الله" }],
+      });
+      const panel = vi.mocked(context.roundRect).mock.calls.find((call) => call[2] === 952)!;
+      const heading = vi.mocked(context.fillText).mock.calls.filter((call) => call[0] === "عنوان الذكر");
+      expect(heading).toHaveLength(1);
+      expect(heading[0]![1]).toBe(540);
+      expect(heading[0]![2]).toBeGreaterThan(panel[1] + 28);
+      expect(heading[0]![2]).toBeLessThan(panel[1] + 110);
+      expect(vi.mocked(context.fillText).mock.calls.find((call) => call[0] === "wa-zaker.com")![1]).toBe(540);
+    });
+  }
+  it("always embeds the exact Mushaf QR in a long-surah reminder", async () => {
+    const { canvas, context } = createMockCanvas();
+    const originalCreateElement = document.createElement.bind(document);
+    vi.spyOn(document, "createElement").mockImplementation(((tagName: string) =>
+      tagName === "canvas" ? canvas : originalCreateElement(tagName)) as typeof document.createElement);
+    const { default: qrcode } = await import("qrcode-generator");
+    const expected = qrcode(0, "M");
+    expected.addData("https://example.com/#/quran/562");
+    expected.make();
+    await generateCollectionStoryPage({
+      ...SAMPLE_PAGE,
+      qr: false,
+      items: [
+        {
+          id: "surah",
+          arabicText: "",
+          title: "Al-Mulk",
+          reminder: true,
+          readingUrl: "https://example.com/#/quran/562",
+          language: "en",
+          benefit: "Reviewed benefit",
+          sourceReference: "Reviewed source",
+        },
+      ],
+    });
+    const fills = vi.mocked(context.fillRect).mock.calls;
+    const moduleFills = fills.filter((call) => call[2] === 3 && call[3] === 3);
+    expect(moduleFills).toHaveLength(
+      Array.from({ length: expected.getModuleCount() }, (_, row) =>
+        Array.from({ length: expected.getModuleCount() }, (_, col) => Number(expected.isDark(row, col))).reduce(
+          (sum, bit) => sum + bit,
+          0,
+        ),
+      ).reduce((sum, count) => sum + count, 0),
+    );
+    expect(moduleFills.every((call) => call[1] >= 1510)).toBe(true);
+  });
   it("releases progressive preview URLs when generation is cancelled", async () => {
     const { canvas } = createMockCanvas();
     const originalCreateElement = document.createElement.bind(document);

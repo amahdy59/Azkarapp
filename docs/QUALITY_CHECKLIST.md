@@ -83,3 +83,12 @@ The remaining rows are **not** automatable and stay `Pending` until a person doe
 - **Media access** — needs human review of alternatives and descriptions.
 
 The keyboard row is marked partial for the same reason: the automation proves tab order, focus visibility and absence of traps, but a human still has to confirm the flow is _sensible_.
+
+## Sharing refinement checks
+
+- Every zikr, selected meaning/pronunciation/benefit and available citation fit together on one image. Incompatible sizes explain size/Text/Link recovery.
+- Reviewed multi-page surahs export name, reviewed benefit/source and an exact Mushaf QR/link; no verse payload in image, Text or ZIP.
+- Current/Selected/Entire-collection scope matches both files and archive text; unsupported native payloads expose Save/Copy.
+- Check 320px width and 200% text: compact header/action footer remain visible, scrolling focus is unobscured, keyboard stays in the modal, and Escape restores the trigger.
+- Inspect actual olive/gold/lavender exports and single/reminder cards. Real social compression, QR scanning, Android/iPhone share sheets, cutouts and human screen-reader checks must be recorded separately from browser emulation.
+- Inspect Arabic/English pill ink bounds, its exact 4px gap, header/title separation, website badge contrast, QR clearance and multi-card-only numbering. Check Portrait reminder defaults and all four available formats; branding must not split or remove content.
