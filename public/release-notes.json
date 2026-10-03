@@ -1,15 +1,13 @@
 {
-  "release": "2026-10-03-sharing-polish-v3",
+  "release": "2026-10-03-keyboard-help-fit",
   "ar": [
-    "شارك ذكرًا واحدًا أو مجموعة ببطاقات أكثر ترتيبًا، مع هوية واضحة في الرأس وتذييل متوازن.",
-    "اعرض النصوص الطويلة كاملة على بطاقات متتابعة، مع عنوان داخل البطاقة وعدّاد ومصدر واضحين.",
-    "استفد من وصول أسرع للأذكار المناسبة، ومساعدة لوحة المفاتيح، وتجهيز السفر للمحتوى المتاح دون اتصال.",
-    "استخدم رمز QR ورابط الموقع بشكل مستقل مع محاذاة مركزية ثابتة وتباين مناسب للقراءة."
+    "تبقى نافذة اختصارات لوحة المفاتيح داخل الشاشة على الهواتف القصيرة.",
+    "مرّر محتوى المساعدة للوصول إلى خيار الاختصارات عند تكبير النص.",
+    "يبقى زر إغلاق المساعدة ظاهرًا أثناء قراءة محتواها."
   ],
   "en": [
-    "Share a single zikr or collection with a clearer card hierarchy, branded header and balanced footer.",
-    "Keep long passages complete across sequential cards, with an in-card title, readable count badge and clear source.",
-    "Reach relevant devotional content faster with keyboard help and travel preparation for verified offline material.",
-    "Keep the QR code and website link independent from the centered footer for consistent alignment and readability."
+    "Keyboard help stays within the screen on short phones.",
+    "Scroll the help content to reach the shortcut setting with enlarged text.",
+    "The help close button stays visible while reading its content."
   ]
 }

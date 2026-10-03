@@ -43,10 +43,10 @@ export function CounterKeyboardHelp({
         language={language}
         direction={direction}
         testId="counter-keyboard-help"
-        className="p-5 sm:p-6"
+        className="h-[85vh] p-5 sm:h-auto sm:p-6"
       >
         <div aria-hidden="true" className="h-12 shrink-0 sm:hidden" />
-        <div className="min-h-0 overflow-y-auto">
+        <div className="min-h-0 flex-1 overflow-y-auto">
           <h2 className="text-lg font-bold sm:pe-12">{t(language, "reader.keyboardShortcuts")}</h2>
           <dl className="mt-4 space-y-3">
             {[...shortcuts, { keys: ["?"], label: t(language, "reader.shortcutHelp") }].map((shortcut) => (

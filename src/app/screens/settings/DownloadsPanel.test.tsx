@@ -44,7 +44,9 @@ describe("DownloadsPanel", () => {
 
   it("maps download and removal failures to localized actionable copy", async () => {
     render(<DownloadsPanel language="en" onBack={vi.fn()} />);
-    fireEvent.click(await screen.findByRole("button", { name: /Morning Core/i }));
+    const morningDownload = await screen.findByRole("button", { name: /Morning Core/i });
+    await waitFor(() => expect(morningDownload).toBeEnabled());
+    fireEvent.click(morningDownload);
     expect(await screen.findByRole("alert")).toHaveTextContent("Free some space or reconnect");
     expect(screen.queryByText(/raw download/i)).not.toBeInTheDocument();
 
