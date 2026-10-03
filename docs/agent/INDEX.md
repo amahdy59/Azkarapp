@@ -137,3 +137,7 @@ The agent must never interpret “perfect the application” as permission to re
 [Phase 76](phases/PHASE_76_PENDING_CHANGES_RELEASE.md) records the review, repair, and authorized release of pending sharing, Mushaf, and audio changes under DEC-215.
 
 [Phase 77](phases/PHASE_77_SHARING_REFINEMENT.md) is the active owner-approved sharing refinement: complete text, measured readable exports, coordinated designs, accessible previews and resilient sharing under DEC-216.
+
+[Phase 77](phases/PHASE_77_HEADER_SCROLL_CONTAINMENT.md) records the local-only ordinary-header scroll repair under DEC-216-H.
+
+[Phase 78](phases/PHASE_78_PRACTICAL_DEVOTIONAL_ACCESS.md) implements the selected practical devotional access recommendations under DEC-217, preserving reviewed content and local-only authority.

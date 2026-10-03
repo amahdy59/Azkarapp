@@ -23,7 +23,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
+import { CounterKeyboardHelp } from "../components/CounterKeyboardHelp";
 import { CounterShortcutHints, ZikrCounterSurface } from "../components/ZikrComponents";
+import { isCounterShortcutBlocked } from "../keyboardShortcuts";
 import { useCounterClickFeedback } from "../hooks/useCounterClickFeedback";
 import { formatNumerals } from "../formatting";
 import { readFridaySalawatProgress, writeFridaySalawatProgress, type FridaySalawatTarget } from "../fridayProgress";
@@ -87,15 +89,10 @@ function ReferenceLink({ text, source, href }: { text: string; source: string; h
 const HEADER_ACTION_CLASS =
   "flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full text-foreground/80 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40";
 
-const HEADER_ACTION_PILL_CLASS = `${HEADER_ACTION_CLASS} w-auto gap-1.5 px-2.5`;
-
 /* The wide band is a fixed navy surface, so its controls take on-media colours
    rather than theme ones — the same split the Reader makes. */
 const HERO_ACTION_CLASS =
   "flex size-11 shrink-0 items-center justify-center rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
-
-const HERO_ACTION_PILL_CLASS =
-  "flex min-h-11 items-center gap-2 rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 px-3 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
 
 function getNextSalawatTarget(currentTarget: number): number {
   const presets = [10, 33, 100, 1000];
@@ -182,6 +179,13 @@ export function FridaySalawatScreen({
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && !event.defaultPrevented && (showBenefits || showCompletionModal)) {
+        event.preventDefault();
+        if (showBenefits) setShowBenefits(false);
+        else setShowCompletionModal(false);
+        return;
+      }
+      if (isCounterShortcutBlocked(event)) return;
       const activeElement = document.activeElement;
       const focusedControl =
         activeElement instanceof Element &&
@@ -251,25 +255,8 @@ export function FridaySalawatScreen({
           actions={(tier) => {
             const isWide = tier === "wide";
             const actionClass = isWide ? HERO_ACTION_CLASS : HEADER_ACTION_CLASS;
-            const pillClass = isWide ? HERO_ACTION_PILL_CLASS : HEADER_ACTION_PILL_CLASS;
             return (
               <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => setShowBenefits(true)}
-                  className={pillClass}
-                  aria-label={copy.benefits}
-                  title={copy.benefits}
-                  aria-haspopup="dialog"
-                >
-                  <Lightbulb size={18} aria-hidden="true" />
-                  <span
-                    className={isWide ? "text-label font-extrabold" : "text-xs font-extrabold min-[600px]:text-label"}
-                    aria-hidden="true"
-                  >
-                    {t(language, "reader.referencesButton")}
-                  </span>
-                </button>
                 <DropdownMenu dir={direction}>
                   <DropdownMenuTrigger className={actionClass} aria-label={t(language, "common.moreOptions")}>
                     <MoreVertical size={20} aria-hidden="true" />
@@ -342,27 +329,46 @@ export function FridaySalawatScreen({
 
               <footer className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">
                 <div data-testid="reader-counter-stack">
-                  <div className="px-3 pb-1" data-testid="counter-panel">
-                    <div className="adaptive-counter-row flex w-full items-center justify-center gap-2.5">
-                      <div className="flex min-w-0 flex-1 justify-center">
-                        <ZikrCounterSurface
-                          count={progress.count}
-                          total={progress.target}
-                          complete={complete}
-                          onTap={increment}
-                          onCompleteTap={() => setShowCompletionModal(true)}
-                          language={language}
-                          instructionText={t(language, "reader.tapAnywhere")}
-                          testId="salawat-counter"
-                          reduceMotion={reduceMotion}
-                        />
-                      </div>
+                  <div className="reader-dock flex w-full flex-col items-center gap-2" data-testid="reader-dock">
+                    <div className="flex w-full items-center justify-center gap-3">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowBenefits(true);
+                        }}
+                        aria-haspopup="dialog"
+                        aria-label={copy.benefits}
+                        title={copy.benefits}
+                        data-testid="salawat-benefit-dock-button"
+                        className="flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-xl border border-border/80 bg-card px-3 text-primary shadow-sm transition-colors duration-fast hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                      >
+                        <Lightbulb size={20} aria-hidden="true" />
+                        <span className="text-label font-bold">{t(language, "reader.referencesButton")}</span>
+                      </button>
                     </div>
-                    <p className="mt-3 min-h-5 text-center text-sm font-medium text-muted-foreground">
-                      {t(language, "reader.tapAnywhere")}
-                    </p>
+                    <div className="w-full px-3 pb-1" data-testid="counter-panel">
+                      <div className="adaptive-counter-row flex w-full items-center justify-center gap-2.5">
+                        <div className="flex min-w-0 flex-1 justify-center">
+                          <ZikrCounterSurface
+                            count={progress.count}
+                            total={progress.target}
+                            complete={complete}
+                            onTap={increment}
+                            onCompleteTap={() => setShowCompletionModal(true)}
+                            language={language}
+                            instructionText={t(language, "reader.tapAnywhere")}
+                            testId="salawat-counter"
+                            reduceMotion={reduceMotion}
+                          />
+                        </div>
+                      </div>
+                      <p className="mt-3 min-h-5 text-center text-sm font-medium text-muted-foreground">
+                        {t(language, "reader.tapAnywhere")}
+                      </p>
+                    </div>
                   </div>
-                  <div className="hidden md:block">
+                  <div>
                     <CounterShortcutHints
                       language={language}
                       direction={direction}
@@ -372,6 +378,14 @@ export function FridaySalawatScreen({
                         { keys: ["Space"], label: t(language, "counter.count") },
                         { keys: ["R"], label: t(language, "counter.reset") },
                       ]}
+                    />
+                    <CounterKeyboardHelp
+                      shortcuts={[
+                        { keys: ["Space"], label: t(language, "counter.count") },
+                        { keys: ["R"], label: t(language, "counter.reset") },
+                      ]}
+                      language={language}
+                      direction={direction}
                     />
                   </div>
                 </div>

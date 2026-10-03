@@ -29,6 +29,7 @@ import { TimeOfDayBackground } from "../components/TimeOfDayBackground";
 import { getFirstIncompleteZikrIndex, getGardenSummary, getProgressDayKey } from "../progress";
 import { fridayKahfOpenedKey } from "../fridayProgress";
 import { VisitorCount } from "../components/VisitorCount";
+import { SituationalShortcuts } from "../components/SituationalShortcuts";
 import type {
   AppLanguage,
   CategoryId,
@@ -883,6 +884,10 @@ export function HomeScreen({
               />
             </div>
           )}
+
+          <div className="px-page">
+            <SituationalShortcuts language={language} onOpen={onResume} />
+          </div>
 
           {/* Devotional Tools: Qiblah & Masbaha */}
           {(onOpenQibla || onOpenMasbaha) && (

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Check, Compass, MapPin } from "../components/icons";
+import { Check, ChevronDown, Compass, MapPin } from "../components/icons";
 import { Header } from "../components/LayoutShells";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { Button } from "../components/ui/button";
@@ -491,9 +491,14 @@ export function QiblaScreen({
               )}
             </section>
           ) : (
-            <details className="rounded-3xl border border-border/50 bg-card p-5 shadow-raised">
-              <summary className="min-h-11 cursor-pointer content-center font-bold focus-visible:ring-[3px] focus-visible:ring-ring">
-                {t(language, "qibla.accuracyTips")}
+            <details className="group rounded-3xl border border-border/50 bg-card p-5 shadow-raised transition-colors">
+              <summary className="flex min-h-11 cursor-pointer select-none items-center justify-between font-bold text-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+                <span>{t(language, "qibla.accuracyTips")}</span>
+                <ChevronDown
+                  size={18}
+                  className="shrink-0 text-muted-foreground transition-transform duration-standard group-open:rotate-180"
+                  aria-hidden="true"
+                />
               </summary>
               <div className="flex items-start gap-3">
                 <span

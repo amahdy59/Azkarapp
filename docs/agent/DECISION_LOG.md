@@ -4041,3 +4041,21 @@ null` shape, so a record written before this change still loads and still
 - **Decision:** Apply the sharing audit's thirty recommendations within Phase 77. Use complete measured continuation cards and a shared preview for single zikr and collections; preserve reviewed words, benefits, translations and counts. Provide coordinated olive/gold/lavender artwork, Story/Square/Portrait/Tall formats, explicit optional content, mandatory available citations, accessible text, exact links/optional QR, serialized native sharing and explicit fallbacks. ZIP saving uses existing platform APIs and no new dependency. Story becomes the preview default; the earlier tall single-card format remains available.
 - **Verification:** Corpus/text reconstruction and geometry, browser Arabic/English/offline/keyboard/narrow-screen/accessibility, existing PWA upgrade tests, full local gates, release notes and production deployment. Real phone social destinations, compression/QR scans, cutouts and human screen-reader sessions remain pending and must not be claimed as completed.
 - **Exact-link context:** Validated routine and prayer parameters travel in the hash query and apply transiently, preserving the recipient's saved preferences. This closes the position mismatch between Complete/Core and prayer-specific lists without replacing the router.
+
+## DEC-216-H — Opaque ordinary headers and local-only scroll repair
+
+- **Date:** 2026-10-03
+- **Status:** Approved
+- **Owner:** Product owner, explicit screenshot request to fix content appearing behind the header and check similar issues; do not push.
+- **Decision:** Ordinary shared headers use the opaque semantic background at rest and during scrolling. Direct-child headers cover the screen scrollport's top edge without container top padding; internal header spacing remains. Preserve the scroll divider/shadow, nested scroll ownership, and Home's separate photographic overlay contract.
+- **Verification:** Header unit regression; Quran Wird, Qibla, Friday, and Progress browser geometry; Arabic/English and all themes; repository quality gates and screenshots. Keep changes local and do not deploy.
+
+## DEC-217 — Implement practical devotional access recommendations
+
+- **Date:** 2026-10-03
+- **Status:** Approved
+- **Owner:** Product owner, explicit request to apply recommended suggestions and exclude those rejected in the review.
+- **Decision:** Add visible situational access, a Masbaha entry to the existing reviewed after-prayer reader, verified/resumable travel preparation, shared keyboard help with character-shortcut control, and explicit ordinary-reader focus with an always-visible exit. Reuse existing press feedback, motion preferences, content, progression, routing, and download services.
+- **Excluded:** Speaker-based haptics, automatic counting, invented ritual combinations, grace-day quotas, decorative sound/number/sky effects, and generic Arabic typography changes. Badges and a canonical Mushaf ruler remain optional research ideas, not this implementation's acceptance criteria.
+- **Authority:** DEC-216-H's local-only restriction remains; no commit, push, or deployment. Preserve unrelated pending edits.
+- **Verification:** Focused unit tests, Arabic/English narrow/tablet/desktop browser checks, axe scans, screenshots, and repository quality gates. Automated evidence does not establish full manual accessibility compliance.

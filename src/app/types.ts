@@ -505,5 +505,7 @@ export interface AppStateSnapshot {
     target: number;
     laps: number;
     selectedZikrId?: string;
+    dayKey?: string;
+    items?: Record<string, { count: number; target: number; laps: number; dayKey?: string }>;
   };
 }

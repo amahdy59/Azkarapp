@@ -15,6 +15,7 @@ export default tseslint.config(
       "playwright-report/**",
       "coverage/**",
       ".perf-audit-dist/**",
+      "scripts/*.cjs",
     ],
   },
   js.configs.recommended,

@@ -126,7 +126,7 @@ export function ReadingScreenChrome({
   return (
     <>
       <div className="w-full">
-        <Header title={title} onBack={onBack} language={language} right={actions("compact")} />
+        <Header title={title} onBack={onBack} language={language} elevateOnScroll={false} right={actions("compact")} />
       </div>
 
       {(progress || subRow) && (

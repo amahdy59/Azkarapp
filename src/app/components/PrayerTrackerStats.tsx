@@ -5,7 +5,7 @@ import { CalendarType } from "../calendarPeriods";
 import { PRAYER_ORDER } from "./PrayerTrackerCards";
 import { formatNumerals, formatRatio } from "../formatting";
 import { t } from "../i18n";
-import { Building, Check, Sparkles, Sun } from "./icons";
+import { Building, Check, ChevronDown, Sparkles, Sun } from "./icons";
 
 interface PrayerPeriodCounts {
   fard: number;
@@ -158,9 +158,14 @@ export function PrayerTrackerStats({
 
       {/* The totals answer the common question first. The five-prayer matrix is
           useful for investigation, but too dense to lead every period view. */}
-      <details className="overflow-hidden rounded-2xl border border-border/60 bg-card">
-        <summary className="flex min-h-11 cursor-pointer items-center px-3.5 py-3 text-sm font-extrabold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
-          {t(language, "progress.showPrayerBreakdown")}
+      <details className="group overflow-hidden rounded-2xl border border-border/60 bg-card transition-colors">
+        <summary className="flex min-h-11 cursor-pointer select-none items-center justify-between px-3.5 py-3 text-sm font-extrabold text-foreground transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+          <span>{t(language, "progress.showPrayerBreakdown")}</span>
+          <ChevronDown
+            size={18}
+            className="shrink-0 text-muted-foreground transition-transform duration-standard group-open:rotate-180"
+            aria-hidden="true"
+          />
         </summary>
         <div className="flex flex-col gap-3 border-t border-border/60 p-3">
           {PRAYER_ORDER.map((prayer) => {

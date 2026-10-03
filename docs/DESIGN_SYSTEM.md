@@ -302,6 +302,7 @@ A prayer uses one shared detail surface: Home discloses it directly below the se
 
 ## Scrollbar contract
 
+- Ordinary shared screen headers use the opaque semantic background at rest and while scrolling. Scroll adds a divider and quiet shadow, without blur or translucency. When the header is a direct child of `ScreenContainer`, it owns its internal top spacing and the container has no top padding: the header must cover the scrollport's top edge without an exposed strip of scrolling content. Home retains its separate controlled photographic overlay contract.
 - Every native app scroll region and every Radix scroll area uses the same thin, rounded, theme-aware scrollbar treatment.
 - Tracks are transparent. Thumbs use the semantic muted-foreground color at restrained opacity and shift toward the primary color on pointer hover.
 - Scrollbars must not introduce horizontal overflow or steal content width; touch scrolling remains the primary mobile interaction.
@@ -393,6 +394,14 @@ Four tiers, defined by width only. `useLayoutMode` and the CSS media queries in 
 - The reference layouts are verified at 320×700, 390×844, 643×275, and 1110×835. Playwright protects narrow-phone, phone, tablet, and desktop shell geometry.
 
 ## Change control
+
+### Phase 78 practical devotional access
+
+- Home exposes six visible semantic links to existing situational collections. Ordinary activation resumes that collection; modified activation retains a real reader URL. The links use stable theme surfaces and 44px-or-larger targets.
+- Masbaha offers an explicit entry to the existing guided after-prayer reader. It preserves the Masbaha tally and uses reviewed collection counts and standard reader advancement; it introduces no new ritual or automatic counting.
+- Ordinary adhkar offer a menu-controlled reading focus mode. Header/progress/sidebar/shortcut chrome leaves layout and keyboard order, while text, manual counter, Previous/Next, and an always-visible 44px exit remain. Escape exits focus before leaving the reader. The current theme and text preferences remain authoritative; focus mode does not force an OLED palette or affect canonical Mushaf geometry.
+- All three counting screens expose shared keyboard help through a visible control and question mark on the reading surface. A visit-local checkbox disables all character shortcuts, including reset/save/benefit and question mark. Native controls, editors, dialogs, modified keys, and composition retain their own semantics. Non-character counting/navigation remain available. Help restores focus on dismissal.
+- Travel preparation discloses its exact audio coverage, verified cached readiness, remaining size, per-group progress, partial success, cancellation, and retry. It reuses independent download jobs and never promises universal offline availability.
 
 ### Phase 59–60 utility refinements
 

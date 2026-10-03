@@ -18,6 +18,7 @@ import { useCounterClickFeedback } from "../hooks/useCounterClickFeedback";
 import { useSwipeGestures } from "../hooks/useSwipeGestures";
 import { useMediaQuery } from "../hooks/useMediaQuery";
 import { useWakeLock } from "../hooks/useWakeLock";
+import { isCounterShortcutBlocked } from "../keyboardShortcuts";
 import {
   Lightbulb,
   BookOpen,
@@ -46,6 +47,7 @@ import { isLongSurah } from "../content/mushafPages";
 import type { AppLanguage, CategoryId, RoutineMode, MushafTextScale, TextSizeOption, ThemeMode, Zikr } from "../types";
 import { isPrayerName } from "../content/prayerTimes";
 import { ProgressBar } from "../components/ProgressBar";
+import { CounterKeyboardHelp } from "../components/CounterKeyboardHelp";
 import { CounterShortcutHints, ZikrCounterSurface } from "../components/ZikrComponents";
 import { ToggleTrack } from "../components/SettingsRow";
 import { ReaderReferenceSheet } from "../components/ReaderReferenceSheet";
@@ -295,6 +297,10 @@ export function ReaderScreen({
     return () => onMushafModeChange?.(false);
   }, [onMushafModeChange, showMushaf]);
   const [benefitOpen, setBenefitOpen] = useState(false);
+  const [focusMode, setFocusMode] = useState(false);
+  const focusExitRef = useRef<HTMLButtonElement>(null);
+  const focusRequestedRef = useRef(false);
+  const previousFocusMode = useRef(false);
   const [hasOpenedBenefit, setHasOpenedBenefit] = useState(false);
   const [showDifficultWords, setShowDifficultWords] = useState(false);
   const [shareMessage, setShareMessage] = useState("");
@@ -313,6 +319,23 @@ export function ReaderScreen({
   const readingScrollRef = useRef<HTMLDivElement | null>(null);
   const restoreReadingFocusOnAdvanceRef = useRef(false);
   const activeNavigatorItemRef = useRef<HTMLDivElement | null>(null);
+
+  const onReaderMenuCloseAutoFocus = (event: Event) => {
+    if (!focusRequestedRef.current) return;
+    event.preventDefault();
+    focusRequestedRef.current = false;
+    focusExitRef.current?.focus({ preventScroll: true });
+  };
+
+  useEffect(() => {
+    if (!focusMode && !previousFocusMode.current) return;
+    previousFocusMode.current = focusMode;
+    // Run after the menu restores focus, so it cannot focus now-hidden chrome.
+    const frame = requestAnimationFrame(() => {
+      (focusMode ? focusExitRef.current : readingScrollRef.current)?.focus({ preventScroll: true });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [focusMode]);
 
   // The hero band + card treatment now starts at the tablet breakpoint
   // (>=768px) rather than at the shell's "large" tier: tablets have the width
@@ -336,9 +359,10 @@ export function ReaderScreen({
     (completedIdx: number) => {
       const firstPage = z?.mushafPages?.[0]?.page;
       if (longSurah && z && firstPage) onSurahPageChange?.(z.id, firstPage);
-      onComplete(completedIdx);
+      setMushafPageTuple([0, 1]);
+      if (!isDone) onComplete(completedIdx);
     },
-    [longSurah, onComplete, onSurahPageChange, z],
+    [isDone, longSurah, onComplete, onSurahPageChange, z],
   );
 
   const {
@@ -441,20 +465,28 @@ export function ReaderScreen({
       setMushafPageTuple([0, 1]);
       return;
     }
+    const firstPage = z?.mushafPages?.[0]?.page;
+    // When revisiting a completed surah, it always starts from the beginning.
+    if (isDone) {
+      setMushafPageTuple([0, 1]);
+      if (firstPage) onSurahPageChange?.(id, firstPage);
+      return;
+    }
     // Set the initial page for the long surah to where they left off
     const rememberedPage = surahReadingPagesRef.current?.[id];
     const rememberedIndex = rememberedPage
       ? (z?.mushafPages?.findIndex((entry) => entry.page === rememberedPage) ?? -1)
       : -1;
     setMushafPageTuple([rememberedIndex > 0 ? rememberedIndex : 0, 1]);
-  }, [longSurah, z?.id, z?.mushafPages]);
+  }, [isDone, longSurah, onSurahPageChange, z?.id, z?.mushafPages]);
 
-  /** Records the page being read, so closing the app does not lose the place. */
+  /** Records the page being read mid-reading, so closing the app does not lose the place. */
   useEffect(() => {
     if (!longSurah || !z) return;
+    if (isDone) return;
     const page = z.mushafPages?.[mushafPageTuple[0]]?.page;
     if (page) onSurahPageChange?.(z.id, page);
-  }, [longSurah, mushafPageTuple, onSurahPageChange, z]);
+  }, [isDone, longSurah, mushafPageTuple, onSurahPageChange, z]);
 
   useLayoutEffect(() => {
     if (readingScrollRef.current) {
@@ -481,6 +513,12 @@ export function ReaderScreen({
     if (immersiveOpen) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && focusMode && !document.querySelector('[role="dialog"], [role="alertdialog"]')) {
+        e.preventDefault();
+        setFocusMode(false);
+        return;
+      }
+      if (isCounterShortcutBlocked(e)) return;
       const activeEl = document.activeElement;
       const focusedControl =
         activeEl instanceof Element &&
@@ -535,7 +573,8 @@ export function ReaderScreen({
         }
       } else if (e.key === "Escape") {
         e.preventDefault();
-        onBack();
+        if (focusMode) setFocusMode(false);
+        else onBack();
       } else if (e.key === "r" || e.key === "R" || e.key === "ق") {
         if (audioModeActive) return;
         e.preventDefault();
@@ -571,6 +610,7 @@ export function ReaderScreen({
     longSurah,
     immersiveOpen,
     audioModeActive,
+    focusMode,
   ]);
 
   if (!z || !category) {
@@ -616,7 +656,7 @@ export function ReaderScreen({
 
   const renderReadingContent = () => (
     <article
-      className={`mt-1 w-full px-4 pb-2 pt-2 flex flex-col items-center justify-center text-center bg-transparent ${longSurah ? "" : "cursor-pointer touch-manipulation transition-colors hover:bg-muted/10 active:bg-muted/20 my-auto"}`}
+      className={`w-full px-4 flex flex-col items-center justify-center text-center bg-transparent ${longSurah ? "" : "cursor-pointer touch-manipulation transition-colors hover:bg-muted/10 active:bg-muted/20"}`}
     >
       {longSurah ? (
         <div className="mx-auto flex w-full max-w-sm flex-col items-center justify-center gap-4 pb-5 pt-2">
@@ -793,6 +833,7 @@ export function ReaderScreen({
     });
   };
   const renderCollectionNavigator = () => {
+    if (focusMode) return null;
     if (!onSelectZikr) return null;
     const doneCount = collectionCompletedCount;
     const isFullyComplete = doneCount === (azkarList?.length ?? 0);
@@ -1044,22 +1085,25 @@ export function ReaderScreen({
   );
 
   const renderKeyboardShortcutsHint = () => (
-    <CounterShortcutHints
-      language={language}
-      direction={direction}
-      testId="reader-keyboard-shortcuts"
-      ariaLabel={t(language, "reader.keyboardShortcuts")}
-      shortcuts={[
-        /* Space only counts once the counter itself is focused in long-Surah
+    <div data-reading-shortcuts>
+      <CounterShortcutHints
+        language={language}
+        direction={direction}
+        testId="reader-keyboard-shortcuts"
+        ariaLabel={t(language, "reader.keyboardShortcuts")}
+        shortcuts={[
+          /* Space only counts once the counter itself is focused in long-Surah
            mode (the reader canvas deliberately never counts a full Surah — see
            the counter-only contract in docs/DESIGN_SYSTEM.md), so the global
            shortcut does not apply and the hint would be misleading. */
-        ...(longSurah ? [] : [{ keys: ["Space"], label: t(language, "reader.shortcutCount") }]),
-        { keys: ["→", "←"], label: t(language, "reader.shortcutNavigate") },
-        { keys: ["R"], label: t(language, "reader.shortcutReset") },
-        { keys: ["Esc"], label: t(language, "reader.shortcutBack") },
-      ]}
-    />
+          ...(longSurah ? [] : [{ keys: ["Space"], label: t(language, "reader.shortcutCount") }]),
+          { keys: ["→", "←"], label: t(language, "reader.shortcutNavigate") },
+          { keys: ["R"], label: t(language, "reader.shortcutReset") },
+          { keys: ["Esc"], label: t(language, "reader.shortcutBack") },
+        ]}
+      />
+      <CounterKeyboardHelp shortcuts={[]} language={language} direction={direction} />
+    </div>
   );
 
   const renderDock = () => {
@@ -1096,7 +1140,7 @@ export function ReaderScreen({
           </div>
           {renderCounterPanel()}
         </div>
-        <div className="hidden md:block">{renderKeyboardShortcutsHint()}</div>
+        <div>{renderKeyboardShortcutsHint()}</div>
       </div>
     );
   };
@@ -1237,6 +1281,17 @@ export function ReaderScreen({
       </DropdownMenuGroup>
 
       {/* Navigation shortcut to view all azkar */}
+      {!longSurah && (
+        <DropdownMenuItem
+          onClick={() => {
+            focusRequestedRef.current = true;
+            setFocusMode(true);
+          }}
+          data-testid="reader-focus-toggle"
+        >
+          {t(language, "reader.enterFocus")}
+        </DropdownMenuItem>
+      )}
       <DropdownMenuSeparator className="my-1 h-px bg-border/60" />
       <DropdownMenuLabel className="px-3 pb-1 pt-1 text-micro font-bold uppercase tracking-wider text-muted-foreground">
         {t(language, "reader.menuNavigation")}
@@ -1267,11 +1322,28 @@ export function ReaderScreen({
       data-counting-mode={longSurah ? "counter-only" : "canvas"}
       dir={direction}
       data-reader-category={catId}
+      data-reading-focus={focusMode && !showMushaf ? "true" : "false"}
       screenName={displayCategoryName}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
+      {focusMode && !showMushaf && (
+        <div
+          className="flex shrink-0 items-center justify-end px-4 pb-2 pt-[max(0.5rem,env(safe-area-inset-top))]"
+          data-prevent-count="true"
+        >
+          <h1 className="sr-only">{displayCategoryName}</h1>
+          <button
+            ref={focusExitRef}
+            type="button"
+            onClick={() => setFocusMode(false)}
+            className="min-h-11 rounded-xl border border-border bg-card px-4 py-2 text-sm font-semibold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          >
+            {t(language, "reader.exitFocus")}
+          </button>
+        </div>
+      )}
       <div className="sr-only" aria-live="polite">
         {shareMessage}
       </div>
@@ -1316,7 +1388,7 @@ export function ReaderScreen({
              * thing to press for something already done. There is one
              * completion for a surah, and it is reaching the end of it.
              */
-            if (!isDone) onComplete(idx);
+            handleZikrCompletion(idx);
             onAdvance(idx);
           }}
         />
@@ -1346,6 +1418,7 @@ export function ReaderScreen({
                 the same "always-dark brand band" role. */}
               <div
                 data-testid="reader-desktop-hero"
+                data-reading-chrome
                 className="relative w-full flex shrink-0 flex-col items-center gap-2 overflow-hidden rounded-b-3xl px-6 pb-4 pt-3 text-center"
                 style={{
                   background:
@@ -1389,7 +1462,7 @@ export function ReaderScreen({
                     >
                       <MoreVertical size={18} />
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuContent align="end" className="w-56" onCloseAutoFocus={onReaderMenuCloseAutoFocus}>
                       {renderReaderMenuItems("desktop")}
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -1493,7 +1566,10 @@ export function ReaderScreen({
             </div>
 
             {/* Desktop Sidebar Toggle Button */}
-            <div className="hidden min-[1200px]:flex items-start pt-6 shrink-0 z-20 -mx-5 pointer-events-none">
+            <div
+              data-reading-chrome
+              className="hidden min-[1200px]:flex items-start pt-6 shrink-0 z-20 -mx-5 pointer-events-none"
+            >
               <button
                 type="button"
                 onClick={() => setIsSidebarOpen((prev) => !prev)}
@@ -1514,11 +1590,12 @@ export function ReaderScreen({
           </div>
         ) : (
           <>
-            <div>
+            <div data-reading-chrome>
               <Header
                 title={displayCategoryName}
                 onBack={onBack}
                 language={language}
+                elevateOnScroll={false}
                 right={
                   // Two actions at most: Reference, then the overflow control.
                   // Share used to sit between them; at 320-390px a third 44px
@@ -1560,7 +1637,7 @@ export function ReaderScreen({
                       >
                         <MoreVertical size={20} />
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-56">
+                      <DropdownMenuContent align="end" className="w-56" onCloseAutoFocus={onReaderMenuCloseAutoFocus}>
                         {renderReaderMenuItems("mobile")}
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -1569,7 +1646,11 @@ export function ReaderScreen({
               />
             </div>
 
-            <div className="shrink-0 px-5 pb-3 pt-2 reader-column" data-testid="reader-session-chrome">
+            <div
+              data-reading-chrome
+              className="shrink-0 px-5 pb-1.5 pt-1 reader-column"
+              data-testid="reader-session-chrome"
+            >
               <div className="mb-2 flex items-center justify-between gap-3 text-xs font-bold text-muted-foreground">
                 <span>{t(language, "reader.collectionPercentComplete", { percent: localizedReadingPercent })}</span>
                 <span>
@@ -1641,7 +1722,7 @@ export function ReaderScreen({
                   the wide branch alone, so on a phone — where the swipe and the
                   tap are the only ways to drive the reader — the page followed
                   nothing and a tap to count moved nothing at all. */}
-                <div style={dragStyle} className="flex min-h-full w-full flex-col py-4">
+                <div style={dragStyle} className="flex min-h-full w-full flex-col py-2">
                   <div
                     key={z.id}
                     style={pressStyle}
@@ -1656,7 +1737,7 @@ export function ReaderScreen({
                 counter itself owns the bottom inset — otherwise it would sit
                 flush against the home indicator. */}
               {!longSurah && (
-                <div className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">{renderDock()}</div>
+                <div className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">{renderDock()}</div>
               )}
               {(!audioModeActive || longSurah) && audioPlayer}
             </div>

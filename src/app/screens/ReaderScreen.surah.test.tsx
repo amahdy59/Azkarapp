@@ -138,6 +138,51 @@ describe("the three surah readings", () => {
     expect(onSurahPageChange).toHaveBeenCalledWith(KAHF.id, KAHF.mushafPages![0].page);
   });
 
+  it("starts from the beginning when revisiting a completed surah", () => {
+    // When revisiting a completed surah, it always starts from page 1 even if a place was saved
+    renderKahf({
+      isDone: true,
+      surahReadingPages: { [KAHF.id]: KAHF.mushafPages![5].page },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Read from Mushaf" }));
+
+    expect(screen.getByTestId("mushaf-immersive-progress")).toHaveAttribute("aria-valuenow", "1");
+  });
+
+  it("resumes the last page until completion is explicitly confirmed", () => {
+    // Merely opening the last page does not confirm that its text was read.
+    const lastPage = KAHF.mushafPages!.at(-1)!.page;
+    renderKahf({
+      surahReadingPages: { [KAHF.id]: lastPage },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Read from Mushaf" }));
+
+    expect(screen.getByTestId("mushaf-immersive-progress")).toHaveAttribute(
+      "aria-valuenow",
+      String(KAHF.mushafPages!.length),
+    );
+  });
+
+  it("resets surah page to beginning when completed directly from the Mushaf reader", () => {
+    const onSurahPageChange = vi.fn();
+    renderKahf({ onSurahPageChange });
+    fireEvent.click(screen.getByRole("button", { name: "Read from Mushaf" }));
+
+    // Reach the last page
+    for (let turn = 0; turn < 12; turn += 1) {
+      const next = screen.queryByTestId("mushaf-rail-next");
+      if (!next || (next as HTMLButtonElement).disabled) break;
+      fireEvent.click(next);
+    }
+
+    onSurahPageChange.mockClear();
+    const finish = screen.getByTestId("mushaf-immersive-return");
+    fireEvent.click(finish);
+
+    // Completing from the Mushaf resets the stored page back to the first page
+    expect(onSurahPageChange).toHaveBeenCalledWith(KAHF.id, KAHF.mushafPages![0].page);
+  });
+
   it("shows a short surah as canonical Quran without an ornamental card", () => {
     renderReader("before_sleep", indexOf("before_sleep", "s-hm-99-ikhlas"));
     expect(screen.getByText(/سُورَةُ/)).toBeInTheDocument();

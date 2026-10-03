@@ -88,11 +88,17 @@ export function MushafNavigationModal({
   const quickPages = useMemo(() => {
     const start = pageRange ? pageRange.first : 1;
     const end = pageRange ? pageRange.last : 604;
+    const span = end - start + 1;
+    // Scale step dynamically: for the full 604-page Mushaf (or spans > 120 pages),
+    // use multiples of 15 (42 items total). In a 6-column grid, this produces
+    // exactly 7 full rows (6 × 7 = 42) that fit on one screen without scrolling.
+    // Smaller spans scale down (5, 2, 1) so the user gets meaningful jump targets.
+    const step = span > 120 ? 15 : span > 40 ? 5 : span > 15 ? 2 : 1;
     const list: number[] = [];
-    if (start % 5 !== 0) list.push(start);
-    const firstMultiple = Math.ceil(start / 5) * 5;
-    for (let p = firstMultiple; p <= end; p += 5) list.push(p);
-    if (end % 5 !== 0 && !list.includes(end)) list.push(end);
+    if (start % step !== 0) list.push(start);
+    const firstMultiple = Math.ceil(start / step) * step;
+    for (let p = firstMultiple; p <= end; p += step) list.push(p);
+    if (end % step !== 0 && !list.includes(end)) list.push(end);
     return list;
   }, [pageRange]);
 
@@ -109,7 +115,7 @@ export function MushafNavigationModal({
   return (
     <Dialog.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs animate-in fade-in" />
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60  animate-in fade-in" />
         <Dialog.Content
           dir={direction}
           className="fixed inset-x-2 bottom-2 top-2 z-50 flex w-auto max-w-xl flex-col overflow-hidden rounded-2xl border border-border bg-card text-card-foreground shadow-overlay animate-in fade-in zoom-in-95 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:h-[min(620px,88dvh)] sm:w-full sm:-translate-x-1/2 sm:-translate-y-1/2"
@@ -201,9 +207,9 @@ export function MushafNavigationModal({
                       onClick={() => handleJump(surah.startPage)}
                       onMouseEnter={() => prefetchMushafPage(surah.startPage)}
                       onPointerDown={() => prefetchMushafPage(surah.startPage)}
-                      className={`group flex min-h-12 items-center justify-between gap-3 rounded-xl border px-3.5 py-2 text-start transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                      className={`group flex min-h-12 items-center justify-between gap-3 rounded-xl border px-3 py-2 text-start transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                         isCurrent
-                          ? "border-primary bg-muted/60 shadow-xs"
+                          ? "border-primary bg-muted/60 "
                           : "border-border/60 bg-card hover:border-border hover:bg-muted/50"
                       }`}
                       style={{ contentVisibility: "auto", containIntrinsicSize: "3.25rem" }}
@@ -250,9 +256,9 @@ export function MushafNavigationModal({
                       onClick={() => handleJump(juz.startPage)}
                       onMouseEnter={() => prefetchMushafPage(juz.startPage)}
                       onPointerDown={() => prefetchMushafPage(juz.startPage)}
-                      className={`group flex items-center justify-between gap-3 rounded-xl border px-3.5 py-2.5 text-start transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                      className={`group flex items-center justify-between gap-3 rounded-xl border px-3 py-2.5 text-start transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                         isCurrent
-                          ? "border-primary bg-muted/60 shadow-xs"
+                          ? "border-primary bg-muted/60 "
                           : "border-border/60 bg-card hover:border-border hover:bg-muted/50"
                       }`}
                     >
@@ -289,8 +295,8 @@ export function MushafNavigationModal({
 
             {/* Jump to Page Tab */}
             {activeTab === "jump" && (
-              <div className="flex flex-col gap-5 py-1">
-                <form onSubmit={handleInputSubmit} className="flex flex-col gap-2.5">
+              <div className="flex flex-col gap-4 py-1 sm:gap-5">
+                <form onSubmit={handleInputSubmit} className="flex flex-col gap-2">
                   <label htmlFor="page-jump-input" className={FIELD_LABEL_CLASS}>
                     {pageRange
                       ? t(language, "mushaf.enterPageNumberInRange", {
@@ -321,9 +327,9 @@ export function MushafNavigationModal({
                 </form>
 
                 {/* Direct Page Selection Grid */}
-                <div className="flex flex-col gap-2.5">
+                <div className="flex flex-col gap-2">
                   <span className="text-xs font-bold text-muted-foreground">{t(language, "mushaf.quickJump")}</span>
-                  <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
+                  <div className="grid grid-cols-6 gap-1.5 sm:gap-2">
                     {quickPages.map((p) => {
                       const isCurrentPage = p === currentPage;
                       return (
@@ -333,9 +339,10 @@ export function MushafNavigationModal({
                           onClick={() => handleJump(p)}
                           onMouseEnter={() => prefetchMushafPage(p)}
                           onPointerDown={() => prefetchMushafPage(p)}
-                          className={`flex min-h-11 items-center justify-center rounded-xl border px-3 py-2 text-sm font-bold tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                          aria-current={isCurrentPage ? "page" : undefined}
+                          className={`flex min-h-11 items-center justify-center rounded-xl border px-1.5 py-2 text-xs font-bold tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:text-sm ${
                             isCurrentPage
-                              ? "border-primary bg-primary text-primary-foreground shadow-xs"
+                              ? "border-primary bg-primary text-primary-foreground "
                               : "border-border/70 bg-muted/40 text-foreground hover:border-border hover:bg-muted"
                           }`}
                         >
@@ -365,7 +372,7 @@ export function MushafNavigationModal({
                           key={page}
                           type="button"
                           onClick={() => handleJump(page)}
-                          className="group flex min-h-12 items-center justify-between gap-3 rounded-xl border border-border/60 bg-card px-3.5 py-2 text-start transition-colors hover:border-border hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                          className="group flex min-h-12 items-center justify-between gap-3 rounded-xl border border-border/60 bg-card px-3 py-2 text-start transition-colors hover:border-border hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                         >
                           <div className="flex min-w-0 items-center gap-3">
                             <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-foreground">
@@ -392,7 +399,7 @@ export function MushafNavigationModal({
                             onSelectVerseBookmark?.(bookmark);
                             handleJump(bookmark.page);
                           }}
-                          className="group flex min-h-12 items-center justify-between gap-3 rounded-xl border border-border/60 bg-card px-3.5 py-2 text-start transition-colors hover:border-border hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                          className="group flex min-h-12 items-center justify-between gap-3 rounded-xl border border-border/60 bg-card px-3 py-2 text-start transition-colors hover:border-border hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                         >
                           <div className="flex min-w-0 items-center gap-3">
                             <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-foreground">

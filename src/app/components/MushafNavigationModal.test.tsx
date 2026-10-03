@@ -153,7 +153,7 @@ describe("MushafNavigationModal", () => {
     expect(handleClose).toHaveBeenCalled();
   });
 
-  it("allows selecting a page number directly from the Page tab grid", () => {
+  it("allows selecting a page number directly from the Page tab grid using multiples of 15", () => {
     const handleSelectPage = vi.fn();
     const handleClose = vi.fn();
 
@@ -169,12 +169,45 @@ describe("MushafNavigationModal", () => {
       />,
     );
 
-    // Quick jump grid shows multiples of 5; select page 565.
-    const page565Btn = screen.getByRole("button", { name: "٥٦٥" });
-    expect(page565Btn).toBeInTheDocument();
-    fireEvent.click(page565Btn);
+    // Quick jump grid shows page 1, multiples of 15 up to 600, and page 604 (42 buttons total).
+    const page1Btn = screen.getByRole("button", { name: "١" });
+    const page15Btn = screen.getByRole("button", { name: "١٥" });
+    const page570Btn = screen.getByRole("button", { name: "٥٧٠" });
+    const page604Btn = screen.getByRole("button", { name: "٦٠٤" });
 
-    expect(handleSelectPage).toHaveBeenCalledWith(565);
+    expect(page1Btn).toBeInTheDocument();
+    expect(page15Btn).toBeInTheDocument();
+    expect(page570Btn).toBeInTheDocument();
+    expect(page604Btn).toBeInTheDocument();
+
+    // Verify 565 is no longer in the grid (which was multiples of 5), but 570 is
+    expect(screen.queryByRole("button", { name: "٥٦٥" })).not.toBeInTheDocument();
+
+    fireEvent.click(page570Btn);
+    expect(handleSelectPage).toHaveBeenCalledWith(570);
     expect(handleClose).toHaveBeenCalled();
+  });
+
+  it("scales quick jump step when viewing a constrained pageRange", () => {
+    const handleSelectPage = vi.fn();
+    const handleClose = vi.fn();
+
+    render(
+      <MushafNavigationModal
+        isOpen={true}
+        onClose={handleClose}
+        currentPage={10}
+        onSelectPage={handleSelectPage}
+        language="ar"
+        direction="rtl"
+        initialTab="jump"
+        pageRange={{ first: 2, last: 49 }}
+      />,
+    );
+
+    // For a 48-page surah, step scales down to 5: 2, 5, 10, ..., 45, 49
+    expect(screen.getByRole("button", { name: "٢" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "٥" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "٤٩" })).toBeInTheDocument();
   });
 });

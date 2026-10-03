@@ -9,6 +9,8 @@ import {
   loadAppState,
   mergeAppStates,
   normalizeAppState,
+  normalizeMasbahaState,
+  resetDailyMasbahaState,
   resetDailyPartialCounts,
   saveAppState,
   toCompletedSets,
@@ -703,5 +705,51 @@ describe("prayer tracking persistence", () => {
 
     expect(merged.dailyHabits).toHaveLength(2);
     expect(merged.dailyHabits?.find((h) => h.habit.startsWith("mosque_"))?.habit).toBe("mosque_5");
+  });
+
+  it("normalizes masbaha state and items correctly", () => {
+    expect(normalizeMasbahaState(null)).toBeUndefined();
+    expect(normalizeMasbahaState("invalid")).toBeUndefined();
+
+    const normalized = normalizeMasbahaState({
+      count: 33,
+      target: 100,
+      laps: 2,
+      selectedZikrId: "tasbeeh",
+      dayKey: "2026-09-18",
+      items: {
+        item1: { count: 10, target: 33, laps: 1, dayKey: "2026-09-18" },
+        item2: { count: -5, target: "invalid", laps: null },
+        "": { count: 5 },
+      },
+    });
+
+    expect(normalized).toEqual({
+      count: 33,
+      target: 100,
+      laps: 2,
+      selectedZikrId: "tasbeeh",
+      dayKey: "2026-09-18",
+      items: {
+        item1: { count: 10, target: 33, laps: 1, dayKey: "2026-09-18" },
+        item2: { count: 0, target: 0, laps: 0 },
+      },
+    });
+
+    // Reset masbaha state on different day
+    const reset = resetDailyMasbahaState(normalized!, "2026-09-19");
+    expect(reset).toEqual({
+      count: 0,
+      target: 100,
+      laps: 0,
+      selectedZikrId: "tasbeeh",
+      dayKey: "2026-09-19",
+      items: undefined,
+    });
+
+    // Reset masbaha state on same day retains count
+    const sameDayReset = resetDailyMasbahaState(normalized!, "2026-09-18");
+    expect(sameDayReset.count).toBe(33);
+    expect(sameDayReset.items?.item1).toBeDefined();
   });
 });

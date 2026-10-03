@@ -89,17 +89,20 @@ export function Header({
   onBack,
   right,
   language = "en",
+  elevateOnScroll = true,
 }: {
   title: string;
   subtitle?: string;
   onBack?: () => void;
   right?: React.ReactNode;
   language?: AppLanguage;
+  elevateOnScroll?: boolean;
 }) {
   const headerRef = useRef<HTMLDivElement>(null);
   const [hasScrolledContent, setHasScrolledContent] = useState(false);
 
   useEffect(() => {
+    if (!elevateOnScroll) return;
     const header = headerRef.current;
     const screen = header?.closest<HTMLElement>(".app-screen-surface");
     if (!screen) return;
@@ -107,6 +110,9 @@ export function Header({
     const updateFromScroll = (event: Event) => {
       const target = event.target;
       if (!(target instanceof HTMLElement)) return;
+      // An inner devotional text reader scrolls within its own card and never
+      // passes content underneath the header, so it should not trigger elevation.
+      if (target.classList.contains("reader-text-scroll") || target.closest(".reader-text-scroll")) return;
       setHasScrolledContent(target.scrollTop > 4);
     };
 
@@ -115,17 +121,17 @@ export function Header({
     // some screens scroll the surface itself, while others use a nested region.
     screen.addEventListener("scroll", updateFromScroll, true);
     return () => screen.removeEventListener("scroll", updateFromScroll, true);
-  }, []);
+  }, [elevateOnScroll]);
+
+  const isScrolled = Boolean(elevateOnScroll && hasScrolledContent);
 
   return (
     <div
       ref={headerRef}
       data-testid="shared-screen-header"
-      data-scrolled={hasScrolledContent || undefined}
-      className={`sticky top-0 z-40 flex w-full shrink-0 items-center gap-2 border-b px-4 pt-0 pb-1 transition-colors duration-standard ${
-        hasScrolledContent
-          ? "scroll-glass-header border-border bg-background/95 shadow-sm backdrop-blur-md"
-          : "border-transparent bg-transparent"
+      data-scrolled={isScrolled || undefined}
+      className={`shared-screen-header sticky top-0 z-40 flex w-full shrink-0 items-center gap-2 border-b bg-background px-4 pt-2 pb-1 transition-colors duration-standard ${
+        isScrolled ? "border-border shadow-sm" : "border-transparent"
       }`}
       style={{ minHeight: 56 }}
     >

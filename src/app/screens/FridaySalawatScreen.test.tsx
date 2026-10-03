@@ -48,7 +48,7 @@ describe("FridaySalawatScreen", () => {
     expect(screen.getByTestId("salawat-counter")).toHaveAccessibleName(/0 \/ 250/);
   });
 
-  it("opens both authentic hadith references from the header benefits action", async () => {
+  it("opens both authentic hadith references from the benefits action above the counter", async () => {
     const user = userEvent.setup();
     render(<FridaySalawatScreen language="en" direction="ltr" onBack={() => undefined} />);
 

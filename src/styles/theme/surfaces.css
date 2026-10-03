@@ -76,6 +76,14 @@
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
+/* A sticky header must cover the scrollport's top edge. Screen padding would
+   otherwise leave an exposed strip where scrolled cards can appear above it.
+   The header owns its internal top spacing; headerless and immersive screens
+   retain their existing padding and safe-area contracts. */
+.app-screen-surface:has(> .shared-screen-header) {
+  padding-block-start: 0;
+}
+
 @media (min-width: 768px) {
   .app-shell {
     width: 390px;

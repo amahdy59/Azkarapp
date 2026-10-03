@@ -195,6 +195,28 @@ describe("the surah view is the Mushaf", () => {
     const finish = screen.getByTestId("mushaf-immersive-return");
     expect(finish.closest("[data-testid='mushaf-tool-rail']")).not.toBeNull();
   });
+
+  it("aligns the mobile completion button with the bottom right action button", () => {
+    vi.stubGlobal("innerWidth", 390);
+    vi.stubGlobal("innerHeight", 844);
+
+    renderKahf();
+
+    // Jump to last page via End key
+    fireEvent.keyDown(window, { key: "End" });
+
+    const finish = screen.getByTestId("mushaf-immersive-return");
+    const rightControl = screen.getByTestId("mushaf-immersive-word-meanings");
+
+    expect(finish.closest("[data-testid='mushaf-corner-bottom-left']")).not.toBeNull();
+    expect(rightControl.closest("[data-testid='mushaf-corner-bottom-right']")).not.toBeNull();
+
+    // Both buttons share the 44px (h-11) touch target height and have an inner 32px (h-8) pill
+    expect(finish).toHaveClass("h-11");
+    expect(rightControl).toHaveClass("h-11");
+    expect(finish.querySelector("span")).toHaveClass("h-8");
+    expect(rightControl.querySelector("span")).toHaveClass("h-8");
+  });
 });
 
 /**
