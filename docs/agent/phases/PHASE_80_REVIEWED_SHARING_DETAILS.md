@@ -26,6 +26,8 @@ Native labelled checkboxes retain 44px rows and the existing keyboard dialog. Co
 
 ## Tests added or updated
 
+The final additional Tall-QR regression passed with all 12 renderer tests; its drawing bounds verify that the QR remains inside the resized canvas and the website uses canvas-center alignment. Targeted ESLint and strict types passed after this test addition.
+
 Exact benefit boundaries, missing-data behavior, matched Quran glossary entries, language availability, evidence citations, primary-reference fallback and complete glossary layout.
 
 ## Commands run
@@ -40,7 +42,7 @@ Exact benefit boundaries, missing-data behavior, matched Quran glossary entries,
 | pnpm check (final application code)    | All 10 stages passed, 258.8 seconds                      |
 | pnpm build:pages                       | Passed, build 23.06 seconds; bundle and CSS gates passed |
 
-The measured Pages initial route is 152957 gzip bytes (1124 above the recorded baseline); the stylesheet is 166428 bytes / 28598 gzip bytes. The baseline records these deliberate sharing-control/localization additions in this diff. Hard ceilings remain unchanged; no new dependency was added.
+After merging the authorized release repair from `origin/main`, all ten quality stages passed again in 77.1 seconds; the Pages build passed in 7.36 seconds. The measured Pages initial route is 152971 gzip bytes (1138 above the earlier recorded baseline); the stylesheet is 166476 bytes / 28610 gzip bytes. The baseline records the deliberate sharing-control/localization additions and merged release fix in this diff. Hard ceilings remain unchanged; no new dependency was added.
 
 ## Visual/manual evidence
 
