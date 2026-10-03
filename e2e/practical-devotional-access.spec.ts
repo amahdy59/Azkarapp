@@ -122,8 +122,9 @@ test("keyboard help remains reachable with enlarged text on a short Arabic phone
   await page.getByRole("button", { name: "اختصارات لوحة المفاتيح", exact: true }).click();
   const dialog = page.getByTestId("counter-keyboard-help");
   await expect(dialog).toBeVisible();
-  await page.evaluate(() => {
+  await page.evaluate(async () => {
     document.documentElement.style.fontSize = "200%";
+    await document.fonts.ready;
   });
   const bounds = (await dialog.boundingBox())!;
   expect(bounds.x).toBeGreaterThanOrEqual(0);
@@ -139,11 +140,29 @@ test("keyboard help remains reachable with enlarged text on a short Arabic phone
   const closeBounds = (await dialog.getByRole("button", { name: "إغلاق", exact: true }).boundingBox())!;
   expect(titleBounds.y).toBeGreaterThanOrEqual(closeBounds.y + closeBounds.height);
   const checkbox = dialog.getByRole("checkbox");
-  await checkbox.scrollIntoViewIfNeeded();
+  // Focus the setting and compare both rectangles in the document's coordinate
+  // system. Mobile WebKit reports a different locator bounding box for this
+  // scrolled descendant, even while it is visibly inside the scrollport.
+  await checkbox.focus();
+  await expect(checkbox).toBeFocused();
   await expect(checkbox).toBeVisible();
-  const checkboxBounds = (await checkbox.boundingBox())!;
-  expect(checkboxBounds.y).toBeGreaterThanOrEqual(closeBounds.y + closeBounds.height);
-  expect(checkboxBounds.y + checkboxBounds.height).toBeLessThanOrEqual(bounds.y + bounds.height);
+  await expect
+    .poll(async () => {
+      return checkbox.evaluate((input) => {
+        const scrollport = input.parentElement?.parentElement;
+        if (!scrollport) return false;
+        const inputBounds = input.getBoundingClientRect();
+        const scrollBounds = scrollport.getBoundingClientRect();
+        return inputBounds.top >= scrollBounds.top && inputBounds.bottom <= scrollBounds.bottom;
+      });
+    })
+    .toBe(true);
+  const checkboxBounds = await checkbox.evaluate((input) => {
+    const bounds = input.getBoundingClientRect();
+    return { top: bounds.top, bottom: bounds.bottom };
+  });
+  expect(checkboxBounds.top).toBeGreaterThanOrEqual(closeBounds.y + closeBounds.height);
+  expect(checkboxBounds.bottom).toBeLessThanOrEqual(bounds.y + bounds.height);
   expect(await dialog.locator("label").evaluate((label) => label.scrollWidth <= label.clientWidth)).toBe(true);
   await page.screenshot({ path: "output/playwright/phase78/keyboard-help-ar-enlarged.png" });
   await dialog.getByRole("button", { name: "إغلاق", exact: true }).click();

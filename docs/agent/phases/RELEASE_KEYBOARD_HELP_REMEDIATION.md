@@ -29,7 +29,7 @@ Preserves keyboard operation, close-button visibility, and access to the charact
 
 ## Tests added or updated
 
-The download failure test waits for the download action to become enabled before clicking. Assertions remain intact. Existing enlarged Arabic phone coverage exercises the modal.
+The download failure test waits for the download action to become enabled before clicking. Assertions remain intact. The enlarged Arabic phone test now compares the focused checkbox and scrollport using DOM rectangles in the same coordinate system. Mobile WebKit's locator bounding box reported the checkbox below the dialog even when its DOM rectangle and screenshot placed it inside the scrollport.
 
 ## Commands run
 
@@ -37,11 +37,13 @@ The download failure test waits for the download action to become enabled before
 - Targeted unit tests: 7 passed.
 - WebKit practical access tests: 3 passed.
 - Pages build and bundle budget: passed.
-- Full check and E2E: results recorded in the release tool output; required pre-push hook repeats these gates.
+- Before commit `ed813de`, frozen install, `pnpm check`, `pnpm test:e2e` and `pnpm build:pages` passed locally.
+- The subsequent Linux Quality workflow failed on the keyboard-help geometry check; Pages build, deploy and production verification succeeded.
+- The local test correction passed the focused check on Chromium, Firefox and WebKit (3 passed, 26.5 seconds). Linux CI verification remains pending because this correction is local and unpublished.
 
 ## Visual/manual evidence
 
-Existing test captures the enlarged Arabic phone keyboard-help screenshot.
+The focused test captures the enlarged Arabic phone keyboard-help screenshot in `output/playwright/phase78/keyboard-help-ar-enlarged.png`. The checkbox is within the scroll area; long enlarged text remains scrollable.
 
 ## Documentation updated
 
@@ -53,12 +55,12 @@ No religious content, persistence, or architecture change.
 
 ## Known limitations or remaining risks
 
-Windows WebKit passed before the repair, while Linux CI reproduced the failure twice. Final Linux CI is the decisive verification.
+The pushed modal repair is live, but Quality failed on the checkbox geometry assertion. The local test correction has not run in Linux CI. Full screen-reader and physical-device verification also remain open.
 
 ## Out-of-scope findings
 
-Sharing source, vocabulary, and benefit controls are saved in a separate stash and excluded from remediation.
+Sharing source, vocabulary, and benefit controls are committed in a separate local worktree and excluded from this published remediation.
 
 ## Recommended next step
 
-Verify Quality and Pages for the remediation commit, then restore and complete the sharing-content phase.
+Keep the test correction local until the owner resumes release work. Then run the required push gates and verify Linux Quality, Pages and production again. Review the finished sharing-content samples in the separate local worktree.
