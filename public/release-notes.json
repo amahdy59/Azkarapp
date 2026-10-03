@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-03-sharing-polish-v1",
+  "release": "2026-10-03-sharing-polish-v2",
   "ar": [
     "شارك ذكرًا واحدًا أو مجموعة ببطاقات أكثر ترتيبًا، مع هوية واضحة في الرأس وتذييل متوازن.",
-    "اعرض النصوص الطويلة كاملة على بطاقات متتابعة، مع إبقاء الذكر الواحد في بطاقة واحدة متى أمكن.",
-    "استفد من تخطيط محسّن للمقاسات المختلفة، مع عنوان داخل البطاقة، عدّاد مقروء، ومصدر واضح.",
+    "اعرض النصوص الطويلة كاملة على بطاقات متتابعة، مع عنوان داخل البطاقة وعدّاد ومصدر واضحين.",
+    "استفد من وصول أسرع للأذكار المناسبة، ومساعدة لوحة المفاتيح، وتجهيز السفر للمحتوى المتاح دون اتصال.",
     "استخدم رمز QR ورابط الموقع بشكل مستقل مع محاذاة مركزية ثابتة وتباين مناسب للقراءة."
   ],
   "en": [
     "Share a single zikr or collection with a clearer card hierarchy, branded header and balanced footer.",
-    "Keep long passages complete across sequential cards while fitting a single zikr on one card whenever possible.",
-    "Use improved layouts for each format, with an in-card title, readable count badge and clear source treatment.",
+    "Keep long passages complete across sequential cards, with an in-card title, readable count badge and clear source.",
+    "Reach relevant devotional content faster with keyboard help and travel preparation for verified offline material.",
     "Keep the QR code and website link independent from the centered footer for consistent alignment and readability."
   ]
 }
