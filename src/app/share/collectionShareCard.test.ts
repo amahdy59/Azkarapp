@@ -178,6 +178,23 @@ describe("collectionShareCard", () => {
     expect(context.fillText).toHaveBeenCalled();
   });
 
+  it("fits single Tall cards to content while preserving readable text and centered footer", () => {
+    const { canvas, context } = createMockCanvas();
+    const originalCreateElement = document.createElement.bind(document);
+    vi.spyOn(document, "createElement").mockImplementation(((tagName: string) =>
+      tagName === "canvas" ? canvas : originalCreateElement(tagName)) as typeof document.createElement);
+    const rendered = renderCollectionStoryPage({
+      ...SAMPLE_PAGE,
+      format: "tall",
+      single: true,
+      items: [{ id: "one", arabicText: "سبحان الله", sourceReference: "Reviewed reference" }],
+    });
+    expect(rendered.height).toBe(1920);
+    expect(rendered.width).toBe(1080);
+    expect(context.fillText).toHaveBeenCalledWith("سبحان الله", expect.any(Number), expect.any(Number));
+    expect(context.fillText).toHaveBeenCalledWith("wa-zaker.com", 540, expect.any(Number));
+  });
+
   it("generates a complete story card PNG file asynchronously", async () => {
     const { canvas } = createMockCanvas();
     const originalCreateElement = document.createElement.bind(document);

@@ -53,6 +53,35 @@ const SAMPLE_ITEMS: Zikr[] = [
 ];
 
 describe("CollectionShareModal", () => {
+  it("keeps the source control checked while benefit evidence requires it", async () => {
+    render(
+      <CollectionShareModal
+        open
+        onClose={vi.fn()}
+        collectionTitle="Morning"
+        items={SAMPLE_ITEMS}
+        language="en"
+        shareItems={[
+          {
+            id: "evidence",
+            arabicText: "الحمد لله وحده",
+            benefitEvidence: "A reviewed benefit quotation.",
+            sourceReference: "Reviewed reference",
+          },
+        ]}
+      />,
+    );
+    await screen.findByRole("img");
+    fireEvent.click(screen.getByText("Customize content", { exact: true }));
+    const source = screen.getByRole("checkbox", { name: "Include sources", exact: true });
+    fireEvent.click(source);
+    expect(source).not.toBeChecked();
+    fireEvent.click(screen.getByRole("checkbox", { name: "Benefit", exact: true }));
+    expect(source).toBeChecked();
+    expect(source).toBeDisabled();
+    fireEvent.click(screen.getByRole("button", { name: "Text", exact: true }));
+    expect((screen.getByRole("textbox") as HTMLTextAreaElement).value).toContain("Reviewed reference");
+  });
   it("keeps full text available when no image format fits", async () => {
     const { getCompatibleShareFormats } = await import("../share/collectionShareCard");
     vi.mocked(getCompatibleShareFormats).mockResolvedValueOnce([]);

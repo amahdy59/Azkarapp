@@ -102,6 +102,10 @@ Do not place `localStorage`, Supabase, or raw network calls inside reusable visu
 
 ## Localization and direction
 
+### Reviewed sharing detail selection
+
+The owner-approved sharing detail choices supersede the earlier mandatory-citation rule for plain zikr exports: ordinary sources default on and may be omitted, while benefit evidence, word explanations and long-surah reminders retain their citations. Primary references are explicit reviewed metadata, never inferred by splitting source strings. Ordinary benefit quotations must match explicitly reviewed contiguous boundaries in the stored narration. Existing reviewed surah reminders retain their approved benefit policy. Glossary selection reuses only entries matched in the actual Quran passage; no definitions or translations are generated. Every selected detail remains part of the indivisible zikr layout. All choices are transient and offline.
+
 The selected `AppLanguage` controls document language and layout direction. Arabic is RTL; English is LTR unless the accessibility force-RTL preference is active.
 
 - Use logical CSS positioning where possible.

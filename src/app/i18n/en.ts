@@ -1884,11 +1884,17 @@ const en = {
     meaning: "Include reviewed English meaning",
     pronunciation: "Include transliteration",
     benefit: "Benefit",
+    sources: "Include sources",
+    wordMeanings: "Explain difficult words",
+    primarySource: "Use the reviewed primary reference",
+    benefitUnavailable:
+      "A reviewed benefit quotation is not available for this selection. No summary will be generated.",
     translation: "Meaning",
     transliteration: "Pronunciation",
     source: "Source",
     qr: "Add a QR link",
-    sourceAlways: "Arabic stays complete. Available reviewed sources are always included.",
+    sourceAlways:
+      "Sources stay attached to benefits and word explanations. Primary references appear only when explicitly reviewed.",
     repetitions: "Repeat {count}×",
     continuation: "Part {current} of {total}",
     morningSubtitle: "Begin your day remembering Allah",

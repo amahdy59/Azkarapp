@@ -128,6 +128,8 @@ may run in parallel.
 
 ## Core rule
 
+[Phase 79](phases/PHASE_79_SHARING_VISUAL_IDENTITY.md) records the branded sharing cards subsequently authorized for release. [Phase 80](phases/PHASE_80_REVIEWED_SHARING_DETAILS.md) is the current local sharing-details phase: sources, reviewed glossary tiles and exact reviewed benefit quotations. New religious content remains subject to independent review.
+
 The latest review and hardening work is recorded in [Phase 72](phases/PHASE_72_WIRD_PLANNING_REDESIGN.md), adding support for daily repeating Quran sections (fixed Juz, Surah, or custom page range) with binary daily completion upon reading 100% of the section, isolated progress calculation, and one-tap section restart.
 
 The agent must never interpret “perfect the application” as permission to rewrite the entire repository. Perfection is approached through evidence-backed iteration, not one-shot replacement.

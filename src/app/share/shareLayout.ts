@@ -2,6 +2,7 @@ import type { AppLanguage, ThemeMode, RoutineMode, PrayerName, Zikr } from "../t
 import { t } from "../i18n";
 import { isLongSurah } from "../content/mushafPages";
 import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content/localizedZikr";
+import { getSharingBenefitExcerpt, getSharingWordMeanings, type ShareWordMeaning } from "./shareDetails";
 
 export type ShareFormat = "story" | "square" | "portrait" | "tall";
 export type ShareAppearance = "olive" | "gold" | "lavender";
@@ -17,8 +18,9 @@ export const SHARE_UI_FONT = '"Noto Sans Arabic Variable", system-ui, sans-serif
 export const SHARE_PILL = { top: 28, height: 50, gap: 4, textTop: 82, bottom: 36 } as const;
 
 export interface ShareSection {
-  key: "arabic" | "translation" | "transliteration" | "benefit" | "source" | "reading";
+  key: "arabic" | "translation" | "transliteration" | "benefit" | "source" | "wordMeanings" | "reading";
   text: string;
+  label?: string;
   direction: "rtl" | "ltr";
 }
 export interface ShareItem {
@@ -29,6 +31,9 @@ export interface ShareItem {
   transliteration?: string;
   benefit?: string;
   sourceReference?: string;
+  wordMeanings?: ShareWordMeaning[];
+  benefitEvidence?: string;
+  primarySourceReference?: string;
   repetitionCount?: number;
   reminder?: boolean;
   readingUrl?: string;
@@ -49,8 +54,11 @@ export function toShareItem(zikr: Zikr, language: AppLanguage, baseUrl?: string)
     title: language === "ar" ? zikr.surahNameArabic : zikr.surahNameEnglish,
     translation: reminder ? undefined : zikr.translation,
     transliteration: reminder ? undefined : zikr.transliteration,
-    benefit: getLocalizedZikrBenefit(zikr, language),
+    benefit: reminder ? getLocalizedZikrBenefit(zikr, language) : undefined,
     sourceReference: getLocalizedSourceReference(zikr, language),
+    wordMeanings: reminder ? [] : getSharingWordMeanings(zikr, language),
+    benefitEvidence: getSharingBenefitExcerpt(zikr, language),
+    primarySourceReference: language === "ar" ? zikr.sharingPrimarySourceArabic : zikr.sharingPrimarySourceEnglish,
     repetitionCount: zikr.repetitionCount,
     reminder,
     readingUrl: reminder ? getMushafShareUrl(zikr.mushafPages![0]!.page, baseUrl) : undefined,
@@ -71,9 +79,13 @@ export interface ShareContentOptions {
   meaning?: boolean;
   pronunciation?: boolean;
   benefit?: boolean;
+  sources?: boolean;
+  primarySource?: boolean;
+  wordMeanings?: boolean;
   qr?: boolean;
 }
 export interface MeasuredSection extends ShareSection {
+  labelLines?: string[];
   lines: string[];
   fontSize: number;
   lineHeight: number;
@@ -129,17 +141,35 @@ export function getShareSections(item: ShareItem, options: ShareContentOptions =
     sections.push({ key: "translation", text: item.translation, direction: "ltr" });
   if (options.pronunciation && item.transliteration?.trim())
     sections.push({ key: "transliteration", text: item.transliteration, direction: "ltr" });
-  if ((options.benefit || item.reminder) && item.benefit?.trim())
+  const benefitText = item.benefitEvidence ?? item.benefit;
+  if ((options.benefit || item.reminder) && benefitText?.trim())
     sections.push({
       key: "benefit",
-      text: item.benefit,
-      direction: /[\u0600-\u06ff]/u.test(item.benefit) ? "rtl" : "ltr",
+      text: benefitText,
+      direction: /[\u0600-\u06ff]/u.test(benefitText) ? "rtl" : "ltr",
     });
-  if (item.sourceReference?.trim())
+  const includedBenefit = sections.some((section) => section.key === "benefit");
+  const vocabulary = options.wordMeanings ? (item.wordMeanings ?? []) : [];
+  const mainSource = options.primarySource
+    ? (item.primarySourceReference ?? item.sourceReference)
+    : item.sourceReference;
+  const sources = [
+    (options.sources ?? true) || includedBenefit || item.reminder ? mainSource : undefined,
+    ...vocabulary.map((entry) => entry.source),
+  ].filter((source): source is string => Boolean(source?.trim()));
+  const sourceText = Array.from(new Set(sources)).join("\n");
+  if (sourceText)
     sections.push({
       key: "source",
-      text: item.sourceReference,
-      direction: /[\u0600-\u06ff]/u.test(item.sourceReference) ? "rtl" : "ltr",
+      text: sourceText,
+      direction: /[\u0600-\u06ff]/u.test(sourceText) ? "rtl" : "ltr",
+    });
+  for (const entry of vocabulary)
+    sections.push({
+      key: "wordMeanings",
+      label: entry.word,
+      text: entry.meaning,
+      direction: /[\u0600-\u06ff]/u.test(entry.meaning) ? "rtl" : "ltr",
     });
   if (item.reminder)
     sections.push({
@@ -193,8 +223,12 @@ export function measureShareSection(
   );
   ctx.font = `${section.key === "arabic" ? 500 : 400} ${fontSize}px ${section.direction === "rtl" ? SHARE_ARABIC_FONT : SHARE_UI_FONT}`;
   const lines = wrapShareText(section.text, (value) => ctx.measureText(value).width, width);
-  const labelHeight = section.key === "arabic" ? 0 : 44;
-  return { ...section, lines, fontSize, lineHeight, height: lines.length * lineHeight + labelHeight };
+  ctx.font = `600 32px ${SHARE_ARABIC_FONT}`;
+  const labelLines = section.label
+    ? wrapShareText(section.label, (value) => ctx.measureText(value).width, width)
+    : undefined;
+  const labelHeight = section.key === "arabic" ? 0 : labelLines ? labelLines.length * 53 : 44;
+  return { ...section, lines, labelLines, fontSize, lineHeight, height: lines.length * lineHeight + labelHeight };
 }
 
 /** Complete items are indivisible. Reject incompatible sizes before encoding any image. */
@@ -283,7 +317,9 @@ export function getShareText(
               count: new Intl.NumberFormat(language === "ar" ? "ar-EG" : "en").format(item.repetitionCount ?? 1),
             }),
         ...getShareSections(item, content).map((section) =>
-          section.key === "arabic" ? section.text : `${t(language, `shareStudio.${section.key}`)}\n${section.text}`,
+          section.key === "arabic"
+            ? section.text
+            : `${section.label ?? t(language, `shareStudio.${section.key}`)}\n${section.text}`,
         ),
         item.readingUrl,
       ]

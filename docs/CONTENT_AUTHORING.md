@@ -104,6 +104,16 @@ Changing a page range requires the same independent source review as adding it. 
 
 ## Review checklist
 
+### Optional reviewed sharing details
+
+`sharingBenefitExcerptArabic` / `sharingBenefitExcerptEnglish` must be independently reviewed, contiguous quotations of the corresponding stored narration. Include all conditions needed to understand the benefit; never derive an excerpt from editorial benefit copy or silently shorten it. The export rejects excerpts that do not match the narration exactly. Ordinary benefits remain unavailable until these fields are reviewed. Existing approved long-surah reminders retain their reviewed benefit policy.
+
+`sharingPrimarySourceArabic` / `sharingPrimarySourceEnglish` explicitly identify the independently reviewed primary citation, including its reference number and relevant grading. The sharing boundary never chooses the first resource by splitting punctuation.
+
+`sharingWordMeanings` contains reviewed word/phrase, Arabic explanation, optional reviewed English explanation and source references. Quran exports can reuse only glossary entries actually matched in the passage. English explanations require reviewed translations. Do not use unsourced common-word lists, generate definitions or change devotional wording to fit a card.
+
+These fields are optional static content, not user-authored or synchronized state. Authoring them requires the existing independent content-review process. Sources remain attached to benefit quotations and word explanations.
+
 - Compare Arabic wording, translation, source number, grading, timing, and count against primary or authoritative references.
 - Distinguish a general dua from a practice specifically established for a time or event.
 - Do not promise a reward, protection, or guaranteed response beyond the cited evidence.

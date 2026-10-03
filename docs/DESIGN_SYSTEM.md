@@ -395,6 +395,12 @@ Four tiers, defined by width only. `useLayoutMode` and the CSS media queries in 
 
 ## Change control
 
+### Sharing explanation tiles
+
+Single-zikr Tall exports use a content-dependent height between 1920 and 2920px at 1080px width. Measured type sizes remain fixed; only unused lower space is removed. Footer and independent QR positions follow the actual canvas height. Standard Story, Portrait and Square dimensions remain fixed.
+
+Difficult-word explanations use stable nested tiles in the same zikr panel. The word/phrase is a fully wrapped accent heading above its complete explanation, with measured label and body heights, 20px inter-section spacing and the existing readable export type scale. Citation text follows the supporting sections. The branded header, padded in-panel zikr title, centered count-pill ink and 4px gap remain unchanged; the centered footer is independent of the side QR. A zikr and selected details never split across images. Incompatible formats offer a larger format or complete Text/Link recovery.
+
 ### Phase 78 practical devotional access
 
 - Home exposes six visible semantic links to existing situational collections. Ordinary activation resumes that collection; modified activation retains a real reader URL. The links use stable theme surfaces and 44px-or-larger targets.

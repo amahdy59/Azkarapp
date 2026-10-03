@@ -181,6 +181,20 @@ export interface Zikr {
   benefit: string;
   /** Reviewed Arabic copy for the benefit UI; falls back to the legacy localization table. */
   benefitArabic?: string;
+  /** Independently reviewed, contiguous benefit quotation from the corresponding narration. */
+  sharingBenefitExcerptArabic?: string;
+  sharingBenefitExcerptEnglish?: string;
+  /** Explicit primary reference; never inferred by splitting the legacy citation string. */
+  sharingPrimarySourceArabic?: string;
+  sharingPrimarySourceEnglish?: string;
+  /** Reviewed vocabulary and its own attribution; optional until content review is complete. */
+  sharingWordMeanings?: {
+    word: string;
+    meaningArabic: string;
+    meaningEnglish?: string;
+    sourceReference: string;
+    sourceReferenceArabic?: string;
+  }[];
   repetitionCount: number;
   countLabel?: string;
   sourceReference: string;

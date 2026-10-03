@@ -88,6 +88,9 @@ export function CollectionShareModal({
   const [exportLanguage, setExportLanguage] = useState<AppLanguage>(language);
   const [pronunciation, setPronunciation] = useState(false);
   const [benefit, setBenefit] = useState(false);
+  const [sources, setSources] = useState(true);
+  const [primarySource, setPrimarySource] = useState(true);
+  const [wordMeanings, setWordMeanings] = useState(false);
   const [qr, setQr] = useState(false);
   const [mode, setMode] = useState<"image" | "text" | "link">("image");
   const [inspect, setInspect] = useState(false);
@@ -116,7 +119,10 @@ export function CollectionShareModal({
   const itemsJson = JSON.stringify({ items, shareItems });
   const stableInput = useMemo(() => JSON.parse(itemsJson) as { items: Zikr[]; shareItems?: ShareItem[] }, [itemsJson]);
   const title = (exportLanguage === "ar" ? collectionTitleArabic : collectionTitleEnglish) ?? collectionTitle;
-  const content = useMemo(() => ({ meaning, pronunciation, benefit, qr }), [meaning, pronunciation, benefit, qr]);
+  const content = useMemo(
+    () => ({ meaning, pronunciation, benefit, sources, primarySource, wordMeanings, qr }),
+    [meaning, pronunciation, benefit, sources, primarySource, wordMeanings, qr],
+  );
   const exportItems = useMemo<ShareItem[]>(
     () =>
       (stableInput.shareItems ?? stableInput.items.map((z) => toShareItem(z, exportLanguage))).map((item) =>
@@ -125,6 +131,9 @@ export function CollectionShareModal({
     [stableInput, exportLanguage, single, title],
   );
   const url = single && exportItems[0]?.reminder ? exportItems[0].readingUrl : collectionUrl;
+  const sourceRequired = exportItems.some(
+    (item) => item.reminder || (benefit && (item.benefitEvidence ?? item.benefit)),
+  );
   const text = getShareText(exportItems, exportLanguage, content, title, url);
   const current = pages[active];
   const total = current?.totalPages ?? pages.length;
@@ -500,7 +509,7 @@ export function CollectionShareModal({
                           >
                             {section.key !== "arabic" && (
                               <strong className="block text-sm">
-                                {t(exportLanguage, `shareStudio.${section.key}`)}
+                                {section.label ?? t(exportLanguage, `shareStudio.${section.key}`)}
                               </strong>
                             )}
                             {section.text}
@@ -689,7 +698,25 @@ export function CollectionShareModal({
                   key: "benefit",
                   value: benefit,
                   set: setBenefit,
-                  available: exportItems.some((item) => item.benefit && !item.reminder),
+                  available: exportItems.some((item) => (item.benefitEvidence ?? item.benefit) && !item.reminder),
+                },
+                {
+                  key: "sources",
+                  value: sources || sourceRequired,
+                  set: setSources,
+                  available: exportItems.some((item) => item.sourceReference),
+                },
+                {
+                  key: "wordMeanings",
+                  value: wordMeanings,
+                  set: setWordMeanings,
+                  available: exportItems.some((item) => item.wordMeanings?.length),
+                },
+                {
+                  key: "primarySource",
+                  value: primarySource,
+                  set: setPrimarySource,
+                  available: exportItems.some((item) => item.primarySourceReference),
                 },
                 {
                   key: "qr",
@@ -705,13 +732,16 @@ export function CollectionShareModal({
                       type="checkbox"
                       checked={option.value}
                       onChange={(event) => option.set(event.target.checked)}
-                      disabled={busy}
+                      disabled={busy || (option.key === "sources" && sourceRequired)}
                       className="size-5 accent-primary"
                     />
                     <span>{t(language, `shareStudio.${option.key}`)}</span>
                   </label>
                 ))}
               <p className="text-xs text-muted-foreground">{t(language, "shareStudio.sourceAlways")}</p>
+              {!exportItems.some((item) => item.benefitEvidence || item.reminder) && (
+                <p className="mt-2 text-xs text-muted-foreground">{t(language, "shareStudio.benefitUnavailable")}</p>
+              )}
               {exportItems.some((item) => item.reminder) && (
                 <p className="mt-2 text-xs text-muted-foreground">{t(language, "shareStudio.reminderHint")}</p>
               )}

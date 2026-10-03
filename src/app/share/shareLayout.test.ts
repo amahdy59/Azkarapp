@@ -7,6 +7,7 @@ import {
   ShareFitError,
   getShareUrl,
   layoutSharePages,
+  getShareSections,
   shareGeometry,
   wrapShareText,
   SHARE_DIMENSIONS,
@@ -24,6 +25,22 @@ function context() {
   } as CanvasRenderingContext2D;
 }
 describe("complete share layouts", () => {
+  it("keeps sources opt-out and exposes reviewed vocabulary separately", () => {
+    const item = {
+      id: "reviewed",
+      arabicText: "اللَّهُ لَا إِلَهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ",
+      sourceReference: "Quran 2:255; Tafsir reference",
+      wordMeanings: [{ word: "الْقَيُّومُ", meaning: "القائم بنفسه المقيم لكل ما سواه", source: "Reviewed glossary" }],
+      benefitEvidence: "A reviewed narration-backed benefit.",
+    };
+    expect(getShareSections(item, { wordMeanings: true, benefit: true }).map((section) => section.key)).toEqual([
+      "arabic",
+      "benefit",
+      "source",
+      "wordMeanings",
+    ]);
+    expect(getShareSections(item, { sources: false }).some((section) => section.key === "source")).toBe(false);
+  });
   it("measures the complete title inside its panel before the pill and body", () => {
     const title = "عنوان الذكر ".repeat(18);
     const item = { id: "titled", title, arabicText: "سبحان الله", sourceReference: "Reviewed source" };

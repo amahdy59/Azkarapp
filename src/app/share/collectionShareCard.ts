@@ -122,6 +122,23 @@ export function renderCollectionStoryPage(input: CollectionStoryPageInput): HTML
   }));
   const layout = input.layout ?? layoutSharePages(ctx, items, format, input.content, input.single)[0];
   if (!layout || (!input.layout && layout.totalPages > 1)) throw new RangeError("Items require separate cards.");
+  const totalHeight =
+    layout.fragments.reduce((sum, fragment) => sum + fragment.height, 0) + (layout.fragments.length - 1) * 28;
+  // Tall is a reading format. Preserve measured type and footer clearance while
+  // avoiding an empty lower half on a single complete zikr with explanations.
+  if (format === "tall" && input.single) {
+    const height = Math.min(
+      canvas.height,
+      Math.max(
+        SHARE_DIMENSIONS.story.height,
+        Math.ceil(geometry.top + totalHeight + 48 + canvas.height - geometry.bottom),
+      ),
+    );
+    const removed = canvas.height - height;
+    canvas.height = height;
+    geometry.bottom -= removed;
+    geometry.footer -= removed;
+  }
   ctx.fillStyle = palette.background;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   const wash = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
@@ -151,8 +168,6 @@ export function renderCollectionStoryPage(input: CollectionStoryPageInput): HTML
   if (!input.single && input.collectionSubtitle)
     drawInkTop(ctx, input.collectionSubtitle, 540, geometry.titleY + titleSize + 12);
   else drawOrnateFlourish(ctx, 540, geometry.top - 20, 112, palette.accent);
-  const totalHeight =
-    layout.fragments.reduce((sum, fragment) => sum + fragment.height, 0) + (layout.fragments.length - 1) * 28;
   let y = geometry.top + Math.min(48, Math.max(0, (geometry.bottom - geometry.top - totalHeight) / 2));
   for (const fragment of layout.fragments) {
     const x = 64;
@@ -206,11 +221,16 @@ export function renderCollectionStoryPage(input: CollectionStoryPageInput): HTML
       ctx.direction = section.direction;
       ctx.textAlign = section.direction === "rtl" ? "right" : "left";
       const textX = section.direction === "rtl" ? 968 : 112;
+      if (section.key === "wordMeanings") {
+        fillRoundedRect(ctx, 96, sectionY - 8, 888, section.height + 8, 16, palette.background);
+      }
       if (section.key !== "arabic") {
-        ctx.font = `600 28px ${SHARE_ARABIC_FONT}`;
+        ctx.font = `600 ${section.labelLines ? 32 : 28}px ${SHARE_ARABIC_FONT}`;
         ctx.fillStyle = palette.accent;
-        drawInkTop(ctx, t(language, `shareStudio.${section.key}`), textX, sectionY);
-        sectionY += 44;
+        for (const label of section.labelLines ?? [t(language, `shareStudio.${section.key}`)]) {
+          drawInkTop(ctx, label.trim(), textX, sectionY);
+          sectionY += section.labelLines ? 53 : 44;
+        }
       }
       ctx.font = `${section.key === "arabic" ? 500 : 400} ${section.fontSize}px ${section.direction === "rtl" ? SHARE_ARABIC_FONT : SHARE_UI_FONT}`;
       ctx.fillStyle = section.key === "source" ? palette.secondary : palette.text;
@@ -287,7 +307,9 @@ export async function generateCollectionStoryPage(
     const size = (modules + 8) * unit;
     const x = 64;
     const y = Math.min(
-      shareGeometry(input.format ?? "story").footer - size / 2,
+      shareGeometry(input.format ?? "story").footer -
+        (SHARE_DIMENSIONS[input.format ?? "story"].height - canvas.height) -
+        size / 2,
       canvas.height - (input.format === "story" ? 200 : 40) - size,
     );
     if (y + size <= canvas.height - 40) {

@@ -4059,3 +4059,7 @@ null` shape, so a record written before this change still loads and still
 - **Excluded:** Speaker-based haptics, automatic counting, invented ritual combinations, grace-day quotas, decorative sound/number/sky effects, and generic Arabic typography changes. Badges and a canonical Mushaf ruler remain optional research ideas, not this implementation's acceptance criteria.
 - **Authority:** DEC-216-H's local-only restriction remains; no commit, push, or deployment. Preserve unrelated pending edits.
 - **Verification:** Focused unit tests, Arabic/English narrow/tablet/desktop browser checks, axe scans, screenshots, and repository quality gates. Automated evidence does not establish full manual accessibility compliance.
+
+## SHARE-DETAILS-2026-10-03 — Reviewed sharing choices
+
+The owner approved independent source, difficult-word and benefit options after release of the current visual sharing work. Plain zikr sources default on and may be omitted; benefit and glossary evidence always retains citation, and approved surah reminders keep their mandatory source/Mushaf destination. This explicitly supersedes mandatory citations for plain exports only. Primary references and exact benefit quotations require reviewed metadata; no punctuation-based reference selection, generated benefit summary or unsourced definition is permitted. Existing matched Quran glossary records can be reused without rewriting religious content. Implementation remains local for sample review.
