@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-03",
+  "release": "2026-10-03b",
   "ar": [
     "شارك الأذكار كاملة مع صور وروابط واضحة تحافظ على تقدّم القراءة.",
     "تابع موضعك في السور الطويلة واستأنف القراءة من الصفحة المحفوظة.",
     "استعد للقراءة دون اتصال بتنزيل المصحف والتسجيلات المعتمدة مع إمكانية الاستئناف.",
-    "حسّنا عرض التقدّم اليومي والبستان ليكون أوضح في العربية."
+    "استعدنا محاذاة وأزرار معلومات الصلاة مع تحسينات أوضح للتنقّل والتركيز."
   ],
   "en": [
     "Share complete azkar with clear images and links that preserve reading progress.",
     "Resume long surahs from the saved page and return to the beginning after finishing.",
     "Prepare for offline reading with resumable downloads for the Mushaf and approved recordings.",
-    "Daily progress and garden updates are clearer in Arabic and English."
+    "Prayer information and focus controls are aligned again with clearer navigation feedback."
   ]
 }

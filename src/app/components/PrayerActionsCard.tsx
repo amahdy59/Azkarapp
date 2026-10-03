@@ -103,13 +103,15 @@ export function PrayerActionsCard({
           data-testid="prayer-actions-more-info"
           aria-haspopup="dialog"
           aria-label={t(language, "prayerActions.moreInfoAria", { prayer: infoData.prayerName })}
-          className={`flex size-11 shrink-0 items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+          className={`flex size-11 -me-2.5 shrink-0 items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
             onGlass
               ? "border-white/20 bg-on-media-surface/60 text-white backdrop-blur-md hover:border-white/40 hover:bg-on-media-surface/60"
               : "border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground"
           }`}
         >
-          <Info size={20} aria-hidden="true" />
+          <span aria-hidden="true" className="flex size-6 items-center justify-center rounded-full border-2">
+            <Info size={14} />
+          </span>
         </button>
       </div>
 
