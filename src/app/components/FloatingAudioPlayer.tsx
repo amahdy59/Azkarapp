@@ -169,7 +169,6 @@ export function FloatingAudioPlayer({
     ease: [0.22, 1, 0.36, 1] as const,
   };
   const wasCoveringReading = useRef(coversReading);
-  const [selectedVoiceOverride, setSelectedVoiceOverride] = useState<string | null>(null);
   const [voiceMenuOpen, setVoiceMenuOpen] = useState(false);
   const [speedMenuOpen, setSpeedMenuOpen] = useState(false);
   const [showArabic, setShowArabic] = useState(false);
@@ -179,10 +178,6 @@ export function FloatingAudioPlayer({
   controllerRef.current = controller;
   const timingRef = useRef({ currentTime: state.currentTime, duration: state.duration });
   timingRef.current = { currentTime: state.currentTime, duration: state.duration };
-
-  useEffect(() => {
-    setSelectedVoiceOverride(null);
-  }, [currentEntry?.entryId, state.currentVoiceId]);
 
   useEffect(() => {
     if (readingTextRef.current) readingTextRef.current.scrollTop = 0;
@@ -268,7 +263,7 @@ export function FloatingAudioPlayer({
     return () => window.removeEventListener("keydown", handleWindowKeyDown, true);
   }, [isMinimized, jumpSeconds, state.status, direction]);
 
-  const currentVoiceId = selectedVoiceOverride ?? state.currentVoiceId ?? currentEntry?.defaultVoiceId;
+  const currentVoiceId = state.currentVoiceId ?? currentEntry?.defaultVoiceId;
   const zikrArabicText = currentEntry ? currentEntry.arabicText?.trim() || currentEntry.titleArabic : "";
   const isEnglishMode = language === "en" || currentVoiceId === "english-george";
   const englishFirst = language === "en" && Boolean(currentEntry?.translation?.trim());
@@ -291,7 +286,7 @@ export function FloatingAudioPlayer({
       : null;
   const title = language === "ar" ? currentEntry.titleArabic : currentEntry.titleEnglish;
   const activeVoiceId = state.currentVoiceId ?? currentEntry.defaultVoiceId;
-  const displayedVoiceId = selectedVoiceOverride ?? activeVoiceId;
+  const displayedVoiceId = activeVoiceId;
   const reciterDisplayName =
     (displayedVoiceId === "english-george" ? t(language, "audioPlayer.englishVoiceShort") : null) ??
     getAudioVoiceName(displayedVoiceId, language) ??
@@ -307,7 +302,7 @@ export function FloatingAudioPlayer({
     ...mainVoices.map((voice) => ({
       id: voice.id,
       label: language === "ar" ? voice.nameArabic : voice.nameEnglish,
-      disabled: voice.disabled && !currentEntry.availableVoiceIds.includes(voice.id),
+      disabled: !currentEntry.availableVoiceIds.includes(voice.id),
     })),
     ...extraVoiceIds.map((id) => ({
       id,
@@ -361,6 +356,14 @@ export function FloatingAudioPlayer({
           <span key={index} style={{ height: Math.max(2, Math.pow(peak / 255, amplitudePower) * height) }} />
         ))}
       </div>
+      <div
+        className="audio-seek-waveform-playhead"
+        data-testid={`${testId}-playhead`}
+        style={{
+          height: `${height + 2}px`,
+          insetInlineStart: `clamp(1px, ${progressPercent}%, calc(100% - 1px))`,
+        }}
+      />
     </div>
   );
   // Group adjacent verified peaks to keep the compact preview quiet and legible.
@@ -531,27 +534,24 @@ export function FloatingAudioPlayer({
               <X size={19} aria-hidden="true" />
             </button>
             <div
-              className="audio-expanded-identity flex min-w-0 flex-nowrap items-center justify-center gap-1.5 px-1"
+              className="audio-expanded-identity flex min-w-0 items-center justify-center px-1"
               data-testid="audio-expanded-identity"
             >
               <Select
                 open={voiceMenuOpen}
                 onOpenChange={setVoiceMenuOpen}
                 value={displayedVoiceId}
-                onValueChange={(nextVoiceId) => {
-                  setSelectedVoiceOverride(nextVoiceId);
-                  controller.setVoice(nextVoiceId);
-                }}
+                onValueChange={controller.setVoice}
                 dir={language === "ar" ? "rtl" : "ltr"}
               >
                 <SelectTrigger
                   aria-label={t(language, "audioPlayer.voice")}
                   data-testid="audio-reciter-select"
                   size="sm"
-                  className="h-11 min-w-0 max-w-[11.5rem] sm:max-w-none shrink gap-2 rounded-full border-border-control bg-background px-3 py-1 text-xs font-bold text-foreground shadow-none transition-colors hover:bg-muted focus-visible:ring-[3px] focus-visible:ring-ring"
+                  className="h-11 w-auto min-w-0 max-w-[min(18rem,calc(100vw-7rem))] shrink justify-center gap-2 rounded-full border-border-control bg-background px-3 py-1 text-xs font-bold text-foreground shadow-none transition-colors hover:bg-muted focus-visible:ring-[3px] focus-visible:ring-ring"
                 >
                   <Headphones size={14} className="shrink-0 text-primary" aria-hidden="true" />
-                  <SelectValue className="truncate">{reciterDisplayName}</SelectValue>
+                  <SelectValue className="truncate text-center">{reciterDisplayName}</SelectValue>
                 </SelectTrigger>
                 <SelectContent
                   align="center"
@@ -578,11 +578,6 @@ export function FloatingAudioPlayer({
                   </SelectGroup>
                 </SelectContent>
               </Select>
-              {positionChip && (
-                <span className="shrink-0 whitespace-nowrap text-micro font-bold text-muted-foreground px-1 select-none">
-                  {positionChip}
-                </span>
-              )}
             </div>
             <button
               ref={collapseButtonRef}
@@ -853,6 +848,11 @@ export function FloatingAudioPlayer({
                     <span />
                   </span>
                 </button>
+              )}
+              {positionChip && (
+                <span data-testid="audio-queue-position" className="text-micro font-bold text-muted-foreground">
+                  {t(language, "audioPlayer.track")} <span dir="ltr">{queuePosition}</span>
+                </span>
               )}
               {repetitionProgress && (
                 <span data-testid="audio-repetition-progress" className="text-micro font-bold text-muted-foreground">

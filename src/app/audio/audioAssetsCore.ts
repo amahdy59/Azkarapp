@@ -2281,7 +2281,8 @@ export const CORE_AUDIO_ASSETS: Readonly<Record<string, AudioAsset>> = Object.fr
             byteSize: 458924,
             sha256: "2425600a7cb18be680985c6a3f033aa871e46be224b6067f0b17df1be553a1d3",
             sourceId: "internal-upload-abdullah-muhammad",
-            reviewStatus: "approved",
+            // Hosted bytes fail the approved checksum; replacement needs fresh review.
+            reviewStatus: "rejected",
           },
           {
             id: "e-hm-91-english-george-v1",
@@ -2298,11 +2299,12 @@ export const CORE_AUDIO_ASSETS: Readonly<Record<string, AudioAsset>> = Object.fr
         ],
       },
     ],
-    defaultVoiceId: "abdullah-muhammad",
+    defaultVoiceId: "english-george",
     reviewStatus: "approved",
     reviewedBy: "Ahmed Mahdy",
     reviewedAt: "2026-09-14T00:00:00.000Z",
-    reviewNotes: "Owner-supplied shared morning/evening recording.",
+    reviewNotes:
+      "Arabic delivery withdrawn after hosted SHA-256 mismatch on 2026-10-04. Previously approved English narration remains available; no automatic Arabic fallback.",
     version: 1,
   },
 
@@ -2383,7 +2385,8 @@ export const CORE_AUDIO_ASSETS: Readonly<Record<string, AudioAsset>> = Object.fr
             byteSize: 501164,
             sha256: "00fd8101c7fd047a736e618d8a2c38d1ab73409155d6c53efbd7272e3900b692",
             sourceId: "internal-upload-abdullah-muhammad",
-            reviewStatus: "approved",
+            // Hosted bytes fail the approved checksum; replacement needs fresh review.
+            reviewStatus: "rejected",
           },
           {
             id: "e-hm-96-english-george-v1",
@@ -2400,11 +2403,12 @@ export const CORE_AUDIO_ASSETS: Readonly<Record<string, AudioAsset>> = Object.fr
         ],
       },
     ],
-    defaultVoiceId: "abdullah-muhammad",
+    defaultVoiceId: "english-george",
     reviewStatus: "approved",
     reviewedBy: "Ahmed Mahdy",
     reviewedAt: "2026-09-14T00:00:00.000Z",
-    reviewNotes: "Owner-supplied shared morning/evening recording.",
+    reviewNotes:
+      "Arabic delivery withdrawn after hosted SHA-256 mismatch on 2026-10-04. Previously approved English narration remains available; no automatic Arabic fallback.",
     version: 1,
   },
 

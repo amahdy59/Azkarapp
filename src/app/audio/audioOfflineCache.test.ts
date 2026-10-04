@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { downloadAudioForZikrs, getDownloadedAudioSummary, removeDownloadedAudio } from "./audioOfflineCache";
 import { DEFAULT_AUDIO_PREFERENCES } from "./audioPreferences";
+import { ALL_AZKAR } from "../content/azkar";
 
 const REGISTRY_KEY = "azkar.audio-downloads.v1";
 
@@ -34,6 +35,22 @@ function makeStorageFull() {
 }
 
 describe("audio offline cache registry writes", () => {
+  it("omits quarantined Arabic recordings without silently downloading English narration", async () => {
+    installCaches();
+    const fetch = vi.fn();
+    vi.stubGlobal("fetch", fetch);
+    try {
+      const zikrs = ALL_AZKAR.filter((zikr) => ["m-hm-91", "m-hm-96"].includes(zikr.id));
+      expect(zikrs).toHaveLength(2);
+      await expect(downloadAudioForZikrs(zikrs, DEFAULT_AUDIO_PREFERENCES)).resolves.toEqual({
+        assetCount: 0,
+        byteSize: 0,
+      });
+      expect(fetch).not.toHaveBeenCalled();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
   beforeEach(() => {
     window.localStorage.clear();
   });

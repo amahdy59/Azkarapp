@@ -194,6 +194,28 @@ function QueueHarness({ queue }: { queue: PlaybackPlan }) {
 }
 
 describe("AudioProvider integration", () => {
+  it("rejects an unavailable voice without changing playback or saved voice preferences", async () => {
+    vi.stubGlobal("Audio", FakeAudio);
+    let controller!: ReturnType<typeof useAudioController>;
+    function VoiceHarness() {
+      controller = useAudioController();
+      return null;
+    }
+    render(
+      <AudioProvider>
+        <VoiceHarness />
+      </AudioProvider>,
+    );
+    act(() => controller.startPlan(plan));
+    await waitFor(() => expect(controller.state.status).toBe("playing"));
+    const preferences = { ...controller.preferences };
+    const source = FakeAudio.latest!.src;
+    act(() => controller.setVoice("english-george"));
+    expect(controller.state.currentVoiceId).toBe("voice");
+    expect(controller.preferences).toEqual(preferences);
+    expect(FakeAudio.latest!.src).toBe(source);
+    expect(controller.state.status).toBe("playing");
+  });
   it("stops after a complete prescribed run with auto-advance off but permits manual queue navigation without completing skips", async () => {
     vi.stubGlobal("Audio", FakeAudio);
     const queue: PlaybackPlan = {

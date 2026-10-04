@@ -56,6 +56,13 @@ function getDownloadVariants(zikrs: readonly Zikr[], preferences: AudioPreferenc
     const resolution = resolveAudioAsset(zikr);
     if (!resolution.available) continue;
     const voiceId = getPreferredVoiceId(resolution, preferences);
+    // Partial coverage must not substitute English narration in an Arabic
+    // download (or Arabic recitation in an English narration download).
+    if (
+      resolution.asset.contentKind === "dua" &&
+      (voiceId === "english-george") !== (preferences.duaVoiceId === "english-george")
+    )
+      continue;
     for (const segment of resolution.asset.segments) {
       const variant = segment.variants.find(
         (candidate) => candidate.voiceId === voiceId && candidate.reviewStatus === "approved",

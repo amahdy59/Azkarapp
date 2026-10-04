@@ -121,6 +121,32 @@ for (const scenario of [
     await expand.focus();
     await page.keyboard.press("Enter");
     await expect(player).toHaveAttribute("data-variant", "expanded");
+    await expect(player.getByTestId("audio-queue-position")).toBeVisible();
+    await expect(player.getByTestId("audio-expanded-identity")).not.toContainText(arabic ? "المقطع" : "Track");
+    const waveformContrast = await player.getByTestId("audio-seek-waveform").evaluate((element) => {
+      const canvas = document.createElement("canvas");
+      canvas.width = canvas.height = 1;
+      const context = canvas.getContext("2d")!;
+      const surface = element.closest(".audio-player-surface")!;
+      context.fillStyle = getComputedStyle(surface).backgroundColor;
+      context.fillRect(0, 0, 1, 1);
+      const background = Array.from(context.getImageData(0, 0, 1, 1).data).slice(0, 3);
+      context.fillStyle = getComputedStyle(element.querySelector(":scope > span")!).backgroundColor;
+      context.fillRect(0, 0, 1, 1);
+      const track = Array.from(context.getImageData(0, 0, 1, 1).data).slice(0, 3);
+      const luminance = (rgb: number[]) =>
+        rgb.reduce((sum, channel, index) => {
+          const value = channel / 255;
+          return (
+            sum +
+            (value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4) * [0.2126, 0.7152, 0.0722][index]!
+          );
+        }, 0);
+      const a = luminance(background);
+      const b = luminance(track);
+      return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+    });
+    expect(waveformContrast).toBeGreaterThanOrEqual(3);
     await expect(page.getByRole("dialog")).toHaveCount(0);
     await expect(page.getByTestId("audio-attribution-trigger")).toHaveCount(0);
     await expect

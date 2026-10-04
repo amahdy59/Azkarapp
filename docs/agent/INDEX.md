@@ -181,3 +181,5 @@ Apple/Microsoft-informed control spacing and alignment improvements.
 [Latest changes review and release](phases/LATEST_CHANGES_REVIEW_RELEASE.md) records the combined review, necessary accessibility/build repairs and owner-authorized publication.
 
 [Arabic audio direction and text transition release](phases/ARABIC_AUDIO_AND_TEXT_TRANSITIONS.md) records the owner-approved review repairs, revised RTL media contract, reading-only motion and release verification.
+
+[Recent review hardening](phases/RECENT_REVIEW_HARDENING.md) records the owner-approved availability/identity and contrast fixes, footer queue position, selective audio quarantine and release verification while retaining the owner's current refinements.

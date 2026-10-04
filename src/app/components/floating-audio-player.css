@@ -51,10 +51,6 @@
   margin: 0 16px 8px;
 }
 
-.audio-compact-progress .audio-seek-waveform > span {
-  opacity: 0.65;
-}
-
 .audio-compact-progress .audio-seek-waveform > span,
 .audio-compact-progress .audio-seek-waveform-played > span {
   width: 3px;
@@ -151,8 +147,9 @@
   height: 2.75rem;
   min-height: 2.75rem;
   white-space: nowrap;
-  padding-inline: 8px;
+  padding-inline: 12px;
   gap: 6px;
+  justify-content: center;
 }
 
 [data-testid="audio-reciter-select"] > svg {
@@ -166,6 +163,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-align: center;
 }
 
 .audio-speed-select [data-slot="select-value"] {
@@ -189,14 +187,54 @@
   width: 2px;
   flex: 1 1 0;
   border-radius: 9999px;
-  /* Unplayed bars: a gentle primary tint over muted-foreground so the played
-     (primary-colored) portion reads as clearly "ahead" vs "already heard". */
-  background: color-mix(in srgb, var(--primary) 18%, var(--muted-foreground));
+  /* Keep the functional track visible against every theme's reading surface.
+     The primary played bars and playhead distinguish the elapsed portion. */
+  background: color-mix(in srgb, var(--muted-foreground) 65%, transparent);
 }
 .audio-seek-waveform-played > span {
   /* Played bars use the full primary color at full opacity for clear progress. */
   background: var(--primary);
   opacity: 1;
+}
+
+.audio-seek-waveform-playhead {
+  position: absolute;
+  top: 50%;
+  width: 2px;
+  border-radius: 9999px;
+  background: var(--primary);
+  margin-inline-start: -1px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 2;
+  box-shadow: 0 0 4px color-mix(in srgb, var(--primary) 45%, transparent);
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.audio-seek-control:hover .audio-seek-waveform-playhead,
+.audio-seek-control:focus-within .audio-seek-waveform-playhead {
+  transform: translateY(-50%) scaleY(1.15);
+  box-shadow: 0 0 6px var(--primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .audio-seek-waveform-playhead {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .audio-seek-waveform > span {
+    background: GrayText;
+  }
+  .audio-seek-waveform-played > span {
+    background: Highlight;
+  }
+  .audio-seek-waveform-playhead {
+    background: Highlight;
+  }
 }
 .audio-seek-control--waveform .audio-timeline-range::-webkit-slider-runnable-track {
   background: transparent;

@@ -543,15 +543,15 @@ export function AudioProvider({
     (voiceId: string) => {
       const current = stateRef.current;
       const entry = current.plan?.entries[current.entryIndex];
-      updatePreferences({
-        ...preferencesRef.current,
-        duaVoiceId: voiceId,
-        ...(entry?.contentKind === "quran" ? { quranReciterId: voiceId } : {}),
-      });
       if (!current.plan || !entry) return;
       const nextPlan = enrichPlanVoices(current.plan);
       const nextEntry = nextPlan.entries[current.entryIndex];
       if (!nextEntry?.availableVoiceIds.includes(voiceId)) return;
+      updatePreferences({
+        ...preferencesRef.current,
+        duaVoiceId: voiceId,
+        ...(entry.contentKind === "quran" ? { quranReciterId: voiceId } : {}),
+      });
       loadAt(
         nextPlan,
         current.entryIndex,

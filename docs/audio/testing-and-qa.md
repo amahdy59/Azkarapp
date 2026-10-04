@@ -52,4 +52,12 @@ Check one progress control, media direction consistently RTL in Arabic and LTR i
 
 - Confirm the collapsed Reader panel reaches the main canvas bottom within 1px at all tiers and 200% text. Safe-area padding belongs inside its surface; no counter-footer gap remains below audio. Check the fuller rounded compact waveform uses actual recording progress without a second line or slider.
 
-Local pnpm check uses metadata-only audio validation; pnpm validate:audio retains full hosted probes and is required separately in Quality CI. Audio-authoring verification still runs the live command. The English voice display label is English Translation; source metadata retains the original narrator identity. Current repetition progress belongs in the expanded footer, separate from header queue position.
+Local pnpm check uses metadata-only audio validation; pnpm validate:audio retains full hosted probes and is required separately in Quality CI. Audio-authoring verification still runs the live command. The English voice display label is English Translation; source metadata retains the original narrator identity. Queue position and current repetition progress belong separately in the expanded footer; the header centers the reciter alone.
+
+## Review hardening — 2026-10-04
+
+- Verify unavailable entry voices are disabled and rejected controller calls cannot change playback, visible identity or saved preferences. A requested voice is displayed only after controller acceptance.
+- Verify unplayed waveform bars retain at least 3:1 contrast against the reading surface in Light, Midnight and Dark. Played bars and the owner's playhead retain distinct primary color, forced-color support and reduced motion.
+- Arabic variants `m-hm-91-abdullah-muhammad-v1` and `m-hm-96-abdullah-muhammad-v1` fail fresh full-byte SHA-256 checks. They are rejected delivery variants, not newly approved content; their expected hashes remain unchanged. All five shared entries keep approved English playback and local reading/counting. Arabic plans/downloads omit those variants, and manifest 7 invalidates the older cache registry.
+- Restore Arabic playback only after reviewed replacement bytes are published at immutable versioned paths with new approval, metadata and manifest version. Do not relabel the mismatched bytes by changing their expected hash.
+- Physical iOS/Android safe-area, lock-screen, background audio and VoiceOver/TalkBack review remain pending human evidence. Use the manual checklist above and record device, OS/browser, date, tester and result. Browser emulation and axe do not close these requirements.

@@ -96,7 +96,7 @@ for (const language of ["ar", "en"] as const) {
   });
 }
 
-test("100-count istighfar offers prescribed repeat and shows each repetition", async ({ page }) => {
+test("100-count tawhid offers prescribed repeat and shows each repetition", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.addInitScript(() => {
     localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
@@ -140,8 +140,10 @@ test("100-count istighfar offers prescribed repeat and shows each repetition", a
     }
     Object.defineProperty(window, "Audio", { value: TestAudio });
   });
-  await page.goto("/#/azkar/morning/24");
-  await expect(page.getByTestId("reader-screen")).toHaveAttribute("data-zikr-id", "m-hm-96");
+  // Preserve the Arabic Repeat action coverage using a currently approved
+  // 100-count recording; the withdrawn istighfar variant is covered separately.
+  await page.goto("/#/azkar/morning/22");
+  await expect(page.getByTestId("reader-screen")).toHaveAttribute("data-zikr-id", "m-hm-93");
   await page.getByRole("button", { name: "Reader options", exact: true }).click();
   await page.getByRole("menuitem", { name: "Repeat prescribed count", exact: true }).click();
   const player = page.getByRole("region", { name: "Audio player", exact: true });

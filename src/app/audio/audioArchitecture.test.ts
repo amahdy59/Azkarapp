@@ -74,6 +74,24 @@ function catalogFor(zikrs: readonly Zikr[], voices = ["voice-a"]): { catalog: Au
 }
 
 describe("explicit audio content architecture", () => {
+  it("quarantines mismatched Arabic recordings while preserving reading and approved English narration", () => {
+    for (const id of ["m-hm-91", "e-hm-91", "misc-ref-3", "m-hm-96", "e-hm-96"]) {
+      const zikr = ALL_AZKAR.find((item) => item.id === id)!;
+      expect(zikr, id).toBeDefined();
+      expect(zikr.arabicText).not.toBe("");
+      const resolution = resolveAudioAsset(zikr);
+      expect(resolution.available).toBe(true);
+      if (resolution.available) expect(resolution.availableVoiceIds).toEqual(["english-george"]);
+      const options = {
+        zikrs: [zikr],
+        context: { category: zikr.category, source: "single" as const, routineMode: "complete" as const },
+      };
+      expect(buildPlaybackPlan({ ...options, audioLanguage: "ar" }).entries).toHaveLength(0);
+      const english = buildPlaybackPlan({ ...options, audioLanguage: "en" });
+      expect(english.entries).toHaveLength(1);
+      expect(english.entries[0]?.availableVoiceIds).toEqual(["english-george"]);
+    }
+  });
   it("links reviewed before-sleep recordings", () => {
     const expectedAssignments = [
       "s-hm-100",
