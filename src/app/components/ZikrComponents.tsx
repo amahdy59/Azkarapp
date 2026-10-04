@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { progressFillStyle } from "./progressFillStyle";
 import "./ZikrComponents.css";
 import { Check, HandTap } from "./icons";
 import { counterNumeralFontFamily, formatNumerals } from "../formatting";
@@ -78,13 +79,13 @@ export function CounterRing({ count, total, size = 160 }: { count: number; total
 }
 
 export function CounterOutlineProgress({ count, total }: { count: number; total: number }) {
-  const progress = total > 0 ? Math.min(1, count / total) : 0;
+  const progress = total > 0 ? Math.max(0, Math.min(1, count / total)) : 0;
 
   return (
     <span className="counter-outline-progress" aria-hidden="true">
       <span
-        className="counter-progress-fill"
-        style={{ inlineSize: `${progress * 100}%`, borderInlineEndWidth: progress > 0 ? 2 : 0 }}
+        className="counter-progress-fill progress-fill-transform"
+        style={{ ...progressFillStyle(progress), borderInlineEndWidth: progress > 0 ? 2 : 0 }}
       />
     </span>
   );
@@ -222,16 +223,13 @@ export function ZikrCounterSurface({
             </span>
           </div>
         ) : isSingleAction ? (
-          <span
-            className="min-w-0 max-w-full text-title font-bold leading-none text-current [overflow-wrap:anywhere]"
-            dir="auto"
-          >
+          <span className="counter-action-label text-sm font-bold leading-none text-current" dir="auto">
             {actionLabel || activeInstruction}
           </span>
         ) : (
           <p
-            className="text-2xl font-black leading-none text-current"
-            dir="ltr"
+            className="inline-flex items-center gap-0.5 text-xl font-black leading-none text-current"
+            dir={isArabic ? "rtl" : "ltr"}
             style={{
               fontFamily: counterNumeralFontFamily(language),
               fontVariantNumeric: "tabular-nums lining-nums",
@@ -241,10 +239,10 @@ export function ZikrCounterSurface({
               {localizedCount}
             </bdi>
             {total > 0 && (
-              <span>
-                {" "}
-                / <bdi dir="ltr">{localizedTotal}</bdi>
-              </span>
+              <>
+                <span aria-hidden="true">/</span>
+                <bdi dir="ltr">{localizedTotal}</bdi>
+              </>
             )}
           </p>
         )}

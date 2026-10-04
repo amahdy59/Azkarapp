@@ -279,9 +279,7 @@ export function ResponsiveSheet({
         aria-describedby={describedById}
         dir={direction}
         className={`fixed inset-x-0 bottom-0 z-[100] mx-auto flex w-full max-w-lg flex-col rounded-t-3xl outline-none focus-visible:outline-none max-h-[88vh] pb-safe ${
-          onGlass
-            ? "hero-glass home-glass-surface text-white"
-            : "border-t border-border/40 bg-background shadow-overlay"
+          onGlass ? "hero-glass home-glass-surface text-white" : "border-t border-border/40 bg-card shadow-overlay"
         } ${drawerClassName}`.trim()}
       >
         <DrawerTitle className="sr-only">{title}</DrawerTitle>

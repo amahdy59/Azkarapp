@@ -225,7 +225,9 @@ describe("KhatmahReaderScreen wird progress", () => {
 
     const backSvg = backBtn.querySelector("svg");
     expect(backSvg).toBeInTheDocument();
-    expect(backSvg).not.toHaveAttribute("data-rtl-flip");
+    // Exit follows the interface Back convention; physical page-turn controls
+    // retain their separate Quran navigation contract.
+    expect(backSvg).toHaveAttribute("data-rtl-flip", "");
 
     expect(screen.queryByTestId("mushaf-settings-trigger")).not.toBeInTheDocument();
   });

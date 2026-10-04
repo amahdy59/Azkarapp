@@ -20,12 +20,6 @@ import { useCallback, useState, type CSSProperties, type MouseEvent, type Pointe
  * the numbers here is what let the reader drift to 0.985/300ms in the first
  * place, and a second copy would drift again.
  */
-function motionToken(name: string, fallback: string): string {
-  if (typeof window === "undefined") return fallback;
-  const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-  return value || fallback;
-}
-
 export const COUNTING_PRESS = {
   /** Matches --motion-scale-pressed. */
   scale: 0.97,
@@ -86,8 +80,8 @@ export function useCountingSurface({ onCount, reduceMotion = false }: UseCountin
     // Down fast, back slowly through an overshoot — the asymmetry is what makes
     // the surface feel sprung rather than resized. Same tokens as every button.
     transition: isPressed
-      ? `transform ${motionToken("--motion-duration-press", "90ms")} ${motionToken("--motion-ease-standard", "cubic-bezier(0.2, 0, 0, 1)")}`
-      : `transform ${motionToken("--motion-duration-release", "420ms")} ${motionToken("--motion-ease-release", "cubic-bezier(0.34, 1.56, 0.64, 1)")}`,
+      ? "transform var(--motion-duration-press, 90ms) var(--motion-ease-standard, cubic-bezier(0.2, 0, 0, 1))"
+      : "transform var(--motion-duration-release, 420ms) var(--motion-ease-release, cubic-bezier(0.34, 1.56, 0.64, 1))",
   };
 
   return {

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { AuthenticZikrPicker } from "../components/AuthenticZikrPicker";
+import { DevotionalAction, DevotionalFooter } from "../components/DevotionalControls";
 import { CounterTargetPicker } from "../components/CounterTargetPicker";
 import { ArrowPrevious, Check, Lightbulb, MoreVertical, Play, RotateCcw, Volume2, VolumeX } from "../components/icons";
 import { ReadingScreenChrome } from "../components/ReadingScreenChrome";
@@ -418,12 +419,9 @@ export function CustomCounterScreen({
               <CounterTapHint text={t(language, "reader.tapAnywhere")} />
               <footer className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
                 <div data-testid="reader-counter-stack">
-                  <div
-                    className="reader-dock devotional-footer flex flex-col items-center gap-3"
-                    data-testid="reader-dock"
-                  >
+                  <DevotionalFooter>
                     <div className="flex w-full items-center justify-center gap-3">
-                      <button
+                      <DevotionalAction
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -433,11 +431,10 @@ export function CustomCounterScreen({
                         aria-label={t(language, "counter.virtueReference")}
                         title={t(language, "counter.virtueReference")}
                         data-testid="custom-counter-benefit-dock-button"
-                        className="devotional-secondary-action flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-border/60 bg-card px-2 text-foreground transition-colors duration-fast hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                       >
                         <Lightbulb size={20} aria-hidden="true" />
                         <span className="text-label font-semibold">{t(language, "reader.referencesButton")}</span>
-                      </button>
+                      </DevotionalAction>
                     </div>
                     <div className="w-full pb-1" data-testid="counter-panel">
                       <div className="adaptive-counter-row flex w-full items-center justify-center gap-2.5">
@@ -456,7 +453,7 @@ export function CustomCounterScreen({
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </DevotionalFooter>
                   <div>
                     <CounterShortcutHints
                       language={language}

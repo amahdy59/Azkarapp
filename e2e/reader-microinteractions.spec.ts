@@ -58,20 +58,16 @@ for (const language of ["ar", "en"] as const) {
       await page.goto(`/#/azkar/morning/${index + 1}`);
       const heading = page.getByTestId("reader-zikr-title");
       const toggle = page.getByRole("switch", {
-        name: language === "ar" ? "تظليل الكلمات الغريبة" : "Highlight difficult words",
+        name: language === "ar" ? "كلمات غريبة" : "Rare words",
       });
       await expect(heading).toHaveText(language === "ar" ? "آية الكرسي" : "Ayah Al-Kursi");
       await expect(toggle).toBeVisible();
       const titleBounds = (await heading.boundingBox())!;
       const toggleBounds = (await toggle.boundingBox())!;
-      if (language === "en" && width === 320) {
-        // The longer English control label needs the documented wrap fallback.
-        expect(toggleBounds.y).toBeGreaterThanOrEqual(titleBounds.y + titleBounds.height);
-      } else {
-        expect(
-          Math.abs(titleBounds.y + titleBounds.height / 2 - toggleBounds.y - toggleBounds.height / 2),
-        ).toBeLessThan(2);
-      }
+
+      expect(Math.abs(titleBounds.y + titleBounds.height / 2 - toggleBounds.y - toggleBounds.height / 2)).toBeLessThan(
+        2,
+      );
       expect(toggleBounds.height).toBeGreaterThanOrEqual(44);
       expect(
         titleBounds.x + titleBounds.width <= toggleBounds.x ||
@@ -89,14 +85,39 @@ for (const language of ["ar", "en"] as const) {
     await page.evaluate(() => {
       document.documentElement.style.fontSize = "200%";
     });
-    await expect(page.getByTestId("reader-zikr-title")).toBeVisible();
+    const enlargedTitle = page.getByTestId("reader-zikr-title");
+    await expect(enlargedTitle).toBeVisible();
     const enlargedToggle = page.getByRole("switch", {
-      name: language === "ar" ? "تظليل الكلمات الغريبة" : "Highlight difficult words",
+      name: language === "ar" ? "كلمات غريبة" : "Rare words",
     });
     await expect(enlargedToggle).toBeVisible();
     const bounds = (await enlargedToggle.boundingBox())!;
+    const titleBounds = (await enlargedTitle.boundingBox())!;
+    expect(titleBounds.width).toBeGreaterThan(0);
+    expect(titleBounds.x).toBeGreaterThanOrEqual(0);
+    expect(titleBounds.x + titleBounds.width).toBeLessThanOrEqual(320);
+    expect(
+      titleBounds.x + titleBounds.width <= bounds.x ||
+        bounds.x + bounds.width <= titleBounds.x ||
+        titleBounds.y + titleBounds.height <= bounds.y ||
+        bounds.y + bounds.height <= titleBounds.y,
+    ).toBe(true);
     expect(bounds.x).toBeGreaterThanOrEqual(0);
     expect(bounds.x + bounds.width).toBeLessThanOrEqual(320);
+    await page.screenshot({ path: `output/playwright/reader-title/${language}-320-enlarged-title.png` });
+    const reading = page.getByRole("region", { name: language === "ar" ? "نص الذكر" : "Zikr reading text" });
+    await expect(reading).toBeVisible();
+    expect((await reading.boundingBox())!.height).toBeGreaterThanOrEqual(128);
+    await reading.scrollIntoViewIfNeeded();
+    await page.screenshot({ path: `output/playwright/reader-title/${language}-320-enlarged-reading.png` });
+    await reading.focus();
+    await reading.press("End");
+    await expect
+      .poll(() => reading.evaluate((element) => element.scrollTop + element.clientHeight >= element.scrollHeight - 2))
+      .toBe(true);
+    const count = page.getByTestId("counter-surface");
+    await count.scrollIntoViewIfNeeded();
+    await expect(count).toBeInViewport();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     await page.screenshot({ path: `output/playwright/reader-title/${language}-320-enlarged.png` });
   });
@@ -138,12 +159,15 @@ async function expectFillToStartAt(progress: ReturnType<Page["getByRole"]>, dire
     expect(fillBox).not.toBeNull();
     if (!trackBox || !fillBox) return;
 
-    expect(fillBox.width).toBeGreaterThan(0);
-    expect(fillBox.width).toBeLessThan(trackBox.width);
+    const visibleStart = Math.max(fillBox.x, trackBox.x);
+    const visibleEnd = Math.min(fillBox.x + fillBox.width, trackBox.x + trackBox.width);
+    const visibleWidth = visibleEnd - visibleStart;
+    expect(visibleWidth).toBeGreaterThan(0);
+    expect(visibleWidth).toBeLessThan(trackBox.width);
     if (direction === "rtl") {
-      expect(Math.abs(fillBox.x + fillBox.width - (trackBox.x + trackBox.width))).toBeLessThanOrEqual(1);
+      expect(Math.abs(visibleEnd - (trackBox.x + trackBox.width))).toBeLessThanOrEqual(1);
     } else {
-      expect(Math.abs(fillBox.x - trackBox.x)).toBeLessThanOrEqual(1);
+      expect(Math.abs(visibleStart - trackBox.x)).toBeLessThanOrEqual(1);
     }
   }).toPass();
 }
@@ -511,7 +535,7 @@ async function openAyatAlKursi(page: Page) {
 test("short surahs expose sourced difficult-word help", async ({ page }) => {
   await openAyatAlKursi(page);
 
-  await page.getByRole("switch", { name: /difficult words/i }).click();
+  await page.getByRole("switch", { name: "Rare words", exact: true }).click();
 
   const counter = page.getByTestId("counter-surface");
 
@@ -941,7 +965,7 @@ test("the reader's text-size control resizes the zikr and never goes below the f
 test("a highlighted Qur'an word is the same size as the ayah around it", async ({ page }) => {
   await openAyatAlKursi(page);
 
-  await page.getByRole("switch", { name: /difficult words/i }).click();
+  await page.getByRole("switch", { name: "Rare words", exact: true }).click();
 
   const paragraph = page.getByTestId("zikr-text").first();
   await expect(paragraph).toBeVisible();
@@ -961,14 +985,19 @@ test("a highlighted Qur'an word is the same size as the ayah around it", async (
       paragraphLeading: paragraphStyle.lineHeight,
       wordLeading: wordStyle.lineHeight,
       wordWeight: wordStyle.fontWeight,
+      paragraphWeight: paragraphStyle.fontWeight,
+      wordDecoration: wordStyle.textDecorationStyle,
     };
   });
 
-  if (!metrics) return;
+  expect(metrics).not.toBeNull();
+  if (!metrics) throw new Error("Expected an annotated Quran word");
   expect(metrics.wordSize).toBe(metrics.paragraphSize);
   expect(metrics.wordLeading).toBe(metrics.paragraphLeading);
-  // The highlight is still carried by weight and colour, not by size.
-  expect(Number(metrics.wordWeight)).toBeGreaterThan(500);
+  // The current contract uses tint and dotted underline, preserving the
+  // surrounding verse weight as well as its size and line spacing.
+  expect(metrics.wordWeight).toBe(metrics.paragraphWeight);
+  expect(metrics.wordDecoration).toBe("dotted");
 });
 
 test("the show all zikr button in reader menu navigates to the category collection view", async ({ page }) => {

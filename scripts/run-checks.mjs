@@ -5,7 +5,7 @@
  * linting, type-checking, the unit suite and the production build strictly one
  * after another. None of those five reads another's output, so they run
  * together here; only the bundle and CSS budgets have a real dependency, on
- * `dist/`, and they still wait for the build.
+ * the isolated build output, and they still wait for the build.
  *
  * Every stage's output is buffered and printed whole, so parallel runs do not
  * interleave into unreadable soup. All stages run to completion even after one
@@ -28,11 +28,13 @@ import os from "node:os";
 const MAX_CONCURRENT_STAGES = Math.max(2, Math.min(3, Math.floor(os.cpus().length / 4)));
 
 const TOOLCHAIN = { name: "toolchain", command: "node scripts/verify-toolchain.mjs" };
+const buildDirectory = `output/check-build-${process.pid}`;
 
 const CONCURRENT = [
   // Longest first, so the pool is never left holding only the slow one.
-  { name: "unit tests", command: "vitest run --coverage" },
-  { name: "build", command: "vite build" },
+  // Concurrent local checks must not share Vitest's transient coverage files.
+  { name: "unit tests", command: `vitest run --coverage --coverage.reportsDirectory=coverage/check-${process.pid}` },
+  { name: "build", command: `vite build --outDir ${buildDirectory}` },
   { name: "typecheck", command: "tsc --noEmit" },
   { name: "lint", command: "eslint . --max-warnings 0" },
   { name: "format", command: "prettier --check ." },
@@ -40,10 +42,10 @@ const CONCURRENT = [
   { name: "type scale", command: "node scripts/check-type-scale.mjs" },
 ];
 
-// These read dist/, so they cannot start until the build has finished.
+// These read this run's build output, so they wait until its build has finished.
 const AFTER_BUILD = [
-  { name: "bundle budget", command: "node scripts/check-bundle-budget.mjs" },
-  { name: "css utilities", command: "node scripts/check-css-utilities.mjs" },
+  { name: "bundle budget", command: `node scripts/check-bundle-budget.mjs ${buildDirectory}` },
+  { name: "css utilities", command: `node scripts/check-css-utilities.mjs ${buildDirectory}` },
 ];
 
 function run({ name, command }) {

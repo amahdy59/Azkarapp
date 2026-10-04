@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const audioMocks = vi.hoisted(() => ({
@@ -55,6 +55,29 @@ describe("DownloadsPanel", () => {
     expect(screen.queryByText(/raw cache/i)).not.toBeInTheDocument();
   });
 
+  it("waits for initial storage status before allowing a download to start", async () => {
+    let resolveStorage!: (estimate: StorageEstimate) => void;
+    const storage = new Promise<StorageEstimate>((resolve) => {
+      resolveStorage = resolve;
+    });
+    vi.mocked(navigator.storage.estimate).mockReturnValueOnce(storage);
+    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    const mushaf = screen.getByRole("button", { name: "Download complete Mushaf" });
+    const audio = screen.getByRole("button", { name: /Morning Core/i });
+    expect(mushaf).toBeDisabled();
+    expect(audio).toBeDisabled();
+    fireEvent.click(mushaf);
+    fireEvent.click(audio);
+    const { downloadMushaf } = await import("../../content/mushafOfflineCache");
+    expect(downloadMushaf).not.toHaveBeenCalled();
+    expect(audioMocks.download).not.toHaveBeenCalled();
+    await act(async () => resolveStorage({ usage: 1024, quota: 4096 }));
+    await waitFor(() => expect(mushaf).toBeEnabled());
+    expect(audio).toBeEnabled();
+    fireEvent.click(audio);
+    expect(await screen.findByRole("alert")).toHaveTextContent("Free some space or reconnect");
+  });
+
   it("handles Mushaf download progress and cancellation independently without affecting audio", async () => {
     Object.defineProperty(navigator, "storage", {
       configurable: true,
@@ -76,6 +99,7 @@ describe("DownloadsPanel", () => {
     render(<DownloadsPanel language="en" onBack={vi.fn()} />);
 
     const downloadMushafBtn = await screen.findByRole("button", { name: "Download complete Mushaf" });
+    await waitFor(() => expect(downloadMushafBtn).toBeEnabled());
     fireEvent.click(downloadMushafBtn);
 
     // Shows progress and cancel button
@@ -94,7 +118,9 @@ describe("DownloadsPanel", () => {
   it("does not start a Mushaf download when estimated storage is insufficient", async () => {
     const { downloadMushaf } = await import("../../content/mushafOfflineCache");
     render(<DownloadsPanel language="en" onBack={vi.fn()} />);
-    fireEvent.click(await screen.findByRole("button", { name: "Download complete Mushaf" }));
+    const downloadMushafBtn = await screen.findByRole("button", { name: "Download complete Mushaf" });
+    await waitFor(() => expect(downloadMushafBtn).toBeEnabled());
+    fireEvent.click(downloadMushafBtn);
     expect(await screen.findByRole("alert")).toHaveTextContent(/space/i);
     expect(downloadMushaf).not.toHaveBeenCalled();
   });

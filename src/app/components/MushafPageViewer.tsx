@@ -1116,12 +1116,9 @@ export function MushafPageViewer({
       return;
     }
     if (shouldReduceMotion(reduceMotion)) {
-      const animation = paper.animate([{ opacity: 0.4 }, { opacity: 1 }], {
-        duration: 160,
-        easing: "ease-out",
-        fill: "both",
-      });
-      return () => animation.cancel();
+      // Keep the reading surface and its controls at full contrast throughout
+      // a reduced-motion page change, including late font/layout updates.
+      return;
     }
     const travel = pageTransitionDirection === "forward" ? "-28px" : "28px";
     const animation = paper.animate(

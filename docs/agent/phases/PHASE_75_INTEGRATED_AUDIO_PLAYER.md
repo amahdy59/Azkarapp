@@ -1,5 +1,7 @@
 # Phase Report — Phase 75: Integrated expanded audio player
 
+Historical report: the owner’s 2026-10-04 follow-up supersedes this phase’s player-attribution requirement. Current players show only the reciter name; optional credits belong in Settings → About. See AUDIO_PLAYER_REFINEMENT.md and the decision log.
+
 ## Objective
 
 Replace the expanded audio modal with an integrated responsive listening canvas, remove the redundant information icon, and support the existing prescribed counts above ten. Keep all changes local as requested.

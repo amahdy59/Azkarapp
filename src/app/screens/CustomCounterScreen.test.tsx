@@ -21,7 +21,7 @@ describe("CustomCounterScreen Component", () => {
     );
     fireEvent.click(screen.getByRole("button", { name: "Read guided after-prayer azkar" }));
     expect(onOpenAfterPrayer).toHaveBeenCalledOnce();
-    expect(screen.getByTestId("custom-counter-surface")).toHaveTextContent("12 / 100");
+    expect(screen.getByTestId("custom-counter-surface")).toHaveTextContent("12/100");
   });
 
   it("renders correctly in Arabic with initial state", () => {
@@ -31,7 +31,7 @@ describe("CustomCounterScreen Component", () => {
     expect(screen.getByText("المسبحة")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ" })).toBeInTheDocument();
     expect(screen.getAllByText("سُبْحَانَ اللَّهِ وَبِحَمْدِهِ")).toHaveLength(2);
-    expect(screen.getByTestId("custom-counter-surface")).toHaveTextContent("٠ / ١٠٠");
+    expect(screen.getByTestId("custom-counter-surface")).toHaveTextContent("٠/١٠٠");
     expect(screen.getByTestId("custom-counter-surface")).toHaveClass("adaptive-counter-surface");
   });
 
@@ -129,7 +129,7 @@ describe("CustomCounterScreen Component", () => {
     expect(screen.queryByRole("menuitemradio", { name: "Open" })).not.toBeInTheDocument();
     await user.click(screen.getByRole("menuitemradio", { name: "33" }));
 
-    expect(screen.getByTestId("custom-counter-surface")).toHaveTextContent("1 / 33");
+    expect(screen.getByTestId("custom-counter-surface")).toHaveTextContent("1/33");
   });
 
   it("protects an in-progress count before changing to another zikr", async () => {
@@ -153,7 +153,7 @@ describe("CustomCounterScreen Component", () => {
     fireEvent.click(counter);
     fireEvent.click(counter);
     fireEvent.click(counter);
-    expect(counter).toHaveTextContent("3 / 100");
+    expect(counter).toHaveTextContent("3/100");
 
     // Open picker and pick another zikr
     await user.click(screen.getByRole("button", { name: /Subhanallahi wa bihamdihi/i }));
@@ -164,12 +164,12 @@ describe("CustomCounterScreen Component", () => {
     await user.click(screen.getByRole("button", { name: "Save & switch" }));
 
     // Now on new zikr with count 0
-    expect(counter).toHaveTextContent("0 / 100");
+    expect(counter).toHaveTextContent("0/100");
 
     // Count 2 on the new zikr
     fireEvent.click(counter);
     fireEvent.click(counter);
-    expect(counter).toHaveTextContent("2 / 100");
+    expect(counter).toHaveTextContent("2/100");
 
     // Open picker again - verify original zikr shows saved count badge
     await user.click(screen.getByRole("button", { name: /La hawla wa la quwwata illa billah/i }));
@@ -180,7 +180,7 @@ describe("CustomCounterScreen Component", () => {
     await user.click(screen.getByRole("button", { name: "Save & switch" }));
 
     // Count is restored to 3!
-    expect(counter).toHaveTextContent("3 / 100");
+    expect(counter).toHaveTextContent("3/100");
   });
 
   it("resets count when switching with Change and reset", async () => {
@@ -190,21 +190,21 @@ describe("CustomCounterScreen Component", () => {
     const counter = screen.getByTestId("custom-counter-surface");
     fireEvent.click(counter);
     fireEvent.click(counter);
-    expect(counter).toHaveTextContent("2 / 100");
+    expect(counter).toHaveTextContent("2/100");
 
     await user.click(screen.getByRole("button", { name: /Subhanallahi wa bihamdihi/i }));
     await user.click(screen.getByRole("radio", { name: /La hawla wa la quwwata illa billah/i }));
 
     // Click Change and reset
     await user.click(screen.getByRole("button", { name: "Change and reset" }));
-    expect(counter).toHaveTextContent("0 / 100");
+    expect(counter).toHaveTextContent("0/100");
 
     // Switch back to original zikr (from count 0, so no prompt)
     await user.click(screen.getByRole("button", { name: /La hawla wa la quwwata illa billah/i }));
     await user.click(screen.getAllByRole("radio", { name: /Subhanallahi wa bihamdihi/i })[0]!);
 
     // Original count was wiped by reset, so starts at 0
-    expect(counter).toHaveTextContent("0 / 100");
+    expect(counter).toHaveTextContent("0/100");
   });
 
   it("keeps a completed counter focusable so its next-step dialog can be reopened", () => {

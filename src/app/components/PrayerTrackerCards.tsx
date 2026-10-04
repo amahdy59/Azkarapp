@@ -231,13 +231,15 @@ function PrayerCard({
           aria-expanded={selected}
           aria-controls="home-expanded-prayer"
           aria-label={t(language, "prayerTracking.openPrayer", { prayer: name })}
-          className="relative z-10 flex min-h-[7.5rem] min-w-0 flex-col items-center justify-center rounded-3xl px-0 py-1.5 outline-none transition-colors focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring sm:min-h-[8.5rem] sm:px-3 sm:py-3"
+          className="relative z-10 flex min-h-[7.5rem] min-w-0 flex-col items-center justify-start rounded-3xl px-0 py-1.5 outline-none transition-colors focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring sm:min-h-[8.5rem] sm:px-3 sm:py-3"
         >
-          {isCurrent && (
-            <span className="mb-1 rounded-full bg-primary px-2.5 py-0.5 text-micro font-black text-primary-foreground sm:text-xs">
-              {t(language, "prayerMoment.badgeNow")}
-            </span>
-          )}
+          <span className="mb-1 flex min-h-6 items-center justify-center">
+            {isCurrent && (
+              <span className="rounded-full bg-primary px-2.5 py-0.5 text-micro font-black text-primary-foreground sm:text-xs">
+                {t(language, "prayerMoment.badgeNow")}
+              </span>
+            )}
+          </span>
           <span
             aria-hidden="true"
             className={`prayer-chip flex size-9 items-center justify-center rounded-full border sm:size-10 ${
@@ -270,22 +272,20 @@ function PrayerCard({
           >
             {formatPrayerTimeLabel(time, language === "ar")}
           </p>
-          {prayer === "fajr" && model.shroukTime && (
-            <p
-              className={`mt-0.5 hidden text-micro font-bold sm:block ${onGlass ? "text-on-media-muted" : "text-muted-foreground"}`}
-            >
-              {t(language, "notifications.shrouk")}: {formatPrayerTimeLabel(model.shroukTime, language === "ar")}
-            </p>
-          )}
-          {countdown && state === "next" && (
-            <span
-              data-testid="next-prayer"
-              className={`mt-1 text-micro font-bold ${onGlass ? "text-on-media-accent" : "text-primary"}`}
-              dir="auto"
-            >
-              {countdown}
-            </span>
-          )}
+          <p
+            className={`mt-0.5 hidden min-h-4 text-micro font-bold sm:block ${onGlass ? "text-on-media-muted" : "text-muted-foreground"}`}
+          >
+            {prayer === "fajr" && model.shroukTime
+              ? `${t(language, "notifications.shrouk")}: ${formatPrayerTimeLabel(model.shroukTime, language === "ar")}`
+              : null}
+          </p>
+          <span
+            data-testid={countdown && state === "next" ? "next-prayer" : undefined}
+            className={`mt-1 min-h-4 text-micro font-bold ${onGlass ? "text-on-media-accent" : "text-primary"}`}
+            dir="auto"
+          >
+            {countdown && state === "next" ? countdown : null}
+          </span>
           <span className="sr-only">{statusLabel(language, state)}</span>
         </button>
       </article>

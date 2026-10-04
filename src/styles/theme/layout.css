@@ -450,3 +450,8 @@
 .mushaf-spread__gutter {
   min-height: 32rem;
 }
+/* ResponsiveSheet owns the compact overlay's bottom inset. Child footers keep
+   their ordinary spacing; the shell navigation's separate inset is outside it. */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}

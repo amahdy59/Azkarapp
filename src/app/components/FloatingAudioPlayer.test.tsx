@@ -1,9 +1,10 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { AudioController } from "../audio/AudioProvider";
 import { createInitialAudioState } from "../audio/audioReducer";
 import type { PlaybackEntry, PlaybackPlan, ResolvedAudioSegment } from "../audio/audioTypes";
 import { FloatingAudioPlayer } from "./FloatingAudioPlayer";
+import { getReadingFontSizeRem } from "../screens/readingTypography";
 
 const segment: ResolvedAudioSegment = {
   id: "segment-1",
@@ -219,7 +220,7 @@ describe("FloatingAudioPlayer", () => {
     expect(expandedRegion).toHaveClass("floating-audio-player--docked");
     expect(expandedRegion).toHaveClass("floating-audio-player--expanded");
     // Unified controls: speed button and volume slider are present beside transport controls
-    expect(screen.getByRole("button", { name: /Speed: 1×/ })).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: /Speed: 1×/ })).toBeInTheDocument();
     expect(screen.getByRole("slider", { name: "Volume" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Pause audio" })).toBeInTheDocument();
   });
@@ -237,7 +238,7 @@ describe("FloatingAudioPlayer", () => {
     render(<FloatingAudioPlayer controller={controller} language="en" direction="ltr" />);
     fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
 
-    const repeatBtn = screen.getByRole("button", { name: "Repeat" });
+    const repeatBtn = screen.getByRole("button", { name: "Repeat 3 times" });
     expect(repeatBtn).toBeInTheDocument();
     expect(repeatBtn).toHaveAttribute("aria-pressed", "true");
 
@@ -335,18 +336,97 @@ describe("FloatingAudioPlayer", () => {
     fireEvent.click(screen.getByRole("button", { name: "توسيع المشغل" }));
 
     const zikrText = screen.getByTestId("audio-player-zikr-text");
-    expect(zikrText).toHaveClass("zikr-text", "text-xl", "sm:text-2xl");
-    expect(zikrText.style.fontSize).toBe("");
+    expect(zikrText).toHaveClass("zikr-text");
+    expect(zikrText.style.fontSize).toBe(
+      getReadingFontSizeRem({ textSize: "medium", arabicLength: shortEntry.arabicText!.length, longSurah: false }),
+    );
     expect(zikrText.textContent).toBe(shortEntry.arabicText);
   });
 
-  it("keeps recording-source attribution inside the reciter menu", () => {
+  it("shows reciter names without recording attribution in the player", () => {
     render(<FloatingAudioPlayer controller={createController()} language="ar" direction="rtl" />);
     fireEvent.click(screen.getByRole("button", { name: "توسيع المشغل" }));
     expect(screen.queryByTestId("audio-attribution-trigger")).not.toBeInTheDocument();
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     fireEvent.click(screen.getByTestId("audio-reciter-select"));
-    expect(screen.getByTestId("audio-recording-source")).toBeVisible();
+    expect(screen.queryByTestId("audio-recording-source")).not.toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Test reciter" })).toBeVisible();
+  });
+
+  it("prioritizes English and reveals Arabic without changing playback", async () => {
+    const controller = createController();
+    controller.currentEntry = { ...entry, arabicText: "سُبْحَانَ اللَّهِ", translation: "Glory be to Allah." };
+    const { rerender } = render(<FloatingAudioPlayer controller={controller} language="en" />);
+    fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
+    expect(screen.getByTestId("audio-player-zikr-text")).toHaveTextContent("Glory be to Allah.");
+    expect(screen.getByTestId("audio-player-zikr-text")).toHaveAttribute("lang", "en");
+    await waitFor(() => expect(screen.getByText("Arabic recitation")).toBeVisible());
+    const arabic = screen.getByTestId("audio-player-arabic-text");
+    expect(arabic).not.toBeVisible();
+    const toggle = screen.getByRole("button", { name: "Show Arabic" });
+    expect(toggle).toHaveAttribute("aria-controls", arabic.id);
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    fireEvent.click(toggle);
+    expect(arabic).toBeVisible();
+    expect(arabic).toHaveAttribute("lang", "ar");
+    expect(arabic).toHaveAttribute("dir", "rtl");
+    expect(toggle).toHaveAccessibleName("Hide Arabic");
+    controller.currentEntry = { ...controller.currentEntry, entryId: "next", translation: "Next translation." };
+    rerender(<FloatingAudioPlayer controller={controller} language="en" />);
+    await waitFor(() => expect(screen.getByTestId("audio-player-arabic-text")).toBeVisible());
+    fireEvent.click(screen.getByRole("button", { name: "Hide Arabic" }));
+    expect(screen.getByTestId("audio-player-arabic-text")).not.toBeVisible();
+    expect(controller.setVoice).not.toHaveBeenCalled();
+    expect(controller.play).not.toHaveBeenCalled();
+    expect(controller.pause).not.toHaveBeenCalled();
+  });
+
+  it("keeps Arabic primary in Arabic mode and explains missing English translations", async () => {
+    const controller = createController();
+    controller.currentEntry = { ...entry, arabicText: "سُبْحَانَ اللَّهِ", translation: "Glory be to Allah." };
+    const { rerender } = render(<FloatingAudioPlayer controller={controller} language="ar" />);
+    fireEvent.click(screen.getByRole("button", { name: "توسيع المشغل" }));
+    expect(screen.getByTestId("audio-player-zikr-text")).toHaveAttribute("lang", "ar");
+    expect(screen.queryByRole("button", { name: "إظهار العربية" })).not.toBeInTheDocument();
+    controller.currentEntry = { ...controller.currentEntry, translation: "  " };
+    rerender(<FloatingAudioPlayer controller={controller} language="en" />);
+    await waitFor(() => expect(screen.getByText(/English translation is not available/)).toBeVisible());
+    expect(screen.getByTestId("audio-player-zikr-text")).toBeVisible();
+    expect(screen.queryByRole("button", { name: "Show Arabic" })).not.toBeInTheDocument();
+  });
+
+  it("selects a playback rate directly instead of cycling through intermediate speeds", () => {
+    const controller = createController();
+    render(<FloatingAudioPlayer controller={controller} language="en" />);
+    fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
+    fireEvent.click(screen.getByRole("combobox", { name: "Speed: 1×" }));
+    expect(screen.getAllByRole("option")).toHaveLength(5);
+    fireEvent.click(screen.getByRole("option", { name: "1.5×" }));
+    expect(controller.setPlaybackRate).toHaveBeenCalledExactlyOnceWith(1.5);
+  });
+
+  it("updates listening typography when the app text-size setting changes", () => {
+    const controller = createController();
+    controller.currentEntry = { ...entry, arabicText: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ." };
+    const { rerender } = render(<FloatingAudioPlayer controller={controller} language="ar" textSize="small" />);
+    fireEvent.click(screen.getByRole("button", { name: "توسيع المشغل" }));
+    const text = screen.getByTestId("audio-player-zikr-text");
+    expect(text).toHaveStyle({
+      fontSize: getReadingFontSizeRem({
+        textSize: "small",
+        arabicLength: controller.currentEntry.arabicText!.length,
+        longSurah: false,
+      }),
+    });
+    rerender(<FloatingAudioPlayer controller={controller} language="ar" textSize="large" />);
+    expect(text).toHaveStyle({
+      fontSize: getReadingFontSizeRem({
+        textSize: "large",
+        arabicLength: controller.currentEntry.arabicText!.length,
+        longSurah: false,
+      }),
+    });
+    expect(text.textContent).toBe(controller.currentEntry.arabicText);
   });
 
   it("replaces only the reader canvas and restores covered controls and focus on collapse", () => {

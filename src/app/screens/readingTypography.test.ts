@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { MIN_READING_FONT_SIZE_PX, getReadingFontSizePx } from "./readingTypography";
+import { MIN_READING_FONT_SIZE_PX, getReadingFontSizePx, getReadingFontSizeRem } from "./readingTypography";
 
 /** "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ." — 31 characters with its diacritics. */
 const REFERENCE_DHIKR_LENGTH = 31;
@@ -14,6 +14,13 @@ const SIZE_BEFORE_THE_INCREASE = 18.5 * 1.15;
 const SIZES = ["small", "medium", "large"] as const;
 
 describe("reading typography", () => {
+  it("matches Reader sizes in scalable units at each application root size", () => {
+    const roots = { small: 14, medium: 16, large: 18 };
+    for (const textSize of SIZES) {
+      const input = { textSize, arabicLength: 108, longSurah: false };
+      expect(parseFloat(getReadingFontSizeRem(input)) * roots[textSize]).toBeCloseTo(getReadingFontSizePx(input));
+    }
+  });
   it("renders the reference dhikr larger than before at every setting", () => {
     for (const textSize of SIZES) {
       const size = getReadingFontSizePx({ textSize, arabicLength: REFERENCE_DHIKR_LENGTH, longSurah: false });

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { DevotionalAction, DevotionalFooter } from "../components/DevotionalControls";
 import { CounterTargetPicker } from "../components/CounterTargetPicker";
 import {
   ArrowPrevious,
@@ -38,28 +39,14 @@ import type { AppLanguage, TextSizeOption } from "../types";
 const SALAWAT_ARABIC = "اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ";
 const SALAWAT_TRANSLITERATION = "Allahumma salli wa sallim ‘ala Nabiyyina Muhammad";
 
-const COPY = {
+const EVIDENCE = {
   en: {
-    title: "Salawat ﷺ",
-    subtitle: "Choose a target and count with intention",
-    phrase: SALAWAT_ARABIC,
-    target: "Target",
-    completed: "Target completed",
-    reset: "Reset counter",
-    benefits: "Authentic benefits",
     muslim: "Whoever sends one blessing upon the Prophet ﷺ, Allah sends ten blessings upon that person.",
     muslimSource: "Sahih Muslim 408",
     friday: "Friday is among the best of your days, so increase your prayers upon the Prophet ﷺ on it.",
     fridaySource: "Sunan Abi Dawud 1047 — Sahih",
   },
   ar: {
-    title: "صلاة على النبي ﷺ",
-    subtitle: "اختر هدفًا واحتسب الأجر",
-    phrase: SALAWAT_ARABIC,
-    target: "الهدف",
-    completed: "اكتمل الهدف",
-    reset: "تصفير العداد",
-    benefits: "فضائل ثابتة بأحاديث صحيحة",
     muslim: "«مَنْ صَلَّى عَلَيَّ وَاحِدَةً صَلَّى اللَّهُ عَلَيْهِ عَشْرًا».",
     muslimSource: "صحيح مسلم ٤٠٨",
     friday: "«إِنَّ مِنْ أَفْضَلِ أَيَّامِكُمْ يَوْمَ الْجُمُعَةِ، فَأَكْثِرُوا عَلَيَّ مِنَ الصَّلَاةِ فِيهِ».",
@@ -118,7 +105,7 @@ export function FridaySalawatScreen({
   hapticFeedback?: boolean;
   textSize?: TextSizeOption;
 }) {
-  const copy = COPY[language];
+  const copy = EVIDENCE[language];
   const [progress, setProgress] = useState(readFridaySalawatProgress);
   const [showBenefits, setShowBenefits] = useState(false);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
@@ -222,13 +209,13 @@ export function FridaySalawatScreen({
     <ScreenContainer
       dir={direction}
       className="relative flex flex-col overflow-y-auto h-full !pb-0 sm:!pt-0"
-      screenName={copy.title}
+      screenName={t(language, "fridaySalawat.title")}
     >
       <div className="relative z-10 flex min-h-0 flex-1 flex-col">
         <ReadingScreenChrome
           language={language}
           direction={direction}
-          title={copy.title}
+          title={t(language, "fridaySalawat.title")}
           onBack={onBack}
           testId="salawat"
           progress={{
@@ -236,7 +223,7 @@ export function FridaySalawatScreen({
             max: progress.target,
             percentLabel: `${formatNumerals(progressPercent, language)}%`,
             countLabel: `${formatNumerals(progress.count, language)} / ${formatNumerals(progress.target, language)}`,
-            ariaLabel: copy.target,
+            ariaLabel: t(language, "fridaySalawat.target"),
           }}
           subRow={
             <div className="w-full" data-prevent-count="true">
@@ -272,7 +259,7 @@ export function FridaySalawatScreen({
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={reset} disabled={progress.count === 0}>
                       <RotateCcw size={16} className="text-muted-foreground me-2" aria-hidden="true" />
-                      <span>{copy.reset}</span>
+                      <span>{t(language, "fridaySalawat.reset")}</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -281,7 +268,7 @@ export function FridaySalawatScreen({
           }}
         />
         <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
-          {complete ? copy.completed : ""}
+          {complete ? t(language, "fridaySalawat.completed") : ""}
         </p>
 
         <div className="relative mx-4 mb-4 mt-4 flex min-h-0 flex-1 overflow-hidden bg-transparent">
@@ -330,26 +317,22 @@ export function FridaySalawatScreen({
               <CounterTapHint text={t(language, "reader.tapAnywhere")} />
               <footer className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
                 <div data-testid="reader-counter-stack">
-                  <div
-                    className="reader-dock devotional-footer flex flex-col items-center gap-3"
-                    data-testid="reader-dock"
-                  >
+                  <DevotionalFooter>
                     <div className="flex w-full items-center justify-center gap-3">
-                      <button
+                      <DevotionalAction
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
                           setShowBenefits(true);
                         }}
                         aria-haspopup="dialog"
-                        aria-label={copy.benefits}
-                        title={copy.benefits}
+                        aria-label={t(language, "fridaySalawat.benefits")}
+                        title={t(language, "fridaySalawat.benefits")}
                         data-testid="salawat-benefit-dock-button"
-                        className="devotional-secondary-action flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-border/60 bg-card px-2 text-foreground transition-colors duration-fast hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                       >
                         <Lightbulb size={20} aria-hidden="true" />
                         <span className="text-label font-semibold">{t(language, "reader.referencesButton")}</span>
-                      </button>
+                      </DevotionalAction>
                     </div>
                     <div className="w-full pb-1" data-testid="counter-panel">
                       <div className="adaptive-counter-row flex w-full items-center justify-center gap-2.5">
@@ -368,7 +351,7 @@ export function FridaySalawatScreen({
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </DevotionalFooter>
                   <div>
                     <CounterShortcutHints
                       language={language}
@@ -462,7 +445,7 @@ export function FridaySalawatScreen({
         <Modal
           open
           onClose={() => setShowBenefits(false)}
-          title={copy.benefits}
+          title={t(language, "fridaySalawat.benefits")}
           direction={direction}
           language={language}
           maxWidthClassName="max-w-lg"
@@ -473,7 +456,7 @@ export function FridaySalawatScreen({
               <span className="flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
                 <Lightbulb size={20} aria-hidden="true" />
               </span>
-              <h2 className="text-lg font-black text-foreground">{copy.benefits}</h2>
+              <h2 className="text-lg font-black text-foreground">{t(language, "fridaySalawat.benefits")}</h2>
             </div>
             <ReferenceLink text={copy.muslim} source={copy.muslimSource} href="https://sunnah.com/muslim:408" />
             <ReferenceLink text={copy.friday} source={copy.fridaySource} href="https://sunnah.com/abudawud:1047" />

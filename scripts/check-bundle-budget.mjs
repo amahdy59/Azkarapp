@@ -85,8 +85,8 @@ function checkAgainstBaseline(name, actual) {
   }
 }
 
-const distDirectory = path.resolve("dist");
-const assetsDirectory = path.resolve("dist/assets");
+const distDirectory = path.resolve(process.argv[2] ?? "dist");
+const assetsDirectory = path.join(distDirectory, "assets");
 const entries = await readdir(assetsDirectory);
 const failures = [];
 
@@ -132,7 +132,7 @@ for (const entry of entries) {
   }
 }
 
-const manifest = JSON.parse(await readFile(path.resolve("dist/.vite/manifest.json"), "utf8"));
+const manifest = JSON.parse(await readFile(path.join(distDirectory, ".vite/manifest.json"), "utf8"));
 const entryKey = Object.keys(manifest).find((key) => manifest[key].isEntry);
 if (!entryKey) {
   failures.push("Build manifest does not contain an entry chunk.");
@@ -161,9 +161,9 @@ if (!entryKey) {
     failures.push(`Initial route statically imports the deferred audio chunk: ${eagerAudio.join(", ")}`);
   }
 
-  let initialGzipSize = gzipSync(await readFile(path.resolve("dist/index.html"))).byteLength;
+  let initialGzipSize = gzipSync(await readFile(path.join(distDirectory, "index.html"))).byteLength;
   for (const file of initialFiles) {
-    initialGzipSize += gzipSync(await readFile(path.resolve("dist", file))).byteLength;
+    initialGzipSize += gzipSync(await readFile(path.join(distDirectory, file))).byteLength;
   }
   if (initialGzipSize > limits.initialGzip) {
     failures.push(`Initial route: ${initialGzipSize} gzip bytes exceeds ${limits.initialGzip} bytes`);

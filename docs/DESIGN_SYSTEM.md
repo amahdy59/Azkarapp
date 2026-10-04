@@ -1,5 +1,11 @@
 # Azkar design system
 
+English expanded audio leads with the reviewed English translation in scalable, left-aligned type. A Show Arabic / Hide Arabic disclosure starts closed and exposes its expanded state and controlled text. Its choice lasts while the player is mounted. Recording language remains explicit. If a translation is unavailable, explain the fallback and show Arabic without an empty toggle. Arabic mode remains Arabic-first. Display changes never switch recordings or alter reviewed wording.
+
+Sharing method, scope and theme choices reserve symmetric icon slots, with the selected checkmark physically to the right of the centered label in both languages, following the owner's preference. Selected choices share a primary border and quiet muted surface, independently of keyboard focus. Method labels and checkmarks appear inline; choices wrap at enlarged text sizes. Scope uses a descriptive heading and a localized count of the cards actually selected for sharing. Preview enlargement is a quiet ghost action that retains a 44px target.
+
+Sharing customization is grouped behind native disclosures with explicit chevrons and a visible summary of selected additions. At 900px and wider the preview occupies three fifths of the dialog and settings two fifths, mirrored between Arabic and English; settings start expanded at that tier. Compact layouts place the preview/recovery first and collapse image settings. The enlargement exit precedes the image; the modal close and safe-area-aware action footer remain outside the scrolling content. Single-card exports omit carousel navigation. Mode, scope, theme and active thumbnail selections use checkmarks as well as color, distinct from keyboard focus. Theme miniatures use the actual export palettes. Size options include proportional shapes, purpose descriptions and explicit incompatibility reasons; ratios are direction-isolated and hints are associated with their fields. Fit failure is a compact recovery panel with a compatible-size action and explained disabled saving. The existing top-level Text/Link choices provide alternatives without duplicated buttons. File collections show their ZIP card count before saving, and cancellation remains quiet.
+
 Sharing uses one preview for collections and individual zikr. Olive daylight, navy/gold evening and navy/lavender night palettes keep decoration outside opaque reading surfaces. Arabic body text uses at least 52 canvas pixels (64 for individual zikr), independent RTL, and a 1.65 line-height to protect marks. Available citations remain attached; every zikr and its selected extras stay together on one card; incompatible formats offer an explicit size/text/link recovery. Story exports reserve at least 170px at the top and 200px at the bottom for platform overlays. Actual platform/device overlays still require physical-device checks.
 
 Formats are Story 1080×1920, Square 1080×1080, Portrait 1080×1350 and Tall 1080×2920. Story is the collection/single-zikr default; standalone long-surah reminders start in Portrait to reduce empty space. Content sits close to its header with at most 48px of extra top space; collection pages preserve sequence and use up to four short items when measured content fits. A crisp centered vector crescent/brand header precedes the collection title. Each zikr title is measured and wrapped at the padded top of its own panel, before the count/reminder pill; single cards omit a duplicate external title. Two opposing botanical corners, a subtle background wash and a fine perimeter frame surround opaque reading panels. Count/reminder pill lettering is centered by visible glyph bounds, with exactly 4 export pixels before the first text's visible ink. Footer text and the navy-on-ivory wa-zaker.com badge always align to the canvas center; the labelled QR is placed independently at the side and never shifts their alignment; card numbers appear only for multi-card sets. The website is the owner-approved brand label; QR/Text/Link retain the actual configured app destination. UI content choices disclose optional reviewed meaning, pronunciation and benefit; sources are mandatory when available. Reviewed multi-page surahs share only their localized name, exact reviewed benefit/source and a mandatory QR to the first reviewed Mushaf page, on a standalone reminder card. Exact zikr/collection links and QR codes contain no private progress or device information. QR-enabled cards reserve additional body clearance.
@@ -45,7 +51,7 @@ Interface text uses named steps, never an arbitrary size. The scale is declared 
 | `text-sm`       | 14 px          | Body copy                                       |
 | `text-subtitle` | 15 px / 0.9375 | Card titles, list headings                      |
 | `text-base`     | 16 px          | Emphasised body, short Arabic evidence          |
-| `text-title`    | 17 px / 1.0625 | Section titles, single-action counter faces     |
+| `text-title`    | 17 px / 1.0625 | Section titles                                  |
 | `text-lg`       | 18 px          | Sheet and dialog titles                         |
 | `text-xl`       | 20 px          | Screen headings                                 |
 | `text-headline` | 22 px / 1.375  | Prayer times, the largest number on a card      |
@@ -102,9 +108,72 @@ The devotional face is the reader's to choose; the interface's is not.
 
 ## Geometry and control contract
 
+### Devotional control family
+
+Reader, Masbaha and Salawat use `DevotionalFooter` and `DevotionalAction` from
+`src/app/components/DevotionalControls.tsx`. Screens supply behavior, localized
+labels and icons; shared components own footer anatomy and support-action states.
+The existing `ZikrCounterSurface`, `CounterTapHint` and `ReadingScreenChrome`
+remain the shared counter, guidance and header implementations.
+
+Use 12px horizontal padding for compact ordinary labelled controls, 16px for
+regular controls and 20-24px for spacious desktop actions. These are role
+recommendations, not a global button override. Zikr desktop side navigation uses
+20px per side and `calc(5.5rem + 24px)` width: 112px at default text size, with
+room to grow at enlarged text. Its existing vertical inset and 48px minimum
+height stay intact. Mobile devotional support and navigation controls retain
+their approved 8px horizontal inset, pill corners and footer/counter geometry.
+
+Ordinary controls retain the existing 12-14px radius role and 44/48/52px
+minimum-height roles. Devotional footer pills are an intentional domain variant;
+Mushaf controls retain their own approved anatomy. Do not unify these through
+broad `button` selectors or changes to the global Button size variants.
+
+Theme colors flow through semantic tokens. Changes to a Reader-only class or
+screen wrapper do not propagate to other screens; change shared components for
+family-wide presentation. Masbaha and Salawat already shared counting and reading
+primitives, but their copied footer/support-action markup allowed local drift.
+Their distinct targets, completion dialogs and shortcuts remain screen behavior.
+
+### Alignment and proximity
+
+Guidance reviewed: [Apple buttons](https://developer.apple.com/design/human-interface-guidelines/buttons),
+[Microsoft Fluent layout](https://fluent2.microsoft.design/layout),
+[Fluent buttons](https://fluent2.microsoft.design/components/web/react/core/button/usage/)
+and [Fluent shapes](https://fluent2.microsoft.design/shapes). Use their principles
+of consistent peer sizing, proximity, center alignment and role-based geometry;
+retain this product's existing radius and semantic theme tokens.
+
+- Shared Button uses equal horizontal inset whether its icon is a direct child,
+  nested content or absent: compact 12px, regular 16px, large 24px. Icon-only
+  buttons use a centered 44px square with zero content padding. Icons do not
+  shrink. Explicit caller variants can still set different role-specific spacing.
+- Icon/label gap is normally 8px; compact internal groups can use 6px.
+  Separate actions use 8-12px; related rows use 12px; sections use 16-24px.
+  Measure from visible component bounds. Connected segmented controls may touch
+  internally because they are one control; independent actions must remain distinct.
+- Center icons against the whole label group, including a subtitle. Center
+  single-line action labels with their icons, and use a stable icon slot in lists.
+  A multiline label should grow the control rather than shrink its icon or switch.
+- Settings rows keep the same 16px inset and 12px icon/text gap in selected,
+  unselected, static, select and switch states. The selected accent is an overlay,
+  so it cannot shift the label. Dividers begin at the same 68px text edge.
+- Sidebar quick settings separate the icon/label group from the current value
+  by 12px; labels may wrap, while icons and value labels retain their width.
+- Home's summary prayer row reserves matching badge, sunrise and countdown
+  slots so conditional metadata cannot shift its icons, names or times.
+- Geometry checks are supplemented by screenshot review: Arabic glyph ink and
+  font line boxes are different measurements. Do not fix perceived alignment with
+  language-specific translate offsets or change sacred-text metrics globally.
+
 - Spacing follows a 4 px grid. Page gutters are role-based: 16 px for dense settings, 20 px for standard app screens, and 24 px for focused onboarding and sheets. Documented set: 4, 8, 12, 16, 20, 24, 32, 40, 48, 64.
 - **Compact sub-scale.** Chips, badges, icon-and-label rows and other compact internal elements may use the 2 px half-steps between those values — 2, 6, 10, 14, 18 px (`gap-1.5`, `py-2.5`, `p-3.5`, and so on). This is a deliberate part of the contract, not drift: at the scale of a 20 px badge the next full step is a 100% jump, and the app already relies on these in roughly 175 places. The half-steps are for spacing _inside_ a component. Page gutters, section rhythm and the gaps between cards stay on the full 4 px set above.
 - Radius roles are 8 px for compact internal elements, 12-14 px for controls, 16-20 px for standard cards, and 24 px for major containers and sheets. Full-radius for chips and compact segmented controls only.
+
+The shared Card consumes the card-radius token, or the overlay-radius token for overlay elevation. Home photographic containers retain their approved large geometry. Editable checklist indicators and completed-status marks can have different shapes when their roles differ.
+
+Ghost/outline button hover and unselected menu focus use the semantic muted surface and foreground. Selected options keep their distinct primary-tinted treatment; keyboard focus remains visible. Compact ResponsiveSheet drawers use the card surface, own bottom safe-area padding, and retain caller content spacing. Modal footers with their own inset remain separate.
+
 - Elevation: Use three levels only (Flat/bordered surface, Raised card, Modal/sheet). Avoid applying a large soft shadow to every card. Raised and Modal/sheet are backed by the `--ds-shadow-raised`/`--ds-shadow-overlay` tokens (`src/styles/theme/tokens.css`), mapped to the `shadow-raised`/`shadow-overlay` Tailwind utilities.
 - Control heights have three roles: compact 44 px, regular 48 px, and prominent 52 px. Every interactive target remains at least 44×44 CSS px.
 - Use subtle borders to separate passive surfaces and the higher-contrast control border for inputs and toggles. Meaningful control boundaries must reach 3:1 non-text contrast.
@@ -233,10 +302,14 @@ Settings provides one Audio & Recitations destination for the reviewed azkar/dua
 - **Listening owns progress while it is active.** The Reader hides its manual counter for the entry controlled by the player. Natural completion of the selected playback run completes that frozen entry exactly once: Play Once completes after one full recitation, while Repeat completes after its prescribed repetitions. Pause, stop, skip, failure, or navigating elsewhere does not complete it. The playback plan retains category, subcategory, routine, and special-flow identity so completion cannot be redirected by later navigation.
 - **Volume is one aligned control group.** Its icon, native range track, thumb, and percentage share a stable visual center and contiguous hover/focus surface. Compact wide layouts reserve a dedicated grid track for it instead of allowing title or transport content to push it off-axis.
 - **Volume follows the familiar streaming-player pattern.** The speaker is always available. Fine-pointer devices reveal a vertical volume slider on hover or keyboard focus and clicking the speaker toggles mute; touch devices open the slider on tap. The speaker and popover share one continuous pointer corridor, so moving onto the slider cannot dismiss it. The native slider exposes its vertical orientation and percentage, volume and mute persist locally, and zero volume is an honest muted state.
-- **Compact is one responsive dock** — expand, cue, title, reciter and time, a scrubber plus ten-second controls where width permits, play/pause, volume and stop. A phone that cannot fit the scrubber uses the inset passive progress strip; wider compact layouts hide that strip and expose the interactive scrubber instead. Exactly one playback-progress indicator is visible in every compact or expanded form. It clears compact bottom navigation and is constrained to the main canvas beside desktop rail/sidebar navigation. Expanded fills the Reader canvas below its session header, or the main app canvas elsewhere. It uses a flat opaque surface with no scrim, rounded outer frame, nested reading card, or modal focus trap. Covered reading controls are inert; the header and navigation remain usable. The text scrolls independently above the transport footer, with a side-by-side arrangement in short landscape windows and whole-surface scrolling when required by text enlargement. The reciter menu carries recording attribution, so no separate info button is rendered. Timeline and volume controls remain native range inputs with explicitly styled CSS tracks and thumbs; no bitmap seeker artwork is used. Opening the Mushaf during playback folds it away; expanding it again remains one tap.
+- **Compact is one responsive dock** — expand, cue, title, reciter and time, a scrubber plus ten-second controls where width permits, play/pause, volume and stop. A phone that cannot fit the scrubber uses the inset passive progress strip; wider compact layouts hide that strip and expose the interactive scrubber instead. Exactly one playback-progress indicator is visible in every compact or expanded form. It clears compact bottom navigation and is constrained to the main canvas beside desktop rail/sidebar navigation. Expanded fills the Reader canvas below its session header, or the main app canvas elsewhere. It uses a flat opaque surface with no scrim, rounded outer frame, nested reading card, or modal focus trap. Covered reading controls are inert; the header and navigation remain usable. The text scrolls independently above the transport footer, with a side-by-side arrangement in short landscape windows and whole-surface scrolling when required by text enlargement. The player identifies the selected recording by reciter name only; no attribution or information action appears in the player. Timeline and volume controls remain native range inputs with explicitly styled CSS tracks and thumbs; no bitmap seeker artwork is used. Opening the Mushaf during playback folds it away; expanding it again remains one tap.
 - A collection with more than one reviewed recording offers **Play All Audio** both on its overview and in Reader options. That action snapshots the available semantic order and continues through the queue; partial coverage is disclosed before playback rather than silently implying every item has audio.
 
+- Audio refinement: a docked player receives no floating navigation offset. Compact adaptation uses its own container width; important metadata uses the existing caption step, elapsed time has reserved space, and full title/reciter/queue context remains in the Expand description. Reciter and position metadata wrap naturally together. Expanded plain-text listening uses the shared Reader length/legibility sizing at the selected app text size, with scalable units for browser text enlargement. Canonical Mushaf pages retain their separate sizing contract. Native transport remains initially visible at normal short-phone size; text scrolls independently, with whole-surface recovery when enlarged. Speed uses the shared Select with explicit rate choices; repeat names the reviewed prescribed count. The player shows reciter names only; optional consolidated credits belong in Settings → About.
+
 ## Home and azkar-group contract
+
+Expanded listening text starts beneath the reciter metadata with compact spacing rather than vertical centering. Its full text scrolls above the footer. The footer order is timeline, main playback controls, then Speed and Volume; DOM and keyboard order match this arrangement in both directions.
 
 - Home is the time-aware daily dashboard. The Azkar tab always opens the library index; it must never reopen an implicit previously selected category.
 - Home's hero begins flush with the screen at every breakpoint. Its time-of-day photograph fills the complete hero at full opacity, while the routine and Today's Wird cards sit responsively over the lower scene on localized opaque surfaces. Compact layouts reserve visible scene space above the stacked cards; desktop uses a balanced five-column overlay. Each category image owns compact and wide focal positions chosen to preserve its primary subject under `object-fit: cover`; no image-wide overlay is permitted.
@@ -431,11 +504,11 @@ The Reader places listening and the visibly labelled Benefit action in a utility
 
 The ordinary Reader uses a quiet labelled support row in logical order: Benefit/evidence, Listen, Share. The labelled footer Benefit action uses Lightbulb, following the owner-selected reference; evidence headings retain BookOpen. Approved audio availability and the existing integrated-player ownership remain authoritative. Audio mode replaces manual counting rather than adding a competing counter. Sharing opens the existing single-zikr share flow without counting.
 
-Reader Previous/Next retain direction-aware arrows and keyboard behavior. Their targets are at least 44px, arrows are 18px, and visible text appears from 360px while the full accessible name remains at every width. Existing tablet/desktop side navigation stays in place. All three ordinary counting views share a 48px minimum-height tally with scalable 24px numerals and a 48px minimum-height single-action face. Controls can grow with enlarged text. This supersedes the older 76px tally geometry; it does not change targets, completion, partial-count persistence, sound, haptics, or reviewed content.
+Reader Previous/Next retain direction-aware arrows and keyboard behavior. Their targets are at least 44px, arrows are 18px, and visible text appears from 360px while the full accessible name remains at every width. Existing tablet/desktop side navigation stays in place. All three ordinary counting views share a 48px minimum-height tally with scalable 20px numerals and a 48px minimum-height single-action face with 14px labels. Counter text stays on one line, using concise localized completion labels while retaining the full instruction in its accessible name. Controls can grow with enlarged text. This supersedes the older 76px tally geometry; it does not change targets, completion, partial-count persistence, sound, haptics, or reviewed content.
 
 Masbaha and Friday Salawat retain their existing virtue actions and completion choices, without invented audio or Previous/Next controls. Guidance sits at the base of the reading surface above the action rows, using smaller muted icon emphasis and spacing. Long-surah completion remains counter-only. Functional surfaces and focus use semantic theme tokens.
 
-The footer uses a shared pill-shaped devotional control radius throughout, approved by the owner for a softer rounded appearance. Reader navigation and counter share a 48px minimum height and stretch together within their row. Previous/Next have equal widths on labelled phone layouts and symmetric 8px horizontal padding, matching the support actions. The utility-to-counter row gap is 12px (increased by 4px). Enlarged text may wrap and grow; it must remain readable.
+The footer uses a shared pill-shaped devotional control radius throughout, approved by the owner for a softer rounded appearance. Reader navigation and counter share a 48px minimum height and stretch together within their row. Previous/Next have equal widths on labelled phone layouts and symmetric 8px horizontal padding, matching the support actions. The utility-to-counter row gap is 12px (increased by 4px). Enlarged support text may wrap and controls grow; the counter face remains a single readable line.
 
 ### Reading progress thickness (2026-10-03)
 
@@ -443,4 +516,14 @@ The shared counting-screen session progress track is 8 CSS px high in compact an
 
 Counting guidance uses the shared CounterTapHint presentation: a persistent compact tinted strip above the actions, a decorative 24px pointing-hand/touch-ripple icon, and the existing localized instruction. It follows theme colors rather than forcing the mockup's cream palette into every theme. It stays visible in ordinary counting views without a dismiss/expand control or new persisted onboarding state. Long-surah completion already carries its counter-only instruction on the action face, so the ordinary strip is omitted without duplicating that instruction. Audio mode retains its transport ownership.
 
-The coordinated footer hierarchy uses one 25rem maximum-width container with 12px horizontal insets for guidance and both action rows. The counter uses the semantic primary surface and contrasting primary foreground, with one subtle shadow and a low-contrast progress fill. Secondary actions use quiet card surfaces, lighter borders, no individual shadow or blur, shared 14px semibold labels, and 20px glyphs. Navigation keeps outer-edge 18px arrows, 48px minimum height, equal widths on labelled phone layouts, and more legible disabled states. Guidance-to-actions and action-row gaps are 12px. Desktop shortcut guidance remains at least 20px below the counter. Existing completion, audio ownership, motion preferences, persistence, and reviewed content are unchanged.
+The coordinated footer hierarchy uses one 25rem maximum-width container with 12px horizontal insets for guidance and both action rows. The counter starts on the neutral card surface with foreground text, a primary border, and one subtle shadow. Its primary-tinted internal fill occupies exactly the counted fraction, from the logical start edge (right in Arabic, left in English), with a primary leading boundary. Zero count has no fill; completion uses the primary surface and contrasting primary foreground. A single reading fills only when explicitly completed. Secondary actions use quiet card surfaces, lighter borders, no individual shadow or blur, shared 14px semibold labels, and 20px glyphs. Navigation keeps outer-edge 18px arrows, 48px minimum height, equal widths on labelled phone layouts, and more legible disabled states. Guidance-to-actions and action-row gaps are 12px. Desktop shortcut guidance remains at least 20px below the counter. Existing completion, audio ownership, motion preferences, persistence, and reviewed content are unchanged.
+
+Counter face content uses 8px padding on each side; separated numeral groups use a 2px gap. This preserves the single-line face at enlarged text sizes while retaining language-aware numeral order. Labelled Reader navigation keeps equal 88px widths as text grows.
+
+Contextual dropdown menus default to non-modal semantics: background content remains exposed to assistive technology, while Arrow keys, Escape, outside dismissal and focus restoration retain their standard menu behavior. Blocking dialogs and sheets keep their separate modal focus contract.
+
+Reader passage titles and the Rare words switch share a row when space permits. The row wraps at enlarged text sizes instead of squeezing the title to zero width; both controls remain bounded, visible and non-overlapping at 320px and 200% text size.
+
+The compact Reader retains a reading viewport of at least `min(8rem, 35dvh)`. Enlarged footer controls may extend the screen's scrolling content, rather than collapsing the passage to zero height. Native passage scrolling and counter focus remain available.
+
+Sharing keeps the action footer outside one scrollable body containing its heading, method choices, preview and settings. This prevents enlarged heading and method text from pushing Save below a short viewport; the dialog's close control remains available independently of body scrolling.

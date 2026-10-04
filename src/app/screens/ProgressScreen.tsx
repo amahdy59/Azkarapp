@@ -27,7 +27,7 @@ import {
   type OasisHabits,
 } from "../oasis/oasisModel";
 import { DropletMark, SeedlingMark, BranchMark, PalmTreeMark, OasisMark } from "../components/GardenMarks";
-import { ChevronDown, Share2, Sparkles, Zap } from "../components/icons";
+import { ChevronDown, ChevronPrevious, ChevronNext, Share2, Sparkles, Zap } from "../components/icons";
 import type {
   AppLanguage,
   CategoryId,
@@ -385,9 +385,7 @@ export function ProgressScreen({
               title={t(language, "garden.prevPeriod")}
               className="flex size-11 shrink-0 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
             >
-              <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
-                <polyline points={isArabic ? "9 18 15 12 9 6" : "15 18 9 12 15 6"} />
-              </svg>
+              <ChevronPrevious size={18} aria-hidden="true" />
             </button>
 
             <span
@@ -408,9 +406,7 @@ export function ProgressScreen({
               title={t(language, "garden.nextPeriod")}
               className="flex size-11 shrink-0 items-center justify-center rounded-lg text-foreground transition-colors enabled:hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-30 disabled:hover:bg-transparent"
             >
-              <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
-                <polyline points={isArabic ? "15 18 9 12 15 6" : "9 18 15 12 9 6"} />
-              </svg>
+              <ChevronNext size={18} aria-hidden="true" />
             </button>
           </div>
         </div>

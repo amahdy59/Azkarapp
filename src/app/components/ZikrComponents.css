@@ -106,6 +106,14 @@
   padding-inline: 12px;
 }
 
+/* Side navigation has room for a wider inset; compact dock controls keep theirs. */
+@media (min-width: 768px) {
+  [data-testid="reader-side-navigation"] .adaptive-counter-nav {
+    width: calc(5.5rem + 24px);
+    padding-inline: 20px;
+  }
+}
+
 .reader-dock .devotional-secondary-action,
 .adaptive-counter-nav.devotional-secondary-action {
   background: var(--card);
@@ -146,8 +154,8 @@
   user-select: none;
   isolation: isolate;
   cursor: pointer;
-  color: var(--primary-foreground);
-  background: var(--primary);
+  color: var(--foreground);
+  background: var(--card);
   border: 1px solid var(--primary);
   border-radius: var(--devotional-control-radius, 999px);
   box-shadow: 0 4px 12px -4px color-mix(in srgb, var(--primary) 25%, transparent);
@@ -173,7 +181,7 @@
     border-color 200ms ease,
     box-shadow 200ms ease,
     background-color 200ms ease;
-  background: color-mix(in srgb, var(--primary-foreground) 6%, var(--primary));
+  background: var(--muted);
   box-shadow: 0 2px 8px color-mix(in srgb, var(--foreground) 4%, transparent);
 }
 
@@ -210,10 +218,8 @@
   position: absolute;
   inset-block: 0;
   inset-inline-start: 0;
-  max-inline-size: 100%;
-  background: color-mix(in srgb, var(--primary-foreground) 8%, var(--primary));
-  border-inline-end: 2px solid color-mix(in srgb, var(--primary-foreground) 40%, transparent);
-  transition: inline-size 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  background: color-mix(in srgb, var(--primary) 22%, var(--card));
+  border-inline-end: 2px solid var(--primary);
 }
 
 .adaptive-counter-content {
@@ -226,7 +232,17 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 8px 12px;
+  padding: 8px;
+  white-space: nowrap;
+}
+
+.adaptive-counter-surface.is-complete {
+  color: var(--primary-foreground);
+  background: var(--primary);
+}
+
+.adaptive-counter-surface.is-complete .counter-progress-fill {
+  background: var(--primary);
 }
 
 .adaptive-counter-pulse {
@@ -273,6 +289,13 @@
 }
 .adaptive-counter-nav:disabled {
   opacity: 0.5;
+}
+
+/* Navigation keeps its measure when text grows, leaving the counter readable. */
+@media (min-width: 360px) {
+  .adaptive-counter-row .adaptive-counter-nav {
+    width: 88px;
+  }
 }
 
 .counter-ring-ready::after {

@@ -1,4 +1,5 @@
-import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ReaderScreen } from "./ReaderScreen";
 import { getAzkarForMode, registerLazyCollection } from "../content/azkar";
@@ -55,7 +56,7 @@ describe("ReaderScreen audio identity", () => {
       );
       expect(screen.getByRole("heading", { name: "آية الكرسي", level: 2 })).toBeInTheDocument();
       expect(azkar[idx].surahNameArabic).toBe(sourceName);
-      const toggle = screen.getByRole("switch", { name: "تظليل الكلمات الغريبة" });
+      const toggle = screen.getByRole("switch", { name: "كلمات غريبة" });
       fireEvent.click(toggle);
       expect(toggle).toHaveAttribute("aria-checked", "true");
     },
@@ -168,6 +169,7 @@ describe("ReaderScreen audio identity", () => {
   });
 
   it("offers dedicated Arabic and English playback actions", async () => {
+    const user = userEvent.setup();
     const onPlayAudio = vi.fn();
     const onPlayEnglishAudio = vi.fn();
     render(
@@ -199,12 +201,15 @@ describe("ReaderScreen audio identity", () => {
       />,
     );
 
-    fireEvent.pointerDown(screen.getByRole("button", { name: "Reader options" }), { button: 0, ctrlKey: false });
-    fireEvent.click(await screen.findByRole("menuitem", { name: "Play Arabic recitation" }));
+    await user.click(screen.getByRole("button", { name: "Reader options" }));
+    await user.click(await screen.findByRole("menuitem", { name: "Play Arabic recitation" }));
     expect(onPlayAudio).toHaveBeenCalledOnce();
-
-    fireEvent.pointerDown(screen.getByRole("button", { name: "Reader options" }), { button: 0, ctrlKey: false });
-    fireEvent.click(await screen.findByRole("menuitem", { name: "Play English translation" }));
+    // Wait for Radix's exit animation before reopening and selecting another item.
+    await waitFor(() =>
+      expect(screen.queryByRole("menuitem", { name: "Play Arabic recitation" })).not.toBeInTheDocument(),
+    );
+    await user.click(screen.getByRole("button", { name: "Reader options" }));
+    await user.click(await screen.findByRole("menuitem", { name: "Play English translation" }));
     expect(onPlayEnglishAudio).toHaveBeenCalledOnce();
   });
 
@@ -345,7 +350,7 @@ describe("ReaderScreen audio identity", () => {
 
     // Now the 3 options should be visible, and NO surah text or difficult words toggle
     expect(screen.queryByTestId("zikr-text")).toBeNull();
-    expect(screen.queryByRole("switch", { name: "تظليل الكلمات الغريبة" })).toBeNull();
+    expect(screen.queryByRole("switch", { name: "كلمات غريبة" })).toBeNull();
     expect(screen.queryByTestId("counter-surface")).toBeNull();
 
     // Check for the 3 buttons

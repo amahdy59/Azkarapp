@@ -50,14 +50,20 @@ test("100-count istighfar offers prescribed repeat and shows each repetition", a
   await page.getByRole("menuitem", { name: "Repeat prescribed count", exact: true }).click();
   const player = page.getByRole("region", { name: "Audio player", exact: true });
   await player.getByRole("button", { name: "Expand player" }).click();
-  await expect(player.getByRole("button", { name: "Repeat", exact: true })).toHaveAttribute("aria-pressed", "true");
+  await expect(player.getByRole("button", { name: "Repeat 100 times", exact: true })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
   await expect(player).toContainText("1 / 100");
   await page.evaluate(() =>
     (window as unknown as { repetitionAudio: EventTarget }).repetitionAudio.dispatchEvent(new Event("ended")),
   );
   await expect(player).toContainText("2 / 100");
-  await player.getByRole("button", { name: "Repeat", exact: true }).click();
-  await expect(player.getByRole("button", { name: "Repeat", exact: true })).toHaveAttribute("aria-pressed", "false");
+  await player.getByRole("button", { name: "Repeat 100 times", exact: true }).click();
+  await expect(player.getByRole("button", { name: "Repeat 100 times", exact: true })).toHaveAttribute(
+    "aria-pressed",
+    "false",
+  );
   await player.getByRole("button", { name: "Stop audio and close player" }).click();
   await expect(page.getByTestId("counter-surface")).toBeFocused();
 });

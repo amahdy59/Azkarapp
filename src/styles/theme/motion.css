@@ -78,6 +78,32 @@
   animation: fade-in var(--motion-duration-entrance) var(--motion-ease-enter) both;
 }
 
+/* Translate a full-size fill through its clipped track. Unlike scaling, this
+   preserves the end radius and the counter's two-pixel progress boundary. */
+.progress-fill-transform:dir(rtl) {
+  --progress-sign: -1;
+}
+
+.nav-active-cue {
+  display: inline-flex;
+  animation: menu-pop var(--motion-duration-standard) var(--motion-ease-enter);
+}
+
+/* Keep persistent navigation out of the route crossfade. Only the unique main
+   canvas transitions; screen-owned headers travel with their own content. */
+.app-main-view {
+  view-transition-name: app-content;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
+::view-transition-group(app-content) {
+  animation-duration: var(--motion-duration-standard);
+}
+
 /* Both class names are in use for the same intent; they resolve to one
    animation so the behaviour cannot diverge. */
 .favorite-pop,

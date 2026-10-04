@@ -72,7 +72,9 @@ export function SegmentedControl<T extends string>({
                 aria-hidden="true"
               />
             )}
-            <span className="relative z-10">{option.label}</span>
+            <span className="relative z-10 inline-flex min-w-0 items-center justify-center gap-2 [&>svg]:block [&>svg]:shrink-0">
+              {option.label}
+            </span>
           </RadioGroupPrimitive.Item>
         ))}
       </RadioGroupPrimitive.Root>

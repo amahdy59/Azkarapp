@@ -104,6 +104,7 @@ The shared screen-transition boundary treats the View Transitions API as optiona
 - Remove scale, translation, spring physics, and parallax effects.
 - Opacity transitions and color changes may remain.
 - Maximum duration for any reduced animation is **100ms**.
+- Mushaf page changes are immediate under reduced motion, keeping devotional text and page controls at full contrast.
 - Implement per-component alternatives instead of a global sledgehammer override where appropriate.
 - JavaScript-driven smooth scrolling and completion effects must use the shared `motionPreferences.ts` gate so both the OS preference and the in-app Reduce Motion setting are honored. Haptics use the same boundary and remain independently controlled by the Haptic Feedback setting.
 - Route view transitions, shared active-tab pills, the audio-player layout morph, and reader direction changes must honor both sources of reduced motion. Qibla alignment uses a finite settle confirmation rather than a looping target animation.
@@ -127,3 +128,8 @@ Animations must not degrade the user experience:
 - **No Extra Libraries:** Do not add new animation libraries. Use CSS transitions/animations or existing libraries carefully.
 - **Pause When Hidden:** Pause all animations when the application or element is not visible.
 - High-frequency counting surfaces replace the current ripple instead of accumulating ripple nodes. A single response confirms each tap without turning repeated devotion into decorative noise.
+
+- Counting press/release styles refer directly to CSS motion variables without synchronous computed-style reads during renders or taps.
+- Shared, Home and counter progress fills translate a full-size surface through a clipped track. Direction follows the interface, rounding and divider thickness remain stable, and no width/inline-size transition or permanent layer hint is needed.
+- Route snapshots name only the main canvas. The root snapshot does not crossfade persistent navigation. Active navigation icons reuse a finite entrance cue; global OS and in-app reduced-motion rules cover elements and pseudo-elements in surfaces.css.
+- Live Qibla rotation uses the existing shortest-angle sensor smoothing without an additional CSS rotation transition. This avoids long interpolation across north and the signed turn seam. The finite alignment confirmation remains optional and reduced-motion aware.

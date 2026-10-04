@@ -19,6 +19,24 @@ function Surface({ onCount, reduceMotion }: { onCount: () => void; reduceMotion?
 }
 
 describe("counting surface", () => {
+  it("counts rapid taps without synchronously reading computed styles", () => {
+    const onCount = vi.fn();
+    render(<Surface onCount={onCount} />);
+    const readStyles = vi.spyOn(window, "getComputedStyle");
+    const page = screen.getByTestId("page");
+    try {
+      for (let index = 0; index < 100; index += 1) {
+        fireEvent.pointerDown(page);
+        fireEvent.pointerUp(page);
+        fireEvent.click(page);
+      }
+      expect(onCount).toHaveBeenCalledTimes(100);
+      expect(readStyles).not.toHaveBeenCalled();
+    } finally {
+      readStyles.mockRestore();
+    }
+  });
+
   it("presses deep enough and quickly enough to feel like a press", () => {
     const onCount = vi.fn();
     render(<Surface onCount={onCount} />);

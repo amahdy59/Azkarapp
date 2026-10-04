@@ -185,7 +185,7 @@ export function BottomNav({ active, onChange, isArabic = false }: NavProps) {
               onClick={(event) => followInAppLink(event, () => onChange(id))}
               aria-label={label}
               aria-current={on ? "page" : undefined}
-              className="relative flex h-full min-h-11 min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-lg no-underline transition-[opacity,transform] duration-fast active:scale-95 active:opacity-70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              className="relative flex h-full min-h-11 min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-lg no-underline transition-[opacity,transform] duration-fast active:opacity-70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
               {/* Persistent non-color active cue. The selected state must not be
                   conveyed by colour alone, and .nav-active-cue below is only a
@@ -379,18 +379,18 @@ export function NavSidebar({
             // announced in two different formats. The explicit focus ring
             // matches the theme button too, which had one while this did not.
             aria-label={`${t(language, "settings.language")}: ${LANGUAGE_LABELS[language]}`}
-            className="flex items-center justify-between min-h-11 px-3 rounded-xl border border-border/60 bg-card hover:bg-muted text-sm font-medium text-foreground transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            className="flex items-center justify-between gap-3 min-h-11 px-3 py-2 rounded-xl border border-border/60 bg-card hover:bg-muted text-sm font-medium text-foreground transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           >
-            <div className="flex items-center gap-2.5">
-              <Globe size={18} className="text-primary" />
-              <span>{t(language, "settings.language")}</span>
+            <div className="flex min-w-0 items-center gap-2">
+              <Globe size={18} className="block shrink-0 text-primary" />
+              <span className="min-w-0">{t(language, "settings.language")}</span>
             </div>
             {/* Label names the setting, value shows the CURRENT language —
                 matching the theme button directly below and every settings row.
                 It previously labelled itself with the *target* language
                 ("English") beside a badge showing the current one ("AR"), which
                 is two opposite mental models in one control. */}
-            <span className="text-micro font-bold text-muted-foreground">{LANGUAGE_LABELS[language]}</span>
+            <span className="shrink-0 text-micro font-bold text-muted-foreground">{LANGUAGE_LABELS[language]}</span>
           </button>
         )}
 
@@ -399,13 +399,15 @@ export function NavSidebar({
             type="button"
             onClick={cycleTheme}
             aria-label={`${t(language, "common.theme")}: ${t(language, themeLabelKeys[themeMode])}`}
-            className="flex items-center justify-between min-h-11 px-3 rounded-xl border border-border/60 bg-card hover:bg-muted text-sm font-medium text-foreground transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            className="flex items-center justify-between gap-3 min-h-11 px-3 py-2 rounded-xl border border-border/60 bg-card hover:bg-muted text-sm font-medium text-foreground transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           >
-            <div className="flex items-center gap-2.5">
-              <ThemeIcon size={18} className="text-primary" />
-              <span>{t(language, "common.theme")}</span>
+            <div className="flex min-w-0 items-center gap-2">
+              <ThemeIcon size={18} className="block shrink-0 text-primary" />
+              <span className="min-w-0">{t(language, "common.theme")}</span>
             </div>
-            <span className="text-micro font-bold text-muted-foreground">{t(language, themeLabelKeys[themeMode])}</span>
+            <span className="shrink-0 text-micro font-bold text-muted-foreground">
+              {t(language, themeLabelKeys[themeMode])}
+            </span>
           </button>
         )}
       </div>

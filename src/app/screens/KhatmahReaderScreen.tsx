@@ -13,7 +13,7 @@ import type {
   ThemeMode,
 } from "../types";
 import {
-  ArrowLeft,
+  ArrowPrevious,
   CheckCircle2,
   ChevronDown,
   X,
@@ -660,10 +660,10 @@ export function KhatmahReaderScreen({
         onClick={onBack}
         data-testid="mushaf-top-left-back"
         aria-label={t(language, "common.back")}
-        className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
         <span className="inline-flex h-8 min-w-[2.75rem] items-center justify-center gap-1 rounded-full border border-border/80 bg-card/90 px-3 text-foreground shadow-xs backdrop-blur-md transition-colors group-hover:bg-muted group-active:bg-muted">
-          <ArrowLeft size={16} aria-hidden="true" />
+          <ArrowPrevious size={16} aria-hidden="true" />
         </span>
       </button>
     ) : undefined;
@@ -676,7 +676,7 @@ export function KhatmahReaderScreen({
         data-testid="mushaf-more-actions"
         aria-label={t(language, "mushaf.moreActions")}
         title={t(language, "mushaf.moreActions")}
-        className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
         <span className="inline-flex h-8 min-w-[2.75rem] items-center justify-center gap-1 rounded-full border border-border/80 bg-card/90 px-3 text-foreground shadow-xs backdrop-blur-md transition-colors group-hover:bg-muted group-active:bg-muted">
           <MoreVertical size={16} aria-hidden="true" />
@@ -697,7 +697,7 @@ export function KhatmahReaderScreen({
         aria-label={t(language, "mushaf.indexTitle")}
         title={t(language, "mushaf.indexTitle")}
         style={{ maxWidth: "calc(100vw - 7.5rem)" }}
-        className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
         <span className="inline-flex h-8 max-w-full items-center justify-center gap-1 rounded-full border border-border/80 bg-card/90 px-3 text-foreground shadow-xs backdrop-blur-md transition-colors group-hover:bg-muted group-active:bg-muted">
           <span className="arabic-ui truncate text-xs font-bold leading-none">{surahName}</span>
@@ -720,7 +720,7 @@ export function KhatmahReaderScreen({
         data-testid="mushaf-page-bookmark"
         aria-label={t(language, "mushaf.bookmarkCurrentPage")}
         title={t(language, "mushaf.bookmarkCurrentPage")}
-        className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
         <span
           className={`inline-flex h-8 min-w-[2.75rem] items-center justify-center gap-1 rounded-full border px-3 shadow-xs backdrop-blur-md transition-colors ${
@@ -746,7 +746,7 @@ export function KhatmahReaderScreen({
         data-testid="mushaf-difficult-words-switch"
         aria-label={t(language, "mushaf.difficultWordsInvite")}
         title={t(language, "mushaf.difficultWordsInvite")}
-        className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-60"
+        className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-60"
       >
         <span
           className={`inline-flex h-8 min-w-[2.75rem] items-center justify-center gap-1 rounded-full border px-3 shadow-xs backdrop-blur-md transition-colors ${

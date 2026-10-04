@@ -53,6 +53,9 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   const mushafPage = page.getByRole("article", { name: "صفحة ٤٢" });
   const pageNavigation = page.getByRole("navigation", { name: "التنقل بين صفحات المصحف" });
   await expect(mushafPage).toBeVisible();
+  const backIcon = page.getByTestId("mushaf-top-left-back").locator("svg");
+  await expect(backIcon).toHaveAttribute("data-rtl-flip", "");
+  await expect(backIcon).toHaveCSS("transform", "matrix(-1, 0, 0, 1, 0, 0)");
   await expect(pageNavigation).toBeAttached();
   await expect(page.getByRole("navigation", { name: /التنقل (السفلي|الرئيسي)/ })).toHaveCount(0);
   const initialBox = await mushafPage.boundingBox();
@@ -134,6 +137,18 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   await page.getByRole("button", { name: "فتح إجراءات الآية ٢٥٥" }).click();
   const ayahSheet = page.getByTestId("ayah-interaction-sheet");
   await expect(ayahSheet).toBeVisible();
+  if ((await page.viewportSize())!.width < 768) {
+    await expect(ayahSheet).toHaveClass(/pb-safe/);
+    const drawerColors = await ayahSheet.evaluate((element) => {
+      const probe = document.createElement("div");
+      probe.style.background = "var(--card)";
+      element.append(probe);
+      const result = [getComputedStyle(element).backgroundColor, getComputedStyle(probe).backgroundColor];
+      probe.remove();
+      return result;
+    });
+    expect(drawerColors[0]).toBe(drawerColors[1]);
+  }
   await expect(ayahSheet).toContainText("ٱللَّهُ لَآ إِلَـٰهَ إِلَّا هُوَ");
   await expect(ayahSheet.getByRole("button", { name: "نسخ الآية" })).toBeEnabled();
   await ayahSheet.getByRole("button", { name: "حفظ الآية" }).click();

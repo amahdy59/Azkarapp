@@ -60,9 +60,9 @@ export function QuranWordText({
             // paragraph — the UA sheet gives it a 16px default — so a
             // highlighted word rendered several pixels smaller than the ayah
             // around it, and the gap grew with the reading-size setting.
-            // Inherited explicitly; the heavier weight stays, since that is
-            // the highlight.
-            className="relative -mx-0.5 inline cursor-help rounded-md bg-primary/10 px-0.5 text-[length:inherit] font-semibold leading-[inherit] text-primary underline decoration-primary/60 decoration-dotted underline-offset-[0.22em] transition-colors hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            // Inherited explicitly; bold is intentionally omitted so the
+            // highlight relies on color and dotted underline only.
+            className="relative -mx-0.5 inline cursor-help rounded-md bg-primary/10 px-0.5 text-[length:inherit] leading-[inherit] text-primary underline decoration-primary/60 decoration-dotted underline-offset-[0.22em] transition-colors hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           >
             {segment.text}
           </button>

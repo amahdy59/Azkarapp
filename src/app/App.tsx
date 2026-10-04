@@ -2141,6 +2141,7 @@ function AppContent({
                       <Suspense fallback={null}>
                         <FloatingAudioPlayer
                           controller={audioController}
+                          textSize={textSize}
                           language={selectedLang}
                           direction={layoutDirection}
                           overReadingSurface
@@ -2386,6 +2387,7 @@ function AppContent({
           <Suspense fallback={null}>
             <FloatingAudioPlayer
               controller={audioController}
+              textSize={textSize}
               language={selectedLang}
               direction={layoutDirection}
               overReadingSurface={view === "reader" || view === "custom_counter" || view === "friday_salawat"}

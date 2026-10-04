@@ -26,7 +26,7 @@
 
 .audio-expanded-layout {
   display: grid;
-  grid-template-rows: auto minmax(12rem, 1fr) auto;
+  grid-template-rows: auto minmax(10rem, 1fr) auto;
   height: 100%;
   min-height: 0;
   overflow: auto;
@@ -44,7 +44,44 @@
 }
 
 .audio-expanded-text {
-  min-height: 6rem;
+  min-height: 0;
+}
+
+.audio-expanded-meta {
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.audio-expanded-meta > div {
+  width: auto;
+  margin-top: 0.5rem;
+}
+.audio-expanded-meta > [role="status"] {
+  flex-basis: 100%;
+}
+
+.floating-audio-player--compact {
+  container-type: inline-size;
+}
+.audio-compact-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+.audio-compact-wide {
+  display: none;
+}
+
+@container (min-width: 42rem) {
+  .audio-compact-row {
+    grid-template-columns: minmax(0, 1fr) minmax(8rem, 1fr) auto;
+  }
+  .audio-compact-wide {
+    display: flex;
+  }
+  .audio-compact-phone {
+    display: none;
+  }
 }
 
 /* The player meets the session header, rather than floating inside the card gutters. */
@@ -154,29 +191,24 @@
 }
 
 @media (min-width: 37.5rem) {
-  .floating-audio-player {
+  .floating-audio-player:not(.floating-audio-player--docked) {
     inset-inline: 0.75rem;
   }
 }
 
 @media (min-width: 56.25rem) {
-  .audio-compact-row {
-    display: grid;
-    grid-template-columns: auto minmax(8rem, 0.65fr) minmax(10rem, 1.35fr) auto;
-  }
-
-  .floating-audio-player {
+  .floating-audio-player:not(.floating-audio-player--docked) {
     bottom: 0.75rem;
     inset-inline-end: 0.75rem;
   }
 
-  .app-shell:not(.app-shell--navigation-hidden) .floating-audio-player {
+  .app-shell:not(.app-shell--navigation-hidden) .floating-audio-player:not(.floating-audio-player--docked) {
     inset-inline-start: calc(var(--nav-rail-width) + 0.75rem);
   }
 }
 
 @media (min-width: 75rem) {
-  .app-shell:not(.app-shell--navigation-hidden) .floating-audio-player {
+  .app-shell:not(.app-shell--navigation-hidden) .floating-audio-player:not(.floating-audio-player--docked) {
     inset-inline-start: calc(var(--nav-sidebar-width) + 0.75rem);
   }
 }

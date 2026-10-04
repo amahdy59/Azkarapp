@@ -70,3 +70,9 @@ export function getReadingFontSizePx({ textSize, arabicLength, longSurah }: Read
 export function getReadingFontSize(input: ReadingSizeInput): string {
   return `${getReadingFontSizePx(input)}px`;
 }
+
+/** Match Reader's size at each app setting while allowing browser text enlargement. */
+export function getReadingFontSizeRem(input: ReadingSizeInput): string {
+  const rootPx = { small: 14, medium: 16, large: 18 }[input.textSize];
+  return `${getReadingFontSizePx(input) / rootPx}rem`;
+}

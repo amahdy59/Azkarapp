@@ -48,11 +48,12 @@ export function SettingsRowItem({
           onClick={onPress}
           data-testid={testId}
           aria-current={current ? "page" : undefined}
-          className={`flex min-h-16 w-full items-center gap-3 px-4 py-3 text-start transition-[color,background-color,border-color,box-shadow,opacity] active:opacity-70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring ${
-            current ? "border-s-4 border-primary bg-primary/10" : "border-s-4 border-transparent bg-card"
+          className={`relative flex min-h-16 w-full items-center gap-3 px-4 py-3 text-start transition-[color,background-color,border-color,box-shadow,opacity] active:opacity-70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring ${
+            current ? "bg-primary/10" : "bg-card"
           }`}
           style={{ background: current ? "color-mix(in srgb, var(--primary) 10%, var(--card))" : "var(--card)" }}
         >
+          {current && <span aria-hidden="true" className="absolute inset-y-0 start-0 w-1 bg-primary" />}
           {content}
         </button>
       ) : (
@@ -98,7 +99,7 @@ export function SettingsSelectRow({
   return (
     <div className="relative">
       <div
-        className="group relative flex min-h-16 w-full items-center gap-3 px-4 focus-within:z-10 focus-within:outline-none focus-within:ring-[3px] focus-within:ring-inset focus-within:ring-ring"
+        className="group relative flex min-h-16 w-full items-center gap-3 px-4 py-3 focus-within:z-10 focus-within:outline-none focus-within:ring-[3px] focus-within:ring-inset focus-within:ring-ring"
         style={{ background: "var(--card)" }}
       >
         <span
@@ -165,7 +166,7 @@ export function SettingsSelectRow({
 }
 
 export function RowChevron() {
-  return <ChevronNext size={18} className="text-foreground/70" />;
+  return <ChevronNext size={18} className="block shrink-0 text-foreground/70" />;
 }
 
 export function RowValue({ value, withChevron = true }: { value: string; withChevron?: boolean }) {
@@ -187,7 +188,7 @@ export function ToggleTrack({ checked }: { checked: boolean }) {
   return (
     <span
       aria-hidden="true"
-      className="relative block h-[26px] w-11 rounded-full border-2 transition-colors duration-standard"
+      className="relative block h-[26px] w-11 shrink-0 rounded-full border-2 transition-colors duration-standard"
       style={{
         background: checked ? "var(--primary)" : "var(--card)",
         borderColor: checked ? "var(--primary)" : "var(--border-control)",

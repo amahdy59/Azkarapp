@@ -188,7 +188,7 @@ describe("the three surah readings", () => {
     expect(screen.getByText(/سُورَةُ/)).toBeInTheDocument();
     expect(screen.getByTestId("canonical-surah-passage")).toBeInTheDocument();
     expect(document.querySelector(".quran-passage")).toBeNull();
-    expect(screen.getByRole("switch", { name: "Highlight difficult words" })).toHaveAttribute("aria-checked", "false");
+    expect(screen.getByRole("switch", { name: "Rare words" })).toHaveAttribute("aria-checked", "false");
   });
 
   it("does not frame a surah that opens in the Mushaf instead", () => {

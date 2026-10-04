@@ -173,6 +173,15 @@ describe("QiblaScreen", () => {
     expect(screen.getByTestId("compass-rose")).toHaveAttribute("transform", "rotate(260 160 160)");
     expect(screen.getByTestId("qibla-arrow")).toHaveAttribute("transform", expect.stringMatching(/^rotate\(36\./));
     expect(screen.getByTestId("kaaba-target")).toHaveAttribute("transform", expect.stringMatching(/^rotate\(-36\./));
+    // Live angles are already smoothed by the domain helper. CSS must not
+    // interpolate a second time, especially when the shortest turn flips sign.
+    for (const heading of [315, 319, 359, 1]) {
+      await act(async () => {
+        window.dispatchEvent(Object.assign(new Event("deviceorientation"), { webkitCompassHeading: heading }));
+      });
+      expect(screen.getByTestId("qibla-arrow").style.transition).toBe("");
+      expect(screen.getByTestId("kaaba-target").style.transition).toBe("");
+    }
   });
 
   it("keeps the compass off and gives recovery guidance when absolute access is denied", async () => {

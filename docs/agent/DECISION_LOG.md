@@ -2,6 +2,16 @@
 
 Record user-approved product, design and architectural decisions here. Do not erase prior decisions; supersede them with a new entry.
 
+## Audio player review refinements — 2026-10-04
+
+Release follow-up: the owner approved English-first text in the English expanded player, with a Show Arabic / Hide Arabic disclosure, explicit recording language and Arabic fallback when no reviewed translation exists. This changes display only and preserves reviewed wording and playback. The owner now authorizes reviewing and publishing all pending changes to GitHub; this supersedes the earlier local-only restriction for this release. See phases/ENGLISH_AUDIO_AND_REFINEMENTS_RELEASE.md.
+
+The owner approved applying the audio-player review recommendations locally, explicitly without pushing. Scope: dock containment, short-screen transport visibility, reciter-only recording identity, compact metadata priority, consistent scalable reading type, responsive metadata grouping, explicit speed selection, prescribed-count repeat wording and stronger initial-visibility regression coverage. Preserve reviewed content, playback/completion ownership, canonical Mushaf typography and concurrent changes. See phases/AUDIO_PLAYER_REFINEMENT.md. No commit or deployment.
+
+Owner follow-up: remove audio attribution from the player and its active guidelines. The selected reciter name is sufficient. Optional credits or contributor information belong in Settings → About. This supersedes the player-attribution requirements in DEC-172/214 and earlier audio phase reports only; recording identity, permission evidence and source metadata stay intact.
+
+Owner screenshot follow-up: reduce empty space between reciter and zikr text and place Speed/Volume below the main transport controls. Preserve native semantics, keyboard order, reading scroll and short-screen visibility.
+
 ## Template
 
 ### DEC-000 — Decision title
@@ -4088,3 +4098,20 @@ null` shape, so a record written before this change still loads and still
 The owner approved all recommendations in the final visual/UX/accessibility review: relocate counting guidance inside the reading surface above actions; unify footer width/insets; emphasize the primary counter; quiet secondary surfaces; harmonize label/icon typography and states; preserve 48px lower controls, pill corners, 12px row gaps, keyboard focus, reduced motion, and enlarged-text growth. No religious content, counting persistence, or audio ownership changes are authorized by this visual scope.
 
 The owner's later instruction explicitly authorizes committing and pushing all recent local improvements, repairing necessary failures, monitoring workflows, and verifying production. This supersedes the earlier no-push instruction. Other-session changes remain included and preserved. The checkout was fast-forwarded to origin/main with a retained recovery stash; the keyboard-help sizing conflict combines the dynamic viewport height with upstream desktop auto-sizing.
+
+## Counter progress and single-line text follow-up — 2026-10-03
+
+- Authority: Owner's screenshot request to reduce counter text, keep all counter text on one line, shorten UI copy as needed, and fill the counter gradually rather than displaying a full surface before counting.
+- Decision: Use scalable 20px tally numerals and 14px concise action labels. Keep full mode-specific counting guidance in the accessible name. Start with a neutral card surface, grow a primary-tinted fill by count/target from the language's logical start edge, and reserve the full primary surface for completion. Single-action readings remain empty until the explicit completion tap; no inferred reading progress.
+- Supersedes: The prior solid primary background at zero and 24px tally face only. Preserve counting, persistence, audio ownership, target size, keyboard, motion, and reviewed content contracts.
+- Scope: Isolated checkout; preserve concurrent main-checkout work. The owner's follow-up explicitly says not to push after completing the changes. Keep this refinement local; no deployment.
+
+## Sharing usability refinement — 2026-10-03
+
+Owner-approved selection follow-up: apply all seven reviewed refinements, with physically right-aligned checkmarks for method/scope/theme labels in both languages, reserved slots for stable label placement, a shared subtle selected surface, inline compact method controls, clearer scope heading and actual localized card counts, and a quieter enlargement action. Preserve 44px targets and enlarged-text reflow. This follow-up remains local: no commit, push or deployment.
+
+Owner approved the combined sharing recommendations and corrected accessibility assessment, explicitly without pushing. Implement compact fit recovery, descriptive size options, native disclosure chevrons/summaries, visible selection checkmarks, actual palette samples, mirrored wide preview/settings columns, phone reflow and safe fixed actions. Preserve native details semantics, modal close behavior, reviewed content and export boundaries. Owner also approved minimal lint remediation: remove the unused audio attribution variable and exclude generated output scripts from ESLint. See phases/SHARING_USABILITY_REFINEMENT.md. No commit or deployment.
+
+## Verified audit remediation — 2026-10-04
+
+Owner approved the qualified audit assessment and its recommendations, explicitly without pushing. Implement one focused local phase covering semantic RTL exit/navigation icons, sheet inset ownership, shared translated progress, direct motion variables, quiet interactive surfaces, finite navigation cues, main-canvas route transitions, and centralized Friday Salawat product copy. Preserve reviewed religious wording, physical Mushaf page-turn conventions, existing sensor smoothing, haptic settings, checklist/status role distinctions, existing search recovery, and pre-existing local work. Keep unverified device/performance findings documented rather than applying arbitrary haptic throttles, font offsets, or decoration. See phases/AUDIT_VERIFIED_REMEDIATION.md. No commit, push, release-note rewrite or deployment.

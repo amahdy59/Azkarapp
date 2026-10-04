@@ -3,6 +3,117 @@ import AxeBuilder from "@axe-core/playwright";
 import { getAzkarForMode } from "../src/app/content/azkar";
 
 for (const language of ["ar", "en"] as const) {
+  test(`counter labels stay on one line and fill starts empty in ${language} @cross-browser`, async ({ page }) => {
+    await page.addInitScript((language) => {
+      localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+      if (!localStorage.getItem("azkarapp.state.v1"))
+        localStorage.setItem(
+          "azkarapp.state.v1",
+          JSON.stringify({
+            settings: { language, reduceMotion: true, routineModes: { morning: "complete" } },
+            profile: { isGuest: true },
+          }),
+        );
+    }, language);
+    for (const width of [320, 390, 820, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto("/#/azkar/waking-up/1");
+      const counter = page.getByTestId("counter-surface");
+      await expect(counter).toBeVisible();
+      for (const fontSize of ["100%", "200%"]) {
+        await page.evaluate((fontSize) => {
+          document.documentElement.style.fontSize = fontSize;
+        }, fontSize);
+        const dimensions = await counter.locator(".counter-action-label").evaluate((element) => {
+          const range = document.createRange();
+          range.selectNodeContents(element);
+          return {
+            lines: range.getClientRects().length,
+            textWidth: range.getBoundingClientRect().width,
+            available: element.parentElement!.clientWidth - 24,
+          };
+        });
+        expect(dimensions.lines).toBe(1);
+        expect(dimensions.textWidth, JSON.stringify({ width, fontSize, dimensions })).toBeLessThanOrEqual(
+          dimensions.available + 1,
+        );
+      }
+      await page.evaluate(() => {
+        document.documentElement.style.fontSize = "100%";
+      });
+    }
+    const index = getAzkarForMode("morning", "complete").findIndex((zikr) => zikr.id === "m-hm-91");
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(`/#/azkar/morning/${index + 1}`);
+    const counter = page.getByTestId("counter-surface");
+    await expect(counter).toBeVisible();
+    const fill = counter.locator(".counter-progress-fill");
+    await expect(fill).toHaveCSS("--progress-ratio", "0");
+    const emptyFill = (await fill.boundingBox())!;
+    const emptyTrack = (await counter.locator(".counter-outline-progress").boundingBox())!;
+    expect(
+      Math.min(emptyFill.x + emptyFill.width, emptyTrack.x + emptyTrack.width) - Math.max(emptyFill.x, emptyTrack.x),
+    ).toBeLessThanOrEqual(1);
+    expect(await counter.evaluate((element) => getComputedStyle(element).backgroundColor)).toBe(
+      await page.evaluate(() => {
+        const probe = document.createElement("div");
+        probe.style.background = "var(--card)";
+        document.body.append(probe);
+        const color = getComputedStyle(probe).backgroundColor;
+        probe.remove();
+        return color;
+      }),
+    );
+    await page.screenshot({ path: `output/playwright/counter-progress/empty-${language}.png` });
+    await counter.click();
+    await expect(counter).toHaveAttribute("aria-label", language === "en" ? /1 \/ 100$/ : /١ \/ ١٠٠$/);
+    // Exercise resumed progress without spending most of WebKit's test window
+    // waiting for fifty separate browser input round trips.
+    await page.evaluate(() => {
+      const state = JSON.parse(localStorage.getItem("azkarapp.state.v1")!);
+      state.partialZikrCounts["m-hm-91"] = 49;
+      localStorage.setItem("azkarapp.state.v1", JSON.stringify(state));
+    });
+    await page.reload();
+    await expect(counter).toHaveAttribute("aria-label", language === "en" ? /49 \/ 100$/ : /٤٩ \/ ١٠٠$/);
+    await counter.click();
+    const half = await fill.boundingBox();
+    const box = (await counter.boundingBox())!;
+    const visibleStart = Math.max(half!.x, box.x + 1);
+    const visibleEnd = Math.min(half!.x + half!.width, box.x + box.width - 1);
+    expect((visibleEnd - visibleStart) / (box.width - 2)).toBeCloseTo(0.5, 2);
+    if (language === "ar") expect(visibleEnd).toBeCloseTo(box.x + box.width - 1, 0);
+    else expect(visibleStart).toBeCloseTo(box.x + 1, 0);
+    await page.screenshot({ path: `output/playwright/counter-progress/half-${language}.png` });
+    await page.reload();
+    await expect(counter).toHaveAttribute("aria-label", language === "en" ? /50 \/ 100$/ : /٥٠ \/ ١٠٠$/);
+    const restoredFill = (await fill.boundingBox())!;
+    const restoredBox = (await counter.boundingBox())!;
+    const restoredWidth =
+      Math.min(restoredFill.x + restoredFill.width, restoredBox.x + restoredBox.width - 1) -
+      Math.max(restoredFill.x, restoredBox.x + 1);
+    expect(restoredWidth / (restoredBox.width - 2)).toBeCloseTo(0.5, 2);
+    await page.setViewportSize({ width: 320, height: 900 });
+    await page.evaluate(() => {
+      document.documentElement.style.fontSize = "200%";
+    });
+    await expect(async () => {
+      const tally = await counter.locator("p").evaluate((element) => {
+        const range = document.createRange();
+        range.selectNodeContents(element);
+        const parent = element.parentElement!;
+        const style = getComputedStyle(parent);
+        return {
+          width: range.getBoundingClientRect().width,
+          available: parent.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight),
+        };
+      });
+      expect(tally.width, JSON.stringify(tally)).toBeLessThanOrEqual(tally.available + 1);
+    }).toPass({ timeout: 15000 });
+  });
+}
+
+for (const language of ["ar", "en"] as const) {
   test(`compact devotional footer in ${language} @cross-browser`, async ({ page }) => {
     await page.addInitScript((language) => {
       localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
@@ -79,6 +190,22 @@ for (const language of ["ar", "en"] as const) {
           expect(new Set(navigationWidths).size).toBe(1);
           const supportBox = (await actions.boundingBox())!;
           expect(Math.round(box!.y - supportBox.y - supportBox.height)).toBe(12);
+        } else {
+          for (const button of await page.getByTestId("reader-side-navigation").getByRole("button").all()) {
+            const geometry = await button.evaluate((element) => {
+              const style = getComputedStyle(element);
+              return {
+                left: style.paddingLeft,
+                right: style.paddingRight,
+                width: element.getBoundingClientRect().width,
+                height: element.getBoundingClientRect().height,
+              };
+            });
+            expect(geometry.left).toBe("20px");
+            expect(geometry.right).toBe("20px");
+            expect(geometry.width).toBeCloseTo(112, 0);
+            expect(geometry.height).toBeCloseTo(48, 0);
+          }
         }
       }).toPass({ timeout: 15000 });
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);

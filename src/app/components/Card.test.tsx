@@ -13,7 +13,7 @@ describe("Card", () => {
 
   it("renders overlay elevation", () => {
     render(<Card elevation="overlay">Sheet</Card>);
-    expect(screen.getByText("Sheet")).toHaveClass("shadow-overlay");
+    expect(screen.getByText("Sheet")).toHaveClass("shadow-overlay", "rounded-3xl");
   });
 
   it("renders flat elevation with no shadow class", () => {
@@ -30,7 +30,7 @@ describe("Card", () => {
 
   it("merges caller-provided className", () => {
     render(<Card className="mt-4">Merged</Card>);
-    expect(screen.getByText("Merged")).toHaveClass("mt-4", "rounded-3xl");
+    expect(screen.getByText("Merged")).toHaveClass("mt-4", "rounded-2xl");
   });
 
   it("applies no padding class when padding is none", () => {

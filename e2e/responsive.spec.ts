@@ -175,7 +175,7 @@ test("Arabic Home keeps group controls in the approved RTL order and loads the s
   expect(trackBox).not.toBeNull();
   expect(fillBox).not.toBeNull();
   if (!trackBox || !fillBox) return;
-  expect(fillBox.x + fillBox.width).toBeCloseTo(trackBox.x + trackBox.width, 0);
+  expect(Math.min(fillBox.x + fillBox.width, trackBox.x + trackBox.width)).toBeCloseTo(trackBox.x + trackBox.width, 0);
 });
 
 async function enterEnglishGuestMode(page: import("@playwright/test").Page) {

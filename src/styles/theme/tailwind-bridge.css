@@ -141,6 +141,7 @@
 
   .ui-icon-button {
     display: inline-flex;
+    flex: none;
     width: var(--ds-icon-size);
     height: var(--ds-icon-size);
     min-width: var(--ds-icon-size);

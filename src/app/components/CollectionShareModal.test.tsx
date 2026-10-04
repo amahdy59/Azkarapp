@@ -4,7 +4,8 @@ import { CollectionShareModal } from "./CollectionShareModal";
 import type { Zikr } from "../types";
 
 // Mock canvas and share functions
-vi.mock("../share/collectionShareCard", () => ({
+vi.mock("../share/collectionShareCard", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../share/collectionShareCard")>()),
   releaseSharePages: vi.fn(),
   getCompatibleShareFormats: vi.fn().mockResolvedValue(["story", "square", "portrait", "tall"]),
   generateAllCollectionStoryPages: vi.fn().mockResolvedValue([
@@ -53,6 +54,70 @@ const SAMPLE_ITEMS: Zikr[] = [
 ];
 
 describe("CollectionShareModal", () => {
+  it("uses matching selected styles and truthful card counts as the scope changes", async () => {
+    render(
+      <CollectionShareModal open onClose={vi.fn()} collectionTitle="Morning" items={SAMPLE_ITEMS} language="en" />,
+    );
+    await screen.findByRole("img");
+    expect(screen.getByText("1 card to share")).toBeVisible();
+    const image = screen.getByRole("button", { name: "Image", exact: true });
+    const current = screen.getByRole("button", { name: "This card", exact: true });
+    expect(image).toHaveClass("border-primary", "bg-muted");
+    expect(current).toHaveClass("border-primary", "bg-muted");
+    fireEvent.click(screen.getByRole("button", { name: "Selected cards", exact: true }));
+    expect(screen.getByText("No cards selected to share")).toBeVisible();
+    expect(current).not.toHaveClass("border-primary");
+    fireEvent.click(screen.getByRole("checkbox", { name: "Select card 1", exact: true }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Select card 2", exact: true }));
+    expect(screen.getByText("2 cards to share")).toBeVisible();
+  });
+  it("associates size and language guidance and hides image settings in other modes", async () => {
+    render(
+      <CollectionShareModal
+        open
+        onClose={vi.fn()}
+        collectionTitle="Morning"
+        categoryId="morning"
+        items={SAMPLE_ITEMS}
+        language="en"
+      />,
+    );
+    await screen.findByRole("img");
+    const settings = screen.getByText("Image settings").closest("details")!;
+    settings.open = true;
+    const size = screen.getByRole("combobox", { name: "Image size" });
+    expect(size).toHaveAccessibleDescription("Choose the shape that suits your destination.");
+    expect(screen.getByRole("combobox", { name: "Card language" })).toHaveAccessibleDescription(
+      "Card labels only. English meaning is a separate addition.",
+    );
+    expect(
+      screen.getByRole("button", { name: "Image", exact: true }).querySelector('svg[aria-hidden="true"]'),
+    ).not.toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Text", exact: true }));
+    expect(screen.queryByText("Image settings")).not.toBeInTheDocument();
+    expect(screen.getByText("Customize content")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Link", exact: true }));
+    expect(screen.queryByText("Customize content")).not.toBeInTheDocument();
+  });
+  it("summarizes selected additions in a native disclosure", async () => {
+    render(
+      <CollectionShareModal
+        open
+        onClose={vi.fn()}
+        collectionTitle="Morning"
+        items={[{ ...SAMPLE_ITEMS[0]!, translation: "Praise Allah" }]}
+        language="en"
+      />,
+    );
+    await screen.findByRole("img");
+    const details = screen.getByText("Customize content").closest("details")!;
+    details.open = true;
+    fireEvent.click(screen.getByRole("checkbox", { name: "Include reviewed English meaning" }));
+    await waitFor(() => expect(details.querySelector("summary")).toHaveTextContent("Meaning"));
+    details.open = false;
+    expect(details.querySelector("summary svg")).toHaveAttribute("aria-hidden", "true");
+    expect(details.querySelector("summary")).toHaveTextContent("Meaning");
+  });
   it("keeps full text available when no image format fits", async () => {
     const { getCompatibleShareFormats } = await import("../share/collectionShareCard");
     vi.mocked(getCompatibleShareFormats).mockResolvedValueOnce([]);
@@ -87,7 +152,9 @@ describe("CollectionShareModal", () => {
     );
     expect(await screen.findByRole("alert")).toHaveTextContent(/complete/i);
     expect(generateAllCollectionStoryPages).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole("button", { name: "Tall reading image" }));
+    expect(screen.getByText("Choose a compatible size to enable saving.")).toBeVisible();
+    expect(screen.getByRole("button", { name: "Text", exact: true })).toBeEnabled();
+    fireEvent.click(screen.getByRole("button", { name: "Use Tall reading image" }));
     await screen.findByRole("img");
     expect(generateAllCollectionStoryPages).toHaveBeenCalledWith(expect.objectContaining({ format: "tall" }));
   });
@@ -136,7 +203,9 @@ describe("CollectionShareModal", () => {
     render(
       <CollectionShareModal open onClose={vi.fn()} collectionTitle="أذكار الصباح" items={SAMPLE_ITEMS} language="ar" />,
     );
-    expect(await screen.findByRole("alert")).toBeVisible();
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "حاول تجهيز الصورة مرة أخرى، أو اختر النص أو الرابط من الأعلى.",
+    );
     fireEvent.click(screen.getByRole("button", { name: "حاول مرة أخرى" }));
     expect(await screen.findByAltText("أذكار الصباح - صفحة 1 من 5")).toBeVisible();
   });
@@ -271,7 +340,7 @@ describe("CollectionShareModal", () => {
       <CollectionShareModal open onClose={vi.fn()} collectionTitle="أذكار الصباح" items={SAMPLE_ITEMS} language="ar" />,
     );
     await screen.findByRole("img");
-    fireEvent.click(screen.getByText("خيارات مشاركة إضافية"));
+    fireEvent.click(screen.getByText("خيارات الحفظ والنسخ"));
     fireEvent.click(screen.getByRole("button", { name: "نسخ الصورة" }));
     expect(await screen.findByRole("alert")).toHaveTextContent("تعذر نسخ الصورة");
     expect(downloadFile).not.toHaveBeenCalled();

@@ -48,4 +48,6 @@ function killProcessOnPort(port) {
   }
 }
 
-killProcessOnPort(PORT);
+// An externally managed preview has its own lifecycle. Do not terminate an
+// unrelated development session on the default port when it is not being used.
+if (!process.env.E2E_BASE_URL) killProcessOnPort(PORT);

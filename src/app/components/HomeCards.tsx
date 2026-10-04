@@ -1,3 +1,4 @@
+import { progressFillStyle } from "./progressFillStyle";
 import { t } from "../i18n";
 import type { DailyEvidence } from "../dailyEvidence";
 import type { AppLanguage, RoutineMode } from "../types";
@@ -5,19 +6,7 @@ import { formatNumerals } from "../formatting";
 import { HomeCard } from "./HomeCard";
 import { ProductImage } from "./ProductImage";
 import { SegmentedControl } from "./SegmentedControl";
-import {
-  ArrowLeft,
-  ArrowRight,
-  Bookmark,
-  BookOpen,
-  Clock,
-  Sparkles,
-  Heart,
-  Sun,
-  MoonStar,
-  Moon,
-  RefreshCw,
-} from "./icons";
+import { ArrowNext, Bookmark, BookOpen, Clock, Sparkles, Heart, Sun, MoonStar, Moon, RefreshCw } from "./icons";
 import { HadithWeakChainBadge } from "./ZikrComponents";
 
 export type HomeSavedSource = "main" | "comprehensive" | "friday";
@@ -27,22 +16,6 @@ export interface HomeSavedCardItem {
   categoryLabel: string;
   displayText: string;
   source: HomeSavedSource;
-}
-
-function DirectionArrow({
-  direction,
-  size = 18,
-  className,
-}: {
-  direction: "ltr" | "rtl";
-  size?: number;
-  className?: string;
-}) {
-  return direction === "rtl" ? (
-    <ArrowLeft size={size} className={`shrink-0${className ? ` ${className}` : ""}`} aria-hidden="true" />
-  ) : (
-    <ArrowRight size={size} className={`shrink-0${className ? ` ${className}` : ""}`} aria-hidden="true" />
-  );
 }
 
 export function PrayerRoutineCard({
@@ -194,8 +167,8 @@ export function PrayerRoutineCard({
               aria-labelledby={progressId}
             >
               <div
-                className="h-full rounded-full bg-primary transition-[width] duration-700 ease-out"
-                style={{ width: `${progress * 100}%` }}
+                className="progress-fill-transform h-full rounded-full bg-primary"
+                style={progressFillStyle(progress)}
               />
             </div>
           </div>
@@ -206,10 +179,10 @@ export function PrayerRoutineCard({
           data-testid="home-primary-cta"
           aria-describedby={progressId}
           onClick={onOpen}
-          className="group mt-3 flex min-h-[54px] w-full items-center justify-center gap-2.5 rounded-2xl bg-primary px-4 text-title font-black text-primary-foreground shadow-raised transition-transform hover:brightness-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
+          className="group mt-3 flex min-h-[52px] w-full items-center justify-center gap-2.5 rounded-2xl bg-primary px-4 text-title font-black text-primary-foreground shadow-raised transition-transform hover:brightness-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <span>{ctaLabel}</span>
-          <DirectionArrow direction={direction} size={20} className="transition-transform group-hover:scale-110" />
+          <ArrowNext size={20} className="transition-transform group-hover:scale-110" />
         </button>
       </HomeCard>
     </section>
@@ -255,6 +228,7 @@ export function SavedZikrCard({
       elevation="flat"
       onGlass={onGlass}
       aria-labelledby="home-saved-heading"
+      dir={direction}
       className="flex h-full flex-col"
       data-testid="home-saved-section"
     >
@@ -310,7 +284,7 @@ export function SavedZikrCard({
                       {item.displayText}
                     </span>
                   </span>
-                  <DirectionArrow direction={direction} size={17} />
+                  <ArrowNext size={17} />
                 </button>
                 {isLoading && (
                   <p role="status" className="mt-1 px-2 text-xs font-semibold text-muted-foreground">
@@ -375,6 +349,7 @@ export function FridayHomeCard({
         as="section"
         onGlass={onGlass}
         data-testid="home-friday-card"
+        dir={direction}
         aria-labelledby="friday-card-heading"
         elevation="raised"
         padding="md"
@@ -404,7 +379,7 @@ export function FridayHomeCard({
               className="flex min-h-11 items-center justify-center gap-2 rounded-2xl bg-primary px-4 text-sm font-black text-primary-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
               {actionLabel}
-              <DirectionArrow direction={direction} />
+              <ArrowNext />
             </button>
           )}
         </div>
@@ -418,6 +393,7 @@ export function FridayHomeCard({
       onGlass={onGlass}
       padding="none"
       data-testid="home-friday-card"
+      dir={direction}
       aria-labelledby="friday-card-heading"
       elevation="raised"
       className="overflow-hidden"
@@ -453,7 +429,7 @@ export function FridayHomeCard({
               className="mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-primary px-6 text-subtitle font-black text-primary-foreground shadow-xs transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:w-fit"
             >
               {actionLabel}
-              <DirectionArrow direction={direction} />
+              <ArrowNext />
             </button>
           )}
         </div>
@@ -548,7 +524,7 @@ export function DailyEvidenceCard({
             aria-label={t(language, "home.nextDailyEvidence")}
             title={t(language, "home.nextDailyEvidence")}
             data-testid="daily-evidence-refresh"
-            className={`-my-1.5 -me-1.5 flex size-11 shrink-0 items-center justify-center rounded-full transition-transform hover:opacity-80 active:scale-90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring motion-reduce:transition-none ${
+            className={`-my-1.5 -me-1.5 flex size-11 shrink-0 items-center justify-center rounded-full transition-transform hover:opacity-80 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring motion-reduce:transition-none ${
               onGlass ? "text-on-media-muted hover:text-on-media" : "text-muted-foreground hover:text-foreground"
             }`}
           >

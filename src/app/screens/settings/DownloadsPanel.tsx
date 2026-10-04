@@ -394,7 +394,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
             type="button"
             variant="outline"
             onClick={() => void downloadCompleteMushaf()}
-            disabled={isAnyJobActive || status?.downloadedMushafPages === 604}
+            disabled={isLoading || isAnyJobActive || status?.downloadedMushafPages === 604}
             className="mt-4 w-full"
           >
             <Download size={18} aria-hidden="true" />
@@ -437,7 +437,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
             <Button
               type="button"
               variant="outline"
-              disabled={isAnyJobActive}
+              disabled={isLoading || isAnyJobActive}
               onClick={() => void removeMushaf()}
               className="mt-3 w-full border-destructive/40 text-destructive"
             >
@@ -467,7 +467,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
                 <button
                   key={collection.category}
                   type="button"
-                  disabled={collection.byteSize === 0 || isAnyJobActive}
+                  disabled={isLoading || collection.byteSize === 0 || isAnyJobActive}
                   onClick={() => void downloadCollection(collection)}
                   className="flex min-h-11 items-center justify-between gap-3 rounded-xl border border-border bg-background px-3 text-start font-semibold text-foreground disabled:opacity-50 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 >
@@ -522,7 +522,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
           <Button
             type="button"
             variant="outline"
-            disabled={!status?.downloadedAudioAssets || isAnyJobActive}
+            disabled={isLoading || !status?.downloadedAudioAssets || isAnyJobActive}
             onClick={() => void removeDownloads()}
             className="mt-3 w-full border-destructive/40 text-destructive"
           >

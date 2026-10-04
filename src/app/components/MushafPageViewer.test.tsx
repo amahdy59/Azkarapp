@@ -110,6 +110,26 @@ describe("MushafPageViewer", () => {
     expect(container.querySelector('[data-page-transition="forward"]')).toBeInTheDocument();
   });
 
+  it("keeps reduced-motion page changes at full opacity", () => {
+    const animate = vi.fn();
+    const paperRef = { current: null as HTMLDivElement | null };
+    const props = {
+      lines: sampleLines,
+      language: "ar" as const,
+      pageNumber: 3,
+      surahName: "سورة البقرة",
+      juzNumber: 1,
+      direction: "rtl" as const,
+      paperRef,
+      reduceMotion: true,
+    };
+    const { rerender } = render(<MushafPageViewer {...props} />);
+    paperRef.current!.animate = animate;
+    rerender(<MushafPageViewer {...props} pageNumber={4} pageTransitionDirection="forward" />);
+    expect(animate).not.toHaveBeenCalled();
+    expect(screen.getByRole("article", { name: "صفحة ٤" })).toBeInTheDocument();
+  });
+
   it("vibrates on a settled page turn only when haptics are enabled", () => {
     const vibrate = vi.fn();
     Object.defineProperty(navigator, "vibrate", { configurable: true, value: vibrate });

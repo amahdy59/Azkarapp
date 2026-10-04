@@ -21,7 +21,7 @@ async function openAyatAlKursi(page: Page) {
   });
   await page.goto("/#/azkar/morning/4");
   await expect(page.getByTestId("reader-screen")).toBeVisible();
-  await page.getByRole("switch", { name: /الكلمات الغريبة/ }).click();
+  await page.getByRole("switch", { name: "كلمات غريبة", exact: true }).click();
 }
 
 test.describe("Quran word meanings", () => {

@@ -319,17 +319,17 @@ describe("AudioProvider integration", () => {
     // Where the reader is in a prescribed repetition, said once.
     expect(screen.getByText("Repetition 1 / 3")).toBeInTheDocument();
 
-    // The pill shows the rate it is on and steps to the next one; the old
-    // control was a five-option select two taps inside a collapsed panel.
-    const speed = screen.getByRole("button", { name: /Speed/ });
+    // Select a rate directly and verify the real controller updates the displayed value.
+    const speed = screen.getByRole("combobox", { name: /Speed/ });
     expect(speed).toHaveTextContent("1×");
     fireEvent.click(speed);
-    expect(screen.getByRole("button", { name: /Speed/ })).toHaveTextContent("1.25×");
+    fireEvent.click(screen.getByRole("option", { name: "1.25×" }));
+    expect(screen.getByRole("combobox", { name: /Speed/ })).toHaveTextContent("1.25×");
 
-    const repeat = screen.getByRole("button", { name: "Repeat" });
+    const repeat = screen.getByRole("button", { name: "Repeat 3 times" });
     expect(repeat).toHaveAttribute("aria-pressed", "true");
     fireEvent.click(repeat);
-    expect(screen.getByRole("button", { name: "Repeat" })).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getByRole("button", { name: "Repeat 3 times" })).toHaveAttribute("aria-pressed", "false");
 
     expect(screen.queryByRole("button", { name: /Replay/ })).not.toBeInTheDocument();
   });
@@ -367,8 +367,8 @@ describe("AudioProvider integration", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "توسيع المشغل" }));
     fireEvent.click(screen.getByTestId("audio-reciter-select"));
-    expect(screen.getByTestId("audio-recording-source")).toBeVisible();
-    expect(screen.getByTestId("audio-recording-source")).toHaveTextContent("المصدر");
+    expect(screen.queryByTestId("audio-recording-source")).not.toBeInTheDocument();
+    expect(screen.getByTestId("audio-reciter-select")).not.toHaveTextContent("المصدر");
   });
 
   it("keeps lock-screen metadata and controls synchronized with the actual recording", async () => {

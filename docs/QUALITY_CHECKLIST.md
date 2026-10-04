@@ -86,9 +86,21 @@ The keyboard row is marked partial for the same reason: the automation proves ta
 
 ## Sharing refinement checks
 
+- Inspect mirrored preview/settings columns at wide widths, preview-first compact reflow, short landscape windows, native disclosure indicators and collapsed additions summaries. Check unavailable-size descriptions, size/language help associations, visible selection checkmarks, dropdown Escape/focus restoration, enlargement exit, and controls scrolling above the footer.
+
 - Every zikr, selected meaning/pronunciation/benefit and available citation fit together on one image. Incompatible sizes explain size/Text/Link recovery.
 - Reviewed multi-page surahs export name, reviewed benefit/source and an exact Mushaf QR/link; no verse payload in image, Text or ZIP.
 - Current/Selected/Entire-collection scope matches both files and archive text; unsupported native payloads expose Save/Copy.
 - Check 320px width and 200% text: compact header/action footer remain visible, scrolling focus is unobscured, keyboard stays in the modal, and Escape restores the trigger.
 - Inspect actual olive/gold/lavender exports and single/reminder cards. Real social compression, QR scanning, Android/iPhone share sheets, cutouts and human screen-reader checks must be recorded separately from browser emulation.
 - Inspect Arabic/English pill ink bounds, its exact 4px gap, header/title separation, website badge contrast, QR clearance and multi-card-only numbering. Check Portrait reminder defaults and all four available formats; branding must not split or remove content.
+
+## Verified audit remediation checks
+
+- `pnpm check` gives each run its own `coverage/check-<pid>` and `output/check-build-<pid>` directories. Bundle and CSS checks read that same build; their optional directory argument defaults to `dist`, preserving the Pages gate. Concurrent local checks must not combine coverage files or hashed build assets.
+- Download and removal actions stay disabled while storage readiness is loading, so initial refreshes cannot clear a job's error or cancellation feedback.
+- Verify Arabic/English Back and Previous/Next icons separately from the physical Mushaf page-turn controls.
+- Inspect partial, empty, full and restored progress in both directions; translated fills must retain clipped geometry and divider thickness.
+- Exercise menu keyboard focus in Light, Midnight and Dark, Escape focus return, OS reduced motion, and in-app reduced motion with OS motion enabled.
+- Inspect compact sheet surface and inset ownership. Real cutout/gesture-navigation hardware, sensor feel and TalkBack/VoiceOver checks remain human evidence requirements.
+- Capture current bundle measurements; never claim input latency or frame-rate gains without a representative-device trace.

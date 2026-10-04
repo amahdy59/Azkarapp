@@ -127,43 +127,47 @@ test("tablet and desktop Home keep prayer detail to the selected half while othe
   await expect(prayerSummary.locator('article[data-density="summary"]')).toHaveCount(5);
   await expect(prayerSummary.getByRole("checkbox")).toHaveCount(0);
 
-  const [gridBox, prayerDetailBox, contextStackBox, primaryBox, companionBox, wirdBox, prayerSummaryBox] =
-    await Promise.all(
-      [grid, prayerDetail, contextStack, primary, companion, wird, prayerSummary].map((locator) =>
-        locator.boundingBox(),
-      ),
-    );
-  expect(
-    gridBox && prayerDetailBox && contextStackBox && primaryBox && companionBox && wirdBox && prayerSummaryBox,
-  ).toBeTruthy();
-  if (gridBox && prayerDetailBox && contextStackBox && primaryBox && companionBox && wirdBox && prayerSummaryBox) {
-    expect(Math.abs(prayerDetailBox.width - (prayerSummaryBox.width - 20) / 2)).toBeLessThanOrEqual(2);
-    expect(prayerDetailBox.x + prayerDetailBox.width).toBeCloseTo(prayerSummaryBox.x + prayerSummaryBox.width, 0);
-    expect(Math.abs(prayerDetailBox.y - contextStackBox.y)).toBeLessThanOrEqual(2);
-    expect(Math.abs(prayerDetailBox.width - contextStackBox.width)).toBeLessThanOrEqual(2);
-    expect(primaryBox.width).toBeCloseTo(contextStackBox.width, 0);
-    expect(companionBox.width).toBeCloseTo(contextStackBox.width, 0);
-    expect(companionBox.y).toBeGreaterThanOrEqual(primaryBox.y + primaryBox.height + 12);
-    expect(wirdBox.y).toBeGreaterThanOrEqual(
-      Math.max(prayerDetailBox.y + prayerDetailBox.height, companionBox.y + companionBox.height) + 12,
-    );
-    expect(wirdBox.width).toBeGreaterThanOrEqual(gridBox.width - 2);
-  }
+  await expect(async () => {
+    const [gridBox, prayerDetailBox, contextStackBox, primaryBox, companionBox, wirdBox, prayerSummaryBox] =
+      await Promise.all(
+        [grid, prayerDetail, contextStack, primary, companion, wird, prayerSummary].map((locator) =>
+          locator.boundingBox(),
+        ),
+      );
+    expect(
+      gridBox && prayerDetailBox && contextStackBox && primaryBox && companionBox && wirdBox && prayerSummaryBox,
+    ).toBeTruthy();
+    if (gridBox && prayerDetailBox && contextStackBox && primaryBox && companionBox && wirdBox && prayerSummaryBox) {
+      expect(Math.abs(prayerDetailBox.width - (prayerSummaryBox.width - 20) / 2)).toBeLessThanOrEqual(2);
+      expect(prayerDetailBox.x + prayerDetailBox.width).toBeCloseTo(prayerSummaryBox.x + prayerSummaryBox.width, 0);
+      expect(Math.abs(prayerDetailBox.y - contextStackBox.y)).toBeLessThanOrEqual(2);
+      expect(Math.abs(prayerDetailBox.width - contextStackBox.width)).toBeLessThanOrEqual(2);
+      expect(primaryBox.width).toBeCloseTo(contextStackBox.width, 0);
+      expect(companionBox.width).toBeCloseTo(contextStackBox.width, 0);
+      expect(companionBox.y).toBeGreaterThanOrEqual(primaryBox.y + primaryBox.height + 12);
+      expect(wirdBox.y).toBeGreaterThanOrEqual(
+        Math.max(prayerDetailBox.y + prayerDetailBox.height, companionBox.y + companionBox.height) + 12,
+      );
+      expect(wirdBox.width).toBeGreaterThanOrEqual(gridBox.width - 2);
+    }
+  }).toPass({ timeout: 15_000 });
 
   await page.setViewportSize({ width: 834, height: 900 });
   await page.waitForFunction(() => window.innerWidth === 834);
-  const [tabletPrayerBox, tabletStackBox, tabletSummaryBox] = await Promise.all([
-    prayerDetail.boundingBox(),
-    contextStack.boundingBox(),
-    prayerSummary.boundingBox(),
-  ]);
-  expect(tabletPrayerBox && tabletStackBox && tabletSummaryBox).toBeTruthy();
-  if (tabletPrayerBox && tabletStackBox && tabletSummaryBox) {
-    expect(Math.abs(tabletPrayerBox.width - (tabletSummaryBox.width - 16) / 2)).toBeLessThanOrEqual(2);
-    expect(tabletPrayerBox.x + tabletPrayerBox.width).toBeCloseTo(tabletSummaryBox.x + tabletSummaryBox.width, 0);
-    expect(Math.abs(tabletPrayerBox.y - tabletStackBox.y)).toBeLessThanOrEqual(2);
-    expect(Math.abs(tabletPrayerBox.width - tabletStackBox.width)).toBeLessThanOrEqual(2);
-  }
+  await expect(async () => {
+    const [tabletPrayerBox, tabletStackBox, tabletSummaryBox] = await Promise.all([
+      prayerDetail.boundingBox(),
+      contextStack.boundingBox(),
+      prayerSummary.boundingBox(),
+    ]);
+    expect(tabletPrayerBox && tabletStackBox && tabletSummaryBox).toBeTruthy();
+    if (tabletPrayerBox && tabletStackBox && tabletSummaryBox) {
+      expect(Math.abs(tabletPrayerBox.width - (tabletSummaryBox.width - 16) / 2)).toBeLessThanOrEqual(2);
+      expect(tabletPrayerBox.x + tabletPrayerBox.width).toBeCloseTo(tabletSummaryBox.x + tabletSummaryBox.width, 0);
+      expect(Math.abs(tabletPrayerBox.y - tabletStackBox.y)).toBeLessThanOrEqual(2);
+      expect(Math.abs(tabletPrayerBox.width - tabletStackBox.width)).toBeLessThanOrEqual(2);
+    }
+  }).toPass({ timeout: 15_000 });
 
   const routineTiles = page.getByTestId("today-garden-card").getByRole("button", { name: / - (مكتملة|غير مكتملة)$/ });
   await expect(routineTiles).toHaveCount(3);

@@ -30,7 +30,10 @@ const WCAG = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"];
 
 async function scan(page: Page, selector: string) {
   const results = await new AxeBuilder({ page }).include(selector).withTags(WCAG).analyze();
-  return results.violations.map((v) => `${v.id}: ${v.nodes.length} node(s)`);
+  return results.violations.map((v) => ({
+    id: v.id,
+    nodes: v.nodes.map(({ target, failureSummary }) => ({ target, failureSummary })),
+  }));
 }
 
 test("immersive Mushaf mode has no automatically detectable WCAG A/AA violations", async ({ page }) => {
@@ -51,7 +54,7 @@ test("the interactive word-meaning card is named, reachable, and has no automati
   await seed(page, "/#/azkar/morning/4");
   await expect(page.getByTestId("reader-screen")).toBeVisible();
 
-  await page.getByRole("switch", { name: /الكلمات الغريبة/ }).click();
+  await page.getByRole("switch", { name: "كلمات غريبة", exact: true }).click();
   await page.getByTestId("quran-word-help").first().click();
   const card = page.getByTestId("quran-word-popover");
   await expect(card).toBeVisible();

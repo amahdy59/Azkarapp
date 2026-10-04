@@ -1,5 +1,7 @@
 # AI Improvement System Index
 
+[English audio and refinements release](phases/ENGLISH_AUDIO_AND_REFINEMENTS_RELEASE.md) records the owner-approved English-first audio disclosure and review/publication of all pending refinements.
+
 ## Purpose
 
 This folder converts the Azkarapp UX and visual-design review into a controlled, testable delivery program.
@@ -122,6 +124,8 @@ may run in parallel.
 
 ## Latest Home refinement
 
+[Audio player refinement](phases/AUDIO_PLAYER_REFINEMENT.md) records the owner-approved local audio review recommendations and verification, without pushing.
+
 [Phase 73](phases/PHASE_73_PRAYER_INFORMATION_CLARITY.md) records the owner-requested prayer-information clarity and reminder-first Home ordering. Phase 72 remains the Quran Wird planning contract.
 
 [Phase 74](phases/PHASE_74_RELEASE_REVIEW.md) records the latest Reader/audio review and push-readiness checks.
@@ -147,3 +151,13 @@ The agent must never interpret “perfect the application” as permission to re
 [Devotional footer redesign](phases/DEVOTIONAL_FOOTER_REDESIGN.md) records the owner-authorized local counter and Reader support-action refinement.
 
 [Coordinated footer release](phases/DEVOTIONAL_FOOTER_RELEASE.md) records the final owner-approved hierarchy refinement, integration of concurrent work, and release verification.
+
+[Counter progress follow-up](phases/COUNTER_PROGRESS_FOLLOWUP.md) records the owner's single-line text and truthful gradual-fill refinement.
+
+[Sharing usability refinement](phases/SHARING_USABILITY_REFINEMENT.md) records the active owner-approved local-only sharing dialog recommendations, corrected native accessibility semantics, responsive evidence and verification.
+
+[Verified audit remediation](phases/AUDIT_VERIFIED_REMEDIATION.md) records the owner-approved local-only fixes and qualified dispositions of the external audit.
+
+[Devotional component and alignment refinement](phases/DEVOTIONAL_COMPONENT_REFINEMENT.md)
+records roomier desktop Zikr navigation, shared counter footer actions, and
+Apple/Microsoft-informed control spacing and alignment improvements.

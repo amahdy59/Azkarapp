@@ -37,7 +37,7 @@ canonical audio asset (AudioAsset.id)
 - `AudioAsset.id` identifies the reusable logical recording.
 - `AudioSegment` preserves order, especially for Qur'anic verse ranges.
 - `AudioVariant` is one voice's delivery file for one segment.
-- `AudioSourceRecord` holds the rights and public attribution for those bytes.
+- `AudioSourceRecord` holds recording identity and permission evidence for those bytes; the player displays only the reciter name.
 
 Never create one physical recording per screen. Identical canonical wording reuses one asset; different morning/evening wording gets different assets.
 
@@ -480,7 +480,7 @@ Before production:
 - Test Bluetooth/headphone disconnect, lock/unlock, background/foreground, interruption by another app/call, slow network, and an intentionally broken URL.
 - Test keyboard operation, visible focus, screen-reader names/live announcements, Arabic RTL, English LTR, narrow width, and 200%/400% zoom.
 - Confirm audio completion never increments the spiritual recitation counter.
-- Confirm the player shows the correct source and attribution for the bytes being played.
+- Confirm the player shows the correct reciter name for the bytes being played, without source attribution in the player.
 
 No audio starts on page load. Browsers may reject `HTMLMediaElement.play()` without a user gesture; the controller must continue handling that rejected promise as `playback-blocked` and offer an explicit retry.
 
@@ -514,7 +514,7 @@ Resolve these before the first applicable production release:
 3. **Pages validation environment:** resolved. The shared CI action passes
    `VITE_AUDIO_BASE_URL` to both quality and browser tests, and the Pages build
    receives the same repository variable.
-4. **Public credits:** the floating player shows the selected source and attribution. Before a large catalogue launch, add a searchable Audio Credits view if licences or contributor expectations require persistent consolidated credits.
+4. **Public credits:** the floating player shows only the selected reciter name. Any consolidated credits or contributor information belong in Settings → About, using the source records rather than adding attribution to playback controls.
 
 These gates are not reasons to weaken validation. Until resolved, the affected audio remains unavailable.
 

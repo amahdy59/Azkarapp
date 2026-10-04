@@ -185,10 +185,10 @@ test("keyboard help disables character actions while preserving native counting"
   await expect(dialog).not.toBeVisible();
   await page.locator("#main-content").focus();
   await page.keyboard.press("r");
-  await expect(counter).toHaveText(/1 \/ 100/);
+  await expect(counter).toHaveText("1/100");
   await counter.focus();
   await page.keyboard.press("Space");
-  await expect(counter).toHaveText(/2 \/ 100/);
+  await expect(counter).toHaveText("2/100");
   await page.getByRole("button", { name: "Read guided after-prayer azkar" }).click();
   await expect(page.getByTestId("reader-screen")).toHaveAttribute("data-reader-category", "after_prayer");
 });

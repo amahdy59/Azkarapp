@@ -56,7 +56,7 @@ async function readBuiltCss(assetsDirectory) {
 const isDirectInvocation = process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1]));
 
 if (isDirectInvocation) {
-  const css = await readBuiltCss(path.resolve("dist/assets"));
+  const css = await readBuiltCss(path.resolve(process.argv[2] ?? "dist", "assets"));
   const missing = findMissingUtilities(css);
 
   if (missing.length > 0) {

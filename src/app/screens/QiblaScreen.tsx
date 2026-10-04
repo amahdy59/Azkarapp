@@ -141,18 +141,10 @@ function CompassDial({
           </text>
         </g>
       </g>
-      <g
-        data-testid="qibla-arrow"
-        transform={`rotate(${rotation} 160 160)`}
-        style={reduceMotion ? undefined : { transition: "transform 180ms ease-out" }}
-      >
+      <g data-testid="qibla-arrow" transform={`rotate(${rotation} 160 160)`}>
         <path d="M160 67 181 168 160 151 139 168Z" fill="var(--primary)" />
         <path d="M160 262 181 152 160 169 139 152Z" fill="var(--muted-foreground)" opacity="0.55" />
-        <g
-          data-testid="kaaba-target"
-          transform={`rotate(${-rotation} 160 43)`}
-          style={reduceMotion ? undefined : { transition: "transform 180ms ease-out" }}
-        >
+        <g data-testid="kaaba-target" transform={`rotate(${-rotation} 160 43)`}>
           <circle
             cx="160"
             cy="43"
