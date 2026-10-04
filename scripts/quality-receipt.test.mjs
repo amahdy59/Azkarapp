@@ -1,6 +1,6 @@
 import { afterEach, expect, test, vi } from "vitest";
 import { execFileSync } from "node:child_process";
-import { mkdtemp, writeFile, mkdir, rm } from "node:fs/promises";
+import { mkdtemp, writeFile, mkdir, rm, realpath } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import {
@@ -12,6 +12,10 @@ import {
 
 const roots = [];
 async function fixture() {
+  // Push hooks export repository-local Git variables. A temporary repository
+  // must discover its own .git directory instead of inheriting the hook's one.
+  for (const name of execFileSync("git", ["rev-parse", "--local-env-vars"], { encoding: "utf8" }).trim().split(/\r?\n/))
+    vi.stubEnv(name, undefined);
   const root = await mkdtemp(path.join(os.tmpdir(), "azkar-quality-receipt-"));
   roots.push(root);
   execFileSync("git", ["init", "--quiet"], { cwd: root });
@@ -31,6 +35,21 @@ afterEach(async () => {
       throw new Error("Unexpected temporary fixture path");
     await rm(resolved, { recursive: true, force: true });
   }
+});
+
+test("temporary fixtures ignore a parent hook's Git directory", async () => {
+  const parent = await fixture();
+  vi.stubEnv("GIT_DIR", path.join(parent, ".git"));
+  const root = await fixture();
+  expect(execFileSync("git", ["rev-parse", "--show-toplevel"], { cwd: root, encoding: "utf8" }).trim()).toBe(
+    (await realpath(root)).replaceAll(path.sep, "/"),
+  );
+  expect(await qualityFingerprint(root)).toBeTruthy();
+  expect(
+    execFileSync("git", ["--git-dir", path.join(parent, ".git"), "config", "--get", "core.bare"], {
+      encoding: "utf8",
+    }).trim(),
+  ).toBe("false");
 });
 
 test("reuses a successful unchanged snapshot and ignores generated output", async () => {
