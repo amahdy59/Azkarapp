@@ -1,8 +1,12 @@
 # AI Improvement System Index
 
+[Latest changes and testing release review](phases/LATEST_CHANGES_RELEASE_REVIEW.md) records the owner-approved integrated release, citation and repetition repairs, and deterministic local testing with mandatory live audio release verification.
+
 [English audio and refinements release](phases/ENGLISH_AUDIO_AND_REFINEMENTS_RELEASE.md) records the owner-approved English-first audio disclosure and review/publication of all pending refinements.
 
 ## Purpose
+
+[Essential local testing and quality](phases/ESSENTIAL_LOCAL_TESTING.md) records the owner-authorized local tooling improvements while application edits continue in another session.
 
 This folder converts the Azkarapp UX and visual-design review into a controlled, testable delivery program.
 

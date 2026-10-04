@@ -1019,7 +1019,7 @@ const en = {
     sessionProgress: "Listening progress",
     speedShort: "Speed",
     reciterShort: "Reciter",
-    englishVoiceShort: "George · English",
+    englishVoiceShort: "English Translation",
     repeatShort: "Repeat",
     repeatPrescribed: "Repeat {count} times",
     errorBlocked: "Playback was blocked. Press Play again.",
@@ -1983,7 +1983,7 @@ const en = {
   shareStoryPack: {
     modalTitle: "Shareable Azkar Cards",
     modalSubtitle: "Readable cards with complete text and sources",
-    actionButton: "Share as Cards",
+    actionButton: "Share Azkar",
     actionButtonAria: "Share collection azkar as story cards for social status",
     shareCurrent: "Share this card",
     shareAll: "Share all cards",

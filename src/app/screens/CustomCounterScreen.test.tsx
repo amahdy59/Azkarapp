@@ -102,24 +102,43 @@ describe("CustomCounterScreen Component", () => {
     expect(counter).toHaveTextContent("1");
   });
 
-  it("exposes an authentic zikr picker with distinct reviewed cards and selection confirmation", async () => {
+  it("exposes an authentic zikr dropdown menu with short names and selection confirmation", async () => {
     const user = userEvent.setup();
     render(<CustomCounterScreen isArabic={false} direction="ltr" onBack={vi.fn()} />);
 
     const picker = screen.getByRole("button", { name: /Subhanallahi wa bihamdihi/i });
     await user.click(picker);
 
-    expect(screen.getByRole("dialog", { name: "Choose a dhikr" })).toBeInTheDocument();
-    expect(screen.getByRole("radio", { name: /Subhanallahi wa bihamdihi, Subhanallahil-Azeem/i })).toBeInTheDocument();
-    expect(screen.getByRole("radio", { name: /La hawla wa la quwwata illa billah/i })).toBeInTheDocument();
-    expect(screen.getByRole("radio", { name: /Allahumma anta Rabbi/i })).toBeInTheDocument();
-    expect(screen.queryByRole("searchbox")).not.toBeInTheDocument();
+    expect(screen.getByRole("menu")).toBeInTheDocument();
+    expect(screen.getByRole("menuitemradio", { name: /Subhanallahi wa bihamdihi\.\.\./i })).toBeInTheDocument();
+    expect(screen.getByRole("menuitemradio", { name: /Hawqalah/i })).toBeInTheDocument();
+    expect(screen.getByRole("menuitemradio", { name: /Sayyid al-Istighfar/i })).toBeInTheDocument();
 
-    await user.click(screen.getByRole("radio", { name: /La hawla wa la quwwata illa billah/i }));
-    await user.click(screen.getByRole("button", { name: "Select" }));
+    await user.click(screen.getByRole("menuitemradio", { name: /Hawqalah/i }));
 
-    expect(screen.queryByRole("dialog", { name: "Choose a dhikr" })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /La hawla wa la quwwata illa billah/i })).toBeInTheDocument();
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Hawqalah/i })).toBeInTheDocument();
+  });
+
+  it("exposes concise Islamic names in Arabic dropdown menu like الحوقلة and سيد الاستغفار", async () => {
+    const user = userEvent.setup();
+    render(<CustomCounterScreen isArabic={true} direction="rtl" onBack={vi.fn()} />);
+
+    const picker = screen.getByRole("button", { name: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ" });
+    await user.click(picker);
+
+    expect(screen.getByRole("menu")).toBeInTheDocument();
+    expect(screen.getByRole("menuitemradio", { name: "الحوقلة" })).toBeInTheDocument();
+    expect(screen.getByRole("menuitemradio", { name: "سيد الاستغفار" })).toBeInTheDocument();
+    expect(screen.getByRole("menuitemradio", { name: "الباقيات الصالحات" })).toBeInTheDocument();
+    expect(screen.getByRole("menuitemradio", { name: "الصلاة على النبي ﷺ" })).toBeInTheDocument();
+
+    await user.click(screen.getByRole("menuitemradio", { name: "سيد الاستغفار" }));
+
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "سيد الاستغفار" })).toBeInTheDocument();
+    // Center reading surface displays full devotional text
+    expect(screen.getByText(/اللَّهُمَّ أَنْتَ رَبِّي لا إِلَهَ إِلا أَنْتَ/)).toBeInTheDocument();
   });
 
   it("keeps the current count when the finite target changes", async () => {
@@ -140,8 +159,7 @@ describe("CustomCounterScreen Component", () => {
 
     fireEvent.click(screen.getByTestId("custom-counter-surface"));
     await user.click(screen.getByRole("button", { name: /Subhanallahi wa bihamdihi/i }));
-    await user.click(screen.getByRole("radio", { name: /La hawla wa la quwwata illa billah/i }));
-    await user.click(screen.getByRole("button", { name: "Select" }));
+    await user.click(screen.getByRole("menuitemradio", { name: /Hawqalah/i }));
 
     expect(screen.getByRole("dialog", { name: "Change the selected dhikr?" })).toBeInTheDocument();
     expect(screen.getByText(/clear the current count of 1/i)).toBeInTheDocument();
@@ -160,8 +178,7 @@ describe("CustomCounterScreen Component", () => {
 
     // Open picker and pick another zikr
     await user.click(screen.getByRole("button", { name: /Subhanallahi wa bihamdihi/i }));
-    await user.click(screen.getByRole("radio", { name: /La hawla wa la quwwata illa billah/i }));
-    await user.click(screen.getByRole("button", { name: "Select" }));
+    await user.click(screen.getByRole("menuitemradio", { name: /Hawqalah/i }));
 
     // Dialog appears with Save & switch
     expect(screen.getByRole("dialog", { name: "Change the selected dhikr?" })).toBeInTheDocument();
@@ -176,12 +193,11 @@ describe("CustomCounterScreen Component", () => {
     expect(counter).toHaveTextContent("2/100");
 
     // Open picker again - verify original zikr shows saved count badge
-    await user.click(screen.getByRole("button", { name: /La hawla wa la quwwata illa billah/i }));
+    await user.click(screen.getByRole("button", { name: /Hawqalah/i }));
     expect(screen.getByText("3 / 100")).toBeInTheDocument();
 
     // Select original zikr
-    await user.click(screen.getAllByRole("radio", { name: /Subhanallahi wa bihamdihi/i })[0]!);
-    await user.click(screen.getByRole("button", { name: "Select" }));
+    await user.click(screen.getByTestId("zikr-option-auth_subhanallah_wabihamdihi"));
     await user.click(screen.getByRole("button", { name: "Save & switch" }));
 
     // Count is restored to 3!
@@ -198,17 +214,15 @@ describe("CustomCounterScreen Component", () => {
     expect(counter).toHaveTextContent("2/100");
 
     await user.click(screen.getByRole("button", { name: /Subhanallahi wa bihamdihi/i }));
-    await user.click(screen.getByRole("radio", { name: /La hawla wa la quwwata illa billah/i }));
-    await user.click(screen.getByRole("button", { name: "Select" }));
+    await user.click(screen.getByRole("menuitemradio", { name: /Hawqalah/i }));
 
     // Click Change and reset
     await user.click(screen.getByRole("button", { name: "Change and reset" }));
     expect(counter).toHaveTextContent("0/100");
 
     // Switch back to original zikr (from count 0, so no prompt)
-    await user.click(screen.getByRole("button", { name: /La hawla wa la quwwata illa billah/i }));
-    await user.click(screen.getAllByRole("radio", { name: /Subhanallahi wa bihamdihi/i })[0]!);
-    await user.click(screen.getByRole("button", { name: "Select" }));
+    await user.click(screen.getByRole("button", { name: /Hawqalah/i }));
+    await user.click(screen.getByTestId("zikr-option-auth_subhanallah_wabihamdihi"));
 
     // Original count was wiped by reset, so starts at 0
     expect(counter).toHaveTextContent("0/100");
@@ -286,6 +300,34 @@ describe("CustomCounterScreen Component", () => {
     render(<CustomCounterScreen isArabic={true} direction="rtl" onBack={vi.fn()} />);
     const arBenefitBtn = screen.getByRole("button", { name: /الفضل والحديث/ });
     expect(arBenefitBtn).toHaveTextContent("الفائدة");
+  });
+
+  it("renders both virtue and full hadith cards with source link in reference sheet", async () => {
+    const user = userEvent.setup();
+    render(<CustomCounterScreen isArabic={true} direction="rtl" onBack={vi.fn()} />);
+
+    const arBenefitBtn = screen.getByRole("button", { name: /الفضل والحديث/ });
+    await user.click(arBenefitBtn);
+
+    const dialog = screen.getByRole("dialog", { name: /الفضل والحديث/ });
+    expect(dialog).toBeInTheDocument();
+
+    // Virtue card
+    expect(screen.getByTestId("masbaha-virtue-text")).toHaveTextContent(
+      "مَنْ قَالَ: سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، فِي يَوْمٍ مِائَةَ مَرَّةٍ، حُطَّتْ خَطَايَاهُ وَإِنْ كَانَتْ مِثْلَ زَبَدِ الْبَحْرِ",
+    );
+    expect(screen.getByRole("heading", { name: "الفائدة" })).toBeInTheDocument();
+
+    // Full Hadith card
+    expect(screen.getByTestId("masbaha-hadith-text")).toHaveTextContent(
+      "عَنْ أَبِي هُرَيْرَةَ رَضِيَ اللَّهُ عَنْهُ، أَنَّ رَسُولَ اللَّهِ ﷺ قَالَ: «مَنْ قَالَ: سُبْحَانَ اللَّهِ وَبِحَمْدِهِ فِي يَوْمٍ مِائَةَ مَرَّةٍ، حُطَّتْ خَطَايَاهُ وَإِنْ كَانَتْ مِثْلَ زَبَدِ الْبَحْرِ».",
+    );
+    expect(screen.getByRole("heading", { name: "نص الحديث" })).toBeInTheDocument();
+
+    // Source link
+    const sourceLink = screen.getByRole("link", { name: /صحيح البخاري/ });
+    expect(sourceLink).toHaveAttribute("href", "https://sunnah.com/bukhari:6405");
+    expect(sourceLink).toHaveAttribute("target", "_blank");
   });
 
   it("exposes return action on completion dialog", async () => {

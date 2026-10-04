@@ -137,8 +137,9 @@ module without being added — that is the fix for an order-dependent failure, n
 assertion.
 
 The `pnpm check` "before" is an estimate: the old serial chain ran the same eight stages
-one after another with the 3 m 34 s test run inside it. `pnpm check:serial` still runs that chain
-if you want to compare directly.
+one after another with the 3 m 34 s test run inside it. `pnpm check:serial` now runs the same
+current orchestrator with one stage at a time, including type-scale checks and the quality
+receipt, so its gates cannot drift from `pnpm check`. The timings above are historical.
 
 ## 9. Verification
 

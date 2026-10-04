@@ -946,12 +946,7 @@ export function ReaderScreen({
                 }
               >
                 <Volume2 size={16} />
-                <span>
-                  {t(language, "category.playAll")}
-                  {audioCoverage
-                    ? ` • ${formatNumerals(audioCoverage.available, language)}/${formatNumerals(audioCoverage.total, language)}`
-                    : ""}
-                </span>
+                <span>{t(language, "category.playAll")}</span>
               </button>
             )}
           </div>
@@ -1683,10 +1678,20 @@ export function ReaderScreen({
                 direction={direction}
                 aria-label={t(language, "reader.groupProgress")}
               />
-              {/* See the desktop heading: passage names render, and the 10px
-                margin keeps harakat clear of the progress track. */}
+            </div>
+
+            {/* Main Layout Area */}
+            <div
+              ref={readerMainRef}
+              className="flex-1 flex flex-col min-h-0 justify-between select-none relative reader-column cursor-pointer"
+              data-testid="reader-card"
+              {...surfaceProps}
+            >
               {((!showSurahChrome && readerZikrTitle) || (!longSurah && allWordMeanings.length > 0)) && (
-                <div className="mt-2.5 flex w-full flex-wrap items-center justify-between gap-x-2 gap-y-1">
+                <div
+                  data-prevent-count="true"
+                  className="px-5 pt-2.5 flex w-full flex-wrap items-center justify-between gap-x-2 gap-y-1"
+                >
                   {!showSurahChrome && readerZikrTitle && (
                     <h2
                       className="max-w-full shrink-0 truncate whitespace-nowrap text-start text-sm font-extrabold leading-relaxed text-foreground"
@@ -1702,7 +1707,10 @@ export function ReaderScreen({
                       type="button"
                       role="switch"
                       aria-checked={showDifficultWords}
-                      onClick={() => setShowDifficultWords((v) => !v)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowDifficultWords((v) => !v);
+                      }}
                       className="ms-auto flex shrink-0 min-h-11 items-center gap-2 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring rounded-full py-1"
                       aria-label={t(language, "settings.showDifficultWords")}
                       title={t(language, "settings.showDifficultWords")}
@@ -1715,15 +1723,6 @@ export function ReaderScreen({
                   )}
                 </div>
               )}
-            </div>
-
-            {/* Main Layout Area */}
-            <div
-              ref={readerMainRef}
-              className="flex-1 flex flex-col min-h-0 justify-between select-none relative reader-column cursor-pointer"
-              data-testid="reader-card"
-              {...surfaceProps}
-            >
               <div
                 ref={readingScrollRef}
                 role="region"

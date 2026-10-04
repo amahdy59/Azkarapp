@@ -210,4 +210,54 @@ describe("CategoryScreen comprehensive-dua session", () => {
 
     expect(screen.getByText("مكتمل")).toBeInTheDocument();
   });
+
+  it("renders shortened action buttons for audio and sharing in Arabic", () => {
+    render(
+      <CategoryScreen
+        catId="morning"
+        completed={new Set()}
+        isArabic
+        direction="rtl"
+        onZikr={() => undefined}
+        onReset={() => undefined}
+        onRepeat={() => undefined}
+        onBack={() => undefined}
+        onPlayAllAudio={() => undefined}
+        audioCoverage={{ available: 23, total: 23 }}
+      />,
+    );
+
+    const shareButton = screen.getByTestId("share-collection-button");
+    expect(shareButton).toHaveTextContent("مشاركة الأذكار");
+    expect(shareButton).toHaveAccessibleName("مشاركة أذكار المجموعة كبطاقات للحالات والتواصل");
+
+    const playAllButton = screen.getByRole("button", { name: "تشغيل الصوتي للكل" });
+    expect(playAllButton).toHaveTextContent("تشغيل الكل");
+    expect(playAllButton).toHaveAttribute("title", "تشغيل الصوتي للكل: 23/23");
+  });
+
+  it("renders shortened action buttons for audio and sharing in English", () => {
+    render(
+      <CategoryScreen
+        catId="morning"
+        completed={new Set()}
+        isArabic={false}
+        direction="ltr"
+        onZikr={() => undefined}
+        onReset={() => undefined}
+        onRepeat={() => undefined}
+        onBack={() => undefined}
+        onPlayAllAudio={() => undefined}
+        audioCoverage={{ available: 23, total: 23 }}
+      />,
+    );
+
+    const shareButton = screen.getByTestId("share-collection-button");
+    expect(shareButton).toHaveTextContent("Share Azkar");
+    expect(shareButton).toHaveAccessibleName("Share collection azkar as story cards for social status");
+
+    const playAllButton = screen.getByRole("button", { name: "Play All Audio" });
+    expect(playAllButton).toHaveTextContent("Play All");
+    expect(playAllButton).toHaveAttribute("title", "Play All Audio: 23/23");
+  });
 });

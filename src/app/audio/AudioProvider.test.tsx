@@ -163,6 +163,7 @@ function Harness({ language = "en" }: { language?: "ar" | "en" }) {
       <output>{controller.state.status}</output>
       <output data-testid="completed-audio-entry">{controller.state.completedEntryId ?? ""}</output>
       <output data-testid="audio-completion-sequence">{controller.state.completionSequence}</output>
+      <output data-testid="audio-repetition-index">{controller.state.repetitionIndex}</output>
       {controller.state.plan && <FloatingAudioPlayer controller={controller} language={language} />}
     </>
   );
@@ -321,7 +322,7 @@ describe("AudioProvider integration", () => {
     for (let count = 1; count < 100; count++) {
       FakeAudio.latest!.dispatchEvent(new Event("ended"));
     }
-    await waitFor(() => expect(screen.getByRole("region", { name: "Audio player" })).toHaveTextContent("100 / 100"));
+    await waitFor(() => expect(screen.getByTestId("audio-repetition-index")).toHaveTextContent("99"));
     expect(screen.getByTestId("completed-audio-entry")).toBeEmptyDOMElement();
     expect(screen.getByTestId("audio-completion-sequence")).toHaveTextContent("0");
     FakeAudio.latest!.dispatchEvent(new Event("ended"));
@@ -414,7 +415,7 @@ describe("AudioProvider integration", () => {
     fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
 
     // Where the reader is in a prescribed repetition, said once.
-    expect(screen.getByText("Repetition 1 / 3")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Repeat 3 times" })).toBeInTheDocument();
 
     // Select a rate directly and verify the real controller updates the displayed value.
     const speed = screen.getByRole("combobox", { name: /Speed/ });
@@ -494,27 +495,29 @@ describe("AudioProvider integration", () => {
       </AudioProvider>,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Start English" }));
-    await waitFor(() => expect(mediaSession.playbackState).toBe("playing"));
-    expect(mediaSession.metadata).toMatchObject({
-      title: "Ayat al-Kursi",
-      artist: "English Translation (George)",
-      album: "Azkar English Translation",
-    });
-    expect(mediaSession.metadata?.artwork).toHaveLength(2);
-    expect(handlers.get("stop")).toBeTypeOf("function");
+    try {
+      fireEvent.click(screen.getByRole("button", { name: "Start English" }));
+      await waitFor(() => expect(mediaSession.playbackState).toBe("playing"));
+      expect(mediaSession.metadata).toMatchObject({
+        title: "Ayat al-Kursi",
+        artist: "English Translation",
+        album: "Azkar English Translation",
+      });
+      expect(mediaSession.metadata?.artwork).toHaveLength(2);
+      expect(handlers.get("stop")).toBeTypeOf("function");
 
-    handlers.get("pause")?.({ action: "pause" });
-    await waitFor(() => expect(mediaSession.playbackState).toBe("paused"));
-    handlers.get("play")?.({ action: "play" });
-    await waitFor(() => expect(mediaSession.playbackState).toBe("playing"));
-    handlers.get("stop")?.({ action: "stop" });
-    await waitFor(() => {
-      expect(mediaSession.playbackState).toBe("none");
-      expect(mediaSession.metadata).toBeNull();
-    });
-
-    Object.defineProperty(window.navigator, "mediaSession", { configurable: true, value: undefined });
+      handlers.get("pause")?.({ action: "pause" });
+      await waitFor(() => expect(mediaSession.playbackState).toBe("paused"));
+      handlers.get("play")?.({ action: "play" });
+      await waitFor(() => expect(mediaSession.playbackState).toBe("playing"));
+      handlers.get("stop")?.({ action: "stop" });
+      await waitFor(() => {
+        expect(mediaSession.playbackState).toBe("none");
+        expect(mediaSession.metadata).toBeNull();
+      });
+    } finally {
+      Object.defineProperty(window.navigator, "mediaSession", { configurable: true, value: undefined });
+    }
   });
 
   it("switches directly to a selected entry in a multi-track plan", async () => {

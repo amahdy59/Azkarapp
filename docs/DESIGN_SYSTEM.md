@@ -542,4 +542,32 @@ Sharing keeps three direct actions in logical order: Share (primary), Save and C
 
 ### Latest release review refinements
 
-Shared Select and menu radio/checkbox items reserve the logical-end checkmark gutter with a persistent selected tint, independently of focus. Masbaha selection uses native grouped radios and an explicit Select action; cancel leaves the current remembrance unchanged. Reference-copy controls in Masbaha and Salawat have 44px targets, scoped success announcements and visible retryable clipboard errors. Dense shared cards keep brand/title and content/footer clearance; collection cards reserve extra space for page numbering and QR cards for the code and its label.
+Shared Select and menu radio/checkbox items reserve the logical-end checkmark gutter with a persistent selected tint, independently of focus. Masbaha selection uses the shared radio-item menu with concise labels and full-text titles. Arrow keys move focus; Enter or pointer activation selects, while Escape dismisses without changing selection. Switching a nonzero count retains the existing save/reset confirmation. Reference-copy controls in Masbaha and Salawat have 44px targets, scoped success announcements and visible retryable clipboard errors. Dense shared cards keep brand/title and content/footer clearance; collection cards reserve extra space for page numbering and QR cards for the code and its label.
+
+## Devotional reference and benefit card contract (2026-10-04)
+
+Benefit, hadith evidence, and source reference cards across the application share one unified look, feel, behavior, typography, and accessibility baseline through the shared `ReferenceCard` component (`src/app/components/ReferenceCard.tsx`). This contract governs the Reader reference sheet (`ReaderReferenceSheet`), Friday Salawat screen (`FridaySalawatScreen`), and Masbaha custom counter reference sheet (`CustomCounterScreen`).
+
+### Visual anatomy and surfaces
+
+- **Card container:** `rounded-2xl border border-border/70 bg-card/80 p-4 text-start` with semantic theme tokens, providing a stable, calm surface across Light, Midnight, and Dark themes without harsh flat dividers or unbordered floating text.
+- **Card header row:** When a title is present, the title and optional copy action share an aligned header row (`flex items-center justify-between gap-3`). When no title is provided, the copy button sits at the logical end of a dedicated top row (`flex justify-end`) to prevent text overlapping or awkward floating buttons.
+- **Card body:** Structured content flow with balanced vertical spacing (`space-y-3`).
+
+### Unified typography specification
+
+- **Heading role:** `text-subtitle font-bold text-primary` (15 px / 0.9375 rem). Headings provide clear semantic structure for benefits, hadith evidence, and source sections.
+- **Devotional & hadith body:** `text-subtitle font-bold leading-7 text-foreground`. Devotional Arabic text and Hadith narrations explicitly apply the `zikr-text` class along with `dir="rtl"` and `lang="ar"`, ensuring optimal font metrics, tashkeel (vocalization) clarity, and consistent line height across platforms.
+- **Source attribution:** `pt-1 text-label font-black text-primary` (13 px / 0.8125 rem) positioned at the bottom of the card, clearly distinguishing citation metadata from the sacred text.
+
+### Copy microinteraction and actions
+
+- **Target size:** Dedicated 44×44 px (`size-11`) touch target floor for `ReferenceCopyButton` (`src/app/components/ReferenceCopyButton.tsx`) to meet WCAG 2.2 AA target criteria.
+- **Focus indicator:** High-visibility 3 px focus ring (`focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2`) conforming to the repository control focus contract.
+- **Icon states:** Seamless state transition between Untitled UI `Copy01` and `Check` with success styling upon copy completion.
+- **Accessible naming and announcements:** Configurable `aria-label` with localized default (`reader.copyHadith` / "نسخ نص الحديث" / "Copy hadith text"). Feedback is announced via a polite, scoped screen-reader live region (`aria-live="polite"` and `role="status"`), preventing disruptive screen takeover while assuring assistive technology users that text was copied.
+
+### External links and citation integrity
+
+- External reference links (`ExternalLink`) maintain a minimum 44 px target floor (`min-h-11 inline-flex items-center gap-1.5`) with secure rel attributes (`noopener noreferrer`) and an external-link icon.
+- Masbaha (`CustomCounterScreen`) reference sheets must include the canonical full Hadith narration (`hadithTextAr` / `hadithTextEn`) and verified Sunnah.com reference links alongside the concise virtue, matching the devotional completeness of the Reader and Friday Salawat screens.

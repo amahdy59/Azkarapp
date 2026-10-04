@@ -297,3 +297,7 @@ Before adding a feature:
 - Add automated coverage proportional to risk.
 - Update the README and relevant domain document.
 - Run `pnpm check` and relevant Playwright specs.
+
+### Essential audio validation gate
+
+Local pnpm check validates audio catalog metadata and content identity without network access. Quality CI requires complete hosted recording validation through pnpm validate:audio before browser verification and deployment. Every approved URL, HTTP/MIME requirement and bounded retry remains enforced.

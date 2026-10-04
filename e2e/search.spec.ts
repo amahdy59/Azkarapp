@@ -76,17 +76,27 @@ test("Library search and responsive section controls stay bounded at every tier"
   expect(desktopTabs!.x + desktopTabs!.width).toBeLessThanOrEqual(1440);
 
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.waitForTimeout(500); // Wait for the media query layout shift to settle
-  const compactInput = await input.boundingBox();
   const compactSection = page.getByTestId("library-mobile-section");
   await expect(compactSection).toBeVisible();
   await expect(tabs).toBeHidden();
-  const compactControl = await compactSection.boundingBox();
-  expect(compactInput).not.toBeNull();
-  expect(compactControl).not.toBeNull();
-  expect(compactControl!.y).toBeGreaterThan(compactInput!.y + compactInput!.height);
-  expect(compactControl!.x).toBeGreaterThanOrEqual(0);
-  expect(compactControl!.x + compactControl!.width).toBeLessThanOrEqual(390);
+  await expect(async () => {
+    const bounds = await input.evaluate((element) => {
+      const control = document.querySelector('[data-testid="library-mobile-section"]');
+      if (!control) return null;
+      const inputBounds = element.getBoundingClientRect();
+      const controlBounds = control.getBoundingClientRect();
+      return {
+        inputBottom: inputBounds.bottom,
+        controlTop: controlBounds.top,
+        left: controlBounds.left,
+        right: controlBounds.right,
+      };
+    });
+    expect(bounds).not.toBeNull();
+    expect(bounds!.controlTop).toBeGreaterThan(bounds!.inputBottom);
+    expect(bounds!.left).toBeGreaterThanOrEqual(0);
+    expect(bounds!.right).toBeLessThanOrEqual(390);
+  }).toPass({ timeout: 15_000 });
 });
 
 test("Arabic search matches undiacritized typing against vocalized content", async ({ page }) => {

@@ -77,6 +77,8 @@ for (const language of ["ar", "en"] as const) {
     await page.reload();
     await expect(counter).toHaveAttribute("aria-label", language === "en" ? /49 \/ 100$/ : /٤٩ \/ ١٠٠$/);
     await counter.click();
+    await expect(counter).toHaveAttribute("aria-label", language === "en" ? /50 \/ 100$/ : /٥٠ \/ ١٠٠$/);
+    await expect(fill).toHaveCSS("--progress-ratio", "0.5");
     const half = await fill.boundingBox();
     const box = (await counter.boundingBox())!;
     const visibleStart = Math.max(half!.x, box.x + 1);

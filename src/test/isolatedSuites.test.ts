@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { ISOLATED_SUITES } from "./isolatedSuites";
 
 const SOURCE_ROOT = path.resolve("src");
-const MOCK_CALL = `vi.${"mock"}(`;
+const REGISTRY_MUTATION = /\bvi\s*\.\s*(?:mock|doMock|unmock|doUnmock|resetModules|hoisted)\s*\(/;
 
 function collectSuites(directory: string, found: string[] = []) {
   for (const entry of readdirSync(directory, { withFileTypes: true })) {
@@ -19,7 +19,7 @@ describe("test isolation policy", () => {
   it("lists every suite that mocks a module, so the shared registry never has to serve two mocks", () => {
     const mocking = collectSuites(SOURCE_ROOT)
       .filter((file) => path.resolve(file) !== path.resolve(SOURCE_ROOT, "test/isolatedSuites.test.ts"))
-      .filter((file) => readFileSync(file, "utf8").includes(MOCK_CALL))
+      .filter((file) => REGISTRY_MUTATION.test(readFileSync(file, "utf8")))
       .map((file) => path.relative(process.cwd(), file).split(path.sep).join("/"))
       .sort();
 

@@ -1,9 +1,15 @@
-/* global fetch, AbortController, clearTimeout */
 import fs from "node:fs";
+import { probeAudioVariants } from "./probe-audio-variants.mjs";
 import path from "node:path";
 import { loadTypeScriptModule } from "./load-typescript-module.mjs";
 
 const root = process.cwd();
+const args = process.argv.slice(2);
+if (args.length > 1 || (args.length === 1 && args[0] !== "--local")) {
+  console.error("Usage: node scripts/validate-audio-manifest.mjs [--local]");
+  process.exit(1);
+}
+const localOnly = args[0] === "--local";
 const content = loadTypeScriptModule(path.join(root, "src/app/content/azkar.ts"));
 const comprehensive = loadTypeScriptModule(path.join(root, "src/app/content/comprehensiveDuas.ts"));
 const fridayKahf = loadTypeScriptModule(path.join(root, "src/app/content/fridayKahf.ts"));
@@ -58,43 +64,7 @@ if (approvedVariants.length > 0 && !baseUrl) {
   issues.push({ code: "missing-base-url", message: "VITE_AUDIO_BASE_URL is required when approved assets exist." });
 }
 
-if (baseUrl) {
-  const fetchRangeOnce = (url, timeoutMs) => {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
-    return fetch(url, { headers: { Range: "bytes=0-0" }, signal: controller.signal }).finally(() =>
-      clearTimeout(timer),
-    );
-  };
-  // Hosted-audio probes are small range requests, so a stall is a transient
-  // network fault rather than a large download. Retry with backoff so one
-  // stalled request cannot fail the whole gate.
-  const fetchRangeWithRetry = async (url, attempts = 3, timeoutMs = 20000) => {
-    let lastError;
-    for (let attempt = 1; attempt <= attempts; attempt += 1) {
-      try {
-        return await fetchRangeOnce(url, timeoutMs);
-      } catch (error) {
-        lastError = error;
-        if (attempt < attempts) await new Promise((resolve) => setTimeout(resolve, 1000 * 2 ** (attempt - 1)));
-      }
-    }
-    throw lastError;
-  };
-  for (const variant of approvedVariants) {
-    try {
-      const response = await fetchRangeWithRetry(`${baseUrl}/${variant.relativePath.replace(/^\/+/, "")}`);
-      const mimeType = response.headers.get("content-type")?.split(";")[0];
-      if (![200, 206].includes(response.status)) throw new Error(`HTTP ${response.status}`);
-      if (mimeType !== variant.mimeType) throw new Error(`MIME ${mimeType ?? "missing"}`);
-    } catch (error) {
-      issues.push({
-        code: "unavailable-url",
-        message: `${variant.id}: ${error instanceof Error ? error.message : String(error)}`,
-      });
-    }
-  }
-}
+if (!localOnly && baseUrl) issues.push(...(await probeAudioVariants(approvedVariants, baseUrl)));
 
 if (issues.length > 0) {
   console.error(`Audio manifest validation failed with ${issues.length} issue(s):`);
@@ -102,6 +72,6 @@ if (issues.length > 0) {
   process.exitCode = 1;
 } else {
   console.log(
-    `Audio manifest valid: ${zikrs.length} zikr instances, ${Object.keys(manifest.AUDIO_CATALOG.assets).length} assets, ${Object.keys(manifest.AUDIO_CATALOG.assignments).length} approved mappings.`,
+    `Audio manifest valid (${localOnly ? "local metadata; hosted probes required separately" : "including hosted probes"}): ${zikrs.length} zikr instances, ${Object.keys(manifest.AUDIO_CATALOG.assets).length} assets, ${Object.keys(manifest.AUDIO_CATALOG.assignments).length} approved mappings.`,
   );
 }

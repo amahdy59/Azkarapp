@@ -46,3 +46,12 @@ jobs:
           path: test-results/
           if-no-files-found: ignore
           retention-days: 7
+
+      - name: Preserve browser timings
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: browser-timings
+          path: output/e2e-results.json
+          if-no-files-found: ignore
+          retention-days: 7

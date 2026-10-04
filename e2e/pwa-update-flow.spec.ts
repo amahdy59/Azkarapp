@@ -1,7 +1,8 @@
 import { execFileSync } from "node:child_process";
+import { createRequire } from "node:module";
 import { createServer, type Server } from "node:http";
 import { createReadStream, existsSync, mkdirSync, rmSync, statSync, writeFileSync } from "node:fs";
-import { extname, join, normalize, resolve, sep } from "node:path";
+import { basename, dirname, extname, join, normalize, resolve, sep } from "node:path";
 import { expect, test } from "@playwright/test";
 
 /**
@@ -18,12 +19,20 @@ import { expect, test } from "@playwright/test";
  * fixed directory, and this needs to change what is being served underneath a
  * running client — which is exactly what a deployment is.
  */
-const PORT = 4199;
-const ORIGIN = `http://127.0.0.1:${PORT}`;
+let origin = "";
+const VITE_CLI = join(dirname(createRequire(import.meta.url).resolve("vite/package.json")), "bin/vite.js");
 const OLD_RELEASE = "1000.1-old";
 const NEW_RELEASE = "1000.2-new";
-const ROOT_RELATIVE = ".playwright-update";
+const ROOT_BASE = resolve(".playwright-update");
+const ROOT_RELATIVE = join(".playwright-update", String(process.pid));
 const ROOT = resolve(ROOT_RELATIVE);
+
+function removeOwnedBuilds() {
+  if (dirname(ROOT) !== ROOT_BASE || basename(ROOT) !== String(process.pid)) {
+    throw new Error("Unexpected update-test build directory");
+  }
+  rmSync(ROOT, { recursive: true, force: true });
+}
 
 const TYPES: Record<string, string> = {
   ".html": "text/html; charset=utf-8",
@@ -50,15 +59,10 @@ function notesFor(release: string) {
 
 function buildRelease(relativeDirectory: string, release: string) {
   const directory = resolve(relativeDirectory);
-  /* The out directory is passed relative, not absolute. `shell: true` is
-     needed for pnpm on Windows, and the shell splits this repository's own
-     path on the spaces in "OneDrive - Advansys IS" — which surfaces as rollup
-     failing to load the entry module, an error that says nothing about the
-     real cause. */
+  // Invoke the existing Vite CLI through Node so paths with spaces stay intact.
   try {
-    execFileSync("pnpm", ["exec", "vite", "build", "--outDir", relativeDirectory, "--emptyOutDir"], {
+    execFileSync(process.execPath, [VITE_CLI, "build", "--outDir", relativeDirectory, "--emptyOutDir"], {
       stdio: "pipe",
-      shell: true,
       env: { ...process.env, AZKAR_RELEASE_OVERRIDE: release },
     });
   } catch (error) {
@@ -111,14 +115,26 @@ function startServer() {
     });
     createReadStream(target).pipe(response);
   });
-  return new Promise<void>((done) => server!.listen(PORT, "127.0.0.1", done));
+  return new Promise<void>((done, reject) => {
+    server!.once("error", reject);
+    server!.listen(0, "127.0.0.1", () => {
+      server!.off("error", reject);
+      const address = server!.address();
+      if (!address || typeof address === "string") {
+        reject(new Error("Update-test server did not receive a TCP port"));
+        return;
+      }
+      origin = `http://127.0.0.1:${address.port}`;
+      done();
+    });
+  });
 }
 
 test.describe.configure({ mode: "serial" });
 
 test.beforeAll(async () => {
   test.setTimeout(600_000);
-  rmSync(ROOT, { recursive: true, force: true });
+  removeOwnedBuilds();
   mkdirSync(ROOT, { recursive: true });
   buildRelease(`${ROOT_RELATIVE}/v1`, OLD_RELEASE);
   buildRelease(`${ROOT_RELATIVE}/v2`, NEW_RELEASE);
@@ -128,7 +144,7 @@ test.beforeAll(async () => {
 
 test.afterAll(async () => {
   await new Promise<void>((done) => (server ? server.close(() => done()) : done()));
-  rmSync(ROOT, { recursive: true, force: true });
+  removeOwnedBuilds();
 });
 
 async function openApp(page: import("@playwright/test").Page) {
@@ -142,7 +158,7 @@ async function openApp(page: import("@playwright/test").Page) {
       }),
     );
   });
-  await page.goto(ORIGIN);
+  await page.goto(origin);
   /* A worker does not control the page that registered it — that is the spec,
      not a quirk, and there is no `clients.claim()` here because the prompt
      flow exists so the reader chooses the moment. So: wait for it to be active,

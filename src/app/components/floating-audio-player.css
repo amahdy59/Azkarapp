@@ -148,9 +148,9 @@
   min-width: 3rem;
 }
 [data-testid="audio-reciter-select"] {
-  height: auto;
+  height: 2.75rem;
   min-height: 2.75rem;
-  white-space: normal;
+  white-space: nowrap;
   padding-inline: 8px;
   gap: 6px;
 }
@@ -163,10 +163,9 @@
 [data-testid="audio-reciter-select"] [data-slot="select-value"] {
   display: block;
   min-width: 0;
-  -webkit-line-clamp: unset;
-  overflow: visible;
-  white-space: normal;
-  overflow-wrap: normal;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .audio-speed-select [data-slot="select-value"] {

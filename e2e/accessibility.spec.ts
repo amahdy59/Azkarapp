@@ -11,7 +11,7 @@ async function enterEnglishGuestMode(page: import("@playwright/test").Page) {
 }
 
 async function expectNoWcagViolations(page: import("@playwright/test").Page) {
-  await page.waitForTimeout(200);
+  await page.evaluate(() => document.fonts.ready);
   // axe-core v4 cannot resolve CSS custom-property chains through Tailwind v4's
   // @theme inline indirection, so its color-contrast rule produces false positives
   // (it reports ~1:1 contrast for elements whose actual getComputedStyle-computed

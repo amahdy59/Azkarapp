@@ -273,17 +273,15 @@ export function FloatingAudioPlayer({
   const isBusy = state.status === "loading" || state.status === "buffering";
   const totalTracks = state.plan.entries.length;
   const queuePosition = `${formatNumerals(state.entryIndex + 1, language)} / ${formatNumerals(totalTracks, language)}`;
-  const isRepeated = currentEntry.repetitions > 1;
-  const embedded = currentEntry.embeddedRepetitions ?? 1;
-  const currentCount =
-    embedded > 1
-      ? Math.min(currentEntry.prescribedRepetitions, (state.repetitionIndex + 1) * embedded)
+  const embeddedRepetitions = currentEntry.embeddedRepetitions ?? 1;
+  const currentRepetition =
+    embeddedRepetitions > 1
+      ? Math.min(currentEntry.prescribedRepetitions, (state.repetitionIndex + 1) * embeddedRepetitions)
       : state.repetitionIndex + 1;
-  const totalCount = embedded > 1 ? currentEntry.prescribedRepetitions : currentEntry.repetitions;
-
-  const repetitionPosition =
-    isRepeated && totalCount > 1
-      ? `${formatNumerals(currentCount, language)} / ${formatNumerals(totalCount, language)}`
+  const totalRepetitions = embeddedRepetitions > 1 ? currentEntry.prescribedRepetitions : currentEntry.repetitions;
+  const repetitionProgress =
+    currentEntry.repetitions > 1 && totalRepetitions > 1
+      ? `${formatNumerals(currentRepetition, language)} / ${formatNumerals(totalRepetitions, language)}`
       : null;
   const title = language === "ar" ? currentEntry.titleArabic : currentEntry.titleEnglish;
   const activeVoiceId = state.currentVoiceId ?? currentEntry.defaultVoiceId;
@@ -334,12 +332,7 @@ export function FloatingAudioPlayer({
     Number.isFinite(state.duration) && state.duration > 0
       ? Math.min(100, Math.max(0, (state.currentTime / state.duration) * 100))
       : 0;
-  const positionChip = [
-    totalTracks > 1 ? `${t(language, "audioPlayer.track")} ${queuePosition}` : null,
-    repetitionPosition ? `${t(language, "audioPlayer.repetitionChip")} ${repetitionPosition}` : null,
-  ]
-    .filter(Boolean)
-    .join(" · ");
+  const positionChip = totalTracks > 1 ? `${t(language, "audioPlayer.track")} ${queuePosition}` : null;
   const repeatLabel = t(language, "audioPlayer.repeatPrescribed", {
     count: formatNumerals(currentEntry.prescribedRepetitions, language),
   });
@@ -417,7 +410,7 @@ export function FloatingAudioPlayer({
               <span
                 data-testid="audio-compact-title"
                 title={title}
-                className="line-clamp-2 text-label font-bold text-foreground"
+                className="truncate block text-label font-bold text-foreground"
               >
                 {title}
               </span>
@@ -524,7 +517,7 @@ export function FloatingAudioPlayer({
               <X size={19} aria-hidden="true" />
             </button>
             <div
-              className="audio-expanded-identity flex min-w-0 flex-wrap items-center justify-center gap-1.5 px-1"
+              className="audio-expanded-identity flex min-w-0 flex-nowrap items-center justify-center gap-1.5 px-1"
               data-testid="audio-expanded-identity"
             >
               <Select
@@ -541,10 +534,10 @@ export function FloatingAudioPlayer({
                   aria-label={t(language, "audioPlayer.voice")}
                   data-testid="audio-reciter-select"
                   size="sm"
-                  className="h-11 w-auto max-w-full gap-2 rounded-full border-border-control bg-background px-3 py-1 text-xs font-bold text-foreground shadow-none transition-colors hover:bg-muted focus-visible:ring-[3px] focus-visible:ring-ring"
+                  className="h-11 min-w-0 max-w-[11.5rem] sm:max-w-none shrink gap-2 rounded-full border-border-control bg-background px-3 py-1 text-xs font-bold text-foreground shadow-none transition-colors hover:bg-muted focus-visible:ring-[3px] focus-visible:ring-ring"
                 >
                   <Headphones size={14} className="shrink-0 text-primary" aria-hidden="true" />
-                  <SelectValue>{reciterDisplayName}</SelectValue>
+                  <SelectValue className="truncate">{reciterDisplayName}</SelectValue>
                 </SelectTrigger>
                 <SelectContent
                   align="center"
@@ -571,7 +564,7 @@ export function FloatingAudioPlayer({
                 </SelectContent>
               </Select>
               {positionChip && (
-                <span className="flex min-h-9 items-center rounded-full border border-border bg-background px-2 py-1 text-micro font-bold text-muted-foreground">
+                <span className="shrink-0 whitespace-nowrap text-micro font-bold text-muted-foreground px-1 select-none">
                   {positionChip}
                 </span>
               )}
@@ -631,7 +624,7 @@ export function FloatingAudioPlayer({
                     <>
                       <p
                         data-testid="audio-player-zikr-text"
-                        className="w-full text-start text-lg sm:text-xl leading-relaxed text-foreground"
+                        className="w-full text-center text-lg sm:text-xl leading-relaxed text-foreground"
                         dir="ltr"
                         lang="en"
                       >
@@ -799,7 +792,7 @@ export function FloatingAudioPlayer({
                 <SelectTrigger
                   size="sm"
                   aria-label={`${t(language, "audioPlayer.speedShort")}: ${formatNumerals(state.playbackRate, language)}×`}
-                  className="audio-speed-select w-auto min-h-11 gap-2 rounded-full bg-card text-xs font-bold"
+                  className="audio-speed-select w-auto min-h-11 gap-2 rounded-full border border-border bg-card text-foreground hover:bg-muted text-xs font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 >
                   <SelectValue />
                 </SelectTrigger>
@@ -830,7 +823,7 @@ export function FloatingAudioPlayer({
                   aria-label={t(language, "audioPlayer.autoAdvance")}
                   aria-checked={controller.autoAdvance}
                   onClick={() => controller.setAutoAdvance(!controller.autoAdvance)}
-                  className="audio-auto-advance flex min-h-11 items-center justify-center gap-2 rounded-full border border-border px-3 text-xs font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                  className="audio-auto-advance flex min-h-11 items-center justify-center gap-2 rounded-full border border-border bg-card text-foreground px-3 text-xs font-semibold hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 >
                   <span>{t(language, "audioPlayer.playAllShort")}</span>
                   <span
@@ -841,21 +834,28 @@ export function FloatingAudioPlayer({
                   </span>
                 </button>
               )}
+              {repetitionProgress && (
+                <span data-testid="audio-repetition-progress" className="text-micro font-bold text-muted-foreground">
+                  {t(language, "audioPlayer.repetitionChip")} <span dir="ltr">{repetitionProgress}</span>
+                </span>
+              )}
               {canRepeat && (
                 <button
                   type="button"
                   aria-pressed={repeatEnabled}
                   onClick={() => controller.setPlaybackMode(repeatEnabled ? "play-once" : "repeat-prescribed-count")}
-                  className={`audio-repeat-option flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-full border px-3 text-xs font-semibold transition-colors duration-fast focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                    repeatEnabled
-                      ? "border-primary bg-primary/15 text-primary"
-                      : "border-border text-muted-foreground hover:bg-muted hover:text-foreground"
-                  }`}
+                  className="audio-repeat-option flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-full border border-border bg-card text-foreground px-3 text-xs font-semibold hover:bg-muted transition-colors duration-fast focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                   aria-label={repeatLabel}
                   title={repeatLabel}
                 >
-                  <Repeat size={15} aria-hidden="true" />
-                  <span>{repeatLabel}</span>
+                  <Repeat
+                    size={15}
+                    className={repeatEnabled ? "text-primary" : "text-muted-foreground"}
+                    aria-hidden="true"
+                  />
+                  <span className={repeatEnabled ? "text-primary font-bold" : "text-foreground font-semibold"}>
+                    {repeatLabel}
+                  </span>
                 </button>
               )}
             </div>

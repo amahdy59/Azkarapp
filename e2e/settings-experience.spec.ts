@@ -21,7 +21,7 @@ async function openSettings(page: Page) {
 }
 
 async function expectNoWcagViolations(page: Page) {
-  await page.waitForTimeout(200);
+  await page.evaluate(() => document.fonts.ready);
   const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
   expect(results.violations).toEqual([]);
 }

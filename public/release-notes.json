@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-04d",
+  "release": "2026-10-04e",
   "ar": [
-    "استمع مع موجة صوتية أوضح، وتحكم في موضع التشغيل والصوت من أدوات مرتبة.",
-    "انتقل بين الأذكار الصوتية، واختر تشغيل الكل أو التوقف بعد الذكر الحالي.",
-    "اختر ذكر المسبحة من قائمة واضحة، وانسخ المراجع مع تأكيد النجاح أو توضيح الخطأ.",
-    "شارك بطاقات أكثر إحكامًا مع الحفاظ على النص كاملًا وخيارات الحجم البديلة."
+    "اختر ذكر المسبحة من قائمة مختصرة، مع الاحتفاظ بخيارات حفظ العد عند التبديل.",
+    "اقرأ الفوائد والأحاديث في بطاقات موحدة، وافتح مراجع المسبحة المطابقة للنص.",
+    "تابع عدد التكرارات أسفل مشغل الصوت، مع فصل موضع الذكر عنه في الأعلى.",
+    "استخدم أزرار مشاركة وتشغيل أقصر، واختر الصوت الإنجليزي باسم الترجمة الإنجليزية."
   ],
   "en": [
-    "Listen with a clearer audio waveform and organized seeking and volume controls.",
-    "Move between recordings and choose whether to play all or stop after the current dhikr.",
-    "Choose a counter dhikr from a clear list and copy references with success or error feedback.",
-    "Share denser cards that keep the complete text and offer alternative sizes when needed."
+    "Choose a counter dhikr from a concise menu while keeping count-saving choices when switching.",
+    "Read benefits and hadiths in consistent cards and open counter references matching the narration.",
+    "Follow repetition progress beneath the audio player, separate from the dhikr position above.",
+    "Use shorter sharing and playback buttons and find the English voice labelled English Translation."
   ]
 }

@@ -109,6 +109,12 @@ Never commit `.env` or service-role credentials. The app remains usable as a loc
 
 Use relevant unit/browser specs while developing. Before pushing, the hook enforces frozen install, `pnpm check`, `pnpm test:e2e:fast` and `pnpm build:pages`. A quality pass is reusable for 24 hours only for identical input contents, installed dependencies, toolchain/platform and build environment. CI always runs full quality and browser verification. Run the full local browser suite for broad changes, browser infrastructure, uncertain scope or CI diagnosis.
 
+For a small change, select its unit files with `pnpm test:run <file>` and its browser specs with `pnpm test:e2e <spec> --project=desktop-chromium`. The fast browser gate covers settings, navigation, legal pages, and offline reading/counting. It uses the normal bounded worker pool instead of forcing extra workers while other sessions are active. Tooling tests run in an isolated Node project; application tests retain their existing DOM and mock-isolation contracts.
+
+Browser runs write `output/e2e-results.json`. Run `pnpm test:timings` to see slow tests, retries, failures and wall time; supply a report filename to inspect an earlier run. Set `E2E_REPORT_PATH` for separate reports when comparing runs. The report is diagnostic and never replaces the test command's exit status.
+
+Browser tests build a fresh preview and fail if the selected port is occupied; they never terminate the process occupying it. The default is 4173. Set `E2E_PORT` to an unused port for a separate session (PowerShell: `$env:E2E_PORT = "4197"`; then run the usual browser command). Ports are validated before starting the server. Stop your own stale preview explicitly, or use `E2E_BASE_URL` only for an independently managed preview of the exact candidate. Concurrent full browser runs should use separate checkouts and ports because their build and trace directories are shared within a checkout.
+
 ## Architecture
 
 ```text
@@ -232,3 +238,7 @@ Documentation sources of truth:
 - Prayer times are calculated values and may differ by local authority. Users can select an authority method and apply manual minute adjustments.
 - Browser geolocation requires HTTPS (or localhost) and explicit user permission.
 - A device with an incorrect timezone can affect calculated times. Settings shows the effective IANA timezone and UTC offset and allows manual correction.
+
+### Audio validation during development
+
+Local pnpm check validates audio catalog metadata offline. Use pnpm validate:audio for audio-host/catalog changes and live recording verification; Quality CI requires this full live validation before every release. pnpm validate:audio:local performs the same structural checks without network probes.

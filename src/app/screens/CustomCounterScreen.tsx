@@ -1,4 +1,4 @@
-import { ReferenceCopyButton } from "../components/ReferenceCopyButton";
+import { ReferenceCard } from "../components/ReferenceCard";
 import { useCallback, useEffect, useState } from "react";
 import { AuthenticZikrPicker } from "../components/AuthenticZikrPicker";
 import { DevotionalAction, DevotionalFooter } from "../components/DevotionalControls";
@@ -625,27 +625,43 @@ export function CustomCounterScreen({
               <h2 className="text-lg font-black text-foreground">{t(language, "counter.virtueReference")}</h2>
             </div>
 
-            <div className="flex-1 overflow-y-auto space-y-4 py-4 pe-1">
-              <section>
-                <div className="flex items-center justify-between gap-2 mb-2">
-                  <h3 className="text-subtitle font-extrabold text-primary">{t(language, "reader.benefitLabel")}</h3>
-                  <ReferenceCopyButton
-                    text={isArabic ? selectedAuthentic.virtueAr : selectedAuthentic.virtueEn}
-                    language={language}
-                  />
-                </div>
-                <p className="text-base font-semibold leading-8 text-foreground" dir="auto">
-                  {isArabic ? selectedAuthentic.virtueAr : selectedAuthentic.virtueEn}
-                </p>
-              </section>
+            <div className="flex-1 overflow-y-auto space-y-3.5 py-4 pe-1">
+              <ReferenceCard
+                title={t(language, "reader.benefitLabel")}
+                titleHeadingId="masbaha-benefit-heading"
+                body={isArabic ? selectedAuthentic.virtueAr : selectedAuthentic.virtueEn}
+                bodyTestId="masbaha-virtue-text"
+                copyable={true}
+                copyText={isArabic ? selectedAuthentic.virtueAr : selectedAuthentic.virtueEn}
+                language={language}
+                direction={direction}
+                isArabicText={isArabic}
+              />
 
-              <section className="border-t border-border/40 pt-3">
-                <h3 className="text-subtitle font-extrabold text-primary mb-2">{t(language, "reader.sourceLabel")}</h3>
-                <p className="text-sm font-semibold leading-relaxed text-muted-foreground" dir="auto">
-                  {isArabic ? selectedAuthentic.sourceRefAr : selectedAuthentic.sourceRefEn} ·{" "}
-                  {isArabic ? selectedAuthentic.hadithGradeAr : selectedAuthentic.hadithGradeEn}
-                </p>
-              </section>
+              <ReferenceCard
+                title={t(language, "reader.hadithLabel")}
+                titleHeadingId="masbaha-hadith-heading"
+                body={
+                  isArabic
+                    ? selectedAuthentic.hadithTextAr
+                    : (selectedAuthentic.hadithTextEn ?? selectedAuthentic.hadithTextAr)
+                }
+                bodyTestId="masbaha-hadith-text"
+                copyable={true}
+                copyText={
+                  isArabic
+                    ? selectedAuthentic.hadithTextAr
+                    : (selectedAuthentic.hadithTextEn ?? selectedAuthentic.hadithTextAr)
+                }
+                copyAriaLabel={t(language, "reader.copyHadith")}
+                sourceText={`${isArabic ? selectedAuthentic.sourceRefAr : selectedAuthentic.sourceRefEn} · ${isArabic ? selectedAuthentic.hadithGradeAr : selectedAuthentic.hadithGradeEn}`}
+                sourceUrl={selectedAuthentic.sourceUrl}
+                sourceTestId="masbaha-hadith-source"
+                sourceHeadingId="masbaha-source-heading"
+                language={language}
+                direction={direction}
+                isArabicText={isArabic}
+              />
             </div>
           </div>
         </ResponsiveSheet>

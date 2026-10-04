@@ -1,11 +1,16 @@
-import { useId, useState } from "react";
 import type { AuthenticZikrItem } from "../content/authenticAzkar";
 import type { AppLanguage } from "../types";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
-import { Check, ChevronDown } from "./icons";
-import { ResponsiveSheet } from "./ResponsiveSheet";
-import { Button } from "./ui/button";
+import { ChevronDown } from "./icons";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 
 export function AuthenticZikrPicker({
   items,
@@ -22,128 +27,71 @@ export function AuthenticZikrPicker({
   savedItems?: Record<string, { count: number; target: number; laps?: number }>;
   onSelect: (item: AuthenticZikrItem) => void;
 }) {
-  const radioName = useId();
-  const [open, setOpen] = useState(false);
-  const [tempSelected, setTempSelected] = useState<AuthenticZikrItem>(selected);
-
-  const handleOpen = () => {
-    setTempSelected(selected);
-    setOpen(true);
-  };
-
-  const handleConfirm = () => {
-    onSelect(tempSelected);
-    setOpen(false);
-  };
-
-  const selectedText = language === "ar" ? selected.textAr : selected.textEn;
+  const isArabic = language === "ar";
+  const selectedLabel = isArabic ? selected.shortNameAr : selected.shortNameEn;
+  const selectedFullText = isArabic ? selected.textAr : selected.textEn;
 
   return (
-    <>
-      <button
-        type="button"
-        onClick={handleOpen}
-        aria-haspopup="dialog"
-        className="interactive-elem flex min-h-11 w-full items-center justify-between gap-2 overflow-hidden rounded-2xl border border-border-control bg-card px-3 text-label font-bold text-foreground shadow-xs transition-colors hover:bg-muted focus-visible:outline-none focus-within:ring-[3px] focus-within:ring-ring sm:px-4 sm:text-sm"
-      >
-        <span className="min-w-0 flex-1 truncate text-start" dir="auto">
-          {selectedText}
-        </span>
-        <ChevronDown size={16} className="shrink-0 text-muted-foreground" aria-hidden="true" />
-      </button>
-
-      {open && (
-        <ResponsiveSheet
-          open={open}
-          onClose={() => setOpen(false)}
-          title={t(language, "counter.chooseDhikr")}
-          direction={direction}
-          language={language}
-          testId="authentic-zikr-sheet"
-          maxWidthClassName="max-w-md"
-          showCloseButton={true}
-          drawerClassName="p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]"
-          dialogClassName="p-6"
+    <fieldset className="w-full min-w-0" dir={direction}>
+      <legend className="sr-only">{t(language, "counter.chooseDhikr")}</legend>
+      <DropdownMenu dir={direction}>
+        <DropdownMenuTrigger asChild>
+          <button
+            type="button"
+            data-testid="counter-zikr-filter"
+            className="interactive-elem flex min-h-[44px] w-full items-center justify-between gap-2 sm:gap-3 rounded-2xl border border-border-control bg-card px-3 sm:px-4 text-label sm:text-sm font-bold text-foreground shadow-xs transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            title={selectedFullText}
+          >
+            <span className="min-w-0 flex-1 truncate text-start" dir="auto">
+              {selectedLabel}
+            </span>
+            <ChevronDown size={16} className="shrink-0 text-muted-foreground" aria-hidden="true" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align="start"
+          className="w-[var(--radix-dropdown-menu-trigger-width)] max-w-[var(--radix-dropdown-menu-trigger-width)] max-h-[70vh] overflow-y-auto"
         >
-          <div className="flex flex-col h-full max-h-[82vh] overflow-hidden text-start">
-            <div className="pe-12 pb-3 shrink-0">
-              <h2 className="text-xl font-black text-foreground">{t(language, "counter.chooseDhikr")}</h2>
-              <p className="mt-1 text-sm font-medium leading-6 text-muted-foreground">
-                {t(language, "counter.chooseDhikrHint")}
-              </p>
-            </div>
+          <DropdownMenuLabel className="px-3 py-2 text-xs font-black text-muted-foreground">
+            {t(language, "counter.chooseDhikr")}
+          </DropdownMenuLabel>
+          <DropdownMenuRadioGroup
+            value={selected.id}
+            onValueChange={(val) => {
+              const item = items.find((it) => it.id === val);
+              if (item) {
+                onSelect(item);
+              }
+            }}
+          >
+            {items.map((item) => {
+              const label = isArabic ? item.shortNameAr : item.shortNameEn;
+              const fullText = isArabic ? item.textAr : item.textEn;
+              const saved = savedItems?.[item.id];
+              const hasProgress = Boolean(saved && saved.count > 0);
 
-            <div
-              role="radiogroup"
-              aria-label={t(language, "counter.chooseDhikr")}
-              className="flex-1 overflow-y-auto space-y-2.5 py-2 pe-1"
-            >
-              {items.map((item) => {
-                const isSelected = item.id === tempSelected.id;
-                const text = language === "ar" ? item.textAr : item.textEn;
-                const saved = savedItems?.[item.id];
-                const hasProgress = Boolean(saved && saved.count > 0);
-
-                return (
-                  <label
-                    key={item.id}
-                    className={`w-full flex items-center justify-between gap-3 p-4 rounded-2xl text-start transition-all cursor-pointer outline-none focus-within:ring-[3px] focus-within:ring-ring ${
-                      isSelected
-                        ? "border-2 border-primary bg-primary/10 shadow-xs"
-                        : "border border-border/70 bg-card/80 hover:bg-muted/60 hover:border-border"
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name={radioName}
-                      checked={isSelected}
-                      onChange={() => setTempSelected(item)}
-                      className="sr-only"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <span
-                        className={`block text-base sm:text-lg font-bold leading-relaxed ${
-                          isSelected ? "text-foreground" : "text-foreground/90"
-                        }`}
-                        dir="auto"
-                      >
-                        {text}
+              return (
+                <DropdownMenuRadioItem
+                  key={item.id}
+                  value={item.id}
+                  className="font-bold min-w-0 cursor-pointer"
+                  title={fullText}
+                  data-testid={`zikr-option-${item.id}`}
+                >
+                  <span className="flex flex-col min-w-0 flex-1">
+                    <span className="truncate min-w-0 font-bold leading-snug">{label}</span>
+                    {hasProgress && (
+                      <span className="text-[11px] font-semibold text-primary/80 leading-tight mt-0.5" dir="ltr">
+                        {formatNumerals(saved!.count, language)} / {formatNumerals(saved!.target, language)}
                       </span>
-                      {hasProgress && (
-                        <span className="mt-1 inline-flex items-center rounded-full bg-primary/15 px-2 py-0.5 text-xs font-bold text-primary">
-                          {formatNumerals(saved!.count, language)} / {formatNumerals(saved!.target, language)}
-                        </span>
-                      )}
-                    </div>
-
-                    <div
-                      className={`size-6 rounded-full shrink-0 flex items-center justify-center transition-colors ${
-                        isSelected
-                          ? "bg-primary text-primary-foreground"
-                          : "border-2 border-border-control/70 bg-transparent text-transparent"
-                      }`}
-                      aria-hidden="true"
-                    >
-                      <Check size={14} strokeWidth={3} />
-                    </div>
-                  </label>
-                );
-              })}
-            </div>
-
-            <div className="pt-4 mt-2 border-t border-border/40 shrink-0">
-              <Button
-                type="button"
-                onClick={handleConfirm}
-                size="lg"
-                className="w-full h-12 rounded-2xl bg-primary text-primary-foreground font-black text-base shadow-sm hover:bg-primary/90 focus-visible:ring-[3px] focus-visible:ring-ring"
-              >
-                {t(language, "counter.selectAction")}
-              </Button>
-            </div>
-          </div>
-        </ResponsiveSheet>
-      )}
-    </>
+                    )}
+                  </span>
+                </DropdownMenuRadioItem>
+              );
+            })}
+          </DropdownMenuRadioGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </fieldset>
   );
 }

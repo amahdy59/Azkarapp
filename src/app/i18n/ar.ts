@@ -998,7 +998,7 @@ const ar = {
     sessionProgress: "تقدم الاستماع",
     speedShort: "السرعة",
     reciterShort: "القارئ",
-    englishVoiceShort: "جورج · الإنجليزية",
+    englishVoiceShort: "الترجمة الإنجليزية",
     repeatShort: "التكرار",
     repeatPrescribed: "التكرار {count} مرات",
     errorBlocked: "تعذر بدء التشغيل. اضغط زر التشغيل مرة أخرى.",
@@ -1989,7 +1989,7 @@ const ar = {
   shareStoryPack: {
     modalTitle: "بطاقات الأذكار للمشاركة",
     modalSubtitle: "بطاقات واضحة بنص كامل ومصادر مراجعة",
-    actionButton: "مشاركة الأذكار كبطاقات",
+    actionButton: "مشاركة الأذكار",
     actionButtonAria: "مشاركة أذكار المجموعة كبطاقات للحالات والتواصل",
     shareCurrent: "مشاركة هذه البطاقة",
     shareAll: "مشاركة جميع البطاقات",

@@ -1,11 +1,10 @@
-import { ReferenceCopyButton } from "../components/ReferenceCopyButton";
+import { ReferenceCard } from "../components/ReferenceCard";
 import { useCallback, useEffect, useState } from "react";
 import { DevotionalAction, DevotionalFooter } from "../components/DevotionalControls";
 import { CounterTargetPicker } from "../components/CounterTargetPicker";
 import {
   ArrowPrevious,
   Check,
-  ExternalLink,
   Lightbulb,
   MoreVertical,
   Play,
@@ -67,23 +66,14 @@ function ReferenceLink({
   language: AppLanguage;
 }) {
   return (
-    <article className="rounded-2xl border border-border/70 bg-card/80 p-4 text-start">
-      <div className="flex items-start justify-between gap-2 mb-2">
-        <p className="text-subtitle font-bold leading-7 text-foreground flex-1" dir="auto">
-          {text}
-        </p>
-        <ReferenceCopyButton text={text} language={language} />
-      </div>
-      <a
-        href={href}
-        target="_blank"
-        rel="noreferrer"
-        className="mt-2 inline-flex min-h-11 items-center gap-2 rounded-xl text-label font-black text-primary hover:underline focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-      >
-        {source}
-        <ExternalLink size={16} aria-hidden="true" />
-      </a>
-    </article>
+    <ReferenceCard
+      body={text}
+      sourceText={source}
+      sourceUrl={href}
+      copyable={true}
+      language={language}
+      isArabicText={language === "ar"}
+    />
   );
 }
 

@@ -24,7 +24,7 @@ export function AudioVolumeControl({ controller, language }: { controller: Audio
         <button
           type="button"
           aria-label={volumeLabel}
-          className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border bg-card text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           {icon}
         </button>

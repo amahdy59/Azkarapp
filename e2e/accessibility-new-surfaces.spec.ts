@@ -79,7 +79,7 @@ test("the prayer virtue dialog has no automatically detectable WCAG A/AA violati
     .locator('article[data-prayer-state="past"], article[data-prayer-state="current"]')
     .first()
     .getAttribute("data-prayer");
-  test.skip(!prayer, "no prayer has arrived yet, so none can be recorded");
+  expect(prayer, "the fixed evening fixture must expose a recordable prayer").toBeTruthy();
 
   await page.locator(`#prayer-${prayer}-mosque`).check();
   await expect(page.getByTestId("prayer-virtue-modal")).toBeVisible();

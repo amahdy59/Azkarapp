@@ -1,4 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
+import { browserTestPort } from "./scripts/browser-test-port.mjs";
 
 /**
  * Specs whose assertions depend on the device the project supplies — adaptive
@@ -24,6 +25,7 @@ const DEVICE_MATRIX_SPECS = [
 const fullMatrix = process.env.E2E_FULL_MATRIX === "1";
 const deviceMatrix = fullMatrix ? undefined : DEVICE_MATRIX_SPECS.map((spec) => `**/${spec}`);
 const externalBaseUrl = process.env.E2E_BASE_URL;
+const previewUrl = `http://127.0.0.1:${browserTestPort()}`;
 
 export default defineConfig({
   testDir: "./e2e",
@@ -36,10 +38,15 @@ export default defineConfig({
    * contention on Windows, and CI comfortably runs 3 workers.
    */
   workers: process.env.CI ? 3 : 2,
-  retries: process.env.CI ? 2 : 1,
-  reporter: process.env.CI ? "github" : "list",
+  // Local failures need diagnosis, not a second attempt that masks a flake.
+  retries: process.env.CI ? 2 : 0,
+  reporter: [
+    [process.env.CI ? "github" : "list"],
+    ["json", { outputFile: process.env.E2E_REPORT_PATH ?? "output/e2e-results.json" }],
+  ],
+  forbidOnly: Boolean(process.env.CI),
   use: {
-    baseURL: externalBaseUrl ?? "http://127.0.0.1:4173",
+    baseURL: externalBaseUrl ?? previewUrl,
     trace: "retain-on-failure",
     reducedMotion: "reduce",
     timezoneId: "Africa/Cairo",
@@ -69,6 +76,9 @@ export default defineConfig({
     },
     {
       name: "mobile-webkit-smoke",
+      // Concurrent WebKit rendering/axe sweeps contend heavily on Windows.
+      // Keep the full engine coverage while bounding this project separately.
+      workers: process.platform === "win32" ? 1 : undefined,
       grep: /@cross-browser/,
       use: { ...devices["iPhone 14"] },
     },
@@ -77,7 +87,7 @@ export default defineConfig({
     ? undefined
     : {
         command: "pnpm test:e2e:serve",
-        url: "http://127.0.0.1:4173",
+        url: previewUrl,
         // Deliberately never reused. Reuse looked like a free win — the build is
         // only ~13 s — but a leftover preview from an interrupted run serves
         // whatever `.playwright-dist` happened to contain, and a half-written

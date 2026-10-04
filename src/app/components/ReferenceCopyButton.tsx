@@ -3,7 +3,15 @@ import { t } from "../i18n";
 import type { AppLanguage } from "../types";
 import { Check, Copy } from "./icons";
 
-export function ReferenceCopyButton({ text, language }: { text: string; language: AppLanguage }) {
+export function ReferenceCopyButton({
+  text,
+  language,
+  ariaLabel,
+}: {
+  text: string;
+  language: AppLanguage;
+  ariaLabel?: string;
+}) {
   const [status, setStatus] = useState<"idle" | "copied" | "error">("idle");
   useEffect(() => {
     if (status !== "copied") return;
@@ -22,7 +30,7 @@ export function ReferenceCopyButton({ text, language }: { text: string; language
             setStatus("error");
           }
         }}
-        aria-label={t(language, "reader.copyHadith")}
+        aria-label={ariaLabel ?? t(language, "reader.copyHadith")}
         className="flex size-11 items-center justify-center rounded-full bg-muted/80 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
         {status === "copied" ? <Check size={16} aria-hidden="true" /> : <Copy size={16} aria-hidden="true" />}

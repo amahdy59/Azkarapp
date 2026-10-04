@@ -1,35 +1,23 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
-import { useEffect, useRef, useState } from "react";
-import { Check, Copy, Lightbulb, X } from "./icons";
+import { Lightbulb, X } from "./icons";
 import { t } from "../i18n";
 import type { AppLanguage, Zikr } from "../types";
 import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content/localizedZikr";
 import { ResponsiveSheet } from "./ResponsiveSheet";
 import { HadithWeakChainBadge } from "./ZikrComponents";
-
-/**
- * The hadith is the only copyable value here. Everything else in this sheet is
- * either a name, a one-line summary, or a citation the reader can read at a
- * glance — a copy affordance beside each of those was five buttons competing
- * for attention with the text they belonged to.
- */
-type ReferenceCopyKey = "hadith";
+import { ReferenceCard } from "./ReferenceCard";
 
 function ReferenceContent({
   zikr,
   language,
   direction,
   onClose,
-  onAnnouncement,
 }: {
   zikr: Zikr;
   language: AppLanguage;
   direction: "ltr" | "rtl";
   onClose: () => void;
-  onAnnouncement: (message: string) => void;
 }) {
-  const [copiedReference, setCopiedReference] = useState<ReferenceCopyKey | null>(null);
-  const copyFeedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isArabic = language === "ar";
   const sourceReference = getLocalizedSourceReference(zikr, language);
   const benefit = getLocalizedZikrBenefit(zikr, language);
@@ -43,43 +31,6 @@ function ReferenceContent({
    */
   const narration = isArabic ? zikr.hadithText : (zikr.hadithTextEnglish ?? zikr.hadithText);
   const inArabic = isArabic || !zikr.hadithTextEnglish;
-
-  useEffect(() => {
-    return () => {
-      if (copyFeedbackTimer.current) {
-        clearTimeout(copyFeedbackTimer.current);
-      }
-    };
-  }, []);
-
-  const copyReference = async (key: ReferenceCopyKey, value: string) => {
-    try {
-      await navigator.clipboard.writeText(value);
-      setCopiedReference(key);
-      onAnnouncement(t(language, "reader.referenceCopied"));
-      if (copyFeedbackTimer.current) {
-        clearTimeout(copyFeedbackTimer.current);
-      }
-      copyFeedbackTimer.current = setTimeout(() => {
-        setCopiedReference(null);
-        onAnnouncement("");
-      }, 1600);
-    } catch {
-      setCopiedReference(null);
-      onAnnouncement(t(language, "reader.copyError"));
-    }
-  };
-
-  const renderCopyButton = (key: ReferenceCopyKey, value: string, label: string) => (
-    <button
-      type="button"
-      onClick={() => void copyReference(key, value)}
-      aria-label={label}
-      className="flex h-[48px] w-[48px] min-h-[48px] min-w-[48px] shrink-0 items-center justify-center rounded-full bg-muted/80 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer"
-    >
-      {copiedReference === key ? <Check size={16} className="favorite-pop text-primary" /> : <Copy size={16} />}
-    </button>
-  );
 
   return (
     <div className="flex flex-col h-full max-h-[inherit] overflow-hidden">
@@ -112,61 +63,50 @@ function ReferenceContent({
         tabIndex={0}
         dir={direction}
       >
-        <div className="reference-sheet-content flex flex-col pb-4">
+        <div className="reference-sheet-content flex flex-col gap-3.5 pb-4">
           {benefit && (
-            <section aria-labelledby="reference-benefit-heading">
-              <h3 id="reference-benefit-heading" className="mb-2 text-subtitle font-extrabold text-primary">
-                {t(language, "reader.benefitLabel")}
-              </h3>
-              <p className="text-start text-base font-semibold leading-8 text-foreground" dir="auto">
-                {benefit}
-              </p>
-            </section>
+            <ReferenceCard
+              title={t(language, "reader.benefitLabel")}
+              titleHeadingId="reference-benefit-heading"
+              body={benefit}
+              language={language}
+              direction={direction}
+              isArabicText={isArabic}
+            />
           )}
           {narration && (
-            <section
-              aria-labelledby="reference-evidence-heading"
-              className={benefit ? "mt-4 border-t border-border/50 pt-3" : undefined}
-            >
-              <div className="mb-2 flex items-center justify-between gap-2">
-                <h3
-                  id="reference-evidence-heading"
-                  className="flex items-center gap-2 text-subtitle font-extrabold text-primary"
-                >
-                  {t(language, "reader.hadithLabel")}
-                  {zikr.authenticityLevel === "weak" && <HadithWeakChainBadge language={language} />}
-                </h3>
-                {renderCopyButton("hadith", narration, t(language, "reader.copyHadith"))}
-              </div>
-              {/* The English app reads the narration in English where one has
-                  been reviewed, and falls back to the Arabic where none has yet.
-                  `lang` and `dir` follow whichever is actually rendered rather
-                  than the interface language: marking English prose `lang="ar"`
-                  had screen readers pronouncing it with an Arabic voice, and the
-                  reverse is just as wrong. */}
+            <ReferenceCard
+              title={t(language, "reader.hadithLabel")}
+              titleBadge={zikr.authenticityLevel === "weak" ? <HadithWeakChainBadge language={language} /> : undefined}
+              titleHeadingId="reference-evidence-heading"
+              body={narration}
+              bodyTestId="reference-hadith"
+              copyable={true}
+              copyText={narration}
+              copyAriaLabel={t(language, "reader.copyHadith")}
+              sourceText={sourceReference}
+              sourceTestId="reference-source"
+              sourceHeadingId="reference-source-heading"
+              language={language}
+              direction={direction}
+              isArabicText={inArabic}
+            />
+          )}
+          {!narration && (
+            <section aria-labelledby="reference-source-heading">
+              <h3 id="reference-source-heading" className="text-subtitle font-bold text-primary">
+                {t(language, "reader.sourceLabel")}
+              </h3>
               <p
-                data-testid="reference-hadith"
-                className={`text-start text-base font-medium leading-8 text-foreground ${inArabic ? "zikr-text" : ""}`}
-                lang={inArabic ? "ar" : "en"}
-                dir={inArabic ? "rtl" : "ltr"}
+                data-testid="reference-source"
+                className="mt-2 text-label font-black text-primary"
+                dir={direction}
+                lang={language}
               >
-                {narration}
+                {sourceReference}
               </p>
             </section>
           )}
-          <section className="mt-4 border-t border-border/50 pt-3" aria-labelledby="reference-source-heading">
-            <h3 id="reference-source-heading" className="mb-2 text-subtitle font-extrabold text-primary">
-              {t(language, "reader.sourceLabel")}
-            </h3>
-            <p
-              data-testid="reference-source"
-              className="text-start text-sm font-semibold leading-relaxed text-muted-foreground"
-              lang={isArabic ? "ar" : "en"}
-              dir={direction}
-            >
-              {sourceReference}
-            </p>
-          </section>
         </div>
       </div>
     </div>
@@ -179,7 +119,6 @@ export function ReaderReferenceSheet({
   language,
   direction,
   onClose,
-  onAnnouncement,
 }: {
   open: boolean;
   zikr: Zikr;
@@ -201,13 +140,7 @@ export function ReaderReferenceSheet({
       // `.reference-sheet` carries the sheet height rules in ReaderScreen.css.
       drawerClassName="reference-sheet"
     >
-      <ReferenceContent
-        zikr={zikr}
-        language={language}
-        direction={direction}
-        onClose={onClose}
-        onAnnouncement={onAnnouncement}
-      />
+      <ReferenceContent zikr={zikr} language={language} direction={direction} onClose={onClose} />
     </ResponsiveSheet>
   );
 }

@@ -55,7 +55,6 @@ echo "Verifying the frozen dependency graph and seven-day package quarantine..."
 "$PNPM" install --frozen-lockfile
 
 echo "Running repository quality gates..."
-node scripts/cleanup-test-server.mjs
 if ! node scripts/quality-receipt.mjs; then
   "$PNPM" check
 fi

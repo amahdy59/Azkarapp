@@ -32,6 +32,12 @@ runs:
       env:
         VITE_AUDIO_BASE_URL: ${{ inputs.vite-audio-base-url }}
 
+    - name: Verify every hosted audio recording
+      run: pnpm validate:audio
+      shell: bash
+      env:
+        VITE_AUDIO_BASE_URL: ${{ inputs.vite-audio-base-url }}
+
     - name: Cache Playwright browsers
       uses: actions/cache@v6
       id: playwright-cache

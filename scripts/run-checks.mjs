@@ -26,7 +26,9 @@ import { qualityFingerprint, recordQualityPass, invalidateQualityPass } from "./
  * through its 15-second timeout inside the pre-push gate. Two heavy stages plus
  * a light one is the shape that stays honest on a sixteen-core machine.
  */
-const MAX_CONCURRENT_STAGES = Math.max(2, Math.min(3, Math.floor(os.cpus().length / 4)));
+const MAX_CONCURRENT_STAGES = process.argv.includes("--serial")
+  ? 1
+  : Math.max(2, Math.min(3, Math.floor(os.cpus().length / 4)));
 
 const TOOLCHAIN = { name: "toolchain", command: "node scripts/verify-toolchain.mjs" };
 const buildDirectory = `output/check-build-${process.pid}`;
@@ -39,7 +41,7 @@ const CONCURRENT = [
   { name: "typecheck", command: "tsc --noEmit" },
   { name: "lint", command: "eslint . --max-warnings 0" },
   { name: "format", command: "prettier --check ." },
-  { name: "audio manifest", command: "node scripts/validate-audio-manifest.mjs" },
+  { name: "audio manifest", command: "node scripts/validate-audio-manifest.mjs --local" },
   { name: "type scale", command: "node scripts/check-type-scale.mjs" },
 ];
 

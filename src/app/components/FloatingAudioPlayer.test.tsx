@@ -212,7 +212,7 @@ describe("FloatingAudioPlayer", () => {
 
     fireEvent.click(reciterTrigger);
     expect(screen.getByRole("option", { name: "عبد الله محمد" })).toBeInTheDocument();
-    expect(screen.getByRole("option", { name: "جورج (الترجمة الإنجليزية)" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "الترجمة الإنجليزية" })).toBeInTheDocument();
     expect(screen.getByRole("option", { name: "محمد شرعي" })).toBeInTheDocument();
     expect(screen.getByRole("option", { name: "محمد معتز" })).toBeInTheDocument();
 
@@ -279,6 +279,9 @@ describe("FloatingAudioPlayer", () => {
     fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
     expect(screen.getByRole("region", { name: "Audio player" })).toHaveTextContent("1 / 2");
     expect(screen.getByRole("region", { name: "Audio player" })).toHaveTextContent("49 / 100");
+    const progress = screen.getByTestId("audio-repetition-progress");
+    expect(progress.closest(".audio-expanded-options")).not.toBeNull();
+    expect(screen.getByTestId("audio-expanded-identity")).not.toHaveTextContent("49 / 100");
   });
 
   it("scales repetition display for embedded 3-count recordings so final number reaches the exact prescribed count", () => {

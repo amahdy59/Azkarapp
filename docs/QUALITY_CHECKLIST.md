@@ -8,6 +8,8 @@ Every pull request must pass the pinned-toolchain check, `pnpm install --frozen-
 
 These full gates run once in the Quality CI job for every application release. Pages waits for successful Quality for the exact current-main commit, then builds and deploys without duplicating its suite. During development, use affected unit/browser tests. Locally, the push hook runs frozen install, full `pnpm check` (or its unchanged, less-than-24-hour content-bound receipt), `pnpm test:e2e:fast` and Pages build. Broader changes and uncertain scope still warrant full local browser verification. CI never trusts the local receipt.
 
+The local smoke includes offline Reader/counting and Settings recovery in addition to navigation/legal coverage. Browser runs produce a JSON timing report inspected with `pnpm test:timings`; retry costs must remain visible. Tooling tests run in Node, and CI forbids focused browser tests. An occupied preview port fails without terminating another session. See `docs/agent/TEST_STRATEGY.md` for the change-based selection policy.
+
 | Concern               | Evidence                                                                                                              |
 | --------------------- | --------------------------------------------------------------------------------------------------------------------- |
 | Type safety           | Strict TypeScript and `tsc --noEmit`                                                                                  |
@@ -113,3 +115,7 @@ The keyboard row is marked partial for the same reason: the automation proves ta
 ### Waveform player refinement
 
 Verify one progress control per player form, physical LTR timeline/transport in Arabic and English, mirrored transport geometry and aligned icon centres, waveform source checksum coverage and truthful missing-data fallback. Confirm manual Previous/Next with continuation off, final-natural-ending-only completion, internal segment/ritual progression, and independent prescribed-repeat state. Volume opens only on click/keyboard, remains vertical, changes no row geometry, and closes on Escape/outside press with correct focus restoration; iOS uses hardware volume. Retain narrow/landscape/200% text, all-theme axe and manual physical-device/screen-reader checks.
+
+### Required audio release verification
+
+Local pnpm check includes deterministic audio metadata validation. Quality CI additionally requires pnpm validate:audio for every approved hosted recording before deployment. No recording checks, coverage thresholds or budgets are removed.

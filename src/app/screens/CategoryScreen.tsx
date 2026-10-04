@@ -249,12 +249,7 @@ export function CategoryScreen({
                     }
                   >
                     <Volume2 size={16} />
-                    <span>
-                      {t(language, "category.playAll")}
-                      {audioCoverage
-                        ? ` · ${formatNumerals(audioCoverage.available, language)}/${formatNumerals(audioCoverage.total, language)}`
-                        : ""}
-                    </span>
+                    <span>{t(language, "category.playAll")}</span>
                   </button>
                 )}
                 {completedItemCount > 0 && (

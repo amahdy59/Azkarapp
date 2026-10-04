@@ -701,19 +701,17 @@ test("reference sheet rises from the bottom edge of the centered app canvas", as
   // Benefit lives in the counter dock on this screen.
   await page.getByTestId("reader-benefit-dock-button").click();
 
-  // Wait for slide-up sheet-enter transition to complete
-  await page.waitForTimeout(300);
   const reader = page.getByTestId("reader-screen");
   const sheet = page.getByTestId("reference-sheet");
-
-  const bounds = await Promise.all([reader.boundingBox(), sheet.boundingBox()]);
-  const [readerBox, sheetBox] = bounds;
-  expect(readerBox).not.toBeNull();
-  expect(sheetBox).not.toBeNull();
-  if (!readerBox || !sheetBox) return;
-  const viewportHeight = page.viewportSize()?.height ?? 1000;
-  expect(Math.abs(sheetBox.y + sheetBox.height - viewportHeight)).toBeLessThanOrEqual(15);
-  expect(Math.abs(sheetBox.x - readerBox.x)).toBeLessThanOrEqual(1);
+  await expect(sheet).toBeVisible();
+  await expect(async () => {
+    const [readerBox, sheetBox] = await Promise.all([reader.boundingBox(), sheet.boundingBox()]);
+    expect(readerBox).not.toBeNull();
+    expect(sheetBox).not.toBeNull();
+    const viewportHeight = page.viewportSize()?.height ?? 1000;
+    expect(Math.abs(sheetBox!.y + sheetBox!.height - viewportHeight)).toBeLessThanOrEqual(15);
+    expect(Math.abs(sheetBox!.x - readerBox!.x)).toBeLessThanOrEqual(1);
+  }).toPass();
 });
 
 for (const locale of [

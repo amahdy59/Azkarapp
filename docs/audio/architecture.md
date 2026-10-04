@@ -53,3 +53,7 @@ The player uses physically LTR media controls in both languages while Arabic tex
 AudioProvider owns transient autoAdvance and its synchronous event ref. Individual listening snapshots the available collection order with continuation off; Play All starts on. The one expanded switch toggles continuation without changing the queue, selected run, voice, current media time, repetition mode or persisted/synchronized preferences. Natural endings still finish all segments and prescribed ritual rounds. Completion remains natural-ending only, and manual navigation is always independent of continuation. Existing Reader completion navigation is preserved and loads the following selection paused when continuation is off.
 
 Expanded identity is reciter plus track/repetition position, without a duplicate zikr title. Reader ownership follows membership of the frozen queue during track synchronization, preventing an intermediate counter remount from collapsing the player on manual Next/Previous. Volume, speed value and the brief continuation switch share one row, wrapping only when space or enlarged text requires it.
+
+### Owner-approved repetition presentation (2026-10-04)
+
+Queue position remains in the expanded header. Current/total repetition progress, including embedded recording counts, appears in the footer beside the prescribed-repeat option. This supersedes the earlier combined queue/repetition identity presentation without changing playback or completion.

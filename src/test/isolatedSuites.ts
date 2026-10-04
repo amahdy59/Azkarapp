@@ -1,8 +1,8 @@
 /**
  * Suites that must run with their own module registry.
  *
- * The rest of the suite runs on worker threads that share one registry, which
- * is what took the full run from 3 m 34 s to under a minute. A shared registry
+ * The remaining application suites share one registry within each worker.
+ * Tooling suites run separately in Node with isolation. A shared registry
  * cannot serve two files that mock the same module differently, and it cannot
  * serve a file that asserts on the *first* use of a module-level cache — so
  * every suite that calls `vi.mock`, plus `releaseNotes.test.ts`, runs isolated.

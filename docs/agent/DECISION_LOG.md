@@ -1,5 +1,21 @@
 # Decision Log
 
+## Latest changes release review — 2026-10-04
+
+The owner authorizes reviewing and pushing all pending application/testing changes, superseding the earlier local-only restriction. Ask before altering owner edits. The owner approved current repetition progress in the footer, separate from header queue position; correcting two reviewed Masbaha references without wording/count changes; Reader source-only citation recovery; the English Translation display label with narrator identity retained in source metadata; and matching menu-selection documentation and keyboard coverage.
+
+The owner approves deterministic local audio catalog validation with complete hosted probes required separately in Quality CI. This resolves the network-independent check contract without removing recording checks or weakening coverage, assertions or budgets. Preserve existing release gates and content-bound quality receipts.
+
+## Essential local testing and quality — 2026-10-04
+
+The owner requests local testing improvements while making application changes in another session. Scope is testing infrastructure, deterministic regression coverage and duplicated verification work; no application feature removal, commit, push or deployment. Verify on an isolated checkout of the last released commit and transfer only testing/documentation changes to the primary checkout.
+
+Keep all release gates, assertions, coverage thresholds, bundle budgets and distinct device/engine checks. Run tooling suites in Node, add offline reading/counting to the fast smoke, use the normal bounded worker pool, expose local failures without automatic retries, forbid focused browser tests in CI, and report every browser attempt for timing analysis. Remove the helper that terminates arbitrary preview-port listeners. Replace selected readiness sleeps with actual conditions and make the fixed prayer accessibility fixture fail if its expected prayer is missing. Extend the shared-registry guard to dynamic mocks and cache resets.
+
+Hosted-audio validation uses four bounded requests instead of serial probes while retaining every approved recording, HTTP/MIME assertions, retries and timeout. Shared URLs are fetched once per run and each variant retains its own metadata assertion. Cancel response bodies after headers; the full-byte checksum audit remains separate. Only remove duplicated test scenarios after proving their unique assertions survive elsewhere.
+
+Concurrent-session verification lost its original default-port preview and produced connection refusals. The invalid run was stopped, its error evidence preserved, and infrastructure repaired with a validated `E2E_PORT` shared by Playwright and the Vite launcher. Rerun the complete suite on a separate port. Preserve browser timing artifacts on every Quality run to support evidence-based future optimization.
+
 Record user-approved product, design and architectural decisions here. Do not erase prior decisions; supersede them with a new entry.
 
 ## Audio player review refinements — 2026-10-04
@@ -4145,3 +4161,16 @@ Collapsed waveform follow-ups: the owner requests docking to the page bottom wit
 ## Latest changes review and release — 2026-10-04
 
 The owner explicitly requests review, necessary repairs and publication of all latest pending changes, superseding local-only restrictions on the waveform/compact-player phases. During review the owner explicitly approved the denser shared-card layout and updating its contract: single Arabic text may fall back from 64px to 52px only after complete-content measurement; reduced Story margins are accepted. Preserve exact reviewed wording, explicit fit failure and source/checksum boundaries. The owner then confirmed that removing picker search/benefit previews and the Masbaha after-prayer shortcut is intentional; the current picker retains native radio keyboard behavior and explicit confirmation. Release review also repairs reference-copy feedback/targets and verifies replacement menu CSS canaries without weakening gates. The owner approves pruning redundant browser scenarios while keeping core coverage and asks that future product-behavior reversals be brought back for a decision.
+
+## Unified reference and benefit cards & Masbaha full hadith — 2026-10-04
+
+- **Authority:** The owner noted visual, structural, and typography differences between benefit cards in Reader vs Friday Salawat, requested fixing the one with issues to follow the same look, feel, behavior, and typography specs across similar items, and requested including full Hadiths for the hadith section of zikr within Masbaha following the same cards pattern. The owner explicitly commanded not to push changes after completion.
+- **Decision:**
+  - Standardize all benefit, hadith evidence, and source reference cards across the application using a shared `ReferenceCard` component (`src/app/components/ReferenceCard.tsx`).
+  - Container: `rounded-2xl border border-border/70 bg-card/80 p-4 text-start` with semantic theme tokens across Light, Midnight, and Dark modes.
+  - Typography: Heading `text-subtitle font-bold text-primary`; body `text-subtitle font-bold leading-7 text-foreground` with `zikr-text`, `dir="rtl"`, and `lang="ar"` for Arabic devotional text; source `text-label font-black text-primary` at the bottom.
+  - Actions: Integrated `ReferenceCopyButton` with 44×44px touch target, 3px focus ring, and polite live status announcement. When no title is supplied, the copy button sits cleanly at the logical end of a dedicated top row.
+  - Sourced Links: `ExternalLink` with 44px minimum target floor (`min-h-11 inline-flex items-center gap-1.5`).
+  - Content Completeness: Enriched all 9 authentic azkar in `src/app/content/authenticAzkar.ts` with canonical Prophetic Hadiths (`hadithTextAr` vocalized, `hadithTextEn`, and Sunnah.com reference URLs), presenting both concise virtue and complete Hadith narration in Masbaha (`CustomCounterScreen`).
+  - E2E & Accessibility Stability: Preserved exact semantic heading levels (`<h3>`), unique heading IDs (`#reference-benefit-heading`, `#reference-evidence-heading`, `#reference-source-heading`), and the 2-button contract in `ReaderReferenceSheet` required by Playwright suites.
+- **Scope & Constraints:** Local only. Strictly no `git push`.

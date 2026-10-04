@@ -14,6 +14,8 @@ pnpm build
 
 Automated tests cover exact/no-fallback lookup, Arabic fingerprints, canonical reuse, required Qur'anic ranges, Core/Complete plan order, immutable plans, segment and ritual-round progression, reducer/stale events, blocked playback, Retry/Skip, paused visibility, and Core Reader identity.
 
+Hosted manifest validation probes all approved recordings with at most four requests in flight. Shared recording URLs are fetched once per run, while every variant still checks its own expected MIME. It retains the three-attempt network retry policy, 20-second request timeout, and HTTP/MIME checks; response bodies are cancelled after headers so servers ignoring Range cannot leave full recordings downloading. Unit tests cover the concurrency bound, complete coverage, failure aggregation, retry recovery/exhaustion, abort cleanup and shared-URL metadata conflicts. This does not replace the separate full-byte English checksum audit.
+
 ## Manual checklist
 
 - Use keyboard only: start, expand/minimize, play/pause, previous/next, seek with arrow keys, speed/voice, volume/mute, Retry/Skip/Stop.
@@ -49,3 +51,5 @@ Generate verified peaks with `node scripts/generate-audio-waveforms.mjs`. The co
 Check one progress control, media direction consistently LTR in both UI languages, symmetrical transport slots and aligned glyph centres at 320px, desktop and 200% text. Verify manual navigation from individual listening without enabling automatic continuation, and that auto-next does not disable internal segments or prescribed ritual repetitions. Volume is absent from compact mode and on iOS; elsewhere its click-open popover stays vertical, supports pointer/arrow-key adjustment and mute, preserves row positions, and closes before the player on Escape.
 
 - Confirm the collapsed Reader panel reaches the main canvas bottom within 1px at all tiers and 200% text. Safe-area padding belongs inside its surface; no counter-footer gap remains below audio. Check the fuller rounded compact waveform uses actual recording progress without a second line or slider.
+
+Local pnpm check uses metadata-only audio validation; pnpm validate:audio retains full hosted probes and is required separately in Quality CI. Audio-authoring verification still runs the live command. The English voice display label is English Translation; source metadata retains the original narrator identity. Current repetition progress belongs in the expanded footer, separate from header queue position.

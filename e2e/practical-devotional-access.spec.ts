@@ -267,18 +267,28 @@ test("keyboard help remains reachable with enlarged text on a short Arabic phone
   await expect(dialog).not.toBeVisible();
 });
 
-test("dhikr picker supports native arrow keys and explicit confirmation @cross-browser", async ({ page }) => {
+test("dhikr picker supports arrow keys, explicit activation and cancellation @cross-browser", async ({ page }) => {
   await returningReader(page, "en");
   await page.goto("/#/counter");
   await page.getByRole("button", { name: /Subhanallahi wa bihamdihi/i }).click();
-  const dialog = page.getByRole("dialog", { name: "Choose a dhikr" });
-  const radios = dialog.getByRole("radio");
+  const menu = page.getByRole("menu");
+  const radios = menu.getByRole("menuitemradio");
   await radios.first().focus();
   await expect(radios.first()).toBeChecked();
   await page.keyboard.press("ArrowDown");
-  await expect(radios.nth(1)).toBeChecked();
+  await expect(radios.first()).toBeChecked();
   await expect(radios.nth(1)).toBeFocused();
-  await dialog.getByRole("button", { name: "Select", exact: true }).click();
-  await expect(dialog).not.toBeVisible();
-  await expect(page.getByRole("button", { name: /Subhanallahi wa bihamdihi, Subhanallahil-Azeem/i })).toBeVisible();
+  await page.keyboard.press("Enter");
+  await expect(menu).not.toBeVisible();
+  const trigger = page.getByTestId("counter-zikr-filter");
+  await expect(trigger).toHaveAttribute("title", "Subhanallahi wa bihamdihi, Subhanallahil-Azeem");
+  await trigger.click();
+  await expect(radios.nth(1)).toBeChecked();
+  await radios.nth(1).focus();
+  await page.keyboard.press("ArrowDown");
+  await expect(radios.nth(2)).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(menu).not.toBeVisible();
+  await expect(trigger).toBeFocused();
+  await expect(trigger).toHaveAttribute("title", "Subhanallahi wa bihamdihi, Subhanallahil-Azeem");
 });
