@@ -3,7 +3,7 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { Modal } from "./ResponsiveSheet";
 import { Button } from "./ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { Check, ChevronNext, ChevronPrevious, Download, Share2 } from "./icons";
+import { Check, ChevronNext, ChevronPrevious, Copy, Download, Share2 } from "./icons";
 import { t } from "../i18n";
 import { FIELD_LABEL_CLASS } from "./FormField";
 import { SharingDisclosure } from "./SharingDisclosure";
@@ -29,6 +29,7 @@ import { createShareArchive } from "../share/shareArchive";
 import {
   defaultShareAppearance,
   getShareText,
+  getShareRepetitionLabel,
   getShareUrl,
   toShareItem,
   ShareFitError,
@@ -92,6 +93,7 @@ export function CollectionShareModal({
       : "story",
   );
   const [meaning, setMeaning] = useState(false);
+  const [wordMeanings, setWordMeanings] = useState(false);
   const [exportLanguage, setExportLanguage] = useState<AppLanguage>(language);
   const [pronunciation, setPronunciation] = useState(false);
   const [benefit, setBenefit] = useState(false);
@@ -116,8 +118,11 @@ export function CollectionShareModal({
   const formatHintId = useId();
   const languageHintId = useId();
   const actionHintId = useId();
+  const copyHintId = useId();
+  const shareHintId = useId();
   const formatId = useId();
   const languageId = useId();
+  const presetId = useId();
   const collectionUrl = categoryId
     ? getShareUrl(categoryId, single ? readerIndex : undefined, undefined, { routineMode, prayer })
     : undefined;
@@ -125,14 +130,24 @@ export function CollectionShareModal({
   // content should restart an expensive export, never a parent render alone.
   const itemsJson = JSON.stringify({ items, shareItems });
   const stableInput = useMemo(() => JSON.parse(itemsJson) as { items: Zikr[]; shareItems?: ShareItem[] }, [itemsJson]);
-  const title = (exportLanguage === "ar" ? collectionTitleArabic : collectionTitleEnglish) ?? collectionTitle;
-  const content = useMemo(() => ({ meaning, pronunciation, benefit, qr }), [meaning, pronunciation, benefit, qr]);
+  const collectionName = (exportLanguage === "ar" ? collectionTitleArabic : collectionTitleEnglish) ?? collectionTitle;
+  const title =
+    single &&
+    categoryId &&
+    !stableInput.items.some((item) => (item.mushafPages?.length ?? 0) > 1) &&
+    !stableInput.shareItems?.some((item) => item.reminder)
+      ? t(exportLanguage, "shareStudio.singleCollectionTitle", { collection: collectionName })
+      : collectionName;
+  const content = useMemo(
+    () => ({ meaning, wordMeanings: wordMeanings && exportLanguage === "ar", pronunciation, benefit, qr }),
+    [meaning, wordMeanings, exportLanguage, pronunciation, benefit, qr],
+  );
   const exportItems = useMemo<ShareItem[]>(
     () =>
       (stableInput.shareItems ?? stableInput.items.map((z) => toShareItem(z, exportLanguage))).map((item) =>
-        single && !item.title ? { ...item, title } : item,
+        single && !item.reminder && (categoryId || !item.title) ? { ...item, title } : item,
       ),
-    [stableInput, exportLanguage, single, title],
+    [stableInput, exportLanguage, single, title, categoryId],
   );
   const url = single && exportItems[0]?.reminder ? exportItems[0].readingUrl : collectionUrl;
   const text = getShareText(exportItems, exportLanguage, content, title, url);
@@ -169,6 +184,9 @@ export function CollectionShareModal({
           )
         : text;
   const nativeText = supportsTextShare(mode === "link" ? { title, url } : { title, text: scopedText });
+  const payload = mode === "link" ? (url ?? "") : scopedText;
+  const payloadReady = mode === "link" ? Boolean(url) : scope !== "selected" || selected.length > 0;
+  const copyAsImage = mode === "image" && scopedPages.length === 1 && canCopyImage();
   useEffect(() => {
     if (current?.layout?.fragments[0]) activeItemRef.current = current.layout.fragments[0].item.id;
   }, [current]);
@@ -313,6 +331,7 @@ export function CollectionShareModal({
   const selectClass = "flex min-w-0 flex-col gap-2";
   const additions = [
     meaning && t(language, "shareStudio.translation"),
+    wordMeanings && exportLanguage === "ar" && t(language, "shareStudio.wordMeanings"),
     pronunciation && t(language, "shareStudio.transliteration"),
     benefit && t(language, "shareStudio.benefit"),
     mode === "image" && qr && t(language, "shareStudio.qr"),
@@ -505,11 +524,9 @@ export function CollectionShareModal({
                           <div key={`${fragment.item.id}-${index}`}>
                             {fragment.item.title && <h3 className="font-semibold">{fragment.item.title}</h3>}
                             <p className="text-sm text-muted-foreground">
-                              {t(
-                                exportLanguage,
-                                fragment.item.reminder ? "shareStudio.reminder" : "shareStudio.repetitions",
-                                { count: formatNumerals(fragment.item.repetitionCount ?? 1, exportLanguage) },
-                              )}
+                              {fragment.item.reminder
+                                ? t(exportLanguage, "shareStudio.reminder")
+                                : getShareRepetitionLabel(fragment.item.repetitionCount ?? 1, exportLanguage)}
                             </p>
                             {[...fragment.sections, ...(fragment.citation ? [fragment.citation] : [])].map(
                               (section, sectionIndex) => (
@@ -808,12 +825,53 @@ export function CollectionShareModal({
                   summary={additions || t(language, "shareStudio.noAdditions")}
                 >
                   <div className="pb-2">
+                    <div className={`${selectClass} mb-3`}>
+                      <label htmlFor={presetId} className={FIELD_LABEL_CLASS}>
+                        {t(language, "shareStudio.preset")}
+                      </label>
+                      <Select
+                        value={
+                          !meaning && !wordMeanings && !pronunciation && !benefit
+                            ? "arabic"
+                            : meaning && !wordMeanings && !pronunciation && !benefit
+                              ? "translated"
+                              : meaning && pronunciation && benefit && (exportLanguage !== "ar" || wordMeanings)
+                                ? "full"
+                                : "custom"
+                        }
+                        disabled={busy}
+                        onValueChange={(value) => {
+                          if (value === "custom") return;
+                          setMeaning(value !== "arabic");
+                          setPronunciation(value === "full");
+                          setBenefit(value === "full");
+                          setWordMeanings(value === "full" && exportLanguage === "ar");
+                        }}
+                      >
+                        <SelectTrigger id={presetId}>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="z-[110]">
+                          {(["arabic", "translated", "full", "custom"] as const).map((value) => (
+                            <SelectItem key={value} value={value}>
+                              {t(language, `shareStudio.preset${value}`)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                     {[
                       {
                         key: "meaning",
                         value: meaning,
                         set: setMeaning,
                         available: exportItems.some((item) => item.translation),
+                      },
+                      {
+                        key: "wordMeanings",
+                        value: wordMeanings,
+                        set: setWordMeanings,
+                        available: exportLanguage === "ar" && exportItems.some((item) => item.wordMeanings),
                       },
                       {
                         key: "pronunciation",
@@ -854,144 +912,118 @@ export function CollectionShareModal({
                   </div>
                 </SharingDisclosure>
               )}
-
-              {mode === "image" && canCopyImage() && (
-                <SharingDisclosure label={t(language, "shareStudio.more")}>
-                  <Button
-                    variant="outline"
-                    className="min-h-11 mb-3"
-                    disabled={!ready || busy}
-                    onClick={() =>
-                      void run(async () => {
-                        if (!current) return;
-                        if (!(await copyImageToClipboard(current.blob))) {
-                          setError(true);
-                          setStatus(t(language, "shareStudio.copyFailed"));
-                          return;
-                        }
-                        setStatus(t(language, "shareStoryPack.copySuccess"));
-                      })
-                    }
-                  >
-                    {t(language, "shareStoryPack.copySingle")}
-                  </Button>
-                </SharingDisclosure>
-              )}
             </section>
           </div>
           <div
             role={error ? "alert" : "status"}
             aria-live={error ? "assertive" : "polite"}
             aria-atomic="true"
-            className="text-sm text-foreground"
+            className={error ? "text-sm text-foreground" : "sr-only"}
           >
             {status}
           </div>
-          <DialogPrimitive.Description id={descriptionId} className="mt-1 text-sm text-muted-foreground">
+          <DialogPrimitive.Description id={descriptionId} className="sr-only">
             {t(language, "shareStudio.description")}
           </DialogPrimitive.Description>
-          <p className="text-xs text-muted-foreground">{t(language, "shareStudio.destinationHint")}</p>
         </div>
       </div>
       <div
         data-testid="sharing-actions"
-        className={`shrink-0 border-t border-border bg-card p-[12px] pb-[max(12px,env(safe-area-inset-bottom))] ${wide ? "flex flex-wrap items-center justify-end gap-3" : "space-y-2"}`}
+        className="shrink-0 border-t border-border bg-card p-[12px] pb-[max(12px,env(safe-area-inset-bottom))]"
       >
         {actionHint && (
-          <p id={actionHintId} className={`text-sm text-muted-foreground ${wide ? "me-auto max-w-sm" : ""}`}>
+          <p id={actionHintId} className="mb-2 text-sm text-muted-foreground">
             {actionHint}
           </p>
         )}
-        {mode === "image" ? (
-          <>
-            <Button
-              aria-describedby={actionHint ? actionHintId : undefined}
-              className={`min-h-12 h-auto whitespace-normal ${wide ? "w-auto min-w-48" : "w-full"}`}
-              disabled={!scopeReady || busy}
-              aria-busy={busy}
-              onClick={() =>
-                void run(async () => {
-                  if (scopedNative) {
-                    if (scopedPages.length === 1)
-                      await shareSingleFile(scopedPages[0]!.file, { title, downloadFallback: false, onStatus: notify });
-                    else
-                      await shareMultipleFiles(
-                        scopedPages.map((page) => page.file),
-                        { title, downloadFallback: false, onStatus: notify },
-                      );
-                  } else if (scopedPages.length === 1) {
-                    downloadFile(scopedPages[0]!.file);
-                    notify("downloaded");
-                  } else {
-                    downloadFile(
-                      await createShareArchive(
-                        scopedPages.map((page) => page.file),
-                        scopedText,
-                      ),
-                    );
-                    notify("downloaded");
-                  }
-                })
-              }
-            >
-              {scopedNative ? <Share2 aria-hidden="true" /> : <Download aria-hidden="true" />}
-              {t(
-                language,
-                scopedNative
-                  ? scope === "current"
-                    ? "shareStoryPack.shareCurrent"
-                    : "shareStudio.shareChosen"
-                  : scopedPages.length <= 1
-                    ? "shareStoryPack.downloadSingle"
-                    : "shareStudio.saveChosen",
-              )}
-            </Button>
-            {scopedNative && (
-              <Button
-                variant="outline"
-                className={`min-h-11 ${wide ? "w-auto" : "w-full"}`}
-                disabled={!scopeReady || busy}
-                onClick={() =>
-                  void run(async () => {
-                    downloadFile(
-                      scopedPages.length === 1
-                        ? scopedPages[0]!.file
-                        : await createShareArchive(
-                            scopedPages.map((page) => page.file),
-                            scopedText,
-                          ),
-                    );
-                    notify("downloaded");
-                  })
+        <div className={`grid grid-cols-[repeat(auto-fit,minmax(5rem,1fr))] gap-2 ${wide ? "ms-auto max-w-md" : ""}`}>
+          <Button
+            className="min-h-12 gap-1 px-2 whitespace-nowrap"
+            aria-describedby={
+              !(mode === "image" ? scopedNative : nativeText) ? shareHintId : actionHint ? actionHintId : undefined
+            }
+            title={
+              !(mode === "image" ? scopedNative : nativeText) ? t(language, "shareStudio.shareUnavailable") : undefined
+            }
+            disabled={busy || (mode === "image" ? !scopeReady || !scopedNative : !nativeText || !payloadReady)}
+            aria-busy={busy}
+            onClick={() =>
+              void run(async () => {
+                if (mode !== "image") {
+                  await shareText(payload, mode === "link");
+                } else if (scopedPages.length === 1) {
+                  await shareSingleFile(scopedPages[0]!.file, { title, downloadFallback: false, onStatus: notify });
+                } else {
+                  await shareMultipleFiles(
+                    scopedPages.map((page) => page.file),
+                    {
+                      title,
+                      downloadFallback: false,
+                      onStatus: notify,
+                    },
+                  );
                 }
-              >
-                {t(language, scopedPages.length <= 1 ? "shareStoryPack.downloadSingle" : "shareStudio.saveChosen")}
-              </Button>
-            )}
-          </>
-        ) : (
-          <div className="flex gap-2">
-            <Button
-              className="min-h-12 flex-1"
-              disabled={
-                busy || (mode === "link" && !url) || (mode === "text" && scope === "selected" && !selected.length)
-              }
-              onClick={() => void run(() => shareText(mode === "text" ? scopedText : (url ?? ""), mode === "link"))}
-            >
-              {t(language, nativeText ? "shareStudio.share" : "shareStudio.copy")}
-            </Button>
-            {nativeText && (
-              <Button
-                variant="outline"
-                className="min-h-11"
-                disabled={busy || (mode === "text" && scope === "selected" && !selected.length)}
-                onClick={() => void run(() => copyText(mode === "text" ? scopedText : (url ?? "")))}
-              >
-                {t(language, "shareStudio.copy")}
-              </Button>
-            )}
-          </div>
-        )}
+              })
+            }
+          >
+            <Share2 aria-hidden="true" />
+            {t(language, "shareStudio.share")}
+          </Button>
+          <Button
+            variant="outline"
+            className="min-h-12 gap-1 px-2 whitespace-nowrap"
+            disabled={busy || (mode === "image" ? !scopeReady : !payloadReady)}
+            aria-describedby={actionHint ? actionHintId : undefined}
+            onClick={() =>
+              void run(async () => {
+                downloadFile(
+                  mode !== "image"
+                    ? new File([payload], "azkar.txt", { type: "text/plain;charset=utf-8" })
+                    : scopedPages.length === 1
+                      ? scopedPages[0]!.file
+                      : await createShareArchive(
+                          scopedPages.map((page) => page.file),
+                          scopedText,
+                        ),
+                );
+                notify("downloaded");
+              })
+            }
+          >
+            <Download aria-hidden="true" />
+            {t(language, "shareStudio.save")}
+          </Button>
+          <Button
+            variant="outline"
+            className="min-h-12 gap-1 px-2 whitespace-nowrap"
+            aria-describedby={copyHintId}
+            title={t(language, copyAsImage ? "shareStoryPack.copySingle" : "shareStudio.copyText")}
+            disabled={busy || (mode === "image" ? !scopeReady : !payloadReady)}
+            onClick={() =>
+              void run(async () => {
+                if (copyAsImage) {
+                  if (!(await copyImageToClipboard(scopedPages[0]!.blob))) {
+                    setError(true);
+                    setStatus(t(language, "shareStudio.copyFailed"));
+                    return;
+                  }
+                  setStatus(t(language, "shareStoryPack.copySuccess"));
+                } else {
+                  await copyText(mode === "image" ? scopedText : payload);
+                }
+              })
+            }
+          >
+            <Copy aria-hidden="true" />
+            {t(language, "shareStudio.copy")}
+          </Button>
+        </div>
+        <span id={copyHintId} className="sr-only">
+          {t(language, copyAsImage ? "shareStoryPack.copySingle" : "shareStudio.copyText")}
+        </span>
+        <span id={shareHintId} className="sr-only">
+          {t(language, "shareStudio.shareUnavailable")}
+        </span>
       </div>
     </Modal>
   );

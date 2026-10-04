@@ -10,6 +10,10 @@ import {
   shareGeometry,
   wrapShareText,
   SHARE_DIMENSIONS,
+  getShareSections,
+  defaultShareAppearance,
+  getShareRepetitionLabel,
+  measureShareSection,
   type ShareFormat,
 } from "./shareLayout";
 
@@ -24,6 +28,51 @@ function context() {
   } as CanvasRenderingContext2D;
 }
 describe("complete share layouts", () => {
+  it("keeps a trailing source number attached to its reference without changing the citation", () => {
+    const citation = "أحمد ٤/٣٣٧؛ الترمذي ٥/٤٦٥؛ حصن المسلم ٨٧.";
+    const ctx = {
+      font: "",
+      measureText: (text: string) => ({ width: Array.from(text).length * 10 }),
+    } as CanvasRenderingContext2D;
+    const section = measureShareSection(ctx, { key: "source", text: citation, direction: "rtl" }, true, 350);
+    expect(section.lines.join("")).toBe(citation);
+    expect(section.lines.at(-1)!.trim()).toBe("حصن المسلم ٨٧.");
+  });
+  it("distinguishes optional English translation from reviewed Arabic word meanings", () => {
+    const zikr = ALL_AZKAR.find((item) => item.canonicalKey === "quran-112")!;
+    expect(zikr).toBeDefined();
+    const before = JSON.stringify(zikr);
+    const arabic = toShareItem(zikr, "ar");
+    expect(arabic.wordMeanings).toContain("الميسر في غريب القرآن");
+    expect(getShareSections(arabic, {})).not.toContainEqual(expect.objectContaining({ key: "wordMeanings" }));
+    const sections = getShareSections(arabic, { meaning: true, wordMeanings: true });
+    expect(sections).toContainEqual({ key: "translation", direction: "ltr", text: zikr.translation });
+    expect(sections).toContainEqual({ key: "wordMeanings", direction: "rtl", text: arabic.wordMeanings });
+    const text = getShareText([arabic], "ar", { meaning: true, wordMeanings: true }, "ذكر");
+    expect(text).toContain("الترجمة الإنجليزية");
+    expect(text).toContain("معاني الكلمات");
+    const english = toShareItem(zikr, "en");
+    expect(english.wordMeanings).toBeUndefined();
+    expect(
+      getShareSections({ ...english, wordMeanings: arabic.wordMeanings }, { wordMeanings: true }).some(
+        (section) => section.key === "wordMeanings",
+      ),
+    ).toBe(false);
+    expect(JSON.stringify(zikr)).toBe(before);
+    const layout = layoutSharePages(context(), [arabic], "tall", { wordMeanings: true }, true)[0]!;
+    expect(layout.fragments[0]!.sections.find((section) => section.key === "wordMeanings")!.lines.join("")).toBe(
+      arabic.wordMeanings,
+    );
+  });
+  it("uses daylight for Morning and natural repetition labels", () => {
+    expect(defaultShareAppearance("morning", "midnight")).toBe("olive");
+    expect(defaultShareAppearance("evening")).toBe("gold");
+    expect(defaultShareAppearance("before_sleep")).toBe("lavender");
+    expect(getShareRepetitionLabel(1, "ar")).toBe("مرة واحدة");
+    expect(getShareRepetitionLabel(2, "ar")).toBe("مرتان");
+    expect(getShareRepetitionLabel(3, "ar")).toBe("٣ مرات");
+    expect(getShareRepetitionLabel(100, "ar")).toBe("١٠٠ مرة");
+  });
   it("measures the complete title inside its panel before the pill and body", () => {
     const title = "عنوان الذكر ".repeat(18);
     const item = { id: "titled", title, arabicText: "سبحان الله", sourceReference: "Reviewed source" };

@@ -68,7 +68,7 @@ async function openSharing(page: Page, language = "ar", route = "morning", recov
         const pill = pills.get(this);
         if (pill) {
           const bounds = this.measureText(text);
-          if (/30px/u.test(this.font) && /^(?:التكرار|Repeat)/u.test(text)) {
+          if (/30px/u.test(this.font) && /^(?:[٠-٩]+ مرة|[٠-٩]+ مرات|مرة واحدة|مرتان|Repeat)/u.test(text)) {
             pill.centered = y + (bounds.actualBoundingBoxDescent - bounds.actualBoundingBoxAscent) / 2;
           } else if (pill.centered !== undefined && pill.gap === undefined && /(?:28|52|64)px/u.test(this.font)) {
             pill.gap = y - bounds.actualBoundingBoxAscent - (pill.top + pill.height);
@@ -240,7 +240,7 @@ test("sharing preview supports readable Arabic, sources and accessible controls 
   const modal = await openSharing(page);
   await expect(modal.getByText("جارٍ تجهيز بقية البطاقات…")).toHaveCount(0);
   const imageDownload = page.waitForEvent("download");
-  await modal.getByRole("button", { name: "حفظ هذه الصورة", exact: true }).click();
+  await modal.getByRole("button", { name: "حفظ", exact: true }).click();
   await (await imageDownload).saveAs(testInfo.outputPath("olive-collection.png"));
   await modal.getByText("قراءة نص هذه البطاقة", { exact: true }).click();
   await expect(modal.locator('[lang="ar"][dir="rtl"]')).not.toHaveCount(0);
@@ -275,7 +275,7 @@ test("sharing preview supports readable Arabic, sources and accessible controls 
   for (const check of artworkChecks) expect(check.clearance).toBeGreaterThanOrEqual(check.kind === "wordmark" ? 6 : 8);
   for (const pill of pills) {
     expect(pill.centered).toBeCloseTo(pill.top + pill.height / 2, 1);
-    expect(pill.gap).toBeCloseTo(4, 1);
+    expect(pill.gap).toBeCloseTo(16, 1);
   }
   for (const measure of measures) {
     expect(measure.width).toBeLessThanOrEqual(858);
@@ -318,16 +318,36 @@ test("sharing works offline with English meaning and exact text/link alternative
   await expect(modal.getByRole("img").first()).toHaveAttribute("height", "2920");
   await expect(modal.getByText("Preparing the remaining cards…")).toHaveCount(0);
   await modal.getByText("Customize content", { exact: true }).click();
-  await modal.getByRole("checkbox", { name: "Include reviewed English meaning" }).check();
+  await modal.getByRole("checkbox", { name: "Include reviewed English translation" }).check();
   await expect(modal.getByRole("img").first()).toBeVisible();
   await expect(modal.getByText("Preparing the remaining cards…")).toHaveCount(0);
   await modal.getByRole("button", { name: "Text", exact: true }).click();
   await expect(modal.getByRole("textbox")).toHaveValue(/We have entered the morning/u);
   await modal.getByRole("button", { name: "Image", exact: true }).click();
   const download = page.waitForEvent("download");
-  await modal.getByRole("button", { name: "Save image", exact: true }).click();
+  await modal.getByRole("button", { name: "Save", exact: true }).click();
   expect((await download).suggestedFilename()).toMatch(/tall-001-of-\d+/u);
   await page.context().setOffline(false);
+});
+
+test("sharing presets separate English translation and Arabic word meanings @cross-browser", async ({ page }) => {
+  const modal = await openSharing(page, "ar", "morning", true);
+  await expect(modal.getByText("جارٍ تجهيز بقية البطاقات…")).toHaveCount(0);
+  await modal.getByRole("button", { name: "المجموعة كاملة", exact: true }).click();
+  await modal.getByRole("button", { name: "نص", exact: true }).click();
+  await modal.getByText("تخصيص المحتوى", { exact: true }).click();
+  const preset = modal.getByRole("combobox", { name: "محتوى البطاقة" });
+  await preset.click();
+  await page.getByRole("option", { name: "النص العربي والترجمة الإنجليزية", exact: true }).click();
+  await expect(modal.getByRole("checkbox", { name: "إضافة الترجمة الإنجليزية المراجعة" })).toBeChecked();
+  await expect(modal.getByRole("checkbox", { name: "معاني الكلمات", exact: true })).not.toBeChecked();
+  await expect(modal.getByRole("textbox")).toHaveValue(/الترجمة الإنجليزية/u);
+  await preset.click();
+  await page.getByRole("option", { name: "التفاصيل كاملة", exact: true }).click();
+  await expect(modal.getByRole("textbox")).toHaveValue(/معاني الكلمات[\s\S]*الميسر في غريب القرآن/u);
+  await preset.click();
+  await page.getByRole("option", { name: "النص العربي فقط", exact: true }).click();
+  await expect(modal.getByRole("textbox")).not.toHaveValue(/معاني الكلمات|الترجمة الإنجليزية/u);
 });
 
 test("single zikr shares through the same preview without affecting its counter @cross-browser", async ({
@@ -350,7 +370,7 @@ test("single zikr shares through the same preview without affecting its counter 
   await expect(modal.getByRole("textbox")).toHaveValue(/#\/azkar\/morning\/4\?mode=complete$/u);
   await modal.getByRole("button", { name: "صورة", exact: true }).click();
   const imageDownload = page.waitForEvent("download");
-  await modal.getByRole("button", { name: "حفظ هذه الصورة", exact: true }).click();
+  await modal.getByRole("button", { name: "حفظ", exact: true }).click();
   await (await imageDownload).saveAs(testInfo.outputPath("single-zikr.png"));
   await modal.evaluate((element) => {
     element.querySelector<HTMLElement>('[data-testid="sharing-scroll"]')!.scrollTop = 0;
@@ -359,6 +379,29 @@ test("single zikr shares through the same preview without affecting its counter 
   await page.keyboard.press("Escape");
   await expect(modal).not.toBeVisible();
   await expect(reader).toHaveAttribute("data-zikr-index", "3");
+});
+
+test("single Morning card keeps its contextual title and complete selected detail", async ({ page }, testInfo) => {
+  const modal = await openSharing(page, "ar");
+  await page.keyboard.press("Escape");
+  const index = getAzkarForMode("morning", "complete").findIndex((zikr) => zikr.id === "m-hm-87");
+  expect(index).toBeGreaterThanOrEqual(0);
+  await page.goto(`./#/azkar/morning/${index + 1}`);
+  await page.getByTestId("reader-share-dock-button").click();
+  await expect(modal.getByRole("img").first()).toBeVisible();
+  await modal.getByText("تخصيص المحتوى", { exact: true }).click();
+  await modal.getByRole("combobox", { name: "محتوى البطاقة" }).click();
+  await page.getByRole("option", { name: "التفاصيل كاملة", exact: true }).click();
+  await expect(modal.getByRole("img").first().or(modal.getByRole("alert")).first()).toBeVisible();
+  if (await modal.getByRole("alert").isVisible())
+    await modal.getByRole("button", { name: "استخدام صورة قراءة طويلة", exact: true }).click();
+  await expect(modal.getByRole("img").first()).toBeVisible();
+  await modal.getByText("قراءة نص هذه البطاقة", { exact: true }).click();
+  await expect(modal.getByRole("heading", { name: "من أذكار الصباح", exact: true })).toBeVisible();
+  await expect(modal.getByText("الترجمة الإنجليزية", { exact: true }).first()).toBeVisible();
+  const download = page.waitForEvent("download");
+  await modal.getByRole("button", { name: "حفظ", exact: true }).click();
+  await (await download).saveAs(testInfo.outputPath("morning-single-full.png"));
 });
 
 test("complete cards, compatible formats and ZIP saving are usable on a narrow screen", async ({ page }, testInfo) => {
@@ -389,11 +432,11 @@ test("complete cards, compatible formats and ZIP saving are usable on a narrow s
     await expect(modal.getByText("جارٍ تجهيز بقية البطاقات…")).toHaveCount(0);
   }
   const imageDownload = page.waitForEvent("download");
-  await modal.getByRole("button", { name: "حفظ هذه الصورة", exact: true }).click();
+  await modal.getByRole("button", { name: "حفظ", exact: true }).click();
   await (await imageDownload).saveAs(testInfo.outputPath("lavender-collection.png"));
   const download = page.waitForEvent("download");
   await modal.getByRole("button", { name: "المجموعة كاملة", exact: true }).click();
-  await modal.getByRole("button", { name: "حفظ الصور · ZIP" }).click();
+  await modal.getByRole("button", { name: "حفظ", exact: true }).click();
   expect((await download).suggestedFilename()).toBe("azkar-cards.zip");
   const overflow = await modal.evaluate((element) => element.scrollWidth > element.clientWidth + 1);
   expect(overflow).toBe(false);
@@ -416,7 +459,7 @@ test("gold cards support QR, keyboard navigation and enlarged text", async ({ pa
   await page.keyboard.press("Home");
   await expect(modal.getByRole("button", { name: "Previous card" })).toBeDisabled();
   const imageDownload = page.waitForEvent("download");
-  await modal.getByRole("button", { name: "Save image", exact: true }).click();
+  await modal.getByRole("button", { name: "Save", exact: true }).click();
   await (await imageDownload).saveAs(testInfo.outputPath("gold-collection-qr.png"));
   await page.evaluate(() => {
     document.documentElement.style.fontSize = "200%";
@@ -450,7 +493,7 @@ test("long surahs share sourced reminders with exact Mushaf links @cross-browser
     await modal.getByText("Read the text on this card", { exact: true }).click();
     await expect(modal.getByRole("heading", { name: item.surahNameEnglish, exact: true })).toBeVisible();
     const download = page.waitForEvent("download");
-    await modal.getByRole("button", { name: "Save image", exact: true }).click();
+    await modal.getByRole("button", { name: "Save", exact: true }).click();
     await (await download).saveAs(testInfo.outputPath(`${id}-reminder.png`));
     await modal.getByRole("button", { name: "Text", exact: true }).click();
     const text = await modal.getByRole("textbox").inputValue();
@@ -477,7 +520,7 @@ test("selection, theme changes and persistent actions preserve user control", as
   await expect(actions.getByRole("button").first()).toBeDisabled();
   await modal.getByRole("checkbox", { name: "Select card 2", exact: true }).check();
   const download = page.waitForEvent("download");
-  await actions.getByRole("button", { name: "Save image", exact: true }).click();
+  await actions.getByRole("button", { name: "Save", exact: true }).click();
   expect((await download).suggestedFilename()).toMatch(/002-of-/u);
   await page.setViewportSize({ width: 320, height: 700 });
   await page.evaluate(() => {
@@ -567,3 +610,48 @@ test("shared reader links preserve content across recipient routine preferences"
     await recipient.close();
   }
 });
+
+for (const language of ["ar", "en"] as const) {
+  test(`sharing footer stays concise with icons in ${language} @cross-browser`, async ({ page }, testInfo) => {
+    await page.setViewportSize({ width: 320, height: 700 });
+    const modal = await openSharing(page, language, "before-sleep", true);
+    const actions = modal.getByTestId("sharing-actions");
+    await expect(actions.locator("p")).toHaveCount(0);
+    const labels = language === "ar" ? ["مشاركة", "حفظ", "نسخ"] : ["Share", "Save", "Copy"];
+    await expect(actions.getByRole("button")).toHaveText(labels);
+    await expect(
+      modal.getByText(language === "ar" ? "خيارات الحفظ والنسخ" : "Save and copy options", { exact: true }),
+    ).toHaveCount(0);
+    const normal = await actions.getByRole("button").evaluateAll((buttons) =>
+      buttons.map((button) => {
+        const bounds = button.getBoundingClientRect();
+        return { top: bounds.top, height: bounds.height, width: bounds.width };
+      }),
+    );
+    expect(new Set(normal.map((button) => button.top)).size).toBe(1);
+    for (const button of normal) {
+      expect(button.height).toBeGreaterThanOrEqual(44);
+      expect(button.width).toBeGreaterThanOrEqual(44);
+    }
+    await expect(actions.locator('button svg[aria-hidden="true"]')).toHaveCount(3);
+    await page.screenshot({ path: testInfo.outputPath(`sharing-footer-${language}.png`) });
+    await page.evaluate(() => {
+      document.documentElement.style.fontSize = "200%";
+    });
+    for (const label of labels) {
+      const button = actions.getByRole("button", { name: label, exact: true });
+      await expect(button).toBeVisible();
+      expect(await button.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
+    }
+    expect(await modal.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
+    await page.screenshot({ path: testInfo.outputPath(`sharing-footer-200percent-${language}.png`) });
+    await page.evaluate(() => {
+      document.documentElement.style.fontSize = "";
+    });
+    const scan = await new AxeBuilder({ page })
+      .include('[data-testid="collection-share-modal"]')
+      .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+      .analyze();
+    expect(scan.violations).toEqual([]);
+  });
+}

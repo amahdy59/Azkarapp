@@ -19,24 +19,34 @@ export function centeredInkBaseline(ctx: CanvasRenderingContext2D, text: string,
 }
 
 /** Vector crescent and live font lettering stay crisp without upscaling the supplied small PNG. */
-export function drawShareBrand(ctx: CanvasRenderingContext2D, top: number, foreground: string): void {
+export function drawShareBrand(
+  ctx: CanvasRenderingContext2D,
+  top: number,
+  foreground: string,
+  accent = "#efd18a",
+  iconBackground = "#091426",
+): void {
   ctx.save();
+  // Grow the whole vector/font lockup from 56 to 64px, around its center.
+  ctx.translate(540, top);
+  ctx.scale(64 / 56, 64 / 56);
+  ctx.translate(-540, -top);
   ctx.font = `700 32px ${SHARE_ARABIC_FONT}`;
   const arabicWidth = ctx.measureText("وَذَكِّرْ").width;
   ctx.font = `600 14px ${SHARE_UI_FONT}`;
   const wordWidth = Math.max(arabicWidth, ctx.measureText("WA ZAKER").width);
   const wordRight = 540 - (wordWidth + 72) / 2 + wordWidth;
   const iconX = wordRight + 16;
-  fillRoundedRect(ctx, iconX, top, 56, 56, 16, "#091426");
-  ctx.fillStyle = "#efd18a";
+  fillRoundedRect(ctx, iconX, top, 56, 56, 16, iconBackground);
+  ctx.fillStyle = accent;
   ctx.beginPath();
   ctx.arc(iconX + 26, top + 29, 18, 0, Math.PI * 2);
   ctx.fill();
-  ctx.fillStyle = "#091426";
+  ctx.fillStyle = iconBackground;
   ctx.beginPath();
   ctx.arc(iconX + 33, top + 23, 18, 0, Math.PI * 2);
   ctx.fill();
-  ctx.fillStyle = "#efd18a";
+  ctx.fillStyle = accent;
   ctx.fillRect(iconX + 43, top + 13, 4, 4);
   ctx.textAlign = "right";
   ctx.direction = "rtl";
@@ -51,9 +61,14 @@ export function drawShareBrand(ctx: CanvasRenderingContext2D, top: number, foreg
   ctx.restore();
 }
 
-export function drawWebsiteBadge(ctx: CanvasRenderingContext2D, centerX: number, centerY: number): void {
+export function drawWebsiteBadge(
+  ctx: CanvasRenderingContext2D,
+  centerX: number,
+  centerY: number,
+  accent = "#b49142",
+): void {
   fillRoundedRect(ctx, centerX - 190, centerY - 31, 380, 62, 31, "#f8f5ed");
-  strokeRoundedRect(ctx, centerX - 190, centerY - 31, 380, 62, 31, "#b49142", 2);
+  strokeRoundedRect(ctx, centerX - 190, centerY - 31, 380, 62, 31, accent, 2);
   ctx.direction = "ltr";
   ctx.textAlign = "center";
   ctx.textBaseline = "alphabetic";

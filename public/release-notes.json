@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-04b",
+  "release": "2026-10-04c",
   "ar": [
-    "استمع بعناصر تحكم متناسقة ومساحة قراءة أفضل، مع اختيار السرعة مباشرة واسم القارئ فقط.",
+    "شارك البطاقة أو احفظها أو انسخها من ثلاثة أزرار واضحة، دون شروحات زائدة.",
+    "خصص بطاقات المشاركة بإعدادات جاهزة وعناوين أوضح، مع فصل الترجمة عن معاني الكلمات العربية.",
     "اقرأ الترجمة أولًا في المشغل الإنجليزي، وأظهر النص العربي أو أخفه دون تغيير التشغيل.",
-    "خصص بطاقات المشاركة بسهولة، مع معاينات أكبر واختيار أوضح للحجم وإرشادات للحفظ.",
-    "كبّر النص مع بقاء أرقام العد والأزرار واضحة، ونوافذ بالحجم الكامل عند تقليل الحركة."
+    "كبّر النص مع بقاء أرقام العد واضحة والنوافذ بالحجم الكامل عند تقليل الحركة."
   ],
   "en": [
-    "Listen with consistent controls and better reading space, direct speed selection and reciter names only.",
-    "Read the translation first in the English player and show or hide Arabic without changing playback.",
-    "Customize sharing cards with larger previews, clearer size selection and saving guidance.",
-    "Enlarge text while keeping counts and buttons readable, with full-size dialogs when motion is reduced."
+    "Share, save or copy from three clear buttons, with less explanatory text.",
+    "Customize sharing cards with presets, clearer titles and separate translation and Arabic word meanings.",
+    "Read the translation first in the English audio player and show or hide Arabic without changing playback.",
+    "Enlarge text while keeping counts readable and dialogs full-size when motion is reduced."
   ]
 }

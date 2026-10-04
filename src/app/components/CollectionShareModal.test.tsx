@@ -54,6 +54,56 @@ const SAMPLE_ITEMS: Zikr[] = [
 ];
 
 describe("CollectionShareModal", () => {
+  for (const language of ["ar", "en"] as const) {
+    for (const single of [false, true]) {
+      it(`distinguishes the ${single ? "single" : "collection"} title in ${language}`, async () => {
+        const { generateAllCollectionStoryPages } = await import("../share/collectionShareCard");
+        const collectionTitle = language === "ar" ? "أذكار الصباح" : "Morning adhkar";
+        render(
+          <CollectionShareModal
+            open
+            single={single}
+            onClose={vi.fn()}
+            collectionTitle={collectionTitle}
+            categoryId="morning"
+            items={SAMPLE_ITEMS}
+            language={language}
+          />,
+        );
+        await screen.findByRole("img");
+        const expected = single ? (language === "ar" ? "من أذكار الصباح" : "From Morning adhkar") : collectionTitle;
+        expect(generateAllCollectionStoryPages).toHaveBeenLastCalledWith(
+          expect.objectContaining({
+            collectionTitle: expected,
+            allItems: [expect.objectContaining(single ? { title: expected } : { id: "m-1" })],
+          }),
+        );
+      });
+    }
+  }
+  it("offers reviewed word meanings only for Arabic exports and keeps them independent of translation", async () => {
+    const { ALL_AZKAR } = await import("../content/azkar");
+    const { generateAllCollectionStoryPages } = await import("../share/collectionShareCard");
+    const item = ALL_AZKAR.find((zikr) => zikr.canonicalKey === "quran-112")!;
+    const view = render(
+      <CollectionShareModal open onClose={vi.fn()} collectionTitle="أذكار الصباح" items={[item]} language="ar" />,
+    );
+    await screen.findByRole("img");
+    screen.getByText("تخصيص المحتوى").closest("details")!.open = true;
+    fireEvent.click(screen.getByRole("checkbox", { name: "معاني الكلمات", exact: true }));
+    await waitFor(() =>
+      expect(generateAllCollectionStoryPages).toHaveBeenLastCalledWith(
+        expect.objectContaining({ content: expect.objectContaining({ wordMeanings: true, meaning: false }) }),
+      ),
+    );
+    expect(screen.getByRole("checkbox", { name: "إضافة الترجمة الإنجليزية المراجعة" })).not.toBeChecked();
+    view.unmount();
+    render(<CollectionShareModal open onClose={vi.fn()} collectionTitle="Morning" items={[item]} language="en" />);
+    await screen.findByRole("img");
+    screen.getByText("Customize content").closest("details")!.open = true;
+    expect(screen.queryByRole("checkbox", { name: "معاني الكلمات" })).not.toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Content preset" })).toHaveTextContent("Arabic only");
+  });
   it("uses matching selected styles and truthful card counts as the scope changes", async () => {
     render(
       <CollectionShareModal open onClose={vi.fn()} collectionTitle="Morning" items={SAMPLE_ITEMS} language="en" />,
@@ -88,7 +138,7 @@ describe("CollectionShareModal", () => {
     const size = screen.getByRole("combobox", { name: "Image size" });
     expect(size).toHaveAccessibleDescription("Choose the shape that suits your destination.");
     expect(screen.getByRole("combobox", { name: "Card language" })).toHaveAccessibleDescription(
-      "Card labels only. English meaning is a separate addition.",
+      "Card labels only. English translation is a separate addition. Word meanings are available in Arabic only.",
     );
     expect(
       screen.getByRole("button", { name: "Image", exact: true }).querySelector('svg[aria-hidden="true"]'),
@@ -112,11 +162,11 @@ describe("CollectionShareModal", () => {
     await screen.findByRole("img");
     const details = screen.getByText("Customize content").closest("details")!;
     details.open = true;
-    fireEvent.click(screen.getByRole("checkbox", { name: "Include reviewed English meaning" }));
-    await waitFor(() => expect(details.querySelector("summary")).toHaveTextContent("Meaning"));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Include reviewed English translation" }));
+    await waitFor(() => expect(details.querySelector("summary")).toHaveTextContent("English translation"));
     details.open = false;
     expect(details.querySelector("summary svg")).toHaveAttribute("aria-hidden", "true");
-    expect(details.querySelector("summary")).toHaveTextContent("Meaning");
+    expect(details.querySelector("summary")).toHaveTextContent("English translation");
   });
   it("keeps full text available when no image format fits", async () => {
     const { getCompatibleShareFormats } = await import("../share/collectionShareCard");
@@ -174,7 +224,7 @@ describe("CollectionShareModal", () => {
       expect.objectContaining({ language: "en", content: expect.objectContaining({ meaning: false }) }),
     );
     fireEvent.click(screen.getByText("Customize content"));
-    fireEvent.click(screen.getByRole("checkbox", { name: "Include reviewed English meaning" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Include reviewed English translation" }));
     await waitFor(() =>
       expect(generateAllCollectionStoryPages).toHaveBeenLastCalledWith(
         expect.objectContaining({ language: "en", content: expect.objectContaining({ meaning: true }) }),
@@ -189,10 +239,10 @@ describe("CollectionShareModal", () => {
     );
     await screen.findByRole("img");
     fireEvent.click(screen.getByRole("button", { name: "Selected cards", exact: true }));
-    expect(screen.getByRole("button", { name: "Save image" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Save" })).toBeDisabled();
     fireEvent.click(screen.getByRole("checkbox", { name: "Select card 2" }));
     expect(canShareMultipleFiles).toHaveBeenLastCalledWith([expect.objectContaining({ name: "p2.png" })]);
-    fireEvent.click(screen.getByRole("button", { name: "Share selected" }));
+    fireEvent.click(screen.getByRole("button", { name: "Share", exact: true }));
     await waitFor(() =>
       expect(shareSingleFile).toHaveBeenCalledWith(expect.objectContaining({ name: "p2.png" }), expect.anything()),
     );
@@ -295,7 +345,7 @@ describe("CollectionShareModal", () => {
       expect(screen.getByAltText("أذكار الصباح - صفحة 1 من 5")).toBeInTheDocument();
     });
 
-    const shareCurrentBtn = screen.getByRole("button", { name: /مشاركة هذه البطاقة/i });
+    const shareCurrentBtn = screen.getByRole("button", { name: "مشاركة", exact: true });
     fireEvent.click(shareCurrentBtn);
 
     expect(shareSingleFile).toHaveBeenCalled();
@@ -340,8 +390,7 @@ describe("CollectionShareModal", () => {
       <CollectionShareModal open onClose={vi.fn()} collectionTitle="أذكار الصباح" items={SAMPLE_ITEMS} language="ar" />,
     );
     await screen.findByRole("img");
-    fireEvent.click(screen.getByText("خيارات الحفظ والنسخ"));
-    fireEvent.click(screen.getByRole("button", { name: "نسخ الصورة" }));
+    fireEvent.click(screen.getByRole("button", { name: "نسخ", exact: true }));
     expect(await screen.findByRole("alert")).toHaveTextContent("تعذر نسخ الصورة");
     expect(downloadFile).not.toHaveBeenCalled();
   });
@@ -359,12 +408,80 @@ describe("CollectionShareModal", () => {
       <CollectionShareModal open onClose={vi.fn()} collectionTitle="أذكار الصباح" items={SAMPLE_ITEMS} language="ar" />,
     );
     await screen.findByRole("img");
-    const button = screen.getByRole("button", { name: "مشاركة هذه البطاقة" });
+    const button = screen.getByRole("button", { name: "مشاركة", exact: true });
     fireEvent.click(button);
     fireEvent.click(button);
     expect(shareSingleFile).toHaveBeenCalledTimes(1);
     expect(button).toBeDisabled();
     finish({ method: "shared", fileCount: 1 });
     await waitFor(() => expect(button).toBeEnabled());
+  });
+  it("puts three concise icon actions in the footer and removes the extra disclosure", async () => {
+    const { copyImageToClipboard } = await import("../share/shareDispatcher");
+    vi.mocked(copyImageToClipboard).mockClear();
+    render(
+      <CollectionShareModal open onClose={vi.fn()} collectionTitle="Morning" items={SAMPLE_ITEMS} language="en" />,
+    );
+    await screen.findByRole("img");
+    const footer = screen.getByTestId("sharing-actions");
+    expect(Array.from(footer.querySelectorAll("button")).map((button) => button.textContent)).toEqual([
+      "Share",
+      "Save",
+      "Copy",
+    ]);
+    expect(footer.querySelectorAll('button svg[aria-hidden="true"]')).toHaveLength(3);
+    expect(screen.queryByText("Save and copy options")).not.toBeInTheDocument();
+    expect(
+      screen
+        .getByRole("dialog")
+        .querySelector('[id="' + screen.getByRole("dialog").getAttribute("aria-describedby") + '"]'),
+    ).toHaveClass("sr-only");
+    fireEvent.click(screen.getByRole("button", { name: "Copy", exact: true }));
+    await waitFor(() => expect(copyImageToClipboard).toHaveBeenCalled());
+    expect(await screen.findByText("Image copied to clipboard.")).toHaveClass("sr-only");
+  });
+  it("keeps explicit saving available when native image sharing is unsupported", async () => {
+    const { canShareMultipleFiles, downloadFile } = await import("../share/shareDispatcher");
+    vi.mocked(canShareMultipleFiles).mockReturnValue(false);
+    vi.mocked(downloadFile).mockClear();
+    try {
+      render(
+        <CollectionShareModal open onClose={vi.fn()} collectionTitle="Morning" items={SAMPLE_ITEMS} language="en" />,
+      );
+      await screen.findByRole("img");
+      expect(screen.getByRole("button", { name: "Share", exact: true })).toBeDisabled();
+      expect(screen.getByRole("button", { name: "Share", exact: true })).toHaveAccessibleDescription(
+        /Use Save or Copy/u,
+      );
+      fireEvent.click(screen.getByRole("button", { name: "Save", exact: true }));
+      expect(downloadFile).toHaveBeenCalledWith(expect.objectContaining({ name: "p1.png" }));
+    } finally {
+      vi.mocked(canShareMultipleFiles).mockReturnValue(true);
+    }
+  });
+  it("copies the selected text for multiple images and saves text without native sharing", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    const descriptor = Object.getOwnPropertyDescriptor(navigator, "clipboard");
+    Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText } });
+    const { downloadFile } = await import("../share/shareDispatcher");
+    vi.mocked(downloadFile).mockClear();
+    try {
+      render(
+        <CollectionShareModal open onClose={vi.fn()} collectionTitle="Morning" items={SAMPLE_ITEMS} language="en" />,
+      );
+      await screen.findByRole("img");
+      fireEvent.click(screen.getByRole("button", { name: "Entire collection", exact: true }));
+      fireEvent.click(screen.getByRole("button", { name: "Copy", exact: true }));
+      await waitFor(() => expect(writeText).toHaveBeenCalledWith(expect.stringContaining(SAMPLE_ITEMS[0]!.arabicText)));
+      await waitFor(() => expect(screen.getByRole("button", { name: "Copy", exact: true })).toBeEnabled());
+      fireEvent.click(screen.getByRole("button", { name: "Text", exact: true }));
+      fireEvent.click(screen.getByRole("button", { name: "Save", exact: true }));
+      expect(downloadFile).toHaveBeenCalledWith(
+        expect.objectContaining({ name: "azkar.txt", type: "text/plain;charset=utf-8" }),
+      );
+    } finally {
+      if (descriptor) Object.defineProperty(navigator, "clipboard", descriptor);
+      else Reflect.deleteProperty(navigator, "clipboard");
+    }
   });
 });

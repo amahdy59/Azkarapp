@@ -95,6 +95,8 @@ describe("collectionShareCard", () => {
       expect(heading[0]![2]).toBeGreaterThan(panel[1] + 28);
       expect(heading[0]![2]).toBeLessThan(panel[1] + 110);
       expect(vi.mocked(context.fillText).mock.calls.find((call) => call[0] === "wa-zaker.com")![1]).toBe(540);
+      expect(vi.mocked(context.fillText).mock.calls.some((call) => /امسح|Scan/u.test(call[0]))).toBe(false);
+      expect(context.scale).toHaveBeenCalledWith(64 / 56, 64 / 56);
     });
   }
   it("always embeds the exact Mushaf QR in a long-surah reminder", async () => {

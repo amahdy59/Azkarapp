@@ -15,8 +15,10 @@ import {
   SHARE_DIMENSIONS,
   defaultShareAppearance,
   layoutSharePages,
+  getShareRepetitionLabel,
   shareGeometry,
   SHARE_PILL,
+  SHARE_SECTION_GAP,
   type ShareAppearance,
   type ShareContentOptions,
   type ShareFormat,
@@ -134,7 +136,13 @@ export function renderCollectionStoryPage(input: CollectionStoryPageInput): HTML
   ctx.globalAlpha = 1;
   drawCardCornerBotanicals(ctx, canvas.width, canvas.height, botanicals, true);
   strokeRoundedRect(ctx, 32, 32, canvas.width - 64, canvas.height - 64, 36, palette.border, 2);
-  drawShareBrand(ctx, format === "story" || format === "tall" ? 170 : 32, palette.text);
+  drawShareBrand(
+    ctx,
+    format === "story" || format === "tall" ? 170 : 32,
+    palette.text,
+    palette.accent,
+    appearance === "olive" ? "#e6eddf" : "#091426",
+  );
   ctx.textAlign = "center";
   ctx.textBaseline = "top";
   ctx.direction = language === "ar" ? "rtl" : "ltr";
@@ -153,7 +161,7 @@ export function renderCollectionStoryPage(input: CollectionStoryPageInput): HTML
   else drawOrnateFlourish(ctx, 540, geometry.top - 20, 112, palette.accent);
   const totalHeight =
     layout.fragments.reduce((sum, fragment) => sum + fragment.height, 0) + (layout.fragments.length - 1) * 28;
-  let y = geometry.top + Math.min(48, Math.max(0, (geometry.bottom - geometry.top - totalHeight) / 2));
+  let y = geometry.top + Math.min(24, Math.max(0, (geometry.bottom - geometry.top - totalHeight) / 2));
   for (const fragment of layout.fragments) {
     const x = 64;
     fillRoundedRect(ctx, x, y, geometry.width, fragment.height, 28, palette.surface);
@@ -168,10 +176,9 @@ export function renderCollectionStoryPage(input: CollectionStoryPageInput): HTML
       );
     }
     const utilityY = y + (fragment.heading?.height ?? 0);
-    const count = new Intl.NumberFormat(language === "ar" ? "ar-EG" : "en").format(fragment.item.repetitionCount ?? 1);
     const repetition = fragment.item.reminder
       ? t(language, "shareStudio.reminder")
-      : t(language, "shareStudio.repetitions", { count });
+      : getShareRepetitionLabel(fragment.item.repetitionCount ?? 1, language);
     ctx.font = `600 30px ${SHARE_ARABIC_FONT}`;
     const pillWidth = ctx.measureText(repetition).width + 32;
     fillRoundedRect(
@@ -194,8 +201,8 @@ export function renderCollectionStoryPage(input: CollectionStoryPageInput): HTML
     );
     let sectionY = utilityY + SHARE_PILL.textTop;
     [...fragment.sections, ...(fragment.citation ? [fragment.citation] : [])].forEach((section, sectionIndex) => {
-      if (sectionIndex > 0) sectionY += 20;
-      if (section.key === "source") {
+      if (sectionIndex > 0) sectionY += SHARE_SECTION_GAP;
+      if (sectionIndex > 0) {
         ctx.beginPath();
         ctx.strokeStyle = palette.border;
         ctx.lineWidth = 1;
@@ -207,7 +214,7 @@ export function renderCollectionStoryPage(input: CollectionStoryPageInput): HTML
       ctx.textAlign = section.direction === "rtl" ? "right" : "left";
       const textX = section.direction === "rtl" ? 968 : 112;
       if (section.key !== "arabic") {
-        ctx.font = `600 28px ${SHARE_ARABIC_FONT}`;
+        ctx.font = `600 28px ${language === "ar" ? SHARE_ARABIC_FONT : SHARE_UI_FONT}`;
         ctx.fillStyle = palette.accent;
         drawInkTop(ctx, t(language, `shareStudio.${section.key}`), textX, sectionY);
         sectionY += 44;
@@ -215,7 +222,12 @@ export function renderCollectionStoryPage(input: CollectionStoryPageInput): HTML
       ctx.font = `${section.key === "arabic" ? 500 : 400} ${section.fontSize}px ${section.direction === "rtl" ? SHARE_ARABIC_FONT : SHARE_UI_FONT}`;
       ctx.fillStyle = section.key === "source" ? palette.secondary : palette.text;
       for (const line of section.lines) {
-        drawInkTop(ctx, line.trim(), textX, sectionY);
+        // Isolate reference numbers without changing the reviewed text payload.
+        const displayLine =
+          section.key === "source" && section.direction === "rtl"
+            ? line.trim().replace(/[0-9٠-٩۰-۹]+(?:[/:٫٬.][0-9٠-٩۰-۹]+)*/gu, "\u2066$&\u2069")
+            : line.trim();
+        drawInkTop(ctx, displayLine, textX, sectionY);
         sectionY += section.lineHeight;
       }
     });
@@ -236,19 +248,7 @@ export function renderCollectionStoryPage(input: CollectionStoryPageInput): HTML
       540,
       geometry.footer - (hasQr ? 130 : 88),
     );
-  drawWebsiteBadge(ctx, 540, geometry.footer);
-  if (hasQr) {
-    ctx.font = `500 28px ${SHARE_ARABIC_FONT}`;
-    ctx.fillStyle = palette.secondary;
-    ctx.textAlign = "center";
-    ctx.direction = language === "ar" ? "rtl" : "ltr";
-    drawInkTop(
-      ctx,
-      t(language, input.items[0]?.reminder ? "shareStudio.scanMushaf" : "shareStudio.scanRead"),
-      540,
-      geometry.footer - 76,
-    );
-  }
+  drawWebsiteBadge(ctx, 540, geometry.footer, palette.accent);
   return canvas;
 }
 
@@ -291,6 +291,14 @@ export async function generateCollectionStoryPage(
       canvas.height - (input.format === "story" ? 200 : 40) - size,
     );
     if (y + size <= canvas.height - 40) {
+      if (input.items[0]?.reminder) {
+        ctx.font = `600 24px ${SHARE_ARABIC_FONT}`;
+        ctx.fillStyle =
+          SHARE_PALETTES[input.appearance ?? defaultShareAppearance(undefined, input.themeMode)].secondary;
+        ctx.direction = input.language === "en" ? "ltr" : "rtl";
+        ctx.textAlign = "center";
+        drawInkTop(ctx, t(input.language ?? "ar", "shareStudio.mushafQr"), x + size / 2, y - 38);
+      }
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(x, y, size, size);
       ctx.fillStyle = "#10241a";

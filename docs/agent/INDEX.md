@@ -161,3 +161,7 @@ The agent must never interpret “perfect the application” as permission to re
 [Devotional component and alignment refinement](phases/DEVOTIONAL_COMPONENT_REFINEMENT.md)
 records roomier desktop Zikr navigation, shared counter footer actions, and
 Apple/Microsoft-informed control spacing and alignment improvements.
+
+[Shared-card hierarchy and content clarity](phases/SHARED_CARD_CONTENT_CLARITY.md) records the owner-approved logo, footer, title, spacing, presets and Arabic glossary refinement.
+
+[Sharing footer and combined release](phases/SHARING_FOOTER_RELEASE.md) records the concise footer, accessible feedback and owner-authorized release of pending refinements.

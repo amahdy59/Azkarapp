@@ -2,6 +2,7 @@ import type { AppLanguage, ThemeMode, RoutineMode, PrayerName, Zikr } from "../t
 import { t } from "../i18n";
 import { isLongSurah } from "../content/mushafPages";
 import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content/localizedZikr";
+import { buildQuranTextSegments, getQuranWordMeanings, QURAN_WORD_MEANING_SOURCE } from "../content/quranWordMeanings";
 
 export type ShareFormat = "story" | "square" | "portrait" | "tall";
 export type ShareAppearance = "olive" | "gold" | "lavender";
@@ -13,11 +14,12 @@ export const SHARE_DIMENSIONS: Record<ShareFormat, { width: number; height: numb
 };
 export const SHARE_ARABIC_FONT = '"IBM Plex Sans Arabic", "Noto Sans Arabic Variable", sans-serif';
 export const SHARE_UI_FONT = '"Noto Sans Arabic Variable", system-ui, sans-serif';
-/** Export pixels: keep the first text's ink exactly four pixels below the badge. */
-export const SHARE_PILL = { top: 28, height: 50, gap: 4, textTop: 82, bottom: 36 } as const;
+/** Export pixels: protect the reading text's diacritics below the badge. */
+export const SHARE_PILL = { top: 28, height: 50, gap: 16, textTop: 94, bottom: 36 } as const;
+export const SHARE_SECTION_GAP = 28;
 
 export interface ShareSection {
-  key: "arabic" | "translation" | "transliteration" | "benefit" | "source" | "reading";
+  key: "arabic" | "translation" | "wordMeanings" | "transliteration" | "benefit" | "source" | "reading";
   text: string;
   direction: "rtl" | "ltr";
 }
@@ -26,6 +28,7 @@ export interface ShareItem {
   arabicText: string;
   title?: string;
   translation?: string;
+  wordMeanings?: string;
   transliteration?: string;
   benefit?: string;
   sourceReference?: string;
@@ -48,6 +51,7 @@ export function toShareItem(zikr: Zikr, language: AppLanguage, baseUrl?: string)
     arabicText: reminder ? "" : zikr.arabicText,
     title: language === "ar" ? zikr.surahNameArabic : zikr.surahNameEnglish,
     translation: reminder ? undefined : zikr.translation,
+    wordMeanings: !reminder && language === "ar" ? getReviewedShareWordMeanings(zikr) : undefined,
     transliteration: reminder ? undefined : zikr.transliteration,
     benefit: getLocalizedZikrBenefit(zikr, language),
     sourceReference: getLocalizedSourceReference(zikr, language),
@@ -56,6 +60,20 @@ export function toShareItem(zikr: Zikr, language: AppLanguage, baseUrl?: string)
     readingUrl: reminder ? getMushafShareUrl(zikr.mushafPages![0]!.page, baseUrl) : undefined,
     language,
   };
+}
+
+/** Only glossary entries actually anchored in the shared excerpt are eligible. */
+function getReviewedShareWordMeanings(zikr: Zikr): string | undefined {
+  const entries = buildQuranTextSegments(zikr.arabicText, getQuranWordMeanings(zikr)).flatMap(
+    (segment) => segment.meanings ?? [],
+  );
+  const unique = [...new Map(entries.map((entry) => [entry.id, entry])).values()];
+  return unique.length
+    ? [
+        ...unique.map((entry) => `${entry.word}: ${entry.explanationArabic}`),
+        QURAN_WORD_MEANING_SOURCE.nameArabic,
+      ].join("\n")
+    : undefined;
 }
 
 export class ShareFitError extends RangeError {
@@ -69,6 +87,7 @@ export class ShareFitError extends RangeError {
 }
 export interface ShareContentOptions {
   meaning?: boolean;
+  wordMeanings?: boolean;
   pronunciation?: boolean;
   benefit?: boolean;
   qr?: boolean;
@@ -107,7 +126,7 @@ export function shareGeometry(format: ShareFormat, qr = false, single = false): 
   const height = SHARE_DIMENSIONS[format].height;
   const story = format === "story" || format === "tall";
   return {
-    top: story ? (single ? 310 : 400) : single ? 172 : 270,
+    top: story ? (single ? 294 : 384) : single ? 172 : 270,
     bottom: height - (story ? (qr ? 410 : 350) : qr ? 330 : 250),
     footer: height - (story ? 240 : 140),
     titleY: story ? 254 : 124,
@@ -118,6 +137,7 @@ export function shareGeometry(format: ShareFormat, qr = false, single = false): 
 }
 
 export function defaultShareAppearance(category?: string, theme?: ThemeMode): ShareAppearance {
+  if (category === "morning") return "olive";
   if (category === "before_sleep") return "lavender";
   if (category === "evening") return "gold";
   return theme === "midnight" || theme === "dark" ? "gold" : "olive";
@@ -127,6 +147,8 @@ export function getShareSections(item: ShareItem, options: ShareContentOptions =
   const sections: ShareSection[] = item.reminder ? [] : [{ key: "arabic", text: item.arabicText, direction: "rtl" }];
   if (options.meaning && item.translation?.trim())
     sections.push({ key: "translation", text: item.translation, direction: "ltr" });
+  if (options.wordMeanings && item.language === "ar" && item.wordMeanings?.trim())
+    sections.push({ key: "wordMeanings", text: item.wordMeanings, direction: "rtl" });
   if (options.pronunciation && item.transliteration?.trim())
     sections.push({ key: "transliteration", text: item.transliteration, direction: "ltr" });
   if ((options.benefit || item.reminder) && item.benefit?.trim())
@@ -148,6 +170,22 @@ export function getShareSections(item: ShareItem, options: ShareContentOptions =
       direction: item.language === "en" ? "ltr" : "rtl",
     });
   return sections;
+}
+
+export function getShareRepetitionLabel(count: number, language: AppLanguage): string {
+  return t(
+    language,
+    count === 1
+      ? "shareStudio.repeatOnce"
+      : count === 2
+        ? "shareStudio.repeatTwice"
+        : count > 10
+          ? "shareStudio.repeatMany"
+          : "shareStudio.repetitions",
+    {
+      count: new Intl.NumberFormat(language === "ar" ? "ar-EG" : "en").format(count),
+    },
+  );
 }
 
 /** Each raw run includes its whitespace; joining runs exactly reproduces the input.
@@ -187,12 +225,21 @@ export function measureShareSection(
   width: number,
   primary = false,
 ): MeasuredSection {
-  const fontSize = section.key === "arabic" ? (single ? 64 : 52) : primary ? 52 : section.key === "source" ? 32 : 36;
-  const lineHeight = Math.ceil(
-    fontSize * (section.key === "arabic" || (primary && section.direction === "rtl") ? 1.65 : 1.5),
-  );
+  const fontSize = section.key === "arabic" ? (single ? 64 : 52) : primary ? 52 : section.key === "source" ? 34 : 36;
+  const lineHeight = Math.ceil(fontSize * (section.direction === "rtl" ? 1.65 : 1.5));
   ctx.font = `${section.key === "arabic" ? 500 : 400} ${fontSize}px ${section.direction === "rtl" ? SHARE_ARABIC_FONT : SHARE_UI_FONT}`;
   const lines = wrapShareText(section.text, (value) => ctx.measureText(value).width, width);
+  // Keep the final reference together when it fits on the next line. The
+  // joined reviewed payload stays identical, including its whitespace.
+  if (section.key === "source" && lines.length > 1) {
+    const previous = lines.at(-2)!;
+    const boundary = Math.max(previous.lastIndexOf(";"), previous.lastIndexOf("؛")) + 1;
+    const reference = previous.slice(boundary) + lines.at(-1)!;
+    if (boundary > 0 && ctx.measureText(reference.trim()).width <= width) {
+      lines[lines.length - 2] = previous.slice(0, boundary);
+      lines[lines.length - 1] = reference;
+    }
+  }
   const labelHeight = section.key === "arabic" ? 0 : 44;
   return { ...section, lines, fontSize, lineHeight, height: lines.length * lineHeight + labelHeight };
 }
@@ -207,7 +254,7 @@ export function layoutSharePages(
 ): ShareLayoutPage[] {
   const geometry = shareGeometry(format, content.qr, single);
   const capacity = geometry.bottom - geometry.top;
-  const sectionGap = 20;
+  const sectionGap = SHARE_SECTION_GAP;
   const fragments: ShareFragment[] = [];
   for (const item of items) {
     let heading: ShareFragment["heading"];
@@ -279,9 +326,7 @@ export function getShareText(
         item.title,
         item.reminder
           ? t(language, "shareStudio.reminder")
-          : t(language, "shareStudio.repetitions", {
-              count: new Intl.NumberFormat(language === "ar" ? "ar-EG" : "en").format(item.repetitionCount ?? 1),
-            }),
+          : getShareRepetitionLabel(item.repetitionCount ?? 1, language),
         ...getShareSections(item, content).map((section) =>
           section.key === "arabic" ? section.text : `${t(language, `shareStudio.${section.key}`)}\n${section.text}`,
         ),

@@ -7,7 +7,7 @@ describe("share card visible-ink spacing", () => {
     ["٣ مرات", 29, 9],
     ["3 repetitions", 22, 7],
   ] as const) {
-    it(`centers ${text} by its actual glyph bounds and preserves the four-pixel content gap`, () => {
+    it(`centers ${text} by its actual glyph bounds and preserves the sixteen-pixel content gap`, () => {
       const ctx = {
         font: "600 30px sans-serif",
         textBaseline: "top",
@@ -25,7 +25,7 @@ describe("share card visible-ink spacing", () => {
       drawInkTop(ctx, "Reading text", 112, SHARE_PILL.textTop);
       expect(ctx.textBaseline).toBe("alphabetic");
       const inkTop = vi.mocked(ctx.fillText).mock.calls[0]![2] - ascent;
-      expect(inkTop - (SHARE_PILL.top + SHARE_PILL.height)).toBe(4);
+      expect(inkTop - (SHARE_PILL.top + SHARE_PILL.height)).toBe(16);
     });
   }
 });

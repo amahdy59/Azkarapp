@@ -109,7 +109,8 @@
 /* Preserve enlarged tally text across platform monospace fonts on narrow
    phones; the surrounding reading canvas already owns its outer gutters. */
 @media (max-width: 359px) {
-  .devotional-footer {
+  .devotional-footer,
+  .devotional-guidance {
     padding-inline: 4px;
   }
 }

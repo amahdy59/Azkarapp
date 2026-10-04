@@ -93,7 +93,8 @@ The keyboard row is marked partial for the same reason: the automation proves ta
 - Current/Selected/Entire-collection scope matches both files and archive text; unsupported native payloads expose Save/Copy.
 - Check 320px width and 200% text: compact header/action footer remain visible, scrolling focus is unobscured, keyboard stays in the modal, and Escape restores the trigger.
 - Inspect actual olive/gold/lavender exports and single/reminder cards. Real social compression, QR scanning, Android/iPhone share sheets, cutouts and human screen-reader checks must be recorded separately from browser emulation.
-- Inspect Arabic/English pill ink bounds, its exact 4px gap, header/title separation, website badge contrast, QR clearance and multi-card-only numbering. Check Portrait reminder defaults and all four available formats; branding must not split or remove content.
+- Inspect Arabic/English pill ink bounds, its exact 16px gap, proportionally enlarged brand, header/title separation, website badge contrast, QR clearance and multi-card-only numbering. Check contextual single-zikr titles versus collection titles, Portrait reminder defaults and all four available formats; branding must not split or remove content.
+- Verify content presets, independent English translation and Arabic-only reviewed word explanations, glossary attribution, hidden unavailable glossary options and unchanged full-text/format recovery. Ordinary cards have no scan instruction above the website; reminder QR labels belong beside their code.
 
 ## Verified audit remediation checks
 
@@ -104,3 +105,5 @@ The keyboard row is marked partial for the same reason: the automation proves ta
 - Exercise menu keyboard focus in Light, Midnight and Dark, Escape focus return, OS reduced motion, and in-app reduced motion with OS motion enabled.
 - Inspect compact sheet surface and inset ownership. Real cutout/gesture-navigation hardware, sensor feel and TalkBack/VoiceOver checks remain human evidence requirements.
 - Capture current bundle measurements; never claim input latency or frame-rate gains without a representative-device trace.
+
+- Sharing footer: verify Share/Save/Copy labels and decorative icons, one ordinary phone row, non-wrapping enlarged labels, 44px targets, matching selected payloads, explicit unavailable sharing, visible clipboard errors and quiet success announcements.
