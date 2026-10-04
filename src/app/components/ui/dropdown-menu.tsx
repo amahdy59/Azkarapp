@@ -8,11 +8,14 @@ import { cn } from "./utils";
 
 function DropdownMenu({
   modal = false,
+  dir,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Root>) {
   // A contextual menu does not obscure the page. Keep background semantics
   // available rather than aria-hiding focusable controls outside the portal.
-  return <DropdownMenuPrimitive.Root data-slot="dropdown-menu" modal={modal} {...props} />;
+  const resolvedDir =
+    dir ?? (typeof document !== "undefined" && document.documentElement.dir === "rtl" ? "rtl" : "ltr");
+  return <DropdownMenuPrimitive.Root data-slot="dropdown-menu" modal={modal} dir={resolvedDir} {...props} />;
 }
 
 function DropdownMenuPortal({
@@ -111,18 +114,18 @@ function DropdownMenuCheckboxItem({
     <DropdownMenuPrimitive.CheckboxItem
       data-slot="dropdown-menu-checkbox-item"
       className={cn(
-        "focus:bg-muted focus:text-foreground relative flex min-h-11 cursor-default items-center gap-2 rounded-xl py-1.5 pe-2 ps-8 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "focus:bg-muted focus:text-foreground data-[state=checked]:bg-primary/10 data-[state=checked]:text-primary relative flex min-h-11 cursor-default items-center justify-between gap-2 rounded-xl py-2 ps-3 pe-8 text-sm text-start outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       checked={checked}
       {...props}
     >
-      <span className="pointer-events-none absolute start-2 flex size-3.5 items-center justify-center">
+      <span className="flex min-w-0 flex-1 items-center gap-2">{children}</span>
+      <span className="pointer-events-none absolute end-2.5 flex size-4 items-center justify-center text-primary">
         <DropdownMenuPrimitive.ItemIndicator>
           <CheckIcon className="size-4" />
         </DropdownMenuPrimitive.ItemIndicator>
       </span>
-      {children}
     </DropdownMenuPrimitive.CheckboxItem>
   );
 }
@@ -147,17 +150,17 @@ function DropdownMenuRadioItem({
     <DropdownMenuPrimitive.RadioItem
       data-slot="dropdown-menu-radio-item"
       className={cn(
-        "focus:bg-muted focus:text-foreground relative flex min-h-11 cursor-default items-center gap-2 rounded-xl py-1.5 pe-2 ps-8 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "focus:bg-muted focus:text-foreground data-[state=checked]:bg-primary/10 data-[state=checked]:text-primary relative flex min-h-11 cursor-default items-center justify-between gap-2 rounded-xl py-2 ps-3 pe-8 text-sm text-start outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       {...props}
     >
-      <span className="pointer-events-none absolute start-2 flex size-4 items-center justify-center">
+      <span className="flex min-w-0 flex-1 items-center gap-2">{children}</span>
+      <span className="pointer-events-none absolute end-2.5 flex size-4 items-center justify-center text-primary">
         <DropdownMenuPrimitive.ItemIndicator>
           <CheckIcon className="size-4" />
         </DropdownMenuPrimitive.ItemIndicator>
       </span>
-      {children}
     </DropdownMenuPrimitive.RadioItem>
   );
 }

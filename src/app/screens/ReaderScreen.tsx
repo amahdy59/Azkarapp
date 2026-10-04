@@ -1106,10 +1106,7 @@ export function ReaderScreen({
       if (isValidElement(audioPlayer) && typeof audioPlayer.type !== "string") {
         return cloneElement(audioPlayer as React.ReactElement<Record<string, unknown>>, {
           dockSlots: {
-            prev: renderNavigationButton("prev", true),
-            audio: renderAudioDockButton(),
             benefit: renderBenefitDockButton(),
-            next: renderNavigationButton("next", true),
           },
           onClose: () => {
             setTimeout(() => {
@@ -1573,7 +1570,9 @@ export function ReaderScreen({
                     </div>
 
                     {!longSurah && !audioModeActive && <CounterTapHint text={counterInstruction} />}
-                    {!longSurah && <footer className="shrink-0 pb-3 pt-3">{renderDock()}</footer>}
+                    {!longSurah && (
+                      <footer className={`shrink-0 pt-3 ${audioModeActive ? "pb-0" : "pb-3"}`}>{renderDock()}</footer>
+                    )}
                     {(!audioModeActive || longSurah) && audioPlayer}
                   </div>
                 </div>
@@ -1754,7 +1753,11 @@ export function ReaderScreen({
                 counter itself owns the bottom inset — otherwise it would sit
                 flush against the home indicator. */}
               {!longSurah && (
-                <div className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">{renderDock()}</div>
+                <div
+                  className={`shrink-0 pt-3 ${audioModeActive ? "pb-0" : "pb-[max(0.75rem,env(safe-area-inset-bottom))]"}`}
+                >
+                  {renderDock()}
+                </div>
               )}
               {(!audioModeActive || longSurah) && audioPlayer}
             </div>

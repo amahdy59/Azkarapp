@@ -1,3 +1,4 @@
+import { ReferenceCopyButton } from "../components/ReferenceCopyButton";
 import { useCallback, useEffect, useState } from "react";
 import { DevotionalAction, DevotionalFooter } from "../components/DevotionalControls";
 import { CounterTargetPicker } from "../components/CounterTargetPicker";
@@ -14,7 +15,7 @@ import {
   VolumeX,
 } from "../components/icons";
 import { ReadingScreenChrome } from "../components/ReadingScreenChrome";
-import { Modal } from "../components/ResponsiveSheet";
+import { ResponsiveSheet } from "../components/ResponsiveSheet";
 import { useCountingSurface } from "../components/countingSurface";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { Button } from "../components/ui/button";
@@ -54,17 +55,30 @@ const EVIDENCE = {
   },
 } as const;
 
-function ReferenceLink({ text, source, href }: { text: string; source: string; href: string }) {
+function ReferenceLink({
+  text,
+  source,
+  href,
+  language,
+}: {
+  text: string;
+  source: string;
+  href: string;
+  language: AppLanguage;
+}) {
   return (
-    <article className="rounded-3xl border border-border bg-card p-4 text-start">
-      <p className="text-subtitle font-semibold leading-7 text-foreground" dir="auto">
-        {text}
-      </p>
+    <article className="rounded-2xl border border-border/70 bg-card/80 p-4 text-start">
+      <div className="flex items-start justify-between gap-2 mb-2">
+        <p className="text-subtitle font-bold leading-7 text-foreground flex-1" dir="auto">
+          {text}
+        </p>
+        <ReferenceCopyButton text={text} language={language} />
+      </div>
       <a
         href={href}
         target="_blank"
         rel="noreferrer"
-        className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-xl text-label font-black text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        className="mt-2 inline-flex min-h-11 items-center gap-2 rounded-xl text-label font-black text-primary hover:underline focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
         {source}
         <ExternalLink size={16} aria-hidden="true" />
@@ -380,16 +394,18 @@ export function FridaySalawatScreen({
       </div>
 
       {showCompletionModal && (
-        <Modal
+        <ResponsiveSheet
           open
           onClose={() => setShowCompletionModal(false)}
           title={t(language, "counter.goalReached")}
           direction={direction}
           language={language}
           maxWidthClassName="max-w-sm"
-          className="p-5 sm:p-6 text-center"
+          showCloseButton={true}
+          drawerClassName="p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]"
+          dialogClassName="p-6"
         >
-          <div>
+          <div className="text-center">
             <div className="mx-auto mb-3 flex size-14 items-center justify-center rounded-2xl bg-success/20 text-success">
               <Check size={32} strokeWidth={3} aria-hidden="true" />
             </div>
@@ -438,30 +454,46 @@ export function FridaySalawatScreen({
               </Button>
             </div>
           </div>
-        </Modal>
+        </ResponsiveSheet>
       )}
 
       {showBenefits && (
-        <Modal
+        <ResponsiveSheet
           open
           onClose={() => setShowBenefits(false)}
           title={t(language, "fridaySalawat.benefits")}
           direction={direction}
           language={language}
+          testId="salawat-benefits-sheet"
           maxWidthClassName="max-w-lg"
-          className="p-5 sm:p-6"
+          showCloseButton={true}
+          drawerClassName="p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]"
+          dialogClassName="p-6"
         >
-          <div className="space-y-3">
-            <div className="flex items-center gap-3 pe-10">
-              <span className="flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+          <div className="flex flex-col h-full max-h-[82vh] overflow-hidden text-start">
+            <div className="flex items-center gap-3 pe-12 pb-4 border-b border-border/40 shrink-0">
+              <span className="flex size-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
                 <Lightbulb size={20} aria-hidden="true" />
               </span>
               <h2 className="text-lg font-black text-foreground">{t(language, "fridaySalawat.benefits")}</h2>
             </div>
-            <ReferenceLink text={copy.muslim} source={copy.muslimSource} href="https://sunnah.com/muslim:408" />
-            <ReferenceLink text={copy.friday} source={copy.fridaySource} href="https://sunnah.com/abudawud:1047" />
+
+            <div className="flex-1 overflow-y-auto space-y-3.5 py-4 pe-1">
+              <ReferenceLink
+                text={copy.muslim}
+                source={copy.muslimSource}
+                href="https://sunnah.com/muslim:408"
+                language={language}
+              />
+              <ReferenceLink
+                text={copy.friday}
+                source={copy.fridaySource}
+                href="https://sunnah.com/abudawud:1047"
+                language={language}
+              />
+            </div>
           </div>
-        </Modal>
+        </ResponsiveSheet>
       )}
     </ScreenContainer>
   );

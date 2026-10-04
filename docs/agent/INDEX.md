@@ -167,3 +167,9 @@ Apple/Microsoft-informed control spacing and alignment improvements.
 [Sharing footer and combined release](phases/SHARING_FOOTER_RELEASE.md) records the concise footer, accessible feedback and owner-authorized release of pending refinements.
 
 [Efficient release verification](phases/RELEASE_VERIFICATION_EFFICIENCY.md) records the owner-approved removal of duplicate release suites, exact-snapshot quality reuse and full CI before deployment.
+
+[Audio waveform and transport refinement](phases/AUDIO_WAVEFORM_TRANSPORT_REFINEMENT.md) records the owner-approved waveform seek control, stable media direction, independent continuation and vertical volume disclosure.
+
+[Collapsed player waveform and edge controls](phases/AUDIO_COMPACT_WAVEFORM_REFINEMENT.md) records the owner-approved short waveform, dedicated edge chevron, title collision protection and keyboard/focus continuity.
+
+[Latest changes review and release](phases/LATEST_CHANGES_REVIEW_RELEASE.md) records the combined review, necessary accessibility/build repairs and owner-authorized publication.

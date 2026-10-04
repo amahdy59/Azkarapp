@@ -109,3 +109,7 @@ The keyboard row is marked partial for the same reason: the automation proves ta
 - Capture current bundle measurements; never claim input latency or frame-rate gains without a representative-device trace.
 
 - Sharing footer: verify Share/Save/Copy labels and decorative icons, one ordinary phone row, non-wrapping enlarged labels, 44px targets, matching selected payloads, explicit unavailable sharing, visible clipboard errors and quiet success announcements.
+
+### Waveform player refinement
+
+Verify one progress control per player form, physical LTR timeline/transport in Arabic and English, mirrored transport geometry and aligned icon centres, waveform source checksum coverage and truthful missing-data fallback. Confirm manual Previous/Next with continuation off, final-natural-ending-only completion, internal segment/ritual progression, and independent prescribed-repeat state. Volume opens only on click/keyboard, remains vertical, changes no row geometry, and closes on Escape/outside press with correct focus restoration; iOS uses hardware volume. Retain narrow/landscape/200% text, all-theme axe and manual physical-device/screen-reader checks.

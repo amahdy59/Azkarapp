@@ -13,7 +13,10 @@ for (const scenario of [
   { name: "rail-boundary", width: 900, height: 768, language: "ar", theme: "midnight" },
   { name: "sidebar-boundary", width: 1200, height: 800, language: "en", theme: "light" },
 ] as const) {
-  test(`expanded listening fills the reader canvas: ${scenario.name} @cross-browser`, async ({ page }, testInfo) => {
+  const engineSmoke = ["phone", "desktop", "enlarged"].includes(scenario.name);
+  test(`expanded listening fills the reader canvas: ${scenario.name}${engineSmoke ? " @cross-browser" : ""}`, async ({
+    page,
+  }, testInfo) => {
     await page.setViewportSize({ width: scenario.width, height: scenario.height });
     await page.addInitScript(({ language, theme }) => {
       localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
@@ -32,6 +35,11 @@ for (const scenario of [
       };
     }, scenario);
     await page.goto("/#/azkar/evening/1");
+    if ("textScale" in scenario) {
+      await page.locator("html").evaluate((el) => {
+        el.style.fontSize = "32px";
+      });
+    }
     const arabic = scenario.language === "ar";
     await page.getByRole("button", { name: arabic ? "خيارات القارئ" : "Reader options", exact: true }).click();
     await page
@@ -43,6 +51,9 @@ for (const scenario of [
     await expect(player).toHaveAttribute("data-variant", "compact");
     const checkCompactContainment = async () => {
       const bounds = (await canvas.boundingBox())!;
+      const mainBounds = (await page.locator(".app-main").boundingBox())!;
+      const dockBounds = (await player.locator(".audio-compact-card").boundingBox())!;
+      expect(Math.abs(dockBounds.y + dockBounds.height - (mainBounds.y + mainBounds.height))).toBeLessThanOrEqual(1);
       // Batch geometry reads to avoid dozens of protocol round trips in WebKit.
       const buttons = await player.getByRole("button").evaluateAll((elements) =>
         elements
@@ -58,6 +69,33 @@ for (const scenario of [
         expect(box.width).toBeGreaterThanOrEqual(44);
         expect(box.height).toBeGreaterThanOrEqual(44);
       }
+      const compact = await player.locator(".audio-compact-row").evaluate((row) => {
+        const controls = Array.from(row.querySelectorAll("button")).map((button) => button.getBoundingClientRect());
+        const context = row.querySelector(".audio-compact-context")!.getBoundingClientRect();
+        const title = row.querySelector('[data-testid="audio-compact-title"]')!.getBoundingClientRect();
+        const metadata = row.querySelector(".audio-compact-meta")!.getBoundingClientRect();
+        return {
+          count: controls.length,
+          alignment: Math.max(
+            ...controls.map((box) => Math.abs(box.y + box.height / 2 - (controls[0].y + controls[0].height / 2))),
+          ),
+          textInside: [title, metadata].every((box) => box.x >= context.x - 1 && box.right <= context.right + 1),
+          collision: controls.some((box) => box.x < context.right - 1 && box.right > context.x + 1),
+          direction: getComputedStyle(row).direction,
+          closeAtStart: controls[0].x < context.x,
+          expandAtEnd: controls[2].x > context.x,
+          overflow: row.scrollWidth - row.clientWidth,
+        };
+      });
+      expect(compact.count).toBe(3);
+      expect(compact.alignment).toBeLessThanOrEqual(1);
+      expect(compact.textInside).toBe(true);
+      expect(compact.collision).toBe(false);
+      expect(compact.direction).toBe(arabic ? "rtl" : "ltr");
+      expect(compact.closeAtStart).toBe(!arabic);
+      expect(compact.expandAtEnd).toBe(!arabic);
+      expect(compact.overflow).toBeLessThanOrEqual(1);
+      await expect(player.getByTestId("audio-compact-waveform")).toBeVisible();
       const stripVisible = await player.getByRole("progressbar").isVisible();
       const seekVisible = await player
         .getByRole("slider", { name: arabic ? "تقديم أو تأخير الصوت" : "Seek audio" })
@@ -70,13 +108,17 @@ for (const scenario of [
       await checkCompactContainment();
     }
     await page.screenshot({ path: testInfo.outputPath(`compact-${scenario.name}.png`) });
-    await player.getByRole("button", { name: arabic ? "توسيع المشغل" : "Expand player", exact: true }).click();
-    await expect(player).toHaveAttribute("data-variant", "expanded");
-    if ("textScale" in scenario) {
-      await page.evaluate(() => {
-        document.documentElement.style.fontSize = "200%";
-      });
+    if (scenario.name === "narrow" || "textScale" in scenario) {
+      const scan = await new AxeBuilder({ page })
+        .include(".floating-audio-player--compact")
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+        .analyze();
+      expect(scan.violations).toEqual([]);
     }
+    const expand = player.getByRole("button", { name: arabic ? "توسيع المشغل" : "Expand player", exact: true });
+    await expand.focus();
+    await page.keyboard.press("Enter");
+    await expect(player).toHaveAttribute("data-variant", "expanded");
     await expect(page.getByRole("dialog")).toHaveCount(0);
     await expect(page.getByTestId("audio-attribution-trigger")).toHaveCount(0);
     await expect
@@ -104,6 +146,49 @@ for (const scenario of [
     }
     const reading = player.getByRole("region", { name: arabic ? "جارٍ التشغيل" : "Now playing" });
     const transport = (await player.locator(".audio-expanded-transport").boundingBox())!;
+    const symmetry = await player.locator(".audio-expanded-transport").evaluate((element) => {
+      const controls = Array.from(element.querySelectorAll("button"));
+      const centers = controls.map((button) => {
+        const bounds = button.getBoundingClientRect();
+        const icon = button.querySelector("svg")!.getBoundingClientRect();
+        return { x: bounds.x + bounds.width / 2, y: icon.y + icon.height / 2 };
+      });
+      const middle = centers[Math.floor(centers.length / 2)];
+      return {
+        direction: getComputedStyle(element).direction,
+        mirrorError: Math.max(
+          ...centers.map((center, index) =>
+            Math.abs((center.x + centers[centers.length - 1 - index].x) / 2 - middle.x),
+          ),
+        ),
+        alignmentError: Math.max(...centers.map((center) => Math.abs(center.y - middle.y))),
+      };
+    });
+    expect(symmetry.direction).toBe("ltr");
+    expect(symmetry.mirrorError).toBeLessThanOrEqual(1);
+    expect(symmetry.alignmentError).toBeLessThanOrEqual(1);
+    await expect(player.getByTestId("audio-seek-waveform")).toBeVisible();
+    await expect(player.getByRole("switch")).toHaveCount(1);
+    await expect(player.getByTestId("audio-expanded-identity").getByTestId("audio-reciter-select")).toBeVisible();
+    const speedAlignment = await player.locator(".audio-speed-select").evaluate((element) => {
+      const value = element.querySelector('[data-slot="select-value"]')!.getBoundingClientRect();
+      const icon = element.querySelector("svg")!.getBoundingClientRect();
+      return Math.abs(value.y + value.height / 2 - (icon.y + icon.height / 2));
+    });
+    expect(speedAlignment).toBeLessThanOrEqual(1);
+    if (!("textScale" in scenario)) {
+      const volumeControl = player.getByRole("button", { name: arabic ? "مستوى الصوت" : "Volume", exact: true });
+      const isIOS = await page.evaluate(() => /iPad|iPhone|iPod/.test(navigator.userAgent));
+      if (isIOS) {
+        await expect(volumeControl).toHaveCount(0);
+      } else {
+        const volume = (await volumeControl.boundingBox())!;
+        const continuation = (await player.getByRole("switch").boundingBox())!;
+        expect(Math.abs(volume.y + volume.height / 2 - (continuation.y + continuation.height / 2))).toBeLessThanOrEqual(
+          1,
+        );
+      }
+    }
     const options = player.locator(".audio-expanded-options");
     expect((await options.boundingBox())!.y).toBeGreaterThanOrEqual(transport.y + transport.height);
     expect(

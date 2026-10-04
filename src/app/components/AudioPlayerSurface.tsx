@@ -37,7 +37,10 @@ export function AudioPlayerSurface({
       inert: child.hasAttribute("inert"),
       hidden: child.getAttribute("aria-hidden"),
     }));
-    surface.querySelector<HTMLButtonElement>("button")?.focus();
+    (
+      surface.querySelector<HTMLButtonElement>("[data-audio-initial-focus]") ??
+      surface.querySelector<HTMLButtonElement>("button")
+    )?.focus();
     for (const { child } of previous) {
       child.setAttribute("inert", "");
       child.setAttribute("aria-hidden", "true");

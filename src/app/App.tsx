@@ -1382,7 +1382,7 @@ function AppContent({
     ) => {
       if (!audioController || !buildPlaybackPlan) return false;
       const plan = buildPlaybackPlan({
-        zikrs: items,
+        zikrs: source === "single" && items.length === 1 ? azkar : items,
         context: {
           category: activeCat,
           routineMode: activeRoutineMode,
@@ -1394,9 +1394,21 @@ function AppContent({
         preferences: audioController.preferences,
         audioLanguage,
       });
-      return audioController.startPlan(plan);
+      const initialEntryIndex =
+        source === "single" ? plan.entries.findIndex((entry) => entry.zikrId === items[0]?.id) : 0;
+      if (initialEntryIndex < 0) return false;
+      return audioController.startPlan(plan, { initialEntryIndex });
     },
-    [activeCat, activeRoutineMode, activeSubCategory, audioController, buildPlaybackPlan, fridayDuaFlow, selectedLang],
+    [
+      activeCat,
+      activeRoutineMode,
+      activeSubCategory,
+      audioController,
+      azkar,
+      buildPlaybackPlan,
+      fridayDuaFlow,
+      selectedLang,
+    ],
   );
 
   useEffect(() => {
@@ -2133,7 +2145,7 @@ function AppContent({
                     Boolean(audioController?.state.plan) &&
                     audioController?.state.plan?.context.category === activeCat &&
                     audioController?.state.plan?.context.subCategory === activeSubCategory &&
-                    audioController.currentEntry?.zikrId === activeZikr.id &&
+                    audioController.state.plan?.entries.some((entry) => entry.zikrId === activeZikr.id) &&
                     ["loading", "ready", "playing", "paused", "buffering"].includes(audioController.state.status)
                   }
                   audioPlayer={
@@ -2353,7 +2365,6 @@ function AppContent({
                   isArabic={selectedLang === "ar"}
                   direction={layoutDirection}
                   onBack={pop}
-                  onOpenAfterPrayer={() => resumeCategory("after_prayer")}
                   hapticFeedback={hapticFeedback}
                   reduceMotion={reduceMotion}
                   textSize={textSize}

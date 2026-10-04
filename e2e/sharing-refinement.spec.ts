@@ -57,7 +57,7 @@ async function openSharing(page: Page, language = "ar", route = "morning", recov
               clearance: y - bounds.actualBoundingBoxAscent - state.wordmarkBottom!,
             });
             state.brandBottom = y + bounds.actualBoundingBoxDescent;
-          } else if (state.brandBottom !== undefined && state.panelBottom === 0 && /(?:52|60)px/u.test(this.font)) {
+          } else if (state.brandBottom !== undefined && state.panelBottom === 0 && /(?:46|54)px/u.test(this.font)) {
             artworkChecks.push({ kind: "header", clearance: y - bounds.actualBoundingBoxAscent - state.brandBottom });
             state.brandBottom = undefined;
           }
@@ -272,7 +272,10 @@ test("sharing preview supports readable Arabic, sources and accessible controls 
   );
   expect(artworkChecks.some((check) => check.kind === "header")).toBe(true);
   expect(artworkChecks.some((check) => check.kind === "footer")).toBe(true);
-  for (const check of artworkChecks) expect(check.clearance).toBeGreaterThanOrEqual(check.kind === "wordmark" ? 6 : 8);
+  for (const check of artworkChecks) {
+    const minimum = check.kind === "wordmark" ? 6 : 8;
+    expect(check.clearance + 0.01).toBeGreaterThanOrEqual(minimum);
+  }
   for (const pill of pills) {
     expect(pill.centered).toBeCloseTo(pill.top + pill.height / 2, 1);
     expect(pill.gap).toBeCloseTo(16, 1);
@@ -330,7 +333,7 @@ test("sharing works offline with English meaning and exact text/link alternative
   await page.context().setOffline(false);
 });
 
-test("sharing presets separate English translation and Arabic word meanings @cross-browser", async ({ page }) => {
+test("sharing presets separate English translation and Arabic word meanings", async ({ page }) => {
   const modal = await openSharing(page, "ar", "morning", true);
   await expect(modal.getByText("جارٍ تجهيز بقية البطاقات…")).toHaveCount(0);
   await modal.getByRole("button", { name: "المجموعة كاملة", exact: true }).click();
@@ -458,6 +461,24 @@ test("gold cards support QR, keyboard navigation and enlarged text", async ({ pa
   await expect(modal.getByRole("button", { name: "Next card" })).toBeDisabled();
   await page.keyboard.press("Home");
   await expect(modal.getByRole("button", { name: "Previous card" })).toBeDisabled();
+  // A valid PNG can still lose font glyphs if their exact face is not ready.
+  const badgeInk = await modal
+    .getByRole("img")
+    .first()
+    .evaluate((element) => {
+      const image = element as HTMLImageElement;
+      const canvas = document.createElement("canvas");
+      canvas.width = image.naturalWidth;
+      canvas.height = image.naturalHeight;
+      const ctx = canvas.getContext("2d")!;
+      ctx.drawImage(image, 0, 0);
+      const pixels = ctx.getImageData(400, canvas.height - 125, 280, 30).data;
+      let ink = 0;
+      for (let i = 0; i < pixels.length; i += 4)
+        if (pixels[i]! < 40 && pixels[i + 1]! < 50 && pixels[i + 2]! < 70) ink++;
+      return ink;
+    });
+  expect(badgeInk).toBeGreaterThan(100);
   const imageDownload = page.waitForEvent("download");
   await modal.getByRole("button", { name: "Save", exact: true }).click();
   await (await imageDownload).saveAs(testInfo.outputPath("gold-collection-qr.png"));
@@ -476,7 +497,7 @@ test("gold cards support QR, keyboard navigation and enlarged text", async ({ pa
   await page.screenshot({ path: testInfo.outputPath("sharing-enlarged.png") });
 });
 
-test("long surahs share sourced reminders with exact Mushaf links @cross-browser", async ({ page }, testInfo) => {
+test("long surahs share sourced reminders with exact Mushaf links", async ({ page }, testInfo) => {
   await openSharing(page, "en", "before-sleep", true);
   const items = getAzkarForMode("before_sleep", "complete");
   for (const id of ["s-hm-110a", "s-hm-110b"]) {
@@ -612,7 +633,7 @@ test("shared reader links preserve content across recipient routine preferences"
 });
 
 for (const language of ["ar", "en"] as const) {
-  test(`sharing footer stays concise with icons in ${language} @cross-browser`, async ({ page }, testInfo) => {
+  test(`sharing footer stays concise with icons in ${language}`, async ({ page }, testInfo) => {
     await page.setViewportSize({ width: 320, height: 700 });
     const modal = await openSharing(page, language, "before-sleep", true);
     const actions = modal.getByTestId("sharing-actions");

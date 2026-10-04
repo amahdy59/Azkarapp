@@ -138,7 +138,7 @@ export function renderCollectionStoryPage(input: CollectionStoryPageInput): HTML
   strokeRoundedRect(ctx, 32, 32, canvas.width - 64, canvas.height - 64, 36, palette.border, 2);
   drawShareBrand(
     ctx,
-    format === "story" || format === "tall" ? 170 : 32,
+    format === "story" || format === "tall" ? 80 : 32,
     palette.text,
     palette.accent,
     appearance === "olive" ? "#e6eddf" : "#091426",
@@ -246,7 +246,7 @@ export function renderCollectionStoryPage(input: CollectionStoryPageInput): HTML
         total: new Intl.NumberFormat(language).format(input.totalPages),
       }),
       540,
-      geometry.footer - (hasQr ? 130 : 88),
+      geometry.footer - (hasQr ? 120 : 64),
     );
   drawWebsiteBadge(ctx, 540, geometry.footer, palette.accent);
   return canvas;
@@ -288,7 +288,7 @@ export async function generateCollectionStoryPage(
     const x = 64;
     const y = Math.min(
       shareGeometry(input.format ?? "story").footer - size / 2,
-      canvas.height - (input.format === "story" ? 200 : 40) - size,
+      canvas.height - (input.format === "story" ? 80 : 40) - size,
     );
     if (y + size <= canvas.height - 40) {
       if (input.items[0]?.reminder) {
@@ -345,6 +345,7 @@ export async function generateAllCollectionStoryPages(
         document.fonts.load(`600 60px ${SHARE_ARABIC_FONT}`, "أذكار"),
         document.fonts.load(`700 60px ${SHARE_ARABIC_FONT}`, "أذكار"),
         document.fonts.load(`400 36px ${SHARE_UI_FONT}`, "Meaning and source"),
+        document.fonts.load(`600 30px ${SHARE_UI_FONT}`, "WA ZAKER wa-zaker.com"),
         document.fonts.ready,
       ]);
     const { ctx } = createCanvas();
@@ -386,6 +387,7 @@ export async function getCompatibleShareFormats(
       document.fonts.load(`600 40px ${SHARE_ARABIC_FONT}`, "سورة"),
       document.fonts.load(`400 36px ${SHARE_ARABIC_FONT}`, "المصدر"),
       document.fonts.load(`400 36px ${SHARE_UI_FONT}`, "Meaning and source"),
+      document.fonts.load(`600 30px ${SHARE_UI_FONT}`, "WA ZAKER wa-zaker.com"),
       document.fonts.ready,
     ]);
   }

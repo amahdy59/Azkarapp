@@ -13,9 +13,9 @@ import path from "node:path";
  */
 export const CANARY_UTILITIES = [
   { selector: ".rounded-sm", reason: "menu and select item radius" },
-  { selector: ".ps-8", reason: "menu item indicator gutter" },
-  { selector: ".pe-2", reason: "menu item trailing padding" },
-  { selector: ".start-2", reason: "menu item indicator inset" },
+  { selector: ".pe-8", reason: "menu item indicator gutter" },
+  { selector: ".pe-9", reason: "select item indicator gutter" },
+  { selector: ".end-2\\.5", reason: "menu item indicator inset" },
   { selector: ".size-4", reason: "menu indicator icon size" },
   { selector: ".min-w-\\[8rem\\]", reason: "menu minimum width" },
   { selector: ".outline-hidden", reason: "menu item focus handling" },

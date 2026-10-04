@@ -1,17 +1,11 @@
-import { useMemo, useState } from "react";
+import { useId, useState } from "react";
 import type { AuthenticZikrItem } from "../content/authenticAzkar";
 import type { AppLanguage } from "../types";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
-import { FormField } from "./FormField";
-import { Check, ChevronDown, Lightbulb, Search } from "./icons";
-import { Modal } from "./ResponsiveSheet";
-
-function searchableText(item: AuthenticZikrItem) {
-  return [item.textAr, item.textEn, item.categoryNameAr, item.categoryNameEn, item.virtueAr, item.virtueEn]
-    .join(" ")
-    .toLocaleLowerCase();
-}
+import { Check, ChevronDown } from "./icons";
+import { ResponsiveSheet } from "./ResponsiveSheet";
+import { Button } from "./ui/button";
 
 export function AuthenticZikrPicker({
   items,
@@ -28,12 +22,19 @@ export function AuthenticZikrPicker({
   savedItems?: Record<string, { count: number; target: number; laps?: number }>;
   onSelect: (item: AuthenticZikrItem) => void;
 }) {
+  const radioName = useId();
   const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState("");
-  const filteredItems = useMemo(() => {
-    const normalizedQuery = query.trim().toLocaleLowerCase();
-    return normalizedQuery ? items.filter((item) => searchableText(item).includes(normalizedQuery)) : items;
-  }, [items, query]);
+  const [tempSelected, setTempSelected] = useState<AuthenticZikrItem>(selected);
+
+  const handleOpen = () => {
+    setTempSelected(selected);
+    setOpen(true);
+  };
+
+  const handleConfirm = () => {
+    onSelect(tempSelected);
+    setOpen(false);
+  };
 
   const selectedText = language === "ar" ? selected.textAr : selected.textEn;
 
@@ -41,9 +42,9 @@ export function AuthenticZikrPicker({
     <>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={handleOpen}
         aria-haspopup="dialog"
-        className="interactive-elem flex min-h-11 w-full items-center justify-between gap-2 overflow-hidden rounded-2xl border border-border-control bg-card px-3 text-label font-bold text-foreground shadow-xs transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:px-4 sm:text-sm"
+        className="interactive-elem flex min-h-11 w-full items-center justify-between gap-2 overflow-hidden rounded-2xl border border-border-control bg-card px-3 text-label font-bold text-foreground shadow-xs transition-colors hover:bg-muted focus-visible:outline-none focus-within:ring-[3px] focus-within:ring-ring sm:px-4 sm:text-sm"
       >
         <span className="min-w-0 flex-1 truncate text-start" dir="auto">
           {selectedText}
@@ -52,110 +53,96 @@ export function AuthenticZikrPicker({
       </button>
 
       {open && (
-        <Modal
-          open
+        <ResponsiveSheet
+          open={open}
           onClose={() => setOpen(false)}
           title={t(language, "counter.chooseDhikr")}
           direction={direction}
           language={language}
-          maxWidthClassName="max-w-xl"
-          className="p-5 sm:p-6"
+          testId="authentic-zikr-sheet"
+          maxWidthClassName="max-w-md"
+          showCloseButton={true}
+          drawerClassName="p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]"
+          dialogClassName="p-6"
         >
-          <div className="space-y-4">
-            <div className="pe-10">
-              <h2 className="text-lg font-black text-foreground">{t(language, "counter.chooseDhikr")}</h2>
-              <p className="mt-1 text-label font-semibold leading-6 text-muted-foreground">
+          <div className="flex flex-col h-full max-h-[82vh] overflow-hidden text-start">
+            <div className="pe-12 pb-3 shrink-0">
+              <h2 className="text-xl font-black text-foreground">{t(language, "counter.chooseDhikr")}</h2>
+              <p className="mt-1 text-sm font-medium leading-6 text-muted-foreground">
                 {t(language, "counter.chooseDhikrHint")}
               </p>
             </div>
 
-            <div className="relative">
-              <Search
-                size={18}
-                className="pointer-events-none absolute end-3 top-[2.2rem] z-10 text-muted-foreground"
-                aria-hidden="true"
-              />
-              <FormField
-                type="search"
-                label={t(language, "counter.searchDhikr")}
-                value={query}
-                onChange={(event) => setQuery(event.currentTarget.value)}
-                placeholder={t(language, "counter.searchDhikrPlaceholder")}
-                autoComplete="off"
-                lang={language}
-                dir={query.trim() ? "auto" : direction}
-                controlClassName="pe-11"
-              />
+            <div
+              role="radiogroup"
+              aria-label={t(language, "counter.chooseDhikr")}
+              className="flex-1 overflow-y-auto space-y-2.5 py-2 pe-1"
+            >
+              {items.map((item) => {
+                const isSelected = item.id === tempSelected.id;
+                const text = language === "ar" ? item.textAr : item.textEn;
+                const saved = savedItems?.[item.id];
+                const hasProgress = Boolean(saved && saved.count > 0);
+
+                return (
+                  <label
+                    key={item.id}
+                    className={`w-full flex items-center justify-between gap-3 p-4 rounded-2xl text-start transition-all cursor-pointer outline-none focus-within:ring-[3px] focus-within:ring-ring ${
+                      isSelected
+                        ? "border-2 border-primary bg-primary/10 shadow-xs"
+                        : "border border-border/70 bg-card/80 hover:bg-muted/60 hover:border-border"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name={radioName}
+                      checked={isSelected}
+                      onChange={() => setTempSelected(item)}
+                      className="sr-only"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <span
+                        className={`block text-base sm:text-lg font-bold leading-relaxed ${
+                          isSelected ? "text-foreground" : "text-foreground/90"
+                        }`}
+                        dir="auto"
+                      >
+                        {text}
+                      </span>
+                      {hasProgress && (
+                        <span className="mt-1 inline-flex items-center rounded-full bg-primary/15 px-2 py-0.5 text-xs font-bold text-primary">
+                          {formatNumerals(saved!.count, language)} / {formatNumerals(saved!.target, language)}
+                        </span>
+                      )}
+                    </div>
+
+                    <div
+                      className={`size-6 rounded-full shrink-0 flex items-center justify-center transition-colors ${
+                        isSelected
+                          ? "bg-primary text-primary-foreground"
+                          : "border-2 border-border-control/70 bg-transparent text-transparent"
+                      }`}
+                      aria-hidden="true"
+                    >
+                      <Check size={14} strokeWidth={3} />
+                    </div>
+                  </label>
+                );
+              })}
             </div>
 
-            <fieldset className="min-w-0">
-              <legend className="sr-only">{t(language, "counter.chooseDhikr")}</legend>
-              <div className="max-h-[min(26rem,55vh)] space-y-2 overflow-y-auto pe-1">
-                {filteredItems.map((item) => {
-                  const checked = item.id === selected.id;
-                  const text = language === "ar" ? item.textAr : item.textEn;
-                  const benefit = language === "ar" ? item.virtueAr : item.virtueEn;
-                  return (
-                    <label
-                      key={item.id}
-                      className={`flex min-h-11 cursor-pointer items-start gap-3 rounded-2xl border p-3 text-start transition-colors focus-within:ring-[3px] focus-within:ring-ring ${
-                        checked ? "border-primary bg-primary/10" : "border-border bg-card hover:bg-muted/50"
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="authentic-zikr"
-                        value={item.id}
-                        checked={checked}
-                        onChange={() => {
-                          onSelect(item);
-                          setOpen(false);
-                          setQuery("");
-                        }}
-                        className="sr-only"
-                      />
-                      <span
-                        className={`mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full border ${
-                          checked
-                            ? "border-primary bg-primary text-primary-foreground"
-                            : "border-border-control bg-background text-transparent"
-                        }`}
-                        aria-hidden="true"
-                      >
-                        <Check size={14} strokeWidth={3} />
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="block text-sm font-black leading-7 text-foreground" dir="auto">
-                            {text}
-                          </span>
-                          {savedItems?.[item.id] && savedItems[item.id]!.count > 0 && (
-                            <span className="shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary">
-                              {formatNumerals(savedItems[item.id]!.count, language)} /{" "}
-                              {formatNumerals(savedItems[item.id]!.target, language)}
-                            </span>
-                          )}
-                        </div>
-                        <span className="mt-1 flex items-start gap-2 text-xs font-semibold leading-5 text-muted-foreground">
-                          <Lightbulb size={15} className="mt-0.5 shrink-0 text-primary" aria-hidden="true" />
-                          <span className="line-clamp-2" dir="auto">
-                            {benefit}
-                          </span>
-                        </span>
-                      </span>
-                    </label>
-                  );
-                })}
-              </div>
-            </fieldset>
-
-            {filteredItems.length === 0 && (
-              <p className="rounded-2xl border border-border bg-muted/40 p-4 text-center text-sm font-semibold text-muted-foreground">
-                {t(language, "counter.noDhikrResults")}
-              </p>
-            )}
+            <div className="pt-4 mt-2 border-t border-border/40 shrink-0">
+              <Button
+                type="button"
+                onClick={handleConfirm}
+                size="lg"
+                className="w-full h-12 rounded-2xl bg-primary text-primary-foreground font-black text-base shadow-sm hover:bg-primary/90 focus-visible:ring-[3px] focus-visible:ring-ring"
+              >
+                {t(language, "counter.selectAction")}
+              </Button>
+            </div>
           </div>
-        </Modal>
+        </ResponsiveSheet>
       )}
     </>
   );

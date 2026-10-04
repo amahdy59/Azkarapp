@@ -1,0 +1,16 @@
+[
+  {
+    "variantId": "m-hm-96-abdullah-muhammad-v1",
+    "manifestChecksum": "00fd8101c7fd047a736e618d8a2c38d1ab73409155d6c53efbd7272e3900b692",
+    "hostedChecksum": "4d8202df6bc5801c9a272bee31152c9871806e41ff91a671033b6953854d93c0",
+    "expectedSize": 501164,
+    "actualSize": 501164
+  },
+  {
+    "variantId": "m-hm-91-abdullah-muhammad-v1",
+    "manifestChecksum": "2425600a7cb18be680985c6a3f033aa871e46be224b6067f0b17df1be553a1d3",
+    "hostedChecksum": "d8a955ce62ce89037c4e61bbf5d686e75205c7e44f9577cf2c7efc2aea4b75ed",
+    "expectedSize": 458924,
+    "actualSize": 458924
+  }
+]

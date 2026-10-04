@@ -121,7 +121,7 @@ test("menus stay inside a 320px viewport and keep their item geometry", async ({
   expect(Number.parseFloat(itemStyle.paddingInlineStart)).toBeGreaterThan(0);
 });
 
-test("radio menu items keep their logical-start indicator gutter in Arabic", async ({ page }) => {
+test("radio menu items keep their logical-end indicator gutter in Arabic", async ({ page }) => {
   await page.addInitScript(() => {
     window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
     window.localStorage.setItem(
@@ -137,27 +137,27 @@ test("radio menu items keep their logical-start indicator gutter in Arabic", asy
   await page.goto("/#/counter");
   await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
 
-  await page.locator('[aria-haspopup="menu"]').last().click();
+  await page.getByTestId("counter-target-filter").click();
   const menu = page.locator('[data-slot="dropdown-menu-content"]');
   await expect(menu).toBeVisible();
 
   const item = menu.getByRole("menuitemradio").first();
   const geometry = await item.evaluate((element) => {
     const style = getComputedStyle(element);
-    const indicator = element.querySelector("span");
+    const indicator = element.querySelector(":scope > span:last-child");
     const itemRect = element.getBoundingClientRect();
     const indicatorRect = indicator?.getBoundingClientRect();
     return {
-      paddingInlineStart: Number.parseFloat(style.paddingInlineStart),
-      // In RTL the logical start edge is the right edge.
-      indicatorInsetFromLogicalStart: indicatorRect ? itemRect.right - indicatorRect.right : null,
+      paddingInlineEnd: Number.parseFloat(style.paddingInlineEnd),
+      // In RTL the logical end edge is the left edge.
+      indicatorInsetFromLogicalEnd: indicatorRect ? indicatorRect.left - itemRect.left : null,
     };
   });
 
-  expect(geometry.paddingInlineStart).toBeGreaterThanOrEqual(24);
-  expect(geometry.indicatorInsetFromLogicalStart).not.toBeNull();
-  expect(geometry.indicatorInsetFromLogicalStart ?? -1).toBeGreaterThanOrEqual(0);
-  expect(geometry.indicatorInsetFromLogicalStart ?? 999).toBeLessThanOrEqual(16);
+  expect(geometry.paddingInlineEnd).toBeGreaterThanOrEqual(24);
+  expect(geometry.indicatorInsetFromLogicalEnd).not.toBeNull();
+  expect(geometry.indicatorInsetFromLogicalEnd ?? -1).toBeGreaterThanOrEqual(0);
+  expect(geometry.indicatorInsetFromLogicalEnd ?? 999).toBeLessThanOrEqual(16);
 });
 
 /* ── Library section tabs: visible, bounded, and direction-aware ── */

@@ -5,6 +5,7 @@ import { createInitialAudioState } from "../audio/audioReducer";
 import type { PlaybackEntry, PlaybackPlan, ResolvedAudioSegment } from "../audio/audioTypes";
 import { FloatingAudioPlayer } from "./FloatingAudioPlayer";
 import { getReadingFontSizeRem } from "../screens/readingTypography";
+import verifiedWaveforms from "../audio/audioWaveforms.json";
 
 const segment: ResolvedAudioSegment = {
   id: "segment-1",
@@ -44,6 +45,8 @@ const plan: PlaybackPlan = {
 
 function createController(): AudioController {
   return {
+    autoAdvance: true,
+    setAutoAdvance: vi.fn(),
     state: {
       ...createInitialAudioState(),
       status: "playing",
@@ -111,6 +114,41 @@ describe("FloatingAudioPlayer", () => {
     expect(screen.getByRole("slider", { name: "Seek audio" })).toBeInTheDocument();
   });
 
+  it("keeps one compact waveform tied to the current recording rather than queue progress", () => {
+    const controller = createController();
+    controller.currentSegment = {
+      ...segment,
+      url: `https://audio.test/file?sha256=${Object.keys(verifiedWaveforms)[0]}`,
+    };
+    controller.state.plan = { ...plan, entries: [entry, { ...entry, entryId: "second" }] };
+    controller.state.entryIndex = 1;
+    render(<FloatingAudioPlayer controller={controller} language="en" />);
+    const progress = screen.getByRole("progressbar", { name: "Listening progress" });
+    expect(progress).toHaveAttribute("aria-valuenow", "20");
+    expect(screen.getByTestId("audio-compact-waveform").querySelectorAll(":scope > span")).toHaveLength(48);
+    expect(screen.getAllByRole("progressbar")).toHaveLength(1);
+    expect(screen.queryByRole("slider")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
+    expect(screen.queryByTestId("audio-compact-waveform")).not.toBeInTheDocument();
+    expect(screen.getByTestId("audio-seek-waveform")).toBeInTheDocument();
+  });
+
+  it("uses three dedicated compact actions, expands from context, and keeps Play independent", () => {
+    const controller = createController();
+    render(<FloatingAudioPlayer controller={controller} language="en" />);
+    expect(screen.getAllByRole("button").map((button) => button.getAttribute("aria-label"))).toEqual([
+      "Stop audio and close player",
+      "Pause audio",
+      "Expand player",
+    ]);
+    fireEvent.click(screen.getByRole("button", { name: "Pause audio" }));
+    expect(controller.pause).toHaveBeenCalledOnce();
+    expect(screen.getByRole("region", { name: "Audio player" })).toHaveAttribute("data-variant", "compact");
+    fireEvent.click(screen.getByTestId("audio-compact-title"));
+    expect(screen.getByRole("region", { name: "Audio player" })).toHaveAttribute("data-variant", "expanded");
+    expect(screen.getByRole("button", { name: "Minimize player" })).toHaveFocus();
+  });
+
   it("seeks by thirty seconds with Page Up and Page Down", () => {
     const controller = createController();
     render(<FloatingAudioPlayer controller={controller} language="en" direction="ltr" />);
@@ -144,38 +182,23 @@ describe("FloatingAudioPlayer", () => {
     expect(expandedPlay).toHaveStyle({ borderRadius: "9999px" });
   });
 
-  it("opens the volume popover on touch tap even when hover media query matches", () => {
-    Object.defineProperty(window, "matchMedia", {
-      configurable: true,
-      writable: true,
-      value: vi.fn().mockImplementation((query: string) => ({
-        matches: query === "(hover: hover) and (pointer: fine)",
-        media: query,
-        onchange: null,
-        addEventListener: vi.fn(),
-        removeEventListener: vi.fn(),
-        addListener: vi.fn(),
-        removeListener: vi.fn(),
-        dispatchEvent: vi.fn(),
-      })),
-    });
-
+  it("reveals one vertical volume control by click and restores focus after Escape", () => {
     const controller = createController();
-    render(<FloatingAudioPlayer controller={controller} language="en" direction="ltr" />);
-
-    const muteButton = screen.getByRole("button", { name: "Mute audio" });
-
-    // Simulate a touch tap on a hybrid device
-    fireEvent.pointerDown(muteButton, { pointerType: "touch" });
-    fireEvent.click(muteButton);
-
-    expect(controller.toggleMuted).not.toHaveBeenCalled();
-    expect(screen.getByTestId("audio-volume-popover")).toBeInTheDocument();
-
-    // Simulate a mouse click on the same hybrid device
-    fireEvent.pointerDown(muteButton, { pointerType: "mouse" });
-    fireEvent.click(muteButton);
+    render(<FloatingAudioPlayer controller={controller} language="en" />);
+    expect(screen.queryByRole("button", { name: "Volume" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
+    const trigger = screen.getByRole("button", { name: "Volume" });
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+    fireEvent.click(trigger);
+    const slider = screen.getByRole("slider", { name: "Volume" });
+    expect(slider).toHaveAttribute("aria-orientation", "vertical");
+    fireEvent.change(slider, { target: { value: "0.4" } });
+    expect(controller.setVolume).toHaveBeenCalledWith(0.4);
+    fireEvent.click(screen.getByRole("button", { name: "Mute audio" }));
     expect(controller.toggleMuted).toHaveBeenCalledTimes(1);
+    fireEvent.keyDown(slider, { key: "Escape" });
+    expect(screen.queryByRole("slider", { name: "Volume" })).not.toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Audio player" })).toHaveAttribute("data-variant", "expanded");
   });
 
   it("turns the reciter name into a dropdown menu for the 4 main reciters while displaying the current or selected reciter", () => {
@@ -198,14 +221,14 @@ describe("FloatingAudioPlayer", () => {
     expect(screen.getByTestId("audio-reciter-select")).toHaveTextContent("محمد شرعي");
   });
 
-  it("keeps the timeline slider continuous (step=any) and aligns the progress fill with the thumb center", () => {
+  it("keeps native seeking continuous with an exact left-to-right progress fill", () => {
     const controller = createController();
     render(<FloatingAudioPlayer controller={controller} language="en" direction="ltr" />);
     fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
 
     const timeline = screen.getByRole("slider", { name: "Seek audio" });
     expect(timeline).toHaveAttribute("step", "any");
-    expect(timeline.getAttribute("style")).toContain("calc(0.5625rem + (100% - 1.125rem) * 0.2000)");
+    expect(timeline.getAttribute("style")).toContain("linear-gradient(to right, var(--primary) 20%, var(--muted) 20%)");
   });
 
   it("applies floating-audio-player--docked class when dockedInReader is set for both compact and expanded states", () => {
@@ -221,11 +244,12 @@ describe("FloatingAudioPlayer", () => {
     expect(expandedRegion).toHaveClass("floating-audio-player--expanded");
     // Unified controls: speed button and volume slider are present beside transport controls
     expect(screen.getByRole("combobox", { name: /Speed: 1×/ })).toBeInTheDocument();
-    expect(screen.getByRole("slider", { name: "Volume" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Volume" }));
+    expect(screen.getByRole("slider", { name: "Volume" })).toHaveAttribute("aria-orientation", "vertical");
     expect(screen.getByRole("button", { name: "Pause audio" })).toBeInTheDocument();
   });
 
-  it("renders repeat button beside timeline when supported and toggles repeat mode", () => {
+  it("renders one prescribed-repeat option separately from the timeline", () => {
     const controller = createController();
     const repeatableEntry: PlaybackEntry = {
       ...entry,
@@ -314,14 +338,15 @@ describe("FloatingAudioPlayer", () => {
     expect(forward10).toBeInTheDocument();
   });
 
-  it("increases the spacing between the title and the pills below by 4px (mt-2)", () => {
+  it("uses the expanded header for reciter and track position without a duplicate zikr title", () => {
     const controller = createController();
     render(<FloatingAudioPlayer controller={controller} language="ar" direction="rtl" />);
     fireEvent.click(screen.getByRole("button", { name: "توسيع المشغل" }));
 
     const reciterSelect = screen.getByTestId("audio-reciter-select");
-    const pillsRow = reciterSelect.parentElement;
-    expect(pillsRow).toHaveClass("mt-2");
+    const identity = screen.getByTestId("audio-expanded-identity");
+    expect(identity).toContainElement(reciterSelect);
+    expect(identity).not.toHaveTextContent(entry.titleArabic);
   });
 
   it("keeps exact devotional text on the scalable reading type scale", () => {
@@ -454,7 +479,7 @@ describe("FloatingAudioPlayer", () => {
     expect(screen.getByRole("button", { name: "Expand player" })).toHaveFocus();
   });
 
-  it("renders 5-part dock slots in compact mode and invokes stop and onClose when close is clicked", () => {
+  it("shows context and Benefit without duplicate compact navigation or expansion actions", () => {
     const controller = createController();
     const onClose = vi.fn();
     render(
@@ -463,19 +488,16 @@ describe("FloatingAudioPlayer", () => {
         language="ar"
         direction="rtl"
         dockSlots={{
-          prev: <button type="button">السابق</button>,
-          audio: <button type="button">صوت</button>,
           benefit: <button type="button">الفائدة</button>,
-          next: <button type="button">التالي</button>,
         }}
         onClose={onClose}
       />,
     );
 
-    expect(screen.getByRole("button", { name: "السابق" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "فتح مشغل الصوت" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "السابق" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "توسيع المشغل" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "الفائدة" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "التالي" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "التالي" })).not.toBeInTheDocument();
 
     const closeBtn = screen.getByRole("button", { name: "إغلاق الصوت والعودة للعداد" });
     expect(closeBtn).toBeInTheDocument();
@@ -492,10 +514,7 @@ describe("FloatingAudioPlayer", () => {
         language="ar"
         direction="rtl"
         dockSlots={{
-          prev: <button type="button">السابق</button>,
-          audio: <button type="button">صوت</button>,
           benefit: <button type="button">الفائدة</button>,
-          next: <button type="button">التالي</button>,
         }}
       />,
     );
@@ -510,6 +529,28 @@ describe("FloatingAudioPlayer", () => {
     // Press Escape to collapse
     fireEvent.keyDown(document, { key: "Escape" });
     expect(screen.getByRole("region", { name: "مشغل الصوت" })).toHaveAttribute("data-variant", "compact");
+  });
+
+  it("keeps manual navigation available with auto-advance off and uses physical media keys in Arabic", () => {
+    const controller = createController();
+    controller.autoAdvance = false;
+    controller.state.plan = { ...plan, entries: [entry, { ...entry, entryId: "entry-2" }] };
+    render(<FloatingAudioPlayer controller={controller} language="ar" />);
+    fireEvent.click(screen.getByRole("button", { name: "توسيع المشغل" }));
+    const next = screen.getByRole("button", { name: "الذكر التالي" });
+    expect(next).toBeEnabled();
+    fireEvent.click(next);
+    expect(controller.next).toHaveBeenCalledOnce();
+    const toggle = screen.getByRole("switch", { name: "تشغيل الذكر التالي تلقائيًا" });
+    expect(toggle).toHaveAttribute("aria-checked", "false");
+    fireEvent.click(toggle);
+    expect(controller.setAutoAdvance).toHaveBeenCalledWith(true);
+    const slider = screen.getByRole("slider", { name: "تقديم أو تأخير الصوت" });
+    fireEvent.keyDown(slider, { key: "ArrowRight" });
+    expect(controller.seek).toHaveBeenLastCalledWith(125);
+    fireEvent.keyDown(slider, { key: "ArrowLeft" });
+    expect(controller.seek).toHaveBeenLastCalledWith(115);
+    expect(slider.closest(".audio-seek-row")).toHaveAttribute("dir", "ltr");
   });
 
   it("hides software volume control on iOS devices", () => {

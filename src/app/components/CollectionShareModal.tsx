@@ -830,6 +830,7 @@ export function CollectionShareModal({
                         {t(language, "shareStudio.preset")}
                       </label>
                       <Select
+                        dir={direction}
                         value={
                           !meaning && !wordMeanings && !pronunciation && !benefit
                             ? "arabic"

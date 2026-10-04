@@ -28,6 +28,15 @@ function context() {
   } as CanvasRenderingContext2D;
 }
 describe("complete share layouts", () => {
+  it("uses the approved readable fallback only when needed, preserving every character", () => {
+    const short = { id: "short", arabicText: "سبحان الله" };
+    const dense = { id: "dense", arabicText: "سبحان الله ".repeat(18) };
+    const shortSection = layoutSharePages(context(), [short], "square", {}, true)[0]!.fragments[0]!.sections[0]!;
+    const denseSection = layoutSharePages(context(), [dense], "square", {}, true)[0]!.fragments[0]!.sections[0]!;
+    expect(shortSection.fontSize).toBe(64);
+    expect(denseSection.fontSize).toBe(52);
+    expect(denseSection.lines.join("")).toBe(dense.arabicText);
+  });
   it("keeps a trailing source number attached to its reference without changing the citation", () => {
     const citation = "أحمد ٤/٣٣٧؛ الترمذي ٥/٤٦٥؛ حصن المسلم ٨٧.";
     const ctx = {

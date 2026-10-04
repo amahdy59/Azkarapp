@@ -1,10 +1,11 @@
+import { ReferenceCopyButton } from "../components/ReferenceCopyButton";
 import { useCallback, useEffect, useState } from "react";
 import { AuthenticZikrPicker } from "../components/AuthenticZikrPicker";
 import { DevotionalAction, DevotionalFooter } from "../components/DevotionalControls";
 import { CounterTargetPicker } from "../components/CounterTargetPicker";
 import { ArrowPrevious, Check, Lightbulb, MoreVertical, Play, RotateCcw, Volume2, VolumeX } from "../components/icons";
 import { ReadingScreenChrome } from "../components/ReadingScreenChrome";
-import { Modal } from "../components/ResponsiveSheet";
+import { ResponsiveSheet } from "../components/ResponsiveSheet";
 import { useCountingSurface } from "../components/countingSurface";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { Button } from "../components/ui/button";
@@ -56,7 +57,6 @@ export function CustomCounterScreen({
   isArabic,
   direction,
   onBack,
-  onOpenAfterPrayer,
   hapticFeedback = true,
   reduceMotion = false,
   textSize = "medium",
@@ -67,7 +67,6 @@ export function CustomCounterScreen({
   isArabic: boolean;
   direction: "ltr" | "rtl";
   onBack: () => void;
-  onOpenAfterPrayer?: () => void;
   hapticFeedback?: boolean;
   reduceMotion?: boolean;
   textSize?: TextSizeOption;
@@ -337,11 +336,6 @@ export function CustomCounterScreen({
                   />
                 </div>
               </div>
-              {onOpenAfterPrayer && (
-                <Button type="button" variant="outline" onClick={onOpenAfterPrayer} className="mt-3 w-full">
-                  {t(language, "counter.guidedAfterPrayer")}
-                </Button>
-              )}
             </div>
           }
           actions={(tier) => {
@@ -482,15 +476,18 @@ export function CustomCounterScreen({
       </div>
 
       {showCompletionDialog && (
-        <Modal
+        <ResponsiveSheet
           open
           onClose={() => setShowCompletionDialog(false)}
           title={t(language, "counter.goalReached")}
           direction={direction}
+          language={language}
           maxWidthClassName="max-w-sm"
-          className="p-6 text-center"
+          showCloseButton={true}
+          drawerClassName="p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]"
+          dialogClassName="p-6"
         >
-          <div>
+          <div className="text-center">
             <div className="mx-auto mb-3 flex size-14 items-center justify-center rounded-full bg-success/20 text-success">
               <Check size={32} strokeWidth={3} aria-hidden="true" />
             </div>
@@ -530,20 +527,22 @@ export function CustomCounterScreen({
               </Button>
             </div>
           </div>
-        </Modal>
+        </ResponsiveSheet>
       )}
 
       {showResetDialog && (
-        <Modal
+        <ResponsiveSheet
           open
           onClose={() => setShowResetDialog(false)}
           title={t(language, "counter.resetConfirmTitle")}
           direction={direction}
           language={language}
           maxWidthClassName="max-w-sm"
-          className="p-6"
+          showCloseButton={true}
+          drawerClassName="p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]"
+          dialogClassName="p-6"
         >
-          <div>
+          <div className="text-start">
             <h2 className="pe-10 text-lg font-black text-foreground">{t(language, "counter.resetConfirmTitle")}</h2>
             <p className="mt-2 text-sm font-medium leading-6 text-muted-foreground">
               {t(language, "counter.resetConfirmBody", { count: formatNumerals(count, language) })}
@@ -564,20 +563,22 @@ export function CustomCounterScreen({
               </Button>
             </div>
           </div>
-        </Modal>
+        </ResponsiveSheet>
       )}
 
       {pendingZikr && (
-        <Modal
+        <ResponsiveSheet
           open
           onClose={() => setPendingZikr(null)}
           title={t(language, "counter.changeDhikrTitle")}
           direction={direction}
           language={language}
           maxWidthClassName="max-w-sm"
-          className="p-6"
+          showCloseButton={true}
+          drawerClassName="p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]"
+          dialogClassName="p-6"
         >
-          <div>
+          <div className="text-start">
             <h2 className="pe-10 text-lg font-black text-foreground">{t(language, "counter.changeDhikrTitle")}</h2>
             <p className="mt-2 text-sm font-medium leading-6 text-muted-foreground">
               {t(language, "counter.changeDhikrBody", { count: formatNumerals(count, language) })}
@@ -600,35 +601,54 @@ export function CustomCounterScreen({
               </div>
             </div>
           </div>
-        </Modal>
+        </ResponsiveSheet>
       )}
 
       {showReference && (
-        <Modal
+        <ResponsiveSheet
           open
           onClose={() => setShowReference(false)}
           title={t(language, "counter.virtueReference")}
           direction={direction}
           language={language}
+          testId="custom-counter-reference-sheet"
           maxWidthClassName="max-w-md"
-          className="p-5 sm:p-6"
+          showCloseButton={true}
+          drawerClassName="p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]"
+          dialogClassName="p-6"
         >
-          <div className="text-start space-y-3">
-            <div className="flex items-center gap-3 pe-10">
-              <span className="flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+          <div className="flex flex-col h-full max-h-[82vh] overflow-hidden text-start">
+            <div className="flex items-center gap-3 pe-12 pb-4 border-b border-border/40 shrink-0">
+              <span className="flex size-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
                 <Lightbulb size={20} aria-hidden="true" />
               </span>
               <h2 className="text-lg font-black text-foreground">{t(language, "counter.virtueReference")}</h2>
             </div>
-            <p className="text-subtitle font-semibold leading-7 text-foreground" dir="auto">
-              {isArabic ? selectedAuthentic.virtueAr : selectedAuthentic.virtueEn}
-            </p>
-            <p className="text-label font-bold leading-6 text-muted-foreground" dir="auto">
-              {isArabic ? selectedAuthentic.sourceRefAr : selectedAuthentic.sourceRefEn} ·{" "}
-              {isArabic ? selectedAuthentic.hadithGradeAr : selectedAuthentic.hadithGradeEn}
-            </p>
+
+            <div className="flex-1 overflow-y-auto space-y-4 py-4 pe-1">
+              <section>
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <h3 className="text-subtitle font-extrabold text-primary">{t(language, "reader.benefitLabel")}</h3>
+                  <ReferenceCopyButton
+                    text={isArabic ? selectedAuthentic.virtueAr : selectedAuthentic.virtueEn}
+                    language={language}
+                  />
+                </div>
+                <p className="text-base font-semibold leading-8 text-foreground" dir="auto">
+                  {isArabic ? selectedAuthentic.virtueAr : selectedAuthentic.virtueEn}
+                </p>
+              </section>
+
+              <section className="border-t border-border/40 pt-3">
+                <h3 className="text-subtitle font-extrabold text-primary mb-2">{t(language, "reader.sourceLabel")}</h3>
+                <p className="text-sm font-semibold leading-relaxed text-muted-foreground" dir="auto">
+                  {isArabic ? selectedAuthentic.sourceRefAr : selectedAuthentic.sourceRefEn} ·{" "}
+                  {isArabic ? selectedAuthentic.hadithGradeAr : selectedAuthentic.hadithGradeEn}
+                </p>
+              </section>
+            </div>
           </div>
-        </Modal>
+        </ResponsiveSheet>
       )}
     </ScreenContainer>
   );

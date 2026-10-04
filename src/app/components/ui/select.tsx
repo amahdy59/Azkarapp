@@ -11,9 +11,12 @@ import {
 import { cn } from "./utils";
 
 function Select({
+  dir,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Root>) {
-  return <SelectPrimitive.Root data-slot="select" {...props} />;
+  const resolvedDir =
+    dir ?? (typeof document !== "undefined" && document.documentElement.dir === "rtl" ? "rtl" : "ltr");
+  return <SelectPrimitive.Root data-slot="select" dir={resolvedDir} {...props} />;
 }
 
 function SelectGroup({
@@ -114,24 +117,20 @@ function SelectItem({
     <SelectPrimitive.Item
       data-slot="select-item"
       className={cn(
-        "focus:bg-accent focus:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground relative flex min-h-11 w-full cursor-default items-center gap-2 rounded-xl py-2 pe-2 ps-8 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
+        "focus:bg-accent focus:text-accent-foreground data-[state=checked]:bg-primary/10 data-[state=checked]:text-primary data-[state=checked]:font-medium [&_svg:not([class*='text-'])]:text-muted-foreground relative flex min-h-11 w-full cursor-default items-center justify-between gap-2 rounded-xl py-2.5 ps-3 pe-9 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       {...props}
     >
-      <span className="pointer-events-none absolute start-2 flex size-3.5 items-center justify-center">
+      <span className="flex min-w-0 flex-1 flex-col items-start text-start">
+        <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+        {description}
+      </span>
+      <span className="pointer-events-none absolute end-2.5 flex size-4 items-center justify-center text-primary">
         <SelectPrimitive.ItemIndicator>
           <CheckIcon className="size-4" />
         </SelectPrimitive.ItemIndicator>
       </span>
-      {description ? (
-        <span className="flex min-w-0 flex-col items-start">
-          <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
-          {description}
-        </span>
-      ) : (
-        <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
-      )}
     </SelectPrimitive.Item>
   );
 }

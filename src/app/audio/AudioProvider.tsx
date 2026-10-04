@@ -48,6 +48,8 @@ function enrichPlanVoices(plan: PlaybackPlan): PlaybackPlan {
 }
 
 export interface AudioController {
+  autoAdvance: boolean;
+  setAutoAdvance: (enabled: boolean) => void;
   state: ReturnType<typeof createInitialAudioState>;
   preferences: AudioPreferences;
   currentEntry: PlaybackEntry | null;
@@ -89,6 +91,12 @@ export function AudioProvider({
   onControllerReady?: (controller: AudioController) => void;
 }) {
   const [preferences, setPreferences] = useState(loadAudioPreferences);
+  const [autoAdvance, setAutoAdvanceState] = useState(true);
+  const autoAdvanceRef = useRef(true);
+  const setAutoAdvance = useCallback((enabled: boolean) => {
+    autoAdvanceRef.current = enabled;
+    setAutoAdvanceState(enabled);
+  }, []);
   const preferencesRef = useRef(preferences);
   const [state, rawDispatch] = useReducer(audioReducer, preferences.playbackRate, createInitialAudioState);
   const stateRef = useRef(state);
@@ -198,6 +206,16 @@ export function AudioProvider({
       if (completedThisEntry) dispatch({ type: "entry-complete", zikrId: entry!.zikrId });
       if (next.complete) {
         dispatch({ type: "complete", generation: generationRef.current });
+        return;
+      }
+      // A prescribed ritual round remains one run. Disable only the transition
+      // into the next independent zikr, never its internal segments/repetitions.
+      const continuesRitual =
+        entry?.ritualGroupId && plan.entries[next.position.entryIndex]?.ritualGroupId === entry.ritualGroupId;
+      if (!autoAdvanceRef.current && completedThisEntry && !continuesRitual) {
+        dispatch({ type: "time", currentTime: stateRef.current.duration, generation: generationRef.current });
+        dispatch({ type: "status", status: "ended", generation: generationRef.current });
+        dispatch({ type: "announce", announcement: "entry-completed" });
         return;
       }
       if (next.repetitionCompleted) dispatch({ type: "announce", announcement: "repetition-completed" });
@@ -326,13 +344,14 @@ export function AudioProvider({
   const startPlan = useCallback(
     (plan: PlaybackPlan, options?: { initialEntryIndex?: number; autoPlay?: boolean }) => {
       if (plan.entries.length === 0) return false;
+      setAutoAdvance(plan.context.source !== "single");
       const rawIndex = options?.initialEntryIndex ?? 0;
       const entryIndex = rawIndex >= 0 && rawIndex < plan.entries.length ? rawIndex : 0;
       const autoPlay = options?.autoPlay ?? true;
       loadAt(plan, entryIndex, 0, 0, autoPlay);
       return true;
     },
-    [loadAt],
+    [loadAt, setAutoAdvance],
   );
 
   const selectEntry = useCallback(
@@ -590,6 +609,8 @@ export function AudioProvider({
     null;
   const controller = useMemo<AudioController>(
     () => ({
+      autoAdvance,
+      setAutoAdvance,
       state,
       preferences,
       currentEntry,
@@ -614,6 +635,8 @@ export function AudioProvider({
       setPlaybackMode,
     }),
     [
+      autoAdvance,
+      setAutoAdvance,
       currentEntry,
       currentSegment,
       next,

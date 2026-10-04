@@ -10,6 +10,63 @@
   position: relative;
 }
 
+.audio-compact-card {
+  container: audio-dock / inline-size;
+}
+
+.audio-compact-row {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 48px 44px;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+}
+
+.audio-compact-row > button,
+.audio-expanded-header > button {
+  width: 44px;
+  height: 44px;
+}
+
+.audio-compact-row > button.size-12 {
+  width: 48px;
+  height: 48px;
+}
+
+.audio-compact-context-icon {
+  display: flex;
+}
+
+.audio-compact-voice {
+  flex: 1 1 6rem;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.audio-compact-progress {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 28px;
+  margin: 0 16px 8px;
+}
+
+.audio-compact-progress .audio-seek-waveform > span {
+  opacity: 0.55;
+}
+
+.audio-compact-progress .audio-seek-waveform > span,
+.audio-compact-progress .audio-seek-waveform-played > span {
+  width: 3px;
+  flex: 0 1 3px;
+}
+
+@container audio-dock (max-width: 24rem) {
+  .audio-compact-context-icon {
+    display: none;
+  }
+}
+
 .audio-player-surface {
   position: absolute;
   inset: 0;
@@ -26,7 +83,7 @@
 
 .audio-expanded-layout {
   display: grid;
-  grid-template-rows: auto minmax(10rem, 1fr) auto;
+  grid-template-rows: auto minmax(14rem, 1fr) auto;
   height: 100%;
   min-height: 0;
   overflow: auto;
@@ -37,14 +94,161 @@
 
 .audio-expanded-header {
   width: 100%;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
 }
 
 .audio-expanded-controls {
   padding-inline: 0.25rem;
 }
 
+/* Equal side slots keep the primary on the exact centre, in both languages. */
+.audio-expanded-transport {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(44px, 1fr)) min(4rem, 16vw) repeat(2, minmax(44px, 1fr));
+  align-items: start;
+  justify-items: center;
+  gap: 0.25rem;
+}
+.audio-expanded-transport[data-tracks="single"] {
+  grid-template-columns: minmax(44px, 1fr) min(4rem, 16vw) minmax(44px, 1fr);
+}
+.audio-expanded-transport > button {
+  max-width: none;
+}
+.audio-expanded-transport > button:not(.size-16) {
+  width: 100%;
+  padding: 0;
+  gap: 0;
+}
+.audio-expanded-transport > button:not(.size-16) > svg {
+  box-sizing: content-box;
+  height: 20px;
+  padding-block: calc((min(4rem, 16vw) - 20px) / 2);
+}
+.audio-expanded-transport > button.size-16 {
+  width: min(4rem, 16vw);
+  height: min(4rem, 16vw);
+}
+.audio-expanded-transport > button > span {
+  overflow-wrap: anywhere;
+}
+.audio-expanded-options {
+  align-items: center;
+}
+.audio-expanded-options > .audio-auto-advance {
+  flex: 0 1 auto;
+  max-width: 100%;
+  padding-inline: 0.5rem;
+}
+.audio-expanded-options .audio-auto-advance > span:first-child {
+  min-width: 0;
+}
+.audio-seek-row > span {
+  width: 3rem;
+  min-width: 3rem;
+}
+[data-testid="audio-reciter-select"] {
+  height: auto;
+  min-height: 2.75rem;
+  white-space: normal;
+  padding-inline: 8px;
+  gap: 6px;
+}
+
+[data-testid="audio-reciter-select"] > svg {
+  width: 16px;
+  height: 16px;
+}
+
+[data-testid="audio-reciter-select"] [data-slot="select-value"] {
+  display: block;
+  min-width: 0;
+  -webkit-line-clamp: unset;
+  overflow: visible;
+  white-space: normal;
+  overflow-wrap: normal;
+}
+
+.audio-speed-select [data-slot="select-value"] {
+  display: flex;
+  align-items: center;
+  line-height: 1;
+}
+
+.audio-seek-waveform,
+.audio-seek-waveform-played {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+  gap: 1px;
+}
+.audio-seek-waveform > span,
+.audio-seek-waveform-played > span {
+  width: 2px;
+  flex: 1 1 0;
+  border-radius: 9999px;
+  background: var(--muted-foreground);
+}
+.audio-seek-waveform-played > span {
+  background: var(--primary);
+}
+.audio-seek-control--waveform .audio-timeline-range::-webkit-slider-runnable-track {
+  background: transparent;
+}
+.audio-seek-control--waveform .audio-timeline-range::-moz-range-track {
+  background: transparent;
+}
+/* A transparent thumb preserves native dragging without a large circular marker. */
+.audio-seek-control .audio-timeline-range::-webkit-slider-thumb {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  width: 0;
+  margin-inline: 0;
+}
+.audio-seek-control .audio-timeline-range::-moz-range-thumb {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  width: 0;
+}
+.audio-seek-control:focus-within {
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+.audio-volume-range {
+  writing-mode: vertical-lr;
+  direction: rtl;
+  width: 2.75rem;
+  height: 8rem;
+}
+.audio-switch-track {
+  display: inline-flex;
+  align-items: center;
+  width: 2rem;
+  height: 1.25rem;
+  padding: 0.125rem;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  background: var(--muted-foreground);
+}
+.audio-switch-track > span {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 9999px;
+  background: var(--card);
+}
+.audio-switch-track--on {
+  background: var(--primary);
+  justify-content: end;
+}
+
 .audio-expanded-text {
-  min-height: 0;
+  min-height: 90px;
 }
 
 .audio-expanded-meta {
@@ -64,24 +268,9 @@
 .floating-audio-player--compact {
   container-type: inline-size;
 }
-.audio-compact-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-}
-.audio-compact-wide {
-  display: none;
-}
-
-@container (min-width: 42rem) {
-  .audio-compact-row {
-    grid-template-columns: minmax(0, 1fr) minmax(8rem, 1fr) auto;
-  }
-  .audio-compact-wide {
-    display: flex;
-  }
-  .audio-compact-phone {
-    display: none;
-  }
+.audio-compact-context-icon {
+  width: 32px;
+  height: 32px;
 }
 
 /* The player meets the session header, rather than floating inside the card gutters. */
@@ -89,11 +278,22 @@
   margin: 0;
 }
 
+.reader-canvas-wrap:has(.floating-audio-player--compact) {
+  margin-block-end: 0;
+}
+
+.floating-audio-player--docked .audio-compact-card {
+  padding-block-end: env(safe-area-inset-bottom);
+  border-block-end: 0;
+  border-end-start-radius: 0;
+  border-end-end-radius: 0;
+}
+
 /* Short, wide windows keep readable text beside a compact transport column. */
 @media (min-width: 37.5rem) and (max-height: 34rem) {
   .audio-expanded-layout {
     grid-template-columns: minmax(0, 1fr) minmax(16rem, 0.75fr);
-    grid-template-rows: auto minmax(9.5rem, 1fr);
+    grid-template-rows: auto minmax(11rem, 1fr);
     column-gap: 1rem;
     padding-block: 0.25rem max(0.25rem, env(safe-area-inset-bottom));
   }

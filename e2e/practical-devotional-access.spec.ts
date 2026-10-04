@@ -50,12 +50,18 @@ test("keyboard instructions follow the shared breakpoint on every counter @cross
 for (const language of ["ar", "en"] as const) {
   for (const themeMode of ["light", "midnight", "dark"] as const) {
     for (const reduceTransparency of [false, true]) {
-      test(`situational material follows ${themeMode} ${reduceTransparency ? "opaque" : "glass"} in ${language} @cross-browser`, async ({
+      const engineSmoke =
+        (language === "ar" && themeMode === "dark" && reduceTransparency) ||
+        (language === "en" && themeMode === "light" && !reduceTransparency);
+      test(`situational material follows ${themeMode} ${reduceTransparency ? "opaque" : "glass"} in ${language}${engineSmoke ? " @cross-browser" : ""}`, async ({
         page,
       }) => {
         await returningReader(page, language, { themeMode, reduceTransparency });
         await page.goto("/#/home");
-        for (const width of [320, 820, 1440]) {
+        // Theme/language contrast is independent of width. Sweep the wider
+        // geometry once; keep every visual mode at the narrowest viewport.
+        const widths = language === "ar" && themeMode === "light" && !reduceTransparency ? [320, 820, 1440] : [320];
+        for (const width of widths) {
           await page.setViewportSize({ width, height: 900 });
           const card = page.getByTestId("situational-shortcuts");
           await card.scrollIntoViewIfNeeded();
@@ -189,7 +195,8 @@ test("keyboard help disables character actions while preserving native counting"
   await counter.focus();
   await page.keyboard.press("Space");
   await expect(counter).toHaveText("2/100");
-  await page.getByRole("button", { name: "Read guided after-prayer azkar" }).click();
+  await expect(page.getByRole("button", { name: "Read guided after-prayer azkar" })).toHaveCount(0);
+  await page.goto("/#/azkar/after-prayer/1");
   await expect(page.getByTestId("reader-screen")).toHaveAttribute("data-reader-category", "after_prayer");
 });
 
@@ -258,4 +265,20 @@ test("keyboard help remains reachable with enlarged text on a short Arabic phone
   await page.screenshot({ path: "output/playwright/phase78/keyboard-help-ar-enlarged.png" });
   await dialog.getByRole("button", { name: "إغلاق", exact: true }).click();
   await expect(dialog).not.toBeVisible();
+});
+
+test("dhikr picker supports native arrow keys and explicit confirmation @cross-browser", async ({ page }) => {
+  await returningReader(page, "en");
+  await page.goto("/#/counter");
+  await page.getByRole("button", { name: /Subhanallahi wa bihamdihi/i }).click();
+  const dialog = page.getByRole("dialog", { name: "Choose a dhikr" });
+  const radios = dialog.getByRole("radio");
+  await radios.first().focus();
+  await expect(radios.first()).toBeChecked();
+  await page.keyboard.press("ArrowDown");
+  await expect(radios.nth(1)).toBeChecked();
+  await expect(radios.nth(1)).toBeFocused();
+  await dialog.getByRole("button", { name: "Select", exact: true }).click();
+  await expect(dialog).not.toBeVisible();
+  await expect(page.getByRole("button", { name: /Subhanallahi wa bihamdihi, Subhanallahil-Azeem/i })).toBeVisible();
 });

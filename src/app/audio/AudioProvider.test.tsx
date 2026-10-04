@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { FloatingAudioPlayer } from "../components/FloatingAudioPlayer";
 import { AudioProvider, useAudioController } from "./AudioProvider";
@@ -175,7 +175,104 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
+function QueueHarness({ queue }: { queue: PlaybackPlan }) {
+  const controller = useAudioController();
+  return (
+    <>
+      <button onClick={() => controller.startPlan(queue)}>Start queue</button>
+      <button onClick={() => controller.setAutoAdvance(false)}>Disable automatic continuation</button>
+      <button onClick={controller.next}>Manual next</button>
+      <button onClick={controller.previous}>Manual previous</button>
+      <output data-testid="queue-state">
+        {controller.state.status}:{controller.state.entryIndex}:{controller.state.segmentIndex}:
+        {controller.state.repetitionIndex}
+      </output>
+      <output data-testid="queue-completions">{controller.state.completionSequence}</output>
+    </>
+  );
+}
+
 describe("AudioProvider integration", () => {
+  it("stops after a complete prescribed run with auto-advance off but permits manual queue navigation without completing skips", async () => {
+    vi.stubGlobal("Audio", FakeAudio);
+    const queue: PlaybackPlan = {
+      ...repeatPlan,
+      context: { ...plan.context, source: "full-session" },
+      entries: [repeatPlan.entries[0]!, { ...plan.entries[0]!, zikrId: "next", entryId: "next" }],
+    };
+    render(
+      <AudioProvider>
+        <QueueHarness queue={queue} />
+      </AudioProvider>,
+    );
+    fireEvent.click(screen.getByText("Start queue"));
+    fireEvent.click(screen.getByText("Disable automatic continuation"));
+    for (let index = 0; index < 2; index++) {
+      act(() => FakeAudio.latest!.dispatchEvent(new Event("ended")));
+      expect(screen.getByTestId("queue-completions")).toHaveTextContent("0");
+      expect(screen.getByTestId("queue-state")).toHaveTextContent(`playing:0:0:${index + 1}`);
+    }
+    act(() => FakeAudio.latest!.dispatchEvent(new Event("ended")));
+    await waitFor(() => expect(screen.getByTestId("queue-state")).toHaveTextContent("ended:0:0:2"));
+    expect(screen.getByTestId("queue-completions")).toHaveTextContent("1");
+    fireEvent.click(screen.getByText("Manual next"));
+    expect(screen.getByTestId("queue-state")).toHaveTextContent("playing:1:0:0");
+    fireEvent.click(screen.getByText("Manual previous"));
+    expect(screen.getByTestId("queue-state")).toHaveTextContent("playing:0:0:0");
+    expect(screen.getByTestId("queue-completions")).toHaveTextContent("1");
+  });
+
+  it("keeps internal segments and ritual rounds running with automatic continuation disabled", () => {
+    vi.stubGlobal("Audio", FakeAudio);
+    const ritualEntry = {
+      ...repeatPlan.entries[0]!,
+      repetitionUnit: "ritual-round" as const,
+      ritualGroupId: "three_quls" as const,
+    };
+    const queue: PlaybackPlan = {
+      ...repeatPlan,
+      entries: [
+        ritualEntry,
+        { ...ritualEntry, entryId: "qul-2", zikrId: "qul-2" },
+        { ...plan.entries[0]!, entryId: "outside" },
+      ],
+    };
+    render(
+      <AudioProvider>
+        <QueueHarness queue={queue} />
+      </AudioProvider>,
+    );
+    fireEvent.click(screen.getByText("Start queue"));
+    fireEvent.click(screen.getByText("Disable automatic continuation"));
+    for (let index = 0; index < 6; index++) act(() => FakeAudio.latest!.dispatchEvent(new Event("ended")));
+    expect(screen.getByTestId("queue-state")).toHaveTextContent("ended:1:0:2");
+    expect(screen.getByTestId("queue-completions")).toHaveTextContent("2");
+  });
+
+  it("finishes internal segments before stopping an individual queue entry", () => {
+    vi.stubGlobal("Audio", FakeAudio);
+    const first = plan.entries[0]!;
+    const segment = first.segmentsByVoice.voice![0]!;
+    const queue: PlaybackPlan = {
+      ...plan,
+      entries: [
+        { ...first, segmentsByVoice: { voice: [segment, { ...segment, id: "segment-2" }] } },
+        { ...first, entryId: "second" },
+      ],
+    };
+    render(
+      <AudioProvider>
+        <QueueHarness queue={queue} />
+      </AudioProvider>,
+    );
+    fireEvent.click(screen.getByText("Start queue"));
+    act(() => FakeAudio.latest!.dispatchEvent(new Event("ended")));
+    expect(screen.getByTestId("queue-state")).toHaveTextContent("playing:0:1:0");
+    expect(screen.getByTestId("queue-completions")).toHaveTextContent("0");
+    act(() => FakeAudio.latest!.dispatchEvent(new Event("ended")));
+    expect(screen.getByTestId("queue-state")).toHaveTextContent("ended:0:1:0");
+    expect(screen.getByTestId("queue-completions")).toHaveTextContent("1");
+  });
   it("reports a zikr complete only after its recording ends naturally", async () => {
     vi.stubGlobal("Audio", FakeAudio);
     render(
@@ -342,17 +439,18 @@ describe("AudioProvider integration", () => {
       </AudioProvider>,
     );
     fireEvent.click(screen.getByRole("button", { name: "Start" }));
-    fireEvent.click(await screen.findByRole("button", { name: /Mute audio/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
 
+    fireEvent.click(screen.getByRole("button", { name: "Volume" }));
     const volume = screen.getByRole("slider", { name: "Volume" });
-    expect(volume).not.toHaveAttribute("aria-orientation", "vertical");
+    expect(volume).toHaveAttribute("aria-orientation", "vertical");
     fireEvent.change(volume, { target: { value: "0.4" } });
 
     expect(screen.getByRole("button", { name: "Mute audio" })).toBeInTheDocument();
     expect(window.localStorage.getItem("azkar.audio-preferences.v1")).toContain('"volume":0.4');
   });
 
-  it("fills the Arabic timeline from the right without changing media time", async () => {
+  it("fills the Arabic media timeline from the left without changing text direction or media time", async () => {
     vi.stubGlobal("Audio", FakeAudio);
     render(
       <AudioProvider>
@@ -361,11 +459,11 @@ describe("AudioProvider integration", () => {
     );
     fireEvent.click(screen.getByRole("button", { name: "Start" }));
 
+    fireEvent.click(screen.getByRole("button", { name: "توسيع المشغل" }));
     const timeline = await screen.findByRole("slider", { name: "تقديم أو تأخير الصوت" });
-    expect(timeline.getAttribute("style")).toContain("to left");
+    expect(timeline.getAttribute("style")).toContain("to right");
     expect(timeline).toHaveValue("0");
 
-    fireEvent.click(screen.getByRole("button", { name: "توسيع المشغل" }));
     fireEvent.click(screen.getByTestId("audio-reciter-select"));
     expect(screen.queryByTestId("audio-recording-source")).not.toBeInTheDocument();
     expect(screen.getByTestId("audio-reciter-select")).not.toHaveTextContent("المصدر");

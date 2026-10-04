@@ -3,12 +3,12 @@ import { defineConfig, devices } from "@playwright/test";
 /**
  * Specs whose assertions depend on the device the project supplies — adaptive
  * navigation tiers, viewport-driven layout, and the axe sweeps that must run at
- * more than one width. Everything else is behaviour that does not change with
- * the device, and running all 25 specs on all three Chromium devices tripled
- * the suite for no extra signal.
+ * more than one width. Reader microinteractions and sharing set their own
+ * responsive viewports inside the relevant tests, so repeating their entire
+ * files on mobile/tablet Chromium adds the same checks again.
  *
- * Set `E2E_FULL_MATRIX=1` to put every spec back on every device — the release
- * evidence run still does that.
+ * Set `E2E_FULL_MATRIX=1` to put every spec back on all Chromium device
+ * profiles for a deeper responsive sweep. Firefox/WebKit remain tagged smoke.
  */
 const DEVICE_MATRIX_SPECS = [
   "accessibility.spec.ts",
@@ -18,9 +18,7 @@ const DEVICE_MATRIX_SPECS = [
   "navigation.spec.ts",
   "overlay-geometry.spec.ts",
   "progress-responsive.spec.ts",
-  "reader-microinteractions.spec.ts",
   "responsive.spec.ts",
-  "sharing-refinement.spec.ts",
 ];
 
 const fullMatrix = process.env.E2E_FULL_MATRIX === "1";

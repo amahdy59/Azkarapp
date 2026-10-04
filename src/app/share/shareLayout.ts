@@ -126,11 +126,11 @@ export function shareGeometry(format: ShareFormat, qr = false, single = false): 
   const height = SHARE_DIMENSIONS[format].height;
   const story = format === "story" || format === "tall";
   return {
-    top: story ? (single ? 294 : 384) : single ? 172 : 270,
-    bottom: height - (story ? (qr ? 410 : 350) : qr ? 330 : 250),
-    footer: height - (story ? 240 : 140),
-    titleY: story ? 254 : 124,
-    titleSize: story ? 60 : 52,
+    top: story ? (single ? 210 : 270) : single ? 130 : 220,
+    bottom: height - (story ? (qr ? 300 : single ? 170 : 200) : qr ? 260 : single ? 130 : 170),
+    footer: height - (story ? 110 : 80),
+    titleY: story ? 165 : 116,
+    titleSize: story ? 54 : 46,
     width: 952,
     textWidth: 856,
   };
@@ -224,8 +224,10 @@ export function measureShareSection(
   single: boolean,
   width: number,
   primary = false,
+  compact = false,
 ): MeasuredSection {
-  const fontSize = section.key === "arabic" ? (single ? 64 : 52) : primary ? 52 : section.key === "source" ? 34 : 36;
+  const fontSize =
+    section.key === "arabic" ? (single ? (compact ? 52 : 64) : 52) : primary ? 52 : section.key === "source" ? 34 : 36;
   const lineHeight = Math.ceil(fontSize * (section.direction === "rtl" ? 1.65 : 1.5));
   ctx.font = `${section.key === "arabic" ? 500 : 400} ${fontSize}px ${section.direction === "rtl" ? SHARE_ARABIC_FONT : SHARE_UI_FONT}`;
   const lines = wrapShareText(section.text, (value) => ctx.measureText(value).width, width);
@@ -264,7 +266,7 @@ export function layoutSharePages(
       const lines = wrapShareText(item.title, (value) => ctx.measureText(value).width, geometry.textWidth);
       heading = { text: item.title, direction, lines, fontSize: 40, lineHeight: 66, height: lines.length * 66 + 16 };
     }
-    const measured = getShareSections(item, content).map((section) =>
+    let measured = getShareSections(item, content).map((section) =>
       measureShareSection(
         ctx,
         section,
@@ -273,16 +275,41 @@ export function layoutSharePages(
         Boolean(item.reminder && section.key === "benefit"),
       ),
     );
-    const source = measured.find((section) => section.key === "source");
-    const citation = source;
-    const sections = measured.filter((section) => section !== citation);
-    const height =
+    let source = measured.find((section) => section.key === "source");
+    let citation = source;
+    let sections = measured.filter((section) => section !== citation);
+    let height =
       SHARE_PILL.textTop +
       SHARE_PILL.bottom +
       (heading?.height ?? 0) +
       measured.reduce((sum, section) => sum + section.height, 0) +
       Math.max(0, measured.length - 1) * sectionGap;
     const itemCapacity = item.reminder ? shareGeometry(format, true).bottom - geometry.top : capacity;
+    if (single && !item.reminder && height > itemCapacity) {
+      const compactMeasured = getShareSections(item, content).map((section) =>
+        measureShareSection(
+          ctx,
+          section,
+          single,
+          geometry.textWidth,
+          Boolean(item.reminder && section.key === "benefit"),
+          true,
+        ),
+      );
+      const compactHeight =
+        SHARE_PILL.textTop +
+        SHARE_PILL.bottom +
+        (heading?.height ?? 0) +
+        compactMeasured.reduce((sum, section) => sum + section.height, 0) +
+        Math.max(0, compactMeasured.length - 1) * sectionGap;
+      if (compactHeight <= itemCapacity) {
+        measured = compactMeasured;
+        source = measured.find((section) => section.key === "source");
+        citation = source;
+        sections = measured.filter((section) => section !== citation);
+        height = compactHeight;
+      }
+    }
     if (height > itemCapacity) throw new ShareFitError(item.id, format);
     fragments.push({ item, sections, part: 1, parts: 1, height, citation, heading });
   }

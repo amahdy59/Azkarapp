@@ -88,6 +88,8 @@ async function expectUnclippedHeading(heading: Locator, context: string) {
 
       return {
         naturalLines,
+        renderedLines: unit > 0 ? Math.round(element.getBoundingClientRect().height / unit) : Number.NaN,
+        clippedHorizontally: element.scrollWidth > element.clientWidth + 1,
         fontSize: Number.isFinite(fontSize) ? fontSize : 18,
         text: element.textContent ?? "",
       };
@@ -97,6 +99,10 @@ async function expectUnclippedHeading(heading: Locator, context: string) {
       metrics.naturalLines,
       `${context}: "${metrics.text}" needs more than three lines, so it is clipped`,
     ).toBeLessThanOrEqual(3);
+    expect(metrics.renderedLines, `${context}: heading hides part of its text`).toBeGreaterThanOrEqual(
+      metrics.naturalLines,
+    );
+    expect(metrics.clippedHorizontally, `${context}: heading clips text horizontally`).toBe(false);
     expect(metrics.fontSize, `${context}: mobile heading is oversized`).toBeLessThanOrEqual(20);
   }).toPass({ timeout: 5000 });
 }
@@ -490,6 +496,29 @@ for (const language of ["ar", "en"] as const) {
     await expectUnclippedHeading(page.getByRole("heading", { level: 1 }).first(), `${language} reader header at 320px`);
   });
 }
+
+test("the Reader heading remains complete at 200% text size", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 700 });
+  await seedAndOpen(page, { language: "en" });
+  await page.goto("/#/azkar/evening/1");
+  const heading = page.getByTestId("shared-screen-header").getByRole("heading", { level: 1 });
+  await expect(heading).toHaveText("Evening Azkar");
+  await page.evaluate(async () => {
+    document.documentElement.style.fontSize = "200%";
+    await document.fonts.ready;
+  });
+  const geometry = await heading.evaluate((element) => ({
+    visibleWidth: element.clientWidth,
+    requiredWidth: element.scrollWidth,
+    overflow: getComputedStyle(element).overflow,
+    textOverflow: getComputedStyle(element).textOverflow,
+    whiteSpace: getComputedStyle(element).whiteSpace,
+  }));
+  expect(geometry.visibleWidth).toBeGreaterThanOrEqual(geometry.requiredWidth - 1);
+  expect(geometry.overflow).toBe("visible");
+  expect(geometry.textOverflow).not.toBe("ellipsis");
+  expect(geometry.whiteSpace).not.toBe("nowrap");
+});
 
 // ─── Motion ──────────────────────────────────────────────────────────────────
 // Checklist row: "Reduce motion stops animation without stopping feedback."

@@ -496,7 +496,9 @@ for (const language of ["ar", "en"] as const) {
     }, language);
 
     for (const theme of ["light", "midnight", "dark"]) {
-      for (const route of ["quran-wird", "qibla", "friday"]) {
+      // The shared header's theme is route-independent: check every route in
+      // light mode and every theme on one representative scroll owner.
+      for (const route of theme === "light" ? ["quran-wird", "qibla", "friday"] : ["quran-wird"]) {
         await page.goto(`/#/${route}`);
         const header = page.getByTestId("shared-screen-header");
         await expect(header).toBeVisible();

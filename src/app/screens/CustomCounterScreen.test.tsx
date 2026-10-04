@@ -8,19 +8,16 @@ describe("CustomCounterScreen Component", () => {
   beforeEach(() => window.localStorage.clear());
   afterEach(() => vi.unstubAllGlobals());
 
-  it("opens the existing guided after-prayer reader without mutating the current tally", () => {
-    const onOpenAfterPrayer = vi.fn();
+  it("keeps the header clean without a sequential after-prayer button", () => {
     render(
       <CustomCounterScreen
         isArabic={false}
         direction="ltr"
         onBack={vi.fn()}
-        onOpenAfterPrayer={onOpenAfterPrayer}
         initialMasbahaState={{ count: 12, target: 100, laps: 0 }}
       />,
     );
-    fireEvent.click(screen.getByRole("button", { name: "Read guided after-prayer azkar" }));
-    expect(onOpenAfterPrayer).toHaveBeenCalledOnce();
+    expect(screen.queryByRole("button", { name: "Read guided after-prayer azkar" })).not.toBeInTheDocument();
     expect(screen.getByTestId("custom-counter-surface")).toHaveTextContent("12/100");
   });
 
@@ -105,19 +102,24 @@ describe("CustomCounterScreen Component", () => {
     expect(counter).toHaveTextContent("1");
   });
 
-  it("exposes a searchable picker with distinct reviewed zikr labels and benefits", async () => {
+  it("exposes an authentic zikr picker with distinct reviewed cards and selection confirmation", async () => {
     const user = userEvent.setup();
     render(<CustomCounterScreen isArabic={false} direction="ltr" onBack={vi.fn()} />);
 
     const picker = screen.getByRole("button", { name: /Subhanallahi wa bihamdihi/i });
-
     await user.click(picker);
 
     expect(screen.getByRole("dialog", { name: "Choose a dhikr" })).toBeInTheDocument();
     expect(screen.getByRole("radio", { name: /Subhanallahi wa bihamdihi, Subhanallahil-Azeem/i })).toBeInTheDocument();
-    await user.type(screen.getByRole("searchbox", { name: "Search remembrances" }), "treasure");
     expect(screen.getByRole("radio", { name: /La hawla wa la quwwata illa billah/i })).toBeInTheDocument();
-    expect(screen.queryByRole("radio", { name: /Sayyid al-Istighfar/i })).not.toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: /Allahumma anta Rabbi/i })).toBeInTheDocument();
+    expect(screen.queryByRole("searchbox")).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("radio", { name: /La hawla wa la quwwata illa billah/i }));
+    await user.click(screen.getByRole("button", { name: "Select" }));
+
+    expect(screen.queryByRole("dialog", { name: "Choose a dhikr" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /La hawla wa la quwwata illa billah/i })).toBeInTheDocument();
   });
 
   it("keeps the current count when the finite target changes", async () => {
@@ -139,6 +141,7 @@ describe("CustomCounterScreen Component", () => {
     fireEvent.click(screen.getByTestId("custom-counter-surface"));
     await user.click(screen.getByRole("button", { name: /Subhanallahi wa bihamdihi/i }));
     await user.click(screen.getByRole("radio", { name: /La hawla wa la quwwata illa billah/i }));
+    await user.click(screen.getByRole("button", { name: "Select" }));
 
     expect(screen.getByRole("dialog", { name: "Change the selected dhikr?" })).toBeInTheDocument();
     expect(screen.getByText(/clear the current count of 1/i)).toBeInTheDocument();
@@ -158,6 +161,7 @@ describe("CustomCounterScreen Component", () => {
     // Open picker and pick another zikr
     await user.click(screen.getByRole("button", { name: /Subhanallahi wa bihamdihi/i }));
     await user.click(screen.getByRole("radio", { name: /La hawla wa la quwwata illa billah/i }));
+    await user.click(screen.getByRole("button", { name: "Select" }));
 
     // Dialog appears with Save & switch
     expect(screen.getByRole("dialog", { name: "Change the selected dhikr?" })).toBeInTheDocument();
@@ -177,6 +181,7 @@ describe("CustomCounterScreen Component", () => {
 
     // Select original zikr
     await user.click(screen.getAllByRole("radio", { name: /Subhanallahi wa bihamdihi/i })[0]!);
+    await user.click(screen.getByRole("button", { name: "Select" }));
     await user.click(screen.getByRole("button", { name: "Save & switch" }));
 
     // Count is restored to 3!
@@ -194,6 +199,7 @@ describe("CustomCounterScreen Component", () => {
 
     await user.click(screen.getByRole("button", { name: /Subhanallahi wa bihamdihi/i }));
     await user.click(screen.getByRole("radio", { name: /La hawla wa la quwwata illa billah/i }));
+    await user.click(screen.getByRole("button", { name: "Select" }));
 
     // Click Change and reset
     await user.click(screen.getByRole("button", { name: "Change and reset" }));
@@ -202,6 +208,7 @@ describe("CustomCounterScreen Component", () => {
     // Switch back to original zikr (from count 0, so no prompt)
     await user.click(screen.getByRole("button", { name: /La hawla wa la quwwata illa billah/i }));
     await user.click(screen.getAllByRole("radio", { name: /Subhanallahi wa bihamdihi/i })[0]!);
+    await user.click(screen.getByRole("button", { name: "Select" }));
 
     // Original count was wiped by reset, so starts at 0
     expect(counter).toHaveTextContent("0/100");
