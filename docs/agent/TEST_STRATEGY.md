@@ -112,8 +112,10 @@ Before phase completion:
 
 ```bash
 pnpm check
-pnpm test:e2e
+pnpm test:e2e:fast
 ```
+
+Also run browser specs for the affected feature. Use full local `pnpm test:e2e` for broad changes, browser infrastructure, uncertain scope or CI diagnosis. Full quality/browser/Pages/audit verification remains mandatory in CI for every application release. The push hook reuses only a recent identical-snapshot quality pass; CI always runs fresh. Pages deploys after successful Quality for the exact current-main commit, avoiding duplicate CI suites.
 
 Before release:
 

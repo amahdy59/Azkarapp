@@ -56,8 +56,10 @@ echo "Verifying the frozen dependency graph and seven-day package quarantine..."
 
 echo "Running repository quality gates..."
 node scripts/cleanup-test-server.mjs
-"$PNPM" check
-"$PNPM" test:e2e
+if ! node scripts/quality-receipt.mjs; then
+  "$PNPM" check
+fi
+"$PNPM" test:e2e:fast
 "$PNPM" build:pages
 
 echo "All pre-push release gates passed."

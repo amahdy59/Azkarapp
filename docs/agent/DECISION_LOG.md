@@ -4123,3 +4123,7 @@ The owner approved the combined screenshot recommendations: a proportional 8px b
 ## Sharing footer and combined release — 2026-10-04
 
 The owner requests removal of the screenshot-highlighted save/copy disclosure, explanatory copy and visible success message. Use three short icon buttons: prominent Share, quieter Save and Copy, with no wrapped labels. Preserve accessible context, success announcements, visible errors, native capability checks and scoped exports. The owner explicitly authorizes releasing the reviewed pending changes together; this supersedes earlier local-only restrictions for those changes. Further organization ideas remain recommendations, not additional product scope.
+
+## Efficient release verification — 2026-10-04
+
+The owner explicitly requests faster release rules and test execution without reducing test quality. Supersede the mandatory full local browser run on every push with affected-feature tests and a core smoke gate. Retain full non-browser checks locally, allowing only an unchanged content/environment/dependency-bound pass under 24 hours old to be reused; CI never trusts it. Keep the complete CI Quality suite and all assertions, coverage and budget ceilings. Pages must wait for successful Quality for the exact current-main commit rather than duplicating its suite. This preserves the release gate while removing repeated local and CI work.

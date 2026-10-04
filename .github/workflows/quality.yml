@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - "main"
+    paths-ignore:
+      - "AGENTS.md"
+      - "README.md"
+      - "README_FIRST.md"
+      - "docs/**"
   pull_request:
   workflow_dispatch:
 
@@ -17,6 +22,7 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v7
       - name: Setup and Test
@@ -31,3 +37,12 @@ jobs:
 
       - name: Audit production dependencies
         run: pnpm audit:prod
+
+      - name: Preserve browser failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: browser-failure-evidence
+          path: test-results/
+          if-no-files-found: ignore
+          retention-days: 7

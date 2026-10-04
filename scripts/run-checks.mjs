@@ -15,6 +15,7 @@
 
 import { spawn } from "node:child_process";
 import os from "node:os";
+import { qualityFingerprint, recordQualityPass, invalidateQualityPass } from "./quality-receipt.mjs";
 
 /**
  * How many stages may run at once.
@@ -71,6 +72,8 @@ function report(result) {
 }
 
 const started = Date.now();
+await invalidateQualityPass();
+const testedFingerprint = process.env.CI ? undefined : await qualityFingerprint();
 const results = [];
 
 const toolchain = await run(TOOLCHAIN);
@@ -116,4 +119,7 @@ console.log(
 if (failed.length > 0) {
   console.log(`     failing stages: ${failed.map((result) => result.name).join(", ")}`);
   process.exit(1);
+}
+if (testedFingerprint && (await recordQualityPass(testedFingerprint))) {
+  console.log("Recorded the local quality pass for this exact file snapshot.");
 }

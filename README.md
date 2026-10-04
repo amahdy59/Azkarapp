@@ -54,7 +54,7 @@ pnpm dev
 
 Use `nvm use` before setup when Node does not match `.nvmrc`. Install pnpm 11.19.0 through your normal package-manager or version-manager bootstrap if `pnpm run verify:toolchain` reports a mismatch. Do not regenerate the lockfile with another pnpm release.
 
-The frozen install activates the repository's tracked pre-push hook through `core.hooksPath`. That hook verifies the toolchain and dependency graph, then runs the quality, browser, and Pages gates before Git can push.
+The frozen install activates the tracked pre-push hook. It verifies the toolchain and dependency graph, reuses an unchanged local quality pass or runs `pnpm check`, then runs core browser smoke tests and the Pages build before Git can push. The full browser suite runs in CI before deployment.
 
 Vite prints the local development URL. To exercise browser tests on a new machine, install the repository-pinned browser engines once:
 
@@ -107,7 +107,7 @@ Never commit `.env` or service-role credentials. The app remains usable as a loc
 | `pnpm validate:audio`          | Validate manifest, mappings, metadata, Qur'an ranges, and hosted audio                    |
 | `pnpm report:audio -- --write` | Regenerate the approved/unmatched audio mapping report                                    |
 
-Run `pnpm install --frozen-lockfile`, `pnpm check`, `pnpm test:e2e`, and `pnpm build:pages` before pushing. The repository pre-push hook enforces this sequence.
+Use relevant unit/browser specs while developing. Before pushing, the hook enforces frozen install, `pnpm check`, `pnpm test:e2e:fast` and `pnpm build:pages`. A quality pass is reusable for 24 hours only for identical input contents, installed dependencies, toolchain/platform and build environment. CI always runs full quality and browser verification. Run the full local browser suite for broad changes, browser infrastructure, uncertain scope or CI diagnosis.
 
 ## Architecture
 
@@ -191,7 +191,7 @@ The authoritative release checklist is [docs/QUALITY_CHECKLIST.md](docs/QUALITY_
 
 ## Deployment
 
-Pushes to `main` trigger `.github/workflows/deploy-pages.yml`, which runs the release gates, creates the GitHub Pages artifact, deploys it, and verifies production. `.github/workflows/quality.yml` runs on pull requests or manual dispatch and provides the standalone Quality check used for direct-main release evidence.
+Application pushes to `main` trigger the full `.github/workflows/quality.yml` gate. Its successful completion triggers `.github/workflows/deploy-pages.yml` for that exact current-main commit. Pages builds the artifact, deploys it and verifies production without running the same suite again. Manual deployment also requires successful Quality for the selected main commit. Documentation-only pushes do not redeploy; pull requests and manual Quality runs retain full verification.
 
 Repository settings must use **GitHub Actions** as the Pages source. Add `VITE_SUPABASE_URL` as an Actions variable and a publishable key as `VITE_SUPABASE_PUBLISHABLE_KEY` (a secret is acceptable despite the key being public). Provider flags are Actions variables and should remain false until the corresponding provider is configured.
 

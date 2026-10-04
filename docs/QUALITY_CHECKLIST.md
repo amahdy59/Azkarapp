@@ -6,6 +6,8 @@ This document makes the project checklist auditable. A recommendation is **met**
 
 Every pull request must pass the pinned-toolchain check, `pnpm install --frozen-lockfile`, `pnpm check`, `pnpm test:e2e`, `pnpm build:pages`, and `pnpm audit:prod`.
 
+These full gates run once in the Quality CI job for every application release. Pages waits for successful Quality for the exact current-main commit, then builds and deploys without duplicating its suite. During development, use affected unit/browser tests. Locally, the push hook runs frozen install, full `pnpm check` (or its unchanged, less-than-24-hour content-bound receipt), `pnpm test:e2e:fast` and Pages build. Broader changes and uncertain scope still warrant full local browser verification. CI never trusts the local receipt.
+
 | Concern               | Evidence                                                                                                              |
 | --------------------- | --------------------------------------------------------------------------------------------------------------------- |
 | Type safety           | Strict TypeScript and `tsc --noEmit`                                                                                  |
@@ -16,7 +18,7 @@ Every pull request must pass the pinned-toolchain check, `pnpm install --frozen-
 | Performance           | Screen lazy loading, Vite tree shaking, per-asset bundle ceilings, and a recorded baseline growth is measured against |
 | Supply chain          | Exact pnpm pin, frozen lockfile, seven-day quarantine, and `pnpm audit:prod` on PRs and `main` pushes                 |
 | Secrets               | Runtime environment variables; `.env*` excluded except `.env.example`                                                 |
-| Deployment            | The Pages workflow runs all non-browser quality gates before building                                                 |
+| Deployment            | Pages requires successful full Quality for the exact current-main commit before building and verifies production      |
 
 Dependency updates must be resolved with the pnpm release declared by `packageManager`. A package that is younger than `minimumReleaseAge` must not enter the lockfile through a local-policy bypass. Select an eligible reviewed release, wait for the quarantine to expire, or record an explicit security exception before changing `minimumReleaseAgeExclude`.
 

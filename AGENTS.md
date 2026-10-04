@@ -258,11 +258,17 @@ enforced by the check above rather than by the suite.
 
 ### Required local gate before every push
 
-Before pushing to `main`, the agent must run:
+During development, run targeted unit and browser tests for the affected feature. Before pushing to `main`, the tracked hook enforces:
 
 ```bash
 pnpm install --frozen-lockfile
 pnpm check
-pnpm test:e2e
+pnpm test:e2e:fast
 pnpm build:pages
 ```
+
+`pnpm check` is still the complete non-browser quality gate, including enforced coverage, content integrity, type safety, lint, accessibility-related checks and bundle budgets. A successful local result may be reused for 24 hours only when the exact tracked/untracked input contents, installed lockfile, Node/platform and build environment match. A changed snapshot or missing receipt runs the gate again. Never fabricate receipts or bypass hooks.
+
+Run relevant feature-specific browser specs locally in addition to the core smoke suite. Run the full local `pnpm test:e2e` for broad/cross-cutting changes, browser infrastructure changes, uncertain affected scope or reproducing CI failures; it is not required for every small feature edit. A successful unchanged full run does not need to be repeated merely because files were committed.
+
+Every application release must still pass the complete `Quality / verify` CI job: frozen install, `pnpm check`, full `pnpm test:e2e`, Pages build and production audit. CI never reuses a local receipt. Pages deploys only the successful Quality commit on current `main`; it builds the production artifact without rerunning the same suite. Manual deployment requires successful Quality for that exact commit too. All existing tests, assertions, coverage thresholds and budget ceilings remain intact.

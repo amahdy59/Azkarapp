@@ -165,3 +165,5 @@ Apple/Microsoft-informed control spacing and alignment improvements.
 [Shared-card hierarchy and content clarity](phases/SHARED_CARD_CONTENT_CLARITY.md) records the owner-approved logo, footer, title, spacing, presets and Arabic glossary refinement.
 
 [Sharing footer and combined release](phases/SHARING_FOOTER_RELEASE.md) records the concise footer, accessible feedback and owner-authorized release of pending refinements.
+
+[Efficient release verification](phases/RELEASE_VERIFICATION_EFFICIENCY.md) records the owner-approved removal of duplicate release suites, exact-snapshot quality reuse and full CI before deployment.

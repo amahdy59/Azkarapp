@@ -1,18 +1,15 @@
 name: Deploy GitHub Pages
 
 on:
-  push:
-    branches:
-      - "main"
-    paths-ignore:
-      - "AGENTS.md"
-      - "README.md"
-      - "README_FIRST.md"
-      - "docs/**"
+  workflow_run:
+    workflows: ["Quality"]
+    types: [completed]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
+  actions: read
   pages: write
   id-token: write
 
@@ -22,19 +19,47 @@ concurrency:
 
 jobs:
   build:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.head_repository.full_name == github.repository)
     # Without an explicit timeout this job inherits GitHub's 6-hour default.
     # Because the "pages" concurrency group does not cancel in progress, one
     # hung step would block every subsequent deployment for that whole window.
     timeout-minutes: 45
     runs-on: ubuntu-latest
+    outputs:
+      verified_sha: ${{ steps.candidate.outputs.sha }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
-
-      - name: Setup and Test
-        uses: ./.github/actions/setup-and-test
         with:
-          vite-audio-base-url: ${{ vars.VITE_AUDIO_BASE_URL }}
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - name: Verify candidate has passed Quality and is current main
+        id: candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERIFIED_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+        run: |
+          current_sha=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq '.object.sha')
+          test "$VERIFIED_SHA" = "$current_sha"
+          passed=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow quality.yml --commit "$VERIFIED_SHA" --status completed --json conclusion --jq 'any(.[]; .conclusion == "success")')
+          test "$passed" = "true"
+          echo "sha=$VERIFIED_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: ".nvmrc"
+          cache: "pnpm"
+
+      - name: Install frozen dependencies and verify toolchain
+        run: pnpm install --frozen-lockfile && pnpm run verify:toolchain
 
       - name: Build app for GitHub Pages
         run: pnpm build:pages
@@ -64,7 +89,7 @@ jobs:
           console.log('Generated deployment-meta.json:', meta);
           "
         env:
-          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_SHA: ${{ steps.candidate.outputs.sha }}
           GITHUB_RUN_ID: ${{ github.run_id }}
           GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
 
@@ -97,7 +122,7 @@ jobs:
 
   verify-production:
     timeout-minutes: 10
-    needs: deploy
+    needs: [build, deploy]
     runs-on: ubuntu-latest
     permissions:
       contents: none
@@ -110,7 +135,7 @@ jobs:
 
           const rawUrl = '${{ needs.deploy.outputs.page_url }}';
           const baseUrl = (rawUrl.endsWith('/') ? rawUrl : rawUrl + '/');
-          const expectedSha = '${{ github.sha }}';
+          const expectedSha = '${{ needs.build.outputs.verified_sha }}';
           const cacheBust = Date.now();
 
           function fetchUrl(url, headers = {}) {
