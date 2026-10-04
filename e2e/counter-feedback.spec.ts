@@ -460,10 +460,15 @@ test("prayer information keeps concise RTL and LTR points with keyboard evidence
     await page.keyboard.press("Enter");
     for (const width of [320, 390, 1440]) {
       await page.setViewportSize({ width, height: 844 });
+      // The media-query update replaces the drawer with a desktop dialog.
+      // Measure the new surface after React commits that replacement.
+      if (width < 600) await expect(modal).toHaveAttribute("data-slot", "drawer-content");
+      else await expect(modal).not.toHaveAttribute("data-slot", "drawer-content");
       expect(await modal.evaluate((element) => element.scrollWidth - element.clientWidth)).toBeLessThanOrEqual(1);
       expect(await points.evaluate((element) => element.scrollWidth - element.clientWidth)).toBeLessThanOrEqual(1);
     }
     await page.setViewportSize({ width: 390, height: 844 });
+    await expect(modal).toHaveAttribute("data-slot", "drawer-content");
     await modal.screenshot({ path: testInfo.outputPath("prayer-info-" + language + ".png") });
     await page.keyboard.press("Escape");
     await expect(info).toBeFocused();

@@ -63,6 +63,22 @@ The final combined `pnpm test:e2e` run passed, exit 0: **526 passed, one existin
 
 ## Visual/manual evidence
 
+### CI verification follow-up
+
+The first pushed candidate, `97597028`, passed the tracked hook: frozen install, all 10 `pnpm check` stages (82.7s), 26 fast browser tests (1.2m), and Pages build. Quality run `37227314886` subsequently reported 524 passed, one flaky, one failed and one existing skip (19.5m). Deployment correctly did not proceed. Failure logs, all-attempt traces and the timing report were downloaded under `output/release-rtl-ci-failure` and `output/release-rtl-ci-timings`.
+
+The failed prayer-info screenshot ran immediately after a desktop-to-phone resize. `ResponsiveSheet` switches between Radix modal and Vaul drawer at 600px; the old desktop node detached during screenshot capture on all three CI attempts. The browser test now waits for the expected drawer/modal branch before measuring each viewport and capturing the returned phone surface. Overflow, keyboard disclosure, screenshot and focus-restoration assertions remain intact.
+
+The English WebKit counter test briefly measured 49% immediately after count 50, before its painted transform caught up with the CSS ratio. Its post-click geometry now samples both rectangles in one browser evaluation and waits under the existing 15-second assertion timeout. The same 50% precision and starting-edge checks remain intact. The already-synchronized reload check is retained. No application code, prayer calculations, persistence, dependencies or test coverage changed in this follow-up.
+
+The repaired cases passed three repetitions: 21 passed, exit 0, 2.8m across Chromium, Firefox and WebKit. A full combined browser run is required before the remediation push; its result and subsequent CI/deployment verification are recorded in the chat release handoff. The release notes still describe the application changes awaiting their first successful deployment; this test-only remediation adds no reader-facing notes.
+
+The first follow-up full run exposed a timing gap in the new Arabic animation probe: its frame recording began after the click and two assertion round trips, which could miss the complete short slide under suite load. That failed run was stopped after the failure was identified. The probe now records frames before input, requires an actual transform greater than one pixel, waits for the final resting transform, and cleans up its frame callback. Control-position, RTL direction, keyboard focus and reduced-motion assertions are retained. Ten Arabic/English repetitions passed, exit 0, 1.1m. The complete suite is restarted on the final test snapshot; earlier failed/interrupted results are not counted as a passing gate.
+
+A restarted shared-checkout run hit two page-load timeouts before reading controls appeared and was stopped. Inspection found a separate active audio browser-test process and preview using the same `.playwright-dist`; its run also replaced `test-results` before the failure evidence could be copied. Concurrent audio implementation edits remained uncommitted. Release verification was moved to the managed `rtl-release-verification` worktree, based on `97597028`, with only these three browser-test repairs and this report applied. Its build/output directories and frozen dependency install are independent. No concurrent edits or tests were overwritten, and the interrupted shared-checkout run is not a passing gate. Final results and release outcomes are recorded in the chat handoff.
+
+The final isolated `pnpm test:e2e` completed successfully: 526 passed, one existing skip, no failures, exit 0, 28.9m. The report is `output/ci-repair-isolated-full-results.json` in the release worktree. `git diff --check` and release-note freshness checks passed. This final report annotation is followed by the tracked hook's exact-snapshot gates; the successful unchanged browser suite does not need to run again solely because the verified changes are committed.
+
 Ignored artifacts under `output/playwright/`: the initial and corrected custom-target 200% screenshots, plus `review-text-slide-ar.png` and `review-text-slide-en.png`. The full candidate browser JSON report is `output/release-rtl-e2e-results.json`. Browser motion checks sample actual frame transforms and compare control positions; screenshots alone do not verify animation.
 
 ## Documentation updated

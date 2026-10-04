@@ -79,13 +79,24 @@ for (const language of ["ar", "en"] as const) {
     await counter.click();
     await expect(counter).toHaveAttribute("aria-label", language === "en" ? /50 \/ 100$/ : /٥٠ \/ ١٠٠$/);
     await expect(fill).toHaveCSS("--progress-ratio", "0.5");
-    const half = await fill.boundingBox();
-    const box = (await counter.boundingBox())!;
-    const visibleStart = Math.max(half!.x, box.x + 1);
-    const visibleEnd = Math.min(half!.x + half!.width, box.x + box.width - 1);
-    expect((visibleEnd - visibleStart) / (box.width - 2)).toBeCloseTo(0.5, 2);
-    if (language === "ar") expect(visibleEnd).toBeCloseTo(box.x + box.width - 1, 0);
-    else expect(visibleStart).toBeCloseTo(box.x + 1, 0);
+    // The CSS value updates before the painted transform on some WebKit frames.
+    // Keep the same geometry and edge requirements, sampled in one frame.
+    await expect(async () => {
+      const geometry = await counter.evaluate((element) => {
+        const half = element.querySelector(".counter-progress-fill")!.getBoundingClientRect();
+        const box = element.getBoundingClientRect();
+        return {
+          visibleStart: Math.max(half.left, box.left + 1),
+          visibleEnd: Math.min(half.right, box.right - 1),
+          left: box.left,
+          right: box.right,
+          width: box.width,
+        };
+      });
+      expect((geometry.visibleEnd - geometry.visibleStart) / (geometry.width - 2)).toBeCloseTo(0.5, 2);
+      if (language === "ar") expect(geometry.visibleEnd).toBeCloseTo(geometry.right - 1, 0);
+      else expect(geometry.visibleStart).toBeCloseTo(geometry.left + 1, 0);
+    }).toPass({ timeout: 15000 });
     await page.screenshot({ path: `output/playwright/counter-progress/half-${language}.png` });
     await page.reload();
     await expect(counter).toHaveAttribute("aria-label", language === "en" ? /50 \/ 100$/ : /٥٠ \/ ١٠٠$/);

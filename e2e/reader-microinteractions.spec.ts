@@ -25,20 +25,37 @@ for (const language of ["ar", "en"] as const) {
     const nextBounds = (await next.boundingBox())!;
     const previousBounds = (await previous.boundingBox())!;
     expect(Math.sign(previousBounds.x - nextBounds.x)).toBe(language === "ar" ? 1 : -1);
+    // Start sampling before input: under suite load the click and assertion
+    // round trips can outlast the short slide we need to observe.
+    await text.evaluate((el) => {
+      const probe = el as HTMLElement & { slideProbe?: { positions: number[]; frame: number } };
+      const sample = { positions: [] as number[], frame: 0 };
+      probe.slideProbe = sample;
+      const record = () => {
+        const child = el.firstElementChild;
+        if (child) sample.positions.push(new DOMMatrixReadOnly(getComputedStyle(child).transform).m41);
+        sample.frame = requestAnimationFrame(record);
+      };
+      sample.frame = requestAnimationFrame(record);
+    });
     await next.click();
     await expect(reader).toHaveAttribute("data-zikr-index", "2");
     await expect(text).toHaveAttribute("data-direction", language === "ar" ? "-1" : "1");
-    const moved = await text.evaluate(async (el) => {
-      const positions: number[] = [];
-      for (let frame = 0; frame < 24; frame++) {
-        await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
-        const child = el.firstElementChild;
-        if (child) positions.push(new DOMMatrixReadOnly(getComputedStyle(child).transform).m41);
-      }
-      return positions.some((x) => Math.abs(x) > 1);
-    });
-    expect(moved).toBe(true);
+    await expect
+      .poll(() =>
+        text.evaluate((el) => {
+          const probe = el as HTMLElement & { slideProbe?: { positions: number[]; frame: number } };
+          return probe.slideProbe!.positions.some((x) => Math.abs(x) > 1);
+        }),
+      )
+      .toBe(true);
     await expect.poll(() => text.locator(":scope > div").evaluate((el) => getComputedStyle(el).transform)).toBe("none");
+    await text.evaluate((el) => {
+      const probe = el as HTMLElement & { slideProbe?: { positions: number[]; frame: number } };
+      const sample = probe.slideProbe!;
+      cancelAnimationFrame(sample.frame);
+      delete probe.slideProbe;
+    });
     const counterAfter = (await page.getByTestId("counter-surface").boundingBox())!;
     expect(Math.abs(counterBefore.y - counterAfter.y)).toBeLessThanOrEqual(1);
     expect(Math.abs(counterBefore.x - counterAfter.x)).toBeLessThanOrEqual(1);
