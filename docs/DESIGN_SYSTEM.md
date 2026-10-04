@@ -1,5 +1,7 @@
 # Azkar design system
 
+On phones narrower than 360px, the devotional footer uses 4px internal gutters so enlarged tally text fits wider platform monospace fonts without reducing its type size. Reduced-motion modal dialogs render immediately at full size; disabling their animation preserves the centering transform and 44px targets in WebKit.
+
 English expanded audio leads with the reviewed English translation in scalable, left-aligned type. A Show Arabic / Hide Arabic disclosure starts closed and exposes its expanded state and controlled text. Its choice lasts while the player is mounted. Recording language remains explicit. If a translation is unavailable, explain the fallback and show Arabic without an empty toggle. Arabic mode remains Arabic-first. Display changes never switch recordings or alter reviewed wording.
 
 Sharing method, scope and theme choices reserve symmetric icon slots, with the selected checkmark physically to the right of the centered label in both languages, following the owner's preference. Selected choices share a primary border and quiet muted surface, independently of keyboard focus. Method labels and checkmarks appear inline; choices wrap at enlarged text sizes. Scope uses a descriptive heading and a localized count of the cards actually selected for sharing. Preview enlargement is a quiet ghost action that retains a 44px target.

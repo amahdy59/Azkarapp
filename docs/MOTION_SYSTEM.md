@@ -105,6 +105,7 @@ The shared screen-transition boundary treats the View Transitions API as optiona
 - Opacity transitions and color changes may remain.
 - Maximum duration for any reduced animation is **100ms**.
 - Mushaf page changes are immediate under reduced motion, keeping devotional text and page controls at full contrast.
+- Reduced-motion modal dialogs disable their entry animation entirely so WebKit cannot retain the initial zoom frame; centering and full-size controls remain intact.
 - Implement per-component alternatives instead of a global sledgehammer override where appropriate.
 - JavaScript-driven smooth scrolling and completion effects must use the shared `motionPreferences.ts` gate so both the OS preference and the in-app Reduce Motion setting are honored. Haptics use the same boundary and remain independently controlled by the Haptic Feedback setting.
 - Route view transitions, shared active-tab pills, the audio-player layout morph, and reader direction changes must honor both sources of reduced motion. Qibla alignment uses a finite settle confirmation rather than a looping target animation.

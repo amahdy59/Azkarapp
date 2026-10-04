@@ -432,6 +432,18 @@ button.ui-icon-button:not(:disabled):not(.no-press):active,
   transition: none !important;
 }
 
+/* A fractional animation duration can leave WebKit's modal at its first zoom
+   frame. Preserve centering while showing the real, full-size hit targets. */
+.reduce-motion [role="dialog"] {
+  animation: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [role="dialog"] {
+    animation: none !important;
+  }
+}
+
 /* The per-component `.tap-ripple` reduced-motion rule that used to sit here is
    owned by ZikrComponents.css alongside the ripple itself (DEC-067 / F22). */
 @media (prefers-reduced-motion: reduce) {

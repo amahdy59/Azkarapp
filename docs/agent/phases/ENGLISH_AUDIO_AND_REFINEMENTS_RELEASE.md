@@ -61,6 +61,8 @@ Automated checks do not certify screen-reader or physical-device behavior. Those
 
 ## Out-of-scope findings
 
+Publication follow-up: the first Pages workflow caught four Linux/WebKit browser failures despite a clean Windows pre-push run: enlarged English tally overflow from wider platform monospace metrics, and WebKit retaining the dialog's 95% entry zoom under reduced motion. Narrow devotional-footer gutters now reserve more tally space without shrinking text, and reduced-motion dialogs disable their entry animation while preserving centering. A title/toggle geometry flake was repaired by waiting for fonts and reading both rectangles in one browser task. The unchanged geometry assertions plus explicit fallback-font and modal-animation regression checks passed all 18 targeted cases across Chromium, Firefox and WebKit. Release notes use the new 2026-10-04b stamp. Later sharing edits in the primary workspace are preserved separately; this platform remediation is verified in an isolated checkout of its exact commit.
+
 The browser sweep caught four transient contrast violations caused by the Mushaf's 160ms reduced-motion fade to 40% opacity. The trace identified page furniture controls; removing that fade corrects the source of the failure without changing contrast assertions. Reviewed content, persistence, remote state and dependencies are unchanged.
 
 ## Recommended next step

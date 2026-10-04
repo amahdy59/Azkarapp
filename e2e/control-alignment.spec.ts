@@ -38,6 +38,7 @@ for (const language of ["ar", "en"] as const) {
       await page.getByTestId("counter-target-filter").click();
       await page.getByRole("menuitem", { name: t(language, "counter.custom"), exact: true }).click();
       await expect(page.getByRole("dialog")).toBeVisible();
+      await expect(page.getByRole("dialog")).toHaveCSS("animation-name", "none");
       const ordinaryButtons = page.locator('[data-slot="button"]');
       expect(await ordinaryButtons.count()).toBeGreaterThanOrEqual(2);
       for (const button of await ordinaryButtons.all()) {

@@ -91,8 +91,14 @@ for (const language of ["ar", "en"] as const) {
       name: language === "ar" ? "كلمات غريبة" : "Rare words",
     });
     await expect(enlargedToggle).toBeVisible();
-    const bounds = (await enlargedToggle.boundingBox())!;
-    const titleBounds = (await enlargedTitle.boundingBox())!;
+    await page.evaluate(() => document.fonts.ready);
+    // Read both boxes in one browser task so a font/layout update cannot
+    // combine the title's old frame with the toggle's new frame.
+    const { bounds, titleBounds } = await page.evaluate(() => {
+      const title = document.querySelector('[data-testid="reader-zikr-title"]')!;
+      const toggle = title.parentElement!.querySelector('[role="switch"]')!;
+      return { bounds: toggle.getBoundingClientRect().toJSON(), titleBounds: title.getBoundingClientRect().toJSON() };
+    });
     expect(titleBounds.width).toBeGreaterThan(0);
     expect(titleBounds.x).toBeGreaterThanOrEqual(0);
     expect(titleBounds.x + titleBounds.width).toBeLessThanOrEqual(320);

@@ -110,6 +110,22 @@ for (const language of ["ar", "en"] as const) {
       });
       expect(tally.width, JSON.stringify(tally)).toBeLessThanOrEqual(tally.available + 1);
     }).toPass({ timeout: 15000 });
+    // Exercise the wider platform fallback too, rather than relying on the
+    // developer machine's narrower Consolas/SFMono metrics.
+    await counter.locator("p").evaluate((element) => {
+      element.style.fontFamily = "monospace";
+    });
+    const fallbackTally = await counter.locator("p").evaluate((element) => {
+      const range = document.createRange();
+      range.selectNodeContents(element);
+      const parent = element.parentElement!;
+      const style = getComputedStyle(parent);
+      return {
+        width: range.getBoundingClientRect().width,
+        available: parent.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight),
+      };
+    });
+    expect(fallbackTally.width).toBeLessThanOrEqual(fallbackTally.available + 1);
   });
 }
 

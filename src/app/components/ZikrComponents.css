@@ -106,6 +106,14 @@
   padding-inline: 12px;
 }
 
+/* Preserve enlarged tally text across platform monospace fonts on narrow
+   phones; the surrounding reading canvas already owns its outer gutters. */
+@media (max-width: 359px) {
+  .devotional-footer {
+    padding-inline: 4px;
+  }
+}
+
 /* Side navigation has room for a wider inset; compact dock controls keep theirs. */
 @media (min-width: 768px) {
   [data-testid="reader-side-navigation"] .adaptive-counter-nav {
