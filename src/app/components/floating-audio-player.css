@@ -52,7 +52,7 @@
 }
 
 .audio-compact-progress .audio-seek-waveform > span {
-  opacity: 0.55;
+  opacity: 0.65;
 }
 
 .audio-compact-progress .audio-seek-waveform > span,
@@ -189,10 +189,14 @@
   width: 2px;
   flex: 1 1 0;
   border-radius: 9999px;
-  background: var(--muted-foreground);
+  /* Unplayed bars: a gentle primary tint over muted-foreground so the played
+     (primary-colored) portion reads as clearly "ahead" vs "already heard". */
+  background: color-mix(in srgb, var(--primary) 18%, var(--muted-foreground));
 }
 .audio-seek-waveform-played > span {
+  /* Played bars use the full primary color at full opacity for clear progress. */
   background: var(--primary);
+  opacity: 1;
 }
 .audio-seek-control--waveform .audio-timeline-range::-webkit-slider-runnable-track {
   background: transparent;

@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, within, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ReaderScreen } from "./ReaderScreen";
@@ -201,14 +201,11 @@ describe("ReaderScreen audio identity", () => {
       />,
     );
 
-    await user.click(screen.getByRole("button", { name: "Reader options" }));
-    await user.click(await screen.findByRole("menuitem", { name: "Play Arabic recitation" }));
+    await user.click(screen.getByTestId("reader-audio-dock-button"));
     expect(onPlayAudio).toHaveBeenCalledOnce();
-    // Wait for Radix's exit animation before reopening and selecting another item.
-    await waitFor(() =>
-      expect(screen.queryByRole("menuitem", { name: "Play Arabic recitation" })).not.toBeInTheDocument(),
-    );
+
     await user.click(screen.getByRole("button", { name: "Reader options" }));
+    expect(screen.queryByRole("menuitem", { name: "Play Arabic recitation" })).not.toBeInTheDocument();
     await user.click(await screen.findByRole("menuitem", { name: "Play English translation" }));
     expect(onPlayEnglishAudio).toHaveBeenCalledOnce();
   });
@@ -318,7 +315,7 @@ describe("ReaderScreen audio identity", () => {
     expect(screen.queryByTestId("reader-counter-stack")).not.toBeInTheDocument();
   });
 
-  it("renders 3 options for long surahs without the surah text", () => {
+  it("renders 3 options for long surahs without the surah text and preserves menu sharing", async () => {
     registerLazyCollection("friday_kahf", FRIDAY_KAHF);
     const onComplete = vi.fn();
 
@@ -366,6 +363,9 @@ describe("ReaderScreen audio identity", () => {
     // Clicking "قرأتها بالفعل" should complete it
     fireEvent.click(readExternallyBtn);
     expect(onComplete).toHaveBeenCalledOnce();
+    expect(screen.queryByTestId("reader-share-dock-button")).toBeNull();
+    await userEvent.setup().click(screen.getAllByRole("button", { name: "خيارات القارئ" })[0]);
+    expect(screen.getByRole("menuitem", { name: /مشاركة/u })).toBeInTheDocument();
   });
 
   it("allows tapping the empty canvas area between text and counter to count zikr for small surahs", () => {

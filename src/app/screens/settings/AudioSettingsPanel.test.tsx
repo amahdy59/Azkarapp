@@ -14,15 +14,25 @@ describe("AudioSettingsPanel", () => {
     render(<AudioSettingsPanel language="en" controller={null} onBack={() => undefined} />);
 
     await user.click(screen.getByRole("combobox", { name: "Azkar and dua voice" }));
-    await user.click(screen.getByRole("option", { name: "Muhammad Moataz" }));
+    await user.click(screen.getByRole("option", { name: "English Translation" }));
     fireEvent.click(screen.getByRole("button", { name: "1.25×" }));
     fireEvent.click(screen.getByRole("switch", { name: /Keep playing while I navigate/ }));
 
     expect(JSON.parse(window.localStorage.getItem("azkar.audio-preferences.v1") ?? "{}")).toMatchObject({
-      duaVoiceId: "muhammad-moataz",
+      duaVoiceId: "english-george",
       playbackRate: 1.25,
       continueOnNavigation: false,
     });
+  });
+
+  it("disables unavailable reciters in the voice dropdown", async () => {
+    const user = userEvent.setup();
+    render(<AudioSettingsPanel language="en" controller={null} onBack={() => undefined} />);
+
+    await user.click(screen.getByRole("combobox", { name: "Azkar and dua voice" }));
+    expect(screen.getByRole("option", { name: "Muhammad Moataz" })).toHaveAttribute("data-disabled");
+    expect(screen.getByRole("option", { name: "Muhammad Shari" })).toHaveAttribute("data-disabled");
+    expect(screen.getByRole("option", { name: "Abdullah Muhammad" })).not.toHaveAttribute("data-disabled");
   });
 
   it("uses the shared themed select instead of a browser-native dropdown", () => {

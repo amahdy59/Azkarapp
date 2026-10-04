@@ -27,6 +27,115 @@ function useRestoreFocusOnClose(open: boolean) {
   }, [open]);
 }
 
+export interface SheetHeaderProps {
+  /** The visible title string or ReactNode. */
+  title: ReactNode;
+  /** Optional subtitle below the title. */
+  subtitle?: ReactNode;
+  /** Optional icon element rendered in a rounded square badge at the start side. */
+  icon?: ReactNode;
+  /** Called when the close button is clicked. */
+  onClose: () => void;
+  /** Accessible label for the close button. Defaults to common.close. */
+  closeAriaLabel?: string;
+  /** Language used to resolve the default aria label. */
+  language?: AppLanguage;
+  /** Layout direction of the sheet. */
+  direction?: "ltr" | "rtl";
+  /** Optional sr-only description element id. */
+  descriptionId?: string;
+  /** Optional sr-only description text. */
+  description?: string;
+  /** Enables frosted glassmorphism styling. */
+  onGlass?: boolean;
+  /** Extra class names for the header row. */
+  className?: string;
+}
+
+/**
+ * Standardized header for all sliding bottom sheets and desktop modals.
+ *
+ * Visual anatomy matches the evening zikr reference card:
+ *   - Start side (Right in RTL, Left in LTR):
+ *       - Optional icon in rounded-2xl bg-primary/10 badge (40×40px)
+ *       - Title in text-lg font-extrabold leading-snug text-foreground
+ *       - Optional subtitle
+ *   - End side (Left in RTL, Right in LTR):
+ *       - Close circular button in bg-muted/80 (48×48px)
+ *   - Bottom border (border-b border-border/40) with px-5 py-3 padding
+ */
+export function SheetHeader({
+  title,
+  subtitle,
+  icon,
+  onClose,
+  closeAriaLabel,
+  language,
+  direction,
+  descriptionId,
+  description,
+  onGlass = false,
+  className = "",
+}: SheetHeaderProps) {
+  const lang: AppLanguage = language ?? (direction === "rtl" ? "ar" : "en");
+  const closeLabel = closeAriaLabel ?? t(lang, "common.close");
+
+  return (
+    <div
+      className={`flex shrink-0 items-center justify-between gap-4 border-b px-5 py-3 ${
+        onGlass ? "border-white/20 bg-white/5" : "border-border/40"
+      } ${className}`.trim()}
+    >
+      <div className="flex min-w-0 flex-1 items-center gap-3">
+        {icon && (
+          <div
+            style={{ width: 40, height: 40 }}
+            className={`flex size-10 shrink-0 items-center justify-center rounded-2xl ${
+              onGlass ? "border border-white/20 bg-white/10 text-white" : "bg-primary/10 text-primary"
+            }`}
+          >
+            {icon}
+          </div>
+        )}
+        <div className="min-w-0 flex-1">
+          <div
+            data-testid="sheet-header-title"
+            aria-hidden="true"
+            className={`break-words text-lg font-extrabold leading-snug ${onGlass ? "text-white" : "text-foreground"}`}
+          >
+            {title}
+          </div>
+          {subtitle && (
+            <p
+              className={`mt-0.5 break-words text-xs font-medium ${onGlass ? "text-white/80" : "text-muted-foreground"}`}
+            >
+              {subtitle}
+            </p>
+          )}
+          {descriptionId && description && (
+            <p id={descriptionId} className="sr-only">
+              {description}
+            </p>
+          )}
+        </div>
+      </div>
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label={closeLabel}
+        data-testid="modal-close-button"
+        className={`flex h-[48px] w-[48px] min-h-[48px] min-w-[48px] shrink-0 items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer active:scale-95 ${
+          onGlass
+            ? "border border-white/20 bg-white/10 text-white hover:border-white/30 hover:bg-white/20 hover:text-white"
+            : "bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground"
+        }`}
+      >
+        <X size={18} aria-hidden="true" />
+      </button>
+    </div>
+  );
+}
+
 interface ModalProps {
   open: boolean;
   onClose: () => void;

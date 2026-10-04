@@ -7,6 +7,15 @@ async function enterAsEnglishGuest(page: Page) {
   await page.getByTestId("onboarding-get-started").click();
 }
 
+async function enterAsReturningEnglishGuest(page: Page) {
+  await page.addInitScript(() => {
+    localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+    localStorage.setItem("azkarapp.state.v1", JSON.stringify({ settings: { language: "en" } }));
+  });
+  await page.goto("/#/home");
+  await expect(page).toHaveTitle("Azkar - wa-zaker");
+}
+
 test("@cross-browser Azkar tab opens the library and exposes search", async ({ page }) => {
   await enterAsEnglishGuest(page);
 
@@ -22,15 +31,15 @@ test("@cross-browser Azkar tab opens the library and exposes search", async ({ p
   await expect(page.getByRole("heading", { name: "Azkar Library", exact: true })).toBeVisible();
 });
 
-test("@cross-browser navigation keeps Qibla, Masbaha, and Settings easy to reach", async ({ page }, testInfo) => {
-  await enterAsEnglishGuest(page);
-
-  for (const viewport of [
-    { width: 320, height: 700 },
-    { width: 834, height: 1112 },
-  ]) {
+// Independent viewport flows do not share one nearly exhausted test deadline.
+// Onboarding remains exercised by the library flow and dedicated onboarding specs.
+for (const viewport of [
+  { width: 320, height: 700 },
+  { width: 834, height: 1112 },
+]) {
+  test(`@cross-browser navigation keeps Qibla and Masbaha reachable at ${viewport.width}px`, async ({ page }) => {
     await page.setViewportSize(viewport);
-    await page.getByTestId("nav-home").click();
+    await enterAsReturningEnglishGuest(page);
     await expect(page.getByTestId("nav-settings")).toBeVisible();
     await expect(page.getByTestId("home-tool-qibla")).toBeVisible();
     await expect(page.getByTestId("home-tool-masbaha")).toBeVisible();
@@ -66,16 +75,23 @@ test("@cross-browser navigation keeps Qibla, Masbaha, and Settings easy to reach
     await page.getByTestId("home-tool-masbaha").click();
     await expect(page).toHaveURL(/#\/counter$/);
     await expect(page.getByRole("heading", { name: "Masbaha", exact: true })).toBeVisible();
-  }
+  });
+}
 
+test("@cross-browser navigation switches to wide utilities and opens Settings", async ({ page }, testInfo) => {
+  await page.setViewportSize({ width: 320, height: 700 });
+  await enterAsReturningEnglishGuest(page);
   await page.setViewportSize({ width: 1440, height: 900 });
+  await expect(page.locator(".nav-sidebar")).toBeVisible();
   await page.getByTestId("nav-quran").click();
   await expect(page.getByTestId("nav-quran")).toHaveAttribute("aria-current", "page");
+  await expect(page).toHaveTitle("Quran Wird - wa-zaker");
   await expect(page.getByTestId("nav-more")).toHaveCount(0);
   await expect(page.getByTestId("nav-qibla")).toBeVisible();
   await expect(page.getByTestId("nav-masbaha")).toBeVisible();
   await expect(page.getByTestId("nav-settings")).toBeVisible();
   await page.getByTestId("nav-settings").click();
+  await expect(page).toHaveURL(/#\/settings$/);
   await expect(page).toHaveTitle("Settings - wa-zaker");
   if (testInfo.project.name.startsWith("desktop-")) {
     await page.goto("/#/qibla");

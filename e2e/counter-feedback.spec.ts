@@ -1,5 +1,29 @@
 import { expect, test, type Page } from "@playwright/test";
 
+test("custom target remains reachable at 200 percent text on a short phone", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 568 });
+  await openReturningGuest(page);
+  await page.goto("/#/counter");
+  await page.getByTestId("counter-target-filter").click();
+  await page.getByRole("menuitem", { name: "Custom", exact: true }).click();
+  await page.locator("html").evaluate((el) => {
+    el.style.fontSize = "32px";
+  });
+  const dialog = page.getByRole("dialog", { name: "Set Custom Target", exact: true });
+  const title = dialog.locator('[aria-hidden="true"]').filter({ hasText: "Set Custom Target" });
+  expect(await title.evaluate((el) => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(1);
+  const target = dialog.getByRole("spinbutton", { name: "Target:" });
+  await target.fill("55");
+  const apply = dialog.getByRole("button", { name: "Apply Target", exact: true });
+  await apply.scrollIntoViewIfNeeded();
+  const bounds = (await apply.boundingBox())!;
+  expect(bounds.y + bounds.height).toBeLessThanOrEqual(569);
+  await page.screenshot({ path: "output/playwright/review-custom-target-200-percent-fixed.png" });
+  await apply.click();
+  await expect(dialog).toBeHidden();
+  await expect(page.getByTestId("counter-target-filter")).toHaveText(/55/);
+});
+
 async function openReturningGuest(page: Page, language: "ar" | "en" = "en", settings: Record<string, unknown> = {}) {
   await page.addInitScript(
     ({ selectedLanguage, settingOverrides }) => {

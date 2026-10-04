@@ -134,3 +134,7 @@ Animations must not degrade the user experience:
 - Shared, Home and counter progress fills translate a full-size surface through a clipped track. Direction follows the interface, rounding and divider thickness remain stable, and no width/inline-size transition or permanent layer hint is needed.
 - Route snapshots name only the main canvas. The root snapshot does not crossfade persistent navigation. Active navigation icons reuse a finite entrance cue; global OS and in-app reduced-motion rules cover elements and pseudo-elements in surfaces.css.
 - Live Qibla rotation uses the existing shortest-angle sensor smoothing without an additional CSS rotation transition. This avoids long interpolation across north and the signed turn seam. The finite alignment confirmation remains optional and reduced-motion aware.
+
+## Reading-text transition — 2026-10-04
+
+ReadingTextTransition shares a non-bouncing sheet-like transition between zikr entries in Reader and expanded audio. Exit translates 20px over 100ms with the existing exit curve; arrival translates 28px over 240ms with cubic-bezier(0.22, 1, 0.36, 1), easing to rest. Travel follows language direction and reverses for Previous. Only the reading text moves; controls and page geometry stay fixed. Initial content and reduced-motion users receive immediate stable text. It does not animate canonical Mushaf pages or add persistence.

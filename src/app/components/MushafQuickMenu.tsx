@@ -1,5 +1,5 @@
 import { type ReactNode } from "react";
-import { ResponsiveSheet } from "./ResponsiveSheet";
+import { ResponsiveSheet, SheetHeader } from "./ResponsiveSheet";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
@@ -181,45 +181,55 @@ export function MushafQuickMenu({
       direction={direction}
       testId="mushaf-quick-menu"
       maxWidthClassName="max-w-sm"
+      showCloseButton={false}
+      drawerClassName="pb-safe"
     >
-      <div className="flex flex-col gap-1 p-3" dir={direction}>
-        <h2 className="px-2 pb-1 pt-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-          {t(language, "mushaf.moreActions")}
-        </h2>
-        {items.map((item) => {
-          const isToggle = item.pressed !== undefined;
-          return (
-            <button
-              key={item.id}
-              type="button"
-              disabled={item.disabled}
-              data-testid={item.testId}
-              {...(isToggle ? { role: "switch" as const, "aria-checked": item.pressed } : {})}
-              onClick={() => {
-                item.onSelect();
-                onClose();
-              }}
-              className={`flex min-h-[52px] w-full items-center gap-3 rounded-xl px-3 py-2 text-start transition-colors hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-50 ${
-                item.pressed ? "bg-primary/10 text-primary" : ""
-              }`}
-            >
-              <span
-                className={`flex size-9 shrink-0 items-center justify-center rounded-lg ${
-                  item.pressed ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+      <div className="flex flex-col h-full overflow-hidden text-start" dir={direction}>
+        <SheetHeader
+          title={t(language, "mushaf.moreActions")}
+          icon={<List size={20} aria-hidden="true" />}
+          onClose={onClose}
+          language={language}
+          direction={direction}
+        />
+        <div className="flex flex-col gap-1 p-3 overflow-y-auto min-h-0 flex-1">
+          {items.map((item) => {
+            const isToggle = item.pressed !== undefined;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                disabled={item.disabled}
+                data-testid={item.testId}
+                {...(isToggle ? { role: "switch" as const, "aria-checked": item.pressed } : {})}
+                onClick={() => {
+                  item.onSelect();
+                  onClose();
+                }}
+                className={`flex min-h-[52px] w-full items-center gap-3 rounded-xl px-3 py-2 text-start transition-colors hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-50 ${
+                  item.pressed ? "bg-primary/10 text-primary" : ""
                 }`}
               >
-                {item.icon}
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm font-bold leading-tight">{item.label}</span>
-                {item.detail && (
-                  <span className="mt-0.5 block truncate text-xs font-medium text-muted-foreground">{item.detail}</span>
-                )}
-              </span>
-              {item.opensSurface && <Chevron size={16} className="shrink-0 opacity-40" aria-hidden="true" />}
-            </button>
-          );
-        })}
+                <span
+                  className={`flex size-9 shrink-0 items-center justify-center rounded-lg ${
+                    item.pressed ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                  }`}
+                >
+                  {item.icon}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-bold leading-tight">{item.label}</span>
+                  {item.detail && (
+                    <span className="mt-0.5 block truncate text-xs font-medium text-muted-foreground">
+                      {item.detail}
+                    </span>
+                  )}
+                </span>
+                {item.opensSurface && <Chevron size={16} className="shrink-0 opacity-40" aria-hidden="true" />}
+              </button>
+            );
+          })}
+        </div>
       </div>
     </ResponsiveSheet>
   );

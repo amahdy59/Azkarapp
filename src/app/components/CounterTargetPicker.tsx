@@ -3,7 +3,7 @@ import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
 import { ChevronDown, SlidersHorizontal } from "./icons";
-import { Modal } from "./ResponsiveSheet";
+import { ResponsiveSheet, SheetHeader } from "./ResponsiveSheet";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
@@ -112,63 +112,72 @@ export function CounterTargetPicker({
 
       {/* Custom Target Dialog */}
       {showCustomModal && (
-        <Modal
+        <ResponsiveSheet
           open
           onClose={() => setShowCustomModal(false)}
           title={t(language, "counter.setCustomTarget")}
           direction={isArabic ? "rtl" : "ltr"}
           language={language}
           maxWidthClassName="max-w-sm"
-          className="p-6"
+          showCloseButton={false}
+          drawerClassName="pb-safe"
         >
-          <div>
-            <h3 className="mb-3 text-lg font-bold text-foreground">{t(language, "counter.setCustomTarget")}</h3>
-            <p className="mb-4 text-label text-muted-foreground">{t(language, "counter.customTargetHint")}</p>
+          <div className="flex min-h-0 flex-col overflow-hidden text-start">
+            <SheetHeader
+              title={t(language, "counter.setCustomTarget")}
+              icon={<SlidersHorizontal size={20} aria-hidden="true" />}
+              onClose={() => setShowCustomModal(false)}
+              language={language}
+              direction={isArabic ? "rtl" : "ltr"}
+            />
+            <div className="min-h-0 overflow-y-auto p-5 sm:p-6">
+              <p className="mb-4 text-label text-muted-foreground">{t(language, "counter.customTargetHint")}</p>
 
-            <form onSubmit={handleCustomSubmit} className="space-y-4">
-              <label htmlFor="custom-counter-target" className="block text-label font-bold text-foreground">
-                {t(language, "counter.targetLabel")}
-              </label>
-              <input
-                type="number"
-                id="custom-counter-target"
-                name="custom-counter-target"
-                min={1}
-                max={100000}
-                value={customInputValue}
-                onChange={(e) => setCustomInputValue(Math.max(1, parseInt(e.target.value) || 1))}
-                inputMode="numeric"
-                onWheel={(event) => event.currentTarget.blur()}
-                className="h-12 w-full rounded-[var(--ds-radius-control)] border border-border-control bg-background px-4 text-xl font-extrabold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                // eslint-disable-next-line jsx-a11y/no-autofocus
-                autoFocus
-              />
+              <form onSubmit={handleCustomSubmit} className="space-y-4">
+                <label htmlFor="custom-counter-target" className="block text-label font-bold text-foreground">
+                  {t(language, "counter.targetLabel")}
+                </label>
+                <input
+                  type="number"
+                  id="custom-counter-target"
+                  name="custom-counter-target"
+                  min={1}
+                  max={100000}
+                  value={customInputValue}
+                  onChange={(e) => setCustomInputValue(Math.max(1, parseInt(e.target.value) || 1))}
+                  inputMode="numeric"
+                  onWheel={(event) => event.currentTarget.blur()}
+                  className="h-12 w-full rounded-[var(--ds-radius-control)] border border-border-control bg-background px-4 text-xl font-extrabold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                  // eslint-disable-next-line jsx-a11y/no-autofocus
+                  autoFocus
+                />
 
-              <div className="grid grid-cols-4 gap-2">
-                {[50, 70, 300, 500].map((quickVal) => (
-                  <Button
-                    key={quickVal}
-                    type="button"
-                    variant={customInputValue === quickVal ? "secondary" : "outline"}
-                    onClick={() => setCustomInputValue(quickVal)}
-                    className="min-w-0 px-2"
-                  >
-                    {formatNumerals(quickVal, language)}
+                <div className="grid grid-cols-4 gap-2">
+                  {[50, 70, 300, 500].map((quickVal) => (
+                    <Button
+                      key={quickVal}
+                      type="button"
+                      variant={customInputValue === quickVal ? "secondary" : "outline"}
+                      onClick={() => setCustomInputValue(quickVal)}
+                      className="min-w-0 px-2"
+                    >
+                      {formatNumerals(quickVal, language)}
+                    </Button>
+                  ))}
+                </div>
+
+                <div className="flex gap-2 pt-2">
+                  <Button type="button" variant="outline" onClick={() => setShowCustomModal(false)} className="flex-1">
+                    {t(language, "common.cancel")}
                   </Button>
-                ))}
-              </div>
-
-              <div className="flex gap-2 pt-2">
-                <Button type="button" variant="outline" onClick={() => setShowCustomModal(false)} className="flex-1">
-                  {t(language, "common.cancel")}
-                </Button>
-                <Button type="submit" className="flex-1">
-                  {t(language, "counter.applyTarget")}
-                </Button>
-              </div>
-            </form>
+                  <Button type="submit" className="flex-1">
+                    {t(language, "counter.applyTarget")}
+                  </Button>
+                </div>
+              </form>
+            </div>
           </div>
-        </Modal>
+        </ResponsiveSheet>
       )}
     </fieldset>
   );

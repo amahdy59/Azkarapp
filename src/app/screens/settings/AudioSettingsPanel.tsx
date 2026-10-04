@@ -68,7 +68,7 @@ export function AudioSettingsPanel({
             </SelectTrigger>
             <SelectContent>
               {voices.map((voice) => (
-                <SelectItem key={voice.id} value={voice.id}>
+                <SelectItem key={voice.id} value={voice.id} disabled={voice.disabled}>
                   {language === "ar" ? voice.nameArabic : voice.nameEnglish}
                 </SelectItem>
               ))}

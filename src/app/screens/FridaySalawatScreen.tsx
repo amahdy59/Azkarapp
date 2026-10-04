@@ -14,7 +14,7 @@ import {
   VolumeX,
 } from "../components/icons";
 import { ReadingScreenChrome } from "../components/ReadingScreenChrome";
-import { ResponsiveSheet } from "../components/ResponsiveSheet";
+import { ResponsiveSheet, SheetHeader } from "../components/ResponsiveSheet";
 import { useCountingSurface } from "../components/countingSurface";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { Button } from "../components/ui/button";
@@ -391,57 +391,64 @@ export function FridaySalawatScreen({
           direction={direction}
           language={language}
           maxWidthClassName="max-w-sm"
-          showCloseButton={true}
-          drawerClassName="p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]"
-          dialogClassName="p-6"
+          showCloseButton={false}
+          drawerClassName="pb-[max(1.5rem,env(safe-area-inset-bottom))]"
         >
-          <div className="text-center">
-            <div className="mx-auto mb-3 flex size-14 items-center justify-center rounded-2xl bg-success/20 text-success">
-              <Check size={32} strokeWidth={3} aria-hidden="true" />
-            </div>
-            <h2 className="mb-1 text-xl font-extrabold text-foreground">{t(language, "counter.goalReached")}</h2>
-            <p className="mb-2 text-sm font-semibold text-muted-foreground">
-              {t(language, "counter.salawatCompletedDetail", { count: formatNumerals(progress.count, language) })}
-            </p>
-            {rounds > 0 && (
-              <p className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
-                <Sparkles size={14} aria-hidden="true" />
-                {t(language, "counter.roundCompleted", { round: formatNumerals(rounds + 1, language) })}
+          <div className="flex min-h-0 flex-col overflow-hidden text-start">
+            <SheetHeader
+              title={t(language, "counter.goalReached")}
+              icon={<Check size={20} strokeWidth={3} aria-hidden="true" />}
+              onClose={() => setShowCompletionModal(false)}
+              language={language}
+              direction={direction}
+            />
+            <div className="min-h-0 overflow-y-auto p-5 sm:p-6 text-center">
+              <div className="mx-auto mb-3 flex size-14 items-center justify-center rounded-2xl bg-success/20 text-success">
+                <Check size={32} strokeWidth={3} aria-hidden="true" />
+              </div>
+              <p className="mb-2 text-sm font-semibold text-muted-foreground">
+                {t(language, "counter.salawatCompletedDetail", { count: formatNumerals(progress.count, language) })}
               </p>
-            )}
-            <div className="mt-4 space-y-2">
-              <Button
-                onClick={handleContinueHigherTarget}
-                size="lg"
-                className="w-full gap-2"
-                data-testid="salawat-continue-streak-btn"
-              >
-                <Sparkles size={18} aria-hidden="true" />
-                {t(language, "counter.continueHigherTargetWithNum", {
-                  target: formatNumerals(getNextSalawatTarget(progress.target), language),
-                })}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={handleStartNewRound}
-                size="lg"
-                className="w-full gap-2"
-                data-testid="salawat-new-round-btn"
-              >
-                <Play size={18} aria-hidden="true" />
-                {t(language, "counter.newRoundWithNum", { round: formatNumerals(rounds + 2, language) })} (
-                {formatNumerals(progress.target, language)})
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={handleReturn}
-                size="lg"
-                className="w-full gap-2 text-muted-foreground hover:text-foreground"
-                data-testid="salawat-return-btn"
-              >
-                <ArrowPrevious size={18} data-rtl-flip aria-hidden="true" />
-                {t(language, "counter.returnToHub")}
-              </Button>
+              {rounds > 0 && (
+                <p className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
+                  <Sparkles size={14} aria-hidden="true" />
+                  {t(language, "counter.roundCompleted", { round: formatNumerals(rounds + 1, language) })}
+                </p>
+              )}
+              <div className="mt-4 space-y-2">
+                <Button
+                  onClick={handleContinueHigherTarget}
+                  size="lg"
+                  className="w-full gap-2"
+                  data-testid="salawat-continue-streak-btn"
+                >
+                  <Sparkles size={18} aria-hidden="true" />
+                  {t(language, "counter.continueHigherTargetWithNum", {
+                    target: formatNumerals(getNextSalawatTarget(progress.target), language),
+                  })}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={handleStartNewRound}
+                  size="lg"
+                  className="w-full gap-2"
+                  data-testid="salawat-new-round-btn"
+                >
+                  <Play size={18} aria-hidden="true" />
+                  {t(language, "counter.newRoundWithNum", { round: formatNumerals(rounds + 2, language) })} (
+                  {formatNumerals(progress.target, language)})
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={handleReturn}
+                  size="lg"
+                  className="w-full gap-2 text-muted-foreground hover:text-foreground"
+                  data-testid="salawat-return-btn"
+                >
+                  <ArrowPrevious size={18} data-rtl-flip aria-hidden="true" />
+                  {t(language, "counter.returnToHub")}
+                </Button>
+              </div>
             </div>
           </div>
         </ResponsiveSheet>
@@ -456,19 +463,19 @@ export function FridaySalawatScreen({
           language={language}
           testId="salawat-benefits-sheet"
           maxWidthClassName="max-w-lg"
-          showCloseButton={true}
-          drawerClassName="p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]"
-          dialogClassName="p-6"
+          showCloseButton={false}
+          drawerClassName="pb-[max(1.25rem,env(safe-area-inset-bottom))]"
         >
           <div className="flex flex-col h-full max-h-[82vh] overflow-hidden text-start">
-            <div className="flex items-center gap-3 pe-12 pb-4 border-b border-border/40 shrink-0">
-              <span className="flex size-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                <Lightbulb size={20} aria-hidden="true" />
-              </span>
-              <h2 className="text-lg font-black text-foreground">{t(language, "fridaySalawat.benefits")}</h2>
-            </div>
+            <SheetHeader
+              title={t(language, "fridaySalawat.benefits")}
+              icon={<Lightbulb size={20} aria-hidden="true" />}
+              onClose={() => setShowBenefits(false)}
+              language={language}
+              direction={direction}
+            />
 
-            <div className="flex-1 overflow-y-auto space-y-3.5 py-4 pe-1">
+            <div className="flex-1 overflow-y-auto space-y-3.5 px-5 py-4 pe-4">
               <ReferenceLink
                 text={copy.muslim}
                 source={copy.muslimSource}

@@ -1,9 +1,9 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
-import { Lightbulb, X } from "./icons";
+import { Lightbulb } from "./icons";
 import { t } from "../i18n";
 import type { AppLanguage, Zikr } from "../types";
 import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content/localizedZikr";
-import { ResponsiveSheet } from "./ResponsiveSheet";
+import { ResponsiveSheet, SheetHeader } from "./ResponsiveSheet";
 import { HadithWeakChainBadge } from "./ZikrComponents";
 import { ReferenceCard } from "./ReferenceCard";
 
@@ -34,27 +34,16 @@ function ReferenceContent({
 
   return (
     <div className="flex flex-col h-full max-h-[inherit] overflow-hidden">
-      <div className="flex shrink-0 items-center justify-between gap-4 border-b border-border/40 px-5 py-3">
-        <div className="flex items-center gap-3">
-          <div className="flex size-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-            <Lightbulb size={20} aria-hidden="true" />
-          </div>
-          <div aria-hidden="true" className="text-lg font-extrabold leading-snug text-foreground">
-            {t(language, "reader.referencesButton")}
-          </div>
-          <p id="reader-reference-description" className="sr-only">
-            {t(language, "reader.referenceTitle")}
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label={t(language, "reader.closeReference")}
-          className="flex h-[48px] w-[48px] min-h-[48px] min-w-[48px] items-center justify-center rounded-full bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer"
-        >
-          <X size={18} />
-        </button>
-      </div>
+      <SheetHeader
+        title={t(language, "reader.referencesButton")}
+        icon={<Lightbulb size={20} aria-hidden="true" />}
+        onClose={onClose}
+        closeAriaLabel={t(language, "reader.closeReference")}
+        language={language}
+        direction={direction}
+        descriptionId="reader-reference-description"
+        description={t(language, "reader.referenceTitle")}
+      />
 
       <div
         role="region"

@@ -5,7 +5,7 @@ import { DevotionalAction, DevotionalFooter } from "../components/DevotionalCont
 import { CounterTargetPicker } from "../components/CounterTargetPicker";
 import { ArrowPrevious, Check, Lightbulb, MoreVertical, Play, RotateCcw, Volume2, VolumeX } from "../components/icons";
 import { ReadingScreenChrome } from "../components/ReadingScreenChrome";
-import { ResponsiveSheet } from "../components/ResponsiveSheet";
+import { ResponsiveSheet, SheetHeader } from "../components/ResponsiveSheet";
 import { useCountingSurface } from "../components/countingSurface";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { Button } from "../components/ui/button";
@@ -314,8 +314,8 @@ export function CustomCounterScreen({
           }}
           subRow={
             <div className="w-full" data-prevent-count="true">
-              <div className="relative z-20 grid grid-cols-2 gap-2 sm:gap-3" data-prevent-count="true">
-                <div className="min-w-0">
+              <div className="relative z-20 flex items-center gap-2 sm:gap-3" data-prevent-count="true">
+                <div className="min-w-0 flex-1">
                   <AuthenticZikrPicker
                     items={AUTHENTIC_AZKAR_COLLECTION}
                     selected={selectedAuthentic}
@@ -326,7 +326,7 @@ export function CustomCounterScreen({
                   />
                 </div>
 
-                <div className="min-w-0">
+                <div className="min-w-fit shrink-0">
                   <CounterTargetPicker
                     activeTarget={target}
                     onTargetChange={changeTarget}
@@ -483,48 +483,58 @@ export function CustomCounterScreen({
           direction={direction}
           language={language}
           maxWidthClassName="max-w-sm"
-          showCloseButton={true}
-          drawerClassName="p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]"
-          dialogClassName="p-6"
+          showCloseButton={false}
+          drawerClassName="pb-[max(1.5rem,env(safe-area-inset-bottom))]"
         >
-          <div className="text-center">
-            <div className="mx-auto mb-3 flex size-14 items-center justify-center rounded-full bg-success/20 text-success">
-              <Check size={32} strokeWidth={3} aria-hidden="true" />
-            </div>
-            <h3 className="mb-1 text-xl font-extrabold text-foreground">{t(language, "counter.goalReached")}</h3>
-            <p className="mb-5 text-sm text-muted-foreground">
-              {t(language, "counter.goalReachedDetail", { target: formatNumerals(target, language), zikr: activeText })}
-            </p>
-            <div className="space-y-2.5">
-              <Button
-                onClick={() => {
-                  setLaps((value) => value + 1);
-                  setCount(0);
-                  setShowCompletionDialog(false);
-                }}
-                size="lg"
-                className="w-full"
-              >
-                <Play size={18} aria-hidden="true" />
-                {t(language, "counter.continueLap", { lap: formatNumerals(laps + 2, language) })}
-              </Button>
-              <Button variant="outline" onClick={handleReset} size="lg" className="w-full">
-                <RotateCcw size={18} aria-hidden="true" />
-                {t(language, "counter.resetToZero")}
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={() => {
-                  setShowCompletionDialog(false);
-                  onBack();
-                }}
-                size="lg"
-                className="w-full gap-2 text-muted-foreground hover:text-foreground"
-                data-testid="custom-counter-return-btn"
-              >
-                <ArrowPrevious size={18} data-rtl-flip aria-hidden="true" />
-                {t(language, "counter.returnToHub")}
-              </Button>
+          <div className="flex min-h-0 flex-col overflow-hidden text-start">
+            <SheetHeader
+              title={t(language, "counter.goalReached")}
+              icon={<Check size={20} strokeWidth={3} aria-hidden="true" />}
+              onClose={() => setShowCompletionDialog(false)}
+              language={language}
+              direction={direction}
+            />
+            <div className="min-h-0 overflow-y-auto p-5 sm:p-6 text-center">
+              <div className="mx-auto mb-3 flex size-14 items-center justify-center rounded-2xl bg-success/20 text-success">
+                <Check size={32} strokeWidth={3} aria-hidden="true" />
+              </div>
+              <p className="mb-5 text-sm text-muted-foreground">
+                {t(language, "counter.goalReachedDetail", {
+                  target: formatNumerals(target, language),
+                  zikr: activeText,
+                })}
+              </p>
+              <div className="space-y-2.5">
+                <Button
+                  onClick={() => {
+                    setLaps((value) => value + 1);
+                    setCount(0);
+                    setShowCompletionDialog(false);
+                  }}
+                  size="lg"
+                  className="w-full"
+                >
+                  <Play size={18} aria-hidden="true" />
+                  {t(language, "counter.continueLap", { lap: formatNumerals(laps + 2, language) })}
+                </Button>
+                <Button variant="outline" onClick={handleReset} size="lg" className="w-full">
+                  <RotateCcw size={18} aria-hidden="true" />
+                  {t(language, "counter.resetToZero")}
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setShowCompletionDialog(false);
+                    onBack();
+                  }}
+                  size="lg"
+                  className="w-full gap-2 text-muted-foreground hover:text-foreground"
+                  data-testid="custom-counter-return-btn"
+                >
+                  <ArrowPrevious size={18} data-rtl-flip aria-hidden="true" />
+                  {t(language, "counter.returnToHub")}
+                </Button>
+              </div>
             </div>
           </div>
         </ResponsiveSheet>
@@ -538,29 +548,36 @@ export function CustomCounterScreen({
           direction={direction}
           language={language}
           maxWidthClassName="max-w-sm"
-          showCloseButton={true}
-          drawerClassName="p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]"
-          dialogClassName="p-6"
+          showCloseButton={false}
+          drawerClassName="pb-[max(1.5rem,env(safe-area-inset-bottom))]"
         >
-          <div className="text-start">
-            <h2 className="pe-10 text-lg font-black text-foreground">{t(language, "counter.resetConfirmTitle")}</h2>
-            <p className="mt-2 text-sm font-medium leading-6 text-muted-foreground">
-              {t(language, "counter.resetConfirmBody", { count: formatNumerals(count, language) })}
-            </p>
-            <div className="mt-5 flex gap-2">
-              <Button variant="outline" onClick={() => setShowResetDialog(false)} className="flex-1">
-                {t(language, "common.cancel")}
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={() => {
-                  handleReset();
-                  setShowResetDialog(false);
-                }}
-                className="flex-1"
-              >
-                {t(language, "counter.resetToZero")}
-              </Button>
+          <div className="flex min-h-0 flex-col overflow-hidden text-start">
+            <SheetHeader
+              title={t(language, "counter.resetConfirmTitle")}
+              icon={<RotateCcw size={20} aria-hidden="true" />}
+              onClose={() => setShowResetDialog(false)}
+              language={language}
+              direction={direction}
+            />
+            <div className="min-h-0 overflow-y-auto p-5 sm:p-6">
+              <p className="text-sm font-medium leading-6 text-muted-foreground">
+                {t(language, "counter.resetConfirmBody", { count: formatNumerals(count, language) })}
+              </p>
+              <div className="mt-5 flex gap-2">
+                <Button variant="outline" onClick={() => setShowResetDialog(false)} className="flex-1">
+                  {t(language, "common.cancel")}
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    handleReset();
+                    setShowResetDialog(false);
+                  }}
+                  className="flex-1"
+                >
+                  {t(language, "counter.resetToZero")}
+                </Button>
+              </div>
             </div>
           </div>
         </ResponsiveSheet>
@@ -574,30 +591,37 @@ export function CustomCounterScreen({
           direction={direction}
           language={language}
           maxWidthClassName="max-w-sm"
-          showCloseButton={true}
-          drawerClassName="p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]"
-          dialogClassName="p-6"
+          showCloseButton={false}
+          drawerClassName="pb-[max(1.5rem,env(safe-area-inset-bottom))]"
         >
-          <div className="text-start">
-            <h2 className="pe-10 text-lg font-black text-foreground">{t(language, "counter.changeDhikrTitle")}</h2>
-            <p className="mt-2 text-sm font-medium leading-6 text-muted-foreground">
-              {t(language, "counter.changeDhikrBody", { count: formatNumerals(count, language) })}
-            </p>
-            <div className="mt-5 space-y-2">
-              <Button onClick={() => handleSaveAndSwitch(pendingZikr)} className="w-full">
-                {t(language, "counter.saveAndSwitch")}
-              </Button>
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={() => setPendingZikr(null)} className="flex-1">
-                  {t(language, "common.cancel")}
+          <div className="flex min-h-0 flex-col overflow-hidden text-start">
+            <SheetHeader
+              title={t(language, "counter.changeDhikrTitle")}
+              icon={<RotateCcw size={20} aria-hidden="true" />}
+              onClose={() => setPendingZikr(null)}
+              language={language}
+              direction={direction}
+            />
+            <div className="min-h-0 overflow-y-auto p-5 sm:p-6">
+              <p className="text-sm font-medium leading-6 text-muted-foreground">
+                {t(language, "counter.changeDhikrBody", { count: formatNumerals(count, language) })}
+              </p>
+              <div className="mt-5 space-y-2">
+                <Button onClick={() => handleSaveAndSwitch(pendingZikr)} className="w-full">
+                  {t(language, "counter.saveAndSwitch")}
                 </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => handleResetAndSwitch(pendingZikr)}
-                  className="flex-1 text-destructive hover:bg-destructive/10 hover:text-destructive"
-                >
-                  {t(language, "counter.changeDhikrConfirm")}
-                </Button>
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => setPendingZikr(null)} className="flex-1">
+                    {t(language, "common.cancel")}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => handleResetAndSwitch(pendingZikr)}
+                    className="flex-1 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                  >
+                    {t(language, "counter.changeDhikrConfirm")}
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
@@ -613,19 +637,19 @@ export function CustomCounterScreen({
           language={language}
           testId="custom-counter-reference-sheet"
           maxWidthClassName="max-w-md"
-          showCloseButton={true}
-          drawerClassName="p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]"
-          dialogClassName="p-6"
+          showCloseButton={false}
+          drawerClassName="pb-[max(1.25rem,env(safe-area-inset-bottom))]"
         >
           <div className="flex flex-col h-full max-h-[82vh] overflow-hidden text-start">
-            <div className="flex items-center gap-3 pe-12 pb-4 border-b border-border/40 shrink-0">
-              <span className="flex size-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                <Lightbulb size={20} aria-hidden="true" />
-              </span>
-              <h2 className="text-lg font-black text-foreground">{t(language, "counter.virtueReference")}</h2>
-            </div>
+            <SheetHeader
+              title={t(language, "counter.virtueReference")}
+              icon={<Lightbulb size={20} aria-hidden="true" />}
+              onClose={() => setShowReference(false)}
+              language={language}
+              direction={direction}
+            />
 
-            <div className="flex-1 overflow-y-auto space-y-3.5 py-4 pe-1">
+            <div className="flex-1 overflow-y-auto space-y-3.5 px-5 py-4 pe-4">
               <ReferenceCard
                 title={t(language, "reader.benefitLabel")}
                 titleHeadingId="masbaha-benefit-heading"

@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-04e",
+  "release": "2026-10-04f",
   "ar": [
-    "اختر ذكر المسبحة من قائمة مختصرة، مع الاحتفاظ بخيارات حفظ العد عند التبديل.",
-    "اقرأ الفوائد والأحاديث في بطاقات موحدة، وافتح مراجع المسبحة المطابقة للنص.",
-    "تابع عدد التكرارات أسفل مشغل الصوت، مع فصل موضع الذكر عنه في الأعلى.",
-    "استخدم أزرار مشاركة وتشغيل أقصر، واختر الصوت الإنجليزي باسم الترجمة الإنجليزية."
+    "تابع تقدم الصوت من اليمين إلى اليسار في العربية، مع السابق يمينًا والتالي يسارًا.",
+    "انتقل بين الأذكار بحركة هادئة للنص وحده، مع احترام تفضيل تقليل الحركة.",
+    "استخدم نوافذ الأهداف والمراجع بعناوين واضحة ومحتوى قابل للتمرير عند تكبير النص.",
+    "اختر من أصوات الأذكار المتاحة، مع بقاء تلاوة الكهف المعتمدة قابلة للاختيار."
   ],
   "en": [
-    "Choose a counter dhikr from a concise menu while keeping count-saving choices when switching.",
-    "Read benefits and hadiths in consistent cards and open counter references matching the narration.",
-    "Follow repetition progress beneath the audio player, separate from the dhikr position above.",
-    "Use shorter sharing and playback buttons and find the English voice labelled English Translation."
+    "Follow audio progress right to left in Arabic, with Previous on the right and Next on the left.",
+    "Move between adhkar with a gentle text-only slide that respects reduced motion.",
+    "Use goal and reference dialogs with readable headings and scrollable content when text is enlarged.",
+    "Choose available adhkar voices while keeping the approved Al-Kahf reciter selectable."
   ]
 }

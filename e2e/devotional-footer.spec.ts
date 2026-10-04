@@ -89,12 +89,20 @@ for (const language of ["ar", "en"] as const) {
     await page.screenshot({ path: `output/playwright/counter-progress/half-${language}.png` });
     await page.reload();
     await expect(counter).toHaveAttribute("aria-label", language === "en" ? /50 \/ 100$/ : /٥٠ \/ ١٠٠$/);
-    const restoredFill = (await fill.boundingBox())!;
-    const restoredBox = (await counter.boundingBox())!;
-    const restoredWidth =
-      Math.min(restoredFill.x + restoredFill.width, restoredBox.x + restoredBox.width - 1) -
-      Math.max(restoredFill.x, restoredBox.x + 1);
-    expect(restoredWidth / (restoredBox.width - 2)).toBeCloseTo(0.5, 2);
+    await expect(fill).toHaveCSS("--progress-ratio", "0.5");
+    // Restored DOM state can precede WebKit's rendered geometry. Sample both
+    // rectangles in one frame and wait for the same half-fill requirement.
+    await expect
+      .poll(() =>
+        counter.evaluate((element) => {
+          const restoredFill = element.querySelector(".counter-progress-fill")!.getBoundingClientRect();
+          const restoredBox = element.getBoundingClientRect();
+          const restoredWidth =
+            Math.min(restoredFill.right, restoredBox.right - 1) - Math.max(restoredFill.left, restoredBox.left + 1);
+          return restoredWidth / (restoredBox.width - 2);
+        }),
+      )
+      .toBeCloseTo(0.5, 2);
     await page.setViewportSize({ width: 320, height: 900 });
     await page.evaluate(() => {
       document.documentElement.style.fontSize = "200%";

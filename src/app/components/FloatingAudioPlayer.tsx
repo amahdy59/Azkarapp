@@ -33,6 +33,7 @@ import { getAudioWaveform } from "../audio/audioWaveform";
 import { motion, useReducedMotion } from "motion/react";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { t } from "../i18n";
+import { ReadingTextTransition } from "./ReadingTextTransition";
 import { AudioPlayerSurface } from "./AudioPlayerSurface";
 
 /** Existing supported speeds, shown explicitly in the selection menu. */
@@ -143,6 +144,7 @@ export function FloatingAudioPlayer({
   const [isMinimized, setIsMinimized] = useState(true);
   const collapseButtonRef = useRef<HTMLButtonElement>(null);
   const expandButtonRef = useRef<HTMLButtonElement>(null);
+  const readingTextRef = useRef<HTMLDivElement>(null);
   const wasExpandedRef = useRef(false);
   const systemReducedMotion = useReducedMotion();
   const motionReduced =
@@ -183,6 +185,10 @@ export function FloatingAudioPlayer({
   }, [currentEntry?.entryId, state.currentVoiceId]);
 
   useEffect(() => {
+    if (readingTextRef.current) readingTextRef.current.scrollTop = 0;
+  }, [currentEntry?.entryId]);
+
+  useEffect(() => {
     // Only on the way in: opening the Mushaf while a surah plays should fold
     // the player away, but closing it must not reopen what the reader folded.
     if (coversReading && !wasCoveringReading.current) setIsMinimized(true);
@@ -210,7 +216,7 @@ export function FloatingAudioPlayer({
       if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
         event.preventDefault();
         event.stopPropagation();
-        const isForward = event.key === "ArrowRight";
+        const isForward = event.key === (direction === "rtl" ? "ArrowLeft" : "ArrowRight");
         jumpSeconds(isForward ? 5 : -5);
         return;
       }
@@ -232,7 +238,7 @@ export function FloatingAudioPlayer({
         controllerRef.current.seek(timingRef.current.duration || 0);
       }
     },
-    [jumpSeconds],
+    [jumpSeconds, direction],
   );
 
   useEffect(() => {
@@ -251,16 +257,16 @@ export function FloatingAudioPlayer({
       } else if (e.key === "ArrowLeft") {
         e.preventDefault();
         e.stopImmediatePropagation();
-        jumpSeconds(-5);
+        jumpSeconds(direction === "rtl" ? 5 : -5);
       } else if (e.key === "ArrowRight") {
         e.preventDefault();
         e.stopImmediatePropagation();
-        jumpSeconds(5);
+        jumpSeconds(direction === "rtl" ? -5 : 5);
       }
     };
     window.addEventListener("keydown", handleWindowKeyDown, true);
     return () => window.removeEventListener("keydown", handleWindowKeyDown, true);
-  }, [isMinimized, jumpSeconds, state.status]);
+  }, [isMinimized, jumpSeconds, state.status, direction]);
 
   const currentVoiceId = selectedVoiceOverride ?? state.currentVoiceId ?? currentEntry?.defaultVoiceId;
   const zikrArabicText = currentEntry ? currentEntry.arabicText?.trim() || currentEntry.titleArabic : "";
@@ -301,6 +307,7 @@ export function FloatingAudioPlayer({
     ...mainVoices.map((voice) => ({
       id: voice.id,
       label: language === "ar" ? voice.nameArabic : voice.nameEnglish,
+      disabled: voice.disabled && !currentEntry.availableVoiceIds.includes(voice.id),
     })),
     ...extraVoiceIds.map((id) => ({
       id,
@@ -309,6 +316,7 @@ export function FloatingAudioPlayer({
         currentEntry.segmentsByVoice[id]?.[0]?.voiceName ??
         (id === activeVoiceId ? currentSegment?.voiceName : undefined) ??
         id,
+      disabled: false,
     })),
   ];
 
@@ -342,7 +350,13 @@ export function FloatingAudioPlayer({
       {peaks.map((peak, index) => (
         <span key={index} style={{ height: Math.max(2, Math.pow(peak / 255, amplitudePower) * height) }} />
       ))}
-      <div className="audio-seek-waveform-played" style={{ clipPath: `inset(0 ${100 - progressPercent}% 0 0)` }}>
+      <div
+        className="audio-seek-waveform-played"
+        style={{
+          clipPath:
+            direction === "rtl" ? `inset(0 0 0 ${100 - progressPercent}%)` : `inset(0 ${100 - progressPercent}% 0 0)`,
+        }}
+      >
         {peaks.map((peak, index) => (
           <span key={index} style={{ height: Math.max(2, Math.pow(peak / 255, amplitudePower) * height) }} />
         ))}
@@ -451,7 +465,7 @@ export function FloatingAudioPlayer({
         <div
           data-testid="audio-compact-progress"
           className="audio-compact-progress"
-          dir="ltr"
+          dir={direction}
           role="progressbar"
           aria-label={t(language, "audioPlayer.sessionProgress")}
           aria-valuemin={0}
@@ -553,6 +567,7 @@ export function FloatingAudioPlayer({
                       <SelectItem
                         key={option.id}
                         value={option.id}
+                        disabled={option.disabled}
                         className="rounded-lg py-2.5 text-sm font-medium focus:bg-muted focus:text-foreground data-[highlighted]:bg-muted data-[highlighted]:text-foreground"
                         tabIndex={option.id === displayedVoiceId ? 0 : -1}
                         aria-label={option.label}
@@ -583,13 +598,7 @@ export function FloatingAudioPlayer({
 
           {/* Metadata stays still while the complete reviewed text scrolls independently. */}
           <div className="audio-expanded-reading flex min-h-0 flex-col overflow-hidden">
-            <motion.div
-              key={currentEntry.entryId}
-              initial={motionReduced ? false : { opacity: 0, y: 4 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={trackMetaTransition}
-              className="flex min-h-0 flex-1 flex-col items-center"
-            >
+            <div className="flex min-h-0 flex-1 flex-col items-center">
               <div className="audio-expanded-meta w-full shrink-0 flex items-center px-3 text-center">
                 {language === "en" && (
                   <span className="text-xs text-muted-foreground">
@@ -612,6 +621,7 @@ export function FloatingAudioPlayer({
 
               {/* Full Zikr Text Area: written within the area of the Zikr name */}
               <div
+                ref={readingTextRef}
                 // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- Native text region must be keyboard-scrollable.
                 tabIndex={0}
                 role="region"
@@ -619,73 +629,81 @@ export function FloatingAudioPlayer({
                 className="audio-expanded-text mt-2 flex min-h-0 w-full flex-1 flex-col items-center overflow-y-auto overscroll-contain px-4 py-1 sm:px-8 select-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-ring/40"
                 style={{ scrollbarGutter: "stable" }}
               >
-                <div className="flex w-full max-w-2xl shrink-0 flex-col items-center justify-center py-2 text-center">
-                  {englishFirst && (
-                    <>
+                <ReadingTextTransition
+                  entryId={currentEntry.entryId}
+                  index={state.entryIndex}
+                  direction={direction}
+                  reduceMotion={Boolean(motionReduced)}
+                  className="w-full max-w-2xl shrink-0 py-2 text-center"
+                >
+                  <div className="flex w-full flex-col items-center justify-center">
+                    {englishFirst && (
+                      <>
+                        <p
+                          data-testid="audio-player-zikr-text"
+                          className="w-full text-center text-lg sm:text-xl leading-relaxed text-foreground"
+                          dir="ltr"
+                          lang="en"
+                        >
+                          {currentEntry.translation}
+                        </p>
+                        <button
+                          type="button"
+                          aria-expanded={showArabic}
+                          aria-controls={arabicTextId}
+                          onClick={() => setShowArabic((visible) => !visible)}
+                          className="mt-2 inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-3 text-sm font-medium text-primary hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                        >
+                          {t(language, showArabic ? "audioPlayer.hideArabic" : "audioPlayer.showArabic")}
+                          {showArabic ? (
+                            <ChevronUp size={16} aria-hidden="true" />
+                          ) : (
+                            <ChevronDown size={16} aria-hidden="true" />
+                          )}
+                        </button>
+                      </>
+                    )}
+                    {language === "en" && !englishFirst && (
+                      <p className="mb-2 text-sm leading-relaxed text-muted-foreground" lang="en" dir="ltr">
+                        {t(language, "audioPlayer.translationUnavailable")}
+                      </p>
+                    )}
+                    <p
+                      id={arabicTextId}
+                      hidden={englishFirst && !showArabic}
+                      data-testid={englishFirst ? "audio-player-arabic-text" : "audio-player-zikr-text"}
+                      className={`zikr-text text-center font-medium leading-loose text-foreground ${englishFirst ? "mt-2 w-full border-t border-border pt-3" : ""}`}
+                      style={{
+                        fontSize: getReadingFontSizeRem({
+                          textSize,
+                          arabicLength: zikrArabicText.length,
+                          longSurah: false,
+                        }),
+                      }}
+                      dir="rtl"
+                      lang="ar"
+                    >
+                      {zikrArabicText}
+                    </p>
+                    {!englishFirst && isEnglishMode && currentEntry.translation && (
                       <p
-                        data-testid="audio-player-zikr-text"
-                        className="w-full text-center text-lg sm:text-xl leading-relaxed text-foreground"
+                        className="mt-3 border-t border-border/40 pt-2 text-center text-sm sm:text-base leading-relaxed text-muted-foreground max-w-2xl"
                         dir="ltr"
                         lang="en"
                       >
                         {currentEntry.translation}
                       </p>
-                      <button
-                        type="button"
-                        aria-expanded={showArabic}
-                        aria-controls={arabicTextId}
-                        onClick={() => setShowArabic((visible) => !visible)}
-                        className="mt-2 inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-3 text-sm font-medium text-primary hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                      >
-                        {t(language, showArabic ? "audioPlayer.hideArabic" : "audioPlayer.showArabic")}
-                        {showArabic ? (
-                          <ChevronUp size={16} aria-hidden="true" />
-                        ) : (
-                          <ChevronDown size={16} aria-hidden="true" />
-                        )}
-                      </button>
-                    </>
-                  )}
-                  {language === "en" && !englishFirst && (
-                    <p className="mb-2 text-sm leading-relaxed text-muted-foreground" lang="en" dir="ltr">
-                      {t(language, "audioPlayer.translationUnavailable")}
-                    </p>
-                  )}
-                  <p
-                    id={arabicTextId}
-                    hidden={englishFirst && !showArabic}
-                    data-testid={englishFirst ? "audio-player-arabic-text" : "audio-player-zikr-text"}
-                    className={`zikr-text text-center font-medium leading-loose text-foreground ${englishFirst ? "mt-2 w-full border-t border-border pt-3" : ""}`}
-                    style={{
-                      fontSize: getReadingFontSizeRem({
-                        textSize,
-                        arabicLength: zikrArabicText.length,
-                        longSurah: false,
-                      }),
-                    }}
-                    dir="rtl"
-                    lang="ar"
-                  >
-                    {zikrArabicText}
-                  </p>
-                  {!englishFirst && isEnglishMode && currentEntry.translation && (
-                    <p
-                      className="mt-3 border-t border-border/40 pt-2 text-center text-sm sm:text-base leading-relaxed text-muted-foreground max-w-2xl"
-                      dir="ltr"
-                      lang="en"
-                    >
-                      {currentEntry.translation}
-                    </p>
-                  )}
-                </div>
+                    )}
+                  </div>
+                </ReadingTextTransition>
               </div>
-            </motion.div>
+            </div>
           </div>
 
           {/* Bottom Transport Controller Area: docked at the bottom where the counter normally sits */}
           <div className="audio-expanded-controls mx-auto w-full max-w-2xl shrink-0 border-t border-border pt-2">
             {/* One waveform seek control with balanced time labels. */}
-            <div className="audio-seek-row flex items-center gap-2 px-1" dir="ltr">
+            <div className="audio-seek-row flex items-center gap-2 px-1" dir={direction}>
               <span className="w-10 text-center text-micro font-bold tabular-nums text-muted-foreground">
                 {formatTime(state.currentTime, language)}
               </span>
@@ -707,7 +725,7 @@ export function FloatingAudioPlayer({
                   aria-valuetext={accessibleTime(state.currentTime, state.duration, language)}
                   style={
                     {
-                      "--audio-range-fill": `linear-gradient(to right, var(--primary) ${progressPercent}%, var(--muted) ${progressPercent}%)`,
+                      "--audio-range-fill": `linear-gradient(to ${direction === "rtl" ? "left" : "right"}, var(--primary) ${progressPercent}%, var(--muted) ${progressPercent}%)`,
                     } as CSSProperties
                   }
                   className="audio-timeline-range h-11 w-full cursor-pointer appearance-none accent-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
@@ -722,7 +740,7 @@ export function FloatingAudioPlayer({
             <div
               className="audio-expanded-transport mt-2"
               data-tracks={totalTracks > 1 ? "multiple" : "single"}
-              dir="ltr"
+              dir={direction}
             >
               {totalTracks > 1 && (
                 <TransportButton
@@ -731,7 +749,8 @@ export function FloatingAudioPlayer({
                   onClick={controller.previous}
                   disabled={state.entryIndex === 0}
                 >
-                  <SkipBack size={20} aria-hidden="true" />
+                  {/* data-rtl-flip mirrors the directional arrow in RTL context */}
+                  <SkipBack size={20} aria-hidden="true" data-rtl-flip />
                 </TransportButton>
               )}
 
@@ -741,7 +760,7 @@ export function FloatingAudioPlayer({
                 onClick={() => jumpSeconds(-10)}
                 disabled={state.duration <= 0}
               >
-                <ClockRewind className="size-5" />
+                <ClockRewind className="size-5" aria-hidden="true" data-rtl-flip />
               </TransportButton>
 
               <button
@@ -762,7 +781,7 @@ export function FloatingAudioPlayer({
                 onClick={() => jumpSeconds(10)}
                 disabled={state.duration <= 0}
               >
-                <ClockFastForward className="size-5" />
+                <ClockFastForward className="size-5" aria-hidden="true" data-rtl-flip />
               </TransportButton>
 
               {totalTracks > 1 && (
@@ -772,7 +791,8 @@ export function FloatingAudioPlayer({
                   onClick={controller.next}
                   disabled={state.entryIndex === totalTracks - 1}
                 >
-                  <SkipForward size={20} aria-hidden="true" />
+                  {/* data-rtl-flip mirrors the directional arrow in RTL context */}
+                  <SkipForward size={20} aria-hidden="true" data-rtl-flip />
                 </TransportButton>
               )}
             </div>

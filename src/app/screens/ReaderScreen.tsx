@@ -22,7 +22,6 @@ import { isCounterShortcutBlocked } from "../keyboardShortcuts";
 import {
   BookOpen,
   ArrowPrevious,
-  Share2,
   ShareExport,
   Lightbulb,
   MoreVertical,
@@ -39,6 +38,7 @@ import {
   Headphones,
   X,
   PanelLeftIcon,
+  Maximize,
 } from "../components/icons";
 import { t } from "../i18n";
 import { shouldReduceMotion, vibrateIfEnabled } from "../motionPreferences";
@@ -52,6 +52,7 @@ import { CounterKeyboardHelp } from "../components/CounterKeyboardHelp";
 import { DevotionalAction, DevotionalFooter } from "../components/DevotionalControls";
 import { CounterShortcutHints, CounterTapHint, ZikrCounterSurface } from "../components/ZikrComponents";
 import { ToggleTrack } from "../components/SettingsRow";
+import { ReadingTextTransition } from "../components/ReadingTextTransition";
 import { ReaderReferenceSheet } from "../components/ReaderReferenceSheet";
 import { IconButton } from "../components/LayoutShells";
 import { prepareZikrShareCardFonts } from "../share/zikrShareCard";
@@ -1151,167 +1152,185 @@ export function ReaderScreen({
     );
   };
 
-  const renderReaderMenuItems = (layout: "mobile" | "desktop") => (
-    <>
-      <DropdownMenuLabel className="px-3 pb-1 pt-1.5 text-micro font-bold uppercase tracking-wider text-muted-foreground">
-        {t(language, "reader.menuAudio")}
-      </DropdownMenuLabel>
-      <DropdownMenuGroup>
+  const renderReaderMenuItems = (layout: "mobile" | "desktop") => {
+    const hasAudioOptions =
+      (!longSurah && (englishAudioAvailable || !isArabic)) || Boolean(onPlayAllAudio) || Boolean(onRepeatAudio);
+
+    return (
+      <>
+        {/* 1. Primary immersion action: Focus Mode */}
         {!longSurah && (
-          <DropdownMenuItem
-            disabled={!audioAvailable}
-            onClick={onPlayAudio}
-            className="flex cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-sm font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
-          >
-            <Volume2 size={16} />
-            {audioAvailable ? t(language, "reader.playArabicAudio") : t(language, "reader.arabicAudioUnavailable")}
-          </DropdownMenuItem>
+          <>
+            <DropdownMenuGroup>
+              <DropdownMenuItem
+                onClick={() => {
+                  focusRequestedRef.current = true;
+                  setFocusMode(true);
+                }}
+                data-testid="reader-focus-toggle"
+                className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted"
+              >
+                <Maximize size={16} aria-hidden="true" />
+                <span>{t(language, "reader.enterFocus")}</span>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator className="my-1 h-px bg-border/60" />
+          </>
         )}
-        {!longSurah && (
-          <DropdownMenuItem
-            disabled={!englishAudioAvailable}
-            onClick={onPlayEnglishAudio}
-            className="flex cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-sm font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
-          >
-            <Volume2 size={16} />
-            {englishAudioAvailable
-              ? t(language, "reader.playEnglishAudio")
-              : t(language, "reader.englishAudioUnavailable")}
-          </DropdownMenuItem>
+
+        {/* 2. Audio playback options (secondary / batch only; single Arabic audio is in the main dock) */}
+        {hasAudioOptions && (
+          <>
+            <DropdownMenuLabel className="px-3 pb-1 pt-1 text-micro font-bold uppercase tracking-wider text-muted-foreground">
+              {t(language, "reader.menuAudio")}
+            </DropdownMenuLabel>
+            <DropdownMenuGroup>
+              {!longSurah && (englishAudioAvailable || !isArabic) && (
+                <DropdownMenuItem
+                  disabled={!englishAudioAvailable}
+                  onClick={onPlayEnglishAudio}
+                  className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
+                >
+                  <Volume2 size={16} aria-hidden="true" />
+                  <span>
+                    {englishAudioAvailable
+                      ? t(language, "reader.playEnglishAudio")
+                      : t(language, "reader.englishAudioUnavailable")}
+                  </span>
+                </DropdownMenuItem>
+              )}
+              {onPlayAllAudio && (
+                <DropdownMenuItem
+                  onClick={onPlayAllAudio}
+                  className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted"
+                >
+                  <Volume2 size={16} aria-hidden="true" />
+                  <span>{t(language, "category.playAllAudio")}</span>
+                </DropdownMenuItem>
+              )}
+              {onRepeatAudio && (
+                <DropdownMenuItem
+                  onClick={onRepeatAudio}
+                  className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted"
+                >
+                  <RotateCcw size={16} aria-hidden="true" />
+                  <span>{t(language, "reader.repeatPrescribed")}</span>
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator className="my-1 h-px bg-border/60" />
+          </>
         )}
-        {onPlayAllAudio && (
-          <DropdownMenuItem
-            onClick={onPlayAllAudio}
-            className="flex cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
-          >
-            <Volume2 size={16} />
-            {t(language, "category.playAllAudio")}
-          </DropdownMenuItem>
-        )}
-        {onRepeatAudio && (
-          <DropdownMenuItem
-            onClick={onRepeatAudio}
-            className="flex cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
-          >
-            <RotateCcw size={16} />
-            {t(language, "reader.repeatPrescribed")}
-          </DropdownMenuItem>
-        )}
-      </DropdownMenuGroup>
 
-      <DropdownMenuSeparator className="my-1 h-px bg-border/60" />
-
-      {/* Reading size: Structured 3-option segmented control */}
-      <div className="px-2.5 py-1">
-        <div className="mb-1.5 flex items-center justify-between px-0.5">
-          <span className="text-micro font-bold uppercase tracking-wider text-muted-foreground">
-            {t(language, "settings.textSize")}
-          </span>
-          <span className="text-xs font-semibold text-primary">
-            {t(
-              language,
-              textSize === "small"
-                ? "settings.textSmall"
-                : textSize === "large"
-                  ? "settings.textLarge"
-                  : "settings.medium",
-            )}
-          </span>
-        </div>
-        <SegmentedControl
-          value={textSize}
-          onChange={onTextSizeChange}
-          direction={direction}
-          aria-label={t(language, "settings.textSize")}
-          className="grid grid-cols-3 gap-1 rounded-xl border border-border/60 bg-muted/50 p-1"
-          indicatorClassName="bg-card"
-          options={[
-            { value: "small", label: t(language, "settings.textSmall"), testId: "reader-text-size-small" },
-            { value: "medium", label: t(language, "settings.medium"), testId: "reader-text-size-medium" },
-            { value: "large", label: t(language, "settings.textLarge"), testId: "reader-text-size-large" },
-          ]}
-          itemClassName={(selected) =>
-            `flex min-h-11 items-center justify-center rounded-lg text-xs font-bold transition-colors focus-visible:ring-[3px] focus-visible:ring-ring ${selected ? "text-foreground shadow-xs ring-1 ring-border/80" : "text-muted-foreground hover:bg-background/50 hover:text-foreground"}`
-          }
-        />
-      </div>
-
-      <DropdownMenuSeparator className="my-1 h-px bg-border/60" />
-
-      {/* Save & Share */}
-      <DropdownMenuLabel className="px-3 pb-1 pt-1 text-micro font-bold uppercase tracking-wider text-muted-foreground">
-        {t(language, "reader.menuActions")}
-      </DropdownMenuLabel>
-      <DropdownMenuGroup>
-        <DropdownMenuItem
-          onClick={handleToggleSaved}
-          className="flex cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
-        >
-          <Bookmark
-            key={String(isSaved)}
-            size={16}
-            className={isSaved ? "favorite-pop fill-current text-primary" : ""}
+        {/* 3. Reading display: Text size */}
+        <div className="px-2.5 py-1">
+          <div className="mb-1.5 flex items-center justify-between px-0.5">
+            <span className="text-micro font-bold uppercase tracking-wider text-muted-foreground">
+              {t(language, "settings.textSize")}
+            </span>
+            <span className="text-xs font-semibold text-primary">
+              {t(
+                language,
+                textSize === "small"
+                  ? "settings.textSmall"
+                  : textSize === "large"
+                    ? "settings.textLarge"
+                    : "settings.medium",
+              )}
+            </span>
+          </div>
+          <SegmentedControl
+            value={textSize}
+            onChange={onTextSizeChange}
+            direction={direction}
+            aria-label={t(language, "settings.textSize")}
+            className="grid grid-cols-3 gap-1 rounded-xl border border-border/60 bg-muted/50 p-1"
+            indicatorClassName="bg-card"
+            options={[
+              { value: "small", label: t(language, "settings.textSmall"), testId: "reader-text-size-small" },
+              { value: "medium", label: t(language, "settings.medium"), testId: "reader-text-size-medium" },
+              { value: "large", label: t(language, "settings.textLarge"), testId: "reader-text-size-large" },
+            ]}
+            itemClassName={(selected) =>
+              `flex min-h-11 items-center justify-center rounded-lg text-xs font-bold transition-colors focus-visible:ring-[3px] focus-visible:ring-ring ${selected ? "text-foreground shadow-xs ring-1 ring-border/80" : "text-muted-foreground hover:bg-background/50 hover:text-foreground"}`
+            }
           />
-          {isSaved ? t(language, "reader.unsave") : t(language, "reader.save")}
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => void handleShare()}
-          disabled={shareOpen}
-          className="flex cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-sm font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
-        >
-          <Share2 size={16} />
-          {t(language, "reader.share")}
-        </DropdownMenuItem>
-      </DropdownMenuGroup>
+        </div>
 
-      <DropdownMenuSeparator className="my-1 h-px bg-border/60" />
-      <DropdownMenuLabel className="px-3 pb-1 pt-1 text-micro font-bold uppercase tracking-wider text-muted-foreground">
-        {t(language, "reader.menuCounter")}
-      </DropdownMenuLabel>
-      <DropdownMenuGroup>
-        <DropdownMenuItem
-          onClick={toggleSound}
-          data-testid={`reader-counter-sound-toggle-${layout}`}
-          className="flex cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
-        >
-          {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
-          {t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={handleResetCounter}
-          className="flex cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
-        >
-          <RotateCcw size={16} />
-          {t(language, "reader.resetCounter")}
-        </DropdownMenuItem>
-      </DropdownMenuGroup>
+        <DropdownMenuSeparator className="my-1 h-px bg-border/60" />
 
-      {/* Navigation shortcut to view all azkar */}
-      {!longSurah && (
-        <DropdownMenuItem
-          onClick={() => {
-            focusRequestedRef.current = true;
-            setFocusMode(true);
-          }}
-          data-testid="reader-focus-toggle"
-        >
-          {t(language, "reader.enterFocus")}
-        </DropdownMenuItem>
-      )}
-      <DropdownMenuSeparator className="my-1 h-px bg-border/60" />
-      <DropdownMenuLabel className="px-3 pb-1 pt-1 text-micro font-bold uppercase tracking-wider text-muted-foreground">
-        {t(language, "reader.menuNavigation")}
-      </DropdownMenuLabel>
-      <DropdownMenuItem
-        onClick={onViewAllAzkar ?? onBack}
-        data-testid="reader-view-all-azkar"
-        className="flex cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
-      >
-        <List size={16} />
-        {t(language, "reader.viewAllAzkar")}
-      </DropdownMenuItem>
-    </>
-  );
+        {/* 4. Saved item; long surahs retain Share because they have no dock. */}
+        <DropdownMenuLabel className="px-3 pb-1 pt-1 text-micro font-bold uppercase tracking-wider text-muted-foreground">
+          {t(language, "reader.menuActions")}
+        </DropdownMenuLabel>
+        <DropdownMenuGroup>
+          <DropdownMenuItem
+            onClick={handleToggleSaved}
+            className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted"
+          >
+            <Bookmark
+              key={String(isSaved)}
+              size={16}
+              aria-hidden="true"
+              className={isSaved ? "favorite-pop fill-current text-primary" : ""}
+            />
+            <span>{isSaved ? t(language, "reader.unsave") : t(language, "reader.save")}</span>
+          </DropdownMenuItem>
+          {longSurah && (
+            <DropdownMenuItem
+              onClick={() => void handleShare()}
+              disabled={shareOpen}
+              className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
+            >
+              <ShareExport size={16} aria-hidden="true" />
+              <span>{t(language, "reader.share")}</span>
+            </DropdownMenuItem>
+          )}
+        </DropdownMenuGroup>
+
+        <DropdownMenuSeparator className="my-1 h-px bg-border/60" />
+
+        {/* 5. Counter feedback & recovery */}
+        <DropdownMenuLabel className="px-3 pb-1 pt-1 text-micro font-bold uppercase tracking-wider text-muted-foreground">
+          {t(language, "reader.menuCounter")}
+        </DropdownMenuLabel>
+        <DropdownMenuGroup>
+          <DropdownMenuItem
+            onClick={toggleSound}
+            data-testid={`reader-counter-sound-toggle-${layout}`}
+            className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted"
+          >
+            {soundEnabled ? <Volume2 size={16} aria-hidden="true" /> : <VolumeX size={16} aria-hidden="true" />}
+            <span>{t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={handleResetCounter}
+            className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted text-muted-foreground hover:text-foreground"
+          >
+            <RotateCcw size={16} aria-hidden="true" />
+            <span>{t(language, "reader.resetCounter")}</span>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+
+        <DropdownMenuSeparator className="my-1 h-px bg-border/60" />
+
+        {/* 6. Collection Navigation */}
+        <DropdownMenuLabel className="px-3 pb-1 pt-1 text-micro font-bold uppercase tracking-wider text-muted-foreground">
+          {t(language, "reader.menuNavigation")}
+        </DropdownMenuLabel>
+        <DropdownMenuGroup>
+          <DropdownMenuItem
+            onClick={onViewAllAzkar ?? onBack}
+            data-testid="reader-view-all-azkar"
+            className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted"
+          >
+            <List size={16} aria-hidden="true" />
+            <span>{t(language, "reader.viewAllAzkar")}</span>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+      </>
+    );
+  };
 
   return (
     // The canvas delegates pointer clicks while its explicit reading and counter surfaces own keyboard activation.
@@ -1551,13 +1570,20 @@ export function ReaderScreen({
                       >
                         <div className="reading-measure mx-auto flex min-h-full w-full flex-col py-4">
                           <div style={dragStyle} className="flex w-full flex-1 flex-col">
-                            <div
-                              key={z.id}
-                              style={pressStyle}
-                              className={`${longSurah ? "mb-auto mt-2" : "my-auto"} w-full flex flex-col items-center justify-center ${justCompleted ? "zikr-step-exit" : "zikr-step-enter"}`}
+                            <ReadingTextTransition
+                              entryId={z.id}
+                              index={idx}
+                              direction={direction}
+                              reduceMotion={reducedMotion || longSurah}
+                              className={`${longSurah ? "mb-auto mt-2" : "my-auto"} w-full`}
                             >
-                              {renderReadingContent()}
-                            </div>
+                              <div
+                                style={pressStyle}
+                                className={`flex w-full flex-col items-center justify-center ${justCompleted ? "zikr-step-exit" : ""}`}
+                              >
+                                {renderReadingContent()}
+                              </div>
+                            </ReadingTextTransition>
                           </div>
                         </div>
                       </div>
@@ -1737,13 +1763,20 @@ export function ReaderScreen({
                   tap are the only ways to drive the reader — the page followed
                   nothing and a tap to count moved nothing at all. */}
                 <div style={dragStyle} className="flex min-h-full w-full flex-col py-2">
-                  <div
-                    key={z.id}
-                    style={pressStyle}
-                    className={`${longSurah ? "mb-auto mt-2" : "my-auto"} w-full flex flex-col items-center justify-center ${justCompleted ? "zikr-step-exit" : "zikr-step-enter"}`}
+                  <ReadingTextTransition
+                    entryId={z.id}
+                    index={idx}
+                    direction={direction}
+                    reduceMotion={reducedMotion || longSurah}
+                    className={`${longSurah ? "mb-auto mt-2" : "my-auto"} w-full`}
                   >
-                    {renderReadingContent()}
-                  </div>
+                    <div
+                      style={pressStyle}
+                      className={`flex w-full flex-col items-center justify-center ${justCompleted ? "zikr-step-exit" : ""}`}
+                    >
+                      {renderReadingContent()}
+                    </div>
+                  </ReadingTextTransition>
                 </div>
               </div>
 

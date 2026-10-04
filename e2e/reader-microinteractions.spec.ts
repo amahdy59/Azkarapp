@@ -2,6 +2,59 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { getAzkarForMode } from "../src/app/content/azkar";
 
+for (const language of ["ar", "en"] as const) {
+  test(`only reading text slides between zikr in ${language}, with stable controls and reduced-motion recovery`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.addInitScript((language) => {
+      localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+      localStorage.setItem(
+        "azkarapp.state.v1",
+        JSON.stringify({ settings: { language, reduceMotion: false }, profile: { isGuest: true } }),
+      );
+    }, language);
+    await page.goto("/#/azkar/morning/2");
+    const reader = page.getByTestId("reader-screen");
+    const text = page.getByTestId("reading-text-transition");
+    const next = page.getByRole("button", { name: language === "ar" ? "التالي" : "Next", exact: true });
+    const previous = page.getByRole("button", { name: language === "ar" ? "السابق" : "Prev", exact: true });
+    await expect(reader).toHaveAttribute("data-zikr-index", "1");
+    const counterBefore = (await page.getByTestId("counter-surface").boundingBox())!;
+    const nextBounds = (await next.boundingBox())!;
+    const previousBounds = (await previous.boundingBox())!;
+    expect(Math.sign(previousBounds.x - nextBounds.x)).toBe(language === "ar" ? 1 : -1);
+    await next.click();
+    await expect(reader).toHaveAttribute("data-zikr-index", "2");
+    await expect(text).toHaveAttribute("data-direction", language === "ar" ? "-1" : "1");
+    const moved = await text.evaluate(async (el) => {
+      const positions: number[] = [];
+      for (let frame = 0; frame < 24; frame++) {
+        await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+        const child = el.firstElementChild;
+        if (child) positions.push(new DOMMatrixReadOnly(getComputedStyle(child).transform).m41);
+      }
+      return positions.some((x) => Math.abs(x) > 1);
+    });
+    expect(moved).toBe(true);
+    await expect.poll(() => text.locator(":scope > div").evaluate((el) => getComputedStyle(el).transform)).toBe("none");
+    const counterAfter = (await page.getByTestId("counter-surface").boundingBox())!;
+    expect(Math.abs(counterBefore.y - counterAfter.y)).toBeLessThanOrEqual(1);
+    expect(Math.abs(counterBefore.x - counterAfter.x)).toBeLessThanOrEqual(1);
+    await expect(next).toBeFocused();
+    await previous.click();
+    await expect(reader).toHaveAttribute("data-zikr-index", "1");
+    await expect(text).toHaveAttribute("data-direction", language === "ar" ? "1" : "-1");
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await next.click();
+    await expect(reader).toHaveAttribute("data-zikr-index", "2");
+    await expect.poll(() => text.locator(":scope > div").evaluate((el) => getComputedStyle(el).transform)).toBe("none");
+    await expect(text.locator("article")).toHaveCount(1);
+    await page.screenshot({ path: `output/playwright/review-text-slide-${language}.png` });
+  });
+}
+
 test("thirty tasbeeh counts survive leaving the collection and reloading", async ({ page }) => {
   await page.addInitScript(() => {
     if (localStorage.getItem("azkarapp.onboarding-complete.v1")) return;
@@ -905,9 +958,8 @@ test("the reader header carries exactly one action on counter screens", async ({
   await expect(page.getByTestId("reader-share-dock-button")).toBeVisible();
   await expect(actions.getByRole("button", { name: "Share zikr", exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "Reader options", exact: true }).click();
-  for (const name of ["Save zikr", "Share zikr"]) {
-    await expect(page.getByRole("menuitem", { name, exact: true })).toBeVisible();
-  }
+  await expect(page.getByRole("menuitem", { name: "Save zikr", exact: true })).toBeVisible();
+  await expect(page.getByRole("menuitem", { name: "Share zikr", exact: true })).toHaveCount(0);
 });
 
 test("a short zikr gets no heading, because the heading used to repeat it", async ({ page }) => {

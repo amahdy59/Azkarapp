@@ -114,7 +114,7 @@ The keyboard row is marked partial for the same reason: the automation proves ta
 
 ### Waveform player refinement
 
-Verify one progress control per player form, physical LTR timeline/transport in Arabic and English, mirrored transport geometry and aligned icon centres, waveform source checksum coverage and truthful missing-data fallback. Confirm manual Previous/Next with continuation off, final-natural-ending-only completion, internal segment/ritual progression, and independent prescribed-repeat state. Volume opens only on click/keyboard, remains vertical, changes no row geometry, and closes on Escape/outside press with correct focus restoration; iOS uses hardware volume. Retain narrow/landscape/200% text, all-theme axe and manual physical-device/screen-reader checks.
+Verify one progress control per player form, RTL timeline/transport in Arabic and LTR in English, mirrored transport geometry and aligned icon centres, waveform source checksum coverage and truthful missing-data fallback. In Arabic, Previous/rewind are on the right and Next/forward on the left; Left Arrow seeks forward and Right Arrow seeks backward. Confirm manual Previous/Next with continuation off, final-natural-ending-only completion, internal segment/ritual progression, and independent prescribed-repeat state. Volume opens only on click/keyboard, remains vertical, changes no row geometry, and closes on Escape/outside press with correct focus restoration; iOS uses hardware volume. Retain narrow/landscape/200% text, all-theme axe and manual physical-device/screen-reader checks.
 
 ### Required audio release verification
 

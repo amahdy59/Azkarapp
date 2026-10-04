@@ -4174,3 +4174,11 @@ The owner explicitly requests review, necessary repairs and publication of all l
   - Content Completeness: Enriched all 9 authentic azkar in `src/app/content/authenticAzkar.ts` with canonical Prophetic Hadiths (`hadithTextAr` vocalized, `hadithTextEn`, and Sunnah.com reference URLs), presenting both concise virtue and complete Hadith narration in Masbaha (`CustomCounterScreen`).
   - E2E & Accessibility Stability: Preserved exact semantic heading levels (`<h3>`), unique heading IDs (`#reference-benefit-heading`, `#reference-evidence-heading`, `#reference-source-heading`), and the 2-button contract in `ReaderReferenceSheet` required by Playwright suites.
 - **Scope & Constraints:** Local only. Strictly no `git push`.
+
+## Arabic listening direction and reading-text transitions — 2026-10-04
+
+The owner approves the review fixes and explicitly supersedes the physical LTR audio contract: Arabic audio timelines, native seeking, waveform sequence/fill and transport follow RTL; Previous/rewind are on the right and Next/forward on the left. English remains LTR. Left Arrow seeks forward in RTL and Right Arrow backward; Page Up/Down and Home/End retain their time meanings. The standalone canonical Mushaf page-turn contract is unchanged.
+
+The owner requests smooth movement of zikr text alone between entries. Use a restrained sheet-like directional slide (100ms exit, 240ms decelerating arrival), reverse it for Previous, preserve controls/DOM order, and make reduced motion immediate. Apply the same reading-text component to the Reader and expanded audio, without changing reviewed wording, audio completion or persistence. Repair clipped enlarged dialogs, allow headings to wrap, top-align expanded audio text, scope reciter disabling to actual entry availability and update affected browser tests. The owner authorizes verification, release notes, commit, push and production verification after these fixes.
+
+The owner subsequently approves diagnosing and repairing the WebKit progress-restoration failure before pushing. Preserve the restored 50/100 state and 50% geometry assertion with its existing precision and timeout; synchronize rendered geometry rather than weakening accuracy, skipping the case or accepting a targeted rerun as a successful full suite.

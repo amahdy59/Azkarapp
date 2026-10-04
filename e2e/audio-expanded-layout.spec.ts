@@ -41,10 +41,12 @@ for (const scenario of [
       });
     }
     const arabic = scenario.language === "ar";
-    await page.getByRole("button", { name: arabic ? "خيارات القارئ" : "Reader options", exact: true }).click();
-    await page
-      .getByRole("menuitem", { name: arabic ? "تشغيل التلاوة العربية" : "Play English translation", exact: true })
-      .click();
+    if (arabic) {
+      await page.getByTestId("reader-audio-dock-button").click();
+    } else {
+      await page.getByRole("button", { name: "Reader options", exact: true }).click();
+      await page.getByRole("menuitem", { name: "Play English translation", exact: true }).click();
+    }
     const player = page.getByRole("region", { name: arabic ? "مشغل الصوت" : "Audio player", exact: true });
     const canvas = page.getByTestId("reader-card");
     // Verify the initial dock, before scrolling or expanding can conceal containment failures.
@@ -164,7 +166,7 @@ for (const scenario of [
         alignmentError: Math.max(...centers.map((center) => Math.abs(center.y - middle.y))),
       };
     });
-    expect(symmetry.direction).toBe("ltr");
+    expect(symmetry.direction).toBe(arabic ? "rtl" : "ltr");
     expect(symmetry.mirrorError).toBeLessThanOrEqual(1);
     expect(symmetry.alignmentError).toBeLessThanOrEqual(1);
     await expect(player.getByTestId("audio-seek-waveform")).toBeVisible();

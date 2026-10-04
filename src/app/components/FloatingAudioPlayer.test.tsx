@@ -114,6 +114,19 @@ describe("FloatingAudioPlayer", () => {
     expect(screen.getByRole("slider", { name: "Seek audio" })).toBeInTheDocument();
   });
 
+  it("starts the next expanded entry at the top without remounting the reading region", () => {
+    const controller = createController();
+    const { rerender } = render(<FloatingAudioPlayer controller={controller} language="en" />);
+    fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
+    const region = screen.getByRole("region", { name: "Now playing" });
+    region.scrollTop = 240;
+    controller.currentEntry = { ...entry, entryId: "second" };
+    controller.state.entryIndex = 1;
+    rerender(<FloatingAudioPlayer controller={controller} language="en" />);
+    expect(screen.getByRole("region", { name: "Now playing" })).toBe(region);
+    expect(region.scrollTop).toBe(0);
+  });
+
   it("keeps one compact waveform tied to the current recording rather than queue progress", () => {
     const controller = createController();
     controller.currentSegment = {
@@ -216,9 +229,13 @@ describe("FloatingAudioPlayer", () => {
     expect(screen.getByRole("option", { name: "محمد شرعي" })).toBeInTheDocument();
     expect(screen.getByRole("option", { name: "محمد معتز" })).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("option", { name: "محمد شرعي" }));
-    expect(controller.setVoice).toHaveBeenCalledWith("muhammad-alshara");
-    expect(screen.getByTestId("audio-reciter-select")).toHaveTextContent("محمد شرعي");
+    expect(screen.getByRole("option", { name: "محمد شرعي" })).toHaveAttribute("data-disabled");
+    expect(screen.getByRole("option", { name: "محمد معتز" })).toHaveAttribute("data-disabled");
+    expect(screen.getByRole("option", { name: "الترجمة الإنجليزية" })).not.toHaveAttribute("data-disabled");
+
+    fireEvent.click(screen.getByRole("option", { name: "الترجمة الإنجليزية" }));
+    expect(controller.setVoice).toHaveBeenCalledWith("english-george");
+    expect(screen.getByTestId("audio-reciter-select")).toHaveTextContent("الترجمة الإنجليزية");
   });
 
   it("keeps native seeking continuous with an exact left-to-right progress fill", () => {
@@ -402,7 +419,7 @@ describe("FloatingAudioPlayer", () => {
     controller.currentEntry = { ...controller.currentEntry, entryId: "next", translation: "Next translation." };
     rerender(<FloatingAudioPlayer controller={controller} language="en" />);
     await waitFor(() => expect(screen.getByTestId("audio-player-arabic-text")).toBeVisible());
-    fireEvent.click(screen.getByRole("button", { name: "Hide Arabic" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Hide Arabic" }));
     expect(screen.getByTestId("audio-player-arabic-text")).not.toBeVisible();
     expect(controller.setVoice).not.toHaveBeenCalled();
     expect(controller.play).not.toHaveBeenCalled();
@@ -534,7 +551,7 @@ describe("FloatingAudioPlayer", () => {
     expect(screen.getByRole("region", { name: "مشغل الصوت" })).toHaveAttribute("data-variant", "compact");
   });
 
-  it("keeps manual navigation available with auto-advance off and uses physical media keys in Arabic", () => {
+  it("keeps manual navigation available with auto-advance off and uses logical media keys in Arabic", () => {
     const controller = createController();
     controller.autoAdvance = false;
     controller.state.plan = { ...plan, entries: [entry, { ...entry, entryId: "entry-2" }] };
@@ -550,10 +567,10 @@ describe("FloatingAudioPlayer", () => {
     expect(controller.setAutoAdvance).toHaveBeenCalledWith(true);
     const slider = screen.getByRole("slider", { name: "تقديم أو تأخير الصوت" });
     fireEvent.keyDown(slider, { key: "ArrowRight" });
-    expect(controller.seek).toHaveBeenLastCalledWith(125);
-    fireEvent.keyDown(slider, { key: "ArrowLeft" });
     expect(controller.seek).toHaveBeenLastCalledWith(115);
-    expect(slider.closest(".audio-seek-row")).toHaveAttribute("dir", "ltr");
+    fireEvent.keyDown(slider, { key: "ArrowLeft" });
+    expect(controller.seek).toHaveBeenLastCalledWith(125);
+    expect(slider.closest(".audio-seek-row")).toHaveAttribute("dir", "rtl");
   });
 
   it("hides software volume control on iOS devices", () => {
@@ -573,5 +590,63 @@ describe("FloatingAudioPlayer", () => {
         configurable: true,
       });
     }
+  });
+
+  it("keeps an approved Quran reciter enabled even when unavailable for adhkar", () => {
+    const controller = createController();
+    controller.currentEntry = {
+      ...entry,
+      availableVoiceIds: ["muhammad-alshara"],
+      defaultVoiceId: "muhammad-alshara",
+      segmentsByVoice: { "muhammad-alshara": [segment] },
+    };
+    render(<FloatingAudioPlayer controller={controller} language="en" />);
+    fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
+    fireEvent.click(screen.getByTestId("audio-reciter-select"));
+    expect(screen.getByRole("option", { name: "Muhammad Shari" })).not.toHaveAttribute("data-disabled");
+  });
+
+  it("seeks and fills from right to left in Arabic, including verified waveforms", () => {
+    const controller = createController();
+    controller.currentSegment = {
+      ...segment,
+      url: `https://audio.test/file?sha256=${Object.keys(verifiedWaveforms)[0]}`,
+    };
+    render(<FloatingAudioPlayer controller={controller} language="ar" direction="rtl" />);
+    expect(screen.getByTestId("audio-compact-progress")).toHaveAttribute("dir", "rtl");
+    expect(screen.getByTestId("audio-compact-waveform").querySelector(".audio-seek-waveform-played")).toHaveStyle({
+      clipPath: "inset(0 0 0 80%)",
+    });
+    fireEvent.click(screen.getByRole("button", { name: "توسيع المشغل" }));
+    const timeline = screen.getByRole("slider", { name: "تقديم أو تأخير الصوت" });
+    expect(timeline.closest(".audio-seek-row")).toHaveAttribute("dir", "rtl");
+    expect(timeline.getAttribute("style")).toContain("linear-gradient(to left");
+    fireEvent.keyDown(timeline, { key: "ArrowLeft" });
+    expect(controller.seek).toHaveBeenLastCalledWith(125);
+    fireEvent.keyDown(timeline, { key: "ArrowRight" });
+    expect(controller.seek).toHaveBeenLastCalledWith(115);
+    expect(screen.getByTestId("audio-seek-waveform").querySelector(".audio-seek-waveform-played")).toHaveStyle({
+      clipPath: "inset(0 0 0 80%)",
+    });
+  });
+
+  it("mirrors transport controls and seeking in RTL mode", () => {
+    const controller = createController();
+    controller.state.plan = { ...plan, entries: [entry, { ...entry, entryId: "entry-2" }] };
+    const { unmount } = render(<FloatingAudioPlayer controller={controller} language="ar" direction="rtl" />);
+    fireEvent.click(screen.getByRole("button", { name: "توسيع المشغل" }));
+
+    const transportRtl = screen.getByRole("button", { name: "الذكر التالي" }).closest(".audio-expanded-transport");
+    expect(transportRtl).toHaveAttribute("dir", "rtl");
+    expect(screen.getByRole("button", { name: "الذكر التالي" }).querySelector("[data-rtl-flip]")).not.toBeNull();
+    expect(screen.getByRole("button", { name: "الذكر السابق" }).querySelector("[data-rtl-flip]")).not.toBeNull();
+
+    unmount();
+
+    render(<FloatingAudioPlayer controller={controller} language="en" direction="ltr" />);
+    fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
+
+    const transportLtr = screen.getByRole("button", { name: "Next item" }).closest(".audio-expanded-transport");
+    expect(transportLtr).toHaveAttribute("dir", "ltr");
   });
 });

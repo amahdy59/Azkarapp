@@ -117,19 +117,24 @@ for (const language of ["ar", "en"] as const) {
 }
 
 for (const language of ["ar", "en"] as const) {
-  test(`situational access and reading focus stay usable in ${language} @cross-browser`, async ({ page }) => {
-    await returningReader(page, language);
-    const repeatedIndex = getAzkarForMode("after_prayer", "core").findIndex(
-      (zikr) => zikr.id === "ap-tasbeeh-subhanallah",
-    );
-    expect(repeatedIndex).toBeGreaterThanOrEqual(0);
-    for (const width of [320, 820, 1440]) {
+  for (const width of [320, 820, 1440]) {
+    test(`situational access and reading focus stay usable in ${language} at ${width}px @cross-browser`, async ({
+      page,
+    }, testInfo) => {
+      await returningReader(page, language);
+      const repeatedIndex = getAzkarForMode("after_prayer", "core").findIndex(
+        (zikr) => zikr.id === "ap-tasbeeh-subhanallah",
+      );
+      expect(repeatedIndex).toBeGreaterThanOrEqual(0);
       await page.setViewportSize({ width, height: 900 });
       await page.goto("/#/home");
       const shortcuts = page.getByTestId("situational-shortcuts");
       await shortcuts.scrollIntoViewIfNeeded();
       await expect(shortcuts.getByRole("link")).toHaveCount(6);
-      await page.screenshot({ path: `output/playwright/phase78/home-${language}-${width}.png` });
+      // These named visual captures are Chromium evidence. Other engines retain
+      // every flow/axe assertion and failure traces without overwriting them.
+      if (testInfo.project.name === "desktop-chromium")
+        await page.screenshot({ path: `output/playwright/phase78/home-${language}-${width}.png` });
       await shortcuts
         .getByRole("link", { name: language === "ar" ? "أذكار الكرب والهم" : "Distress & Anxiety" })
         .click();
@@ -163,12 +168,13 @@ for (const language of ["ar", "en"] as const) {
         .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
         .analyze();
       expect(result.violations).toEqual([]);
-      await page.screenshot({ path: `output/playwright/phase78/focus-${language}-${width}.png` });
+      if (testInfo.project.name === "desktop-chromium")
+        await page.screenshot({ path: `output/playwright/phase78/focus-${language}-${width}.png` });
       await exit.focus();
       await page.keyboard.press("Escape");
       await expect(page.getByTestId("reader-screen")).toHaveAttribute("data-reading-focus", "false");
-    }
-  });
+    });
+  }
 }
 
 test("keyboard help disables character actions while preserving native counting", async ({ page }) => {
@@ -229,14 +235,17 @@ test("keyboard help remains reachable with enlarged text on a short Arabic phone
   expect(bounds.x + bounds.width).toBeLessThanOrEqual(320);
   expect(bounds.y).toBeGreaterThanOrEqual(0);
   expect(bounds.y + bounds.height).toBeLessThanOrEqual(480);
-  const titleBounds = await dialog.locator("h2:not(.sr-only)").evaluate((heading) => {
+  const titleBounds = await dialog.getByTestId("sheet-header-title").evaluate((heading) => {
     const text = document.createRange();
     text.selectNodeContents(heading);
     const bounds = text.getBoundingClientRect();
-    return { y: bounds.y };
+    return { x: bounds.x, y: bounds.y, right: bounds.right, bottom: bounds.bottom };
   });
   const closeBounds = (await dialog.getByRole("button", { name: "إغلاق", exact: true }).boundingBox())!;
-  expect(titleBounds.y).toBeGreaterThanOrEqual(closeBounds.y + closeBounds.height);
+  expect(titleBounds.x).toBeGreaterThanOrEqual(closeBounds.x + closeBounds.width);
+  expect(titleBounds.right).toBeLessThanOrEqual(bounds.x + bounds.width);
+  expect(titleBounds.y).toBeGreaterThanOrEqual(bounds.y);
+  expect(titleBounds.bottom).toBeLessThanOrEqual(bounds.y + bounds.height);
   const checkbox = dialog.getByRole("checkbox");
   // Use native focus to reach the setting, and compare DOM rectangles in one
   // coordinate system. WebKit locator bounds differ for scrolled descendants.

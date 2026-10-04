@@ -1,5 +1,7 @@
 # AI Improvement System Index
 
+[Navigation flake and browser timings](phases/NAVIGATION_FLAKE_AND_BROWSER_TIMINGS.md) records the WebKit deadline investigation, independent navigation cases, capture ownership and retained retry evidence.
+
 [Latest changes and testing release review](phases/LATEST_CHANGES_RELEASE_REVIEW.md) records the owner-approved integrated release, citation and repetition repairs, and deterministic local testing with mandatory live audio release verification.
 
 [English audio and refinements release](phases/ENGLISH_AUDIO_AND_REFINEMENTS_RELEASE.md) records the owner-approved English-first audio disclosure and review/publication of all pending refinements.
@@ -177,3 +179,5 @@ Apple/Microsoft-informed control spacing and alignment improvements.
 [Collapsed player waveform and edge controls](phases/AUDIO_COMPACT_WAVEFORM_REFINEMENT.md) records the owner-approved short waveform, dedicated edge chevron, title collision protection and keyboard/focus continuity.
 
 [Latest changes review and release](phases/LATEST_CHANGES_REVIEW_RELEASE.md) records the combined review, necessary accessibility/build repairs and owner-authorized publication.
+
+[Arabic audio direction and text transition release](phases/ARABIC_AUDIO_AND_TEXT_TRANSITIONS.md) records the owner-approved review repairs, revised RTL media contract, reading-only motion and release verification.

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useId, useState } from "react";
-import { Bookmark, Check, Copy, Share2, X } from "./icons";
-import { ResponsiveSheet } from "./ResponsiveSheet";
+import { Bookmark, BookOpen, Check, Copy, Share2 } from "./icons";
+import { ResponsiveSheet, SheetHeader } from "./ResponsiveSheet";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
 import { getSurahDisplayName } from "../content/surahInfo";
@@ -123,25 +123,17 @@ export function AyahInteractionSheet({
       testId="ayah-interaction-sheet"
       showCloseButton={false}
     >
-      <div className="flex flex-col pb-6 pt-3">
-        <div className="flex items-start justify-between gap-3 px-5 pb-4">
-          <div className="min-w-0 flex-1">
-            <p aria-hidden="true" className="text-xl font-bold leading-tight tracking-tight text-foreground">
-              {headerTitle}
-            </p>
-            <p id={descriptionId} className="sr-only">
-              {t(language, "reader.interactionSheetAria")}
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="-me-2 -mt-2 flex size-11 shrink-0 items-center justify-center rounded-full opacity-70 hover:opacity-100 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-            aria-label={t(language, "common.close")}
-          >
-            <X size={20} aria-hidden="true" />
-          </button>
-        </div>
+      <div className="flex flex-col pb-6">
+        <SheetHeader
+          title={headerTitle || t(language, "reader.interactionSheetAria")}
+          icon={<BookOpen size={20} aria-hidden="true" />}
+          onClose={onClose}
+          language={language}
+          direction={language === "ar" ? "rtl" : "ltr"}
+          descriptionId={descriptionId}
+          description={t(language, "reader.interactionSheetAria")}
+        />
+        <div className="pt-3" />
 
         <div className="mx-5 mb-3 max-h-36 overflow-y-auto rounded-xl bg-muted/55 px-4 py-3">
           {text ? (

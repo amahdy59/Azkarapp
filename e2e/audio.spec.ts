@@ -1,82 +1,100 @@
 import { expect, test } from "@playwright/test";
 
-test("individual listening keeps manual navigation and waveform seeking independent of automatic continuation @cross-browser", async ({
-  page,
-}) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.addInitScript(() => {
-    localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
-    localStorage.setItem(
-      "azkarapp.state.v1",
-      JSON.stringify({ settings: { language: "en", reduceMotion: true }, profile: { isGuest: true } }),
-    );
-    class SeekAudio extends EventTarget {
-      src = "";
-      currentTime = 0;
-      duration = 120;
-      volume = 1;
-      muted = false;
-      playbackRate = 1;
-      paused = true;
-      ended = false;
-      constructor() {
-        super();
-        Object.assign(window, { __seekAudio: this });
+for (const language of ["ar", "en"] as const) {
+  test(`individual listening keeps manual navigation and waveform seeking independent of automatic continuation in ${language} @cross-browser`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.addInitScript((language) => {
+      localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+      localStorage.setItem(
+        "azkarapp.state.v1",
+        JSON.stringify({ settings: { language, reduceMotion: true }, profile: { isGuest: true } }),
+      );
+      class SeekAudio extends EventTarget {
+        src = "";
+        currentTime = 0;
+        duration = 120;
+        volume = 1;
+        muted = false;
+        playbackRate = 1;
+        paused = true;
+        ended = false;
+        constructor() {
+          super();
+          Object.assign(window, { __seekAudio: this });
+        }
+        load() {
+          this.dispatchEvent(new Event("loadedmetadata"));
+          this.dispatchEvent(new Event("canplay"));
+        }
+        play() {
+          this.paused = false;
+          this.dispatchEvent(new Event("playing"));
+          return Promise.resolve();
+        }
+        pause() {
+          this.paused = true;
+          this.dispatchEvent(new Event("pause"));
+        }
+        removeAttribute() {
+          this.src = "";
+        }
       }
-      load() {
-        this.dispatchEvent(new Event("loadedmetadata"));
-        this.dispatchEvent(new Event("canplay"));
-      }
-      play() {
-        this.paused = false;
-        this.dispatchEvent(new Event("playing"));
-        return Promise.resolve();
-      }
-      pause() {
-        this.paused = true;
-        this.dispatchEvent(new Event("pause"));
-      }
-      removeAttribute() {
-        this.src = "";
-      }
+      Object.defineProperty(window, "Audio", { value: SeekAudio });
+    }, language);
+    await page.goto("/#/azkar/evening/1");
+    if (language === "ar") await page.getByTestId("reader-audio-dock-button").click();
+    else {
+      await page.getByRole("button", { name: "Reader options", exact: true }).click();
+      await page.getByRole("menuitem", { name: "Play English translation", exact: true }).click();
     }
-    Object.defineProperty(window, "Audio", { value: SeekAudio });
+    const player = page.getByRole("region", { name: language === "ar" ? "مشغل الصوت" : "Audio player", exact: true });
+    await expect(player.getByRole("button")).toHaveCount(3); // Close, Play and Expand; context is not a duplicate button.
+    await expect(player.getByRole("slider")).toHaveCount(0);
+    await player.getByTestId("audio-compact-title").click();
+    const continuation = player.getByRole("switch", {
+      name: language === "ar" ? "تشغيل الذكر التالي تلقائيًا" : "Play next zikr automatically",
+    });
+    await expect(continuation).toHaveAttribute("aria-checked", "false");
+    const reader = page.getByTestId("reader-screen");
+    const firstId = await reader.getAttribute("data-zikr-id");
+    await player.getByRole("button", { name: language === "ar" ? "الذكر التالي" : "Next item", exact: true }).click();
+    await expect(reader).not.toHaveAttribute("data-zikr-id", firstId!);
+    await expect(continuation).toHaveAttribute("aria-checked", "false");
+    await player
+      .getByRole("button", { name: language === "ar" ? "الذكر السابق" : "Previous item", exact: true })
+      .click();
+    await expect(reader).toHaveAttribute("data-zikr-id", firstId!);
+    await expect(player.getByTestId("audio-seek-waveform")).toBeVisible();
+    const seek = player.getByRole("slider", { name: language === "ar" ? "تقديم أو تأخير الصوت" : "Seek audio" });
+    const prevBounds = (await player
+      .getByRole("button", { name: language === "ar" ? "الذكر السابق" : "Previous item", exact: true })
+      .boundingBox())!;
+    const nextBounds = (await player
+      .getByRole("button", { name: language === "ar" ? "الذكر التالي" : "Next item", exact: true })
+      .boundingBox())!;
+    expect(Math.sign(prevBounds.x - nextBounds.x)).toBe(language === "ar" ? 1 : -1);
+    const bounds = (await seek.boundingBox())!;
+    await seek.click({ position: { x: bounds.width * (language === "ar" ? 0.25 : 0.75), y: bounds.height / 2 } });
+    await expect
+      .poll(() => page.evaluate(() => (window as unknown as { __seekAudio: HTMLMediaElement }).__seekAudio.currentTime))
+      .toBeGreaterThan(80);
+    await page.mouse.move(bounds.x + bounds.width * (language === "ar" ? 0.8 : 0.2), bounds.y + bounds.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(bounds.x + bounds.width * (language === "ar" ? 0.4 : 0.6), bounds.y + bounds.height / 2, {
+      steps: 5,
+    });
+    await page.mouse.up();
+    await expect
+      .poll(() => page.evaluate(() => (window as unknown as { __seekAudio: HTMLMediaElement }).__seekAudio.currentTime))
+      .toBeGreaterThan(65);
+    await expect
+      .poll(() => page.evaluate(() => (window as unknown as { __seekAudio: HTMLMediaElement }).__seekAudio.currentTime))
+      .toBeLessThan(80);
+    await expect(continuation).toHaveAttribute("aria-checked", "false");
   });
-  await page.goto("/#/azkar/evening/1");
-  await page.getByRole("button", { name: "Reader options", exact: true }).click();
-  await page.getByRole("menuitem", { name: "Play English translation", exact: true }).click();
-  const player = page.getByRole("region", { name: "Audio player", exact: true });
-  await expect(player.getByRole("button")).toHaveCount(3); // Close, Play and Expand; context is not a duplicate button.
-  await expect(player.getByRole("slider")).toHaveCount(0);
-  await player.getByTestId("audio-compact-title").click();
-  const continuation = player.getByRole("switch", { name: "Play next zikr automatically" });
-  await expect(continuation).toHaveAttribute("aria-checked", "false");
-  const reader = page.getByTestId("reader-screen");
-  const firstId = await reader.getAttribute("data-zikr-id");
-  await player.getByRole("button", { name: "Next item", exact: true }).click();
-  await expect(reader).not.toHaveAttribute("data-zikr-id", firstId!);
-  await expect(continuation).toHaveAttribute("aria-checked", "false");
-  await player.getByRole("button", { name: "Previous item", exact: true }).click();
-  await expect(reader).toHaveAttribute("data-zikr-id", firstId!);
-  await expect(player.getByTestId("audio-seek-waveform")).toBeVisible();
-  const seek = player.getByRole("slider", { name: "Seek audio" });
-  const bounds = (await seek.boundingBox())!;
-  await seek.click({ position: { x: bounds.width * 0.75, y: bounds.height / 2 } });
-  await expect
-    .poll(() => page.evaluate(() => (window as unknown as { __seekAudio: HTMLMediaElement }).__seekAudio.currentTime))
-    .toBeGreaterThan(80);
-  await page.mouse.move(bounds.x + bounds.width * 0.2, bounds.y + bounds.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(bounds.x + bounds.width * 0.6, bounds.y + bounds.height / 2, { steps: 5 });
-  await page.mouse.up();
-  await expect
-    .poll(() => page.evaluate(() => (window as unknown as { __seekAudio: HTMLMediaElement }).__seekAudio.currentTime))
-    .toBeGreaterThan(65);
-  await expect
-    .poll(() => page.evaluate(() => (window as unknown as { __seekAudio: HTMLMediaElement }).__seekAudio.currentTime))
-    .toBeLessThan(80);
-  await expect(continuation).toHaveAttribute("aria-checked", "false");
-});
+}
 
 test("100-count istighfar offers prescribed repeat and shows each repetition", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
@@ -301,7 +319,7 @@ test("Al-Kahf queues an intentional listen press while the audio module loads", 
   }
   await expect(player.getByRole("slider", { name: "تقديم أو تأخير الصوت" })).toHaveAttribute(
     "style",
-    /linear-gradient\(to right/,
+    /linear-gradient\(to left/,
   );
   await player.getByRole("button", { name: "مستوى الصوت", exact: true }).click();
   const volume = page.getByTestId("audio-volume-popover").getByRole("slider", { name: "مستوى الصوت" });

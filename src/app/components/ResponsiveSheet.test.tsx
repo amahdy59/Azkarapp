@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { Modal } from "./ResponsiveSheet";
+import { Modal, SheetHeader } from "./ResponsiveSheet";
 
 describe("Modal accessibility", () => {
   it("uses the title once without inventing a duplicate description", () => {
@@ -61,5 +61,51 @@ describe("Modal accessibility", () => {
 
     const modal = screen.getByTestId("glass-modal");
     expect(modal).toHaveClass("hero-glass");
+  });
+});
+
+describe("SheetHeader", () => {
+  it("renders canonical header with title, close button and triggers onClose", () => {
+    const handleClose = vi.fn();
+    render(<SheetHeader title="الفائدة" onClose={handleClose} language="ar" direction="rtl" />);
+
+    expect(screen.getByText("الفائدة")).toBeInTheDocument();
+    const closeBtn = screen.getByTestId("modal-close-button");
+    expect(closeBtn).toBeInTheDocument();
+    expect(closeBtn).toHaveAccessibleName("إغلاق");
+    closeBtn.click();
+    expect(handleClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("renders optional icon in a styled container", () => {
+    render(
+      <SheetHeader
+        title="الفائدة"
+        icon={<span data-testid="header-bulb-icon">💡</span>}
+        onClose={vi.fn()}
+        language="ar"
+        direction="rtl"
+      />,
+    );
+
+    expect(screen.getByTestId("header-bulb-icon")).toBeInTheDocument();
+    expect(screen.getByTestId("header-bulb-icon").parentElement).toHaveClass("rounded-2xl", "bg-primary/10");
+  });
+
+  it("renders optional subtitle and custom close aria label", () => {
+    render(
+      <SheetHeader
+        title="إعدادات القراءة"
+        subtitle="سورة البقرة · صفحة ٢"
+        closeAriaLabel="إغلاق الإعدادات"
+        onClose={vi.fn()}
+        language="ar"
+        direction="rtl"
+      />,
+    );
+
+    expect(screen.getByText("إعدادات القراءة")).toBeInTheDocument();
+    expect(screen.getByText("سورة البقرة · صفحة ٢")).toBeInTheDocument();
+    expect(screen.getByTestId("modal-close-button")).toHaveAccessibleName("إغلاق الإعدادات");
   });
 });

@@ -50,7 +50,8 @@ export function AuthenticZikrPicker({
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align="start"
-          className="w-[var(--radix-dropdown-menu-trigger-width)] max-w-[var(--radix-dropdown-menu-trigger-width)] max-h-[70vh] overflow-y-auto"
+          collisionPadding={16}
+          className="w-[calc(100vw-2rem)] max-w-sm sm:w-96 max-h-[70vh] overflow-y-auto"
         >
           <DropdownMenuLabel className="px-3 py-2 text-xs font-black text-muted-foreground">
             {t(language, "counter.chooseDhikr")}
@@ -78,8 +79,8 @@ export function AuthenticZikrPicker({
                   title={fullText}
                   data-testid={`zikr-option-${item.id}`}
                 >
-                  <span className="flex flex-col min-w-0 flex-1">
-                    <span className="truncate min-w-0 font-bold leading-snug">{label}</span>
+                  <span className="flex flex-col min-w-0 flex-1 py-0.5">
+                    <span className="min-w-0 font-bold leading-relaxed break-words text-start text-sm">{label}</span>
                     {hasProgress && (
                       <span className="text-[11px] font-semibold text-primary/80 leading-tight mt-0.5" dir="ltr">
                         {formatNumerals(saved!.count, language)} / {formatNumerals(saved!.target, language)}

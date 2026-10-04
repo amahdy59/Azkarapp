@@ -5,7 +5,7 @@ import type { AppLanguage, QuranVerseBookmark } from "../types";
 import { t } from "../i18n";
 import { formatNumerals } from "../formatting";
 import { SURAHS, JUZS, searchSurahs, getJuzNumberForPage, getSurahDisplayName } from "../content/surahInfo";
-import { X, Search, Bookmark } from "./icons";
+import { X, Search, Bookmark, BookOpen } from "./icons";
 import { TabList, tabPanelProps, type TabDefinition } from "./Tabs";
 import { prefetchMushafPage } from "../content/qcfMushaf";
 
@@ -121,18 +121,24 @@ export function MushafNavigationModal({
           className="fixed inset-x-2 bottom-2 top-2 z-50 flex w-auto max-w-xl flex-col overflow-hidden rounded-2xl border border-border bg-card text-card-foreground shadow-overlay animate-in fade-in zoom-in-95 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:h-[min(620px,88dvh)] sm:w-full sm:-translate-x-1/2 sm:-translate-y-1/2"
         >
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-border bg-card px-4 py-3 sm:px-5">
-            <Dialog.Title className="arabic-ui text-base font-bold text-foreground sm:text-lg">
-              {t(language, "mushaf.indexTitle")}
-            </Dialog.Title>
+          <div className="flex shrink-0 items-center justify-between gap-4 border-b border-border/40 bg-card px-5 py-3">
+            <div className="flex min-w-0 flex-1 items-center gap-3">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                <BookOpen size={20} aria-hidden="true" />
+              </div>
+              <Dialog.Title className="truncate text-lg font-extrabold leading-snug text-foreground">
+                {t(language, "mushaf.indexTitle")}
+              </Dialog.Title>
+            </div>
             <Dialog.Description className="sr-only">{t(language, "mushaf.indexDescription")}</Dialog.Description>
             <Dialog.Close asChild>
               <button
                 type="button"
-                className="flex size-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                className="flex h-[48px] w-[48px] min-h-[48px] min-w-[48px] shrink-0 items-center justify-center rounded-full bg-muted/80 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer active:scale-95"
                 aria-label={t(language, "common.close")}
+                data-testid="modal-close-button"
               >
-                <X size={20} />
+                <X size={18} aria-hidden="true" />
               </button>
             </Dialog.Close>
           </div>

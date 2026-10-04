@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
-import { Modal } from "./ResponsiveSheet";
+import { ResponsiveSheet, SheetHeader } from "./ResponsiveSheet";
+import { Mosque } from "./icons";
 import { getPrayerVirtues, PRAYER_VIRTUE_CLOSING_ARABIC } from "../content/prayerVirtues";
 import { t } from "../i18n";
 import type { AppLanguage, PrayerName } from "../types";
@@ -7,11 +8,8 @@ import type { AppLanguage, PrayerName } from "../types";
 /**
  * Acknowledges praying in congregation with what that prayer is worth.
  *
- * Deliberately small: it appears on a tap the reader made for a different
- * reason, so it stays an acknowledgement rather than a reading screen. Built
- * on the shared Modal, which already supplies the entrance and exit motion,
- * focus containment, focus restore, and Escape — so this cannot drift from
- * every other dialog in the app.
+ * Built on ResponsiveSheet and SheetHeader to match the standard
+ * sliding bottom sheet and desktop modal look and feel across the app.
  */
 export function PrayerVirtueModal({
   prayer,
@@ -33,28 +31,28 @@ export function PrayerVirtueModal({
   const name = t(language, `notifications.${prayer}`);
 
   return (
-    <Modal
+    <ResponsiveSheet
       open
       onClose={onClose}
       title={t(language, "prayerTracking.virtueTitle", { prayer: name })}
       direction={direction}
+      language={language}
       testId="prayer-virtue-modal"
       maxWidthClassName="max-w-[32rem]"
       onGlass={onGlass}
+      showCloseButton={false}
+      drawerClassName="pb-safe"
     >
-      <div className="flex min-h-0 flex-col">
-        <header
-          className={`shrink-0 border-b px-5 py-4 text-center ${
-            onGlass ? "border-white/20 bg-white/10" : "border-border/50 bg-gradient-to-b from-primary/12 to-transparent"
-          }`}
-        >
-          <p className={`text-xs font-bold ${onGlass ? "text-white/80" : "text-muted-foreground"}`}>
-            {t(language, "prayerTracking.mosque")}
-          </p>
-          <h2 className={`mt-0.5 text-lg font-black ${onGlass ? "text-white" : "text-foreground"}`} dir="auto">
-            {t(language, "prayerTracking.virtueTitle", { prayer: name })}
-          </h2>
-        </header>
+      <div className="flex min-h-0 flex-col overflow-hidden text-start">
+        <SheetHeader
+          title={t(language, "prayerTracking.virtueTitle", { prayer: name })}
+          subtitle={t(language, "prayerTracking.mosque")}
+          icon={<Mosque size={20} aria-hidden="true" />}
+          onClose={onClose}
+          language={language}
+          direction={direction}
+          onGlass={onGlass}
+        />
 
         <div
           className="min-h-0 flex-1 overflow-y-auto px-5 py-4"
@@ -110,6 +108,6 @@ export function PrayerVirtueModal({
           </button>
         </footer>
       </div>
-    </Modal>
+    </ResponsiveSheet>
   );
 }

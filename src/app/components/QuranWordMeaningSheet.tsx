@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
-import { ArrowLeft, ArrowRight, ExternalLink, Info, BookOpen, X } from "./icons";
+import { ArrowLeft, ArrowRight, ExternalLink, Info, BookOpen } from "./icons";
 import {
   QURAN_WORD_MEANING_SOURCE,
   type QuranWordMeaning,
@@ -8,7 +8,7 @@ import {
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
-import { ResponsiveSheet } from "./ResponsiveSheet";
+import { ResponsiveSheet, SheetHeader } from "./ResponsiveSheet";
 import { useLayoutMode } from "../hooks/useLayoutMode";
 
 // ─── Shared content ───────────────────────────────────────────────────────────
@@ -20,7 +20,7 @@ function WordMeaningContent({
   direction,
   onNavigate,
   onClose,
-  variant,
+  variant: _variant,
 }: {
   meanings: QuranWordMeaning[];
   /** Where this word sits among the passage's annotated words, 1-based. */
@@ -35,43 +35,23 @@ function WordMeaningContent({
 
   return (
     <div className="flex flex-col h-full max-h-[inherit] overflow-hidden">
-      {/* Drag handle (sheet only) */}
-      {variant === "sheet" && (
-        <div className="flex shrink-0 justify-center pt-3 pb-1">
-          <div className="h-1.5 w-12 rounded-full bg-muted-foreground/30" aria-hidden="true" />
-        </div>
-      )}
-
-      {/* Header */}
-      <div className="flex shrink-0 items-center justify-between px-6 py-4 border-b border-border/40">
-        <div className="flex items-center gap-3">
-          <div className="flex size-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-            <BookOpen size={20} aria-hidden="true" />
-          </div>
-          <div>
-            <h2 className="text-lg font-extrabold text-foreground leading-snug">
-              {t(language, "reader.wordMeaningTitle")}
-            </h2>
-            <p id="quran-word-meaning-description" className="text-xs font-medium text-muted-foreground">
-              {t(language, "reader.wordMeaningsTitle")}
-            </p>
-          </div>
-        </div>
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label={t(language, "reader.closeWordMeaning")}
-          className="flex h-11 w-11 items-center justify-center rounded-full bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer"
-        >
-          <X size={18} />
-        </button>
-      </div>
+      <SheetHeader
+        title={t(language, "reader.wordMeaningTitle")}
+        subtitle={t(language, "reader.wordMeaningsTitle")}
+        icon={<BookOpen size={20} aria-hidden="true" />}
+        onClose={onClose}
+        closeAriaLabel={t(language, "reader.closeWordMeaning")}
+        language={language}
+        direction={direction}
+        descriptionId="quran-word-meaning-description"
+        description={t(language, "reader.wordMeaningsTitle")}
+      />
 
       {/* Scrollable main content */}
       <div
         role="region"
         aria-label={t(language, "reader.wordMeaningTitle")}
-        className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-4 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
+        className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-4 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
         tabIndex={0}
         dir={direction}
       >

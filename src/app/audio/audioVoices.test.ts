@@ -32,4 +32,15 @@ describe("audio voices", () => {
     expect(getAudioVoiceName("muhammad-moataz", "en")).toBe("Muhammad Moataz");
     expect(getAudioVoiceName("not-a-reciter", "ar")).toBeUndefined();
   });
+
+  it("marks unavailable reciters as disabled without removing them from choices", () => {
+    const voices = getAudioVoices("ar");
+    const disabledIds = voices.filter((voice) => voice.disabled).map((voice) => voice.id);
+    expect(disabledIds).toContain("muhammad-alshara");
+    expect(disabledIds).toContain("muhammad-moataz");
+
+    const availableIds = voices.filter((voice) => !voice.disabled).map((voice) => voice.id);
+    expect(availableIds).toContain("abdullah-muhammad");
+    expect(availableIds).toContain("english-george");
+  });
 });

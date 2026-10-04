@@ -301,3 +301,5 @@ Before adding a feature:
 ### Essential audio validation gate
 
 Local pnpm check validates audio catalog metadata and content identity without network access. Quality CI requires complete hosted recording validation through pnpm validate:audio before browser verification and deployment. Every approved URL, HTTP/MIME requirement and bounded retry remains enforced.
+
+ReadingTextTransition owns presentation-only directional entry changes for Reader and expanded audio text. It tracks entry identity/index transiently, keeps one text entry present, and never owns navigation, counting, content or persistence. Shared SheetHeader centralizes wrapped dialog headings and close controls; callers retain scroll-body ownership.

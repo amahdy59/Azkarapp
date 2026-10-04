@@ -361,11 +361,7 @@ test("single zikr shares through the same preview without affecting its counter 
   await page.goto("./#/azkar/morning/4");
   const reader = page.getByTestId("reader-screen");
   await expect(reader).toBeVisible();
-  await reader
-    .getByRole("button", { name: /خيارات|Options/u })
-    .first()
-    .click();
-  await page.getByRole("menuitem", { name: /مشاركة/u }).click();
+  await reader.getByTestId("reader-share-dock-button").click();
   const modal = page.getByTestId("collection-share-modal");
   await expect(modal).toHaveAccessibleName("مشاركة هذا الذكر");
   await expect(modal.getByRole("img").first()).toBeVisible();
@@ -506,6 +502,7 @@ test("long surahs share sourced reminders with exact Mushaf links", async ({ pag
     const item = items[index]!;
     await page.goto(`./#/azkar/before-sleep/${index + 1}`);
     await expect(page.getByTestId("reader-screen")).toHaveAttribute("data-zikr-id", id);
+    await expect(page.getByTestId("reader-share-dock-button")).toHaveCount(0);
     await page.getByRole("button", { name: "Reader options", exact: true }).first().click();
     await page.getByRole("menuitem", { name: /Share/u }).click();
     const modal = page.getByTestId("collection-share-modal");
@@ -580,8 +577,7 @@ test("shared reader links preserve content across recipient routine preferences"
   const reader = page.getByTestId("reader-screen");
   await expect(reader).toBeVisible();
   const expectedId = await reader.getAttribute("data-zikr-id");
-  await reader.getByRole("button", { name: "Reader options", exact: true }).first().click();
-  await page.getByRole("menuitem", { name: /Share/u }).click();
+  await reader.getByTestId("reader-share-dock-button").click();
   const modal = page.getByTestId("collection-share-modal");
   await modal.getByRole("button", { name: "Link", exact: true }).click();
   const url = await modal.getByRole("textbox").inputValue();

@@ -451,7 +451,7 @@ describe("AudioProvider integration", () => {
     expect(window.localStorage.getItem("azkar.audio-preferences.v1")).toContain('"volume":0.4');
   });
 
-  it("fills the Arabic media timeline from the left without changing text direction or media time", async () => {
+  it("fills the Arabic media timeline from the right without changing text direction or media time", async () => {
     vi.stubGlobal("Audio", FakeAudio);
     render(
       <AudioProvider>
@@ -462,7 +462,7 @@ describe("AudioProvider integration", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "توسيع المشغل" }));
     const timeline = await screen.findByRole("slider", { name: "تقديم أو تأخير الصوت" });
-    expect(timeline.getAttribute("style")).toContain("to right");
+    expect(timeline.getAttribute("style")).toContain("to left");
     expect(timeline).toHaveValue("0");
 
     fireEvent.click(screen.getByTestId("audio-reciter-select"));
