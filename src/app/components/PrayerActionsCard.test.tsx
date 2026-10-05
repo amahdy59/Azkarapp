@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { PrayerActionsCard } from "./PrayerActionsCard";
 import type { PrayerTrackingRecord } from "../types";
@@ -8,6 +8,56 @@ afterEach(cleanup);
 const DAY = "2026-09-18";
 
 describe("PrayerActionsCard", () => {
+  it("returns information-sheet focus to its pointer trigger rather than the previous checkbox", async () => {
+    render(
+      <PrayerActionsCard
+        prayer="fajr"
+        language="en"
+        direction="ltr"
+        records={[]}
+        dayKey={DAY}
+        onToggle={vi.fn()}
+        onOpenAdhkar={vi.fn()}
+      />,
+    );
+    screen.getAllByRole("checkbox")[0]!.focus();
+    const trigger = screen.getByTestId("prayer-actions-more-info");
+    fireEvent.click(trigger);
+    fireEvent.click(screen.getByTestId("modal-close-button"));
+    await waitFor(() => expect(trigger).toHaveFocus());
+  });
+  it("announces the actual prayer-specific total and keeps completed rows editable", () => {
+    const onToggle = vi.fn();
+    render(
+      <PrayerActionsCard
+        prayer="dhuhr"
+        language="en"
+        direction="ltr"
+        records={[
+          {
+            dayKey: DAY,
+            prayer: "dhuhr",
+            mosque: true,
+            location: "mosque",
+            sunnahBefore: true,
+            sunnahAfter: true,
+            adhkar: true,
+          },
+        ]}
+        dayKey={DAY}
+        onToggle={onToggle}
+        onOpenAdhkar={vi.fn()}
+        showProgress
+      />,
+    );
+    const progress = screen.getByTestId("prayer-actions-progress");
+    expect(progress).toHaveTextContent("4 of 4 completed");
+    expect(progress).toHaveAttribute("aria-live", "polite");
+    const inputs = screen.getAllByRole("checkbox");
+    for (const input of inputs) expect(input).toBeEnabled();
+    fireEvent.click(inputs[0]!);
+    expect(onToggle).toHaveBeenCalledWith("dhuhr", "location", null);
+  });
   it("renders Dhuhr with 4 action rows, dynamic heading and more info button", () => {
     const onToggle = vi.fn();
     const onOpenAdhkar = vi.fn();
@@ -31,7 +81,7 @@ describe("PrayerActionsCard", () => {
 
     expect(infoButton).toHaveTextContent("");
     expect(infoButton).toHaveClass("size-11");
-    expect(infoButton).toHaveClass("border");
+    expect(infoButton).not.toHaveClass("border");
     expect(infoButton).toHaveAttribute("aria-haspopup", "dialog");
     fireEvent.click(infoButton);
     expect(screen.getByTestId("prayer-info-points").querySelectorAll(":scope > li")).toHaveLength(2);
@@ -303,7 +353,7 @@ describe("PrayerActionsCard", () => {
     );
 
     const button = screen.getByTestId("prayer-open-adhkar");
-    expect(button).toHaveTextContent("ابدأ الأذكار");
+    expect(button).toHaveTextContent("ابدأ أذكار بعد الصلاة");
     fireEvent.click(button);
     expect(onOpenAdhkar).toHaveBeenCalledWith("maghrib");
   });
@@ -326,7 +376,7 @@ describe("PrayerActionsCard", () => {
     expect(screen.getByTestId("prayer-action-dhuhr-sunnah-before")).toHaveTextContent("4 rak'ahs before Dhuhr");
     expect(screen.getByTestId("prayer-action-dhuhr-adhkar")).toHaveTextContent("Azkar after prayer");
     expect(screen.getByTestId("prayer-action-dhuhr-sunnah-after")).toHaveTextContent("2 rak'ahs after Dhuhr");
-    expect(screen.getByTestId("prayer-open-adhkar")).toHaveTextContent("Start Azkar");
+    expect(screen.getByTestId("prayer-open-adhkar")).toHaveTextContent("Start after-prayer adhkar");
   });
 
   it("renders with clean aligned rows without fill/stroke when onGlass is true", () => {
@@ -344,7 +394,7 @@ describe("PrayerActionsCard", () => {
     );
 
     const section = screen.getByTestId("prayer-actions-card");
-    expect(section).toHaveClass("p-5");
+    expect(section).toHaveClass("p-4");
 
     const row = screen.getByTestId("prayer-action-location");
     expect(row).not.toHaveClass("backdrop-blur-md");
@@ -353,9 +403,12 @@ describe("PrayerActionsCard", () => {
     expect(row).toHaveClass("px-2");
     expect(row).toHaveClass("-mx-2");
     expect(row).toHaveClass("text-white");
+    expect(row.querySelector(":scope > div svg")).toBeNull();
+    expect(row.querySelector(".tracking-check")).toHaveClass("size-5");
+    expect(row.querySelector("input")).toHaveAccessibleName("صليت الظهر جماعة");
 
     const heading = screen.getByRole("heading", { level: 3 });
-    expect(heading).toHaveClass("text-on-media-accent");
+    expect(heading).toHaveClass("text-on-media");
 
     const cta = screen.getByTestId("prayer-open-adhkar");
     expect(cta).toHaveClass("bg-primary");

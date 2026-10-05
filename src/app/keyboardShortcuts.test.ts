@@ -7,6 +7,15 @@ afterEach(() => {
 });
 
 describe("counter shortcut boundaries", () => {
+  it("leaves resizing keys to a focused interactive separator", () => {
+    const separator = document.createElement("div");
+    separator.setAttribute("role", "separator");
+    separator.tabIndex = 0;
+    document.body.append(separator);
+    separator.focus();
+    for (const key of ["ArrowLeft", "ArrowRight", "Home", "End", "Enter", " "])
+      expect(isCounterShortcutBlocked(new KeyboardEvent("keydown", { key }))).toBe(true);
+  });
   it("disables character shortcuts without disabling counting or navigation", () => {
     setCharacterShortcutsEnabled(false);
     for (const key of ["r", "R", "ق", "s", "b", "[", "?"])

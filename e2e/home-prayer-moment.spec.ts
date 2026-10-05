@@ -34,14 +34,14 @@ test("the prayer card is on Home inside the window, and gone outside it", async 
   await expect(card).toHaveAttribute("data-prayer", "dhuhr");
 
   // Its parts are the prayer screen's, not a second copy of them.
-  await expect(card.getByTestId("prayer-moment-hero")).toBeVisible();
+  await expect(card.getByTestId("prayer-moment-status")).toBeVisible();
   await expect(card.getByTestId("prayer-action-location")).toBeVisible();
 
   const strip = page.getByTestId("home-prayer-strip");
   await expect(strip).toBeVisible();
   expect(
     await strip.evaluate((element) => {
-      const contextElement = document.querySelector('[data-testid="home-context-grid"]');
+      const contextElement = document.querySelector('[data-testid="home-prayer-moment"]');
       return Boolean(
         contextElement && element.compareDocumentPosition(contextElement) & Node.DOCUMENT_POSITION_FOLLOWING,
       );
@@ -98,7 +98,7 @@ test("each Home prayer expands its shared properties under an aligned notch", as
   await expect(page).toHaveURL(/\/?$/);
   const expanded = page.getByTestId("home-prayer-moment");
   await expect(expanded).toHaveAttribute("data-prayer", "dhuhr");
-  await expect(expanded.getByTestId("prayer-moment-hero")).toBeVisible();
+  await expect(expanded.getByTestId("prayer-moment-status")).toBeVisible();
   await expect(expanded.getByTestId("prayer-action-location")).toBeVisible();
 
   const selected = page.getByTestId("prayer-card-dhuhr");
@@ -225,8 +225,10 @@ test("tracking uses a circular keyboard focus indicator and mirrors in RTL", asy
   const infoCircle = infoButton.locator("span[aria-hidden='true']");
   const infoCircleBox = await infoCircle.boundingBox();
   expect(infoCircleBox).not.toBeNull();
-  expect(infoCircleBox!.width).toBeCloseTo(indicatorBox!.width, 0);
-  expect(infoCircleBox!.height).toBeCloseTo(indicatorBox!.height, 0);
+  expect(indicatorBox!.width).toBeCloseTo(20, 0);
+  expect(indicatorBox!.height).toBeCloseTo(20, 0);
+  expect(infoCircleBox!.width).toBeCloseTo(24, 0);
+  expect(infoCircleBox!.height).toBeCloseTo(24, 0);
 
   const infoCenterX = infoCircleBox!.x + infoCircleBox!.width / 2;
   const indicatorCenterX = indicatorBox!.x + indicatorBox!.width / 2;

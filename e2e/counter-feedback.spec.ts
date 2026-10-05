@@ -56,8 +56,10 @@ async function openReturningGuest(page: Page, language: "ar" | "en" = "en", sett
 test("the Home Wird keeps semantic order while mirroring Arabic placement and expanding on mobile", async ({
   page,
 }) => {
+  await page.clock.setFixedTime(new Date("2026-09-05T13:20:00+03:00"));
   await page.setViewportSize({ width: 834, height: 900 });
   await openReturningGuest(page, "en");
+  await page.evaluate(() => document.fonts.ready);
 
   const ltrCards = page.getByTestId("today-garden-card").getByRole("button", { name: / - (Completed|Not completed)$/ });
   // Asserted before indexing: boundingBox() on a locator that never resolves
@@ -116,6 +118,7 @@ test("the Home Wird keeps semantic order while mirroring Arabic placement and ex
   ).toEqual({ overflow: 0, textOverflow: "clip" });
 
   await openReturningGuest(page, "ar");
+  await page.evaluate(() => document.fonts.ready);
   await page.setViewportSize({ width: 834, height: 900 });
   await page.waitForFunction(() => window.innerWidth === 834);
   const rtlCards = page.getByTestId("today-garden-card").getByRole("button", { name: / - (مكتملة|غير مكتملة)$/ });
@@ -162,9 +165,14 @@ test("tablet and desktop Home keep prayer detail to the selected half while othe
       gridBox && prayerDetailBox && contextStackBox && primaryBox && companionBox && wirdBox && prayerSummaryBox,
     ).toBeTruthy();
     if (gridBox && prayerDetailBox && contextStackBox && primaryBox && companionBox && wirdBox && prayerSummaryBox) {
-      expect(Math.abs(prayerDetailBox.width - (prayerSummaryBox.width - 20) / 2)).toBeLessThanOrEqual(2);
-      expect(prayerDetailBox.x + prayerDetailBox.width).toBeCloseTo(prayerSummaryBox.x + prayerSummaryBox.width, 0);
-      expect(Math.abs(prayerDetailBox.y - contextStackBox.y)).toBeLessThanOrEqual(2);
+      const rootSize = await page.locator("html").evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
+      expect(Math.abs(prayerDetailBox.width - (gridBox.width - 1.25 * rootSize) / 2)).toBeLessThanOrEqual(2);
+      expect(prayerDetailBox.x + prayerDetailBox.width).toBeCloseTo(gridBox.x + gridBox.width, 0);
+      expect(prayerSummaryBox.width).toBeLessThanOrEqual(40 * rootSize);
+      expect(prayerSummaryBox.width).toBeCloseTo(prayerDetailBox.width, 0);
+      expect(prayerSummaryBox.x).toBeCloseTo(prayerDetailBox.x, 0);
+      expect(Math.abs(prayerSummaryBox.y - contextStackBox.y)).toBeLessThanOrEqual(2);
+      expect(prayerDetailBox.y).toBeCloseTo(prayerSummaryBox.y + prayerSummaryBox.height + 1.25 * rootSize, 0);
       expect(Math.abs(prayerDetailBox.width - contextStackBox.width)).toBeLessThanOrEqual(2);
       expect(primaryBox.width).toBeCloseTo(contextStackBox.width, 0);
       expect(companionBox.width).toBeCloseTo(contextStackBox.width, 0);
@@ -179,15 +187,18 @@ test("tablet and desktop Home keep prayer detail to the selected half while othe
   await page.setViewportSize({ width: 834, height: 900 });
   await page.waitForFunction(() => window.innerWidth === 834);
   await expect(async () => {
-    const [tabletPrayerBox, tabletStackBox, tabletSummaryBox] = await Promise.all([
+    const [tabletPrayerBox, tabletStackBox, tabletSummaryBox, tabletGridBox] = await Promise.all([
       prayerDetail.boundingBox(),
       contextStack.boundingBox(),
       prayerSummary.boundingBox(),
+      grid.boundingBox(),
     ]);
-    expect(tabletPrayerBox && tabletStackBox && tabletSummaryBox).toBeTruthy();
-    if (tabletPrayerBox && tabletStackBox && tabletSummaryBox) {
-      expect(Math.abs(tabletPrayerBox.width - (tabletSummaryBox.width - 16) / 2)).toBeLessThanOrEqual(2);
-      expect(tabletPrayerBox.x + tabletPrayerBox.width).toBeCloseTo(tabletSummaryBox.x + tabletSummaryBox.width, 0);
+    expect(tabletPrayerBox && tabletStackBox && tabletSummaryBox && tabletGridBox).toBeTruthy();
+    if (tabletPrayerBox && tabletStackBox && tabletSummaryBox && tabletGridBox) {
+      const rootSize = await page.locator("html").evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
+      expect(Math.abs(tabletPrayerBox.width - (tabletGridBox.width - rootSize) / 2)).toBeLessThanOrEqual(2);
+      expect(tabletPrayerBox.x + tabletPrayerBox.width).toBeCloseTo(tabletGridBox.x + tabletGridBox.width, 0);
+      expect(tabletSummaryBox.width).toBeLessThanOrEqual(40 * rootSize);
       expect(Math.abs(tabletPrayerBox.y - tabletStackBox.y)).toBeLessThanOrEqual(2);
       expect(Math.abs(tabletPrayerBox.width - tabletStackBox.width)).toBeLessThanOrEqual(2);
     }

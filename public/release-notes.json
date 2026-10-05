@@ -1,13 +1,15 @@
 {
-  "release": "2026-10-05.7",
+  "release": "2026-10-05.8",
   "ar": [
-    "بطاقات المجموعة تجمع أذكارًا أكثر عندما تتسع، مع نص واضح ومساحة مريحة بين التشكيل والخطوط الفاصلة.",
-    "يمكنك إضافة المصادر أو إخفاؤها، وتعرض الصور المرجع الأول باختصار في سطرين كحد أقصى.",
-    "أرقام البطاقات والتكرار والمراجع تظهر بالأرقام ٠١٢٣٤٥٦٧٨٩، مع تذييل أبسط وخيار إظهار العبارة أسفل العنوان."
+    "مواقيت الصلاة أوضح، مع إبراز الصلاة الحالية وبطاقة أعمال أبسط وأكثر اختصارًا.",
+    "بطاقات الرئيسية متوازنة على الشاشات الكبيرة، وتتكيف مع الشاشات الصغيرة وتكبير النص.",
+    "رأس قارئ الأذكار يعرض مشاهد هادئة مع ألوان أوضح وأدوات متناسقة.",
+    "يمكنك طي قائمة الأذكار وتغيير عرضها بالسحب أو لوحة المفاتيح على الشاشات الكبيرة."
   ],
   "en": [
-    "Combined cards fit more adhkar when space allows, with readable text and clear spacing between Arabic marks and dividers.",
-    "Include or hide sources. Images show the first reference concisely in at most two lines.",
-    "Card, repetition and reference numbers use ٠١٢٣٤٥٦٧٨٩, with a simpler footer and an optional collection subtitle."
+    "Prayer times are clearer, with stronger current-prayer emphasis and a simpler, more compact deeds card.",
+    "Home cards stay balanced on large screens and adapt to small screens and enlarged text.",
+    "The adhkar Reader header has calm scenes, clearer colors and consistent tools.",
+    "Collapse the adhkar list and resize it by dragging or using the keyboard on large screens."
   ]
 }

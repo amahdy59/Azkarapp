@@ -1,5 +1,13 @@
 # Decision Log
 
+## Reader collection scenes — 2026-10-05
+
+Owner approves the follow-up reading-column alignment, quieter skyline, title/progress hierarchy, consistent toolbar anatomy and compact theme tuning. Explicit preference: mobile header buttons stay borderless; preserve existing header height and mobile spacing. Keep this work local while other agents are working; no commit, push or deployment.
+
+Owner visual follow-up moves the individual zikr title and Rare words switch out of the wide collection header into the reading area. Keep collection header dimensions consistent across groups/entries within each responsive tier; preserve the existing compact header and reading-row sizing. No extra mobile space, content change or publication is authorized.
+
+The owner approves the CSS-gradient and small-SVG approach for azkar Reader headers, requiring attractive proportionally fitted desktop/mobile artwork, unchanged header heights, accessibility and offline fallbacks. Implement as an absolute decorative layer: desktop retains the dark brand surface, compact retains the theme surface with a muted vignette. Morning, Evening and Before Sleep use coordinated collection-specific skies; other collections receive neutral treatment. Hide artwork for reduced transparency and forced colors. Preserve content, functional controls, prayer scenes and persistence. This explicitly permits decoration on the compact Reader's otherwise opaque shared header without changing the ordinary-header scroll containment contract. Local verification only: do not push or deploy.
+
 ## Compact combined shared cards — 2026-10-05
 
 Owner follow-up explicitly supersedes the earlier mandatory citation requirement for sharing: sources become an optional export setting, on by default. Image citations use the first listed reviewed reference rather than an inferred most-important source, and never exceed two lines. Abbreviate exceptionally long names visibly without editing reviewed data; retain the numeric reference where it fits. Source-enabled Text/ZIP keep the complete reference, while source-disabled exports omit it. Preserve separate glossary attribution and long-surah QR/reading links.
@@ -4214,3 +4222,37 @@ The owner additionally flags the overlapping floating collection toggle as a maj
 ## Shared-card separator repair — 2026-10-05
 
 The owner reports devotional text touching the separator in a lavender combined card. Reserve actual glyph height and at least 20 export pixels of clearance on each side of every section divider. Readability takes precedence over packing another item. The pending release is superseded by this repair.
+
+## Resizable Reader collection panel — 2026-10-05
+
+Owner subsequently requests a single visible collapse/reopen control, matching Codex: hide the Reader toolbar toggle while the docked panel is open; use the panel's own collapse control, then reveal the toolbar toggle to reopen. Transfer keyboard focus to the newly available control on either transition. Narrow-screen drawer access remains available.
+
+Owner agrees to the proposed panel icon placement, collapsible familiar sidebar, continuous drag/keyboard resizing, viewport-aware min/max widths, 480px reading-space protection and narrow-screen drawer fallback. Keep preferred width, expanded previews and scrolling within the visit. Explicit latest instruction: do not push after implementation. This phase is local-only and supersedes the older fixed 288–352px collection panel contract.
+
+## Compact prayer companion — 2026-10-05
+
+The owner approves the prayer-card review recommendations and explicitly requests local changes only, with no push. Merge duplicate prayer hero/header into one compact heading and quiet status/count; retain complete reviewed virtue/source, plain wrapping checklist rows, existing recording and temporal logic, editing after completion, and one clearly labelled after-prayer action. Calm the Home tiles, distinguish viewed/current/next prayers, preserve chronological RTL/LTR order and semantic focus, and verify all widths and enlarged text. Keep the existing contextual shell tracks; internal columns are unnecessary. This supersedes only older separate hero/minimum-height virtue and decorative summary-tile anatomy, not prayer-time or content contracts.
+
+## Prayer timer emphasis and checklist density — 2026-10-05
+
+The owner approves local implementation of bolder prayer times (12px at the narrowest width, 13px ordinary phones, 14px wider views), higher time contrast, removal of expanded checklist label icons, 20px visual checks and zero extra row gap. Preserve 44px full-row targets, wrapping, native checked/focus semantics, reviewed wording, state and other tracking surfaces. No commit or push is requested. This is a follow-up to the compact prayer companion phase.
+
+## Prayer tile breathing room and current emphasis — 2026-10-05
+
+The owner approves continuing the local refinement: add 2px to summary tile element gaps, use bold 14px phone/15px wider times with a 12px narrow fallback, strengthen current-prayer tint and outline independently of selected detail, and quiet the upcoming status. Preserve responsive reflow, equal row height, semantic state and full targets. Explicit instruction remains local-only; no commit or push while other agents work.
+
+## Prayer tile status gap and short next label — 2026-10-05
+
+Owner requests removing the large time-to-status gap and using "القادمة" instead of "الصلاة القادمة" in small tiles, with single-line text and times. Remove the status auto margin, keep the 6px element rhythm, use summary-specific short localized labels and allow fewer grid columns at constrained/enlarged widths. No clipping, ellipsis or reduction in interactive target size. Local-only authorization remains in force.
+
+## Bounded Home composition and consistent prayer font — 2026-10-05
+
+Owner requests maximum widths for Home cards and prayer times instead of stretching across desktop, plus the surrounding app font for the prayer narration. Approved implementation: center the 70rem Home grid and utility header, independently center the 40rem prayer strip, bound individual reading cards to 40rem, keep existing two contextual tracks and full composite routine row within 66rem, constrain standalone Friday/situational cards, and retain fluid compact widths and semantic DOM order. The reviewed prayer narration uses inherited app typography with semibold weight; content/diacritics/source are unchanged. This supersedes the earlier 90rem Home measure and full-grid-width prayer strip alignment. Owner also authorizes publishing the completed combined working tree after gates; edits outside requested prayer/Home scope require returning to the owner first.
+
+## Aligned desktop prayer column — 2026-10-05
+
+Owner asks the prayer times and expanded card to share the same maximum width and contextual cards to align with the summary's top. At desktop (1024px+) with expanded detail, place the summary and detail in one bounded 40rem column beside the contextual stack. Use a flex column inside the grid so the stack's height cannot introduce a large empty gap between summary and detail. Tablet retains the centered full-row summary and two contextual tracks; phone stacks in semantic priority order. All reviewed hadith wording remains unchanged and the companion narration inherits app typography, verified against its heading font family. This supersedes the preceding centered desktop strip spanning the grid's midpoint.
+
+### 2026-10-05 — Integrated Reader browser expectations
+
+Owner approved updating the two outdated Reader header expectations identified by the combined prayer/Home release verification. Scope is limited to browser assertions covering the completed collection panel and drawer open/close states, toolbar actions and focus restoration; no Reader application behavior change is authorized by this decision.

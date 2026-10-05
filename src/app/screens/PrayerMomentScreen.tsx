@@ -71,7 +71,7 @@ export function PrayerMomentScreen({
             tracker cards for the same purpose, which is why the strip belongs
             to the screen rather than to the shared panel. */}
         <nav
-          className="mt-1 flex items-stretch justify-between gap-1 rounded-2xl border border-border bg-card p-1.5 md:col-span-2"
+          className="mt-1 grid grid-cols-[repeat(auto-fit,minmax(min(100%,3rem),1fr))] gap-1 rounded-2xl border border-border bg-card p-1.5 md:col-span-2"
           aria-label={t(language, "prayerMoment.dayTitle")}
           data-testid="prayer-moment-strip"
         >
@@ -85,7 +85,7 @@ export function PrayerMomentScreen({
                 onClick={() => onSelectPrayer(item)}
                 aria-current={current ? "true" : undefined}
                 data-testid={`prayer-strip-${item}`}
-                className={`flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl px-1 py-1.5 transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                className={`flex min-h-11 min-w-0 flex-col items-center justify-center gap-0.5 rounded-xl px-1 py-1.5 transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                   current ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-muted"
                 }`}
               >

@@ -74,6 +74,29 @@ function renderRow(current: PrayerName) {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("PrayerTrackerCards", () => {
+  it("keeps the viewed prayer distinct from the current prayer and describes its time", () => {
+    render(
+      <PrayerTrackerCards
+        models={modelsWithCurrent("asr")}
+        language="en"
+        direction="ltr"
+        records={[]}
+        dayKey="2026-09-05"
+        onToggle={vi.fn()}
+        onOpen={vi.fn()}
+        summaryOnly
+        selectedPrayer="fajr"
+      />,
+    );
+    expect(screen.getByTestId("prayer-card-fajr")).toHaveAttribute("data-selected", "true");
+    expect(screen.getByTestId("prayer-card-fajr")).not.toHaveAttribute("aria-current");
+    expect(screen.getByTestId("prayer-card-asr")).toHaveAttribute("aria-current", "step");
+    expect(screen.getByTestId("prayer-card-asr")).toHaveClass("border-primary", "bg-primary/15");
+    expect(screen.getByTestId("prayer-card-fajr")).not.toHaveClass("border-primary");
+    expect(screen.getByRole("button", { name: /Open Fajr/i })).toHaveAccessibleDescription(/4:52 AM/);
+    expect(screen.getByTestId("prayer-card-asr")).toHaveTextContent("Now");
+    expect(screen.getByTestId("prayer-card-maghrib")).toHaveTextContent("Next");
+  });
   it("renders all five cards unconditionally", () => {
     stubViewport([]);
     expect(renderRow("fajr")).toEqual(["fajr", "dhuhr", "asr", "maghrib", "isha"]);

@@ -19,7 +19,7 @@ for (const language of ["ar", "en"] as const) {
       await expect(async () => {
         const geometry = await cards.evaluateAll((cards) =>
           cards.map((card) => {
-            const icon = card.querySelector(".prayer-chip")!.getBoundingClientRect();
+            const icon = card.querySelector("[data-prayer-icon]")!.getBoundingClientRect();
             const heading = card.querySelector("h3")!.getBoundingClientRect();
             return { icon: icon.y, heading: heading.y };
           }),

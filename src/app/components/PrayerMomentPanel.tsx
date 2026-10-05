@@ -1,7 +1,5 @@
-import { progressFillStyle } from "./progressFillStyle";
 import { useMemo } from "react";
 import type { PrayerTrackingWrite } from "./PrayerTrackerCards";
-import { PrayerSceneArt } from "./PrayerSceneArt";
 import { CloudSun, MoonStar, Sun, Sunrise, Sunset } from "./icons";
 import { t } from "../i18n";
 import { formatPrayerTimeLabel } from "../content/prayerTimes";
@@ -20,22 +18,7 @@ export const PRAYER_ICON: Record<PrayerName, typeof Sunrise> = {
   isha: MoonStar,
 };
 
-/** One shape for the three cards that record something. */
-/**
- * The prayer at hand: the sky it is called in, why it is worth walking to, and
- * the three things a reader records about it.
- *
- * One component for two call sites. It is the body of PrayerMomentScreen, and
- * it is what Home shows in place of a link once the prayer is close enough to
- * act on — recording a prayer that is happening now should not cost a
- * navigation. Home and the screen therefore cannot drift: there is one hero,
- * one virtue, one set of action cards, and one definition of "live".
- *
- * It renders a fragment of grid items rather than its own container, because
- * the two call sites legitimately differ there — the screen is a scrolling
- * page, Home is one section in a column — while everything inside the grid is
- * the same in both.
- */
+/** One compact identity, reviewed virtue and editable checklist on Home and the prayer screen. */
 export function PrayerMomentPanel({
   prayer,
   language,
@@ -48,7 +31,6 @@ export function PrayerMomentPanel({
   onOpenAdhkar,
   onGlass = false,
   canRecord = true,
-  fullWidth = false,
 }: {
   prayer: PrayerName;
   language: AppLanguage;
@@ -59,21 +41,11 @@ export function PrayerMomentPanel({
   /** Injected so the states can be held to a fixed clock in a test. */
   now?: Date;
   onToggle: (prayer: PrayerName, field: PrayerTrackingWrite, value: boolean | "mosque" | "home" | null) => void;
-  /**
-   * Rendered over the Home hero's photograph rather than on the page ground.
-   *
-   * The card carries its own `PrayerSceneArt` everywhere else, which is right
-   * on its own screen and wrong on Home: two illustrations, the page's
-   * photograph and the card's sky, competing for the same focal point behind
-   * the same text. On glass the card drops its scene and lets the photograph be
-   * the single ground, which is what `hero-glass` and the `on-media` tokens
-   * were built for.
-   */
+  /** Use Home’s shared on-media palette when composed over its photograph. */
   onGlass?: boolean;
   /** Future prayers may be previewed shortly before adhan, but not recorded. */
   canRecord?: boolean;
   onOpenAdhkar: (prayer: PrayerName) => void;
-  fullWidth?: boolean;
 }) {
   const moment: PrayerMoment = useMemo(
     () => getPrayerMoment({ prayer, now, dayKey, records, location: locationSettings }),
@@ -82,21 +54,12 @@ export function PrayerMomentPanel({
 
   const isArabic = language === "ar";
   const name = t(language, `notifications.${prayer}`);
-  const Icon = PRAYER_ICON[prayer];
   const virtue = getPrayerVirtues(prayer)[0];
 
-  /* The prayer leads from twenty minutes before its adhan until the next one,
-     and the moment it is recorded. Everywhere else this is a reference for a
-     prayer that is not the one at hand. */
-  /* The wide band is a fixed navy surface, so its controls take on-media colours
-     rather than theme ones. Declared here rather than inline: this is the
-     pairing that fails silently when one class string is left behind. */
   const titleText = onGlass ? "text-on-media" : "text-foreground";
   const bodyText = onGlass ? "text-on-media-muted" : "text-muted-foreground";
   const accentText = onGlass ? "text-on-media-accent" : "text-primary";
   const hairline = onGlass ? "border-white/20" : "border-border/60";
-
-  const isLive = moment.phase === "now" || moment.phase === "approaching" || moment.phase === "recorded";
 
   /* Only while the prayer is still ahead. Once it is in, "in 0 min" is worse
      than silence, and once recorded the wait is no longer the point. */
@@ -107,10 +70,6 @@ export function PrayerMomentPanel({
         : t(language, "prayerMoment.countdownMinutes", { minutes: formatNumerals(moment.minutesUntil, language) })
       : null;
 
-  const approachFraction =
-    moment.phase === "approaching" && moment.leadMinutes > 0
-      ? Math.min(1, Math.max(0, (moment.leadMinutes - moment.minutesUntil) / moment.leadMinutes))
-      : null;
   const statusKey =
     moment.phase === "recorded"
       ? "prayerMoment.statusRecorded"
@@ -123,116 +82,7 @@ export function PrayerMomentPanel({
             : "prayerMoment.statusUpcoming";
 
   return (
-    <HomeCard as="article" onGlass={onGlass} padding="none" className="flex flex-col overflow-hidden">
-      <div className={`flex flex-col ${fullWidth && virtue ? "md:grid md:grid-cols-2" : ""}`}>
-        <section
-          /* A floor, not a height: the scene is the ground for the name and
-          the time, and at content height alone it read as a strip of sky
-          rather than as the sky. It still grows for a longer name, and on
-          the wide grid it stretches to match the virtue beside it.
-
-          bg-on-media-surface under the art, as the Home hero carries under
-          its photograph. The scene is an absolutely positioned sibling at
-          -z-10, so nothing in the ancestor chain describes what this white
-          text sits on: the analyser read it as white on the light theme's
-          page colour at 1.08:1, and it was right to — one failed paint and
-          that is what a reader would get. */
-          className={`relative isolate min-h-[11rem] border-b ${hairline} ${
-            fullWidth && virtue && isLive ? "journey-hero-aside" : ""
-          } ${onGlass ? "bg-transparent" : "bg-on-media-surface text-white"}`}
-          data-testid="prayer-moment-hero"
-        >
-          {!onGlass && <PrayerSceneArt prayer={prayer} className="absolute inset-0 -z-10" />}
-          {/* Fixed light-on-dark, because the scene is its own ground in every
-          theme — the same rule the Home hero follows over its photograph. */}
-          <div className="flex h-full flex-col justify-between gap-4 p-5 sm:p-6 text-white">
-            <div className="flex flex-col gap-1 text-start">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h2 className="text-3xl font-black leading-tight md:text-4xl" dir="auto">
-                    {name}
-                  </h2>
-                  {countdown && (
-                    <p className="mt-1 text-label font-medium text-white/70" dir="auto">
-                      {countdown}
-                    </p>
-                  )}
-                </div>
-                <span
-                  className={`flex size-12 shrink-0 items-center justify-center rounded-full border-[1.5px] border-[currentColor]/70 ${accentText}`}
-                >
-                  <Icon size={24} aria-hidden="true" />
-                </span>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-3">
-              <div className="flex flex-wrap items-center gap-2.5">
-                <p className="text-4xl font-black leading-none tabular-nums" dir="auto">
-                  {formatPrayerTimeLabel(moment.time, isArabic)}
-                </p>
-                {moment.phase === "now" && (
-                  <span className="rounded-full bg-primary px-3 py-1 text-xs font-black text-primary-foreground">
-                    {t(language, "prayerMoment.badgeNow")}
-                  </span>
-                )}
-              </div>
-              {prayer === "fajr" && moment.shroukTime && (
-                <p className="text-sm font-semibold text-white/80 sm:hidden" dir="auto">
-                  {t(language, "notifications.shrouk")}: {formatPrayerTimeLabel(moment.shroukTime, isArabic)}
-                </p>
-              )}
-
-              {approachFraction !== null && (
-                <div
-                  role="meter"
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                  aria-valuenow={Math.round(approachFraction * 100)}
-                  aria-label={t(language, "prayerMoment.countdownProgress", { prayer: name })}
-                  className={`h-2 w-full overflow-hidden rounded-full ${onGlass ? "bg-white/20" : "bg-muted"}`}
-                >
-                  <div
-                    className="h-full rounded-full bg-primary progress-fill-transform"
-                    style={{ ...progressFillStyle(Math.round(approachFraction * 100) / 100) }}
-                  />
-                </div>
-              )}
-            </div>
-            <p className="flex items-center gap-2 text-label font-medium text-white/90">
-              <span className="size-1.5 rounded-full bg-primary" aria-hidden="true" />
-              {t(language, statusKey)}
-            </p>
-          </div>
-        </section>
-        {virtue && (
-          <section
-            className={`flex min-h-[11rem] flex-col justify-center border-b p-5 sm:p-6 text-start ${hairline} ${
-              onGlass ? "bg-transparent" : ""
-            }`}
-            data-testid="prayer-moment-virtue"
-          >
-            <h3 className={`text-subtitle font-black ${accentText}`} dir="auto">
-              {t(language, "prayerMoment.virtueTitle", { prayer: name })}
-            </h3>
-            <p className={`mt-2 text-xs font-bold ${bodyText}`} dir="auto">
-              {t(language, "prayerMoment.virtueAttribution")}
-            </p>
-            <p
-              className={`mt-2 text-title font-bold leading-loose ${titleText} ${
-                isArabic || !virtue.textEnglish ? "zikr-text" : ""
-              }`}
-              dir={isArabic || !virtue.textEnglish ? "rtl" : "ltr"}
-              lang={isArabic || !virtue.textEnglish ? "ar" : "en"}
-            >
-              {isArabic ? virtue.textArabic : (virtue.textEnglish ?? virtue.textArabic)}
-            </p>
-            <p className={`mt-2 text-xs font-semibold ${bodyText}`} dir="auto">
-              {isArabic ? virtue.referenceArabic : virtue.referenceEnglish}
-            </p>
-          </section>
-        )}
-      </div>
+    <HomeCard as="article" onGlass={onGlass} padding="none" className="min-w-0 overflow-hidden">
       <div data-testid="prayer-journey">
         <PrayerActionsCard
           prayer={prayer}
@@ -244,7 +94,48 @@ export function PrayerMomentPanel({
           onToggle={onToggle}
           onOpenAdhkar={onOpenAdhkar}
           onGlass={onGlass}
-        />
+          showProgress
+          headingLevel={2}
+          status={
+            <div
+              data-testid="prayer-moment-status"
+              className={`flex flex-wrap gap-x-3 gap-y-1 text-label leading-relaxed ${bodyText}`}
+            >
+              <p>{t(language, statusKey)}</p>
+              {countdown && <p dir="auto">{countdown}</p>}
+              {prayer === "fajr" && moment.shroukTime && (
+                <p dir="auto">
+                  {t(language, "notifications.shrouk")}: {formatPrayerTimeLabel(moment.shroukTime, isArabic)}
+                </p>
+              )}
+            </div>
+          }
+        >
+          {virtue && (
+            <section
+              className={`min-w-0 border-y py-3 text-start ${hairline}`}
+              data-testid="prayer-moment-virtue"
+              aria-labelledby={`prayer-virtue-heading-${prayer}`}
+            >
+              <h3 id={`prayer-virtue-heading-${prayer}`} className={`text-sm font-semibold ${accentText}`} dir="auto">
+                {t(language, "prayerMoment.virtueTitle", { prayer: name })}
+              </h3>
+              <p className={`mt-1 text-xs font-medium ${bodyText}`} dir="auto">
+                {t(language, "prayerMoment.virtueAttribution")}
+              </p>
+              <p
+                className={`mt-1 text-base font-semibold leading-loose ${titleText}`}
+                dir={isArabic || !virtue.textEnglish ? "rtl" : "ltr"}
+                lang={isArabic || !virtue.textEnglish ? "ar" : "en"}
+              >
+                {isArabic ? virtue.textArabic : (virtue.textEnglish ?? virtue.textArabic)}
+              </p>
+              <p className={`mt-1 text-xs font-medium ${bodyText}`} dir="auto">
+                {isArabic ? virtue.referenceArabic : virtue.referenceEnglish}
+              </p>
+            </section>
+          )}
+        </PrayerActionsCard>
       </div>
     </HomeCard>
   );

@@ -51,34 +51,29 @@ for (const language of ["ar", "en"] as const) {
         const panelBox = (await panel.boundingBox())!;
         const toggle = page.getByTestId("reader-sidebar-toggle");
         const toolbar = page.getByTestId("reader-header-toolbar");
-        await expect(toolbar.getByTestId("reader-sidebar-toggle")).toBeVisible();
+        await expect(toolbar.getByTestId("reader-sidebar-toggle")).toBeHidden();
         const menu = page.getByRole("button", {
           name: language === "ar" ? "خيارات القارئ" : "Reader options",
           exact: true,
         });
-        const [toggleBox, menuBox, toolbarBox, headingBox] = await Promise.all([
-          toggle.boundingBox(),
-          menu.boundingBox(),
+        const [toolbarBox, headingBox] = await Promise.all([
           toolbar.boundingBox(),
           page.getByRole("heading", { level: 1 }).boundingBox(),
         ]);
-        expect(toggleBox!.width).toBeGreaterThanOrEqual(44);
-        expect(
-          Math.max(toggleBox!.x, menuBox!.x) - Math.min(toggleBox!.x + toggleBox!.width, menuBox!.x + menuBox!.width),
-        ).toBeGreaterThanOrEqual(8);
         expect(toolbarBox!.y + toolbarBox!.height).toBeLessThanOrEqual(headingBox!.y);
-        expect(
-          language === "ar"
-            ? panelBox.x + panelBox.width <= toggleBox!.x
-            : toggleBox!.x + toggleBox!.width <= panelBox.x,
-        ).toBe(true);
         expect(text!.width).toBeGreaterThanOrEqual(350);
         expect(language === "ar" ? panelBox.x + panelBox.width <= text!.x : text!.x + text!.width <= panelBox.x).toBe(
           true,
         );
-        await toggle.click();
+        await page.getByTestId("reader-sidebar-close").click();
         await expect(panel).not.toBeVisible();
+        await expect(toggle).toBeFocused();
         await expect(toggle).toHaveAttribute("aria-expanded", "false");
+        const [toggleBox, menuBox] = await Promise.all([toggle.boundingBox(), menu.boundingBox()]);
+        expect(toggleBox!.width).toBeGreaterThanOrEqual(44);
+        expect(
+          Math.max(toggleBox!.x, menuBox!.x) - Math.min(toggleBox!.x + toggleBox!.width, menuBox!.x + menuBox!.width),
+        ).toBeGreaterThanOrEqual(8);
         await toggle.click();
         await expect(panel).toBeVisible();
         await page.getByTestId("reader-sidebar-close").click();
@@ -102,20 +97,27 @@ for (const language of ["ar", "en"] as const) {
     await page.setViewportSize({ width: 1440, height: 900 });
     const panel = page.getByTestId("reader-collection-navigator");
     await expect(panel).toBeVisible();
-    const [heading, close, toggle, menu] = await Promise.all([
+    const [heading, close] = await Promise.all([
       panel
         .getByRole("heading", { level: 2, name: (await panel.getAttribute("aria-label"))!, exact: true })
         .boundingBox(),
       page.getByTestId("reader-sidebar-close").boundingBox(),
-      page.getByTestId("reader-sidebar-toggle").boundingBox(),
-      page
-        .getByTestId("reader-hero-actions")
-        .getByRole("button", { name: language === "ar" ? "خيارات القارئ" : "Reader options", exact: true })
-        .boundingBox(),
     ]);
     expect(
       Math.max(heading!.x, close!.x) - Math.min(heading!.x + heading!.width, close!.x + close!.width),
     ).toBeGreaterThanOrEqual(8);
+    await expect(page.getByTestId("reader-sidebar-toggle")).toBeHidden();
+    await page.getByTestId("reader-sidebar-close").click();
+    const [toggle, menu] = await Promise.all([
+      page.getByTestId("reader-sidebar-toggle").boundingBox(),
+      page
+        .getByTestId("reader-hero-actions")
+        .getByRole("button", {
+          name: language === "ar" ? "خيارات القارئ" : "Reader options",
+          exact: true,
+        })
+        .boundingBox(),
+    ]);
     expect(
       Math.max(toggle!.x, menu!.x) - Math.min(toggle!.x + toggle!.width, menu!.x + menu!.width),
     ).toBeGreaterThanOrEqual(8);

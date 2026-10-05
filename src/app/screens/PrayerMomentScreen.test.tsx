@@ -71,10 +71,12 @@ describe("the prayer as one surface", () => {
     expect(onToggle).not.toHaveBeenCalled();
   });
 
-  it("opens on the prayer, its time and its own sky", () => {
+  it("opens on one compact prayer identity with its reviewed virtue", () => {
     renderScreen({ prayer: "maghrib", now: at(shift(times.maghrib, 5)) });
     expect(screen.getByTestId("prayer-moment-screen")).toHaveAttribute("data-prayer", "maghrib");
-    expect(screen.getByTestId("prayer-scene")).toHaveAttribute("data-prayer-scene", "maghrib");
+    expect(screen.getByRole("heading", { level: 2, name: /أعمال صلاة المغرب/ })).toBeInTheDocument();
+    expect(screen.queryByTestId("prayer-moment-hero")).toBeNull();
+    expect(screen.getByTestId("prayer-moment-status")).toBeInTheDocument();
   });
 
   it("offers the virtue while it can still be an invitation", () => {
@@ -121,7 +123,7 @@ describe("the prayer as one surface", () => {
 
   it("renders the prayer actions card with prayer-specific deeds", () => {
     renderScreen({ prayer: "dhuhr" });
-    expect(screen.getByRole("heading", { level: 3, name: /أعمال صلاة الظهر/ })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: /أعمال صلاة الظهر/ })).toBeInTheDocument();
     expect(screen.getByTestId("prayer-action-location")).toHaveTextContent("صليت الظهر جماعة");
     expect(screen.getByTestId("prayer-action-dhuhr-sunnah-before")).toHaveTextContent("أربع ركعات قبل الظهر");
     expect(screen.getByTestId("prayer-action-dhuhr-adhkar")).toHaveTextContent("أذكار بعد الصلاة");

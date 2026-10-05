@@ -7,6 +7,17 @@ import { FRIDAY_KAHF } from "../content/fridayKahf";
 
 beforeEach(() => {
   window.localStorage.clear();
+  vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue({
+    width: 1104,
+    height: 900,
+    x: 0,
+    y: 0,
+    left: 0,
+    right: 1104,
+    top: 0,
+    bottom: 900,
+    toJSON() {},
+  });
   vi.stubGlobal(
     "ResizeObserver",
     class {
@@ -18,6 +29,7 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup();
+  vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
 
@@ -66,7 +78,7 @@ describe("ReaderScreen audio identity", () => {
     vi.stubGlobal(
       "matchMedia",
       vi.fn().mockImplementation((query: string) => ({
-        matches: query.includes("min-width: 768px"),
+        matches: query.includes("min-width: 768px") || query.includes("min-width: 1200px"),
         media: query,
         addEventListener: vi.fn(),
         removeEventListener: vi.fn(),
@@ -111,17 +123,20 @@ describe("ReaderScreen audio identity", () => {
     fireEvent.click(screen.getByRole("button", { name: /ذكر ٢ من/ }));
     expect(onSelectZikr).toHaveBeenCalledWith(1);
 
-    // Collapsing sidebar using toggle button
+    // Only the panel's collapse button is available while docked and open.
     const toggleBtn = screen.getByTestId("reader-sidebar-toggle");
-    fireEvent.click(toggleBtn);
+    expect(toggleBtn).not.toBeVisible();
+    fireEvent.click(screen.getByTestId("reader-sidebar-close"));
     expect(navigator).toHaveAttribute("hidden");
     expect(screen.queryByRole("button", { name: /ذكر ٢ من/ })).not.toBeInTheDocument();
 
     // Expanding sidebar using toggle button
     fireEvent.click(toggleBtn);
-    expect(navigator).toHaveClass("w-[30%]", "min-w-[288px]", "max-w-[352px]");
+    expect(toggleBtn).not.toBeVisible();
+    expect(navigator).toHaveStyle({ width: "336px" });
+    expect(screen.getByRole("separator")).toHaveAttribute("aria-valuemax", "441");
     expect(navigator).not.toHaveAttribute("hidden");
-    fireEvent.click(within(navigator).getByRole("button", { name: toggleBtn.getAttribute("aria-label")! }));
+    fireEvent.click(screen.getByTestId("reader-sidebar-close"));
     expect(navigator).toHaveAttribute("hidden");
     expect(toggleBtn).toHaveFocus();
   });
@@ -452,7 +467,7 @@ describe("ReaderScreen audio identity", () => {
     vi.stubGlobal(
       "matchMedia",
       vi.fn().mockImplementation((query: string) => ({
-        matches: query.includes("min-width: 768px"),
+        matches: query.includes("min-width: 768px") || query.includes("min-width: 1200px"),
         media: query,
         addEventListener: vi.fn(),
         removeEventListener: vi.fn(),

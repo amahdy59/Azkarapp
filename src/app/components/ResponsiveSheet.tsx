@@ -241,6 +241,8 @@ export function Modal({
 }
 
 export interface SidePanelProps extends Omit<ModalProps, "maxWidthClassName"> {
+  /** Explicit recovery for panels opened from a menu item that unmounts. */
+  onCloseAutoFocus?: (event: Event) => void;
   /** The physical edge the panel docks to. */
   side: "right" | "left";
   /**
@@ -274,6 +276,7 @@ export function SidePanel({
   side,
   inset = 0,
   className = "",
+  onCloseAutoFocus,
 }: SidePanelProps) {
   useRestoreFocusOnClose(open);
 
@@ -295,6 +298,7 @@ export function SidePanel({
           // See Modal: a modal consumes Escape so it never also reaches the
           // reader's own shortcut handlers underneath.
           onEscapeKeyDown={(event) => event.stopPropagation()}
+          onCloseAutoFocus={onCloseAutoFocus}
           style={inset > 0 ? { [side]: `${inset}px` } : undefined}
           className={`animate-in fixed inset-y-0 z-[100] flex w-[22rem] max-w-[calc(100%-3rem)] flex-col overflow-y-auto bg-card shadow-overlay duration-standard outline-none ${
             side === "right" ? "right-0 border-l slide-in-from-right" : "left-0 border-r slide-in-from-left"

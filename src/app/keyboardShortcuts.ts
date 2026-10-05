@@ -32,7 +32,7 @@ export function isCounterShortcutBlocked(event: KeyboardEvent) {
     active instanceof Element &&
     Boolean(
       active.closest(
-        'button, a[href], input, textarea, select, [contenteditable]:not([contenteditable="false"]), [role="button"], [role="checkbox"], [role="combobox"], [role="menu"], [role="menuitem"], [role="option"], [role="radio"], [role="slider"], [role="switch"], [role="tab"], [role="textbox"], [inert]',
+        'button, a[href], input, textarea, select, [contenteditable]:not([contenteditable="false"]), [role="button"], [role="checkbox"], [role="combobox"], [role="menu"], [role="menuitem"], [role="option"], [role="radio"], [role="slider"], [role="separator"], [role="switch"], [role="tab"], [role="textbox"], [inert]',
       ),
     )
   );

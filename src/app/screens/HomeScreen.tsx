@@ -641,7 +641,7 @@ export function HomeScreen({
           <header
             data-testid="home-utility-header"
             data-scrolled={hasScrolledHomeContent || undefined}
-            className={`px-page flex w-full items-center justify-between gap-3 transition-[background-color,backdrop-filter,box-shadow,padding] duration-standard ${
+            className={`px-page mx-auto flex w-full max-w-[70rem] items-center justify-between gap-3 transition-[background-color,backdrop-filter,box-shadow,padding] duration-standard ${
               hasScrolledHomeContent
                 ? "pt-[max(0.5rem,env(safe-area-inset-top))] pb-1"
                 : "pt-[max(1rem,env(safe-area-inset-top))] pb-3 sm:pt-5"
@@ -690,28 +690,10 @@ export function HomeScreen({
             </button>
           </header>
         </div>
-        <div className="mx-auto flex w-full max-w-[90rem] flex-col gap-4 lg:gap-5">
+        <div data-testid="home-content-grid" className="mx-auto grid w-full max-w-[70rem] grid-cols-1 gap-4 lg:gap-5">
           <div data-testid="home-hero" className="relative isolate w-full pt-16">
             {showHeroContent && (
               <div className="relative z-10 mx-auto flex w-full flex-col items-stretch justify-end gap-4 px-4 pb-5 pt-3 sm:px-6 sm:pb-6 sm:pt-4 md:px-8 lg:gap-5 lg:px-8 lg:pb-8 lg:pt-5">
-                {/* The five daily prayers are the stable navigation and status
-                    layer. Context below may change with time; this strip does
-                    not move or disappear. */}
-                <div data-testid="home-prayer-strip" className="relative z-10 w-full max-w-full overflow-visible">
-                  <PrayerTrackerCards
-                    models={prayerCardModels}
-                    language={language}
-                    direction={direction}
-                    records={prayerTracking}
-                    dayKey={todayKey}
-                    onToggle={onTogglePrayerTracking ?? (() => undefined)}
-                    onOpen={handlePrayerOpen}
-                    onGlass={homeVisualEffects}
-                    summaryOnly
-                    selectedPrayer={expandedPrayer}
-                  />
-                </div>
-
                 <div
                   data-testid="home-context-grid"
                   className={`grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:gap-5 ${
@@ -719,38 +701,69 @@ export function HomeScreen({
                   }`}
                   dir={direction}
                 >
-                  {expandedPrayer && (
-                    <section
-                      id="home-expanded-prayer"
-                      data-testid="home-prayer-moment"
-                      data-prayer={expandedPrayer}
-                      aria-label={t(language, "prayerMoment.homeTitle")}
-                      className={
-                        hasContextStackContent
-                          ? direction === "rtl"
-                            ? "md:col-start-1 md:row-start-1"
-                            : "md:col-start-2 md:row-start-1"
-                          : "md:col-span-2 md:row-start-1"
-                      }
+                  <div
+                    data-testid="home-prayer-column"
+                    className={`contents lg:flex lg:w-full lg:min-w-0 lg:max-w-[40rem] lg:flex-col lg:gap-5 lg:justify-self-center lg:row-start-1 ${
+                      hasContextStackContent && expandedPrayer
+                        ? direction === "rtl"
+                          ? "lg:col-start-1"
+                          : "lg:col-start-2"
+                        : "lg:col-span-2"
+                    }`}
+                  >
+                    {/* Summary stays first in reading order; desktop pairs it with
+                    its expanded detail beside the contextual stack. */}
+                    <div
+                      data-testid="home-prayer-strip"
+                      className="relative z-10 mx-auto w-full max-w-[40rem] overflow-visible md:col-span-2"
                     >
-                      <PrayerMomentPanel
-                        prayer={expandedPrayer}
+                      <h2 className="sr-only">{t(language, "prayerMoment.dayTitle")}</h2>
+                      <PrayerTrackerCards
+                        models={prayerCardModels}
                         language={language}
                         direction={direction}
                         records={prayerTracking}
                         dayKey={todayKey}
-                        locationSettings={locationSettings}
-                        now={now}
                         onToggle={onTogglePrayerTracking ?? (() => undefined)}
-                        onOpenAdhkar={(prayer) =>
-                          onOpenPrayerAdhkar ? onOpenPrayerAdhkar(prayer) : onResume("after_prayer")
-                        }
+                        onOpen={handlePrayerOpen}
                         onGlass={homeVisualEffects}
-                        canRecord={expandedPrayerModel?.isRecordable ?? false}
-                        fullWidth={!hasContextStackContent}
+                        summaryOnly
+                        selectedPrayer={expandedPrayer}
                       />
-                    </section>
-                  )}
+                    </div>
+
+                    {expandedPrayer && (
+                      <section
+                        id="home-expanded-prayer"
+                        data-testid="home-prayer-moment"
+                        data-prayer={expandedPrayer}
+                        aria-label={t(language, "prayerMoment.homeTitle")}
+                        className={`mx-auto w-full min-w-0 max-w-[40rem] justify-self-center ${
+                          hasContextStackContent
+                            ? direction === "rtl"
+                              ? "md:col-start-1 md:row-start-2"
+                              : "md:col-start-2 md:row-start-2"
+                            : "md:col-span-2 md:row-start-2"
+                        }`}
+                      >
+                        <PrayerMomentPanel
+                          prayer={expandedPrayer}
+                          language={language}
+                          direction={direction}
+                          records={prayerTracking}
+                          dayKey={todayKey}
+                          locationSettings={locationSettings}
+                          now={now}
+                          onToggle={onTogglePrayerTracking ?? (() => undefined)}
+                          onOpenAdhkar={(prayer) =>
+                            onOpenPrayerAdhkar ? onOpenPrayerAdhkar(prayer) : onResume("after_prayer")
+                          }
+                          onGlass={homeVisualEffects}
+                          canRecord={expandedPrayerModel?.isRecordable ?? false}
+                        />
+                      </section>
+                    )}
+                  </div>
 
                   {hasContextStackContent && (
                     <div
@@ -758,7 +771,9 @@ export function HomeScreen({
                       className={
                         expandedPrayer
                           ? `contents md:flex md:min-w-0 md:flex-col md:gap-4 lg:gap-5 ${
-                              direction === "rtl" ? "md:col-start-2 md:row-start-1" : "md:col-start-1 md:row-start-1"
+                              direction === "rtl"
+                                ? "md:col-start-2 md:row-start-2 lg:row-start-1"
+                                : "md:col-start-1 md:row-start-2 lg:row-start-1"
                             }`
                           : "contents"
                       }
@@ -767,7 +782,7 @@ export function HomeScreen({
                       {hasPrimaryContext && (
                         <div
                           data-testid="home-primary-card"
-                          className={`grid min-w-0 ${hasContextCompanion ? "md:col-span-1" : "md:col-span-2"}`}
+                          className={`grid w-full min-w-0 max-w-[40rem] justify-self-center ${hasContextCompanion ? "md:col-span-1" : "md:col-span-2"}`}
                         >
                           {showCompletionCard ? (
                             <div className="h-full">
@@ -814,7 +829,7 @@ export function HomeScreen({
                       {dailyEvidence ? (
                         <div
                           data-testid="home-context-companion"
-                          className={`flex min-w-0 ${hasPrimaryContext ? "md:col-span-1" : "md:col-span-2"}`}
+                          className={`flex w-full min-w-0 max-w-[40rem] justify-self-center ${hasPrimaryContext ? "md:col-span-1" : "md:col-span-2"}`}
                         >
                           <DailyEvidenceCard
                             language={language}
@@ -831,7 +846,10 @@ export function HomeScreen({
                   {/* Today's Wird needs the full row: its three routine tiles must
                       respond to their own available width, not the viewport. */}
                   {quietProgressEnabled && (
-                    <div data-testid="home-wird-row" className="min-w-0 md:col-span-2">
+                    <div
+                      data-testid="home-wird-row"
+                      className="w-full min-w-0 max-w-[66rem] justify-self-center md:col-span-2"
+                    >
                       <TodayRoutineGarden
                         summary={gardenSummary}
                         language={language}
@@ -873,7 +891,7 @@ export function HomeScreen({
           />
 
           {fridayInWindow && (
-            <div className="px-page">
+            <div className="px-page mx-auto w-full max-w-[44rem]">
               <FridayHomeCard
                 language={language}
                 direction={direction}
@@ -885,7 +903,7 @@ export function HomeScreen({
             </div>
           )}
 
-          <div className="px-page">
+          <div className="px-page mx-auto w-full max-w-[44rem]">
             <SituationalShortcuts language={language} onOpen={onResume} onGlass={homeVisualEffects} />
           </div>
 

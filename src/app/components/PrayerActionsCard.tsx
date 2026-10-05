@@ -1,17 +1,11 @@
-import { useMemo, useState } from "react";
-import { BookOpen, ChevronDown, CloudSun, Info, MoonStar, Mosque, PrayerRug, Sun, Sunrise, Sunset } from "./icons";
+import { useMemo, useState, type ReactNode } from "react";
+import { BookOpen, ChevronDown, Info, PrayerRug } from "./icons";
 import { TrackingCheckMark } from "./PrayerTrackerCards";
 import { ResponsiveSheet, SheetHeader } from "./ResponsiveSheet";
 import { t } from "../i18n";
+import { formatNumerals } from "../formatting";
 import type { AppLanguage, PrayerName, PrayerTrackingRecord } from "../types";
 
-const PRAYER_ICON: Record<PrayerName, typeof Sunrise> = {
-  fajr: Sunrise,
-  dhuhr: Sun,
-  asr: CloudSun,
-  maghrib: Sunset,
-  isha: MoonStar,
-};
 import { getPrayerActions, getPrayerInfoData } from "../content/prayerActions";
 import type { PrayerTrackingWrite } from "./PrayerTrackerCards";
 
@@ -26,16 +20,20 @@ export interface PrayerActionsCardProps {
   onOpenAdhkar: (prayer: PrayerName) => void;
   onGlass?: boolean;
   className?: string;
+  /** Context and reviewed evidence compose into the same reading surface. */
+  status?: ReactNode;
+  showProgress?: boolean;
+  headingLevel?: 2 | 3;
+  children?: ReactNode;
 }
 
 /**
  * Universal, data-driven Prayer Actions Card for all five daily prayers.
  *
  * Visual design:
- * - Frosted glass pill checklist rows
- * - RTL order: [Icon on far right] -> [Action label] -> [Checkbox on far left]
- * - Strictly one line per item without subtitle clutter
- * - Header with Mosque icon + dynamic title + secondary "More Info" button
+ * - Plain, wrapping checklist rows with full-row native checkbox targets
+ * - RTL order: [Action label] -> [Checkbox on far left]
+ * - One dynamic heading and a secondary information action
  * - Educational Sunnah bottom sheet with rak'ah breakdown, rank, and authentic hadith evidence
  * - Prominent full-width gold CTA to start adhkar
  */
@@ -50,6 +48,10 @@ export function PrayerActionsCard({
   onOpenAdhkar,
   onGlass = false,
   className = "",
+  status,
+  showProgress = false,
+  headingLevel = 3,
+  children,
 }: PrayerActionsCardProps) {
   const [infoOpen, setInfoOpen] = useState(false);
   const isArabic = language === "ar";
@@ -64,49 +66,41 @@ export function PrayerActionsCard({
   const infoData = useMemo(() => getPrayerInfoData(prayer, language), [prayer, language]);
 
   const titleColor = onGlass ? "text-on-media" : "text-foreground";
+  const Heading = headingLevel === 2 ? "h2" : "h3";
 
   return (
     <section
       data-testid="prayer-actions-card"
       data-prayer={prayer}
       aria-labelledby={`prayer-actions-heading-${prayer}`}
-      className={`flex flex-col gap-3 p-5 sm:p-6 ${className}`}
+      dir={direction}
+      className={`flex min-w-0 flex-col gap-3 p-4 sm:p-5 ${className}`}
     >
-      {/* Header: Prayer Icon + Heading + More Info Button */}
+      {/* One heading and a quiet information action. */}
       <div className="flex items-center justify-between gap-3">
-        <div className="flex min-w-0 flex-1 items-center gap-2.5">
-          <span
-            aria-hidden="true"
-            className={`flex size-9 shrink-0 items-center justify-center rounded-full ${
-              onGlass
-                ? "border border-white/20 bg-on-media-surface/60 text-on-media-accent"
-                : "bg-primary/15 text-primary"
-            }`}
-          >
-            {(() => {
-              const HeaderIcon = PRAYER_ICON[prayer] ?? Mosque;
-              return <HeaderIcon size={20} />;
-            })()}
-          </span>
-          <h3
+        <div className="min-w-0 flex-1">
+          <Heading
             id={`prayer-actions-heading-${prayer}`}
-            className={`truncate text-subtitle font-black ${onGlass ? "text-on-media-accent" : titleColor}`}
+            className={`text-title font-bold leading-relaxed ${titleColor}`}
             dir="auto"
           >
             {t(language, "prayerActions.heading", { prayer: infoData.prayerName })}
-          </h3>
+          </Heading>
         </div>
 
         <button
           type="button"
-          onClick={() => setInfoOpen(true)}
+          onClick={(event) => {
+            // Safari pointer activation does not focus buttons by default.
+            // The sheet must capture this trigger, not the previous checkbox.
+            event.currentTarget.focus();
+            setInfoOpen(true);
+          }}
           data-testid="prayer-actions-more-info"
           aria-haspopup="dialog"
           aria-label={t(language, "prayerActions.moreInfoAria", { prayer: infoData.prayerName })}
-          className={`flex size-11 -me-2.5 shrink-0 items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-            onGlass
-              ? "border-white/20 bg-on-media-surface/60 text-white backdrop-blur-md hover:border-white/40 hover:bg-on-media-surface/60"
-              : "border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground"
+          className={`flex size-11 -me-3 shrink-0 items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+            onGlass ? "text-on-media hover:bg-white/10" : "text-muted-foreground hover:bg-muted hover:text-foreground"
           }`}
         >
           <span aria-hidden="true" className="flex size-6 items-center justify-center rounded-full border-2">
@@ -114,11 +108,31 @@ export function PrayerActionsCard({
           </span>
         </button>
       </div>
+      {(status || showProgress) && (
+        <div
+          className={`flex flex-wrap items-start justify-between gap-x-3 gap-y-1 text-label ${onGlass ? "text-on-media-muted" : "text-muted-foreground"}`}
+        >
+          {status}
+          {showProgress && (
+            <output
+              aria-live="polite"
+              aria-atomic="true"
+              className="leading-relaxed"
+              data-testid="prayer-actions-progress"
+            >
+              {t(language, "prayerActions.completedCount", {
+                count: formatNumerals(actions.filter((action) => action.checked).length, language),
+                total: formatNumerals(actions.length, language),
+              })}
+            </output>
+          )}
+        </div>
+      )}
+      {children}
 
-      {/* Main Checklist: 1 line per item, clean aligned rows without fill/stroke */}
-      <ol className="flex flex-col gap-1">
+      {/* Plain rows grow naturally with wrapped labels, retaining 44px targets. */}
+      <ol className="flex flex-col">
         {actions.map((action) => {
-          const ItemIcon = action.Icon;
           const inputId = `prayer-action-${prayer}-${action.id}`;
           const labelId = `prayer-action-label-${prayer}-${action.id}`;
 
@@ -151,19 +165,10 @@ export function PrayerActionsCard({
                 className="tracking-choice peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-xl opacity-0 disabled:cursor-not-allowed"
               />
 
-              {/* Start: Icon centered in 36px optical column matching header + 1-line label */}
-              <div className="flex min-w-0 flex-1 items-center gap-2.5">
-                <span
-                  aria-hidden="true"
-                  className={`flex size-9 shrink-0 items-center justify-center ${
-                    onGlass ? "text-on-media-accent" : "text-muted-foreground"
-                  }`}
-                >
-                  <ItemIcon size={19} />
-                </span>
+              <div className="min-w-0 flex-1">
                 <span
                   id={labelId}
-                  className={`truncate text-base font-bold ${onGlass ? "text-white" : titleColor}`}
+                  className={`block break-words text-base font-semibold leading-relaxed ${onGlass ? "text-on-media" : titleColor}`}
                   dir="auto"
                 >
                   {action.label}
@@ -171,7 +176,7 @@ export function PrayerActionsCard({
               </div>
 
               {/* End: Circular tracking checkmark on far left (RTL) / far right (LTR) */}
-              <TrackingCheckMark checked={action.checked} onGlass={onGlass} />
+              <TrackingCheckMark checked={action.checked} onGlass={onGlass} compact />
             </li>
           );
         })}
@@ -182,9 +187,9 @@ export function PrayerActionsCard({
         type="button"
         onClick={() => onOpenAdhkar(prayer)}
         data-testid="prayer-open-adhkar"
-        className="mt-2 flex min-h-14 w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-lg font-black text-primary-foreground shadow-raised transition-colors duration-fast hover:bg-primary/90 active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        className="mt-1 flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-3 text-base font-bold text-primary-foreground transition-colors duration-fast hover:bg-primary/90 active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
-        <BookOpen size={22} aria-hidden="true" />
+        <BookOpen size={20} className="shrink-0" aria-hidden="true" />
         <span>{t(language, "prayerActions.startAdhkar")}</span>
       </button>
 

@@ -90,6 +90,8 @@ export function Header({
   right,
   language = "en",
   elevateOnScroll = true,
+  decoration,
+  backButtonClassName,
 }: {
   title: string;
   subtitle?: string;
@@ -97,6 +99,9 @@ export function Header({
   right?: React.ReactNode;
   language?: AppLanguage;
   elevateOnScroll?: boolean;
+  /** Absolutely positioned, non-interactive artwork; never changes sizing. */
+  decoration?: React.ReactNode;
+  backButtonClassName?: string;
 }) {
   const headerRef = useRef<HTMLDivElement>(null);
   const [hasScrolledContent, setHasScrolledContent] = useState(false);
@@ -130,13 +135,14 @@ export function Header({
       ref={headerRef}
       data-testid="shared-screen-header"
       data-scrolled={isScrolled || undefined}
-      className={`shared-screen-header sticky top-0 z-40 flex w-full shrink-0 items-center gap-2 border-b bg-background px-4 pt-2 pb-1 transition-colors duration-standard ${
+      className={`shared-screen-header ${decoration ? "isolate" : ""} sticky top-0 z-40 flex w-full shrink-0 items-center gap-2 border-b bg-background px-4 pt-2 pb-1 transition-colors duration-standard ${
         isScrolled ? "border-border shadow-sm" : "border-transparent"
       }`}
       style={{ minHeight: 56 }}
     >
+      {decoration}
       {onBack && (
-        <IconButton onClick={onBack} label={t(language, "common.back")}>
+        <IconButton onClick={onBack} label={t(language, "common.back")} className={backButtonClassName}>
           <ArrowPrevious size={20} className="text-foreground" />
         </IconButton>
       )}

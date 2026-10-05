@@ -406,12 +406,22 @@ test("desktop and tablet keep navigation below reading text and keyboard help in
   // Page-level actions live in the hero toolbar on this tier, not in a second
   // row under the counter.
   await expect(page.getByTestId("reader-actions")).toHaveCount(0);
-  // On counter screens Benefit lives in the bottom dock beside the counter,
-  // so the hero toolbar is reduced to the overflow menu only.
+  // At 1024px the toolbar exposes the collection drawer alongside options;
+  // Benefit stays in the bottom dock beside the counter.
   const heroActions = page.getByTestId("reader-hero-actions");
   await expect(heroActions.getByRole("button", { name: "Benefit", exact: true })).toHaveCount(0);
   await expect(heroActions.getByRole("button", { name: "Reader options", exact: true })).toBeVisible();
-  await expect(heroActions.locator("button:visible")).toHaveCount(1);
+  const collectionToggle = heroActions.getByTestId("reader-sidebar-toggle");
+  await expect(collectionToggle).toBeVisible();
+  await expect(collectionToggle).toHaveAttribute("aria-expanded", "false");
+  await expect(heroActions.locator("button:visible")).toHaveCount(2);
+  await collectionToggle.click();
+  await expect(page.getByTestId("reader-collection-drawer")).toBeVisible();
+  await expect(collectionToggle).toHaveAttribute("aria-expanded", "true");
+  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("reader-collection-drawer")).toBeHidden();
+  await expect(collectionToggle).toHaveAttribute("aria-expanded", "false");
+  await expect(collectionToggle).toBeFocused();
   // Benefit is accessible via the dock button.
   await expect(page.getByTestId("reader-benefit-dock-button")).toBeVisible();
   await expect(desktopHero.getByRole("button", { name: "Share zikr", exact: true })).toHaveCount(0);
@@ -961,8 +971,29 @@ test("the reader header keeps options and wide collection navigation together", 
 
   const actions = readerHeaderActions(page);
   await expect(actions).toBeVisible();
-  // The collection toggle joins the menu only when the inline panel is available.
-  await expect(actions.locator("button:visible")).toHaveCount((page.viewportSize()?.width ?? 0) >= 1200 ? 2 : 1);
+  // An open desktop panel owns its close action; the toolbar restores the
+  // collection toggle when the panel closes, avoiding duplicate controls.
+  const width = page.viewportSize()?.width ?? 0;
+  const collectionToggle = actions.getByTestId("reader-sidebar-toggle");
+  if (width >= 1200) {
+    const collectionPanel = page.getByTestId("reader-collection-navigator");
+    await expect(collectionPanel).toBeVisible();
+    await expect(collectionToggle).toBeHidden();
+    await expect(actions.locator("button:visible")).toHaveCount(1);
+    await page.getByTestId("reader-sidebar-close").click();
+    await expect(collectionPanel).toBeHidden();
+    await expect(collectionToggle).toBeVisible();
+    await expect(collectionToggle).toBeFocused();
+    await expect(collectionToggle).toHaveAttribute("aria-expanded", "false");
+    await expect(actions.locator("button:visible")).toHaveCount(2);
+    await collectionToggle.click();
+    await expect(collectionPanel).toBeVisible();
+    await expect(collectionToggle).toBeHidden();
+    await expect(page.getByTestId("reader-sidebar-close")).toBeFocused();
+    await expect(actions.locator("button:visible")).toHaveCount(1);
+  } else {
+    await expect(actions.locator("button:visible")).toHaveCount(width >= 768 ? 2 : 1);
+  }
   await expect(actions.getByRole("button", { name: "Benefit", exact: true })).toHaveCount(0);
   await expect(actions.getByRole("button", { name: "Reader options", exact: true })).toBeVisible();
   // Benefit is accessible in the dock.

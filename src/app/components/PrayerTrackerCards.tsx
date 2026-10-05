@@ -84,12 +84,20 @@ function statusLabel(language: AppLanguage, state: PrayerTemporalState) {
  * with a transparent fill and a grey ring. It still reads `peer-*` for hover
  * and active, which have no such problem.
  */
-export function TrackingCheckMark({ checked, onGlass = false }: { checked: boolean; onGlass?: boolean }) {
+export function TrackingCheckMark({
+  checked,
+  onGlass = false,
+  compact = false,
+}: {
+  checked: boolean;
+  onGlass?: boolean;
+  compact?: boolean;
+}) {
   return (
     <span
       aria-hidden="true"
       data-checked={checked ? "true" : undefined}
-      className={`tracking-check pointer-events-none flex size-6 shrink-0 items-center justify-center rounded-full border-2 transition-[background-color,border-color,transform,box-shadow] duration-standard ease-standard peer-enabled:peer-active:scale-90 ${
+      className={`tracking-check pointer-events-none flex ${compact ? "size-5" : "size-6"} shrink-0 items-center justify-center rounded-full border-2 transition-[background-color,border-color,transform,box-shadow] duration-standard ease-standard peer-enabled:peer-active:scale-90 ${
         checked
           ? "border-primary bg-primary text-primary-foreground shadow-[0_2px_8px_-2px_var(--primary)]"
           : onGlass
@@ -97,7 +105,7 @@ export function TrackingCheckMark({ checked, onGlass = false }: { checked: boole
             : "border-border-control text-transparent peer-enabled:peer-hover:border-primary peer-enabled:peer-hover:bg-primary/10"
       }`}
     >
-      <Check size={14} strokeWidth={3} />
+      <Check size={compact ? 12 : 14} strokeWidth={3} />
     </span>
   );
 }
@@ -213,12 +221,18 @@ function PrayerCard({
         data-density="summary"
         aria-current={isCurrent ? "step" : undefined}
         data-selected={selected ? "true" : undefined}
-        className={`relative flex min-w-0 flex-col rounded-3xl border text-center transition-all duration-standard ease-standard ${
-          selected
-            ? "border-primary bg-primary/25 text-on-media shadow-[inset_0_0_0_1px_var(--primary)]"
-            : onGlass
-              ? "border-transparent bg-transparent hover:border-white/20 hover:bg-on-media-surface/60"
-              : "border-transparent bg-transparent hover:border-border hover:bg-muted"
+        className={`relative flex min-w-0 flex-col rounded-xl border text-center transition-colors duration-standard ease-standard ${
+          isCurrent
+            ? onGlass
+              ? "border-on-media-accent bg-on-media-accent/15 text-on-media"
+              : "border-primary bg-primary/15 text-foreground"
+            : selected
+              ? onGlass
+                ? "border-white/40 bg-white/5 text-on-media"
+                : "border-border bg-muted text-foreground"
+              : onGlass
+                ? "border-transparent bg-transparent hover:border-white/20 hover:bg-on-media-surface/60"
+                : "border-transparent bg-transparent hover:border-border hover:bg-muted"
         }`}
       >
         <button
@@ -231,26 +245,27 @@ function PrayerCard({
           aria-expanded={selected}
           aria-controls="home-expanded-prayer"
           aria-label={t(language, "prayerTracking.openPrayer", { prayer: name })}
-          className="relative z-10 flex min-h-[7.5rem] min-w-0 flex-col items-center justify-start rounded-3xl px-0 py-1.5 outline-none transition-colors focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring sm:min-h-[8.5rem] sm:px-3 sm:py-3"
+          aria-describedby={`prayer-summary-time-${prayer} prayer-summary-status-${prayer}`}
+          className="relative z-10 flex min-h-24 min-w-0 flex-1 flex-col items-center justify-start gap-1.5 rounded-xl px-0 py-2 outline-none transition-colors focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring sm:px-2"
         >
-          <span className="mb-1 flex min-h-6 items-center justify-center">
-            {isCurrent && (
-              <span className="rounded-full bg-primary px-2.5 py-0.5 text-micro font-black text-primary-foreground sm:text-xs">
-                {t(language, "prayerMoment.badgeNow")}
-              </span>
-            )}
-          </span>
           <span
             aria-hidden="true"
-            className={`prayer-chip flex size-9 items-center justify-center rounded-full border sm:size-10 ${
-              isCurrent ? (onGlass ? "text-on-media-accent" : "text-primary") : ""
+            data-prayer-icon
+            className={`flex size-5 shrink-0 items-center justify-center ${
+              isCurrent
+                ? onGlass
+                  ? "text-on-media-accent"
+                  : "text-primary"
+                : onGlass
+                  ? "text-on-media-muted"
+                  : "text-muted-foreground"
             }`}
           >
             <Icon size={19} />
           </span>
           <h3
             id={`prayer-card-heading-${prayer}`}
-            className={`mt-1 min-w-0 max-w-full whitespace-nowrap text-micro font-black leading-tight min-[360px]:text-xs sm:text-subtitle ${
+            className={`min-w-0 max-w-full whitespace-nowrap text-micro font-bold leading-tight min-[360px]:text-xs sm:text-subtitle ${
               onGlass
                 ? isCurrent
                   ? "text-on-media-accent"
@@ -264,29 +279,39 @@ function PrayerCard({
             {name}
           </h3>
           <p
+            id={`prayer-summary-time-${prayer}`}
             data-testid={state === "next" ? "next-prayer-time" : undefined}
-            className={`mt-0.5 whitespace-nowrap text-xs font-bold tabular-nums sm:text-label ${
-              onGlass ? (isCurrent ? "text-on-media-accent" : "text-on-media-muted") : "text-muted-foreground"
+            className={`max-w-full whitespace-nowrap text-xs font-bold tabular-nums min-[360px]:text-sm sm:text-subtitle ${
+              onGlass
+                ? isCurrent
+                  ? "text-on-media-accent"
+                  : "text-on-media"
+                : isCurrent
+                  ? "text-primary"
+                  : "text-foreground"
             }`}
             dir="auto"
           >
             {formatPrayerTimeLabel(time, language === "ar")}
           </p>
-          <p
-            className={`mt-0.5 hidden min-h-4 text-micro font-bold sm:block ${onGlass ? "text-on-media-muted" : "text-muted-foreground"}`}
-          >
-            {prayer === "fajr" && model.shroukTime
-              ? `${t(language, "notifications.shrouk")}: ${formatPrayerTimeLabel(model.shroukTime, language === "ar")}`
-              : null}
-          </p>
           <span
+            id={`prayer-summary-status-${prayer}`}
             data-testid={countdown && state === "next" ? "next-prayer" : undefined}
-            className={`mt-1 min-h-4 text-micro font-bold ${onGlass ? "text-on-media-accent" : "text-primary"}`}
+            className={`min-h-4 max-w-full whitespace-nowrap text-micro font-semibold ${
+              isCurrent
+                ? onGlass
+                  ? "text-on-media-accent"
+                  : "text-primary"
+                : onGlass
+                  ? "text-on-media-muted"
+                  : "text-muted-foreground"
+            }`}
             dir="auto"
           >
-            {countdown && state === "next" ? countdown : null}
+            <span className={!isCurrent && state !== "next" ? "sr-only" : undefined}>
+              {state === "next" ? t(language, "prayerTracking.nextShort") : statusLabel(language, state)}
+            </span>
           </span>
-          <span className="sr-only">{statusLabel(language, state)}</span>
         </button>
       </article>
     );
@@ -526,7 +551,7 @@ export function PrayerTrackerCards({
           onGlass={onGlass}
           elevation="raised"
           padding="sm"
-          className="stagger-in grid grid-cols-5 gap-1 overflow-visible sm:gap-2"
+          className="stagger-in grid grid-cols-[repeat(auto-fit,minmax(min(100%,3.5rem),1fr))] gap-1 overflow-visible sm:gap-2"
           style={{ ["--prayer-columns" as string]: "5" }}
         >
           {ordered.map((model) => {

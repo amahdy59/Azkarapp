@@ -17,6 +17,9 @@ import { prefixZikrId } from "../progress";
 import { useCounterClickFeedback } from "../hooks/useCounterClickFeedback";
 import { useSwipeGestures } from "../hooks/useSwipeGestures";
 import { useMediaQuery } from "../hooks/useMediaQuery";
+import { useCollectionPanelSize } from "../hooks/useCollectionPanelSize";
+import { CollectionPanelResizeHandle } from "../components/CollectionPanelResizeHandle";
+import { SidePanel } from "../components/ResponsiveSheet";
 import { useWakeLock } from "../hooks/useWakeLock";
 import { isCounterShortcutBlocked } from "../keyboardShortcuts";
 import {
@@ -36,7 +39,6 @@ import {
   ChevronDown,
   SlidersHorizontal,
   Headphones,
-  X,
   PanelLeftIcon,
   Maximize,
 } from "../components/icons";
@@ -59,6 +61,7 @@ import { prepareZikrShareCardFonts } from "../share/zikrShareCard";
 import { useCountingSurface } from "../components/countingSurface";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { Header } from "../components/LayoutShells";
+import { ReaderSceneArt } from "../components/ReaderSceneArt";
 import { QuranPrelude, QuranSurahHeader } from "../components/QuranChrome";
 import { QuranWordText } from "../components/QuranWordText";
 import {
@@ -90,7 +93,10 @@ import { getReadingFontSize } from "./readingTypography";
  * Same three steps, same labels and same order as Settings → Accessibility →
 /** Shared ghost icon-button treatment for every control in the phone header row. */
 const READER_HEADER_ACTION_CLASS =
-  "flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full text-foreground/80 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40";
+  "flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40";
+
+const READER_WIDE_HEADER_ACTION_CLASS =
+  "flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[color:var(--on-media)]/20 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-on-media";
 
 const QURAN_CARD_IMAGE = `${import.meta.env.BASE_URL || "/"}assets/cards/wird-quran.jpg`;
 
@@ -273,6 +279,12 @@ export function ReaderScreen({
   const [immersiveOpen, setImmersiveOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const sidebarToggleRef = useRef<HTMLButtonElement>(null);
+  const readerMenuRef = useRef<HTMLButtonElement>(null);
+  const collectionMenuRequested = useRef(false);
+  const collectionSelectionRequested = useRef(false);
+  const [isCollectionDrawerOpen, setIsCollectionDrawerOpen] = useState(false);
+  const [expandedNavigatorIds, setExpandedNavigatorIds] = useState<Set<string>>(() => new Set());
+  const navigatorScrollTop = useRef(0);
 
   /**
    * The Mushaf position, held here rather than inside the view.
@@ -325,6 +337,11 @@ export function ReaderScreen({
   const activeNavigatorItemRef = useRef<HTMLDivElement | null>(null);
 
   const onReaderMenuCloseAutoFocus = (event: Event) => {
+    if (collectionMenuRequested.current) {
+      event.preventDefault();
+      collectionMenuRequested.current = false;
+      return;
+    }
     if (!focusRequestedRef.current) return;
     event.preventDefault();
     focusRequestedRef.current = false;
@@ -346,6 +363,33 @@ export function ReaderScreen({
   // for the desktop reader, and running the phone layout there left a wide,
   // sparse column. Below 768px the phone layout takes over.
   const isDesktopReader = useMediaQuery("(min-width: 768px)");
+  const isWideReader = useMediaQuery("(min-width: 1200px)");
+  const panelSize = useCollectionPanelSize(isDesktopReader && !focusMode);
+  const canDockCollection = isWideReader && panelSize.canDock;
+  const previousSidebarOpen = useRef(isSidebarOpen);
+  const sidebarCloseRef = useRef<HTMLButtonElement>(null);
+  useLayoutEffect(() => {
+    if (canDockCollection && previousSidebarOpen.current !== isSidebarOpen) {
+      const target = isSidebarOpen ? sidebarCloseRef.current : sidebarToggleRef.current;
+      target?.focus({ preventScroll: true });
+    }
+    previousSidebarOpen.current = isSidebarOpen;
+  }, [canDockCollection, isSidebarOpen]);
+  useEffect(() => {
+    if (canDockCollection) setIsCollectionDrawerOpen(false);
+  }, [canDockCollection]);
+  const closeCollectionDrawer = () => {
+    setIsCollectionDrawerOpen(false);
+  };
+  const collapseCollectionPanel = () => {
+    if (canDockCollection) {
+      setIsSidebarOpen(false);
+    } else closeCollectionDrawer();
+  };
+  const toggleCollectionPanel = () => {
+    if (canDockCollection) setIsSidebarOpen((open) => !open);
+    else setIsCollectionDrawerOpen((open) => !open);
+  };
 
   useWakeLock(true);
 
@@ -504,9 +548,9 @@ export function ReaderScreen({
 
   useEffect(() => {
     const activeItem = activeNavigatorItemRef.current;
-    if (!activeItem || !window.matchMedia("(min-width: 1200px)").matches) return;
+    if (!activeItem || !(canDockCollection ? isSidebarOpen : isCollectionDrawerOpen)) return;
     activeItem.scrollIntoView?.({ block: "nearest", behavior: reducedMotion ? "auto" : "smooth" });
-  }, [idx, reducedMotion]);
+  }, [idx, reducedMotion, canDockCollection, isSidebarOpen, isCollectionDrawerOpen]);
 
   const handleToggleSaved = useCallback(() => {
     if (z) onToggleSaved(z.id);
@@ -592,7 +636,8 @@ export function ReaderScreen({
         setBenefitOpen(true);
       } else if ((e.key === "[" || e.key === "]" || e.key === "ج" || e.key === "د") && onSelectZikr) {
         e.preventDefault();
-        setIsSidebarOpen((prev) => !prev);
+        if (canDockCollection) setIsSidebarOpen((prev) => !prev);
+        else setIsCollectionDrawerOpen((prev) => !prev);
       }
     };
 
@@ -615,6 +660,7 @@ export function ReaderScreen({
     immersiveOpen,
     audioModeActive,
     focusMode,
+    canDockCollection,
   ]);
 
   if (!z || !category) {
@@ -835,7 +881,7 @@ export function ReaderScreen({
       }
     });
   };
-  const renderCollectionNavigator = () => {
+  const renderCollectionNavigator = (drawer = false) => {
     if (focusMode) return null;
     if (!onSelectZikr) return null;
     const doneCount = collectionCompletedCount;
@@ -844,11 +890,10 @@ export function ReaderScreen({
     return (
       <nav
         id="reader-collection-navigator"
-        hidden={!isSidebarOpen}
+        hidden={!drawer && !isSidebarOpen}
         aria-label={t(language, "reader.viewAllAzkar")}
-        className={`hidden h-full min-h-0 shrink-0 flex-col overflow-hidden border-s border-border/60 bg-card/85 backdrop-blur-sm shadow-md min-[1200px]:flex ${
-          isSidebarOpen ? "w-[30%] min-w-[288px] max-w-[352px]" : "!hidden"
-        }`}
+        style={drawer ? undefined : { width: panelSize.width }}
+        className={`h-full min-h-0 shrink-0 flex-col overflow-hidden bg-card ${drawer || isSidebarOpen ? "flex" : "hidden"}`}
         data-testid="reader-collection-navigator"
       >
         <div className="shrink-0 border-b border-border/60 px-4 py-4">
@@ -861,16 +906,18 @@ export function ReaderScreen({
             </div>
             <button
               type="button"
-              onClick={() => {
-                setIsSidebarOpen(false);
-                sidebarToggleRef.current?.focus();
-              }}
+              onClick={collapseCollectionPanel}
               aria-label={t(language, "reader.collapseSidebar")}
               title={t(language, "reader.collapseSidebar")}
               data-testid="reader-sidebar-close"
+              ref={sidebarCloseRef}
               className="flex size-11 shrink-0 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
-              <X size={18} aria-hidden="true" />
+              <PanelLeftIcon
+                size={18}
+                className={direction === "ltr" ? "-scale-x-100" : undefined}
+                aria-hidden="true"
+              />
             </button>
           </div>
           <p className="mt-1 text-xs font-semibold text-muted-foreground">
@@ -955,7 +1002,16 @@ export function ReaderScreen({
           </div>
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto p-3">
+        <div
+          className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-3"
+          data-testid="reader-sidebar-scroll"
+          ref={(element) => {
+            if (element) element.scrollTop = navigatorScrollTop.current;
+          }}
+          onScroll={(event) => {
+            navigatorScrollTop.current = event.currentTarget.scrollTop;
+          }}
+        >
           <AzkarListLayout
             azkar={azkar}
             completed={completedZikrIds}
@@ -981,8 +1037,21 @@ export function ReaderScreen({
                   direction={direction}
                   isActive={active}
                   activeRef={activeNavigatorItemRef}
+                  expandedOverride={expandedNavigatorIds.has(z.id)}
+                  onToggleExpand={() =>
+                    setExpandedNavigatorIds((current) => {
+                      const next = new Set(current);
+                      if (next.has(z.id)) next.delete(z.id);
+                      else next.add(z.id);
+                      return next;
+                    })
+                  }
                   onClickText={(targetIndex) => {
                     onSelectZikr(targetIndex);
+                    if (drawer) {
+                      collectionSelectionRequested.current = true;
+                      setIsCollectionDrawerOpen(false);
+                    }
                   }}
                   ariaLabelOverride={itemLabel}
                 />
@@ -1138,6 +1207,17 @@ export function ReaderScreen({
 
     return (
       <>
+        {!canDockCollection && onSelectZikr && (
+          <DropdownMenuItem
+            onSelect={() => {
+              collectionMenuRequested.current = true;
+              setIsCollectionDrawerOpen(true);
+            }}
+          >
+            <PanelLeftIcon size={16} className={direction === "ltr" ? "-scale-x-100" : undefined} aria-hidden="true" />
+            <span>{t(language, "reader.expandSidebar")}</span>
+          </DropdownMenuItem>
+        )}
         {/* 1. Primary immersion action: Focus Mode */}
         {!longSurah && (
           <>
@@ -1413,7 +1493,12 @@ export function ReaderScreen({
           that duplication is what made the two feel like separate screens. */}
       {!showMushaf &&
         (isDesktopReader ? (
-          <div className="flex h-full w-full min-h-0 flex-1 overflow-hidden" dir={direction}>
+          <div
+            ref={panelSize.workspaceRef}
+            data-testid="reader-workspace"
+            className="flex h-full w-full min-h-0 flex-1 overflow-hidden"
+            dir={direction}
+          >
             {/* Reading Canvas Column (flex-1): Hero + Reading Card + Counter */}
             <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
               {/* Wide-desktop hero band (>=1200px). Fixed navy brand surface,
@@ -1424,17 +1509,18 @@ export function ReaderScreen({
               <div
                 data-testid="reader-desktop-hero"
                 data-reading-chrome
-                className="relative w-full flex shrink-0 flex-col items-center gap-2 overflow-hidden rounded-b-3xl px-6 pb-4 pt-3 text-center"
+                className="relative isolate w-full flex shrink-0 flex-col items-center gap-2 overflow-hidden rounded-b-3xl px-6 pb-4 pt-3 text-center"
                 style={{
                   background:
                     "radial-gradient(120% 140% at 50% 10%, rgba(232,180,32,0.18), transparent 60%), var(--brand-hero)",
                 }}
               >
+                <ReaderSceneArt category={catId} />
                 <div className="flex w-full items-start justify-between gap-3" data-testid="reader-header-toolbar">
                   <IconButton
                     onClick={onBack}
                     label={t(language, "common.back")}
-                    className="shrink-0 border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] hover:bg-[color:var(--on-media)]/20"
+                    className={READER_WIDE_HEADER_ACTION_CLASS}
                   >
                     <ArrowPrevious size={20} />
                   </IconButton>
@@ -1452,21 +1538,22 @@ export function ReaderScreen({
                         aria-haspopup="dialog"
                         aria-label={t(language, "reader.referencesButton")}
                         title={t(language, "reader.referencesButton")}
-                        className="flex min-h-11 items-center gap-2 rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 px-3 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                        className={`${READER_WIDE_HEADER_ACTION_CLASS} w-auto gap-2 px-3`}
                       >
-                        <BookOpen size={18} aria-hidden="true" />
+                        <BookOpen size={20} aria-hidden="true" />
                         <span className="text-label font-extrabold">{t(language, "reader.referencesButton")}</span>
                       </button>
                     )}
 
                     <DropdownMenu dir={direction}>
                       <DropdownMenuTrigger
+                        ref={readerMenuRef}
                         aria-label={t(language, "reader.menu")}
                         onPointerEnter={() => void prepareZikrShareCardFonts()}
                         onFocus={() => void prepareZikrShareCardFonts()}
-                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                        className={READER_WIDE_HEADER_ACTION_CLASS}
                       >
-                        <MoreVertical size={18} />
+                        <MoreVertical size={20} />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-56" onCloseAutoFocus={onReaderMenuCloseAutoFocus}>
                         {renderReaderMenuItems("desktop")}
@@ -1474,20 +1561,29 @@ export function ReaderScreen({
                     </DropdownMenu>
                     <button
                       type="button"
-                      onClick={() => setIsSidebarOpen((prev) => !prev)}
-                      aria-expanded={isSidebarOpen}
+                      hidden={canDockCollection && isSidebarOpen}
+                      onClick={toggleCollectionPanel}
+                      aria-expanded={canDockCollection ? isSidebarOpen : isCollectionDrawerOpen}
                       aria-controls="reader-collection-navigator"
                       aria-label={
-                        isSidebarOpen ? t(language, "reader.collapseSidebar") : t(language, "reader.expandSidebar")
+                        (canDockCollection ? isSidebarOpen : isCollectionDrawerOpen)
+                          ? t(language, "reader.collapseSidebar")
+                          : t(language, "reader.expandSidebar")
                       }
                       title={
-                        isSidebarOpen ? t(language, "reader.collapseSidebar") : t(language, "reader.expandSidebar")
+                        (canDockCollection ? isSidebarOpen : isCollectionDrawerOpen)
+                          ? t(language, "reader.collapseSidebar")
+                          : t(language, "reader.expandSidebar")
                       }
                       data-testid="reader-sidebar-toggle"
                       ref={sidebarToggleRef}
-                      className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring min-[1200px]:flex"
+                      className={`${READER_WIDE_HEADER_ACTION_CLASS} ${canDockCollection && isSidebarOpen ? "hidden" : ""}`}
                     >
-                      <PanelLeftIcon size={18} aria-hidden="true" />
+                      <PanelLeftIcon
+                        size={20}
+                        className={direction === "ltr" ? "-scale-x-100" : undefined}
+                        aria-hidden="true"
+                      />
                     </button>
                   </div>
                 </div>
@@ -1501,10 +1597,10 @@ export function ReaderScreen({
 
                 <div className="flex w-full max-w-[520px] flex-col items-center gap-2">
                   <div className="flex w-full items-center justify-between px-1" aria-hidden="true">
-                    <span className="text-label font-semibold text-[color:var(--on-media-accent)]">
+                    <span className="text-label font-semibold text-on-media-muted">
                       {t(language, "reader.collectionPercentComplete", { percent: localizedReadingPercent })}
                     </span>
-                    <span className="text-xs font-bold text-[color:var(--on-media-accent)]">
+                    <span className="text-xs font-bold text-on-media-muted">
                       {t(language, "reader.collectionCount", {
                         done: formatNumerals(readingProgressValue, language),
                         total: formatNumerals(azkar.length, language),
@@ -1520,11 +1616,26 @@ export function ReaderScreen({
                     direction={direction}
                     aria-label={t(language, "reader.groupProgress")}
                   />
+                </div>
+              </div>
+
+              {/* Wide-desktop card: reading content, side navigation, counter,
+                and keyboard guidance. Page-level actions stay in the hero. */}
+              <div className="reader-canvas-wrap relative mx-4 my-4 flex min-h-0 flex-1 overflow-hidden bg-transparent">
+                <div
+                  className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden cursor-pointer"
+                  data-testid="reader-card"
+                  {...surfaceProps}
+                >
                   {((!showSurahChrome && readerZikrTitle) || (!longSurah && allWordMeanings.length > 0)) && (
-                    <div className="mt-1.5 flex w-full flex-wrap items-center justify-between gap-x-2 gap-y-1">
+                    <div
+                      data-testid="reader-entry-tools"
+                      data-prevent-count="true"
+                      className="reader-entry-tools--wide shrink-0 pt-2.5 flex flex-wrap items-center justify-between gap-x-2 gap-y-1"
+                    >
                       {!showSurahChrome && readerZikrTitle && (
                         <h2
-                          className="max-w-full shrink-0 truncate text-start text-sm font-extrabold leading-relaxed text-[color:var(--on-media)]"
+                          className="max-w-full shrink-0 truncate text-start text-sm font-extrabold leading-relaxed text-foreground"
                           dir="auto"
                           title={readerZikrTitle}
                           data-testid="reader-zikr-title"
@@ -1538,11 +1649,11 @@ export function ReaderScreen({
                           role="switch"
                           aria-checked={showDifficultWords}
                           onClick={() => setShowDifficultWords((v) => !v)}
-                          className="ms-auto flex shrink-0 min-h-11 items-center gap-2 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-on-media rounded-full py-1"
+                          className="ms-auto flex shrink-0 min-h-11 items-center gap-2 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring rounded-full py-1"
                           aria-label={t(language, "settings.showDifficultWords")}
                           title={t(language, "settings.showDifficultWords")}
                         >
-                          <span className="text-xs font-medium text-on-media">
+                          <span className="text-xs font-medium text-muted-foreground">
                             {t(language, "settings.showDifficultWords")}
                           </span>
                           <ToggleTrack checked={showDifficultWords} />
@@ -1550,17 +1661,6 @@ export function ReaderScreen({
                       )}
                     </div>
                   )}
-                </div>
-              </div>
-
-              {/* Wide-desktop card: reading content, side navigation, counter,
-                and keyboard guidance. Page-level actions stay in the hero. */}
-              <div className="reader-canvas-wrap relative mx-4 my-4 flex min-h-0 flex-1 overflow-hidden bg-transparent">
-                <div
-                  className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden cursor-pointer"
-                  data-testid="reader-card"
-                  {...surfaceProps}
-                >
                   <div ref={readerMainRef} className="flex flex-1 min-h-0 flex-col justify-between select-none">
                     <div className="relative flex min-h-0 flex-1">
                       <div
@@ -1605,7 +1705,23 @@ export function ReaderScreen({
             </div>
 
             {/* Desktop Full-Height All-Azkar Sidebar */}
-            {renderCollectionNavigator()}
+            {canDockCollection && onSelectZikr && !focusMode && (
+              <>
+                {isSidebarOpen && (
+                  <CollectionPanelResizeHandle
+                    width={panelSize.width}
+                    minimum={panelSize.minimum}
+                    maximum={panelSize.maximum}
+                    direction={direction}
+                    language={language}
+                    onResize={panelSize.setWidth}
+                    onReset={panelSize.resetWidth}
+                    onCollapse={collapseCollectionPanel}
+                  />
+                )}
+                {renderCollectionNavigator()}
+              </>
+            )}
           </div>
         ) : (
           <>
@@ -1615,6 +1731,8 @@ export function ReaderScreen({
                 onBack={onBack}
                 language={language}
                 elevateOnScroll={false}
+                decoration={<ReaderSceneArt category={catId} compact />}
+                backButtonClassName={READER_HEADER_ACTION_CLASS}
                 right={
                   // Two actions at most: Reference, then the overflow control.
                   // Share used to sit between them; at 320-390px a third 44px
@@ -1649,6 +1767,7 @@ export function ReaderScreen({
                         now, so the trigger warms them instead — still ahead of
                         the click, one step earlier in the same gesture. */}
                       <DropdownMenuTrigger
+                        ref={readerMenuRef}
                         aria-label={t(language, "reader.menu")}
                         className={READER_HEADER_ACTION_CLASS}
                         onPointerEnter={() => void prepareZikrShareCardFonts()}
@@ -1699,6 +1818,7 @@ export function ReaderScreen({
             >
               {((!showSurahChrome && readerZikrTitle) || (!longSurah && allWordMeanings.length > 0)) && (
                 <div
+                  data-testid="reader-entry-tools"
                   data-prevent-count="true"
                   className="px-5 pt-2.5 flex w-full flex-wrap items-center justify-between gap-x-2 gap-y-1"
                 >
@@ -1810,6 +1930,28 @@ export function ReaderScreen({
           onClose={closeReference}
           onAnnouncement={setShareMessage}
         />
+      )}
+      {!canDockCollection && onSelectZikr && !focusMode && (
+        <SidePanel
+          open={isCollectionDrawerOpen}
+          onClose={closeCollectionDrawer}
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+            const target = collectionSelectionRequested.current
+              ? readingScrollRef.current
+              : (sidebarToggleRef.current ?? readerMenuRef.current);
+            collectionSelectionRequested.current = false;
+            target?.focus({ preventScroll: true });
+          }}
+          title={t(language, "reader.viewAllAzkar")}
+          side={direction === "rtl" ? "left" : "right"}
+          direction={direction}
+          language={language}
+          testId="reader-collection-drawer"
+          className="!overflow-hidden"
+        >
+          {renderCollectionNavigator(true)}
+        </SidePanel>
       )}
       <QuranWordPopover
         meanings={wordSheetOpen ? null : (wordMeaningSelection?.groups[wordMeaningSelection.index] ?? null)}

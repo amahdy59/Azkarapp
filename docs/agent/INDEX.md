@@ -1,5 +1,7 @@
 # AI Improvement System Index
 
+[Reader collection scenes](phases/READER_COLLECTION_SCENES.md) records the owner-approved static gradient/SVG header refinement, unchanged sizing, accessibility fallbacks and local-only verification.
+
 [Compact combined shared cards](phases/COMPACT_COMBINED_SHARED_CARDS.md) records the active owner-approved combined-card density, citation/repetition row, plain footer and Arabic-Indic export numeral refinement.
 
 [Reading, update and sharing reliability](phases/READING_AND_UPDATE_RELIABILITY.md) is the active owner-approved follow-up for rapid navigation/counting, release-specific update deferral, sharing geometry, encouraging copy and device/accessibility evidence.
@@ -193,3 +195,7 @@ Apple/Microsoft-informed control spacing and alignment improvements.
 [Expanded audio text centering](phases/EXPANDED_AUDIO_TEXT_CENTERING.md) records the owner-requested correction to both-axis alignment with accessible overflow recovery.
 
 [Reader guidance and motion consistency](phases/READER_GUIDANCE_AND_MOTION_CONSISTENCY.md) records the owner-approved combined keyboard hint, responsive reading layout and animation audit refinements.
+
+[Resizable Reader collection panel](phases/RESIZABLE_READER_COLLECTION_PANEL.md) records the owner-approved familiar sidebar, pointer/keyboard resizing and drawer fallback; verification is local only and publication is withheld.
+
+[Compact prayer companion](phases/COMPACT_PRAYER_COMPANION.md) records the owner-approved local-only prayer card and summary-tile refinement, responsive reflow, native checklist semantics and verification.

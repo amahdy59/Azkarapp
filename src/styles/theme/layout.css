@@ -245,14 +245,6 @@
   background-image: linear-gradient(to bottom, rgb(2 6 23 / 0.5), rgb(2 6 23 / 0.35), rgb(2 6 23 / 0.75));
 }
 
-/* Journey cards — full-width prayer panel at md. */
-@media (min-width: 768px) {
-  .journey-hero-aside {
-    border-bottom: 0;
-    border-inline-end-width: 1px;
-  }
-}
-
 @keyframes stagger-enter {
   0% {
     opacity: 0;

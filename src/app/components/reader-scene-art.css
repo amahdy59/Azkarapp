@@ -1,0 +1,131 @@
+/* Art palettes are deliberately independent of UI tokens. The functional
+   surface underneath and the central contrast veil use the existing tokens. */
+.reader-scene {
+  --scene-horizon: #73523f;
+  --scene-zenith: #101c30;
+  --scene-light: #f1c989;
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background: linear-gradient(180deg, var(--scene-zenith), var(--scene-horizon));
+}
+
+.reader-scene[data-scene="evening"] {
+  --scene-horizon: #684252;
+  --scene-zenith: #17182d;
+  --scene-light: #e9a875;
+}
+
+.reader-scene[data-scene="before_sleep"] {
+  --scene-horizon: #263654;
+  --scene-zenith: #0c1326;
+  --scene-light: #d8e1ef;
+}
+
+.reader-scene[data-scene="neutral"] {
+  --scene-horizon: #2d4048;
+  --scene-zenith: #111c2a;
+}
+
+.reader-scene__light {
+  position: absolute;
+  inset-inline-end: 2%;
+  bottom: -2.5rem;
+  width: 12rem;
+  height: 9rem;
+  background: radial-gradient(ellipse, var(--scene-light) 0%, transparent 68%);
+  opacity: 0.2;
+}
+
+.reader-scene[data-scene="morning"] .reader-scene__light,
+.reader-scene[data-scene="evening"] .reader-scene__light {
+  background:
+    radial-gradient(circle at 50% 55%, var(--scene-light) 0 7%, transparent 8%),
+    radial-gradient(ellipse, var(--scene-light), transparent 68%);
+}
+
+.reader-scene__skyline {
+  position: absolute;
+  inset-inline-end: 0;
+  bottom: 0;
+  width: min(24%, 18rem);
+  height: min(64%, 6rem);
+}
+
+.reader-scene__celestial {
+  position: absolute;
+  inset-inline-end: 2%;
+  top: 35%;
+  width: min(14%, 7rem);
+  height: 3rem;
+}
+
+.reader-scene__distance {
+  fill: var(--scene-light);
+  opacity: 0.12;
+}
+
+.reader-scene__mosque {
+  fill: #0a1222;
+}
+
+.reader-scene__windows {
+  fill: var(--scene-light);
+  opacity: 0.18;
+}
+
+.reader-scene__stars {
+  fill: var(--scene-light);
+  opacity: 0.6;
+}
+
+/* Keep title, progress and toolbar over a dark, stable surface. This veil is
+   above the illustration but below all functional content. */
+.reader-scene::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 30%, var(--brand-hero) 20%, transparent 100%),
+    linear-gradient(180deg, color-mix(in srgb, var(--brand-hero) 80%, transparent), transparent 70%);
+}
+
+/* Compact headers retain their theme and typography. A muted vignette has
+   no layout dimensions and never competes with the destination or actions. */
+.reader-scene--compact {
+  opacity: 0.24;
+}
+
+.theme-light .reader-scene--compact {
+  opacity: 0.12;
+}
+
+.reader-scene--compact::after {
+  background: radial-gradient(ellipse at 50% 25%, var(--background) 30%, transparent 100%);
+}
+
+.reader-scene--compact .reader-scene__skyline {
+  width: min(42%, 12rem);
+  height: 90%;
+}
+
+.reader-scene--compact .reader-scene__mosque {
+  fill: var(--foreground);
+  opacity: 0.55;
+}
+
+.reader-scene--compact .reader-scene__celestial {
+  display: none;
+}
+
+.reduce-transparency .reader-scene {
+  display: none;
+}
+
+@media (prefers-reduced-transparency: reduce), (forced-colors: active) {
+  .reader-scene {
+    display: none;
+  }
+}
