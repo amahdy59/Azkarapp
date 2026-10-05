@@ -15,8 +15,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
-import { CounterKeyboardHelp } from "../components/CounterKeyboardHelp";
-import { CounterShortcutHints, CounterTapHint, ZikrCounterSurface } from "../components/ZikrComponents";
+import { CounterGuidance } from "../components/CounterGuidance";
+import { ZikrCounterSurface } from "../components/ZikrComponents";
 import { AUTHENTIC_AZKAR_COLLECTION, type AuthenticZikrItem } from "../content/authenticAzkar";
 import { formatNumerals } from "../formatting";
 import { useCounterClickFeedback } from "../hooks/useCounterClickFeedback";
@@ -410,7 +410,7 @@ export function CustomCounterScreen({
                 </div>
               </div>
 
-              <CounterTapHint text={t(language, "reader.tapAnywhere")} />
+              <CounterGuidance language={language} direction={direction} placement="above" />
               <footer className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
                 <div data-testid="reader-counter-stack">
                   <DevotionalFooter>
@@ -448,26 +448,7 @@ export function CustomCounterScreen({
                       </div>
                     </div>
                   </DevotionalFooter>
-                  <div>
-                    <CounterShortcutHints
-                      language={language}
-                      direction={direction}
-                      testId="counter-keyboard-shortcuts"
-                      ariaLabel={t(language, "reader.keyboardShortcuts")}
-                      shortcuts={[
-                        { keys: ["Space"], label: t(language, "counter.count") },
-                        { keys: ["R"], label: t(language, "counter.reset") },
-                      ]}
-                    />
-                    <CounterKeyboardHelp
-                      shortcuts={[
-                        { keys: ["Space"], label: t(language, "counter.count") },
-                        { keys: ["R"], label: t(language, "counter.reset") },
-                      ]}
-                      language={language}
-                      direction={direction}
-                    />
-                  </div>
+                  <CounterGuidance language={language} direction={direction} placement="below" />
                 </div>
               </footer>
             </div>

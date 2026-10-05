@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import type { CategoryId } from "../types";
@@ -6,6 +6,28 @@ import { normalizeSearchText } from "../content/searchNormalization";
 import { AzkarLibraryScreen } from "./AzkarLibraryScreen";
 
 describe("AzkarLibraryScreen", () => {
+  it("does not replay entrance motion when search results or cleared collections appear", async () => {
+    const { container } = render(
+      <AzkarLibraryScreen
+        completed={{} as Record<CategoryId, Set<string>>}
+        language="en"
+        direction="ltr"
+        routineModes={{ morning: "core", evening: "core", before_sleep: "core", after_prayer: "core" }}
+        onCategory={() => undefined}
+        onZikr={() => undefined}
+        savedZikrIds={new Set()}
+      />,
+    );
+    expect(container.querySelector(".stagger-enter")).not.toBeNull();
+    await waitFor(() => expect(container.querySelector(".stagger-enter")).toBeNull(), { timeout: 2000 });
+    const input = screen.getByRole("textbox", { name: "Search azkar and duas" });
+    fireEvent.change(input, { target: { value: "sleep" } });
+    expect(screen.getAllByTestId("matching-zikr-card").length).toBeGreaterThan(0);
+    expect(container.querySelector(".stagger-enter")).toBeNull();
+    fireEvent.change(input, { target: { value: "" } });
+    expect(screen.getByRole("link", { name: /^Morning Azkar/ })).toBeInTheDocument();
+    expect(container.querySelector(".stagger-enter")).toBeNull();
+  });
   it("keeps collections primary and exposes one clear Benefits destination", () => {
     const onOpenBenefits = vi.fn();
     render(

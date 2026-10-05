@@ -1,3 +1,4 @@
+import { progressFillStyle } from "../components/progressFillStyle";
 import { useState, type ReactNode } from "react";
 import { useMediaQuery } from "../hooks/useMediaQuery";
 import { Header } from "../components/LayoutShells";
@@ -230,8 +231,8 @@ export function FridayModeScreen({
           </div>
           <div className="mt-2 h-2 overflow-hidden rounded-full bg-background/80" aria-hidden="true">
             <div
-              className="h-full rounded-full bg-primary transition-[width]"
-              style={{ width: `${(completedCount / totalPractices) * 100}%` }}
+              className="progress-fill-transform h-full rounded-full bg-primary"
+              style={{ ...progressFillStyle(((completedCount / totalPractices) * 100) / 100) }}
             />
           </div>
           {completedCount >= totalPractices ? (

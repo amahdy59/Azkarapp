@@ -1,3 +1,4 @@
+import { progressFillStyle } from "./progressFillStyle";
 import { BookOpen, ArrowNext, CheckCircle2, Calendar } from "./icons";
 import { t } from "../i18n";
 import type { AppLanguage, QuranReadingPosition, QuranWirdPlan } from "../types";
@@ -141,8 +142,8 @@ export function QuranHomeCard({
                   aria-valuemin={0}
                   aria-valuemax={goal}
                   aria-valuenow={Math.min(read, goal)}
-                  className="h-full bg-primary rounded-full transition-[width] duration-500 ease-out"
-                  style={{ width: `${Math.min(100, Math.max(0, (read / goal) * 100))}%` }}
+                  className="h-full bg-primary rounded-full progress-fill-transform"
+                  style={{ ...progressFillStyle(Math.min(100, Math.max(0, (read / goal) * 100)) / 100) }}
                 />
               </div>
             </div>

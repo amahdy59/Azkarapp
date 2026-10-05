@@ -477,6 +477,14 @@ Four tiers, defined by width only. `useLayoutMode` and the CSS media queries in 
 
 ## Change control
 
+### Combined counting guidance and responsive Reader — 2026-10-05
+
+Reader, Masbaha and Friday Salawat use one shared counting-guidance card. Below 768px it stays above the actions with the touch icon and tap instruction; from 768px it replaces the shortcut strip below the counter with localized click/Space guidance and a 44px keyboard-icon action that opens the complete shortcut guide. The separate shortcut strip and text trigger are removed. Question-mark access, the character-shortcut preference, native-control exclusions and dialog focus restoration remain. The icon is available on tablets with attached keyboards without trying to infer keyboard hardware. This supersedes the former all-width above-actions placement described in the footer refinement below.
+
+Ordinary Reader Previous/Next share the existing counter row at every width, with equal 48px targets and direction-aware arrows. They no longer overlay the text at desktop/tablet widths. Their label visibility follows the available button width through a container query; enlarged labels that do not fit yield to centered arrows while full accessible names and titles remain. This supersedes the older ordinary-reader side-navigation contract. Long-surah side navigation retains reserved gutters and its separate counter-only behavior. Wide collection navigation uses 30% of the available row, bounded between 288px and 352px so enlarged text cannot consume the reading canvas; it remains an inline panel from 1200px and a disclosure below that tier. The collection toggle sits beside the menu in a normal-flow header toolbar, separated from the wrapping title and the collection panel. It never floats across the panel boundary; Back and toolbar actions retain independent space at enlarged text sizes. The reading canvas has symmetric scrollbar gutters and 24px wide-layout insets, while fitting text stays centered and overflowing text remains scrollable. Focus mode, audio ownership, reviewed wording, type size and persisted progress retain their contracts.
+
+Home photography stays static. Progress fills translate inside clipped tracks, Library card entrances are capped at 200ms delay, and the existing 100ms exit/240ms arrival text-only zikr transition remains authoritative.
+
 ### Phase 78 practical devotional access
 
 - Home exposes six visible semantic links to existing situational collections. Ordinary activation resumes that collection; modified activation retains a real reader URL. The card uses the shared `hero-glass home-glass-surface` material over Home photography, including on-media text and focus treatment in every theme. With Reduce Transparency enabled, it uses the active theme's opaque card, border, text, and elevation tokens like the adjacent utilities. The links retain 44px-or-larger targets.

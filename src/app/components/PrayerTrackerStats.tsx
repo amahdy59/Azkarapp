@@ -1,3 +1,4 @@
+import { progressFillStyle } from "./progressFillStyle";
 import { useMemo } from "react";
 import { AppLanguage, PrayerName, PrayerTrackingRecord } from "../types";
 import { getPeriodRange } from "../calendarPeriods";
@@ -95,9 +96,11 @@ export function PrayerTrackerStats({
           </div>
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
             <div
-              className="h-full rounded-full bg-primary transition-all duration-500"
+              className="h-full rounded-full bg-primary progress-fill-transform"
               style={{
-                width: `${Math.min(100, Math.round((stats.totalFard / Math.max(1, stats.maxTotalPrayers)) * 100))}%`,
+                ...progressFillStyle(
+                  Math.min(100, Math.round((stats.totalFard / Math.max(1, stats.maxTotalPrayers)) * 100)) / 100,
+                ),
               }}
             />
           </div>
@@ -113,9 +116,11 @@ export function PrayerTrackerStats({
           </div>
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
             <div
-              className="h-full rounded-full bg-primary transition-all duration-500"
+              className="h-full rounded-full bg-primary progress-fill-transform"
               style={{
-                width: `${Math.min(100, Math.round((stats.totalMosque / Math.max(1, stats.maxTotalPrayers)) * 100))}%`,
+                ...progressFillStyle(
+                  Math.min(100, Math.round((stats.totalMosque / Math.max(1, stats.maxTotalPrayers)) * 100)) / 100,
+                ),
               }}
             />
           </div>
@@ -129,9 +134,11 @@ export function PrayerTrackerStats({
           <div className="text-base font-black text-foreground">{formatNumerals(stats.totalRawatib, language)}</div>
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
             <div
-              className="h-full rounded-full bg-secondary transition-all duration-500"
+              className="h-full rounded-full bg-secondary progress-fill-transform"
               style={{
-                width: `${Math.min(100, Math.round((stats.totalRawatib / Math.max(1, stats.daysInPeriod * 4)) * 100))}%`,
+                ...progressFillStyle(
+                  Math.min(100, Math.round((stats.totalRawatib / Math.max(1, stats.daysInPeriod * 4)) * 100)) / 100,
+                ),
               }}
             />
           </div>
@@ -147,9 +154,11 @@ export function PrayerTrackerStats({
           </div>
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
             <div
-              className="h-full rounded-full bg-success transition-all duration-500"
+              className="h-full rounded-full bg-success progress-fill-transform"
               style={{
-                width: `${Math.min(100, Math.round((stats.totalAdhkar / Math.max(1, stats.maxTotalPrayers)) * 100))}%`,
+                ...progressFillStyle(
+                  Math.min(100, Math.round((stats.totalAdhkar / Math.max(1, stats.maxTotalPrayers)) * 100)) / 100,
+                ),
               }}
             />
           </div>
@@ -194,9 +203,11 @@ export function PrayerTrackerStats({
                     </div>
                     <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
                       <div
-                        className="h-full rounded-full bg-primary transition-all duration-500"
+                        className="h-full rounded-full bg-primary progress-fill-transform"
                         style={{
-                          width: `${Math.min(100, Math.round((fard / Math.max(1, stats.daysInPeriod)) * 100))}%`,
+                          ...progressFillStyle(
+                            Math.min(100, Math.round((fard / Math.max(1, stats.daysInPeriod)) * 100)) / 100,
+                          ),
                         }}
                       />
                     </div>
@@ -212,9 +223,11 @@ export function PrayerTrackerStats({
                     </div>
                     <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
                       <div
-                        className="h-full rounded-full bg-primary/80 transition-all duration-500"
+                        className="h-full rounded-full bg-primary/80 progress-fill-transform"
                         style={{
-                          width: `${Math.min(100, Math.round((mosque / Math.max(1, stats.daysInPeriod)) * 100))}%`,
+                          ...progressFillStyle(
+                            Math.min(100, Math.round((mosque / Math.max(1, stats.daysInPeriod)) * 100)) / 100,
+                          ),
                         }}
                       />
                     </div>
@@ -230,11 +243,13 @@ export function PrayerTrackerStats({
                     </div>
                     <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
                       <div
-                        className="h-full rounded-full bg-secondary transition-all duration-500"
+                        className="h-full rounded-full bg-secondary progress-fill-transform"
                         style={{
-                          width: hasRawatib
-                            ? `${Math.min(100, Math.round((rawatib / Math.max(1, stats.daysInPeriod)) * 100))}%`
-                            : "0%",
+                          ...progressFillStyle(
+                            hasRawatib
+                              ? Math.min(100, Math.round((rawatib / Math.max(1, stats.daysInPeriod)) * 100)) / 100
+                              : 0,
+                          ),
                         }}
                       />
                     </div>
@@ -250,9 +265,11 @@ export function PrayerTrackerStats({
                     </div>
                     <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
                       <div
-                        className="h-full rounded-full bg-success transition-all duration-500"
+                        className="h-full rounded-full bg-success progress-fill-transform"
                         style={{
-                          width: `${Math.min(100, Math.round((adhkar / Math.max(1, stats.daysInPeriod)) * 100))}%`,
+                          ...progressFillStyle(
+                            Math.min(100, Math.round((adhkar / Math.max(1, stats.daysInPeriod)) * 100)) / 100,
+                          ),
                         }}
                       />
                     </div>

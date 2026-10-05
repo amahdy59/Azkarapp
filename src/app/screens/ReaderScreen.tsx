@@ -48,9 +48,9 @@ import { isLongSurah } from "../content/mushafPages";
 import type { AppLanguage, CategoryId, RoutineMode, MushafTextScale, TextSizeOption, ThemeMode, Zikr } from "../types";
 import { isPrayerName } from "../content/prayerTimes";
 import { ProgressBar } from "../components/ProgressBar";
-import { CounterKeyboardHelp } from "../components/CounterKeyboardHelp";
+import { CounterGuidance } from "../components/CounterGuidance";
 import { DevotionalAction, DevotionalFooter } from "../components/DevotionalControls";
-import { CounterShortcutHints, CounterTapHint, ZikrCounterSurface } from "../components/ZikrComponents";
+import { ZikrCounterSurface } from "../components/ZikrComponents";
 import { ToggleTrack } from "../components/SettingsRow";
 import { ReadingTextTransition } from "../components/ReadingTextTransition";
 import { ReaderReferenceSheet } from "../components/ReaderReferenceSheet";
@@ -798,13 +798,13 @@ export function ReaderScreen({
         className={
           inDock
             ? "flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1 rounded-xl px-2 border border-border/60 bg-card text-foreground shadow-sm transition-all duration-fast hover:bg-muted disabled:opacity-50 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-            : "adaptive-counter-nav devotional-secondary-action flex min-h-12 min-w-11 min-[360px]:w-[5.5rem] shrink-0 items-center justify-center min-[360px]:justify-between gap-1 rounded-xl px-2 border border-border/60 bg-card/90 backdrop-blur-xs text-foreground shadow-sm transition-all duration-fast hover:bg-muted disabled:opacity-50 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            : "adaptive-counter-nav devotional-secondary-action flex min-h-12 min-w-11 min-[360px]:w-[88px] shrink-0 items-center justify-center min-[360px]:justify-between gap-1 rounded-xl px-2 border border-border/60 bg-card/90 backdrop-blur-xs text-foreground shadow-sm transition-all duration-fast hover:bg-muted disabled:opacity-50 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         }
       >
         {isPrevious ? (
-          <ChevronPrevious size={18} className="shrink-0" aria-hidden="true" />
+          <ChevronPrevious size={18} className="mx-auto shrink-0" aria-hidden="true" />
         ) : (
-          <ChevronNext size={18} className="order-2 shrink-0" aria-hidden="true" />
+          <ChevronNext size={18} className="order-2 mx-auto shrink-0" aria-hidden="true" />
         )}
         {!inDock && (
           <span className="min-w-0 flex-1 hidden min-[360px]:inline text-center text-label font-semibold [overflow-wrap:anywhere]">
@@ -846,16 +846,18 @@ export function ReaderScreen({
         id="reader-collection-navigator"
         hidden={!isSidebarOpen}
         aria-label={t(language, "reader.viewAllAzkar")}
-        className={`hidden h-full min-h-0 shrink-0 flex-col overflow-hidden border-s border-border/60 bg-card/85 backdrop-blur-sm shadow-md transition-all duration-300 min-[1200px]:flex ${
-          isSidebarOpen ? "w-[34%] min-w-[20rem] max-w-md" : "!hidden"
+        className={`hidden h-full min-h-0 shrink-0 flex-col overflow-hidden border-s border-border/60 bg-card/85 backdrop-blur-sm shadow-md min-[1200px]:flex ${
+          isSidebarOpen ? "w-[30%] min-w-[288px] max-w-[352px]" : "!hidden"
         }`}
         data-testid="reader-collection-navigator"
       >
         <div className="shrink-0 border-b border-border/60 px-4 py-4">
           <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
+            <div className="flex min-w-0 flex-1 items-center gap-2">
               <List size={19} className="shrink-0 text-primary" aria-hidden="true" />
-              <h2 className="text-subtitle font-extrabold text-foreground">{t(language, "reader.viewAllAzkar")}</h2>
+              <h2 className="min-w-0 break-words text-subtitle font-extrabold text-foreground">
+                {t(language, "reader.viewAllAzkar")}
+              </h2>
             </div>
             <button
               type="button"
@@ -1051,7 +1053,7 @@ export function ReaderScreen({
   const renderCounterPanel = () => (
     <div className="w-full pb-1" data-testid="counter-panel">
       <div className="adaptive-counter-row flex w-full items-stretch justify-center gap-2">
-        <div className="flex md:hidden">{renderNavigationButton("prev")}</div>
+        <div className="flex">{renderNavigationButton("prev")}</div>
         <div className="flex min-w-0 flex-1 justify-center">
           <ZikrCounterSurface
             count={count}
@@ -1070,30 +1072,8 @@ export function ReaderScreen({
             reduceMotion={reduceMotion}
           />
         </div>
-        <div className="flex md:hidden">{renderNavigationButton("next")}</div>
+        <div className="flex">{renderNavigationButton("next")}</div>
       </div>
-    </div>
-  );
-
-  const renderKeyboardShortcutsHint = () => (
-    <div data-reading-shortcuts>
-      <CounterShortcutHints
-        language={language}
-        direction={direction}
-        testId="reader-keyboard-shortcuts"
-        ariaLabel={t(language, "reader.keyboardShortcuts")}
-        shortcuts={[
-          /* Space only counts once the counter itself is focused in long-Surah
-           mode (the reader canvas deliberately never counts a full Surah — see
-           the counter-only contract in docs/DESIGN_SYSTEM.md), so the global
-           shortcut does not apply and the hint would be misleading. */
-          ...(longSurah ? [] : [{ keys: ["Space"], label: t(language, "reader.shortcutCount") }]),
-          { keys: ["→", "←"], label: t(language, "reader.shortcutNavigate") },
-          { keys: ["R"], label: t(language, "reader.shortcutReset") },
-          { keys: ["Esc"], label: t(language, "reader.shortcutBack") },
-        ]}
-      />
-      <CounterKeyboardHelp shortcuts={[]} language={language} direction={direction} />
     </div>
   );
 
@@ -1147,7 +1127,7 @@ export function ReaderScreen({
           </div>
           {renderCounterPanel()}
         </DevotionalFooter>
-        <div>{renderKeyboardShortcutsHint()}</div>
+        <CounterGuidance language={language} direction={direction} reader placement="below" />
       </div>
     );
   };
@@ -1450,50 +1430,72 @@ export function ReaderScreen({
                     "radial-gradient(120% 140% at 50% 10%, rgba(232,180,32,0.18), transparent 60%), var(--brand-hero)",
                 }}
               >
-                <IconButton
-                  onClick={onBack}
-                  label={t(language, "common.back")}
-                  className="absolute start-4 top-4 border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] hover:bg-[color:var(--on-media)]/20"
-                >
-                  <ArrowPrevious size={20} />
-                </IconButton>
+                <div className="flex w-full items-start justify-between gap-3" data-testid="reader-header-toolbar">
+                  <IconButton
+                    onClick={onBack}
+                    label={t(language, "common.back")}
+                    className="shrink-0 border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] hover:bg-[color:var(--on-media)]/20"
+                  >
+                    <ArrowPrevious size={20} />
+                  </IconButton>
 
-                {/* Hero actions: Reference (for surahs without bottom dock), Overflow menu. */}
-                <div className="absolute end-4 top-4 flex items-center gap-2" data-testid="reader-hero-actions">
-                  {longSurah && (
+                  {/* Hero actions: Reference (for surahs without bottom dock), Overflow menu. */}
+                  <div className="flex flex-wrap items-center justify-end gap-2" data-testid="reader-hero-actions">
+                    {longSurah && (
+                      <button
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          setHasOpenedBenefit(true);
+                          setBenefitOpen(true);
+                        }}
+                        aria-haspopup="dialog"
+                        aria-label={t(language, "reader.referencesButton")}
+                        title={t(language, "reader.referencesButton")}
+                        className="flex min-h-11 items-center gap-2 rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 px-3 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                      >
+                        <BookOpen size={18} aria-hidden="true" />
+                        <span className="text-label font-extrabold">{t(language, "reader.referencesButton")}</span>
+                      </button>
+                    )}
+
+                    <DropdownMenu dir={direction}>
+                      <DropdownMenuTrigger
+                        aria-label={t(language, "reader.menu")}
+                        onPointerEnter={() => void prepareZikrShareCardFonts()}
+                        onFocus={() => void prepareZikrShareCardFonts()}
+                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                      >
+                        <MoreVertical size={18} />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-56" onCloseAutoFocus={onReaderMenuCloseAutoFocus}>
+                        {renderReaderMenuItems("desktop")}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                     <button
                       type="button"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        setHasOpenedBenefit(true);
-                        setBenefitOpen(true);
-                      }}
-                      aria-haspopup="dialog"
-                      aria-label={t(language, "reader.referencesButton")}
-                      title={t(language, "reader.referencesButton")}
-                      className="flex min-h-11 items-center gap-2 rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 px-3 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                      onClick={() => setIsSidebarOpen((prev) => !prev)}
+                      aria-expanded={isSidebarOpen}
+                      aria-controls="reader-collection-navigator"
+                      aria-label={
+                        isSidebarOpen ? t(language, "reader.collapseSidebar") : t(language, "reader.expandSidebar")
+                      }
+                      title={
+                        isSidebarOpen ? t(language, "reader.collapseSidebar") : t(language, "reader.expandSidebar")
+                      }
+                      data-testid="reader-sidebar-toggle"
+                      ref={sidebarToggleRef}
+                      className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring min-[1200px]:flex"
                     >
-                      <BookOpen size={18} aria-hidden="true" />
-                      <span className="text-label font-extrabold">{t(language, "reader.referencesButton")}</span>
+                      <PanelLeftIcon size={18} aria-hidden="true" />
                     </button>
-                  )}
-
-                  <DropdownMenu dir={direction}>
-                    <DropdownMenuTrigger
-                      aria-label={t(language, "reader.menu")}
-                      onPointerEnter={() => void prepareZikrShareCardFonts()}
-                      onFocus={() => void prepareZikrShareCardFonts()}
-                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                    >
-                      <MoreVertical size={18} />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56" onCloseAutoFocus={onReaderMenuCloseAutoFocus}>
-                      {renderReaderMenuItems("desktop")}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  </div>
                 </div>
 
-                <h1 className="text-display font-extrabold text-[color:var(--on-media-accent)]" dir="auto">
+                <h1
+                  className="w-full break-words text-display font-extrabold text-[color:var(--on-media-accent)]"
+                  dir="auto"
+                >
                   {displayCategoryName}
                 </h1>
 
@@ -1566,7 +1568,7 @@ export function ReaderScreen({
                         role="region"
                         tabIndex={0}
                         aria-label={t(language, "reader.readingText")}
-                        className="reader-text-scroll h-full min-h-0 w-full overflow-y-auto ps-6 pe-7 md:px-20 py-4 outline-none focus-visible:outline-none focus:ring-0 [scrollbar-gutter:stable]"
+                        className={`reader-text-scroll h-full min-h-0 w-full overflow-y-auto ${longSurah ? "px-28" : "px-4 md:px-6"} py-4 outline-none focus-visible:outline-none focus:ring-0 [scrollbar-gutter:stable both-edges]`}
                       >
                         <div className="reading-measure mx-auto flex min-h-full w-full flex-col py-4">
                           <div style={dragStyle} className="flex w-full flex-1 flex-col">
@@ -1587,10 +1589,12 @@ export function ReaderScreen({
                           </div>
                         </div>
                       </div>
-                      {renderSideNavigation()}
+                      {longSurah && renderSideNavigation()}
                     </div>
 
-                    {!longSurah && !audioModeActive && <CounterTapHint text={counterInstruction} />}
+                    {!longSurah && !audioModeActive && (
+                      <CounterGuidance language={language} direction={direction} reader placement="above" />
+                    )}
                     {!longSurah && (
                       <footer className={`shrink-0 pt-3 ${audioModeActive ? "pb-0" : "pb-3"}`}>{renderDock()}</footer>
                     )}
@@ -1598,26 +1602,6 @@ export function ReaderScreen({
                   </div>
                 </div>
               </div>
-            </div>
-
-            {/* Desktop Sidebar Toggle Button */}
-            <div
-              data-reading-chrome
-              className="hidden min-[1200px]:flex items-start pt-6 shrink-0 z-20 -mx-5 pointer-events-none"
-            >
-              <button
-                type="button"
-                onClick={() => setIsSidebarOpen((prev) => !prev)}
-                aria-expanded={isSidebarOpen}
-                aria-controls="reader-collection-navigator"
-                aria-label={isSidebarOpen ? t(language, "reader.collapseSidebar") : t(language, "reader.expandSidebar")}
-                title={isSidebarOpen ? t(language, "reader.collapseSidebar") : t(language, "reader.expandSidebar")}
-                data-testid="reader-sidebar-toggle"
-                ref={sidebarToggleRef}
-                className="pointer-events-auto flex h-11 w-11 items-center justify-center rounded-xl border border-border/80 bg-card shadow-sm text-foreground transition-colors duration-fast hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-              >
-                <PanelLeftIcon size={18} aria-hidden="true" />
-              </button>
             </div>
 
             {/* Desktop Full-Height All-Azkar Sidebar */}
@@ -1780,7 +1764,9 @@ export function ReaderScreen({
                 </div>
               </div>
 
-              {!longSurah && !audioModeActive && <CounterTapHint text={counterInstruction} />}
+              {!longSurah && !audioModeActive && (
+                <CounterGuidance language={language} direction={direction} reader placement="above" />
+              )}
               {/* The screen sets !pb-0 and the tab bar is hidden here, so the
                 counter itself owns the bottom inset — otherwise it would sit
                 flush against the home indicator. */}

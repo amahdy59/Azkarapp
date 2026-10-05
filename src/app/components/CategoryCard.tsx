@@ -40,7 +40,7 @@ export function CategoryCard({
   const isStarted = completedCount > 0;
 
   const className = `interactive-elem flex min-h-[82px] w-full items-center gap-4 rounded-3xl border border-border/40 bg-card p-4.5 text-start no-underline shadow-raised hover:border-primary/40 hover:shadow-overlay transition-transform focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${index !== undefined ? "stagger-enter" : ""}`;
-  const style = index !== undefined ? { animationDelay: `${index * 45}ms` } : undefined;
+  const style = index !== undefined ? { animationDelay: `${Math.min(Math.max(0, index), 5) * 40}ms` } : undefined;
   const content = (
     <>
       <span

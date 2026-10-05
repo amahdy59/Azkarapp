@@ -41,9 +41,10 @@ export function SplashScreen({ onDone, language }: { onDone: () => void; languag
       <div className="flex flex-col items-center gap-3 pb-14">
         <div className="h-1 w-40 overflow-hidden rounded-full bg-card" aria-hidden="true">
           <motion.div
-            className="h-full rounded-full bg-primary"
-            initial={{ width: 0 }}
-            animate={{ width: 100 }}
+            className="h-full w-full rounded-full bg-primary"
+            style={{ transformOrigin: arabic ? "right" : "left" }}
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
             transition={{ duration: reduceMotion ? 0 : 1.1, ease: "easeInOut" }}
           />
         </div>

@@ -1379,6 +1379,7 @@ const en = {
     copyBenefit: "Copy benefit",
     copySource: "Copy source",
     referenceCopied: "Copied to clipboard",
+    referenceCopying: "Copying text…",
     translationSheet: "English translation",
     translationSheetHint: "Open the meaning and transliteration here without shrinking the counter.",
     translationEmpty: "Turn on English or transliteration to view them here.",

@@ -119,7 +119,7 @@ describe("ReaderScreen audio identity", () => {
 
     // Expanding sidebar using toggle button
     fireEvent.click(toggleBtn);
-    expect(navigator).toHaveClass("w-[34%]");
+    expect(navigator).toHaveClass("w-[30%]", "min-w-[288px]", "max-w-[352px]");
     expect(navigator).not.toHaveAttribute("hidden");
     fireEvent.click(within(navigator).getByRole("button", { name: toggleBtn.getAttribute("aria-label")! }));
     expect(navigator).toHaveAttribute("hidden");

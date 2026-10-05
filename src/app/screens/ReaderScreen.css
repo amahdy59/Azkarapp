@@ -35,6 +35,19 @@
   max-width: var(--content-reading);
 }
 
+/* Label fit depends on the button's available width and enlarged text, not
+   only the viewport. The accessible name/title remain on the native button. */
+.adaptive-counter-nav {
+  container-type: inline-size;
+  container-name: counter-navigation;
+}
+
+@container counter-navigation (max-width: 4rem) {
+  .adaptive-counter-nav > span {
+    display: none;
+  }
+}
+
 /* Hidden chrome is removed from both layout and keyboard/accessibility order.
    Reading, counter, Previous/Next, and an explicit exit remain available. */
 [data-reading-focus="true"] [data-reading-chrome],

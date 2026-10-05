@@ -31,7 +31,9 @@ Use the following CSS custom properties to ensure consistency across the applica
   --motion-duration-press: 90ms;
   --motion-duration-fast: 150ms;
   --motion-duration-standard: 220ms;
-  --motion-duration-emphasis: 360ms;
+  --motion-duration-emphasis: 500ms;
+  --motion-duration-entrance: 260ms;
+  --motion-duration-release: 420ms;
 
   /* Easings */
   --motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
@@ -39,7 +41,9 @@ Use the following CSS custom properties to ensure consistency across the applica
   --motion-ease-exit: cubic-bezier(0.4, 0, 1, 1);
 
   /* Transformations */
-  --motion-scale-pressed: 0.98;
+  --motion-scale-pressed: 0.97;
+  --motion-scale-pressed-compact: 0.92;
+  --motion-ease-release: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 ```
 
@@ -65,33 +69,33 @@ The following animation patterns are strictly prohibited:
 - Parallax scrolling effects
 - Flashing or rapidly blinking elements
 - Confetti (except on specific completion screens)
-- Bouncy or arcade-style motion
+- Exaggerated bouncy or arcade-style motion. The restrained press-release overshoot approved in DEC-116 remains governed by the shared release token.
 - Rotation (except for loading spinners)
 - Blur filters (heavy on performance)
 - Large or complex shadows
 
 ## 6. Component Motion Matrix
 
-| Component               | Animation                         | Duration    | Easing     | Reduced Motion Behavior         |
-| :---------------------- | :-------------------------------- | :---------- | :--------- | :------------------------------ |
-| **Universal Press**     | Scale to 0.98                     | 90ms        | Standard   | Opacity change only, max 100ms  |
-| **Counter Number Pop**  | Scale/Opacity up                  | 160ms       | Enter      | Opacity transition              |
-| **Counter Ring Pulse**  | Subtle scale outward              | 280ms       | Enter      | Removed                         |
-| **Counter Readiness**   | Ready state indication            | 600ms       | Enter      | Removed                         |
-| **Counter Completion**  | Final state animation             | 440ms       | Enter      | Fade to completion state        |
-| **Home Completion**     | Surface/copy/icon in; reverse out | 500ms       | Enter/Exit | Instant reveal/removal          |
-| **Counter Tap Ripple**  | Scale/opacity from input          | 560ms       | Ease-out   | Removed                         |
-| **Home Hero Particles** | Finite upward drift               | 3.9-4.8s    | Ease-out   | Removed                         |
-| **Check Draw**          | SVG `stroke-dashoffset`           | 300ms       | Enter      | Instant or fast opacity (100ms) |
-| **Navigation Active**   | Highlight state change            | 220ms       | Enter      | Opacity fade                    |
-| **Favorite Pop**        | Scale and color shift             | 260ms       | Enter      | Opacity/Color transition only   |
-| **Zikr Step**           | Enter / Exit translation          | 300ms/220ms | Enter/Exit | Crossfade only                  |
-| **Completion Screen**   | Enter transition                  | 240ms       | Ease-out   | Crossfade only                  |
-| **Celebration Pop**     | Pop / Glow                        | 520ms/900ms | Enter      | Opacity fade (max 100ms)        |
-| **Menu Pop**            | Context menu opening              | 160ms       | Standard   | Opacity fade                    |
-| **Scrim In**            | Background dimming                | 180ms       | Standard   | Instant or fast opacity         |
-| **Leaf Appear**         | Spring scale in                   | 380ms       | Spring     | Opacity fade                    |
-| **Progress Ring**       | `stroke-dashoffset`               | 150ms       | Standard   | Removed or fast opacity         |
+| Component               | Animation                         | Duration                  | Easing             | Reduced Motion Behavior         |
+| :---------------------- | :-------------------------------- | :------------------------ | :----------------- | :------------------------------ |
+| **Universal Press**     | Scale to 0.97; compact icons 0.92 | 90ms down / 420ms release | Standard / Release | Opacity change only, max 100ms  |
+| **Counter Number Pop**  | Scale/Opacity up                  | 160ms                     | Enter              | Opacity transition              |
+| **Counter Ring Pulse**  | Subtle scale outward              | 280ms                     | Enter              | Removed                         |
+| **Counter Readiness**   | Ready state indication            | 600ms                     | Enter              | Removed                         |
+| **Counter Completion**  | Final state animation             | 440ms                     | Enter              | Fade to completion state        |
+| **Home Completion**     | Surface/copy/icon in; reverse out | 500ms                     | Enter/Exit         | Instant reveal/removal          |
+| **Counter Tap Ripple**  | Scale/opacity from input          | 560ms                     | Ease-out           | Removed                         |
+| **Home Hero Particles** | Finite upward drift               | 3.9-4.8s                  | Ease-out           | Removed                         |
+| **Check Draw**          | SVG `stroke-dashoffset`           | 300ms                     | Enter              | Instant or fast opacity (100ms) |
+| **Navigation Active**   | Highlight state change            | 220ms                     | Enter              | Opacity fade                    |
+| **Favorite Pop**        | Scale and color shift             | 260ms                     | Enter              | Opacity/Color transition only   |
+| **Zikr Step**           | Enter / Exit translation          | 300ms/220ms               | Enter/Exit         | Crossfade only                  |
+| **Completion Screen**   | Enter transition                  | 240ms                     | Ease-out           | Crossfade only                  |
+| **Celebration Pop**     | Pop / Glow                        | 520ms/900ms               | Enter              | Opacity fade (max 100ms)        |
+| **Menu Pop**            | Context menu opening              | 160ms                     | Standard           | Opacity fade                    |
+| **Scrim In**            | Background dimming                | 180ms                     | Standard           | Instant or fast opacity         |
+| **Leaf Appear**         | Spring scale in                   | 380ms                     | Spring             | Opacity fade                    |
+| **Progress Ring**       | `stroke-dashoffset`               | 150ms                     | Standard           | Removed or fast opacity         |
 
 ## 7. Reduced Motion Behavior
 
@@ -131,6 +135,10 @@ Animations must not degrade the user experience:
 - High-frequency counting surfaces replace the current ripple instead of accumulating ripple nodes. A single response confirms each tap without turning repeated devotion into decorative noise.
 
 - Counting press/release styles refer directly to CSS motion variables without synchronous computed-style reads during renders or taps.
+- Home photographs are static. They have no ambient scale loop or permanent `will-change` hint.
+- Library card entrances use the 260ms entrance token with at most 200ms stagger delay, only during the initial opening. Search, group and tab interactions stop entrances immediately; later filtering and clearing search do not replay them. Static chart heights update directly; only their colors transition.
+- Prayer, Friday and Mushaf progress indicators reuse clipped translated fills, retaining their existing numeric values, direction and reduced-motion behavior.
+- The motion quality gate checks CSS ambient loops and explicit JSX layout transitions/Motion targets. An unrelated earlier reduced-motion rule never exempts a later loop. This static check does not prove frame rate, visibility pausing or comprehensive accessibility.
 - Shared, Home and counter progress fills translate a full-size surface through a clipped track. Direction follows the interface, rounding and divider thickness remain stable, and no width/inline-size transition or permanent layer hint is needed.
 - Route snapshots name only the main canvas. The root snapshot does not crossfade persistent navigation. Active navigation icons reuse a finite entrance cue; global OS and in-app reduced-motion rules cover elements and pseudo-elements in surfaces.css.
 - Live Qibla rotation uses the existing shortest-angle sensor smoothing without an additional CSS rotation transition. This avoids long interpolation across north and the signed turn seam. The finite alignment confirmation remains optional and reduced-motion aware.

@@ -7,17 +7,31 @@ import { t } from "../i18n";
 import { shouldReduceMotion } from "../motionPreferences";
 import type { AppLanguage } from "../types";
 
-/** Quiet counting guidance belongs to the reading surface, above its actions. */
-export function CounterTapHint({ text }: { text: string }) {
+/** Quiet counting guidance follows the shared responsive footer hierarchy. */
+export function CounterTapHint({
+  text,
+  desktopText,
+  keyboardHelp,
+}: {
+  text: string;
+  desktopText?: string;
+  keyboardHelp?: React.ReactNode;
+}) {
   return (
     <div className="devotional-guidance mx-auto w-full max-w-[25rem] shrink-0 px-3 pt-2">
-      <p
+      <div
         data-testid="counter-tap-hint"
         className="counter-tap-hint flex min-h-11 items-center justify-center gap-2 px-3 py-2 text-center text-label font-medium"
       >
-        <HandTap size={24} className="shrink-0 text-muted-foreground" />
-        <span>{text}</span>
-      </p>
+        <HandTap
+          size={24}
+          className={`shrink-0 text-muted-foreground ${keyboardHelp ? "md:hidden" : ""}`}
+          aria-hidden="true"
+        />
+        {keyboardHelp && <div className="hidden shrink-0 md:block">{keyboardHelp}</div>}
+        <span className={desktopText ? "md:hidden" : undefined}>{text}</span>
+        {desktopText && <span className="hidden md:inline">{desktopText}</span>}
+      </div>
     </div>
   );
 }

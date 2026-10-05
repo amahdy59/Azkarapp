@@ -1,3 +1,4 @@
+import { progressFillStyle } from "./progressFillStyle";
 import { useMemo } from "react";
 import { AppLanguage } from "../types";
 import { getPeriodRange } from "../calendarPeriods";
@@ -82,9 +83,12 @@ export function FridayProgressStats({
           </div>
           <div className="h-2 w-full rounded-full bg-black/5 dark:bg-white/10 overflow-hidden">
             <div
-              className="h-full bg-primary rounded-full transition-all duration-500"
+              className="h-full bg-primary rounded-full progress-fill-transform"
               style={{
-                width: `${Math.min(100, Math.round((stats.practicesDoneCount / Math.max(1, stats.practicesTotalCount)) * 100))}%`,
+                ...progressFillStyle(
+                  Math.min(100, Math.round((stats.practicesDoneCount / Math.max(1, stats.practicesTotalCount)) * 100)) /
+                    100,
+                ),
               }}
             />
           </div>
@@ -102,9 +106,11 @@ export function FridayProgressStats({
           </div>
           <div className="h-2 w-full rounded-full bg-black/5 dark:bg-white/10 overflow-hidden">
             <div
-              className="h-full bg-success rounded-full transition-all duration-500"
+              className="h-full bg-success rounded-full progress-fill-transform"
               style={{
-                width: `${Math.min(100, Math.round((stats.kahfOpenedCount / Math.max(1, stats.fridaysCount)) * 100))}%`,
+                ...progressFillStyle(
+                  Math.min(100, Math.round((stats.kahfOpenedCount / Math.max(1, stats.fridaysCount)) * 100)) / 100,
+                ),
               }}
             />
           </div>

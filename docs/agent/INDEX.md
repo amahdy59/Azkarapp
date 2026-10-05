@@ -1,5 +1,7 @@
 # AI Improvement System Index
 
+[Scoped Arabic audio restoration](phases/SCOPED_AUDIO_RESTORATION.md) records the owner-reviewed three-recording repair at new R2 paths, with other audio untouched and publication reserved for the owner's other session.
+
 [Navigation flake and browser timings](phases/NAVIGATION_FLAKE_AND_BROWSER_TIMINGS.md) records the WebKit deadline investigation, independent navigation cases, capture ownership and retained retry evidence.
 
 [Latest changes and testing release review](phases/LATEST_CHANGES_RELEASE_REVIEW.md) records the owner-approved integrated release, citation and repetition repairs, and deterministic local testing with mandatory live audio release verification.
@@ -185,3 +187,5 @@ Apple/Microsoft-informed control spacing and alignment improvements.
 [Recent review hardening](phases/RECENT_REVIEW_HARDENING.md) records the owner-approved availability/identity and contrast fixes, footer queue position, selective audio quarantine and release verification while retaining the owner's current refinements.
 
 [Expanded audio text centering](phases/EXPANDED_AUDIO_TEXT_CENTERING.md) records the owner-requested correction to both-axis alignment with accessible overflow recovery.
+
+[Reader guidance and motion consistency](phases/READER_GUIDANCE_AND_MOTION_CONSISTENCY.md) records the owner-approved combined keyboard hint, responsive reading layout and animation audit refinements.

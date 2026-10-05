@@ -1366,6 +1366,7 @@ const ar = {
     copyBenefit: "\u0646\u0633\u062e \u0627\u0644\u0641\u0627\u0626\u062f\u0629",
     copySource: "\u0646\u0633\u062e \u0627\u0644\u0645\u0635\u062f\u0631",
     referenceCopied: "\u062a\u0645 \u0646\u0633\u062e \u0627\u0644\u0646\u0635",
+    referenceCopying: "جارٍ نسخ النص…",
     translationSheet:
       "\u0627\u0644\u062a\u0631\u062c\u0645\u0629 \u0627\u0644\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0629",
     translationSheetHint:

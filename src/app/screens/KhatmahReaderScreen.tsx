@@ -1,3 +1,4 @@
+import { progressFillStyle } from "../components/progressFillStyle";
 import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { t } from "../i18n";
@@ -826,10 +827,8 @@ export function KhatmahReaderScreen({
         data-testid="mushaf-wird-progress"
       >
         <div
-          className={`h-full transition-[width] duration-standard ease-standard ${
-            wirdComplete ? "bg-success" : "bg-primary"
-          }`}
-          style={{ width: `${Math.min(100, (wirdRead / wirdGoal) * 100)}%` }}
+          className={`progress-fill-transform h-full ${wirdComplete ? "bg-success" : "bg-primary"}`}
+          style={{ ...progressFillStyle(Math.min(100, (wirdRead / wirdGoal) * 100) / 100) }}
         />
       </div>
     ) : null;

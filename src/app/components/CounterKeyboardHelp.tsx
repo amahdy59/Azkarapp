@@ -9,15 +9,18 @@ import type { AppLanguage } from "../types";
 import type { CounterShortcut } from "./ZikrComponents";
 import { ResponsiveSheet, SheetHeader } from "./ResponsiveSheet";
 import { Button } from "./ui/button";
+import { Keyboard } from "./icons";
 
 export function CounterKeyboardHelp({
   shortcuts,
   language,
   direction,
+  compact = false,
 }: {
   shortcuts: readonly CounterShortcut[];
   language: AppLanguage;
   direction: "ltr" | "rtl";
+  compact?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const enabled = useCharacterShortcutsEnabled();
@@ -33,8 +36,24 @@ export function CounterKeyboardHelp({
 
   return (
     <>
-      <Button type="button" variant="ghost" onClick={() => setOpen(true)} className="mx-auto mt-1 hidden md:flex">
-        {t(language, "reader.keyboardShortcuts")}
+      <Button
+        type="button"
+        variant="ghost"
+        onClick={(event) => {
+          event.stopPropagation();
+          event.currentTarget.focus({ preventScroll: true });
+          setOpen(true);
+        }}
+        aria-label={t(language, "reader.keyboardShortcuts")}
+        title={t(language, "reader.keyboardShortcuts")}
+        aria-haspopup="dialog"
+        className={compact ? "hidden size-11 shrink-0 p-0 md:flex" : "mx-auto mt-1 hidden md:flex"}
+      >
+        {compact ? (
+          <Keyboard size={24} className="size-6" aria-hidden="true" />
+        ) : (
+          t(language, "reader.keyboardShortcuts")
+        )}
       </Button>
       <ResponsiveSheet
         open={open}

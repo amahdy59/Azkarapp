@@ -1,3 +1,4 @@
+import { progressFillStyle } from "./progressFillStyle";
 import { useMemo } from "react";
 import type { PrayerTrackingWrite } from "./PrayerTrackerCards";
 import { PrayerSceneArt } from "./PrayerSceneArt";
@@ -192,8 +193,8 @@ export function PrayerMomentPanel({
                   className={`h-2 w-full overflow-hidden rounded-full ${onGlass ? "bg-white/20" : "bg-muted"}`}
                 >
                   <div
-                    className="h-full rounded-full bg-primary transition-[width] duration-500 motion-reduce:transition-none"
-                    style={{ width: `${Math.round(approachFraction * 100)}%` }}
+                    className="h-full rounded-full bg-primary progress-fill-transform"
+                    style={{ ...progressFillStyle(Math.round(approachFraction * 100) / 100) }}
                   />
                 </div>
               )}

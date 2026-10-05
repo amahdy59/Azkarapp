@@ -61,6 +61,7 @@ export {
   HelpCircle,
   Home01 as Home,
   InfoCircle as Info,
+  Keyboard01 as Keyboard,
   Globe01 as Globe,
   LayoutLeft as PanelLeftIcon,
   Lightbulb05 as Lightbulb,

@@ -43,6 +43,7 @@ const CONCURRENT = [
   { name: "format", command: "prettier --check ." },
   { name: "audio manifest", command: "node scripts/validate-audio-manifest.mjs --local" },
   { name: "type scale", command: "node scripts/check-type-scale.mjs" },
+  { name: "motion rules", command: "node scripts/check-motion-rules.mjs" },
 ];
 
 // These read this run's build output, so they wait until its build has finished.

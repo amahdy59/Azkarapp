@@ -303,7 +303,7 @@ test("the Reader counter keeps one rectangular shape across phone, tablet, and d
   }
 });
 
-test("wide Reader keeps a one-third RTL collection navigator and supports direct jumps", async ({ page }, testInfo) => {
+test("wide Reader keeps a bounded RTL collection navigator and supports direct jumps", async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 1600, height: 900 });
   await openReturningGuestHome(page, "ar");
   await page.getByTestId("category-card-morning").click();
@@ -319,8 +319,9 @@ test("wide Reader keeps a one-third RTL collection navigator and supports direct
   expect(readerBox).not.toBeNull();
   if (navigatorBox && readerBox) {
     const occupiedWidth = navigatorBox.width + readerBox.width;
-    expect(navigatorBox.width / occupiedWidth).toBeGreaterThanOrEqual(0.32);
-    expect(navigatorBox.width / occupiedWidth).toBeLessThanOrEqual(0.36);
+    expect(navigatorBox.width).toBeGreaterThanOrEqual(288);
+    expect(navigatorBox.width).toBeLessThanOrEqual(352);
+    expect(navigatorBox.width / occupiedWidth).toBeLessThanOrEqual(0.32);
     expect(navigatorBox.x + navigatorBox.width).toBeLessThanOrEqual(readerBox.x);
   }
 
@@ -357,11 +358,11 @@ test("Space counts without outlining the full Reader text region", async ({ page
   }
 });
 
-test("desktop and tablet place navigation at the card sides and shortcuts below the counter", async ({ page }) => {
+test("desktop and tablet keep navigation below reading text and keyboard help inside guidance", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await openFirstMorningZikr(page);
 
-  const shortcutGuide = page.getByTestId("reader-keyboard-shortcuts");
+  const shortcutGuide = page.getByTestId("counter-tap-hint");
   const desktopHero = page.getByTestId("reader-desktop-hero");
   await expect(desktopHero.getByTestId("reader-keyboard-shortcuts")).toHaveCount(0);
   await expect(page.getByText("Zikr 1 of 25", { exact: true })).toHaveCount(0);
@@ -375,20 +376,20 @@ test("desktop and tablet place navigation at the card sides and shortcuts below 
   ]) {
     await page.setViewportSize(viewport);
     const card = page.getByTestId("reader-card");
-    const sideNavigation = card.getByTestId("reader-side-navigation");
+    const navigation = card.getByTestId("counter-panel");
     const counter = card.getByTestId("counter-surface");
 
-    await expect(sideNavigation).toBeVisible();
-    await expect(sideNavigation.getByRole("button", { name: "Prev", exact: true })).toBeVisible();
-    await expect(sideNavigation.getByRole("button", { name: "Next", exact: true })).toBeVisible();
-    await expect(card.getByTestId("reader-counter-stack").getByTestId("reader-keyboard-shortcuts")).toBeVisible();
-    await expect(shortcutGuide).toHaveAccessibleName("Keyboard shortcuts");
+    await expect(card.getByTestId("reader-side-navigation")).toHaveCount(0);
+    await expect(navigation.getByRole("button", { name: "Prev", exact: true })).toBeVisible();
+    await expect(navigation.getByRole("button", { name: "Next", exact: true })).toBeVisible();
+    await expect(shortcutGuide.getByRole("button", { name: "Keyboard shortcuts", exact: true })).toBeVisible();
+    await expect(page.getByTestId("reader-keyboard-shortcuts")).toHaveCount(0);
     await expect(counter).toHaveAccessibleName(/Click the dhikr, counter, or press Space to count/);
 
     const zikrText = card.getByTestId("zikr-text").first();
     const [textBox, navigationBox, counterBox, guideBox] = await Promise.all([
       zikrText.boundingBox(),
-      sideNavigation.boundingBox(),
+      navigation.boundingBox(),
       counter.boundingBox(),
       shortcutGuide.boundingBox(),
     ]);
@@ -396,12 +397,8 @@ test("desktop and tablet place navigation at the card sides and shortcuts below 
     expect(navigationBox).not.toBeNull();
     expect(counterBox).not.toBeNull();
     expect(guideBox).not.toBeNull();
-    if (textBox && navigationBox) {
-      expect(
-        Math.abs(navigationBox.y + navigationBox.height / 2 - (textBox.y + textBox.height / 2)),
-      ).toBeLessThanOrEqual(2);
-    }
-    if (counterBox && guideBox) expect(guideBox.y - (counterBox.y + counterBox.height)).toBeGreaterThanOrEqual(20);
+    if (textBox && navigationBox) expect(textBox.y + textBox.height).toBeLessThanOrEqual(navigationBox.y);
+    if (counterBox && guideBox) expect(counterBox.y + counterBox.height).toBeLessThanOrEqual(guideBox.y);
   }
 
   await expect(desktopHero).toBeVisible();
@@ -414,7 +411,7 @@ test("desktop and tablet place navigation at the card sides and shortcuts below 
   const heroActions = page.getByTestId("reader-hero-actions");
   await expect(heroActions.getByRole("button", { name: "Benefit", exact: true })).toHaveCount(0);
   await expect(heroActions.getByRole("button", { name: "Reader options", exact: true })).toBeVisible();
-  await expect(heroActions.getByRole("button")).toHaveCount(1);
+  await expect(heroActions.locator("button:visible")).toHaveCount(1);
   // Benefit is accessible via the dock button.
   await expect(page.getByTestId("reader-benefit-dock-button")).toBeVisible();
   await expect(desktopHero.getByRole("button", { name: "Share zikr", exact: true })).toHaveCount(0);
@@ -952,20 +949,20 @@ test("resetting the counter clears an accidental completion from stored progress
   await expect.poll(stored).toHaveLength(0);
 });
 
-/** The header carries the overflow menu only on counter screens; Benefit moves to the dock. */
+/** Benefit stays in the dock; wide layouts also expose the collection toggle. */
 function readerHeaderActions(page: Page) {
   // The phone header row and the wide-desktop hero toolbar are the same
   // contract under different test ids; exactly one of them is mounted.
   return page.getByTestId("reader-actions").or(page.getByTestId("reader-hero-actions"));
 }
 
-test("the reader header carries exactly one action on counter screens", async ({ page }) => {
+test("the reader header keeps options and wide collection navigation together", async ({ page }) => {
   await openFirstMorningZikr(page);
 
   const actions = readerHeaderActions(page);
   await expect(actions).toBeVisible();
-  // Benefit moved to the counter dock, so only the overflow menu remains.
-  await expect(actions.getByRole("button")).toHaveCount(1);
+  // The collection toggle joins the menu only when the inline panel is available.
+  await expect(actions.locator("button:visible")).toHaveCount((page.viewportSize()?.width ?? 0) >= 1200 ? 2 : 1);
   await expect(actions.getByRole("button", { name: "Benefit", exact: true })).toHaveCount(0);
   await expect(actions.getByRole("button", { name: "Reader options", exact: true })).toBeVisible();
   // Benefit is accessible in the dock.

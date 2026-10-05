@@ -16,7 +16,7 @@ import { join, extname, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const SRC_DIR = join(__dirname, "..", "src");
+const SRC_DIR = process.argv[2] ?? join(__dirname, "..", "src");
 const MAX_DURATION_MS = 600;
 
 // Known exceptions documented in MOTION_SYSTEM.md
@@ -74,9 +74,8 @@ for (const file of cssFiles) {
     if (/\binfinite\b/.test(line) && /animation/i.test(line)) {
       // Check if this is an exception
       const isException = [...INFINITE_EXCEPTIONS].some((name) => line.includes(name));
-      // Check if inside a @media (prefers-reduced-motion) block
-      const isInReducedMotion = content.slice(0, content.indexOf(line)).includes("prefers-reduced-motion");
-      if (!isException && !isInReducedMotion) {
+      // An earlier reduced-motion rule does not make a later ambient loop safe.
+      if (!isException) {
         issues.push({
           severity: "error",
           file: file.replace(SRC_DIR, "src"),
@@ -166,6 +165,41 @@ for (const file of cssFiles) {
       });
     }
   }
+}
+
+// Explicit layout transitions and Motion animate targets in JSX are not CSS
+// keyframes, but have the same reflow cost. Inspect actual JSX attributes so
+// comments and unrelated static geometry cannot produce false positives.
+const ts = (await import("typescript")).default;
+for (const file of walk(SRC_DIR, [".tsx"])) {
+  const source = ts.createSourceFile(file, readFileSync(file, "utf8"), ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+  function visit(node) {
+    if (ts.isJsxAttribute(node) && node.initializer) {
+      const name = node.name.getText(source);
+      const value = node.initializer.getText(source);
+      const explicitTransition =
+        name === "className" && /transition-\[(?:width|height|margin|padding)(?:\]|,)/.test(value);
+      const layoutTarget =
+        name === "animate" &&
+        ts.isJsxExpression(node.initializer) &&
+        node.initializer.expression &&
+        ts.isObjectLiteralExpression(node.initializer.expression) &&
+        node.initializer.expression.properties.some(
+          (property) => property.name && layoutProps.includes(property.name.getText(source).replace(/["']/g, "")),
+        );
+      if (explicitTransition || layoutTarget) {
+        issues.push({
+          severity: "error",
+          file: file.replace(SRC_DIR, "src"),
+          line: source.getLineAndCharacterOfPosition(node.getStart(source)).line + 1,
+          rule: "no-layout-animation",
+          message: `JSX ${name} animates a layout property: ${value}`,
+        });
+      }
+    }
+    ts.forEachChild(node, visit);
+  }
+  visit(source);
 }
 
 // ── Report ─────────────────────────────────────────────────────────

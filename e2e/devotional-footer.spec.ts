@@ -172,12 +172,13 @@ for (const language of ["ar", "en"] as const) {
       await expect(actions).toBeVisible();
       await expect(actions.getByRole("button")).toHaveCount(3);
       await expect(hint).toBeVisible();
-      await expect(hint.locator("svg")).toHaveCount(1);
+      await expect(hint.locator("svg:visible")).toHaveCount(1);
       await expect(async () => {
         const hintBox = (await hint.boundingBox())!;
         const supportBox = (await actions.boundingBox())!;
         const panelBox = (await page.getByTestId("counter-panel").boundingBox())!;
-        expect(hintBox.y + hintBox.height).toBeLessThanOrEqual(supportBox.y);
+        if (width < 768) expect(hintBox.y + hintBox.height).toBeLessThanOrEqual(supportBox.y);
+        else expect(panelBox.y + panelBox.height).toBeLessThanOrEqual(hintBox.y);
         expect(Math.abs(hintBox.x - supportBox.x)).toBeLessThanOrEqual(1);
         expect(Math.abs(panelBox.x - supportBox.x)).toBeLessThanOrEqual(1);
         expect(Math.abs(panelBox.width - supportBox.width)).toBeLessThanOrEqual(1);
@@ -271,7 +272,7 @@ for (const language of ["ar", "en"] as const) {
       await expect(page.getByTestId("counter-tap-hint")).toBeVisible();
       const hintBox = (await page.getByTestId("counter-tap-hint").boundingBox())!;
       const dockBox = (await page.getByTestId("reader-dock").boundingBox())!;
-      expect(hintBox.y + hintBox.height).toBeLessThanOrEqual(dockBox.y);
+      expect(dockBox.y + dockBox.height).toBeLessThanOrEqual(hintBox.y);
       expect(Math.round((await surface.boundingBox())!.height)).toBe(48);
       await page.screenshot({ path: `output/playwright/footer-redesign/${testId}-${language}.png` });
     }

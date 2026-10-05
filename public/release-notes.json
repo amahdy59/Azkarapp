@@ -1,13 +1,15 @@
 {
-  "release": "2026-10-05.2",
+  "release": "2026-10-05.3",
   "ar": [
-    "يظهر نص الذكر في وسط مساحة القراءة بالمشغل الموسّع رأسيًا.",
-    "يبقى النص في المنتصف أفقيًا عند ظهور شريط التمرير.",
-    "يمكن تمرير النصوص الطويلة أو المكبّرة من أول سطر إلى آخر سطر."
+    "تجمع بطاقة الإرشادات تعليمات العد واختصارات لوحة المفاتيح على الكمبيوتر والجهاز اللوحي.",
+    "أصبحت أزرار قائمة الأذكار منفصلة وواضحة، مع مساحة أوسع للقراءة ونص يتوسط المشغل الموسّع.",
+    "خلفية الرئيسية ثابتة، وبطاقات الأذكار تظهر أسرع، مع حركة أهدأ للتقدم وتأكيد أوضح عند النسخ.",
+    "عادت التسجيلات العربية المراجَعة للأذكار المستعادة ودعاء اللهم مصرف القلوب، مع بقاء التسجيلات الإنجليزية."
   ],
   "en": [
-    "Zikr text sits vertically in the middle of the expanded player's reading area.",
-    "Text stays horizontally centered when a scrollbar appears.",
-    "Long or enlarged passages remain scrollable from the first line to the last."
+    "Counting instructions and keyboard help now share one card on desktop and tablet.",
+    "Zikr list controls have their own space, with more reading room and centered expanded-player text.",
+    "Home stays still, zikr cards appear sooner, progress moves smoothly and copying gives clearer feedback.",
+    "Reviewed Arabic recordings are restored for the affected adhkar and the Turner of Hearts dua, alongside English narration."
   ]
 }

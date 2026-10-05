@@ -67,11 +67,19 @@ export function AzkarLibraryScreen({
   useEffect(() => setSection(initialSection), [initialSection]);
 
   const changeSection = (next: LibrarySection) => {
+    setEntranceActive(false);
     setSection(next);
     onSectionChange?.(next);
   };
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGroupId, setSelectedGroupId] = useState<string>("all");
+  const [entranceActive, setEntranceActive] = useState(true);
+  useEffect(() => {
+    // The final initial card settles after its capped 200ms delay + 260ms entrance.
+    // Later filtering, clearing search and returning to tabs should be immediate.
+    const timer = setTimeout(() => setEntranceActive(false), 460);
+    return () => clearTimeout(timer);
+  }, []);
   const searchInputId = useId();
   const selectedGroupRef = useRef<HTMLButtonElement>(null);
   const isArabic = language === "ar";
@@ -95,6 +103,7 @@ export function AzkarLibraryScreen({
 
   const deferredQuery = useDeferredValue(searchQuery.trim());
   const normalizedQuery = useMemo(() => normalizeSearchText(deferredQuery), [deferredQuery]);
+  const animateCards = entranceActive && !normalizedQuery && selectedGroupId === "all";
 
   const visibleGroups = useMemo(() => {
     if (!normalizedQuery) return CATEGORY_GROUPS.map((group) => ({ group, categories: group.categories }));
@@ -256,7 +265,10 @@ export function AzkarLibraryScreen({
                   dir={searchQuery.trim() ? "auto" : direction}
                   lang={language}
                   autoComplete="off"
-                  onChange={(event) => setSearchQuery(event.currentTarget.value)}
+                  onChange={(event) => {
+                    setEntranceActive(false);
+                    setSearchQuery(event.currentTarget.value);
+                  }}
                   onKeyDown={(event) => {
                     if (event.key === "Enter") {
                       event.preventDefault();
@@ -339,7 +351,10 @@ export function AzkarLibraryScreen({
                     type="button"
                     ref={selectedGroupId === "all" ? selectedGroupRef : undefined}
                     aria-pressed={selectedGroupId === "all"}
-                    onClick={() => setSelectedGroupId("all")}
+                    onClick={() => {
+                      setEntranceActive(false);
+                      setSelectedGroupId("all");
+                    }}
                     className={`interactive-elem shrink-0 flex min-h-11 items-center justify-center rounded-2xl px-4 py-1.5 text-sm font-bold transition-colors cursor-pointer ${
                       selectedGroupId === "all"
                         ? "bg-primary text-primary-foreground shadow-sm"
@@ -354,7 +369,10 @@ export function AzkarLibraryScreen({
                       type="button"
                       ref={selectedGroupId === group.id ? selectedGroupRef : undefined}
                       aria-pressed={selectedGroupId === group.id}
-                      onClick={() => setSelectedGroupId(group.id)}
+                      onClick={() => {
+                        setEntranceActive(false);
+                        setSelectedGroupId(group.id);
+                      }}
                       className={`interactive-elem shrink-0 flex min-h-11 items-center justify-center rounded-2xl px-4 py-1.5 text-sm font-bold transition-colors cursor-pointer ${
                         selectedGroupId === group.id
                           ? "bg-primary text-primary-foreground shadow-sm"
@@ -469,7 +487,7 @@ export function AzkarLibraryScreen({
                                 title={isArabic ? category.nameArabic : category.name}
                                 icon={category.icon}
                                 direction={direction}
-                                index={index}
+                                index={animateCards ? index : undefined}
                                 isOccasional={isOccasional}
                                 totalCount={total}
                                 completedCount={done}
@@ -514,7 +532,7 @@ export function AzkarLibraryScreen({
                           {t(language, "library.matchingAzkar")} ({formatNumerals(matchingAzkar.length, language)})
                         </h2>
                         <div className="space-y-3">
-                          {matchingAzkar.map((zikr, index) => {
+                          {matchingAzkar.map((zikr) => {
                             const category = CATEGORIES.find((item) => item.id === zikr.category);
                             const categoryName = isArabic
                               ? (category?.nameArabic ?? zikr.category)
@@ -545,8 +563,7 @@ export function AzkarLibraryScreen({
                                   }
                                   onZikr(zikr.category, Math.max(0, itemIndex));
                                 }}
-                                style={{ animationDelay: `${index * 30}ms` }}
-                                className="stagger-enter interactive-elem flex w-full flex-col items-start gap-2 rounded-3xl border border-border/40 bg-card p-4 text-start shadow-raised hover:border-primary/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-all cursor-pointer"
+                                className="interactive-elem flex w-full flex-col items-start gap-2 rounded-3xl border border-border/40 bg-card p-4 text-start shadow-raised hover:border-primary/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-all cursor-pointer"
                                 aria-label={
                                   isArabic ? zikr.arabicText.slice(0, 60) : zikr.translation.split(".")[0] || zikr.id
                                 }
@@ -659,7 +676,7 @@ export function AzkarLibraryScreen({
                             title={isArabic ? category.nameArabic : category.name}
                             icon={category.icon}
                             direction={direction}
-                            index={index}
+                            index={animateCards ? index : undefined}
                             isOccasional={isOccasional}
                             totalCount={total}
                             completedCount={done}
@@ -748,8 +765,8 @@ export function AzkarLibraryScreen({
                         }
                         onZikr(zikr.category, Math.max(0, itemIndex));
                       }}
-                      style={{ animationDelay: `${index * 45}ms` }}
-                      className="stagger-enter flex min-h-24 w-full items-start gap-3 rounded-3xl border border-border/40 bg-card p-4 text-start shadow-raised hover:border-primary/40 transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                      style={animateCards ? { animationDelay: `${Math.min(Math.max(0, index), 5) * 40}ms` } : undefined}
+                      className={`${animateCards ? "stagger-enter" : ""} flex min-h-24 w-full items-start gap-3 rounded-3xl border border-border/40 bg-card p-4 text-start shadow-raised hover:border-primary/40 transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring`}
                       aria-label={`${isArabic ? category.nameArabic : category.name}: ${
                         isArabic ? zikr.arabicText.split("\n")[0] : zikr.translation
                       }`}

@@ -1,3 +1,4 @@
+import { progressFillStyle } from "./progressFillStyle";
 import { useCallback, useEffect, useMemo, useRef, useState, startTransition, type CSSProperties } from "react";
 import { ArrowLeft, Bookmark, CheckCircle2, ChevronDown, MoreVertical, Translate } from "./icons";
 import { useSwipeGestures } from "../hooks/useSwipeGestures";
@@ -563,7 +564,7 @@ export function MushafImmersiveReader({
 
   const progressBar = (
     <div
-      className="pointer-events-none absolute inset-x-0 bottom-0 h-1 bg-muted"
+      className="pointer-events-none absolute inset-x-0 bottom-0 h-1 overflow-hidden bg-muted"
       role="progressbar"
       aria-valuemin={1}
       aria-valuemax={pageCount}
@@ -572,8 +573,11 @@ export function MushafImmersiveReader({
       data-testid="mushaf-immersive-progress"
     >
       <div
-        className={`h-full bg-primary ${reducedMotion ? "" : "transition-[width] duration-standard ease-standard"}`}
-        style={{ width: `${((pageIndex + 1) / pageCount) * 100}%` }}
+        className="progress-fill-transform h-full bg-primary"
+        style={{
+          ...progressFillStyle((pageIndex + 1) / pageCount),
+          transition: reducedMotion ? "none" : "transform var(--motion-duration-standard) var(--motion-ease-standard)",
+        }}
       />
     </div>
   );

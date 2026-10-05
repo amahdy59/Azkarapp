@@ -266,7 +266,7 @@
 
 .stagger-enter {
   opacity: 0;
-  animation: stagger-enter 400ms var(--motion-ease-enter) forwards;
+  animation: stagger-enter var(--motion-duration-entrance) var(--motion-ease-enter) forwards;
 }
 /* Facing Mushaf pages keep their paper measure near the spine, with a real
    desktop gutter so the two canvases never read as one crowded block. */
