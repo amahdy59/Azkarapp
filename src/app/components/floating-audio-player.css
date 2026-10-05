@@ -292,6 +292,12 @@
   min-height: 90px;
 }
 
+/* Auto margins center passages that fit and resolve to zero for overflow,
+   keeping the beginning of long/enlarged text reachable by native scrolling. */
+.audio-expanded-text > [data-testid="reading-text-transition"] {
+  margin-block: auto;
+}
+
 .audio-expanded-meta {
   flex-direction: row;
   flex-wrap: wrap;

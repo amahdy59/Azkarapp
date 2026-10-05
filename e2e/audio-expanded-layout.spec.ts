@@ -242,19 +242,29 @@ for (const scenario of [
       });
     }
     expect((await reading.boundingBox())!.height).toBeGreaterThanOrEqual(90);
-    if (!("textScale" in scenario)) {
-      // Read both rectangles in one frame: the loading status can disappear
-      // between separate browser calls and move both elements together.
-      await expect
-        .poll(() =>
-          player.evaluate((el) => {
-            const text = el.querySelector('[data-testid="audio-player-zikr-text"]')!.getBoundingClientRect();
-            const metadata = el.querySelector(".audio-expanded-meta")!.getBoundingClientRect();
-            return text.top - metadata.bottom;
-          }),
-        )
-        .toBeLessThanOrEqual(24);
-    }
+    // Fitting content belongs at the center of the reading canvas. Overflow
+    // must instead start at the top, with both ends reachable by scrolling.
+    const alignment = await reading.evaluate((el) => {
+      const region = el.getBoundingClientRect();
+      const content = el.querySelector('[data-testid="reading-text-transition"]')!.getBoundingClientRect();
+      const style = getComputedStyle(el);
+      const paddingTop = parseFloat(style.paddingTop);
+      const paddingBottom = parseFloat(style.paddingBottom);
+      const available = el.clientHeight - paddingTop - paddingBottom;
+      const fits = content.height <= available;
+      const verticalError = fits
+        ? Math.abs(content.y + content.height / 2 - (region.y + (el.clientHeight + paddingTop - paddingBottom) / 2))
+        : Math.abs(content.top - region.top - paddingTop);
+      const horizontalError = Math.abs(content.x + content.width / 2 - (region.x + region.width / 2));
+      el.scrollTop = el.scrollHeight;
+      const end = el.querySelector('[data-testid="reading-text-transition"]')!.getBoundingClientRect();
+      const endReachable = end.bottom <= region.top + el.clientHeight - paddingBottom + 1;
+      el.scrollTop = 0;
+      return { verticalError, horizontalError, endReachable };
+    });
+    expect(alignment.verticalError).toBeLessThanOrEqual(1);
+    expect(alignment.horizontalError).toBeLessThanOrEqual(1);
+    expect(alignment.endReachable).toBe(true);
     const initialZikr = await page.getByTestId("reader-screen").getAttribute("data-zikr-id");
     await reading.focus();
     await page.keyboard.press("ArrowLeft");

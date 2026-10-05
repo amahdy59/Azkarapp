@@ -574,7 +574,7 @@ Benefit, hadith evidence, and source reference cards across the application shar
 
 ### Reviewed dialogs and reading transitions — 2026-10-04
 
-SheetHeader shares wrapped titles/subtitles and one 48px close action. Modal bodies, including custom-target and counter confirmations, must scroll independently at 200% text on short phones. Expanded audio stays top-aligned. Voices unavailable for adhkar remain visible but disabled in Settings; the active player enables a voice when its current approved entry provides it, including Al-Kahf.
+SheetHeader shares wrapped titles/subtitles and one 48px close action. Modal bodies, including custom-target and counter confirmations, must scroll independently at 200% text on short phones. Expanded audio centers fitting text horizontally and vertically in the reading area between its header and transport. Overflowing text starts at the top and scrolls natively; symmetric scrollbar gutters preserve horizontal centering. Voices unavailable for adhkar remain visible but disabled in Settings; the active player enables a voice when its current approved entry provides it, including Al-Kahf.
 
 Ordinary zikr sharing uses the permanent reader dock. Long-surah pages have no counter dock, so their options menu retains Share to preserve access to sourced reminders and Mushaf links.
 

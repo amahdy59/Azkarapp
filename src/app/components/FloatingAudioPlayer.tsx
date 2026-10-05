@@ -622,7 +622,7 @@ export function FloatingAudioPlayer({
                 role="region"
                 aria-label={t(language, "audioPlayer.nowPlaying")}
                 className="audio-expanded-text mt-2 flex min-h-0 w-full flex-1 flex-col items-center overflow-y-auto overscroll-contain px-4 py-1 sm:px-8 select-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-ring/40"
-                style={{ scrollbarGutter: "stable" }}
+                style={{ scrollbarGutter: "stable both-edges" }}
               >
                 <ReadingTextTransition
                   entryId={currentEntry.entryId}

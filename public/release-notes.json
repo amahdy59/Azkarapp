@@ -1,15 +1,13 @@
 {
-  "release": "2026-10-05",
+  "release": "2026-10-05.2",
   "ar": [
-    "تابع موضع الاستماع بموجة صوتية أوضح ومؤشر ظاهر في المشغل.",
-    "شاهد اسم القارئ في وسط المشغل وتابع ترتيب المقاطع أسفله.",
-    "اختر فقط الأصوات المتاحة للتسجيل الحالي، مع اسم يطابق الصوت الذي تسمعه ويحفظ اختيارك الصحيح.",
-    "أُوقف تسجيلان عربيان مؤقتًا لعدم اجتياز فحص سلامة الملفات؛ تظل القراءة والعدّ والتسجيلات الإنجليزية متاحة."
+    "يظهر نص الذكر في وسط مساحة القراءة بالمشغل الموسّع رأسيًا.",
+    "يبقى النص في المنتصف أفقيًا عند ظهور شريط التمرير.",
+    "يمكن تمرير النصوص الطويلة أو المكبّرة من أول سطر إلى آخر سطر."
   ],
   "en": [
-    "Follow your listening position with a clearer waveform and a visible player marker.",
-    "See the reciter centered in the player and follow queue position in its footer.",
-    "Choose only voices available for the current recording, with a name that matches playback and preserves your valid selection.",
-    "Two Arabic recordings are temporarily unavailable after file-integrity checks failed; reading, counting and English narration remain available."
+    "Zikr text sits vertically in the middle of the expanded player's reading area.",
+    "Text stays horizontally centered when a scrollbar appears.",
+    "Long or enlarged passages remain scrollable from the first line to the last."
   ]
 }

@@ -27,6 +27,8 @@ Qur'anic passages are logical entries containing ordered verse segments. Next an
 
 ## State and failures
 
+Expanded reading centers fitting content on both axes in its available text canvas. Flex auto margins collapse for overflowing passages, preserving access to the first and last lines through native keyboard/pointer scrolling. Symmetric scrollbar gutters keep the passage horizontally centered in both languages. This owner-requested alignment supersedes the earlier top-alignment rule for fitting content only.
+
 The controller states are idle, loading, ready, playing, paused, buffering, ended, and error. Every media load has a generation number; reducer actions from an older load are ignored. A failed item pauses progression and exposes Retry, Skip, and Stop. No error substitutes another asset.
 
 ## Adding or replacing audio
