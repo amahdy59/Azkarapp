@@ -56,6 +56,8 @@ Local pnpm check uses metadata-only audio validation; pnpm validate:audio retain
 
 ## Review hardening — 2026-10-04
 
+Superseded for playback on 2026-10-05: the owner supplied and confirmed exact matching single-repetition recordings for both quarantined Arabic phrases, plus اللهم مصرف القلوب. Manifest 8 uses fresh v2 objects, verified full-byte checksums and 96-bin waveforms. Original R2 objects and English variants remain unchanged. Arabic/English plan and browser regressions cover all six affected instances; rejected-variant unit fixtures retain the language-isolation protections described below. See `docs/agent/phases/SCOPED_AUDIO_RESTORATION.md`. Publishing the local manifest awaits the owner's other working session; this repair does not authorize a push.
+
 - Verify unavailable entry voices are disabled and rejected controller calls cannot change playback, visible identity or saved preferences. A requested voice is displayed only after controller acceptance.
 - Verify unplayed waveform bars retain at least 3:1 contrast against the reading surface in Light, Midnight and Dark. Played bars and the owner's playhead retain distinct primary color, forced-color support and reduced motion.
 - Arabic variants `m-hm-91-abdullah-muhammad-v1` and `m-hm-96-abdullah-muhammad-v1` fail fresh full-byte SHA-256 checks. They are rejected delivery variants, not newly approved content; their expected hashes remain unchanged. All five shared entries keep approved English playback and local reading/counting. Arabic plans/downloads omit those variants, and manifest 7 invalidates the older cache registry.

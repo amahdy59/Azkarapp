@@ -2272,17 +2272,17 @@ export const CORE_AUDIO_ASSETS: Readonly<Record<string, AudioAsset>> = Object.fr
         normalizedTranscriptHash: "arabic-v1-f37d0886dde3188a",
         variants: [
           {
-            id: "m-hm-91-abdullah-muhammad-v1",
+            id: "m-hm-91-abdullah-muhammad-v2",
             voiceId: "abdullah-muhammad",
             voiceName: "عبد الله محمد",
-            relativePath: "azkar/evening/abdullah-muhammad/v1/e-hm-91.wav",
+            relativePath: "dua/m-hm-91/abdullah-muhammad/v2/m-hm-91.wav",
             mimeType: "audio/wav",
             durationMs: 4780,
             byteSize: 458924,
-            sha256: "2425600a7cb18be680985c6a3f033aa871e46be224b6067f0b17df1be553a1d3",
+            sha256: "d8a955ce62ce89037c4e61bbf5d686e75205c7e44f9577cf2c7efc2aea4b75ed",
             sourceId: "internal-upload-abdullah-muhammad",
-            // Hosted bytes fail the approved checksum; replacement needs fresh review.
-            reviewStatus: "rejected",
+            reviewStatus: "approved",
+            embeddedRepetitions: 1,
           },
           {
             id: "e-hm-91-english-george-v1",
@@ -2299,13 +2299,13 @@ export const CORE_AUDIO_ASSETS: Readonly<Record<string, AudioAsset>> = Object.fr
         ],
       },
     ],
-    defaultVoiceId: "english-george",
+    defaultVoiceId: "abdullah-muhammad",
     reviewStatus: "approved",
     reviewedBy: "Ahmed Mahdy",
-    reviewedAt: "2026-09-14T00:00:00.000Z",
+    reviewedAt: "2026-10-05",
     reviewNotes:
-      "Arabic delivery withdrawn after hosted SHA-256 mismatch on 2026-10-04. Previously approved English narration remains available; no automatic Arabic fallback.",
-    version: 1,
+      "Owner confirmed complete matching Arabic, Abdullah Muhammad and one embedded repetition for the supplied replacement on 2026-10-05. Published unchanged bytes at a fresh v2 path; existing hosted objects and English narration remain untouched.",
+    version: 2,
   },
 
   "m-hm-94": {
@@ -2376,17 +2376,17 @@ export const CORE_AUDIO_ASSETS: Readonly<Record<string, AudioAsset>> = Object.fr
         normalizedTranscriptHash: "arabic-v1-663a9cdf8d02bb6a",
         variants: [
           {
-            id: "m-hm-96-abdullah-muhammad-v1",
+            id: "m-hm-96-abdullah-muhammad-v2",
             voiceId: "abdullah-muhammad",
             voiceName: "عبد الله محمد",
-            relativePath: "azkar/evening/abdullah-muhammad/v1/e-hm-96.wav",
+            relativePath: "dua/m-hm-96/abdullah-muhammad/v2/m-hm-96.wav",
             mimeType: "audio/wav",
             durationMs: 5220,
             byteSize: 501164,
-            sha256: "00fd8101c7fd047a736e618d8a2c38d1ab73409155d6c53efbd7272e3900b692",
+            sha256: "4d8202df6bc5801c9a272bee31152c9871806e41ff91a671033b6953854d93c0",
             sourceId: "internal-upload-abdullah-muhammad",
-            // Hosted bytes fail the approved checksum; replacement needs fresh review.
-            reviewStatus: "rejected",
+            reviewStatus: "approved",
+            embeddedRepetitions: 1,
           },
           {
             id: "e-hm-96-english-george-v1",
@@ -2403,13 +2403,13 @@ export const CORE_AUDIO_ASSETS: Readonly<Record<string, AudioAsset>> = Object.fr
         ],
       },
     ],
-    defaultVoiceId: "english-george",
+    defaultVoiceId: "abdullah-muhammad",
     reviewStatus: "approved",
     reviewedBy: "Ahmed Mahdy",
-    reviewedAt: "2026-09-14T00:00:00.000Z",
+    reviewedAt: "2026-10-05",
     reviewNotes:
-      "Arabic delivery withdrawn after hosted SHA-256 mismatch on 2026-10-04. Previously approved English narration remains available; no automatic Arabic fallback.",
-    version: 1,
+      "Owner confirmed complete matching Arabic, Abdullah Muhammad and one embedded repetition for the supplied replacement on 2026-10-05. Published unchanged bytes at a fresh v2 path; existing hosted objects and English narration remain untouched.",
+    version: 2,
   },
 
   "m-hm-97": {

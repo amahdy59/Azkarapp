@@ -74,16 +74,22 @@ function catalogFor(zikrs: readonly Zikr[], voices = ["voice-a"]): { catalog: Au
 }
 
 describe("explicit audio content architecture", () => {
-  it("quarantines mismatched Arabic recordings while preserving reading and approved English narration", () => {
-    for (const id of ["m-hm-91", "e-hm-91", "misc-ref-3", "m-hm-96", "e-hm-96"]) {
+  it("quarantines rejected Arabic recordings while preserving reading and approved English narration", () => {
+    for (const id of ["m-hm-96", "e-hm-96"]) {
       const zikr = ALL_AZKAR.find((item) => item.id === id)!;
       expect(zikr, id).toBeDefined();
       expect(zikr.arabicText).not.toBe("");
-      const resolution = resolveAudioAsset(zikr);
+      const fixture = catalogFor([zikr], ["abdullah-muhammad", "english-george"]);
+      const catalog = fixture.catalog;
+      const asset = catalog.assets[fixture.zikrs[0]!.audioAssetId!]!;
+      asset.segments[0]!.variants[0]!.reviewStatus = "rejected";
+      asset.defaultVoiceId = "english-george";
+      const resolution = resolveAudioAsset(fixture.zikrs[0]!, { catalog });
       expect(resolution.available).toBe(true);
       if (resolution.available) expect(resolution.availableVoiceIds).toEqual(["english-george"]);
       const options = {
-        zikrs: [zikr],
+        zikrs: fixture.zikrs,
+        catalog,
         context: { category: zikr.category, source: "single" as const, routineMode: "complete" as const },
       };
       expect(buildPlaybackPlan({ ...options, audioLanguage: "ar" }).entries).toHaveLength(0);

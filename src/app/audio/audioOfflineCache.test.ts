@@ -2,6 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { downloadAudioForZikrs, getDownloadedAudioSummary, removeDownloadedAudio } from "./audioOfflineCache";
 import { DEFAULT_AUDIO_PREFERENCES } from "./audioPreferences";
 import { ALL_AZKAR } from "../content/azkar";
+import { AUDIO_CATALOG } from "./audioManifest";
+import * as audioResolver from "./resolveAudioAsset";
 
 const REGISTRY_KEY = "azkar.audio-downloads.v1";
 
@@ -39,8 +41,14 @@ describe("audio offline cache registry writes", () => {
     installCaches();
     const fetch = vi.fn();
     vi.stubGlobal("fetch", fetch);
+    const catalog = structuredClone(AUDIO_CATALOG);
+    const asset = catalog.assets["m-hm-96"]!;
+    asset.defaultVoiceId = "english-george";
+    asset.segments[0]!.variants.find((variant) => variant.voiceId === "abdullah-muhammad")!.reviewStatus = "rejected";
+    const resolve = audioResolver.resolveAudioAsset;
+    vi.spyOn(audioResolver, "resolveAudioAsset").mockImplementation((zikr) => resolve(zikr, { catalog }));
     try {
-      const zikrs = ALL_AZKAR.filter((zikr) => ["m-hm-91", "m-hm-96"].includes(zikr.id));
+      const zikrs = ALL_AZKAR.filter((zikr) => ["m-hm-96", "e-hm-96"].includes(zikr.id));
       expect(zikrs).toHaveLength(2);
       await expect(downloadAudioForZikrs(zikrs, DEFAULT_AUDIO_PREFERENCES)).resolves.toEqual({
         assetCount: 0,

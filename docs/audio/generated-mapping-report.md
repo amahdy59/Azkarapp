@@ -1,6 +1,6 @@
 # Generated audio mapping report
 
-Generated: 2026-10-04T20:52:38.388Z
+Generated: 2026-10-05T03:58:09.271Z
 
 | Metric                    | Count |
 | ------------------------- | ----: |
@@ -9,7 +9,7 @@ Generated: 2026-10-04T20:52:38.388Z
 | Approved audio mappings   |   195 |
 | Pending assets            |     0 |
 | Unmatched zikrs           |    58 |
-| Duplicate asset paths     |     9 |
+| Duplicate asset paths     |     7 |
 | Shared canonical groups   |    34 |
 | Qur'anic range errors     |     0 |
 | Licence metadata warnings |     0 |

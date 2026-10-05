@@ -1971,6 +1971,19 @@ export const DUA_AUDIO_ASSETS: Readonly<Record<string, AudioAsset>> = Object.fre
         normalizedTranscriptHash: "arabic-v1-a285bdd0c983ac09",
         variants: [
           {
+            id: "friday-dua-08-abdullah-muhammad-v2",
+            voiceId: "abdullah-muhammad",
+            voiceName: "عبد الله محمد",
+            relativePath: "dua/friday-dua-08/abdullah-muhammad/v2/friday-dua-08.mp3",
+            mimeType: "audio/mpeg",
+            durationMs: 7344,
+            byteSize: 293760,
+            sha256: "58c80cb54e7a893e241bb9192b304af10493fd2f07e1a920a596dc773f621962",
+            sourceId: "internal-upload-abdullah-muhammad",
+            reviewStatus: "approved",
+            embeddedRepetitions: 1,
+          },
+          {
             id: "friday-dua-08-english-george-v1",
             voiceId: "english-george",
             voiceName: "جورج (الترجمة الإنجليزية)",
@@ -1985,12 +1998,13 @@ export const DUA_AUDIO_ASSETS: Readonly<Record<string, AudioAsset>> = Object.fre
         ],
       },
     ],
-    defaultVoiceId: "english-george",
+    defaultVoiceId: "abdullah-muhammad",
     reviewStatus: "approved",
-    reviewNotes: "English translation audio recorded by George via ElevenLabs.",
+    reviewNotes:
+      "Owner confirmed complete matching Arabic, Abdullah Muhammad and one embedded repetition for the supplied recording on 2026-10-05. Published unchanged bytes at a fresh v2 path; existing English narration remains untouched.",
     reviewedBy: "Ahmed Mahdy",
-    reviewedAt: "2026-09-26",
-    version: 1,
+    reviewedAt: "2026-10-05",
+    version: 2,
   },
 
   "friday-dua-13-english": {

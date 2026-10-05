@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { getAzkarForMode } from "../src/app/content/azkar";
+import { COMPREHENSIVE_DUAS } from "../src/app/content/comprehensiveDuas";
 
 async function prepareAudio(page: Page) {
   await page.setViewportSize({ width: 390, height: 844 });
@@ -44,22 +45,42 @@ async function prepareAudio(page: Page) {
   });
 }
 
-for (const id of ["m-hm-91", "m-hm-96"]) {
-  test(`quarantined Arabic ${id} keeps counting and explicit English playback @cross-browser`, async ({ page }) => {
+for (const id of ["m-hm-91", "e-hm-91", "misc-ref-3", "m-hm-96", "e-hm-96", "friday-dua-08"]) {
+  test(`restored Arabic ${id} keeps counting and explicit English playback @cross-browser`, async ({ page }) => {
     await prepareAudio(page);
-    const index = getAzkarForMode("morning", "complete").findIndex((zikr) => zikr.id === id);
-    await page.goto(`/#/azkar/morning/${index + 1}`);
+    const category = id.startsWith("e-")
+      ? "evening"
+      : id === "misc-ref-3"
+        ? "miscellaneous"
+        : id === "friday-dua-08"
+          ? "comprehensive_duas"
+          : "morning";
+    const collection =
+      id === "friday-dua-08"
+        ? COMPREHENSIVE_DUAS.filter((zikr) => !zikr.isCollectionIntroduction)
+        : getAzkarForMode(category, "complete");
+    const index = collection.findIndex((zikr) => zikr.id === id);
+    await page.goto(`/#/azkar/${category.replaceAll("_", "-")}/${index + 1}?mode=complete`);
     await expect(page.getByTestId("reader-screen")).toHaveAttribute("data-zikr-id", id);
-    await expect(page.getByTestId("reader-audio-dock-button")).toBeDisabled();
-    const counter = page.getByTestId("counter-surface");
-    await counter.click();
-    await expect(counter).toHaveAccessibleName(/1 \/ 100$/);
-    await page.reload();
-    await expect(counter).toHaveAccessibleName(/1 \/ 100$/);
-    await page.getByRole("button", { name: "Reader options", exact: true }).click();
-    await expect(page.getByRole("menuitem", { name: "Repeat prescribed count", exact: true })).toHaveCount(0);
-    await page.getByRole("menuitem", { name: "Play English translation", exact: true }).click();
+    const listen = page.getByTestId("reader-audio-dock-button");
+    await expect(listen).toBeEnabled();
+    await listen.click();
     const player = page.getByRole("region", { name: "Audio player", exact: true });
+    await expect(player).toBeVisible();
+    const path = id === "friday-dua-08" ? "friday-dua-08" : id.endsWith("96") ? "m-hm-96" : "m-hm-91";
+    await expect
+      .poll(() => page.evaluate(() => (window as unknown as { __reviewAudio: HTMLAudioElement }).__reviewAudio.src))
+      .toContain(`/dua/${path}/abdullah-muhammad/v2/`);
+    await player.getByRole("button", { name: "Stop audio and close player", exact: true }).click();
+    const counter = page.getByTestId("counter-surface");
+    if (id !== "friday-dua-08") {
+      await counter.click();
+      await expect(counter).toHaveAccessibleName(/1 \/ 100$/);
+      await page.reload();
+      await expect(counter).toHaveAccessibleName(/1 \/ 100$/);
+    }
+    await page.getByRole("button", { name: "Reader options", exact: true }).click();
+    await page.getByRole("menuitem", { name: "Play English translation", exact: true }).click();
     await expect(player).toBeVisible();
     await expect
       .poll(() => page.evaluate(() => (window as unknown as { __reviewAudio: HTMLAudioElement }).__reviewAudio.src))
@@ -67,11 +88,13 @@ for (const id of ["m-hm-91", "m-hm-96"]) {
     await player.getByRole("button", { name: "Expand player", exact: true }).click();
     await expect(player.getByTestId("audio-reciter-select")).toContainText("English Translation");
     await player.getByTestId("audio-reciter-select").click();
-    await expect(page.getByRole("option", { name: "Abdullah Muhammad", exact: true })).toHaveAttribute("data-disabled");
+    await expect(page.getByRole("option", { name: "Abdullah Muhammad", exact: true })).not.toHaveAttribute(
+      "data-disabled",
+    );
     await page.keyboard.press("Escape");
     await player.getByRole("button", { name: "Stop audio and close player", exact: true }).click();
-    await expect(counter).toHaveAccessibleName(/1 \/ 100$/);
-    await expect(page.getByTestId("reader-audio-dock-button")).toBeDisabled();
+    if (id !== "friday-dua-08") await expect(counter).toHaveAccessibleName(/1 \/ 100$/);
+    await expect(listen).toBeEnabled();
   });
 }
 
