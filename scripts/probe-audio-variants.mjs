@@ -25,7 +25,15 @@ export async function probeAudioVariants(
           headers: { Range: "bytes=0-0" },
           signal: controller.signal,
         });
-        break;
+        if (response.status !== 429 || attempt === 3) break;
+        // A rate-limited recording is still required to pass HTTP/MIME checks.
+        // Release the body and timer before a bounded server-directed backoff.
+        await response.body?.cancel();
+        clearTimeout(timer);
+        const retryAfter = response.headers.get("retry-after");
+        const seconds = retryAfter === null ? NaN : Number(retryAfter);
+        const requestedDelay = Number.isFinite(seconds) ? seconds * 1000 : Date.parse(retryAfter ?? "") - Date.now();
+        await sleep(Math.min(30_000, Math.max(1000 * 2 ** (attempt - 1), requestedDelay || 0)));
       } catch (error) {
         if (attempt === 3) throw error;
         // Release the request timer before the retry backoff.

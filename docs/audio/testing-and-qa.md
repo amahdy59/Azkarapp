@@ -63,3 +63,7 @@ Superseded for playback on 2026-10-05: the owner supplied and confirmed exact ma
 - Arabic variants `m-hm-91-abdullah-muhammad-v1` and `m-hm-96-abdullah-muhammad-v1` fail fresh full-byte SHA-256 checks. They are rejected delivery variants, not newly approved content; their expected hashes remain unchanged. All five shared entries keep approved English playback and local reading/counting. Arabic plans/downloads omit those variants, and manifest 7 invalidates the older cache registry.
 - Restore Arabic playback only after reviewed replacement bytes are published at immutable versioned paths with new approval, metadata and manifest version. Do not relabel the mismatched bytes by changing their expected hash.
 - Physical iOS/Android safe-area, lock-screen, background audio and VoiceOver/TalkBack review remain pending human evidence. Use the manual checklist above and record device, OS/browser, date, tester and result. Browser emulation and axe do not close these requirements.
+
+### Hosted rate-limit recovery — 2026-10-05
+
+Hosted probes also retry HTTP 429 within the existing three-attempt bound. Retry-After seconds or HTTP dates are honored up to 30 seconds per wait, with the existing exponential delay as a minimum. Each response body and request timer is released before waiting. A persistent rate limit still fails validation, and successful responses still require the approved HTTP status and exact MIME. CI exposed this on changing recording URLs during the shared-card release; playback and reviewed manifests are unchanged.

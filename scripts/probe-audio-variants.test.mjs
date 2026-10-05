@@ -9,6 +9,34 @@ const response = (status = 206, mimeType = "audio/mpeg; charset=binary") => ({
 });
 afterEach(() => vi.useRealTimers());
 
+test("retries rate limits with bounded Retry-After and releases every response", async () => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date("2026-10-05T12:00:00.000Z"));
+  const limited = response(429);
+  limited.headers.set("retry-after", "120");
+  const second = response(429);
+  second.headers.set("retry-after", new Date(Date.now() + 5000).toUTCString());
+  const ready = response();
+  const sleep = vi.fn(async () => {});
+  const fetchImpl = vi.fn().mockResolvedValueOnce(limited).mockResolvedValueOnce(second).mockResolvedValue(ready);
+  expect(await probeAudioVariants([variant("a")], "https://audio.test", { fetchImpl, sleep })).toEqual([]);
+  expect(sleep.mock.calls).toEqual([[30_000], [5000]]);
+  expect(fetchImpl).toHaveBeenCalledTimes(3);
+  for (const reply of [limited, second, ready]) expect(reply.body.cancel).toHaveBeenCalledOnce();
+  expect(vi.getTimerCount()).toBe(0);
+});
+
+test("still fails persistent rate limits after three attempts", async () => {
+  const replies = [response(429), response(429), response(429)];
+  const sleep = vi.fn(async () => {});
+  const fetchImpl = vi.fn(async () => replies.shift());
+  expect(await probeAudioVariants([variant("a")], "https://audio.test", { fetchImpl, sleep })).toEqual([
+    { code: "unavailable-url", message: "a: HTTP 429" },
+  ]);
+  expect(fetchImpl).toHaveBeenCalledTimes(3);
+  expect(sleep.mock.calls).toEqual([[1000], [2000]]);
+});
+
 test("checks every recording while bounding requests and releasing response bodies", async () => {
   const pending = [];
   const replies = [];
