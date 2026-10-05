@@ -130,3 +130,7 @@ Verify one progress control per player form, RTL timeline/transport in Arabic an
 ### Required audio release verification
 
 Local pnpm check includes deterministic audio metadata validation. Quality CI additionally requires pnpm validate:audio for every approved hosted recording before deployment. No recording checks, coverage thresholds or budgets are removed.
+
+### Shared-card divider clearance — 2026-10-05
+
+Export rows reserve the measured alphabetic ascent and descent of their actual displayed glyphs, plus at least 8 pixels of trailing leading. Separators sit within a 40-pixel section gap, leaving at least 20 export pixels from visible text on either side, including Arabic diacritics. This applies to single-card supporting sections and combined-card source/count rows. Browser evidence must assert actual ink-to-divider clearance; nominal font size or line boxes alone are insufficient.

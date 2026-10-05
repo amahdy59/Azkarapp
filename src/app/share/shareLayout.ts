@@ -16,8 +16,16 @@ export const SHARE_ARABIC_FONT = '"IBM Plex Sans Arabic", "Noto Sans Arabic Vari
 export const SHARE_UI_FONT = '"Noto Sans Arabic Variable", system-ui, sans-serif';
 /** Export pixels: protect the reading text's diacritics below the badge. */
 export const SHARE_PILL = { top: 28, height: 50, gap: 16, textTop: 94, bottom: 36 } as const;
-export const SHARE_SECTION_GAP = 28;
-export const SHARE_COMPACT = { top: 24, bottom: 24, sectionGap: 20, panelGap: 20, metadataGap: 32 } as const;
+/** Clear space on each side of a divider, measured from visible glyphs. */
+export const SHARE_DIVIDER_CLEARANCE = 20;
+export const SHARE_SECTION_GAP = SHARE_DIVIDER_CLEARANCE * 2;
+export const SHARE_COMPACT = {
+  top: 24,
+  bottom: 24,
+  sectionGap: SHARE_SECTION_GAP,
+  panelGap: 20,
+  metadataGap: 32,
+} as const;
 
 /** Display glyphs only: reviewed payloads, URLs and filenames stay byte-preserving. */
 export function shareDisplayDigits(text: string): string {
@@ -247,8 +255,8 @@ export function measureShareSection(
 ): MeasuredSection {
   const fontSize =
     section.key === "arabic" ? (single ? (compact ? 52 : 64) : 52) : primary ? 52 : section.key === "source" ? 34 : 36;
-  const lineHeight = Math.ceil(fontSize * (section.direction === "rtl" ? 1.65 : 1.5));
   ctx.font = `${section.key === "arabic" ? 500 : 400} ${fontSize}px ${section.direction === "rtl" ? SHARE_ARABIC_FONT : SHARE_UI_FONT}`;
+  ctx.textBaseline = "alphabetic";
   const lines = wrapShareText(section.text, (value) => ctx.measureText(shareDisplayDigits(value)).width, width);
   // Keep the final reference together when it fits on the next line. The
   // joined reviewed payload stays identical, including its whitespace.
@@ -262,6 +270,15 @@ export function measureShareSection(
     }
   }
   const labelHeight = section.key === "arabic" || section.key === "source" ? 0 : 44;
+  // drawInkTop positions actual ink at the row top. Arabic marks can extend
+  // beyond nominal leading; reserve their real height before the next row.
+  const inkHeight = Math.max(
+    ...lines.map((line) => {
+      const bounds = ctx.measureText(shareDisplayDigits(line.trim()));
+      return (bounds.actualBoundingBoxAscent ?? fontSize * 0.8) + (bounds.actualBoundingBoxDescent ?? fontSize * 0.2);
+    }),
+  );
+  const lineHeight = Math.ceil(Math.max(fontSize * (section.direction === "rtl" ? 1.65 : 1.5), inkHeight + 8));
   return { ...section, lines, fontSize, lineHeight, height: lines.length * lineHeight + labelHeight };
 }
 

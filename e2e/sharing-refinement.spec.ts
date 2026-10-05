@@ -2,6 +2,23 @@ import { getAzkarForMode } from "../src/app/content/azkar";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
+async function expectDividerClearance(page: Page) {
+  const ink = await page.evaluate(
+    () => (window as unknown as { cardInk: { top: number; bottom: number; panelId: number }[] }).cardInk,
+  );
+  const dividers = await page.evaluate(
+    () => (window as unknown as { cardDividers: { y: number; panelId: number }[] }).cardDividers,
+  );
+  expect(dividers.length).toBeGreaterThan(0);
+  for (const divider of dividers) {
+    const lines = ink.filter((line) => line.panelId === divider.panelId);
+    const before = lines.filter((line) => line.top < divider.y);
+    const after = lines.filter((line) => line.top >= divider.y);
+    expect(divider.y - Math.max(...before.map((line) => line.bottom))).toBeGreaterThanOrEqual(20);
+    expect(Math.min(...after.map((line) => line.top)) - divider.y).toBeGreaterThanOrEqual(20);
+  }
+}
+
 async function openSharing(page: Page, language = "ar", route = "morning", recoverFit = false) {
   await page.addInitScript(
     ({ language }) => {
@@ -20,6 +37,22 @@ async function openSharing(page: Page, language = "ar", route = "morning", recov
       );
       const original = CanvasRenderingContext2D.prototype.fillText;
       const originalRect = CanvasRenderingContext2D.prototype.roundRect;
+      const originalMove = CanvasRenderingContext2D.prototype.moveTo;
+      const originalLine = CanvasRenderingContext2D.prototype.lineTo;
+      const points = new WeakMap<CanvasRenderingContext2D, { x: number; y: number }>();
+      const cardDividers: { y: number; panelId: number }[] = [];
+      (window as unknown as { cardDividers: unknown[] }).cardDividers = cardDividers;
+      CanvasRenderingContext2D.prototype.moveTo = function (x, y) {
+        points.set(this, { x, y });
+        originalMove.call(this, x, y);
+      };
+      CanvasRenderingContext2D.prototype.lineTo = function (x, y) {
+        const start = points.get(this);
+        if (this.canvas.width === 1080 && start?.x === 116 && x === 964 && start.y === y) {
+          cardDividers.push({ y, panelId: artwork.get(this)!.panelId! });
+        }
+        originalLine.call(this, x, y);
+      };
       const artwork = new WeakMap<
         CanvasRenderingContext2D,
         { brandBottom?: number; wordmarkBottom?: number; panelTop?: number; panelId?: number; panelBottom: number }
@@ -308,12 +341,14 @@ test("sharing preview supports readable Arabic, sources and accessible controls 
             panelTop: number;
             panelBottom: number;
             size: number;
+            panelId: number;
           }[];
         }
       ).cardInk,
   );
   expect(ink.some((line) => line.size === 34)).toBe(true);
   expect(ink.some((line) => line.size === 30)).toBe(true);
+  await expectDividerClearance(page);
   for (const line of ink) {
     expect(line.text).not.toMatch(/[0-9۰-۹]/u);
     expect(line.text).not.toBe("المصدر");
@@ -496,6 +531,7 @@ test("single Morning card keeps its contextual title and complete selected detai
   const download = page.waitForEvent("download");
   await modal.getByRole("button", { name: "حفظ", exact: true }).click();
   await (await download).saveAs(testInfo.outputPath("morning-single-full.png"));
+  await expectDividerClearance(page);
 });
 
 test("complete cards, compatible formats and ZIP saving are usable on a narrow screen", async ({ page }, testInfo) => {
@@ -528,6 +564,7 @@ test("complete cards, compatible formats and ZIP saving are usable on a narrow s
   const imageDownload = page.waitForEvent("download");
   await modal.getByRole("button", { name: "حفظ", exact: true }).click();
   await (await imageDownload).saveAs(testInfo.outputPath("lavender-collection.png"));
+  await expectDividerClearance(page);
   const download = page.waitForEvent("download");
   await modal.getByRole("button", { name: "المجموعة كاملة", exact: true }).click();
   await modal.getByRole("button", { name: "حفظ", exact: true }).click();

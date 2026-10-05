@@ -19,6 +19,7 @@ import {
   shareGeometry,
   SHARE_PILL,
   SHARE_SECTION_GAP,
+  SHARE_DIVIDER_CLEARANCE,
   SHARE_COMPACT,
   formatShareNumber,
   shareDisplayDigits,
@@ -222,8 +223,8 @@ export function renderCollectionStoryPage(input: CollectionStoryPageInput): HTML
         ctx.beginPath();
         ctx.strokeStyle = palette.border;
         ctx.lineWidth = 1;
-        ctx.moveTo(textLeft, sectionY - 10);
-        ctx.lineTo(textRight, sectionY - 10);
+        ctx.moveTo(textLeft, sectionY - SHARE_DIVIDER_CLEARANCE);
+        ctx.lineTo(textRight, sectionY - SHARE_DIVIDER_CLEARANCE);
         ctx.stroke();
       }
       ctx.direction = section.direction;
@@ -253,8 +254,8 @@ export function renderCollectionStoryPage(input: CollectionStoryPageInput): HTML
       ctx.beginPath();
       ctx.strokeStyle = palette.border;
       ctx.lineWidth = 1;
-      ctx.moveTo(textLeft, sectionY - 10);
-      ctx.lineTo(textRight, sectionY - 10);
+      ctx.moveTo(textLeft, sectionY - SHARE_DIVIDER_CLEARANCE);
+      ctx.lineTo(textRight, sectionY - SHARE_DIVIDER_CLEARANCE);
       ctx.stroke();
       ctx.direction = language === "ar" ? "rtl" : "ltr";
       ctx.textAlign = language === "ar" ? "left" : "right";

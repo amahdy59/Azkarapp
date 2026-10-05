@@ -46,7 +46,7 @@ Earlier diagnostic failures are retained: one unit expected the wrong existing E
 
 ## Visual/manual evidence
 
-Accepted exports: morning-with-sources.png and morning-without-sources.png in docs/agent/evidence/compact-combined-shared-cards. Inspection confirms compact reference/count rows, complete devotional text, plain footer, Hindi numerals and readable panels. The two exports have identical header pixels; source removal allows three complete items on the example's first page, instead of two. Browser artifacts include all palettes, single cards, reminders/QR, narrow and enlarged-text settings. Real destination-app compression, physical cutouts and screen-reader speech remain human follow-ups.
+Accepted exports: morning-with-sources.png and morning-without-sources.png in docs/agent/evidence/compact-combined-shared-cards. Inspection confirms compact reference/count rows, complete devotional text, plain footer, Hindi numerals and readable panels. The two exports have identical header pixels; source removal reduces panel height; the corrected example keeps two complete items and prioritizes diacritic clearance over denser packing. Browser artifacts include all palettes, single cards, reminders/QR, narrow and enlarged-text settings. Real destination-app compression, physical cutouts and screen-reader speech remain human follow-ups.
 
 ## Documentation updated
 
@@ -67,3 +67,9 @@ The previous deployed reading/update/audio changes are preserved. No content rev
 ## Recommended next step
 
 Check shared images on real Android/iPhone destinations and verify reading comfort and source choices with assistive technology.
+
+## Follow-up: visible separator clearance
+
+Owner-reported lavender-card collision is repaired by measuring actual Arabic ascent/descent before advancing rows, reserving 8 pixels of trailing leading, and centering dividers in 40-pixel section gaps. Actual ink clearance must be at least 20 pixels above and below separators. Added a tall-diacritic unit regression and browser canvas assertions grouped by panel. Initial targeted unit verification: 3 files, 37 tests passed. Final browser, release gates and deployment outcomes are recorded in output/compact-sharing-release/RELEASE_VERIFICATION.md. Release stamp is 2026-10-05.6. The first pending Quality run was cancelled to supersede it before deployment.
+
+Additional accepted evidence: lavender-divider-clearance.png, inspected at full export size. The separator leaves visible breathing room from the final devotional line and the count/source metadata.

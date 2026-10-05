@@ -1,12 +1,12 @@
 {
-  "release": "2026-10-05.5",
+  "release": "2026-10-05.6",
   "ar": [
-    "بطاقات المجموعة تجمع أذكارًا أكثر عندما تتسع، مع الحفاظ على حجم النص ووضوح التشكيل.",
+    "بطاقات المجموعة تجمع أذكارًا أكثر عندما تتسع، مع نص واضح ومساحة مريحة بين التشكيل والخطوط الفاصلة.",
     "يمكنك إضافة المصادر أو إخفاؤها، وتعرض الصور المرجع الأول باختصار في سطرين كحد أقصى.",
     "أرقام البطاقات والتكرار والمراجع تظهر بالأرقام ٠١٢٣٤٥٦٧٨٩، مع تذييل أبسط وخيار إظهار العبارة أسفل العنوان."
   ],
   "en": [
-    "Combined cards fit more adhkar when space allows, keeping the same readable text size and clear Arabic marks.",
+    "Combined cards fit more adhkar when space allows, with readable text and clear spacing between Arabic marks and dividers.",
     "Include or hide sources. Images show the first reference concisely in at most two lines.",
     "Card, repetition and reference numbers use ٠١٢٣٤٥٦٧٨٩, with a simpler footer and an optional collection subtitle."
   ]

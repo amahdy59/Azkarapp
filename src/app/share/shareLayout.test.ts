@@ -32,6 +32,14 @@ function context() {
   } as CanvasRenderingContext2D;
 }
 describe("complete share layouts", () => {
+  it("reserves actual diacritic height before advancing a row", () => {
+    const ctx = context();
+    ctx.measureText = () => ({ width: 120, actualBoundingBoxAscent: 90, actualBoundingBoxDescent: 22 }) as TextMetrics;
+    const section = measureShareSection(ctx, { key: "arabic", text: "رَبِّ", direction: "rtl" }, false, 848);
+    expect(section.lineHeight).toBe(120);
+    expect(section.height).toBe(120);
+    expect(SHARE_COMPACT.sectionGap).toBe(40);
+  });
   it("uses Arabic-Indic display digits without changing reviewed lines or URLs", () => {
     expect(shareDisplayDigits("0123456789 · ۰۱۲۳۴۵۶۷۸۹ · ٠١٢٣٤٥٦٧٨٩")).toBe("٠١٢٣٤٥٦٧٨٩ · ٠١٢٣٤٥٦٧٨٩ · ٠١٢٣٤٥٦٧٨٩");
     expect(formatShareNumber(13)).toBe("١٣");

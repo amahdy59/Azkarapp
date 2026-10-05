@@ -593,3 +593,7 @@ SheetHeader shares wrapped titles/subtitles and one 48px close action. Modal bod
 Ordinary zikr sharing uses the permanent reader dock. Long-surah pages have no counter dock, so their options menu retains Share to preserve access to sourced reminders and Mushaf links.
 
 ReadingTextTransition moves only the Reader or expanded-player text: 20px exit over 100ms, then 28px arrival over 240ms with cubic-bezier(0.22, 1, 0.36, 1) deceleration. Next enters from logical end and the old text leaves toward logical start; Previous reverses. Initial content does not slide; both OS and application reduced-motion preferences remove movement and waiting. Controls, progress, reading semantics and canonical Mushaf pages remain stable.
+
+### Shared-card divider clearance — 2026-10-05
+
+Export rows reserve the measured alphabetic ascent and descent of their actual displayed glyphs, plus at least 8 pixels of trailing leading. Separators sit within a 40-pixel section gap, leaving at least 20 export pixels from visible text on either side, including Arabic diacritics. This applies to single-card supporting sections and combined-card source/count rows. Browser evidence must assert actual ink-to-divider clearance; nominal font size or line boxes alone are insufficient.
