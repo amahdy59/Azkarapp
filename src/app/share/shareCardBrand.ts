@@ -1,4 +1,4 @@
-import { fillRoundedRect, strokeRoundedRect } from "./canvasBotanicals";
+import { fillRoundedRect } from "./canvasBotanicals";
 import { SHARE_ARABIC_FONT, SHARE_UI_FONT } from "./shareLayout";
 
 /** Position visible ink, rather than the font's invisible leading. */
@@ -61,18 +61,16 @@ export function drawShareBrand(
   ctx.restore();
 }
 
-export function drawWebsiteBadge(
+export function drawWebsiteText(
   ctx: CanvasRenderingContext2D,
   centerX: number,
   centerY: number,
   accent = "#b49142",
 ): void {
-  fillRoundedRect(ctx, centerX - 190, centerY - 31, 380, 62, 31, "#f8f5ed");
-  strokeRoundedRect(ctx, centerX - 190, centerY - 31, 380, 62, 31, accent, 2);
   ctx.direction = "ltr";
   ctx.textAlign = "center";
   ctx.textBaseline = "alphabetic";
   ctx.font = `600 30px ${SHARE_UI_FONT}`;
-  ctx.fillStyle = "#091426";
+  ctx.fillStyle = accent;
   ctx.fillText("wa-zaker.com", centerX, centeredInkBaseline(ctx, "wa-zaker.com", centerY));
 }

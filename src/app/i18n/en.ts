@@ -1950,6 +1950,10 @@ const en = {
     transliteration: "Pronunciation",
     source: "Source",
     qr: "Add a QR link",
+    subtitle: "Show the collection subtitle",
+    includeSources: "Include sources",
+    sourceHint:
+      "Images show the first reference concisely, in at most two lines. When sources are included, shared text keeps the full reference.",
     sourceAlways: "Arabic stays complete. Available reviewed sources are always included.",
     repetitions: "Repeat {count} times",
     repeatOnce: "Repeat once",

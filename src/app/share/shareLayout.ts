@@ -17,6 +17,18 @@ export const SHARE_UI_FONT = '"Noto Sans Arabic Variable", system-ui, sans-serif
 /** Export pixels: protect the reading text's diacritics below the badge. */
 export const SHARE_PILL = { top: 28, height: 50, gap: 16, textTop: 94, bottom: 36 } as const;
 export const SHARE_SECTION_GAP = 28;
+export const SHARE_COMPACT = { top: 24, bottom: 24, sectionGap: 20, panelGap: 20, metadataGap: 32 } as const;
+
+/** Display glyphs only: reviewed payloads, URLs and filenames stay byte-preserving. */
+export function shareDisplayDigits(text: string): string {
+  return text.replace(/[0-9۰-۹]/gu, (digit) =>
+    String.fromCharCode(0x660 + (digit.charCodeAt(0) >= 0x6f0 ? digit.charCodeAt(0) - 0x6f0 : Number(digit))),
+  );
+}
+
+export function formatShareNumber(value: number): string {
+  return new Intl.NumberFormat("ar-EG-u-nu-arab").format(value);
+}
 
 export interface ShareSection {
   key: "arabic" | "translation" | "wordMeanings" | "transliteration" | "benefit" | "source" | "reading";
@@ -91,8 +103,11 @@ export interface ShareContentOptions {
   pronunciation?: boolean;
   benefit?: boolean;
   qr?: boolean;
+  subtitle?: boolean;
+  source?: boolean;
 }
 export interface MeasuredSection extends ShareSection {
+  displayText?: string;
   lines: string[];
   fontSize: number;
   lineHeight: number;
@@ -106,6 +121,8 @@ export interface ShareFragment {
   height: number;
   citation?: MeasuredSection;
   heading?: Omit<MeasuredSection, "key">;
+  metadataWidth?: number;
+  metadataHeight?: number;
 }
 export interface ShareLayoutPage {
   fragments: ShareFragment[];
@@ -122,17 +139,17 @@ export interface ShareGeometry {
   textWidth: number;
 }
 
-export function shareGeometry(format: ShareFormat, qr = false, single = false): ShareGeometry {
+export function shareGeometry(format: ShareFormat, qr = false, single = false, subtitle = false): ShareGeometry {
   const height = SHARE_DIMENSIONS[format].height;
   const story = format === "story" || format === "tall";
   return {
-    top: story ? (single ? 210 : 270) : single ? 130 : 220,
-    bottom: height - (story ? (qr ? 300 : single ? 170 : 200) : qr ? 260 : single ? 130 : 170),
+    top: story ? (single ? 210 : subtitle ? 270 : 230) : single ? 130 : subtitle ? 220 : 180,
+    bottom: height - (story ? (qr ? 300 : 170) : qr ? 260 : single ? 130 : 150),
     footer: height - (story ? 110 : 80),
-    titleY: story ? 165 : 116,
+    titleY: story ? (single || subtitle ? 165 : 150) : 116,
     titleSize: story ? 54 : 46,
     width: 952,
-    textWidth: 856,
+    textWidth: 848,
   };
 }
 
@@ -157,7 +174,7 @@ export function getShareSections(item: ShareItem, options: ShareContentOptions =
       text: item.benefit,
       direction: /[\u0600-\u06ff]/u.test(item.benefit) ? "rtl" : "ltr",
     });
-  if (item.sourceReference?.trim())
+  if (options.source !== false && item.sourceReference?.trim())
     sections.push({
       key: "source",
       text: item.sourceReference,
@@ -173,18 +190,20 @@ export function getShareSections(item: ShareItem, options: ShareContentOptions =
 }
 
 export function getShareRepetitionLabel(count: number, language: AppLanguage): string {
-  return t(
-    language,
-    count === 1
-      ? "shareStudio.repeatOnce"
-      : count === 2
-        ? "shareStudio.repeatTwice"
-        : count > 10
-          ? "shareStudio.repeatMany"
-          : "shareStudio.repetitions",
-    {
-      count: new Intl.NumberFormat(language === "ar" ? "ar-EG" : "en").format(count),
-    },
+  return shareDisplayDigits(
+    t(
+      language,
+      count === 1
+        ? "shareStudio.repeatOnce"
+        : count === 2
+          ? "shareStudio.repeatTwice"
+          : count > 10
+            ? "shareStudio.repeatMany"
+            : "shareStudio.repetitions",
+      {
+        count: formatShareNumber(count),
+      },
+    ),
   );
 }
 
@@ -230,20 +249,66 @@ export function measureShareSection(
     section.key === "arabic" ? (single ? (compact ? 52 : 64) : 52) : primary ? 52 : section.key === "source" ? 34 : 36;
   const lineHeight = Math.ceil(fontSize * (section.direction === "rtl" ? 1.65 : 1.5));
   ctx.font = `${section.key === "arabic" ? 500 : 400} ${fontSize}px ${section.direction === "rtl" ? SHARE_ARABIC_FONT : SHARE_UI_FONT}`;
-  const lines = wrapShareText(section.text, (value) => ctx.measureText(value).width, width);
+  const lines = wrapShareText(section.text, (value) => ctx.measureText(shareDisplayDigits(value)).width, width);
   // Keep the final reference together when it fits on the next line. The
   // joined reviewed payload stays identical, including its whitespace.
   if (section.key === "source" && lines.length > 1) {
     const previous = lines.at(-2)!;
     const boundary = Math.max(previous.lastIndexOf(";"), previous.lastIndexOf("؛")) + 1;
     const reference = previous.slice(boundary) + lines.at(-1)!;
-    if (boundary > 0 && ctx.measureText(reference.trim()).width <= width) {
+    if (boundary > 0 && ctx.measureText(shareDisplayDigits(reference.trim())).width <= width) {
       lines[lines.length - 2] = previous.slice(0, boundary);
       lines[lines.length - 1] = reference;
     }
   }
-  const labelHeight = section.key === "arabic" ? 0 : 44;
+  const labelHeight = section.key === "arabic" || section.key === "source" ? 0 : 44;
   return { ...section, lines, fontSize, lineHeight, height: lines.length * lineHeight + labelHeight };
+}
+
+/** Image-only source summary: first reviewed reference, never a ranked/invented source. */
+export function measureShareCitation(
+  ctx: CanvasRenderingContext2D,
+  section: ShareSection,
+  single: boolean,
+  width: number,
+): MeasuredSection {
+  const first = section.text
+    .trim()
+    .split(/[;؛\r\n]/u)[0]!
+    .trim();
+  let measured = measureShareSection(ctx, { ...section, text: first }, single, width);
+  if (measured.lines.length > 2) {
+    const reference = [...first.matchAll(/[0-9٠-٩۰-۹]+(?:[/:–−-][0-9٠-٩۰-۹]+)*/gu)].at(-1);
+    if (reference?.index !== undefined) {
+      const name = Array.from(
+        new Intl.Segmenter("ar", { granularity: "grapheme" }).segment(first.slice(0, reference.index).trimEnd()),
+        ({ segment }) => segment,
+      );
+      const suffix = first.slice(reference.index);
+      do {
+        name.pop();
+        measured = measureShareSection(
+          ctx,
+          { ...section, text: name.join("").trimEnd() + "… " + suffix },
+          single,
+          width,
+        );
+      } while (name.length && measured.lines.length > 2);
+    }
+  }
+  if (measured.lines.length > 2) {
+    const visible = measured.lines.slice(0, 2);
+    const graphemes = Array.from(
+      new Intl.Segmenter("ar", { granularity: "grapheme" }).segment(visible[1]!.trimEnd()),
+      ({ segment }) => segment,
+    );
+    while (graphemes.length && ctx.measureText(shareDisplayDigits(graphemes.join("") + "…")).width > width)
+      graphemes.pop();
+    visible[1] = graphemes.join("").trimEnd() + "…";
+    measured.lines = visible;
+    measured.height = visible.length * measured.lineHeight;
+  }
+  return { ...measured, text: section.text, displayText: measured.lines.join("") };
 }
 
 /** Complete items are indivisible. Reject incompatible sizes before encoding any image. */
@@ -254,47 +319,79 @@ export function layoutSharePages(
   content: ShareContentOptions = {},
   single = false,
 ): ShareLayoutPage[] {
-  const geometry = shareGeometry(format, content.qr, single);
+  const geometry = shareGeometry(format, content.qr, single, content.subtitle);
   const capacity = geometry.bottom - geometry.top;
-  const sectionGap = SHARE_SECTION_GAP;
+  const sectionGap = single ? SHARE_SECTION_GAP : SHARE_COMPACT.sectionGap;
   const fragments: ShareFragment[] = [];
   for (const item of items) {
     let heading: ShareFragment["heading"];
     if (item.title?.trim()) {
       const direction = /[\u0600-\u06ff]/u.test(item.title) ? "rtl" : "ltr";
       ctx.font = `600 40px ${direction === "rtl" ? SHARE_ARABIC_FONT : SHARE_UI_FONT}`;
-      const lines = wrapShareText(item.title, (value) => ctx.measureText(value).width, geometry.textWidth);
+      const lines = wrapShareText(
+        item.title,
+        (value) => ctx.measureText(shareDisplayDigits(value)).width,
+        geometry.textWidth,
+      );
       heading = { text: item.title, direction, lines, fontSize: 40, lineHeight: 66, height: lines.length * 66 + 16 };
     }
     let measured = getShareSections(item, content).map((section) =>
-      measureShareSection(
-        ctx,
-        section,
-        single,
-        geometry.textWidth,
-        Boolean(item.reminder && section.key === "benefit"),
-      ),
+      section.key === "source"
+        ? measureShareCitation(ctx, section, single, geometry.textWidth)
+        : measureShareSection(
+            ctx,
+            section,
+            single,
+            geometry.textWidth,
+            Boolean(item.reminder && section.key === "benefit"),
+          ),
     );
+    let metadataWidth: number | undefined;
+    let metadataHeight: number | undefined;
+    if (!single) {
+      ctx.font = `600 30px ${SHARE_ARABIC_FONT}`;
+      metadataWidth = Math.ceil(
+        ctx.measureText(
+          item.reminder
+            ? t(item.language ?? "ar", "shareStudio.reminder")
+            : getShareRepetitionLabel(item.repetitionCount ?? 1, item.language ?? "ar"),
+        ).width,
+      );
+      const citationWidth = geometry.textWidth - metadataWidth - SHARE_COMPACT.metadataGap;
+      measured = measured.map((section) =>
+        section.key === "source" ? measureShareCitation(ctx, section, false, citationWidth) : section,
+      );
+      metadataHeight = Math.max(50, measured.find((section) => section.key === "source")?.height ?? 0);
+    }
     let source = measured.find((section) => section.key === "source");
     let citation = source;
     let sections = measured.filter((section) => section !== citation);
-    let height =
-      SHARE_PILL.textTop +
-      SHARE_PILL.bottom +
-      (heading?.height ?? 0) +
-      measured.reduce((sum, section) => sum + section.height, 0) +
-      Math.max(0, measured.length - 1) * sectionGap;
+    let height = single
+      ? SHARE_PILL.textTop +
+        SHARE_PILL.bottom +
+        (heading?.height ?? 0) +
+        measured.reduce((sum, section) => sum + section.height, 0) +
+        Math.max(0, measured.length - 1) * sectionGap
+      : SHARE_COMPACT.top +
+        SHARE_COMPACT.bottom +
+        (heading?.height ?? 0) +
+        sections.reduce((sum, section) => sum + section.height, 0) +
+        Math.max(0, sections.length - 1) * sectionGap +
+        (sections.length ? sectionGap : 0) +
+        metadataHeight!;
     const itemCapacity = item.reminder ? shareGeometry(format, true).bottom - geometry.top : capacity;
     if (single && !item.reminder && height > itemCapacity) {
       const compactMeasured = getShareSections(item, content).map((section) =>
-        measureShareSection(
-          ctx,
-          section,
-          single,
-          geometry.textWidth,
-          Boolean(item.reminder && section.key === "benefit"),
-          true,
-        ),
+        section.key === "source"
+          ? measureShareCitation(ctx, section, single, geometry.textWidth)
+          : measureShareSection(
+              ctx,
+              section,
+              single,
+              geometry.textWidth,
+              Boolean(item.reminder && section.key === "benefit"),
+              true,
+            ),
       );
       const compactHeight =
         SHARE_PILL.textTop +
@@ -311,14 +408,14 @@ export function layoutSharePages(
       }
     }
     if (height > itemCapacity) throw new ShareFitError(item.id, format);
-    fragments.push({ item, sections, part: 1, parts: 1, height, citation, heading });
+    fragments.push({ item, sections, part: 1, parts: 1, height, citation, heading, metadataWidth, metadataHeight });
   }
   const groups: ShareFragment[][] = [];
   let group: ShareFragment[] = [];
   let height = 0;
   for (const fragment of fragments) {
-    const gap = group.length ? 28 : 0;
-    const short = (part: ShareFragment) => part.height <= (capacity - 84) / 4;
+    const gap = group.length ? SHARE_COMPACT.panelGap : 0;
+    const short = (part: ShareFragment) => part.height <= (capacity - 3 * SHARE_COMPACT.panelGap) / 4;
     const maxItems = short(fragment) && group.every(short) ? 4 : 3;
     if (
       group.length &&
@@ -332,7 +429,7 @@ export function layoutSharePages(
       group = [];
       height = 0;
     }
-    height += (group.length ? 28 : 0) + fragment.height;
+    height += (group.length ? SHARE_COMPACT.panelGap : 0) + fragment.height;
     group.push(fragment);
   }
   if (group.length) groups.push(group);

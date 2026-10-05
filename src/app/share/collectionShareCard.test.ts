@@ -75,6 +75,30 @@ beforeEach(() => {
 });
 
 describe("collectionShareCard", () => {
+  for (const language of ["ar", "en"] as const) {
+    it(`renders plain website text, compact sources and Arabic-Indic footer digits in ${language}`, () => {
+      const { canvas, context } = createMockCanvas();
+      const originalCreateElement = document.createElement.bind(document);
+      vi.spyOn(document, "createElement").mockImplementation(((tagName: string) =>
+        tagName === "canvas" ? canvas : originalCreateElement(tagName)) as typeof document.createElement);
+      const items = [
+        { id: "short", arabicText: "سبحان الله", repetitionCount: 100, sourceReference: "مسلم 2088/4؛ حصن المسلم 77" },
+      ];
+      const original = JSON.stringify(items);
+      renderCollectionStoryPage({ ...SAMPLE_PAGE, language, totalPages: 13, items });
+      const text = vi.mocked(context.fillText).mock.calls.map((call) => call[0]);
+      expect(text).toContain(language === "ar" ? "بطاقة ١ من ١٣" : "Card ١ of ١٣");
+      expect(text.some((line) => line.includes("٢٠٨٨/٤"))).toBe(true);
+      expect(text.every((line) => !/[0-9۰-۹]/u.test(line))).toBe(true);
+      expect(text).not.toContain("المصدر");
+      expect(text).not.toContain("Source");
+      expect(text).not.toContain(SAMPLE_PAGE.collectionSubtitle);
+      expect(vi.mocked(context.roundRect).mock.calls.some((call) => call[2] === 380 || call[3] === 50)).toBe(false);
+      expect(JSON.stringify(items)).toBe(original);
+      renderCollectionStoryPage({ ...SAMPLE_PAGE, content: { subtitle: true } });
+      expect(context.fillText).toHaveBeenCalledWith(SAMPLE_PAGE.collectionSubtitle, 540, expect.any(Number));
+    });
+  }
   for (const qr of [false, true]) {
     it(`puts the single zikr title inside its panel and keeps the website centered (QR ${qr})`, () => {
       const { canvas, context } = createMockCanvas();

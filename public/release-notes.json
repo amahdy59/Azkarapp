@@ -1,15 +1,13 @@
 {
-  "release": "2026-10-05.4",
+  "release": "2026-10-05.5",
   "ar": [
-    "التنقل السريع بين الأذكار يعرض اختيارك الأخير، والعد المتتابع يحفظ كل ضغطة دون تغيير توقيت الحركة المعتاد.",
-    "اختيار «لاحقًا» يؤجل تذكير التحديث نفسه لمدة ٢٤ ساعة، ويمكن مراجعته مبكرًا من الإعدادات حول التطبيق.",
-    "نافذة المشاركة تحافظ على أزرارها داخل الشاشة عند تغيير حجمها أو تكبير النص.",
-    "رسائل التقدم تدعوك للاستمرار بهدوء، مع بقاء إنجازاتك وأيام مواظبتك واضحة."
+    "بطاقات المجموعة تجمع أذكارًا أكثر عندما تتسع، مع الحفاظ على حجم النص ووضوح التشكيل.",
+    "يمكنك إضافة المصادر أو إخفاؤها، وتعرض الصور المرجع الأول باختصار في سطرين كحد أقصى.",
+    "أرقام البطاقات والتكرار والمراجع تظهر بالأرقام ٠١٢٣٤٥٦٧٨٩، مع تذييل أبسط وخيار إظهار العبارة أسفل العنوان."
   ],
   "en": [
-    "Rapid zikr navigation shows your latest choice, and consecutive counting taps are preserved with the usual motion timing.",
-    "Later pauses the same update reminder for 24 hours. You can review it sooner in Settings, About.",
-    "Sharing actions stay within the screen when resizing or enlarging text.",
-    "Progress messages invite gentle continuation while keeping your completions and consecutive practice days clear."
+    "Combined cards fit more adhkar when space allows, keeping the same readable text size and clear Arabic marks.",
+    "Include or hide sources. Images show the first reference concisely in at most two lines.",
+    "Card, repetition and reference numbers use ٠١٢٣٤٥٦٧٨٩, with a simpler footer and an optional collection subtitle."
   ]
 }

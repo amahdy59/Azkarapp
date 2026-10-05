@@ -54,6 +54,54 @@ const SAMPLE_ITEMS: Zikr[] = [
 ];
 
 describe("CollectionShareModal", () => {
+  it("can omit sources from image and text exports without changing the reviewed item", async () => {
+    const { generateAllCollectionStoryPages } = await import("../share/collectionShareCard");
+    const original = JSON.stringify(SAMPLE_ITEMS);
+    render(
+      <CollectionShareModal open onClose={vi.fn()} collectionTitle="Morning" items={SAMPLE_ITEMS} language="en" />,
+    );
+    await screen.findByRole("img");
+    screen.getByText("Customize content").closest("details")!.open = true;
+    const checkbox = screen.getByRole("checkbox", { name: "Include sources", exact: true });
+    expect(checkbox).toBeChecked();
+    fireEvent.click(checkbox);
+    await waitFor(() =>
+      expect(generateAllCollectionStoryPages).toHaveBeenLastCalledWith(
+        expect.objectContaining({ content: expect.objectContaining({ source: false }) }),
+      ),
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Text", exact: true }));
+    expect((screen.getByRole("textbox") as HTMLTextAreaElement).value).not.toContain("أبو داود");
+    fireEvent.click(screen.getByRole("checkbox", { name: "Include sources", exact: true }));
+    expect((screen.getByRole("textbox") as HTMLTextAreaElement).value).toContain("أبو داود");
+    expect(JSON.stringify(SAMPLE_ITEMS)).toBe(original);
+  });
+  it("offers a transient collection subtitle without changing reading additions", async () => {
+    const { generateAllCollectionStoryPages } = await import("../share/collectionShareCard");
+    render(
+      <CollectionShareModal
+        open
+        onClose={vi.fn()}
+        collectionTitle="Morning"
+        collectionSubtitle="Begin with remembrance"
+        items={SAMPLE_ITEMS}
+        language="en"
+      />,
+    );
+    await screen.findByRole("img");
+    screen.getByText("Customize content").closest("details")!.open = true;
+    const checkbox = screen.getByRole("checkbox", { name: "Show the collection subtitle", exact: true });
+    expect(checkbox).not.toBeChecked();
+    fireEvent.click(checkbox);
+    await waitFor(() =>
+      expect(generateAllCollectionStoryPages).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          content: expect.objectContaining({ subtitle: true, meaning: false, pronunciation: false, benefit: false }),
+        }),
+      ),
+    );
+    expect(screen.getByText("Show the collection subtitle", { selector: "summary *" })).toBeVisible();
+  });
   for (const language of ["ar", "en"] as const) {
     for (const single of [false, true]) {
       it(`distinguishes the ${single ? "single" : "collection"} title in ${language}`, async () => {

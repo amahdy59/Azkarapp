@@ -14,6 +14,10 @@ import {
   defaultShareAppearance,
   getShareRepetitionLabel,
   measureShareSection,
+  SHARE_COMPACT,
+  shareDisplayDigits,
+  formatShareNumber,
+  measureShareCitation,
   type ShareFormat,
 } from "./shareLayout";
 
@@ -28,6 +32,63 @@ function context() {
   } as CanvasRenderingContext2D;
 }
 describe("complete share layouts", () => {
+  it("uses Arabic-Indic display digits without changing reviewed lines or URLs", () => {
+    expect(shareDisplayDigits("0123456789 · ۰۱۲۳۴۵۶۷۸۹ · ٠١٢٣٤٥٦٧٨٩")).toBe("٠١٢٣٤٥٦٧٨٩ · ٠١٢٣٤٥٦٧٨٩ · ٠١٢٣٤٥٦٧٨٩");
+    expect(formatShareNumber(13)).toBe("١٣");
+    expect(getShareRepetitionLabel(100, "en")).toContain("١٠٠");
+    const item = {
+      id: "digits",
+      arabicText: "سبحان الله",
+      sourceReference: "مسلم 2088/4؛ حصن المسلم 77",
+      repetitionCount: 100,
+    };
+    const fragment = layoutSharePages(context(), [item], "story")[0]!.fragments[0]!;
+    expect(fragment.citation!.lines.join("")).toBe("مسلم 2088/4");
+    expect(fragment.citation!.text).toBe(item.sourceReference);
+    expect(getShareText([item], "ar", {}, "ذكر", "https://example.com/1")).toContain("https://example.com/1");
+  });
+  it("summarizes the first source to at most two lines and makes attribution optional", () => {
+    const sourceReference = "اسم مصدر طويل ".repeat(60) + " 2088؛ مرجع آخر 77";
+    const ctx = context();
+    const measured = measureShareCitation(ctx, { key: "source", text: sourceReference, direction: "rtl" }, false, 400);
+    expect(measured.lines).toHaveLength(2);
+    expect(measured.displayText).toContain("…");
+    expect(measured.displayText).toContain("2088");
+    expect(measured.text).toBe(sourceReference);
+    for (const line of measured.lines)
+      expect(ctx.measureText(shareDisplayDigits(line.trim())).width).toBeLessThanOrEqual(400);
+    const item = { id: "source-choice", arabicText: "سبحان الله", sourceReference };
+    for (const single of [false, true]) {
+      const shown = layoutSharePages(context(), [item], "story", {}, single)[0]!.fragments[0]!;
+      const hidden = layoutSharePages(context(), [item], "story", { source: false }, single)[0]!.fragments[0]!;
+      expect(shown.citation!.lines.length).toBeLessThanOrEqual(2);
+      expect(hidden.citation).toBeUndefined();
+      expect(hidden.height).toBeLessThan(shown.height);
+      expect(hidden.sections[0]!.text).toBe(item.arabicText);
+    }
+    expect(getShareText([item], "ar", {}, "ذكر")).toContain(sourceReference);
+    expect(getShareText([item], "ar", { source: false }, "ذكر")).not.toContain(sourceReference);
+  });
+  it("packs four sourced short items at the original reading size with inline metadata", () => {
+    const items = Array.from({ length: 8 }, (_, index) => ({
+      id: String(index),
+      arabicText: "سُبْحَانَ اللَّهِ",
+      sourceReference: "مسلم ١",
+      repetitionCount: 100,
+    }));
+    const pages = layoutSharePages(context(), items, "story");
+    expect(pages.map((page) => page.fragments.length)).toEqual([4, 4]);
+    for (const fragment of pages.flatMap((page) => page.fragments)) {
+      expect(fragment.sections[0]!.fontSize).toBe(52);
+      expect(fragment.metadataWidth).toBeGreaterThan(0);
+      expect(fragment.metadataHeight).toBeGreaterThanOrEqual(fragment.citation!.height);
+      expect(fragment.citation!.height).toBe(fragment.citation!.lines.length * fragment.citation!.lineHeight);
+      expect(fragment.height).toBeLessThan(
+        layoutSharePages(context(), [fragment.item], "story", {}, true)[0]!.fragments[0]!.height,
+      );
+    }
+    expect(shareGeometry("story", false, false, true).top).toBeGreaterThan(shareGeometry("story").top);
+  });
   it("uses the approved readable fallback only when needed, preserving every character", () => {
     const short = { id: "short", arabicText: "سبحان الله" };
     const dense = { id: "dense", arabicText: "سبحان الله ".repeat(18) };
@@ -112,6 +173,7 @@ describe("complete share layouts", () => {
           expect(fragment.parts).toBe(1);
           expect(fragment.height).toBeLessThanOrEqual(geometry.bottom - geometry.top);
           expect(fragment.citation?.text).toBe(item.sourceReference);
+          if (fragment.citation) expect(fragment.citation.lines.length).toBeLessThanOrEqual(2);
           if (!item.reminder) {
             const arabic = fragment.sections.find((section) => section.key === "arabic")!;
             expect(arabic.text).toBe(zikr.arabicText);
@@ -164,7 +226,8 @@ describe("complete share layouts", () => {
     for (const page of pages) {
       expect(page.fragments.length).toBeLessThanOrEqual(4);
       expect(
-        page.fragments.reduce((sum, part) => sum + part.height, 0) + (page.fragments.length - 1) * 28,
+        page.fragments.reduce((sum, part) => sum + part.height, 0) +
+          (page.fragments.length - 1) * SHARE_COMPACT.panelGap,
       ).toBeLessThanOrEqual(shareGeometry("story").bottom - shareGeometry("story").top);
       for (const part of page.fragments) {
         expect(part.parts).toBe(1);

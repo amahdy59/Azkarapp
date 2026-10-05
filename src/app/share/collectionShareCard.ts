@@ -19,13 +19,16 @@ import {
   shareGeometry,
   SHARE_PILL,
   SHARE_SECTION_GAP,
+  SHARE_COMPACT,
+  formatShareNumber,
+  shareDisplayDigits,
   type ShareAppearance,
   type ShareContentOptions,
   type ShareFormat,
   type ShareItem,
   type ShareLayoutPage,
 } from "./shareLayout";
-import { centeredInkBaseline, drawInkTop, drawShareBrand, drawWebsiteBadge } from "./shareCardBrand";
+import { centeredInkBaseline, drawInkTop, drawShareBrand, drawWebsiteText } from "./shareCardBrand";
 
 export const COLLECTION_STORY_WIDTH = 1080;
 export const COLLECTION_STORY_HEIGHT = 1920;
@@ -116,12 +119,16 @@ export function renderCollectionStoryPage(input: CollectionStoryPageInput): HTML
     format,
     input.qr || (input.items.length === 1 && input.items[0]?.reminder),
     input.single,
+    input.content?.subtitle,
   );
   const items = input.items.map((item) => ({
     ...item,
+    language: item.language ?? language,
     benefit: item.benefit ?? item.benefitArabic,
     title: item.title ?? item.surahNameArabic ?? (input.single ? input.collectionTitle : undefined),
   }));
+  const textLeft = (canvas.width - geometry.textWidth) / 2;
+  const textRight = canvas.width - textLeft;
   const layout = input.layout ?? layoutSharePages(ctx, items, format, input.content, input.single)[0];
   if (!layout || (!input.layout && layout.totalPages > 1)) throw new RangeError("Items require separate cards.");
   ctx.fillStyle = palette.background;
@@ -138,7 +145,7 @@ export function renderCollectionStoryPage(input: CollectionStoryPageInput): HTML
   strokeRoundedRect(ctx, 32, 32, canvas.width - 64, canvas.height - 64, 36, palette.border, 2);
   drawShareBrand(
     ctx,
-    format === "story" || format === "tall" ? 80 : 32,
+    format === "story" || format === "tall" ? (input.single || input.content?.subtitle ? 80 : 64) : 32,
     palette.text,
     palette.accent,
     appearance === "olive" ? "#e6eddf" : "#091426",
@@ -149,18 +156,19 @@ export function renderCollectionStoryPage(input: CollectionStoryPageInput): HTML
   let titleSize = geometry.titleSize;
   do {
     ctx.font = `700 ${titleSize}px ${SHARE_ARABIC_FONT}`;
-    if (ctx.measureText(input.collectionTitle).width <= 940) break;
+    if (ctx.measureText(shareDisplayDigits(input.collectionTitle)).width <= 940) break;
     titleSize -= 2;
   } while (titleSize > 32);
   ctx.fillStyle = palette.text;
-  if (!input.single) drawInkTop(ctx, input.collectionTitle, 540, geometry.titleY);
+  if (!input.single) drawInkTop(ctx, shareDisplayDigits(input.collectionTitle), 540, geometry.titleY);
   ctx.font = `500 32px ${SHARE_ARABIC_FONT}`;
   ctx.fillStyle = palette.secondary;
-  if (!input.single && input.collectionSubtitle)
-    drawInkTop(ctx, input.collectionSubtitle, 540, geometry.titleY + titleSize + 12);
-  else drawOrnateFlourish(ctx, 540, geometry.top - 20, 112, palette.accent);
+  if (!input.single && input.content?.subtitle && input.collectionSubtitle)
+    drawInkTop(ctx, shareDisplayDigits(input.collectionSubtitle), 540, geometry.titleY + titleSize + 12);
+  else if (input.single) drawOrnateFlourish(ctx, 540, geometry.top - 20, 112, palette.accent);
   const totalHeight =
-    layout.fragments.reduce((sum, fragment) => sum + fragment.height, 0) + (layout.fragments.length - 1) * 28;
+    layout.fragments.reduce((sum, fragment) => sum + fragment.height, 0) +
+    (layout.fragments.length - 1) * SHARE_COMPACT.panelGap;
   let y = geometry.top + Math.min(24, Math.max(0, (geometry.bottom - geometry.top - totalHeight) / 2));
   for (const fragment of layout.fragments) {
     const x = 64;
@@ -172,7 +180,12 @@ export function renderCollectionStoryPage(input: CollectionStoryPageInput): HTML
       ctx.textAlign = "center";
       ctx.fillStyle = palette.accent;
       fragment.heading.lines.forEach((line, index) =>
-        drawInkTop(ctx, line.trim(), 540, y + SHARE_PILL.top + index * fragment.heading!.lineHeight),
+        drawInkTop(
+          ctx,
+          shareDisplayDigits(line.trim()),
+          540,
+          y + (input.single ? SHARE_PILL.top : SHARE_COMPACT.top) + index * fragment.heading!.lineHeight,
+        ),
       );
     }
     const utilityY = y + (fragment.heading?.height ?? 0);
@@ -180,40 +193,44 @@ export function renderCollectionStoryPage(input: CollectionStoryPageInput): HTML
       ? t(language, "shareStudio.reminder")
       : getShareRepetitionLabel(fragment.item.repetitionCount ?? 1, language);
     ctx.font = `600 30px ${SHARE_ARABIC_FONT}`;
-    const pillWidth = ctx.measureText(repetition).width + 32;
-    fillRoundedRect(
-      ctx,
-      language === "ar" ? x + 48 : x + geometry.width - 48 - pillWidth,
-      utilityY + SHARE_PILL.top,
-      pillWidth,
-      SHARE_PILL.height,
-      25,
-      palette.accent,
-    );
-    ctx.fillStyle = palette.background;
-    ctx.textAlign = "center";
-    ctx.direction = language === "ar" ? "rtl" : "ltr";
-    ctx.textBaseline = "alphabetic";
-    ctx.fillText(
-      repetition,
-      language === "ar" ? x + 48 + pillWidth / 2 : x + geometry.width - 48 - pillWidth / 2,
-      centeredInkBaseline(ctx, repetition, utilityY + SHARE_PILL.top + SHARE_PILL.height / 2),
-    );
-    let sectionY = utilityY + SHARE_PILL.textTop;
-    [...fragment.sections, ...(fragment.citation ? [fragment.citation] : [])].forEach((section, sectionIndex) => {
-      if (sectionIndex > 0) sectionY += SHARE_SECTION_GAP;
+    if (input.single) {
+      const pillWidth = ctx.measureText(repetition).width + 32;
+      fillRoundedRect(
+        ctx,
+        language === "ar" ? x + 48 : x + geometry.width - 48 - pillWidth,
+        utilityY + SHARE_PILL.top,
+        pillWidth,
+        SHARE_PILL.height,
+        25,
+        palette.accent,
+      );
+      ctx.fillStyle = palette.background;
+      ctx.textAlign = "center";
+      ctx.direction = language === "ar" ? "rtl" : "ltr";
+      ctx.textBaseline = "alphabetic";
+      ctx.fillText(
+        repetition,
+        language === "ar" ? x + 48 + pillWidth / 2 : x + geometry.width - 48 - pillWidth / 2,
+        centeredInkBaseline(ctx, repetition, utilityY + SHARE_PILL.top + SHARE_PILL.height / 2),
+      );
+    }
+    let sectionY = utilityY + (input.single ? SHARE_PILL.textTop : SHARE_COMPACT.top);
+    const sections = [...fragment.sections, ...(input.single && fragment.citation ? [fragment.citation] : [])];
+    sections.forEach((section, sectionIndex) => {
+      if (sectionIndex > 0) sectionY += input.single ? SHARE_SECTION_GAP : SHARE_COMPACT.sectionGap;
       if (sectionIndex > 0) {
         ctx.beginPath();
         ctx.strokeStyle = palette.border;
         ctx.lineWidth = 1;
-        ctx.moveTo(112, sectionY - 10);
-        ctx.lineTo(968, sectionY - 10);
+        ctx.moveTo(textLeft, sectionY - 10);
+        ctx.lineTo(textRight, sectionY - 10);
         ctx.stroke();
       }
       ctx.direction = section.direction;
-      ctx.textAlign = section.direction === "rtl" ? "right" : "left";
-      const textX = section.direction === "rtl" ? 968 : 112;
-      if (section.key !== "arabic") {
+      const centered = section.key === "arabic" && section.lines.length <= 2;
+      ctx.textAlign = centered ? "center" : section.direction === "rtl" ? "right" : "left";
+      const textX = centered ? 540 : section.direction === "rtl" ? textRight : textLeft;
+      if (section.key !== "arabic" && section.key !== "source") {
         ctx.font = `600 28px ${language === "ar" ? SHARE_ARABIC_FONT : SHARE_UI_FONT}`;
         ctx.fillStyle = palette.accent;
         drawInkTop(ctx, t(language, `shareStudio.${section.key}`), textX, sectionY);
@@ -225,13 +242,43 @@ export function renderCollectionStoryPage(input: CollectionStoryPageInput): HTML
         // Isolate reference numbers without changing the reviewed text payload.
         const displayLine =
           section.key === "source" && section.direction === "rtl"
-            ? line.trim().replace(/[0-9٠-٩۰-۹]+(?:[/:٫٬.][0-9٠-٩۰-۹]+)*/gu, "\u2066$&\u2069")
-            : line.trim();
+            ? shareDisplayDigits(line.trim()).replace(/[٠-٩]+(?:[/:٫٬.][٠-٩]+)*/gu, "\u2066$&\u2069")
+            : shareDisplayDigits(line.trim());
         drawInkTop(ctx, displayLine, textX, sectionY);
         sectionY += section.lineHeight;
       }
     });
-    y += fragment.height + 28;
+    if (!input.single) {
+      if (sections.length) sectionY += SHARE_COMPACT.sectionGap;
+      ctx.beginPath();
+      ctx.strokeStyle = palette.border;
+      ctx.lineWidth = 1;
+      ctx.moveTo(textLeft, sectionY - 10);
+      ctx.lineTo(textRight, sectionY - 10);
+      ctx.stroke();
+      ctx.direction = language === "ar" ? "rtl" : "ltr";
+      ctx.textAlign = language === "ar" ? "left" : "right";
+      ctx.font = `600 30px ${SHARE_ARABIC_FONT}`;
+      ctx.fillStyle = palette.accent;
+      drawInkTop(ctx, repetition, language === "ar" ? textLeft : textRight, sectionY);
+      const citation = fragment.citation;
+      if (citation) {
+        ctx.font = `400 ${citation.fontSize}px ${citation.direction === "rtl" ? SHARE_ARABIC_FONT : SHARE_UI_FONT}`;
+        ctx.fillStyle = palette.secondary;
+        ctx.direction = citation.direction;
+        ctx.textAlign = language === "ar" ? "right" : "left";
+        citation.lines.forEach((line, index) => {
+          const text = shareDisplayDigits(line.trim());
+          drawInkTop(
+            ctx,
+            citation.direction === "rtl" ? text.replace(/[٠-٩]+(?:[/:٫٬.][٠-٩]+)*/gu, "\u2066$&\u2069") : text,
+            language === "ar" ? textRight : textLeft,
+            sectionY + index * citation.lineHeight,
+          );
+        });
+      }
+    }
+    y += fragment.height + SHARE_COMPACT.panelGap;
   }
   ctx.direction = language === "ar" ? "rtl" : "ltr";
   ctx.textAlign = "center";
@@ -242,13 +289,13 @@ export function renderCollectionStoryPage(input: CollectionStoryPageInput): HTML
     drawInkTop(
       ctx,
       t(language, "shareStoryPack.pageCount", {
-        current: new Intl.NumberFormat(language).format(input.pageNumber),
-        total: new Intl.NumberFormat(language).format(input.totalPages),
+        current: formatShareNumber(input.pageNumber),
+        total: formatShareNumber(input.totalPages),
       }),
       540,
-      geometry.footer - (hasQr ? 120 : 64),
+      geometry.footer - (hasQr ? 120 : 48),
     );
-  drawWebsiteBadge(ctx, 540, geometry.footer, palette.accent);
+  drawWebsiteText(ctx, 540, geometry.footer, palette.accent);
   return canvas;
 }
 
@@ -324,7 +371,7 @@ export async function generateCollectionStoryPage(
     totalPages: input.totalPages,
     width: canvas.width,
     height: canvas.height,
-    altText: `${input.collectionTitle}. ${t(language, "shareStoryPack.pageCount", { current: input.pageNumber, total: input.totalPages })}`,
+    altText: `${shareDisplayDigits(input.collectionTitle)}. ${t(language, "shareStoryPack.pageCount", { current: formatShareNumber(input.pageNumber), total: formatShareNumber(input.totalPages) })}`,
   };
 }
 
@@ -351,6 +398,7 @@ export async function generateAllCollectionStoryPages(
     const { ctx } = createCanvas();
     const items = options.allItems.map((item) => ({
       ...item,
+      language: item.language ?? options.language ?? "ar",
       benefit: item.benefit ?? item.benefitArabic,
       title: item.title ?? item.surahNameArabic ?? (options.single ? options.collectionTitle : undefined),
     }));

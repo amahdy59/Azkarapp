@@ -97,6 +97,10 @@ The keyboard row is marked partial for the same reason: the automation proves ta
 
 ## Sharing refinement checks
 
+- The owner-approved Include sources control overrides older mandatory image/source checks: on by default, sources can be omitted from image, Text and ZIP exports. Verify first-listed reference selection without invented ranking, at most two visible source lines, ellipsis for unusually long names with preserved reference number, semantic preview agreement and original full citation in source-enabled Text/ZIP. Canonical reviewed payloads, glossary attribution and reminder QR/reading links remain intact.
+
+- Compact collections: inspect source/count metadata row separation, full citations without repeated headings, 24px panel ink clearance, 20px gaps and unchanged 52px Arabic reading size. Confirm short passages center while long passages align right; sequential packing never splits/truncates an item. Toggle the optional subtitle and inspect header separation. Verify plain website text in every palette, Arabic-Indic export numbers in both label languages, preserved Text/ZIP source strings and unchanged QR/URL/filename digits. Single-card repetition pills retain their 16px clearance. The compact collection contract supersedes the older collection-pill and website-badge checks below.
+
 - Inspect mirrored preview/settings columns at wide widths, preview-first compact reflow, short landscape windows, native disclosure indicators and collapsed additions summaries. Check unavailable-size descriptions, size/language help associations, visible selection checkmarks, dropdown Escape/focus restoration, enlargement exit, and controls scrolling above the footer.
 
 - Every zikr, selected meaning/pronunciation/benefit and available citation fit together on one image. Incompatible sizes explain size/Text/Link recovery.

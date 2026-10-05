@@ -22,9 +22,22 @@ async function openSharing(page: Page, language = "ar", route = "morning", recov
       const originalRect = CanvasRenderingContext2D.prototype.roundRect;
       const artwork = new WeakMap<
         CanvasRenderingContext2D,
-        { brandBottom?: number; wordmarkBottom?: number; panelBottom: number }
+        { brandBottom?: number; wordmarkBottom?: number; panelTop?: number; panelId?: number; panelBottom: number }
       >();
       const artworkChecks: { kind: string; clearance: number }[] = [];
+      let panelId = 0;
+      const cardInk: {
+        text: string;
+        left: number;
+        right: number;
+        top: number;
+        bottom: number;
+        panelTop: number;
+        panelBottom: number;
+        size: number;
+        panelId: number;
+      }[] = [];
+      (window as unknown as { cardInk: unknown[] }).cardInk = cardInk;
       (window as unknown as { artworkChecks: unknown[] }).artworkChecks = artworkChecks;
       const pills = new WeakMap<
         CanvasRenderingContext2D,
@@ -36,6 +49,8 @@ async function openSharing(page: Page, language = "ar", route = "morning", recov
         if (this.canvas.width === 1080 && width === 952) {
           const bounds = artwork.get(this) ?? { panelBottom: 0 };
           bounds.panelBottom = Math.max(bounds.panelBottom, y + height);
+          bounds.panelTop = y;
+          bounds.panelId = ++panelId;
           artwork.set(this, bounds);
         }
         if (this.canvas.width === 1080 && height === 50) {
@@ -64,6 +79,19 @@ async function openSharing(page: Page, language = "ar", route = "morning", recov
           if (text === "wa-zaker.com" || /^(?:Card |بطاقة )/u.test(text))
             artworkChecks.push({ kind: "footer", clearance: y - bounds.actualBoundingBoxAscent - state.panelBottom });
           artwork.set(this, state);
+          if (state.panelTop !== undefined && text !== "wa-zaker.com" && !/^(?:Card |بطاقة )/u.test(text)) {
+            cardInk.push({
+              text,
+              left: x - bounds.actualBoundingBoxLeft,
+              right: x + bounds.actualBoundingBoxRight,
+              top: y - bounds.actualBoundingBoxAscent,
+              bottom: y + bounds.actualBoundingBoxDescent,
+              panelTop: state.panelTop,
+              panelBottom: state.panelBottom,
+              size: Number(this.font.match(/(\d+)px/u)?.[1]),
+              panelId: state.panelId!,
+            });
+          }
         }
         const pill = pills.get(this);
         if (pill) {
@@ -266,7 +294,34 @@ test("sharing preview supports readable Arabic, sources and accessible controls 
       (window as unknown as { pillEvidence: { top: number; height: number; centered: number; gap: number }[] })
         .pillEvidence,
   );
-  expect(pills.length).toBeGreaterThan(0);
+  expect(pills).toEqual([]);
+  const ink = await page.evaluate(
+    () =>
+      (
+        window as unknown as {
+          cardInk: {
+            text: string;
+            left: number;
+            right: number;
+            top: number;
+            bottom: number;
+            panelTop: number;
+            panelBottom: number;
+            size: number;
+          }[];
+        }
+      ).cardInk,
+  );
+  expect(ink.some((line) => line.size === 34)).toBe(true);
+  expect(ink.some((line) => line.size === 30)).toBe(true);
+  for (const line of ink) {
+    expect(line.text).not.toMatch(/[0-9۰-۹]/u);
+    expect(line.text).not.toBe("المصدر");
+    expect(line.left).toBeGreaterThanOrEqual(110);
+    expect(line.right).toBeLessThanOrEqual(970);
+    expect(line.top).toBeGreaterThanOrEqual(line.panelTop + 23);
+    expect(line.bottom).toBeLessThanOrEqual(line.panelBottom - 23);
+  }
   const artworkChecks = await page.evaluate(
     () => (window as unknown as { artworkChecks: { kind: string; clearance: number }[] }).artworkChecks,
   );
@@ -283,9 +338,9 @@ test("sharing preview supports readable Arabic, sources and accessible controls 
   for (const measure of measures) {
     expect(measure.width).toBeLessThanOrEqual(858);
     expect(measure.direction).toBe("rtl");
-    expect(measure.alignment).toBe("right");
-    expect(measure.y + measure.descent).toBeLessThanOrEqual(measure.canvasHeight - 280);
-    expect(measure.x - measure.width).toBeGreaterThanOrEqual(110);
+    expect(["right", "center"]).toContain(measure.alignment);
+    expect(measure.y + measure.descent).toBeLessThanOrEqual(measure.canvasHeight - 170);
+    expect(measure.x - measure.width / (measure.alignment === "center" ? 2 : 1)).toBeGreaterThanOrEqual(110);
   }
   const results = await new AxeBuilder({ page })
     .include('[data-testid="collection-share-modal"]')
@@ -303,6 +358,46 @@ test("sharing preview supports readable Arabic, sources and accessible controls 
     element.querySelector<HTMLElement>('[data-testid="sharing-scroll"]')!.scrollTop = 0;
   });
   await page.screenshot({ path: testInfo.outputPath("sharing-collection.png") });
+});
+
+test("compact sources are optional and never exceed two image lines @cross-browser", async ({ page }, testInfo) => {
+  const modal = await openSharing(page, "ar");
+  await expect(modal.getByText("جارٍ تجهيز بقية البطاقات…")).toHaveCount(0);
+  const sourceLines = await page.evaluate(() =>
+    (window as unknown as { cardInk: { text: string; size: number; panelId: number }[] }).cardInk.filter(
+      (line) => line.size === 34,
+    ),
+  );
+  expect(sourceLines.length).toBeGreaterThan(0);
+  expect(sourceLines.some((line) => line.text.includes("٢٠٨٨"))).toBe(true);
+  expect(sourceLines[0]!.text).not.toContain("حصن المسلم");
+  for (const id of new Set(sourceLines.map((line) => line.panelId)))
+    expect(sourceLines.filter((line) => line.panelId === id).length).toBeLessThanOrEqual(2);
+  const download = page.waitForEvent("download");
+  await modal.getByRole("button", { name: "حفظ", exact: true }).click();
+  await (await download).saveAs(testInfo.outputPath("compact-sources.png"));
+  await modal.getByText("تخصيص المحتوى", { exact: true }).click();
+  const checkbox = modal.getByRole("checkbox", { name: "إضافة المصادر", exact: true });
+  await expect(checkbox).toBeChecked();
+  const previous = await modal.getByRole("img").first().getAttribute("src");
+  await page.evaluate(() => {
+    (window as unknown as { cardInk: unknown[] }).cardInk.length = 0;
+  });
+  await checkbox.uncheck();
+  await expect(modal.getByRole("img").first()).not.toHaveAttribute("src", previous!);
+  await expect(modal.getByText("جارٍ تجهيز بقية البطاقات…")).toHaveCount(0);
+  expect(
+    await page.evaluate(() =>
+      (window as unknown as { cardInk: { size: number }[] }).cardInk.some((line) => line.size === 34),
+    ),
+  ).toBe(false);
+  const withoutSources = page.waitForEvent("download");
+  await modal.getByRole("button", { name: "حفظ", exact: true }).click();
+  await (await withoutSources).saveAs(testInfo.outputPath("compact-no-sources.png"));
+  await modal.getByRole("button", { name: "نص", exact: true }).click();
+  await expect(modal.getByRole("textbox")).not.toHaveValue(/مسلم|حصن المسلم/u);
+  await checkbox.check();
+  await expect(modal.getByRole("textbox")).toHaveValue(/حصن المسلم/u);
 });
 
 test("sharing works offline with English meaning and exact text/link alternatives @cross-browser", async ({ page }) => {
@@ -449,7 +544,9 @@ test("gold cards support QR, keyboard navigation and enlarged text", async ({ pa
   const modal = await openSharing(page, "en", "evening");
   await expect(modal.getByText("Preparing the remaining cards…")).toHaveCount(0);
   await modal.getByText("Customize content", { exact: true }).click();
+  const previousImage = await modal.getByRole("img").first().getAttribute("src");
   await modal.getByRole("checkbox", { name: "Add a QR link" }).check();
+  await expect(modal.getByRole("img").first()).not.toHaveAttribute("src", previousImage!);
   await expect(modal.getByText("Preparing the remaining cards…")).toHaveCount(0);
   const preview = modal.getByRole("button", { name: "Enlarge preview" }).first();
   await preview.focus();
@@ -458,7 +555,7 @@ test("gold cards support QR, keyboard navigation and enlarged text", async ({ pa
   await page.keyboard.press("Home");
   await expect(modal.getByRole("button", { name: "Previous card" })).toBeDisabled();
   // A valid PNG can still lose font glyphs if their exact face is not ready.
-  const badgeInk = await modal
+  const websiteInk = await modal
     .getByRole("img")
     .first()
     .evaluate((element) => {
@@ -471,10 +568,10 @@ test("gold cards support QR, keyboard navigation and enlarged text", async ({ pa
       const pixels = ctx.getImageData(400, canvas.height - 125, 280, 30).data;
       let ink = 0;
       for (let i = 0; i < pixels.length; i += 4)
-        if (pixels[i]! < 40 && pixels[i + 1]! < 50 && pixels[i + 2]! < 70) ink++;
+        if (pixels[i]! > 180 && pixels[i + 1]! > 150 && pixels[i + 2]! < 180) ink++;
       return ink;
     });
-  expect(badgeInk).toBeGreaterThan(100);
+  expect(websiteInk).toBeGreaterThan(100);
   const imageDownload = page.waitForEvent("download");
   await modal.getByRole("button", { name: "Save", exact: true }).click();
   await (await imageDownload).saveAs(testInfo.outputPath("gold-collection-qr.png"));

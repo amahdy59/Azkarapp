@@ -30,6 +30,7 @@ import {
   defaultShareAppearance,
   getShareText,
   getShareRepetitionLabel,
+  shareDisplayDigits,
   getShareUrl,
   toShareItem,
   ShareFitError,
@@ -98,6 +99,8 @@ export function CollectionShareModal({
   const [pronunciation, setPronunciation] = useState(false);
   const [benefit, setBenefit] = useState(false);
   const [qr, setQr] = useState(false);
+  const [subtitle, setSubtitle] = useState(false);
+  const [source, setSource] = useState(true);
   const [mode, setMode] = useState<"image" | "text" | "link">("image");
   const [inspect, setInspect] = useState(false);
   const [pages, setPages] = useState<GeneratedCollectionStoryCard[]>([]);
@@ -139,8 +142,16 @@ export function CollectionShareModal({
       ? t(exportLanguage, "shareStudio.singleCollectionTitle", { collection: collectionName })
       : collectionName;
   const content = useMemo(
-    () => ({ meaning, wordMeanings: wordMeanings && exportLanguage === "ar", pronunciation, benefit, qr }),
-    [meaning, wordMeanings, exportLanguage, pronunciation, benefit, qr],
+    () => ({
+      meaning,
+      wordMeanings: wordMeanings && exportLanguage === "ar",
+      pronunciation,
+      benefit,
+      qr,
+      subtitle,
+      source,
+    }),
+    [meaning, wordMeanings, exportLanguage, pronunciation, benefit, qr, subtitle, source],
   );
   const exportItems = useMemo<ShareItem[]>(
     () =>
@@ -335,6 +346,7 @@ export function CollectionShareModal({
     pronunciation && t(language, "shareStudio.transliteration"),
     benefit && t(language, "shareStudio.benefit"),
     mode === "image" && qr && t(language, "shareStudio.qr"),
+    mode === "image" && subtitle && t(language, "shareStudio.subtitle"),
   ]
     .filter(Boolean)
     .join(" · ");
@@ -522,7 +534,9 @@ export function CollectionShareModal({
                       <div className="pb-3 space-y-4">
                         {current.layout.fragments.map((fragment, index) => (
                           <div key={`${fragment.item.id}-${index}`}>
-                            {fragment.item.title && <h3 className="font-semibold">{fragment.item.title}</h3>}
+                            {fragment.item.title && (
+                              <h3 className="font-semibold">{shareDisplayDigits(fragment.item.title)}</h3>
+                            )}
                             <p className="text-sm text-muted-foreground">
                               {fragment.item.reminder
                                 ? t(exportLanguage, "shareStudio.reminder")
@@ -536,12 +550,12 @@ export function CollectionShareModal({
                                   dir={section.direction}
                                   className={`whitespace-pre-wrap break-words text-base leading-relaxed ${section.direction === "rtl" ? "zikr-text" : ""}`}
                                 >
-                                  {section.key !== "arabic" && (
+                                  {section.key !== "arabic" && section.key !== "source" && (
                                     <strong className="block text-sm">
                                       {t(exportLanguage, `shareStudio.${section.key}`)}
                                     </strong>
                                   )}
-                                  {section.text}
+                                  {shareDisplayDigits(section.displayText ?? section.text)}
                                 </p>
                               ),
                             )}
@@ -863,6 +877,12 @@ export function CollectionShareModal({
                     </div>
                     {[
                       {
+                        key: "includeSources",
+                        value: source,
+                        set: setSource,
+                        available: exportItems.some((item) => item.sourceReference),
+                      },
+                      {
                         key: "meaning",
                         value: meaning,
                         set: setMeaning,
@@ -892,6 +912,12 @@ export function CollectionShareModal({
                         set: setQr,
                         available: mode === "image" && Boolean(url) && exportItems.some((item) => !item.reminder),
                       },
+                      {
+                        key: "subtitle",
+                        value: subtitle,
+                        set: setSubtitle,
+                        available: mode === "image" && !single && Boolean(collectionSubtitle),
+                      },
                     ]
                       .filter((option) => option.available)
                       .map((option) => (
@@ -906,7 +932,7 @@ export function CollectionShareModal({
                           <span>{t(language, `shareStudio.${option.key}`)}</span>
                         </label>
                       ))}
-                    <p className="text-xs text-muted-foreground">{t(language, "shareStudio.sourceAlways")}</p>
+                    <p className="text-xs text-muted-foreground">{t(language, "shareStudio.sourceHint")}</p>
                     {exportItems.some((item) => item.reminder) && (
                       <p className="mt-2 text-xs text-muted-foreground">{t(language, "shareStudio.reminderHint")}</p>
                     )}
