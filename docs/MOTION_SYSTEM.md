@@ -145,4 +145,8 @@ Animations must not degrade the user experience:
 
 ## Reading-text transition — 2026-10-04
 
+Enabling reduced motion during an unfinished transition cancels the outgoing presence boundary immediately, without waiting for the earlier exit animation.
+
+Interruption refinement (2026-10-05): when another selection arrives before the current transition settles, cancel that animation generation and show the latest entry immediately. Every further input remains immediate until 340ms (one exit/arrival interval) passes without a selection change. Do not queue intermediate entries or replay their counts. Ordinary navigation preserves 100ms exit/240ms arrival. Reduced motion retains one stable frame while entry-local reading controls reset by identity. Reset/restore cancels delayed completion advance; normal taps retain 15ms haptics and the final tap uses only the existing completion pattern.
+
 ReadingTextTransition shares a non-bouncing sheet-like transition between zikr entries in Reader and expanded audio. Exit translates 20px over 100ms with the existing exit curve; arrival translates 28px over 240ms with cubic-bezier(0.22, 1, 0.36, 1), easing to rest. Travel follows language direction and reverses for Previous. Only the reading text moves; controls and page geometry stay fixed. Initial content and reduced-motion users receive immediate stable text. It does not animate canonical Mushaf pages or add persistence.

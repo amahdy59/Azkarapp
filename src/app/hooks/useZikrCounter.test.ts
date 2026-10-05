@@ -44,6 +44,34 @@ function tapEventOn(target: Element) {
 }
 
 describe("useZikrCounter", () => {
+  it("counts a burst exactly once per tap, with a single stronger completion cue", () => {
+    const onCount = vi.fn();
+    const { result, onComplete, vibrate } = setup({ hapticFeedback: true, onCount });
+    act(() => {
+      for (let i = 0; i < 10; i++) result.current.handleTap();
+    });
+    expect(result.current.count).toBe(3);
+    expect(onCount).toHaveBeenCalledTimes(3);
+    expect(onComplete).toHaveBeenCalledOnce();
+    expect(vibrate.mock.calls).toEqual([[15], [15], [[30, 50, 30, 50, 50]]]);
+  });
+
+  it("cancels a completed entry's pending advance when reset", () => {
+    vi.useFakeTimers();
+    try {
+      const view = setup({ z: makeZikr({ repetitionCount: 1 }) });
+      act(() => view.result.current.handleTap());
+      act(() => view.result.current.handleReset());
+      act(() => vi.runAllTimers());
+      expect(view.onAdvance).not.toHaveBeenCalled();
+      expect(view.result.current.count).toBe(0);
+      act(() => view.result.current.handleTap());
+      expect(view.result.current.count).toBe(1);
+      view.unmount();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
   it("resets an open reader at the progress day boundary", () => {
     const z = makeZikr({ id: "boundary", repetitionCount: 33 });
     const { result, rerender } = renderHook(

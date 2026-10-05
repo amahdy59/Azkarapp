@@ -25,6 +25,7 @@ import {
 } from "./SettingsPanels";
 
 export function SettingsScreen({
+  onReviewUpdate,
   audioController,
   themeMode,
   language,
@@ -353,6 +354,7 @@ export function SettingsScreen({
       case "about":
         return (
           <AboutPanel
+            onReviewUpdate={onReviewUpdate}
             language={language}
             onHelp={() => openSubPanel("help")}
             onLegal={() => openSubPanel("legal")}

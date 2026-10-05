@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-05.3",
+  "release": "2026-10-05.4",
   "ar": [
-    "تجمع بطاقة الإرشادات تعليمات العد واختصارات لوحة المفاتيح على الكمبيوتر والجهاز اللوحي.",
-    "أصبحت أزرار قائمة الأذكار منفصلة وواضحة، مع مساحة أوسع للقراءة ونص يتوسط المشغل الموسّع.",
-    "خلفية الرئيسية ثابتة، وبطاقات الأذكار تظهر أسرع، مع حركة أهدأ للتقدم وتأكيد أوضح عند النسخ.",
-    "عادت التسجيلات العربية المراجَعة للأذكار المستعادة ودعاء اللهم مصرف القلوب، مع بقاء التسجيلات الإنجليزية."
+    "التنقل السريع بين الأذكار يعرض اختيارك الأخير، والعد المتتابع يحفظ كل ضغطة دون تغيير توقيت الحركة المعتاد.",
+    "اختيار «لاحقًا» يؤجل تذكير التحديث نفسه لمدة ٢٤ ساعة، ويمكن مراجعته مبكرًا من الإعدادات حول التطبيق.",
+    "نافذة المشاركة تحافظ على أزرارها داخل الشاشة عند تغيير حجمها أو تكبير النص.",
+    "رسائل التقدم تدعوك للاستمرار بهدوء، مع بقاء إنجازاتك وأيام مواظبتك واضحة."
   ],
   "en": [
-    "Counting instructions and keyboard help now share one card on desktop and tablet.",
-    "Zikr list controls have their own space, with more reading room and centered expanded-player text.",
-    "Home stays still, zikr cards appear sooner, progress moves smoothly and copying gives clearer feedback.",
-    "Reviewed Arabic recordings are restored for the affected adhkar and the Turner of Hearts dua, alongside English narration."
+    "Rapid zikr navigation shows your latest choice, and consecutive counting taps are preserved with the usual motion timing.",
+    "Later pauses the same update reminder for 24 hours. You can review it sooner in Settings, About.",
+    "Sharing actions stay within the screen when resizing or enlarging text.",
+    "Progress messages invite gentle continuation while keeping your completions and consecutive practice days clear."
   ]
 }

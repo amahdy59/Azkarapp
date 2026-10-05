@@ -14,6 +14,7 @@ import type { SettingsSubScreen } from "./SettingsPanels";
 
 /** The screen's application-facing contract, kept separate from its responsive panel composition. */
 export interface SettingsScreenProps {
+  onReviewUpdate?: () => void;
   audioController: AudioController | null;
   themeMode: ThemeMode;
   language: AppLanguage;

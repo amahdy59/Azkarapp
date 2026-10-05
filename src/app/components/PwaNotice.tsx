@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { useId, type Ref } from "react";
 import { Button } from "./ui/button";
 
 export function PwaNotice({
@@ -12,6 +12,7 @@ export function PwaNotice({
   isActionLoading,
   statusMessage,
   errorMessage,
+  actionRef,
 }: {
   title: string;
   body?: string;
@@ -23,6 +24,7 @@ export function PwaNotice({
   isActionLoading?: boolean;
   statusMessage?: string;
   errorMessage?: string;
+  actionRef?: Ref<HTMLButtonElement>;
 }) {
   const titleId = useId();
 
@@ -73,6 +75,7 @@ export function PwaNotice({
         </Button>
         {actionLabel && onAction && (
           <Button
+            ref={actionRef}
             type="button"
             onClick={onAction}
             disabled={isActionLoading}

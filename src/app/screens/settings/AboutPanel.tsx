@@ -31,6 +31,7 @@ function openMailto(email: string, subject: string) {
 }
 
 export function AboutPanel({
+  onReviewUpdate,
   language,
   onHelp,
   onLegal,
@@ -38,6 +39,7 @@ export function AboutPanel({
   onWhatsNew,
   onBack,
 }: {
+  onReviewUpdate?: () => void;
   language: AppLanguage;
   onHelp: () => void;
   onLegal: () => void;
@@ -103,6 +105,16 @@ export function AboutPanel({
         <div>
           <SectionLabel label={t(language, "about.support")} />
           <div className="overflow-hidden rounded-3xl border border-border/40 bg-card shadow-raised">
+            {onReviewUpdate && (
+              <SupportRow
+                icon={<Sparkles size={18} className="text-background" />}
+                label={t(language, "pwa.reviewUpdate")}
+                onPress={(event) => {
+                  event.currentTarget.focus();
+                  onReviewUpdate();
+                }}
+              />
+            )}
             <SupportRow
               icon={<MessageChat size={18} className="text-background" />}
               label={t(language, "about.sendFeedback")}
@@ -206,14 +218,14 @@ function SupportRow({
   label: string;
   right?: React.ReactNode;
   hasDivider?: boolean;
-  onPress?: () => void;
+  onPress?: React.MouseEventHandler<HTMLButtonElement>;
 }) {
   return (
     <div className="relative">
       <button
         type="button"
         onClick={onPress}
-        className="flex h-[56px] w-full items-center gap-4 bg-card px-4 text-start transition-[background-color,opacity] active:opacity-70"
+        className="flex min-h-[56px] w-full items-center gap-4 bg-card px-4 py-3 text-start transition-[background-color,opacity] active:opacity-70"
       >
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-foreground">{icon}</div>
         <p className="flex-1 font-sans text-subtitle font-medium text-foreground">{label}</p>

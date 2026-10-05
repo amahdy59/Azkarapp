@@ -318,7 +318,26 @@ function AppContent({
     updatedNotes,
     dismissUpdatedNotes,
     updateAvailable,
+    hasWaitingUpdate,
+    reviewUpdate,
   } = usePwaLifecycle(selectedLang);
+  const updateActionRef = useRef<HTMLButtonElement>(null);
+  const updateReviewTrigger = useRef<HTMLElement | null>(null);
+  const handleReviewUpdate = useCallback(() => {
+    updateReviewTrigger.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    reviewUpdate();
+    updateActionRef.current?.focus();
+  }, [reviewUpdate]);
+  useEffect(() => {
+    const trigger = updateReviewTrigger.current;
+    if (!trigger) return;
+    if (updateAvailable) {
+      updateActionRef.current?.focus();
+    } else {
+      if (trigger.isConnected) trigger.focus();
+      updateReviewTrigger.current = null;
+    }
+  }, [updateAvailable]);
   const [showTransliteration, setShowTransliteration] = useState(initialState.settings.showTransliteration);
   const [showTranslation, setShowTranslation] = useState(initialState.settings.showTranslation);
   const [textSize, setTextSize] = useState<TextSizeOption>(initialState.settings.textSize);
@@ -2207,6 +2226,7 @@ function AppContent({
               )}
               {view === "settings" && (
                 <SettingsScreen
+                  onReviewUpdate={hasWaitingUpdate ? handleReviewUpdate : undefined}
                   audioController={audioController}
                   themeMode={themeMode}
                   language={selectedLang}
@@ -2430,7 +2450,8 @@ function AppContent({
             ) : updateAvailable ? (
               <PwaNotice
                 title={t(selectedLang, "pwa.updateTitle")}
-                body={releaseNotes ? undefined : t(selectedLang, "pwa.updateBody")}
+                actionRef={updateActionRef}
+                body={t(selectedLang, "pwa.deferHint")}
                 items={releaseNotes?.[selectedLang]}
                 actionLabel={t(selectedLang, "pwa.refresh")}
                 dismissLabel={t(selectedLang, "pwa.later")}

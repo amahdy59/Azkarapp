@@ -202,6 +202,28 @@ describe("Home wird card", () => {
     expect(screen.getByTestId("thimar-progress-badge")).toHaveTextContent(/10\s*of\s*20/);
     expect(screen.getByText(/Halfway through your daily path \(10 fruits\)/i)).toBeInTheDocument();
   });
+
+  it("keeps encouraging subtitles factual without a Quran wird", () => {
+    const { rerender } = render(<TodayRoutineGarden summary={makeSummary()} language="en" hideTabs onMedia={false} />);
+    expect(
+      screen.getByText("Completed 2 of 3 awrad (10 fruits). One remains whenever you are ready."),
+    ).toBeInTheDocument();
+    rerender(
+      <TodayRoutineGarden
+        summary={makeSummary({
+          today: { goldenLeafCount: 3, completedCategories: ["morning", "evening", "before_sleep"], extraLeafCount: 0 },
+        })}
+        language="en"
+        hideTabs
+        onMedia={false}
+      />,
+    );
+    expect(
+      screen.getByText("Today's awrad are complete and your palm has flourished (15 fruits)."),
+    ).toBeInTheDocument();
+    rerender(<TodayRoutineGarden summary={makeSummary()} language="ar" hideTabs onMedia={false} />);
+    expect(screen.getByText("أتممت ٢ من ٣ أوراد (١٠ ثمرة). بقي وِرد واحد حين تكون مستعدًا.")).toBeInTheDocument();
+  });
 });
 
 describe("GrowthEventStatus", () => {

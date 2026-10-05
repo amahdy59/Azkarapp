@@ -42,6 +42,7 @@ export function useZikrCounter({
   const [readerAnnouncement, setReaderAnnouncement] = useState("");
 
   const activeZikrId = useRef<string | null>(null);
+  const currentCount = useRef(0);
   const previousResetKey = useRef(resetKey);
   /**
    * Partial tallies for every zikr visited in this reading session, keyed by
@@ -80,6 +81,7 @@ export function useZikrCounter({
     const remembered = Math.max(0, Math.min(partialCounts.current.get(z.id) ?? initialTally ?? 0, z.repetitionCount));
     const initialCount = isDone ? z.repetitionCount : remembered;
     const initialComplete = initialCount >= z.repetitionCount;
+    currentCount.current = initialCount;
     setCount(initialCount);
     setComplete(initialComplete);
     setJustCompleted(false);
@@ -101,16 +103,13 @@ export function useZikrCounter({
   }, []);
 
   const handleTap = useCallback(() => {
-    if (complete || !z) {
+    if (!z || activeZikrId.current !== z.id || currentCount.current >= z.repetitionCount) {
       return;
     }
 
-    const next = count + 1;
+    const next = ++currentCount.current;
     setCount(next);
     onCount?.();
-    if (hapticFeedback) {
-      vibrate(15);
-    }
 
     if (next >= z.repetitionCount) {
       partialCounts.current.delete(z.id);
@@ -134,6 +133,7 @@ export function useZikrCounter({
         onAdvance(idx);
       }, COUNTER_ADVANCE_DELAY_MS);
     } else {
+      if (hapticFeedback) vibrate(15);
       partialCounts.current.set(z.id, next);
       onPartialCountChange?.(z.id, next);
       if (next % 10 === 0 || next === Math.floor(z.repetitionCount / 2)) {
@@ -141,9 +141,7 @@ export function useZikrCounter({
       }
     }
   }, [
-    complete,
     z,
-    count,
     onCount,
     hapticFeedback,
     vibrate,
@@ -188,6 +186,9 @@ export function useZikrCounter({
   };
 
   const handleReset = () => {
+    if (advanceTimer.current) clearTimeout(advanceTimer.current);
+    advanceTimer.current = null;
+    currentCount.current = 0;
     if (z) {
       partialCounts.current.delete(z.id);
       onPartialCountChange?.(z.id, 0);
@@ -202,6 +203,9 @@ export function useZikrCounter({
     (targetCount: number) => {
       if (!z) return;
       const restored = Math.max(0, Math.min(targetCount, z.repetitionCount));
+      if (advanceTimer.current) clearTimeout(advanceTimer.current);
+      advanceTimer.current = null;
+      currentCount.current = restored;
       setCount(restored);
       const isNowComplete = restored >= z.repetitionCount;
       if (isNowComplete || restored === 0) {

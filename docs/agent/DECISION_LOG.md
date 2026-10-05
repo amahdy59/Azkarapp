@@ -1,5 +1,9 @@
 # Decision Log
 
+## Reading, update and sharing reliability — 2026-10-05
+
+The owner instructs applying all six recommendations reviewed in this conversation. Preserve ordinary 100ms exit/240ms arrival reading motion and existing feedback timings; interrupt unfinished motion on further navigation so the latest selection wins. Protect burst counting and cancel pending automatic advance on reset/restore. Later defers the same waiting release for 24 hours across navigation/reload, with Settings → About manual review and independent eligibility for a newer release. Give sharing a definite viewport height while retaining exact geometry assertions. Replace pressure-oriented interface copy in Arabic/English without changing factual progress or reviewed religious content. Verify browser engines, landscape, enlarged text, reduced motion, audio and accessibility; physical-device and human screen-reader checks remain pending until actual evidence exists. Existing repository release authority applies.
+
 ## Latest changes release review — 2026-10-04
 
 The owner authorizes reviewing and pushing all pending application/testing changes, superseding the earlier local-only restriction. Ask before altering owner edits. The owner approved current repetition progress in the footer, separate from header queue position; correcting two reviewed Masbaha references without wording/count changes; Reader source-only citation recovery; the English Translation display label with narrator identity retained in source metadata; and matching menu-selection documentation and keyboard coverage.

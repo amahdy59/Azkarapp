@@ -1,5 +1,7 @@
 # AI Improvement System Index
 
+[Reading, update and sharing reliability](phases/READING_AND_UPDATE_RELIABILITY.md) is the active owner-approved follow-up for rapid navigation/counting, release-specific update deferral, sharing geometry, encouraging copy and device/accessibility evidence.
+
 [Scoped Arabic audio restoration](phases/SCOPED_AUDIO_RESTORATION.md) records the owner-reviewed three-recording repair at new R2 paths, with other audio untouched and publication reserved for the owner's other session.
 
 [Navigation flake and browser timings](phases/NAVIGATION_FLAKE_AND_BROWSER_TIMINGS.md) records the WebKit deadline investigation, independent navigation cases, capture ownership and retained retry evidence.

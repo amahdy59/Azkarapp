@@ -3,6 +3,23 @@ import { describe, it, expect, vi } from "vitest";
 import { AboutPanel } from "./AboutPanel";
 
 describe("AboutPanel", () => {
+  it("offers manual review of a deferred update without applying it", () => {
+    const onReviewUpdate = vi.fn();
+    render(
+      <AboutPanel
+        language="en"
+        onReviewUpdate={onReviewUpdate}
+        onSources={() => undefined}
+        onBack={() => undefined}
+        onHelp={() => undefined}
+        onLegal={() => undefined}
+        onWhatsNew={() => undefined}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Review available update" }));
+    expect(onReviewUpdate).toHaveBeenCalledOnce();
+    expect(screen.getByRole("button", { name: "Review available update" })).toHaveFocus();
+  });
   it("renders Quran Word Meanings source row and calls onSources when clicked", () => {
     const onSources = vi.fn();
     const onBack = vi.fn();

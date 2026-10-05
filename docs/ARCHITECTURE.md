@@ -1,5 +1,9 @@
 # Application architecture
 
+Unavailable release notes preserve the existing deferral identity until a known release is fetched. Manual-review focus uses the shared button's React 18 ref forwarding to its native element.
+
+Update dismissal is device-local (`azkarapp.update-deferred.v1`), outside normalized progress/account sync. The waiting release and an expiry timestamp defer the same release for 24 hours across navigation and reload. New releases remain independently eligible; Settings → About can reopen the waiting prompt without applying it. Manual review moves focus to the update action and dismissal restores its trigger, including Safari pointer activation; automatic discovery does not move focus. Storage denial retains the current mounted-session choice. Async update-note results use request identity so stale responses cannot replace the latest prompt; deferral timers are released on unmount/application.
+
 This document describes Azkarapp's runtime structure and the boundaries maintainers must preserve. Update it whenever ownership, persistence, remote services, build behavior, or navigation materially changes.
 
 ## Runtime overview

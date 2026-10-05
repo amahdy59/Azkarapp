@@ -369,7 +369,7 @@ export function CollectionShareModal({
       describedById={descriptionId}
       testId="collection-share-modal"
       maxWidthClassName="max-w-5xl"
-      className="!max-h-[calc(100dvh-16px)] !w-[calc(100%-16px)] gap-0"
+      className="!h-[calc(100dvh-16px)] !max-h-[calc(100dvh-16px)] !w-[calc(100%-16px)] gap-0"
     >
       <div data-testid="sharing-scroll" className="min-h-0 flex-1 overflow-y-auto scroll-py-4">
         <div className="shrink-0 border-b border-border px-[16px] py-[12px] pe-[96px]">

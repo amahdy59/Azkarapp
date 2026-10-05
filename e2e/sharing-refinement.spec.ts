@@ -524,7 +524,9 @@ test("long surahs share sourced reminders with exact Mushaf links", async ({ pag
   }
 });
 
-test("selection, theme changes and persistent actions preserve user control", async ({ page }, testInfo) => {
+test("selection, theme changes and persistent actions preserve user control @cross-browser", async ({
+  page,
+}, testInfo) => {
   const modal = await openSharing(page, "en");
   await expect(modal.getByText("Preparing the remaining cards…")).toHaveCount(0);
   await modal.getByRole("button", { name: "Next card", exact: true }).click();
@@ -547,6 +549,17 @@ test("selection, theme changes and persistent actions preserve user control", as
   const box = await actions.boundingBox();
   expect(box!.y).toBeGreaterThanOrEqual(0);
   expect(box!.y + box!.height).toBeLessThanOrEqual(700);
+  // Keep the exact viewport assertion through live resize and font reflow.
+  for (const height of [699, 701, 700]) {
+    await page.setViewportSize({ width: 320, height });
+    await actions.evaluate(async () => {
+      await document.fonts.ready;
+    });
+    const geometry = await actions.boundingBox();
+    expect(geometry!.y).toBeGreaterThanOrEqual(0);
+    expect(geometry!.y + geometry!.height).toBeLessThanOrEqual(height);
+    expect(await modal.getByTestId("sharing-scroll").evaluate((element) => element.clientHeight)).toBeGreaterThan(0);
+  }
   for (const checkbox of await modal.getByRole("checkbox", { name: /^Select card / }).all()) {
     const label = checkbox.locator("..");
     expect(await label.evaluate((element) => element.scrollWidth - element.clientWidth)).toBeLessThanOrEqual(1);

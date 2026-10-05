@@ -40,7 +40,7 @@ describe("ProgressScreen", () => {
 
     // Summary Strip in Day view
     expect(screen.getByTestId("progress-summary-strip")).toBeInTheDocument();
-    expect(screen.getByText("سلسلة المواظبة")).toBeInTheDocument();
+    expect(screen.getByText("أيام المواظبة المتتالية")).toBeInTheDocument();
     expect(screen.getByText("النخيل المثمر")).toBeInTheDocument();
 
     // Share action in Header

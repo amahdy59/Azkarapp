@@ -1,8 +1,25 @@
 import { render, screen } from "@testing-library/react";
+import { createRef } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { PwaNotice } from "./PwaNotice";
 
 describe("PwaNotice", () => {
+  it("lets manual update review focus its native action", () => {
+    const actionRef = createRef<HTMLButtonElement>();
+    render(
+      <PwaNotice
+        title="An update is ready"
+        actionLabel="Refresh"
+        dismissLabel="Later"
+        actionRef={actionRef}
+        onAction={vi.fn()}
+        onDismiss={vi.fn()}
+      />,
+    );
+    expect(actionRef.current).toBe(screen.getByRole("button", { name: "Refresh" }));
+    actionRef.current?.focus();
+    expect(screen.getByRole("button", { name: "Refresh" })).toHaveFocus();
+  });
   it("limits announcements to the changing status and exposes busy state", () => {
     render(
       <PwaNotice

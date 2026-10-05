@@ -1,5 +1,12 @@
 # Engineering and release checklist
 
+## Reading reliability follow-up
+
+- Exercise rapid Next/Previous, reversal, count bursts before rendering and reset during completion. Latest text/counter must match, partial counts must survive return/reload, and old completion must not advance another entry.
+- Verify Later across repeated update events, navigation and reload; the same release is deferred 24 hours, a new release can appear, and About permits manual review without applying it.
+- Preserve exact sharing bounds through 320px/200% text, live resize, font settling and short landscape windows. Passing retries do not establish the cause of a prior geometry failure.
+- Browser evidence covers Arabic/English, reduced motion, keyboard/focus, target geometry, audio recovery and automated accessibility. Record physical checks separately in `docs/agent/evidence/reading-reliability/DEVICE_CHECKLIST.md`; do not claim human assistive-technology or device performance results from emulation.
+
 This document makes the project checklist auditable. A recommendation is **met** only when its automated check passes or a dated manual test record exists. “Not applicable” requires a reason in the pull request.
 
 ## Automated gates

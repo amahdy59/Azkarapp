@@ -4,6 +4,7 @@ import { t } from "../i18n";
 import { APP_RELEASE } from "../releaseStamp";
 import { loadReleaseNotes, markReleaseSeen, readSeenRelease, type ReleaseNotes } from "../releaseNotes";
 import { escapeStaleServiceWorker, rememberUpdateAttempt } from "../pwaUpdate";
+import { deferUpdate, readUpdateDeferral, remainingUpdateDeferral } from "../updateDeferral";
 import type { AppLanguage, BeforeInstallPromptEvent } from "../types";
 
 const INSTALL_DISMISSED_KEY = "azkarapp.install-dismissed";
@@ -18,6 +19,7 @@ function readInstallDismissed() {
 
 export function usePwaLifecycle(language: AppLanguage) {
   const [updateAvailable, setUpdateAvailable] = useState(false);
+  const [hasWaitingUpdate, setHasWaitingUpdate] = useState(false);
   const [releaseNotes, setReleaseNotes] = useState<ReleaseNotes | null>(null);
   const [updatedNotes, setUpdatedNotes] = useState<ReleaseNotes | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -27,13 +29,32 @@ export function usePwaLifecycle(language: AppLanguage) {
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [installDismissed, setInstallDismissed] = useState(readInstallDismissed);
   const statusTimer = useRef<number | undefined>(undefined);
+  const deferralTimer = useRef<number | undefined>(undefined);
+  const [initialDeferral] = useState(readUpdateDeferral);
+  const deferredUpdate = useRef(initialDeferral);
+  const updateRequest = useRef(0);
+
+  const showWaitingUpdate = useCallback((notes: ReleaseNotes | null) => {
+    setHasWaitingUpdate(true);
+    window.clearTimeout(deferralTimer.current);
+    setReleaseNotes(notes);
+    // A failed/offline notes fetch must not undo the reader's known choice.
+    const release = notes?.release || deferredUpdate.current?.release || "unknown";
+    const remaining = remainingUpdateDeferral(deferredUpdate.current, release);
+    setUpdateAvailable(remaining === 0);
+    if (remaining > 0) {
+      deferralTimer.current = window.setTimeout(() => setUpdateAvailable(true), remaining);
+    }
+  }, []);
 
   useEffect(() => {
+    let active = true;
     const handleUpdate = () => {
-      setUpdateAvailable(true);
+      const request = ++updateRequest.current;
       setPwaError("");
-      setReleaseNotes(null);
-      void loadReleaseNotes().then(setReleaseNotes);
+      void loadReleaseNotes().then((notes) => {
+        if (active && request === updateRequest.current) showWaitingUpdate(notes);
+      });
     };
     const handleInstallPrompt = (event: Event) => {
       event.preventDefault();
@@ -48,11 +69,12 @@ export function usePwaLifecycle(language: AppLanguage) {
     window.addEventListener("azkar-update-failed", handleUpdateFailure);
     window.addEventListener("beforeinstallprompt", handleInstallPrompt);
     return () => {
+      active = false;
       window.removeEventListener("azkar-update-available", handleUpdate);
       window.removeEventListener("azkar-update-failed", handleUpdateFailure);
       window.removeEventListener("beforeinstallprompt", handleInstallPrompt);
     };
-  }, [language]);
+  }, [language, showWaitingUpdate]);
 
   /**
    * Tell "here is what you just got" from "here is what is waiting for you".
@@ -74,8 +96,9 @@ export function usePwaLifecycle(language: AppLanguage) {
     if (typeof navigator !== "undefined" && !navigator.onLine) return;
 
     let cancelled = false;
+    const request = ++updateRequest.current;
     void loadReleaseNotes().then((notes) => {
-      if (cancelled || !notes?.release) return;
+      if (cancelled || request !== updateRequest.current || !notes?.release) return;
 
       if (APP_RELEASE && notes.release !== APP_RELEASE) {
         /* Still on the old build after asking for the new one. The worker
@@ -88,9 +111,8 @@ export function usePwaLifecycle(language: AppLanguage) {
           getRegistration: () => navigator.serviceWorker?.getRegistration?.() ?? Promise.resolve(undefined),
           reload: () => window.location.reload(),
         }).then((escalated) => {
-          if (escalated) return;
-          setReleaseNotes(notes);
-          setUpdateAvailable(true);
+          if (cancelled || request !== updateRequest.current || escalated) return;
+          showWaitingUpdate(notes);
         });
         return;
       }
@@ -106,11 +128,13 @@ export function usePwaLifecycle(language: AppLanguage) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [showWaitingUpdate]);
 
   useEffect(() => () => window.clearTimeout(statusTimer.current), []);
+  useEffect(() => () => window.clearTimeout(deferralTimer.current), []);
 
   const applyUpdate = useCallback(() => {
+    window.clearTimeout(deferralTimer.current);
     setPwaError("");
     setIsUpdating(true);
     // The notes were on screen when this was tapped, so the recap after the
@@ -125,8 +149,14 @@ export function usePwaLifecycle(language: AppLanguage) {
   }, [releaseNotes]);
 
   const dismissUpdate = useCallback(() => {
-    setUpdateAvailable(false);
-    setReleaseNotes(null);
+    ++updateRequest.current;
+    deferredUpdate.current = deferUpdate(releaseNotes?.release || deferredUpdate.current?.release || "unknown");
+    showWaitingUpdate(releaseNotes);
+  }, [releaseNotes, showWaitingUpdate]);
+
+  const reviewUpdate = useCallback(() => {
+    window.clearTimeout(deferralTimer.current);
+    setUpdateAvailable(true);
   }, []);
 
   const dismissUpdatedNotes = useCallback(() => {
@@ -176,5 +206,7 @@ export function usePwaLifecycle(language: AppLanguage) {
     releaseNotes,
     updatedNotes,
     updateAvailable,
+    hasWaitingUpdate,
+    reviewUpdate,
   };
 }
