@@ -10,12 +10,14 @@ Make notification settings easier to find and configure while preserving local c
 - Added a test notification action and deployment-aware notification identity.
 - Added prayer lead choices at 0, 5, 10, 15, 20 and 30 minutes, plus per-prayer selection.
 - Added deployment-aware notification identity and URL data for a future push boundary.
+- Improved mobile Reader artwork stacking and reduced excess vertical spacing on compact screens.
 
 ## Files changed
 
 - `src/app/types.ts`, `src/app/state.ts`, `src/app/hooks/useForegroundReminders.ts`
 - `src/app/screens/settings/NotificationsPanel.tsx` and tests
-- `src/app/i18n/ar.ts`, `src/app/i18n/en.ts`, `vite.config.ts`, `src/sw.ts`
+- `src/app/i18n/ar.ts`, `src/app/i18n/en.ts`
+- `src/app/components/LayoutShells.tsx`, `src/app/components/ReaderSceneArt.tsx`, `src/app/components/reader-scene-art.css`, `src/app/screens/ReaderScreen.tsx`
 - `README.md`, `docs/ARCHITECTURE.md`, `public/release-notes.json`
 
 ## User-visible behavior
