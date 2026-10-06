@@ -762,8 +762,14 @@ export function KhatmahReaderScreen({
         style={{ maxWidth: "calc(100vw - 7.5rem)" }}
         className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
-        <span className="inline-flex h-8 max-w-full items-center justify-center gap-1 rounded-full border border-border/80 bg-card/90 px-3 text-foreground shadow-xs backdrop-blur-md transition-colors group-hover:bg-muted group-active:bg-muted">
-          <span className="arabic-ui truncate text-xs font-bold leading-none">{surahName}</span>
+        <span className="inline-flex h-8 max-w-full items-center justify-center gap-2 rounded-full border border-border/80 bg-card/90 px-3 text-foreground shadow-xs backdrop-blur-md transition-colors group-hover:bg-muted group-active:bg-muted">
+          <span className="arabic-ui truncate text-xs font-bold leading-none">{surahShortName}</span>
+          <span className="text-xs select-none" style={{ opacity: 0.6 }}>
+            •
+          </span>
+          <span className="arabic-ui shrink-0 text-xs font-normal leading-none" style={{ opacity: 0.8 }}>
+            {t(language, "mushaf.juzLabel", { juz: formatNumerals(juzNumber, language) })}
+          </span>
           <ChevronDown
             size={13}
             className="ms-0.5 shrink-0 select-none text-muted-foreground opacity-70"
@@ -880,7 +886,7 @@ export function KhatmahReaderScreen({
   const wirdProgressBar =
     wirdGoal > 0 ? (
       <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-0.5 bg-current/10"
+        className="pointer-events-none w-full h-1 overflow-hidden bg-foreground/10"
         role="progressbar"
         aria-valuemin={0}
         aria-valuemax={wirdGoal}

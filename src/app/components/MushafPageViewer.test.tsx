@@ -12,6 +12,15 @@ describe("AyahMarker", () => {
     render(<AyahMarker number="6" language="en" />);
     expect(screen.getByRole("img", { name: "Ayah 6" })).toBeInTheDocument();
   });
+
+  it("renders the Madani Octagram Rosette with high contrast numeral text", () => {
+    const { container } = render(<AyahMarker number="6" language="ar" />);
+    const marker = screen.getByRole("img", { name: "الآية ٦" });
+    expect(marker).toBeInTheDocument();
+    expect(container.querySelector('rect[transform="rotate(45 16 16)"]')).not.toBeNull();
+    const textSpan = marker.querySelector("span");
+    expect(textSpan).toHaveClass("text-foreground");
+  });
 });
 
 describe("MushafPageViewer", () => {

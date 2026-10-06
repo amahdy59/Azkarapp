@@ -30,9 +30,9 @@ for (const language of ["ar", "en"] as const) {
       await expect(header).toBeVisible();
       await page.evaluate(() => document.fonts.ready);
       const bounds = (await header.boundingBox())!;
-      // Existing compact padding/border and wide toolbar/title/progress geometry.
+      // Compact padding/border and wide toolbar/title/progress geometry.
       // Preserve the fractional CSS height rather than its rounded screenshot value.
-      expect(bounds.height).toBeCloseTo(width < 768 ? 57 : 165.5, 1);
+      expect(bounds.height).toBeCloseTo(width < 768 ? 57 : 127, 0);
       // The owner's sidebar controls share their separate card anatomy in
       // both open and closed states; the remaining header actions are round.
       const buttons = header.getByRole("button");

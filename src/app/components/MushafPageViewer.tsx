@@ -67,31 +67,45 @@ export function AyahMarker({
       role="img"
       aria-label={t(language, "reader.ayahLabel", { ayah: displayNum })}
     >
-      {/* Drawn in the page's own ink, not the accent colour. A coloured
-          medallion every few words pulled the eye out of the line; print sets
-          the marker in the same ink as the text it closes. */}
-      <svg
-        width="1.15em"
-        height="1.15em"
-        viewBox="0 0 32 32"
-        fill="none"
-        className={isOled ? "text-white" : "text-current opacity-75"}
-        aria-hidden="true"
-      >
-        <circle cx="16" cy="16" r="14.5" stroke="currentColor" strokeWidth="1.5" className="opacity-90" />
+      {/* Authentic Madani Octagram Rosette in manuscript gold ink */}
+      <svg width="1.3em" height="1.3em" viewBox="0 0 32 32" fill="none" className="select-none" aria-hidden="true">
+        <rect
+          x="5.5"
+          y="5.5"
+          width="21"
+          height="21"
+          rx="3.5"
+          stroke="var(--mushaf-rule-ink, var(--accent, #d4b47c))"
+          strokeWidth="1.2"
+          strokeOpacity="0.85"
+        />
+        <rect
+          x="5.5"
+          y="5.5"
+          width="21"
+          height="21"
+          rx="3.5"
+          stroke="var(--mushaf-rule-ink, var(--accent, #d4b47c))"
+          strokeWidth="1.2"
+          strokeOpacity="0.85"
+          transform="rotate(45 16 16)"
+        />
         <circle
           cx="16"
           cy="16"
-          r="12"
-          stroke="currentColor"
-          strokeWidth="0.75"
-          strokeDasharray="2 1.5"
-          className="opacity-60"
+          r="8.5"
+          stroke="var(--mushaf-rule-ink, var(--accent, #d4b47c))"
+          strokeWidth="1"
+          strokeOpacity="0.75"
         />
+        <circle cx="16" cy="3.5" r="1.1" fill="var(--mushaf-rule-ink, var(--accent, #d4b47c))" />
+        <circle cx="16" cy="28.5" r="1.1" fill="var(--mushaf-rule-ink, var(--accent, #d4b47c))" />
+        <circle cx="3.5" cy="16" r="1.1" fill="var(--mushaf-rule-ink, var(--accent, #d4b47c))" />
+        <circle cx="28.5" cy="16" r="1.1" fill="var(--mushaf-rule-ink, var(--accent, #d4b47c))" />
       </svg>
       <span
         className={`absolute inset-0 flex items-center justify-center font-sans text-[0.42em] font-bold leading-none ${
-          isOled ? "text-white" : "text-current opacity-85"
+          isOled ? "text-white" : "text-foreground"
         }`}
         style={{ fontVariantNumeric: "tabular-nums" }}
         aria-hidden="true"
@@ -1430,7 +1444,12 @@ export function MushafPageViewer({
       ) : (
         /* Focus mode: no chrome at all, and the progress hairline is the last
            thing to go — it is the only thing on screen that is not the page. */
-        <div className="pointer-events-none absolute inset-x-0 top-0 z-10">{progressBar}</div>
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 z-30"
+          style={{ top: "env(safe-area-inset-top, 0px)" }}
+        >
+          {progressBar}
+        </div>
       )}
 
       {/* One page, or two facing pages when the screen has room for both at a

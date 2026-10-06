@@ -187,7 +187,7 @@
   --muted-foreground: #3f3a62;
   --accent: #d4a020;
   --accent-foreground: #1a1228;
-  --on-media-accent: #d97706;
+  --on-media-accent: #f0c14b;
   --destructive: #8b2015;
   --destructive-foreground: #ffffff;
   --border-subtle: #c4bcb0;
@@ -553,7 +553,8 @@ textarea {
 
    Dark grounds first, matching :root; the light theme overrides below. */
 
-[data-reader-category="morning"] {
+[data-reader-category="morning"],
+[data-reader-category="travel"] {
   --primary: #fbbf24;
   --ring: #fbbf24;
 }
@@ -586,11 +587,6 @@ textarea {
 [data-reader-category="distress_anxiety"] {
   --primary: #818cf8;
   --ring: #818cf8;
-}
-
-[data-reader-category="travel"] {
-  --primary: #fbbf24;
-  --ring: #fbbf24;
 }
 
 /* Light needs the darker 700-weight variants to hold contrast on #f8f5f0. */

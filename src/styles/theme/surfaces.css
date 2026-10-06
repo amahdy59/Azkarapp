@@ -54,7 +54,6 @@
   box-sizing: border-box;
   width: 100%;
   height: 100dvh;
-  min-height: 100dvh;
   overflow: hidden;
   background: var(--background);
 }
@@ -86,8 +85,6 @@
 
 @media (min-width: 768px) {
   .app-shell {
-    width: 390px;
-    height: min(100dvh, 882px);
     border: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
   }
 }
@@ -212,11 +209,8 @@
    card" that belonged to no documented tier. */
 @media (max-width: 599px) {
   .app-viewport {
-    height: 100dvh;
-    min-height: 100dvh;
     align-items: stretch;
     justify-content: flex-start;
-    overflow: hidden;
     padding: 0;
   }
   .app-shell {
@@ -547,7 +541,7 @@ button.ui-icon-button:not(:disabled):not(.no-press):active,
 /* Semantic surfaces extracted from PrayerTrackerCards for consistency */
 .surface-active-card {
   border-color: var(--primary);
-  background-image: linear-gradient(to bottom, color-mix(in srgb, var(--primary) 12%, transparent), transparent);
+  background-image: linear-gradient(color-mix(in srgb, var(--primary) 12%, transparent), transparent);
   box-shadow:
     0 0 0 1px var(--primary),
     0 12px 32px -12px var(--primary);
@@ -555,6 +549,6 @@ button.ui-icon-button:not(:disabled):not(.no-press):active,
 
 .surface-upcoming-card {
   border-color: var(--border);
-  background-image: linear-gradient(to bottom, var(--card), color-mix(in srgb, var(--muted) 30%, transparent));
+  background-image: linear-gradient(var(--card), color-mix(in srgb, var(--muted) 30%, transparent));
   box-shadow: var(--shadow-raised);
 }

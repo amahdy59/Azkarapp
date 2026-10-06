@@ -1587,14 +1587,18 @@ export function ReaderScreen({
               <div
                 data-testid="reader-desktop-hero"
                 data-reading-chrome
-                className="relative isolate w-full flex shrink-0 flex-col items-center gap-2 overflow-hidden rounded-b-3xl px-6 pb-4 pt-3 text-center"
+                className="relative isolate w-full flex shrink-0 flex-col items-center overflow-hidden rounded-b-2xl px-6 pb-2.5 pt-2 text-center"
                 style={{
+                  gap: "0.375rem",
                   background:
                     "radial-gradient(120% 140% at 50% 10%, rgba(232,180,32,0.18), transparent 60%), var(--brand-hero)",
                 }}
               >
                 <ReaderSceneArt category={catId} />
-                <div className="flex w-full items-start justify-between gap-3" data-testid="reader-header-toolbar">
+                <div
+                  className="relative z-10 flex w-full items-center justify-between gap-3"
+                  data-testid="reader-header-toolbar"
+                >
                   <IconButton
                     onClick={onBack}
                     label={t(language, "common.back")}
@@ -1667,15 +1671,15 @@ export function ReaderScreen({
                 </div>
 
                 <h1
-                  className="w-full break-words text-display font-extrabold text-[color:var(--on-media-accent)]"
+                  className="relative z-10 w-full break-words text-lg md:text-xl font-extrabold leading-tight text-on-media-accent drop-shadow-sm"
                   dir="auto"
                 >
                   {displayCategoryName}
                 </h1>
 
-                <div className="flex w-full max-w-[520px] flex-col items-center gap-2">
-                  <div className="flex w-full items-center justify-between px-1" aria-hidden="true">
-                    <span className="text-label font-semibold text-on-media-muted">
+                <div className="relative z-10 flex w-full flex-col items-center gap-1" style={{ maxWidth: 480 }}>
+                  <div className="flex w-full items-center justify-between px-1 leading-none" aria-hidden="true">
+                    <span className="text-xs font-semibold text-on-media-muted">
                       {t(language, "reader.collectionPercentComplete", { percent: localizedReadingPercent })}
                     </span>
                     <span className="text-xs font-bold text-on-media-muted">
@@ -1699,7 +1703,7 @@ export function ReaderScreen({
 
               {/* Wide-desktop card: reading content, side navigation, counter,
                 and keyboard guidance. Page-level actions stay in the hero. */}
-              <div className="reader-canvas-wrap relative mx-4 my-4 flex min-h-0 flex-1 overflow-hidden bg-transparent">
+              <div className="reader-canvas-wrap relative mx-3 my-2 md:mx-4 md:my-2 flex min-h-0 flex-1 overflow-hidden bg-transparent">
                 <div
                   className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden cursor-pointer"
                   data-testid="reader-card"
@@ -1709,7 +1713,7 @@ export function ReaderScreen({
                     <div
                       data-testid="reader-entry-tools"
                       data-prevent-count="true"
-                      className="reader-entry-tools--wide shrink-0 pt-2.5 flex flex-wrap items-center justify-between gap-x-2 gap-y-1"
+                      className="reader-entry-tools--wide shrink-0 pt-1 pb-1 flex flex-wrap items-center justify-between gap-x-2 gap-y-1"
                     >
                       {!showSurahChrome && readerZikrTitle && (
                         <h2
@@ -1746,16 +1750,16 @@ export function ReaderScreen({
                         role="region"
                         tabIndex={0}
                         aria-label={t(language, "reader.readingText")}
-                        className={`reader-text-scroll h-full min-h-0 w-full overflow-y-auto ${longSurah ? "px-28" : "px-4 md:px-6"} py-4 outline-none focus-visible:outline-none focus:ring-0 [scrollbar-gutter:stable both-edges]`}
+                        className={`reader-text-scroll h-full min-h-0 w-full overflow-y-auto ${longSurah ? "px-28" : "px-4 md:px-6"} py-2 outline-none focus-visible:outline-none focus:ring-0 [scrollbar-gutter:stable both-edges]`}
                       >
-                        <div className="reading-measure mx-auto flex min-h-full w-full flex-col py-4">
+                        <div className="reading-measure mx-auto flex min-h-full w-full flex-col py-1">
                           <div style={dragStyle} className="flex w-full flex-1 flex-col">
                             <ReadingTextTransition
                               entryId={z.id}
                               index={idx}
                               direction={direction}
                               reduceMotion={reducedMotion || longSurah}
-                              className={`${longSurah ? "mb-auto mt-2" : "my-4"} w-full`}
+                              className={`${longSurah ? "mb-auto mt-1" : "my-2"} w-full`}
                             >
                               <div
                                 style={pressStyle}
@@ -1774,7 +1778,7 @@ export function ReaderScreen({
                       <CounterGuidance language={language} direction={direction} reader placement="above" />
                     )}
                     {!longSurah && (
-                      <footer className={`shrink-0 pt-3 ${audioModeActive ? "pb-0" : "pb-3"}`}>{renderDock()}</footer>
+                      <footer className={`shrink-0 pt-1.5 ${audioModeActive ? "pb-0" : "pb-2"}`}>{renderDock()}</footer>
                     )}
                     {(!audioModeActive || longSurah) && audioPlayer}
                   </div>

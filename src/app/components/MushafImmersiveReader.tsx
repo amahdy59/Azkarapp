@@ -31,7 +31,13 @@ import {
   prefetchMushafPage,
   type MushafVerseData,
 } from "../content/qcfMushaf";
-import { SURAHS, getJuzNumberForPage, getSurahDisplayName, getSurahNumberForPage } from "../content/surahInfo";
+import {
+  SURAHS,
+  getJuzNumberForPage,
+  getSurahDisplayName,
+  getSurahNumberForPage,
+  getSurahShortName,
+} from "../content/surahInfo";
 import { SURAH_PLACEMENTS } from "../content/mushafSurahPlacements";
 import { loadSurahWordMeanings, type QuranWordMeaning, type WordMeaningSelection } from "../content/quranWordMeanings";
 import { formatNumerals } from "../formatting";
@@ -416,19 +422,25 @@ export function MushafImmersiveReader({
 
   const lines = useMemo(() => toMushafLines(pageData), [pageData]);
 
-  const { surahName, juzNumber } = useMemo(() => {
+  const { surahName, shortSurahName, juzNumber } = useMemo(() => {
     const juz = getJuzNumberForPage(displayPage);
+    const pageSurah = getSurahNumberForPage(displayPage);
     if (!pageData || pageData.length === 0) {
       return {
-        surahName: customPages ? getSurahDisplayName(getSurahNumberForPage(displayPage), language) : title,
+        surahName: customPages ? getSurahDisplayName(pageSurah, language) : title,
+        shortSurahName: getSurahShortName(pageSurah, language),
         juzNumber: juz,
       };
     }
-    const canonicalSurah = String(getSurahNumberForPage(displayPage));
+    const canonicalSurah = String(pageSurah);
     const hasCanonicalSurah = pageData.some((v) => v.k.startsWith(`${canonicalSurah}:`));
     const [firstSurah] = (pageData[0]?.k || "1:1").split(":");
     const surah = hasCanonicalSurah ? canonicalSurah : firstSurah || "1";
-    return { surahName: getSurahDisplayName(surah, language), juzNumber: juz };
+    return {
+      surahName: getSurahDisplayName(surah, language),
+      shortSurahName: getSurahShortName(surah, language),
+      juzNumber: juz,
+    };
   }, [customPages, displayPage, language, pageData, title]);
 
   const atStart = hasSpread ? rightNumber <= pageNumbers[0]! : pageIndex <= 0;
@@ -550,8 +562,14 @@ export function MushafImmersiveReader({
         style={{ maxWidth: "calc(100vw - 7.5rem)" }}
         className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
-        <span className="inline-flex h-8 max-w-full items-center justify-center gap-1 rounded-full border border-border/80 bg-card/90 px-3 text-foreground  backdrop-blur-md transition-colors group-hover:bg-muted group-active:bg-muted">
-          <span className="arabic-ui truncate text-xs font-bold leading-none">{surahName}</span>
+        <span className="inline-flex h-8 max-w-full items-center justify-center gap-2 rounded-full border border-border/80 bg-card/90 px-3 text-foreground backdrop-blur-md transition-colors group-hover:bg-muted group-active:bg-muted">
+          <span className="arabic-ui truncate text-xs font-bold leading-none">{shortSurahName}</span>
+          <span className="text-xs select-none" style={{ opacity: 0.6 }}>
+            •
+          </span>
+          <span className="arabic-ui shrink-0 text-xs font-normal leading-none" style={{ opacity: 0.8 }}>
+            {t(language, "mushaf.juzLabel", { juz: formatNumerals(juzNumber, language) })}
+          </span>
           <ChevronDown
             size={13}
             className="ms-0.5 shrink-0 select-none text-muted-foreground opacity-70"
@@ -624,7 +642,7 @@ export function MushafImmersiveReader({
 
   const progressBar = (
     <div
-      className="pointer-events-none absolute inset-x-0 bottom-0 h-1 overflow-hidden bg-muted"
+      className="pointer-events-none w-full h-1 overflow-hidden bg-foreground/10"
       role="progressbar"
       aria-valuemin={1}
       aria-valuemax={pageCount}

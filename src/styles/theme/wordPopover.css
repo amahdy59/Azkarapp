@@ -59,8 +59,8 @@
   width: 0.625rem;
   height: 0.625rem;
   rotate: 45deg;
-  border-inline-start: 1px solid color-mix(in srgb, var(--primary) 28%, transparent);
-  border-block-start: 1px solid color-mix(in srgb, var(--primary) 28%, transparent);
+  border: solid color-mix(in srgb, var(--primary) 28%, transparent);
+  border-width: 1px 0 0 1px;
   border-start-start-radius: 2px;
   background: inherit;
 }

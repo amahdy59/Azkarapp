@@ -1,13 +1,13 @@
 {
-  "release": "2026-10-06.4",
+  "release": "2026-10-06.5",
   "ar": [
-    "تنظيم إعدادات الإشعارات ومواقيت الصلاة في تبويبين واضحين للوصول الأسرع إلى كل خيار.",
-    "تخصيص الصلوات التي تستقبل تنبيهاتها واختيار وقت التنبيه من لحظة الصلاة حتى ثلاثين دقيقة قبلها.",
-    "إضافة إشعار تجريبي بهوية التطبيق وتحسين عرض Reader على الشاشات الصغيرة لاستعمال المساحة المتاحة بصورة أفضل."
+    "تحسين تباين عنوان الأذكار وقابلية قراءته بوضوح في شاشات القراءة المختلفة.",
+    "إبراز معالم المسجد والإضاءة الدافئة في المشهد الفني الخلفي لأذكار الصباح والمساء والنوم.",
+    "تقليل المساحات الرأسية المهدرة واستغلال مساحة القراءة في الحواسيب والأجهزة اللوحية دون الحاجة للتمرير غير الضروري."
   ],
   "en": [
-    "Organize notification and prayer-time settings into two clear tabs for faster access.",
-    "Choose which prayers to notify and whether the alert arrives at prayer time or up to 30 minutes earlier.",
-    "Add a test notification with clearer app identity and improve mobile Reader spacing and collection artwork."
+    "Improve reader title contrast and visibility across reading themes.",
+    "Highlight mosque architecture and glowing illumination within the devotional background artwork.",
+    "Reduce dead vertical space on tablet and desktop views, presenting zikr text comfortably without unnecessary scrolling."
   ]
 }

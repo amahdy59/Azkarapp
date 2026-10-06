@@ -428,12 +428,33 @@ describe("KhatmahReaderScreen quick menu", () => {
     renderReader({ language: "en", direction: "ltr", setMushafLayout: vi.fn() });
     await screen.findByRole("article", { name: "Page 42" });
 
-    await user.click(screen.getByTestId("mushaf-top-center-index"));
+    const topPill = screen.getByTestId("mushaf-top-center-index");
+    expect(topPill).toHaveTextContent("•");
+    expect(topPill).toHaveTextContent(/Juz 3/i);
+
+    await user.click(topPill);
     expect(await screen.findByRole("tab", { name: /Surahs/, selected: true })).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Close" }));
 
     await user.click(screen.getByTestId("mushaf-furniture-page-btn"));
     expect(await screen.findByRole("tab", { name: "Page", selected: true })).toBeInTheDocument();
+  });
+
+  it("renders a sleek textless progress bar at the top edge representing the active wird plan", async () => {
+    setViewport(390, 844);
+    renderReader({
+      language: "en",
+      direction: "ltr",
+      quranWirdPlan: { kind: "daily", dailyPages: 4 },
+      wirdHistory: { "2026-10-06": [42] },
+    });
+    await screen.findByRole("article", { name: "Page 42" });
+
+    const progressBar = screen.getByTestId("mushaf-wird-progress");
+    expect(progressBar).toBeInTheDocument();
+    expect(progressBar.textContent?.trim()).toBe("");
+    expect(progressBar).toHaveAttribute("aria-valuenow", "1");
+    expect(progressBar).toHaveAttribute("aria-valuemax", "4");
   });
 
   it("keeps duplicated page tools out of the reading-options menu", async () => {

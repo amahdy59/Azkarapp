@@ -33,10 +33,10 @@
   position: absolute;
   inset-inline-end: 2%;
   bottom: -2.5rem;
-  width: 12rem;
-  height: 9rem;
+  width: 14rem;
+  height: 10rem;
   background: radial-gradient(ellipse, var(--scene-light) 0%, transparent 68%);
-  opacity: 0.2;
+  opacity: 0.38;
 }
 
 .reader-scene[data-scene="morning"] .reader-scene__light,
@@ -51,24 +51,19 @@
   inset-inline-end: 0;
   bottom: 0;
   width: min(24%, 18rem);
-  height: min(64%, 6rem);
+  height: min(68%, 6rem);
 }
 
 .reader-scene__celestial {
   position: absolute;
   inset-inline-end: 2%;
-  top: 35%;
+  top: 24%;
   width: min(14%, 7rem);
   height: 3rem;
 }
 
 .reader-scene__mosque {
-  fill: #0a1222;
-}
-
-.reader-scene__stars {
-  fill: var(--scene-light);
-  opacity: 0.6;
+  fill: #0c1628;
 }
 
 /* Keep title, progress and toolbar over a dark, stable surface. This veil is
@@ -82,8 +77,6 @@
     linear-gradient(180deg, color-mix(in srgb, var(--brand-hero) 80%, transparent), transparent 70%);
 }
 
-/* Compact headers retain their theme and typography. A muted vignette has
-   no layout dimensions and never competes with the destination or actions. */
 .reader-scene--compact {
   opacity: 0.24;
 }

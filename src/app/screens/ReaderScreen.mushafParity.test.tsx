@@ -371,9 +371,10 @@ describe("the phone layout integrates controls directly into the Mushaf canvas",
     renderKahf();
     const surahBtn = screen.getByTestId("mushaf-furniture-surah-btn");
     fireEvent.click(surahBtn);
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    const dialog = screen.getByRole("dialog");
+    expect(dialog).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: /السور/ })).toHaveAttribute("aria-selected", "true");
-    expect(screen.getByText("الكهف")).toBeInTheDocument();
+    expect(within(dialog).getByText("الكهف")).toBeInTheDocument();
   });
 
   it("makes tapping the page number in the folio open the jump modal onto page selection", () => {
