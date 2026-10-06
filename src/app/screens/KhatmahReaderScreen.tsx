@@ -23,7 +23,8 @@ import {
   Translate,
   MoreVertical,
 } from "../components/icons";
-import { PAPER_ASPECT, spreadStart, useMushafShell } from "../components/mushafShell";
+import { PAPER_ASPECT, getNextMushafTheme, spreadStart, useMushafShell } from "../components/mushafShell";
+import { vibrateIfEnabled } from "../motionPreferences";
 import { MushafPageViewer } from "../components/MushafPageViewer";
 import { MushafNavigationModal } from "../components/MushafNavigationModal";
 import { AyahInteractionSheet } from "../components/AyahInteractionSheet";
@@ -288,10 +289,33 @@ export function KhatmahReaderScreen({
    * on the same surface stays put. With the settings docked beside the page,
    * closing them also took away the view of what the choice had just done.
    */
-  const handleSelectTheme = (newTheme: MushafTheme) => {
-    setTheme(newTheme);
-    onUpdateTheme?.(newTheme);
-  };
+  const handleSelectTheme = useCallback(
+    (newTheme: MushafTheme) => {
+      setTheme(newTheme);
+      onUpdateTheme?.(newTheme);
+    },
+    [onUpdateTheme],
+  );
+
+  const [themeHud, setThemeHud] = useState<ThemeMode | null>(null);
+  const themeHudTimer = useRef<number | null>(null);
+
+  const cycleTheme = useCallback(() => {
+    const nextTheme = getNextMushafTheme(theme, appTheme);
+    handleSelectTheme(nextTheme);
+    vibrateIfEnabled(hapticFeedback, 10);
+    setThemeHud(nextTheme);
+    if (themeHudTimer.current) window.clearTimeout(themeHudTimer.current);
+    themeHudTimer.current = window.setTimeout(() => {
+      setThemeHud(null);
+    }, 1400);
+  }, [appTheme, handleSelectTheme, hapticFeedback, theme]);
+
+  useEffect(() => {
+    return () => {
+      if (themeHudTimer.current) window.clearTimeout(themeHudTimer.current);
+    };
+  }, []);
 
   useEffect(() => {
     const root = readerRootRef.current;
@@ -607,7 +631,7 @@ export function KhatmahReaderScreen({
       if (clientX === null || clientY === null) return;
       const offsetY = clientY - startY;
       if (offsetY <= -SWIPE_THRESHOLD) {
-        setIsQuickMenuOpen(true);
+        cycleTheme();
         return;
       }
       if (offsetY >= SWIPE_THRESHOLD) {
@@ -621,7 +645,7 @@ export function KhatmahReaderScreen({
       // A still tap belongs to the page. The four corner controls remain
       // available, so reading never changes into a second hidden-tools mode.
     },
-    [paginate],
+    [cycleTheme, paginate],
   );
 
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
@@ -1020,6 +1044,33 @@ export function KhatmahReaderScreen({
           onUpdateVerseBookmarks?.(next);
         }}
       />
+
+      {/* Theme cycle HUD feedback */}
+      {themeHud && (
+        <div
+          role="status"
+          aria-live="polite"
+          data-testid="mushaf-theme-hud"
+          className="pointer-events-none absolute inset-x-0 top-16 z-30 flex justify-center px-4"
+        >
+          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-popover px-4 py-2 text-xs font-bold text-popover-foreground shadow-overlay">
+            <span
+              className="size-3 rounded-full border border-border"
+              style={{
+                backgroundColor: themeHud === "light" ? "#fdfbf7" : themeHud === "midnight" ? "#0b1220" : "#18181b",
+              }}
+              aria-hidden="true"
+            />
+            <span>
+              {themeHud === "light"
+                ? t(language, "mushaf.themeLight")
+                : themeHud === "midnight"
+                  ? t(language, "mushaf.themeMidnight")
+                  : t(language, "mushaf.themeDark")}
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Wird completed */}
       {wirdComplete && completionSeen === todayKey && (

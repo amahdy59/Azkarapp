@@ -427,7 +427,7 @@ test("turns pages by swipe without hiding the permanent controls", async ({ page
   await expect(page.getByTestId("mushaf-page-bookmark")).toBeVisible();
 });
 
-test("touch swipes open tools and focus mode while short pages retain native scrolling", async ({ page }) => {
+test("touch swipes cycle themes and toggle focus mode while short pages retain native scrolling", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.getByRole("button", { name: "متابعة القراءة" }).click();
   const paper = page.locator(".mushaf-paper");
@@ -449,9 +449,7 @@ test("touch swipes open tools and focus mode while short pages retain native scr
     await client.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
   };
   await swipe(-140);
-  await expect(page.getByTestId("mushaf-quick-menu")).toBeVisible();
-  await page.keyboard.press("Escape");
-  await expect(page.getByTestId("mushaf-quick-menu")).not.toBeVisible();
+  await expect(page.getByTestId("mushaf-theme-hud")).toBeVisible();
   await swipe(140);
   await expect(page.getByTestId("mushaf-focus-exit")).toBeVisible();
   await page.getByTestId("mushaf-focus-exit").click();

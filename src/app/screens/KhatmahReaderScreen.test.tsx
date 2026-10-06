@@ -76,8 +76,40 @@ describe("KhatmahReaderScreen navigation", () => {
     fireEvent.pointerMove(paper, { pointerId: 1, clientX: 185, clientY: 330 });
     fireEvent.pointerMove(paper, { pointerId: 1, clientX: 260, clientY: 270 });
     fireEvent.pointerUp(paper, { pointerId: 1, clientX: 260, clientY: 270 });
-    expect(screen.getByTestId("mushaf-quick-menu")).toBeInTheDocument();
+    expect(screen.getByTestId("mushaf-theme-hud")).toBeInTheDocument();
     expect(setKhatmahPage).not.toHaveBeenCalled();
+  });
+
+  it("cycles between the three themes on upward swipes", async () => {
+    setViewport(390, 844);
+    const setMushafTheme = vi.fn();
+    renderReader({
+      mushafTheme: "light",
+      appTheme: "light",
+      setMushafTheme,
+    });
+    const article = await screen.findByRole("article", { name: /صفحة ٤٢/ });
+    expect(article).toHaveAttribute("data-theme", "light");
+
+    const paper = document.querySelector(".mushaf-paper")!;
+    // 1st swipe up: light -> midnight
+    fireEvent.pointerDown(paper, { pointerId: 1, button: 0, clientX: 180, clientY: 400 });
+    fireEvent.pointerMove(paper, { pointerId: 1, clientX: 180, clientY: 300 });
+    fireEvent.pointerUp(paper, { pointerId: 1, clientX: 180, clientY: 300 });
+    expect(setMushafTheme).toHaveBeenLastCalledWith("midnight");
+    expect(screen.getByTestId("mushaf-theme-hud")).toBeInTheDocument();
+
+    // 2nd swipe up: midnight -> dark
+    fireEvent.pointerDown(paper, { pointerId: 2, button: 0, clientX: 180, clientY: 400 });
+    fireEvent.pointerMove(paper, { pointerId: 2, clientX: 180, clientY: 300 });
+    fireEvent.pointerUp(paper, { pointerId: 2, clientX: 180, clientY: 300 });
+    expect(setMushafTheme).toHaveBeenLastCalledWith("dark");
+
+    // 3rd swipe up: dark -> light
+    fireEvent.pointerDown(paper, { pointerId: 3, button: 0, clientX: 180, clientY: 400 });
+    fireEvent.pointerMove(paper, { pointerId: 3, clientX: 180, clientY: 300 });
+    fireEvent.pointerUp(paper, { pointerId: 3, clientX: 180, clientY: 300 });
+    expect(setMushafTheme).toHaveBeenLastCalledWith("light");
   });
 
   it("keeps semantic next and previous controls aligned with physical direction", async () => {

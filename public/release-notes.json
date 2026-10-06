@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-06.1",
+  "release": "2026-10-06.2",
   "ar": [
-    "اضبط خطة ختم القرآن بصفحات ومدة تختارها، وابحث عن الجزء أو السورة وتابع تقدمك العام.",
-    "انتقل إلى صفحة المصحف مباشرة من رقمها، واسحب لأعلى لفتح الأدوات أو لأسفل لتبديل وضع التركيز.",
-    "سورة البقرة كاملة متاحة ضمن الرقية الشرعية، مع تلاوتها الصوتية.",
-    "تفتح مجموعات الأذكار عند موضع المتابعة، مع مشاركة المجموعة وإعادة قراءتها وقائمة أوسع وحفظ أكثر موثوقية للتقدم."
+    "تصفح أرباع وأحزاب القرآن الكريم في فهرس المصحف مع الانتقال السريع لأي ربع أو حزب.",
+    "بدّل بين المظهر الفاتح والليلي والفحمي في المصحف بسهولة عبر السحب لأعلى أثناء القراءة.",
+    "اضبط خطة ختم القرآن بصفحات ومدة تختارها، وتابع وردك وتقدمك اليومي والإجمالي.",
+    "تصفح سورة البقرة كاملة مع التلاوة الصوتية، مع حفظ تلقائي لموضع المتابعة."
   ],
   "en": [
-    "Set a Quran completion plan with your own page range and duration, search Juzs or surahs, and see overall progress.",
-    "Jump to a Mushaf page from its number, swipe up to open tools, or swipe down to toggle focus mode.",
-    "Read the complete Surah Al-Baqarah in the ruqyah collection and listen to its recitation.",
-    "Adhkar collections open at your continuation point, with collection sharing, repeat reading, a roomier list and more reliable progress saving."
+    "Navigate Quranic quarters and hizbs with direct jumping from the Mushaf index.",
+    "Cycle between light, midnight, and dark Mushaf themes with an upward swipe while reading.",
+    "Customize your Quran completion plan and follow your daily reading pace and total progress.",
+    "Read Surah Al-Baqarah in full with audio recitation and reliable progress resumption."
   ]
 }

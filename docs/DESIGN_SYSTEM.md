@@ -2,7 +2,7 @@
 
 Integrated refinements (2026-10-06): collection entry resumes the Reader directly; explicit collection overview routes remain available. The Reader collection panel starts at 420px, has a 380px minimum and a maximum of 600px, 45% of available workspace, or the width left after reserving 480px for reading and a 12px gutter, whichever is smallest. Existing pointer/keyboard resizing, focus recovery and narrow drawer behavior remain. Collection sharing, repeat reading and reset use the existing sharing/session boundaries.
 
-Mushaf vertical shortcuts open tools upward and toggle focus downward when the complete paper fits. Overflowing paper retains native vertical scrolling so short viewports keep all reviewed lines accessible. Both policies permit pinch zoom; cancellation never turns a page. Horizontal page turns remain independent, and a vertical gesture cannot become a page turn merely because the finger drifts sideways. Permanent controls provide non-gesture alternatives.
+Mushaf vertical shortcuts cycle display themes upward and toggle focus downward when the complete paper fits. Overflowing paper retains native vertical scrolling so short viewports keep all reviewed lines accessible. Both policies permit pinch zoom; cancellation never turns a page. Horizontal page turns remain independent, and a vertical gesture cannot become a page turn merely because the finger drifts sideways. Permanent controls provide non-gesture alternatives.
 
 Floating Mushaf controls reserve their footer space in the minimum scrolling canvas as well as in its padding, preserving the existing fifteen-line text area on short viewports. The Reader sidebar open/close controls retain their matching rounded card anatomy, including tablet widths that require a drawer.
 

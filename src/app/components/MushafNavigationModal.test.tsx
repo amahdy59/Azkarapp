@@ -210,4 +210,85 @@ describe("MushafNavigationModal", () => {
     expect(screen.getByRole("button", { name: "٥" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "٤٩" })).toBeInTheDocument();
   });
+
+  it("renders surahs in a 2-column grid with compact page tags", () => {
+    render(
+      <MushafNavigationModal
+        isOpen={true}
+        onClose={vi.fn()}
+        currentPage={1}
+        onSelectPage={vi.fn()}
+        language="ar"
+        direction="rtl"
+      />,
+    );
+
+    const fatihahBtn = screen.getByText("الفاتحة").closest("button");
+    expect(fatihahBtn).toBeInTheDocument();
+    expect(fatihahBtn?.parentElement).toHaveClass("grid-cols-2");
+    // Verify compact page tag
+    expect(screen.getByText("ص ١")).toBeInTheDocument();
+    expect(screen.getByText("ص ٢")).toBeInTheDocument();
+  });
+
+  it("expands current juz by default, displays hizbs/quarters and navigates to quarter page", () => {
+    const handleSelectPage = vi.fn();
+    const handleClose = vi.fn();
+
+    render(
+      <MushafNavigationModal
+        isOpen={true}
+        onClose={handleClose}
+        currentPage={1} // Juz 1
+        onSelectPage={handleSelectPage}
+        language="ar"
+        direction="rtl"
+        initialTab="juzs"
+      />,
+    );
+
+    // Juz 1 is active and expanded by default
+    expect(screen.getByText("الحزب ١")).toBeInTheDocument();
+    expect(screen.getByText("الحزب ٢")).toBeInTheDocument();
+
+    // Quarters within Hizb 1 (pages 1, 5, 7, 9)
+    expect(screen.getByTitle("الربع ١ - صفحة ١")).toBeInTheDocument();
+    const q2Btn = screen.getByTitle("الربع ٢ - صفحة ٥");
+    expect(q2Btn).toBeInTheDocument();
+
+    // Clicking a quarter jumps to its page and closes modal
+    fireEvent.click(q2Btn);
+    expect(handleSelectPage).toHaveBeenCalledWith(5);
+    expect(handleClose).toHaveBeenCalled();
+  });
+
+  it("collapses and re-expands a juz accordion on toggle", () => {
+    render(
+      <MushafNavigationModal
+        isOpen={true}
+        onClose={vi.fn()}
+        currentPage={1} // Juz 1
+        onSelectPage={vi.fn()}
+        language="ar"
+        direction="rtl"
+        initialTab="juzs"
+      />,
+    );
+
+    expect(screen.getByText("الحزب ١")).toBeInTheDocument();
+
+    // Toggle button for Juz 1
+    const toggleBtn = screen.getByRole("button", { name: /عرض أرباع الحزب - الجزء الأول/ });
+    expect(toggleBtn).toHaveAttribute("aria-expanded", "true");
+
+    // Click to collapse
+    fireEvent.click(toggleBtn);
+    expect(toggleBtn).toHaveAttribute("aria-expanded", "false");
+    expect(screen.queryByText("الحزب ١")).not.toBeInTheDocument();
+
+    // Click to re-expand
+    fireEvent.click(toggleBtn);
+    expect(toggleBtn).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByText("الحزب ١")).toBeInTheDocument();
+  });
 });

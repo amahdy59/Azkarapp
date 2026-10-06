@@ -4,8 +4,16 @@ import { FIELD_LABEL_CLASS } from "./FormField";
 import type { AppLanguage, QuranVerseBookmark } from "../types";
 import { t } from "../i18n";
 import { formatNumerals } from "../formatting";
-import { SURAHS, JUZS, searchSurahs, getJuzNumberForPage, getSurahDisplayName } from "../content/surahInfo";
-import { X, Search, Bookmark, BookOpen } from "./icons";
+import {
+  SURAHS,
+  JUZS,
+  RUB_START_PAGES,
+  searchSurahs,
+  getJuzNumberForPage,
+  getSurahDisplayName,
+  getHizbsForJuz,
+} from "../content/surahInfo";
+import { X, Search, Bookmark, BookOpen, ChevronDown, ChevronUp } from "./icons";
 import { TabList, tabPanelProps, type TabDefinition } from "./Tabs";
 import { prefetchMushafPage } from "../content/qcfMushaf";
 
@@ -43,6 +51,7 @@ export function MushafNavigationModal({
   const [activeTab, setActiveTab] = useState<NavigationTab>(initialTab);
   const [searchQuery, setSearchQuery] = useState("");
   const [inputPage, setInputPage] = useState(currentPage.toString());
+  const [expandedJuzs, setExpandedJuzs] = useState<Set<number>>(() => new Set([getJuzNumberForPage(currentPage)]));
 
   useEffect(() => {
     if (isOpen) setInputPage(currentPage.toString());
@@ -51,8 +60,23 @@ export function MushafNavigationModal({
   // The caller names the tab when it opens the sheet; reopening from the same
   // entry point must land there again, not on whatever was left showing.
   useEffect(() => {
-    if (isOpen) setActiveTab(initialTab);
-  }, [initialTab, isOpen]);
+    if (isOpen) {
+      setActiveTab(initialTab);
+      setExpandedJuzs(new Set([getJuzNumberForPage(currentPage)]));
+    }
+  }, [initialTab, isOpen, currentPage]);
+
+  const toggleJuz = (juzNumber: number) => {
+    setExpandedJuzs((prev) => {
+      const next = new Set(prev);
+      if (next.has(juzNumber)) {
+        next.delete(juzNumber);
+      } else {
+        next.add(juzNumber);
+      }
+      return next;
+    });
+  };
 
   const filteredSurahs = useMemo(() => {
     return searchSurahs(searchQuery, language);
@@ -115,18 +139,18 @@ export function MushafNavigationModal({
   return (
     <Dialog.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60  animate-in fade-in" />
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60 animate-in fade-in" />
         <Dialog.Content
           dir={direction}
           className="fixed inset-x-2 bottom-2 top-2 z-50 flex w-auto max-w-xl flex-col overflow-hidden rounded-2xl border border-border bg-card text-card-foreground shadow-overlay animate-in fade-in zoom-in-95 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:h-[min(620px,88dvh)] sm:w-full sm:-translate-x-1/2 sm:-translate-y-1/2"
         >
           {/* Header */}
-          <div className="flex shrink-0 items-center justify-between gap-4 border-b border-border/40 bg-card px-5 py-3">
-            <div className="flex min-w-0 flex-1 items-center gap-3">
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                <BookOpen size={20} aria-hidden="true" />
+          <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border/40 bg-card px-4 py-2.5 sm:px-5 sm:py-3">
+            <div className="flex min-w-0 flex-1 items-center gap-2.5">
+              <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <BookOpen size={17} aria-hidden="true" />
               </div>
-              <Dialog.Title className="truncate text-lg font-extrabold leading-snug text-foreground">
+              <Dialog.Title className="truncate text-base font-extrabold leading-snug text-foreground sm:text-lg">
                 {t(language, "mushaf.indexTitle")}
               </Dialog.Title>
             </div>
@@ -134,11 +158,11 @@ export function MushafNavigationModal({
             <Dialog.Close asChild>
               <button
                 type="button"
-                className="flex h-[48px] w-[48px] min-h-[48px] min-w-[48px] shrink-0 items-center justify-center rounded-full bg-muted/80 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer active:scale-95"
+                className="flex h-10 w-10 min-h-10 min-w-10 shrink-0 items-center justify-center rounded-full bg-muted/80 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer active:scale-95"
                 aria-label={t(language, "common.close")}
                 data-testid="modal-close-button"
               >
-                <X size={18} aria-hidden="true" />
+                <X size={16} aria-hidden="true" />
               </button>
             </Dialog.Close>
           </div>
@@ -151,9 +175,9 @@ export function MushafNavigationModal({
             direction={direction}
             idPrefix="mushaf-index"
             aria-label={t(language, "mushaf.indexTitle")}
-            className="flex border-b border-border bg-card px-2 sm:px-4"
+            className="flex border-b border-border bg-card px-1.5 sm:px-3"
             itemClassName={(selected) =>
-              `flex min-h-11 min-w-0 flex-1 items-center justify-center whitespace-nowrap border-b-2 px-2 py-2.5 text-label font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring sm:text-sm ${
+              `flex min-h-10 min-w-0 flex-1 items-center justify-center whitespace-nowrap border-b-2 px-2 py-2 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring sm:text-sm ${
                 selected
                   ? "border-primary text-primary"
                   : "border-transparent text-muted-foreground hover:text-foreground"
@@ -161,15 +185,15 @@ export function MushafNavigationModal({
             }
           />
 
-          {/* Search Bar */}
+          {/* Search Bar - Slim 36px height */}
           {activeTab === "surahs" && (
-            <div className="shrink-0 border-b border-border/60 bg-card px-4 py-2.5">
+            <div className="shrink-0 border-b border-border/60 bg-card px-3.5 py-1.5">
               <label htmlFor="surah-search" className="sr-only">
                 {t(language, "mushaf.searchSurahs")}
               </label>
               <div className="relative flex items-center">
-                <span className="pointer-events-none absolute start-3.5 text-muted-foreground">
-                  <Search size={16} aria-hidden="true" />
+                <span className="pointer-events-none absolute start-3 text-muted-foreground">
+                  <Search size={14} aria-hidden="true" />
                 </span>
                 <input
                   id="surah-search"
@@ -177,17 +201,17 @@ export function MushafNavigationModal({
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={t(language, "mushaf.searchSurahs")}
-                  className="min-h-11 w-full rounded-xl border border-border bg-input-background ps-10 pe-10 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                  className="h-9 min-h-9 w-full rounded-xl border border-border bg-input-background ps-9 pe-9 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring sm:text-sm"
                 />
                 {searchQuery && (
                   <button
                     type="button"
                     onClick={() => setSearchQuery("")}
                     aria-label={t(language, "common.clear")}
-                    className="absolute flex size-11 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                    style={{ insetInlineEnd: 0 }}
+                    className="absolute flex size-8 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                    style={{ insetInlineEnd: 4 }}
                   >
-                    <X size={14} />
+                    <X size={13} />
                   </button>
                 )}
               </div>
@@ -197,11 +221,11 @@ export function MushafNavigationModal({
           {/* Tab Content */}
           <div
             {...tabPanelProps("mushaf-index", activeTab)}
-            className="min-h-0 flex-1 overflow-y-auto p-3.5 sm:p-4 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
+            className="min-h-0 flex-1 overflow-y-auto p-2.5 sm:p-3.5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
           >
-            {/* Surahs Tab */}
+            {/* Surahs Tab - 2 Columns Grid */}
             {activeTab === "surahs" && (
-              <div className="flex flex-col gap-1.5">
+              <div className="grid grid-cols-2 gap-1.5">
                 {filteredSurahs.map((surah) => {
                   const isCurrent =
                     currentPage >= surah.startPage &&
@@ -213,35 +237,29 @@ export function MushafNavigationModal({
                       onClick={() => handleJump(surah.startPage)}
                       onMouseEnter={() => prefetchMushafPage(surah.startPage)}
                       onPointerDown={() => prefetchMushafPage(surah.startPage)}
-                      className={`group flex min-h-12 items-center justify-between gap-3 rounded-xl border px-3 py-2 text-start transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                      aria-current={isCurrent ? "true" : undefined}
+                      className={`group flex min-h-11 items-center justify-between gap-2 rounded-xl border px-3 py-2 text-start transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer ${
                         isCurrent
-                          ? "border-primary bg-muted/60 "
-                          : "border-border/60 bg-card hover:border-border hover:bg-muted/50"
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border/60 bg-card hover:border-border hover:bg-muted/50 text-foreground"
                       }`}
-                      style={{ contentVisibility: "auto", containIntrinsicSize: "3.25rem" }}
+                      style={{ contentVisibility: "auto", containIntrinsicSize: "2.75rem" }}
                     >
-                      <div className="flex min-w-0 items-center gap-3">
+                      <div className="flex min-w-0 items-center gap-2">
                         <span
-                          className={`flex size-9 shrink-0 items-center justify-center rounded-lg text-xs font-bold tabular-nums font-sans ${
+                          className={`flex size-6 shrink-0 items-center justify-center rounded-md text-xs font-bold tabular-nums font-sans ${
                             isCurrent ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"
                           }`}
                         >
                           {formatNumerals(surah.number, language)}
                         </span>
-                        <div className="flex min-w-0 items-baseline gap-2 text-start">
-                          <span className="arabic-ui truncate text-base font-bold leading-snug text-foreground">
-                            {surah.nameArabic}
-                          </span>
-                          {!isArabic && (
-                            <span className="truncate text-xs font-medium text-muted-foreground">
-                              {surah.nameEnglish}
-                            </span>
-                          )}
-                        </div>
+                        <span className="arabic-ui truncate text-sm font-bold leading-tight">
+                          {isArabic ? surah.nameArabic : surah.nameEnglish}
+                        </span>
                       </div>
 
-                      <span className="shrink-0 rounded-full border border-border/60 bg-muted/60 px-2.5 py-1 text-xs font-semibold tabular-nums text-muted-foreground">
-                        {t(language, "mushaf.pageLabel", { page: formatNumerals(surah.startPage, language) })}
+                      <span className="shrink-0 text-xs font-medium tabular-nums text-muted-foreground">
+                        {t(language, "mushaf.pageShort", { page: formatNumerals(surah.startPage, language) })}
                       </span>
                     </button>
                   );
@@ -249,51 +267,136 @@ export function MushafNavigationModal({
               </div>
             )}
 
-            {/* Juzs Tab */}
+            {/* Juzs Tab - Accordion with Hizbs & Quarters */}
             {activeTab === "juzs" && (
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-2">
                 {JUZS.map((juz) => {
-                  const isCurrent = getJuzNumberForPage(currentPage) === juz.number;
+                  const isCurrentJuz = getJuzNumberForPage(currentPage) === juz.number;
                   const surahName = getSurahDisplayName(juz.startSurahNumber, language);
+                  const isExpanded = expandedJuzs.has(juz.number);
+                  const hizbs = getHizbsForJuz(juz.number);
+
                   return (
-                    <button
+                    <div
                       key={juz.number}
-                      type="button"
-                      onClick={() => handleJump(juz.startPage)}
-                      onMouseEnter={() => prefetchMushafPage(juz.startPage)}
-                      onPointerDown={() => prefetchMushafPage(juz.startPage)}
-                      className={`group flex items-center justify-between gap-3 rounded-xl border px-3 py-2.5 text-start transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                        isCurrent
-                          ? "border-primary bg-muted/60 "
-                          : "border-border/60 bg-card hover:border-border hover:bg-muted/50"
+                      className={`rounded-xl border transition-colors ${
+                        isCurrentJuz ? "border-primary bg-card shadow-sm" : "border-border/60 bg-card"
                       }`}
                     >
-                      <div className="flex min-w-0 items-center gap-3">
-                        <span
-                          className={`flex size-9 shrink-0 items-center justify-center rounded-lg text-xs font-bold tabular-nums font-sans ${
-                            isCurrent ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"
-                          }`}
+                      {/* Juz Header Row */}
+                      <div className="flex min-h-11 items-center justify-between gap-2 px-3 py-2">
+                        <button
+                          type="button"
+                          onClick={() => handleJump(juz.startPage)}
+                          onMouseEnter={() => prefetchMushafPage(juz.startPage)}
+                          onPointerDown={() => prefetchMushafPage(juz.startPage)}
+                          className="group flex min-w-0 flex-1 items-center justify-between gap-2 text-start focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring rounded-lg cursor-pointer"
+                          title={t(language, "mushaf.pageLabel", { page: formatNumerals(juz.startPage, language) })}
                         >
-                          {formatNumerals(juz.number, language)}
-                        </span>
-                        <div className="flex min-w-0 flex-col items-start text-start">
-                          <div className="arabic-ui truncate text-base font-bold leading-snug text-foreground">
-                            {isArabic ? juz.nameArabic : juz.nameEnglish}
-                          </div>
-                          <div className="mt-0.5 truncate text-xs text-muted-foreground">
-                            <span>{surahName}</span>
-                            <span aria-hidden="true"> · </span>
-                            <span>
-                              {t(language, "reader.ayahLabel", { ayah: formatNumerals(juz.startAyah, language) })}
+                          <div className="flex min-w-0 items-center gap-2">
+                            <span
+                              className={`flex size-6 shrink-0 items-center justify-center rounded-md text-xs font-bold tabular-nums font-sans ${
+                                isCurrentJuz ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"
+                              }`}
+                            >
+                              {formatNumerals(juz.number, language)}
                             </span>
+                            <div className="flex min-w-0 flex-col items-start text-start">
+                              <span className="arabic-ui truncate text-sm font-bold leading-tight text-foreground">
+                                {isArabic ? juz.nameArabic : juz.nameEnglish}
+                              </span>
+                              <span className="mt-0.5 truncate text-xs text-muted-foreground">
+                                <span>{surahName}</span>
+                                <span aria-hidden="true"> · </span>
+                                <span>
+                                  {t(language, "reader.ayahLabel", { ayah: formatNumerals(juz.startAyah, language) })}
+                                </span>
+                              </span>
+                            </div>
                           </div>
-                        </div>
+
+                          <span className="shrink-0 rounded-full border border-border/60 bg-muted/60 px-2.5 py-1 text-xs font-semibold tabular-nums text-muted-foreground">
+                            {t(language, "mushaf.pageShort", { page: formatNumerals(juz.startPage, language) })}
+                          </span>
+                        </button>
+
+                        {/* Accordion Toggle */}
+                        <button
+                          type="button"
+                          onClick={() => toggleJuz(juz.number)}
+                          aria-expanded={isExpanded}
+                          aria-label={`${t(language, "mushaf.toggleQuarters")} - ${isArabic ? juz.nameArabic : juz.nameEnglish}`}
+                          className="flex size-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring active:scale-95 cursor-pointer"
+                        >
+                          {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                        </button>
                       </div>
 
-                      <span className="shrink-0 rounded-full border border-border/60 bg-muted/60 px-2.5 py-1 text-xs font-semibold tabular-nums text-muted-foreground">
-                        {t(language, "mushaf.pageLabel", { page: formatNumerals(juz.startPage, language) })}
-                      </span>
-                    </button>
+                      {/* Expanded Hizbs & Quarters Section */}
+                      {isExpanded && (
+                        <div className="border-t border-border/50 bg-muted/30 p-2 space-y-2 animate-in fade-in duration-fast">
+                          {hizbs.map((hizb) => {
+                            return (
+                              <div key={hizb.hizbNumber} className="space-y-1">
+                                <div className="flex items-center justify-between px-1 text-xs font-semibold text-muted-foreground">
+                                  <span>
+                                    {t(language, "mushaf.hizbLabel", {
+                                      number: formatNumerals(hizb.hizbNumber, language),
+                                    })}
+                                  </span>
+                                  <span className="tabular-nums">
+                                    {t(language, "mushaf.pageShort", {
+                                      page: formatNumerals(hizb.startPage, language),
+                                    })}
+                                  </span>
+                                </div>
+
+                                <div className="grid grid-cols-4 gap-1">
+                                  {hizb.quarters.map((q) => {
+                                    const isCurrentQuarter =
+                                      currentPage >= q.startPage &&
+                                      (q.rubNumber === 240 || currentPage < (RUB_START_PAGES[q.rubNumber] ?? 605));
+                                    return (
+                                      <button
+                                        key={q.rubNumber}
+                                        type="button"
+                                        onClick={() => handleJump(q.startPage)}
+                                        onMouseEnter={() => prefetchMushafPage(q.startPage)}
+                                        onPointerDown={() => prefetchMushafPage(q.startPage)}
+                                        aria-current={isCurrentQuarter ? "true" : undefined}
+                                        title={`${t(language, "mushaf.quarterLabel", { number: formatNumerals(q.quarterNumber, language) })} - ${t(language, "mushaf.pageLabel", { page: formatNumerals(q.startPage, language) })}`}
+                                        className={`flex flex-col items-center justify-center rounded-lg border p-1 text-center transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer ${
+                                          isCurrentQuarter
+                                            ? "border-primary bg-primary text-primary-foreground font-bold shadow-sm"
+                                            : "border-border/60 bg-card hover:border-border hover:bg-muted text-foreground"
+                                        }`}
+                                      >
+                                        <span className="text-xs font-bold leading-tight">
+                                          {t(language, "mushaf.quarterShort", {
+                                            number: formatNumerals(q.quarterNumber, language),
+                                          })}
+                                        </span>
+                                        <span
+                                          className={`mt-0.5 text-micro tabular-nums leading-none ${
+                                            isCurrentQuarter
+                                              ? "text-primary-foreground opacity-90"
+                                              : "text-muted-foreground"
+                                          }`}
+                                        >
+                                          {t(language, "mushaf.pageShort", {
+                                            page: formatNumerals(q.startPage, language),
+                                          })}
+                                        </span>
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
                   );
                 })}
               </div>

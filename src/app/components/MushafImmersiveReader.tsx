@@ -2,7 +2,8 @@ import { progressFillStyle } from "./progressFillStyle";
 import { useCallback, useEffect, useMemo, useRef, useState, startTransition, type CSSProperties } from "react";
 import { ArrowPrevious, Bookmark, CheckCircle2, ChevronDown, MoreVertical, Translate } from "./icons";
 import { useSwipeGestures } from "../hooks/useSwipeGestures";
-import { PAPER_ASPECT, spreadStart, useMushafShell } from "./mushafShell";
+import { PAPER_ASPECT, getNextMushafTheme, spreadStart, useMushafShell } from "./mushafShell";
+import { vibrateIfEnabled } from "../motionPreferences";
 import { MushafToolRail, MUSHAF_RAIL_WIDTH, type SurahAudioControl } from "./MushafToolRail";
 import { MushafNavigationModal } from "./MushafNavigationModal";
 import { MushafSettingsSheet } from "./MushafSettingsSheet";
@@ -183,6 +184,39 @@ export function MushafImmersiveReader({
   const [activeAyah, setActiveAyah] = useState<{ verseKey: string; text: string | null; pageNumber: number } | null>(
     null,
   );
+  const [localTheme, setLocalTheme] = useState<MushafPageTheme>(theme ?? "midnight");
+  const [themeHud, setThemeHud] = useState<ThemeMode | null>(null);
+  const themeHudTimer = useRef<number | null>(null);
+
+  const resolvedTheme: MushafPageTheme = mushafSettings
+    ? mushafSettings.theme === "follow-app"
+      ? mushafSettings.appTheme
+      : mushafSettings.theme
+    : localTheme;
+
+  const handleThemeSwipe = useCallback(() => {
+    const currentTheme = mushafSettings ? mushafSettings.theme : localTheme;
+    const currentAppTheme = mushafSettings ? mushafSettings.appTheme : "midnight";
+    const nextTheme = getNextMushafTheme(currentTheme, currentAppTheme);
+    if (mushafSettings) {
+      mushafSettings.onSelectTheme(nextTheme);
+    } else {
+      setLocalTheme(nextTheme);
+    }
+    vibrateIfEnabled(hapticFeedback, 10);
+    setThemeHud(nextTheme);
+    if (themeHudTimer.current) window.clearTimeout(themeHudTimer.current);
+    themeHudTimer.current = window.setTimeout(() => {
+      setThemeHud(null);
+    }, 1400);
+  }, [hapticFeedback, localTheme, mushafSettings]);
+
+  useEffect(() => {
+    return () => {
+      if (themeHudTimer.current) window.clearTimeout(themeHudTimer.current);
+    };
+  }, []);
+
   const ayahRequestId = useRef(0);
   const paperRef = useRef<HTMLDivElement>(null);
   /**
@@ -345,7 +379,7 @@ export function MushafImmersiveReader({
     direction,
     onNext: () => paginate(1),
     onPrev: () => paginate(-1),
-    onSwipeUp: () => setIsQuickMenuOpen(true),
+    onSwipeUp: handleThemeSwipe,
     onSwipeDown: () => setIsFocusMode((prev) => !prev),
     reduceMotion: reducedMotion,
   });
@@ -649,7 +683,7 @@ export function MushafImmersiveReader({
             surahName={surahName}
             juzNumber={juzNumber}
             direction={direction}
-            theme={theme}
+            theme={resolvedTheme}
             isBookmarked={isPageBookmarked}
             useQcfGlyphs={useQcfGlyphs}
             showWordMeanings={showWordMeanings}
@@ -697,6 +731,33 @@ export function MushafImmersiveReader({
           />
         </div>
       </div>
+
+      {/* Theme cycle HUD feedback */}
+      {themeHud && (
+        <div
+          role="status"
+          aria-live="polite"
+          data-testid="mushaf-theme-hud"
+          className="pointer-events-none absolute inset-x-0 top-16 z-30 flex justify-center px-4"
+        >
+          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-popover px-4 py-2 text-xs font-bold text-popover-foreground shadow-md">
+            <span
+              className="size-3 rounded-full border border-border"
+              style={{
+                backgroundColor: themeHud === "light" ? "#fdfbf7" : themeHud === "midnight" ? "#0b1220" : "#18181b",
+              }}
+              aria-hidden="true"
+            />
+            <span>
+              {themeHud === "light"
+                ? t(language, "mushaf.themeLight")
+                : themeHud === "midnight"
+                  ? t(language, "mushaf.themeMidnight")
+                  : t(language, "mushaf.themeDark")}
+            </span>
+          </div>
+        </div>
+      )}
 
       {isFocusMode && (
         /* Focus mode hides the rail that turned it on, so without this the only

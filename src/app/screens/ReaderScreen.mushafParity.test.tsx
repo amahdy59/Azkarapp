@@ -528,3 +528,28 @@ describe("the rail is banded rather than flat", () => {
     }
   });
 });
+
+describe("mushaf immersive theme cycling", () => {
+  it("cycles themes on upward swipe and announces via hud", () => {
+    const onSelectTheme = vi.fn();
+    renderKahf({
+      mushafSettings: {
+        theme: "light",
+        appTheme: "light",
+        onSelectTheme,
+        layout: "auto",
+        onSelectLayout: () => undefined,
+        onSelectTextScale: () => undefined,
+        onSelectToolbarSide: () => undefined,
+      },
+    });
+
+    const track = screen.getByTestId("mushaf-immersive-track");
+    fireEvent.pointerDown(track, { pointerId: 1, button: 0, clientX: 200, clientY: 400 });
+    fireEvent.pointerMove(track, { pointerId: 1, clientX: 200, clientY: 300 });
+    fireEvent.pointerUp(track, { pointerId: 1, clientX: 200, clientY: 300 });
+
+    expect(onSelectTheme).toHaveBeenCalledWith("midnight");
+    expect(screen.getByTestId("mushaf-theme-hud")).toBeInTheDocument();
+  });
+});

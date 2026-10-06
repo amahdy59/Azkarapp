@@ -7,6 +7,27 @@
  * spread fits, which is exactly the drift the surah view already had.
  */
 import { useEffect, useState } from "react";
+import type { MushafTheme, ThemeMode } from "../types";
+
+/** The three standard visual themes cycled sequentially via reading shortcuts. */
+export const MUSHAF_THEME_CYCLE: readonly ThemeMode[] = ["light", "midnight", "dark"] as const;
+
+/**
+ * Returns the next theme in the 3-theme reading cycle:
+ * Light (عاجي دافئ) -> Midnight (كحلي ليلي) -> Charcoal Dark (فحمي هادئ) -> Light.
+ */
+export function getNextMushafTheme(current: MushafTheme, appTheme: ThemeMode = "midnight"): ThemeMode {
+  const resolved = current === "follow-app" ? appTheme : current === "oled" ? "dark" : current;
+  switch (resolved) {
+    case "light":
+      return "midnight";
+    case "midnight":
+      return "dark";
+    case "dark":
+    default:
+      return "light";
+  }
+}
 
 /**
  * A spread is only worth showing when both pages still read comfortably.

@@ -252,10 +252,6 @@
   transition-delay: 120ms;
 }
 
-.waveform-bar {
-  animation: waveform 1s ease-in-out infinite;
-}
-
 /* The counter surface, its states, the tap ripple and its keyframes used to be
    declared here AND in ZikrComponents.css with conflicting values — 38px
    translucent glass here, 24px opaque there. Which one won depended on bundler
