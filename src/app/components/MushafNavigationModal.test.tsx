@@ -251,9 +251,11 @@ describe("MushafNavigationModal", () => {
     expect(screen.getByText("الحزب ١")).toBeInTheDocument();
     expect(screen.getByText("الحزب ٢")).toBeInTheDocument();
 
-    // Quarters within Hizb 1 (pages 1, 5, 7, 9)
-    expect(screen.getByTitle("الربع ١ - صفحة ١")).toBeInTheDocument();
-    const q2Btn = screen.getByTitle("الربع ٢ - صفحة ٥");
+    // Quarters within Hizb 1 (pages 1, 5, 7, 9) include their first words
+    expect(screen.getByText("الحمد لله")).toBeInTheDocument();
+    expect(screen.getByText("إِنَّ اللَّهَ")).toBeInTheDocument();
+    expect(screen.getByTitle(/الربع ١.*الحمد لله.*صفحة ١/)).toBeInTheDocument();
+    const q2Btn = screen.getByTitle(/الربع ٢.*إِنَّ اللَّهَ.*صفحة ٥/);
     expect(q2Btn).toBeInTheDocument();
 
     // Clicking a quarter jumps to its page and closes modal

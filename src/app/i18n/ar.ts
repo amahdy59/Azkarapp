@@ -1837,6 +1837,8 @@ const ar = {
     resetPreferencesTitle: "استعادة الإعدادات الافتراضية",
     resetPreferencesConfirm: "هل تريد استعادة التفضيلات الافتراضية؟ سيبقى تقدمك وجلساتك والأذكار المحفوظة.",
     prayerTimesAndReminders: "مواقيت الصلاة والتذكيرات",
+    notificationsAndReminders: "الإشعارات والتذكيرات",
+    notificationsDescription: "تنبيهات مواقيت الصلاة وأذكار الصباح والمساء والنوم",
     routineAndReminders: "الورد والتنبيهات",
     languageAndCalendar: "اللغة والتقويم",
     locationNotSet: "لم يُحدَّد",

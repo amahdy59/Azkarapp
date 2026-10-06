@@ -126,4 +126,35 @@ describe("SettingsRootPanel", () => {
     fireEvent.click(plusOneBtn);
     expect(onOffsetChange).toHaveBeenCalledWith(1);
   });
+
+  it("exposes notifications settings row and matches notification search terms", () => {
+    const onNav = vi.fn();
+    render(
+      <SettingsRootPanel
+        onNav={onNav}
+        language="ar"
+        direction="rtl"
+        themeMode="system"
+        highContrast={false}
+        onThemeModeChange={vi.fn()}
+        onDisableHighContrast={vi.fn()}
+        onLanguageChange={vi.fn()}
+        isGuest={true}
+        isSyncing={false}
+        syncError=""
+      />,
+    );
+
+    const notificationsRow = screen.getByTestId("settings-sub-notifications");
+    expect(notificationsRow).toBeInTheDocument();
+    expect(screen.getByText("الإشعارات والتذكيرات")).toBeInTheDocument();
+
+    fireEvent.click(notificationsRow);
+    expect(onNav).toHaveBeenCalledWith("notifications");
+
+    // Search for notifications in Arabic
+    const searchInput = screen.getByRole("searchbox");
+    fireEvent.change(searchInput, { target: { value: "إشعارات" } });
+    expect(screen.getByText("الإشعارات والتذكيرات")).toBeInTheDocument();
+  });
 });

@@ -364,8 +364,8 @@ export function MushafNavigationModal({
                                         onMouseEnter={() => prefetchMushafPage(q.startPage)}
                                         onPointerDown={() => prefetchMushafPage(q.startPage)}
                                         aria-current={isCurrentQuarter ? "true" : undefined}
-                                        title={`${t(language, "mushaf.quarterLabel", { number: formatNumerals(q.quarterNumber, language) })} - ${t(language, "mushaf.pageLabel", { page: formatNumerals(q.startPage, language) })}`}
-                                        className={`flex flex-col items-center justify-center rounded-lg border p-1 text-center transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer ${
+                                        title={`${t(language, "mushaf.quarterLabel", { number: formatNumerals(q.quarterNumber, language) })}${q.firstWord ? ` - ${q.firstWord}` : ""} - ${t(language, "mushaf.pageLabel", { page: formatNumerals(q.startPage, language) })}`}
+                                        className={`flex flex-col items-center justify-center rounded-lg border px-1 py-1.5 text-center transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer ${
                                           isCurrentQuarter
                                             ? "border-primary bg-primary text-primary-foreground font-bold shadow-sm"
                                             : "border-border/60 bg-card hover:border-border hover:bg-muted text-foreground"
@@ -376,6 +376,16 @@ export function MushafNavigationModal({
                                             number: formatNumerals(q.quarterNumber, language),
                                           })}
                                         </span>
+                                        {q.firstWord && (
+                                          <span
+                                            className={`mt-0.5 truncate max-w-full px-0.5 text-micro font-semibold leading-tight ${
+                                              isCurrentQuarter ? "text-primary-foreground" : "text-foreground"
+                                            }`}
+                                            dir="rtl"
+                                          >
+                                            {q.firstWord}
+                                          </span>
+                                        )}
                                         <span
                                           className={`mt-0.5 text-micro tabular-nums leading-none ${
                                             isCurrentQuarter

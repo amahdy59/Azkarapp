@@ -1,15 +1,13 @@
 {
-  "release": "2026-10-06.2",
+  "release": "2026-10-06.3",
   "ar": [
-    "تصفح أرباع وأحزاب القرآن الكريم في فهرس المصحف مع الانتقال السريع لأي ربع أو حزب.",
-    "بدّل بين المظهر الفاتح والليلي والفحمي في المصحف بسهولة عبر السحب لأعلى أثناء القراءة.",
-    "اضبط خطة ختم القرآن بصفحات ومدة تختارها، وتابع وردك وتقدمك اليومي والإجمالي.",
-    "تصفح سورة البقرة كاملة مع التلاوة الصوتية، مع حفظ تلقائي لموضع المتابعة."
+    "عرض الكلمات الافتتاحية لكل ربع من أرباع القرآن الكريم في فهرس المصحف لتسهيل الاستدلال والتنقل.",
+    "تحسين تخطيط الترويسة الرئيسية وتقليل الفراغات العلوية في الهواتف لجعل بطاقات الصلاة والأوراد في الواجهة مباشرة.",
+    "إبراز إعدادات الإشعارات والتذكيرات برمز واضح وبحث فوري في قائمة الإعدادات وتأكيد تباين الألوان."
   ],
   "en": [
-    "Navigate Quranic quarters and hizbs with direct jumping from the Mushaf index.",
-    "Cycle between light, midnight, and dark Mushaf themes with an upward swipe while reading.",
-    "Customize your Quran completion plan and follow your daily reading pace and total progress.",
-    "Read Surah Al-Baqarah in full with audio recitation and reliable progress resumption."
+    "Display the opening words for every Quranic quarter in the Mushaf index for effortless navigation.",
+    "Streamline the top header height on mobile views, bringing prayer cards and daily wird immediately into focus.",
+    "Feature notifications and reminders clearly in the Settings menu with direct search and verified color contrast."
   ]
 }

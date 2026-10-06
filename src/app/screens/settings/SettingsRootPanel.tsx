@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from "react";
 import {
+  Bell,
   Calendar,
   BookOpen,
   Database,
@@ -92,13 +93,18 @@ export function SettingsRootPanel({
   }> = [
     {
       id: "notifications",
-      icon: <MapPin size={20} className="text-primary" />,
-      title: t(language, "settings.prayerTimesAndReminders"),
+      icon: <Bell size={20} className="text-primary" />,
+      title: t(language, "settings.notificationsAndReminders"),
       description: locationSettings?.cityName || t(language, "settings.locationNotSet"),
       keywords: [
+        "notifications",
+        "notification",
+        "reminders",
+        "reminder",
+        "alerts",
+        "alert",
         "prayer",
         "times",
-        "reminders",
         "adhan",
         "athan",
         "fajr",
@@ -106,16 +112,20 @@ export function SettingsRootPanel({
         "asr",
         "maghrib",
         "isha",
+        "إشعارات",
+        "إشعار",
+        "تنبيهات",
+        "تنبيه",
+        "تذكيرات",
+        "تذكير",
         "مواقيت",
         "صلاة",
-        "تذكير",
         "أذان",
         "الفجر",
         "الظهر",
         "العصر",
         "المغرب",
         "العشاء",
-        "تنبيهات",
       ],
     },
     {
@@ -306,10 +316,18 @@ export function SettingsRootPanel({
             type="search"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={t(language, "settings.searchPlaceholder")}
             aria-label={t(language, "settings.searchPlaceholder")}
-            className="w-full rounded-2xl border border-border/50 bg-card py-2.5 ps-10 pe-10 text-sm font-medium text-foreground placeholder:text-muted-foreground shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            className="w-full rounded-2xl border border-border/50 bg-card py-2.5 ps-10 pe-10 text-sm font-medium text-foreground shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           />
+          {!searchQuery && (
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute top-1/2 -translate-y-1/2 text-sm text-muted-foreground truncate"
+              style={{ insetInlineStart: "2.5rem", insetInlineEnd: "2.5rem" }}
+            >
+              {t(language, "settings.searchPlaceholder")}
+            </span>
+          )}
           {searchQuery && (
             <button
               type="button"
@@ -490,12 +508,21 @@ export function SettingsRootPanel({
           <SettingsSection label={t(language, "settings.routineAndReminders")}>
             <SettingsRowItem
               iconBg={iconBackground}
+              icon={<Bell size={20} className="text-primary" />}
+              label={t(language, "settings.notificationsAndReminders")}
+              right={<RowChevron />}
+              onPress={() => onNav("notifications")}
+              hasDivider={true}
+              {...itemProps("notifications")}
+            />
+            <SettingsRowItem
+              iconBg={iconBackground}
               icon={<MapPin size={20} className="text-primary" />}
               label={t(language, "settings.prayerTimesAndReminders")}
               right={<RowValue value={locationSettings?.cityName || t(language, "settings.locationNotSet")} />}
               onPress={() => onNav("notifications")}
               hasDivider={true}
-              {...itemProps("notifications")}
+              testId="settings-sub-location"
             />
             <SettingsRowItem
               iconBg={iconBackground}

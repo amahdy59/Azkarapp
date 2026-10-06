@@ -1827,6 +1827,8 @@ const en = {
     resetPreferencesTitle: "Restore Defaults",
     resetPreferencesConfirm: "Restore default preferences? Your progress, sessions, and saved azkar will be kept.",
     prayerTimesAndReminders: "Prayer Times & Reminders",
+    notificationsAndReminders: "Notifications & Reminders",
+    notificationsDescription: "Prayer-time alerts, morning, evening, and sleep reminders",
     routineAndReminders: "Routine & Reminders",
     languageAndCalendar: "Language & Calendar",
     locationNotSet: "Not set",
