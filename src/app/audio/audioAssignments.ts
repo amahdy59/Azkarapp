@@ -12,6 +12,7 @@ export const APPROVED_AUDIO_ASSIGNMENTS: Readonly<Record<string, string>> = Obje
   "s-hm-110b": "s-hm-110b",
   "s-hm-111": "s-hm-111",
   "friday-kahf": "quran-018",
+  "ir-baqarah": "quran-002",
   "m-hm-75": "m-hm-75",
   "m-hm-75a": "evening-e-hm-75a",
   "m-hm-76a": "m-hm-76a",

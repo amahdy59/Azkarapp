@@ -576,7 +576,7 @@ export function KhatmahReaderScreen({
   // Pointer-driven page turn. The transform is written straight to the node, so
   // dragging costs no React render at all — the previous implementation ran a
   // spring through component state on every frame.
-  const drag = useRef({ pointerId: -1, startX: 0, startY: 0, startedAt: 0, engaged: false });
+  const drag = useRef({ pointerId: -1, startX: 0, startY: 0, startedAt: 0, engaged: false, vertical: false });
 
   /** A tap is short and still. Anything slower or further is a gesture the
    *  reader was making, and must not be read as one they were not. */
@@ -591,7 +591,7 @@ export function KhatmahReaderScreen({
         paper.style.transform = "";
       }
       const { engaged, startX, startY, startedAt } = drag.current;
-      drag.current = { pointerId: -1, startX: 0, startY: 0, startedAt: 0, engaged: false };
+      drag.current = { pointerId: -1, startX: 0, startY: 0, startedAt: 0, engaged: false, vertical: false };
       // The browser cancels the pointer when it takes the gesture over for
       // scrolling. Committing a page turn on that would turn a scroll into a
       // page the reader never asked for.
@@ -605,6 +605,15 @@ export function KhatmahReaderScreen({
       }
 
       if (clientX === null || clientY === null) return;
+      const offsetY = clientY - startY;
+      if (offsetY <= -SWIPE_THRESHOLD) {
+        setIsQuickMenuOpen(true);
+        return;
+      }
+      if (offsetY >= SWIPE_THRESHOLD) {
+        setIsFocusMode((prev) => !prev);
+        return;
+      }
       const moved = Math.hypot(clientX - startX, clientY - startY);
       const heldFor = performance.now() - startedAt;
       if (moved > TAP_SLOP || heldFor > TAP_MS) return;
@@ -624,12 +633,18 @@ export function KhatmahReaderScreen({
       startY: event.clientY,
       startedAt: performance.now(),
       engaged: false,
+      vertical: false,
     };
   };
 
   const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
     if (drag.current.pointerId !== event.pointerId) return;
     const offset = event.clientX - drag.current.startX;
+    const verticalOffset = event.clientY - drag.current.startY;
+    if (!drag.current.engaged && Math.abs(verticalOffset) >= 12 && Math.abs(verticalOffset) > Math.abs(offset)) {
+      drag.current.vertical = true;
+    }
+    if (drag.current.vertical) return;
     if (!drag.current.engaged) {
       if (Math.abs(offset) < 12) return;
       drag.current.engaged = true;
@@ -654,7 +669,9 @@ export function KhatmahReaderScreen({
     endDrag(null, null, null, true);
   };
 
-  const mobileTopLeft =
+  const isRtl = direction === "rtl";
+
+  const mobileBack =
     !useRail && !isFocusMode ? (
       <button
         type="button"
@@ -669,7 +686,7 @@ export function KhatmahReaderScreen({
       </button>
     ) : undefined;
 
-  const mobileTopRight =
+  const mobileMore =
     !useRail && !isFocusMode ? (
       <button
         type="button"
@@ -681,6 +698,27 @@ export function KhatmahReaderScreen({
       >
         <span className="inline-flex h-8 min-w-[2.75rem] items-center justify-center gap-1 rounded-full border border-border/80 bg-card/90 px-3 text-foreground shadow-xs backdrop-blur-md transition-colors group-hover:bg-muted group-active:bg-muted">
           <MoreVertical size={16} aria-hidden="true" />
+        </span>
+      </button>
+    ) : undefined;
+
+  const mobileTopLeft = isRtl ? mobileMore : mobileBack;
+  const mobileTopRight = isRtl ? mobileBack : mobileMore;
+
+  const mobileBottomCenter =
+    !useRail && !isFocusMode ? (
+      <button
+        type="button"
+        onClick={() => {
+          setIndexTab("jump");
+          setIsIndexOpen(true);
+        }}
+        data-testid="mushaf-furniture-page-btn"
+        aria-label={t(language, "mushaf.pagePosition", { position: formatNumerals(currentPage, language) })}
+        className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+      >
+        <span className="inline-flex h-8 min-w-[2.75rem] items-center justify-center rounded-full border border-border/80 bg-card/90 px-3 text-xs font-bold tabular-nums text-foreground shadow-xs backdrop-blur-md transition-colors group-hover:bg-muted group-active:bg-muted">
+          {formatNumerals(currentPage, language)}
         </span>
       </button>
     ) : undefined;
@@ -852,7 +890,7 @@ export function KhatmahReaderScreen({
         onPointerMove={onPointerMove}
         onPointerUp={onPointerEnd}
         onPointerCancel={onPointerCancel}
-        style={{ touchAction: "pan-y" }}
+        style={{ touchAction: "pan-y pinch-zoom" }}
       >
         {!pageData && !error && (
           <div
@@ -909,6 +947,7 @@ export function KhatmahReaderScreen({
               topRightControl={mobileTopRight}
               topCenterControl={mobileTopCenter}
               bottomLeftControl={mobileBottomLeft}
+              bottomCenterControl={mobileBottomCenter}
               bottomRightControl={mobileBottomRight}
               onSurahClick={() => {
                 setIndexTab("surahs");
@@ -931,6 +970,8 @@ export function KhatmahReaderScreen({
               onNext={() => paginate(1)}
               progressBar={wirdProgressBar}
               paperRef={paperRef}
+              verticalGestures
+              showFloatingPageIndicator={!isFocusMode}
               pageTransitionDirection={pageTransitionDirection}
               reduceMotion={reduceMotion}
               hapticFeedback={hapticFeedback}

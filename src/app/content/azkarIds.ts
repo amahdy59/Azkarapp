@@ -143,7 +143,7 @@ export const CATEGORY_ZIKR_IDS: Partial<Record<CategoryId, readonly string[]>> =
   clothing: ["clo-ref-1", "clo-ref-2", "clo-ref-3", "clo-ref-4"],
   travel: ["tr-ref-1", "tr-ref-2", "tr-ref-3", "tr-ref-5", "tr-ref-6", "tr-ref-7", "tr-ref-8", "tr-ref-4", "tr-ref-9"],
   distress_anxiety: ["da-ref-1", "da-ref-2", "da-ref-3", "da-ref-4", "da-ref-5", "da-ref-6", "da-ref-7", "da-ref-8"],
-  illness_ruqyah: ["ir-ref-1", "ir-ref-2", "ir-ref-3", "ir-ref-4", "ir-ref-5", "ir-ref-6", "ir-ref-7"],
+  illness_ruqyah: ["ir-ref-1", "ir-ref-2", "ir-ref-3", "ir-ref-4", "ir-ref-5", "ir-ref-6", "ir-ref-7", "ir-baqarah"],
   social_community: [
     "sc-ref-1",
     "sc-ref-2",

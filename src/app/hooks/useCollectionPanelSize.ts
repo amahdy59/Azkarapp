@@ -1,13 +1,14 @@
 import { useLayoutEffect, useRef, useState } from "react";
 
-export const COLLECTION_PANEL_MIN = 288;
-export const COLLECTION_PANEL_DEFAULT = 336;
+export const COLLECTION_PANEL_MIN = 380;
+export const COLLECTION_PANEL_DEFAULT = 420;
+export const COLLECTION_PANEL_MAX = 600;
 export const COLLECTION_READING_MIN = 480;
 export const COLLECTION_PANEL_GUTTER = 12;
 
 export function collectionPanelBounds(workspace: number) {
   const maximum = Math.floor(
-    Math.min(480, workspace * 0.4, workspace - COLLECTION_READING_MIN - COLLECTION_PANEL_GUTTER),
+    Math.min(COLLECTION_PANEL_MAX, workspace * 0.45, workspace - COLLECTION_READING_MIN - COLLECTION_PANEL_GUTTER),
   );
   return { minimum: COLLECTION_PANEL_MIN, maximum, canDock: maximum >= COLLECTION_PANEL_MIN };
 }

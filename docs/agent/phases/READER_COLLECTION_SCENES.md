@@ -118,3 +118,40 @@ Other agents continue to modify the shared checkout. The passing check applies t
 ### Recommended next step
 
 Owner review of the local header visuals, followed by combined verification when all agents finish and before any publication.
+
+## Reduced-transparency visibility repair — 2026-10-05
+
+### Objective and scope
+
+Owner screenshot showed the original fallback rather than the new skyline. Remove only the Reader scene's app/OS reduced-transparency hiding rules. Static artwork already composites over an opaque wide brand surface or compact theme surface; it never samples content behind the header. Forced-colors decoration hiding remains. No layout, text, controls, persistence or loading changes.
+
+### Files and components changed
+
+ReaderSceneArt stylesheet, reader-scene browser regression spec, design system, decision log and this report. No new component or dependency.
+
+### User-visible and accessibility behavior
+
+Morning, Evening, Sleep and neutral static skies remain visible when the app or OS requests reduced transparency. Existing global blur-removal and opaque-surface accessibility rules remain intact. Mobile buttons stay borderless and all header geometry stays unchanged. Forced colors still show the plain functional header.
+
+### Tests and commands
+
+Updated browser assertions require both artwork and skyline to remain visible under app reduced transparency at four widths. Native Chromium media emulation checks OS reduced transparency at the same widths, with unchanged geometry and axe checks. Existing theme, enlarged-text, forced-colors and offline checks remain.
+
+| Command                                                                                                                           | Result                                                                                                                                                                                                                                                                                                              |
+| --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm exec vite build --outDir output/reader-visibility-preview`                                                                  | Passed, including generated offline service worker.                                                                                                                                                                                                                                                                 |
+| `pnpm test:e2e e2e/reader-scene.spec.ts e2e/reader-header-refinement.spec.ts --project=desktop-chromium` against isolated preview | Passed: 16 tests, 2.9 minutes. Both languages, three scene variants, four widths, all three themes, app/native OS reduced transparency, forced colors, enlarged text, offline, geometry and axe checks. Report: `output/reader-visibility-results.json`.                                                            |
+| Scoped ESLint                                                                                                                     | Passed for the modified browser spec.                                                                                                                                                                                                                                                                               |
+| `pnpm check`                                                                                                                      | Failed in 331.4s on concurrent lint/format work: AccessibleCombobox interaction lint, unused quranProgressStats argument and nine formatting files. Toolchain, typecheck, build, unit tests, audio manifest, type scale, motion, bundle budgets and CSS utilities passed. No unrelated assertions or gates changed. |
+| Scoped Prettier                                                                                                                   | CSS, browser spec, decision log and phase report passed. Shared DESIGN_SYSTEM fails on concurrent Mushaf section formatting; unrelated prose was preserved.                                                                                                                                                         |
+| `git diff --check`                                                                                                                | Passed.                                                                                                                                                                                                                                                                                                             |
+
+### Documentation and decisions
+
+Design system and decision log supersede the earlier overly broad scene-hiding contract. Earlier report sections retain their historical verification results. Owner authorizes local fixes only; no commit, push, deployment or release-note update.
+
+### Evidence, risks and next step
+
+Isolated preview: `output/reader-visibility-preview/`. Screenshots remain under `output/playwright/reader-scenes/`. Concurrent unrelated work is preserved. Physical-device and human assistive-technology evidence remain unclaimed. Include this repair in the owner's next independently verified release.
+
+Visually reviewed the 1440px Arabic Morning capture with native OS reduced transparency: dawn gradient and bounded mosque are visible, with clear title/progress and unchanged reader surface. The full gate must be rerun after the other agents finish their lint/format repairs; this local header repair has passed its scoped browser verification.

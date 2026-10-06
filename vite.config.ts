@@ -242,7 +242,18 @@ export default defineConfig(({ mode }) => {
           // are gone entirely (DEC-066 / F24), so naming them here would be dead
           // configuration. Do not re-add an asset here to hide its weight; take
           // it out of public/ instead.
-          globIgnores: ["**/FridayModeScreen-*.js"],
+          globIgnores: [
+            // FridayModeScreen is excluded because it is the heaviest optional
+            // route and is only relevant one day a week.
+            "**/FridayModeScreen-*.js",
+            // The following are low-traffic screens that are never on the
+            // critical path. They are served by runtime caching (StaleWhileRevalidate)
+            // after first visit, so pulling them into every install payload is
+            // wasteful — especially on first-time visitors who may never open them.
+            "**/MarketingLanding-*.js",
+            "**/AudioContentReviewScreen-*.js",
+            "**/QiblaScreen-*.js",
+          ],
           runtimeCaching: [
             // The Mushaf page data now ships with the app, so no api.quran.com
             // route is needed. The QCF page fonts are stored explicitly by
@@ -327,6 +338,7 @@ export default defineConfig(({ mode }) => {
              * lazy application shell requests a reading surface.
              */
             if (id.endsWith("/src/app/content/azkar.ts")) return "content";
+            if (id.endsWith("/src/app/content/baqarahSurah.ts")) return "baqarah";
             if (id.includes("node_modules/motion")) return "motion";
             if (id.endsWith("/src/app/audio/audioAssetsCore.ts")) return "audio-core";
             if (id.endsWith("/src/app/audio/audioAssetsDuas.ts")) return "audio-duas";

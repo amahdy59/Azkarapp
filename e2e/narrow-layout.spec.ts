@@ -43,6 +43,11 @@ test("core app screens do not overflow a 320px viewport", async ({ page }) => {
   await expectNoHorizontalOverflow(page, "Azkar Library");
 
   await page.getByTestId("category-card-morning").click();
+  await expect(page.getByTestId("reader-screen")).toBeVisible();
+  await expectNoHorizontalOverflow(page, "Direct Reader entry");
+  await page.getByRole("button", { name: "Back", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Azkar Library", exact: true })).toBeVisible();
+  await page.goto("./#/azkar/morning");
   await expect(page.locator("h1", { hasText: "Morning Azkar" })).toBeVisible();
   await expectNoHorizontalOverflow(page, "Category");
 

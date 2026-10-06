@@ -90,9 +90,9 @@ test("the prayer virtue dialog has no automatically detectable WCAG A/AA violati
 test("the collection share modal has no automatically detectable WCAG A/AA violations", async ({ page }, testInfo) => {
   await seed(page, "/#/azkar");
   await page.getByTestId("category-card-morning").click();
-  await expect(page.getByTestId("category-overview")).toBeVisible();
-
-  const shareBtn = page.getByTestId("share-collection-button");
+  await expect(page.getByTestId("reader-screen")).toBeVisible();
+  await page.getByRole("button", { name: /خيارات القارئ|Reader options/ }).click();
+  const shareBtn = page.getByTestId("reader-menu-share-collection");
   await expect(shareBtn).toBeVisible();
   await shareBtn.click();
 

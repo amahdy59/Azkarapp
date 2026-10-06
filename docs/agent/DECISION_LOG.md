@@ -1,6 +1,12 @@
 # Decision Log
 
+## Combined pending changes review and release — 2026-10-06
+
+The owner asks to recheck all changes and push the complete pending tree, superseding the previous publication hold. Preserve the requested refinements; repair clear code and efficiency defects, run the unchanged quality/release gates and monitor deployment. Existing Al-Baqarah content/recording metadata and Reader integration are preserved. No new religious interpretation, dependency, persistence schema or data migration is authorized by this review.
+
 ## Reader collection scenes — 2026-10-05
+
+Owner approves the local visibility repair after the published header showed only its fallback. Static gradient/SVG artwork must remain visible under app and OS reduced-transparency preferences: both header tiers already provide an opaque backing and the scene has no backdrop filter. Forced colors still omit decoration. This supersedes the earlier reduced-transparency scene-hiding decision only. Preserve sizing and borderless mobile controls; do not commit, push or deploy.
 
 Owner approves the follow-up reading-column alignment, quieter skyline, title/progress hierarchy, consistent toolbar anatomy and compact theme tuning. Explicit preference: mobile header buttons stay borderless; preserve existing header height and mobile spacing. Keep this work local while other agents are working; no commit, push or deployment.
 

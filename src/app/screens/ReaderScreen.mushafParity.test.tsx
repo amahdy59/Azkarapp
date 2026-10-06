@@ -343,7 +343,11 @@ describe("the phone layout integrates controls directly into the Mushaf canvas",
 
     const closeSvg = closeBtn.querySelector("svg");
     expect(closeSvg).toBeInTheDocument();
-    expect(closeSvg).not.toHaveAttribute("data-rtl-flip");
+    expect(closeSvg).toHaveAttribute("data-rtl-flip", "");
+
+    // In RTL, Back button sits at top-right (leading) and More options sits at top-left (trailing)
+    expect(closeBtn.closest("[data-testid='mushaf-corner-top-right']")).not.toBeNull();
+    expect(moreBtn.closest("[data-testid='mushaf-corner-top-left']")).not.toBeNull();
   });
 
   it("names the surah being read in the cartouche", () => {

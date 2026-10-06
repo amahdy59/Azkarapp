@@ -53,8 +53,8 @@
 
 .audio-compact-progress .audio-seek-waveform > span,
 .audio-compact-progress .audio-seek-waveform-played > span {
-  width: 3px;
-  flex: 0 1 3px;
+  width: 2px;
+  flex: 0 0 2px;
 }
 
 @container audio-dock (max-width: 24rem) {

@@ -5,6 +5,12 @@ import { getEstimatedPrayerTimes } from "../src/app/content/prayerTimes";
 const prayers = ["fajr", "dhuhr", "asr", "maghrib", "isha"] as const;
 
 async function openHome(page: Page, language: "ar" | "en") {
+  // Repeated theme reloads can surface a waiting-worker notice in Firefox.
+  // Defer through the real control so it cannot obstruct the prayer flow.
+  const later = page.getByRole("button", { name: language === "ar" ? "لاحقاً" : "Later", exact: true });
+  await page.addLocatorHandler(later, async () => {
+    await later.click();
+  });
   await page.clock.setFixedTime(new Date("2026-09-05T13:40:00+03:00"));
   await page.addInitScript((language) => {
     localStorage.setItem("azkarapp.onboarding-complete.v1", "true");

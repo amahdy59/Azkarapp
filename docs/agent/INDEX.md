@@ -1,5 +1,7 @@
 # AI Improvement System Index
 
+[Pending changes review and release, 2026-10-06](phases/PENDING_CHANGES_REVIEW_2026_10_06.md) records the combined review, lifecycle-safe persistence, daily streak refresh, keyboard and touch-gesture repairs, preserved owner refinements, and release verification.
+
 [Reader collection scenes](phases/READER_COLLECTION_SCENES.md) records the owner-approved static gradient/SVG header refinement, unchanged sizing, accessibility fallbacks and local-only verification.
 
 [Compact combined shared cards](phases/COMPACT_COMBINED_SHARED_CARDS.md) records the active owner-approved combined-card density, citation/repetition row, plain footer and Arabic-Indic export numeral refinement.

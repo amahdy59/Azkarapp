@@ -2,8 +2,8 @@ import { useMemo, useState } from "react";
 import { Header } from "../components/LayoutShells";
 import { ProgressBar } from "../components/ProgressBar";
 import { ScreenContainer } from "../components/ScreenContainer";
-import { ArrowNext, BookOpen, Check, Undo, Minus, Plus, RotateCcw } from "../components/icons";
-import { getJuzNumberForPage, getSurahDisplayName, JUZS, SURAHS } from "../content/surahInfo";
+import { ArrowNext, BookOpen, Check, ChevronDown, Minus, Plus, RotateCcw, Search, Undo, X } from "../components/icons";
+import { getJuzNumberForPage, getSurahDisplayName, JUZS, SURAHS, searchSurahs } from "../content/surahInfo";
 import {
   effectiveDailyGoal,
   getQuranWirdGoal,
@@ -11,20 +11,13 @@ import {
   getReadingMonthDuration,
   TOTAL_MUSHAF_PAGES,
 } from "./quranWirdGoal";
+import { computeQuranProgressStats, getJuzPageRange } from "./quranProgressStats";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { getProgressDayKey } from "../progress";
 import { useNow } from "../hooks/useNow";
 import type { AppLanguage, QuranReadingEvent, QuranReadingPosition, QuranWirdPlan } from "../types";
 import { currentSaturdayWeekKeys } from "./quranWirdWeek";
-
-function getJuzPageRange(juzNum: number): { startPage: number; endPage: number } {
-  const juz = JUZS.find((j) => j.number === juzNum) ?? JUZS[0]!;
-  if (juzNum >= 30) return { startPage: juz.startPage, endPage: 604 };
-  const nextJuz = JUZS.find((j) => j.number === juzNum + 1);
-  const endPage = nextJuz ? nextJuz.startPage - 1 : 604;
-  return { startPage: juz.startPage, endPage };
-}
 
 function getSurahPageRange(surahNum: number): { startPage: number; endPage: number } {
   const surah = SURAHS.find((s) => s.number === surahNum) ?? SURAHS[0]!;
@@ -66,7 +59,7 @@ function planLabel(language: AppLanguage, plan: QuranWirdPlan) {
   return t(language, "mushaf.planDaily");
 }
 
-type VisiblePlanKind = "repeating" | "daily" | "hijriMonth" | "gregorianMonth" | "free";
+type VisiblePlanKind = "repeating" | "daily" | "hijriMonth" | "gregorianMonth" | "custom" | "free";
 
 function createPlan(
   kind: VisiblePlanKind,
@@ -94,6 +87,19 @@ function createPlan(
     return {
       kind,
       dailyPages: current?.kind === "daily" ? current.dailyPages : 4,
+      startedDayKey: todayKey,
+    };
+  }
+  if (kind === "custom") {
+    const startPage = current?.startPage ?? position.page;
+    const targetPage = current?.targetPage ?? TOTAL_MUSHAF_PAGES;
+    const durationDays = current?.durationDays ?? 30;
+    return {
+      kind: "custom",
+      durationDays,
+      dailyPages: Math.ceil(Math.max(1, targetPage - startPage + 1) / durationDays),
+      startPage,
+      targetPage,
       startedDayKey: todayKey,
     };
   }
@@ -180,6 +186,11 @@ export function QuranWirdScreen({
   const repeatEnd = plan.repeatEndPage ?? TOTAL_MUSHAF_PAGES;
   const completedPages = Array.from(new Set(wirdHistory[todayKey] ?? []));
 
+  const overallStats = useMemo(
+    () => computeQuranProgressStats(plan, wirdHistory, position),
+    [plan, wirdHistory, position],
+  );
+
   const targetPages: number[] = [];
   if (isRepeating) {
     for (let page = repeatStart; page <= repeatEnd; page += 1) {
@@ -229,8 +240,29 @@ export function QuranWirdScreen({
     !plan.startedDayKey && position.page === 1 && Object.values(wirdHistory).every((pages) => !pages.length);
   const [isDrafting, setIsDrafting] = useState(firstPlan);
   const [draftPlan, setDraftPlan] = useState<QuranWirdPlan>(() =>
-    plan.kind === "custom" || plan.kind === "khatmah30" ? createPlan("hijriMonth", now, todayKey, position) : plan,
+    plan.kind === "khatmah30" ? createPlan("hijriMonth", now, todayKey, position) : plan,
   );
+
+  const [juzSearch, setJuzSearch] = useState("");
+  const [surahSearch, setSurahSearch] = useState("");
+
+  const filteredJuzs = useMemo(() => {
+    const query = juzSearch.trim().toLowerCase();
+    if (!query) return JUZS;
+    return JUZS.filter((j) => {
+      const nameAr = j.nameArabic.toLowerCase();
+      const nameEn = j.nameEnglish.toLowerCase();
+      const num = String(j.number);
+      return nameAr.includes(query) || nameEn.includes(query) || num.includes(query);
+    });
+  }, [juzSearch]);
+
+  const filteredSurahs = useMemo(() => {
+    const query = surahSearch.trim().toLowerCase();
+    if (!query) return SURAHS;
+    return searchSurahs(query, language);
+  }, [surahSearch, language]);
+
   const timedDraft =
     draftPlan.kind === "custom" ||
     draftPlan.kind === "khatmah30" ||
@@ -273,9 +305,27 @@ export function QuranWirdScreen({
           className="rounded-3xl border border-primary/50 bg-card p-5 shadow-raised sm:p-6 lg:col-span-2"
           aria-labelledby="wird-today-title"
         >
-          <h2 id="wird-today-title" className="mb-3 text-xl font-extrabold text-foreground">
-            {t(language, "mushaf.todayReadingTitle")}
-          </h2>
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <h2 id="wird-today-title" className="text-xl font-extrabold text-foreground">
+              {t(language, "mushaf.todayReadingTitle")}
+            </h2>
+            {!isFreeReading && !goalResult.expired && (
+              <span
+                className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-bold ${
+                  remaining === 0 ? "bg-success/15 text-success" : "bg-primary/10 text-primary"
+                }`}
+              >
+                {remaining === 0 ? (
+                  <>
+                    <Check size={12} strokeWidth={3} aria-hidden="true" />
+                    <span>{t(language, "mushaf.statusCompleted")}</span>
+                  </>
+                ) : (
+                  <span>{t(language, "mushaf.statusInProgress")}</span>
+                )}
+              </span>
+            )}
+          </div>
 
           {isFreeReading ? (
             <>
@@ -404,12 +454,18 @@ export function QuranWirdScreen({
           )}
         </section>
 
+        {/* Plan card with integrated overall completion metrics */}
         <section
-          className={`rounded-3xl border border-border bg-card p-5 shadow-xs ${isFreeReading || isMonthPlan ? "lg:col-span-2" : ""}`}
+          className={`rounded-3xl border border-border bg-card p-5 shadow-xs sm:p-6 ${
+            isFreeReading || isMonthPlan ? "lg:col-span-2" : "lg:col-span-1"
+          }`}
+          aria-labelledby="wird-plan-title"
         >
           <div className="mb-4 flex items-start justify-between">
             <div>
-              <h2 className="text-base font-extrabold text-foreground">{t(language, "mushaf.planTitle")}</h2>
+              <h2 id="wird-plan-title" className="text-base font-extrabold text-foreground">
+                {t(language, "mushaf.planTitle")}
+              </h2>
               {!isDrafting && (
                 <>
                   {isMonthPlan && <p className="mt-1 text-lg font-extrabold text-foreground">{currentPlanMonth}</p>}
@@ -421,11 +477,7 @@ export function QuranWirdScreen({
               <button
                 type="button"
                 onClick={() => {
-                  setDraftPlan(
-                    plan.kind === "custom" || plan.kind === "khatmah30"
-                      ? createPlan("hijriMonth", now, todayKey, position)
-                      : plan,
-                  );
+                  setDraftPlan(plan.kind === "khatmah30" ? createPlan("hijriMonth", now, todayKey, position) : plan);
                   setIsDrafting(true);
                 }}
                 className="min-h-11 rounded-xl px-3 text-sm font-bold text-primary hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
@@ -457,6 +509,49 @@ export function QuranWirdScreen({
             </div>
           )}
 
+          {!isDrafting && !isMonthPlan && !isFreeReading && (
+            <div className="border-t border-border/60 pt-4">
+              <p className="mb-3 text-xs font-bold text-muted-foreground">
+                {t(language, "mushaf.overallProgressTitle")}
+              </p>
+              <div className="grid grid-cols-2 gap-2.5">
+                <div className="rounded-2xl border border-border/70 bg-muted/30 p-3">
+                  <p className="text-xs font-bold text-muted-foreground">{t(language, "mushaf.overallPagesRead")}</p>
+                  <p className="mt-1 text-sm font-black text-foreground">
+                    <bdi dir="ltr">
+                      {formatNumerals(overallStats.totalUniquePagesRead, language)} /{" "}
+                      {formatNumerals(TOTAL_MUSHAF_PAGES, language)}
+                    </bdi>
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-border/70 bg-muted/30 p-3">
+                  <p className="text-xs font-bold text-muted-foreground">{t(language, "mushaf.completedJuzs")}</p>
+                  <p className="mt-1 text-sm font-black text-foreground">
+                    <bdi dir="ltr">
+                      {formatNumerals(overallStats.completedJuzsCount, language)} / {formatNumerals(30, language)}
+                    </bdi>
+                  </p>
+                </div>
+              </div>
+              <div className="mt-3 flex items-center justify-between text-xs font-semibold text-muted-foreground">
+                <span>
+                  {t(language, "mushaf.khatmahProgressPercent", {
+                    percent: formatNumerals(overallStats.mushafCompletionPercent, language),
+                  })}
+                </span>
+                <span>
+                  {t(language, "mushaf.wirdRemaining", {
+                    count: formatNumerals(
+                      Math.max(0, TOTAL_MUSHAF_PAGES - overallStats.totalUniquePagesRead),
+                      language,
+                    ),
+                    goal: formatNumerals(TOTAL_MUSHAF_PAGES, language),
+                  })}
+                </span>
+              </div>
+            </div>
+          )}
+
           {isDrafting && (
             <div className="flex flex-col gap-4 border-t border-border/60 pt-4">
               <fieldset>
@@ -471,6 +566,7 @@ export function QuranWirdScreen({
                       ["daily", "mushaf.planPagesPerDay", "mushaf.planPagesPerDayHint"],
                       ["hijriMonth", "mushaf.planHijriMonth", "mushaf.planHijriMonthHint"],
                       ["gregorianMonth", "mushaf.planGregorianMonth", "mushaf.planGregorianMonthHint"],
+                      ["custom", "mushaf.planCustomChoice", "mushaf.customPlanChoiceHint"],
                       ["free", "mushaf.planFreeReading", "mushaf.planFreeReadingHint"],
                     ] as const
                   ).map(([kind, titleKey, hintKey]) => {
@@ -578,77 +674,133 @@ export function QuranWirdScreen({
                   </div>
 
                   {(draftPlan.repeatScope ?? "juz") === "juz" && (
-                    <div className="flex flex-col gap-1.5">
+                    <div className="flex flex-col gap-2">
                       <label htmlFor="quran-wird-juz-select" className="text-xs font-bold text-muted-foreground">
                         {t(language, "mushaf.selectJuz")}
                       </label>
-                      <select
-                        id="quran-wird-juz-select"
-                        value={draftPlan.repeatNumber ?? 1}
-                        onChange={(e) => {
-                          const juzNum = Number(e.target.value);
-                          const range = getJuzPageRange(juzNum);
-                          setDraftPlan({
-                            ...draftPlan,
-                            repeatScope: "juz",
-                            repeatNumber: juzNum,
-                            repeatStartPage: range.startPage,
-                            repeatEndPage: range.endPage,
-                            dailyPages: range.endPage - range.startPage + 1,
-                            startedDayKey: todayKey,
-                          });
-                        }}
-                        className="h-12 w-full rounded-xl border border-border bg-card px-3 text-sm font-bold text-foreground focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                      >
-                        {JUZS.map((j) => {
-                          const range = getJuzPageRange(j.number);
-                          const name = language === "ar" ? j.nameArabic : j.nameEnglish;
-                          return (
-                            <option key={j.number} value={j.number}>
-                              {name} ({formatNumerals(range.startPage, language)}–
-                              {formatNumerals(range.endPage, language)})
-                            </option>
-                          );
-                        })}
-                      </select>
+                      <div className="relative">
+                        <span className="pointer-events-none absolute inset-y-0 start-3 flex items-center text-muted-foreground">
+                          <Search size={16} aria-hidden="true" />
+                        </span>
+                        <input
+                          type="text"
+                          value={juzSearch}
+                          onChange={(e) => setJuzSearch(e.target.value)}
+                          placeholder={t(language, "mushaf.searchJuzPlaceholder")}
+                          aria-label={t(language, "mushaf.searchJuzPlaceholder")}
+                          className="h-11 w-full rounded-xl border border-border bg-background pe-12 ps-9 text-xs font-bold text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                        />
+                        {juzSearch && (
+                          <button
+                            type="button"
+                            onClick={() => setJuzSearch("")}
+                            className="absolute inset-y-0 end-0 flex w-11 items-center justify-center rounded-xl text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                            aria-label={t(language, "common.clear")}
+                          >
+                            <X size={14} aria-hidden="true" />
+                          </button>
+                        )}
+                      </div>
+                      <div className="relative">
+                        <select
+                          id="quran-wird-juz-select"
+                          value={draftPlan.repeatNumber ?? 1}
+                          onChange={(e) => {
+                            const juzNum = Number(e.target.value);
+                            const range = getJuzPageRange(juzNum);
+                            setDraftPlan({
+                              ...draftPlan,
+                              repeatScope: "juz",
+                              repeatNumber: juzNum,
+                              repeatStartPage: range.startPage,
+                              repeatEndPage: range.endPage,
+                              dailyPages: range.endPage - range.startPage + 1,
+                              startedDayKey: todayKey,
+                            });
+                          }}
+                          className="h-12 w-full appearance-none rounded-xl border border-border bg-card pe-10 ps-3.5 text-sm font-bold text-foreground transition-colors hover:border-primary/50 focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                        >
+                          {filteredJuzs.map((j) => {
+                            const range = getJuzPageRange(j.number);
+                            const name = language === "ar" ? j.nameArabic : j.nameEnglish;
+                            return (
+                              <option key={j.number} value={j.number}>
+                                {name} ({formatNumerals(range.startPage, language)}–
+                                {formatNumerals(range.endPage, language)})
+                              </option>
+                            );
+                          })}
+                        </select>
+                        <span className="pointer-events-none absolute inset-y-0 end-3.5 flex items-center text-muted-foreground">
+                          <ChevronDown size={18} aria-hidden="true" />
+                        </span>
+                      </div>
                     </div>
                   )}
 
                   {draftPlan.repeatScope === "surah" && (
-                    <div className="flex flex-col gap-1.5">
+                    <div className="flex flex-col gap-2">
                       <label htmlFor="quran-wird-surah-select" className="text-xs font-bold text-muted-foreground">
                         {t(language, "mushaf.selectSurah")}
                       </label>
-                      <select
-                        id="quran-wird-surah-select"
-                        value={draftPlan.repeatNumber ?? 1}
-                        onChange={(e) => {
-                          const surahNum = Number(e.target.value);
-                          const range = getSurahPageRange(surahNum);
-                          setDraftPlan({
-                            ...draftPlan,
-                            repeatScope: "surah",
-                            repeatNumber: surahNum,
-                            repeatStartPage: range.startPage,
-                            repeatEndPage: range.endPage,
-                            dailyPages: range.endPage - range.startPage + 1,
-                            startedDayKey: todayKey,
-                          });
-                        }}
-                        className="h-12 w-full rounded-xl border border-border bg-card px-3 text-sm font-bold text-foreground focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                      >
-                        {SURAHS.map((s) => {
-                          const range = getSurahPageRange(s.number);
-                          const name = getSurahDisplayName(s.number, language);
-                          const pagesCount = range.endPage - range.startPage + 1;
-                          return (
-                            <option key={s.number} value={s.number}>
-                              {s.number}. {name} ({formatNumerals(pagesCount, language)}{" "}
-                              {t(language, "mushaf.pagesUnit")})
-                            </option>
-                          );
-                        })}
-                      </select>
+                      <div className="relative">
+                        <span className="pointer-events-none absolute inset-y-0 start-3 flex items-center text-muted-foreground">
+                          <Search size={16} aria-hidden="true" />
+                        </span>
+                        <input
+                          type="text"
+                          value={surahSearch}
+                          onChange={(e) => setSurahSearch(e.target.value)}
+                          placeholder={t(language, "mushaf.searchSurahPlaceholder")}
+                          aria-label={t(language, "mushaf.searchSurahPlaceholder")}
+                          className="h-11 w-full rounded-xl border border-border bg-background pe-12 ps-9 text-xs font-bold text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                        />
+                        {surahSearch && (
+                          <button
+                            type="button"
+                            onClick={() => setSurahSearch("")}
+                            className="absolute inset-y-0 end-0 flex w-11 items-center justify-center rounded-xl text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                            aria-label={t(language, "common.clear")}
+                          >
+                            <X size={14} aria-hidden="true" />
+                          </button>
+                        )}
+                      </div>
+                      <div className="relative">
+                        <select
+                          id="quran-wird-surah-select"
+                          value={draftPlan.repeatNumber ?? 1}
+                          onChange={(e) => {
+                            const surahNum = Number(e.target.value);
+                            const range = getSurahPageRange(surahNum);
+                            setDraftPlan({
+                              ...draftPlan,
+                              repeatScope: "surah",
+                              repeatNumber: surahNum,
+                              repeatStartPage: range.startPage,
+                              repeatEndPage: range.endPage,
+                              dailyPages: range.endPage - range.startPage + 1,
+                              startedDayKey: todayKey,
+                            });
+                          }}
+                          className="h-12 w-full appearance-none rounded-xl border border-border bg-card pe-10 ps-3.5 text-sm font-bold text-foreground transition-colors hover:border-primary/50 focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                        >
+                          {filteredSurahs.map((s) => {
+                            const range = getSurahPageRange(s.number);
+                            const name = getSurahDisplayName(s.number, language);
+                            const pagesCount = range.endPage - range.startPage + 1;
+                            return (
+                              <option key={s.number} value={s.number}>
+                                {s.number}. {name} ({formatNumerals(pagesCount, language)}{" "}
+                                {t(language, "mushaf.pagesUnit")})
+                              </option>
+                            );
+                          })}
+                        </select>
+                        <span className="pointer-events-none absolute inset-y-0 end-3.5 flex items-center text-muted-foreground">
+                          <ChevronDown size={18} aria-hidden="true" />
+                        </span>
+                      </div>
                     </div>
                   )}
 
@@ -772,6 +924,168 @@ export function QuranWirdScreen({
                 </div>
               ) : null}
 
+              {draftPlan.kind === "custom" ? (
+                <div className="flex flex-col gap-3 rounded-2xl border border-border bg-muted/40 p-4">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label
+                        htmlFor="quran-wird-custom-start-page"
+                        className="mb-1 block text-xs font-bold text-muted-foreground"
+                      >
+                        {t(language, "mushaf.fromPage")}
+                      </label>
+                      <input
+                        id="quran-wird-custom-start-page"
+                        type="number"
+                        min={1}
+                        max={604}
+                        value={draftPlan.startPage ?? position.page}
+                        onWheel={(e) => e.currentTarget.blur()}
+                        onChange={(e) => {
+                          const start = Math.min(604, Math.max(1, Number(e.target.value) || 1));
+                          const end = Math.max(start, draftPlan.targetPage ?? TOTAL_MUSHAF_PAGES);
+                          const days = draftPlan.durationDays ?? 30;
+                          setDraftPlan({
+                            ...draftPlan,
+                            startPage: start,
+                            targetPage: end,
+                            dailyPages: Math.ceil((end - start + 1) / days),
+                            startedDayKey: todayKey,
+                          });
+                        }}
+                        className="h-12 w-full rounded-xl border border-border bg-card px-3 text-center text-base font-bold text-foreground focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="quran-wird-custom-target-page"
+                        className="mb-1 block text-xs font-bold text-muted-foreground"
+                      >
+                        {t(language, "mushaf.toPage")}
+                      </label>
+                      <input
+                        id="quran-wird-custom-target-page"
+                        type="number"
+                        min={1}
+                        max={604}
+                        value={draftPlan.targetPage ?? TOTAL_MUSHAF_PAGES}
+                        onWheel={(e) => e.currentTarget.blur()}
+                        onChange={(e) => {
+                          const end = Math.min(604, Math.max(1, Number(e.target.value) || 1));
+                          const start = Math.min(end, draftPlan.startPage ?? 1);
+                          const days = draftPlan.durationDays ?? 30;
+                          setDraftPlan({
+                            ...draftPlan,
+                            startPage: start,
+                            targetPage: end,
+                            dailyPages: Math.ceil((end - start + 1) / days),
+                            startedDayKey: todayKey,
+                          });
+                        }}
+                        className="h-12 w-full rounded-xl border border-border bg-card px-3 text-center text-base font-bold text-foreground focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="quran-wird-custom-days"
+                      className="mb-1 block text-xs font-bold text-muted-foreground"
+                    >
+                      {t(language, "mushaf.durationDays")}
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const days = Math.max(1, (draftPlan.durationDays ?? 30) - 5);
+                          const start = draftPlan.startPage ?? position.page;
+                          const end = draftPlan.targetPage ?? TOTAL_MUSHAF_PAGES;
+                          setDraftPlan({
+                            ...draftPlan,
+                            durationDays: days,
+                            dailyPages: Math.ceil((end - start + 1) / days),
+                            startedDayKey: todayKey,
+                          });
+                        }}
+                        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-border bg-card text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                        aria-label={t(language, "common.decrease")}
+                      >
+                        <Minus size={20} />
+                      </button>
+                      <input
+                        id="quran-wird-custom-days"
+                        type="number"
+                        min={1}
+                        max={365}
+                        value={draftPlan.durationDays ?? 30}
+                        onChange={(e) => {
+                          const days = Math.min(365, Math.max(1, Number(e.target.value) || 1));
+                          const start = draftPlan.startPage ?? position.page;
+                          const end = draftPlan.targetPage ?? TOTAL_MUSHAF_PAGES;
+                          setDraftPlan({
+                            ...draftPlan,
+                            durationDays: days,
+                            dailyPages: Math.ceil((end - start + 1) / days),
+                            startedDayKey: todayKey,
+                          });
+                        }}
+                        inputMode="numeric"
+                        onWheel={(e) => e.currentTarget.blur()}
+                        className="h-12 w-full rounded-xl border border-border bg-background px-3 text-center text-lg font-bold text-foreground focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const days = Math.min(365, (draftPlan.durationDays ?? 30) + 5);
+                          const start = draftPlan.startPage ?? position.page;
+                          const end = draftPlan.targetPage ?? TOTAL_MUSHAF_PAGES;
+                          setDraftPlan({
+                            ...draftPlan,
+                            durationDays: days,
+                            dailyPages: Math.ceil((end - start + 1) / days),
+                            startedDayKey: todayKey,
+                          });
+                        }}
+                        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-border bg-card text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                        aria-label={t(language, "common.increase")}
+                      >
+                        <Plus size={20} />
+                      </button>
+                    </div>
+
+                    <div className="mt-2 flex items-center gap-2">
+                      {[30, 60, 90, 180].map((preset) => {
+                        const isActive = (draftPlan.durationDays ?? 30) === preset;
+                        return (
+                          <button
+                            key={preset}
+                            type="button"
+                            onClick={() => {
+                              const start = draftPlan.startPage ?? position.page;
+                              const end = draftPlan.targetPage ?? TOTAL_MUSHAF_PAGES;
+                              setDraftPlan({
+                                ...draftPlan,
+                                durationDays: preset,
+                                dailyPages: Math.ceil((end - start + 1) / preset),
+                                startedDayKey: todayKey,
+                              });
+                            }}
+                            className={`min-h-11 rounded-lg px-2.5 py-1 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                              isActive
+                                ? "bg-primary text-primary-foreground"
+                                : "border border-border bg-card text-muted-foreground hover:bg-muted"
+                            }`}
+                          >
+                            {formatNumerals(preset, language)} {t(language, "mushaf.durationDays")}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+
               <div className="flex flex-col gap-1 rounded-xl bg-muted p-4 text-sm font-medium text-foreground">
                 {draftPlan.kind === "free" ? (
                   <p>{t(language, "mushaf.freeReadingSummary")}</p>
@@ -819,11 +1133,29 @@ export function QuranWirdScreen({
         </section>
 
         {!isFreeReading && !isMonthPlan && (
-          <section className="rounded-3xl border border-border bg-card p-5 shadow-xs" aria-labelledby="wird-week-title">
-            <h2 id="wird-week-title" className="text-base font-extrabold text-foreground">
-              {t(language, "mushaf.thisWeek")}
-            </h2>
-            <div className="mt-4 flex flex-col gap-2" role="list" aria-label={t(language, "mushaf.thisWeek")}>
+          <section
+            className="rounded-3xl border border-border bg-card p-5 shadow-xs sm:p-6 lg:col-span-1"
+            aria-labelledby="wird-week-title"
+          >
+            <div className="mb-4 flex items-center justify-between">
+              <h2 id="wird-week-title" className="text-base font-extrabold text-foreground">
+                {t(language, "mushaf.thisWeek")}
+              </h2>
+              <span className="text-xs font-bold text-muted-foreground">
+                {t(language, "mushaf.weekDaysCompleted", {
+                  done: formatNumerals(
+                    week.filter((k) => {
+                      const dp = getQuranWirdDayProgress(plan, wirdHistory, k);
+                      const elig = !plan.startedDayKey || k >= plan.startedDayKey;
+                      const dg = elig ? (quranWirdDailyGoals[k] ?? dp.goal) : 0;
+                      return elig && dg > 0 && dp.read >= dg;
+                    }).length,
+                    language,
+                  ),
+                })}
+              </span>
+            </div>
+            <div className="flex flex-col gap-2" role="list" aria-label={t(language, "mushaf.thisWeek")}>
               {week.map((dayKey) => {
                 const dayProgress = getQuranWirdDayProgress(plan, wirdHistory, dayKey);
                 const dayEligible = !plan.startedDayKey || dayKey >= plan.startedDayKey;
@@ -838,7 +1170,9 @@ export function QuranWirdScreen({
                   <div
                     key={dayKey}
                     role="listitem"
-                    className={`flex items-center justify-between rounded-xl p-3 ${dayKey === todayKey ? "bg-muted" : ""}`}
+                    className={`flex items-center justify-between rounded-xl px-3 py-2.5 transition-colors ${
+                      dayKey === todayKey ? "bg-muted font-bold" : "hover:bg-muted/40"
+                    }`}
                   >
                     <div className="flex items-center gap-3">
                       <span className="w-12 text-sm font-bold text-foreground">{dayLabel}</span>

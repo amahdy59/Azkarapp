@@ -326,4 +326,20 @@ describe("useSessionHandlers", () => {
     act(() => result.current.handlers.repeatCategory("before_sleep"));
     expect(onResetSurahPages).toHaveBeenCalledWith(["s-hm-110a", "s-hm-110b"]);
   });
+
+  it("navigates directly to reader at the first incomplete zikr when openCategory is called", () => {
+    const { result, push } = renderSessionHarness({ initialView: "library" });
+    act(() => result.current.handlers.openCategory("morning"));
+    expect(push).toHaveBeenCalledWith("reader");
+    expect(result.current.category).toBe("morning");
+    expect(result.current.index).toBe(0);
+    expect(result.current.activeTab).toBe("azkar");
+  });
+
+  it("navigates directly to reader with subcategory when openCategory is called", () => {
+    const { result, push } = renderSessionHarness({ initialView: "library" });
+    act(() => result.current.handlers.openCategory("after_prayer", "maghrib"));
+    expect(push).toHaveBeenCalledWith("reader");
+    expect(result.current.category).toBe("after_prayer");
+  });
 });

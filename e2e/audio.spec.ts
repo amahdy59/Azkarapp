@@ -180,7 +180,7 @@ async function _enterEnglishGuestMode(page: import("@playwright/test").Page) {
   await page.getByTestId("onboarding-get-started").click();
   await page.getByTestId("nav-azkar").click();
   await page.getByTestId("category-card-morning").click();
-  await page.getByRole("button", { name: "Start Session", exact: true }).click();
+  await expect(page.getByTestId("reader-screen")).toBeVisible();
 }
 
 test("unreviewed audio is unavailable and never autoplays", async ({ page }) => {
@@ -215,11 +215,12 @@ test("Core Reader keeps the same stable zikr identity as its filtered routine", 
   await page.getByTestId("confirm-language").click();
   await page.getByTestId("onboarding-get-started").click();
 
-  // Go to Library and click Morning Azkar to enter Category Screen.
+  // Select the mode in the collection overview before entering ReaderScreen.
   await page.getByTestId("nav-azkar").click();
   await page.getByTestId("category-card-morning").click();
-
-  // Change the mode, then start session into ReaderScreen.
+  await expect(page.getByTestId("reader-screen")).toBeVisible();
+  await page.goto("./#/azkar/morning");
+  await expect(page.getByTestId("category-overview")).toBeVisible();
   await page.getByTestId("routine-mode-filter").click();
   await page.getByRole("menuitemradio", { name: /^Core/ }).click();
   await page.getByRole("button", { name: "Start Session", exact: true }).click();

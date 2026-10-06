@@ -156,11 +156,7 @@ export function useSessionHandlers({
     setRepeatCompleted(new Set());
     readerOpenedFromCategoryRef.current = false;
     setActiveTab("azkar");
-    setActiveCat(catId);
-    if (subCat !== undefined) {
-      setActiveSubCategory(subCat);
-    }
-    push("category");
+    resumeCategory(catId, subCat);
   };
 
   const openReader = (catId: CategoryId, i: number, modeOverride?: RoutineMode, subCat?: string) => {

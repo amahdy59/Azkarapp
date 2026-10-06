@@ -33,10 +33,11 @@ describe("reviewed Mushaf pages", () => {
 
   it("covers every reviewed page and preserves each complete long surah", () => {
     const sleepSurahs = getAzkarByCategory("before_sleep").filter((zikr) => isLongSurah(zikr));
-    const longSurahs = [...sleepSurahs, FRIDAY_KAHF[0]!];
+    const ruqyahSurahs = getAzkarByCategory("illness_ruqyah").filter((zikr) => isLongSurah(zikr));
+    const longSurahs = [...sleepSurahs, FRIDAY_KAHF[0]!, ...ruqyahSurahs];
 
-    expect(longSurahs.map((zikr) => zikr.id)).toEqual(["s-hm-110a", "s-hm-110b", "friday-kahf"]);
-    expect(longSurahs.map((zikr) => zikr.mushafPages?.length)).toEqual([3, 3, 12]);
+    expect(longSurahs.map((zikr) => zikr.id)).toEqual(["s-hm-110a", "s-hm-110b", "friday-kahf", "ir-baqarah"]);
+    expect(longSurahs.map((zikr) => zikr.mushafPages?.length)).toEqual([3, 3, 12, 48]);
 
     for (const zikr of longSurahs) {
       const pages = splitMushafPages(zikr.arabicText, zikr.mushafPages ?? []);

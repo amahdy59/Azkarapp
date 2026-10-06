@@ -133,8 +133,8 @@ describe("ReaderScreen audio identity", () => {
     // Expanding sidebar using toggle button
     fireEvent.click(toggleBtn);
     expect(toggleBtn).not.toBeVisible();
-    expect(navigator).toHaveStyle({ width: "336px" });
-    expect(screen.getByRole("separator")).toHaveAttribute("aria-valuemax", "441");
+    expect(navigator).toHaveStyle({ width: "420px" });
+    expect(screen.getByRole("separator")).toHaveAttribute("aria-valuemax", "496");
     expect(navigator).not.toHaveAttribute("hidden");
     fireEvent.click(screen.getByTestId("reader-sidebar-close"));
     expect(navigator).toHaveAttribute("hidden");
@@ -692,5 +692,111 @@ describe("ReaderScreen audio identity", () => {
     expect(screen.getByTestId("mock-audio")).toBeInTheDocument();
     expect(screen.getByTestId("mock-benefit")).toBeInTheDocument();
     expect(screen.getByTestId("mock-next")).toBeInTheDocument();
+  });
+
+  it("preserves identical look, feel and border styling between expanded and collapsed sidebar toggle buttons", () => {
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn().mockImplementation((query: string) => ({
+        matches: query.includes("min-width: 768px") || query.includes("min-width: 1200px"),
+        media: query,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      })),
+    );
+    const morning = getAzkarForMode("morning", "core");
+    render(
+      <ReaderScreen
+        catId="morning"
+        idx={0}
+        routineMode="core"
+        azkarList={morning}
+        isArabic
+        direction="rtl"
+        themeMode="light"
+        isDone={false}
+        collectionCompletedCount={0}
+        hapticFeedback={false}
+        showTranslation={false}
+        showTransliteration={false}
+        textSize="medium"
+        onTextSizeChange={() => undefined}
+        savedZikrIds={new Set()}
+        onBack={() => undefined}
+        onComplete={() => undefined}
+        onAdvance={() => undefined}
+        onNext={() => undefined}
+        onPrev={() => undefined}
+        onSelectZikr={() => undefined}
+        onToggleSaved={() => undefined}
+        audioAvailable={false}
+      />,
+    );
+
+    const closeBtn = screen.getByTestId("reader-sidebar-close");
+    const toggleBtn = screen.getByTestId("reader-sidebar-toggle");
+
+    // Both use the same prominent card border and rounded-xl classes
+    expect(closeBtn.className).toContain("rounded-xl");
+    expect(closeBtn.className).toContain("border border-border/80");
+    expect(closeBtn.className).toContain("bg-card");
+
+    expect(toggleBtn.className).toContain("rounded-xl");
+    expect(toggleBtn.className).toContain("border border-border/80");
+    expect(toggleBtn.className).toContain("bg-card");
+
+    // Collapsing does not alter the toggle button styling
+    fireEvent.click(closeBtn);
+    expect(toggleBtn).toBeVisible();
+    expect(toggleBtn.className).toContain("rounded-xl");
+    expect(toggleBtn.className).toContain("border border-border/80");
+  });
+
+  it("includes repeat, share collection, routine mode, and reset collection progress in the reader options menu", async () => {
+    const onRepeat = vi.fn();
+    const onReset = vi.fn();
+    const onRoutineModeChange = vi.fn();
+
+    render(
+      <ReaderScreen
+        catId="morning"
+        idx={0}
+        routineMode="complete"
+        isArabic
+        direction="rtl"
+        themeMode="light"
+        isDone={true}
+        collectionCompletedCount={25}
+        hapticFeedback={false}
+        showTranslation={false}
+        showTransliteration={false}
+        textSize="medium"
+        onTextSizeChange={() => undefined}
+        savedZikrIds={new Set()}
+        onBack={() => undefined}
+        onRepeat={onRepeat}
+        onReset={onReset}
+        onRoutineModeChange={onRoutineModeChange}
+        onComplete={() => undefined}
+        onAdvance={() => undefined}
+        onNext={() => undefined}
+        onPrev={() => undefined}
+        onToggleSaved={() => undefined}
+        audioAvailable={false}
+      />,
+    );
+
+    const menuButton = screen.getAllByRole("button", { name: /خيارات القارئ|Reader options/i })[0]!;
+    fireEvent.pointerDown(menuButton, { button: 0, ctrlKey: false });
+
+    // Share collection option
+    expect(await screen.findByTestId("reader-menu-share-collection")).toBeInTheDocument();
+    expect(screen.getByTestId("reader-menu-repeat")).toBeInTheDocument();
+    expect(screen.getByTestId("reader-menu-routine-mode")).toBeInTheDocument();
+    expect(screen.getByTestId("reader-menu-reset-collection")).toBeInTheDocument();
+
+    // Repeat option click triggers onRepeat
+    fireEvent.click(screen.getByTestId("reader-menu-repeat"));
+    expect(onRepeat).toHaveBeenCalledOnce();
   });
 });

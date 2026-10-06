@@ -67,6 +67,11 @@ for (const language of ["ar", "en"] as const) {
     await page.screenshot({ path: `output/playwright/counter-progress/empty-${language}.png` });
     await counter.click();
     await expect(counter).toHaveAttribute("aria-label", language === "en" ? /1 \/ 100$/ : /١ \/ ١٠٠$/);
+    await expect
+      .poll(() =>
+        page.evaluate(() => JSON.parse(localStorage.getItem("azkarapp.state.v1")!).partialZikrCounts["m-hm-91"]),
+      )
+      .toBe(1);
     // Exercise resumed progress without spending most of WebKit's test window
     // waiting for fifty separate browser input round trips.
     await page.evaluate(() => {

@@ -69,7 +69,7 @@ for (const language of ["ar", "en"] as const) {
       page,
       browserName,
     }, testInfo) => {
-      await prepare(page, language, browserName);
+      const cdp = await prepare(page, language, browserName);
       await page.goto(`/#/azkar/${categorySlug(category)}/1`);
       for (const width of [320, 390, 820, 1440]) {
         await page.setViewportSize({ width, height: 900 });
@@ -89,13 +89,25 @@ for (const language of ["ar", "en"] as const) {
         expect(art!.height).toBeCloseTo(before!.height - borderHeight, 1);
         expect(art!.width).toBeLessThanOrEqual(before!.width);
         await page.evaluate(() => document.documentElement.classList.add("reduce-transparency"));
-        await expect(scene).toBeHidden();
+        await expect(scene).toBeVisible();
+        await expect(scene.locator(".reader-scene__skyline")).toBeVisible();
         expect(await header.boundingBox()).toEqual(before);
         await page.evaluate(() => document.documentElement.classList.remove("reduce-transparency"));
+        if (cdp) {
+          await cdp.send("Emulation.setEmulatedMedia", {
+            features: [{ name: "prefers-reduced-transparency", value: "reduce" }],
+          });
+          await expect(scene).toBeVisible();
+          await expect(scene.locator(".reader-scene__skyline")).toBeVisible();
+          expect(await header.boundingBox()).toEqual(before);
+        }
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
         expect((await new AxeBuilder({ page }).include(headerSelector(width)).analyze()).violations).toEqual([]);
         await page.screenshot({
           path: `output/playwright/reader-scenes/${testInfo.project.name}/${category}-${language}-${width}.png`,
+        });
+        await cdp?.send("Emulation.setEmulatedMedia", {
+          features: [{ name: "prefers-reduced-transparency", value: "no-preference" }],
         });
       }
     });
@@ -132,10 +144,18 @@ for (const language of ["ar", "en"] as const) {
       await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
       await expect(page.getByTestId("reader-scene")).toBeVisible();
       if (cdp) {
+        const header = page.locator(headerSelector(390));
+        const before = await header.boundingBox();
         await cdp.send("Emulation.setEmulatedMedia", {
           features: [{ name: "prefers-reduced-transparency", value: "reduce" }],
         });
-        await expect(page.getByTestId("reader-scene")).toBeHidden();
+        await expect(page.getByTestId("reader-scene")).toBeVisible();
+        await expect(page.locator(".reader-scene__skyline")).toBeVisible();
+        expect(await header.boundingBox()).toEqual(before);
+        expect((await new AxeBuilder({ page }).include(headerSelector(390)).analyze()).violations).toEqual([]);
+        await page.screenshot({
+          path: `output/playwright/reader-scenes/${testInfo.project.name}/sleep-${theme}-${language}-reduced-transparency.png`,
+        });
       }
     });
   }

@@ -638,10 +638,12 @@ function PageFurnitureFoot({
   pageNumber,
   language,
   onPageClick,
+  floating = false,
 }: {
   pageNumber: number;
   language: AppLanguage;
   onPageClick?: () => void;
+  floating?: boolean;
 }) {
   const [highlighted, setHighlighted] = useState(false);
   const initialMount = useRef(true);
@@ -661,6 +663,27 @@ function PageFurnitureFoot({
       ? "border-primary/50 bg-card text-primary font-black"
       : "border-border/80 bg-card/90 text-foreground group-hover:bg-muted group-active:bg-muted"
   }`;
+
+  if (floating) {
+    return onPageClick ? (
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onPageClick();
+        }}
+        data-testid="mushaf-furniture-page-btn"
+        aria-label={t(language, "mushaf.pagePosition", { position: formatNumerals(pageNumber, language) })}
+        className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+      >
+        <span className={pillClassName}>{formatNumerals(pageNumber, language)}</span>
+      </button>
+    ) : (
+      <span className="flex h-11 min-w-11 items-center justify-center px-1" aria-hidden="true">
+        <span className={pillClassName}>{formatNumerals(pageNumber, language)}</span>
+      </span>
+    );
+  }
 
   return (
     <div className="mushaf-page-furniture mushaf-page-furniture--foot flex shrink-0 items-end justify-center" dir="rtl">
@@ -745,6 +768,7 @@ function MushafPageCanvas({
 }) {
   const isFloating = isFloatingLayout ?? hasFloatingControls ?? false;
   const showPageFurnitureHead = Boolean(spreadSide) || (!isFloating && showPageIdentity);
+  const showPageFurnitureFoot = Boolean(spreadSide) || (!isFloating && showPageIdentity);
   const [activeWord, setActiveWord] = useState<ActiveWord | null>(null);
 
   useEffect(() => {
@@ -807,8 +831,11 @@ function MushafPageCanvas({
         containerType: "size",
         ...(isFloating
           ? {
+              // Reserve the new floating footer without taking space from the
+              // existing fifteen-line minimum on short, scrolling viewports.
+              minHeight: "calc(32rem + 2.65rem)",
               paddingTop: "calc(3.25rem + env(safe-area-inset-top))",
-              paddingBottom: "calc(max(0.6rem, env(safe-area-inset-bottom)))",
+              paddingBottom: "calc(3.25rem + env(safe-area-inset-bottom))",
             }
           : {}),
       }}
@@ -887,7 +914,7 @@ function MushafPageCanvas({
                 </div>
               ))}
             </div>
-            {showPageIdentity && (
+            {showPageFurnitureFoot && (
               <PageFurnitureFoot pageNumber={pageNumber} language={language} onPageClick={onPageClick} />
             )}
           </div>
@@ -960,7 +987,7 @@ function MushafPageCanvas({
               </div>
             ))}
           </div>
-          {showPageIdentity && (
+          {showPageFurnitureFoot && (
             <PageFurnitureFoot pageNumber={pageNumber} language={language} onPageClick={onPageClick} />
           )}
         </div>
@@ -1035,6 +1062,8 @@ export function MushafPageViewer({
   railSide = "right",
   progressBar,
   paperRef,
+  verticalGestures = false,
+  showFloatingPageIndicator = true,
   pageTransitionDirection,
   reduceMotion = false,
   hapticFeedback = false,
@@ -1049,6 +1078,7 @@ export function MushafPageViewer({
   topRightControl,
   topCenterControl,
   bottomLeftControl,
+  bottomCenterControl,
   bottomRightControl,
   onEdgeTap,
   onCenterTap,
@@ -1080,6 +1110,9 @@ export function MushafPageViewer({
   progressBar?: ReactNode;
   /** The paper itself. A page turn drags this, never the chrome around it. */
   paperRef?: MutableRefObject<HTMLDivElement | null>;
+  /** Vertical shortcuts yield to native scrolling when the paper overflows. */
+  verticalGestures?: boolean;
+  showFloatingPageIndicator?: boolean;
   /**
    * Applied to the paper, for a caller that moves it under the thumb.
    *
@@ -1102,6 +1135,7 @@ export function MushafPageViewer({
   topRightControl?: ReactNode;
   topCenterControl?: ReactNode;
   bottomLeftControl?: ReactNode;
+  bottomCenterControl?: ReactNode;
   bottomRightControl?: ReactNode;
   onEdgeTap?: (edge: "left" | "right") => void;
   onCenterTap?: () => void;
@@ -1109,6 +1143,30 @@ export function MushafPageViewer({
   onNext?: () => void;
 }) {
   const formattedJuz = `${t(language, "common.juz")} ${formatNumerals(juzNumber, language)}`;
+
+  useLayoutEffect(() => {
+    const paper = paperRef?.current;
+    if (!verticalGestures || !paper) return;
+    let active = true;
+    const updateGesturePolicy = () => {
+      if (!active) return;
+      // Keep native scrolling for short viewports; only a fitting page owns
+      // vertical shortcuts. Pinch zoom stays available in either case.
+      paper.style.touchAction = paper.scrollHeight > paper.clientHeight + 1 ? "pan-y pinch-zoom" : "pinch-zoom";
+    };
+    updateGesturePolicy();
+    const observer = typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(updateGesturePolicy);
+    observer?.observe(paper);
+    for (const child of paper.children) observer?.observe(child);
+    window.addEventListener("resize", updateGesturePolicy);
+    void document.fonts?.ready.then(updateGesturePolicy);
+    return () => {
+      active = false;
+      observer?.disconnect();
+      window.removeEventListener("resize", updateGesturePolicy);
+      paper.style.removeProperty("touch-action");
+    };
+  }, [verticalGestures, paperRef, pageNumber, facingPage?.pageNumber, lines, textScale]);
 
   useLayoutEffect(() => {
     const paper = paperRef?.current;
@@ -1135,8 +1193,19 @@ export function MushafPageViewer({
     if (pageTransitionDirection) vibrateIfEnabled(hapticFeedback, 10);
   }, [hapticFeedback, pageNumber, pageTransitionDirection]);
 
+  const paperTap = useRef<{ id: number; x: number; y: number; startedAt: number; moved: boolean } | null>(null);
   const handlePaperPointerUp = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
+      const start = paperTap.current;
+      paperTap.current = null;
+      if (
+        !start ||
+        start.id !== e.pointerId ||
+        start.moved ||
+        Math.hypot(e.clientX - start.x, e.clientY - start.y) > 8 ||
+        performance.now() - start.startedAt > 400
+      )
+        return;
       if (e.button !== 0 && e.pointerType === "mouse") return;
       const target = e.target as HTMLElement;
       if (target.closest('button, [role="button"], a, input, select, textarea, [data-interactive="true"]')) {
@@ -1183,7 +1252,14 @@ export function MushafPageViewer({
   const isFloatingLayout = !useRail && !headerContent;
   const hasFloatingControls =
     isFloatingLayout &&
-    Boolean(topLeftControl || topRightControl || topCenterControl || bottomLeftControl || bottomRightControl);
+    Boolean(
+      topLeftControl ||
+      topRightControl ||
+      topCenterControl ||
+      bottomLeftControl ||
+      bottomRightControl ||
+      bottomCenterControl,
+    );
 
   return (
     <article
@@ -1299,6 +1375,21 @@ export function MushafPageViewer({
         </div>
       )}
 
+      {(bottomCenterControl || (isFloatingLayout && !facingPage && showPageIdentity && showFloatingPageIndicator)) && (
+        <div
+          data-testid="mushaf-control-bottom-center"
+          className="pointer-events-auto absolute left-1/2 -translate-x-1/2 z-30 flex items-center justify-center"
+          style={{
+            bottom: "max(0.6rem, env(safe-area-inset-bottom))",
+            maxWidth: "calc(100vw - 7.5rem)",
+          }}
+        >
+          {bottomCenterControl ?? (
+            <PageFurnitureFoot pageNumber={pageNumber} language={language} onPageClick={onPageClick} floating />
+          )}
+        </div>
+      )}
+
       {bottomRightControl && (
         <div
           data-testid="mushaf-corner-bottom-right"
@@ -1357,6 +1448,22 @@ export function MushafPageViewer({
         className={`mushaf-paper flex min-h-0 min-w-0 flex-1 ${facingPage ? "mushaf-spread" : ""}`}
         data-page-transition={pageTransitionDirection}
         dir="rtl"
+        onPointerDown={(event) => {
+          paperTap.current = {
+            id: event.pointerId,
+            x: event.clientX,
+            y: event.clientY,
+            startedAt: performance.now(),
+            moved: false,
+          };
+        }}
+        onPointerMove={(event) => {
+          const start = paperTap.current;
+          if (start && Math.hypot(event.clientX - start.x, event.clientY - start.y) > 8) start.moved = true;
+        }}
+        onPointerCancel={() => {
+          paperTap.current = null;
+        }}
         onPointerUp={handlePaperPointerUp}
       >
         {/* Plain visual words step aside from the accessibility tree until

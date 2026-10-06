@@ -1,6 +1,6 @@
 import { progressFillStyle } from "./progressFillStyle";
 import { useCallback, useEffect, useMemo, useRef, useState, startTransition, type CSSProperties } from "react";
-import { ArrowLeft, Bookmark, CheckCircle2, ChevronDown, MoreVertical, Translate } from "./icons";
+import { ArrowPrevious, Bookmark, CheckCircle2, ChevronDown, MoreVertical, Translate } from "./icons";
 import { useSwipeGestures } from "../hooks/useSwipeGestures";
 import { PAPER_ASPECT, spreadStart, useMushafShell } from "./mushafShell";
 import { MushafToolRail, MUSHAF_RAIL_WIDTH, type SurahAudioControl } from "./MushafToolRail";
@@ -33,6 +33,7 @@ import {
 import { SURAHS, getJuzNumberForPage, getSurahDisplayName, getSurahNumberForPage } from "../content/surahInfo";
 import { SURAH_PLACEMENTS } from "../content/mushafSurahPlacements";
 import { loadSurahWordMeanings, type QuranWordMeaning, type WordMeaningSelection } from "../content/quranWordMeanings";
+import { formatNumerals } from "../formatting";
 import { MushafPageViewer } from "./MushafPageViewer";
 import { AyahInteractionSheet } from "./AyahInteractionSheet";
 import { reportError } from "../../lib/observability";
@@ -344,6 +345,8 @@ export function MushafImmersiveReader({
     direction,
     onNext: () => paginate(1),
     onPrev: () => paginate(-1),
+    onSwipeUp: () => setIsQuickMenuOpen(true),
+    onSwipeDown: () => setIsFocusMode((prev) => !prev),
     reduceMotion: reducedMotion,
   });
 
@@ -445,7 +448,9 @@ export function MushafImmersiveReader({
 
   const isPageBookmarked = bookmarkedPages.includes(displayPage);
 
-  const mobileTopLeft =
+  const isRtl = direction === "rtl";
+
+  const mobileBack =
     !shell.rail && !isFocusMode ? (
       <button
         type="button"
@@ -455,12 +460,12 @@ export function MushafImmersiveReader({
         className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
         <span className="inline-flex h-8 min-w-[2.75rem] items-center justify-center gap-1 rounded-full border border-border/80 bg-card/90 px-3 text-foreground  backdrop-blur-md transition-colors group-hover:bg-muted group-active:bg-muted">
-          <ArrowLeft size={16} aria-hidden="true" />
+          <ArrowPrevious size={16} aria-hidden="true" />
         </span>
       </button>
     ) : undefined;
 
-  const mobileTopRight =
+  const mobileMore =
     !shell.rail && !isFocusMode ? (
       <button
         type="button"
@@ -471,6 +476,27 @@ export function MushafImmersiveReader({
       >
         <span className="inline-flex h-8 min-w-[2.75rem] items-center justify-center gap-1 rounded-full border border-border/80 bg-card/90 px-3 text-foreground  backdrop-blur-md transition-colors group-hover:bg-muted group-active:bg-muted">
           <MoreVertical size={16} />
+        </span>
+      </button>
+    ) : undefined;
+
+  const mobileTopLeft = isRtl ? mobileMore : mobileBack;
+  const mobileTopRight = isRtl ? mobileBack : mobileMore;
+
+  const mobileBottomCenter =
+    !shell.rail && !isFocusMode ? (
+      <button
+        type="button"
+        onClick={() => {
+          setIndexTab("jump");
+          setIsIndexOpen(true);
+        }}
+        data-testid="mushaf-furniture-page-btn"
+        aria-label={t(language, "mushaf.pagePosition", { position: formatNumerals(displayPage, language) })}
+        className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+      >
+        <span className="inline-flex h-8 min-w-[2.75rem] items-center justify-center rounded-full border border-border/80 bg-card/90 px-3 text-xs font-bold tabular-nums text-foreground shadow-xs backdrop-blur-md transition-colors group-hover:bg-muted group-active:bg-muted">
+          {formatNumerals(displayPage, language)}
         </span>
       </button>
     ) : undefined;
@@ -605,7 +631,7 @@ export function MushafImmersiveReader({
         /* The surface itself never scrolls: the paper inside it does when a
            short screen makes it taller than the viewport. Leaving the browser
            a vertical axis to claim here is what let a drag move the page. */
-        style={{ touchAction: "pan-y", overscrollBehavior: "none" }}
+        style={{ touchAction: "pan-y pinch-zoom", overscrollBehavior: "none" }}
       >
         {/* The page turn animates the paper, not the chrome.
             This wrapped the whole viewer in AnimatePresence, so every turn
@@ -632,6 +658,7 @@ export function MushafImmersiveReader({
             topRightControl={mobileTopRight}
             topCenterControl={mobileTopCenter}
             bottomLeftControl={mobileBottomLeft}
+            bottomCenterControl={mobileBottomCenter}
             bottomRightControl={mobileBottomRight}
             onSurahClick={() => {
               setIndexTab("surahs");
@@ -652,6 +679,8 @@ export function MushafImmersiveReader({
             onCenterTap={() => setIsFocusMode((prev) => !prev)}
             progressBar={progressBar}
             paperRef={paperRef}
+            verticalGestures
+            showFloatingPageIndicator={!isFocusMode}
             reduceMotion={reducedMotion}
             textScale={textScale}
             facingPage={

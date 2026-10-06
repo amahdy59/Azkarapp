@@ -30,7 +30,7 @@ flowchart TD
 2. `App.tsx` calls `loadAppState()` once and uses the normalized snapshot to initialize React state.
 3. `normalizeAppState()` validates every persisted field, applies defaults, repairs legacy values, and drops unsafe collection entries.
 4. `appStateSnapshot` recomposes the authoritative serializable state from React values.
-5. A persistence effect writes the snapshot through `saveAppState()`.
+5. `useAppStatePersistence` coalesces rapid snapshot changes over 400 ms and writes through `saveAppState()`. Pending changes flush synchronously on hidden visibility, `pagehide`, and unmount; closing/backgrounding the app does not depend on a delayed timer firing. Storage failures retain the existing retry/dismiss feedback.
 6. When authenticated sync returns remote data, `mergeAppStates()` applies deterministic merge rules and the result is normalized again before rendering.
 
 Never render untrusted persisted or remote data directly.

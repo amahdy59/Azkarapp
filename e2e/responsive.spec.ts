@@ -319,8 +319,7 @@ test("zikr overview uses the form measure on desktop and remains fluid on mobile
   await page.setViewportSize({ width: 1440, height: 900 });
   await enterEnglishGuestMode(page);
   await page.getByTestId("nav-azkar").click();
-  await page.getByTestId("category-card-morning").click();
-
+  await page.goto("./#/azkar/morning");
   const overview = page.getByTestId("category-overview");
   await expect(overview).toBeVisible();
   const [desktopBounds, mainBounds] = await Promise.all([

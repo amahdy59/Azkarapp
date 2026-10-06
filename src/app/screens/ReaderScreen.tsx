@@ -41,6 +41,8 @@ import {
   Headphones,
   PanelLeftIcon,
   Maximize,
+  RefreshCw,
+  Share2,
 } from "../components/icons";
 import { t } from "../i18n";
 import { shouldReduceMotion, vibrateIfEnabled } from "../motionPreferences";
@@ -98,6 +100,9 @@ const READER_HEADER_ACTION_CLASS =
 const READER_WIDE_HEADER_ACTION_CLASS =
   "flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[color:var(--on-media)]/20 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-on-media";
 
+const READER_SIDEBAR_TOGGLE_CLASS =
+  "flex size-11 shrink-0 items-center justify-center rounded-xl border border-border/80 bg-card shadow-xs text-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
+
 const QURAN_CARD_IMAGE = `${import.meta.env.BASE_URL || "/"}assets/cards/wird-quran.jpg`;
 
 const SharingPreview = lazy(() =>
@@ -154,6 +159,7 @@ export function ReaderScreen({
   onUncomplete,
   onRoutineModeChange,
   onReset,
+  onRepeat,
   onAdvance: onAdvanceProp,
   onNext: onNextProp,
   onPrev: onPrevProp,
@@ -206,6 +212,7 @@ export function ReaderScreen({
   onUncomplete?: (idx: number) => void;
   onRoutineModeChange?: (mode: RoutineMode) => void;
   onReset?: () => void;
+  onRepeat?: () => void;
   onAdvance: (idx: number) => void;
   onNext: () => void;
   onPrev: () => void;
@@ -321,6 +328,7 @@ export function ReaderScreen({
   const [showDifficultWords, setShowDifficultWords] = useState(false);
   const [shareMessage, setShareMessage] = useState("");
   const [shareOpen, setShareOpen] = useState(false);
+  const [collectionShareOpen, setCollectionShareOpen] = useState(false);
   const [wordMeaningSelection, setWordMeaningSelection] = useState<WordMeaningSelection | null>(null);
   /* The popover answers the tap; the sheet is the deliberate "all meanings"
      step, so the same selection drives both and only this flag differs. */
@@ -911,7 +919,7 @@ export function ReaderScreen({
               title={t(language, "reader.collapseSidebar")}
               data-testid="reader-sidebar-close"
               ref={sidebarCloseRef}
-              className="flex size-11 shrink-0 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              className={READER_SIDEBAR_TOGGLE_CLASS}
             >
               <PanelLeftIcon
                 size={18}
@@ -955,23 +963,35 @@ export function ReaderScreen({
               </DropdownMenu>
             )}
 
-            <button
-              type="button"
-              onClick={() => toggleCompleteAll(!isFullyComplete)}
-              className={`flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-lg px-4 text-sm font-bold shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                isFullyComplete
-                  ? "border border-success/30 bg-success/15 text-success hover:bg-success/20 dark:text-success"
-                  : "border border-primary bg-primary text-primary-foreground hover:bg-primary/90"
-              }`}
-              aria-label={
-                isFullyComplete ? t(language, "category.completedToggle") : t(language, "category.remainingToggle")
-              }
-            >
-              <Check size={16} strokeWidth={isFullyComplete ? 3 : 2} />
-              <span>{t(language, "category.completeAction")}</span>
-            </button>
+            {isFullyComplete && onRepeat ? (
+              <button
+                type="button"
+                onClick={onRepeat}
+                data-testid="reader-repeat-collection"
+                className="interactive-elem flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-lg border border-primary/40 bg-primary/10 px-4 text-sm font-bold text-primary shadow-xs transition-colors hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              >
+                <RefreshCw size={16} className="shrink-0" aria-hidden="true" />
+                <span>{t(language, "category.readAgain")}</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => toggleCompleteAll(!isFullyComplete)}
+                className={`flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-lg px-4 text-sm font-bold shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                  isFullyComplete
+                    ? "border border-success/30 bg-success/15 text-success hover:bg-success/20 dark:text-success"
+                    : "border border-primary bg-primary text-primary-foreground hover:bg-primary/90"
+                }`}
+                aria-label={
+                  isFullyComplete ? t(language, "category.completedToggle") : t(language, "category.remainingToggle")
+                }
+              >
+                <Check size={16} strokeWidth={isFullyComplete ? 3 : 2} />
+                <span>{t(language, "category.completeAction")}</span>
+              </button>
+            )}
 
-            {doneCount > 0 && (
+            {doneCount > 0 && onReset && (
               <button
                 type="button"
                 onClick={onReset}
@@ -982,6 +1002,17 @@ export function ReaderScreen({
                 <RotateCcw size={14} />
               </button>
             )}
+
+            <button
+              type="button"
+              data-testid="reader-sidebar-share"
+              onClick={() => setCollectionShareOpen(true)}
+              className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 rounded-lg border border-input bg-card px-3 text-sm font-bold text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              aria-label={t(language, "shareStoryPack.actionButtonAria")}
+              title={t(language, "shareStoryPack.actionButton")}
+            >
+              <Share2 size={16} aria-hidden="true" />
+            </button>
 
             {onPlayAllAudio && (
               <button
@@ -1319,7 +1350,7 @@ export function ReaderScreen({
 
         <DropdownMenuSeparator className="my-1 h-px bg-border/60" />
 
-        {/* 4. Saved item; long surahs retain Share because they have no dock. */}
+        {/* 4. Actions: Bookmark, Share collection/surah, Repeat, Routine mode */}
         <DropdownMenuLabel className="px-3 pb-1 pt-1 text-micro font-bold uppercase tracking-wider text-muted-foreground">
           {t(language, "reader.menuActions")}
         </DropdownMenuLabel>
@@ -1336,6 +1367,16 @@ export function ReaderScreen({
             />
             <span>{isSaved ? t(language, "reader.unsave") : t(language, "reader.save")}</span>
           </DropdownMenuItem>
+          {!longSurah && (
+            <DropdownMenuItem
+              onClick={() => setCollectionShareOpen(true)}
+              data-testid="reader-menu-share-collection"
+              className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted"
+            >
+              <Share2 size={16} aria-hidden="true" />
+              <span>{t(language, "shareStoryPack.actionButton")}</span>
+            </DropdownMenuItem>
+          )}
           {longSurah && (
             <DropdownMenuItem
               onClick={() => void handleShare()}
@@ -1344,6 +1385,33 @@ export function ReaderScreen({
             >
               <ShareExport size={16} aria-hidden="true" />
               <span>{t(language, "reader.share")}</span>
+            </DropdownMenuItem>
+          )}
+          {onRepeat && (
+            <DropdownMenuItem
+              onClick={onRepeat}
+              data-testid="reader-menu-repeat"
+              className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted"
+            >
+              <RefreshCw size={16} aria-hidden="true" />
+              <span>{t(language, "category.readAgain")}</span>
+            </DropdownMenuItem>
+          )}
+          {isRoutineCategory(catId) && onRoutineModeChange && (
+            <DropdownMenuItem
+              onClick={() => onRoutineModeChange(routineMode === "complete" ? "core" : "complete")}
+              data-testid="reader-menu-routine-mode"
+              className="flex min-h-11 cursor-pointer items-center justify-between gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted"
+            >
+              <div className="flex items-center gap-2.5">
+                <SlidersHorizontal size={16} aria-hidden="true" />
+                <span>
+                  {routineMode === "complete" ? t(language, "category.complete") : t(language, "category.core")}
+                </span>
+              </div>
+              <span className="text-xs text-muted-foreground">
+                {routineMode === "complete" ? t(language, "category.core") : t(language, "category.complete")}
+              </span>
             </DropdownMenuItem>
           )}
         </DropdownMenuGroup>
@@ -1370,6 +1438,16 @@ export function ReaderScreen({
             <RotateCcw size={16} aria-hidden="true" />
             <span>{t(language, "reader.resetCounter")}</span>
           </DropdownMenuItem>
+          {onReset && (
+            <DropdownMenuItem
+              onClick={onReset}
+              data-testid="reader-menu-reset-collection"
+              className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium text-destructive transition-colors hover:bg-muted hover:text-destructive"
+            >
+              <RotateCcw size={16} aria-hidden="true" />
+              <span>{t(language, "category.resetProgress")}</span>
+            </DropdownMenuItem>
+          )}
         </DropdownMenuGroup>
 
         <DropdownMenuSeparator className="my-1 h-px bg-border/60" />
@@ -1577,10 +1655,10 @@ export function ReaderScreen({
                       }
                       data-testid="reader-sidebar-toggle"
                       ref={sidebarToggleRef}
-                      className={`${READER_WIDE_HEADER_ACTION_CLASS} ${canDockCollection && isSidebarOpen ? "hidden" : ""}`}
+                      className={`${READER_SIDEBAR_TOGGLE_CLASS} ${canDockCollection && isSidebarOpen ? "hidden" : ""}`}
                     >
                       <PanelLeftIcon
-                        size={20}
+                        size={18}
                         className={direction === "ltr" ? "-scale-x-100" : undefined}
                         aria-hidden="true"
                       />
@@ -1916,6 +1994,25 @@ export function ReaderScreen({
             routineMode={routineMode}
             prayer={isPrayerName(subCategory) ? subCategory : undefined}
             items={[z]}
+            language={language}
+            themeMode={themeMode}
+          />
+        </Suspense>
+      )}
+      {collectionShareOpen && (
+        <Suspense fallback={null}>
+          <SharingPreview
+            open
+            onClose={() => setCollectionShareOpen(false)}
+            single={false}
+            collectionTitle={displayCategoryName}
+            collectionTitleArabic={CATEGORIES.find((c) => c.id === catId)?.nameArabic}
+            collectionTitleEnglish={CATEGORIES.find((c) => c.id === catId)?.name}
+            categoryId={catId}
+            readerIndex={idx}
+            routineMode={routineMode}
+            prayer={isPrayerName(subCategory) ? subCategory : undefined}
+            items={azkarList ?? [z]}
             language={language}
             themeMode={themeMode}
           />

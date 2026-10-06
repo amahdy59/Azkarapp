@@ -78,6 +78,7 @@ import { useAuthHandlers, type ConfirmDialogOptions, type GuestMigrationDecision
 import { useSettingsHandlers } from "./hooks/useSettingsHandlers";
 import { useSessionHandlers } from "./hooks/useSessionHandlers";
 import { usePwaLifecycle } from "./hooks/usePwaLifecycle";
+import { useAppStatePersistence } from "./hooks/useAppStatePersistence";
 import {
   getPalmStreakSummary,
   getFirstIncompleteZikrIndex,
@@ -364,6 +365,7 @@ function AppContent({
   const [quietProgressEnabled, setQuietProgressEnabled] = useState(initialState.settings.quietProgressEnabled);
   const [progressDayStartHour, setProgressDayStartHour] = useState(initialState.settings.progressDayStartHour);
   const activeProgressDayRef = useRef(getProgressDayKey(new Date(), progressDayStartHour));
+  const [activeProgressDay, setActiveProgressDay] = useState(activeProgressDayRef.current);
   const [calendarType, setCalendarType] = useState<"hijri" | "gregorian">(
     initialState.settings.calendarType ?? "hijri",
   );
@@ -700,10 +702,10 @@ function AppContent({
     [],
   );
 
-  const { currentPalmRhythm: currentStreak, longestPalmRhythm: longestStreak } = getPalmStreakSummary(
-    dailyCompletions,
-    new Date(),
-    progressDayStartHour,
+  const { currentPalmRhythm: currentStreak, longestPalmRhythm: longestStreak } = useMemo(
+    () => getPalmStreakSummary(dailyCompletions, new Date(`${activeProgressDay}T12:00:00`), progressDayStartHour),
+    // Completion history and the practice-day boundary determine the streak.
+    [dailyCompletions, progressDayStartHour, activeProgressDay],
   );
   const isArabic = selectedLang === "ar";
   const layoutDirection = isArabic || forceRtl ? "rtl" : "ltr";
@@ -881,7 +883,7 @@ function AppContent({
 
   const openCategory = useCallback(
     async (categoryId: CategoryId) => {
-      if (isLazyRouteCategory(categoryId) && !(await hydrateRouteCategory(categoryId, "category"))) {
+      if (isLazyRouteCategory(categoryId) && !(await hydrateRouteCategory(categoryId, "reader"))) {
         setActiveCat(categoryId);
         setActiveTab("azkar");
         push("reader");
@@ -1253,6 +1255,7 @@ function AppContent({
     if (activeProgressDayRef.current === currentDayKey) return;
 
     activeProgressDayRef.current = currentDayKey;
+    setActiveProgressDay(currentDayKey);
     setCompleted((previous) => resetDailyRoutineProgress(previous));
     setPartialZikrCounts(resetDailyPartialCounts);
     setMasbahaState((previous) => (previous ? resetDailyMasbahaState(previous, currentDayKey) : previous));
@@ -1320,12 +1323,11 @@ function AppContent({
     zikrFont,
   ]);
 
-  useEffect(() => {
-    const saved = saveAppState(appStateSnapshot);
+  const handlePersistenceResult = useCallback((saved: boolean) => {
     setPersistenceError(!saved);
     if (saved) setPersistenceNoticeDismissed(false);
-  }, [appStateSnapshot]);
-
+  }, []);
+  useAppStatePersistence(appStateSnapshot, handlePersistenceResult);
   /**
    * The Mushaf is a reading surface, not a screen with a menu bar.
    *
@@ -2064,6 +2066,14 @@ function AppContent({
                         true,
                       );
                     }
+                  }}
+                  onRepeat={() => {
+                    if (fridayDuaFlow && activeCat === "comprehensive_duas") {
+                      resetFridayDuaProgress();
+                      openReader(activeCat, 0);
+                      return;
+                    }
+                    repeatCategory(activeCat);
                   }}
                   onUncomplete={(i) => {
                     if (fridayDuaFlow && activeCat === "comprehensive_duas") {

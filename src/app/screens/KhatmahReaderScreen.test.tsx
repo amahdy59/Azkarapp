@@ -66,6 +66,20 @@ afterEach(() => {
 });
 
 describe("KhatmahReaderScreen navigation", () => {
+  it("keeps vertical swipes vertical even when the pointer drifts sideways", async () => {
+    setViewport(390, 844);
+    const { setKhatmahPage } = renderReader();
+    await screen.findByRole("article", { name: /صفحة ٤٢/ });
+    setKhatmahPage.mockClear();
+    const paper = document.querySelector(".mushaf-paper")!;
+    fireEvent.pointerDown(paper, { pointerId: 1, button: 0, clientX: 180, clientY: 400 });
+    fireEvent.pointerMove(paper, { pointerId: 1, clientX: 185, clientY: 330 });
+    fireEvent.pointerMove(paper, { pointerId: 1, clientX: 260, clientY: 270 });
+    fireEvent.pointerUp(paper, { pointerId: 1, clientX: 260, clientY: 270 });
+    expect(screen.getByTestId("mushaf-quick-menu")).toBeInTheDocument();
+    expect(setKhatmahPage).not.toHaveBeenCalled();
+  });
+
   it("keeps semantic next and previous controls aligned with physical direction", async () => {
     const user = userEvent.setup();
     const { setKhatmahPage } = renderReader();
@@ -228,6 +242,8 @@ describe("KhatmahReaderScreen wird progress", () => {
     // Exit follows the interface Back convention; physical page-turn controls
     // retain their separate Quran navigation contract.
     expect(backSvg).toHaveAttribute("data-rtl-flip", "");
+    expect(backBtn.closest("[data-testid='mushaf-corner-top-right']")).not.toBeNull();
+    expect(moreBtn.closest("[data-testid='mushaf-corner-top-left']")).not.toBeNull();
 
     expect(screen.queryByTestId("mushaf-settings-trigger")).not.toBeInTheDocument();
   });
@@ -469,7 +485,7 @@ describe("KhatmahReaderScreen settings presentation", () => {
 describe("KhatmahReaderScreen reading type size", () => {
   afterEach(() => setViewport(1024, 768));
 
-  it("says the size cannot change where the line already fills the page width", async () => {
+  it("omits the text size control where the line already fills the page width to avoid clutter", async () => {
     const user = userEvent.setup();
     setViewport(390, 844);
     renderReader({ language: "en", direction: "ltr", setMushafTextScale: vi.fn() });
@@ -479,12 +495,9 @@ describe("KhatmahReaderScreen reading type size", () => {
     await user.click(await screen.findByTestId("mushaf-quick-settings"));
     const sheet = within(await screen.findByTestId("mushaf-settings-sheet"));
 
-    // A phone page is width-bound: all three steps rendered the identical
-    // measure and the identical type, so the control said nothing while doing
-    // nothing. It is disabled and explains itself instead.
-    expect(sheet.getByTestId("mushaf-text-size-option-large")).toBeDisabled();
-    expect(sheet.getByTestId("mushaf-text-size-option-small")).toBeDisabled();
-    expect(sheet.getByText(/already as large as this page allows/i)).toBeInTheDocument();
+    // A phone page is width-bound: the control does not apply, so it is omitted
+    // to keep the reading settings surface calm and uncluttered.
+    expect(sheet.queryByTestId("mushaf-text-size-group")).not.toBeInTheDocument();
   });
 
   it("offers the size where the page is fitted to its height instead", async () => {
@@ -543,6 +556,7 @@ describe("KhatmahReaderScreen wird completion notice", () => {
     // Press 'f' to toggle focus mode
     fireEvent.keyDown(document.body, { key: "f" });
     expect(screen.queryByTestId("mushaf-top-left-back")).toBeNull();
+    expect(screen.queryByTestId("mushaf-control-bottom-center")).toBeNull();
     expect(screen.getByTestId("mushaf-focus-exit")).toBeInTheDocument();
 
     // Click focus exit handle

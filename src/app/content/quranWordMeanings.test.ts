@@ -28,7 +28,7 @@ describe("Quran difficult-word meanings", () => {
 
   it("covers every full surah currently available in the app", () => {
     expect(fullSurahs.map(getQuranSurahNumber).sort((left, right) => (left ?? 0) - (right ?? 0))).toEqual([
-      18, 32, 67, 109, 112, 113, 114,
+      2, 18, 32, 67, 109, 112, 113, 114,
     ]);
 
     for (const surah of fullSurahs) {

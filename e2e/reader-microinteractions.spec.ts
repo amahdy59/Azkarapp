@@ -257,7 +257,7 @@ async function openFirstMorningZikr(page: Page) {
   await page.getByTestId("onboarding-get-started").click();
   await page.getByTestId("nav-azkar").click();
   await page.getByTestId("category-card-waking_up").click();
-  await page.getByRole("button", { name: "Start Session", exact: true }).click();
+  await expect(page.getByTestId("reader-screen")).toBeVisible();
 }
 
 /**
@@ -307,7 +307,7 @@ test("wide Reader keeps a bounded RTL collection navigator and supports direct j
   await page.setViewportSize({ width: 1600, height: 900 });
   await openReturningGuestHome(page, "ar");
   await page.getByTestId("category-card-morning").click();
-  await page.getByTestId("start-session-button").click();
+  await expect(page.getByTestId("reader-screen")).toBeVisible();
 
   const navigator = page.getByTestId("reader-collection-navigator");
   const readerCard = page.getByTestId("reader-card");
@@ -319,9 +319,9 @@ test("wide Reader keeps a bounded RTL collection navigator and supports direct j
   expect(readerBox).not.toBeNull();
   if (navigatorBox && readerBox) {
     const occupiedWidth = navigatorBox.width + readerBox.width;
-    expect(navigatorBox.width).toBeGreaterThanOrEqual(288);
-    expect(navigatorBox.width).toBeLessThanOrEqual(352);
-    expect(navigatorBox.width / occupiedWidth).toBeLessThanOrEqual(0.32);
+    expect(navigatorBox.width).toBeGreaterThanOrEqual(380);
+    expect(navigatorBox.width).toBeLessThanOrEqual(600);
+    expect(navigatorBox.width / occupiedWidth).toBeLessThanOrEqual(0.45);
     expect(navigatorBox.x + navigatorBox.width).toBeLessThanOrEqual(readerBox.x);
   }
 
@@ -804,7 +804,7 @@ for (const locale of [
   }) => {
     await openReturningGuestHome(page, locale.language);
     await page.getByTestId("category-card-morning").click();
-    await page.getByTestId("start-session-button").click();
+    await expect(page.getByTestId("reader-screen")).toBeVisible();
     await page.getByRole("button", { name: locale.reference, exact: true }).click();
 
     const sheet = page.getByTestId("reference-sheet");
@@ -848,7 +848,8 @@ for (const locale of [
     page,
   }) => {
     await openReturningGuestHome(page, locale.language);
-    await page.getByTestId("category-card-morning").click();
+    // The overview remains a direct destination; collection cards now resume the Reader.
+    await page.goto("./#/azkar/morning");
 
     const categoryProgress = page.getByRole("progressbar");
     await expect(page.getByTestId("category-overview")).toBeVisible();
@@ -1107,7 +1108,7 @@ test("the show all zikr button in reader menu navigates to the category collecti
 
   // On nav-azkar tab, click evening azkar
   await page.getByTestId("category-card-evening").click();
-  await page.getByTestId("start-session-button").click();
+  await expect(page.getByTestId("reader-screen")).toBeVisible();
   await expect(page).toHaveURL(/#\/azkar\/evening\/1$/);
 
   // Open the 3-dots menu in reader

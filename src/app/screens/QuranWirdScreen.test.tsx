@@ -281,4 +281,57 @@ describe("QuranWirdScreen", () => {
     expect(screen.getByText("21 of 21 completed")).toBeInTheDocument();
     expect(screen.getByText("Today's Wird complete")).toBeInTheDocument();
   });
+
+  it("configures a custom plan with start page, target page, and duration days", () => {
+    const props = renderScreen();
+    cleanup();
+    const onPlanChange = vi.fn();
+    render(<QuranWirdScreen {...props} onPlanChange={onPlanChange} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+    fireEvent.click(screen.getByRole("radio", { name: /Custom Khatmah/i }));
+
+    const startInput = screen.getByLabelText("From page");
+    const targetInput = screen.getByLabelText("To page");
+    const daysInput = screen.getByLabelText("Days to complete");
+
+    fireEvent.change(startInput, { target: { value: "10" } });
+    fireEvent.change(targetInput, { target: { value: "100" } });
+    fireEvent.change(daysInput, { target: { value: "30" } });
+
+    fireEvent.click(screen.getByRole("button", { name: "Save plan" }));
+
+    expect(onPlanChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: "custom",
+        startPage: 10,
+        targetPage: 100,
+        durationDays: 30,
+        dailyPages: expect.any(Number),
+      }),
+    );
+  });
+
+  it("displays overall Quran progress stats (completed pages and Juz count) inside the plan card", () => {
+    const props = renderScreen();
+    cleanup();
+    const juz1Pages = Array.from({ length: 21 }, (_, i) => i + 1);
+
+    render(
+      <QuranWirdScreen
+        {...props}
+        plan={{ kind: "daily", dailyPages: 4 }}
+        wirdHistory={{
+          "2026-10-01": juz1Pages,
+        }}
+      />,
+    );
+
+    expect(screen.getByText("Overall Quran progress")).toBeInTheDocument();
+    expect(screen.getByText("Completed pages")).toBeInTheDocument();
+    expect(screen.getByText("Completed Juzs")).toBeInTheDocument();
+    // 21 / 604 pages and 1 / 30 juzs
+    expect(screen.getByText("21 / 604")).toBeInTheDocument();
+    expect(screen.getByText("1 / 30")).toBeInTheDocument();
+  });
 });

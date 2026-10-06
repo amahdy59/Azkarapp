@@ -120,11 +120,9 @@
   display: none;
 }
 
-.reduce-transparency .reader-scene {
-  display: none;
-}
-
-@media (prefers-reduced-transparency: reduce), (forced-colors: active) {
+/* Static artwork is composited over an opaque header, never content behind it.
+   Reduced transparency therefore keeps this scene; system colors omit it. */
+@media (forced-colors: active) {
   .reader-scene {
     display: none;
   }

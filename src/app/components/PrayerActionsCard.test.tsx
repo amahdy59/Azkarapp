@@ -316,6 +316,12 @@ describe("PrayerActionsCard", () => {
     // Hadith evidence - distinct narrations for before and after prayer without repetition
     expect(modal).toHaveTextContent("مَنْ حَافَظَ عَلَى أَرْبَعِ رَكَعَاتٍ قَبْلَ الظُّهْرِ");
     expect(modal).toHaveTextContent("كَانَ يُصَلِّي فِي بَيْتِي قَبْلَ الظُّهْرِ أَرْبَعًا");
+
+    // Can be closed via the footer close action
+    const closeBtn = screen.getByTestId("prayer-actions-info-close");
+    expect(closeBtn).toHaveTextContent("إغلاق");
+    fireEvent.click(closeBtn);
+    expect(screen.queryByTestId("prayer-actions-info-modal")).toBeNull();
   });
 
   it("omits rawatib banner for Asr since its Sunnah is optional rather than rawatib", () => {

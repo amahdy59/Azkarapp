@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-05.8",
+  "release": "2026-10-06.1",
   "ar": [
-    "مواقيت الصلاة أوضح، مع إبراز الصلاة الحالية وبطاقة أعمال أبسط وأكثر اختصارًا.",
-    "بطاقات الرئيسية متوازنة على الشاشات الكبيرة، وتتكيف مع الشاشات الصغيرة وتكبير النص.",
-    "رأس قارئ الأذكار يعرض مشاهد هادئة مع ألوان أوضح وأدوات متناسقة.",
-    "يمكنك طي قائمة الأذكار وتغيير عرضها بالسحب أو لوحة المفاتيح على الشاشات الكبيرة."
+    "اضبط خطة ختم القرآن بصفحات ومدة تختارها، وابحث عن الجزء أو السورة وتابع تقدمك العام.",
+    "انتقل إلى صفحة المصحف مباشرة من رقمها، واسحب لأعلى لفتح الأدوات أو لأسفل لتبديل وضع التركيز.",
+    "سورة البقرة كاملة متاحة ضمن الرقية الشرعية، مع تلاوتها الصوتية.",
+    "تفتح مجموعات الأذكار عند موضع المتابعة، مع مشاركة المجموعة وإعادة قراءتها وقائمة أوسع وحفظ أكثر موثوقية للتقدم."
   ],
   "en": [
-    "Prayer times are clearer, with stronger current-prayer emphasis and a simpler, more compact deeds card.",
-    "Home cards stay balanced on large screens and adapt to small screens and enlarged text.",
-    "The adhkar Reader header has calm scenes, clearer colors and consistent tools.",
-    "Collapse the adhkar list and resize it by dragging or using the keyboard on large screens."
+    "Set a Quran completion plan with your own page range and duration, search Juzs or surahs, and see overall progress.",
+    "Jump to a Mushaf page from its number, swipe up to open tools, or swipe down to toggle focus mode.",
+    "Read the complete Surah Al-Baqarah in the ruqyah collection and listen to its recitation.",
+    "Adhkar collections open at your continuation point, with collection sharing, repeat reading, a roomier list and more reliable progress saving."
   ]
 }

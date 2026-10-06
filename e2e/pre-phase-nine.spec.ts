@@ -265,6 +265,10 @@ test("Friday dua progress starts weekly even when the canonical collection was c
   await page.goto("/?view=friday");
 
   await page.getByRole("button", { name: /Seek the response hour after/ }).click();
+  await expect(page.getByTestId("reader-screen")).toBeVisible();
+  await page.getByRole("button", { name: "Reader options", exact: true }).click();
+  await page.getByTestId("reader-view-all-azkar").click();
+  await expect(page.getByTestId("category-overview")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Comprehensive Duas", exact: true })).toBeVisible();
   await expect(page.getByText("0 of 47", { exact: true })).toBeVisible();
 
@@ -287,6 +291,10 @@ test("before-sleep preparation reports progress and completion", async ({ page }
   await openReturningGuest(page);
   await page.getByTestId("nav-azkar").click();
   await page.getByTestId("category-card-before_sleep").click();
+  await expect(page.getByTestId("reader-screen")).toBeVisible();
+  await page.getByRole("button", { name: "Reader options", exact: true }).click();
+  await page.getByTestId("reader-view-all-azkar").click();
+  await expect(page.getByTestId("category-overview")).toBeVisible();
 
   const progress = page.getByTestId("sleep-preparation-count");
   await expect(progress).toHaveText("0 / 3");

@@ -19,11 +19,11 @@ for (const language of ["ar", "en"] as const) {
     const handle = page.getByTestId("reader-sidebar-resizer");
     await expect(panel).toBeVisible();
     await expect(toggle).toBeHidden();
-    await expect(handle).toHaveAttribute("aria-valuenow", "336");
+    await expect(handle).toHaveAttribute("aria-valuenow", "420");
     const before = await page.getByTestId("reader-screen").getAttribute("data-zikr-index");
     await handle.focus();
     await page.keyboard.press(language === "ar" ? "ArrowRight" : "ArrowLeft");
-    await expect(handle).toHaveAttribute("aria-valuenow", "352");
+    await expect(handle).toHaveAttribute("aria-valuenow", "436");
     const expanded = panel
       .getByRole("button", { name: language === "ar" ? "عرض الذكر كاملاً" : "Expand dhikr", exact: true })
       .first();
@@ -46,13 +46,13 @@ for (const language of ["ar", "en"] as const) {
     await expect(handle).toHaveAttribute("aria-valuenow", String(maximum));
     await handle.focus();
     await page.keyboard.press("Home");
-    await expect(handle).toHaveAttribute("aria-valuenow", "288");
+    await expect(handle).toHaveAttribute("aria-valuenow", "380");
     const grip = (await handle.boundingBox())!;
     await page.mouse.move(grip.x + grip.width / 2, grip.y + grip.height / 2);
     await page.mouse.down();
     await page.mouse.move(grip.x + grip.width / 2 + (language === "ar" ? 64 : -64), grip.y + grip.height / 2);
     await page.mouse.up();
-    await expect(handle).toHaveAttribute("aria-valuenow", "352");
+    await expect(handle).toHaveAttribute("aria-valuenow", "444");
     await page.getByTestId("reader-sidebar-close").click();
     await expect(panel).not.toBeVisible();
     await expect(toggle).toBeVisible();
@@ -60,12 +60,12 @@ for (const language of ["ar", "en"] as const) {
     await toggle.click();
     await expect(toggle).toBeHidden();
     await expect(page.getByTestId("reader-sidebar-close")).toBeFocused();
-    await expect(handle).toHaveAttribute("aria-valuenow", "352");
+    await expect(handle).toHaveAttribute("aria-valuenow", "444");
     await expect(
       panel.getByRole("button", { name: language === "ar" ? "طي الذكر" : "Collapse dhikr", exact: true }).first(),
     ).toHaveAttribute("aria-expanded", "true");
     await handle.dblclick();
-    await expect(handle).toHaveAttribute("aria-valuenow", "336");
+    await expect(handle).toHaveAttribute("aria-valuenow", "420");
     await handle.focus();
     await page.keyboard.press("Enter");
     await expect(panel).not.toBeVisible();

@@ -33,6 +33,8 @@ for (const language of ["ar", "en"] as const) {
       // Existing compact padding/border and wide toolbar/title/progress geometry.
       // Preserve the fractional CSS height rather than its rounded screenshot value.
       expect(bounds.height).toBeCloseTo(width < 768 ? 57 : 165.5, 1);
+      // The owner's sidebar controls share their separate card anatomy in
+      // both open and closed states; the remaining header actions are round.
       const buttons = header.getByRole("button");
       const styles = await buttons.evaluateAll((elements) =>
         elements.map((element) => {
@@ -44,14 +46,20 @@ for (const language of ["ar", "en"] as const) {
             radius: style.borderRadius,
             border: parseFloat(style.borderTopWidth),
             color: style.color,
+            sidebarToggle: element.getAttribute("data-testid") === "reader-sidebar-toggle",
           };
         }),
       );
       for (const style of styles) {
         expect(style.width).toBeGreaterThanOrEqual(44);
         expect(style.height).toBeGreaterThanOrEqual(44);
-        expect(style.radius).toBe(styles[0]!.radius);
-        expect(style.color).toBe(styles[0]!.color);
+        if (style.sidebarToggle) {
+          expect(style.radius).toBe("14px");
+          expect(style.border).toBe(1);
+        } else {
+          expect(style.radius).toBe(styles[0]!.radius);
+          expect(style.color).toBe(styles[0]!.color);
+        }
         if (width < 768) expect(style.border).toBe(0);
       }
       const tools = page.getByTestId("reader-entry-tools");

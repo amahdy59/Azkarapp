@@ -1,6 +1,7 @@
 import type { CategoryId, RitualGroupId, RoutineCategoryId, RoutineMode, Zikr, ZikrDraft, ZikrGroupId } from "../types";
 import type { PrayerName } from "./prayerTimes";
 import { applyContentReview } from "./contentReview";
+import { BAQARAH_SURAH } from "./baqarahSurah";
 import { FASTING_RAMADAN_AZKAR } from "./fastingRamadan";
 import { IN_PRAYER_AZKAR } from "./inPrayerSupplications";
 
@@ -3045,6 +3046,7 @@ const ILLNESS_RUQYAH_AZKAR: ZikrDraft[] = [
     authenticityNote: "Sahih Muslim.",
     sourceUrl: "https://sunnah.com/muslim%3A916",
   },
+  BAQARAH_SURAH,
 ];
 
 const SOCIAL_COMMUNITY_AZKAR: ZikrDraft[] = [

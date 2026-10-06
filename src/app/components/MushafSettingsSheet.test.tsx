@@ -125,6 +125,18 @@ describe("MushafSettingsSheet reading choices", () => {
     expect(onSelectToolbarSide).toHaveBeenCalledWith("left");
   });
 
+  it("omits the text size section when textScaleApplies is false to prevent mobile clutter", () => {
+    const onSelectTextScale = vi.fn();
+    renderSheet({ onSelectTextScale, textScaleApplies: false });
+
+    expect(screen.queryByTestId("mushaf-text-size-group")).not.toBeInTheDocument();
+  });
+
+  it("shows app theme badge on the theme matching appTheme", () => {
+    renderSheet({ appTheme: "midnight" });
+    expect(screen.getByText("سمة التطبيق")).toBeInTheDocument();
+  });
+
   it("lists the page keys only where there is a keyboard using them", () => {
     renderSheet({ showKeyboardHelp: true });
     expect(screen.getByText(/اختصارات لوحة المفاتيح/)).toBeInTheDocument();

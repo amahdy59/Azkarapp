@@ -118,6 +118,43 @@ describe("reader page drag", () => {
     fireEvent.touchEnd(surface, release(200, 400));
     expect(onNext).toHaveBeenCalledTimes(1);
   });
+
+  it("invokes onSwipeUp and onSwipeDown on vertical swipe gestures", () => {
+    const onSwipeUp = vi.fn();
+    const onSwipeDown = vi.fn();
+    function VerticalSurface() {
+      const { onTouchStart, onTouchMove, onTouchEnd } = useSwipeGestures({
+        direction: "rtl",
+        onNext: vi.fn(),
+        onPrev: vi.fn(),
+        onSwipeUp,
+        onSwipeDown,
+      });
+      return (
+        <div
+          data-testid="vertical-surface"
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
+        />
+      );
+    }
+    render(<VerticalSurface />);
+    const surface = screen.getByTestId("vertical-surface");
+
+    // Swipe up (deltaY < -60)
+    fireEvent.touchStart(surface, touch(200, 400));
+    fireEvent.touchMove(surface, touch(200, 300));
+    fireEvent.touchEnd(surface, release(200, 300));
+    expect(onSwipeUp).toHaveBeenCalledTimes(1);
+    expect(onSwipeDown).not.toHaveBeenCalled();
+
+    // Swipe down (deltaY > 60)
+    fireEvent.touchStart(surface, touch(200, 200));
+    fireEvent.touchMove(surface, touch(200, 320));
+    fireEvent.touchEnd(surface, release(200, 320));
+    expect(onSwipeDown).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe("the reader applies the gesture on every layout", () => {

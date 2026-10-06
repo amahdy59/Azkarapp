@@ -192,7 +192,7 @@ test("offers clear RTL reading choices and free reading without progress trackin
   await page.getByRole("button", { name: "تعديل" }).click();
 
   const radios = page.getByRole("radio");
-  await expect(radios).toHaveCount(5);
+  await expect(radios).toHaveCount(6);
   await expect(page.getByRole("combobox")).toHaveCount(0);
   await expect(page.getByRole("radio", { name: /صفحات كل يوم/ })).toBeChecked();
 
@@ -245,9 +245,44 @@ test("offers clear RTL reading choices and free reading without progress trackin
   await expect(page.getByRole("article", { name: "صفحة ٤٢" })).toBeVisible();
   await page.keyboard.press("ArrowLeft");
   await expect(page.getByRole("article", { name: "صفحة ٤٣" })).toBeVisible();
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => JSON.parse(window.localStorage.getItem("azkarapp.state.v1") ?? "{}").quranReadingPosition?.page,
+      ),
+    )
+    .toBe(43);
   const stored = await page.evaluate(() => JSON.parse(window.localStorage.getItem("azkarapp.state.v1") ?? "{}"));
   expect(stored.quranReadingPosition?.page).toBe(43);
   expect(stored.wirdHistory).toEqual({});
+});
+
+test("custom plan presets and section search remain keyboard usable with 44px targets", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 700 });
+  await page.getByRole("button", { name: "تعديل" }).click();
+  await page.getByRole("radio", { name: /ختمة مخصصة/ }).check();
+  const presets = page.getByRole("button", { name: /^[٣٦٩١][٠٨]+ أيام الإتمام$/ });
+  await expect(presets).toHaveCount(4);
+  for (const preset of await presets.all()) {
+    const bounds = await preset.boundingBox();
+    expect(bounds!.width).toBeGreaterThanOrEqual(44);
+    expect(bounds!.height).toBeGreaterThanOrEqual(44);
+  }
+  await presets.first().focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByLabel("أيام الإتمام", { exact: true })).toHaveValue("30");
+
+  await page.getByRole("radio", { name: /وِرد يومي ثابت/ }).check();
+  const search = page.getByRole("textbox", { name: "ابحث عن جزء..." });
+  await search.fill("1");
+  const clear = page.getByRole("button", { name: "مسح", exact: true });
+  const bounds = await clear.boundingBox();
+  expect(bounds!.width).toBeGreaterThanOrEqual(44);
+  expect(bounds!.height).toBeGreaterThanOrEqual(44);
+  await clear.focus();
+  await page.keyboard.press("Enter");
+  await expect(search).toHaveValue("");
+  await expect(page.getByRole("combobox").locator("option")).toHaveCount(30);
 });
 
 test("fits a two-page desktop spread with a focused rail and returns to one page in portrait", async ({ page }) => {
@@ -333,6 +368,16 @@ test("scrolls the paper on a short viewport instead of shrinking it to nine pixe
     )
     .toBeGreaterThanOrEqual(512);
 
+  // The initial fallback fit precedes the page font and its scheduled refit.
+  await expect
+    .poll(() =>
+      page
+        .locator("[data-mushaf-line-content]")
+        .first()
+        .evaluate((element) => Number.parseFloat(getComputedStyle(element).fontSize)),
+    )
+    .toBeGreaterThan(12);
+
   const geometry = await page.evaluate(() => {
     const canvas = document.querySelector<HTMLElement>("[data-mushaf-page]")!;
     const paper = document.querySelector<HTMLElement>(".mushaf-paper")!;
@@ -363,13 +408,11 @@ test("turns pages by swipe without hiding the permanent controls", async ({ page
   await page.getByRole("button", { name: "متابعة القراءة" }).click();
   await expect(page.getByRole("article", { name: "صفحة ٤٢" })).toBeVisible();
 
-  // The paper became a scroll container to keep short viewports legible, which
-  // let it compute `touch-action: auto` and claim both axes — every swipe was
-  // eaten before the page-turn handler saw it.
+  // A fitting page owns directional swipes while preserving pinch zoom.
   const paperTouchAction = await page
     .locator(".mushaf-paper")
     .evaluate((element) => getComputedStyle(element).touchAction);
-  expect(paperTouchAction).toBe("pan-y");
+  expect(paperTouchAction).toBe("pinch-zoom");
 
   const paper = await page.locator(".mushaf-paper").boundingBox();
   const midY = paper!.y + paper!.height / 2;
@@ -382,6 +425,40 @@ test("turns pages by swipe without hiding the permanent controls", async ({ page
   await expect(page.getByRole("article", { name: "صفحة ٤٣" })).toBeVisible();
   await expect(page.getByTestId("mushaf-more-actions")).toBeVisible();
   await expect(page.getByTestId("mushaf-page-bookmark")).toBeVisible();
+});
+
+test("touch swipes open tools and focus mode while short pages retain native scrolling", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole("button", { name: "متابعة القراءة" }).click();
+  const paper = page.locator(".mushaf-paper");
+  await expect(page.getByRole("article", { name: "صفحة ٤٢" })).toBeVisible();
+  await expect.poll(() => paper.evaluate((element) => getComputedStyle(element).touchAction)).toBe("pinch-zoom");
+  const client = await page.context().newCDPSession(page);
+  await client.send("Emulation.setTouchEmulationEnabled", { enabled: true });
+  const swipe = async (delta: number) => {
+    const box = (await paper.boundingBox())!;
+    const x = box.x + box.width / 2;
+    const y = box.y + box.height / 2;
+    await client.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x, y }] });
+    for (let step = 1; step <= 6; step++) {
+      await client.send("Input.dispatchTouchEvent", {
+        type: "touchMove",
+        touchPoints: [{ x, y: y + (delta * step) / 6 }],
+      });
+    }
+    await client.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+  };
+  await swipe(-140);
+  await expect(page.getByTestId("mushaf-quick-menu")).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("mushaf-quick-menu")).not.toBeVisible();
+  await swipe(140);
+  await expect(page.getByTestId("mushaf-focus-exit")).toBeVisible();
+  await page.getByTestId("mushaf-focus-exit").click();
+  await page.setViewportSize({ width: 643, height: 275 });
+  await expect.poll(() => paper.evaluate((element) => getComputedStyle(element).touchAction)).toBe("pan-y pinch-zoom");
+  await expect(page.getByRole("article", { name: "صفحة ٤٢" })).toBeVisible();
+  await client.detach();
 });
 
 test("keeps the full-screen desktop rail accessible", async ({ page }) => {

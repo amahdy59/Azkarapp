@@ -1,6 +1,54 @@
 import type { AudioAsset } from "./audioTypes";
+import { BAQARAH_SURAH } from "../content/baqarahSurah";
 
 export const CORE_AUDIO_ASSETS: Readonly<Record<string, AudioAsset>> = Object.freeze({
+  "quran-002": {
+    id: "quran-002",
+    titleArabic: "سورة البقرة",
+    titleEnglish: "Surah Al-Baqarah",
+    contentKind: "quran",
+    kind: "sequence",
+    canonicalArabicText: BAQARAH_SURAH.arabicText,
+    normalizedTextHash: "arabic-v1-b8c674f9ac9336a7",
+    requiredQuranRange: {
+      surah: 2,
+      ayahStart: 1,
+      ayahEnd: 286,
+    },
+    segments: [
+      {
+        id: "quran-002-complete",
+        order: 1,
+        transcriptArabic: BAQARAH_SURAH.arabicText,
+        normalizedTranscriptHash: "arabic-v1-b8c674f9ac9336a7",
+        quranReference: {
+          surah: 2,
+          ayahStart: 1,
+          ayahEnd: 286,
+        },
+        variants: [
+          {
+            id: "quran-002-voice-muhammad-alshara-v1",
+            voiceId: "muhammad-alshara",
+            voiceName: "Muhammad Al-Shara",
+            relativePath: "quran/002-baqarah/muhammad-alshara/v1/002-baqarah.mp3",
+            mimeType: "audio/mpeg",
+            durationMs: 6825000,
+            byteSize: 273038727,
+            sha256: "5fe3319c48293dc8a954a43a0b2a2536e614c90bab9ffb6b714430285273062d",
+            sourceId: "internal-upload",
+            reviewStatus: "approved",
+          },
+        ],
+      },
+    ],
+    defaultVoiceId: "muhammad-alshara",
+    reviewStatus: "approved",
+    reviewNotes: "Complete recitation of Surah Al-Baqarah by Muhammad Al-Shara.",
+    reviewedBy: "Antigravity",
+    reviewedAt: "2026-10-05T20:00:00.000Z",
+    version: 1,
+  },
   "quran-018": {
     id: "quran-018",
     titleArabic: "سورة الكهف",

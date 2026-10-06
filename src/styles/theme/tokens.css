@@ -250,6 +250,24 @@
   color-scheme: dark;
   --mushaf-paper: #000000;
   --mushaf-rule-ink: #d4b47c;
+  --background: #000000;
+  --foreground: #ffffff;
+  --card: #09090b;
+  --card-foreground: #f4f4f5;
+  --popover: #09090b;
+  --popover-foreground: #ffffff;
+  --primary: #d4a020;
+  --primary-foreground: #000000;
+  --secondary: #27272a;
+  --secondary-foreground: #ffffff;
+  --muted: #18181b;
+  --muted-foreground: #a1a1aa;
+  --accent: #27272a;
+  --accent-foreground: #ffffff;
+  --border: #27272a;
+  --border-subtle: #18181b;
+  --border-control: #3f3f46;
+  --ring: #d4a020;
 }
 
 :root {

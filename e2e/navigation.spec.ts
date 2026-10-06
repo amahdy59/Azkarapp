@@ -166,7 +166,7 @@ test("saved zikr is visible from the first-class Saved library tab", async ({ pa
   // Comprehensive Duas during the last third of the night.
   await page.getByRole("link", { name: "Azkar", exact: true }).click();
   await page.getByTestId("category-card-morning").click();
-  await page.getByRole("button", { name: "Start Session", exact: true }).click();
+  await expect(page.getByTestId("reader-screen")).toBeVisible();
 
   // Save lives in the reader's overflow menu on every tier: the header carries
   // at most two actions, Benefit and the menu.
@@ -256,6 +256,9 @@ test("collection keeps canonical order and reset stays inside the app canvas", a
   await page.getByRole("link", { name: "Azkar", exact: true }).click();
   await page.getByTestId("category-card-morning").click();
 
+  await expect(page.getByTestId("reader-screen")).toBeVisible();
+  await page.goto("./#/azkar/morning");
+  await expect(page.getByTestId("category-overview")).toBeVisible();
   await expect(page.getByText("Collection introduction", { exact: true })).toBeVisible();
   await expect(
     page.getByText(

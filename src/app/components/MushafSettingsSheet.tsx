@@ -1,4 +1,4 @@
-import { ResponsiveSheet, SheetHeader, SidePanel } from "./ResponsiveSheet";
+import { Modal, SheetHeader, SidePanel } from "./ResponsiveSheet";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage, MushafLayout, MushafTextScale, MushafToolbarSide, MushafTheme, ThemeMode } from "../types";
@@ -32,9 +32,9 @@ export interface MushafSettingsSheetProps {
   /**
    * Where a tool rail is showing there is width to spare, so the settings dock
    * beside the paper instead of covering it — the reader watches the page
-   * answer while they choose. Everywhere else it stays a sheet.
+   * answer while they choose. Everywhere else it opens as a centered modal.
    */
-  presentation?: "sheet" | "side-panel";
+  presentation?: "sheet" | "side-panel" | "modal";
   /** How far the docked panel holds back from its edge, to clear the rail. */
   panelInset?: number;
   pageNumber: number;
@@ -51,13 +51,6 @@ interface ThemeOption {
 
 const THEME_OPTIONS: readonly ThemeOption[] = [
   {
-    id: "follow-app",
-    nameKey: "mushaf.themeFollowApp",
-    swatchBg: "var(--card)",
-    swatchBorder: "var(--border)",
-    swatchAccent: "var(--primary)",
-  },
-  {
     id: "midnight",
     nameKey: "mushaf.themeMidnight",
     swatchBg: "#0b1220",
@@ -65,18 +58,18 @@ const THEME_OPTIONS: readonly ThemeOption[] = [
     swatchAccent: "#d4af37",
   },
   {
-    id: "dark",
-    nameKey: "mushaf.themeDark",
-    swatchBg: "#18181b",
-    swatchBorder: "#27272a",
-    swatchAccent: "#a1a1aa",
-  },
-  {
     id: "light",
     nameKey: "mushaf.themeLight",
     swatchBg: "#fdfbf7",
     swatchBorder: "#e5e0d8",
     swatchAccent: "#b45309",
+  },
+  {
+    id: "dark",
+    nameKey: "mushaf.themeDark",
+    swatchBg: "#18181b",
+    swatchBorder: "#27272a",
+    swatchAccent: "#a1a1aa",
   },
   {
     id: "oled",
@@ -114,7 +107,7 @@ export function MushafSettingsSheet({
   const isPanel = presentation === "side-panel";
   const sheetSurfaceClass =
     resolvedTheme === "oled"
-      ? "bg-black text-white border-neutral-800"
+      ? "theme-oled bg-card text-card-foreground border-neutral-800"
       : `theme-${resolvedTheme} bg-card text-card-foreground border-border`;
 
   const layoutOptions = [
@@ -154,9 +147,11 @@ export function MushafSettingsSheet({
       />
 
       <div className="flex flex-col gap-5 p-5 sm:p-6 overflow-y-auto min-h-0 flex-1">
-        {/* Section 1: Reading type size. Scales the ink inside the fifteen
-            slots; it can never add, remove, or re-break a line. */}
-        {onSelectTextScale && (
+        {/* Section 1: Reading type size. Only shown when the page aspect allows
+            scaling (e.g. landscape or wide tablet/desktop). On portrait mobile,
+            the line already spans the full width and words cannot reflow without
+            breaking the 15-line Medina Mushaf layout. */}
+        {onSelectTextScale && textScaleApplies && (
           <section aria-labelledby="mushaf-text-size-heading" className="flex flex-col gap-2.5">
             <h3
               id="mushaf-text-size-heading"
@@ -169,9 +164,7 @@ export function MushafSettingsSheet({
               aria-labelledby="mushaf-text-size-heading"
               aria-describedby="mushaf-text-size-hint"
               data-testid="mushaf-text-size-group"
-              className={`grid grid-cols-3 gap-1.5 rounded-xl border border-border/60 bg-muted/40 p-1 ${
-                textScaleApplies ? "" : "opacity-50"
-              }`}
+              className="grid grid-cols-3 gap-1.5 rounded-xl border border-border/60 bg-muted/40 p-1"
             >
               {textScaleOptions.map(([id, label]) => {
                 const isSelected = textScale === id;
@@ -181,7 +174,6 @@ export function MushafSettingsSheet({
                     type="button"
                     role="radio"
                     aria-checked={isSelected}
-                    disabled={!textScaleApplies}
                     data-testid={`mushaf-text-size-option-${id}`}
                     onClick={() => onSelectTextScale(id)}
                     className={segmentClass(isSelected)}
@@ -199,12 +191,12 @@ export function MushafSettingsSheet({
               })}
             </div>
             <p id="mushaf-text-size-hint" className="text-micro font-medium leading-snug text-muted-foreground">
-              {t(language, textScaleApplies ? "mushaf.textSizeHint" : "mushaf.textSizeAtPageWidth")}
+              {t(language, "mushaf.textSizeHint")}
             </p>
           </section>
         )}
 
-        {/* Section 1: Themes (Modern 1-Tap Grid) */}
+        {/* Section 2: Themes (Clean Swatches + App Theme Badge) */}
         <section aria-labelledby="mushaf-theme-heading" className="flex flex-col gap-2.5">
           <h3 id="mushaf-theme-heading" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
             {t(language, "mushaf.themeTitle")}
@@ -212,12 +204,12 @@ export function MushafSettingsSheet({
           <div
             role="radiogroup"
             aria-labelledby="mushaf-theme-heading"
-            // A 352px panel has room for one column; a centred sheet has two.
             className={`grid gap-2 ${isPanel ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2"}`}
           >
             {THEME_OPTIONS.map((opt) => {
-              const isSelected = theme === opt.id;
+              const isSelected = theme === opt.id || (theme === "follow-app" && opt.id === appTheme);
               const label = t(language, opt.nameKey);
+              const isAppTheme = opt.id === appTheme;
 
               return (
                 <button
@@ -229,20 +221,34 @@ export function MushafSettingsSheet({
                   onClick={() => onSelectTheme(opt.id)}
                   className={`interactive-elem flex min-h-[48px] items-center justify-between gap-3 rounded-xl border p-2.5 text-start transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                     isSelected
-                      ? "border-primary bg-primary/10 shadow-xs ring-1 ring-primary/40 font-bold"
+                      ? "border-primary bg-primary/10 shadow-xs ring-1 ring-primary/40 font-bold text-foreground"
                       : "border-border/60 bg-muted/30 hover:bg-muted/60 text-foreground"
                   }`}
                 >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    {/* Visual Color Preview Swatch */}
+                  <div className="flex items-center gap-3 min-w-0">
+                    {/* Visual Color Preview Swatch: Rectangular miniature page, not a radio circle */}
                     <div
-                      className="size-6 shrink-0 rounded-full border shadow-xs flex items-center justify-center"
+                      className="flex h-7 w-9 shrink-0 flex-col justify-center gap-1 rounded-lg border px-1.5 shadow-xs transition-transform"
                       style={{ backgroundColor: opt.swatchBg, borderColor: opt.swatchBorder }}
                       aria-hidden="true"
                     >
-                      <div className="size-2 rounded-full" style={{ backgroundColor: opt.swatchAccent }} />
+                      <div
+                        className="h-1 w-full rounded-full opacity-90"
+                        style={{ backgroundColor: opt.swatchAccent }}
+                      />
+                      <div
+                        className="h-1 w-2/3 rounded-full opacity-60"
+                        style={{ backgroundColor: opt.swatchAccent }}
+                      />
                     </div>
-                    <span className="text-xs font-semibold truncate">{label}</span>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-xs font-semibold truncate">{label}</span>
+                      {isAppTheme && (
+                        <span className="text-[10px] font-medium text-muted-foreground">
+                          {t(language, "mushaf.appThemeBadge")}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   {isSelected && (
                     <div className="flex size-5 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
@@ -367,21 +373,19 @@ export function MushafSettingsSheet({
   }
 
   return (
-    <ResponsiveSheet
+    <Modal
       open={open}
       onClose={onClose}
       title={t(language, "mushaf.readingSettings")}
       direction={direction}
+      language={language}
       testId="mushaf-settings-sheet"
       maxWidthClassName="max-w-md"
-      // Theme, type size, and layout all change the page behind this sheet, so
-      // it dims rather than filters what it covers.
       overlayClassName="bg-black/50"
-      dialogClassName={sheetSurfaceClass}
-      drawerClassName={sheetSurfaceClass}
+      className={sheetSurfaceClass}
       showCloseButton={false}
     >
       {body}
-    </ResponsiveSheet>
+    </Modal>
   );
 }

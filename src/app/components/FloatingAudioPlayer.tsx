@@ -477,7 +477,7 @@ export function FloatingAudioPlayer({
           aria-valuetext={accessibleTime(state.currentTime, state.duration, language)}
         >
           {compactWaveform ? (
-            renderWaveform(compactWaveform, 26, "audio-compact-waveform", 4)
+            renderWaveform(compactWaveform, 26, "audio-compact-waveform", 1.5)
           ) : (
             <div className="h-0.5 w-full overflow-hidden rounded-full bg-muted">
               <div className="h-full bg-primary" style={{ width: `${progressPercent}%` }} />

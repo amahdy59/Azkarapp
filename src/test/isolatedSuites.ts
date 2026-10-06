@@ -11,6 +11,7 @@
  * fails until the suite is listed here.
  */
 export const ISOLATED_SUITES = [
+  "src/app/hooks/useAppStatePersistence.test.tsx",
   "src/app/App.composition.test.tsx",
   "src/app/audio/audioOfflineCache.resume.test.ts",
   "src/app/audio/travelPreparation.test.ts",

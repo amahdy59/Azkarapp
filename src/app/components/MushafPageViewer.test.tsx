@@ -467,7 +467,7 @@ describe("MushafPageViewer invariant layout and center tap", () => {
     const canvasWithControls = withControls.querySelector(".mushaf-page-canvas") as HTMLElement;
     expect(canvasWithControls).toBeInTheDocument();
     expect(canvasWithControls.style.paddingTop).toBe("calc(3.25rem + env(safe-area-inset-top))");
-    expect(canvasWithControls.style.paddingBottom).toMatch(/^calc\(max\(0\.6rem,\s*env\(safe-area-inset-bottom\)\)\)$/);
+    expect(canvasWithControls.style.paddingBottom).toMatch(/^calc\(3\.25rem\s*\+\s*env\(safe-area-inset-bottom\)\)$/);
     expect(canvasWithControls.querySelector("[data-testid='mushaf-furniture-surah']")).toBeNull();
 
     const { container: withoutControls } = render(
@@ -523,18 +523,60 @@ describe("MushafPageViewer invariant layout and center tap", () => {
     });
 
     // Tap in center (x = 500, ratio = 0.5)
+    fireEvent.pointerDown(paper, { clientX: 500, pointerType: "touch", button: 0 });
     fireEvent.pointerUp(paper, { clientX: 500, pointerType: "touch", button: 0 });
     expect(onCenterTap).toHaveBeenCalledTimes(1);
     expect(onEdgeTap).not.toHaveBeenCalled();
 
     // Tap on left edge (x = 100, ratio = 0.1 < 0.22)
+    fireEvent.pointerDown(paper, { clientX: 100, pointerType: "touch", button: 0 });
     fireEvent.pointerUp(paper, { clientX: 100, pointerType: "touch", button: 0 });
     expect(onEdgeTap).toHaveBeenCalledWith("left");
     expect(onCenterTap).toHaveBeenCalledTimes(1);
 
     // Tap on right edge (x = 900, ratio = 0.9 > 0.78)
+    fireEvent.pointerDown(paper, { clientX: 900, pointerType: "touch", button: 0 });
     fireEvent.pointerUp(paper, { clientX: 900, pointerType: "touch", button: 0 });
     expect(onEdgeTap).toHaveBeenCalledWith("right");
     expect(onCenterTap).toHaveBeenCalledTimes(1);
+  });
+
+  it("aligns bottom controls (start, center folio, end) with identical bottom coordinate and touch targets", () => {
+    const onPageClick = vi.fn();
+    const { container } = render(
+      <MushafPageViewer
+        lines={sampleLines}
+        language="ar"
+        pageNumber={6}
+        surahName="سورة البقرة"
+        juzNumber={1}
+        direction="rtl"
+        onPageClick={onPageClick}
+        bottomLeftControl={
+          <button type="button" className="h-11">
+            <span className="h-8">Bookmark</span>
+          </button>
+        }
+        bottomRightControl={
+          <button type="button" className="h-11">
+            <span className="h-8">Meanings</span>
+          </button>
+        }
+      />,
+    );
+
+    const left = container.querySelector("[data-testid='mushaf-corner-bottom-left']") as HTMLElement;
+    const center = container.querySelector("[data-testid='mushaf-control-bottom-center']") as HTMLElement;
+    const right = container.querySelector("[data-testid='mushaf-corner-bottom-right']") as HTMLElement;
+
+    expect(left).toBeInTheDocument();
+    expect(center).toBeInTheDocument();
+    expect(right).toBeInTheDocument();
+
+    // Center folio button meets 44px (h-11) target with inner 32px (h-8) pill
+    const centerBtn = center.querySelector("[data-testid='mushaf-furniture-page-btn']") as HTMLElement;
+    expect(centerBtn).toBeInTheDocument();
+    expect(centerBtn.className).toContain("h-11");
+    expect(centerBtn.querySelector("span")?.className).toContain("h-8");
   });
 });

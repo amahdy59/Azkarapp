@@ -29,6 +29,8 @@ export function useSwipeGestures({
   direction,
   onNext,
   onPrev,
+  onSwipeUp,
+  onSwipeDown,
   suppressTap,
   threshold = TURN_THRESHOLD,
   reduceMotion = false,
@@ -36,6 +38,8 @@ export function useSwipeGestures({
   direction: "ltr" | "rtl";
   onNext: () => void;
   onPrev: () => void;
+  onSwipeUp?: () => void;
+  onSwipeDown?: () => void;
   suppressTap?: React.MutableRefObject<boolean>;
   threshold?: number;
   /** Suppresses the drag. The turn itself still happens on release. */
@@ -113,12 +117,18 @@ export function useSwipeGestures({
         }, 220);
       }
 
-      // A gesture the lock called vertical is a scroll, whatever it drifted to
-      // horizontally by the time the thumb left the glass. Still undecided means
-      // a flick too quick to have moved — that is a turn, not a scroll.
-      if (lockedAxis !== "vertical") handleSwipe(dx);
+      if (lockedAxis === "vertical") {
+        const touchEndY = event.changedTouches?.[0]?.clientY;
+        if (touchEndY !== undefined) {
+          const dy = touchEndY - start.y;
+          if (dy < -threshold && onSwipeUp) onSwipeUp();
+          else if (dy > threshold && onSwipeDown) onSwipeDown();
+        }
+      } else {
+        handleSwipe(dx);
+      }
     },
-    [handleSwipe, settle, suppressTap],
+    [handleSwipe, onSwipeDown, onSwipeUp, settle, suppressTap, threshold],
   );
 
   /**
@@ -164,10 +174,15 @@ export function useSwipeGestures({
       setDragOffset(0);
       pointer.current = { id: -1, x: 0, y: 0 };
       axis.current = "undecided";
-      if (lockedAxis === "vertical") return;
+      if (lockedAxis === "vertical") {
+        const dy = event.clientY - start.y;
+        if (dy < -threshold && onSwipeUp) onSwipeUp();
+        else if (dy > threshold && onSwipeDown) onSwipeDown();
+        return;
+      }
       handleSwipe(event.clientX - start.x);
     },
-    [handleSwipe],
+    [handleSwipe, onSwipeDown, onSwipeUp, threshold],
   );
 
   /**
