@@ -399,6 +399,11 @@ test("prayer times: effective timezone and offset are surfaced and survive going
   }
   await page.getByRole("button", { name: /Prayer Times & Reminders/ }).click();
 
+  const locationTab = page.getByRole("tab", { name: /Location|الموقع/i });
+  if (await locationTab.isVisible()) {
+    await locationTab.click();
+  }
+
   const status = page.getByTestId("daylight-saving-status");
   await expect(status).toBeVisible();
   await expect(status).toContainText("Africa/Cairo");
