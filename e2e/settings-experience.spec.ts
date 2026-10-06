@@ -180,11 +180,13 @@ test("launch-critical settings screens are discoverable and accessible", async (
   await openSettings(page);
 
   await page.getByRole("button", { name: /Prayer Times & Reminders/ }).click();
+  await page.getByRole("tab", { name: "Location & prayer times" }).click();
   await expect(page.getByRole("heading", { name: "Location & Prayer Times", exact: true })).toBeVisible();
-  await expect(page.getByRole("switch", { name: "Prayer-time reminders" })).toHaveAttribute("aria-checked", "false");
-  await expect(page.locator("#prayer-reminder-lead")).toBeDisabled();
   await expect(page.getByTestId("daylight-saving-status")).toContainText("Africa/Cairo");
   await expect(page.getByTestId("daylight-saving-status")).toContainText(/UTC\+0[23]:00/);
+  await page.getByRole("tab", { name: "Notifications & reminders" }).click();
+  await expect(page.getByRole("switch", { name: "Prayer-time reminders" })).toHaveAttribute("aria-checked", "false");
+  await expect(page.locator("#prayer-reminder-lead")).toBeDisabled();
   await expectNoWcagViolations(page);
   const backBtn1 = page.getByRole("button", { name: "Back", exact: true });
   if (await backBtn1.isVisible()) {

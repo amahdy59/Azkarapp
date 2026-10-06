@@ -138,7 +138,7 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
     forceRtl: false,
     colorBlindSupport: "none",
     reminders: {
-      prayer: { enabled: false, leadMinutes: 15 },
+      prayer: { enabled: false, leadMinutes: 15, prayers: ["fajr", "dhuhr", "asr", "maghrib", "isha"] },
       morning: { enabled: false, time: "07:30" },
       evening: { enabled: false, time: "18:30" },
       before_sleep: { enabled: false, time: "22:00" },
@@ -646,10 +646,14 @@ function normalizeReminders(
   const defaultReminders = DEFAULT_APP_STATE.settings.reminders;
   const prayerFallback = {
     enabled: typeof fallback?.prayer?.enabled === "boolean" ? fallback.prayer.enabled : defaultReminders.prayer.enabled,
-    leadMinutes:
-      fallback?.prayer?.leadMinutes === 10 || fallback?.prayer?.leadMinutes === 15
-        ? fallback.prayer.leadMinutes
-        : defaultReminders.prayer.leadMinutes,
+    leadMinutes: [0, 5, 10, 15, 20, 30].includes(fallback?.prayer?.leadMinutes as number)
+      ? fallback.prayer!.leadMinutes
+      : defaultReminders.prayer.leadMinutes,
+    prayers: Array.isArray(fallback?.prayer?.prayers)
+      ? (fallback.prayer.prayers.filter((prayer) =>
+          PRAYER_TRACKING_NAMES.has(prayer),
+        ) as ReminderSettings["prayer"]["prayers"])
+      : defaultReminders.prayer.prayers,
   };
   const morningFallback = {
     enabled:
@@ -678,10 +682,14 @@ function normalizeReminders(
   return {
     prayer: {
       enabled: typeof candidate?.prayer?.enabled === "boolean" ? candidate.prayer.enabled : prayerFallback.enabled,
-      leadMinutes:
-        candidate?.prayer?.leadMinutes === 10 || candidate?.prayer?.leadMinutes === 15
-          ? candidate.prayer.leadMinutes
-          : prayerFallback.leadMinutes,
+      leadMinutes: [0, 5, 10, 15, 20, 30].includes(candidate?.prayer?.leadMinutes as number)
+        ? candidate!.prayer!.leadMinutes
+        : prayerFallback.leadMinutes,
+      prayers: Array.isArray(candidate?.prayer?.prayers)
+        ? (candidate!.prayer!.prayers.filter((prayer) =>
+            PRAYER_TRACKING_NAMES.has(prayer),
+          ) as ReminderSettings["prayer"]["prayers"])
+        : prayerFallback.prayers,
     },
     morning: {
       enabled: typeof candidate?.morning?.enabled === "boolean" ? candidate.morning.enabled : morningFallback.enabled,

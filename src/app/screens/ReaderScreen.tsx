@@ -1755,7 +1755,7 @@ export function ReaderScreen({
                               index={idx}
                               direction={direction}
                               reduceMotion={reducedMotion || longSurah}
-                              className={`${longSurah ? "mb-auto mt-2" : "my-auto"} w-full`}
+                              className={`${longSurah ? "mb-auto mt-2" : "my-4"} w-full`}
                             >
                               <div
                                 style={pressStyle}

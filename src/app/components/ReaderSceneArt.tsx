@@ -30,7 +30,7 @@ export const ReaderSceneArt = memo(function ReaderSceneArt({
         focusable="false"
       >
         <path
-          className="reader-scene__distance"
+          className="reader-scene__mosque"
           d="M0 150V138H20V128H43V135H62V125H84V135H108V120H132V133H163V128H193V136H224V121H248V133H282V128H310V138H338V132H365V140H395V136H423V142H452V146Q467 147 480 150Z"
         />
         <g className="reader-scene__mosque">
@@ -41,10 +41,6 @@ export const ReaderSceneArt = memo(function ReaderSceneArt({
           <path d="M99 150V115H104C104 103 115 98 122 91C129 98 140 103 140 115H147V91H153C156 69 173 62 185 47V39H187V47C199 62 216 69 219 91H225V115H232C232 103 243 98 250 91C257 98 268 103 268 115H273V150Z" />
           <path d="M0 150V146Q45 136 96 142H278Q349 140 402 146Q442 150 480 150Z" />
         </g>
-        <path
-          className="reader-scene__windows"
-          d="M177 150V126Q186 111 195 126V150ZM113 139V124Q119 117 125 124V139ZM247 139V124Q253 117 259 124V139Z"
-        />
       </svg>
       {scene === "before_sleep" && (
         <svg className="reader-scene__celestial" viewBox="0 0 120 60" aria-hidden="true" focusable="false">

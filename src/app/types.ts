@@ -127,11 +127,13 @@ export interface ReminderSchedule {
   time: string;
 }
 
-export type PrayerReminderLeadMinutes = 10 | 15;
+export type PrayerReminderLeadMinutes = 0 | 5 | 10 | 15 | 20 | 30;
 
 export interface PrayerReminderSchedule {
   enabled: boolean;
   leadMinutes: PrayerReminderLeadMinutes;
+  /** Individual prayers enabled for alerts; absent legacy data means all five. */
+  prayers?: PrayerName[];
 }
 
 export interface ReminderSettings {

@@ -9,6 +9,7 @@ import type {
   DailyCollectionCompletion,
   LocationSettings,
   PrayerName,
+  PrayerReminderLeadMinutes,
   ReminderSettings,
 } from "../types";
 
@@ -20,7 +21,8 @@ type RoutineReminderKind = "morning" | "evening" | "before_sleep" | "after_praye
 type ReminderHistoryKey = RoutineReminderKind | `prayer:${PrayerName}`;
 
 export type DueReminder =
-  { kind: RoutineReminderKind; category: CategoryId } | { kind: "prayer"; prayer: PrayerName; leadMinutes: 10 | 15 };
+  | { kind: RoutineReminderKind; category: CategoryId }
+  | { kind: "prayer"; prayer: PrayerName; leadMinutes: PrayerReminderLeadMinutes };
 
 export function synchronizeReminderTimes(reminders: ReminderSettings, prayerTimes: PrayerTimes): ReminderSettings {
   return {
@@ -77,6 +79,7 @@ export function getDuePrayerReminder(
 
   const times = getEstimatedPrayerTimes(now, location);
   for (const prayer of PRAYER_NAMES) {
+    if (reminders.prayer.prayers && !reminders.prayer.prayers.includes(prayer)) continue;
     const notificationTime = new Date(
       scheduledTime(now, times[prayer]).getTime() - reminders.prayer.leadMinutes * 60_000,
     );
@@ -140,6 +143,7 @@ export function getNextReminderDelay(
       date.setDate(date.getDate() + dayOffset);
       const times = getEstimatedPrayerTimes(date, location);
       for (const prayer of PRAYER_NAMES) {
+        if (reminders.prayer.prayers && !reminders.prayer.prayers.includes(prayer)) continue;
         const at = scheduledTime(now, times[prayer], dayOffset).getTime() - reminders.prayer.leadMinutes * 60_000;
         if (at > now.getTime()) candidates.push(at);
       }
@@ -184,6 +188,11 @@ async function deliverNotification(reminder: DueReminder, language: AppLanguage,
     tag: `azkar-${reminderHistoryKey(reminder).replace(":", "-")}-${dayKey}`,
     lang: language,
     dir: language === "ar" ? "rtl" : "ltr",
+    icon: `${window.location.origin}${import.meta.env.BASE_URL}192.png`,
+    badge: `${window.location.origin}${import.meta.env.BASE_URL}192.png`,
+    data: {
+      url: `${import.meta.env.BASE_URL}#/azkar/${isPrayer ? "after_prayer" : reminder.category}`,
+    },
   };
   const title = isPrayer ? t(language, "notifications.prayerReminderTitle", { prayer: prayerName }) : "Azkar";
 

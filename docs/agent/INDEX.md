@@ -201,3 +201,5 @@ Apple/Microsoft-informed control spacing and alignment improvements.
 [Resizable Reader collection panel](phases/RESIZABLE_READER_COLLECTION_PANEL.md) records the owner-approved familiar sidebar, pointer/keyboard resizing and drawer fallback; verification is local only and publication is withheld.
 
 [Compact prayer companion](phases/COMPACT_PRAYER_COMPANION.md) records the owner-approved local-only prayer card and summary-tile refinement, responsive reflow, native checklist semantics and verification.
+
+[Phase 79](phases/PHASE_79_NOTIFICATION_REFINEMENT.md) records the owner-approved notification settings, reminder customization, test delivery and service-worker click-routing refinement.

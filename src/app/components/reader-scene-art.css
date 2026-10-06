@@ -6,7 +6,7 @@
   --scene-light: #f1c989;
   position: absolute;
   inset: 0;
-  z-index: -1;
+  z-index: 0;
   overflow: hidden;
   pointer-events: none;
   background: linear-gradient(180deg, var(--scene-zenith), var(--scene-horizon));
@@ -62,18 +62,8 @@
   height: 3rem;
 }
 
-.reader-scene__distance {
-  fill: var(--scene-light);
-  opacity: 0.12;
-}
-
 .reader-scene__mosque {
   fill: #0a1222;
-}
-
-.reader-scene__windows {
-  fill: var(--scene-light);
-  opacity: 0.18;
 }
 
 .reader-scene__stars {

@@ -63,12 +63,12 @@ describe("NotificationsPanel", () => {
     expect(screen.getByRole("combobox", { name: "Reminder time" })).toBeDisabled();
     fireEvent.click(screen.getByRole("switch", { name: "Prayer-time reminders" }));
     expect(onRemindersChange).toHaveBeenLastCalledWith(
-      expect.objectContaining({ prayer: { enabled: true, leadMinutes: 15 } }),
+      expect.objectContaining({ prayer: expect.objectContaining({ enabled: true, leadMinutes: 15 }) }),
     );
 
     const enabled = {
       ...DEFAULT_APP_STATE.settings.reminders,
-      prayer: { enabled: true, leadMinutes: 15 as const },
+      prayer: { enabled: true, leadMinutes: 15 as const, prayers: ["fajr", "dhuhr", "asr", "maghrib", "isha"] },
     };
     rerender(
       <NotificationsPanel
@@ -83,7 +83,7 @@ describe("NotificationsPanel", () => {
     await user.click(screen.getByRole("combobox", { name: "Reminder time" }));
     await user.click(screen.getByRole("option", { name: "10 minutes before prayer" }));
     expect(onRemindersChange).toHaveBeenLastCalledWith(
-      expect.objectContaining({ prayer: { enabled: true, leadMinutes: 10 } }),
+      expect.objectContaining({ prayer: expect.objectContaining({ enabled: true, leadMinutes: 10 }) }),
     );
   });
 
@@ -103,6 +103,8 @@ describe("NotificationsPanel", () => {
         onBack={vi.fn()}
       />,
     );
+
+    fireEvent.click(screen.getByRole("tab", { name: "Location & prayer times" }));
 
     fireEvent.change(screen.getByRole("searchbox", { name: "Search cities and countries" }), {
       target: { value: "London" },
@@ -138,6 +140,8 @@ describe("NotificationsPanel", () => {
         onBack={vi.fn()}
       />,
     );
+
+    fireEvent.click(screen.getByRole("tab", { name: "الموقع ومواقيت الصلاة" }));
 
     fireEvent.change(screen.getByRole("searchbox", { name: "البحث في المدن والدول" }), {
       target: { value: "لندن" },

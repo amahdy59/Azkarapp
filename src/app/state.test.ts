@@ -328,7 +328,11 @@ describe("app state persistence", () => {
     expect(state.settings.reminders).toEqual({
       ...DEFAULT_APP_STATE.settings.reminders,
       evening: { enabled: true, time: DEFAULT_APP_STATE.settings.reminders.evening.time },
-      prayer: { enabled: true, leadMinutes: DEFAULT_APP_STATE.settings.reminders.prayer.leadMinutes },
+      prayer: {
+        enabled: true,
+        leadMinutes: DEFAULT_APP_STATE.settings.reminders.prayer.leadMinutes,
+        prayers: ["fajr", "dhuhr", "asr", "maghrib", "isha"],
+      },
     });
     expect(state.sessions).toEqual([]);
   });

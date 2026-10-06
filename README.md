@@ -20,7 +20,7 @@ Production site: [amahdy59.github.io/Azkarapp](https://amahdy59.github.io/Azkara
 
 Prayer times are calculated synchronously on the device from the selected coordinates, calculation method, and the saved IANA timezone. Date-specific timezone rules apply DST automatically, and the user's optional per-prayer minute adjustments are applied last. No coordinate or prayer-time network request is required.
 
-Settings displays the selected timezone, current UTC offset, and whether daylight saving or standard time is active. Users can opt into a reminder 10 or 15 minutes before each calculated prayer. Reminder scheduling uses the next exact due time while the installed app remains open or backgrounded rather than repeatedly polling.
+Settings displays the selected timezone, current UTC offset, and whether daylight saving or standard time is active. Users can opt into reminders at prayer time or 5, 10, 15, 20, or 30 minutes before selected prayers. Reminder scheduling uses the next exact due time while the installed app remains open or backgrounded rather than repeatedly polling; dependable delivery after full closure requires Push API support.
 
 See [docs/PRAYER_TIMES.md](docs/PRAYER_TIMES.md) for formulas, caching, DST detection, failure behavior, and verification procedures.
 

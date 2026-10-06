@@ -1,13 +1,13 @@
 {
-  "release": "2026-10-06.3",
+  "release": "2026-10-06.4",
   "ar": [
-    "عرض الكلمات الافتتاحية لكل ربع من أرباع القرآن الكريم في فهرس المصحف لتسهيل الاستدلال والتنقل.",
-    "تحسين تخطيط الترويسة الرئيسية وتقليل الفراغات العلوية في الهواتف لجعل بطاقات الصلاة والأوراد في الواجهة مباشرة.",
-    "إبراز إعدادات الإشعارات والتذكيرات برمز واضح وبحث فوري في قائمة الإعدادات وتأكيد تباين الألوان."
+    "تنظيم إعدادات الإشعارات ومواقيت الصلاة في تبويبين واضحين للوصول الأسرع إلى كل خيار.",
+    "تخصيص الصلوات التي تستقبل تنبيهاتها واختيار وقت التنبيه من لحظة الصلاة حتى ثلاثين دقيقة قبلها.",
+    "إضافة إشعار تجريبي بهوية التطبيق وتحسين عرض Reader على الشاشات الصغيرة لاستعمال المساحة المتاحة بصورة أفضل."
   ],
   "en": [
-    "Display the opening words for every Quranic quarter in the Mushaf index for effortless navigation.",
-    "Streamline the top header height on mobile views, bringing prayer cards and daily wird immediately into focus.",
-    "Feature notifications and reminders clearly in the Settings menu with direct search and verified color contrast."
+    "Organize notification and prayer-time settings into two clear tabs for faster access.",
+    "Choose which prayers to notify and whether the alert arrives at prayer time or up to 30 minutes earlier.",
+    "Add a test notification with clearer app identity and improve mobile Reader spacing and collection artwork."
   ]
 }
