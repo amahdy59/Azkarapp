@@ -4256,3 +4256,14 @@ Owner asks the prayer times and expanded card to share the same maximum width an
 ### 2026-10-05 — Integrated Reader browser expectations
 
 Owner approved updating the two outdated Reader header expectations identified by the combined prayer/Home release verification. Scope is limited to browser assertions covering the completed collection panel and drawer open/close states, toolbar actions and focus restoration; no Reader application behavior change is authorized by this decision.
+
+## DEC-219 — Schedule Android reminders with native local alarms
+
+- **Date:** 2026-10-06
+- **Status:** Approved
+- **Owner:** Product owner (explicit request to fix closed-app Android reminder delivery)
+- **Context:** The foreground reminder hook relies on JavaScript timers, which stop when Android terminates the WebView. The earlier reminder contract described the PWA only and required server push for dependable closed-browser delivery.
+- **Decision:** In native Android builds, schedule a rolling 14-day window of opted-in routine and prayer reminders through Capacitor Local Notifications. Rebuild the window on app launch and when reminder settings, language, location, or same-day completion state changes. Use OS alarms with allow-while-idle and exact scheduling requests. Keep the existing browser timer/service-worker path for the PWA; do not claim that browser alarms work after the browser is closed.
+- **Permission and recovery:** Android notification permission is required. Exact-alarm access and vendor battery controls can affect punctual delivery. Capacitor restores alarms after reboot. Refreshing the 14-day window requires opening the app; force-stopped apps remain subject to Android's suppression behavior.
+- **Dependency:** Add Capacitor Core and Local Notifications at runtime, with Android and CLI packages in development dependencies for the native build. No Push Notifications package is used.
+- **Verification:** Scheduler unit coverage, the Android sync/build, repository quality gates, and a physical-device swipe-away/reboot smoke test. Automated tests do not prove OS delivery.

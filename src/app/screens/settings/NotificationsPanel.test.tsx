@@ -36,7 +36,7 @@ describe("NotificationsPanel", () => {
       />,
     );
 
-    expect(screen.getByText(/Open this site’s settings/i)).toBeInTheDocument();
+    expect(screen.getByText(/Open this app’s or site’s settings/i)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("switch", { name: "Morning reminder" }));
     expect(screen.getByRole("alert")).toHaveTextContent("Notifications remain off");
     expect(onRemindersChange).not.toHaveBeenCalled();

@@ -22,6 +22,7 @@ export const ISOLATED_SUITES = [
   "src/app/hooks/usePwaLifecycle.test.ts",
   "src/app/hooks/useRemoteAccountSync.test.tsx",
   "src/app/hooks/useSettingsHandlers.test.ts",
+  "src/app/hooks/useForegroundReminders.native.test.ts",
   "src/app/releaseNotes.test.ts",
   "src/app/screens/settings/DownloadsPanel.test.tsx",
   "src/app/screens/settings/WhatsNewPanel.test.tsx",

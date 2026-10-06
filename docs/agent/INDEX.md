@@ -144,6 +144,8 @@ may run in parallel.
 
 [Phase 74](phases/PHASE_74_RELEASE_REVIEW.md) records the latest Reader/audio review and push-readiness checks.
 
+[Phase 80](phases/PHASE_80_ANDROID_LOCAL_REMINDERS.md) records the native Android reminder scheduler under DEC-219. The PWA continues to use browser scheduling and retains its closed-browser limitation.
+
 ## Core rule
 
 The latest review and hardening work is recorded in [Phase 72](phases/PHASE_72_WIRD_PLANNING_REDESIGN.md), adding support for daily repeating Quran sections (fixed Juz, Surah, or custom page range) with binary daily completion upon reading 100% of the section, isolated progress calculation, and one-tap section restart.

@@ -1,4 +1,6 @@
 import { useEffect } from "react";
+import { Capacitor } from "@capacitor/core";
+import { LocalNotifications } from "@capacitor/local-notifications";
 import { getEstimatedPrayerTimes, PRAYER_NAMES, type PrayerTimes } from "../content/prayerTimes";
 import { t } from "../i18n";
 import { formatNumerals } from "../formatting";
@@ -15,6 +17,8 @@ import type {
 const REMINDER_HISTORY_KEY = "azkarapp.foreground-reminders.v1";
 const REMINDER_WINDOW_MS = 5 * 60_000;
 const MAX_TIMEOUT_MS = 2_147_000_000;
+const ANDROID_SCHEDULE_DAYS = 14;
+const ANDROID_CHANNEL_ID = "azkarapp-reminders";
 
 type RoutineReminderKind = "morning" | "evening" | "before_sleep" | "after_prayer";
 type ReminderHistoryKey = RoutineReminderKind | `prayer:${PrayerName}`;
@@ -148,6 +152,106 @@ export function getNextReminderDelay(
   return candidates.length > 0 ? Math.min(...candidates) - now.getTime() : null;
 }
 
+type ScheduledReminder = {
+  id: number;
+  title: string;
+  body: string;
+  at: Date;
+  kind: ReminderHistoryKey;
+  dayKey: string;
+};
+
+function nativeNotificationId(kind: string, at: Date) {
+  let hash = 2166136261;
+  for (const character of `${kind}:${at.getTime()}`) hash = Math.imul(hash ^ character.charCodeAt(0), 16777619);
+  return (hash >>> 0) & 0x7fffffff;
+}
+
+export function getUpcomingNativeReminders(
+  reminders: ReminderSettings,
+  dailyCompletions: DailyCollectionCompletion[],
+  language: AppLanguage,
+  location: LocationSettings | undefined,
+  now = new Date(),
+  horizonDays = ANDROID_SCHEDULE_DAYS,
+): ScheduledReminder[] {
+  const upcoming: ScheduledReminder[] = [];
+  const routines: Array<{ kind: RoutineReminderKind; category: CategoryId }> = [
+    { kind: "morning", category: "morning" },
+    { kind: "evening", category: "evening" },
+    { kind: "before_sleep", category: "before_sleep" },
+    { kind: "after_prayer", category: "after_prayer" },
+  ];
+  for (let dayOffset = 0; dayOffset < horizonDays; dayOffset += 1) {
+    const date = new Date(now);
+    date.setDate(date.getDate() + dayOffset);
+    const dayKey = getProgressDayKey(date, DEFAULT_PROGRESS_DAY_START_HOUR);
+    for (const { kind, category } of routines) {
+      if (!reminders[kind].enabled) continue;
+      if (
+        dayOffset === 0 &&
+        reminders.onlyWhenIncomplete &&
+        didCompleteCategoryToday(dailyCompletions, category, now, DEFAULT_PROGRESS_DAY_START_HOUR)
+      )
+        continue;
+      const at = scheduledTime(date, reminders[kind].time);
+      if (at <= now) continue;
+      upcoming.push({
+        id: nativeNotificationId(kind, at),
+        title: "Azkar",
+        body: t(language, `notifications.${kind}`),
+        at,
+        kind,
+        dayKey,
+      });
+    }
+    if (!reminders.prayer.enabled) continue;
+    const prayerTimes = getEstimatedPrayerTimes(date, location);
+    for (const prayer of PRAYER_NAMES) {
+      const at = new Date(scheduledTime(date, prayerTimes[prayer]).getTime() - reminders.prayer.leadMinutes * 60_000);
+      if (at <= now) continue;
+      const prayerName = t(language, `notifications.${prayer}`);
+      upcoming.push({
+        id: nativeNotificationId(`prayer:${prayer}`, at),
+        title: t(language, "notifications.prayerReminderTitle", { prayer: prayerName }),
+        body: t(language, "notifications.prayerReminderBody", {
+          prayer: prayerName,
+          minutes: formatNumerals(reminders.prayer.leadMinutes, language),
+        }),
+        at,
+        kind: `prayer:${prayer}`,
+        dayKey,
+      });
+    }
+  }
+  return upcoming.sort((a, b) => a.at.getTime() - b.at.getTime());
+}
+
+async function rescheduleNativeReminders(
+  reminders: ReminderSettings,
+  dailyCompletions: DailyCollectionCompletion[],
+  language: AppLanguage,
+  location: LocationSettings | undefined,
+) {
+  if ((await LocalNotifications.checkPermissions()).display !== "granted") return;
+  const pending = await LocalNotifications.getPending();
+  const owned = pending.notifications.filter((item) => item.extra?.azkarappReminder === true);
+  if (owned.length) await LocalNotifications.cancel({ notifications: owned.map(({ id }) => ({ id })) });
+  const upcoming = getUpcomingNativeReminders(reminders, dailyCompletions, language, location);
+  if (!upcoming.length) return;
+  await LocalNotifications.createChannel({ id: ANDROID_CHANNEL_ID, name: "Azkar reminders", importance: 4 });
+  await LocalNotifications.schedule({
+    notifications: upcoming.map(({ id, title, body, at, kind, dayKey }) => ({
+      id,
+      title,
+      body,
+      schedule: { at, allowWhileIdle: true, isExactNotification: true },
+      channelId: ANDROID_CHANNEL_ID,
+      extra: { azkarappReminder: true, kind, dayKey },
+    })),
+  });
+}
+
 function readReminderHistory() {
   try {
     const parsed = JSON.parse(window.localStorage.getItem(REMINDER_HISTORY_KEY) ?? "{}") as unknown;
@@ -174,38 +278,36 @@ function recordNotification(key: ReminderHistoryKey, now: Date, progressDayStart
 async function deliverNotification(reminder: DueReminder, language: AppLanguage, dayKey: string) {
   const isPrayer = reminder.kind === "prayer";
   const prayerName = isPrayer ? t(language, `notifications.${reminder.prayer}`) : "";
-  const options: NotificationOptions = {
-    body: isPrayer
-      ? t(language, "notifications.prayerReminderBody", {
-          prayer: prayerName,
-          minutes: formatNumerals(reminder.leadMinutes, language),
-        })
-      : t(language, `notifications.${reminder.kind}`),
-    tag: `azkar-${reminderHistoryKey(reminder).replace(":", "-")}-${dayKey}`,
-    lang: language,
-    dir: language === "ar" ? "rtl" : "ltr",
-  };
+  const body = isPrayer
+    ? t(language, "notifications.prayerReminderBody", {
+        prayer: prayerName,
+        minutes: formatNumerals(reminder.leadMinutes, language),
+      })
+    : t(language, `notifications.${reminder.kind}`);
   const title = isPrayer ? t(language, "notifications.prayerReminderTitle", { prayer: prayerName }) : "Azkar";
-
   try {
+    if (!("Notification" in window) || Notification.permission !== "granted") return false;
+    const options: NotificationOptions = {
+      body,
+      tag: `azkar-${reminderHistoryKey(reminder).replace(":", "-")}-${dayKey}`,
+      lang: language,
+      dir: language === "ar" ? "rtl" : "ltr",
+    };
     if ("serviceWorker" in navigator) {
       const registration = await navigator.serviceWorker.ready;
       await registration.showNotification(title, options);
-      return true;
+    } else {
+      new Notification(title, options);
     }
-
-    new Notification(title, options);
     return true;
   } catch {
-    // Some mobile browsers expose Notification but only permit service-worker delivery.
     return false;
   }
 }
 
 /**
- * Sends an opt-in browser notification when a configured reminder is due.
- * Browser tabs cannot guarantee background scheduling; a push service is still
- * required for dependable delivery after the app has been closed.
+ * Android reminders are owned by OS alarms. The web app retains its
+ * best-effort timer/service-worker behavior because browsers cannot schedule OS alarms.
  */
 export function useForegroundReminders({
   reminders,
@@ -221,7 +323,10 @@ export function useForegroundReminders({
   location?: LocationSettings;
 }) {
   useEffect(() => {
-    if (!("Notification" in window) || Notification.permission !== "granted") {
+    if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === "android") {
+      void rescheduleNativeReminders(reminders, dailyCompletions, language, location).catch(() => {
+        // Notification denial or OS scheduling failure must not interrupt app startup.
+      });
       return;
     }
 
@@ -238,9 +343,10 @@ export function useForegroundReminders({
     };
 
     const notifyIfDue = async () => {
-      if (cancelled || isDelivering) {
-        return;
-      }
+      if (cancelled || isDelivering) return;
+
+      if (!("Notification" in window) || Notification.permission !== "granted") return scheduleNextCheck();
+
       const now = new Date();
       const wasAlreadyNotified = (key: ReminderHistoryKey) => hasAlreadyNotified(key, now, progressDayStartHour);
       const due =
@@ -259,8 +365,6 @@ export function useForegroundReminders({
         timerId = window.setTimeout(() => void notifyIfDue(), 250);
         return;
       }
-      // A transient service-worker failure should retry inside the delivery
-      // window without returning to the old continuous polling loop.
       timerId = window.setTimeout(() => void notifyIfDue(), 60_000);
     };
 

@@ -1,15 +1,13 @@
 {
-  "release": "2026-10-05.8",
+  "release": "2026-10-06-android-reminders",
   "ar": [
-    "مواقيت الصلاة أوضح، مع إبراز الصلاة الحالية وبطاقة أعمال أبسط وأكثر اختصارًا.",
-    "بطاقات الرئيسية متوازنة على الشاشات الكبيرة، وتتكيف مع الشاشات الصغيرة وتكبير النص.",
-    "رأس قارئ الأذكار يعرض مشاهد هادئة مع ألوان أوضح وأدوات متناسقة.",
-    "يمكنك طي قائمة الأذكار وتغيير عرضها بالسحب أو لوحة المفاتيح على الشاشات الكبيرة."
+    "يجدول تطبيق Android التذكيرات على الجهاز لتتمكن من الوصول بعد إغلاق التطبيق.",
+    "توضح الإعدادات طريقة وصول التذكيرات في تطبيق Android والمتصفح.",
+    "تستخدم تذكيرات الصلاة مواقيتك المحسوبة وموقعك المحفوظ، بينما تستمر تذكيرات الروتين حسب أوقاتك المحددة."
   ],
   "en": [
-    "Prayer times are clearer, with stronger current-prayer emphasis and a simpler, more compact deeds card.",
-    "Home cards stay balanced on large screens and adapt to small screens and enlarged text.",
-    "The adhkar Reader header has calm scenes, clearer colors and consistent tools.",
-    "Collapse the adhkar list and resize it by dragging or using the keyboard on large screens."
+    "The Android app schedules reminders on your device so they can arrive after you close the app.",
+    "Settings explains how reminder delivery differs between the Android app and a browser.",
+    "Prayer reminders use your calculated local times, while routine reminders follow the times you set."
   ]
 }

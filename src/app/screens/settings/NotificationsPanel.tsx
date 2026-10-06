@@ -16,16 +16,30 @@ import {
 import { searchPrayerLocations, type PrayerLocationPreset } from "../../content/prayerLocations";
 import type { AppLanguage, LocationSettings, PrayerReminderLeadMinutes, ReminderSettings } from "../../types";
 import { SubHeader } from "./SettingsPrimitives";
+import { Capacitor } from "@capacitor/core";
+import { LocalNotifications } from "@capacitor/local-notifications";
 
-type BrowserNotificationPermission = NotificationPermission | "unsupported";
+type BrowserNotificationPermission = "granted" | "denied" | "default";
 type ReminderKind = "morning" | "evening" | "before_sleep" | "after_prayer";
 
-function readNotificationPermission(): BrowserNotificationPermission {
-  if (typeof window === "undefined" || !("Notification" in window)) {
-    return "unsupported";
-  }
+function normalizePermission(permission: string): BrowserNotificationPermission {
+  return permission === "granted" || permission === "denied" ? permission : "default";
+}
 
-  return Notification.permission;
+function isAndroidRuntime() {
+  return Capacitor.isNativePlatform() && Capacitor.getPlatform() === "android";
+}
+
+async function getCurrentPermission(): Promise<BrowserNotificationPermission> {
+  if (!isAndroidRuntime()) {
+    return typeof Notification === "undefined" ? "default" : Notification.permission;
+  }
+  try {
+    const result = await LocalNotifications.checkPermissions();
+    return normalizePermission(result.display);
+  } catch {
+    return "default";
+  }
 }
 
 function permissionCopy(permission: BrowserNotificationPermission, language: AppLanguage) {
@@ -34,8 +48,6 @@ function permissionCopy(permission: BrowserNotificationPermission, language: App
       return t(language, "notifications.permissionGranted");
     case "denied":
       return t(language, "notifications.permissionDenied");
-    case "unsupported":
-      return t(language, "notifications.permissionUnsupported");
     default:
       return t(language, "notifications.permissionDefault");
   }
@@ -124,13 +136,20 @@ export function NotificationsPanel({
   onBack: () => void;
 }) {
   const isArabic = language === "ar";
-  const [permission, setPermission] = useState<BrowserNotificationPermission>(readNotificationPermission);
+  const [permission, setPermission] = useState<BrowserNotificationPermission>(() =>
+    isAndroidRuntime() || typeof Notification === "undefined" ? "default" : Notification.permission,
+  );
   const [isRequesting, setIsRequesting] = useState(false);
   const [hasRequestError, setHasRequestError] = useState(false);
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
   const [locationStatus, setLocationStatus] = useState<string | null>(null);
   const [locationStatusIsError, setLocationStatusIsError] = useState(false);
   const [permissionAttemptBlocked, setPermissionAttemptBlocked] = useState(false);
+
+  // Load Capacitor permission status on mount
+  useEffect(() => {
+    if (isAndroidRuntime()) void getCurrentPermission().then(setPermission);
+  }, []);
   const [latitudeDraft, setLatitudeDraft] = useState(String(locationSettings?.latitude ?? ""));
   const [longitudeDraft, setLongitudeDraft] = useState(String(locationSettings?.longitude ?? ""));
   const [cityDraft, setCityDraft] = useState(locationSettings?.cityName ?? "");
@@ -259,16 +278,15 @@ export function NotificationsPanel({
   };
 
   const requestPermission = async () => {
-    if (!("Notification" in window)) {
-      setPermission("unsupported");
-      return "unsupported" as const;
-    }
-
     try {
       setHasRequestError(false);
       setPermissionAttemptBlocked(false);
       setIsRequesting(true);
-      const next = await Notification.requestPermission();
+      const next = isAndroidRuntime()
+        ? normalizePermission((await LocalNotifications.requestPermissions()).display)
+        : typeof Notification === "undefined"
+          ? "default"
+          : await Notification.requestPermission();
       setPermission(next);
       setPermissionAttemptBlocked(next !== "granted");
       return next;
@@ -623,7 +641,7 @@ export function NotificationsPanel({
               {t(language, "notifications.permissionError")}
             </p>
           )}
-          {(permission === "denied" || permission === "unsupported") && (
+          {permission === "denied" && (
             <p className="mt-3 rounded-xl bg-muted px-3 py-2 text-label leading-5 text-foreground">
               {t(language, "notifications.permissionBlockedAction")}
             </p>

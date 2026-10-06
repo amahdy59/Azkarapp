@@ -20,7 +20,7 @@ Production site: [amahdy59.github.io/Azkarapp](https://amahdy59.github.io/Azkara
 
 Prayer times are calculated synchronously on the device from the selected coordinates, calculation method, and the saved IANA timezone. Date-specific timezone rules apply DST automatically, and the user's optional per-prayer minute adjustments are applied last. No coordinate or prayer-time network request is required.
 
-Settings displays the selected timezone, current UTC offset, and whether daylight saving or standard time is active. Users can opt into a reminder 10 or 15 minutes before each calculated prayer. Reminder scheduling uses the next exact due time while the installed app remains open or backgrounded rather than repeatedly polling.
+Settings displays the selected timezone, current UTC offset, and whether daylight saving or standard time is active. Users can opt into a reminder 10 or 15 minutes before each calculated prayer. The Android app pre-schedules the next 14 days with native alarms, including while the app is closed; the PWA uses browser scheduling and needs a connected push service for dependable delivery after the browser is closed.
 
 See [docs/PRAYER_TIMES.md](docs/PRAYER_TIMES.md) for formulas, caching, DST detection, failure behavior, and verification procedures.
 
@@ -55,6 +55,10 @@ pnpm dev
 Use `nvm use` before setup when Node does not match `.nvmrc`. Install pnpm 11.19.0 through your normal package-manager or version-manager bootstrap if `pnpm run verify:toolchain` reports a mismatch. Do not regenerate the lockfile with another pnpm release.
 
 The frozen install activates the tracked pre-push hook. It verifies the toolchain and dependency graph, reuses an unchanged local quality pass or runs `pnpm check`, then runs core browser smoke tests and the Pages build before Git can push. The full browser suite runs in CI before deployment.
+
+### Android build
+
+With Android Studio and its Android SDK installed, run `pnpm build:android` to build the web bundle with the root-relative paths required by the native shell and synchronize Capacitor plugins. Open `android/` in Android Studio to run or package the app. Android Studio's bundled Java 21 runtime is required by the current Capacitor Android project.
 
 Vite prints the local development URL. To exercise browser tests on a new machine, install the repository-pinned browser engines once:
 
