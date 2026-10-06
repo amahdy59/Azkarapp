@@ -76,6 +76,12 @@ for (const language of ["ar", "en"] as const) {
     });
     await page.reload();
     await expect(counter).toHaveAttribute("aria-label", language === "en" ? /49 \/ 100$/ : /٤٩ \/ ١٠٠$/);
+    const updateNotice = page.getByRole("complementary", {
+      name: language === "en" ? "An update is ready" : "يتوفر تحديث جديد",
+    });
+    if (await updateNotice.isVisible()) {
+      await updateNotice.getByRole("button", { name: language === "en" ? "Later" : "لاحقاً", exact: true }).click();
+    }
     await counter.click();
     await expect(counter).toHaveAttribute("aria-label", language === "en" ? /50 \/ 100$/ : /٥٠ \/ ١٠٠$/);
     await expect(fill).toHaveCSS("--progress-ratio", "0.5");

@@ -18,6 +18,7 @@ Deliver enabled routine and prayer reminders on Android when the app is closed, 
 - `src/app/hooks/useForegroundReminders.test.ts`
 - `src/app/hooks/useForegroundReminders.native.test.ts`
 - `src/test/isolatedSuites.ts`
+- `e2e/devotional-footer.spec.ts` (dismisses an update notice that otherwise intercepts the counter after reload)
 - `src/app/screens/settings/NotificationsPanel.tsx`
 - `src/app/screens/settings/NotificationsPanel.test.tsx`
 - `src/app/i18n/ar.ts`
@@ -56,6 +57,7 @@ Deliver enabled routine and prayer reminders on Android when the app is closed, 
 - Verify reminder generation for the rolling horizon, future prayer-time calculations, stable distinct alarm IDs, and completion suppression for today's routine.
 - Verify the Android hook hands opted-in reminders to Capacitor Local Notifications instead of starting browser timers.
 - Updated permission-copy expectation for browser/app settings.
+- Updated the Firefox footer browser check to dismiss a visible PWA update notice before interacting with the counter; the previous failure was caused by the notice overlay intercepting pointer input.
 
 ## Commands run
 
