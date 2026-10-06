@@ -19,6 +19,7 @@ export const ISOLATED_SUITES = [
   "src/app/components/ReadingScreenChrome.test.tsx",
   "src/app/content/qcfMushaf.test.ts",
   "src/app/hooks/useAuthHandlers.test.ts",
+  "src/app/hooks/useAndroidBackNavigation.native.test.ts",
   "src/app/hooks/usePwaLifecycle.test.ts",
   "src/app/hooks/useRemoteAccountSync.test.tsx",
   "src/app/hooks/useSettingsHandlers.test.ts",

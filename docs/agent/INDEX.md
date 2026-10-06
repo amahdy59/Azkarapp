@@ -1,5 +1,7 @@
 # AI Improvement System Index
 
+[Android hardware Back navigation](phases/PHASE_82_ANDROID_BACK_NAVIGATION.md) records the native Back-button integration with the existing app history and Home exit behavior.
+
 [Reader collection scenes](phases/READER_COLLECTION_SCENES.md) records the owner-approved static gradient/SVG header refinement, unchanged sizing, accessibility fallbacks and local-only verification.
 
 [Compact combined shared cards](phases/COMPACT_COMBINED_SHARED_CARDS.md) records the active owner-approved combined-card density, citation/repetition row, plain footer and Arabic-Indic export numeral refinement.
@@ -145,6 +147,8 @@ may run in parallel.
 [Phase 74](phases/PHASE_74_RELEASE_REVIEW.md) records the latest Reader/audio review and push-readiness checks.
 
 [Phase 80](phases/PHASE_80_ANDROID_LOCAL_REMINDERS.md) records the native Android reminder scheduler under DEC-219. The PWA continues to use browser scheduling and retains its closed-browser limitation.
+
+[Phase 81](phases/PHASE_81_ANDROID_SHARE_SAVE.md) records the native Android share chooser and Downloads/save-picker repair for exported zikr cards.
 
 ## Core rule
 

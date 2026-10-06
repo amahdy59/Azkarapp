@@ -1,5 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { flushSync } from "react-dom";
+import { App } from "@capacitor/app";
+import { Capacitor } from "@capacitor/core";
 import { parseLocation, routeToHash } from "../routing";
 import type { LibraryRouteSection, ProgressRoutePeriod, RouteState, SettingsRoutePanel } from "../routing";
 import { getAzkarForMode, getAzkarForPrayer, isRoutineCategory, registerLazyCollection } from "../content/azkar";
@@ -270,6 +272,31 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
       window.removeEventListener("hashchange", handleHashChange);
     };
   }, [applyRouteFromLocation, hasCompletedOnboarding, reduceMotion]);
+
+  useEffect(() => {
+    if (Capacitor.getPlatform() !== "android") return;
+
+    let removeListener: (() => void) | undefined;
+    let cancelled = false;
+    void App.addListener("backButton", () => {
+      if (view === "home") {
+        void App.exitApp();
+      } else if (inAppHistoryDepth.current > 0) {
+        window.history.back();
+      } else {
+        setActiveTab("home");
+        replace("home");
+      }
+    }).then((listener) => {
+      if (cancelled) void listener.remove();
+      else removeListener = () => void listener.remove();
+    });
+
+    return () => {
+      cancelled = true;
+      removeListener?.();
+    };
+  }, [replace, view]);
 
   const pushRouteState = useCallback(
     (route: RouteState, update: () => void) => {

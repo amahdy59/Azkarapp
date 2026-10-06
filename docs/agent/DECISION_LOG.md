@@ -4267,3 +4267,23 @@ Owner approved updating the two outdated Reader header expectations identified b
 - **Permission and recovery:** Android notification permission is required. Exact-alarm access and vendor battery controls can affect punctual delivery. Capacitor restores alarms after reboot. Refreshing the 14-day window requires opening the app; force-stopped apps remain subject to Android's suppression behavior.
 - **Dependency:** Add Capacitor Core and Local Notifications at runtime, with Android and CLI packages in development dependencies for the native build. No Push Notifications package is used.
 - **Verification:** Scheduler unit coverage, the Android sync/build, repository quality gates, and a physical-device swipe-away/reboot smoke test. Automated tests do not prove OS delivery.
+
+## DEC-220 — Use native Android intents for sharing and saving cards
+
+- **Date:** 2026-10-06
+- **Status:** Approved
+- **Owner:** Product owner (explicit request to fix share and download actions)
+- **Context:** The Android shell runs the sharing UI inside a Capacitor WebView. Web Share file support and blob-anchor downloads are not dependable native Android delivery paths.
+- **Decision:** Keep browser sharing and download behavior for the PWA. In the Android app, use a small registered Capacitor plugin to open Android's system share chooser for files, text, and links. Save Android 10+ exports through MediaStore into `Downloads/AzkarApp`; on older Android, use the system document picker. Keep the generated share payload, archive, and app behavior unchanged.
+- **Permissions and dependencies:** Do not request broad storage permissions and do not add a runtime npm dependency. Share files from cache using the existing FileProvider.
+- **Verification:** Dispatcher/modal tests, strict TypeScript checking, web build, Capacitor sync, and Android debug APK compilation. Physical Android chooser and saved-file inspection remain a device smoke test.
+
+## DEC-221 — Route Android hardware Back through app navigation
+
+- **Date:** 2026-10-06
+- **Status:** Approved
+- **Owner:** Product owner (explicit request for Android device Back to follow app navigation and exit from Home)
+- **Context:** The web router tracks in-app history and handles browser `popstate`, but Android's hardware Back button was closing the activity without asking the router to consume its navigation stack.
+- **Decision:** Use Capacitor's official App plugin back-button event. Pop existing app history for nested screens; return a directly opened non-Home route to Home; call `exitApp` only when Back is pressed on Home. Keep browser/PWA history behavior unchanged.
+- **Dependency:** Add `@capacitor/app` 8.1.0, compatible with Capacitor Core 8 and older than the repository's configured package minimum-release-age window.
+- **Verification:** Native Back handler unit coverage, TypeScript/repository gates, Capacitor sync and Android build where available. Physical Android verification should confirm nested route return and Home exit.
