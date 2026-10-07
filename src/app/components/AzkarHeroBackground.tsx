@@ -1,4 +1,4 @@
-import { useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { azkarBackgrounds, toSrcSet, type AzkarBackgroundKey } from "./azkar-backgrounds";
 import "./azkar-hero-background.css";
 
@@ -20,14 +20,31 @@ export function AzkarHeroBackground({ kind, priority = false, className = "" }: 
   // blocked request, a corrupt file — the hero must still be a dark ground,
   // because everything drawn on it is light-on-media text. Falling back to
   // nothing would leave white text on the page background.
-  const [failed, setFailed] = useState(false);
+  const [failedKind, setFailedKind] = useState<AzkarBackgroundKey | null>(null);
+  const [decodedKind, setDecodedKind] = useState<AzkarBackgroundKey | null>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
+  const revealDecodedImage = useCallback(
+    async (image: HTMLImageElement) => {
+      try {
+        if (typeof image.decode === "function") await image.decode();
+        if (imageRef.current === image && image.naturalWidth > 0) setDecodedKind(kind);
+      } catch {
+        if (imageRef.current === image) setFailedKind(kind);
+      }
+    },
+    [kind],
+  );
+  useEffect(() => {
+    const image = imageRef.current;
+    if (image?.complete && image.naturalWidth > 0) void revealDecodedImage(image);
+  }, [kind, revealDecodedImage]);
   const style = {
     "--azkar-bg-placeholder": `url(${getAssetUrl(asset.placeholder)})`,
     "--azkar-bg-position": asset.objectPositionCompact,
     "--azkar-bg-position-wide": asset.objectPositionWide,
   } as CSSProperties;
 
-  if (failed) {
+  if (failedKind === kind) {
     return (
       <div
         data-testid="azkar-hero-fallback"
@@ -42,6 +59,8 @@ export function AzkarHeroBackground({ kind, priority = false, className = "" }: 
       <source type="image/avif" srcSet={toSrcSet(asset.avif)} sizes={asset.sizes} />
       <source type="image/webp" srcSet={toSrcSet(asset.webp)} sizes={asset.sizes} />
       <img
+        key={kind}
+        ref={imageRef}
         src={getAssetUrl(asset.webp[1]?.src || asset.webp[0]?.src || "")}
         alt=""
         aria-hidden="true"
@@ -50,7 +69,9 @@ export function AzkarHeroBackground({ kind, priority = false, className = "" }: 
         loading={priority ? "eager" : "lazy"}
         {...{ fetchpriority: priority ? "high" : "auto" }}
         decoding="async"
-        onError={() => setFailed(true)}
+        style={{ opacity: decodedKind === kind ? 1 : 0 }}
+        onLoad={(event) => void revealDecodedImage(event.currentTarget)}
+        onError={() => setFailedKind(kind)}
       />
     </picture>
   );

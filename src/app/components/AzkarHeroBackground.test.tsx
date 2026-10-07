@@ -1,9 +1,35 @@
-import { render } from "@testing-library/react";
+import { fireEvent, render, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { AzkarHeroBackground } from "./AzkarHeroBackground";
 import { TimeOfDayBackground } from "./TimeOfDayBackground";
 
 describe("AzkarHeroBackground", () => {
+  it("reveals the photo only after decoding and keeps a new scene hidden until it is ready", async () => {
+    let finishDecode!: () => void;
+    const view = render(<AzkarHeroBackground kind="morning" />);
+    const image = view.container.querySelector("img")!;
+    Object.defineProperty(image, "naturalWidth", { value: 1280 });
+    image.decode = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          finishDecode = resolve;
+        }),
+    );
+    expect(image).toHaveStyle({ opacity: "0" });
+    fireEvent.load(image);
+    expect(image).toHaveStyle({ opacity: "0" });
+    finishDecode();
+    await waitFor(() => expect(image).toHaveStyle({ opacity: "1" }));
+    view.rerender(<AzkarHeroBackground kind="evening" />);
+    expect(view.container.querySelector("img")).toHaveStyle({ opacity: "0" });
+  });
+  it("recovers from a failed image when the scene changes", () => {
+    const view = render(<AzkarHeroBackground kind="morning" />);
+    fireEvent.error(view.container.querySelector("img")!);
+    expect(view.container.querySelector("img")).toBeNull();
+    view.rerender(<AzkarHeroBackground kind="evening" />);
+    expect(view.container.querySelector("img")).toHaveStyle({ opacity: "0" });
+  });
   it("emits the standard fetch-priority hint without a React DOM warning", () => {
     const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
 
