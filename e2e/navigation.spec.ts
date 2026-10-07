@@ -1,3 +1,4 @@
+import { clickReaderOption } from "./reader-options";
 import { expect, test, type Page } from "@playwright/test";
 
 async function enterAsEnglishGuest(page: Page) {
@@ -171,7 +172,7 @@ test("saved zikr is visible from the first-class Saved library tab", async ({ pa
   // Save lives in the reader's overflow menu on every tier: the header carries
   // at most two actions, Benefit and the menu.
   await page.getByRole("button", { name: "Reader options", exact: true }).click();
-  await page.getByRole("menuitem", { name: "Save zikr", exact: true }).click();
+  await clickReaderOption(page, "Save zikr");
   await page.getByRole("button", { name: "Back", exact: true }).click();
   await page.getByRole("link", { name: "Azkar", exact: true }).click();
   const compactSection = page.getByTestId("library-mobile-section");

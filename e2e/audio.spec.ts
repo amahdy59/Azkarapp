@@ -1,3 +1,4 @@
+import { clickReaderOption } from "./reader-options";
 import { expect, test } from "@playwright/test";
 
 for (const language of ["ar", "en"] as const) {
@@ -47,7 +48,7 @@ for (const language of ["ar", "en"] as const) {
     if (language === "ar") await page.getByTestId("reader-audio-dock-button").click();
     else {
       await page.getByRole("button", { name: "Reader options", exact: true }).click();
-      await page.getByRole("menuitem", { name: "Play English translation", exact: true }).click();
+      await clickReaderOption(page, "Play English translation");
     }
     const player = page.getByRole("region", { name: language === "ar" ? "مشغل الصوت" : "Audio player", exact: true });
     await expect(player.getByRole("button")).toHaveCount(3); // Close, Play and Expand; context is not a duplicate button.
@@ -145,7 +146,7 @@ test("100-count tawhid offers prescribed repeat and shows each repetition", asyn
   await page.goto("/#/azkar/morning/22");
   await expect(page.getByTestId("reader-screen")).toHaveAttribute("data-zikr-id", "m-hm-93");
   await page.getByRole("button", { name: "Reader options", exact: true }).click();
-  await page.getByRole("menuitem", { name: "Repeat prescribed count", exact: true }).click();
+  await clickReaderOption(page, "Repeat prescribed count");
   const player = page.getByRole("region", { name: "Audio player", exact: true });
   await player.getByRole("button", { name: "Expand player" }).click();
   await expect(player.getByRole("button", { name: "Repeat 100 times", exact: true })).toHaveAttribute(
@@ -252,7 +253,7 @@ test("the shared player replaces the current zikr counter while listening", asyn
 
   await expect(page.getByTestId("reader-counter-stack")).toBeVisible();
   await page.getByRole("button", { name: "Reader options", exact: true }).click();
-  await page.getByRole("menuitem", { name: "Play English translation", exact: true }).click();
+  await clickReaderOption(page, "Play English translation");
 
   await expect(page.getByRole("region", { name: "Audio player" })).toBeVisible();
   await expect(page.getByTestId("reader-counter-stack")).toHaveCount(0);

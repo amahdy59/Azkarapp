@@ -1,3 +1,4 @@
+import { clickReaderOption } from "./reader-options";
 import { expect, test, type Page } from "@playwright/test";
 import { getAzkarForMode } from "../src/app/content/azkar";
 import { COMPREHENSIVE_DUAS } from "../src/app/content/comprehensiveDuas";
@@ -80,7 +81,7 @@ for (const id of ["m-hm-91", "e-hm-91", "misc-ref-3", "m-hm-96", "e-hm-96", "fri
       await expect(counter).toHaveAccessibleName(/1 \/ 100$/);
     }
     await page.getByRole("button", { name: "Reader options", exact: true }).click();
-    await page.getByRole("menuitem", { name: "Play English translation", exact: true }).click();
+    await clickReaderOption(page, "Play English translation");
     await expect(player).toBeVisible();
     await expect
       .poll(() => page.evaluate(() => (window as unknown as { __reviewAudio: HTMLAudioElement }).__reviewAudio.src))

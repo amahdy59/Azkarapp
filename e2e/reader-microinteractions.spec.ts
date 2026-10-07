@@ -1,3 +1,5 @@
+import { clickReaderOption } from "./reader-options";
+import { readerOption } from "./reader-options";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { getAzkarForMode } from "../src/app/content/azkar";
@@ -577,7 +579,7 @@ test("the full reader canvas counts taps while controls and the reference sheet 
   // only the overflow menu on counter screens (Benefit moved to the dock).
   await expect(page.getByRole("button", { name: "Save zikr", exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "Reader options", exact: true }).click();
-  await page.getByRole("menuitem", { name: "Save zikr", exact: true }).click();
+  await clickReaderOption(page, "Save zikr");
   await expect(counterSurface).toHaveAttribute("aria-label", /0 \/ 1$/);
 
   await page.getByTestId("reader-benefit-dock-button").click();
@@ -1004,7 +1006,7 @@ test("the reader header keeps options and wide collection navigation together", 
   await expect(page.getByTestId("reader-share-dock-button")).toBeVisible();
   await expect(actions.getByRole("button", { name: "Share zikr", exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "Reader options", exact: true }).click();
-  await expect(page.getByRole("menuitem", { name: "Save zikr", exact: true })).toBeVisible();
+  await expect(readerOption(page, "Save zikr")).toBeVisible();
   await expect(page.getByRole("menuitem", { name: "Share zikr", exact: true })).toHaveCount(0);
 });
 

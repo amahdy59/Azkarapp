@@ -1,3 +1,4 @@
+import { clickReaderOption } from "./reader-options";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
@@ -45,7 +46,7 @@ for (const scenario of [
       await page.getByTestId("reader-audio-dock-button").click();
     } else {
       await page.getByRole("button", { name: "Reader options", exact: true }).click();
-      await page.getByRole("menuitem", { name: "Play English translation", exact: true }).click();
+      await clickReaderOption(page, "Play English translation");
     }
     const player = page.getByRole("region", { name: arabic ? "مشغل الصوت" : "Audio player", exact: true });
     const canvas = page.getByTestId("reader-card");

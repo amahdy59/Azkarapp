@@ -1,3 +1,4 @@
+import { revealReaderOption } from "./reader-options";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
@@ -93,7 +94,7 @@ test("the collection share modal has no automatically detectable WCAG A/AA viola
   await expect(page.getByTestId("reader-screen")).toBeVisible();
   await page.getByRole("button", { name: /خيارات القارئ|Reader options/ }).click();
   const shareBtn = page.getByTestId("reader-menu-share-collection");
-  await expect(shareBtn).toBeVisible();
+  await revealReaderOption(shareBtn);
   await shareBtn.click();
 
   const modal = page.getByTestId("collection-share-modal");

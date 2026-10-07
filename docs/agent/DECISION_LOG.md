@@ -4266,3 +4266,7 @@ Owner asks the prayer times and expanded card to share the same maximum width an
 ### 2026-10-05 — Integrated Reader browser expectations
 
 Owner approved updating the two outdated Reader header expectations identified by the combined prayer/Home release verification. Scope is limited to browser assertions covering the completed collection panel and drawer open/close states, toolbar actions and focus restoration; no Reader application behavior change is authorized by this decision.
+
+## Reader options simplification — 2026-10-07
+
+The owner approves trying the proposed Reader menu solution: clarify current-zikr versus collection labels, replace the implicit complete/core toggle with a labelled selector, group counter settings, keep focus/text size/save visible and use the existing bottom-sheet pattern on small screens. Unique audio and recovery actions remain available; reviewed content, progress and persistence boundaries are unchanged. The repository release authority applies.

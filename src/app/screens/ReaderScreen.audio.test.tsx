@@ -255,7 +255,7 @@ describe("ReaderScreen audio identity", () => {
     );
 
     fireEvent.pointerDown(screen.getByRole("button", { name: "Reader options" }), { button: 0, ctrlKey: false });
-    fireEvent.click(await screen.findByRole("menuitem", { name: "Play All Audio" }));
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Listen to all azkar" }));
     expect(onPlayAllAudio).toHaveBeenCalledOnce();
   });
 
@@ -293,7 +293,7 @@ describe("ReaderScreen audio identity", () => {
     expect(within(headerActions).queryByRole("button", { name: "Benefit" })).not.toBeInTheDocument();
     expect(within(headerActions).getByRole("button", { name: "Reader options" })).toBeInTheDocument();
     expect(screen.getByTestId("reader-benefit-dock-button")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Share zikr" })).toBeVisible();
+    expect(screen.getByRole("button", { name: "Share this zikr" })).toBeVisible();
     for (const name of ["Save zikr", "Counter sound"]) {
       expect(screen.queryByRole("button", { name })).toBeNull();
     }

@@ -215,3 +215,5 @@ Apple/Microsoft-informed control spacing and alignment improvements.
 [Phase 84](phases/PHASE_84_HOME_PHOTO_LOADING.md) records atomic decoded Home photograph loading and scene recovery.
 
 [Phase 85](phases/PHASE_85_STARTUP_PERFORMANCE.md) records throttled startup evidence, deferred cache maintenance and audio loading at reading intent.
+
+[Phase 86](phases/PHASE_86_READER_OPTIONS.md) records the owner-approved compact Reader options sheet, explicit list selector and scoped action labels.

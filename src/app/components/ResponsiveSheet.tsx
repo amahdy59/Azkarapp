@@ -313,6 +313,8 @@ export function SidePanel({
 }
 
 export interface ResponsiveSheetProps extends Omit<ModalProps, "className"> {
+  /** Move focus inside compact option dialogs; callers with text inputs can opt out. */
+  focusOnOpen?: boolean;
   /** Extra classes for the desktop dialog surface only. */
   dialogClassName?: string;
   /** Extra classes for the compact drawer surface only. */
@@ -339,10 +341,13 @@ export function ResponsiveSheet({
   showCloseButton = false,
   dialogClassName = "",
   drawerClassName = "",
+  focusOnOpen = false,
 }: ResponsiveSheetProps) {
   const layoutMode = useLayoutMode();
   const isCompact = layoutMode === "compact";
   const lang: AppLanguage = language ?? (direction === "rtl" ? "ar" : "en");
+  // Vaul's dialog behavior option enables its focus scope, rather than DOM input autofocus.
+  const drawerFocusBehavior = { autoFocus: focusOnOpen };
   // Modal runs this itself; only the drawer branch needs it here.
   useRestoreFocusOnClose(isCompact && open);
 
@@ -381,6 +386,7 @@ export function ResponsiveSheet({
 
   return (
     <Drawer
+      {...drawerFocusBehavior}
       open={open}
       onOpenChange={(nextOpen) => {
         if (!nextOpen) onClose();

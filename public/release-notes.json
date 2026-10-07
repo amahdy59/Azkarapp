@@ -1,15 +1,13 @@
 {
-  "release": "2026-10-07.5",
+  "release": "2026-10-07.6",
   "ar": [
-    "تفتح الصفحة الرئيسية بأعمال أقل أثناء البدء، مع إشارة واضحة عند انتظار التحميل.",
-    "تحافظ صفحات المصحف على المسافات الطبيعية بين الكلمات دون تمديدها على الشاشات الواسعة.",
-    "يمكن تشغيل تلاوة سورة البقرة وإيقافها مؤقتاً ومتابعتها من شريط أدوات المصحف.",
-    "تظهر صورة الصفحة الرئيسية بعد اكتمال تجهيزها لتجنب ظهور أجزاء الصورة أثناء التحميل."
+    "تفتح خيارات القارئ في لوحة سفلية على الهاتف، مع إبقاء أدوات القراءة الأساسية ظاهرة.",
+    "اختر قائمة الأذكار الكاملة أو المختصرة مباشرة، مع إظهار اختيارك الحالي.",
+    "تميّز تسميات الاستماع والمشاركة بين الذكر الحالي ومجموعة الأذكار، وتُجمع إعدادات العدّاد في مكان واحد."
   ],
   "en": [
-    "Home opens with less startup work and clear feedback while application code loads.",
-    "Mushaf pages preserve natural word spacing instead of stretching gaps on wide screens.",
-    "Play, pause and resume Al-Baqarah recitation from the Mushaf toolbar.",
-    "Home reveals its photograph after decoding finishes, avoiding partially loaded image bands."
+    "Reader options open in a bottom sheet on phones, with essential reading controls kept visible.",
+    "Choose the complete or core Azkar list directly and see your current selection.",
+    "Listening and sharing labels distinguish this zikr from the collection, with counter settings grouped together."
   ]
 }

@@ -1342,6 +1342,13 @@ const ar = {
     collectionPercentComplete: "{percent}% مكتمل",
     collectionCount: "{done} من {total}",
     groupProgress: "\u062a\u0642\u062f\u0645 \u0627\u0644\u0645\u062c\u0645\u0648\u0639\u0629",
+    collectionMode: "قائمة الأذكار",
+    moreActions: "إجراءات إضافية",
+    counterSettings: "إعدادات العدّاد",
+    listenCollection: "الاستماع لجميع الأذكار",
+    listenCurrent: "الاستماع لهذا الذكر",
+    shareCollection: "مشاركة مجموعة الأذكار",
+    shareCurrent: "مشاركة هذا الذكر",
     menu: "\u062e\u064a\u0627\u0631\u0627\u062a \u0627\u0644\u0642\u0627\u0631\u0626",
     keyboardShortcuts:
       "\u0627\u062e\u062a\u0635\u0627\u0631\u0627\u062a \u0644\u0648\u062d\u0629 \u0627\u0644\u0645\u0641\u0627\u062a\u064a\u062d",

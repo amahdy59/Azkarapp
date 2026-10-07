@@ -151,7 +151,7 @@ test.describe("immersive mushaf mode", () => {
     await expect(page.getByTestId("reader-screen")).toBeVisible();
     await expect(page.getByTestId("mushaf-immersive")).toHaveCount(0);
     await page.getByRole("button", { name: "خيارات القارئ" }).click();
-    await expect(page.getByRole("menuitem").first()).toBeVisible();
+    await expect(page.locator('[role="menuitem"], [data-testid="reader-options-sheet"] button').first()).toBeVisible();
     await expect(page.getByRole("menuitem", { name: "وضع المصحف" })).toHaveCount(0);
   });
 

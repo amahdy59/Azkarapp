@@ -93,7 +93,7 @@ for (const language of ["ar", "en"] as const) {
       .getByRole("button", { name: language === "ar" ? "خيارات القارئ" : "Reader options", exact: true })
       .click();
     await page
-      .getByRole("menuitem", { name: language === "ar" ? "عرض القائمة الجانبية" : "Show sidebar", exact: true })
+      .getByRole("button", { name: language === "ar" ? "عرض القائمة الجانبية" : "Show sidebar", exact: true })
       .click();
     await expect(drawer).toBeVisible();
     await expect(drawer).toHaveAttribute("data-side", language === "ar" ? "left" : "right");
