@@ -9,6 +9,7 @@ import {
   type StoredSession,
 } from "./state";
 import { applyAppAppearance } from "./theme";
+import { scheduleStartupMaintenance } from "./startupMaintenance";
 import { getAzkarForMode, getAzkarForPrayer, isRoutineCategory, registerLazyCollection } from "./content/azkar";
 import { isPrayerName } from "./content/prayerTimes";
 import type {
@@ -20,6 +21,7 @@ import type {
   LocationSettings,
   ReminderSettings,
   RoutineMode,
+  View,
   TextSizeOption,
   ZikrFontOption,
   ThemeMode,
@@ -206,7 +208,8 @@ function AppContent({
   buildPlaybackPlan: AudioModule["buildPlaybackPlan"] | null;
   getAudioCoverage: AudioModule["getAudioCoverage"] | null;
 }) {
-  const initialState = useRef(loadAppState()).current;
+  const [initialState] = useState(loadAppState);
+  useEffect(scheduleStartupMaintenance, []);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(() => {
     try {
       return window.localStorage.getItem(ONBOARDING_COMPLETE_KEY) === "true";
@@ -257,6 +260,15 @@ function AppContent({
     sharedRoutineMode,
     clearSharedRoutineMode,
   } = useAppRouting({ routineModes, hasCompletedOnboarding, reduceMotion });
+
+  const audioWarmViewRef = useRef<View | null>(null);
+  useEffect(() => {
+    if (audioWarmViewRef.current === view) return;
+    audioWarmViewRef.current = view;
+    if (["reader", "category", "library", "prayer", "settings", "friday", "friday_salawat", "khatmah"].includes(view)) {
+      requestAudioModule();
+    }
+  }, [view, requestAudioModule]);
 
   const activeRoutineMode: RoutineMode =
     sharedRoutineMode ?? (isRoutineCategory(activeCat) ? routineModes[activeCat] : "complete");
@@ -1364,6 +1376,7 @@ function AppContent({
     (!audioController?.state.plan?.context.subCategory ||
       audioController?.state.plan?.context.subCategory === activeSubCategory);
   const [queuedAudioZikrId, setQueuedAudioZikrId] = useState<string | null>(null);
+  const [queuedAudioLanguage, setQueuedAudioLanguage] = useState<AppLanguage>("ar");
   /**
    * A reviewed assignment is enough to expose the listen action while the
    * lazy audio chunk is still arriving. Treating that short interval as
@@ -1439,9 +1452,9 @@ function AppContent({
       return;
     }
     if (!audioController || !buildPlaybackPlan) return;
-    void startAudio([activeZikr], "single", true, "ar");
+    void startAudio([activeZikr], "single", true, queuedAudioLanguage);
     setQueuedAudioZikrId(null);
-  }, [activeZikr, audioController, buildPlaybackPlan, queuedAudioZikrId, startAudio]);
+  }, [activeZikr, audioController, buildPlaybackPlan, queuedAudioZikrId, queuedAudioLanguage, startAudio]);
 
   useEffect(() => {
     if (queuedAudioZikrId && !audioModuleLoading && !audioController && !buildPlaybackPlan) {
@@ -1455,11 +1468,20 @@ function AppContent({
    * the beginning — the Mushaf's rail and the floating player drive the same
    * controller, so either can pick up where the other left off.
    */
+  const playActiveZikrAudio = (language: AppLanguage) => {
+    if (!activeZikr) return;
+    if (!audioController || !buildPlaybackPlan) {
+      setQueuedAudioLanguage(language);
+      setQueuedAudioZikrId(activeZikr.id);
+      requestAudioModule();
+      return;
+    }
+    void startAudio([activeZikr], "single", true, language);
+  };
   const toggleActiveZikrAudio = () => {
     if (!activeZikr || !activeZikrHasArabicAudio) return;
     if (!audioController || !buildPlaybackPlan) {
-      setQueuedAudioZikrId(activeZikr.id);
-      requestAudioModule();
+      playActiveZikrAudio("ar");
       return;
     }
     if (activeZikrAudioStatus === "playing" || activeZikrAudioStatus === "buffering") {
@@ -2191,16 +2213,10 @@ function AppContent({
                         : [...previous, page].sort((a, b) => a - b),
                     )
                   }
-                  onPlayAudio={
-                    activeZikrHasArabicAudio && activeZikr
-                      ? () => void startAudio([activeZikr], "single", true, "ar")
-                      : undefined
-                  }
+                  onPlayAudio={activeZikrHasArabicAudio && activeZikr ? () => playActiveZikrAudio("ar") : undefined}
                   englishAudioAvailable={activeZikrHasEnglishAudio}
                   onPlayEnglishAudio={
-                    activeZikrHasEnglishAudio && activeZikr
-                      ? () => void startAudio([activeZikr], "single", true, "en")
-                      : undefined
+                    activeZikrHasEnglishAudio && activeZikr ? () => playActiveZikrAudio("en") : undefined
                   }
                   onPlayAllAudio={
                     activeCat !== "comprehensive_duas" && audioCoverage.available > 1 ? startPlayAllAudio : undefined
@@ -2208,7 +2224,7 @@ function AppContent({
                   onRepeatAudio={
                     activeZikrHasArabicAudio &&
                     activeZikr?.audioBehavior.supportedModes.includes("repeat-prescribed-count")
-                      ? () => void startAudio([activeZikr], "single", true, "ar")
+                      ? () => playActiveZikrAudio("ar")
                       : undefined
                   }
                   audioModeActive={
@@ -2391,12 +2407,12 @@ function AppContent({
                   language={selectedLang}
                   direction={layoutDirection}
                   onBack={pop}
+                  khatmahPage={khatmahPage}
                   baqarahAudio={{
                     available: Boolean(baqarahZikr?.audioAssetId),
                     status: baqarahAudioStatus,
                     onToggle: toggleBaqarahAudio,
                   }}
-                  khatmahPage={khatmahPage}
                   setKhatmahPage={handleKhatmahPageChange}
                   progressDayStartHour={progressDayStartHour}
                   reduceMotion={reduceMotion}
@@ -2561,10 +2577,11 @@ function AppContent({
 export default function App() {
   const [audioModule, setAudioModule] = useState<AudioModule | null>(null);
   const [audioController, setAudioController] = useState<AudioController | null>(null);
-  const [audioModuleLoading, setAudioModuleLoading] = useState(true);
+  const [audioModuleLoading, setAudioModuleLoading] = useState(false);
   const [audioLoadAttempt, setAudioLoadAttempt] = useState(0);
 
   useEffect(() => {
+    if (audioLoadAttempt === 0) return;
     let cancelled = false;
     loadAudioModule()
       .then((loaded) => {

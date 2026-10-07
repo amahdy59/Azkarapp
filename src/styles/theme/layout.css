@@ -6,6 +6,21 @@
    between parts, or reordering the imports, can change which declaration wins. */
 
 /* App Shell Adaptive Grid */
+/* A feature guard preserves this fallback through production CSS optimization. */
+@supports not (height: 100dvh) {
+  .app-viewport {
+    height: 100vh;
+  }
+  .app-shell {
+    height: min(100vh, 882px);
+  }
+  @media (min-width: 37.5rem) {
+    .app-shell {
+      height: 100vh;
+    }
+  }
+}
+
 @media (min-width: 37.5rem) {
   .app-viewport {
     align-items: stretch;

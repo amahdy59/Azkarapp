@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import { AppErrorBoundary } from "./app/components/AppErrorBoundary.tsx";
+import { ScreenFallback } from "./app/components/ScreenFallback.tsx";
 import { pruneStaleFridayProgress } from "./app/fridayProgress.ts";
 import { loadAppState } from "./app/state.ts";
 import { applyAppAppearance } from "./app/theme.ts";
@@ -19,10 +20,9 @@ const Root = isMarketingLanding ? MarketingLanding : App;
 const initialAppearance = loadAppState().settings;
 applyAppAppearance(isMarketingLanding ? { ...initialAppearance, language: "en", forceRtl: false } : initialAppearance);
 startPerformanceMonitoring();
-// Best-effort startup cleanup, alongside cleanupStaleAudioDownloads below.
+// Daily progress cleanup stays synchronous; optional cache maintenance runs after App commits.
 if (!isMarketingLanding) {
   pruneStaleFridayProgress();
-  void import("./app/content/qcfMushaf.ts").then((module) => module.discardRetiredCaches());
 }
 
 document.querySelector<HTMLAnchorElement>(".skip-link")?.addEventListener("click", (event) => {
@@ -42,7 +42,7 @@ document.querySelector<HTMLAnchorElement>(".skip-link")?.addEventListener("click
 
 createRoot(document.getElementById("root")!).render(
   <AppErrorBoundary>
-    <Suspense fallback={null}>
+    <Suspense fallback={<ScreenFallback language={isMarketingLanding ? "en" : initialAppearance.language} />}>
       <Root />
     </Suspense>
   </AppErrorBoundary>,
@@ -86,14 +86,6 @@ const updateServiceWorker = registerSW({
     checkForUpdate();
   },
 });
-
-if (!isMarketingLanding && "caches" in window) {
-  void import("./app/audio/audioOfflineCache.ts")
-    .then(({ cleanupStaleAudioDownloads }) => cleanupStaleAudioDownloads())
-    .catch(() => {
-      // Offline cleanup is best-effort and must not block reading the app.
-    });
-}
 
 window.addEventListener("azkar-apply-update", () => {
   let timeoutId = 0;

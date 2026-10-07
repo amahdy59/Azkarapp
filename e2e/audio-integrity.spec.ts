@@ -98,6 +98,28 @@ for (const id of ["m-hm-91", "e-hm-91", "misc-ref-3", "m-hm-96", "e-hm-96", "fri
   });
 }
 
+test("ordinary Reader retains an early Listen tap while audio code loads @cross-browser", async ({ page }) => {
+  await prepareAudio(page);
+  let release!: () => void;
+  const delayed = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await page.route("**/assets/audio-*.js", async (route) => {
+    await delayed;
+    await route.continue();
+  });
+  const index = getAzkarForMode("evening", "complete").findIndex((zikr) => zikr.id === "e-hm-91");
+  await page.goto(`/#/azkar/evening/${index + 1}?mode=complete`);
+  await page.getByTestId("reader-audio-dock-button").click();
+  await expect(page.getByTestId("reader-audio-dock-button")).toHaveAttribute("aria-busy", "true");
+  release();
+  const player = page.getByRole("region", { name: "Audio player", exact: true });
+  await expect(player).toBeVisible();
+  await expect
+    .poll(() => page.evaluate(() => (window as unknown as { __reviewAudio: HTMLAudioElement }).__reviewAudio.src))
+    .toContain("/dua/m-hm-91/abdullah-muhammad/v2/");
+});
+
 test("Al-Kahf offers only its approved reciter and Escape preserves the expanded player @cross-browser", async ({
   page,
 }) => {

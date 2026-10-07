@@ -209,3 +209,9 @@ Apple/Microsoft-informed control spacing and alignment improvements.
 [Phase 81](phases/PHASE_81_HEADER_AND_COUNTER_GUIDANCE.md) records contrast-safe shared headers and progressive first-use counting guidance with a persistent hand-button restore affordance.
 
 [Phase 82](phases/PHASE_82_RESPONSIVE_READER_REFINEMENT.md) records the owner's wide Mushaf measure, opaque mobile header, compact guidance and shorter menu refinement.
+
+[Phase 83](phases/PHASE_83_MUSHAF_SPACING_AND_BAQARAH_AUDIO.md) records natural Mushaf word spacing and the approved Al-Baqarah toolbar recitation action.
+
+[Phase 84](phases/PHASE_84_HOME_PHOTO_LOADING.md) records atomic decoded Home photograph loading and scene recovery.
+
+[Phase 85](phases/PHASE_85_STARTUP_PERFORMANCE.md) records throttled startup evidence, deferred cache maintenance and audio loading at reading intent.

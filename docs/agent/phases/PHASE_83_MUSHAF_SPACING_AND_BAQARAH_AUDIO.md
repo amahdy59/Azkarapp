@@ -16,7 +16,16 @@ The native toolbar button reuses localized listen/pause labels, loading state, k
 
 ## Commands and evidence
 
-Results are recorded in the release response. The phase uses targeted Mushaf/audio browser suites plus the complete non-browser and enforced release gates; the final CI commit runs the full browser suite.
+| Command                                                                              | Result                                       |
+| ------------------------------------------------------------------------------------ | -------------------------------------------- |
+| Focused component Vitest (Mushaf, Khatmah, background and initial maintenance tests) | 66 passed                                    |
+| Focused Chromium Mushaf/Home/audio browser suites                                    | 12 passed                                    |
+| Facing-spread/Baqarah/performance browser matrix                                     | 7 passed across Chromium, Firefox and WebKit |
+| Earlier complete non-browser gate after spacing/audio/photo changes                  | Passed all 11 stages                         |
+
+The L shortcut invokes the same Baqarah controller as the native toolbar button. Wide screenshots at 1600×834 and 1920×1080 are in `output/playwright/mushaf-<project>-<width>.png`; the Chromium 1600 image was visually inspected. Browser fixtures include Unicode fallback, so this is geometry/spacing evidence rather than a certification of printed artwork. Complete release-gate and deployment results are in the final release report.
+
+A separate browser capture loaded actual remote QCF fonts for pages 41 and 42, verified both rendering attributes as qcf-v2, and saved `output/playwright/mushaf-real-qcf-1600.png`. Visual inspection confirms the primary-font appearance and natural spacing; the earlier fallback screenshot uses Amiri Quran and is not the primary-font reference.
 
 ## Documentation and risks
 

@@ -1,13 +1,15 @@
 {
-  "release": "2026-10-07.4",
+  "release": "2026-10-07.5",
   "ar": [
-    "أصبح عنوان الشاشة وأزرارها أوضح على خلفية ثابتة في الهاتف، مع قائمة قراءة أكثر اختصاراً.",
-    "تظهر إرشادات العد للمرة الأولى فقط ثم تختفي بهدوء بعد أول ضغطة.",
-    "يمكن استعادة الإرشادات من زر يد صغير، مع صفحات مصحف متوازنة أثناء التحميل وعلى الشاشات الواسعة."
+    "تفتح الصفحة الرئيسية بأعمال أقل أثناء البدء، مع إشارة واضحة عند انتظار التحميل.",
+    "تحافظ صفحات المصحف على المسافات الطبيعية بين الكلمات دون تمديدها على الشاشات الواسعة.",
+    "يمكن تشغيل تلاوة سورة البقرة وإيقافها مؤقتاً ومتابعتها من شريط أدوات المصحف.",
+    "تظهر صورة الصفحة الرئيسية بعد اكتمال تجهيزها لتجنب ظهور أجزاء الصورة أثناء التحميل."
   ],
   "en": [
-    "Mobile titles and actions have a clear solid background, with a shorter reading menu.",
-    "Counting guidance appears for first-time users, then quietly collapses after the first tap.",
-    "Restore guidance from a compact hand button, with balanced Mushaf pages during loading and on wide displays."
+    "Home opens with less startup work and clear feedback while application code loads.",
+    "Mushaf pages preserve natural word spacing instead of stretching gaps on wide screens.",
+    "Play, pause and resume Al-Baqarah recitation from the Mushaf toolbar.",
+    "Home reveals its photograph after decoding finishes, avoiding partially loaded image bands."
   ]
 }

@@ -1,5 +1,9 @@
 # Decision Log
 
+## Mushaf spacing, Home loading and startup performance — 2026-10-07
+
+The owner requests natural printed Mushaf spacing, Al-Baqarah recitation on the right toolbar, stable Home photograph loading and lower startup cost on older devices. Implement these as phases 83, 84 and 85 with separate coherent commits. Preserve reviewed content, the single audio controller, offline reading, normalized progress, prayer calculations and the approved React/Vite/Tailwind architecture. Retain explicit audio requests while code loads, defer optional cache maintenance, and avoid initializing audio on Home. The owner cannot provide the affected Samsung's browser version; do not claim Android 6/7 engine compatibility from modern-browser simulation. Existing autonomous main-branch release authority applies after the required gates.
+
 ## Combined pending changes review and release — 2026-10-06
 
 The owner asks to recheck all changes and push the complete pending tree, superseding the previous publication hold. Preserve the requested refinements; repair clear code and efficiency defects, run the unchanged quality/release gates and monitor deployment. Existing Al-Baqarah content/recording metadata and Reader integration are preserved. No new religious interpretation, dependency, persistence schema or data migration is authorized by this review.

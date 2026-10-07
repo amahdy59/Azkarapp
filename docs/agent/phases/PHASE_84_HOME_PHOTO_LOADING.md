@@ -14,7 +14,14 @@ The background remains decorative and does not add focus targets or announcement
 
 ## Commands and evidence
 
-Results are recorded in the release response. Targeted Home/browser coverage and complete non-browser gates are run; final CI runs the full browser suite.
+| Command                                                       | Result               |
+| ------------------------------------------------------------- | -------------------- |
+| Focused component Vitest including background decode/recovery | 66 passed            |
+| Focused Chromium Mushaf/Home/audio browser suites             | 12 passed            |
+| Home/Baqarah Firefox and WebKit browser matrix                | 4 passed             |
+| Complete non-browser gate after spacing/audio/photo changes   | Passed all 11 stages |
+
+`output/playwright/home-image-loading-pending.png` and `home-image-loading-decoded.png` show the two loading states. The decoded phone screenshot was visually inspected: the photo, card surfaces and title are continuous. The image remains decorative; there are no new focus targets, user settings, dependencies or reviewed-content changes. Design-system and agent-index updates document the decode boundary. Full release/deployment results follow in the final release report.
 
 ## Known limitations
 

@@ -1100,6 +1100,7 @@ export function ReaderScreen({
         type="button"
         active={audioModeActive}
         disabled={!audioAvailable}
+        aria-busy={surahAudio?.status === "loading" || surahAudio?.status === "buffering"}
         onClick={(e) => {
           e.stopPropagation();
           onPlayAudio?.();
