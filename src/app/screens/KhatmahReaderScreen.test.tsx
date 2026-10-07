@@ -66,6 +66,17 @@ afterEach(() => {
 });
 
 describe("KhatmahReaderScreen navigation", () => {
+  it("exposes Baqarah recitation through the existing right toolbar controller", async () => {
+    setViewport(1280, 720);
+    const onToggle = vi.fn();
+    renderReader({ baqarahAudio: { available: true, status: "paused", onToggle } });
+    const listen = await screen.findByTestId("mushaf-rail-listen");
+    expect(listen).toBeEnabled();
+    fireEvent.click(listen);
+    expect(onToggle).toHaveBeenCalledOnce();
+    fireEvent.keyDown(document.body, { key: "l" });
+    expect(onToggle).toHaveBeenCalledTimes(2);
+  });
   it("keeps vertical swipes vertical even when the pointer drifts sideways", async () => {
     setViewport(390, 844);
     const { setKhatmahPage } = renderReader();

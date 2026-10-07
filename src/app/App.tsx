@@ -1473,6 +1473,47 @@ function AppContent({
     void startAudio([activeZikr], "single", true, "ar");
   };
 
+  const baqarahZikr = useMemo(
+    () => getAzkarForMode("illness_ruqyah", "complete").find((item) => item.id === "ir-baqarah"),
+    [],
+  );
+  const [queuedBaqarahAudio, setQueuedBaqarahAudio] = useState(false);
+  const baqarahOwnsAudio =
+    audioController?.state.plan?.entries[audioController.state.entryIndex]?.zikrId === "ir-baqarah";
+  const baqarahAudioStatus = queuedBaqarahAudio ? "loading" : baqarahOwnsAudio ? audioController!.state.status : "idle";
+  const startBaqarahAudio = useCallback(() => {
+    if (!baqarahZikr || !audioController || !buildPlaybackPlan) return;
+    const plan = buildPlaybackPlan({
+      zikrs: [baqarahZikr],
+      context: { category: "illness_ruqyah", routineMode: "complete", source: "single" },
+      mode: "play-once",
+      preferences: audioController.preferences,
+      audioLanguage: "ar",
+    });
+    audioController.startPlan(plan);
+  }, [baqarahZikr, audioController, buildPlaybackPlan]);
+  useEffect(() => {
+    if (!queuedBaqarahAudio) return;
+    if (view !== "khatmah") {
+      setQueuedBaqarahAudio(false);
+      return;
+    }
+    if (audioController && buildPlaybackPlan) {
+      setQueuedBaqarahAudio(false);
+      startBaqarahAudio();
+    } else if (!audioModuleLoading) setQueuedBaqarahAudio(false);
+  }, [queuedBaqarahAudio, view, audioController, buildPlaybackPlan, audioModuleLoading, startBaqarahAudio]);
+  const toggleBaqarahAudio = () => {
+    if (!baqarahZikr) return;
+    if (!audioController || !buildPlaybackPlan) {
+      setQueuedBaqarahAudio(true);
+      requestAudioModule();
+    } else if (baqarahOwnsAudio && ["playing", "buffering"].includes(audioController.state.status))
+      audioController.pause();
+    else if (baqarahOwnsAudio && ["paused", "ready"].includes(audioController.state.status)) audioController.play();
+    else startBaqarahAudio();
+  };
+
   const startPlayAllAudio = () => {
     if (!audioController || !buildPlaybackPlan) return;
     const playAvailable = () => {
@@ -2350,6 +2391,11 @@ function AppContent({
                   language={selectedLang}
                   direction={layoutDirection}
                   onBack={pop}
+                  baqarahAudio={{
+                    available: Boolean(baqarahZikr?.audioAssetId),
+                    status: baqarahAudioStatus,
+                    onToggle: toggleBaqarahAudio,
+                  }}
                   khatmahPage={khatmahPage}
                   setKhatmahPage={handleKhatmahPageChange}
                   progressDayStartHour={progressDayStartHour}

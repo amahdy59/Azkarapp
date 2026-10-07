@@ -285,7 +285,9 @@ test("custom plan presets and section search remain keyboard usable with 44px ta
   await expect(page.getByRole("combobox").locator("option")).toHaveCount(30);
 });
 
-test("fits a two-page desktop spread with a focused rail and returns to one page in portrait", async ({ page }) => {
+test("fits a two-page desktop spread with a focused rail and returns to one page in portrait @cross-browser", async ({
+  page,
+}, testInfo) => {
   await page.setViewportSize({ width: 1280, height: 720 });
   await page.getByRole("button", { name: "متابعة القراءة" }).click();
 
@@ -317,6 +319,18 @@ test("fits a two-page desktop spread with a focused rail and returns to one page
   });
   expect(spreadGeometry.widthDelta).toBeLessThanOrEqual(1);
   expect(spreadGeometry.heightDelta).toBeLessThanOrEqual(1);
+  const widestWordGap = await article.locator("[data-mushaf-line-content]").evaluateAll((lines) =>
+    Math.max(
+      0,
+      ...lines.flatMap((line) => {
+        const words = Array.from(line.children)
+          .map((word) => word.getBoundingClientRect())
+          .sort((a, b) => a.x - b.x);
+        return words.slice(1).map((word, index) => word.left - words[index]!.right);
+      }),
+    ),
+  );
+  expect(widestWordGap).toBeLessThanOrEqual(8);
   for (const viewport of [
     { width: 1600, height: 834 },
     { width: 1920, height: 1080 },
@@ -334,6 +348,7 @@ test("fits a two-page desktop spread with a focused rail and returns to one page
         ),
       )
       .toBe(true);
+    await page.screenshot({ path: `output/playwright/mushaf-${testInfo.project.name}-${viewport.width}.png` });
   }
   await page.setViewportSize({ width: 1280, height: 720 });
   await expect(page.getByTestId("mushaf-top-left-back")).toHaveCount(0);
@@ -342,6 +357,7 @@ test("fits a two-page desktop spread with a focused rail and returns to one page
   await expect(page.getByTestId("mushaf-difficult-words-switch")).toBeVisible();
   await expect(page.getByTestId("mushaf-rail-more")).toBeVisible();
   await expect(page.getByTestId("mushaf-focus-enter")).toHaveCount(0);
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight)).toBe(true);
   const desktopGeometry = await page.evaluate(() => {
     const paper = document.querySelector<HTMLElement>(".mushaf-paper")!;
     return {

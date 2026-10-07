@@ -30,7 +30,7 @@ import { MushafLoadingPlaceholder } from "../components/MushafLoadingPlaceholder
 import { MushafNavigationModal } from "../components/MushafNavigationModal";
 import { AyahInteractionSheet } from "../components/AyahInteractionSheet";
 import { MushafSettingsSheet } from "../components/MushafSettingsSheet";
-import { MUSHAF_RAIL_WIDTH, MushafToolRail } from "../components/MushafToolRail";
+import { MUSHAF_RAIL_WIDTH, MushafToolRail, type SurahAudioControl } from "../components/MushafToolRail";
 import { MushafQuickMenu } from "../components/MushafQuickMenu";
 import {
   getSurahDisplayName,
@@ -149,6 +149,7 @@ export function KhatmahReaderScreen({
   progressDayStartHour,
   reduceMotion = false,
   hapticFeedback = false,
+  baqarahAudio,
 }: {
   language: AppLanguage;
   direction: "ltr" | "rtl";
@@ -158,6 +159,7 @@ export function KhatmahReaderScreen({
   mushafTheme?: MushafTheme;
   appTheme?: ThemeMode;
   setMushafTheme?: (theme: MushafTheme) => void;
+  baqarahAudio?: SurahAudioControl;
   mushafLayout?: MushafLayout;
   setMushafLayout?: (layout: MushafLayout) => void;
   mushafToolbarSide?: MushafToolbarSide;
@@ -604,12 +606,25 @@ export function KhatmahReaderScreen({
         }
       } else if (e.key === "f" || e.key === "F") {
         setIsFocusMode((prev) => !prev);
+      } else if ((e.key === "l" || e.key === "L") && baqarahAudio?.available && pageData?.[0]?.k.startsWith("2:")) {
+        baqarahAudio.onToggle();
       } else handled = false;
       if (handled) e.preventDefault();
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeAyah, isFocusMode, isIndexOpen, isOptionsMenuOpen, isQuickMenuOpen, onBack, paginate, setKhatmahPage]);
+  }, [
+    activeAyah,
+    baqarahAudio,
+    pageData,
+    isFocusMode,
+    isIndexOpen,
+    isOptionsMenuOpen,
+    isQuickMenuOpen,
+    onBack,
+    paginate,
+    setKhatmahPage,
+  ]);
 
   // Pointer-driven page turn. The transform is written straight to the node, so
   // dragging costs no React render at all — the previous implementation ran a
@@ -875,6 +890,7 @@ export function KhatmahReaderScreen({
       onEnterFocusMode={() => setIsFocusMode(true)}
       onOpenSettings={() => setIsOptionsMenuOpen(true)}
       onOpenMore={() => setIsQuickMenuOpen(true)}
+      surahAudio={pageData?.[0]?.k.startsWith("2:") ? baqarahAudio : undefined}
     />
   );
 

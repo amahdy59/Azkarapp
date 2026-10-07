@@ -253,15 +253,15 @@ const MushafTextLine = memo(function MushafTextLine({
     // line fits the page width, and Arabic diacritics reach into the space
     // between lines exactly as they do in print.
     <div data-mushaf-line="" className="flex h-full w-full min-w-0 items-center justify-center">
-      {/* The printed Mushaf justifies ordinary lines to both margins.
-          Opening pages use natural center alignment without artificial wide gaps. */}
+      {/* QCF glyph advances preserve printed spacing; the canvas never stretches word gaps. */}
       <div
         data-mushaf-line-content=""
         className={`flex shrink-0 flex-nowrap items-baseline whitespace-nowrap ${
           justifyCenter
             ? `w-auto justify-center ${useQcfGlyphs ? "gap-x-1 min-[360px]:gap-x-1.5" : "gap-x-1.5 min-[360px]:gap-x-2"}`
-            : `w-full justify-between ${useQcfGlyphs ? "gap-x-0" : "gap-x-0.5"}`
+            : `w-full justify-center ${useQcfGlyphs ? "gap-x-0" : "gap-x-0.5"}`
         }`}
+        style={justifyCenter ? undefined : { maxWidth: "var(--mushaf-measure, 100%)" }}
       >
         {words.map((w, wIdx) => {
           const key = `${w.verseKey}:${w.position}:${wIdx}`;
@@ -364,11 +364,6 @@ const MushafTextLine = memo(function MushafTextLine({
     </div>
   );
 });
-
-/** Below this much of the page width a line is treated as a short closing line
- *  and centred, the way print sets the last line of a surah. Spreading three
- *  words across the full measure is the tell of a web page, not a Mushaf. */
-const JUSTIFY_FILL_THRESHOLD = 0.82;
 
 /**
  * The width this line would occupy at its natural word spacing.
@@ -502,7 +497,9 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
         const fill = measure > 0 ? scaledNat / measure : 1;
 
         content.style.transform = fill > 1 ? `scale(${(1 / fill).toFixed(4)})` : "";
-        content.style.justifyContent = fill >= JUSTIFY_FILL_THRESHOLD ? "" : "center";
+        // QCF carries the printed line's spacing in its glyph advances. Flex
+        // justification must never distribute spare page width between words.
+        content.style.justifyContent = "center";
       }
     };
 

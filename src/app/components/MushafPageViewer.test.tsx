@@ -212,8 +212,9 @@ describe("MushafPageViewer", () => {
     );
 
     expect(container.querySelectorAll("[data-mushaf-column] > div")).toHaveLength(15);
-    // The printed Mushaf justifies each line to both margins.
-    expect(container.querySelector("[data-mushaf-line-content]")).toHaveClass("justify-between");
+    // The page font supplies printed spacing; spare canvas width is not
+    // distributed between words, and all fifteen reviewed slots remain.
+    expect(container.querySelector("[data-mushaf-line-content]")).toHaveClass("justify-center");
   });
 
   it("places Surah header at the end of the previous page when canonical (e.g. Surah An-Nisaa on page 76)", () => {
@@ -372,6 +373,9 @@ describe("MushafPageViewer spread measure", () => {
     for (const canvas of canvases) {
       expect(canvas.style.getPropertyValue("--mushaf-measure")).not.toBe("");
       expect(canvas.querySelector("[data-mushaf-column]")).not.toBeNull();
+      const line = canvas.querySelector<HTMLElement>("[data-mushaf-line-content]")!;
+      expect(line).toHaveStyle({ maxWidth: "var(--mushaf-measure, 100%)", justifyContent: "center" });
+      expect(line).not.toHaveClass("justify-between");
     }
   });
 });
