@@ -6,7 +6,7 @@ Keep reader headers legible across themes and device sizes, and reduce repeated 
 
 ## Scope completed
 
-- Strengthened the shared compact header with an opaque semantic background, backdrop treatment, border and balanced title wrapping.
+- Strengthened the shared compact header with an opaque semantic background, backdrop treatment and scroll-state border/shadow.
 - Added device-local first-use guidance state. The full hint is shown until the first count, then collapses to a compact hand button.
 - Added a 44px hand-button restore action that reopens the explanation without changing counter state.
 - The hand control is a real toggle, so users can hide and restore the explanation deliberately.
@@ -32,14 +32,19 @@ Added coverage for automatic collapse, device-local dismissal, explicit toggle, 
 
 ## Commands run
 
-| Command          | Result    |
-| ---------------- | --------- |
-| `pnpm typecheck` | Passed    |
-| Focused Vitest   | 11 passed |
+| Command                    | Result                                                           |
+| -------------------------- | ---------------------------------------------------------------- |
+| `pnpm typecheck`           | Passed                                                           |
+| `pnpm check`               | Passed (1,479 tests; coverage, lint, content and bundle budgets) |
+| Focused Vitest             | 11 passed                                                        |
+| Mushaf parity/surah Vitest | 48 passed                                                        |
+| `pnpm test:e2e:fast`       | Passed (26 tests)                                                |
+| Focused browser suite      | Passed (41 tests, desktop Chromium)                              |
+| `pnpm build:pages`         | Passed                                                           |
 
 ## Visual/manual evidence
 
-The shared header keeps its existing layout while adding a solid contrast surface; the guidance collapses in place rather than moving the footer.
+The focused browser suite passed across the existing reader micro-interaction and Khatmah flows. It includes phone, tablet and desktop geometry checks, keyboard counting, reduced-motion behavior and the loading/resolved Mushaf spread. A physical OLED and enlarged-text pass remains recommended.
 
 ## Documentation updated
 
@@ -47,8 +52,8 @@ Architecture and agent index entries added.
 
 ## Known limitations or remaining risks
 
-Manual physical-device verification is still recommended for OLED and enlarged-text combinations.
+Manual physical-device verification is still recommended for OLED, enlarged-text and browser safe-area combinations. The placeholder reserves equal leaf space; final QCF page fitting can still vary slightly by font metrics after the font becomes available.
 
 ## Recommended next step
 
-Capture visual snapshots on a light theme, OLED theme, 320px viewport and 200% text size.
+Capture visual snapshots on a light theme, OLED theme, 320px viewport and 200% text size, then add those snapshots to the visual regression set if the project adopts one.
