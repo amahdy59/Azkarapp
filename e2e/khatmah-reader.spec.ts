@@ -383,8 +383,10 @@ test("fits a two-page desktop spread with a focused rail and returns to one page
   await expect(meanings).toHaveAttribute("aria-checked", "true");
   await expect(page.getByRole("button", { name: /معنى كلمة/ }).first()).toBeVisible();
 
+  // Wait for both facing pages before turning: a ready spread advances by two.
+  await expect(page.locator('article [data-mushaf-page="22"]')).toBeVisible();
   await page.keyboard.press("ArrowLeft");
-  await expect(page.getByRole("article", { name: /٢٢/ })).toBeVisible();
+  await expect(page.getByRole("article", { name: /٢٣/ })).toBeVisible();
   await expect(page.locator('[data-page-transition="forward"]')).toBeVisible();
 
   // Portrait: clean full-screen reading canvas with integrated corner controls
