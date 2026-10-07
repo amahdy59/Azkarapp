@@ -80,7 +80,8 @@ for (const language of ["ar", "en"] as const) {
       const menu = header.getByRole("button", { name: language === "ar" ? "خيارات القارئ" : "Reader options" });
       await menu.focus();
       await menu.press("Enter");
-      await expect(page.getByRole("menu")).toBeVisible();
+      const optionsSurface = width < 600 ? page.getByTestId("reader-options-sheet") : page.getByRole("menu");
+      await expect(optionsSurface).toBeVisible();
       await page.keyboard.press("Escape");
       await expect(menu).toBeFocused();
       expect(

@@ -28,6 +28,12 @@ The initial complete non-browser gate found two stale accessible-name expectatio
 
 Final sheet verification passed six tests across Chromium, Firefox and WebKit with exit 0 in 3.7 minutes, including 44px text-size targets, Tab containment, Escape and trigger restoration. Nested collection-drawer and long-surah-sharing checks passed five tests with exit 0 in 3.5 minutes. Both collapsed and expanded Arabic/English 390px screenshots were inspected. An intermediate gate also found a Home composition timeout during concurrent checks; that suite passed all five tests in isolation. The final complete gate runs without a concurrent browser suite, preserving the existing assertions and timeouts.
 
+## Release verification
+
+The pre-push gate for the feature commit passed frozen installation, the complete non-browser check (1,493 unit tests), 26 core browser smoke tests and the Pages build. The Pages CSS budget initially exceeded its unchanged ceiling by two bytes; reusing the existing `ring-border/80` utility corrected the increase without changing the budget or unrelated scene styling.
+
+Quality CI for commit `863c50c2` passed 695 browser tests but failed six Arabic/English header checks across Chromium, Firefox and WebKit. Those checks still expected a dropdown at compact widths. The regression now expects the approved sheet below 600px and the dropdown above it, retaining geometry, target size, keyboard, focus-return, overflow and accessibility assertions. The corrected six-test matrix passed locally in 59 seconds. The complete local `pnpm test:e2e` run then passed 702 tests with one skipped, zero failures and exit 0 in 1.1 hours.
+
 ## Documentation and decision
 
 Updated DESIGN_SYSTEM.md, DECISION_LOG.md, agent INDEX.md and release notes for this release only.
