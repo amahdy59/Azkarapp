@@ -1227,7 +1227,7 @@ export function ReaderScreen({
           </div>
           {renderCounterPanel()}
         </DevotionalFooter>
-        <CounterGuidance language={language} direction={direction} reader placement="below" />
+        <CounterGuidance language={language} direction={direction} reader hasStarted={count > 0} placement="below" />
       </div>
     );
   };
@@ -1775,7 +1775,13 @@ export function ReaderScreen({
                     </div>
 
                     {!longSurah && !audioModeActive && (
-                      <CounterGuidance language={language} direction={direction} reader placement="above" />
+                      <CounterGuidance
+                        language={language}
+                        direction={direction}
+                        reader
+                        hasStarted={count > 0}
+                        placement="above"
+                      />
                     )}
                     {!longSurah && (
                       <footer className={`shrink-0 pt-1.5 ${audioModeActive ? "pb-0" : "pb-2"}`}>{renderDock()}</footer>
@@ -1967,7 +1973,13 @@ export function ReaderScreen({
               </div>
 
               {!longSurah && !audioModeActive && (
-                <CounterGuidance language={language} direction={direction} reader placement="above" />
+                <CounterGuidance
+                  language={language}
+                  direction={direction}
+                  reader
+                  hasStarted={count > 0}
+                  placement="above"
+                />
               )}
               {/* The screen sets !pb-0 and the tab bar is hidden here, so the
                 counter itself owns the bottom inset — otherwise it would sit

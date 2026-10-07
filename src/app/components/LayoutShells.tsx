@@ -135,7 +135,8 @@ export function Header({
       ref={headerRef}
       data-testid="shared-screen-header"
       data-scrolled={isScrolled || undefined}
-      className={`shared-screen-header ${decoration ? "isolate" : ""} sticky top-0 z-40 flex w-full shrink-0 items-center gap-2 border-b bg-background px-4 pt-2 pb-1 transition-colors duration-standard ${
+      data-header-contrast="solid"
+      className={`shared-screen-header ${decoration ? "isolate" : ""} sticky top-0 z-40 flex w-full shrink-0 items-center gap-2 border-b border-transparent bg-background px-4 pt-2 pb-1 shadow-xs backdrop-blur-xl transition-colors duration-standard ${
         isScrolled ? "border-border shadow-sm" : "border-transparent"
       }`}
       style={{ minHeight: 56 }}

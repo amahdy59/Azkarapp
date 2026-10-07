@@ -1367,6 +1367,7 @@ const en = {
     groupProgress: "Group progress",
     menu: "Reader options",
     keyboardShortcuts: "Keyboard shortcuts",
+    showCountingGuidance: "Show counting guidance",
     shortcutCount: "Count",
     shortcutNavigate: "Navigate",
     shortcutReset: "Reset",

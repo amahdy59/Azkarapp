@@ -410,7 +410,7 @@ export function CustomCounterScreen({
                 </div>
               </div>
 
-              <CounterGuidance language={language} direction={direction} placement="above" />
+              <CounterGuidance language={language} direction={direction} hasStarted={count > 0} placement="above" />
               <footer className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
                 <div data-testid="reader-counter-stack">
                   <DevotionalFooter>
@@ -448,7 +448,7 @@ export function CustomCounterScreen({
                       </div>
                     </div>
                   </DevotionalFooter>
-                  <CounterGuidance language={language} direction={direction} placement="below" />
+                  <CounterGuidance language={language} direction={direction} hasStarted={count > 0} placement="below" />
                 </div>
               </footer>
             </div>

@@ -578,6 +578,8 @@ Reader passage titles and the Rare words switch share a row when space permits. 
 
 The compact Reader retains a reading viewport of at least `min(8rem, 35dvh)`. Enlarged footer controls may extend the screen's scrolling content, rather than collapsing the passage to zero height. Native passage scrolling and counter focus remain available.
 
+Counting guidance uses progressive disclosure. New devices see the localized instruction until the first successful count; it then collapses to a 44px hand button in the same layout slot. Activating the hand button restores the full explanation without changing count state. The marker is device-local (`azkarapp.counter-guidance.v1`) and does not sync. Shared compact headers use an opaque semantic background, border and backdrop treatment so title and actions retain readable contrast over decorative artwork, themes, enlarged text and narrow viewports.
+
 Sharing keeps the action footer outside one scrollable body containing its heading, method choices, preview and settings. This prevents enlarged heading and method text from pushing Save below a short viewport; the dialog's close control remains available independently of body scrolling.
 
 ### Sharing footer simplification

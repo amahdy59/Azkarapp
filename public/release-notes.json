@@ -1,13 +1,13 @@
 {
-  "release": "2026-10-07.1",
+  "release": "2026-10-07.2",
   "ar": [
-    "أصبحت صفحات المصحف المتقابلة تحافظ على حجم خط موحّد أثناء التحميل.",
-    "تظل صفحات المصحف متساوية الأبعاد من دون قفزات أو اختلاف مفاجئ في المقاس.",
-    "تتحسن القراءة مع الاتصال الضعيف أو بعد العودة من وضع عدم الاتصال، مع تحديث الصفحتين معًا."
+    "أصبح عنوان الشاشة وأزرارها أوضح فوق الخلفيات المختلفة وعلى الشاشات الصغيرة.",
+    "تظهر إرشادات العد للمرة الأولى فقط ثم تختفي بهدوء بعد أول ضغطة.",
+    "يمكن إعادة فتح إرشادات العد في أي وقت من زر اليد الصغير بجوار العداد."
   ],
   "en": [
-    "Facing Mushaf pages now keep one consistent text scale while loading.",
-    "Mushaf pages stay equal in size without sudden jumps or mismatched dimensions.",
-    "Reading is steadier on slow or offline connections, with both pages updating together."
+    "Screen titles and actions stay readable over different backgrounds and on small displays.",
+    "Counting guidance appears for first-time users, then quietly collapses after the first tap.",
+    "Reopen counting guidance anytime from the small hand button beside the counter."
   ]
 }

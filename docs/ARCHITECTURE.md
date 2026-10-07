@@ -313,3 +313,5 @@ Before adding a feature:
 Local pnpm check validates audio catalog metadata and content identity without network access. Quality CI requires complete hosted recording validation through pnpm validate:audio before browser verification and deployment. Every approved URL, HTTP/MIME requirement and bounded retry remains enforced.
 
 ReadingTextTransition owns presentation-only directional entry changes for Reader and expanded audio text. It tracks entry identity/index transiently, keeps one text entry present, and never owns navigation, counting, content or persistence. Shared SheetHeader centralizes wrapped dialog headings and close controls; callers retain scroll-body ownership.
+
+Counter guidance follows the same boundary: `CounterGuidance` owns presentation and disclosure while `useCounterGuidance` owns the small device-local dismissal marker. A first count collapses the explanation, and reopening it never changes counter state. The shared `Header` keeps an opaque semantic background and contrast-safe border so optional decoration cannot become the contrast surface for interactive content.
