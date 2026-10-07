@@ -143,13 +143,28 @@ export function Header({
     >
       {decoration}
       {onBack && (
-        <div style={{ position: "relative", zIndex: 10 }}>
+        <div
+          style={{
+            position: "relative",
+            zIndex: 10,
+            background: decoration ? "var(--background)" : undefined,
+            borderRadius: "var(--radius-btn)",
+          }}
+        >
           <IconButton onClick={onBack} label={t(language, "common.back")} className={backButtonClassName}>
             <ArrowPrevious size={20} className="text-foreground" />
           </IconButton>
         </div>
       )}
-      <div style={{ position: "relative", zIndex: 10 }} className="flex-1 min-w-0">
+      <div
+        style={{
+          position: "relative",
+          zIndex: 10,
+          background: decoration ? "var(--background)" : undefined,
+          borderRadius: "var(--radius-btn)",
+        }}
+        className="flex-1 min-w-0"
+      >
         {/* Long collection names wrap within the available header column.
             Enlarged text may need more than two lines; the header grows rather
             than hiding the destination name. */}
@@ -161,7 +176,16 @@ export function Header({
         </h1>
         {subtitle && <p className="text-xs text-muted-foreground font-sans leading-[18px]">{subtitle}</p>}
       </div>
-      <div style={{ position: "relative", zIndex: 10 }}>{right}</div>
+      <div
+        style={{
+          position: "relative",
+          zIndex: 10,
+          background: decoration ? "var(--background)" : undefined,
+          borderRadius: "var(--radius-btn)",
+        }}
+      >
+        {right}
+      </div>
     </div>
   );
 }

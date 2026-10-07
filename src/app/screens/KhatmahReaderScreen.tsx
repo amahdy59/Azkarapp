@@ -26,6 +26,7 @@ import {
 import { PAPER_ASPECT, getNextMushafTheme, spreadStart, useMushafShell } from "../components/mushafShell";
 import { vibrateIfEnabled } from "../motionPreferences";
 import { MushafPageViewer } from "../components/MushafPageViewer";
+import { MushafLoadingPlaceholder } from "../components/MushafLoadingPlaceholder";
 import { MushafNavigationModal } from "../components/MushafNavigationModal";
 import { AyahInteractionSheet } from "../components/AyahInteractionSheet";
 import { MushafSettingsSheet } from "../components/MushafSettingsSheet";
@@ -935,19 +936,7 @@ export function KhatmahReaderScreen({
         onPointerCancel={onPointerCancel}
         style={{ touchAction: "pan-y pinch-zoom" }}
       >
-        {!pageData && !error && (
-          <div
-            className="absolute inset-0 flex flex-col items-center justify-center gap-3"
-            role="status"
-            aria-busy="true"
-          >
-            <div
-              className="size-8 animate-spin rounded-full border-4 border-primary border-t-transparent"
-              aria-hidden="true"
-            />
-            <span className="text-sm font-semibold text-muted-foreground">{t(language, "common.loading")}</span>
-          </div>
-        )}
+        {!pageData && !error && <MushafLoadingPlaceholder language={language} spread={spreadRoom} />}
 
         {error && !pageData && (
           <div className="flex flex-1 flex-col items-center justify-center gap-3 p-6 text-center">

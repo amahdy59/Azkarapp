@@ -44,6 +44,7 @@ import { SURAH_PLACEMENTS } from "../content/mushafSurahPlacements";
 import { loadSurahWordMeanings, type QuranWordMeaning, type WordMeaningSelection } from "../content/quranWordMeanings";
 import { formatNumerals } from "../formatting";
 import { MushafPageViewer } from "./MushafPageViewer";
+import { MushafLoadingPlaceholder } from "./MushafLoadingPlaceholder";
 import { AyahInteractionSheet } from "./AyahInteractionSheet";
 import { reportError } from "../../lib/observability";
 export type { SurahAudioControl } from "./MushafToolRail";
@@ -705,6 +706,11 @@ export function MushafImmersiveReader({
             paper from `pageTransitionDirection`, which is what the Mushaf uses
             and what leaves the tools standing still. */}
         <div className="relative h-full w-full">
+          {!pageData && (
+            <div className="pointer-events-none absolute inset-0 z-10">
+              <MushafLoadingPlaceholder language={language} spread={hasSpread} />
+            </div>
+          )}
           <MushafPageViewer
             lines={lines}
             language={language}

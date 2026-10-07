@@ -1368,6 +1368,7 @@ const en = {
     menu: "Reader options",
     keyboardShortcuts: "Keyboard shortcuts",
     showCountingGuidance: "Show counting guidance",
+    hideCountingGuidance: "Hide counting guidance",
     shortcutCount: "Count",
     shortcutNavigate: "Navigate",
     shortcutReset: "Reset",

@@ -33,10 +33,23 @@ describe("combined counting guidance", () => {
     expect(screen.getByTestId("counter-tap-hint")).toBeInTheDocument();
 
     view.rerender(<CounterGuidance language="en" direction="ltr" hasStarted />);
-    await waitFor(() => expect(screen.getByTestId("counter-guidance-reopen")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByRole("button", { name: "Show counting guidance" })).toBeInTheDocument());
     expect(window.localStorage.getItem("azkarapp.counter-guidance.v1")).toBe("true");
 
     fireEvent.click(screen.getByTestId("counter-guidance-reopen"));
-    expect(screen.getByTestId("counter-tap-hint")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Hide counting guidance" })).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByText(t("en", "reader.tapAnywhereDesktop"))).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Hide counting guidance" }));
+    expect(screen.getByRole("button", { name: "Show counting guidance" })).toHaveAttribute("aria-expanded", "false");
+    fireEvent.click(screen.getByRole("button", { name: "Keyboard shortcuts" }));
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+  });
+
+  it("keeps guidance collapsed on return and allows a restored count to reopen it", () => {
+    window.localStorage.setItem("azkarapp.counter-guidance.v1", "true");
+    render(<CounterGuidance language="en" direction="ltr" hasStarted />);
+    const hand = screen.getByRole("button", { name: "Show counting guidance" });
+    fireEvent.click(hand);
+    expect(hand).toHaveAttribute("aria-expanded", "true");
   });
 });

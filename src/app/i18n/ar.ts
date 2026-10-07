@@ -1346,6 +1346,7 @@ const ar = {
     keyboardShortcuts:
       "\u0627\u062e\u062a\u0635\u0627\u0631\u0627\u062a \u0644\u0648\u062d\u0629 \u0627\u0644\u0645\u0641\u0627\u062a\u064a\u062d",
     showCountingGuidance: "إظهار إرشادات العد",
+    hideCountingGuidance: "إخفاء إرشادات العد",
     shortcutCount: "\u0627\u0644\u0639\u062f",
     shortcutNavigate: "\u0627\u0644\u0627\u0646\u062a\u0642\u0627\u0644",
     shortcutReset: "\u0625\u0639\u0627\u062f\u0629",
