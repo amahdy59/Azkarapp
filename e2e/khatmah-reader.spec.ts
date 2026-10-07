@@ -294,6 +294,29 @@ test("fits a two-page desktop spread with a focused rail and returns to one page
   await expect(page.getByTestId("mushaf-tool-rail")).toBeVisible();
   await expect(page.getByTestId("mushaf-tool-rail")).toHaveAttribute("data-rail-side", "right");
   await expect(article.locator("[data-mushaf-page]")).toHaveCount(2);
+  await expect
+    .poll(async () =>
+      page.locator("[data-mushaf-page]").evaluateAll((pages) => {
+        const frames = pages.map((page) =>
+          page.querySelector<HTMLElement>(".mushaf-page-frame")?.getBoundingClientRect(),
+        );
+        const renderModes = pages.map((page) => page.getAttribute("data-mushaf-rendering"));
+        return {
+          sameMode: renderModes[0] === renderModes[1],
+          visible: frames.every((frame) => Boolean(frame && frame.width > 0 && frame.height > 0)),
+        };
+      }),
+    )
+    .toEqual({ sameMode: true, visible: true });
+  const spreadGeometry = await page.locator("[data-mushaf-page]").evaluateAll((pages) => {
+    const frames = pages.map((page) => page.querySelector<HTMLElement>(".mushaf-page-frame")?.getBoundingClientRect());
+    return {
+      widthDelta: Math.abs((frames[0]?.width ?? 0) - (frames[1]?.width ?? 0)),
+      heightDelta: Math.abs((frames[0]?.height ?? 0) - (frames[1]?.height ?? 0)),
+    };
+  });
+  expect(spreadGeometry.widthDelta).toBeLessThanOrEqual(1);
+  expect(spreadGeometry.heightDelta).toBeLessThanOrEqual(1);
   await expect(page.getByTestId("mushaf-top-left-back")).toHaveCount(0);
   await expect(page.getByTestId("mushaf-more-actions")).toHaveCount(0);
   await expect(page.getByTestId("mushaf-rail-page-bookmark")).toBeVisible();

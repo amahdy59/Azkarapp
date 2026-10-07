@@ -9,6 +9,7 @@ import {
   pageHasQcfGlyphs,
   parseMushafPage,
   prepareMushafPage,
+  resolveSpreadQcfMode,
 } from "./qcfMushaf";
 
 afterEach(() => {
@@ -16,6 +17,12 @@ afterEach(() => {
 });
 
 describe("Mushaf page data", () => {
+  it("keeps both faces in fallback mode when either spread font is unavailable", () => {
+    expect(resolveSpreadQcfMode(true, true)).toBe(true);
+    expect(resolveSpreadQcfMode(true, false)).toBe(false);
+    expect(resolveSpreadQcfMode(false, true)).toBe(false);
+    expect(resolveSpreadQcfMode(true, undefined)).toBe(true);
+  });
   it("reads pages from the shipped reference layout, not from a remote API", () => {
     expect(getMushafPageUrl(106)).toMatch(/data\/mushaf\/106\.json\?v=3$/);
     expect(getQcfFontUrl(106)).toBe("https://verses.quran.foundation/fonts/quran/hafs/v2/woff2/p106.woff2");

@@ -203,3 +203,5 @@ Apple/Microsoft-informed control spacing and alignment improvements.
 [Compact prayer companion](phases/COMPACT_PRAYER_COMPANION.md) records the owner-approved local-only prayer card and summary-tile refinement, responsive reflow, native checklist semantics and verification.
 
 [Phase 79](phases/PHASE_79_NOTIFICATION_REFINEMENT.md) records the owner-approved notification settings, reminder customization, test delivery and service-worker click-routing refinement.
+
+[Phase 80](phases/PHASE_80_MUSHAF_SPREAD_RELIABILITY.md) records atomic facing-page font selection, equal spread geometry, late-font recovery, and responsive Mushaf verification.

@@ -29,6 +29,8 @@ import {
   loadQcfFont,
   pageHasQcfGlyphs,
   prefetchMushafPage,
+  resolveSpreadQcfMode,
+  subscribeQcfFontLoaded,
   type MushafVerseData,
 } from "../content/qcfMushaf";
 import {
@@ -256,6 +258,7 @@ export function MushafImmersiveReader({
   const facingNumber = hasSpread ? (currentPage === rightNumber ? leftNumber : rightNumber) : null;
 
   const [facing, setFacing] = useState<ResolvedPage | null>(null);
+  const [fontRevision, setFontRevision] = useState(0);
 
   const [resolved, setResolved] = useState<ResolvedPage | null>(() => {
     const cached = getCachedMushafPage(currentPage);
@@ -268,9 +271,19 @@ export function MushafImmersiveReader({
   const rightResolved = resolved?.page === rightNumber ? resolved : facing?.page === rightNumber ? facing : null;
   const leftResolved = resolved?.page === leftNumber ? resolved : facing?.page === leftNumber ? facing : null;
 
+  useEffect(() => {
+    return subscribeQcfFontLoaded((page) => {
+      if (page === currentPage || page === rightNumber || page === leftNumber) setFontRevision((value) => value + 1);
+    });
+  }, [currentPage, leftNumber, rightNumber]);
+
   const displayPage = rightResolved?.page ?? (hasSpread ? rightNumber : (resolved?.page ?? currentPage));
   const pageData = rightResolved?.data ?? resolved?.data ?? null;
   const useQcfGlyphs = rightResolved?.qcf ?? resolved?.qcf ?? false;
+  const spreadQcf =
+    hasSpread && rightResolved && leftResolved
+      ? resolveSpreadQcfMode(rightResolved.qcf, leftResolved.qcf)
+      : useQcfGlyphs;
 
   useEffect(() => {
     let active = true;
@@ -293,7 +306,7 @@ export function MushafImmersiveReader({
     return () => {
       active = false;
     };
-  }, [currentPage, facingNumber, showWordMeanings]);
+  }, [currentPage, facingNumber, showWordMeanings, fontRevision]);
 
   // Aggressive prefetching of adjacent pages
   useEffect(() => {
@@ -703,7 +716,7 @@ export function MushafImmersiveReader({
             direction={direction}
             theme={resolvedTheme}
             isBookmarked={isPageBookmarked}
-            useQcfGlyphs={useQcfGlyphs}
+            useQcfGlyphs={spreadQcf}
             showWordMeanings={showWordMeanings}
             {...(shell.rail && !isFocusMode ? { railContent: toolRail, railSide: "right" as const } : {})}
             topLeftControl={mobileTopLeft}
@@ -740,7 +753,7 @@ export function MushafImmersiveReader({
                 ? {
                     pageNumber: leftResolved.page,
                     lines: toMushafLines(leftResolved.data),
-                    useQcfGlyphs: leftResolved.qcf,
+                    useQcfGlyphs: spreadQcf,
                   }
                 : undefined
             }

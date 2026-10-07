@@ -938,6 +938,7 @@ function MushafPageCanvas({
           className={`mushaf-page-frame relative z-10 flex h-full w-full flex-col ${
             spreadSide === "right" ? "mr-auto ml-0" : spreadSide === "left" ? "mr-0 ml-auto" : "mx-auto"
           }`}
+          style={spreadSide ? { maxWidth: "100%" } : undefined}
         >
           {showPageFurnitureHead && (
             <PageFurnitureHead

@@ -446,7 +446,7 @@ describe("KhatmahReaderScreen quick menu", () => {
       language: "en",
       direction: "ltr",
       quranWirdPlan: { kind: "daily", dailyPages: 4 },
-      wirdHistory: { "2026-10-06": [42] },
+      wirdHistory: { [getProgressDayKey(new Date(), 4)]: [42] },
     });
     await screen.findByRole("article", { name: "Page 42" });
 

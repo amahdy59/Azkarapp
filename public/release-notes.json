@@ -1,13 +1,13 @@
 {
-  "release": "2026-10-06.5",
+  "release": "2026-10-07.1",
   "ar": [
-    "تحسين تباين عنوان الأذكار وقابلية قراءته بوضوح في شاشات القراءة المختلفة.",
-    "إبراز معالم المسجد والإضاءة الدافئة في المشهد الفني الخلفي لأذكار الصباح والمساء والنوم.",
-    "تقليل المساحات الرأسية المهدرة واستغلال مساحة القراءة في الحواسيب والأجهزة اللوحية دون الحاجة للتمرير غير الضروري."
+    "أصبحت صفحات المصحف المتقابلة تحافظ على حجم خط موحّد أثناء التحميل.",
+    "تظل صفحات المصحف متساوية الأبعاد من دون قفزات أو اختلاف مفاجئ في المقاس.",
+    "تتحسن القراءة مع الاتصال الضعيف أو بعد العودة من وضع عدم الاتصال، مع تحديث الصفحتين معًا."
   ],
   "en": [
-    "Improve reader title contrast and visibility across reading themes.",
-    "Highlight mosque architecture and glowing illumination within the devotional background artwork.",
-    "Reduce dead vertical space on tablet and desktop views, presenting zikr text comfortably without unnecessary scrolling."
+    "Facing Mushaf pages now keep one consistent text scale while loading.",
+    "Mushaf pages stay equal in size without sudden jumps or mismatched dimensions.",
+    "Reading is steadier on slow or offline connections, with both pages updating together."
   ]
 }

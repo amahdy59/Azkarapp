@@ -92,6 +92,11 @@ export function pageHasQcfGlyphs(page: readonly MushafVerseData[]): boolean {
   return page.every((verse) => verse.w.every((word) => typeof word[4] === "string" && word[4].length > 0));
 }
 
+/** A facing spread must use one glyph system on both pages. */
+export function resolveSpreadQcfMode(primary: boolean, facing: boolean | undefined): boolean {
+  return facing === undefined ? primary : primary && facing;
+}
+
 export function getCachedMushafPage(page: number): MushafVerseData[] | undefined {
   return pageCache.get(page);
 }

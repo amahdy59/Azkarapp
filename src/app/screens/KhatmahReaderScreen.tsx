@@ -50,6 +50,8 @@ import {
   loadQcfFont,
   pageHasQcfGlyphs,
   prefetchMushafPage,
+  resolveSpreadQcfMode,
+  subscribeQcfFontLoaded,
   type MushafVerseData,
 } from "../content/qcfMushaf";
 import { reportError } from "../../lib/observability";
@@ -190,6 +192,7 @@ export function KhatmahReaderScreen({
   const settledPage = useRef(resolved?.page ?? currentPage);
   const [pageTransitionDirection, setPageTransitionDirection] = useState<"forward" | "backward" | undefined>();
   const [other, setOther] = useState<ResolvedPage | null>(null);
+  const [fontRevision, setFontRevision] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [reloadToken, setReloadToken] = useState(0);
   const [isIndexOpen, setIsIndexOpen] = useState(false);
@@ -244,6 +247,15 @@ export function KhatmahReaderScreen({
   // tablet. The physical fit gate is authoritative; settings only opt out.
   const spreadRoom = shell.spreadRoom && (mushafLayout === "spread" || (mushafLayout === "auto" && autoSpreadRoom));
   const useRail = shell.rail;
+
+  // Re-resolve both visible pages when a timed-out QCF font finishes later.
+  useEffect(() => {
+    return subscribeQcfFontLoaded((page) => {
+      const right = spreadStart(currentPage);
+      const left = right + 1 <= LAST_PAGE ? right + 1 : null;
+      if (page === currentPage || page === right || page === left) setFontRevision((value) => value + 1);
+    });
+  }, [currentPage]);
 
   const paperRef = useRef<HTMLDivElement>(null);
   const readerRootRef = useRef<HTMLDivElement>(null);
@@ -384,7 +396,7 @@ export function KhatmahReaderScreen({
     return () => {
       active = false;
     };
-  }, [currentPage, language, reloadToken, spreadRoom]);
+  }, [currentPage, language, reloadToken, spreadRoom, fontRevision]);
 
   /**
    * A page counts itself once it has actually been read.
@@ -517,6 +529,7 @@ export function KhatmahReaderScreen({
       ? otherReady && { page: otherReady.page, lines: otherReady.lines, qcf: otherReady.qcf }
       : { page: displayPage, lines, qcf: resolved?.qcf ?? false };
   const spreadReady = Boolean(leftNumber && rightSide && leftSide);
+  const spreadQcf = spreadReady && rightSide && leftSide ? resolveSpreadQcfMode(rightSide.qcf, leftSide.qcf) : false;
 
   const useQcfGlyphs = resolved?.qcf ?? false;
 
@@ -961,12 +974,12 @@ export function KhatmahReaderScreen({
               direction={direction}
               theme={resolvedTheme}
               isBookmarked={isPageBookmarked}
-              useQcfGlyphs={spreadReady && rightSide ? rightSide.qcf : useQcfGlyphs}
+              useQcfGlyphs={spreadReady && rightSide ? (spreadRoom ? spreadQcf : rightSide.qcf) : useQcfGlyphs}
               showWordMeanings={showWordMeanings}
               highlightedVerseKey={highlightedVerseKey}
               facingPage={
                 spreadReady && leftSide
-                  ? { pageNumber: leftSide.page, lines: leftSide.lines, useQcfGlyphs: leftSide.qcf }
+                  ? { pageNumber: leftSide.page, lines: leftSide.lines, useQcfGlyphs: spreadQcf }
                   : undefined
               }
               headerContent={undefined}
