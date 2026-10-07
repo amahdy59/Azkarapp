@@ -74,6 +74,17 @@ for (const language of ["ar", "en"] as const) {
       for (const width of [320, 390, 820, 1440]) {
         await page.setViewportSize({ width, height: 900 });
         const scene = page.getByTestId("reader-scene");
+        if (width < 768) {
+          const header = page.locator(headerSelector(width));
+          await expect(header).toHaveAttribute("data-header-contrast", "solid");
+          await expect(scene).toHaveCount(0);
+          await expect(header).toHaveCSS("backdrop-filter", "none");
+          expect((await new AxeBuilder({ page }).include(headerSelector(width)).analyze()).violations).toEqual([]);
+          await page.screenshot({
+            path: `output/playwright/reader-scenes/${testInfo.project.name}/${category}-${language}-${width}.png`,
+          });
+          continue;
+        }
         await expect(scene).toBeVisible();
         await expect(scene).toHaveAttribute("data-scene", category);
         const header = page.locator(headerSelector(width));
@@ -123,7 +134,8 @@ for (const language of ["ar", "en"] as const) {
       await expect(page.locator("html")).toHaveClass(new RegExp(`theme-${theme}`));
       for (const width of [320, 1440]) {
         await page.setViewportSize({ width, height: 900 });
-        await expect(page.getByTestId("reader-scene")).toBeVisible();
+        if (width < 768) await expect(page.getByTestId("reader-scene")).toHaveCount(0);
+        else await expect(page.getByTestId("reader-scene")).toBeVisible();
         await expect(page.locator(headerSelector(width))).toBeVisible();
         expect((await new AxeBuilder({ page }).include(headerSelector(width)).analyze()).violations).toEqual([]);
         await page.screenshot({
@@ -142,15 +154,15 @@ for (const language of ["ar", "en"] as const) {
       await page.emulateMedia({ forcedColors: "none" });
       await page.context().setOffline(true);
       await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-      await expect(page.getByTestId("reader-scene")).toBeVisible();
+      await expect(page.getByTestId("reader-scene")).toHaveCount(0);
       if (cdp) {
         const header = page.locator(headerSelector(390));
         const before = await header.boundingBox();
         await cdp.send("Emulation.setEmulatedMedia", {
           features: [{ name: "prefers-reduced-transparency", value: "reduce" }],
         });
-        await expect(page.getByTestId("reader-scene")).toBeVisible();
-        await expect(page.locator(".reader-scene__skyline")).toBeVisible();
+        await expect(page.getByTestId("reader-scene")).toHaveCount(0);
+        await expect(header).toHaveAttribute("data-header-contrast", "solid");
         expect(await header.boundingBox()).toEqual(before);
         expect((await new AxeBuilder({ page }).include(headerSelector(390)).analyze()).violations).toEqual([]);
         await page.screenshot({

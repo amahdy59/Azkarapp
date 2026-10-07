@@ -1,5 +1,7 @@
 # Azkar design system
 
+Owner responsive follow-up (2026-10-07): compact reading headers use one opaque semantic background without scene artwork or backdrop blur. Wide reader heroes retain their existing scenes. Learned counting guidance collapses to a 44px hand disclosure rather than a full-width empty strip. Facing Mushaf frames share a bounded page-shaped measure (at most 72% of canvas height); spread eligibility accounts for the side toolbar. Menu headings and player-duplicate repeat actions are removed to reduce vertical clutter while unique actions remain reachable.
+
 Integrated refinements (2026-10-06): collection entry resumes the Reader directly; explicit collection overview routes remain available. The Reader collection panel starts at 420px, has a 380px minimum and a maximum of 600px, 45% of available workspace, or the width left after reserving 480px for reading and a 12px gutter, whichever is smallest. Existing pointer/keyboard resizing, focus recovery and narrow drawer behavior remain. Collection sharing, repeat reading and reset use the existing sharing/session boundaries.
 
 Mushaf vertical shortcuts cycle display themes upward and toggle focus downward when the complete paper fits. Overflowing paper retains native vertical scrolling so short viewports keep all reviewed lines accessible. Both policies permit pinch zoom; cancellation never turns a page. Horizontal page turns remain independent, and a vertical gesture cannot become a page turn merely because the finger drifts sideways. Permanent controls provide non-gesture alternatives.

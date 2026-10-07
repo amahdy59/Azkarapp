@@ -207,3 +207,5 @@ Apple/Microsoft-informed control spacing and alignment improvements.
 [Phase 80](phases/PHASE_80_MUSHAF_SPREAD_RELIABILITY.md) records atomic facing-page font selection, equal spread geometry, late-font recovery, and responsive Mushaf verification.
 
 [Phase 81](phases/PHASE_81_HEADER_AND_COUNTER_GUIDANCE.md) records contrast-safe shared headers and progressive first-use counting guidance with a persistent hand-button restore affordance.
+
+[Phase 82](phases/PHASE_82_RESPONSIVE_READER_REFINEMENT.md) records the owner's wide Mushaf measure, opaque mobile header, compact guidance and shorter menu refinement.

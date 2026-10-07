@@ -37,7 +37,8 @@ export function getNextMushafTheme(current: MushafTheme, appTheme: ThemeMode = "
  * narrower than a single page is now, which trades legibility for novelty.
  */
 export function fitsTwoPages(width: number, height: number) {
-  return width >= 1024 && width / height >= 1.4;
+  const railWidth = fitsToolRail(width, height) ? (width < 1200 ? 60 : 72) : 0;
+  return width >= 1024 && (width - railWidth) / height >= 1.4;
 }
 
 /** The height the rail's controls occupy. Below this it would scroll, and a
@@ -73,7 +74,7 @@ export function measureShell() {
   const spreadRoom = fitsTwoPages(width, height);
   // What one page actually gets: the viewport less whichever chrome is showing,
   // halved when two pages share the width.
-  const pageWidth = (width - (rail ? 72 : 0)) / (spreadRoom ? 2 : 1);
+  const pageWidth = (width - (rail ? (width < 1200 ? 60 : 72) : 0)) / (spreadRoom ? 2 : 1);
   const pageHeight = Math.max(1, height - (rail ? 0 : BARS_HEIGHT));
   return {
     spreadRoom,

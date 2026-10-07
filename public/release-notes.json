@@ -1,13 +1,13 @@
 {
-  "release": "2026-10-07.3",
+  "release": "2026-10-07.4",
   "ar": [
-    "أصبح عنوان الشاشة وأزرارها أوضح فوق الخلفيات المختلفة وعلى الشاشات الصغيرة.",
+    "أصبح عنوان الشاشة وأزرارها أوضح على خلفية ثابتة في الهاتف، مع قائمة قراءة أكثر اختصاراً.",
     "تظهر إرشادات العد للمرة الأولى فقط ثم تختفي بهدوء بعد أول ضغطة.",
-    "يمكن إظهار الإرشادات أو إخفاؤها من زر اليد، كما يستقر شكل المصحف أثناء التحميل."
+    "يمكن استعادة الإرشادات من زر يد صغير، مع صفحات مصحف متوازنة أثناء التحميل وعلى الشاشات الواسعة."
   ],
   "en": [
-    "Screen titles and actions stay readable over different backgrounds and on small displays.",
+    "Mobile titles and actions have a clear solid background, with a shorter reading menu.",
     "Counting guidance appears for first-time users, then quietly collapses after the first tap.",
-    "Show or hide guidance from the hand button, while the Mushaf keeps its shape during loading."
+    "Restore guidance from a compact hand button, with balanced Mushaf pages during loading and on wide displays."
   ]
 }

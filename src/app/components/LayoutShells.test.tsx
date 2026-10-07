@@ -3,6 +3,11 @@ import { describe, expect, it, vi } from "vitest";
 import { Header, BottomNav } from "./LayoutShells";
 
 describe("Header", () => {
+  it("keeps artwork out of the compact title and action surface", () => {
+    render(<Header title="Reader" decoration={<div data-testid="header-art">Scene</div>} />);
+    expect(screen.queryByTestId("header-art")).not.toBeInTheDocument();
+    expect(screen.getByTestId("shared-screen-header")).toHaveAttribute("data-header-contrast", "solid");
+  });
   it("keeps an opaque surface and adds a divider after nested content scrolls", () => {
     render(
       <div className="app-screen-surface">

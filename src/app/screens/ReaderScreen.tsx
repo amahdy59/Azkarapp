@@ -1234,7 +1234,7 @@ export function ReaderScreen({
 
   const renderReaderMenuItems = (layout: "mobile" | "desktop") => {
     const hasAudioOptions =
-      (!longSurah && (englishAudioAvailable || !isArabic)) || Boolean(onPlayAllAudio) || Boolean(onRepeatAudio);
+      (!longSurah && englishAudioAvailable) || Boolean(onPlayAllAudio) || Boolean(onRepeatAudio && !audioModeActive);
 
     return (
       <>
@@ -1272,11 +1272,8 @@ export function ReaderScreen({
         {/* 2. Audio playback options (secondary / batch only; single Arabic audio is in the main dock) */}
         {hasAudioOptions && (
           <>
-            <DropdownMenuLabel className="px-3 pb-1 pt-1 text-micro font-bold uppercase tracking-wider text-muted-foreground">
-              {t(language, "reader.menuAudio")}
-            </DropdownMenuLabel>
             <DropdownMenuGroup>
-              {!longSurah && (englishAudioAvailable || !isArabic) && (
+              {!longSurah && englishAudioAvailable && (
                 <DropdownMenuItem
                   disabled={!englishAudioAvailable}
                   onClick={onPlayEnglishAudio}
@@ -1299,7 +1296,7 @@ export function ReaderScreen({
                   <span>{t(language, "category.playAllAudio")}</span>
                 </DropdownMenuItem>
               )}
-              {onRepeatAudio && (
+              {onRepeatAudio && !audioModeActive && (
                 <DropdownMenuItem
                   onClick={onRepeatAudio}
                   className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted"
@@ -1351,9 +1348,6 @@ export function ReaderScreen({
         <DropdownMenuSeparator className="my-1 h-px bg-border/60" />
 
         {/* 4. Actions: Bookmark, Share collection/surah, Repeat, Routine mode */}
-        <DropdownMenuLabel className="px-3 pb-1 pt-1 text-micro font-bold uppercase tracking-wider text-muted-foreground">
-          {t(language, "reader.menuActions")}
-        </DropdownMenuLabel>
         <DropdownMenuGroup>
           <DropdownMenuItem
             onClick={handleToggleSaved}
@@ -1419,9 +1413,6 @@ export function ReaderScreen({
         <DropdownMenuSeparator className="my-1 h-px bg-border/60" />
 
         {/* 5. Counter feedback & recovery */}
-        <DropdownMenuLabel className="px-3 pb-1 pt-1 text-micro font-bold uppercase tracking-wider text-muted-foreground">
-          {t(language, "reader.menuCounter")}
-        </DropdownMenuLabel>
         <DropdownMenuGroup>
           <DropdownMenuItem
             onClick={toggleSound}
@@ -1453,9 +1444,6 @@ export function ReaderScreen({
         <DropdownMenuSeparator className="my-1 h-px bg-border/60" />
 
         {/* 6. Collection Navigation */}
-        <DropdownMenuLabel className="px-3 pb-1 pt-1 text-micro font-bold uppercase tracking-wider text-muted-foreground">
-          {t(language, "reader.menuNavigation")}
-        </DropdownMenuLabel>
         <DropdownMenuGroup>
           <DropdownMenuItem
             onClick={onViewAllAzkar ?? onBack}

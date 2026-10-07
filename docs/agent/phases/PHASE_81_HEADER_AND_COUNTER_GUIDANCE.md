@@ -20,7 +20,7 @@ Keep reader headers legible across themes and device sizes, and reduce repeated 
 
 ## User-visible behavior changed
 
-Headers remain readable over optional artwork and high-contrast themes. Counting guidance teaches new users once per device, then leaves a small hand control in the same area for reopening or hiding. Mushaf first paint reserves the final page geometry rather than showing a generic spinner.
+Headers retain a semantic contrast surface across themes. Counting guidance teaches new users once per device, then leaves a hand control in the same area for reopening or hiding. Mushaf first paint reserves equal page slots rather than showing a generic spinner; final typography is fitted after page data and fonts resolve. Phase 82 refines the compact header and collapsed hint footprint.
 
 ## Accessibility work
 

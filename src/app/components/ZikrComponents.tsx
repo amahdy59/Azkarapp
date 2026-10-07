@@ -24,10 +24,15 @@ export function CounterTapHint({
   toggleLabel?: string;
 }) {
   return (
-    <div className="devotional-guidance mx-auto w-full max-w-[25rem] shrink-0 px-3 pt-2">
+    <div
+      className="devotional-guidance mx-auto w-full max-w-[25rem] shrink-0 px-3 pt-2"
+      style={expanded ? undefined : { width: "max-content" }}
+    >
       <div
         data-testid="counter-tap-hint"
+        data-expanded={expanded}
         className="counter-tap-hint flex min-h-11 items-center justify-center gap-2 px-3 py-2 text-center text-label font-medium"
+        style={{ paddingBlock: 0, ...(!expanded ? { paddingInline: 0 } : {}) }}
       >
         {onToggle ? (
           <button

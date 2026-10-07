@@ -177,7 +177,10 @@ for (const language of ["ar", "en"] as const) {
       await expect(actions).toBeVisible();
       await expect(actions.getByRole("button")).toHaveCount(3);
       await expect(hint).toBeVisible();
-      await expect(hint.locator("svg:visible")).toHaveCount(1);
+      await expect(hint.locator("svg:visible")).toHaveCount(width < 768 ? 1 : 2);
+      await expect(
+        hint.getByRole("button", { name: language === "ar" ? "إخفاء إرشادات العد" : "Hide counting guidance" }),
+      ).toHaveAttribute("aria-expanded", "true");
       await expect(async () => {
         const hintBox = (await hint.boundingBox())!;
         const supportBox = (await actions.boundingBox())!;

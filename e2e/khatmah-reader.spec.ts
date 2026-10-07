@@ -317,6 +317,25 @@ test("fits a two-page desktop spread with a focused rail and returns to one page
   });
   expect(spreadGeometry.widthDelta).toBeLessThanOrEqual(1);
   expect(spreadGeometry.heightDelta).toBeLessThanOrEqual(1);
+  for (const viewport of [
+    { width: 1600, height: 834 },
+    { width: 1920, height: 1080 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await expect
+      .poll(async () =>
+        page.locator(".mushaf-page-frame").evaluateAll(
+          (frames) =>
+            frames.length === 2 &&
+            frames.every((frame) => {
+              const bounds = frame.getBoundingClientRect();
+              return bounds.width <= bounds.height * 0.73 && bounds.width > 300;
+            }),
+        ),
+      )
+      .toBe(true);
+  }
+  await page.setViewportSize({ width: 1280, height: 720 });
   await expect(page.getByTestId("mushaf-top-left-back")).toHaveCount(0);
   await expect(page.getByTestId("mushaf-more-actions")).toHaveCount(0);
   await expect(page.getByTestId("mushaf-rail-page-bookmark")).toBeVisible();

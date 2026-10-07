@@ -35,6 +35,8 @@ describe("combined counting guidance", () => {
     view.rerender(<CounterGuidance language="en" direction="ltr" hasStarted />);
     await waitFor(() => expect(screen.getByRole("button", { name: "Show counting guidance" })).toBeInTheDocument());
     expect(window.localStorage.getItem("azkarapp.counter-guidance.v1")).toBe("true");
+    expect(screen.getByTestId("counter-tap-hint")).toHaveAttribute("data-expanded", "false");
+    expect(screen.getByTestId("counter-tap-hint").parentElement).toHaveStyle({ width: "max-content" });
 
     fireEvent.click(screen.getByTestId("counter-guidance-reopen"));
     expect(screen.getByRole("button", { name: "Hide counting guidance" })).toHaveAttribute("aria-expanded", "true");

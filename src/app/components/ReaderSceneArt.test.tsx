@@ -23,7 +23,8 @@ describe("Reader scene", () => {
     render(<Header title="Morning Azkar" decoration={<ReaderSceneArt category="morning" compact />} />);
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Morning Azkar");
     expect(screen.getByTestId("shared-screen-header")).toHaveStyle({ minHeight: "56px" });
-    expect(screen.getByTestId("reader-scene")).toHaveClass("reader-scene--compact");
+    expect(screen.queryByTestId("reader-scene")).not.toBeInTheDocument();
+    expect(screen.getByTestId("shared-screen-header")).toHaveAttribute("data-header-contrast", "solid");
   });
 
   it("allows the Reader to match its borderless back button without changing ordinary headers", () => {
