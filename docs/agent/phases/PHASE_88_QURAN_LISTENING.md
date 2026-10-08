@@ -55,6 +55,8 @@ Synthetic test-only annotations cover exact recording identity, independent revi
 
 The earlier full run produced 731 passes, one existing skip and four failures. Concurrent browser invocations rebuild the same `.playwright-dist`, and three failures showed missing lazy-loaded sections or root loading errors. All four scenarios passed in isolation. That run and interrupted intermediate snapshots are superseded by the successful final isolated full run; it is not recorded as a pass. No assertion, retry policy, timeout, coverage threshold or bundle ceiling was weakened.
 
+The first push was blocked before transmission: Pages CSS measured 28,676 gzip bytes against the unchanged 28,672-byte ceiling. Reusing the existing 4px margin-marker width utility removed the new width rule; `pnpm build:pages` then passed at 28,672 gzip bytes. The affected three-engine suite passed again: 12 tests, 1.3 minutes (`output/phase88-budget-feature.log`). The full run above precedes this isolated marker-width adjustment; CI exercises the final exact commit. No budget or baseline was raised. The pre-push hook passed frozen install, the full check in 60.7 seconds and 26 smoke tests in 1.0 minute before identifying the Pages failure.
+
 ## Visual/manual evidence
 
 Browser screenshots in `output/playwright/quran88/final-browser/` cover all four pages at 390px and 320px across Chromium, Firefox and WebKit. `output/playwright/quran88/controls-qcf-final.png` records the loaded Al-Kahf QCF page and retained unavailable-alignment explanation. Manual browser inspection confirmed `qcf-v2-page-293`, RTL direction and the Next control's actual pointer target. Visual review corrected the paper's stacking over sticky controls and retained the unavailable explanation in that area; regressions check positions and pointer hit testing. The complete local run passed. Hook, CI and production results are recorded after the authorized push in `output/phase88-release-verification.md`. Human screen-reader and physical-device checks remain outstanding; no such results are claimed.
@@ -69,7 +71,7 @@ DECISION_LOG records approval of all three recommendations and the owner's expli
 
 ## Known limitations or remaining risks
 
-No production recording has reviewed verse/word timestamps. The annotation catalog intentionally remains empty, so automatic following and learner word emphasis are not yet enabled. Phrase looping requires separately reviewed phrase boundaries and is outside this phase. Collapsing/reopening resets manual page browsing while audio continues. Printed pages may include adjacent-surah text. Structural validation cannot replace listening review. Manual assistive-technology checks remain necessary.
+No production recording has reviewed verse/word timestamps. The annotation catalog intentionally remains empty, so automatic following and learner word emphasis are not yet enabled. Phrase looping requires separately reviewed phrase boundaries and is outside this phase. Collapsing/reopening resets manual page browsing while audio continues. Printed pages may include adjacent-surah text. Structural validation cannot replace listening review. Pages CSS is at the existing gzip ceiling; further styling must reuse or simplify existing rules. Manual assistive-technology checks remain necessary.
 
 ## Out-of-scope findings
 

@@ -265,7 +265,7 @@ const MushafTextLine = memo(function MushafTextLine({
         <span
           aria-hidden="true"
           data-playback-line=""
-          className="absolute h-3 w-0.5 rounded-full bg-current"
+          className="absolute h-3 w-1 rounded-full bg-current"
           style={{ insetInlineStart: "-0.25rem" }}
         />
       )}
