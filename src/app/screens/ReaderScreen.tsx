@@ -700,7 +700,8 @@ export function ReaderScreen({
     arabicLength: z.arabicText.length,
     longSurah,
   });
-  const readingFontFamily = "var(--font-zikr)";
+  const readingFontFamily =
+    z.quranText || z.attributionType === "quranic_supplication" ? "var(--font-mushaf)" : "var(--font-zikr)";
   const readingPercent = azkar.length > 0 ? Math.round((readingProgressValue / azkar.length) * 100) : 0;
   const readerZikrTitle = getReaderZikrTitle(z, language);
   const localizedReadingPercent = formatNumerals(readingPercent, language);

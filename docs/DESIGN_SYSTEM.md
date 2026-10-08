@@ -658,3 +658,7 @@ Aligned desktop prayer column (2026-10-05): when prayer detail is expanded, the 
 
 Reader options (2026-10-07): below the existing 600px compact breakpoint, Reader options use the shared modal bottom sheet with native buttons and collapsible listening, collection-action and counter sections. Focus mode, text size, saved state and the complete/core Azkar-list radio selector stay visible. At medium/wide tiers, retain the Radix dropdown and keyboard navigation with labelled secondary groups. Current-zikr and collection listening/sharing have distinct accessible labels. Escape/close returns focus to the Reader trigger; settings changes stay in the sheet.
 `CounterTapHint` retains its full-width row when collapsed so the hand target stays at the logical start when toggled. First-count dismissal is recorded even while already hidden; later expansion is controlled only by the reader. Search results show a localized surah title with an excerpt around the matching original words.
+
+## Quran listening typography
+
+The expanded player uses the existing fifteen-line Mushaf canvas and matching per-page QCF glyph/font pair for reviewed long surahs. Unicode Quran passages use `--font-mushaf` (Amiri Quran), independently of the ordinary zikr font. Listening pages have no inline ayah action buttons. Future reviewed cues use quiet verse shading and optional word underlining/outline, with no word live announcements or focus movement. Following starts off; manual page turns or scrolling pause it.

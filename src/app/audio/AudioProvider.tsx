@@ -54,6 +54,8 @@ export interface AudioController {
   preferences: AudioPreferences;
   currentEntry: PlaybackEntry | null;
   currentSegment: ResolvedAudioSegment | null;
+  /** Read-only clock access for reviewed learner alignment; never creates another media element. */
+  getPlaybackTime?: () => number;
   startPlan: (plan: PlaybackPlan, options?: { initialEntryIndex?: number; autoPlay?: boolean }) => boolean;
   selectEntry: (entryIndex: number, autoPlay?: boolean) => boolean;
   play: () => void;
@@ -101,6 +103,7 @@ export function AudioProvider({
   const [state, rawDispatch] = useReducer(audioReducer, preferences.playbackRate, createInitialAudioState);
   const stateRef = useRef(state);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const getPlaybackTime = useCallback(() => audioRef.current?.currentTime ?? 0, []);
   const generationRef = useRef(0);
   const removeListenersRef = useRef<() => void>(() => undefined);
 
@@ -615,6 +618,7 @@ export function AudioProvider({
       preferences,
       currentEntry,
       currentSegment,
+      getPlaybackTime,
       startPlan,
       selectEntry,
       play,
@@ -640,6 +644,7 @@ export function AudioProvider({
       currentEntry,
       currentSegment,
       next,
+      getPlaybackTime,
       pause,
       play,
       preferences,

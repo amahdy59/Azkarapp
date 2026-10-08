@@ -113,3 +113,7 @@ Changing a page range requires the same independent source review as adding it. 
 - Run `pnpm check`; for layout or interaction changes also run the relevant Playwright spec or `pnpm test:e2e`.
 
 The comprehensive dua collection is the reference example for lazy session content: `comprehensiveDuas.ts` contains an optional introduction, 20 essential items, and reviewed additional items with direct Arabic benefits, sources, contexts, and attribution types. Its Azkar Library category opens the standard collection, counter, completion, progress, and saved-item flow; Friday Mode references that same content and can start the same session. Keep large optional collections lazy and inject them into the shared session components rather than duplicating either content or UI.
+
+## Listening timestamp review
+
+Quran text and audio alignment have separate reviews. Do not invent or interpolate approved timestamps. Register only independently reviewed timings for the exact approved variant checksum, following [Quran timing authoring](audio/QURAN_TIMING_AUTHORING.md). `node scripts/validate-quran-timings.mjs` is part of `pnpm check` and checks recording identity, complete ordered verse coverage and shipped semantic word positions.

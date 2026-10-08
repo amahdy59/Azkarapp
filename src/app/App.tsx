@@ -2244,6 +2244,8 @@ function AppContent({
                         <FloatingAudioPlayer
                           controller={audioController}
                           textSize={textSize}
+                          mushafTheme={mushafTheme === "follow-app" ? themeMode : mushafTheme}
+                          mushafTextScale={mushafTextScale}
                           language={selectedLang}
                           direction={layoutDirection}
                           overReadingSurface
@@ -2497,6 +2499,8 @@ function AppContent({
             <FloatingAudioPlayer
               controller={audioController}
               textSize={textSize}
+              mushafTheme={mushafTheme === "follow-app" ? themeMode : mushafTheme}
+              mushafTextScale={mushafTextScale}
               language={selectedLang}
               direction={layoutDirection}
               overReadingSurface={view === "reader" || view === "custom_counter" || view === "friday_salawat"}

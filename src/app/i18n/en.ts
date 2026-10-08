@@ -992,6 +992,16 @@ const en = {
       "May this bring barakah to your day.",
     ],
   },
+  quranListening: {
+    reader: "Mushaf while listening",
+    follow: "Follow recitation",
+    words: "Highlight words",
+    unavailable: "Following is not available for this recitation yet. You can browse the Mushaf while listening.",
+    browseHint: "Changing pages pauses following. Turn Follow recitation on to return to the current verse.",
+    pageError: "The Mushaf page layout could not be loaded. You can still read the Quran text.",
+    loading: "Loading Mushaf page…",
+    translation: "English meaning",
+  },
   audioPlayer: {
     region: "Audio player",
     play: "Play audio",

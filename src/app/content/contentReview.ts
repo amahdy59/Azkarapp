@@ -333,6 +333,12 @@ export function applyContentReview(items: ZikrDraft[]): Zikr[] {
             : item.id.startsWith("friday-kahf-")
               ? `quran-018-${item.id.slice(-3)}`
               : `zikr:${item.id}`),
+        quranText: Boolean(
+          QURAN_CONTENT_BY_ID[item.id as keyof typeof QURAN_CONTENT_BY_ID] ||
+          item.isSurah ||
+          item.attributionType === "quranic_supplication" ||
+          ["m-hm-83", "e-hm-83", "da-ref-5"].includes(item.id),
+        ),
         audioBehavior: getAudioBehavior(item),
         ...(audioAssetId ? { audioAssetId } : {}),
       }) as Zikr;

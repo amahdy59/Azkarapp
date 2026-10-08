@@ -42,6 +42,7 @@ const CONCURRENT = [
   { name: "lint", command: "eslint . --max-warnings 0" },
   { name: "format", command: "prettier --check ." },
   { name: "audio manifest", command: "node scripts/validate-audio-manifest.mjs --local" },
+  { name: "Quran timings", command: "node scripts/validate-quran-timings.mjs" },
   { name: "type scale", command: "node scripts/check-type-scale.mjs" },
   { name: "motion rules", command: "node scripts/check-motion-rules.mjs" },
 ];

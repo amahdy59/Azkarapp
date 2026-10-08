@@ -87,6 +87,13 @@ function createController(): AudioController {
 }
 
 describe("FloatingAudioPlayer", () => {
+  it("uses Quran typography for an explicitly reviewed Quran excerpt even when its audio category is dua", () => {
+    const controller = createController();
+    controller.currentEntry = { ...entry, contentKind: "dua", quranText: true, arabicText: "fixture" };
+    render(<FloatingAudioPlayer controller={controller} language="ar" />);
+    fireEvent.click(screen.getByRole("button", { name: "توسيع المشغل" }));
+    expect(screen.getByTestId("audio-player-zikr-text")).toHaveStyle({ fontFamily: "var(--font-mushaf)" });
+  });
   beforeEach(() => {
     Object.defineProperty(window, "matchMedia", {
       configurable: true,

@@ -57,6 +57,8 @@ export function resolveAudioAssetById(
           return {
             id: segment.id,
             variantId: variant.id,
+            sha256: variant.sha256,
+            ...(segment.quranReference ? { quranReference: { ...segment.quranReference } } : {}),
             voiceId,
             voiceName: variant.voiceName,
             sourceName: source.name,

@@ -1,15 +1,13 @@
 {
-  "release": "2026-10-08.1",
+  "release": "2026-10-08.2",
   "ar": [
-    "تفتح أيقونة اليد إرشادات العدّ وتغلقها بضغطة واحدة، حتى بعد بدء العدّ.",
-    "يعرض البحث أدعية المكتبة نفسها، ويحتفظ بعبارة البحث عند الرجوع من القراءة.",
-    "تظهر أسماء السور ومقتطفات المطابقة بوضوح، وفتح نتيجة لا يغيّر اختيارك لقائمة الأذكار.",
-    "تحترم اختصارات التنقل اللوحات المفتوحة وتحافظ على طريق الرجوع إلى القراءة."
+    "يمكنك تصفح صفحات المصحف داخل مشغل البقرة والكهف والسجدة والملك أثناء الاستماع.",
+    "تظهر المقاطع القرآنية بخط المصحف، مع خط بديل واضح عند تعذّر تحميل خط الصفحة.",
+    "توضح التلاوات التي لا تتوفر لها أوقات مراجعة أن متابعة النص غير متاحة بعد، مع بقاء التصفح متاحًا."
   ],
   "en": [
-    "The hand icon opens and closes counting guidance with one click, including after counting starts.",
-    "Search includes the same duas as the Library and retains your query when returning from reading.",
-    "Surah names and matching excerpts are clearer, and opening a result preserves your saved Azkar list choice.",
-    "Navigation shortcuts respect open panels and preserve your route back to reading."
+    "Browse Mushaf pages inside the audio player while listening to Baqarah, Kahf, Sajdah and Mulk.",
+    "Quran passages use Quran typography, with a readable fallback when a page font cannot load.",
+    "Recitations without reviewed timings clearly explain that text following is not available yet; manual browsing remains available."
   ]
 }

@@ -16,6 +16,7 @@ import { QURAN_AUDIO_REVIEW_CANDIDATES, REJECTED_LEGACY_AUDIO_MATCHES } from "./
 import { resolveAudioAsset } from "./resolveAudioAsset";
 import type { AudioAsset, AudioCatalog } from "./audioTypes";
 import { validateAudioCatalog } from "./validateAudioCatalog";
+import { FRIDAY_KAHF } from "../content/fridayKahf";
 
 const SHA256 = "a".repeat(64);
 
@@ -74,6 +75,31 @@ function catalogFor(zikrs: readonly Zikr[], voices = ["voice-a"]): { catalog: Au
 }
 
 describe("explicit audio content architecture", () => {
+  it("carries reviewed page boundaries, Quran ranges and exact recording checksums for all four long surahs", () => {
+    const zikrs = [...ALL_AZKAR, ...FRIDAY_KAHF].filter((zikr) =>
+      ["ir-baqarah", "friday-kahf", "s-hm-110a", "s-hm-110b"].includes(zikr.id),
+    );
+    expect(zikrs).toHaveLength(4);
+    for (const zikr of zikrs) {
+      const plan = buildPlaybackPlan({
+        zikrs: [zikr],
+        context: { category: zikr.category, source: "single", routineMode: "complete" },
+        baseUrl: "https://audio.example.test",
+        audioLanguage: "ar",
+      });
+      const entry = plan.entries[0]!;
+      expect(entry.mushafPages).toEqual(zikr.mushafPages);
+      expect(entry.mushafPages).not.toBe(zikr.mushafPages);
+      expect(Object.isFrozen(entry.mushafPages)).toBe(true);
+      expect(entry.quranRange?.ayahEnd).toBe(zikr.verseCount);
+      for (const segments of Object.values(entry.segmentsByVoice))
+        for (const segment of segments) {
+          expect(segment.sha256).toMatch(/^[a-f0-9]{64}$/);
+          expect(segment.quranReference).toEqual(entry.quranRange);
+        }
+      expect(zikr.quranText).toBe(true);
+    }
+  });
   it("quarantines rejected Arabic recordings while preserving reading and approved English narration", () => {
     for (const id of ["m-hm-96", "e-hm-96"]) {
       const zikr = ALL_AZKAR.find((item) => item.id === id)!;

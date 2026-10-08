@@ -216,6 +216,8 @@ export interface Zikr {
   ritualGroupId?: RitualGroupId;
   isCollectionIntroduction?: boolean;
   isSurah?: boolean;
+  /** Explicit Quran presentation role; never inferred from citations. */
+  quranText?: boolean;
   surahNameArabic?: string;
   surahNameEnglish?: string;
   surahType?: "Meccan" | "Medinan" | "مكية" | "مدنية";

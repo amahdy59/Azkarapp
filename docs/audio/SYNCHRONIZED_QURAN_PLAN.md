@@ -1,6 +1,6 @@
 # Qur'an listening typography and synchronization proposal — 2026-10-08
 
-This is a design and engineering proposal, not an implemented feature or a claim that the current recordings have timing annotations. The owner asked about embedded Mushaf pages, learner-oriented highlighting and consistent Qur'an typography while authorizing the separate usability fixes.
+This proposal records the original delivery recommendations. [Phase 88](../agent/phases/PHASE_88_QURAN_LISTENING.md) implements shared Mushaf presentation, Quran typography and the review-ready verse/word following system. The current recordings still have no reviewed timing annotations; following remains unavailable. [Timing authoring](QURAN_TIMING_AUTHORING.md) defines the independent review required to enable it.
 
 ## Current evidence
 

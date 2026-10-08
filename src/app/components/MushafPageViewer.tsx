@@ -139,6 +139,7 @@ function MushafSurahHeader({
       className="relative flex h-full w-full min-w-0 items-center justify-center select-none"
       dir="rtl"
       data-testid="mushaf-surah-heading"
+      data-mushaf-surah-number={surahNumber}
       data-variant="pill"
     >
       {!hideArtwork && (
@@ -230,6 +231,8 @@ const MushafTextLine = memo(function MushafTextLine({
   meanings,
   activeWord,
   highlightedVerseKey,
+  readOnly = false,
+  highlightedWord,
   justifyCenter = false,
   onActiveWordChange,
   onAyahAction,
@@ -244,6 +247,8 @@ const MushafTextLine = memo(function MushafTextLine({
    *  re-rendered all fifteen lines every time a popover opened. */
   activeWord: ActiveWord | null;
   highlightedVerseKey?: string | null;
+  readOnly?: boolean;
+  highlightedWord?: { verseKey: string; position: number } | null;
   justifyCenter?: boolean;
   onActiveWordChange: (word: ActiveWord | null) => void;
   onAyahAction?: (verseKey: string) => void;
@@ -252,7 +257,18 @@ const MushafTextLine = memo(function MushafTextLine({
     // The slot deliberately does not clip: the fitter already guarantees the
     // line fits the page width, and Arabic diacritics reach into the space
     // between lines exactly as they do in print.
-    <div data-mushaf-line="" className="flex h-full w-full min-w-0 items-center justify-center">
+    <div
+      data-mushaf-line=""
+      className={`flex h-full w-full min-w-0 items-center justify-center ${readOnly ? "relative" : ""}`}
+    >
+      {readOnly && highlightedVerseKey && words.some((word) => word.verseKey === highlightedVerseKey) && (
+        <span
+          aria-hidden="true"
+          data-playback-line=""
+          className="absolute h-3 w-0.5 rounded-full bg-current"
+          style={{ insetInlineStart: "-0.25rem" }}
+        />
+      )}
       {/* QCF glyph advances preserve printed spacing; the canvas never stretches word gaps. */}
       <div
         data-mushaf-line-content=""
@@ -267,6 +283,23 @@ const MushafTextLine = memo(function MushafTextLine({
           const key = `${w.verseKey}:${w.position}:${wIdx}`;
           const meaning = meanings.get(`${w.verseKey}:${w.position}`);
 
+          if (w.isEnd && readOnly) {
+            return (
+              <span
+                key={key}
+                aria-hidden="true"
+                className={
+                  highlightedVerseKey === w.verseKey ? "bg-primary/20 rounded-sm ring-2 ring-primary/55" : undefined
+                }
+              >
+                {useQcfGlyphs && w.qcfCode ? (
+                  w.qcfCode
+                ) : (
+                  <AyahMarker number={w.verseKey.split(":")[1] || w.text} language={language} theme={_theme} />
+                )}
+              </span>
+            );
+          }
           if (w.isEnd) {
             return (
               <button
@@ -349,7 +382,12 @@ const MushafTextLine = memo(function MushafTextLine({
           return (
             <span
               key={key}
-              className={`shrink-0 rounded-sm ${highlightedVerseKey === w.verseKey ? "bg-primary/20" : ""}`}
+              data-playback-verse={highlightedVerseKey === w.verseKey ? w.verseKey : undefined}
+              data-listening-verse={readOnly ? w.verseKey : undefined}
+              data-playback-word={
+                highlightedWord?.verseKey === w.verseKey && highlightedWord.position === w.position ? "true" : undefined
+              }
+              className={`shrink-0 rounded-sm ${highlightedVerseKey === w.verseKey ? "bg-primary/20" : ""} ${highlightedWord?.verseKey === w.verseKey && highlightedWord.position === w.position ? "ring-2 ring-primary/55 underline underline-offset-4" : ""}`}
               aria-hidden={!showWordMeanings}
               onContextMenu={(e) => {
                 e.preventDefault();
@@ -745,6 +783,8 @@ function MushafPageCanvas({
   isFloatingLayout = false,
   onAyahAction,
   highlightedVerseKey,
+  readOnly = false,
+  highlightedWord,
   onSurahClick,
   onJuzClick,
   onPageClick,
@@ -773,6 +813,8 @@ function MushafPageCanvas({
   isFloatingLayout?: boolean;
   onAyahAction?: (verseKey: string, pageNumber: number) => void;
   highlightedVerseKey?: string | null;
+  readOnly?: boolean;
+  highlightedWord?: { verseKey: string; position: number } | null;
   onSurahClick?: () => void;
   onJuzClick?: () => void;
   onPageClick?: () => void;
@@ -916,6 +958,8 @@ function MushafPageCanvas({
                           : null
                       }
                       highlightedVerseKey={highlightedVerseKey}
+                      readOnly={readOnly}
+                      highlightedWord={highlightedWord}
                       onActiveWordChange={handleActiveWordChange}
                       onAyahAction={handleAyahAction}
                     />
@@ -988,6 +1032,8 @@ function MushafPageCanvas({
                         : null
                     }
                     highlightedVerseKey={highlightedVerseKey}
+                    readOnly={readOnly}
+                    highlightedWord={highlightedWord}
                     onActiveWordChange={handleActiveWordChange}
                     onAyahAction={handleAyahAction}
                   />
@@ -1017,10 +1063,12 @@ function ScreenReaderVerses({
   lines,
   language,
   pageNumber,
+  highlightedVerseKey,
 }: {
   lines: MushafWordToken[][];
   language: AppLanguage;
   pageNumber: number;
+  highlightedVerseKey?: string | null;
 }) {
   const verses = useMemo(() => {
     const verseMap = new Map<string, string[]>();
@@ -1045,8 +1093,11 @@ function ScreenReaderVerses({
         const [surah, ayah] = key.split(":");
         const surahName = getSurahDisplayName(Number(surah), language);
         return (
-          <p key={key}>
-            {surahName}, {t(language, "reader.ayahLabel", { ayah: formatNumerals(Number(ayah), language) })}: {text}
+          <p key={key} aria-current={highlightedVerseKey === key ? "true" : undefined}>
+            {surahName}, {t(language, "reader.ayahLabel", { ayah: formatNumerals(Number(ayah), language) })}:{" "}
+            <span lang="ar" dir="rtl">
+              {text}
+            </span>
           </p>
         );
       })}
@@ -1557,5 +1608,62 @@ export function MushafPageViewer({
         </div>
       )}
     </article>
+  );
+}
+
+/** Read-only listening presentation: no reader actions or progress callbacks. */
+export function MushafListeningPage({
+  lines,
+  language,
+  pageNumber,
+  useQcfGlyphs,
+  highlightedVerseKey,
+  highlightedWord,
+  theme = "light",
+  textScale = "medium",
+}: {
+  lines: MushafWordToken[][];
+  language: AppLanguage;
+  pageNumber: number;
+  useQcfGlyphs: boolean;
+  theme?: MushafPageTheme;
+  textScale?: MushafTextScale;
+  highlightedVerseKey?: string | null;
+  highlightedWord?: { verseKey: string; position: number } | null;
+}) {
+  return (
+    <>
+      <div
+        aria-hidden="true"
+        className={`theme-${theme} relative isolate flex w-full flex-col rounded-lg bg-background text-foreground`}
+        dir="rtl"
+        lang="ar"
+        style={{ height: "36rem", minHeight: "36rem" }}
+      >
+        <MushafPageCanvas
+          lines={lines}
+          language={language}
+          pageNumber={pageNumber}
+          direction="rtl"
+          theme={theme}
+          useQcfGlyphs={useQcfGlyphs}
+          showWordMeanings={false}
+          inkStroke={{ midnight: "0.016em", dark: "0.016em", oled: "0.012em", light: "0.021em" }[theme]}
+          textScale={textScale}
+          showPageIdentity={false}
+          readOnly
+          highlightedVerseKey={highlightedVerseKey}
+          highlightedWord={highlightedWord}
+        />
+      </div>
+      <div className="sr-only">
+        <ScreenReaderVerses
+          lines={lines}
+          language={language}
+          pageNumber={pageNumber}
+          highlightedVerseKey={highlightedVerseKey}
+        />
+      </div>
+    </>
   );
 }

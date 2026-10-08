@@ -318,3 +318,7 @@ ReadingTextTransition owns presentation-only directional entry changes for Reade
 
 Counter guidance follows the same boundary: `CounterGuidance` owns presentation and disclosure while `useCounterGuidance` owns the small device-local dismissal marker. A first count collapses the explanation, and reopening it never changes counter state. The shared `Header` keeps an opaque semantic background and contrast-safe border so optional decoration cannot become the contrast surface for interactive content.
 `content/searchCatalog.ts` shares the Library and Search inventory and resolves lazy dua results by stable ID. Search edits replace the current query route. Lookup reading uses visit-local complete-list context, preserving the saved routine preference; global shortcuts push history and defer to modal/menu ownership.
+
+## Quran listening presentation and alignment
+
+Phase 88 reuses the shared Mushaf canvas in the expanded player with display-only page state and no progress/bookmark writes. Playback plans carry reviewed page/range metadata and resolved recording checksums. Exact-file annotations must pass runtime review/identity validation and the semantic authoring check before following is enabled. The shipped timing catalog is empty. See [timing authoring](audio/QURAN_TIMING_AUTHORING.md).

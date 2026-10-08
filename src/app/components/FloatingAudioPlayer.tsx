@@ -1,5 +1,7 @@
 import "./floating-audio-player.css";
 import {
+  lazy,
+  Suspense,
   useCallback,
   useId,
   useEffect,
@@ -22,7 +24,7 @@ import {
   SkipForward,
   X,
 } from "./icons";
-import type { AppLanguage, TextSizeOption } from "../types";
+import type { AppLanguage, TextSizeOption, MushafPageTheme, MushafTextScale } from "../types";
 import { getReadingFontSizeRem } from "../screens/readingTypography";
 import type { AudioController } from "../audio/AudioProvider";
 import { formatNumerals } from "../formatting";
@@ -35,6 +37,8 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { t } from "../i18n";
 import { ReadingTextTransition } from "./ReadingTextTransition";
 import { AudioPlayerSurface } from "./AudioPlayerSurface";
+
+const QuranListeningReader = lazy(() => import("./QuranListeningReader"));
 
 /** Existing supported speeds, shown explicitly in the selection menu. */
 const PLAYBACK_RATES = [0.8, 1, 1.25, 1.5, 2] as const;
@@ -113,10 +117,14 @@ export function FloatingAudioPlayer({
   dockSlots,
   onClose,
   textSize = "medium",
+  mushafTheme = "light",
+  mushafTextScale = "medium",
 }: {
   controller: AudioController;
   language: AppLanguage;
   textSize?: TextSizeOption;
+  mushafTheme?: MushafPageTheme;
+  mushafTextScale?: MushafTextScale;
   direction?: "ltr" | "rtl";
   /**
    * The player is covering something being read — today, the Mushaf.
@@ -624,73 +632,103 @@ export function FloatingAudioPlayer({
                 className="audio-expanded-text mt-2 flex min-h-0 w-full flex-1 flex-col items-center overflow-y-auto overscroll-contain px-4 py-1 sm:px-8 select-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-ring/40"
                 style={{ scrollbarGutter: "stable both-edges" }}
               >
-                <ReadingTextTransition
-                  entryId={currentEntry.entryId}
-                  index={state.entryIndex}
-                  direction={direction}
-                  reduceMotion={Boolean(motionReduced)}
-                  className="w-full max-w-2xl shrink-0 py-2 text-center"
-                >
-                  <div className="flex w-full flex-col items-center justify-center">
-                    {englishFirst && (
-                      <>
+                {currentEntry.contentKind === "quran" && currentEntry.quranRange && currentEntry.mushafPages?.length ? (
+                  <Suspense fallback={<p role="status">{t(language, "quranListening.loading")}</p>}>
+                    <QuranListeningReader
+                      key={currentEntry.entryId}
+                      entry={currentEntry}
+                      segment={controller.currentSegment}
+                      currentTime={state.currentTime}
+                      playing={state.status === "playing"}
+                      readTime={state.status === "loading" ? undefined : controller.getPlaybackTime}
+                      theme={mushafTheme}
+                      textScale={mushafTextScale}
+                      language={language}
+                    />
+                    {currentEntry.translation && language === "en" && (
+                      <details className="w-full py-2">
+                        <summary className="min-h-11 cursor-pointer rounded-lg px-3 py-3 focus-visible:ring-[3px] focus-visible:ring-ring">
+                          {t(language, "quranListening.translation")}
+                        </summary>
+                        <p dir="ltr" lang="en" className="text-center leading-relaxed">
+                          {currentEntry.translation}
+                        </p>
+                      </details>
+                    )}
+                  </Suspense>
+                ) : (
+                  <ReadingTextTransition
+                    entryId={currentEntry.entryId}
+                    index={state.entryIndex}
+                    direction={direction}
+                    reduceMotion={Boolean(motionReduced)}
+                    className="w-full max-w-2xl shrink-0 py-2 text-center"
+                  >
+                    <div className="flex w-full flex-col items-center justify-center">
+                      {englishFirst && (
+                        <>
+                          <p
+                            data-testid="audio-player-zikr-text"
+                            className="w-full text-center text-lg sm:text-xl leading-relaxed text-foreground"
+                            dir="ltr"
+                            lang="en"
+                          >
+                            {currentEntry.translation}
+                          </p>
+                          <button
+                            type="button"
+                            aria-expanded={showArabic}
+                            aria-controls={arabicTextId}
+                            onClick={() => setShowArabic((visible) => !visible)}
+                            className="mt-2 inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-3 text-sm font-medium text-primary hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                          >
+                            {t(language, showArabic ? "audioPlayer.hideArabic" : "audioPlayer.showArabic")}
+                            {showArabic ? (
+                              <ChevronUp size={16} aria-hidden="true" />
+                            ) : (
+                              <ChevronDown size={16} aria-hidden="true" />
+                            )}
+                          </button>
+                        </>
+                      )}
+                      {language === "en" && !englishFirst && (
+                        <p className="mb-2 text-sm leading-relaxed text-muted-foreground" lang="en" dir="ltr">
+                          {t(language, "audioPlayer.translationUnavailable")}
+                        </p>
+                      )}
+                      <p
+                        id={arabicTextId}
+                        hidden={englishFirst && !showArabic}
+                        data-testid={englishFirst ? "audio-player-arabic-text" : "audio-player-zikr-text"}
+                        className={`zikr-text text-center font-medium leading-loose text-foreground ${englishFirst ? "mt-2 w-full border-t border-border pt-3" : ""}`}
+                        style={{
+                          fontFamily:
+                            currentEntry.quranText || currentEntry.contentKind === "quran"
+                              ? "var(--font-mushaf)"
+                              : undefined,
+                          fontSize: getReadingFontSizeRem({
+                            textSize,
+                            arabicLength: zikrArabicText.length,
+                            longSurah: false,
+                          }),
+                        }}
+                        dir="rtl"
+                        lang="ar"
+                      >
+                        {zikrArabicText}
+                      </p>
+                      {!englishFirst && isEnglishMode && currentEntry.translation && (
                         <p
-                          data-testid="audio-player-zikr-text"
-                          className="w-full text-center text-lg sm:text-xl leading-relaxed text-foreground"
+                          className="mt-3 border-t border-border/40 pt-2 text-center text-sm sm:text-base leading-relaxed text-muted-foreground max-w-2xl"
                           dir="ltr"
                           lang="en"
                         >
                           {currentEntry.translation}
                         </p>
-                        <button
-                          type="button"
-                          aria-expanded={showArabic}
-                          aria-controls={arabicTextId}
-                          onClick={() => setShowArabic((visible) => !visible)}
-                          className="mt-2 inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-3 text-sm font-medium text-primary hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                        >
-                          {t(language, showArabic ? "audioPlayer.hideArabic" : "audioPlayer.showArabic")}
-                          {showArabic ? (
-                            <ChevronUp size={16} aria-hidden="true" />
-                          ) : (
-                            <ChevronDown size={16} aria-hidden="true" />
-                          )}
-                        </button>
-                      </>
-                    )}
-                    {language === "en" && !englishFirst && (
-                      <p className="mb-2 text-sm leading-relaxed text-muted-foreground" lang="en" dir="ltr">
-                        {t(language, "audioPlayer.translationUnavailable")}
-                      </p>
-                    )}
-                    <p
-                      id={arabicTextId}
-                      hidden={englishFirst && !showArabic}
-                      data-testid={englishFirst ? "audio-player-arabic-text" : "audio-player-zikr-text"}
-                      className={`zikr-text text-center font-medium leading-loose text-foreground ${englishFirst ? "mt-2 w-full border-t border-border pt-3" : ""}`}
-                      style={{
-                        fontSize: getReadingFontSizeRem({
-                          textSize,
-                          arabicLength: zikrArabicText.length,
-                          longSurah: false,
-                        }),
-                      }}
-                      dir="rtl"
-                      lang="ar"
-                    >
-                      {zikrArabicText}
-                    </p>
-                    {!englishFirst && isEnglishMode && currentEntry.translation && (
-                      <p
-                        className="mt-3 border-t border-border/40 pt-2 text-center text-sm sm:text-base leading-relaxed text-muted-foreground max-w-2xl"
-                        dir="ltr"
-                        lang="en"
-                      >
-                        {currentEntry.translation}
-                      </p>
-                    )}
-                  </div>
-                </ReadingTextTransition>
+                      )}
+                    </div>
+                  </ReadingTextTransition>
+                )}
               </div>
             </div>
           </div>

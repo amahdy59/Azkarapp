@@ -117,6 +117,11 @@ function freezePlan(plan: PlaybackPlan): PlaybackPlan {
     Object.freeze(entry.segmentsByVoice);
     Object.freeze(entry.availableVoiceIds);
     Object.freeze(entry.supportedModes);
+    if (entry.quranRange) Object.freeze(entry.quranRange);
+    if (entry.mushafPages) {
+      entry.mushafPages.forEach(Object.freeze);
+      Object.freeze(entry.mushafPages);
+    }
     Object.freeze(entry);
   }
   Object.freeze(plan.entries);
@@ -209,6 +214,9 @@ export function buildPlaybackPlan({
       ...(zikr.translation ? { translation: zikr.translation } : {}),
       ...(zikr.transliteration ? { transliteration: zikr.transliteration } : {}),
       contentKind: resolution.asset.contentKind,
+      ...(zikr.quranText || zikr.attributionType === "quranic_supplication" ? { quranText: true } : {}),
+      ...(resolution.asset.requiredQuranRange ? { quranRange: { ...resolution.asset.requiredQuranRange } } : {}),
+      ...(zikr.mushafPages ? { mushafPages: zikr.mushafPages.map((page) => ({ ...page })) } : {}),
       repetitions,
       prescribedRepetitions: zikr.repetitionCount,
       playbackMode: mode === "repeat-prescribed-count" && canRepeat ? "repeat-prescribed-count" : "play-once",

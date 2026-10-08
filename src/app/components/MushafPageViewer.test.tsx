@@ -88,7 +88,7 @@ describe("MushafPageViewer", () => {
       />,
     );
     expect(screen.queryByRole("button", { name: /معنى كلمة/ })).not.toBeInTheDocument();
-    expect(screen.getByText("ٱلۡقَيُّومُ")).toBeInTheDocument();
+    expect(screen.getByText("ٱلۡقَيُّومُ", { selector: "[data-mushaf-line] span" })).toBeInTheDocument();
   });
 
   it("uses a compositor-only directional entrance for a settled page turn", () => {
@@ -195,7 +195,8 @@ describe("MushafPageViewer", () => {
       />,
     );
     expect(screen.getByText("")).toHaveAttribute("aria-hidden", "true");
-    expect(screen.getByText("يَـٰٓأَيُّهَا")).toHaveClass("sr-only");
+    expect(screen.getByText("يَـٰٓأَيُّهَا", { selector: "[data-mushaf-line] span" })).toHaveClass("sr-only");
+    expect(screen.getByRole("article").querySelector('.sr-only [lang="ar"]')).toHaveTextContent("يَـٰٓأَيُّهَا");
     expect(screen.getByRole("article").querySelector('[data-mushaf-rendering="qcf-v2"]')).not.toBeNull();
   });
 
@@ -288,7 +289,7 @@ describe("MushafPageViewer", () => {
     expect(bismillah).toHaveAttribute("role", "img");
     expect(screen.getAllByTestId("mushaf-surah-ornament")).toHaveLength(1);
     expect(screen.getByRole("heading", { level: 2, name: "سورة آل عمران" })).toBeInTheDocument();
-    expect(screen.getByText("الٓمٓ")).toBeInTheDocument();
+    expect(screen.getByText("الٓمٓ", { selector: "[data-mushaf-line] span" })).toBeInTheDocument();
   });
 });
 
@@ -446,7 +447,7 @@ describe("MushafPageViewer opening pages consistency (pages 1 & 2)", () => {
     const bismillah = screen.getByLabelText("بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ");
     expect(bismillah).toBeInTheDocument();
     expect(bismillah).toHaveAttribute("role", "img");
-    expect(screen.getByText("الٓمٓ")).toBeInTheDocument();
+    expect(screen.getByText("الٓمٓ", { selector: "[data-mushaf-line] span" })).toBeInTheDocument();
   });
 });
 

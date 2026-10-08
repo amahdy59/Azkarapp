@@ -1,4 +1,4 @@
-import type { CategoryId, RoutineMode, RitualGroupId, ZikrAudioMode } from "../types";
+import type { CategoryId, RoutineMode, RitualGroupId, ZikrAudioMode, MushafPageRange } from "../types";
 
 export type AudioReviewStatus = "pending" | "approved" | "rejected";
 export type AudioContentKind = "quran" | "dua";
@@ -83,6 +83,8 @@ export interface AudioCatalog {
 }
 
 export interface ResolvedAudioSegment {
+  sha256?: string;
+  quranReference?: AudioSegment["quranReference"];
   id: string;
   variantId: string;
   voiceId: string;
@@ -98,6 +100,9 @@ export interface ResolvedAudioSegment {
 }
 
 export interface PlaybackEntry {
+  quranText?: boolean;
+  quranRange?: AudioAsset["requiredQuranRange"];
+  mushafPages?: readonly MushafPageRange[];
   entryId: string;
   zikrId: string;
   canonicalKey: string;
