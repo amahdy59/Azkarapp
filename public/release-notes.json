@@ -1,13 +1,13 @@
 {
-  "release": "2026-10-08.4",
+  "release": "2026-10-08.5",
   "ar": [
-    "تصفح صفحات المصحف أثناء الاستماع إلى البقرة والكهف والسجدة والملك دون تغيير موضع القراءة المحفوظ.",
-    "اقرأ المقاطع القرآنية بخط مخصص للقرآن، مع نص بديل واضح عند تعذّر تحميل صفحة المصحف أو خطها.",
-    "مساحة أكبر للقرآن بأزرار صفحات صغيرة، وتوضيح متابعة التلاوة عند الطلب، دون ظهور النص فوق الأزرار أثناء التمرير."
+    "دعم تمييز الكلمات أثناء الاستماع بالعربية والإنجليزية للتسجيلات التي تتوفر لها توقيتات راجعها مختص.",
+    "يمكن إيقاف تمييز الكلمات دون إيقاف الصوت، مع احترام اختيارك لإظهار النص العربي أو إخفائه.",
+    "مدد أكثر دقة لتسجيلات أذكار المساء دون تغيير التسجيلات أو حذف الملفات التي نزلتها."
   ],
   "en": [
-    "Browse Mushaf pages while listening to Baqarah, Kahf, Sajdah and Mulk without changing your saved reading position.",
-    "Read Quran passages with dedicated Quran typography and a clear fallback when a Mushaf page or font cannot load.",
-    "More room for Quran text: compact page controls, text-following guidance on demand, and no text peeking above controls while scrolling."
+    "Word highlights are supported for Arabic and English recordings whose timings have been checked by a qualified reviewer.",
+    "Turn word highlights off without stopping playback; your choice to show or hide Arabic is respected.",
+    "More accurate evening-azkar recording durations, with your recordings and downloaded files preserved."
   ]
 }

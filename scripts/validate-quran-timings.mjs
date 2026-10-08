@@ -1,11 +1,29 @@
 import fs from "node:fs";
 import path from "node:path";
+import crypto from "node:crypto";
 import { loadTypeScriptModule } from "./load-typescript-module.mjs";
 
 const { AUDIO_CATALOG } = loadTypeScriptModule(path.resolve("src/app/audio/audioManifest.ts"));
 const { QURAN_TIMING_CATALOG, validateQuranTiming } = loadTypeScriptModule(
   path.resolve("src/app/audio/quranTimings.ts"),
 );
+const { REVIEWED_TIMING_FILES, reviewedTimingFilename } = loadTypeScriptModule("src/app/audio/reviewedTimingFiles.ts");
+const annotations = [...QURAN_TIMING_CATALOG];
+for (const file of REVIEWED_TIMING_FILES.filter((item) => item.kind === "quran")) {
+  const bytes = fs.readFileSync(path.join("public/data/listening-timings", reviewedTimingFilename(file)));
+  if (bytes.length > 750000 || crypto.createHash("sha256").update(bytes).digest("hex") !== file.annotationSha256)
+    throw new Error("Reviewed Quran annotation checksum or size differs.");
+  const annotation = JSON.parse(bytes.toString("utf8"));
+  if (
+    annotation.sha256 !== file.sha256 ||
+    file.language !== "ar" ||
+    file.textSha256 ||
+    file.variantIds.length !== 1 ||
+    annotation.variantId !== file.variantIds[0]
+  )
+    throw new Error("Quran timing file differs from its registration index.");
+  annotations.push(annotation);
+}
 const issues = [];
 const seen = new Set();
 const wordCounts = new Map();
@@ -17,7 +35,7 @@ for (const file of fs.readdirSync("public/data/mushaf")) {
     wordCounts.set(verse.k, positions);
   }
 }
-for (const annotation of QURAN_TIMING_CATALOG) {
+for (const annotation of annotations) {
   const identity = `${annotation.variantId}:${annotation.sha256}`;
   if (seen.has(identity)) issues.push(`${identity}: duplicate annotation`);
   seen.add(identity);
@@ -54,5 +72,5 @@ if (issues.length) {
   process.exitCode = 1;
 } else
   console.log(
-    `Quran timings validated: ${QURAN_TIMING_CATALOG.length} reviewed recordings. Zero means following remains unavailable.`,
+    `Quran timings validated: ${annotations.length} reviewed recordings. Zero means following remains unavailable.`,
   );

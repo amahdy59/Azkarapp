@@ -63,3 +63,7 @@ Expanded identity centers the reciter without a duplicate zikr title; queue and 
 ### Owner-approved repetition presentation (2026-10-04)
 
 Queue position and current/total repetition progress, including embedded recording counts, appear separately in the expanded footer beside the prescribed-repeat option. The header centers only the reciter, preserving the owner's current refinement. This supersedes the earlier header queue-position presentation without changing playback or completion.
+
+### Recording-specific Arabic and English word cues (Phase 89)
+
+`docs/audio/WORD_ALIGNMENT.md` defines offline draft authoring, independent review and immutable timing registration for all approved recordings. The expanded player highlights only the spoken language using exact display-word offsets and the existing media clock. Quran listening keeps the shared QCF/Amiri presentation; reviewed word emphasis starts enabled, while page following remains opt-in. Timing JSON is selected by recording/transcript identity, checked by annotation SHA and lazily cached on first use. Unreviewed or unavailable timing never changes readable content. Twenty-three evening WAV duration fields were corrected from their malformed header byte-rate estimates to browser-decoded PCM durations; paths, recording bytes/checksums and audio-cache manifest version 8 remain unchanged.

@@ -1,0 +1,90 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+}
+body {
+  margin: 0;
+  background: Canvas;
+  color: CanvasText;
+}
+main {
+  max-width: 70rem;
+  margin: auto;
+  padding: 1rem;
+}
+label {
+  display: block;
+  margin: 1rem 0;
+}
+select,
+input,
+button {
+  font: inherit;
+  min-height: 44px;
+  max-width: 100%;
+  padding: 0.4rem;
+}
+button {
+  cursor: pointer;
+  margin: 0.2rem;
+}
+audio {
+  width: 100%;
+}
+#identity {
+  overflow-wrap: anywhere;
+}
+#transcript {
+  font-size: 1.6rem;
+  line-height: 2.4;
+  max-height: 24rem;
+  overflow: auto;
+  padding: 0.5rem;
+  border: 1px solid GrayText;
+}
+#transcript button {
+  border: 1px solid transparent;
+  background: transparent;
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  border-radius: 0.25rem;
+}
+#transcript button[aria-current="true"] {
+  outline: 2px solid currentColor;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+#transcript button[data-flagged="true"] {
+  border-bottom: 2px dotted currentColor;
+}
+*:focus-visible {
+  outline: 3px solid Highlight;
+  outline-offset: 3px;
+}
+pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 20rem;
+  overflow: auto;
+}
+.confirmation {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.confirmation input {
+  min-width: 44px;
+}
+fieldset {
+  border: 1px solid GrayText;
+}
+#coverage,
+#status {
+  font-weight: 600;
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto;
+  }
+}

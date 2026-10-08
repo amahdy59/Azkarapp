@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Listening timing review</title>
+    <link rel="stylesheet" href="/review.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Listening timing review</h1>
+      <p>
+        Listen to the exact recording, choose the wording actually spoken, and check every word. Drafts never enable
+        production highlights automatically.
+      </p>
+      <label
+        >Recording
+        <select id="recording"></select></label
+      ><button id="refresh" type="button">Refresh drafts</button>
+      <p id="status" role="status"></p>
+      <p id="identity"></p>
+      <audio id="audio" controls preload="metadata"></audio>
+      <label
+        >Transcript candidate
+        <select id="candidate"></select
+      ></label>
+      <p id="coverage"></p>
+      <section aria-label="Transcript preview"><p id="transcript"></p></section>
+      <p>
+        Choose a word to replay and edit its boundary. Times are milliseconds in the original recording; pauses remain
+        unhighlighted. Use Left/Right arrows on a word to select its neighbour, or Home/End to reach the first/last
+        word.
+      </p>
+      <fieldset id="edit" disabled>
+        <legend id="selected">Selected word</legend>
+        <label>Start (ms) <input id="start" type="number" min="0" step="1" /></label
+        ><label>End (ms) <input id="end" type="number" min="1" step="1" /></label
+        ><label class="confirmation"
+          ><input id="unspoken" type="checkbox" />This printed token is not spoken in this recording (independent review
+          required).</label
+        ><button id="save" type="button">Apply boundary</button><button id="replay" type="button">Replay word</button>
+        <p id="flags"></p>
+      </fieldset>
+      <details>
+        <summary>Recognition evidence and unresolved concerns</summary>
+        <pre id="evidence"></pre>
+      </details>
+      <label>Independent reviewer name <input id="reviewer" autocomplete="name" /></label
+      ><label>Review date <input id="date" type="date" /></label>
+      <label class="confirmation"
+        ><input id="confirmed" type="checkbox" />I am an independent qualified reviewer. I checked the entire recording,
+        actual wording, every boundary, repeated occurrences, and all flagged words.</label
+      >
+      <button id="export" type="button">Export independently reviewed annotation</button
+      ><button id="draft" type="button">Save edits as unreviewed draft</button>
+      <p id="export-status" role="status"></p>
+    </main>
+    <script type="module" src="/review.js"></script>
+  </body>
+</html>

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { AppLanguage, MushafPageTheme, MushafTextScale } from "../types";
 import type { PlaybackEntry, ResolvedAudioSegment } from "../audio/audioTypes";
-import { resolveQuranTiming } from "../audio/quranTimings";
+import { useReviewedQuranTiming } from "../hooks/useReviewedListeningTiming";
 import { useQuranPlaybackCue } from "../hooks/useQuranPlaybackCue";
 import { useListeningMushafPage } from "../hooks/useListeningMushafPage";
 import { MushafListeningPage } from "./MushafPageViewer";
@@ -9,10 +9,10 @@ import { t } from "../i18n";
 import { formatNumerals } from "../formatting";
 import { splitMushafPages } from "../content/mushafPages";
 import * as Popover from "@radix-ui/react-popover";
-import { ChevronLeft, ChevronRight, Info, X } from "./icons";
+import { Check, ChevronLeft, ChevronRight, Info, X } from "./icons";
 
 const buttonClass =
-  "min-h-11 min-w-11 rounded-lg px-3 text-sm hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-50";
+  "inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-lg px-3 text-sm hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-50";
 
 function revealListeningTarget(root: HTMLElement | null, target: HTMLElement | null) {
   const viewport = root?.closest<HTMLElement>(".audio-expanded-text");
@@ -50,9 +50,9 @@ export default function QuranListeningReader({
   const pages = useMemo(() => entry.mushafPages ?? [], [entry.mushafPages]);
   const [manualIndex, setManualIndex] = useState(0);
   const [follow, setFollow] = useState(false);
-  const [words, setWords] = useState(false);
+  const [words, setWords] = useState(true);
   const [retry, setRetry] = useState(0);
-  const timing = useMemo(() => resolveQuranTiming(segment), [segment]);
+  const timing = useReviewedQuranTiming(segment);
   const cue = useQuranPlaybackCue(timing, currentTime, playing, readTime);
   const root = useRef<HTMLElement>(null);
   const positionedAtStart = useRef(false);
@@ -164,6 +164,7 @@ export default function QuranListeningReader({
             }}
           >
             {t(language, "quranListening.follow")}
+            {follow ? <Check size={16} aria-hidden="true" /> : null}
           </button>
         )}
         {hasWords && (
@@ -174,6 +175,7 @@ export default function QuranListeningReader({
             onClick={() => setWords((value) => !value)}
           >
             {t(language, "quranListening.words")}
+            {words ? <Check size={16} aria-hidden="true" /> : null}
           </button>
         )}
         <Popover.Root>

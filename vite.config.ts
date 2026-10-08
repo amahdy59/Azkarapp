@@ -255,6 +255,16 @@ export default defineConfig(({ mode }) => {
             "**/QiblaScreen-*.js",
           ],
           runtimeCaching: [
+            {
+              urlPattern: /\/data\/listening-timings\/(?:listening|quran)-[a-f0-9]{64}-[a-f0-9]{64}\.json$/,
+              handler: "CacheFirst" as const,
+              method: "GET" as const,
+              options: {
+                cacheName: "azkar-listening-timings-v1",
+                cacheableResponse: { statuses: [200] },
+                expiration: { maxEntries: 400, maxAgeSeconds: 365 * 24 * 60 * 60 },
+              },
+            },
             // The Mushaf page data now ships with the app, so no api.quran.com
             // route is needed. The QCF page fonts are stored explicitly by
             // src/app/content/qcfMushaf.ts in `azkar-qcf-fonts-v1`, which works

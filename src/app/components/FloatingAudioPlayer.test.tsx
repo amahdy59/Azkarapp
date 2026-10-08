@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import * as listeningTimings from "../audio/listeningTimings";
 import type { AudioController } from "../audio/AudioProvider";
 import { createInitialAudioState } from "../audio/audioReducer";
 import type { PlaybackEntry, PlaybackPlan, ResolvedAudioSegment } from "../audio/audioTypes";
@@ -87,6 +88,56 @@ function createController(): AudioController {
 }
 
 describe("FloatingAudioPlayer", () => {
+  afterEach(() => vi.restoreAllMocks());
+  it("reveals reviewed Arabic cues in the English interface and respects an explicit hide choice", async () => {
+    const controller = createController();
+    const arabic = "اللَّهُ";
+    controller.currentEntry = { ...entry, contentKind: "dua", arabicText: arabic, translation: "Allah" };
+    const resolver = vi.spyOn(listeningTimings, "resolveListeningTiming").mockReturnValue(null);
+    const { container, rerender } = render(<FloatingAudioPlayer controller={controller} language="en" />);
+    fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
+    expect(screen.getByTestId("audio-player-arabic-text")).not.toBeVisible();
+    resolver.mockReturnValue({
+      words: [{ startOffset: 0, endOffset: arabic.length, startMs: 0, endMs: 600000, occurrence: 0 }],
+    } as listeningTimings.ListeningTimingAnnotation);
+    controller.currentSegment = { ...segment };
+    rerender(<FloatingAudioPlayer controller={controller} language="en" />);
+    await waitFor(() => expect(screen.getByTestId("audio-player-arabic-text")).toBeVisible());
+    expect(container.querySelector("[data-listening-word]")?.textContent).toBe(arabic);
+    fireEvent.click(screen.getByRole("button", { name: "Hide Arabic" }));
+    expect(screen.getByTestId("audio-player-arabic-text")).not.toBeVisible();
+    controller.currentSegment = { ...segment };
+    rerender(<FloatingAudioPlayer controller={controller} language="en" />);
+    expect(screen.getByTestId("audio-player-arabic-text")).not.toBeVisible();
+  });
+  it("highlights the spoken language independent of interface language and clears cues between tracks", () => {
+    const controller = createController();
+    const text = "Allah protects";
+    controller.currentEntry = { ...entry, contentKind: "dua", translation: text, arabicText: "اللَّهُ" };
+    controller.state.currentVoiceId = "english-george";
+    vi.spyOn(listeningTimings, "resolveListeningTiming").mockImplementation((_segment, displayed, language) =>
+      displayed === text && language === "en"
+        ? ({
+            words: [{ startOffset: 0, endOffset: 5, startMs: 0, endMs: 600000, occurrence: 0 }],
+          } as listeningTimings.ListeningTimingAnnotation)
+        : null,
+    );
+    const { container, rerender } = render(<FloatingAudioPlayer controller={controller} language="ar" />);
+    fireEvent.click(screen.getByRole("button", { name: "توسيع المشغل" }));
+    expect(container.querySelector("[data-listening-word]")?.textContent).toBe("Allah");
+    expect(container.querySelector("[data-listening-word]")?.closest("p")).toHaveAttribute("lang", "en");
+    expect(screen.getByTestId("audio-player-zikr-text").textContent).toBe(text);
+    expect(screen.getByTestId("audio-player-arabic-text").textContent).toBe("اللَّهُ");
+    const highlight = screen.getByRole("button", { name: "تمييز الكلمات" });
+    expect(highlight).toHaveAttribute("aria-pressed", "true");
+    fireEvent.click(highlight);
+    expect(container.querySelector("[data-listening-word]")).toBeNull();
+    fireEvent.click(highlight);
+    expect(container.querySelector("[data-listening-word]")?.textContent).toBe("Allah");
+    controller.state.currentVoiceId = "voice-1";
+    rerender(<FloatingAudioPlayer controller={controller} language="ar" />);
+    expect(container.querySelector("[data-listening-word]")).toBeNull();
+  });
   it("uses Quran typography for an explicitly reviewed Quran excerpt even when its audio category is dua", () => {
     const controller = createController();
     controller.currentEntry = { ...entry, contentKind: "dua", quranText: true, arabicText: "fixture" };

@@ -43,6 +43,7 @@ const CONCURRENT = [
   { name: "format", command: "prettier --check ." },
   { name: "audio manifest", command: "node scripts/validate-audio-manifest.mjs --local" },
   { name: "Quran timings", command: "node scripts/validate-quran-timings.mjs" },
+  { name: "listening timings", command: "node scripts/validate-listening-timings.mjs" },
   { name: "type scale", command: "node scripts/check-type-scale.mjs" },
   { name: "motion rules", command: "node scripts/check-motion-rules.mjs" },
 ];

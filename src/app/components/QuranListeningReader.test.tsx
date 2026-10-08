@@ -103,8 +103,12 @@ describe("read-only listening controls", () => {
     const { container, rerender } = render(
       <QuranListeningReader entry={entry} segment={null} currentTime={1} language="en" />,
     );
+    const words = screen.getByRole("button", { name: "Highlight words" });
+    expect(words).toHaveAttribute("aria-pressed", "true");
+    expect(container.querySelector('[data-playback-word="true"]')).not.toBeNull();
+    fireEvent.click(words);
     expect(container.querySelector('[data-playback-word="true"]')).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: "Highlight words" }));
+    fireEvent.click(words);
     expect(container.querySelector('[data-playback-word="true"]')).not.toBeNull();
     expect(container.querySelector("[data-playback-line]")).not.toBeNull();
     expect(container.querySelector('[aria-current="true"]')).not.toBeNull();

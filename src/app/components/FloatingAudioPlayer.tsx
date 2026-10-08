@@ -14,6 +14,7 @@ import {
 import {
   ChevronDown,
   ChevronUp,
+  Check,
   Headphones,
   Pause,
   Play,
@@ -37,6 +38,9 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { t } from "../i18n";
 import { ReadingTextTransition } from "./ReadingTextTransition";
 import { AudioPlayerSurface } from "./AudioPlayerSurface";
+import { ListeningWordText } from "./ListeningWordText";
+import { useReviewedListeningTiming } from "../hooks/useReviewedListeningTiming";
+import { useListeningWordCue } from "../hooks/useListeningWordCue";
 
 const QuranListeningReader = lazy(() => import("./QuranListeningReader"));
 
@@ -179,7 +183,8 @@ export function FloatingAudioPlayer({
   const wasCoveringReading = useRef(coversReading);
   const [voiceMenuOpen, setVoiceMenuOpen] = useState(false);
   const [speedMenuOpen, setSpeedMenuOpen] = useState(false);
-  const [showArabic, setShowArabic] = useState(false);
+  const [arabicVisibility, setArabicVisibility] = useState<"auto" | "show" | "hide">("auto");
+  const [showListeningWords, setShowListeningWords] = useState(true);
   const arabicTextId = useId();
   const compactDescriptionId = useId();
   const controllerRef = useRef(controller);
@@ -274,7 +279,20 @@ export function FloatingAudioPlayer({
   const currentVoiceId = state.currentVoiceId ?? currentEntry?.defaultVoiceId;
   const zikrArabicText = currentEntry ? currentEntry.arabicText?.trim() || currentEntry.titleArabic : "";
   const isEnglishMode = language === "en" || currentVoiceId === "english-george";
-  const englishFirst = language === "en" && Boolean(currentEntry?.translation?.trim());
+  const englishFirst =
+    (language === "en" || currentVoiceId === "english-george") && Boolean(currentEntry?.translation?.trim());
+  const spokenLanguage = currentVoiceId === "english-george" ? "en" : "ar";
+  const spokenText = spokenLanguage === "en" ? (currentEntry?.translation ?? "") : zikrArabicText;
+  const listeningTiming = useReviewedListeningTiming(currentSegment, spokenText, spokenLanguage);
+  const showArabic =
+    arabicVisibility === "show" || (arabicVisibility === "auto" && spokenLanguage === "ar" && Boolean(listeningTiming));
+  const liveListeningCue = useListeningWordCue(
+    listeningTiming,
+    state.currentTime,
+    state.status === "playing",
+    controller.getPlaybackTime,
+  );
+  const listeningCue = showListeningWords ? liveListeningCue : null;
 
   if (!state.plan || !currentEntry) return null;
 
@@ -671,6 +689,19 @@ export function FloatingAudioPlayer({
                     className="w-full max-w-2xl shrink-0 py-2 text-center"
                   >
                     <div className="flex w-full flex-col items-center justify-center">
+                      {listeningTiming && (
+                        <button
+                          type="button"
+                          aria-pressed={showListeningWords}
+                          onClick={() => setShowListeningWords((value) => !value)}
+                          className="inline-flex min-h-11 min-w-11 items-center gap-2 rounded-lg px-3 text-sm hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                        >
+                          <span aria-hidden="true" className="inline-block w-4">
+                            {showListeningWords ? <Check size={16} /> : "—"}
+                          </span>
+                          {t(language, "quranListening.words")}
+                        </button>
+                      )}
                       {englishFirst && (
                         <>
                           <p
@@ -679,13 +710,16 @@ export function FloatingAudioPlayer({
                             dir="ltr"
                             lang="en"
                           >
-                            {currentEntry.translation}
+                            <ListeningWordText
+                              text={currentEntry.translation ?? ""}
+                              cue={spokenLanguage === "en" ? listeningCue : null}
+                            />
                           </p>
                           <button
                             type="button"
                             aria-expanded={showArabic}
                             aria-controls={arabicTextId}
-                            onClick={() => setShowArabic((visible) => !visible)}
+                            onClick={() => setArabicVisibility(showArabic ? "hide" : "show")}
                             className="mt-2 inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-3 text-sm font-medium text-primary hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                           >
                             {t(language, showArabic ? "audioPlayer.hideArabic" : "audioPlayer.showArabic")}
@@ -721,7 +755,7 @@ export function FloatingAudioPlayer({
                         dir="rtl"
                         lang="ar"
                       >
-                        {zikrArabicText}
+                        <ListeningWordText text={zikrArabicText} cue={spokenLanguage === "ar" ? listeningCue : null} />
                       </p>
                       {!englishFirst && isEnglishMode && currentEntry.translation && (
                         <p
@@ -729,7 +763,10 @@ export function FloatingAudioPlayer({
                           dir="ltr"
                           lang="en"
                         >
-                          {currentEntry.translation}
+                          <ListeningWordText
+                            text={currentEntry.translation}
+                            cue={spokenLanguage === "en" ? listeningCue : null}
+                          />
                         </p>
                       )}
                     </div>
