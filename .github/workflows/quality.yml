@@ -22,7 +22,10 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    # Browser system-package installation took 16m25s in run 37848744096;
+    # the previous successful full browser suite took 33m08s. Keep every gate
+    # while allowing runner setup plus the complete suite to finish.
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@v7
       - name: Setup and Test
