@@ -1,5 +1,7 @@
 # AI Improvement System Index
 
+[Phase 90](phases/PHASE_90_FIRST_REVIEWED_WORD_TIMING.md) activates the owner's exported, reviewed Friday dua word timings through the existing exact-recording registration contract.
+
 [Phase 89](phases/PHASE_89_ALL_AUDIO_WORD_ALIGNMENT.md) records the owner-approved extension to timestamp drafting and accessible word following for every approved Arabic and English recording. Phase 88's layout release completes independently.
 
 [Phase 88](phases/PHASE_88_QURAN_LISTENING.md) is the owner-approved Mushaf listening and review-ready synchronization phase.

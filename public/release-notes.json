@@ -1,13 +1,13 @@
 {
-  "release": "2026-10-08.5",
+  "release": "2026-10-08.6",
   "ar": [
-    "دعم تمييز الكلمات أثناء الاستماع بالعربية والإنجليزية للتسجيلات التي تتوفر لها توقيتات راجعها مختص.",
-    "يمكن إيقاف تمييز الكلمات دون إيقاف الصوت، مع احترام اختيارك لإظهار النص العربي أو إخفائه.",
-    "مدد أكثر دقة لتسجيلات أذكار المساء دون تغيير التسجيلات أو حذف الملفات التي نزلتها."
+    "تمييز الكلمات أثناء الاستماع لدعاء «اللهم إني أسألك الثبات في الأمر» بصوت عبد الله محمد بعد مراجعة توقيتاته.",
+    "يمكنك تشغيل تمييز كلمات هذا الدعاء أو إيقافه مع استمرار الاستماع.",
+    "توقيتات هذا الدعاء متاحة دون اتصال بعد تحميلها أثناء الاستماع."
   ],
   "en": [
-    "Word highlights are supported for Arabic and English recordings whose timings have been checked by a qualified reviewer.",
-    "Turn word highlights off without stopping playback; your choice to show or hide Arabic is respected.",
-    "More accurate evening-azkar recording durations, with your recordings and downloaded files preserved."
+    "Arabic word highlighting is now available for the reviewed Abdullah Muhammad recording of the dua asking for steadfastness.",
+    "Switch this dua’s word highlights on or off while continuing to listen.",
+    "This dua’s timings remain available offline after they load during listening."
   ]
 }

@@ -46,6 +46,48 @@ async function prepareAudio(page: Page) {
   });
 }
 
+test("owner-reviewed Friday dua loads exact registered timings and clears cues on opt-out and voice change @cross-browser", async ({
+  page,
+}) => {
+  await prepareAudio(page);
+  const collection = COMPREHENSIVE_DUAS.filter((zikr) => !zikr.isCollectionIntroduction);
+  const index = collection.findIndex((zikr) => zikr.id === "friday-dua-18");
+  expect(index).toBeGreaterThanOrEqual(0);
+  await page.goto(`/#/azkar/comprehensive-duas/${index + 1}?mode=complete`);
+  await expect(page.getByTestId("reader-screen")).toHaveAttribute("data-zikr-id", "friday-dua-18");
+  await page.getByTestId("reader-audio-dock-button").click();
+  const player = page.getByRole("region", { name: "Audio player", exact: true });
+  await player.getByRole("button", { name: "Expand player", exact: true }).click();
+  const emphasis = player.getByRole("button", { name: "Highlight words", exact: true });
+  await expect(emphasis).toHaveAttribute("aria-pressed", "true");
+  const clock = async (time: number) =>
+    page.evaluate((time) => {
+      const audio = (window as unknown as { __reviewAudio: HTMLAudioElement }).__reviewAudio;
+      audio.currentTime = time;
+      audio.dispatchEvent(new Event("timeupdate"));
+    }, time);
+  await clock(0.5);
+  await expect(player.locator("[data-listening-word]")).toHaveText("اللهم");
+  await clock(1.2);
+  await expect(player.locator("[data-listening-word]")).toHaveText("إني");
+  await emphasis.click();
+  await expect(player.locator("[data-listening-word]")).toHaveCount(0);
+  expect(
+    await page.evaluate(() => (window as unknown as { __reviewAudio: HTMLAudioElement }).__reviewAudio.paused),
+  ).toBe(false);
+  await emphasis.click();
+  await clock(1.05);
+  await expect(player.locator("[data-listening-word]")).toHaveCount(0);
+  await clock(0.5);
+  await expect(player.locator("[data-listening-word]")).toHaveText("اللهم");
+  await player.getByRole("button", { name: "Stop audio and close player", exact: true }).click();
+  await page.getByRole("button", { name: "Reader options", exact: true }).click();
+  await clickReaderOption(page, "Play English translation");
+  await player.getByRole("button", { name: "Expand player", exact: true }).click();
+  await expect(player.locator("[data-listening-word]")).toHaveCount(0);
+  await expect(player.getByRole("button", { name: "Highlight words", exact: true })).toHaveCount(0);
+});
+
 for (const id of ["m-hm-91", "e-hm-91", "misc-ref-3", "m-hm-96", "e-hm-96", "friday-dua-08"]) {
   test(`restored Arabic ${id} keeps counting and explicit English playback @cross-browser`, async ({ page }) => {
     await prepareAudio(page);

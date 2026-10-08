@@ -4286,3 +4286,7 @@ Phase 88 owner screenshot correction and timestamp follow-up: compact page contr
 ## Phase 89 — 2026-10-08: all audio word alignment
 
 The owner explicitly asks to extend alignment and visible word following to all audio recordings, including English. Generate model-assisted drafts from exact approved audio and existing transcript sources, deduplicate recordings, and build a repeatable authoring/review path. Preserve independent human timing review before production activation. Do not rewrite reviewed translations to fit recordings, borrow timings between different bytes, or add runtime inference dependencies. Complete phase 88's pending layout release separately.
+
+## Phase 90 — 2026-10-08: owner-reviewed Friday dua activation
+
+The owner reviewed a sample and authorizes implementation. Their exported approved annotation identifies `friday-dua-18-abdullah-muhammad-v1`, with Ahmed Mahdy as independent reviewer. Register that exact validated file to activate Arabic word highlighting for the sample. Other recordings remain subject to the existing recording-specific review requirement; do not convert unreviewed drafts into approved data from sampling alone.
