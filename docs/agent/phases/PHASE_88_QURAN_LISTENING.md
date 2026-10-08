@@ -90,3 +90,13 @@ The prior hand-icon/search fixes shipped separately in phase 87. No persisted sc
 ## Recommended next step
 
 Annotate and independently review verse intervals for one exact approved recording, exercise the authoring validator and real-recitation browser/assistive-technology checks, then enable verse following. Optional word alignment follows a complete semantic-word review; phrase practice remains a separate approved step.
+
+## Exact-commit CI follow-up
+
+Quality run 37786730447: 746 browser tests passed, one existing skip and one failed Linux/WebKit synthetic update-deferral test after all retries (33.4 minutes). Trace responses show the mocked future-release-a/503 manifest was replaced after reload by the real 2026-10-08.4 manifest. A controlling service worker bypassed page.route, as documented by Playwright. Scope: block workers only in the synthetic manifest describe group and explicitly await the simulated 503 response. Preserve every original deferral, navigation, focus and new-release assertion; run the separate real service-worker update-flow and offline specs as evidence. No production update-deferral logic is changed. This test-only repair is isolated from the newly authorized phase 89 authoring work. The release remains pending exact-commit CI and production verification.
+
+The corrected synthetic-manifest cases passed all six Arabic/English cases across Chromium, Firefox and WebKit (1.0 minute). A fresh complete local browser suite, including real service-worker update handover and offline reading, is required before the test-only remediation push. Its final results and exact-commit CI/Pages/production checks are recorded in the release verification evidence.
+
+### Remediation verification
+
+The unchanged full browser sweep completed with 744 passed, one existing skip and three Windows WebKit screenshot timeouts (compact-prayer English theme sweep and the two situational-material screenshots). All three retained their assertions and passed on an isolated rerun after local model inference was stopped: `3 passed (2.7m)`. The six synthetic update-manifest cases passed in all three engines; `pnpm check` passed in 115.6 seconds. No screenshot/test timeout, assertion, coverage threshold or bundle ceiling was changed. The full sweep and failed artifacts are retained under `output/phase88-remediation-full.*`; isolated recovery is `output/phase88-remediation-resource-recheck.log`. Exact-commit CI remains the final full-suite release gate. The fixture repair changes only synthetic network interception; real service-worker update coverage is unchanged.

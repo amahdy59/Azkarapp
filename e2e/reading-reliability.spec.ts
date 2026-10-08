@@ -109,60 +109,70 @@ for (const language of ["ar", "en"] as const) {
     });
   }
 
-  test(`Later survives navigation, reload and repeated update events in ${language} @cross-browser`, async ({
-    page,
-  }, testInfo) => {
-    let release = "future-release-a";
-    let notesAvailable = true;
-    await page.route("**/release-notes.json*", (route) =>
-      route.fulfill({
-        status: notesAvailable ? 200 : 503,
-        json: notesAvailable
-          ? { release, en: ["Reading", "Sharing", "Progress"], ar: ["القراءة", "المشاركة", "التقدم"] }
-          : {},
-      }),
-    );
-    await page.addInitScript((language) => {
-      if (localStorage.getItem("azkarapp.onboarding-complete.v1")) return;
-      localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
-      localStorage.setItem(
-        "azkarapp.state.v1",
-        JSON.stringify({ settings: { language, reduceMotion: true }, profile: { isGuest: true } }),
+  test.describe(`synthetic update manifests ${language}`, () => {
+    // A controlling worker bypasses page.route after reload, invalidating the simulated offline manifest.
+    // Real service-worker handover is exercised separately by pwa-update-flow.spec.ts.
+    test.use({ serviceWorkers: "block" });
+
+    test(`Later survives navigation, reload and repeated update events in ${language} @cross-browser`, async ({
+      page,
+    }, testInfo) => {
+      let release = "future-release-a";
+      let notesAvailable = true;
+      await page.route("**/release-notes.json*", (route) =>
+        route.fulfill({
+          status: notesAvailable ? 200 : 503,
+          json: notesAvailable
+            ? { release, en: ["Reading", "Sharing", "Progress"], ar: ["القراءة", "المشاركة", "التقدم"] }
+            : {},
+        }),
       );
-    }, language);
-    await page.goto("./#/home");
-    const title = page.getByText(language === "ar" ? "يتوفر تحديث جديد" : "An update is ready", { exact: true });
-    await expect(title).toBeVisible();
-    await page.getByRole("button", { name: language === "ar" ? "لاحقاً" : "Later", exact: true }).click();
-    await expect(title).not.toBeVisible();
-    notesAvailable = false;
-    await page.evaluate(() => window.dispatchEvent(new Event("azkar-update-available")));
-    await page.goto("./#/settings/about");
-    await expect(title).not.toBeVisible();
-    await page.reload();
-    await expect(
-      page.getByRole("heading", { name: language === "ar" ? "حول تطبيق أذكار" : "About Azkar", exact: true }),
-    ).toBeVisible();
-    await page.evaluate(() => window.dispatchEvent(new Event("azkar-update-available")));
-    await expect(
-      page.getByRole("button", { name: language === "ar" ? "مراجعة التحديث المتاح" : "Review available update" }),
-    ).toBeVisible();
-    await expect(title).not.toBeVisible();
-    await page
-      .getByRole("button", { name: language === "ar" ? "مراجعة التحديث المتاح" : "Review available update" })
-      .click();
-    await expect(title).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: language === "ar" ? "تحديث" : "Refresh", exact: true }),
-    ).toBeFocused();
-    await page.getByRole("button", { name: language === "ar" ? "لاحقاً" : "Later", exact: true }).click();
-    await expect(
-      page.getByRole("button", { name: language === "ar" ? "مراجعة التحديث المتاح" : "Review available update" }),
-    ).toBeFocused();
-    notesAvailable = true;
-    release = "future-release-b";
-    await page.evaluate(() => window.dispatchEvent(new Event("azkar-update-available")));
-    await expect(title).toBeVisible();
-    await page.screenshot({ path: testInfo.outputPath(`update-deferral-${language}.png`) });
+      await page.addInitScript((language) => {
+        if (localStorage.getItem("azkarapp.onboarding-complete.v1")) return;
+        localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+        localStorage.setItem(
+          "azkarapp.state.v1",
+          JSON.stringify({ settings: { language, reduceMotion: true }, profile: { isGuest: true } }),
+        );
+      }, language);
+      await page.goto("./#/home");
+      const title = page.getByText(language === "ar" ? "يتوفر تحديث جديد" : "An update is ready", { exact: true });
+      await expect(title).toBeVisible();
+      await page.getByRole("button", { name: language === "ar" ? "لاحقاً" : "Later", exact: true }).click();
+      await expect(title).not.toBeVisible();
+      notesAvailable = false;
+      await page.evaluate(() => window.dispatchEvent(new Event("azkar-update-available")));
+      await page.goto("./#/settings/about");
+      await expect(title).not.toBeVisible();
+      await page.reload();
+      await expect(
+        page.getByRole("heading", { name: language === "ar" ? "حول تطبيق أذكار" : "About Azkar", exact: true }),
+      ).toBeVisible();
+      const unavailableManifest = page.waitForResponse(
+        (response) => response.url().includes("/release-notes.json") && response.status() === 503,
+      );
+      await page.evaluate(() => window.dispatchEvent(new Event("azkar-update-available")));
+      await unavailableManifest;
+      await expect(
+        page.getByRole("button", { name: language === "ar" ? "مراجعة التحديث المتاح" : "Review available update" }),
+      ).toBeVisible();
+      await expect(title).not.toBeVisible();
+      await page
+        .getByRole("button", { name: language === "ar" ? "مراجعة التحديث المتاح" : "Review available update" })
+        .click();
+      await expect(title).toBeVisible();
+      await expect(
+        page.getByRole("button", { name: language === "ar" ? "تحديث" : "Refresh", exact: true }),
+      ).toBeFocused();
+      await page.getByRole("button", { name: language === "ar" ? "لاحقاً" : "Later", exact: true }).click();
+      await expect(
+        page.getByRole("button", { name: language === "ar" ? "مراجعة التحديث المتاح" : "Review available update" }),
+      ).toBeFocused();
+      notesAvailable = true;
+      release = "future-release-b";
+      await page.evaluate(() => window.dispatchEvent(new Event("azkar-update-available")));
+      await expect(title).toBeVisible();
+      await page.screenshot({ path: testInfo.outputPath(`update-deferral-${language}.png`) });
+    });
   });
 }
