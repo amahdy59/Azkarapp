@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { normalizeRecentSearches, SearchScreen } from "./SearchScreen";
+import { getAzkarByCategory } from "../content/azkar";
 
 describe("SearchScreen", () => {
   beforeEach(() => {
@@ -68,6 +69,56 @@ describe("SearchScreen", () => {
 
   it("bounds and normalizes persisted recent searches", () => {
     expect(normalizeRecentSearches([" a ", "a", "b", "c", "d", "e", "f", null])).toEqual(["a", "b", "c", "d", "e"]);
+  });
+
+  it("finds Comprehensive Duas and resolves its canonical item when opened", () => {
+    const onZikr = vi.fn();
+    render(
+      <SearchScreen language="en" direction="ltr" initialQuery="steadfast" onBack={() => undefined} onZikr={onZikr} />,
+    );
+    expect(screen.getAllByTestId("search-result")).toHaveLength(3);
+    const result = screen
+      .getAllByTestId("search-result")
+      .find((item) => item.textContent?.includes("guide me and make me correct"))!;
+    fireEvent.click(result);
+    const [category, index] = onZikr.mock.calls[0]!;
+    expect(category).toBe("comprehensive_duas");
+    expect(getAzkarByCategory(category)[index]?.translation).toContain("guide me and make me correct");
+  });
+
+  it("reports query edits, recent selection and clearing to routing", () => {
+    const onQueryChange = vi.fn();
+    localStorage.setItem("azkarapp_recent_searches_en", JSON.stringify(["mercy"]));
+    render(
+      <SearchScreen
+        language="en"
+        direction="ltr"
+        onQueryChange={onQueryChange}
+        onBack={() => undefined}
+        onZikr={() => undefined}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "mercy", exact: true }));
+    expect(onQueryChange).toHaveBeenLastCalledWith("mercy");
+    fireEvent.change(screen.getByRole("textbox"), { target: { value: "steadfast" } });
+    expect(onQueryChange).toHaveBeenLastCalledWith("steadfast");
+    fireEvent.click(screen.getByRole("button", { name: "Clear search" }));
+    expect(onQueryChange).toHaveBeenLastCalledWith("");
+  });
+
+  it("shows the surah name and the matching passage in its visible preview", () => {
+    render(
+      <SearchScreen
+        language="en"
+        direction="ltr"
+        initialQuery="steadfast"
+        onBack={() => undefined}
+        onZikr={() => undefined}
+      />,
+    );
+    const result = screen.getByRole("button", { name: "As-Sajdah, in Before Sleep Azkar" });
+    expect(result.querySelector("p")).toHaveTextContent("As-Sajdah");
+    expect(result.querySelector("mark")?.textContent).toBe("steadfast");
   });
 
   it("updates the document title for the search route", () => {

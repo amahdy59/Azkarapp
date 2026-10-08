@@ -23,6 +23,7 @@ import {
 } from "../content/azkar";
 import { CATEGORIES, CATEGORY_GROUPS, isOccasionalCategory } from "../content/categories";
 import { COMPREHENSIVE_DUAS } from "../content/comprehensiveDuas";
+import { COMPREHENSIVE_DUA_ITEMS, SEARCHABLE_AZKAR } from "../content/searchCatalog";
 import { formatNumerals } from "../formatting";
 import { matchesSearch, normalizeSearchText, searchKeyFor } from "../content/searchNormalization";
 import { FIELD_LABEL_CLASS } from "../components/FormField";
@@ -34,9 +35,6 @@ export type LibrarySection = "collections" | "saved";
 type SavedLibraryItem = Pick<Zikr, "id" | "category" | "arabicText" | "translation" | "transliteration"> & {
   lazyCollection?: "friday_kahf";
 };
-
-const COMPREHENSIVE_DUA_ITEMS = COMPREHENSIVE_DUAS.filter((dua) => !dua.isCollectionIntroduction);
-const SEARCHABLE_AZKAR: Zikr[] = [...ALL_AZKAR.filter((z) => !z.isCollectionIntroduction), ...COMPREHENSIVE_DUA_ITEMS];
 
 export function AzkarLibraryScreen({
   completed,

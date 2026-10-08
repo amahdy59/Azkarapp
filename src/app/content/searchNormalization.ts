@@ -112,3 +112,17 @@ export function splitHighlightedSearchTokens(text: string, query: string): Array
 
   return runs.length > 0 ? runs : [{ text, matched: false }];
 }
+
+/** A bounded excerpt around a match, sliced only at original word boundaries. */
+export function getSearchSnippet(text: string, query: string): string {
+  const words = [...text.matchAll(/\S+/gu)];
+  if (words.length <= 24) return text;
+  const terms = normalizeSearchText(query)
+    .split(" ")
+    .filter((term) => term.length >= 2);
+  const match = words.findIndex((word) => terms.some((term) => normalizeSearchText(word[0]).includes(term)));
+  const start = Math.max(0, match - 6);
+  const end = Math.min(words.length, start + 24);
+  const excerpt = text.slice(words[start]!.index, words[end - 1]!.index + words[end - 1]![0].length);
+  return `${start > 0 ? "… " : ""}${excerpt}${end < words.length ? " …" : ""}`;
+}

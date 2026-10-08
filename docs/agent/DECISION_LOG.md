@@ -4270,3 +4270,9 @@ Owner approved updating the two outdated Reader header expectations identified b
 ## Reader options simplification — 2026-10-07
 
 The owner approves trying the proposed Reader menu solution: clarify current-zikr versus collection labels, replace the implicit complete/core toggle with a labelled selector, group counter settings, keep focus/text size/save visible and use the existing bottom-sheet pattern on small screens. Unique audio and recovery actions remain available; reviewed content, progress and persistence boundaries are unchanged. The repository release authority applies.
+
+## Interaction and search reliability — 2026-10-08
+
+The owner approves the five usability-review recommendations and explicitly identifies the hand counting-guidance icon as requiring repeated activation. Repair first-count dismissal/manual reopening and stationary target access, search inventory/query restoration, temporary lookup context that preserves saved routine mode, modal shortcut ownership/history, and recognizable surah search previews. A fixed-width guidance row replaces the collapsed max-content row so the hand target no longer shifts horizontally when text expands. Existing sacred text, progress, audio and persistence contracts remain intact. Follow the repository release authority.
+
+The owner also asks about embedded Mushaf rendering, consistent Quran fonts and synchronized phrase/word learning. Inspect the existing renderer and exact recording metadata, document a staged proposal, and require verified per-recording timings before implementing synchronization. Do not treat total duration as verse/word timing or silently substitute a different reciter's annotation.

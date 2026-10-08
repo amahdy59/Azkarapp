@@ -259,6 +259,7 @@ function AppContent({
     hydrateRouteCategory,
     sharedRoutineMode,
     clearSharedRoutineMode,
+    setReadingRoutineMode,
   } = useAppRouting({ routineModes, hasCompletedOnboarding, reduceMotion });
 
   const audioWarmViewRef = useRef<View | null>(null);
@@ -1881,7 +1882,10 @@ function AppContent({
                   language={selectedLang}
                   direction={layoutDirection}
                   onCategory={openCategory}
-                  onZikr={(catId, index) => openReader(catId, index, "complete")}
+                  onZikr={(catId, index) => {
+                    setReadingRoutineMode(catId, "complete");
+                    openReader(catId, index);
+                  }}
                   onSearch={(query) => {
                     setSearchQuery(query);
                     push("search");
@@ -2360,9 +2364,11 @@ function AppContent({
                   language={selectedLang}
                   direction={layoutDirection}
                   initialQuery={searchQuery}
+                  onQueryChange={setSearchQuery}
                   onBack={pop}
                   onZikr={(catId, i) => {
-                    openReader(catId, i, "complete");
+                    setReadingRoutineMode(catId, "complete");
+                    openReader(catId, i);
                   }}
                 />
               )}

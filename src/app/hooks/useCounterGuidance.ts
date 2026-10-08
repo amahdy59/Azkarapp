@@ -38,11 +38,11 @@ export function useCounterGuidance(hasStarted: boolean) {
   const [hasAutoDismissed, setHasAutoDismissed] = useState(() => hasStarted);
 
   useEffect(() => {
-    if (!hasStarted || !expanded || hasAutoDismissed) return;
+    if (!hasStarted || hasAutoDismissed) return;
     writeDismissed();
     setHasAutoDismissed(true);
     setExpanded(false);
-  }, [expanded, hasAutoDismissed, hasStarted]);
+  }, [hasAutoDismissed, hasStarted]);
 
   return {
     expanded,

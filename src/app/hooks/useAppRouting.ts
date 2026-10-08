@@ -59,6 +59,9 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
   );
   const sharedRoutineMode = sharedContext?.categoryId === activeCat ? sharedContext.mode : undefined;
   const clearSharedRoutineMode = useCallback(() => setSharedContext(undefined), []);
+  const setReadingRoutineMode = useCallback((categoryId: CategoryId, mode: RoutineMode) => {
+    setSharedContext({ categoryId, mode });
+  }, []);
   const [activeIdx, setActiveIdx] = useState(initialRoute?.index ?? 0);
   const [quranPage, setQuranPage] = useState<number | undefined>(initialRoute?.page);
   /** Which prayer the prayer screen is showing, so `#/prayer/asr` survives a reload. */
@@ -316,6 +319,13 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.defaultPrevented ||
+        e.isComposing ||
+        e.repeat ||
+        document.querySelector('[role="dialog"], [role="alertdialog"], [role="menu"], [role="listbox"]')
+      )
+        return;
       const activeEl = document.activeElement;
       if (
         activeEl &&
@@ -329,13 +339,13 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
 
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
-        setView("search");
+        push("search");
         return;
       }
 
       if (e.key === "/" && view !== "reader" && view !== "custom_counter" && view !== "friday_salawat") {
         e.preventDefault();
-        setView("search");
+        push("search");
         return;
       }
 
@@ -343,30 +353,30 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
         if (e.key === "1") {
           e.preventDefault();
           setActiveTab("home");
-          setView("home");
+          push("home");
         } else if (e.key === "2") {
           e.preventDefault();
           setActiveTab("quran");
-          setView("khatmah_overview");
+          push("khatmah_overview");
         } else if (e.key === "3") {
           e.preventDefault();
           setActiveTab("azkar");
-          setView("library");
+          push("library");
         } else if (e.key === "4") {
           e.preventDefault();
           setActiveTab("progress");
-          setView("progress");
+          push("progress");
         } else if (e.key === "5") {
           e.preventDefault();
           setActiveTab("settings");
-          setView("settings");
+          push("settings");
         }
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [view]);
+  }, [view, push]);
 
   useEffect(() => {
     if (view !== "home") return;
@@ -412,6 +422,7 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
     activeIdx,
     sharedRoutineMode,
     clearSharedRoutineMode,
+    setReadingRoutineMode,
     setActiveIdx,
     quranPage,
     setQuranPage,

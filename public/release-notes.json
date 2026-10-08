@@ -1,13 +1,15 @@
 {
-  "release": "2026-10-07.6",
+  "release": "2026-10-08.1",
   "ar": [
-    "تفتح خيارات القارئ في لوحة سفلية على الهاتف، مع إبقاء أدوات القراءة الأساسية ظاهرة.",
-    "اختر قائمة الأذكار الكاملة أو المختصرة مباشرة، مع إظهار اختيارك الحالي.",
-    "تميّز تسميات الاستماع والمشاركة بين الذكر الحالي ومجموعة الأذكار، وتُجمع إعدادات العدّاد في مكان واحد."
+    "تفتح أيقونة اليد إرشادات العدّ وتغلقها بضغطة واحدة، حتى بعد بدء العدّ.",
+    "يعرض البحث أدعية المكتبة نفسها، ويحتفظ بعبارة البحث عند الرجوع من القراءة.",
+    "تظهر أسماء السور ومقتطفات المطابقة بوضوح، وفتح نتيجة لا يغيّر اختيارك لقائمة الأذكار.",
+    "تحترم اختصارات التنقل اللوحات المفتوحة وتحافظ على طريق الرجوع إلى القراءة."
   ],
   "en": [
-    "Reader options open in a bottom sheet on phones, with essential reading controls kept visible.",
-    "Choose the complete or core Azkar list directly and see your current selection.",
-    "Listening and sharing labels distinguish this zikr from the collection, with counter settings grouped together."
+    "The hand icon opens and closes counting guidance with one click, including after counting starts.",
+    "Search includes the same duas as the Library and retains your query when returning from reading.",
+    "Surah names and matching excerpts are clearer, and opening a result preserves your saved Azkar list choice.",
+    "Navigation shortcuts respect open panels and preserve your route back to reading."
   ]
 }

@@ -1,7 +1,8 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useDeferredValue, useId, useMemo, useState } from "react";
 import { ArrowPrevious, Search, X } from "../components/icons";
-import { ALL_AZKAR, getAzkarByCategory, ZIKR_LABELS } from "../content/azkar";
+import { ZIKR_LABELS } from "../content/azkar";
+import { SEARCHABLE_AZKAR, resolveSearchResultIndex } from "../content/searchCatalog";
 import { CATEGORIES } from "../content/categories";
 import type { AppLanguage, CategoryId } from "../types";
 import { StatePanel } from "../components/StatePanel";
@@ -10,7 +11,12 @@ import { FIELD_LABEL_CLASS } from "../components/FormField";
 import { t } from "../i18n";
 import { useScreenFocus } from "../hooks/useScreenFocus";
 
-import { normalizeSearchText, searchKeyFor, splitHighlightedSearchTokens } from "../content/searchNormalization";
+import {
+  getSearchSnippet,
+  normalizeSearchText,
+  searchKeyFor,
+  splitHighlightedSearchTokens,
+} from "../content/searchNormalization";
 
 // ─── Recent-search persistence ────────────────────────────────────────────────
 // Stored per-language so Arabic and English histories don't overwrite each other.
@@ -91,17 +97,23 @@ export function SearchScreen({
   language,
   direction,
   initialQuery = "",
+  onQueryChange,
 }: {
   onBack: () => void;
   onZikr: (catId: CategoryId, i: number) => void;
   language: AppLanguage;
   direction: "ltr" | "rtl";
   initialQuery?: string;
+  onQueryChange?: (query: string) => void;
 }) {
   const isArabic = language === "ar";
   useScreenFocus(t(language, "search.inputAriaLabel"));
   const searchInputId = useId();
   const [q, setQ] = useState(() => initialQuery.trim());
+  const changeQuery = (query: string) => {
+    setQ(query);
+    onQueryChange?.(query);
+  };
   const deferredQuery = useDeferredValue(q.trim());
 
   // Load per-language history from localStorage; no hardcoded defaults.
@@ -111,7 +123,7 @@ export function SearchScreen({
     if (deferredQuery.length < 2) return [];
     const normalizedQuery = normalizeSearchText(deferredQuery);
     if (!normalizedQuery) return [];
-    return ALL_AZKAR.filter(
+    return SEARCHABLE_AZKAR.filter(
       (zikr) =>
         !zikr.isCollectionIntroduction && searchKeyFor(zikr, ZIKR_LABELS[zikr.id] ?? "").includes(normalizedQuery),
     );
@@ -126,7 +138,7 @@ export function SearchScreen({
       saveRecents(language, next);
       return next;
     });
-    setQ(trimmed);
+    changeQuery(trimmed);
   };
 
   const handleRemoveRecent = (term: string) => {
@@ -171,14 +183,14 @@ export function SearchScreen({
               dir={q.trim() ? "auto" : direction}
               lang={language}
               autoComplete="off"
-              onChange={(e) => setQ(e.target.value)}
+              onChange={(e) => changeQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSubmit(q)}
               className="min-w-0 flex-1 bg-transparent text-start font-sans text-sm leading-[22px] text-foreground focus:outline-none"
             />
             {q && (
               <button
                 type="button"
-                onClick={() => setQ("")}
+                onClick={() => changeQuery("")}
                 className="-me-3 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 aria-label={t(language, "search.clearAriaLabel")}
               >
@@ -215,7 +227,7 @@ export function SearchScreen({
                 <div key={term} className="flex items-center rounded-full bg-secondary text-secondary-foreground">
                   <button
                     type="button"
-                    onClick={() => setQ(term)}
+                    onClick={() => changeQuery(term)}
                     className="min-h-11 rounded-full px-4 text-label font-medium font-sans leading-[20px] text-start transition-[color,background-color,border-color,transform] active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                   >
                     {term}
@@ -252,14 +264,19 @@ export function SearchScreen({
                 title={t(language, "search.emptyTitle")}
                 description={t(language, "search.emptyDescription")}
                 actionLabel={t(language, "search.emptyAction")}
-                onAction={() => setQ("")}
+                onAction={() => changeQuery("")}
               />
             ) : (
               results.map((z) => {
-                const zIdx = getAzkarByCategory(z.category).findIndex((a) => a.id === z.id);
                 const category = CATEGORIES.find((item) => item.id === z.category)!;
-                const label = (isArabic ? z.arabicText.split("\n")[0] : z.translation) ?? z.id;
-                const subtitle = isArabic ? category.nameArabic : z.transliteration;
+                const sourceText = isArabic ? z.arabicText : z.translation;
+                const surahTitle = isArabic ? z.surahNameArabic : z.surahNameEnglish;
+                const label = surahTitle || getSearchSnippet(sourceText, deferredQuery);
+                const subtitle = surahTitle
+                  ? getSearchSnippet(sourceText, deferredQuery)
+                  : isArabic
+                    ? category.nameArabic
+                    : z.transliteration;
                 const rawEnglishTitle = (z.surahNameEnglish || ZIKR_LABELS[z.id] || label.split(".")[0] || label || "")
                   .slice(0, 64)
                   .trim();
@@ -270,7 +287,8 @@ export function SearchScreen({
                     data-testid="search-result"
                     onClick={() => {
                       handleSubmit(q);
-                      onZikr(z.category, zIdx);
+                      const zIdx = resolveSearchResultIndex(z);
+                      if (zIdx >= 0) onZikr(z.category, zIdx);
                     }}
                     aria-label={t(language, "search.resultAriaLabel", {
                       title: accessibleTitle,

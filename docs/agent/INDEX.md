@@ -1,5 +1,7 @@
 # AI Improvement System Index
 
+[Phase 87](phases/PHASE_87_INTERACTION_AND_SEARCH_RELIABILITY.md) covers owner-authorized guidance and search/navigation reliability fixes. [Synchronized Quran listening proposal](../audio/SYNCHRONIZED_QURAN_PLAN.md) separates reusable Mushaf presentation from the verified timing annotations required for learner highlighting.
+
 [Pending changes review and release, 2026-10-06](phases/PENDING_CHANGES_REVIEW_2026_10_06.md) records the combined review, lifecycle-safe persistence, daily streak refresh, keyboard and touch-gesture repairs, preserved owner refinements, and release verification.
 
 [Reader collection scenes](phases/READER_COLLECTION_SCENES.md) records the owner-approved static gradient/SVG header refinement, unchanged sizing, accessibility fallbacks and local-only verification.

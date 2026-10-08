@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { matchesSearch, normalizeSearchText, searchKeyFor, splitHighlightedSearchTokens } from "./searchNormalization";
+import {
+  getSearchSnippet,
+  matchesSearch,
+  normalizeSearchText,
+  searchKeyFor,
+  splitHighlightedSearchTokens,
+} from "./searchNormalization";
 
 describe("normalizeSearchText", () => {
   it("strips diacritics so typed Arabic matches vocalized content", () => {
@@ -52,6 +58,22 @@ describe("matchesSearch", () => {
 
   it("still matches Latin translations case-insensitively", () => {
     expect(matchesSearch("In Your name, O Allah, I die and I live.", normalizeSearchText("YOUR NAME"))).toBe(true);
+  });
+});
+
+describe("getSearchSnippet", () => {
+  it("includes late matches without modifying their original vocalized words", () => {
+    const text = `${"مقدمة ".repeat(50)}أَحْيَانَا ${"تتمة ".repeat(30)}`;
+    const snippet = getSearchSnippet(text, "احيانا");
+    expect(snippet).toContain("أَحْيَانَا");
+    expect(snippet).toMatch(/^… .* …$/u);
+    expect(text).toContain(snippet.replace(/^… | …$/gu, ""));
+    expect(snippet.split(" ").length).toBeLessThanOrEqual(26);
+  });
+
+  it("keeps short text unchanged and bounds unmatched previews", () => {
+    expect(getSearchSnippet("  بِاسْمِكَ اللَّهُمَّ  ", "باسمك")).toBe("  بِاسْمِكَ اللَّهُمَّ  ");
+    expect(getSearchSnippet("word ".repeat(100), "absent").split(" ")).toHaveLength(25);
   });
 });
 

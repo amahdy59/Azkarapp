@@ -36,7 +36,7 @@ describe("combined counting guidance", () => {
     await waitFor(() => expect(screen.getByRole("button", { name: "Show counting guidance" })).toBeInTheDocument());
     expect(window.localStorage.getItem("azkarapp.counter-guidance.v1")).toBe("true");
     expect(screen.getByTestId("counter-tap-hint")).toHaveAttribute("data-expanded", "false");
-    expect(screen.getByTestId("counter-tap-hint").parentElement).toHaveStyle({ width: "max-content" });
+    expect(screen.getByTestId("counter-tap-hint").parentElement).not.toHaveStyle({ width: "max-content" });
 
     fireEvent.click(screen.getByTestId("counter-guidance-reopen"));
     expect(screen.getByRole("button", { name: "Hide counting guidance" })).toHaveAttribute("aria-expanded", "true");
@@ -53,5 +53,18 @@ describe("combined counting guidance", () => {
     const hand = screen.getByRole("button", { name: "Show counting guidance" });
     fireEvent.click(hand);
     expect(hand).toHaveAttribute("aria-expanded", "true");
+  });
+
+  it("does not immediately auto-close a manual reopen after counting with dismissed guidance", () => {
+    window.localStorage.setItem("azkarapp.counter-guidance.v1", "true");
+    const view = render(<CounterGuidance language="en" direction="ltr" hasStarted={false} />);
+    view.rerender(<CounterGuidance language="en" direction="ltr" hasStarted />);
+    const hand = screen.getByTestId("counter-guidance-reopen");
+    for (let click = 0; click < 8; click++) {
+      fireEvent.click(hand);
+      expect(hand).toHaveAttribute("aria-expanded", String(click % 2 === 0));
+      const explanation = document.getElementById(hand.getAttribute("aria-controls")!);
+      expect(explanation?.hidden).toBe(click % 2 !== 0);
+    }
   });
 });

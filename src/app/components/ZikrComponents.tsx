@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useId, useState } from "react";
 import { progressFillStyle } from "./progressFillStyle";
 import "./ZikrComponents.css";
 import { Check, HandTap } from "./icons";
@@ -23,16 +23,14 @@ export function CounterTapHint({
   onToggle?: () => void;
   toggleLabel?: string;
 }) {
+  const explanationId = useId();
   return (
-    <div
-      className="devotional-guidance mx-auto w-full max-w-[25rem] shrink-0 px-3 pt-2"
-      style={expanded ? undefined : { width: "max-content" }}
-    >
+    <div className="devotional-guidance mx-auto w-full max-w-[25rem] shrink-0 px-3 pt-2">
       <div
         data-testid="counter-tap-hint"
         data-expanded={expanded}
-        className="counter-tap-hint flex min-h-11 items-center justify-center gap-2 px-3 py-2 text-center text-label font-medium"
-        style={{ paddingBlock: 0, ...(!expanded ? { paddingInline: 0 } : {}) }}
+        className="counter-tap-hint flex min-h-11 items-center gap-2 px-3 text-center text-label font-medium"
+        style={expanded ? undefined : { background: "transparent" }}
       >
         {onToggle ? (
           <button
@@ -42,6 +40,7 @@ export function CounterTapHint({
             aria-label={toggleLabel}
             title={toggleLabel}
             aria-expanded={expanded}
+            aria-controls={explanationId}
             onClick={(event) => {
               event.stopPropagation();
               onToggle();
@@ -53,8 +52,10 @@ export function CounterTapHint({
           <HandTap size={24} className="shrink-0 text-muted-foreground" aria-hidden="true" />
         )}
         {keyboardHelp && <div className="hidden shrink-0 md:block">{keyboardHelp}</div>}
-        {expanded && <span className={desktopText ? "md:hidden" : undefined}>{text}</span>}
-        {expanded && desktopText && <span className="hidden md:inline">{desktopText}</span>}
+        <span id={explanationId} hidden={!expanded} className="min-w-0 flex-1">
+          <span className={desktopText ? "md:hidden" : undefined}>{text}</span>
+          {desktopText && <span className="hidden md:inline">{desktopText}</span>}
+        </span>
       </div>
     </div>
   );
