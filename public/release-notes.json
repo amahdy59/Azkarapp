@@ -1,13 +1,13 @@
 {
-  "release": "2026-10-08.2",
+  "release": "2026-10-08.3",
   "ar": [
-    "يمكنك تصفح صفحات المصحف داخل مشغل البقرة والكهف والسجدة والملك أثناء الاستماع.",
-    "تظهر المقاطع القرآنية بخط المصحف، مع خط بديل واضح عند تعذّر تحميل خط الصفحة.",
-    "توضح التلاوات التي لا تتوفر لها أوقات مراجعة أن متابعة النص غير متاحة بعد، مع بقاء التصفح متاحًا."
+    "تصفح المصحف أثناء الاستماع إلى البقرة والكهف والسجدة والملك، دون تغيير موضع القراءة المحفوظ.",
+    "اقرأ المقاطع القرآنية بخط مخصص للقرآن، مع نص واضح بديل عند تعذّر تحميل صفحة المصحف أو خطها.",
+    "تبقى أزرار تصفح الصفحات وتوضيح عدم توفر متابعة التلاوة ظاهرين أثناء الاستماع، حتى تُراجع أوقات التسجيل."
   ],
   "en": [
-    "Browse Mushaf pages inside the audio player while listening to Baqarah, Kahf, Sajdah and Mulk.",
-    "Quran passages use Quran typography, with a readable fallback when a page font cannot load.",
-    "Recitations without reviewed timings clearly explain that text following is not available yet; manual browsing remains available."
+    "Read Mushaf pages while listening to Baqarah, Kahf, Sajdah and Mulk without changing your saved reading position.",
+    "Quran passages use dedicated Quran typography, with readable text when a Mushaf page or its font cannot load.",
+    "Page controls and the explanation that following is unavailable stay visible while listening, until recording timings are reviewed."
   ]
 }

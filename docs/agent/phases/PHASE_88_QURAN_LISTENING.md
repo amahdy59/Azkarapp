@@ -23,7 +23,7 @@ Reuse the shared Mushaf canvas inside expanded Baqarah, Kahf, Sajdah and Mulk pl
 - Hooks: new `useListeningMushafPage` and `useQuranPlaybackCue` with cue regression tests.
 - Validation: `scripts/validate-quran-timings.mjs`, `scripts/run-checks.mjs`, isolated test registration and `e2e/quran-listening.spec.ts`.
 - Documentation: architecture, design system, content authoring, agent index/decisions, this phase, original synchronization proposal and new timing authoring guide.
-- Release: three parallel Arabic/English entries in `public/release-notes.json`, stamp `2026-10-08.2`.
+- Release: three parallel Arabic/English entries in `public/release-notes.json`, stamp `2026-10-08.3`.
 
 ## Components added or modified
 
@@ -55,7 +55,7 @@ Synthetic test-only annotations cover exact recording identity, independent revi
 
 The earlier full run produced 731 passes, one existing skip and four failures. Concurrent browser invocations rebuild the same `.playwright-dist`, and three failures showed missing lazy-loaded sections or root loading errors. All four scenarios passed in isolation. That run and interrupted intermediate snapshots are superseded by the successful final isolated full run; it is not recorded as a pass. No assertion, retry policy, timeout, coverage threshold or bundle ceiling was weakened.
 
-The first push was blocked before transmission: Pages CSS measured 28,676 gzip bytes against the unchanged 28,672-byte ceiling. Reusing the existing 4px margin-marker width utility removed the new width rule; `pnpm build:pages` then passed at 28,672 gzip bytes. The affected three-engine suite passed again: 12 tests, 1.3 minutes (`output/phase88-budget-feature.log`). The full run above precedes this isolated marker-width adjustment; CI exercises the final exact commit. No budget or baseline was raised. The pre-push hook passed frozen install, the full check in 60.7 seconds and 26 smoke tests in 1.0 minute before identifying the Pages failure.
+The first push was blocked before transmission: Pages CSS measured 28,676 gzip bytes against the unchanged 28,672-byte ceiling. Reusing the existing 4px margin-marker width utility removed the new width rule; `pnpm build:pages` then passed at 28,672 gzip bytes. The affected three-engine suite passed again: 12 tests, 1.3 minutes (`output/phase88-budget-feature.log`). The full run above precedes this isolated marker-width adjustment; CI exercises the final exact commit. No budget or baseline was raised. The next attempt was correctly blocked by release-note freshness after the remediation commit; all three entries were rewritten for the complete still-undeployed phase and the stamp advanced to `2026-10-08.3`. Neither blocked push reached origin. The pre-push hook passed frozen install, the full check in 60.7 seconds and 26 smoke tests in 1.0 minute before identifying the Pages failure.
 
 ## Visual/manual evidence
 
