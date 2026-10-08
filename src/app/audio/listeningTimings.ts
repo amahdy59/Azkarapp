@@ -1,4 +1,5 @@
 import type { ResolvedAudioSegment } from "./audioTypes";
+import { validTimingApproval, type TimingApproval } from "./timingApproval";
 
 export interface ListeningWordTiming {
   startOffset: number;
@@ -7,7 +8,7 @@ export interface ListeningWordTiming {
   endMs: number;
   occurrence: number;
 }
-export interface ListeningTimingAnnotation {
+export interface ListeningTimingAnnotation extends TimingApproval {
   variantIds: string[];
   sha256: string;
   durationMs: number;
@@ -19,10 +20,11 @@ export interface ListeningTimingAnnotation {
   authoredBy: string;
   reviewedBy: string;
   reviewedAt: string;
-  reviewStatus: "approved";
   words: ListeningWordTiming[];
   /** Explicitly reviewed display tokens absent from this recording (e.g. printed verse numbers). */
   unspokenWords?: Pick<ListeningWordTiming, "startOffset" | "endOffset" | "occurrence">[];
+  /** Missing model boundaries are explicit preview gaps, never declared unspoken. */
+  unresolvedWords?: Pick<ListeningWordTiming, "startOffset" | "endOffset" | "occurrence">[];
 }
 
 /** Exact display wording is required. A translation of the spoken words is not an alignment. */
@@ -45,29 +47,23 @@ export function validateListeningTiming(
     !/^[a-f0-9]{64}$/.test(annotation.textSha256)
   )
     issues.push("Recording, language or exact transcript differs.");
-  if (
-    annotation.reviewStatus !== "approved" ||
-    !annotation.source?.trim() ||
-    !annotation.authoredBy?.trim() ||
-    !annotation.reviewedBy?.trim() ||
-    annotation.authoredBy.trim() === annotation.reviewedBy.trim() ||
-    !/^\d{4}-\d{2}-\d{2}$/.test(annotation.reviewedAt) ||
-    !Number.isFinite(Date.parse(annotation.reviewedAt)) ||
-    new Date(annotation.reviewedAt).toISOString().slice(0, 10) !== annotation.reviewedAt
-  )
-    issues.push("Independent dated review is required.");
+  if (!validTimingApproval(annotation)) issues.push("Dated review or explicit owner preview acceptance is required.");
   const tokens = [...text.matchAll(/[\p{L}\p{N}][\p{L}\p{M}\p{N}'’-]*/gu)];
   const repetitions = segment.embeddedRepetitions ?? 1;
   const unspoken = annotation.unspokenWords ?? [];
+  const unresolved = annotation.unresolvedWords ?? [];
+  if (annotation.reviewStatus !== "owner-preview" && unresolved.length)
+    issues.push("Reviewed timings cannot contain unresolved words.");
   if (
     !Array.isArray(annotation.words) ||
     !Array.isArray(unspoken) ||
-    annotation.words.length + unspoken.length !== tokens.length * repetitions ||
+    !Array.isArray(unresolved) ||
+    annotation.words.length + unspoken.length + unresolved.length !== tokens.length * repetitions ||
     !tokens.length ||
     !annotation.words.length
   )
     return [...issues, "Complete word occurrences are required."];
-  const coverage = [...annotation.words, ...unspoken].sort(
+  const coverage = [...annotation.words, ...unspoken, ...unresolved].sort(
     (a, b) => a.occurrence - b.occurrence || a.startOffset - b.startOffset,
   );
   for (let occurrence = 0; occurrence < repetitions; occurrence++) {

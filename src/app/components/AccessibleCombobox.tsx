@@ -8,6 +8,7 @@ export interface ComboboxOption {
   label: string;
   secondaryLabel?: string;
   badge?: number | string;
+  keywords?: readonly string[];
 }
 
 export interface AccessibleComboboxProps {
@@ -60,7 +61,8 @@ export function AccessibleCombobox({
       const matchSecondary = opt.secondaryLabel?.toLowerCase().includes(query) ?? false;
       const matchBadge = opt.badge ? String(opt.badge).includes(query) : false;
       const matchId = String(opt.id).includes(query);
-      return matchLabel || matchSecondary || matchBadge || matchId;
+      const matchKeywords = opt.keywords ? opt.keywords.some((k) => k.toLowerCase().includes(query)) : false;
+      return matchLabel || matchSecondary || matchBadge || matchId || matchKeywords;
     });
   }, [options, searchQuery]);
 

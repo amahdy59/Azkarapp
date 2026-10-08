@@ -402,36 +402,30 @@ test("there is exactly one main landmark and focus moves to it on navigation", a
   await expect(page.locator("#main-content")).toBeFocused();
 });
 
-test("the Library keeps mobile category pills and compacts only the section switch", async ({ page }) => {
+test("the Library displays unified section tabs beside the heading across mobile and desktop", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await enterEnglishGuestMode(page);
   await page.getByTestId("nav-azkar").click();
 
   const heading = page.getByRole("heading", { name: "Azkar Library", exact: true });
-  const sectionMenu = page.getByTestId("library-mobile-section");
+  const collectionsTab = page.getByTestId("library-section-collections");
+  const savedTab = page.getByTestId("library-section-saved");
   await expect(heading).toBeVisible();
-  await expect(sectionMenu).toBeVisible();
-  await expect(sectionMenu).toHaveText(/Collections/);
+  await expect(collectionsTab).toBeVisible();
+  await expect(savedTab).toBeVisible();
+
   const allPill = page.getByRole("button", { name: "All", exact: true });
   await expect(allPill).toBeVisible();
   await expect(page.getByRole("button", { name: "Daily Azkar", exact: true })).toBeVisible();
-  const [mobileSectionBox, allPillBox] = await Promise.all([sectionMenu.boundingBox(), allPill.boundingBox()]);
-  expect(mobileSectionBox).not.toBeNull();
-  expect(allPillBox).not.toBeNull();
-  if (mobileSectionBox && allPillBox) {
-    expect(Math.abs(mobileSectionBox.y - allPillBox.y)).toBeLessThan(3);
-  }
 
-  await sectionMenu.click();
-  await page.getByRole("menuitemradio", { name: "Saved" }).click();
-  await expect(sectionMenu).toHaveText(/Saved/);
+  await savedTab.click();
   await expect(page.getByRole("heading", { name: "Nothing saved yet" })).toBeVisible();
 
-  await sectionMenu.click();
-  await page.getByRole("menuitemradio", { name: "Collections" }).click();
+  await collectionsTab.click();
 
   await page.setViewportSize({ width: 1280, height: 800 });
-  await expect(sectionMenu).toBeHidden();
+  await expect(collectionsTab).toBeVisible();
+  await expect(savedTab).toBeVisible();
   await expect(page.getByRole("button", { name: "All", exact: true })).toBeVisible();
 
   const [headingBox, tablistBox] = await Promise.all([

@@ -54,9 +54,14 @@ for (const scenario of [
     await expect(player).toHaveAttribute("data-variant", "compact");
     const checkCompactContainment = async () => {
       const bounds = (await canvas.boundingBox())!;
-      const mainBounds = (await page.locator(".app-main").boundingBox())!;
-      const dockBounds = (await player.locator(".audio-compact-card").boundingBox())!;
-      expect(Math.abs(dockBounds.y + dockBounds.height - (mainBounds.y + mainBounds.height))).toBeLessThanOrEqual(1);
+      // The reader measures its dock after menu dismissal and resized text reflow.
+      await expect
+        .poll(async () => {
+          const mainBounds = (await page.locator(".app-main").boundingBox())!;
+          const dockBounds = (await player.locator(".audio-compact-card").boundingBox())!;
+          return Math.abs(dockBounds.y + dockBounds.height - (mainBounds.y + mainBounds.height));
+        })
+        .toBeLessThanOrEqual(1);
       // Batch geometry reads to avoid dozens of protocol round trips in WebKit.
       const buttons = await player.getByRole("button").evaluateAll((elements) =>
         elements

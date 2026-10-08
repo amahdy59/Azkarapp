@@ -662,17 +662,16 @@ test("reader actions stay inside a 320 px app canvas", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 700 });
   await openFirstMorningZikr(page);
 
-  // Phone chrome: Benefit moved to the bottom counter dock, so the header
-  // row has only the overflow menu. The counter dock hosts Benefit beside
-  // the tap target, keeping the reading surface clear.
+  // The header exposes appearance and overflow actions. Benefit remains beside
+  // the counter, keeping the reading surface clear.
   await expect(page.getByTestId("reader-actions")).toBeVisible();
-  await expect(page.getByTestId("reader-actions").getByRole("button")).toHaveCount(1);
+  await expect(page.getByTestId("reader-actions").getByRole("button")).toHaveCount(2);
   await expect(page.getByTestId("reader-benefit-dock-button")).toBeVisible();
   await expect(page.getByTestId("nav-azkar")).toHaveCount(0);
 
   const readerBox = await page.getByTestId("reader-screen").boundingBox();
   const actionBoxes = await Promise.all(
-    ["Reader options"].map((name) => page.getByRole("button", { name, exact: true }).boundingBox()),
+    ["Appearance", "Reader options"].map((name) => page.getByRole("button", { name, exact: true }).boundingBox()),
   );
   // Also check the dock benefit button fits within the reader canvas.
   const dockBenefitBox = await page.getByTestId("reader-benefit-dock-button").boundingBox();

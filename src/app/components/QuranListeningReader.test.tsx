@@ -71,7 +71,7 @@ describe("read-only listening controls", () => {
     const { container } = render(<QuranListeningReader entry={entry} segment={null} currentTime={0} language="en" />);
     expect(screen.queryByRole("button", { name: "Follow recitation" })).toBeNull();
     expect(screen.queryByText(/Following is not available/)).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: "About text following" }));
+    fireEvent.click(screen.getByRole("button", { name: "Listening options" }));
     expect(screen.getByText(/Following is not available/)).toBeVisible();
     fireEvent.click(screen.getByRole("button", { name: "Close" }));
     expect(screen.queryByRole("button", { name: "Highlight words" })).toBeNull();
@@ -83,11 +83,17 @@ describe("read-only listening controls", () => {
   it("follows verified verse changes, pauses on manual browsing and returns without moving focus", () => {
     vi.mocked(timings.resolveQuranTiming).mockReturnValue(annotation);
     const props = { entry, segment: null, language: "en" as const };
-    const { container, rerender } = render(<QuranListeningReader {...props} currentTime={0.5} />);
+    const show = (currentTime: number) => (
+      <div className="audio-expanded-text">
+        <QuranListeningReader {...props} currentTime={currentTime} />
+      </div>
+    );
+    const { container, rerender } = render(show(0.5));
+    fireEvent.click(screen.getByRole("button", { name: "Listening options" }));
     const follow = screen.getByRole("button", { name: "Follow recitation" });
+    expect(follow).toHaveAttribute("aria-pressed", "true");
     follow.focus();
-    fireEvent.click(follow);
-    rerender(<QuranListeningReader {...props} currentTime={3} />);
+    rerender(show(3));
     expect(container.querySelector('[data-mushaf-page="563"]')).not.toBeNull();
     expect(follow).toHaveFocus();
     fireEvent.click(screen.getByRole("button", { name: "Previous" }));
@@ -95,7 +101,7 @@ describe("read-only listening controls", () => {
     expect(container.querySelector('[data-mushaf-page="562"]')).not.toBeNull();
     fireEvent.click(follow);
     expect(container.querySelector('[data-mushaf-page="563"]')).not.toBeNull();
-    fireEvent.wheel(screen.getByRole("region", { name: "Mushaf while listening" }));
+    fireEvent.wheel(container.querySelector(".audio-expanded-text")!);
     expect(follow).toHaveAttribute("aria-pressed", "false");
   });
   it("makes word emphasis optional and clears it after a recording loses approved alignment", () => {
@@ -103,6 +109,7 @@ describe("read-only listening controls", () => {
     const { container, rerender } = render(
       <QuranListeningReader entry={entry} segment={null} currentTime={1} language="en" />,
     );
+    fireEvent.click(screen.getByRole("button", { name: "Listening options" }));
     const words = screen.getByRole("button", { name: "Highlight words" });
     expect(words).toHaveAttribute("aria-pressed", "true");
     expect(container.querySelector('[data-playback-word="true"]')).not.toBeNull();

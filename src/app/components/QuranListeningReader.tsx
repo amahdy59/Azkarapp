@@ -49,13 +49,18 @@ export default function QuranListeningReader({
 }) {
   const pages = useMemo(() => entry.mushafPages ?? [], [entry.mushafPages]);
   const [manualIndex, setManualIndex] = useState(0);
-  const [follow, setFollow] = useState(false);
+  const [follow, setFollow] = useState(true);
   const [words, setWords] = useState(true);
   const [retry, setRetry] = useState(0);
   const timing = useReviewedQuranTiming(segment);
   const cue = useQuranPlaybackCue(timing, currentTime, playing, readTime);
   const root = useRef<HTMLElement>(null);
   const positionedAtStart = useRef(false);
+  useEffect(() => {
+    setFollow(true);
+    setManualIndex(0);
+    positionedAtStart.current = false;
+  }, [entry.entryId, segment?.variantId]);
   const ayah = Number(cue.verseKey?.split(":")[1]);
   const playingIndex =
     cue.verseKey && Number(cue.verseKey.split(":")[0]) === entry.quranRange?.surah
@@ -70,14 +75,16 @@ export default function QuranListeningReader({
     setFollow(false);
     setManualIndex(next);
   };
-  const pauseFollowing = () => {
-    if (follow) browse(index);
-  };
   useEffect(() => {
     if (follow && result && cue.verseKey) {
-      revealListeningTarget(root.current, root.current?.querySelector<HTMLElement>("[data-playback-verse]") ?? null);
+      revealListeningTarget(
+        root.current,
+        root.current?.querySelector<HTMLElement>('[data-playback-word="true"]') ??
+          root.current?.querySelector<HTMLElement>("[data-playback-verse]") ??
+          null,
+      );
     }
-  }, [follow, result, cue.verseKey]);
+  }, [follow, result, cue.verseKey, cue.word?.position]);
   useEffect(() => {
     if (!result || positionedAtStart.current) return;
     positionedAtStart.current = true;
@@ -91,7 +98,13 @@ export default function QuranListeningReader({
     revealListeningTarget(root.current, heading ?? null);
   }, [result, index, entry.quranRange]);
   useEffect(() => {
-    const viewport = root.current?.closest<HTMLElement>(".audio-expanded-text");
+    const viewport = root.current?.closest<HTMLElement>(".audio-expanded-text") ?? root.current;
+    const pauseFollowing = () => {
+      if (follow) {
+        setFollow(false);
+        setManualIndex(index);
+      }
+    };
     const handleKey = (event: KeyboardEvent) => {
       if (
         !follow ||
@@ -105,16 +118,16 @@ export default function QuranListeningReader({
       }
     };
     viewport?.addEventListener("keydown", handleKey);
-    return () => viewport?.removeEventListener("keydown", handleKey);
+    viewport?.addEventListener("wheel", pauseFollowing, { passive: true });
+    viewport?.addEventListener("touchmove", pauseFollowing, { passive: true });
+    return () => {
+      viewport?.removeEventListener("keydown", handleKey);
+      viewport?.removeEventListener("wheel", pauseFollowing);
+      viewport?.removeEventListener("touchmove", pauseFollowing);
+    };
   }, [follow, index]);
   return (
-    <section
-      ref={root}
-      className="w-full"
-      aria-label={t(language, "quranListening.reader")}
-      onWheel={pauseFollowing}
-      onTouchMove={pauseFollowing}
-    >
+    <section ref={root} className="w-full" aria-label={t(language, "quranListening.reader")}>
       <div
         data-listening-controls=""
         className="sticky top-0 z-10 flex flex-wrap items-center justify-center gap-1 bg-background"
@@ -152,32 +165,6 @@ export default function QuranListeningReader({
             <ChevronRight size={18} aria-hidden="true" />
           )}
         </button>
-        {timing && (
-          <button
-            type="button"
-            className={buttonClass}
-            aria-pressed={follow && Boolean(timing) && !error}
-            disabled={!timing || error}
-            onClick={() => {
-              setManualIndex(index);
-              setFollow((value) => !value);
-            }}
-          >
-            {t(language, "quranListening.follow")}
-            {follow ? <Check size={16} aria-hidden="true" /> : null}
-          </button>
-        )}
-        {hasWords && (
-          <button
-            type="button"
-            className={buttonClass}
-            aria-pressed={words}
-            onClick={() => setWords((value) => !value)}
-          >
-            {t(language, "quranListening.words")}
-            {words ? <Check size={16} aria-hidden="true" /> : null}
-          </button>
-        )}
         <Popover.Root>
           <Popover.Trigger asChild>
             <button type="button" className={buttonClass} aria-label={t(language, "quranListening.information")}>
@@ -199,6 +186,35 @@ export default function QuranListeningReader({
               <p className="text-sm">
                 {t(language, timing ? "quranListening.browseHint" : "quranListening.unavailable")}
               </p>
+              {timing && (
+                <button
+                  type="button"
+                  className={buttonClass}
+                  aria-pressed={follow && !error}
+                  disabled={error}
+                  onClick={() => {
+                    setManualIndex(index);
+                    setFollow((value) => !value);
+                  }}
+                >
+                  {t(language, "quranListening.follow")}
+                  {follow ? <Check size={16} aria-hidden="true" /> : null}
+                </button>
+              )}
+              {hasWords && (
+                <button
+                  type="button"
+                  className={buttonClass}
+                  aria-pressed={words}
+                  onClick={() => setWords((value) => !value)}
+                >
+                  {t(
+                    language,
+                    timing?.reviewStatus === "owner-preview" ? "quranListening.estimatedWords" : "quranListening.words",
+                  )}
+                  {words ? <Check size={16} aria-hidden="true" /> : null}
+                </button>
+              )}
               <Popover.Close asChild>
                 <button type="button" className={buttonClass} aria-label={t(language, "common.close")}>
                   <X size={18} aria-hidden="true" />

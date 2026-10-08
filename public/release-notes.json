@@ -1,13 +1,15 @@
 {
-  "release": "2026-10-08.6",
+  "release": "2026-10-08.7",
   "ar": [
-    "تمييز الكلمات أثناء الاستماع لدعاء «اللهم إني أسألك الثبات في الأمر» بصوت عبد الله محمد بعد مراجعة توقيتاته.",
-    "يمكنك تشغيل تمييز كلمات هذا الدعاء أو إيقافه مع استمرار الاستماع.",
-    "توقيتات هذا الدعاء متاحة دون اتصال بعد تحميلها أثناء الاستماع."
+    "تمييز تقريبي للكلمات أثناء الاستماع للتسجيلات العربية والإنجليزية، مع إمكانية إيقافه دون إيقاف الصوت.",
+    "متابعة تلقائية للكلمة أو موضع التلاوة في المصحف، مع إيقاف المتابعة عند التمرير اليدوي.",
+    "تمييز لوني هادئ يحافظ على حجم النص وتباعده، وخيارات استماع مختصرة وتوقيتات متاحة دون اتصال.",
+    "تبقى تبويبات المكتبة ظاهرة على الهاتف، مع البحث في خيارات القرآن وزر Aa لفتح إعدادات القراءة."
   ],
   "en": [
-    "Arabic word highlighting is now available for the reviewed Abdullah Muhammad recording of the dua asking for steadfastness.",
-    "Switch this dua’s word highlights on or off while continuing to listen.",
-    "This dua’s timings remain available offline after they load during listening."
+    "Estimated word highlights are available while listening to Arabic and English recordings, with an option to turn them off.",
+    "Automatically follow the spoken word or Mushaf section; scrolling manually pauses following.",
+    "Gentle color highlights preserve text size and spacing, with compact listening options and offline timing support.",
+    "Library tabs stay visible on phones; Quran pickers are searchable, and Aa opens reading settings."
   ]
 }

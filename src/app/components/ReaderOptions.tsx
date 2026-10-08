@@ -46,10 +46,12 @@ export function ReaderOptionsSection({ title, children }: { title: string; child
   const { sheet } = useContext(ReaderOptionsContext);
   if (!sheet)
     return (
-      <>
-        <DropdownMenuLabel>{title}</DropdownMenuLabel>
+      <div className="py-0.5">
+        <DropdownMenuLabel className="px-2.5 py-1 text-micro font-bold uppercase tracking-wider text-muted-foreground">
+          {title}
+        </DropdownMenuLabel>
         {children}
-      </>
+      </div>
     );
   return (
     <details className="border-t border-border/60">

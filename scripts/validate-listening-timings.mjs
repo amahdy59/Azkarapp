@@ -29,13 +29,17 @@ for (const annotation of annotations) {
     const identity = `${variantId}:${annotation.language}:${annotation.textSha256}`;
     if (seen.has(identity)) issues.push(`${identity}: ambiguous annotations`);
     seen.add(identity);
-    const variants = Object.values(AUDIO_CATALOG.assets)
+    const rawVariants = Object.values(AUDIO_CATALOG.assets)
       .filter((asset) => asset.reviewStatus === "approved")
       .flatMap((asset) =>
         asset.segments.flatMap((segment) =>
-          segment.variants.filter((variant) => variant.id === variantId && variant.reviewStatus === "approved"),
+          segment.variants.filter(
+            (variant) =>
+              variant.id === variantId && variant.sha256 === annotation.sha256 && variant.reviewStatus === "approved",
+          ),
         ),
       );
+    const variants = [...new Map(rawVariants.map((variant) => [JSON.stringify(variant), variant])).values()];
     if (variants.length !== 1) issues.push(`${identity}: missing or ambiguous approved recording`);
     else
       issues.push(
@@ -52,4 +56,7 @@ for (const annotation of annotations) {
 if (issues.length) {
   console.error(issues.join("\n"));
   process.exitCode = 1;
-} else console.log(`Listening timings validated: ${annotations.length} independently reviewed exact transcripts.`);
+} else
+  console.log(
+    `Listening timings validated: ${annotations.length} exact transcripts; ${annotations.filter((value) => value.reviewStatus === "owner-preview").length} owner-accepted previews.`,
+  );

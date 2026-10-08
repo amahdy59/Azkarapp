@@ -177,20 +177,18 @@ test("Library Benefits entry and section tabs stay inside the content boundary a
     await page.setViewportSize(viewport);
     await page.waitForTimeout(500);
     await expect(page.getByTestId("library-benefits-tool")).toBeVisible();
-    const compactSections = viewport.width < 640;
-    const sectionElements = compactSections
-      ? [page.getByTestId("library-mobile-section")]
-      : [page.getByTestId("library-section-collections"), page.getByTestId("library-section-saved")];
+    const sectionElements = [
+      page.getByTestId("library-section-collections"),
+      page.getByTestId("library-section-saved"),
+    ];
     for (const element of sectionElements) await expect(element).toBeVisible();
 
-    const geometry = await page.evaluate((compact) => {
+    const geometry = await page.evaluate(() => {
       const benefits = document.querySelector<HTMLElement>('[data-testid="library-benefits-tool"]')!;
-      const sectionControls = compact
-        ? [document.querySelector<HTMLElement>('[data-testid="library-mobile-section"]')!]
-        : [
-            document.querySelector<HTMLElement>('[data-testid="library-section-collections"]')!,
-            document.querySelector<HTMLElement>('[data-testid="library-section-saved"]')!,
-          ];
+      const sectionControls = [
+        document.querySelector<HTMLElement>('[data-testid="library-section-collections"]')!,
+        document.querySelector<HTMLElement>('[data-testid="library-section-saved"]')!,
+      ];
       const region = benefits.closest<HTMLElement>(".app-screen-surface")!;
       const regionBounds = region.getBoundingClientRect();
       const elements = [benefits, ...sectionControls];
@@ -227,7 +225,7 @@ test("Library Benefits entry and section tabs stay inside the content boundary a
           };
         }),
       };
-    }, compactSections);
+    });
 
     expect(geometry.offenders, `Home overflow elements at ${viewport.width}px`).toEqual([]);
     expect(geometry.regionOverflow, `Home content overflow at ${viewport.width}px`).toBeLessThanOrEqual(1);

@@ -4,6 +4,13 @@ import { getAzkarForMode } from "../src/app/content/azkar";
 import { FRIDAY_KAHF } from "../src/app/content/fridayKahf";
 import { t } from "../src/app/i18n";
 import { splitMushafPages } from "../src/app/content/mushafPages";
+import { readFileSync } from "node:fs";
+import { gunzipSync } from "node:zlib";
+import { OWNER_TIMING_PACK_SHA, expandOwnerTiming, type OwnerTimingPack } from "../src/app/audio/ownerTimingPreviews";
+
+const timingPack: OwnerTimingPack = JSON.parse(
+  gunzipSync(readFileSync(`public/data/listening-timings/owner-${OWNER_TIMING_PACK_SHA}.bin`)).toString(),
+);
 
 for (const item of [
   { id: "ir-baqarah", category: "illness_ruqyah", route: "illness-ruqyah", first: 2, next: 3 },
@@ -104,22 +111,108 @@ for (const item of [
       expect(initialLayout.controlsHeight).toBeLessThanOrEqual(48);
       expect(initialLayout.headingTop).toBeGreaterThanOrEqual(initialLayout.controlsBottom - 1);
       expect(initialLayout.headingBottom).toBeLessThanOrEqual(initialLayout.viewportBottom + 1);
-      await expect(player.getByRole("button", { name: t(language, "quranListening.follow"), exact: true })).toHaveCount(
-        0,
-      );
       await expect(page.getByText(t(language, "quranListening.unavailable"), { exact: true })).toHaveCount(0);
       const information = player.getByRole("button", { name: t(language, "quranListening.information"), exact: true });
       await information.focus();
       await page.keyboard.press("Enter");
       const explanation = page.getByTestId("quran-follow-info");
       await expect(explanation).toBeVisible();
-      await expect(explanation).toHaveText(t(language, "quranListening.unavailable"));
+      await expect(explanation.locator("p")).toHaveText(t(language, "quranListening.browseHint"));
+      await expect(
+        explanation.getByRole("button", { name: t(language, "quranListening.follow"), exact: true }),
+      ).toHaveAttribute("aria-pressed", "true");
+      await expect(
+        explanation.getByRole("button", { name: t(language, "quranListening.estimatedWords"), exact: true }),
+      ).toHaveAttribute("aria-pressed", "true");
       expect(
         (await new AxeBuilder({ page }).include('[data-testid="quran-follow-info"]').analyze()).violations,
       ).toEqual([]);
       await page.keyboard.press("Escape");
       await expect(explanation).toHaveCount(0);
       await expect(information).toBeFocused();
+      const record = timingPack.records.find(
+        (record) =>
+          record.q &&
+          record.v.some((id) =>
+            id.startsWith(item.id === "ir-baqarah" ? "quran-002" : item.id === "friday-kahf" ? "quran-018" : item.id),
+          ),
+      )!;
+      const annotation = expandOwnerTiming(timingPack, record);
+      if (!("verses" in annotation)) throw new Error("Expected Quran timings");
+      const first = annotation.verses.find((verse) => verse.words?.length)!;
+      await page.evaluate(
+        (time) => {
+          const audio = (window as unknown as { __listeningAudio: HTMLAudioElement }).__listeningAudio;
+          audio.currentTime = time;
+          audio.dispatchEvent(new Event("timeupdate"));
+        },
+        (first.words![0]!.startMs + 1) / 1000,
+      );
+      const active = player.locator('[data-playback-word="true"]');
+      await expect(active).toHaveCount(1);
+      const metrics = await active.evaluate((word) => {
+        const bounds = word.getBoundingClientRect(),
+          view = word.closest(".audio-expanded-text")!.getBoundingClientRect();
+        return {
+          width: bounds.width,
+          height: bounds.height,
+          font: getComputedStyle(word).fontSize,
+          visible: bounds.top >= view.top && bounds.bottom <= view.bottom,
+        };
+      });
+      expect(metrics.visible).toBe(true);
+      await information.click();
+      await explanation
+        .getByRole("button", { name: t(language, "quranListening.estimatedWords"), exact: true })
+        .click();
+      await expect(active).toHaveCount(0);
+      await explanation
+        .getByRole("button", { name: t(language, "quranListening.estimatedWords"), exact: true })
+        .click();
+      await expect(active).toHaveCount(1);
+      const restored = await active.evaluate((word) => ({
+        width: word.getBoundingClientRect().width,
+        height: word.getBoundingClientRect().height,
+        font: getComputedStyle(word).fontSize,
+      }));
+      expect(restored).toEqual({ width: metrics.width, height: metrics.height, font: metrics.font });
+      await page.keyboard.press("Escape");
+      const firstRange = (
+        item.id === "friday-kahf"
+          ? FRIDAY_KAHF[0]!
+          : getAzkarForMode(item.category, "complete").find((zikr) => zikr.id === item.id)!
+      ).mushafPages![0]!;
+      const lastVerse = annotation.verses
+        .filter((verse) => Number(verse.verseKey.split(":")[1]) <= firstRange.endAyah && verse.words?.length)
+        .at(-1)!;
+      const laterTime = (lastVerse.words!.at(-1)!.startMs + 1) / 1000;
+      await page.evaluate((time) => {
+        const audio = (window as unknown as { __listeningAudio: HTMLAudioElement }).__listeningAudio;
+        audio.currentTime = time;
+        audio.dispatchEvent(new Event("timeupdate"));
+      }, laterTime);
+      await expect(active).toHaveCount(1);
+      await expect
+        .poll(() =>
+          active.evaluate((word) => {
+            const view = word.closest(".audio-expanded-text")!,
+              bounds = word.getBoundingClientRect();
+            return (
+              bounds.top >= view.querySelector("[data-listening-controls]")!.getBoundingClientRect().bottom &&
+              bounds.bottom <= view.getBoundingClientRect().bottom
+            );
+          }),
+        )
+        .toBe(true);
+      await player
+        .locator(".audio-expanded-text")
+        .evaluate((viewport) => viewport.dispatchEvent(new WheelEvent("wheel", { bubbles: true })));
+      await information.click();
+      const following = explanation.getByRole("button", { name: t(language, "quranListening.follow"), exact: true });
+      await expect(following).toHaveAttribute("aria-pressed", "false");
+      await following.click();
+      await expect(following).toHaveAttribute("aria-pressed", "true");
+      await page.keyboard.press("Escape");
       for (const offset of [0, 120, 240]) {
         const scrollLayout = await player.evaluate((element, offset) => {
           const viewport = element.querySelector<HTMLElement>(".audio-expanded-text")!;

@@ -799,4 +799,46 @@ describe("ReaderScreen audio identity", () => {
     fireEvent.click(screen.getByTestId("reader-menu-repeat"));
     expect(onRepeat).toHaveBeenCalledOnce();
   });
+
+  it("provides a dedicated Aa button in the top reader toolbar to open reading display settings directly", async () => {
+    const onTextSizeChange = vi.fn();
+    const onRoutineModeChange = vi.fn();
+    render(
+      <ReaderScreen
+        catId="morning"
+        idx={0}
+        routineMode="core"
+        isArabic
+        direction="rtl"
+        themeMode="light"
+        isDone={false}
+        collectionCompletedCount={0}
+        hapticFeedback={false}
+        showTranslation={false}
+        showTransliteration={false}
+        textSize="medium"
+        onTextSizeChange={onTextSizeChange}
+        savedZikrIds={new Set()}
+        onBack={() => undefined}
+        onRoutineModeChange={onRoutineModeChange}
+        onComplete={() => undefined}
+        onAdvance={() => undefined}
+        onNext={() => undefined}
+        onPrev={() => undefined}
+        onToggleSaved={() => undefined}
+        audioAvailable={false}
+      />,
+    );
+
+    const aaButton = screen.getByTestId("reader-settings-button");
+    expect(aaButton).toBeInTheDocument();
+    fireEvent.click(aaButton);
+
+    const sheet = await screen.findByTestId("reader-display-settings-sheet");
+    expect(sheet).toBeInTheDocument();
+
+    const largeOption = screen.getByTestId("reader-display-text-size-large");
+    fireEvent.click(largeOption);
+    expect(onTextSizeChange).toHaveBeenCalledWith("large");
+  });
 });

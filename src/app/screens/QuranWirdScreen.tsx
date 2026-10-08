@@ -2,8 +2,9 @@ import { useMemo, useState } from "react";
 import { Header } from "../components/LayoutShells";
 import { ProgressBar } from "../components/ProgressBar";
 import { ScreenContainer } from "../components/ScreenContainer";
-import { ArrowNext, BookOpen, Check, ChevronDown, Minus, Plus, RotateCcw, Search, Undo, X } from "../components/icons";
-import { getJuzNumberForPage, getSurahDisplayName, JUZS, SURAHS, searchSurahs } from "../content/surahInfo";
+import { ArrowNext, BookOpen, Check, Minus, Plus, RotateCcw, Undo } from "../components/icons";
+import { getJuzNumberForPage, getSurahDisplayName, JUZS, SURAHS } from "../content/surahInfo";
+import { AccessibleCombobox, type ComboboxOption } from "../components/AccessibleCombobox";
 import {
   effectiveDailyGoal,
   getQuranWirdGoal,
@@ -243,25 +244,34 @@ export function QuranWirdScreen({
     plan.kind === "khatmah30" ? createPlan("hijriMonth", now, todayKey, position) : plan,
   );
 
-  const [juzSearch, setJuzSearch] = useState("");
-  const [surahSearch, setSurahSearch] = useState("");
-
-  const filteredJuzs = useMemo(() => {
-    const query = juzSearch.trim().toLowerCase();
-    if (!query) return JUZS;
-    return JUZS.filter((j) => {
-      const nameAr = j.nameArabic.toLowerCase();
-      const nameEn = j.nameEnglish.toLowerCase();
-      const num = String(j.number);
-      return nameAr.includes(query) || nameEn.includes(query) || num.includes(query);
+  const juzOptions = useMemo<ComboboxOption[]>(() => {
+    return JUZS.map((j) => {
+      const range = getJuzPageRange(j.number);
+      const name = language === "ar" ? j.nameArabic : j.nameEnglish;
+      return {
+        id: j.number,
+        label: name,
+        secondaryLabel: `${formatNumerals(range.startPage, language)}–${formatNumerals(range.endPage, language)}`,
+        badge: formatNumerals(j.number, language),
+        keywords: [j.nameArabic, j.nameEnglish, String(j.number)],
+      };
     });
-  }, [juzSearch]);
+  }, [language]);
 
-  const filteredSurahs = useMemo(() => {
-    const query = surahSearch.trim().toLowerCase();
-    if (!query) return SURAHS;
-    return searchSurahs(query, language);
-  }, [surahSearch, language]);
+  const surahOptions = useMemo<ComboboxOption[]>(() => {
+    return SURAHS.map((s) => {
+      const range = getSurahPageRange(s.number);
+      const name = getSurahDisplayName(s.number, language);
+      const pagesCount = range.endPage - range.startPage + 1;
+      return {
+        id: s.number,
+        label: name,
+        secondaryLabel: `${formatNumerals(pagesCount, language)} ${t(language, "mushaf.pagesUnit")}`,
+        badge: formatNumerals(s.number, language),
+        keywords: [s.nameArabic, s.nameEnglish, String(s.number)],
+      };
+    });
+  }, [language]);
 
   const timedDraft =
     draftPlan.kind === "custom" ||
@@ -674,134 +684,55 @@ export function QuranWirdScreen({
                   </div>
 
                   {(draftPlan.repeatScope ?? "juz") === "juz" && (
-                    <div className="flex flex-col gap-2">
-                      <label htmlFor="quran-wird-juz-select" className="text-xs font-bold text-muted-foreground">
-                        {t(language, "mushaf.selectJuz")}
-                      </label>
-                      <div className="relative">
-                        <span className="pointer-events-none absolute inset-y-0 start-3 flex items-center text-muted-foreground">
-                          <Search size={16} aria-hidden="true" />
-                        </span>
-                        <input
-                          type="text"
-                          value={juzSearch}
-                          onChange={(e) => setJuzSearch(e.target.value)}
-                          placeholder={t(language, "mushaf.searchJuzPlaceholder")}
-                          aria-label={t(language, "mushaf.searchJuzPlaceholder")}
-                          className="h-11 w-full rounded-xl border border-border bg-background pe-12 ps-9 text-xs font-bold text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                        />
-                        {juzSearch && (
-                          <button
-                            type="button"
-                            onClick={() => setJuzSearch("")}
-                            className="absolute inset-y-0 end-0 flex w-11 items-center justify-center rounded-xl text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                            aria-label={t(language, "common.clear")}
-                          >
-                            <X size={14} aria-hidden="true" />
-                          </button>
-                        )}
-                      </div>
-                      <div className="relative">
-                        <select
-                          id="quran-wird-juz-select"
-                          value={draftPlan.repeatNumber ?? 1}
-                          onChange={(e) => {
-                            const juzNum = Number(e.target.value);
-                            const range = getJuzPageRange(juzNum);
-                            setDraftPlan({
-                              ...draftPlan,
-                              repeatScope: "juz",
-                              repeatNumber: juzNum,
-                              repeatStartPage: range.startPage,
-                              repeatEndPage: range.endPage,
-                              dailyPages: range.endPage - range.startPage + 1,
-                              startedDayKey: todayKey,
-                            });
-                          }}
-                          className="h-12 w-full appearance-none rounded-xl border border-border bg-card pe-10 ps-3.5 text-sm font-bold text-foreground transition-colors hover:border-primary/50 focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                        >
-                          {filteredJuzs.map((j) => {
-                            const range = getJuzPageRange(j.number);
-                            const name = language === "ar" ? j.nameArabic : j.nameEnglish;
-                            return (
-                              <option key={j.number} value={j.number}>
-                                {name} ({formatNumerals(range.startPage, language)}–
-                                {formatNumerals(range.endPage, language)})
-                              </option>
-                            );
-                          })}
-                        </select>
-                        <span className="pointer-events-none absolute inset-y-0 end-3.5 flex items-center text-muted-foreground">
-                          <ChevronDown size={18} aria-hidden="true" />
-                        </span>
-                      </div>
-                    </div>
+                    <AccessibleCombobox
+                      id="quran-wird-juz-select"
+                      label={t(language, "mushaf.selectJuz")}
+                      options={juzOptions}
+                      value={draftPlan.repeatNumber ?? 1}
+                      onChange={(val) => {
+                        const juzNum = Number(val);
+                        const range = getJuzPageRange(juzNum);
+                        setDraftPlan({
+                          ...draftPlan,
+                          repeatScope: "juz",
+                          repeatNumber: juzNum,
+                          repeatStartPage: range.startPage,
+                          repeatEndPage: range.endPage,
+                          dailyPages: range.endPage - range.startPage + 1,
+                          startedDayKey: todayKey,
+                        });
+                      }}
+                      placeholder={t(language, "mushaf.selectJuz")}
+                      searchPlaceholder={t(language, "mushaf.searchJuzPlaceholder")}
+                      direction={direction}
+                      language={language}
+                    />
                   )}
 
                   {draftPlan.repeatScope === "surah" && (
-                    <div className="flex flex-col gap-2">
-                      <label htmlFor="quran-wird-surah-select" className="text-xs font-bold text-muted-foreground">
-                        {t(language, "mushaf.selectSurah")}
-                      </label>
-                      <div className="relative">
-                        <span className="pointer-events-none absolute inset-y-0 start-3 flex items-center text-muted-foreground">
-                          <Search size={16} aria-hidden="true" />
-                        </span>
-                        <input
-                          type="text"
-                          value={surahSearch}
-                          onChange={(e) => setSurahSearch(e.target.value)}
-                          placeholder={t(language, "mushaf.searchSurahPlaceholder")}
-                          aria-label={t(language, "mushaf.searchSurahPlaceholder")}
-                          className="h-11 w-full rounded-xl border border-border bg-background pe-12 ps-9 text-xs font-bold text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                        />
-                        {surahSearch && (
-                          <button
-                            type="button"
-                            onClick={() => setSurahSearch("")}
-                            className="absolute inset-y-0 end-0 flex w-11 items-center justify-center rounded-xl text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                            aria-label={t(language, "common.clear")}
-                          >
-                            <X size={14} aria-hidden="true" />
-                          </button>
-                        )}
-                      </div>
-                      <div className="relative">
-                        <select
-                          id="quran-wird-surah-select"
-                          value={draftPlan.repeatNumber ?? 1}
-                          onChange={(e) => {
-                            const surahNum = Number(e.target.value);
-                            const range = getSurahPageRange(surahNum);
-                            setDraftPlan({
-                              ...draftPlan,
-                              repeatScope: "surah",
-                              repeatNumber: surahNum,
-                              repeatStartPage: range.startPage,
-                              repeatEndPage: range.endPage,
-                              dailyPages: range.endPage - range.startPage + 1,
-                              startedDayKey: todayKey,
-                            });
-                          }}
-                          className="h-12 w-full appearance-none rounded-xl border border-border bg-card pe-10 ps-3.5 text-sm font-bold text-foreground transition-colors hover:border-primary/50 focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                        >
-                          {filteredSurahs.map((s) => {
-                            const range = getSurahPageRange(s.number);
-                            const name = getSurahDisplayName(s.number, language);
-                            const pagesCount = range.endPage - range.startPage + 1;
-                            return (
-                              <option key={s.number} value={s.number}>
-                                {s.number}. {name} ({formatNumerals(pagesCount, language)}{" "}
-                                {t(language, "mushaf.pagesUnit")})
-                              </option>
-                            );
-                          })}
-                        </select>
-                        <span className="pointer-events-none absolute inset-y-0 end-3.5 flex items-center text-muted-foreground">
-                          <ChevronDown size={18} aria-hidden="true" />
-                        </span>
-                      </div>
-                    </div>
+                    <AccessibleCombobox
+                      id="quran-wird-surah-select"
+                      label={t(language, "mushaf.selectSurah")}
+                      options={surahOptions}
+                      value={draftPlan.repeatNumber ?? 1}
+                      onChange={(val) => {
+                        const surahNum = Number(val);
+                        const range = getSurahPageRange(surahNum);
+                        setDraftPlan({
+                          ...draftPlan,
+                          repeatScope: "surah",
+                          repeatNumber: surahNum,
+                          repeatStartPage: range.startPage,
+                          repeatEndPage: range.endPage,
+                          dailyPages: range.endPage - range.startPage + 1,
+                          startedDayKey: todayKey,
+                        });
+                      }}
+                      placeholder={t(language, "mushaf.selectSurah")}
+                      searchPlaceholder={t(language, "mushaf.searchSurahPlaceholder")}
+                      direction={direction}
+                      language={language}
+                    />
                   )}
 
                   {draftPlan.repeatScope === "custom" && (

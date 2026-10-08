@@ -2,6 +2,8 @@ import { resolveListeningTiming, type ListeningTimingAnnotation } from "./listen
 import { resolveQuranTiming, type QuranTimingAnnotation } from "./quranTimings";
 import { REVIEWED_TIMING_FILES, reviewedTimingFilename, type ReviewedTimingFile } from "./reviewedTimingFiles";
 import type { ResolvedAudioSegment } from "./audioTypes";
+import { loadOwnerTimingPack } from "./ownerTimingLoader";
+import { expandOwnerTiming } from "./ownerTimingPreviews";
 
 async function readTiming(file: ReviewedTimingFile, signal: AbortSignal): Promise<unknown> {
   if (
@@ -37,11 +39,26 @@ export async function loadReviewedListeningTiming(
         file.language === language &&
         file.variantIds.includes(segment.variantId),
     );
-    if (!candidates.length) return null;
     const digest = [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text)))]
       .map((byte) => byte.toString(16).padStart(2, "0"))
       .join("");
     const matching = candidates.filter((file) => file.textSha256 === digest);
+    if (!matching.length && files === REVIEWED_TIMING_FILES) {
+      const pack = await loadOwnerTimingPack(signal);
+      const records =
+        pack?.records.filter(
+          (record) =>
+            !record.q &&
+            record.s === segment.sha256 &&
+            record.v.includes(segment.variantId) &&
+            record.l === language &&
+            record.h === digest,
+        ) ?? [];
+      if (pack && records.length === 1 && !signal.aborted)
+        return resolveListeningTiming(segment, text, language, [
+          expandOwnerTiming(pack, records[0]!, text) as ListeningTimingAnnotation,
+        ]);
+    }
     if (matching.length !== 1 || signal.aborted) return null;
     const annotation = (await readTiming(matching[0]!, signal)) as ListeningTimingAnnotation | null;
     return annotation?.textSha256 === digest && !signal.aborted
@@ -64,6 +81,15 @@ export async function loadReviewedQuranTiming(
         file.sha256 === segment.sha256 &&
         file.variantIds.includes(segment.variantId),
     );
+    if (!candidates.length && files === REVIEWED_TIMING_FILES) {
+      const pack = await loadOwnerTimingPack(signal);
+      const records =
+        pack?.records.filter(
+          (record) => record.q && record.s === segment.sha256 && record.v.includes(segment.variantId),
+        ) ?? [];
+      if (pack && records.length === 1 && !signal.aborted)
+        return resolveQuranTiming(segment, [expandOwnerTiming(pack, records[0]!) as QuranTimingAnnotation]);
+    }
     if (candidates.length !== 1) return null;
     const annotation = (await readTiming(candidates[0]!, signal)) as QuranTimingAnnotation | null;
     return annotation && !signal.aborted ? resolveQuranTiming(segment, [annotation]) : null;

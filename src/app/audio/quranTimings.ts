@@ -1,4 +1,5 @@
 import type { ResolvedAudioSegment } from "./audioTypes";
+import { validTimingApproval, type TimingApproval } from "./timingApproval";
 
 export interface QuranWordTiming {
   position: number;
@@ -11,7 +12,7 @@ export interface QuranVerseTiming {
   endMs: number;
   words?: QuranWordTiming[];
 }
-export interface QuranTimingAnnotation {
+export interface QuranTimingAnnotation extends TimingApproval {
   variantId: string;
   sha256: string;
   durationMs: number;
@@ -20,7 +21,6 @@ export interface QuranTimingAnnotation {
   authoredBy: string;
   reviewedBy: string;
   reviewedAt: string;
-  reviewStatus: "approved";
   verses: QuranVerseTiming[];
 }
 
@@ -36,25 +36,17 @@ export function validateQuranTiming(annotation: QuranTimingAnnotation, segment: 
     annotation.durationMs !== segment.durationMs
   )
     issues.push("Checksum, units or duration is invalid.");
-  if (
-    annotation.reviewStatus !== "approved" ||
-    !annotation.source?.trim() ||
-    !annotation.authoredBy?.trim() ||
-    !annotation.reviewedBy?.trim() ||
-    annotation.authoredBy.trim() === annotation.reviewedBy.trim() ||
-    !/^\d{4}-\d{2}-\d{2}$/.test(annotation.reviewedAt) ||
-    !Number.isFinite(Date.parse(annotation.reviewedAt))
-  )
-    issues.push("An independent dated review and source are required.");
+  if (!validTimingApproval(annotation)) issues.push("An independent dated review and source are required.");
+  const preview = annotation.reviewStatus === "owner-preview";
   if (!Array.isArray(annotation.verses) || !annotation.verses.length) return [...issues, "Verse timings are missing."];
   let previousEnd = 0;
   let previousAyah = (range?.ayahStart ?? 1) - 1;
   for (const verse of annotation.verses) {
-    const [surah, ayah] = verse.verseKey.split(":").map(Number);
+    const [surah = 0, ayah = 0] = verse.verseKey.split(":").map(Number);
     if (
       !/^\d+:\d+$/.test(verse.verseKey) ||
       surah !== range?.surah ||
-      ayah !== previousAyah + 1 ||
+      (preview ? ayah <= previousAyah : ayah !== previousAyah + 1) ||
       ayah > (range?.ayahEnd ?? 0)
     )
       issues.push("Verses must cover the recording range in order.");
@@ -75,7 +67,7 @@ export function validateQuranTiming(annotation: QuranTimingAnnotation, segment: 
     previousEnd = verse.endMs;
     previousAyah = ayah ?? 0;
   }
-  if (previousAyah !== range?.ayahEnd) issues.push("Verse coverage is incomplete.");
+  if (!preview && previousAyah !== range?.ayahEnd) issues.push("Verse coverage is incomplete.");
   return issues;
 }
 

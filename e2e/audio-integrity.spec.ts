@@ -2,6 +2,9 @@ import { clickReaderOption } from "./reader-options";
 import { expect, test, type Page } from "@playwright/test";
 import { getAzkarForMode } from "../src/app/content/azkar";
 import { COMPREHENSIVE_DUAS } from "../src/app/content/comprehensiveDuas";
+import { readFileSync } from "node:fs";
+import { gunzipSync } from "node:zlib";
+import { OWNER_TIMING_PACK_SHA, expandOwnerTiming, type OwnerTimingPack } from "../src/app/audio/ownerTimingPreviews";
 
 async function prepareAudio(page: Page) {
   await page.setViewportSize({ width: 390, height: 844 });
@@ -46,6 +49,26 @@ async function prepareAudio(page: Page) {
   });
 }
 
+test("Aa reader settings retain keyboard focus, persisted text sizing and accessible controls @cross-browser", async ({
+  page,
+}) => {
+  await prepareAudio(page);
+  await page.goto("/#/azkar/morning/1");
+  const trigger = page.getByTestId("reader-settings-button");
+  await expect(trigger).toHaveAccessibleName("Appearance");
+  await trigger.focus();
+  await page.keyboard.press("Enter");
+  const sheet = page.getByTestId("reader-display-settings-sheet");
+  await expect(sheet).toBeVisible();
+  await sheet.getByTestId("reader-display-text-size-large").click();
+  await expect
+    .poll(() => page.evaluate(() => JSON.parse(localStorage.getItem("azkarapp.state.v1")!).settings.textSize))
+    .toBe("large");
+  await page.keyboard.press("Escape");
+  await expect(sheet).toHaveCount(0);
+  await expect(trigger).toBeFocused();
+});
+
 test("owner-reviewed Friday dua loads exact registered timings and clears cues on opt-out and voice change @cross-browser", async ({
   page,
 }) => {
@@ -84,8 +107,46 @@ test("owner-reviewed Friday dua loads exact registered timings and clears cues o
   await page.getByRole("button", { name: "Reader options", exact: true }).click();
   await clickReaderOption(page, "Play English translation");
   await player.getByRole("button", { name: "Expand player", exact: true }).click();
-  await expect(player.locator("[data-listening-word]")).toHaveCount(0);
-  await expect(player.getByRole("button", { name: "Highlight words", exact: true })).toHaveCount(0);
+  await expect(player.locator('[data-listening-word]:has-text("اللهم")')).toHaveCount(0);
+  await expect(player.getByRole("button", { name: "Estimated word highlights", exact: true })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  const pack: OwnerTimingPack = JSON.parse(
+    gunzipSync(readFileSync(`public/data/listening-timings/owner-${OWNER_TIMING_PACK_SHA}.bin`)).toString(),
+  );
+  const text = COMPREHENSIVE_DUAS.find((entry) => entry.id === "friday-dua-18")!.translation!;
+  const source = await page.evaluate(
+    () => (window as unknown as { __reviewAudio: HTMLAudioElement }).__reviewAudio.src,
+  );
+  const { createHash } = await import("node:crypto");
+  const digest = createHash("sha256").update(text).digest("hex");
+  const audioSha = new URL(source).searchParams.get("sha256");
+  expect(audioSha).toMatch(/^[a-f0-9]{64}$/);
+  const record = pack.records.find((record) => record.l === "en" && record.h === digest && record.s === audioSha)!;
+  const annotation = expandOwnerTiming(pack, record, text);
+  if (!("words" in annotation)) throw new Error("Expected English timing");
+  const firstWord = annotation.words[0]!;
+  await clock((firstWord.startMs + 1) / 1000);
+  const englishWord = player.locator("[data-listening-word]");
+  await expect(englishWord).toHaveText(text.slice(firstWord.startOffset, firstWord.endOffset));
+  const geometry = await englishWord.evaluate((word) => ({
+    width: word.getBoundingClientRect().width,
+    height: word.getBoundingClientRect().height,
+    font: getComputedStyle(word).fontSize,
+  }));
+  const estimated = player.getByRole("button", { name: "Estimated word highlights", exact: true });
+  await estimated.click();
+  await expect(englishWord).toHaveCount(0);
+  await estimated.click();
+  await expect(englishWord).toHaveCount(1);
+  expect(
+    await englishWord.evaluate((word) => ({
+      width: word.getBoundingClientRect().width,
+      height: word.getBoundingClientRect().height,
+      font: getComputedStyle(word).fontSize,
+    })),
+  ).toEqual(geometry);
 });
 
 for (const id of ["m-hm-91", "e-hm-91", "misc-ref-3", "m-hm-96", "e-hm-96", "friday-dua-08"]) {

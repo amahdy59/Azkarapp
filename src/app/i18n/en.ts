@@ -994,10 +994,12 @@ const en = {
   },
   quranListening: {
     page: "Page {page}",
-    information: "About text following",
+    information: "Listening options",
     reader: "Mushaf while listening",
     follow: "Follow recitation",
     words: "Highlight words",
+    estimatedWords: "Estimated word highlights",
+    followText: "Follow text",
     unavailable: "Following is not available for this recitation yet. You can browse the Mushaf while listening.",
     browseHint: "Changing pages pauses following. Turn Follow recitation on to return to the current verse.",
     pageError: "The Mushaf page layout could not be loaded. You can still read the Quran text.",

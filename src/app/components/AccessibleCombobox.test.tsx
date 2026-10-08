@@ -9,6 +9,31 @@ const testOptions = [
 ];
 
 describe("AccessibleCombobox", () => {
+  it("finds a Quran choice by its other-language name and selects it with the keyboard", () => {
+    const onChange = vi.fn();
+    render(
+      <AccessibleCombobox
+        label="Select Surah"
+        language="en"
+        options={[
+          { id: 1, label: "Al-Fatihah", keywords: ["الفاتحة"] },
+          { id: 18, label: "Al-Kahf", keywords: ["الكهف", "Cave"] },
+        ]}
+        value={1}
+        onChange={onChange}
+      />,
+    );
+    fireEvent.click(screen.getByRole("combobox"));
+    const search = screen.getByRole("textbox");
+    fireEvent.change(search, { target: { value: "الكهف" } });
+    expect(screen.getAllByRole("option")).toHaveLength(1);
+    expect(screen.getByRole("option")).toHaveTextContent("Al-Kahf");
+    fireEvent.change(search, { target: { value: "CAVE" } });
+    fireEvent.keyDown(search, { key: "ArrowDown" });
+    fireEvent.keyDown(search, { key: "Enter" });
+    expect(onChange).toHaveBeenCalledExactlyOnceWith(18);
+    expect(screen.getByRole("combobox")).toHaveFocus();
+  });
   it("renders with trigger showing selected option and opens on click", () => {
     const onChange = vi.fn();
     render(<AccessibleCombobox label="Select Surah" options={testOptions} value={2} onChange={onChange} />);

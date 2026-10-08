@@ -46,6 +46,28 @@ const annotation: QuranTimingAnnotation = {
 };
 
 describe("reviewed Quran timing boundary", () => {
+  it("permits owner-preview gaps without relaxing reviewed range coverage or interval order", () => {
+    const preview = {
+      ...annotation,
+      reviewStatus: "owner-preview" as const,
+      reviewedBy: "",
+      reviewedAt: "",
+      acceptedBy: "Owner",
+      acceptedAt: "2026-10-08",
+      verses: [annotation.verses[1]!],
+    };
+    expect(validateQuranTiming(preview, segment)).toEqual([]);
+    expect(getQuranPlaybackCue(preview, 1).word).toBeNull();
+    expect(
+      validateQuranTiming(
+        { ...preview, reviewStatus: "approved", reviewedBy: "Reviewer", reviewedAt: "2026-10-08" },
+        segment,
+      ),
+    ).toContain("Verses must cover the recording range in order.");
+    expect(
+      validateQuranTiming({ ...preview, verses: [{ ...preview.verses[0]!, verseKey: "68:2" }] }, segment),
+    ).toContain("Verses must cover the recording range in order.");
+  });
   it("ships no alignment and resolves only a unique reviewed exact-file match", () => {
     expect(resolveQuranTiming(segment)).toBeNull();
     expect(validateQuranTiming(annotation, segment)).toEqual([]);

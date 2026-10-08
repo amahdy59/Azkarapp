@@ -273,7 +273,11 @@ test("custom plan presets and section search remain keyboard usable with 44px ta
   await expect(page.getByLabel("أيام الإتمام", { exact: true })).toHaveValue("30");
 
   await page.getByRole("radio", { name: /وِرد يومي ثابت/ }).check();
+  const choice = page.getByRole("combobox", { name: /^اختر الجزء/ });
+  await choice.focus();
+  await page.keyboard.press("Enter");
   const search = page.getByRole("textbox", { name: "ابحث عن جزء..." });
+  await expect(search).toBeFocused();
   await search.fill("1");
   const clear = page.getByRole("button", { name: "مسح", exact: true });
   const bounds = await clear.boundingBox();
@@ -282,7 +286,12 @@ test("custom plan presets and section search remain keyboard usable with 44px ta
   await clear.focus();
   await page.keyboard.press("Enter");
   await expect(search).toHaveValue("");
-  await expect(page.getByRole("combobox").locator("option")).toHaveCount(30);
+  await expect(page.getByRole("listbox", { name: "اختر الجزء", exact: true }).getByRole("option")).toHaveCount(30);
+  await expect(search).toBeFocused();
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("Enter");
+  await expect(choice).toHaveAttribute("aria-expanded", "false");
+  await expect(choice).toBeFocused();
 });
 
 test("fits a two-page desktop spread with a focused rail and returns to one page in portrait @cross-browser", async ({

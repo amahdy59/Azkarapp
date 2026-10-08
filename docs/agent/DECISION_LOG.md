@@ -4290,3 +4290,9 @@ The owner explicitly asks to extend alignment and visible word following to all 
 ## Phase 90 — 2026-10-08: owner-reviewed Friday dua activation
 
 The owner reviewed a sample and authorizes implementation. Their exported approved annotation identifies `friday-dua-18-abdullah-muhammad-v1`, with Ahmed Mahdy as independent reviewer. Register that exact validated file to activate Arabic word highlighting for the sample. Other recordings remain subject to the existing recording-specific review requirement; do not convert unreviewed drafts into approved data from sampling alone.
+
+## Phase 91 — 2026-10-08: owner explicitly accepts all generated timings for testing
+
+The owner subsequently states “I want to consider all as reviewed” and will perform full review later while testing; they do not have time now. This supersedes the activation prerequisite recorded in phases 88–90. Enable exact-recording model-derived cues across the library as owner-accepted previews, retaining true provenance rather than fabricating independent full review. Missing or invalid intervals stay unhighlighted, reviewed content/recordings are unchanged, and the existing independently reviewed contract remains strict for later final annotations. Generated controls clearly identify estimated word highlights. Preserve all release quality gates.
+
+The owner also requests automatic scrolling to the highlighted word/section and color decoration without enlargement or layout shifts. Following defaults on, manual navigation pauses it, and users can resume it. They explicitly authorize including their parallel workspace edits in this release; preserve and test those edits together, including library tabs, searchable Quran plan pickers and reader menu refinements, without staging unrelated personal notes.

@@ -75,14 +75,14 @@ export function AuthenticZikrPicker({
                 <DropdownMenuRadioItem
                   key={item.id}
                   value={item.id}
-                  className="font-bold min-w-0 cursor-pointer"
+                  className="font-bold min-w-0 cursor-pointer py-2"
                   title={fullText}
                   data-testid={`zikr-option-${item.id}`}
                 >
                   <span className="flex flex-col min-w-0 flex-1 py-0.5">
-                    <span className="min-w-0 font-bold leading-relaxed break-words text-start text-sm">{label}</span>
+                    <span className="min-w-0 font-bold leading-[1.7] break-words text-start text-sm">{label}</span>
                     {hasProgress && (
-                      <span className="text-[11px] font-semibold text-primary/80 leading-tight mt-0.5" dir="ltr">
+                      <span className="text-micro font-semibold text-primary/90 leading-tight mt-0.5" dir="ltr">
                         {formatNumerals(saved!.count, language)} / {formatNumerals(saved!.target, language)}
                       </span>
                     )}

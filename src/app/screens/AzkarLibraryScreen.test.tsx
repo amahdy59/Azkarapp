@@ -81,8 +81,9 @@ describe("AzkarLibraryScreen", () => {
     expect(screen.getByRole("heading", { name: "Nothing saved yet" })).toBeVisible();
   });
 
-  it("offers Collections and Saved through one compact section menu", async () => {
+  it("supports switching between Collections and Saved via the tab switcher and notifies onSectionChange", async () => {
     const user = userEvent.setup();
+    const onSectionChange = vi.fn();
     render(
       <AzkarLibraryScreen
         completed={{} as Record<CategoryId, Set<string>>}
@@ -93,20 +94,15 @@ describe("AzkarLibraryScreen", () => {
         onZikr={() => undefined}
         onSearch={() => undefined}
         savedZikrIds={new Set()}
+        onSectionChange={onSectionChange}
       />,
     );
 
-    const sectionMenu = screen.getByTestId("library-mobile-section");
-    expect(sectionMenu).toHaveAttribute("aria-haspopup", "menu");
-    expect(sectionMenu).toHaveTextContent("Collections");
-    expect(screen.getByRole("button", { name: "All" })).toHaveAttribute("aria-pressed", "true");
-
-    await user.click(sectionMenu);
-    const saved = screen.getByRole("menuitemradio", { name: "Saved" });
-    expect(saved).toHaveAttribute("aria-checked", "false");
-    await user.click(saved);
-
-    expect(sectionMenu).toHaveTextContent("Saved");
+    const savedTab = screen.getByTestId("library-section-saved");
+    expect(savedTab).toHaveAttribute("aria-selected", "false");
+    await user.click(savedTab);
+    expect(savedTab).toHaveAttribute("aria-selected", "true");
+    expect(onSectionChange).toHaveBeenCalledWith("saved");
     expect(screen.getByRole("heading", { name: "Nothing saved yet" })).toBeVisible();
   });
 

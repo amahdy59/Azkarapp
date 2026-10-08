@@ -22,8 +22,7 @@ export function ListeningWordText({ text, cue }: { text: string; cue: ListeningW
                       textDecorationThickness: "0.12em",
                       textUnderlineOffset: "0.18em",
                       borderRadius: "0.15em",
-                      outline: "1px solid currentColor",
-                      outlineOffset: "2px",
+                      backgroundColor: "color-mix(in srgb, var(--primary) 20%, transparent)",
                     }
                   : undefined
               }

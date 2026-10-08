@@ -76,26 +76,15 @@ test("Library search and responsive section controls stay bounded at every tier"
   expect(desktopTabs!.x + desktopTabs!.width).toBeLessThanOrEqual(1440);
 
   await page.setViewportSize({ width: 390, height: 844 });
-  const compactSection = page.getByTestId("library-mobile-section");
-  await expect(compactSection).toBeVisible();
-  await expect(tabs).toBeHidden();
+  await expect(tabs).toBeVisible();
   await expect(async () => {
-    const bounds = await input.evaluate((element) => {
-      const control = document.querySelector('[data-testid="library-mobile-section"]');
-      if (!control) return null;
-      const inputBounds = element.getBoundingClientRect();
-      const controlBounds = control.getBoundingClientRect();
-      return {
-        inputBottom: inputBounds.bottom,
-        controlTop: controlBounds.top,
-        left: controlBounds.left,
-        right: controlBounds.right,
-      };
-    });
-    expect(bounds).not.toBeNull();
-    expect(bounds!.controlTop).toBeGreaterThan(bounds!.inputBottom);
-    expect(bounds!.left).toBeGreaterThanOrEqual(0);
-    expect(bounds!.right).toBeLessThanOrEqual(390);
+    const mobileInput = await input.boundingBox();
+    const mobileTabs = await tabs.boundingBox();
+    expect(mobileInput).not.toBeNull();
+    expect(mobileTabs).not.toBeNull();
+    expect(mobileTabs!.y + mobileTabs!.height).toBeLessThanOrEqual(mobileInput!.y);
+    expect(mobileTabs!.x).toBeGreaterThanOrEqual(0);
+    expect(mobileTabs!.x + mobileTabs!.width).toBeLessThanOrEqual(390);
   }).toPass({ timeout: 15_000 });
 });
 

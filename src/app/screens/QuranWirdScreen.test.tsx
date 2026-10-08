@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { getProgressDayKey } from "../progress";
 import { QuranWirdScreen } from "./QuranWirdScreen";
@@ -175,10 +175,12 @@ describe("QuranWirdScreen", () => {
     // Juz scope defaults to the reader's current position (Juz 2: pages 22-41)
     const juzSelect = screen.getByRole("combobox", { name: /Juz/i });
     expect(juzSelect).toBeInTheDocument();
-    expect(juzSelect).toHaveValue("2");
+    expect(juzSelect).toHaveTextContent("Juz 2");
 
     // Change to Juz 1
-    fireEvent.change(juzSelect, { target: { value: "1" } });
+    fireEvent.click(juzSelect);
+    const listbox = screen.getByRole("listbox");
+    fireEvent.click(within(listbox).getByText("Juz 1"));
     fireEvent.click(screen.getByRole("button", { name: "Save plan" }));
 
     expect(onPlanChange).toHaveBeenCalledWith(

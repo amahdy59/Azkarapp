@@ -62,7 +62,8 @@ for (const annotation of annotations) {
     if (!positions) issues.push(`${identity}: unknown semantic verse ${verse.verseKey}`);
     if (
       verse.words?.length &&
-      (positions?.size !== verse.words.length || verse.words.some((word) => !positions.has(word.position)))
+      ((annotation.reviewStatus !== "owner-preview" && positions?.size !== verse.words.length) ||
+        verse.words.some((word) => !positions.has(word.position)))
     )
       issues.push(`${identity}: incomplete or mismatched semantic word positions for ${verse.verseKey}`);
   }
@@ -72,5 +73,5 @@ if (issues.length) {
   process.exitCode = 1;
 } else
   console.log(
-    `Quran timings validated: ${annotations.length} reviewed recordings. Zero means following remains unavailable.`,
+    `Quran timings validated: ${annotations.length} recordings; ${annotations.filter((value) => value.reviewStatus === "owner-preview").length} owner-accepted previews.`,
   );

@@ -41,6 +41,7 @@ import { AudioPlayerSurface } from "./AudioPlayerSurface";
 import { ListeningWordText } from "./ListeningWordText";
 import { useReviewedListeningTiming } from "../hooks/useReviewedListeningTiming";
 import { useListeningWordCue } from "../hooks/useListeningWordCue";
+import { useListeningTextFollowing } from "../hooks/useListeningTextFollowing";
 
 const QuranListeningReader = lazy(() => import("./QuranListeningReader"));
 
@@ -293,6 +294,11 @@ export function FloatingAudioPlayer({
     controller.getPlaybackTime,
   );
   const listeningCue = showListeningWords ? liveListeningCue : null;
+  const [followListeningText, setFollowListeningText] = useListeningTextFollowing(
+    readingTextRef,
+    listeningCue,
+    `${currentSegment?.variantId ?? ""}:${currentSegment?.sha256 ?? ""}:${isMinimized}`,
+  );
 
   if (!state.plan || !currentEntry) return null;
 
@@ -594,7 +600,6 @@ export function FloatingAudioPlayer({
                         key={option.id}
                         value={option.id}
                         disabled={option.disabled}
-                        className="rounded-lg py-2.5 text-sm font-medium focus:bg-muted focus:text-foreground data-[highlighted]:bg-muted data-[highlighted]:text-foreground"
                         tabIndex={option.id === displayedVoiceId ? 0 : -1}
                         aria-label={option.label}
                       >
@@ -690,17 +695,36 @@ export function FloatingAudioPlayer({
                   >
                     <div className="flex w-full flex-col items-center justify-center">
                       {listeningTiming && (
-                        <button
-                          type="button"
-                          aria-pressed={showListeningWords}
-                          onClick={() => setShowListeningWords((value) => !value)}
-                          className="inline-flex min-h-11 min-w-11 items-center gap-2 rounded-lg px-3 text-sm hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                        <div
+                          data-listening-controls=""
+                          className="sticky top-0 z-10 flex flex-wrap justify-center bg-background"
                         >
-                          <span aria-hidden="true" className="inline-block w-4">
-                            {showListeningWords ? <Check size={16} /> : "—"}
-                          </span>
-                          {t(language, "quranListening.words")}
-                        </button>
+                          <button
+                            type="button"
+                            aria-pressed={showListeningWords}
+                            onClick={() => setShowListeningWords((value) => !value)}
+                            className="inline-flex min-h-11 min-w-11 items-center gap-2 rounded-lg px-3 text-sm hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                          >
+                            <span aria-hidden="true" className="inline-block w-4">
+                              {showListeningWords ? <Check size={16} /> : "—"}
+                            </span>
+                            {t(
+                              language,
+                              listeningTiming.reviewStatus === "owner-preview"
+                                ? "quranListening.estimatedWords"
+                                : "quranListening.words",
+                            )}
+                          </button>
+                          <button
+                            type="button"
+                            aria-pressed={followListeningText}
+                            onClick={() => setFollowListeningText((value) => !value)}
+                            className="inline-flex min-h-11 min-w-11 items-center gap-2 rounded-lg px-3 text-sm hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                          >
+                            {t(language, "quranListening.followText")}
+                            {followListeningText ? <Check size={16} aria-hidden="true" /> : null}
+                          </button>
+                        </div>
                       )}
                       {englishFirst && (
                         <>
@@ -900,11 +924,7 @@ export function FloatingAudioPlayer({
                   }}
                 >
                   {PLAYBACK_RATES.map((rate) => (
-                    <SelectItem
-                      key={rate}
-                      value={String(rate)}
-                      className="focus:bg-muted focus:text-foreground data-[highlighted]:bg-muted data-[highlighted]:text-foreground"
-                    >
+                    <SelectItem key={rate} value={String(rate)}>
                       <span dir="ltr">{formatNumerals(rate, language)}×</span>
                     </SelectItem>
                   ))}

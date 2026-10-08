@@ -256,7 +256,8 @@ export default defineConfig(({ mode }) => {
           ],
           runtimeCaching: [
             {
-              urlPattern: /\/data\/listening-timings\/(?:listening|quran)-[a-f0-9]{64}-[a-f0-9]{64}\.json$/,
+              urlPattern:
+                /\/data\/listening-timings\/(?:(?:listening|quran)-[a-f0-9]{64}-[a-f0-9]{64}\.json|owner-[a-f0-9]{64}\.bin)$/,
               handler: "CacheFirst" as const,
               method: "GET" as const,
               options: {

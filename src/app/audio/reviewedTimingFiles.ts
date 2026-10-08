@@ -6,6 +6,7 @@ export interface ReviewedTimingFile {
   annotationSha256: string;
   textSha256?: string;
   language: "ar" | "en";
+  ownerPreview?: boolean;
 }
 export const REVIEWED_TIMING_FILES: readonly ReviewedTimingFile[] = [
   {

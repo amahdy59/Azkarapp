@@ -39,6 +39,31 @@ const approved: ListeningTimingAnnotation = {
   ],
 };
 describe("exact-recording listening word cues", () => {
+  it("allows explicit owner-preview gaps but never unresolved words in reviewed annotations", () => {
+    const preview = {
+      ...approved,
+      reviewStatus: "owner-preview" as const,
+      acceptedBy: "Owner",
+      acceptedAt: "2026-10-08",
+      reviewedBy: "",
+      reviewedAt: "",
+      words: [approved.words[0]!, approved.words[2]!],
+      unresolvedWords: [{ startOffset: 7, endOffset: 14, occurrence: 0 }],
+    };
+    expect(validateListeningTiming(preview, segment, approved.transcript, "en")).toEqual([]);
+    expect(getListeningWordCue(preview, 0.7)).toBeNull();
+    expect(
+      validateListeningTiming(
+        { ...preview, reviewStatus: "approved", reviewedBy: "Reviewer", reviewedAt: "2026-10-08" },
+        segment,
+        approved.transcript,
+        "en",
+      ),
+    ).toContain("Reviewed timings cannot contain unresolved words.");
+    expect(
+      validateListeningTiming({ ...preview, unresolvedWords: [] }, segment, approved.transcript, "en").length,
+    ).toBeGreaterThan(0);
+  });
   it("requires exact spoken language, identity, wording and unique independent approval", () => {
     expect(resolveListeningTiming(segment, approved.transcript, "en", [approved])).toBe(approved);
     for (const changed of [

@@ -92,6 +92,8 @@ export function Header({
   elevateOnScroll = true,
   decoration,
   backButtonClassName,
+  style,
+  titleStyle,
 }: {
   title: string;
   subtitle?: string;
@@ -102,6 +104,8 @@ export function Header({
   /** Absolutely positioned, non-interactive artwork; never changes sizing. */
   decoration?: React.ReactNode;
   backButtonClassName?: string;
+  style?: React.CSSProperties;
+  titleStyle?: React.CSSProperties;
 }) {
   const headerRef = useRef<HTMLDivElement>(null);
   const [hasScrolledContent, setHasScrolledContent] = useState(false);
@@ -139,7 +143,7 @@ export function Header({
       className={`shared-screen-header ${decoration ? "isolate" : ""} sticky top-0 z-40 flex w-full shrink-0 items-center gap-2 border-b border-transparent bg-background px-4 pt-2 pb-1 shadow-xs transition-colors duration-standard ${
         isScrolled ? "border-border shadow-sm" : "border-transparent"
       }`}
-      style={{ minHeight: 56 }}
+      style={{ minHeight: 56, ...style }}
     >
       {/* Reading headers use one opaque surface; scene artwork belongs below
           the header so it cannot reduce contrast between the title/actions. */}
@@ -172,6 +176,7 @@ export function Header({
         <h1
           className="max-w-full break-words font-sans text-lg font-extrabold leading-tight text-foreground min-[360px]:text-xl sm:text-2xl"
           title={title}
+          style={titleStyle}
         >
           {title}
         </h1>
