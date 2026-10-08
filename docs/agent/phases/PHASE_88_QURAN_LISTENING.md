@@ -8,6 +8,8 @@ Reuse the existing page canvas for read-only listening to Al-Baqarah, Al-Kahf, A
 
 Validate metadata and alignment rejection, seeking and gaps, page navigation and keyboard controls; run repository quality and browser gates, record visual evidence, update release notes and complete the authorized main release.
 
+Owner screenshot follow-up: supersede the pending release with compact page controls and on-demand alignment information. Remove the scrolling viewport's top padding for Mushaf playback so text cannot appear above its toolbar. Reuse existing icons/Popover and preserve 44px keyboard targets, truthful unavailable alignment, exact text, audio and progress. Verify RTL/LTR, 320px, scrolling hit tests, popover focus/escape and page browsing; rerun affected browser/quality/Pages gates and complete final exact-commit CI and production checks.
+
 ## Objective
 
 Apply the three approved Quran listening recommendations while respecting the owner's choice to build a review-ready system without timestamps.
@@ -23,7 +25,7 @@ Reuse the shared Mushaf canvas inside expanded Baqarah, Kahf, Sajdah and Mulk pl
 - Hooks: new `useListeningMushafPage` and `useQuranPlaybackCue` with cue regression tests.
 - Validation: `scripts/validate-quran-timings.mjs`, `scripts/run-checks.mjs`, isolated test registration and `e2e/quran-listening.spec.ts`.
 - Documentation: architecture, design system, content authoring, agent index/decisions, this phase, original synchronization proposal and new timing authoring guide.
-- Release: three parallel Arabic/English entries in `public/release-notes.json`, stamp `2026-10-08.3`.
+- Release: three parallel Arabic/English entries in `public/release-notes.json`, stamp `2026-10-08.4`.
 
 ## Components added or modified
 
@@ -31,7 +33,7 @@ Added QuranListeningReader and the read-only MushafListeningPage adapter. Modifi
 
 ## User-visible changes
 
-The four full-surah recordings can display printed Mushaf pages, browse manually and recover from an offline page-data failure using the unchanged reviewed Unicode text. Matching QCF glyphs/fonts use the existing bounded Unicode fallback. Quran passages use Amiri Quran independently of the selected zikr font. Paper honors Mushaf theme and text scale; selected surah boundaries start in view. Following is visibly unavailable until independently reviewed exact-recording annotations exist.
+The four full-surah recordings can display printed Mushaf pages, browse manually and recover from an offline page-data failure using the unchanged reviewed Unicode text. Matching QCF glyphs/fonts use the existing bounded Unicode fallback. Quran passages use Amiri Quran independently of the selected zikr font. Paper honors Mushaf theme and text scale; selected surah boundaries start in view. A compact 44px toolbar gives more space to the Quran; unavailable-following guidance opens from its information button. Scroll clipping prevents text appearing above the toolbar. Following controls appear only when independently reviewed exact-recording annotations exist.
 
 ## Accessibility work
 
@@ -39,7 +41,7 @@ Native controls retain 44px targets, visible focus and localized labels. Arabic 
 
 ## Tests added or updated
 
-Synthetic test-only annotations cover exact recording identity, independent review, complete ordered verses, gaps, end-exclusive boundaries, seeking, word bounds and duplicate rejection. Cue tests cover native clock sampling and hidden-tab cancellation. Component tests cover manual control, optional words, following, focus preservation, source replacement and offline recovery. Twelve browser checks cover all four surahs across Chromium, Firefox and WebKit: English-interface RTL word positions, font fallback, sticky controls, initial boundary visibility, offline retry, one audio controller, unchanged reading progress, collapse/reopen and axe scans. Existing Mushaf and player regressions retain their assertions.
+Synthetic test-only annotations cover exact recording identity, independent review, complete ordered verses, gaps, end-exclusive boundaries, seeking, word bounds and duplicate rejection. Cue tests cover native clock sampling and hidden-tab cancellation. Component tests cover manual control, optional words, following, focus preservation, source replacement and offline recovery. Twenty-four browser checks cover Arabic and English interfaces for all four surahs across Chromium, Firefox and WebKit: English-interface RTL word positions, font fallback, sticky controls, initial boundary visibility, offline retry, one audio controller, unchanged reading progress, collapse/reopen and axe scans. Existing Mushaf and player regressions retain their assertions.
 
 ## Commands run
 
@@ -55,11 +57,19 @@ Synthetic test-only annotations cover exact recording identity, independent revi
 
 The earlier full run produced 731 passes, one existing skip and four failures. Concurrent browser invocations rebuild the same `.playwright-dist`, and three failures showed missing lazy-loaded sections or root loading errors. All four scenarios passed in isolation. That run and interrupted intermediate snapshots are superseded by the successful final isolated full run; it is not recorded as a pass. No assertion, retry policy, timeout, coverage threshold or bundle ceiling was weakened.
 
-The first push was blocked before transmission: Pages CSS measured 28,676 gzip bytes against the unchanged 28,672-byte ceiling. Reusing the existing 4px margin-marker width utility removed the new width rule; `pnpm build:pages` then passed at 28,672 gzip bytes. The affected three-engine suite passed again: 12 tests, 1.3 minutes (`output/phase88-budget-feature.log`). The full run above precedes this isolated marker-width adjustment; CI exercises the final exact commit. No budget or baseline was raised. The next attempt was correctly blocked by release-note freshness after the remediation commit; all three entries were rewritten for the complete still-undeployed phase and the stamp advanced to `2026-10-08.3`. Neither blocked push reached origin. The pre-push hook passed frozen install, the full check in 60.7 seconds and 26 smoke tests in 1.0 minute before identifying the Pages failure.
+The first push was blocked before transmission: Pages CSS measured 28,676 gzip bytes against the unchanged 28,672-byte ceiling. Reusing the existing 4px margin-marker width utility removed the new width rule; `pnpm build:pages` then passed at 28,672 gzip bytes. The affected three-engine suite passed again: 12 tests, 1.3 minutes (`output/phase88-budget-feature.log`). The full run above precedes this isolated marker-width adjustment; CI exercises the final exact commit. No budget or baseline was raised. The next attempt was correctly blocked by release-note freshness after the remediation commit; all three entries were rewritten for the complete still-undeployed phase and the stamp advanced to `2026-10-08.4`. Neither blocked push reached origin. The pre-push hook passed frozen install, the full check in 60.7 seconds and 26 smoke tests in 1.0 minute before identifying the Pages failure.
+
+Owner screenshot follow-up: 37 component tests passed (4.92 seconds, `output/phase88-compact-units.log`); all 24 Arabic/English listening browser tests passed across three engines (2.4 minutes, `output/phase88-compact-feature.log`). Tests cover a 48px maximum default toolbar, on-demand guidance, focus restoration, Escape, scrolling hit tests, 320px and axe scans. Screenshots were copied to `output/playwright/quran88/compact-browser/`. Prior full-suite results precede this scoped follow-up; final exact-commit CI must pass before deployment. The previously pushed Quality run 37781666055 was cancelled to supersede that layout before deployment.
+
+Timestamp investigation checked QUD v3.2.0's 69-recitation catalog without finding either current reciter. Exact semantic transcript/reference preparation for four variants is saved under `output/quran-alignment-preparation/`. The timing guide records a Mulk-first forced-alignment workflow and the machine's missing inference stack; no model inference or timestamp review is claimed.
+
+The additional expanded-player layout and Baqarah audio regressions passed: 19 checks across three engines (`output/phase88-compact-regressions.log`). The first invocation stopped before executing tests because the owned manual preview occupied its port; the isolated 4174 rerun is the recorded result.
+
+The compact snapshot also passed `pnpm check` in 69.8 seconds (`output/phase88-compact-check.log`) and `pnpm build:pages` (`output/phase88-compact-pages.log`), retaining every existing gate and budget. Actual Arabic QCF screenshots at 390px are `compact-ar.png`, `compact-ar-scrolled.png` and `compact-ar-info.png` under `output/playwright/quran88/`. These confirm the compact toolbar, scrolled clipping and disclosed explanation with the real recording.
 
 ## Visual/manual evidence
 
-Browser screenshots in `output/playwright/quran88/final-browser/` cover all four pages at 390px and 320px across Chromium, Firefox and WebKit. `output/playwright/quran88/controls-qcf-final.png` records the loaded Al-Kahf QCF page and retained unavailable-alignment explanation. Manual browser inspection confirmed `qcf-v2-page-293`, RTL direction and the Next control's actual pointer target. Visual review corrected the paper's stacking over sticky controls and retained the unavailable explanation in that area; regressions check positions and pointer hit testing. The complete local run passed. Hook, CI and production results are recorded after the authorized push in `output/phase88-release-verification.md`. Human screen-reader and physical-device checks remain outstanding; no such results are claimed.
+Browser screenshots in `output/playwright/quran88/final-browser/` cover all four pages at 390px and 320px across Chromium, Firefox and WebKit. The original `output/playwright/quran88/controls-qcf-final.png` prompted the owner screenshot correction; compact-layout evidence supersedes its bulky guidance. Manual browser inspection confirmed `qcf-v2-page-293`, RTL direction and the Next control's actual pointer target. The screenshot follow-up moves guidance into a keyboard-accessible popover and removes the viewport top slit; regressions check positions and pointer hit testing. The complete local run passed. Hook, CI and production results are recorded after the authorized push in `output/phase88-release-verification.md`. Human screen-reader and physical-device checks remain outstanding; no such results are claimed.
 
 ## Documentation updated
 

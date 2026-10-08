@@ -971,6 +971,8 @@ const ar = {
     ],
   },
   quranListening: {
+    page: "صفحة {page}",
+    information: "عن متابعة التلاوة",
     reader: "المصحف أثناء الاستماع",
     follow: "متابعة التلاوة",
     words: "تمييز الكلمات",

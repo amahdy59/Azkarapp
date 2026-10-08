@@ -1,13 +1,13 @@
 {
-  "release": "2026-10-08.3",
+  "release": "2026-10-08.4",
   "ar": [
-    "تصفح المصحف أثناء الاستماع إلى البقرة والكهف والسجدة والملك، دون تغيير موضع القراءة المحفوظ.",
-    "اقرأ المقاطع القرآنية بخط مخصص للقرآن، مع نص واضح بديل عند تعذّر تحميل صفحة المصحف أو خطها.",
-    "تبقى أزرار تصفح الصفحات وتوضيح عدم توفر متابعة التلاوة ظاهرين أثناء الاستماع، حتى تُراجع أوقات التسجيل."
+    "تصفح صفحات المصحف أثناء الاستماع إلى البقرة والكهف والسجدة والملك دون تغيير موضع القراءة المحفوظ.",
+    "اقرأ المقاطع القرآنية بخط مخصص للقرآن، مع نص بديل واضح عند تعذّر تحميل صفحة المصحف أو خطها.",
+    "مساحة أكبر للقرآن بأزرار صفحات صغيرة، وتوضيح متابعة التلاوة عند الطلب، دون ظهور النص فوق الأزرار أثناء التمرير."
   ],
   "en": [
-    "Read Mushaf pages while listening to Baqarah, Kahf, Sajdah and Mulk without changing your saved reading position.",
-    "Quran passages use dedicated Quran typography, with readable text when a Mushaf page or its font cannot load.",
-    "Page controls and the explanation that following is unavailable stay visible while listening, until recording timings are reviewed."
+    "Browse Mushaf pages while listening to Baqarah, Kahf, Sajdah and Mulk without changing your saved reading position.",
+    "Read Quran passages with dedicated Quran typography and a clear fallback when a Mushaf page or font cannot load.",
+    "More room for Quran text: compact page controls, text-following guidance on demand, and no text peeking above controls while scrolling."
   ]
 }

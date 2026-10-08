@@ -993,6 +993,8 @@ const en = {
     ],
   },
   quranListening: {
+    page: "Page {page}",
+    information: "About text following",
     reader: "Mushaf while listening",
     follow: "Follow recitation",
     words: "Highlight words",

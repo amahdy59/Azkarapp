@@ -69,8 +69,11 @@ describe("read-only listening controls", () => {
   });
   it("allows manual browsing while explaining unavailable exact-recording alignment", () => {
     const { container } = render(<QuranListeningReader entry={entry} segment={null} currentTime={0} language="en" />);
-    expect(screen.getByRole("button", { name: "Follow recitation" })).toBeDisabled();
+    expect(screen.queryByRole("button", { name: "Follow recitation" })).toBeNull();
+    expect(screen.queryByText(/Following is not available/)).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "About text following" }));
     expect(screen.getByText(/Following is not available/)).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: "Close" }));
     expect(screen.queryByRole("button", { name: "Highlight words" })).toBeNull();
     expect(container.querySelector('[data-mushaf-page="562"]')).not.toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
