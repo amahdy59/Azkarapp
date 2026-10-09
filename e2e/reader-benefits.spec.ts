@@ -40,7 +40,8 @@ for (const language of ["ar", "en"] as const) {
         expect(bounds.y + bounds.height).toBeLessThanOrEqual(844);
         if (item.id) {
           const actions = page.getByTestId("surah-reading-actions");
-          await expect(actions.getByRole("button")).toHaveCount(4);
+          await expect(actions.locator(":scope > button")).toHaveCount(4);
+          await expect(actions.getByTestId("reader-surah-share-button")).toBeVisible();
           await expect(actions.getByRole("button").last()).toHaveAttribute("data-testid", "reader-benefit-dock-button");
         } else await expect(benefit.locator("xpath=ancestor::*[@data-testid='reader-dock']").first()).toBeVisible();
         if (item.id === "friday-kahf") {

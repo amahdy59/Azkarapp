@@ -736,6 +736,15 @@ export function ReaderScreen({
                 <BookOpen size={22} />
               </span>
             </div>
+            <button
+              type="button"
+              onClick={handleShare}
+              aria-label={t(language, "reader.shareCurrent")}
+              data-testid="reader-surah-share-button"
+              className="absolute end-2 top-2 flex size-11 items-center justify-center rounded-full border border-border bg-card text-foreground shadow-sm hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            >
+              <ShareExport size={20} aria-hidden="true" />
+            </button>
           </figure>
           <button
             type="button"

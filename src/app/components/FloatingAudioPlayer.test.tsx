@@ -185,6 +185,22 @@ describe("FloatingAudioPlayer", () => {
     expect(region.scrollTop).toBe(0);
   });
 
+  it("scrolls the focused reading region with Home/End without capturing keys from controls", () => {
+    render(<FloatingAudioPlayer controller={createController()} language="en" />);
+    fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
+    const region = screen.getByRole("region", { name: "Now playing" });
+    Object.defineProperty(region, "scrollHeight", { value: 900 });
+    region.scrollTo = vi.fn();
+    fireEvent.keyDown(region, { key: "End" });
+    expect(region.scrollTo).toHaveBeenLastCalledWith({ top: 900, behavior: "instant" });
+    fireEvent.keyDown(region, { key: "Home" });
+    expect(region.scrollTo).toHaveBeenLastCalledWith({ top: 0, behavior: "instant" });
+    vi.mocked(region.scrollTo).mockClear();
+    fireEvent.keyDown(region, { key: "End", ctrlKey: true });
+    fireEvent.keyDown(screen.getByRole("button", { name: "Minimize player" }), { key: "End" });
+    expect(region.scrollTo).not.toHaveBeenCalled();
+  });
+
   it("keeps one compact waveform tied to the current recording rather than queue progress", () => {
     const controller = createController();
     controller.currentSegment = {

@@ -537,7 +537,23 @@ export function FloatingAudioPlayer({
         aria-label={t(language, "audioPlayer.region")}
         dir={direction}
         data-variant="expanded"
-        onKeyDown={(event) => event.stopPropagation()}
+        onKeyDown={(event) => {
+          event.stopPropagation();
+          const viewport = readingTextRef.current;
+          if (
+            viewport &&
+            event.target === viewport &&
+            !event.altKey &&
+            !event.ctrlKey &&
+            !event.metaKey &&
+            !event.shiftKey &&
+            ["Home", "End"].includes(event.key)
+          ) {
+            event.preventDefault();
+            setFollowListeningText(false);
+            viewport.scrollTo({ top: event.key === "Home" ? 0 : viewport.scrollHeight, behavior: "instant" });
+          }
+        }}
         onClick={(e) => e.stopPropagation()}
         onTouchStart={(e) => e.stopPropagation()}
         onTouchMove={(e) => e.stopPropagation()}

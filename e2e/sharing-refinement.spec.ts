@@ -1,4 +1,3 @@
-import { clickReaderOption } from "./reader-options";
 import { getAzkarForMode } from "../src/app/content/azkar";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
@@ -638,8 +637,7 @@ test("long surahs share sourced reminders with exact Mushaf links", async ({ pag
     await page.goto(`./#/azkar/before-sleep/${index + 1}`);
     await expect(page.getByTestId("reader-screen")).toHaveAttribute("data-zikr-id", id);
     await expect(page.getByTestId("reader-share-dock-button")).toHaveCount(0);
-    await page.getByRole("button", { name: "Reader options", exact: true }).first().click();
-    await clickReaderOption(page, /Share/u);
+    await page.getByTestId("reader-surah-share-button").click();
     const modal = page.getByTestId("collection-share-modal");
     await expect(modal.getByRole("img").first()).toBeVisible();
     await expect(modal.getByRole("img").first()).toHaveJSProperty("naturalHeight", 1350);
