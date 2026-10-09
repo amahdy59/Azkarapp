@@ -42,8 +42,10 @@ import { ListeningWordText } from "./ListeningWordText";
 import { useReviewedListeningTiming } from "../hooks/useReviewedListeningTiming";
 import { useListeningWordCue } from "../hooks/useListeningWordCue";
 import { useListeningTextFollowing } from "../hooks/useListeningTextFollowing";
+import { MUSHAF_EXCERPTS } from "../content/mushafExcerpts";
 
 const QuranListeningReader = lazy(() => import("./QuranListeningReader"));
+const MushafExcerpt = lazy(() => import("./MushafExcerpt"));
 
 /** Existing supported speeds, shown explicitly in the selection menu. */
 const PLAYBACK_RATES = [0.8, 1, 1.25, 1.5, 2] as const;
@@ -119,7 +121,6 @@ export function FloatingAudioPlayer({
   direction = language === "ar" ? "rtl" : "ltr",
   overReadingSurface = false,
   dockedInReader = false,
-  dockSlots,
   onClose,
   textSize = "medium",
   mushafTheme = "light",
@@ -302,6 +303,9 @@ export function FloatingAudioPlayer({
 
   if (!state.plan || !currentEntry) return null;
 
+  const hasExcerpt = Boolean(MUSHAF_EXCERPTS[currentEntry.canonicalKey]);
+  const ArabicTextTag = hasExcerpt ? "div" : "p";
+
   const isPlaying = state.status === "playing";
   const isBusy = state.status === "loading" || state.status === "buffering";
   const totalTracks = state.plan.entries.length;
@@ -429,7 +433,6 @@ export function FloatingAudioPlayer({
       <div className="sr-only" aria-live="polite" aria-atomic="true">
         {liveMessage}
       </div>
-      {dockSlots?.benefit && <div className="flex justify-center pb-2">{dockSlots.benefit}</div>}
       <div
         className={`audio-compact-card relative w-full ${dockedInReader ? "max-w-2xl mx-auto rounded-2xl border border-border bg-card shadow-sm overflow-hidden" : ""}`}
       >
@@ -440,7 +443,7 @@ export function FloatingAudioPlayer({
               controller.stop();
               onClose?.();
             }}
-            aria-label={dockSlots ? t(language, "audioPlayer.closeAndReturn") : t(language, "audioPlayer.stop")}
+            aria-label={t(language, "audioPlayer.stop")}
             className="flex size-11 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           >
             <X size={19} aria-hidden="true" />
@@ -559,8 +562,8 @@ export function FloatingAudioPlayer({
                 controller.stop();
                 onClose?.();
               }}
-              aria-label={dockSlots ? t(language, "audioPlayer.closeAndReturn") : t(language, "audioPlayer.stop")}
-              title={dockSlots ? t(language, "audioPlayer.closeAndReturn") : t(language, "audioPlayer.stop")}
+              aria-label={t(language, "audioPlayer.stop")}
+              title={t(language, "audioPlayer.stop")}
               className="flex size-11 items-center justify-center rounded-xl text-muted-foreground transition-colors duration-fast active:scale-95 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
               <X size={19} aria-hidden="true" />
@@ -760,11 +763,11 @@ export function FloatingAudioPlayer({
                           {t(language, "audioPlayer.translationUnavailable")}
                         </p>
                       )}
-                      <p
+                      <ArabicTextTag
                         id={arabicTextId}
                         hidden={englishFirst && !showArabic}
                         data-testid={englishFirst ? "audio-player-arabic-text" : "audio-player-zikr-text"}
-                        className={`zikr-text text-center font-medium leading-loose text-foreground ${englishFirst ? "mt-2 w-full border-t border-border pt-3" : ""}`}
+                        className={`zikr-text text-center font-medium leading-loose text-foreground ${hasExcerpt ? "w-full" : ""} ${englishFirst ? "mt-2 w-full border-t border-border pt-3" : ""}`}
                         style={{
                           fontFamily:
                             currentEntry.quranText || currentEntry.contentKind === "quran"
@@ -779,8 +782,35 @@ export function FloatingAudioPlayer({
                         dir="rtl"
                         lang="ar"
                       >
-                        <ListeningWordText text={zikrArabicText} cue={spokenLanguage === "ar" ? listeningCue : null} />
-                      </p>
+                        {hasExcerpt ? (
+                          <Suspense
+                            fallback={
+                              <ListeningWordText
+                                text={zikrArabicText}
+                                cue={spokenLanguage === "ar" ? listeningCue : null}
+                              />
+                            }
+                          >
+                            <MushafExcerpt
+                              canonicalKey={currentEntry.canonicalKey}
+                              transcript={zikrArabicText}
+                              language={language}
+                              cue={spokenLanguage === "ar" ? listeningCue : null}
+                              fallback={
+                                <ListeningWordText
+                                  text={zikrArabicText}
+                                  cue={spokenLanguage === "ar" ? listeningCue : null}
+                                />
+                              }
+                            />
+                          </Suspense>
+                        ) : (
+                          <ListeningWordText
+                            text={zikrArabicText}
+                            cue={spokenLanguage === "ar" ? listeningCue : null}
+                          />
+                        )}
+                      </ArabicTextTag>
                       {!englishFirst && isEnglishMode && currentEntry.translation && (
                         <p
                           className="mt-3 border-t border-border/40 pt-2 text-center text-sm sm:text-base leading-relaxed text-muted-foreground max-w-2xl"

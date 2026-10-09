@@ -586,7 +586,7 @@ describe("FloatingAudioPlayer", () => {
     expect(screen.getByRole("button", { name: "Expand player" })).toHaveFocus();
   });
 
-  it("shows context and Benefit without duplicate compact navigation or expansion actions", () => {
+  it("keeps reading Benefit outside the player without duplicate compact navigation actions", () => {
     const controller = createController();
     const onClose = vi.fn();
     render(
@@ -603,10 +603,10 @@ describe("FloatingAudioPlayer", () => {
 
     expect(screen.queryByRole("button", { name: "السابق" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "توسيع المشغل" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "الفائدة" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "الفائدة" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "التالي" })).not.toBeInTheDocument();
 
-    const closeBtn = screen.getByRole("button", { name: "إغلاق الصوت والعودة للعداد" });
+    const closeBtn = screen.getByRole("button", { name: "إيقاف الصوت وإغلاق المشغل" });
     expect(closeBtn).toBeInTheDocument();
     fireEvent.click(closeBtn);
     expect(controller.stop).toHaveBeenCalled();
@@ -632,6 +632,7 @@ describe("FloatingAudioPlayer", () => {
     // Expanded state
     const region = screen.getByRole("region", { name: "مشغل الصوت" });
     expect(region).toHaveAttribute("data-variant", "expanded");
+    expect(screen.queryByRole("button", { name: "الفائدة" })).not.toBeInTheDocument();
 
     // Press Escape to collapse
     fireEvent.keyDown(document, { key: "Escape" });

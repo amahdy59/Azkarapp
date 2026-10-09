@@ -312,9 +312,13 @@ const MushafTextLine = memo(function MushafTextLine({
                 aria-label={t(language, "reader.openAyahActions", {
                   ayah: formatNumerals(w.verseKey.split(":")[1] || w.text, language),
                 })}
-                onClick={() => onAyahAction?.(w.verseKey)}
+                onClick={(event) => {
+                  event.currentTarget.focus();
+                  onAyahAction?.(w.verseKey);
+                }}
                 onContextMenu={(e) => {
                   e.preventDefault();
+                  e.currentTarget.focus();
                   onAyahAction?.(w.verseKey);
                 }}
               >
@@ -386,6 +390,9 @@ const MushafTextLine = memo(function MushafTextLine({
               data-listening-verse={readOnly ? w.verseKey : undefined}
               data-playback-word={
                 highlightedWord?.verseKey === w.verseKey && highlightedWord.position === w.position ? "true" : undefined
+              }
+              data-listening-word={
+                highlightedWord?.verseKey === w.verseKey && highlightedWord.position === w.position ? "" : undefined
               }
               style={
                 highlightedWord?.verseKey === w.verseKey && highlightedWord.position === w.position
@@ -524,6 +531,7 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
       }
 
       const lineHeight = first.offsetHeight;
+      if (!widest) widest = Math.max(...naturalWidths);
       const responsiveInkAllowance = window.innerWidth >= 768 ? Math.max(0.58, inkAllowance - 0.06) : inkAllowance;
       const verticalScale = lineHeight > 0 ? (slotHeight * responsiveInkAllowance) / lineHeight : 1;
       const measure = Math.min(widest * verticalScale, available);
@@ -1617,6 +1625,68 @@ export function MushafPageViewer({
 }
 
 /** Read-only listening presentation: no reader actions or progress callbacks. */
+/** A selection of canonical printed lines, without the unused page slots. */
+export function MushafExcerptCanvas({
+  lines,
+  pageNumber,
+  language,
+  useQcfGlyphs,
+  highlightedWord,
+}: {
+  lines: MushafWordToken[][];
+  pageNumber: number;
+  language: AppLanguage;
+  useQcfGlyphs: boolean;
+  highlightedWord?: { verseKey: string; position: number } | null;
+}) {
+  const canvasRef = useLineFitter(
+    `${pageNumber}:${useQcfGlyphs}:${lines
+      .flat()
+      .map((w) => `${w.verseKey}:${w.position}`)
+      .join(",")}`,
+    useQcfGlyphs ? 0.9 : 0.72,
+  );
+  return (
+    <>
+      <div
+        ref={canvasRef}
+        aria-hidden="true"
+        dir="rtl"
+        lang="ar"
+        data-testid="mushaf-excerpt"
+        style={{ containerType: "inline-size", width: "100%" }}
+      >
+        <div
+          style={{
+            fontFamily: useQcfGlyphs ? `qcf-v2-page-${pageNumber}, var(--font-mushaf)` : "var(--font-mushaf)",
+            fontSize: "calc(5cqi * var(--mushaf-fit, 1))",
+          }}
+        >
+          {lines.map((words, index) => (
+            <div key={index} style={{ height: "4rem", width: "100%" }}>
+              <MushafTextLine
+                words={words}
+                language={language}
+                theme="light"
+                useQcfGlyphs={useQcfGlyphs}
+                showWordMeanings={false}
+                meanings={new Map()}
+                activeWord={null}
+                readOnly
+                highlightedWord={highlightedWord}
+                onActiveWordChange={() => {}}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="sr-only">
+        <ScreenReaderVerses lines={lines} language={language} pageNumber={pageNumber} />
+      </div>
+    </>
+  );
+}
+
 export function MushafListeningPage({
   lines,
   language,
