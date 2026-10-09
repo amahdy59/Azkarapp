@@ -207,7 +207,7 @@ Pushes to `main` that touch `cloudflare/**` or `wrangler.jsonc` additionally tri
 
 1. Fetch `origin/main` and confirm the working tree scope.
 2. Make the smallest domain-appropriate change.
-3. Rewrite `public/release-notes.json` so it covers only what changed since the last deployment: replace every entry with the 3–4 most important user-facing changes in simple Arabic and English, and bump `"release"`. Run `pnpm run check:release-notes` to list the commits still waiting to be announced; the same check runs first in the pre-push hook.
+3. Rewrite `public/release-notes.json` so it covers only what changed since the last deployment: replace every entry with the 3–4 most important user-facing changes in simple Arabic and English, and bump `"release"`. Run `pnpm archive:release-notes` to retain these notes in the lasting bilingual history. Run `pnpm run check:release-notes` to check both freshness and archiving; the same check runs first in the pre-push hook. Settings › About › What's new shows the newest summary and expandable earlier summaries, including offline. The history preserves recorded notes; it does not infer missing historical changes from commit subjects.
 4. Add or update colocated unit tests and relevant Playwright coverage.
 5. Update documentation when behavior, state shape, environment variables, or operational procedures change.
 6. Run `pnpm run verify:toolchain`, `pnpm install --frozen-lockfile`, `pnpm check`, the relevant Playwright specs, and `pnpm build:pages`.

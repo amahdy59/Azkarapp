@@ -321,4 +321,14 @@ Counter guidance follows the same boundary: `CounterGuidance` owns presentation 
 
 ## Quran listening presentation and alignment
 
-Phase 88 reuses the shared Mushaf canvas in the expanded player with display-only page state and no progress/bookmark writes. Playback plans carry reviewed page/range metadata and resolved recording checksums. Exact-file annotations must pass runtime review/identity validation and the semantic authoring check before following is enabled. The shipped timing catalog is empty. See [timing authoring](audio/QURAN_TIMING_AUTHORING.md).
+The shared Mushaf canvas appears in expanded playback with display-only page state and no progress/bookmark writes. Playback plans carry reviewed page/range metadata and resolved recording checksums. Exact-file annotations must pass runtime identity validation and the semantic authoring check. Phase 91 enables owner-accepted generated previews with honest estimated provenance; independently reviewed annotations retain their strict review contract. See [word alignment](audio/WORD_ALIGNMENT.md) and [timing authoring](audio/QURAN_TIMING_AUTHORING.md).
+
+### Lasting release history
+
+Settings › About › What's new is the bilingual release notes page. It displays the newest summary and earlier recorded summaries with native keyboard-operable details/summary controls and batches of twenty entries. src/app/releaseHistory.data.json is the authoring archive. Its generated lossless gzip asset is precached with the app and decoded locally for offline reading; the current summary remains readable if decoding is unavailable. The latest deployed manifest remains fetched on demand; failure leaves the cached history readable. History is backfilled from actual stamped bilingual manifests in Git, with identical summaries deduplicated. Earlier missing or undocumented changes are not invented, and archived stamps are not independent proof of deployment.
+
+After rewriting the newest-only public/release-notes.json, pnpm archive:release-notes prepends it to the archive while retaining prior entries. The pre-push freshness check additionally requires the current bilingual notes to be archived verbatim and the preceding release to be preserved. The update prompt continues to show only the latest 3–4 highlights.
+
+### Ayah image presentation
+
+AyahInteractionSheet opens a lazy AyahShareStudio inside the existing sheet. Arabic text comes from the canonical selected verse, while optional English text is extracted only at explicit numbered boundaries in existing reviewed content. Stored Pickthall and Saheeh International sources remain distinct. The existing reviewed glossary supplies optional Arabic word meanings. Unsupported optional content is explained and disabled. Canvas export reuses share utilities and the embedded Amiri Quran font; pure measured pagination preserves complete text at fixed readable sizes across portrait/square cards. Transient previews own and revoke their object URLs. No remote content request, new dependency, persisted preference or religious-text edit is introduced.

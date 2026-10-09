@@ -1,5 +1,11 @@
 # AI Improvement System Index
 
+[Phase 95](phases/PHASE_95_READER_SIMPLIFICATION_AND_AYAH_SHARING.md) applies the owner's corrected reading-only Benefit placement, removes redundant overflow actions, and adds complete ayah image cards with optional reviewed content.
+
+[Phase 94](phases/PHASE_94_RELEASE_HISTORY.md) gives bilingual updates a lasting offline release history and enforces archiving future summaries.
+
+[Phase 93](phases/PHASE_93_PLAYER_CONTAINMENT_AND_SNIPPETS.md) addresses clipped playback controls and canonical Mushaf excerpts for short Quran passages. Phase 95 supersedes its initial playback Benefit assumption.
+
 [Phase 92](phases/PHASE_92_READER_MENUS_AND_BENEFITS.md) covers the owner's colored narration highlights, compact contextual menus, bottom Benefit action and additional sourced Al-Kahf narration.
 
 [Phase 91](phases/PHASE_91_OWNER_ACCEPTED_AUDIO_HIGHLIGHTS.md) records the owner's explicit batch acceptance of generated Arabic/English/Quran timings for app testing, with full review deferred and uncertain intervals left as gaps.
