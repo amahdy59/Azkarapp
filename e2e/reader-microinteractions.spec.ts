@@ -416,7 +416,8 @@ test("desktop and tablet keep navigation below reading text and keyboard help in
   const collectionToggle = heroActions.getByTestId("reader-sidebar-toggle");
   await expect(collectionToggle).toBeVisible();
   await expect(collectionToggle).toHaveAttribute("aria-expanded", "false");
-  await expect(heroActions.locator("button:visible")).toHaveCount(2);
+  await expect(heroActions.getByRole("button", { name: "Appearance", exact: true })).toBeVisible();
+  await expect(heroActions.locator("button:visible")).toHaveCount(3);
   await collectionToggle.click();
   await expect(page.getByTestId("reader-collection-drawer")).toBeVisible();
   await expect(collectionToggle).toHaveAttribute("aria-expanded", "true");
@@ -981,22 +982,23 @@ test("the reader header keeps options and wide collection navigation together", 
     const collectionPanel = page.getByTestId("reader-collection-navigator");
     await expect(collectionPanel).toBeVisible();
     await expect(collectionToggle).toBeHidden();
-    await expect(actions.locator("button:visible")).toHaveCount(1);
+    await expect(actions.locator("button:visible")).toHaveCount(2);
     await page.getByTestId("reader-sidebar-close").click();
     await expect(collectionPanel).toBeHidden();
     await expect(collectionToggle).toBeVisible();
     await expect(collectionToggle).toBeFocused();
     await expect(collectionToggle).toHaveAttribute("aria-expanded", "false");
-    await expect(actions.locator("button:visible")).toHaveCount(2);
+    await expect(actions.locator("button:visible")).toHaveCount(3);
     await collectionToggle.click();
     await expect(collectionPanel).toBeVisible();
     await expect(collectionToggle).toBeHidden();
     await expect(page.getByTestId("reader-sidebar-close")).toBeFocused();
-    await expect(actions.locator("button:visible")).toHaveCount(1);
+    await expect(actions.locator("button:visible")).toHaveCount(2);
   } else {
-    await expect(actions.locator("button:visible")).toHaveCount(width >= 768 ? 2 : 1);
+    await expect(actions.locator("button:visible")).toHaveCount(width >= 768 ? 3 : 2);
   }
   await expect(actions.getByRole("button", { name: "Benefit", exact: true })).toHaveCount(0);
+  await expect(actions.getByRole("button", { name: "Appearance", exact: true })).toBeVisible();
   await expect(actions.getByRole("button", { name: "Reader options", exact: true })).toBeVisible();
   // Benefit is accessible in the dock.
   await expect(page.getByTestId("reader-benefit-dock-button")).toBeVisible();
