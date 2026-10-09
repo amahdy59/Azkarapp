@@ -162,20 +162,14 @@ test("English narrated words retain readable contrast in light and dark travel p
   const pack: OwnerTimingPack = JSON.parse(
     gunzipSync(readFileSync(`public/data/listening-timings/owner-${OWNER_TIMING_PACK_SHA}.bin`)).toString(),
   );
+  await page.goto(`/#/azkar/travel/${index + 1}?mode=complete`);
   for (const themeMode of ["light", "midnight", "dark"]) {
-    await page.addInitScript(
-      (themeMode) =>
-        localStorage.setItem(
-          "azkarapp.state.v1",
-          JSON.stringify({
-            settings: { language: "en", themeMode, reduceMotion: true },
-            profile: { isGuest: true },
-            routineMode: "complete",
-          }),
-        ),
-      themeMode,
-    );
-    await page.goto(`/#/azkar/travel/${index + 1}?mode=complete`);
+    await page.evaluate((themeMode) => {
+      const state = JSON.parse(localStorage.getItem("azkarapp.state.v1")!);
+      state.settings.themeMode = themeMode;
+      localStorage.setItem("azkarapp.state.v1", JSON.stringify(state));
+    }, themeMode);
+    await page.reload();
     await page.getByRole("button", { name: "Reader options", exact: true }).click();
     await clickReaderOption(page, "Play English translation");
     const player = page.getByRole("region", { name: "Audio player", exact: true });
@@ -231,6 +225,8 @@ test("English narrated words retain readable contrast in light and dark travel p
         }),
       )
       .toBeGreaterThanOrEqual(4.5);
+    await player.getByRole("button", { name: "Stop audio and close player", exact: true }).click();
+    await expect(player).toHaveCount(0);
   }
 });
 
