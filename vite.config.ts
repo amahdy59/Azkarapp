@@ -234,7 +234,7 @@ export default defineConfig(({ mode }) => {
           ],
         },
         workbox: {
-          globPatterns: ["**/*.{js,css,html,svg,png,webp,avif,woff2}"],
+          globPatterns: ["**/*.{js,css,html,svg,png,webp,avif,woff2}", "**/release-history-*.bin"],
           // Only real exclusions belong here. The rest of this list used to name
           // uncompressed masters, design sources and superseded imagery that no
           // code path referenced — keeping them out of the precache while still

@@ -1,11 +1,36 @@
 import { describe, expect, it } from "vitest";
-import { findStaleness, validateManifest } from "./check-release-notes.mjs";
+import { findStaleness, validateManifest, validateReleaseHistory } from "./check-release-notes.mjs";
 
 const valid = {
   release: "2026-08-19",
   ar: ["الأول", "الثاني", "الثالث"],
   en: ["First", "Second", "Third"],
 };
+
+describe("release history", () => {
+  const previous = { ...valid, release: "2026-08-18" };
+  it("keeps both the current and prior bilingual notes", () => {
+    expect(validateReleaseHistory([valid, previous], valid, previous)).toEqual([]);
+  });
+  it("requires the current manifest to be archived verbatim", () => {
+    expect(validateReleaseHistory([previous], valid, previous)).toContainEqual(
+      expect.stringContaining("Archive the current release"),
+    );
+  });
+  it("rejects duplicates, invalid entries and dropped previous notes", () => {
+    expect(validateReleaseHistory([valid, valid, {}], valid, previous)).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining("repeats"),
+        expect.stringContaining("invalid"),
+        expect.stringContaining("preserve the previous"),
+      ]),
+    );
+  });
+  it("retains legitimate older five-item summaries", () => {
+    const legacy = { ...previous, ar: ["١", "٢", "٣", "٤", "٥"], en: ["1", "2", "3", "4", "5"] };
+    expect(validateReleaseHistory([valid, legacy], valid, legacy)).toEqual([]);
+  });
+});
 
 describe("validateManifest", () => {
   it("accepts a bilingual manifest carrying a release stamp", () => {

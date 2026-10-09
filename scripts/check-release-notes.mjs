@@ -1,6 +1,7 @@
 import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import { gunzipSync } from "node:zlib";
 
 /**
  * `public/release-notes.json` is what the update prompt shows a reader when a
@@ -97,6 +98,37 @@ function sameNotes(a, b) {
   return JSON.stringify([a?.ar, a?.en]) === JSON.stringify([b?.ar, b?.en]);
 }
 
+export function validateReleaseHistory(history, current, previous) {
+  const problems = [];
+  if (!Array.isArray(history) || !history.length)
+    return ["Release history must retain the current and earlier release notes."];
+  const stamps = new Set();
+  for (const entry of history) {
+    if (
+      !entry ||
+      !isNonEmptyString(entry.release) ||
+      !Array.isArray(entry.ar) ||
+      !Array.isArray(entry.en) ||
+      !entry.ar.length ||
+      entry.ar.length !== entry.en.length ||
+      !entry.ar.every(isNonEmptyString) ||
+      !entry.en.every(isNonEmptyString)
+    )
+      problems.push("Release history contains an invalid bilingual entry.");
+    else if (stamps.has(entry.release)) problems.push(`Release history repeats ${entry.release}.`);
+    else stamps.add(entry.release);
+  }
+  if (history[0]?.release !== current.release || !sameNotes(history[0], current))
+    problems.push("Archive the current release with pnpm archive:release-notes before deploying.");
+  if (
+    previous?.release &&
+    previous.release !== current.release &&
+    !history.some((entry) => entry.release === previous.release && sameNotes(entry, previous))
+  )
+    problems.push("Release history must preserve the previous release's notes.");
+  return problems;
+}
+
 /**
  * @param commits    user-facing commits landed since the manifest last changed
  * @param current    the manifest as it stands in the working tree
@@ -135,6 +167,10 @@ function run() {
   const problems = validateManifest(current);
 
   const lastNotesCommit = git(["log", "-1", "--format=%H", "--", MANIFEST]).trim();
+  const history = JSON.parse(readFileSync("src/app/releaseHistory.data.json", "utf8"));
+  if (gunzipSync(readFileSync("src/app/release-history.bin")).toString("utf8") !== JSON.stringify(history))
+    problems.push("The offline release archive is stale. Run pnpm archive:release-notes.");
+  problems.push(...validateReleaseHistory(history, current, lastNotesCommit ? readManifestAt(lastNotesCommit) : null));
   if (lastNotesCommit) {
     const commits = git(["log", "--format=%h %s", `${lastNotesCommit}..HEAD`, "--", ...USER_FACING_PATHS])
       .split("\n")

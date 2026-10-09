@@ -1,4 +1,5 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import history from "../../releaseHistory.data.json";
 import { describe, expect, it, vi } from "vitest";
 
 const { loadReleaseNotes } = vi.hoisted(() => ({ loadReleaseNotes: vi.fn() }));
@@ -7,6 +8,7 @@ vi.mock("../../releaseNotes", async (importOriginal) => ({
   ...(await importOriginal<typeof import("../../releaseNotes")>()),
   loadReleaseNotes,
 }));
+vi.mock("../../releaseHistory", () => ({ latestBundledRelease: history[0], loadReleaseHistory: async () => history }));
 
 import { t } from "../../i18n";
 import { WhatsNewPanel } from "./WhatsNewPanel";
@@ -35,11 +37,18 @@ describe("WhatsNewPanel", () => {
     expect(screen.queryByText(notes.en[0])).not.toBeInTheDocument();
   });
 
-  it("explains itself instead of showing an empty list when the notes cannot be loaded", async () => {
+  it("keeps the bundled latest and earlier notes available offline", async () => {
     loadReleaseNotes.mockResolvedValue(null);
     render(<WhatsNewPanel language="en" onBack={vi.fn()} />);
 
-    await waitFor(() => expect(screen.getByText(t("en", "about.whatsNewUnavailable"))).toBeInTheDocument());
-    expect(screen.queryByRole("listitem")).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText(t("en", "about.releaseNotesOffline"))).toBeInTheDocument());
+    expect(
+      within(
+        screen.getByRole("region", { name: t("en", "about.releaseVersion", { release: history[0]!.release }) }),
+      ).getByText(history[0]!.en[0]!),
+    ).toBeInTheDocument();
+    await waitFor(() => expect(document.querySelectorAll("details")).toHaveLength(19));
+    fireEvent.click(screen.getByRole("button", { name: t("en", "about.moreReleases") }));
+    expect(document.querySelectorAll("details")).toHaveLength(39);
   });
 });

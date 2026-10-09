@@ -32,6 +32,7 @@
     "test:run": "vitest run",
     "budget": "node scripts/check-bundle-budget.mjs",
     "check:release-notes": "node scripts/check-release-notes.mjs",
+    "archive:release-notes": "node scripts/archive-release-notes.mjs",
     "typecheck": "tsc --noEmit",
     "validate:audio": "node scripts/validate-audio-manifest.mjs",
     "validate:audio:local": "node scripts/validate-audio-manifest.mjs --local",
