@@ -824,7 +824,7 @@ export function MushafImmersiveReader({
           aria-label={t(language, "mushaf.focusModeExit")}
           title={t(language, "mushaf.focusModeExit")}
           className="group absolute inset-x-0 bottom-[env(safe-area-inset-bottom)] z-20 flex h-5 items-center justify-center focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-          style={benefitAction ? { bottom: "calc(60px + env(safe-area-inset-bottom))" } : undefined}
+          style={benefitAction ? { bottom: "calc(3.75rem + env(safe-area-inset-bottom))" } : undefined}
         >
           <span
             aria-hidden="true"
