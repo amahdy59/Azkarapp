@@ -62,19 +62,29 @@ for (const language of ["ar", "en"] as const) {
     await page.goto("/#/azkar/morning/2?mode=complete");
     const reader = page.getByTestId("reader-screen");
     await expect(reader).toBeVisible();
-    await page
-      .getByRole("button", { name: language === "ar" ? "خيارات القارئ" : "Reader options", exact: true })
-      .click();
-    const dialog = page.getByRole("dialog");
-    await expect(dialog).toBeVisible();
     const readingUrl = page.url();
-    for (const shortcut of ["Control+k", "Alt+1", "/"]) {
-      await page.keyboard.press(shortcut);
-      await expect(dialog).toBeVisible();
-      await expect(page).toHaveURL(readingUrl);
+    for (const surface of [
+      {
+        trigger: page.getByRole("button", {
+          name: language === "ar" ? "خيارات القارئ" : "Reader options",
+          exact: true,
+        }),
+        role: "menu" as const,
+      },
+      { trigger: page.getByTestId("reader-benefit-dock-button"), role: "dialog" as const },
+    ]) {
+      await surface.trigger.click();
+      const overlay = page.getByRole(surface.role);
+      await expect(overlay).toBeVisible();
+      for (const shortcut of ["Control+k", "Alt+1", "/"]) {
+        await page.keyboard.press(shortcut);
+        await expect(overlay).toBeVisible();
+        await expect(page).toHaveURL(readingUrl);
+      }
+      await page.keyboard.press("Escape");
+      await expect(overlay).not.toBeVisible();
+      await expect(surface.trigger).toBeFocused();
     }
-    await page.keyboard.press("Escape");
-    await expect(dialog).not.toBeVisible();
     await page.keyboard.press("Control+k");
     await expect(page).toHaveURL(/#\/search/);
     await page.getByRole("button", { name: language === "ar" ? "رجوع" : "Back", exact: true }).click();
