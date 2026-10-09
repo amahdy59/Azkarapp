@@ -1,13 +1,13 @@
 {
-  "release": "2026-10-09.1",
+  "release": "2026-10-09.2",
   "ar": [
-    "تظهر الكلمات المنطوقة بلون مميز وخلفية خفيفة وتسطير، دون تغيير حجم النص أو تحريكه.",
+    "تظهر الكلمات المنطوقة بلون واضح في المظهر الفاتح والداكن، مع خلفية خفيفة وتسطير دون تغيير حجم النص أو تحريكه.",
     "تجد زر الفائدة أسفل شاشة القراءة، بما فيها صفحات السور والمصحف.",
     "يفتح زرا Aa وخيارات القارئ قوائم مختصرة بجانب الزر، مع إزالة الخيارات المكررة.",
     "تتضمن فائدة سورة الكهف رواية نور الجمعة مع مرجعها ودرجة الحديث."
   ],
   "en": [
-    "Spoken words use a distinct color, faint background and underline without changing text size or position.",
+    "Spoken words use readable color in light and dark themes, with a faint background and underline that preserve text size and position.",
     "Benefit is available at the bottom of reading screens, including surahs and Mushaf pages.",
     "Aa and Reader options open compact menus beside their buttons, with duplicated choices removed.",
     "Al-Kahf benefits include the Friday-light narration with its reference and named grading."
