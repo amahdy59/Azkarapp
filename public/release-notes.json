@@ -2,13 +2,13 @@
   "release": "2026-10-09.4",
   "ar": [
     "تبقى أزرار الصوت قابلة للوصول على الشاشات القصيرة، وتعرض المقاطع القرآنية القصيرة سطور المصحف مع متابعة الكلمات المتطابقة.",
-    "أصبحت قائمة القارئ أبسط دون تكرار أزرار الصوت والمشاركة، وتظهر الفائدة في القراءة وأسفل أزرار السورة.",
+    "أصبحت قائمة القارئ أبسط، وتظهر الفائدة أسفل أزرار السورة، وتتوفر مشاركة السورة على صورتها.",
     "شارك الآية في بطاقات صور طولية أو مربعة، مع خيارات للترجمة الإنجليزية ومعاني الكلمات المتاحة؛ يستمر النص الطويل على بطاقات إضافية.",
     "اقرأ سجل التحديثات في الإعدادات ثم حول التطبيق ثم ما الجديد، حتى دون اتصال بالإنترنت."
   ],
   "en": [
     "Audio controls remain reachable on short screens, and short Quran recordings show Mushaf lines with matching word highlights.",
-    "Reader menus are simpler without duplicate audio and sharing actions. Benefit stays in reading, below the surah actions.",
+    "Reader menus are simpler. Benefit stays below the surah actions, and surah sharing is available on its image.",
     "Share ayahs as portrait or square image cards, with available English translation and word meanings. Long text continues across extra cards.",
     "Read earlier updates in Settings, About, What's new, including when you are offline."
   ]
