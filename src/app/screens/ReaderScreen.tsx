@@ -19,8 +19,7 @@ import { useSwipeGestures } from "../hooks/useSwipeGestures";
 import { useMediaQuery } from "../hooks/useMediaQuery";
 import { useCollectionPanelSize } from "../hooks/useCollectionPanelSize";
 import { CollectionPanelResizeHandle } from "../components/CollectionPanelResizeHandle";
-import { SidePanel, ResponsiveSheet, SheetHeader } from "../components/ResponsiveSheet";
-import { useLayoutMode } from "../hooks/useLayoutMode";
+import { SidePanel } from "../components/ResponsiveSheet";
 import {
   ReaderOptionsContext,
   ReaderOptionsAction,
@@ -83,7 +82,6 @@ import { QuranWordPopover } from "../components/QuranWordPopover";
 import { getQuranWordMeanings, type WordMeaningSelection } from "../content/quranWordMeanings";
 import { formatNumerals } from "../formatting";
 import { AzkarListItem } from "../components/AzkarListItem";
-import { SegmentedControl } from "../components/SegmentedControl";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -291,12 +289,6 @@ export function ReaderScreen({
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const sidebarToggleRef = useRef<HTMLButtonElement>(null);
   const readerMenuRef = useRef<HTMLButtonElement>(null);
-  const compactOptions = useLayoutMode() === "compact";
-  const [readerOptionsOpen, setReaderOptionsOpen] = useState(false);
-  const [readerDisplaySettingsOpen, setReaderDisplaySettingsOpen] = useState(false);
-  useEffect(() => {
-    if (!compactOptions) setReaderOptionsOpen(false);
-  }, [compactOptions]);
   const collectionMenuRequested = useRef(false);
   const collectionSelectionRequested = useRef(false);
   const [isCollectionDrawerOpen, setIsCollectionDrawerOpen] = useState(false);
@@ -1146,6 +1138,9 @@ export function ReaderScreen({
       type="button"
       onClick={(e) => {
         e.stopPropagation();
+        // Safari does not focus buttons on pointer activation. The sheet needs
+        // a concrete return target when it closes.
+        e.currentTarget.focus({ preventScroll: true });
         setHasOpenedBenefit(true);
         setBenefitOpen(true);
       }}
@@ -1211,6 +1206,8 @@ export function ReaderScreen({
       return null;
     }
 
+    if (longSurah) return <DevotionalFooter>{renderBenefitDockButton()}</DevotionalFooter>;
+
     return (
       <div data-testid="reader-counter-stack">
         <DevotionalFooter>
@@ -1244,16 +1241,74 @@ export function ReaderScreen({
     );
   };
 
+  const renderAppearanceMenu = (triggerClass: string) => (
+    <DropdownMenu dir={direction}>
+      <DropdownMenuTrigger
+        data-testid="reader-settings-button"
+        aria-label={t(language, "appearance.title")}
+        className={triggerClass}
+      >
+        <span className="text-sm font-bold tracking-tight" aria-hidden="true">
+          Aa
+        </span>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        align="end"
+        data-testid="reader-appearance-menu"
+        style={{ width: "max-content", minWidth: "12rem", maxWidth: "calc(100vw - 16px)" }}
+      >
+        <DropdownMenuLabel>{t(language, "settings.textSize")}</DropdownMenuLabel>
+        <DropdownMenuRadioGroup
+          value={textSize}
+          onValueChange={(value) => onTextSizeChange(value as TextSizeOption)}
+          aria-label={t(language, "settings.textSize")}
+        >
+          {(["small", "medium", "large"] as const).map((size) => (
+            <DropdownMenuRadioItem
+              key={size}
+              value={size}
+              onSelect={(event) => event.preventDefault()}
+              data-testid={`reader-display-text-size-${size}`}
+            >
+              {t(
+                language,
+                size === "small" ? "settings.textSmall" : size === "large" ? "settings.textLarge" : "settings.medium",
+              )}
+            </DropdownMenuRadioItem>
+          ))}
+        </DropdownMenuRadioGroup>
+        {isRoutineCategory(catId) && onRoutineModeChange && (
+          <>
+            <ReaderOptionsDivider />
+            <DropdownMenuLabel>{t(language, "reader.collectionMode")}</DropdownMenuLabel>
+            <DropdownMenuRadioGroup
+              value={routineMode}
+              onValueChange={(value) => onRoutineModeChange(value as RoutineMode)}
+              aria-label={t(language, "reader.collectionMode")}
+            >
+              <DropdownMenuRadioItem value="complete" onSelect={(event) => event.preventDefault()}>
+                {t(language, "category.complete")}
+              </DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="core" onSelect={(event) => event.preventDefault()}>
+                {t(language, "category.core")}
+              </DropdownMenuRadioItem>
+            </DropdownMenuRadioGroup>
+          </>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+
   const renderReaderMenuItems = (layout: "mobile" | "desktop") => {
     const hasAudioOptions =
-      (!longSurah && englishAudioAvailable) || Boolean(onPlayAllAudio) || Boolean(onRepeatAudio && !audioModeActive);
+      !longSurah && (englishAudioAvailable || Boolean(onPlayAllAudio) || Boolean(onRepeatAudio && !audioModeActive));
 
     return (
-      <ReaderOptionsContext.Provider value={{ sheet: compactOptions, close: () => setReaderOptionsOpen(false) }}>
-        {!canDockCollection && onSelectZikr && (
+      <ReaderOptionsContext.Provider value={{ sheet: false, close: () => {} }}>
+        {!canDockCollection && onSelectZikr && azkar.length > 1 && (
           <ReaderOptionsAction
             onSelect={() => {
-              collectionMenuRequested.current = !compactOptions;
+              collectionMenuRequested.current = true;
               setIsCollectionDrawerOpen(true);
             }}
           >
@@ -1267,7 +1322,7 @@ export function ReaderScreen({
             <div>
               <ReaderOptionsAction
                 onClick={() => {
-                  focusRequestedRef.current = !compactOptions;
+                  focusRequestedRef.current = true;
                   setFocusMode(true);
                 }}
                 data-testid="reader-focus-toggle"
@@ -1321,43 +1376,6 @@ export function ReaderScreen({
           </>
         )}
 
-        {/* 3. Reading display: Text size */}
-        <div className="px-2.5 py-1">
-          <div className="mb-1.5 flex items-center justify-between px-0.5">
-            <span className="text-micro font-bold uppercase tracking-wider text-muted-foreground">
-              {t(language, "settings.textSize")}
-            </span>
-            <span className="text-xs font-semibold text-primary">
-              {t(
-                language,
-                textSize === "small"
-                  ? "settings.textSmall"
-                  : textSize === "large"
-                    ? "settings.textLarge"
-                    : "settings.medium",
-              )}
-            </span>
-          </div>
-          <SegmentedControl
-            value={textSize}
-            onChange={onTextSizeChange}
-            direction={direction}
-            aria-label={t(language, "settings.textSize")}
-            className="grid grid-cols-3 gap-1 rounded-xl border border-border/60 bg-muted/50 p-1"
-            indicatorClassName="bg-card"
-            options={[
-              { value: "small", label: t(language, "settings.textSmall"), testId: "reader-text-size-small" },
-              { value: "medium", label: t(language, "settings.medium"), testId: "reader-text-size-medium" },
-              { value: "large", label: t(language, "settings.textLarge"), testId: "reader-text-size-large" },
-            ]}
-            itemClassName={(selected) =>
-              `flex min-h-11 items-center justify-center rounded-lg text-xs font-bold transition-colors focus-visible:ring-[3px] focus-visible:ring-ring ${selected ? "text-foreground shadow-xs ring-1 ring-border/80" : "text-muted-foreground hover:bg-background/50 hover:text-foreground"}`
-            }
-          />
-        </div>
-
-        <ReaderOptionsDivider className="my-1 h-px bg-border/60" />
-
         {/* 4. Actions: Bookmark, Share collection/surah, Repeat, Routine mode */}
         <div>
           <ReaderOptionsAction
@@ -1394,7 +1412,7 @@ export function ReaderScreen({
               <span>{t(language, "reader.shareCurrent")}</span>
             </ReaderOptionsAction>
           )}
-          {onRepeat && (
+          {onRepeat && !longSurah && (
             <ReaderOptionsAction
               onClick={onRepeat}
               data-testid="reader-menu-repeat"
@@ -1405,48 +1423,29 @@ export function ReaderScreen({
             </ReaderOptionsAction>
           )}
         </ReaderOptionsSection>
-        {isRoutineCategory(catId) && onRoutineModeChange && (
-          <div className="px-2.5 py-2" data-testid="reader-menu-routine-mode">
-            <div className="mb-2 text-sm font-semibold">{t(language, "reader.collectionMode")}</div>
-            <SegmentedControl
-              value={routineMode}
-              onChange={onRoutineModeChange}
-              direction={direction}
-              aria-label={t(language, "reader.collectionMode")}
-              options={[
-                { value: "complete", label: t(language, "category.complete") },
-                { value: "core", label: t(language, "category.core") },
-              ]}
-              className="grid grid-cols-2 gap-1 rounded-xl bg-muted p-1"
-              indicatorClassName="bg-card"
-              itemClassName={(selected) =>
-                `min-h-11 rounded-lg px-3 text-sm font-semibold focus-visible:ring-[3px] focus-visible:ring-ring ${selected ? "text-foreground ring-1 ring-border/80" : "text-muted-foreground"}`
-              }
-            />
-          </div>
+        {!longSurah && (
+          <>
+            {/* 5. Counter feedback & recovery */}
+            <ReaderOptionsSection title={t(language, "reader.counterSettings")}>
+              <ReaderOptionsAction
+                onClick={toggleSound}
+                keepOpen
+                data-testid={`reader-counter-sound-toggle-${layout}`}
+                className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted"
+              >
+                {soundEnabled ? <Volume2 size={16} aria-hidden="true" /> : <VolumeX size={16} aria-hidden="true" />}
+                <span>{t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}</span>
+              </ReaderOptionsAction>
+              <ReaderOptionsAction
+                onClick={handleResetCounter}
+                className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted text-muted-foreground hover:text-foreground"
+              >
+                <RotateCcw size={16} aria-hidden="true" />
+                <span>{t(language, "reader.resetCounter")}</span>
+              </ReaderOptionsAction>
+            </ReaderOptionsSection>
+          </>
         )}
-
-        <ReaderOptionsDivider className="my-1 h-px bg-border/60" />
-
-        {/* 5. Counter feedback & recovery */}
-        <ReaderOptionsSection title={t(language, "reader.counterSettings")}>
-          <ReaderOptionsAction
-            onClick={toggleSound}
-            keepOpen
-            data-testid={`reader-counter-sound-toggle-${layout}`}
-            className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted"
-          >
-            {soundEnabled ? <Volume2 size={16} aria-hidden="true" /> : <VolumeX size={16} aria-hidden="true" />}
-            <span>{t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}</span>
-          </ReaderOptionsAction>
-          <ReaderOptionsAction
-            onClick={handleResetCounter}
-            className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted text-muted-foreground hover:text-foreground"
-          >
-            <RotateCcw size={16} aria-hidden="true" />
-            <span>{t(language, "reader.resetCounter")}</span>
-          </ReaderOptionsAction>
-        </ReaderOptionsSection>
 
         {onReset && (
           <>
@@ -1545,6 +1544,7 @@ export function ReaderScreen({
           onTogglePageBookmark={onToggleMushafBookmark}
           mushafSettings={mushafSettings}
           surahAudio={surahAudio}
+          benefitAction={renderBenefitDockButton()}
           onClose={() => setImmersiveOpen(false)}
           onReadExternally={() => {
             if (!isDone) handleZikrCompletion(idx);
@@ -1616,26 +1616,9 @@ export function ReaderScreen({
                     <ArrowPrevious size={20} />
                   </IconButton>
 
-                  {/* Hero actions: Reference (for surahs without bottom dock), Overflow menu. */}
+                  {/* Hero actions: appearance and contextual actions. */}
                   <div className="flex flex-wrap items-center justify-end gap-2" data-testid="reader-hero-actions">
-                    {longSurah && (
-                      <button
-                        type="button"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          setHasOpenedBenefit(true);
-                          setBenefitOpen(true);
-                        }}
-                        aria-haspopup="dialog"
-                        aria-label={t(language, "reader.referencesButton")}
-                        title={t(language, "reader.referencesButton")}
-                        className={`${READER_WIDE_HEADER_ACTION_CLASS} w-auto gap-2 px-3`}
-                      >
-                        <BookOpen size={20} aria-hidden="true" />
-                        <span className="text-label font-extrabold">{t(language, "reader.referencesButton")}</span>
-                      </button>
-                    )}
-
+                    {renderAppearanceMenu(READER_WIDE_HEADER_ACTION_CLASS)}
                     <DropdownMenu dir={direction}>
                       <DropdownMenuTrigger
                         ref={readerMenuRef}
@@ -1648,7 +1631,7 @@ export function ReaderScreen({
                       </DropdownMenuTrigger>
                       <DropdownMenuContent
                         align="end"
-                        className="w-60 min-w-[15rem]"
+                        style={{ width: "max-content", maxWidth: "calc(100vw - 16px)" }}
                         onCloseAutoFocus={onReaderMenuCloseAutoFocus}
                       >
                         {renderReaderMenuItems("desktop")}
@@ -1796,10 +1779,8 @@ export function ReaderScreen({
                         placement="above"
                       />
                     )}
-                    {!longSurah && (
-                      <footer className={`shrink-0 pt-1.5 ${audioModeActive ? "pb-0" : "pb-2"}`}>{renderDock()}</footer>
-                    )}
-                    {(!audioModeActive || longSurah) && audioPlayer}
+                    {<footer className={`shrink-0 pt-1.5 ${audioModeActive ? "pb-0" : "pb-2"}`}>{renderDock()}</footer>}
+                    {!audioModeActive && audioPlayer}
                   </div>
                 </div>
               </div>
@@ -1837,93 +1818,37 @@ export function ReaderScreen({
                 decoration={<ReaderSceneArt category={catId} compact />}
                 backButtonClassName={READER_HEADER_ACTION_CLASS}
                 right={
-                  // Two actions at most: Reference, then the overflow control.
+                  // Two actions: appearance, then the overflow control.
                   // Share used to sit between them; at 320-390px a third 44px
                   // target was the difference between the collection name
                   // fitting and being truncated to "أذكار ال…", and share is not
                   // a per-zikr primary. Both share the header's ghost
                   // icon-button treatment so the row reads as one set.
                   <div className="flex items-center gap-1" data-testid="reader-actions">
-                    {longSurah && (
-                      <button
-                        type="button"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          setHasOpenedBenefit(true);
-                          setBenefitOpen(true);
-                        }}
-                        aria-haspopup="dialog"
-                        className={`${READER_HEADER_ACTION_CLASS} w-auto gap-1.5 px-2.5`}
-                        aria-label={t(language, "reader.referencesButton")}
-                        title={t(language, "reader.referencesButton")}
-                      >
-                        <BookOpen size={18} aria-hidden="true" />
-                        <span className="text-xs font-extrabold min-[600px]:text-label">
-                          {t(language, "reader.referencesButton")}
-                        </span>
-                      </button>
-                    )}
+                    {renderAppearanceMenu(READER_HEADER_ACTION_CLASS)}
 
-                    <button
-                      type="button"
-                      data-testid="reader-settings-button"
-                      aria-label={t(language, "appearance.title")}
-                      title={t(language, "appearance.title")}
-                      aria-haspopup="dialog"
-                      aria-expanded={readerDisplaySettingsOpen}
-                      className={READER_HEADER_ACTION_CLASS}
-                      onClick={(event) => {
-                        event.currentTarget.focus({ preventScroll: true });
-                        setReaderDisplaySettingsOpen(true);
-                      }}
-                    >
-                      <span className="text-sm font-bold tracking-tight" aria-hidden="true">
-                        Aa
-                      </span>
-                    </button>
-
-                    {compactOptions ? (
-                      <button
-                        type="button"
-                        ref={readerMenuRef}
-                        aria-label={t(language, "reader.menu")}
-                        aria-haspopup="dialog"
-                        aria-expanded={readerOptionsOpen}
-                        className={READER_HEADER_ACTION_CLASS}
-                        onClick={(event) => {
-                          // Safari does not focus buttons on pointer activation.
-                          event.currentTarget.focus({ preventScroll: true });
-                          setReaderOptionsOpen(true);
-                        }}
-                        onPointerEnter={() => void prepareZikrShareCardFonts()}
-                        onFocus={() => void prepareZikrShareCardFonts()}
-                      >
-                        <MoreVertical size={20} aria-hidden="true" />
-                      </button>
-                    ) : (
-                      <DropdownMenu dir={direction}>
-                        {/* The share-card fonts used to be prefetched on the share
+                    <DropdownMenu dir={direction}>
+                      {/* The share-card fonts used to be prefetched on the share
                         button's own hover/focus. That button is in the menu
                         now, so the trigger warms them instead — still ahead of
                         the click, one step earlier in the same gesture. */}
-                        <DropdownMenuTrigger
-                          ref={readerMenuRef}
-                          aria-label={t(language, "reader.menu")}
-                          className={READER_HEADER_ACTION_CLASS}
-                          onPointerEnter={() => void prepareZikrShareCardFonts()}
-                          onFocus={() => void prepareZikrShareCardFonts()}
-                        >
-                          <MoreVertical size={20} />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                          align="end"
-                          className="w-60 min-w-[15rem]"
-                          onCloseAutoFocus={onReaderMenuCloseAutoFocus}
-                        >
-                          {renderReaderMenuItems("mobile")}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    )}
+                      <DropdownMenuTrigger
+                        ref={readerMenuRef}
+                        aria-label={t(language, "reader.menu")}
+                        className={READER_HEADER_ACTION_CLASS}
+                        onPointerEnter={() => void prepareZikrShareCardFonts()}
+                        onFocus={() => void prepareZikrShareCardFonts()}
+                      >
+                        <MoreVertical size={20} />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        align="end"
+                        style={{ width: "max-content", maxWidth: "calc(100vw - 16px)" }}
+                        onCloseAutoFocus={onReaderMenuCloseAutoFocus}
+                      >
+                        {renderReaderMenuItems("mobile")}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 }
               />
@@ -2041,14 +1966,14 @@ export function ReaderScreen({
               {/* The screen sets !pb-0 and the tab bar is hidden here, so the
                 counter itself owns the bottom inset — otherwise it would sit
                 flush against the home indicator. */}
-              {!longSurah && (
+              {
                 <div
                   className={`shrink-0 pt-3 ${audioModeActive ? "pb-0" : "pb-[max(0.75rem,env(safe-area-inset-bottom))]"}`}
                 >
                   {renderDock()}
                 </div>
-              )}
-              {(!audioModeActive || longSurah) && audioPlayer}
+              }
+              {!audioModeActive && audioPlayer}
             </div>
           </>
         ))}
@@ -2158,138 +2083,6 @@ export function ReaderScreen({
             {t(language, "common.undo")}
           </button>
         </div>
-      )}
-      {compactOptions && readerOptionsOpen && (
-        <ResponsiveSheet
-          focusOnOpen
-          open={readerOptionsOpen}
-          onClose={() => setReaderOptionsOpen(false)}
-          title={t(language, "reader.menu")}
-          direction={direction}
-          language={language}
-          testId="reader-options-sheet"
-        >
-          <SheetHeader
-            title={t(language, "reader.menu")}
-            onClose={() => setReaderOptionsOpen(false)}
-            language={language}
-            direction={direction}
-          />
-          <div className="min-h-0 overflow-y-auto px-4 pb-4" data-vaul-no-drag>
-            {renderReaderMenuItems("mobile")}
-          </div>
-        </ResponsiveSheet>
-      )}
-      {readerDisplaySettingsOpen && (
-        <ResponsiveSheet
-          focusOnOpen
-          open={readerDisplaySettingsOpen}
-          onClose={() => setReaderDisplaySettingsOpen(false)}
-          title={t(language, "appearance.title")}
-          direction={direction}
-          language={language}
-          testId="reader-display-settings-sheet"
-        >
-          <SheetHeader
-            title={t(language, "appearance.title")}
-            onClose={() => setReaderDisplaySettingsOpen(false)}
-            language={language}
-            direction={direction}
-          />
-          <div className="min-h-0 overflow-y-auto px-4 pb-6 pt-2 space-y-5" data-vaul-no-drag>
-            {/* 1. Reading display: Text size */}
-            <div>
-              <div className="mb-2 flex items-center justify-between">
-                <span className="text-xs font-bold text-muted-foreground">{t(language, "settings.textSize")}</span>
-                <span className="text-xs font-semibold text-primary">
-                  {t(
-                    language,
-                    textSize === "small"
-                      ? "settings.textSmall"
-                      : textSize === "large"
-                        ? "settings.textLarge"
-                        : "settings.medium",
-                  )}
-                </span>
-              </div>
-              <SegmentedControl
-                value={textSize}
-                onChange={onTextSizeChange}
-                direction={direction}
-                aria-label={t(language, "settings.textSize")}
-                className="grid grid-cols-3 gap-1 rounded-xl border border-border/60 bg-muted/50 p-1"
-                indicatorClassName="bg-card"
-                options={[
-                  {
-                    value: "small",
-                    label: t(language, "settings.textSmall"),
-                    testId: "reader-display-text-size-small",
-                  },
-                  { value: "medium", label: t(language, "settings.medium"), testId: "reader-display-text-size-medium" },
-                  {
-                    value: "large",
-                    label: t(language, "settings.textLarge"),
-                    testId: "reader-display-text-size-large",
-                  },
-                ]}
-                itemClassName={(selected) =>
-                  `flex min-h-11 items-center justify-center rounded-lg text-xs font-bold transition-colors focus-visible:ring-[3px] focus-visible:ring-ring ${selected ? "text-foreground shadow-xs ring-1 ring-border/80" : "text-muted-foreground hover:bg-background/50 hover:text-foreground"}`
-                }
-              />
-            </div>
-
-            {/* 2. Collection routine mode (if applicable) */}
-            {isRoutineCategory(catId) && onRoutineModeChange && (
-              <div data-testid="reader-display-routine-mode">
-                <div className="mb-2 text-xs font-bold text-muted-foreground">
-                  {t(language, "reader.collectionMode")}
-                </div>
-                <SegmentedControl
-                  value={routineMode}
-                  onChange={onRoutineModeChange}
-                  direction={direction}
-                  aria-label={t(language, "reader.collectionMode")}
-                  options={[
-                    { value: "complete", label: t(language, "category.complete") },
-                    { value: "core", label: t(language, "category.core") },
-                  ]}
-                  className="grid grid-cols-2 gap-1 rounded-xl bg-muted p-1"
-                  indicatorClassName="bg-card"
-                  itemClassName={(selected) =>
-                    `min-h-11 rounded-lg px-3 text-sm font-semibold focus-visible:ring-[3px] focus-visible:ring-ring ${selected ? "text-foreground ring-1 ring-border/80" : "text-muted-foreground"}`
-                  }
-                />
-              </div>
-            )}
-
-            {/* 3. Counter feedback & sound toggle */}
-            <div>
-              <div className="mb-2 text-xs font-bold text-muted-foreground">
-                {t(language, "reader.counterSettings")}
-              </div>
-              <button
-                type="button"
-                onClick={toggleSound}
-                data-testid="reader-display-sound-toggle"
-                className="flex min-h-12 w-full cursor-pointer items-center justify-between rounded-xl border border-border/70 bg-card px-4 py-2.5 text-sm font-bold text-foreground transition-colors hover:bg-muted"
-              >
-                <span className="flex items-center gap-2.5">
-                  {soundEnabled ? (
-                    <Volume2 size={18} className="text-primary" aria-hidden="true" />
-                  ) : (
-                    <VolumeX size={18} className="text-muted-foreground" aria-hidden="true" />
-                  )}
-                  <span>{t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}</span>
-                </span>
-                <span
-                  className={`text-xs font-bold px-2 py-0.5 rounded-md ${soundEnabled ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}
-                >
-                  {t(language, soundEnabled ? "notifications.enabled" : "notifications.disabled")}
-                </span>
-              </button>
-            </div>
-          </div>
-        </ResponsiveSheet>
       )}
     </ScreenContainer>
   );

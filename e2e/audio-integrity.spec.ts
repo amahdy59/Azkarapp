@@ -58,7 +58,7 @@ test("Aa reader settings retain keyboard focus, persisted text sizing and access
   await expect(trigger).toHaveAccessibleName("Appearance");
   await trigger.focus();
   await page.keyboard.press("Enter");
-  const sheet = page.getByTestId("reader-display-settings-sheet");
+  const sheet = page.getByTestId("reader-appearance-menu");
   await expect(sheet).toBeVisible();
   await sheet.getByTestId("reader-display-text-size-large").click();
   await expect
@@ -130,6 +130,10 @@ test("owner-reviewed Friday dua loads exact registered timings and clears cues o
   await clock((firstWord.startMs + 1) / 1000);
   const englishWord = player.locator("[data-listening-word]");
   await expect(englishWord).toHaveText(text.slice(firstWord.startOffset, firstWord.endOffset));
+  expect(await englishWord.evaluate((word) => getComputedStyle(word).color)).not.toBe(
+    await englishWord.evaluate((word) => getComputedStyle(word.parentElement!).color),
+  );
+  expect(await englishWord.evaluate((word) => getComputedStyle(word).backgroundColor)).not.toBe("rgba(0, 0, 0, 0)");
   const geometry = await englishWord.evaluate((word) => ({
     width: word.getBoundingClientRect().width,
     height: word.getBoundingClientRect().height,

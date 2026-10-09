@@ -835,17 +835,15 @@ const FRIDAY_KAHF_DRAFT: ZikrDraft[] = [
     benefitArabic: "تُقرأ سورة الكهف يوم الجمعة.",
     repetitionCount: 1,
     countLabel: "1",
-    /* The benefit stated the practice but cited nothing for it, so the reference
-       sheet showed a claim and a Qur'an citation with no narration between them.
-       This is the Muslim-graded wording; the widely quoted "light between the two
-       Fridays" narration is graded by later scholars rather than by Muslim, so the
-       stronger chain is the one shown. */
-    hadithText: "«مَنْ حَفِظَ عَشْرَ آيَاتٍ مِنْ أَوَّلِ سُورَةِ الْكَهْفِ عُصِمَ مِنَ الدَّجَّالِ»",
+    // Friday-light evidence was explicitly requested by the owner. Its named
+    // grading is distinct from the existing Sahih Muslim narration.
+    hadithText:
+      "«مَنْ حَفِظَ عَشْرَ آيَاتٍ مِنْ أَوَّلِ سُورَةِ الْكَهْفِ عُصِمَ مِنَ الدَّجَّالِ»\n\n«من قَرَأَ سُورَة الْكَهْف فِي يَوْم الْجُمُعَة أَضَاء لَهُ النُّور مَا بَيْنَ الْجُمْعَتَيْنِ». رواه البيهقي؛ مشكاة المصابيح ٢١٧٥، حسّنه الألباني.",
     hadithTextEnglish:
-      "“Whoever memorises ten verses from the beginning of Surat al-Kahf is protected from the Dajjal.”",
-    authenticityNote: "صحيح مسلم ٨٠٩.",
-    sourceReference: "Qur'an 18:1-110.",
-    sourceReferenceArabic: "القرآن الكريم، سورة الكهف (١٨:١-١١٠).",
+      "“Whoever memorises ten verses from the beginning of Surat al-Kahf is protected from the Dajjal.”\n\nReciting Al-Kahf on Friday is described as bringing light through to the following Friday. Reported by Al-Bayhaqi; Mishkat al-Masabih 2175, graded Hasan by Al-Albani.",
+    authenticityNote: "صحيح مسلم ٨٠٩؛ رواية نور الجمعة: حسن (الألباني)، مشكاة المصابيح ٢١٧٥.",
+    sourceReference: "Qur'an 18:1-110. Sahih Muslim 809. Mishkat al-Masabih 2175 — Hasan (Al-Albani).",
+    sourceReferenceArabic: "القرآن الكريم، سورة الكهف (١٨:١-١١٠). صحيح مسلم ٨٠٩. مشكاة المصابيح ٢١٧٥ — حسن (الألباني).",
     preferredTiming: "Friday.",
   },
 ];

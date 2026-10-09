@@ -12,7 +12,16 @@ describe("Surah Al-Kahf content", () => {
     expect(surah.repetitionCount).toBe(1);
     expect(surah.arabicText).toContain("﴿١﴾");
     expect(surah.arabicText).toContain("﴿١١٠﴾");
-    expect(surah.sourceReference).toBe("Qur'an 18:1-110.");
+    expect(surah.sourceReference).toContain("Qur'an 18:1-110.");
     expect(surah.sourceReferenceArabic).toMatch(/[\u0600-\u06ff]/);
+  });
+
+  it("keeps both virtues and identifies the Friday-light report's named grading", () => {
+    const surah = FRIDAY_KAHF[0]!;
+    expect(surah.hadithText).toContain("عُصِمَ مِنَ الدَّجَّالِ");
+    expect(surah.hadithText).toContain("مَا بَيْنَ الْجُمْعَتَيْنِ");
+    expect(surah.hadithTextEnglish).toContain("following Friday");
+    expect(surah.sourceReference).toContain("Sahih Muslim 809");
+    expect(surah.sourceReference).toContain("Mishkat al-Masabih 2175 — Hasan (Al-Albani)");
   });
 });

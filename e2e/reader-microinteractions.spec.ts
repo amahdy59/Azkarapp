@@ -1036,9 +1036,9 @@ test("the reader's text-size control resizes the zikr and never goes below the f
 
   const measured: Record<string, number> = {};
   for (const step of ["small", "medium", "large"] as const) {
-    const sizeButton = page.getByTestId(`reader-text-size-${step}`);
+    const sizeButton = page.getByTestId(`reader-display-text-size-${step}`);
     if (!(await sizeButton.isVisible())) {
-      await page.getByRole("button", { name: "Reader options", exact: true }).click();
+      await page.getByTestId("reader-settings-button").click();
     }
     await sizeButton.click();
     // The menu writes the one app-wide setting, so the root token moves too.
@@ -1053,16 +1053,16 @@ test("the reader's text-size control resizes the zikr and never goes below the f
   expect(measured.small, "smallest step must stay legible").toBeGreaterThanOrEqual(21.3);
   expect(measured.medium).toBeGreaterThan(measured.small);
   expect(measured.large).toBeGreaterThan(measured.medium);
-  const large = page.getByTestId("reader-text-size-large");
-  if (!(await large.isVisible())) await page.getByRole("button", { name: "Reader options", exact: true }).click();
+  const large = page.getByTestId("reader-display-text-size-large");
+  if (!(await large.isVisible())) await page.getByTestId("reader-settings-button").click();
   await large.focus();
   // Radix defers roving focus; hold the key through the selection event.
-  await page.keyboard.down("ArrowLeft");
-  await expect(page.getByTestId("reader-text-size-medium")).toBeFocused();
+  await page.keyboard.press("ArrowUp");
+  await expect(page.getByTestId("reader-display-text-size-medium")).toBeFocused();
+  await page.keyboard.press("Enter");
   await expect
     .poll(() => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--font-size").trim()))
     .toBe("16px");
-  await page.keyboard.up("ArrowLeft");
 });
 
 test("a highlighted Qur'an word is the same size as the ayah around it", async ({ page }) => {

@@ -387,7 +387,7 @@ const MushafTextLine = memo(function MushafTextLine({
               data-playback-word={
                 highlightedWord?.verseKey === w.verseKey && highlightedWord.position === w.position ? "true" : undefined
               }
-              className={`shrink-0 rounded-sm ${highlightedWord?.verseKey === w.verseKey && highlightedWord.position === w.position ? "bg-primary/20 underline underline-offset-4" : ""}`}
+              className={`shrink-0 rounded-sm ${highlightedWord?.verseKey === w.verseKey && highlightedWord.position === w.position ? "bg-primary/20 text-primary underline underline-offset-4" : ""}`}
               aria-hidden={!showWordMeanings}
               onContextMenu={(e) => {
                 e.preventDefault();

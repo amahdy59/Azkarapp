@@ -141,7 +141,7 @@ describe("ReaderScreen audio identity", () => {
     expect(toggleBtn).toHaveFocus();
   });
 
-  it("renders a compact horizontal text size segmented control in the more options menu", async () => {
+  it("provides text-size choices in the anchored Aa menu", async () => {
     const onTextSizeChange = vi.fn();
     render(
       <ReaderScreen
@@ -169,10 +169,10 @@ describe("ReaderScreen audio identity", () => {
       />,
     );
 
-    fireEvent.pointerDown(screen.getByRole("button", { name: "خيارات القارئ" }), { button: 0, ctrlKey: false });
+    fireEvent.pointerDown(screen.getByTestId("reader-settings-button"), { button: 0, ctrlKey: false });
 
-    const decreaseBtn = await screen.findByTestId("reader-text-size-small");
-    const increaseBtn = await screen.findByTestId("reader-text-size-large");
+    const decreaseBtn = await screen.findByTestId("reader-display-text-size-small");
+    const increaseBtn = await screen.findByTestId("reader-display-text-size-large");
 
     expect(decreaseBtn).toBeInTheDocument();
     expect(increaseBtn).toBeInTheDocument();
@@ -792,7 +792,7 @@ describe("ReaderScreen audio identity", () => {
     // Share collection option
     expect(await screen.findByTestId("reader-menu-share-collection")).toBeInTheDocument();
     expect(screen.getByTestId("reader-menu-repeat")).toBeInTheDocument();
-    expect(screen.getByTestId("reader-menu-routine-mode")).toBeInTheDocument();
+    expect(screen.queryByTestId("reader-menu-routine-mode")).not.toBeInTheDocument();
     expect(screen.getByTestId("reader-menu-reset-collection")).toBeInTheDocument();
 
     // Repeat option click triggers onRepeat
@@ -832,10 +832,11 @@ describe("ReaderScreen audio identity", () => {
 
     const aaButton = screen.getByTestId("reader-settings-button");
     expect(aaButton).toBeInTheDocument();
-    fireEvent.click(aaButton);
+    fireEvent.pointerDown(aaButton, { button: 0, ctrlKey: false });
 
-    const sheet = await screen.findByTestId("reader-display-settings-sheet");
-    expect(sheet).toBeInTheDocument();
+    const menu = await screen.findByTestId("reader-appearance-menu");
+    expect(menu).toHaveAttribute("role", "menu");
+    expect(screen.queryByTestId("reader-display-settings-sheet")).not.toBeInTheDocument();
 
     const largeOption = screen.getByTestId("reader-display-text-size-large");
     fireEvent.click(largeOption);

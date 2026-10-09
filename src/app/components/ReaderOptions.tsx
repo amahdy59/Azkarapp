@@ -18,7 +18,16 @@ export function ReaderOptionsAction(props: {
 }) {
   const { sheet, close } = useContext(ReaderOptionsContext);
   const { keepOpen, ...actionProps } = props;
-  if (!sheet) return <DropdownMenuItem {...actionProps} />;
+  if (!sheet)
+    return (
+      <DropdownMenuItem
+        {...actionProps}
+        onSelect={(event) => {
+          if (keepOpen) event.preventDefault();
+          actionProps.onSelect?.();
+        }}
+      />
+    );
   const { children, onClick, onSelect, disabled, className, ...rest } = actionProps;
   return (
     <button

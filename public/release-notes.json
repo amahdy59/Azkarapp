@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-08.7",
+  "release": "2026-10-09.1",
   "ar": [
-    "تمييز تقريبي للكلمات أثناء الاستماع للتسجيلات العربية والإنجليزية، مع إمكانية إيقافه دون إيقاف الصوت.",
-    "متابعة تلقائية للكلمة أو موضع التلاوة في المصحف، مع إيقاف المتابعة عند التمرير اليدوي.",
-    "تمييز لوني هادئ يحافظ على حجم النص وتباعده، وخيارات استماع مختصرة وتوقيتات متاحة دون اتصال.",
-    "تبقى تبويبات المكتبة ظاهرة على الهاتف، مع البحث في خيارات القرآن وزر Aa لفتح إعدادات القراءة."
+    "تظهر الكلمات المنطوقة بلون مميز وخلفية خفيفة وتسطير، دون تغيير حجم النص أو تحريكه.",
+    "تجد زر الفائدة أسفل شاشة القراءة، بما فيها صفحات السور والمصحف.",
+    "يفتح زرا Aa وخيارات القارئ قوائم مختصرة بجانب الزر، مع إزالة الخيارات المكررة.",
+    "تتضمن فائدة سورة الكهف رواية نور الجمعة مع مرجعها ودرجة الحديث."
   ],
   "en": [
-    "Estimated word highlights are available while listening to Arabic and English recordings, with an option to turn them off.",
-    "Automatically follow the spoken word or Mushaf section; scrolling manually pauses following.",
-    "Gentle color highlights preserve text size and spacing, with compact listening options and offline timing support.",
-    "Library tabs stay visible on phones; Quran pickers are searchable, and Aa opens reading settings."
+    "Spoken words use a distinct color, faint background and underline without changing text size or position.",
+    "Benefit is available at the bottom of reading screens, including surahs and Mushaf pages.",
+    "Aa and Reader options open compact menus beside their buttons, with duplicated choices removed.",
+    "Al-Kahf benefits include the Friday-light narration with its reference and named grading."
   ]
 }

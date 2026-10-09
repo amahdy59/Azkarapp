@@ -13,6 +13,7 @@ it("preserves Arabic diacritics, punctuation, spacing and inherited font without
   expect(screen.getByText("بِسْمِ")).toHaveAttribute("aria-current", "true");
   expect(container.querySelector("[aria-live], [tabindex], button")).toBeNull();
   expect(container.querySelector("[data-listening-word]")).toHaveStyle({ textDecoration: "underline" });
+  expect(container.querySelector("[data-listening-word]")).toHaveStyle({ color: "var(--primary)" });
   const originalWord = screen.getByText("بِسْمِ");
   rerender(
     <p dir="rtl" lang="ar" style={{ fontFamily: "var(--font-mushaf)" }}>

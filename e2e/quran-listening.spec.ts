@@ -150,6 +150,12 @@ for (const item of [
       );
       const active = player.locator('[data-playback-word="true"]');
       await expect(active).toHaveCount(1);
+      await expect
+        .poll(() =>
+          active.evaluate((word) => getComputedStyle(word).color !== getComputedStyle(word.parentElement!).color),
+        )
+        .toBe(true);
+      expect(await active.evaluate((word) => getComputedStyle(word).backgroundColor)).not.toBe("rgba(0, 0, 0, 0)");
       const metrics = await active.evaluate((word) => {
         const bounds = word.getBoundingClientRect(),
           view = word.closest(".audio-expanded-text")!.getBoundingClientRect();

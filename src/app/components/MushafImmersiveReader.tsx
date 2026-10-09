@@ -1,5 +1,14 @@
 import { progressFillStyle } from "./progressFillStyle";
-import { useCallback, useEffect, useMemo, useRef, useState, startTransition, type CSSProperties } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  startTransition,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 import { ArrowPrevious, Bookmark, CheckCircle2, ChevronDown, MoreVertical, Translate } from "./icons";
 import { useSwipeGestures } from "../hooks/useSwipeGestures";
 import { PAPER_ASPECT, getNextMushafTheme, spreadStart, useMushafShell } from "./mushafShell";
@@ -127,6 +136,7 @@ export function MushafImmersiveReader({
   onClose,
   onComplete,
   onReadExternally,
+  benefitAction,
 }: {
   zikr: Zikr;
   /** The page position, held above so it survives closing this view. */
@@ -157,6 +167,7 @@ export function MushafImmersiveReader({
   onClose: () => void;
   onComplete?: () => void;
   onReadExternally?: () => void;
+  benefitAction?: ReactNode;
 }) {
   const [customPages, setCustomPages] = useState<number[] | null>(null);
   useEffect(() => {
@@ -769,6 +780,12 @@ export function MushafImmersiveReader({
         </div>
       </div>
 
+      {benefitAction && (
+        <footer className="flex shrink-0 justify-center px-4 pt-1 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+          {benefitAction}
+        </footer>
+      )}
+
       {/* Theme cycle HUD feedback */}
       {themeHud && (
         <div
@@ -807,6 +824,7 @@ export function MushafImmersiveReader({
           aria-label={t(language, "mushaf.focusModeExit")}
           title={t(language, "mushaf.focusModeExit")}
           className="group absolute inset-x-0 bottom-[env(safe-area-inset-bottom)] z-20 flex h-5 items-center justify-center focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          style={benefitAction ? { bottom: "calc(60px + env(safe-area-inset-bottom))" } : undefined}
         >
           <span
             aria-hidden="true"
