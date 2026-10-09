@@ -153,6 +153,87 @@ test("owner-reviewed Friday dua loads exact registered timings and clears cues o
   ).toEqual(geometry);
 });
 
+test("English narrated words retain readable contrast in light and dark travel palettes @cross-browser", async ({
+  page,
+}) => {
+  await prepareAudio(page);
+  const entries = getAzkarForMode("travel", "complete");
+  const index = entries.findIndex((entry) => entry.id === "tr-ref-1");
+  const pack: OwnerTimingPack = JSON.parse(
+    gunzipSync(readFileSync(`public/data/listening-timings/owner-${OWNER_TIMING_PACK_SHA}.bin`)).toString(),
+  );
+  for (const themeMode of ["light", "midnight", "dark"]) {
+    await page.addInitScript(
+      (themeMode) =>
+        localStorage.setItem(
+          "azkarapp.state.v1",
+          JSON.stringify({
+            settings: { language: "en", themeMode, reduceMotion: true },
+            profile: { isGuest: true },
+            routineMode: "complete",
+          }),
+        ),
+      themeMode,
+    );
+    await page.goto(`/#/azkar/travel/${index + 1}?mode=complete`);
+    await page.getByRole("button", { name: "Reader options", exact: true }).click();
+    await clickReaderOption(page, "Play English translation");
+    const player = page.getByRole("region", { name: "Audio player", exact: true });
+    await player.getByRole("button", { name: "Expand player", exact: true }).click();
+    const source = await page.evaluate(
+      () => (window as unknown as { __reviewAudio: HTMLAudioElement }).__reviewAudio.src,
+    );
+    const record = pack.records.find(
+      (record) => record.l === "en" && record.s === new URL(source).searchParams.get("sha256"),
+    )!;
+    const annotation = expandOwnerTiming(pack, record, entries[index]!.translation!);
+    if (!("words" in annotation)) throw new Error("Expected English timing");
+    await page.evaluate(
+      (time) => {
+        const audio = (window as unknown as { __reviewAudio: HTMLAudioElement }).__reviewAudio;
+        audio.currentTime = time;
+        audio.dispatchEvent(new Event("timeupdate"));
+      },
+      (annotation.words[0]!.startMs + 1) / 1000,
+    );
+    const word = player.locator("[data-listening-word]");
+    await expect(word).toHaveCount(1);
+    await expect
+      .poll(() =>
+        word.evaluate((element) => {
+          const canvas = document.createElement("canvas");
+          canvas.width = canvas.height = 1;
+          const ctx = canvas.getContext("2d")!;
+          const ancestors: Element[] = [];
+          for (let current: Element | null = element; current; current = current.parentElement)
+            ancestors.unshift(current);
+          for (const ancestor of ancestors) {
+            ctx.fillStyle = getComputedStyle(ancestor).backgroundColor;
+            ctx.fillRect(0, 0, 1, 1);
+          }
+          const background = ctx.getImageData(0, 0, 1, 1).data;
+          ctx.clearRect(0, 0, 1, 1);
+          ctx.fillStyle = getComputedStyle(element).color;
+          ctx.fillRect(0, 0, 1, 1);
+          const foreground = ctx.getImageData(0, 0, 1, 1).data;
+          const luminance = (color: Uint8ClampedArray) =>
+            [0, 1, 2].reduce((sum, i) => {
+              const channel = color[i]! / 255;
+              return (
+                sum +
+                (channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4) *
+                  [0.2126, 0.7152, 0.0722][i]!
+              );
+            }, 0);
+          const a = luminance(background),
+            b = luminance(foreground);
+          return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+        }),
+      )
+      .toBeGreaterThanOrEqual(4.5);
+  }
+});
+
 for (const id of ["m-hm-91", "e-hm-91", "misc-ref-3", "m-hm-96", "e-hm-96", "friday-dua-08"]) {
   test(`restored Arabic ${id} keeps counting and explicit English playback @cross-browser`, async ({ page }) => {
     await prepareAudio(page);

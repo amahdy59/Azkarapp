@@ -387,6 +387,11 @@ const MushafTextLine = memo(function MushafTextLine({
               data-playback-word={
                 highlightedWord?.verseKey === w.verseKey && highlightedWord.position === w.position ? "true" : undefined
               }
+              style={
+                highlightedWord?.verseKey === w.verseKey && highlightedWord.position === w.position
+                  ? { color: "color-mix(in srgb, var(--primary) 60%, var(--foreground))" }
+                  : undefined
+              }
               className={`shrink-0 rounded-sm ${highlightedWord?.verseKey === w.verseKey && highlightedWord.position === w.position ? "bg-primary/20 text-primary underline underline-offset-4" : ""}`}
               aria-hidden={!showWordMeanings}
               onContextMenu={(e) => {

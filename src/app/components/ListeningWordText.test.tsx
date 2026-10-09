@@ -13,7 +13,9 @@ it("preserves Arabic diacritics, punctuation, spacing and inherited font without
   expect(screen.getByText("بِسْمِ")).toHaveAttribute("aria-current", "true");
   expect(container.querySelector("[aria-live], [tabindex], button")).toBeNull();
   expect(container.querySelector("[data-listening-word]")).toHaveStyle({ textDecoration: "underline" });
-  expect(container.querySelector("[data-listening-word]")).toHaveStyle({ color: "var(--primary)" });
+  expect(container.querySelector("[data-listening-word]")).toHaveStyle({
+    color: "color-mix(in srgb, var(--primary) 60%, var(--foreground))",
+  });
   const originalWord = screen.getByText("بِسْمِ");
   rerender(
     <p dir="rtl" lang="ar" style={{ fontFamily: "var(--font-mushaf)" }}>
