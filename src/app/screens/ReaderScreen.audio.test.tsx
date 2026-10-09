@@ -183,7 +183,7 @@ describe("ReaderScreen audio identity", () => {
     expect(onTextSizeChange).toHaveBeenCalledWith("large");
   });
 
-  it("offers dedicated Arabic and English playback actions", async () => {
+  it.each([true, false])("keeps available audio on the page with Arabic availability %s", async (arabicAvailable) => {
     const user = userEvent.setup();
     const onPlayAudio = vi.fn();
     const onPlayEnglishAudio = vi.fn();
@@ -209,7 +209,7 @@ describe("ReaderScreen audio identity", () => {
         onNext={() => undefined}
         onPrev={() => undefined}
         onToggleSaved={() => undefined}
-        audioAvailable
+        audioAvailable={arabicAvailable}
         englishAudioAvailable
         onPlayAudio={onPlayAudio}
         onPlayEnglishAudio={onPlayEnglishAudio}
@@ -217,16 +217,25 @@ describe("ReaderScreen audio identity", () => {
     );
 
     await user.click(screen.getByTestId("reader-audio-dock-button"));
-    expect(onPlayAudio).toHaveBeenCalledOnce();
+    expect(onPlayAudio).toHaveBeenCalledTimes(arabicAvailable ? 1 : 0);
+    expect(onPlayEnglishAudio).toHaveBeenCalledTimes(arabicAvailable ? 0 : 1);
 
     await user.click(screen.getByRole("button", { name: "Reader options" }));
     expect(screen.queryByRole("menuitem", { name: "Play Arabic recitation" })).not.toBeInTheDocument();
-    await user.click(await screen.findByRole("menuitem", { name: "Play English translation" }));
-    expect(onPlayEnglishAudio).toHaveBeenCalledOnce();
+    expect(screen.queryByRole("menuitem", { name: "Play English translation" })).not.toBeInTheDocument();
   });
 
-  it("offers continuous play for the available routine from reader options", async () => {
+  it("offers continuous play in the collection navigator instead of Reader overflow", async () => {
     const onPlayAllAudio = vi.fn();
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn().mockImplementation((query) => ({
+        matches: query.includes("min-width: 768px") || query.includes("min-width: 1200px"),
+        media: query,
+        addEventListener() {},
+        removeEventListener() {},
+      })),
+    );
     render(
       <ReaderScreen
         catId="morning"
@@ -251,11 +260,14 @@ describe("ReaderScreen audio identity", () => {
         onToggleSaved={() => undefined}
         audioAvailable
         onPlayAllAudio={onPlayAllAudio}
+        onSelectZikr={() => undefined}
       />,
     );
 
     fireEvent.pointerDown(screen.getByRole("button", { name: "Reader options" }), { button: 0, ctrlKey: false });
-    fireEvent.click(await screen.findByRole("menuitem", { name: "Listen to all azkar" }));
+    expect(screen.queryByRole("menuitem", { name: "Listen to all azkar" })).not.toBeInTheDocument();
+    await userEvent.setup().keyboard("{Escape}");
+    fireEvent.click(screen.getByRole("button", { name: "Play All Audio" }));
     expect(onPlayAllAudio).toHaveBeenCalledOnce();
   });
 
@@ -330,7 +342,7 @@ describe("ReaderScreen audio identity", () => {
     expect(screen.queryByTestId("reader-counter-stack")).not.toBeInTheDocument();
   });
 
-  it("renders 3 options for long surahs without the surah text and preserves menu sharing", async () => {
+  it("renders the three surah actions followed by Benefit and omits duplicate menu sharing", async () => {
     registerLazyCollection("friday_kahf", FRIDAY_KAHF);
     const onComplete = vi.fn();
 
@@ -380,7 +392,10 @@ describe("ReaderScreen audio identity", () => {
     expect(onComplete).toHaveBeenCalledOnce();
     expect(screen.queryByTestId("reader-share-dock-button")).toBeNull();
     await userEvent.setup().click(screen.getAllByRole("button", { name: "خيارات القارئ" })[0]);
-    expect(screen.getByRole("menuitem", { name: /مشاركة/u })).toBeInTheDocument();
+    expect(screen.queryByRole("menuitem", { name: /مشاركة/u })).not.toBeInTheDocument();
+    expect(screen.getByTestId("surah-reading-actions").lastElementChild).toBe(
+      screen.getByTestId("reader-benefit-dock-button"),
+    );
   });
 
   it("allows tapping the empty canvas area between text and counter to count zikr for small surahs", () => {
@@ -790,7 +805,8 @@ describe("ReaderScreen audio identity", () => {
     fireEvent.pointerDown(menuButton, { button: 0, ctrlKey: false });
 
     // Share collection option
-    expect(await screen.findByTestId("reader-menu-share-collection")).toBeInTheDocument();
+    expect(screen.queryByTestId("reader-menu-share-collection")).not.toBeInTheDocument();
+    expect(screen.getByTestId("reader-share-dock-button")).toBeInTheDocument();
     expect(screen.getByTestId("reader-menu-repeat")).toBeInTheDocument();
     expect(screen.queryByTestId("reader-menu-routine-mode")).not.toBeInTheDocument();
     expect(screen.getByTestId("reader-menu-reset-collection")).toBeInTheDocument();

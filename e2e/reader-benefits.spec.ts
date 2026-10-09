@@ -1,6 +1,5 @@
 import { expect, test } from "@playwright/test";
 import { getAzkarForMode } from "../src/app/content/azkar";
-import { t } from "../src/app/i18n";
 
 for (const language of ["ar", "en"] as const) {
   test(`Benefit stays in the bottom action area for ordinary and surah readers in ${language} @cross-browser`, async ({
@@ -35,17 +34,15 @@ for (const language of ["ar", "en"] as const) {
         await page.goto(`/#/azkar/${item.route}`);
         const benefit = page.getByTestId("reader-benefit-dock-button");
         await expect(benefit).toBeVisible();
+        await benefit.scrollIntoViewIfNeeded();
         const bounds = (await benefit.boundingBox())!;
         expect(bounds.height).toBeGreaterThanOrEqual(44);
         expect(bounds.y + bounds.height).toBeLessThanOrEqual(844);
-        await expect(
-          benefit.locator("xpath=ancestor::footer | ancestor::*[@data-testid='reader-dock']").first(),
-        ).toBeVisible();
-        await expect(
-          page
-            .locator('[data-testid="reader-actions"], [data-testid="reader-hero-actions"]')
-            .getByRole("button", { name: t(language, "reader.referencesButton"), exact: true }),
-        ).toHaveCount(0);
+        if (item.id) {
+          const actions = page.getByTestId("surah-reading-actions");
+          await expect(actions.getByRole("button")).toHaveCount(4);
+          await expect(actions.getByRole("button").last()).toHaveAttribute("data-testid", "reader-benefit-dock-button");
+        } else await expect(benefit.locator("xpath=ancestor::*[@data-testid='reader-dock']").first()).toBeVisible();
         if (item.id === "friday-kahf") {
           await benefit.click();
           const reference = page.getByTestId("reference-sheet");

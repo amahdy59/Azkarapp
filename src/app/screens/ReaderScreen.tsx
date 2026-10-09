@@ -178,11 +178,10 @@ export function ReaderScreen({
   mushafSettings,
   onMushafModeChange,
   onPlayAudio,
-  englishAudioAvailable = false,
+  englishAudioAvailable,
   onPlayEnglishAudio,
   onPlayAllAudio,
   audioCoverage,
-  onRepeatAudio,
   audioModeActive = false,
   partialZikrCounts,
   onPartialZikrCountChange,
@@ -253,7 +252,7 @@ export function ReaderScreen({
   partialZikrCounts?: Record<string, number>;
   onPartialZikrCountChange?: (zikrId: string, count: number) => void;
   counterResetKey?: string;
-  audioPlayer?: React.ReactNode;
+  audioPlayer?: React.ReactNode | ((onClose: () => void) => React.ReactNode);
 }) {
   const vibrate = useCallback(
     (pattern: number | number[]) => vibrateIfEnabled(hapticFeedback, pattern),
@@ -720,7 +719,10 @@ export function ReaderScreen({
       className={`w-full px-4 flex flex-col items-center justify-center text-center bg-transparent ${longSurah ? "" : "cursor-pointer touch-manipulation transition-colors hover:bg-muted/10 active:bg-muted/20"}`}
     >
       {longSurah ? (
-        <div className="mx-auto flex w-full max-w-sm flex-col items-center justify-center gap-4 pb-5 pt-2">
+        <div
+          className="mx-auto flex w-full max-w-sm flex-col items-center justify-center gap-4 pb-5 pt-2"
+          data-testid="surah-reading-actions"
+        >
           <figure className="relative mb-1 h-32 w-full overflow-hidden rounded-3xl border border-primary/20 bg-primary/5 shadow-soft">
             <img
               src={QURAN_CARD_IMAGE}
@@ -765,6 +767,7 @@ export function ReaderScreen({
             <Check size={20} />
             {t(language, "reader.readExternally")}
           </button>
+          {renderBenefitDockButton(true)}
         </div>
       ) : (
         <>
@@ -1102,25 +1105,30 @@ export function ReaderScreen({
       <DevotionalAction
         type="button"
         active={audioModeActive}
-        disabled={!audioAvailable}
+        disabled={!audioAvailable && !englishAudioAvailable}
         aria-busy={surahAudio?.status === "loading" || surahAudio?.status === "buffering"}
         onClick={(e) => {
           e.stopPropagation();
-          onPlayAudio?.();
+          if (audioAvailable) onPlayAudio?.();
+          else onPlayEnglishAudio?.();
         }}
         aria-label={
           audioModeActive
             ? t(language, "audioPlayer.openFullPlayer")
             : audioAvailable
               ? t(language, "reader.listenCurrent")
-              : t(language, "reader.arabicAudioUnavailable")
+              : englishAudioAvailable
+                ? t(language, "reader.playEnglishAudio")
+                : t(language, "reader.arabicAudioUnavailable")
         }
         title={
           audioModeActive
             ? t(language, "audioPlayer.openFullPlayer")
             : audioAvailable
               ? t(language, "reader.listenCurrent")
-              : t(language, "reader.arabicAudioUnavailable")
+              : englishAudioAvailable
+                ? t(language, "reader.playEnglishAudio")
+                : t(language, "reader.arabicAudioUnavailable")
         }
         data-testid="reader-audio-dock-button"
         className={`min-w-[5rem] flex-1 ${audioModeActive ? "" : "shadow-sm"}`}
@@ -1133,7 +1141,7 @@ export function ReaderScreen({
     );
   };
 
-  const renderBenefitDockButton = () => (
+  const renderBenefitDockButton = (fullWidth = false) => (
     <DevotionalAction
       type="button"
       onClick={(e) => {
@@ -1148,7 +1156,7 @@ export function ReaderScreen({
       aria-label={t(language, "reader.referencesButton")}
       title={t(language, "reader.referencesButton")}
       data-testid="reader-benefit-dock-button"
-      className="min-w-[5rem] flex-1 shadow-sm"
+      className={fullWidth ? "w-full rounded-2xl px-6 py-4 shadow-sm" : "min-w-[5rem] flex-1 shadow-sm"}
     >
       <Lightbulb size={20} aria-hidden="true" />
       <span className="min-w-0 text-label font-semibold [overflow-wrap:anywhere]">
@@ -1186,27 +1194,33 @@ export function ReaderScreen({
 
   const renderDock = () => {
     if (audioModeActive && audioPlayer) {
-      if (isValidElement(audioPlayer) && typeof audioPlayer.type !== "string") {
-        return cloneElement(audioPlayer as React.ReactElement<Record<string, unknown>>, {
-          dockSlots: {
-            benefit: renderBenefitDockButton(),
-          },
-          onClose: () => {
-            setTimeout(() => {
-              const counter = document.querySelector<HTMLElement>('[data-testid="counter-surface"]');
-              counter?.focus();
-            }, 50);
-          },
-        });
-      }
-      return audioPlayer;
+      const onClose = () => {
+        setTimeout(() => {
+          const target =
+            document.querySelector<HTMLElement>('[data-testid="counter-surface"]') ??
+            document.querySelector<HTMLElement>('[data-testid="reader-mushaf-button"]');
+          target?.focus();
+        }, 50);
+      };
+      const player =
+        typeof audioPlayer === "function"
+          ? audioPlayer(onClose)
+          : isValidElement(audioPlayer) && typeof audioPlayer.type !== "string"
+            ? cloneElement(audioPlayer as React.ReactElement<Record<string, unknown>>, { dockSlots: {}, onClose })
+            : audioPlayer;
+      return (
+        <>
+          {!longSurah && <DevotionalFooter>{renderBenefitDockButton()}</DevotionalFooter>}
+          {player}
+        </>
+      );
     }
 
     if (audioModeActive) {
       return null;
     }
 
-    if (longSurah) return <DevotionalFooter>{renderBenefitDockButton()}</DevotionalFooter>;
+    if (longSurah) return null;
 
     return (
       <div data-testid="reader-counter-stack">
@@ -1300,9 +1314,6 @@ export function ReaderScreen({
   );
 
   const renderReaderMenuItems = (layout: "mobile" | "desktop") => {
-    const hasAudioOptions =
-      !longSurah && (englishAudioAvailable || Boolean(onPlayAllAudio) || Boolean(onRepeatAudio && !audioModeActive));
-
     return (
       <ReaderOptionsContext.Provider value={{ sheet: false, close: () => {} }}>
         {!canDockCollection && onSelectZikr && azkar.length > 1 && (
@@ -1336,47 +1347,7 @@ export function ReaderScreen({
           </>
         )}
 
-        {/* 2. Audio playback options (secondary / batch only; single Arabic audio is in the main dock) */}
-        {hasAudioOptions && (
-          <>
-            <ReaderOptionsSection title={t(language, "reader.menuAudio")}>
-              {!longSurah && englishAudioAvailable && (
-                <ReaderOptionsAction
-                  disabled={!englishAudioAvailable}
-                  onClick={onPlayEnglishAudio}
-                  className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
-                >
-                  <Volume2 size={16} aria-hidden="true" />
-                  <span>
-                    {englishAudioAvailable
-                      ? t(language, "reader.playEnglishAudio")
-                      : t(language, "reader.englishAudioUnavailable")}
-                  </span>
-                </ReaderOptionsAction>
-              )}
-              {onPlayAllAudio && (
-                <ReaderOptionsAction
-                  onClick={onPlayAllAudio}
-                  className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted"
-                >
-                  <Volume2 size={16} aria-hidden="true" />
-                  <span>{t(language, "reader.listenCollection")}</span>
-                </ReaderOptionsAction>
-              )}
-              {onRepeatAudio && !audioModeActive && (
-                <ReaderOptionsAction
-                  onClick={onRepeatAudio}
-                  className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted"
-                >
-                  <RotateCcw size={16} aria-hidden="true" />
-                  <span>{t(language, "reader.repeatPrescribed")}</span>
-                </ReaderOptionsAction>
-              )}
-            </ReaderOptionsSection>
-          </>
-        )}
-
-        {/* 4. Actions: Bookmark, Share collection/surah, Repeat, Routine mode */}
+        {/* 4. Saved state and reading recovery */}
         <div>
           <ReaderOptionsAction
             onClick={handleToggleSaved}
@@ -1391,28 +1362,8 @@ export function ReaderScreen({
             <span>{isSaved ? t(language, "reader.unsave") : t(language, "reader.save")}</span>
           </ReaderOptionsAction>
         </div>
-        <ReaderOptionsSection title={t(language, "reader.moreActions")}>
-          {!longSurah && (
-            <ReaderOptionsAction
-              onClick={() => setCollectionShareOpen(true)}
-              data-testid="reader-menu-share-collection"
-              className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted"
-            >
-              <Share2 size={16} aria-hidden="true" />
-              <span>{t(language, "reader.shareCollection")}</span>
-            </ReaderOptionsAction>
-          )}
-          {longSurah && (
-            <ReaderOptionsAction
-              onClick={() => void handleShare()}
-              disabled={shareOpen}
-              className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
-            >
-              <ShareExport size={16} aria-hidden="true" />
-              <span>{t(language, "reader.shareCurrent")}</span>
-            </ReaderOptionsAction>
-          )}
-          {onRepeat && !longSurah && (
+        {onRepeat && !longSurah && (
+          <ReaderOptionsSection title={t(language, "reader.moreActions")}>
             <ReaderOptionsAction
               onClick={onRepeat}
               data-testid="reader-menu-repeat"
@@ -1421,8 +1372,8 @@ export function ReaderScreen({
               <RefreshCw size={16} aria-hidden="true" />
               <span>{t(language, "category.readAgain")}</span>
             </ReaderOptionsAction>
-          )}
-        </ReaderOptionsSection>
+          </ReaderOptionsSection>
+        )}
         {!longSurah && (
           <>
             {/* 5. Counter feedback & recovery */}
@@ -1780,7 +1731,7 @@ export function ReaderScreen({
                       />
                     )}
                     {<footer className={`shrink-0 pt-1.5 ${audioModeActive ? "pb-0" : "pb-2"}`}>{renderDock()}</footer>}
-                    {!audioModeActive && audioPlayer}
+                    {!audioModeActive && typeof audioPlayer !== "function" && audioPlayer}
                   </div>
                 </div>
               </div>
@@ -1973,7 +1924,7 @@ export function ReaderScreen({
                   {renderDock()}
                 </div>
               }
-              {!audioModeActive && audioPlayer}
+              {!audioModeActive && typeof audioPlayer !== "function" && audioPlayer}
             </div>
           </>
         ))}

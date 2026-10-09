@@ -1,4 +1,4 @@
-import { clickReaderOption } from "./reader-options";
+import { playEnglishTranslation } from "./reader-options";
 import { expect, test, type Page } from "@playwright/test";
 import { getAzkarForMode } from "../src/app/content/azkar";
 import { COMPREHENSIVE_DUAS } from "../src/app/content/comprehensiveDuas";
@@ -105,7 +105,7 @@ test("owner-reviewed Friday dua loads exact registered timings and clears cues o
   await expect(player.locator("[data-listening-word]")).toHaveText("اللهم");
   await player.getByRole("button", { name: "Stop audio and close player", exact: true }).click();
   await page.getByRole("button", { name: "Reader options", exact: true }).click();
-  await clickReaderOption(page, "Play English translation");
+  await playEnglishTranslation(page);
   await player.getByRole("button", { name: "Expand player", exact: true }).click();
   await expect(player.locator('[data-listening-word]:has-text("اللهم")')).toHaveCount(0);
   await expect(player.getByRole("button", { name: "Estimated word highlights", exact: true })).toHaveAttribute(
@@ -171,7 +171,7 @@ test("English narrated words retain readable contrast in light and dark travel p
     }, themeMode);
     await page.reload();
     await page.getByRole("button", { name: "Reader options", exact: true }).click();
-    await clickReaderOption(page, "Play English translation");
+    await playEnglishTranslation(page);
     const player = page.getByRole("region", { name: "Audio player", exact: true });
     await player.getByRole("button", { name: "Expand player", exact: true }).click();
     const source = await page.evaluate(
@@ -265,7 +265,7 @@ for (const id of ["m-hm-91", "e-hm-91", "misc-ref-3", "m-hm-96", "e-hm-96", "fri
       await expect(counter).toHaveAccessibleName(/1 \/ 100$/);
     }
     await page.getByRole("button", { name: "Reader options", exact: true }).click();
-    await clickReaderOption(page, "Play English translation");
+    await playEnglishTranslation(page);
     await expect(player).toBeVisible();
     await expect
       .poll(() => page.evaluate(() => (window as unknown as { __reviewAudio: HTMLAudioElement }).__reviewAudio.src))

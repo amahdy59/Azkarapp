@@ -1,5 +1,12 @@
-@import "@fontsource/amiri-quran";
 @import "@fontsource-variable/noto-sans-arabic/wght.css";
+
+@font-face {
+  font-family: "Amiri Quran";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url("@fontsource/amiri-quran/files/amiri-quran-arabic-400-normal.woff2") format("woff2");
+}
 
 @font-face {
   font-family: "IBM Plex Sans Arabic";

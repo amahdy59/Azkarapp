@@ -58,9 +58,13 @@ for (const language of ["ar", "en"] as const) {
           .getByTestId("reader-counter-sound-toggle-mobile")
           .or(menu.getByTestId("reader-counter-sound-toggle-desktop")),
       ).toBeVisible();
-      await expect(menu.getByTestId("reader-menu-share-collection")).toHaveAccessibleName(
-        ar ? "مشاركة مجموعة الأذكار" : "Share this collection",
-      );
+      await expect(menu.getByTestId("reader-menu-share-collection")).toHaveCount(0);
+      await expect(
+        menu.getByRole("menuitem", {
+          name: ar ? /الاستماع|الترجمة الإنجليزية|العدد المحدد/ : /Listen|English translation|prescribed/,
+        }),
+      ).toHaveCount(0);
+      await expect(page.getByTestId("reader-share-dock-button")).toBeVisible();
       await page.keyboard.press("ArrowDown");
       expect(await menu.evaluate((el) => el.contains(document.activeElement))).toBe(true);
       const bounds = (await menu.boundingBox())!,

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useId, useRef, useState } from "react";
 import { Bookmark, BookOpen, Check, Copy, Share2 } from "./icons";
 import { ResponsiveSheet, SheetHeader } from "./ResponsiveSheet";
 import { t } from "../i18n";
@@ -9,6 +9,7 @@ import { reportError } from "../../lib/observability";
 import { getAyahWordMeanings, loadSurahWordMeanings, type QuranWordMeaning } from "../content/quranWordMeanings";
 
 type Feedback = { message: string; error: boolean } | null;
+const AyahShareStudio = lazy(() => import("./AyahShareStudio"));
 
 export function AyahInteractionSheet({
   isOpen,
@@ -31,6 +32,9 @@ export function AyahInteractionSheet({
   const [copied, setCopied] = useState(false);
   const [feedback, setFeedback] = useState<Feedback>(null);
   const [meanings, setMeanings] = useState<QuranWordMeaning[]>([]);
+  const [imageShare, setImageShare] = useState(false);
+  const imageTrigger = useRef<HTMLButtonElement>(null);
+  useEffect(() => setImageShare(false), [verseKey, isOpen]);
 
   useEffect(() => {
     if (!isOpen || !verseKey) {
@@ -123,7 +127,7 @@ export function AyahInteractionSheet({
       testId="ayah-interaction-sheet"
       showCloseButton={false}
     >
-      <div className="flex flex-col pb-6">
+      <div className="flex min-h-0 flex-col overflow-y-auto overscroll-contain pb-6" data-vaul-no-drag>
         <SheetHeader
           title={headerTitle || t(language, "reader.interactionSheetAria")}
           icon={<BookOpen size={20} aria-hidden="true" />}
@@ -133,83 +137,119 @@ export function AyahInteractionSheet({
           descriptionId={descriptionId}
           description={t(language, "reader.interactionSheetAria")}
         />
-        <div className="pt-3" />
-
-        <div className="mx-5 mb-3 max-h-36 overflow-y-auto rounded-xl bg-muted/55 px-4 py-3">
-          {text ? (
-            <p className="zikr-text text-start text-xl leading-9" lang="ar" dir="rtl" data-testid="ayah-sheet-text">
-              {text}
-            </p>
-          ) : (
-            <p className="text-sm font-semibold text-muted-foreground" role="status">
-              {t(language, "reader.loadingAyah")}
-            </p>
-          )}
-        </div>
-
-        {meanings.length > 0 && (
-          <div
-            className="mx-5 mb-3 rounded-xl border border-primary/20 bg-primary/5 p-3"
-            data-testid="ayah-meanings-container"
+        {imageShare && verseKey && text ? (
+          <Suspense
+            fallback={
+              <p role="status" className="p-5">
+                {t(language, "reader.shareCardGenerating")}
+              </p>
+            }
           >
-            <h4 className="mb-2 text-xs font-bold text-primary">{t(language, "reader.wordMeaningsTitle")}</h4>
-            <div className="space-y-1.5 max-h-28 overflow-y-auto pe-1">
-              {meanings.map((m) => (
-                <div key={m.id} className="text-xs leading-5 flex items-baseline gap-2">
-                  <span className="font-bold text-foreground shrink-0">{m.word}:</span>
-                  <span className="text-muted-foreground">{m.explanationArabic}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+            <AyahShareStudio
+              verseKey={verseKey}
+              text={text}
+              title={headerTitle}
+              meanings={meanings}
+              language={language}
+              onBack={() => {
+                setImageShare(false);
+                window.setTimeout(() => imageTrigger.current?.focus(), 0);
+              }}
+            />
+          </Suspense>
+        ) : (
+          <>
+            <div className="pt-3" />
 
-        <div className="flex flex-col gap-1 px-3">
-          <button type="button" onClick={() => void handleCopy()} className={actionClass} disabled={!text}>
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-foreground">
-              {copied ? (
-                <Check size={18} className="text-primary" aria-hidden="true" />
+            <div className="mx-5 mb-3 max-h-36 overflow-y-auto rounded-xl bg-muted/55 px-4 py-3">
+              {text ? (
+                <p className="zikr-text text-start text-xl leading-9" lang="ar" dir="rtl" data-testid="ayah-sheet-text">
+                  {text}
+                </p>
               ) : (
-                <Copy size={18} aria-hidden="true" />
+                <p className="text-sm font-semibold text-muted-foreground" role="status">
+                  {t(language, "reader.loadingAyah")}
+                </p>
               )}
-            </span>
-            <span className="font-semibold">{t(language, "reader.copyAyah")}</span>
-          </button>
+            </div>
 
-          <button
-            type="button"
-            onClick={() => {
-              onBookmark();
-              setFeedback({
-                message: t(language, isBookmarked ? "reader.ayahBookmarkRemoved" : "reader.ayahBookmarkSaved"),
-                error: false,
-              });
-            }}
-            className={actionClass}
-          >
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-foreground">
-              <Bookmark size={18} className={isBookmarked ? "fill-primary text-primary" : ""} aria-hidden="true" />
-            </span>
-            <span className="font-semibold">
-              {t(language, isBookmarked ? "reader.removeAyahBookmark" : "reader.bookmarkAyah")}
-            </span>
-          </button>
+            {meanings.length > 0 && (
+              <div
+                className="mx-5 mb-3 rounded-xl border border-primary/20 bg-primary/5 p-3"
+                data-testid="ayah-meanings-container"
+              >
+                <h4 className="mb-2 text-xs font-bold text-primary">{t(language, "reader.wordMeaningsTitle")}</h4>
+                <div className="space-y-1.5 max-h-28 overflow-y-auto pe-1">
+                  {meanings.map((m) => (
+                    <div key={m.id} className="text-xs leading-5 flex items-baseline gap-2">
+                      <span className="font-bold text-foreground shrink-0">{m.word}:</span>
+                      <span className="text-muted-foreground">{m.explanationArabic}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
-          <button type="button" onClick={() => void handleShare()} className={actionClass} disabled={!text}>
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-foreground">
-              <Share2 size={18} aria-hidden="true" />
-            </span>
-            <span className="font-semibold">{t(language, "reader.shareAyah")}</span>
-          </button>
-        </div>
+            <div className="flex flex-col gap-1 px-3">
+              <button type="button" onClick={() => void handleCopy()} className={actionClass} disabled={!text}>
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-foreground">
+                  {copied ? (
+                    <Check size={18} className="text-primary" aria-hidden="true" />
+                  ) : (
+                    <Copy size={18} aria-hidden="true" />
+                  )}
+                </span>
+                <span className="font-semibold">{t(language, "reader.copyAyah")}</span>
+              </button>
 
-        {feedback && (
-          <p
-            className={`mx-5 mt-3 text-sm font-semibold ${feedback.error ? "text-destructive" : "text-primary"}`}
-            role={feedback.error ? "alert" : "status"}
-          >
-            {feedback.message}
-          </p>
+              <button
+                type="button"
+                onClick={() => {
+                  onBookmark();
+                  setFeedback({
+                    message: t(language, isBookmarked ? "reader.ayahBookmarkRemoved" : "reader.ayahBookmarkSaved"),
+                    error: false,
+                  });
+                }}
+                className={actionClass}
+              >
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-foreground">
+                  <Bookmark size={18} className={isBookmarked ? "fill-primary text-primary" : ""} aria-hidden="true" />
+                </span>
+                <span className="font-semibold">
+                  {t(language, isBookmarked ? "reader.removeAyahBookmark" : "reader.bookmarkAyah")}
+                </span>
+              </button>
+
+              <button type="button" onClick={() => void handleShare()} className={actionClass} disabled={!text}>
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-foreground">
+                  <Share2 size={18} aria-hidden="true" />
+                </span>
+                <span className="font-semibold">{t(language, "reader.shareAyah")}</span>
+              </button>
+              <button
+                ref={imageTrigger}
+                type="button"
+                onClick={() => setImageShare(true)}
+                className={actionClass}
+                disabled={!text}
+              >
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-foreground">
+                  <Share2 size={18} aria-hidden="true" />
+                </span>
+                <span className="font-semibold">{t(language, "reader.shareAyahImage")}</span>
+              </button>
+            </div>
+
+            {feedback && (
+              <p
+                className={`mx-5 mt-3 text-sm font-semibold ${feedback.error ? "text-destructive" : "text-primary"}`}
+                role={feedback.error ? "alert" : "status"}
+              >
+                {feedback.message}
+              </p>
+            )}
+          </>
         )}
       </div>
     </ResponsiveSheet>

@@ -2239,20 +2239,24 @@ function AppContent({
                     ["loading", "ready", "playing", "paused", "buffering"].includes(audioController.state.status)
                   }
                   audioPlayer={
-                    isAudioPlayerDockedInReader && audioController ? (
-                      <Suspense fallback={null}>
-                        <FloatingAudioPlayer
-                          controller={audioController}
-                          textSize={textSize}
-                          mushafTheme={mushafTheme === "follow-app" ? themeMode : mushafTheme}
-                          mushafTextScale={mushafTextScale}
-                          language={selectedLang}
-                          direction={layoutDirection}
-                          overReadingSurface
-                          dockedInReader
-                        />
-                      </Suspense>
-                    ) : undefined
+                    isAudioPlayerDockedInReader && audioController
+                      ? (onClose) => (
+                          <Suspense fallback={null}>
+                            <FloatingAudioPlayer
+                              controller={audioController}
+                              textSize={textSize}
+                              mushafTheme={mushafTheme === "follow-app" ? themeMode : mushafTheme}
+                              mushafTextScale={mushafTextScale}
+                              language={selectedLang}
+                              direction={layoutDirection}
+                              overReadingSurface
+                              dockedInReader
+                              dockSlots={{}}
+                              onClose={onClose}
+                            />
+                          </Suspense>
+                        )
+                      : undefined
                   }
                 />
               )}

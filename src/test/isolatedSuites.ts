@@ -11,6 +11,8 @@
  * fails until the suite is listed here.
  */
 export const ISOLATED_SUITES = [
+  "src/app/components/AyahShareStudio.test.tsx",
+  "src/app/components/MushafExcerpt.test.tsx",
   "src/app/audio/ownerTimingLoader.test.ts",
   "src/app/components/QuranListeningReader.test.tsx",
   "src/app/hooks/useAppStatePersistence.test.tsx",

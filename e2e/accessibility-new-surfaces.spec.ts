@@ -1,4 +1,3 @@
-import { revealReaderOption } from "./reader-options";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
@@ -93,8 +92,12 @@ test("the collection share modal has no automatically detectable WCAG A/AA viola
   await page.getByTestId("category-card-morning").click();
   await expect(page.getByTestId("reader-screen")).toBeVisible();
   await page.getByRole("button", { name: /خيارات القارئ|Reader options/ }).click();
-  const shareBtn = page.getByTestId("reader-menu-share-collection");
-  await revealReaderOption(shareBtn);
+  const sidebar = page.getByRole("menuitem", { name: /عرض القائمة الجانبية|Show sidebar/ });
+  if (await sidebar.count()) await sidebar.click();
+  else await page.keyboard.press("Escape");
+  const shareBtn = page.getByRole("button", {
+    name: /Share collection azkar as story cards for social status|مشاركة أذكار المجموعة/,
+  });
   await shareBtn.click();
 
   const modal = page.getByTestId("collection-share-modal");
