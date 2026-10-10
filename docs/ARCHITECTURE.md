@@ -160,7 +160,9 @@ Mushaf downloads estimate remaining storage conservatively (224 KiB per unfinish
 plus 15% headroom). Estimates are advisory, not reservations; unsupported estimates fall
 back to normal cache-write error handling. A failed job aborts and drains sibling requests
 before exposing retry/removal controls. Cached page JSON and its font must both exist for
-a page to be reported ready.
+a page to be reported ready. On Android, remote QCF font bytes use Capacitor's
+native HTTP bridge before being stored in the same Cache Storage bucket; bundled
+Mushaf JSON and browser/PWA requests retain the normal fetch path.
 
 Cloudflare is the production sync boundary for device pairing and anonymous active-visitor
 presence. While Home is visible, the client refreshes its anonymous presence every 30 seconds;
@@ -296,7 +298,7 @@ The active reading mode also reaches `useSessionHandlers`, so completion identit
 
 Phase 78 adds presentation-only situational links and guided after-prayer access through existing routing/session callbacks. Reading focus is screen-local. Character-shortcut preferences live in a visit-local external store (`keyboardShortcuts.ts`) and never enter persistence or sync. Shared keyboard help uses the existing Modal boundary; counting screens share native-control/modal/modifier guards.
 
-`audio/travelPreparation.ts` coordinates independent Mushaf and audio jobs without owning cache/storage access. `audioOfflineCache.ts` verifies cached selected-voice bytes before reporting readiness or skipping them on retry. Downloads lazily loads Al-Kahf, displays advisory storage estimates, and preserves completed jobs after failure/cancellation. No new dependencies, reviewed content, synchronized fields, or prayer calculations are introduced.
+`audio/travelPreparation.ts` coordinates independent Mushaf and audio jobs without owning cache/storage access. `audioOfflineCache.ts` verifies cached selected-voice bytes before reporting readiness or skipping them on retry. Browser/PWA playback keeps the hosted media URL so Workbox can serve cached range requests; Android Capacitor playback turns verified downloaded bytes into a temporary Blob URL because its WebView does not run that service worker. The URL is revoked when playback changes or stops, and a cache-read failure falls back to the hosted URL. Downloads lazily loads Al-Kahf, displays advisory storage estimates, and preserves completed jobs after failure/cancellation. No new dependencies, reviewed content, synchronized fields, or prayer calculations are introduced.
 
 Before adding a feature:
 

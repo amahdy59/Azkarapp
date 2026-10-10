@@ -1,10 +1,16 @@
+import { Capacitor } from "@capacitor/core";
 import type { Zikr } from "../types";
 import { AUDIO_CATALOG, AUDIO_MANIFEST_VERSION } from "./audioManifest";
 import type { AudioPreferences, AudioVariant } from "./audioTypes";
 import { getPreferredVoiceId, resolveAudioAsset } from "./resolveAudioAsset";
+import { fetchNativeBinaryResource } from "../content/nativeMushafDownload";
 
 export const AUDIO_CACHE_NAME = `azkar-audio-v${AUDIO_MANIFEST_VERSION}`;
 const REGISTRY_KEY = "azkar.audio-downloads.v1";
+
+function isNativeAndroid() {
+  return Capacitor.isNativePlatform() && Capacitor.getPlatform() === "android";
+}
 
 interface DownloadedAssetRecord {
   assetId: string;
@@ -101,6 +107,34 @@ async function isVerifiedCachedAudio(cache: Cache, item: ReturnType<typeof getDo
   }
 }
 
+/**
+ * Android's Capacitor WebView can write to Cache Storage, but does not run the
+ * PWA service worker that normally maps an audio element's network request
+ * back to that cache. Give native playback a temporary Blob URL instead.
+ *
+ * The response entered this cache only after the download path verified its
+ * MIME type, byte length, and checksum. Browser/PWA playback keeps its URL so
+ * Workbox can continue to serve range requests from the same cache.
+ */
+export function canUseNativeCachedAudio() {
+  return typeof window !== "undefined" && isNativeAndroid() && "caches" in window;
+}
+
+export async function getNativeCachedAudioUrl(url: string): Promise<string | null> {
+  if (!canUseNativeCachedAudio()) return null;
+  try {
+    const cache = await caches.open(AUDIO_CACHE_NAME);
+    const response = await cache.match(url);
+    if (!response?.ok) return null;
+    const blob = await response.blob();
+    return blob.size > 0 ? URL.createObjectURL(blob) : null;
+  } catch {
+    // A cache read must never make online playback fail. The caller falls back
+    // to the approved hosted URL when this WebView denies or loses its cache.
+    return null;
+  }
+}
+
 /** Readiness comes from complete, checksummed bytes, never registry totals alone. */
 export async function getAudioDownloadStatus(zikrs: readonly Zikr[], preferences: AudioPreferences) {
   const variants = getDownloadVariants(zikrs, preferences);
@@ -140,7 +174,10 @@ export async function downloadAudioForZikrs(
       options.signal?.throwIfAborted();
       const alreadyCached = await isVerifiedCachedAudio(cache, item);
       if (!alreadyCached) {
-        const response = await fetch(item.url, { cache: "no-store", credentials: "omit", signal: options.signal });
+        const response = await fetchNativeBinaryResource(item.url, options.signal, {
+          cache: "no-store",
+          credentials: "omit",
+        });
         if (response.status !== 200 || !response.ok) throw new Error(`Audio download failed: ${item.variant.id}`);
         const contentType = response.headers.get("content-type")?.split(";")[0]?.trim();
         if (contentType !== item.variant.mimeType) throw new Error(`Unexpected audio MIME type: ${item.variant.id}`);

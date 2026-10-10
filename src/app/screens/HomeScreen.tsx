@@ -637,14 +637,12 @@ export function HomeScreen({
         onScroll={(event) => setHasScrolledHomeContent(event.currentTarget.scrollTop > 4)}
       >
         {/* Sticky Header Overlay */}
-        <div className="pointer-events-none sticky inset-x-0 top-0 z-50 h-0 overflow-visible">
+        <div className="pointer-events-none sticky inset-x-0 top-0 z-50 overflow-visible">
           <header
             data-testid="home-utility-header"
             data-scrolled={hasScrolledHomeContent || undefined}
             className={`px-page mx-auto flex w-full max-w-[70rem] items-center justify-between gap-3 transition-[background-color,backdrop-filter,box-shadow,padding] duration-standard ${
-              hasScrolledHomeContent
-                ? "pt-[max(0.5rem,env(safe-area-inset-top))] pb-1"
-                : "pt-[max(1rem,env(safe-area-inset-top))] pb-3 sm:pt-5"
+              hasScrolledHomeContent ? "pt-2 pb-1" : "pt-4 pb-3 sm:pt-5"
             } ${
               homeVisualEffects
                 ? hasScrolledHomeContent
@@ -691,7 +689,7 @@ export function HomeScreen({
           </header>
         </div>
         <div data-testid="home-content-grid" className="mx-auto grid w-full max-w-[70rem] grid-cols-1 gap-4 lg:gap-5">
-          <div data-testid="home-hero" className="relative isolate w-full pt-16">
+          <div data-testid="home-hero" className="relative isolate w-full">
             {showHeroContent && (
               <div className="relative z-10 mx-auto flex w-full flex-col items-stretch justify-end gap-4 px-4 pb-5 pt-3 sm:px-6 sm:pb-6 sm:pt-4 md:px-8 lg:gap-5 lg:px-8 lg:pb-8 lg:pt-5">
                 <div

@@ -4287,3 +4287,40 @@ Owner approved updating the two outdated Reader header expectations identified b
 - **Decision:** Use Capacitor's official App plugin back-button event. Pop existing app history for nested screens; return a directly opened non-Home route to Home; call `exitApp` only when Back is pressed on Home. Keep browser/PWA history behavior unchanged.
 - **Dependency:** Add `@capacitor/app` 8.1.0, compatible with Capacitor Core 8 and older than the repository's configured package minimum-release-age window.
 - **Verification:** Native Back handler unit coverage, TypeScript/repository gates, Capacitor sync and Android build where available. Physical Android verification should confirm nested route return and Home exit.
+
+## DEC-222 — Play verified downloaded media directly in the Android WebView
+
+- **Date:** 2026-10-10
+- **Status:** Approved
+- **Owner:** Product owner (explicit request to make Settings offline media work in the Android app)
+- **Context:** Settings verifies and stores audio downloads in Cache Storage. Browser/PWA media requests are intercepted by Workbox, but the Capacitor Android WebView has no active service worker, so its `<audio>` element continued to request the hosted recording while offline.
+- **Decision:** On Android only, resolve a downloaded recording from the verified Cache Storage bucket and give the audio element a temporary Blob URL. Revoke that URL when the recording changes or playback stops. Keep browser/PWA playback on the hosted URL so Workbox preserves range-request handling. A missing or unreadable cache must fall back to the hosted URL without preventing online playback.
+- **Dependencies and scope:** Reuse the existing Cache API and Capacitor Core; do not add a runtime dependency or native storage permission. Keep reviewed recordings, download verification, registry boundaries, Mushaf caching, and browser behavior unchanged.
+- **Verification:** Cache-resolution and AudioProvider regressions, strict TypeScript, Capacitor synchronization, debug APK compilation, and an Android device offline playback smoke test.
+
+## DEC-223 — Download Android Mushaf fonts through native HTTP
+
+- **Date:** 2026-10-10
+- **Status:** Approved
+- **Owner:** Product owner (explicit report that Complete Mushaf download fails in the Android app)
+- **Context:** Mushaf pages and their QCF fonts are cached together. Android WebView can reject the cross-origin font request even when the device is connected, causing the whole download job to surface its generic retry message.
+- **Decision:** On Android only, fetch the remote QCF font through Capacitor's native HTTP bridge, convert the returned bytes to a Response, and keep the existing Cache Storage verification and retry behavior. Bundled page JSON and browser/PWA requests remain on fetch.
+- **Dependencies and scope:** Reuse Capacitor Core's built-in HTTP bridge; do not add a runtime dependency, storage permission, or change reviewed Mushaf content. Do not enable global fetch patching.
+- **Verification:** Native bridge unit coverage, Mushaf cache regression coverage, strict TypeScript, Capacitor synchronization, debug APK compilation, and a physical-device complete-download smoke test.
+
+## DEC-224 — Download Android audio through native HTTP
+
+- **Date:** 2026-10-10
+- **Status:** Approved
+- **Owner:** Product owner (explicit report that Morning Core download fails in the Android app)
+- **Context:** Android WebView audio downloads used browser fetch against the hosted R2 audio origin, so a cross-origin failure surfaced as the generic offline-download error.
+- **Decision:** Route approved hosted audio downloads through the existing native HTTP bridge on Android, then preserve the current checksum, MIME, Cache Storage, progress, and retry boundaries. Browser/PWA downloads retain fetch.
+- **Verification:** Audio/cache and native-bridge tests, strict TypeScript, Capacitor synchronization, debug APK compilation, and a physical-device Morning Core download smoke test.
+
+## DEC-225 — Keep Android dark-shell status icons readable
+
+- **Date:** 2026-10-10
+- **Status:** Approved
+- **Owner:** Product owner (explicit screenshot report of dark status icons on dark app header)
+- **Decision:** Clear Android's inherited `LIGHT_STATUS_BAR` flag after the Capacitor activity starts so the dark navy shell receives light clock and system icons. App content and navigation remain unchanged.
+- **Verification:** Android debug APK compilation and physical-device checks across affected Android versions.

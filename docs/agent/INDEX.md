@@ -2,6 +2,8 @@
 
 [Android hardware Back navigation](phases/PHASE_82_ANDROID_BACK_NAVIGATION.md) records the native Back-button integration with the existing app history and Home exit behavior.
 
+[Android offline media playback](phases/PHASE_83_ANDROID_OFFLINE_MEDIA.md) records the Cache Storage playback repair for downloaded recordings in the Capacitor WebView.
+
 [Reader collection scenes](phases/READER_COLLECTION_SCENES.md) records the owner-approved static gradient/SVG header refinement, unchanged sizing, accessibility fallbacks and local-only verification.
 
 [Compact combined shared cards](phases/COMPACT_COMBINED_SHARED_CARDS.md) records the active owner-approved combined-card density, citation/repetition row, plain footer and Arabic-Indic export numeral refinement.
@@ -205,3 +207,5 @@ Apple/Microsoft-informed control spacing and alignment improvements.
 [Resizable Reader collection panel](phases/RESIZABLE_READER_COLLECTION_PANEL.md) records the owner-approved familiar sidebar, pointer/keyboard resizing and drawer fallback; verification is local only and publication is withheld.
 
 [Compact prayer companion](phases/COMPACT_PRAYER_COMPANION.md) records the owner-approved local-only prayer card and summary-tile refinement, responsive reflow, native checklist semantics and verification.
+
+[Android Mushaf download recovery](phases/PHASE_84_ANDROID_MUSHAF_DOWNLOAD.md) records the native QCF font download fallback and verification.

@@ -1,5 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { downloadAudioForZikrs, getDownloadedAudioSummary, removeDownloadedAudio } from "./audioOfflineCache";
+import {
+  downloadAudioForZikrs,
+  getDownloadedAudioSummary,
+  getNativeCachedAudioUrl,
+  removeDownloadedAudio,
+} from "./audioOfflineCache";
+import { Capacitor } from "@capacitor/core";
 import { DEFAULT_AUDIO_PREFERENCES } from "./audioPreferences";
 import { ALL_AZKAR } from "../content/azkar";
 import { AUDIO_CATALOG } from "./audioManifest";
@@ -105,5 +111,29 @@ describe("audio offline cache registry writes", () => {
     window.localStorage.setItem(REGISTRY_KEY, "{ not json");
 
     expect(getDownloadedAudioSummary()).toEqual({ assetCount: 0, byteSize: 0 });
+  });
+
+  it("keeps browser playback on the hosted URL rather than creating a Blob URL", async () => {
+    installCaches();
+    const createObjectUrl = vi.spyOn(URL, "createObjectURL");
+
+    await expect(getNativeCachedAudioUrl("https://audio.example.test/recording.mp3")).resolves.toBeNull();
+    expect(createObjectUrl).not.toHaveBeenCalled();
+  });
+
+  it("creates an Android playback URL from the downloaded cache response", async () => {
+    const match = vi.fn(async () => new Response(new Uint8Array([1, 2, 3]), { status: 200 }));
+    Object.defineProperty(window, "caches", {
+      configurable: true,
+      value: { open: vi.fn(async () => ({ match })) },
+    });
+    vi.spyOn(Capacitor, "isNativePlatform").mockReturnValue(true);
+    vi.spyOn(Capacitor, "getPlatform").mockReturnValue("android");
+    vi.spyOn(URL, "createObjectURL").mockReturnValue("blob:cached-recording");
+
+    await expect(getNativeCachedAudioUrl("https://audio.example.test/recording.mp3")).resolves.toBe(
+      "blob:cached-recording",
+    );
+    expect(match).toHaveBeenCalledWith("https://audio.example.test/recording.mp3");
   });
 });
