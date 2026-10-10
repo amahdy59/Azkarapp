@@ -1,11 +1,13 @@
 import "./floating-audio-player.css";
 import { MushafMagnificationControl } from "./MushafMagnificationControl";
+import { getScrollViewport } from "./scrollViewport";
 import {
   lazy,
   Suspense,
   useCallback,
   useId,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   type CSSProperties,
@@ -63,16 +65,29 @@ function getErrorMessage(code: string | undefined, language: AppLanguage) {
 
 function formatTime(seconds: number, language: AppLanguage) {
   const safeSeconds = Number.isFinite(seconds) && seconds > 0 ? Math.floor(seconds) : 0;
-  const minutes = Math.floor(safeSeconds / 60);
+  const hours = Math.floor(safeSeconds / 3600);
+  const minutes = Math.floor((safeSeconds % 3600) / 60);
   const remainder = safeSeconds % 60;
+  if (hours > 0) {
+    return formatNumerals(
+      `${hours}:${minutes.toString().padStart(2, "0")}:${remainder.toString().padStart(2, "0")}`,
+      language,
+    );
+  }
   return formatNumerals(`${minutes}:${remainder.toString().padStart(2, "0")}`, language);
 }
 
 function accessibleTime(current: number, duration: number, language: AppLanguage) {
   const describe = (seconds: number) => {
     const safe = Number.isFinite(seconds) && seconds > 0 ? Math.floor(seconds) : 0;
-    const minutes = Math.floor(safe / 60);
+    const hours = Math.floor(safe / 3600);
+    const minutes = Math.floor((safe % 3600) / 60);
     const remainder = Math.floor(safe % 60);
+    if (hours > 0) {
+      return language === "ar"
+        ? `${formatNumerals(hours, language)} ساعة و${formatNumerals(minutes, language)} دقيقة و${formatNumerals(remainder, language)} ثانية`
+        : `${hours} hour${hours === 1 ? "" : "s"} ${minutes} minute${minutes === 1 ? "" : "s"} ${remainder} second${remainder === 1 ? "" : "s"}`;
+    }
     return language === "ar"
       ? `${formatNumerals(minutes, language)} دقيقة و${formatNumerals(remainder, language)} ثانية`
       : `${minutes} minute${minutes === 1 ? "" : "s"} ${remainder} second${remainder === 1 ? "" : "s"}`;
@@ -164,28 +179,54 @@ export function FloatingAudioPlayer({
   const coversReading = overReadingSurface && (preferCompactReading || !hasRoomBesideReading);
   const [isMinimized, setIsMinimized] = useState(true);
   const compactRootRef = useRef<HTMLElement>(null);
-  useEffect(() => {
+  const reserveClearanceRef = useRef<(() => void) | null>(null);
+  useLayoutEffect(() => {
+    const main = document.getElementById("main-content");
+    if (!main) return;
+    const clear = () => {
+      main.style.removeProperty("--floating-audio-clearance");
+      main.style.removeProperty("--mushaf-audio-clearance");
+    };
+    if (dockedInReader || !currentEntry?.entryId) clear();
+    return clear;
+  }, [dockedInReader, currentEntry?.entryId]);
+  useLayoutEffect(() => {
     const main = document.getElementById("main-content");
     const dock = compactRootRef.current;
-    if (!main || !dock || !isMinimized || !preferCompactReading || !currentEntry?.entryId) return;
+    if (!main || !dock || !isMinimized || dockedInReader || !currentEntry?.entryId) return;
     const reserve = () => {
       const clearance = Math.max(
         0,
         Math.ceil(main.getBoundingClientRect().bottom - dock.getBoundingClientRect().top) + 8,
       );
-      main.style.setProperty("--mushaf-audio-clearance", `${clearance}px`);
+      main.style.setProperty("--floating-audio-clearance", `${clearance}px`);
+      if (preferCompactReading) main.style.setProperty("--mushaf-audio-clearance", `${clearance}px`);
+      else main.style.removeProperty("--mushaf-audio-clearance");
+      const focused = document.activeElement;
+      if (focused instanceof HTMLElement && main.contains(focused) && !dock.contains(focused)) {
+        const scroll = getScrollViewport(focused);
+        const bottom = Math.min(main.getBoundingClientRect().bottom, scroll.getBoundingClientRect().bottom) - clearance;
+        const covered = focused.getBoundingClientRect().bottom - bottom;
+        if (covered > 0) scroll.scrollTop += covered + 8;
+      }
     };
+    reserveClearanceRef.current = reserve;
     reserve();
+    // Container layout can settle after the compact shell has mounted.
+    const frame = requestAnimationFrame(reserve);
     const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(reserve);
     observer?.observe(dock);
     observer?.observe(main);
     window.addEventListener("resize", reserve);
     return () => {
       observer?.disconnect();
+      cancelAnimationFrame(frame);
+      reserveClearanceRef.current = null;
       window.removeEventListener("resize", reserve);
-      main.style.removeProperty("--mushaf-audio-clearance");
+      // Keep the compact footprint while the expanded overlay covers the page.
+      // Removing and restoring inherited calc() padding leaves stale layout in WebKit.
     };
-  }, [isMinimized, preferCompactReading, currentEntry?.entryId]);
+  }, [isMinimized, preferCompactReading, dockedInReader, currentEntry?.entryId]);
   const collapseButtonRef = useRef<HTMLButtonElement>(null);
   const expandButtonRef = useRef<HTMLButtonElement>(null);
   const readingTextRef = useRef<HTMLDivElement>(null);
@@ -407,38 +448,57 @@ export function FloatingAudioPlayer({
     count: formatNumerals(currentEntry.prescribedRepetitions, language),
   });
 
-  const renderWaveform = (peaks: readonly number[], height: number, testId: string, amplitudePower = 1) => (
-    <div className="audio-seek-waveform" aria-hidden="true" data-testid={testId}>
-      {peaks.map((peak, index) => (
-        <span key={index} style={{ height: Math.max(2, Math.pow(peak / 255, amplitudePower) * height) }} />
-      ))}
-      <div
-        className="audio-seek-waveform-played"
-        style={{
-          clipPath:
-            direction === "rtl" ? `inset(0 0 0 ${100 - progressPercent}%)` : `inset(0 ${100 - progressPercent}% 0 0)`,
-        }}
-      >
+  const renderWaveform = (peaks: readonly number[], height: number, testId: string, amplitudePower = 1) => {
+    let minPeak = 255;
+    let maxPeak = 0;
+    for (let i = 0; i < peaks.length; i++) {
+      const p = peaks[i]!;
+      if (p < minPeak) minPeak = p;
+      if (p > maxPeak) maxPeak = p;
+    }
+    const peakRange = maxPeak - minPeak;
+    const calcHeight = (peak: number) => {
+      if (peakRange > 15) {
+        const normalized = (peak - minPeak) / peakRange;
+        return Math.max(2.5, (0.18 + 0.82 * Math.pow(normalized, amplitudePower)) * height);
+      }
+      return Math.max(2, Math.pow(peak / 255, amplitudePower) * height);
+    };
+
+    return (
+      <div className="audio-seek-waveform" aria-hidden="true" data-testid={testId}>
         {peaks.map((peak, index) => (
-          <span key={index} style={{ height: Math.max(2, Math.pow(peak / 255, amplitudePower) * height) }} />
+          <span key={index} style={{ height: calcHeight(peak) }} />
         ))}
+        <div
+          className="audio-seek-waveform-played"
+          style={{
+            clipPath:
+              direction === "rtl" ? `inset(0 0 0 ${100 - progressPercent}%)` : `inset(0 ${100 - progressPercent}% 0 0)`,
+          }}
+        >
+          {peaks.map((peak, index) => (
+            <span key={index} style={{ height: calcHeight(peak) }} />
+          ))}
+        </div>
+        <div
+          className="audio-seek-waveform-playhead"
+          data-testid={`${testId}-playhead`}
+          style={{
+            height: `${height + 2}px`,
+            insetInlineStart: `clamp(1px, ${progressPercent}%, calc(100% - 1px))`,
+          }}
+        />
       </div>
-      <div
-        className="audio-seek-waveform-playhead"
-        data-testid={`${testId}-playhead`}
-        style={{
-          height: `${height + 2}px`,
-          insetInlineStart: `clamp(1px, ${progressPercent}%, calc(100% - 1px))`,
-        }}
-      />
-    </div>
-  );
+    );
+  };
   const renderCompact = () => (
     <motion.section
       ref={compactRootRef}
       initial={motionReduced ? false : { opacity: 0, y: 10, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={shellTransition}
+      onAnimationComplete={() => reserveClearanceRef.current?.()}
       role="region"
       aria-label={t(language, "audioPlayer.region")}
       aria-describedby={compactDescriptionId}
@@ -703,6 +763,7 @@ export function FloatingAudioPlayer({
                           {t(language, "audioPlayer.translationUnavailable")}
                         </p>
                       )}
+
                       <ArabicTextTag
                         id={arabicTextId}
                         hidden={englishFirst && !showArabic}
@@ -778,7 +839,7 @@ export function FloatingAudioPlayer({
           </div>
 
           {/* Bottom Transport Controller Area: docked at the bottom where the counter normally sits */}
-          <div className="audio-expanded-controls mx-auto w-full max-w-5xl shrink-0 border-t border-border pt-2">
+          <div className="audio-expanded-controls mx-auto w-full max-w-5xl shrink-0 border-t border-border pt-1">
             {/* One waveform seek control with balanced time labels. */}
             <div className="audio-seek-row flex items-center gap-2 px-1" dir={direction}>
               <span className="w-10 text-center text-micro font-bold tabular-nums text-muted-foreground">
@@ -877,7 +938,7 @@ export function FloatingAudioPlayer({
             </div>
 
             <div
-              className="audio-expanded-options flex flex-wrap items-center justify-center gap-3 pt-3 text-xs text-muted-foreground"
+              className="audio-expanded-options flex flex-wrap items-center justify-center gap-2 pt-1 text-xs text-muted-foreground"
               dir={direction}
             >
               {positionChip && (

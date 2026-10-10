@@ -54,10 +54,12 @@ export function AyahMarker({
   number,
   language,
   theme = "light",
+  isHighlighted = false,
 }: {
   number: string | number;
   language: AppLanguage;
   theme?: MushafPageTheme;
+  isHighlighted?: boolean;
 }) {
   const displayNum = formatNumerals(number, language);
   const isOled = theme === "oled";
@@ -77,8 +79,8 @@ export function AyahMarker({
           height="21"
           rx="3.5"
           stroke="var(--mushaf-rule-ink, var(--accent, #d4b47c))"
-          strokeWidth="1.2"
-          strokeOpacity="0.85"
+          strokeWidth={isHighlighted ? "1.5" : "1.2"}
+          strokeOpacity={isHighlighted ? "1" : "0.85"}
         />
         <rect
           x="5.5"
@@ -87,17 +89,19 @@ export function AyahMarker({
           height="21"
           rx="3.5"
           stroke="var(--mushaf-rule-ink, var(--accent, #d4b47c))"
-          strokeWidth="1.2"
-          strokeOpacity="0.85"
+          strokeWidth={isHighlighted ? "1.5" : "1.2"}
+          strokeOpacity={isHighlighted ? "1" : "0.85"}
           transform="rotate(45 16 16)"
         />
         <circle
           cx="16"
           cy="16"
           r="8.5"
+          fill={isHighlighted ? "var(--primary)" : "none"}
+          fillOpacity={isHighlighted ? 0.35 : undefined}
           stroke="var(--mushaf-rule-ink, var(--accent, #d4b47c))"
-          strokeWidth="1"
-          strokeOpacity="0.75"
+          strokeWidth={isHighlighted ? "1.5" : "1"}
+          strokeOpacity={isHighlighted ? "1" : "0.75"}
         />
         <circle cx="16" cy="3.5" r="1.1" fill="var(--mushaf-rule-ink, var(--accent, #d4b47c))" />
         <circle cx="16" cy="28.5" r="1.1" fill="var(--mushaf-rule-ink, var(--accent, #d4b47c))" />
@@ -106,7 +110,7 @@ export function AyahMarker({
       </svg>
       <span
         className={`absolute inset-0 flex items-center justify-center font-sans text-[0.42em] font-bold leading-none ${
-          isOled ? "text-white" : "text-foreground"
+          isHighlighted ? "text-primary font-black" : isOled ? "text-white" : "text-foreground"
         }`}
         style={{ fontVariantNumeric: "tabular-nums" }}
         aria-hidden="true"
@@ -290,13 +294,20 @@ const MushafTextLine = memo(function MushafTextLine({
                 key={key}
                 aria-hidden="true"
                 className={
-                  highlightedVerseKey === w.verseKey ? "bg-primary/25 rounded-sm ring-2 ring-primary/60" : undefined
+                  highlightedVerseKey === w.verseKey && useQcfGlyphs && w.qcfCode
+                    ? "text-primary transition-colors"
+                    : undefined
                 }
               >
                 {useQcfGlyphs && w.qcfCode ? (
                   w.qcfCode
                 ) : (
-                  <AyahMarker number={w.verseKey.split(":")[1] || w.text} language={language} theme={_theme} />
+                  <AyahMarker
+                    number={w.verseKey.split(":")[1] || w.text}
+                    language={language}
+                    theme={_theme}
+                    isHighlighted={highlightedVerseKey === w.verseKey}
+                  />
                 )}
               </span>
             );
@@ -306,8 +317,8 @@ const MushafTextLine = memo(function MushafTextLine({
               <button
                 key={key}
                 type="button"
-                className={`inline-block shrink-0 select-none rounded-sm border-0 bg-transparent p-0 [font:inherit] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                  highlightedVerseKey === w.verseKey ? "bg-primary/25 ring-2 ring-primary/60" : ""
+                className={`inline-block shrink-0 select-none rounded-full border-0 bg-transparent p-0 [font:inherit] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-colors ${
+                  highlightedVerseKey === w.verseKey && useQcfGlyphs && w.qcfCode ? "text-primary" : ""
                 }`}
                 aria-current={highlightedVerseKey === w.verseKey ? "true" : undefined}
                 style={{ lineHeight: "inherit", verticalAlign: "baseline" }}
@@ -327,7 +338,12 @@ const MushafTextLine = memo(function MushafTextLine({
                 {useQcfGlyphs && w.qcfCode ? (
                   w.qcfCode
                 ) : (
-                  <AyahMarker number={w.verseKey.split(":")[1] || w.text} language={language} theme={_theme} />
+                  <AyahMarker
+                    number={w.verseKey.split(":")[1] || w.text}
+                    language={language}
+                    theme={_theme}
+                    isHighlighted={highlightedVerseKey === w.verseKey}
+                  />
                 )}
               </button>
             );
@@ -398,17 +414,13 @@ const MushafTextLine = memo(function MushafTextLine({
               style={
                 isWordHighlighted
                   ? {
-                      color: "color-mix(in srgb, var(--primary) 70%, var(--foreground))",
-                      boxShadow: "0 0 0 1px var(--primary)",
+                      color: "color-mix(in srgb, var(--primary) 85%, var(--foreground))",
+                      boxShadow: "0 0 6px color-mix(in srgb, var(--primary) 35%, transparent)",
                     }
                   : undefined
               }
               className={`shrink-0 transition-colors ${
-                isWordHighlighted
-                  ? "rounded-md bg-primary/25 text-primary underline underline-offset-4 ring-1 ring-primary/60"
-                  : isVerseActive
-                    ? "rounded-sm bg-primary/20 text-foreground ring-1 ring-primary/45"
-                    : "rounded-sm"
+                isWordHighlighted ? "rounded-md bg-primary/25 text-primary ring-1 ring-primary/50" : "rounded-sm"
               }`}
               aria-hidden={!showWordMeanings}
               onContextMenu={(e) => {
@@ -492,6 +504,9 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
     let frame = 0;
     let containmentFrame = 0;
     let cancelled = false;
+    let fittedScale = "1";
+    let fittedMeasure = 0;
+    let fittedViewport = "";
 
     const fit = () => {
       const column = canvas.firstElementChild as HTMLElement | null;
@@ -504,6 +519,19 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
          owns its own measure: the vars are set on its canvas and inherited by
          its column. */
       const page = canvas;
+      const magnification = Number.parseFloat(getComputedStyle(canvas).getPropertyValue("--mushaf-magnification")) || 1;
+      // Native scrollbar space changes clientWidth during enlargement. It
+      // must not be mistaken for a new reading viewport and refit the ink.
+      const viewport = `${window.innerWidth}:${window.innerHeight}`;
+      if (magnification > 1 && fittedMeasure > 0 && viewport === fittedViewport) {
+        page.style.setProperty("--mushaf-fit", fittedScale);
+        page.style.setProperty("--mushaf-measure", `${Math.round(fittedMeasure * magnification)}px`);
+        return;
+      }
+
+      // Always measure natural type against the available page. Inherited
+      // line heights and late font swaps cannot reliably be divided by the
+      // previous fit, and doing so can progressively shrink a scrolling page.
       page.style.setProperty("--mushaf-measure", "100%");
       page.style.setProperty("--mushaf-fit", "1");
 
@@ -513,7 +541,7 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
         content.style.justifyContent = "";
       }
 
-      const available = (first.parentElement as HTMLElement | null)?.clientWidth ?? first.clientWidth;
+      const available = first.clientWidth;
       const slotHeight = (first.parentElement as HTMLElement | null)?.clientHeight ?? 0;
       if (available <= 0 || slotHeight <= 0) return;
 
@@ -544,17 +572,38 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
 
       const lineHeight = first.offsetHeight;
       if (!widest) widest = Math.max(...naturalWidths);
-      const verticalScale = lineHeight > 0 ? (slotHeight * inkAllowance) / lineHeight : 1;
-      const measure = Math.min(widest * verticalScale, available);
-      const scale = Math.min(Math.max(widest > 0 ? measure / widest : 1, 0.6), 2.8);
+      // Mobile Chromium may defer inherited container-unit font updates during
+      // a resize. Normalize by the font actually used for these measurements,
+      // rather than assuming that the requested fit has already been applied.
+      const canvasStyle = getComputedStyle(canvas);
+      const contentWidth =
+        canvas.clientWidth - parseFloat(canvasStyle.paddingLeft) - parseFloat(canvasStyle.paddingRight);
+      const contentHeight =
+        canvas.clientHeight - parseFloat(canvasStyle.paddingTop) - parseFloat(canvasStyle.paddingBottom);
+      const naturalFontSize =
+        (canvas.dataset.mushafRendering === "qcf-v2"
+          ? Math.min(contentWidth * 0.046, contentHeight * 0.046)
+          : Math.min(contentWidth * 0.036, contentHeight * 0.041)) / magnification;
+      const renderedFontSize = Number.parseFloat(getComputedStyle(first).fontSize);
+      const effectiveFit = naturalFontSize > 0 ? renderedFontSize / naturalFontSize : magnification;
+      const baseWidest = effectiveFit > 0 ? widest / effectiveFit : widest;
+      const baseLineHeight = effectiveFit > 0 ? lineHeight / effectiveFit : lineHeight;
+      const baseSlotHeight = slotHeight / magnification;
+      const baseAvailable = available / magnification;
+      const verticalScale = baseLineHeight > 0 ? (baseSlotHeight * inkAllowance) / baseLineHeight : 1;
+      const measure = Math.min(baseWidest * verticalScale, baseAvailable);
+      const scale = Math.min(Math.max(baseWidest > 0 ? measure / baseWidest : 1, 0.6), 2.4);
 
-      // Single write pass: apply calculated scale and transforms bounded by available width
-      page.style.setProperty("--mushaf-measure", `${Math.round(measure)}px`);
+      // Single write pass: apply calculated scale and transforms
+      page.style.setProperty("--mushaf-measure", `${Math.round(measure * magnification)}px`);
       page.style.setProperty("--mushaf-fit", scale.toFixed(3));
+      fittedScale = scale.toFixed(3);
+      fittedMeasure = measure;
+      fittedViewport = viewport;
 
       for (let i = 0; i < lineCount; i++) {
         const content = contents[i]!;
-        const nat = naturalWidths[i]!;
+        const nat = effectiveFit > 0 ? naturalWidths[i]! / effectiveFit : naturalWidths[i]!;
         const scaledNat = nat * scale;
         const fill = measure > 0 ? scaledNat / measure : 1;
 

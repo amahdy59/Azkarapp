@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Card } from "../../components/Card";
 import { IconButton } from "../../components/LayoutShells";
 import { ArrowPrevious } from "../../components/icons";
@@ -20,11 +20,19 @@ export function SubHeader({
 }) {
   const layoutMode = useLayoutMode();
   const isTwoPane = layoutMode === "expanded" || layoutMode === "large";
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    // Panels may mount after the outgoing animation has finished. Focus the
+    // heading owned by the mounted panel, rather than querying the old panel.
+    const frame = requestAnimationFrame(() => headingRef.current?.focus());
+    return () => cancelAnimationFrame(frame);
+  }, [isTwoPane]);
 
   if (isTwoPane) {
     return (
       <div className="flex items-center justify-between px-4 pt-4 pb-2 shrink-0">
         <h2
+          ref={headingRef}
           data-settings-subheading
           tabIndex={-1}
           aria-label={
@@ -47,6 +55,7 @@ export function SubHeader({
         <ArrowPrevious size={20} className="text-foreground" />
       </IconButton>
       <h1
+        ref={headingRef}
         data-settings-subheading
         tabIndex={-1}
         className="block min-w-0 flex-1 break-words text-center font-sans text-xl font-extrabold leading-tight text-foreground outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:text-2xl"

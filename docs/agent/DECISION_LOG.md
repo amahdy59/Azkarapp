@@ -4399,3 +4399,7 @@ Owner authorized all footer/audio recommendations locally before pushing; reques
 ### Owner correction: centered two-row Reader footer (2026-10-09)
 
 The owner rejected the wide single-row arrangement after local review: it broke perceived symmetry and wrapped button labels. Use two centered action rows at every width, equal tool cells, non-wrapping labels, and centered Previous / Done / Next. Center fitting devotional text vertically and horizontally; overflowing text scrolls within the reading region above the footer. All work remains local and uncommitted pending owner testing.
+
+## Offline downloads and coordinated release — 2026-10-10
+
+The owner approves all qualified offline-download recommendations from the review and requests implementation, review of the supplied test report, and publication of all pending application changes. This supersedes the previous local-only release holds for those pending changes. Keep the existing essentials scope, expose independent Al-Baqarah/Al-Kahf and daily controls, use truthful origin storage and verified cache readiness, preserve cancellation/rollback and reviewed content, and repair demonstrated CI regressions without weakening tests. No new dependencies or persistence migrations. See phases/OFFLINE_DOWNLOADS_AND_RELEASE_2026_10_10.md.

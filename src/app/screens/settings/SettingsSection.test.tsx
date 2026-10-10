@@ -1,6 +1,16 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { SettingsSection } from "./SettingsPrimitives";
+import { SettingsSection, SubHeader } from "./SettingsPrimitives";
+
+describe("SubHeader focus", () => {
+  it("focuses the newly mounted panel after an outgoing header is removed", async () => {
+    const { rerender } = render(<SubHeader key="old" title="Previous panel" onBack={() => undefined} />);
+    await waitFor(() => expect(screen.getByRole("heading", { name: "Previous panel" })).toHaveFocus());
+    rerender(<div>Outgoing panel</div>);
+    rerender(<SubHeader key="new" title="Reading & Typography" onBack={() => undefined} />);
+    await waitFor(() => expect(screen.getByRole("heading", { name: "Reading & Typography" })).toHaveFocus());
+  });
+});
 
 describe("SettingsSection", () => {
   it("renders a label heading when provided", () => {

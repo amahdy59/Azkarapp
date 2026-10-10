@@ -1,7 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Zikr } from "../types";
 import { DEFAULT_AUDIO_PREFERENCES } from "./audioPreferences";
-import { downloadAudioForZikrs, getAudioDownloadStatus } from "./audioOfflineCache";
+import {
+  downloadAudioForZikrs,
+  getAudioDownloadStatus,
+  getAudioDownloadStatuses,
+  removeAudioForZikrs,
+} from "./audioOfflineCache";
 
 const fixtures = vi.hoisted(() => ({
   hash: "00".repeat(32),
@@ -68,6 +73,60 @@ afterEach(() => {
 });
 
 describe("verified offline audio", () => {
+  it("verifies shared recordings only once across collection and bundle readiness", async () => {
+    files.set(fixtures.urls[0]!, response());
+    const result = await getAudioDownloadStatuses([zikrs, [zikrs[0]!], zikrs], DEFAULT_AUDIO_PREFERENCES);
+    expect(result).toEqual([
+      { completed: 1, total: 2, remainingBytes: 3 },
+      { completed: 1, total: 1, remainingBytes: 0 },
+      { completed: 1, total: 2, remainingBytes: 3 },
+    ]);
+    expect(crypto.subtle.digest).toHaveBeenCalledTimes(1);
+  });
+  it("removes the selected cached recording without a registry while preserving unrelated audio", async () => {
+    files.set(fixtures.urls[0]!, response());
+    files.set(fixtures.urls[1]!, response());
+    await removeAudioForZikrs([zikrs[0]!], DEFAULT_AUDIO_PREFERENCES);
+    expect(files.has(fixtures.urls[0]!)).toBe(false);
+    expect(files.has(fixtures.urls[1]!)).toBe(true);
+    expect(await getAudioDownloadStatus(zikrs, DEFAULT_AUDIO_PREFERENCES)).toEqual({
+      completed: 1,
+      total: 2,
+      remainingBytes: 3,
+    });
+  });
+  it("propagates a failed scoped deletion", async () => {
+    vi.mocked(caches.open).mockResolvedValueOnce({
+      delete: async () => {
+        throw new Error("cache write failed");
+      },
+    } as unknown as Cache);
+    await expect(removeAudioForZikrs(zikrs, DEFAULT_AUDIO_PREFERENCES)).rejects.toThrow("cache write failed");
+  });
+  it("cancellation while verifying a large file cannot publish it into the cache", async () => {
+    const controller = new AbortController();
+    vi.mocked(crypto.subtle.digest).mockImplementationOnce(async () => {
+      controller.abort();
+      return new Uint8Array(32).buffer;
+    });
+    await expect(
+      downloadAudioForZikrs(zikrs, DEFAULT_AUDIO_PREFERENCES, { signal: controller.signal }),
+    ).rejects.toThrow();
+    expect(files.size).toBe(0);
+  });
+  it("quota failure rolls back new files and keeps earlier verified downloads", async () => {
+    files.set(fixtures.urls[0]!, response());
+    vi.mocked(caches.open).mockResolvedValueOnce({
+      match: async (url: string) => files.get(url)?.clone(),
+      put: async () => {
+        throw new DOMException("full", "QuotaExceededError");
+      },
+      delete: async (url: string) => files.delete(url),
+    } as unknown as Cache);
+    await expect(downloadAudioForZikrs(zikrs, DEFAULT_AUDIO_PREFERENCES)).rejects.toThrow("full");
+    expect(files.has(fixtures.urls[0]!)).toBe(true);
+    expect(files.has(fixtures.urls[1]!)).toBe(false);
+  });
   it("resumes without fetching files whose cached bytes already pass verification", async () => {
     files.set(fixtures.urls[0]!, response());
     expect(await getAudioDownloadStatus(zikrs, DEFAULT_AUDIO_PREFERENCES)).toEqual({

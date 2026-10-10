@@ -250,3 +250,5 @@ Apple/Microsoft-informed control spacing and alignment improvements.
 [Stable Reader disclosures](phases/STABLE_READER_DISCLOSURES.md) records the owner's superseding fixed-geometry toggle behavior, refined controls, standard sharing glyph and local review.
 
 [Responsive Reader controls and Mushaf magnification](phases/RESPONSIVE_READER_CONTROL_REFINEMENT.md) is the active local owner-review phase for balanced footer/audio controls and 100–200% printed-page enlargement.
+
+[Offline downloads and coordinated release](phases/OFFLINE_DOWNLOADS_AND_RELEASE_2026_10_10.md) is the active owner-approved phase: independent downloads, honest storage/readiness, accessible responsive controls, verification of pending changes and full main/Pages release. The owner explicitly supersedes earlier publication holds.

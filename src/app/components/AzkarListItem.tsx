@@ -79,7 +79,16 @@ export function AzkarListItem({
   const timingText = getLocalizedPreferredTiming(z, language);
   const longSurah = isLongSurah(z);
   const isQuranicText = isArabic && Boolean(z.quranText || z.isSurah || z.attributionType === "quranic_supplication");
-  const visibleText = isArabic ? z.arabicText : z.translation;
+  const cleanArabicText =
+    expanded && (z.hasBasmalah || z.isSurah)
+      ? z.arabicText
+          .replace(
+            /^(بِسْمِ\s+اللَّهِ\s+الرَّحْمَٰنِ\s+الرَّحِيمِ|بِسْمِ\s+اللَّهِ\s+الرَّحْمَنِ\s+الرَّحِيمِ|بِسْمِ\s+اللهِ\s+الرَّحْمٰنِ\s+الرَّحِيْمِ)[.\s\u06d4]*/,
+            "",
+          )
+          .trim()
+      : z.arabicText;
+  const visibleText = isArabic ? cleanArabicText : z.translation;
   const { summaryRef, overflows } = useClampedTextOverflow(expanded, visibleText);
   const hasExpandedOnlyContent =
     (isArabic && (z.hasSeekRefuge || z.hasBasmalah || z.isSurah)) || Boolean(showTiming && timingText) || longSurah;

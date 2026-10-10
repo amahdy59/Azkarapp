@@ -472,6 +472,31 @@ test("scrolls the paper on a short viewport instead of shrinking it to nine pixe
   expect(geometry.overflowX).toBe(0);
 });
 
+test("late fonts and repeated landscape resizing keep fallback readable @cross-browser", async ({ page }) => {
+  await page.route("**/amiri-quran-*.woff2", async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    await route.continue();
+  });
+  await page.setViewportSize({ width: 844, height: 390 });
+  await page.getByRole("button", { name: "متابعة القراءة" }).click();
+  const canvas = page.locator('[data-mushaf-page="42"]');
+  await expect(canvas).toHaveAttribute("data-mushaf-rendering", "unicode-fallback");
+  await page.evaluate(async () => document.fonts.ready);
+  for (const width of [820, 844, 820, 844]) {
+    await page.setViewportSize({ width, height: 390 });
+    await expect
+      .poll(() =>
+        canvas
+          .locator("[data-mushaf-line-content]")
+          .first()
+          .evaluate((element) => Number.parseFloat(getComputedStyle(element).fontSize)),
+      )
+      .toBeGreaterThan(12);
+  }
+  await expect(canvas.locator("[data-mushaf-column] > div")).toHaveCount(15);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBe(0);
+});
+
 test("turns pages by swipe without hiding the permanent controls", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.getByRole("button", { name: "متابعة القراءة" }).click();

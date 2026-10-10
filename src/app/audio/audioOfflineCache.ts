@@ -103,23 +103,52 @@ async function isVerifiedCachedAudio(cache: Cache, item: ReturnType<typeof getDo
 
 /** Readiness comes from complete, checksummed bytes, never registry totals alone. */
 export async function getAudioDownloadStatus(zikrs: readonly Zikr[], preferences: AudioPreferences) {
-  const variants = getDownloadVariants(zikrs, preferences);
-  let completedBytes = 0;
-  let completed = 0;
+  return (await getAudioDownloadStatuses([zikrs], preferences))[0]!;
+}
+
+/** Verify shared recordings once, sequentially, to bound large-file memory use. */
+export async function getAudioDownloadStatuses(
+  collections: readonly (readonly Zikr[])[],
+  preferences: AudioPreferences,
+) {
+  const groups = collections.map((zikrs) => getDownloadVariants(zikrs, preferences));
+  const verified = new Map<string, boolean>();
   if ("caches" in window) {
     const cache = await caches.open(AUDIO_CACHE_NAME);
-    for (const item of variants) {
-      if (await isVerifiedCachedAudio(cache, item)) {
-        completed += 1;
-        completedBytes += item.variant.byteSize;
+    for (const variants of groups) {
+      for (const item of variants) {
+        if (!verified.has(item.variant.id)) verified.set(item.variant.id, await isVerifiedCachedAudio(cache, item));
       }
     }
   }
-  return {
-    completed,
+  return groups.map((variants) => ({
+    completed: variants.filter((item) => verified.get(item.variant.id)).length,
     total: variants.length,
-    remainingBytes: variants.reduce((sum, item) => sum + item.variant.byteSize, 0) - completedBytes,
-  };
+    remainingBytes: variants.reduce(
+      (sum, item) => sum + (verified.get(item.variant.id) ? 0 : item.variant.byteSize),
+      0,
+    ),
+  }));
+}
+
+/** Remove only the selected recordings, including files whose registry write failed. */
+export async function removeAudioForZikrs(zikrs: readonly Zikr[], preferences: AudioPreferences) {
+  if (!("caches" in window)) throw new Error("Offline audio is not supported in this browser.");
+  const variants = getDownloadVariants(zikrs, preferences);
+  const cache = await caches.open(AUDIO_CACHE_NAME);
+  const registry = loadRegistry();
+  for (const item of variants) {
+    await cache.delete(item.url);
+    const record = registry[item.assetId];
+    if (!record) continue;
+    const index = record.variantIds.indexOf(item.variant.id);
+    if (index < 0) continue;
+    record.variantIds.splice(index, 1);
+    record.urls.splice(index, 1);
+    record.byteSize = Math.max(0, record.byteSize - item.variant.byteSize);
+    if (record.variantIds.length === 0) delete registry[item.assetId];
+  }
+  saveRegistry(registry);
 }
 
 export async function downloadAudioForZikrs(
@@ -146,6 +175,7 @@ export async function downloadAudioForZikrs(
         if (contentType !== item.variant.mimeType) throw new Error(`Unexpected audio MIME type: ${item.variant.id}`);
         const buffer = await response.arrayBuffer();
         await verifyDownload(buffer, item.variant);
+        options.signal?.throwIfAborted();
         const headers = new Headers(response.headers);
         headers.set("content-length", String(buffer.byteLength));
         headers.set("content-type", item.variant.mimeType);
@@ -169,6 +199,7 @@ export async function downloadAudioForZikrs(
       record.byteSize += item.variant.byteSize;
       records.set(item.assetId, record);
     }
+    options.signal?.throwIfAborted();
   } catch (error) {
     await Promise.all(storedUrls.map((url) => cache.delete(url)));
     throw error;

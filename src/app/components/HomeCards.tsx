@@ -466,6 +466,26 @@ export function FridayHomeCard({
  * the only place in the app making a claim it could not support, so
  * {@link getDailyEvidence} will not return an entry that lacks one.
  */
+function renderEvidenceHadithContent(text: string, isQuran?: boolean, onGlass = false) {
+  if (!isQuran) return text;
+  const parts = text.split(/(﴿[^﴾]+﴾)/g);
+  if (parts.length === 1) return text;
+  return parts.map((part, index) => {
+    if (part.startsWith("﴿") && part.endsWith("﴾")) {
+      return (
+        <span
+          key={index}
+          className={`inline-block font-bold px-1 ${onGlass ? "text-on-media" : "text-foreground"}`}
+          style={{ fontVariantNumeric: "tabular-nums" }}
+        >
+          {part}
+        </span>
+      );
+    }
+    return part;
+  });
+}
+
 export function DailyEvidenceCard({
   language,
   direction,
@@ -540,16 +560,17 @@ export function DailyEvidenceCard({
           English heading — the reference sheet's own defect, one screen over.
           `lang` and `dir` follow the text that is actually rendered, and the
           Arabic face is only applied when the text is Arabic. */}
+
       <blockquote
-        className={`text-title font-medium ${evidence.isQuran ? "leading-[1.7]" : "leading-[2]"} ${
-          onGlass ? "text-on-media" : "text-foreground"
-        } ${evidence.hadithInArabic ? "zikr-text" : ""}`}
-        style={evidence.isQuran ? { fontFamily: "var(--font-mushaf)", lineHeight: 1.7 } : undefined}
+        className={`font-medium ${
+          evidence.isQuran ? "text-xl sm:text-2xl font-normal leading-relaxed tracking-wide" : "text-title leading-[2]"
+        } ${onGlass ? "text-on-media" : "text-foreground"} ${evidence.hadithInArabic ? "zikr-text" : ""}`}
+        style={evidence.isQuran ? { fontFamily: "var(--font-mushaf)", lineHeight: 1.85 } : undefined}
         dir={evidence.hadithInArabic ? "rtl" : "ltr"}
         lang={evidence.hadithInArabic ? "ar" : "en"}
         data-testid="daily-evidence-hadith"
       >
-        {evidence.hadith}
+        {renderEvidenceHadithContent(evidence.hadith, evidence.isQuran, onGlass)}
       </blockquote>
 
       <p

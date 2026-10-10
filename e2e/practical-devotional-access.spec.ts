@@ -209,9 +209,9 @@ test("keyboard help disables character actions while preserving native counting"
 test("travel preparation discloses verified coverage without starting downloads", async ({ page }) => {
   await returningReader(page, "en");
   await page.goto("/#/settings/downloads");
-  const prepare = page.getByRole("button", { name: "Prepare offline reading and audio" });
+  const prepare = page.getByRole("button", { name: "Download essentials" });
   await expect(prepare).toBeEnabled();
-  await expect(page.getByTestId("travel-readiness")).toHaveText("Travel downloads are not complete yet");
+  await expect(page.getByTestId("travel-readiness")).toHaveText("Essentials are not fully downloaded");
   await expect(page.getByText(/0 \/ 604 Mushaf pages/)).toBeVisible();
   await page.screenshot({ path: "output/playwright/phase78/travel-downloads-en.png" });
 });

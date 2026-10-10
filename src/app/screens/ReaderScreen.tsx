@@ -328,6 +328,7 @@ export function ReaderScreen({
   }, [onMushafModeChange, showMushaf]);
   const [benefitOpen, setBenefitOpen] = useState(false);
   const [focusMode, setFocusMode] = useState(false);
+  const [footerToolsExpanded, setFooterToolsExpanded] = useState(true);
   const focusExitRef = useRef<HTMLButtonElement>(null);
   const focusRequestedRef = useRef(false);
   const previousFocusMode = useRef(false);
@@ -1190,26 +1191,6 @@ export function ReaderScreen({
     </DevotionalAction>
   );
 
-  const renderFocusDockButton = () => (
-    <DevotionalAction
-      type="button"
-      onClick={(e) => {
-        e.stopPropagation();
-        focusRequestedRef.current = true;
-        setFocusMode(true);
-      }}
-      aria-label={t(language, "reader.enterFocus")}
-      title={t(language, "reader.enterFocus")}
-      data-testid="reader-focus-dock-button"
-      className="min-w-0 flex-1 shadow-sm"
-    >
-      <Maximize size={20} aria-hidden="true" />
-      <span className="min-w-0 text-label font-semibold [overflow-wrap:anywhere]">
-        {t(language, "reader.enterFocus")}
-      </span>
-    </DevotionalAction>
-  );
-
   const renderCounterPanel = () => (
     <div className="w-full pb-1" data-testid="counter-panel">
       <div className="adaptive-counter-row flex w-full items-stretch justify-center gap-2">
@@ -1270,8 +1251,16 @@ export function ReaderScreen({
     return (
       <div data-testid="reader-counter-stack">
         <DevotionalFooter className="reader-session-footer">
-          <ReaderFooterTools language={language} primary={renderCounterPanel()}>
-            <div className="flex w-full items-center justify-center gap-2" data-testid="reader-support-actions">
+          <ReaderFooterTools
+            language={language}
+            expanded={footerToolsExpanded}
+            onToggle={() => setFooterToolsExpanded((expanded) => !expanded)}
+            primary={renderCounterPanel()}
+          >
+            <div
+              className="flex w-full flex-wrap items-center justify-center gap-2"
+              data-testid="reader-support-actions"
+            >
               {renderBenefitDockButton()}
               {renderAudioDockButton()}
               <DevotionalAction
@@ -1287,14 +1276,13 @@ export function ReaderScreen({
                 aria-label={t(language, "reader.shareCurrent")}
                 title={t(language, "reader.shareCurrent")}
                 data-testid="reader-share-dock-button"
-                className="min-w-0 flex-1 shadow-sm"
+                className="min-w-[5rem] flex-1 shadow-sm"
               >
                 <Share2 size={20} aria-hidden="true" />
                 <span className="min-w-0 text-label font-semibold [overflow-wrap:anywhere]">
                   {t(language, "reader.shareAction")}
                 </span>
               </DevotionalAction>
-              {renderFocusDockButton()}
             </div>
           </ReaderFooterTools>
         </DevotionalFooter>

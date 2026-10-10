@@ -16,6 +16,9 @@ import { Check, ChevronLeft, ChevronRight, Info, X } from "./icons";
 const buttonClass =
   "inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-lg px-3 text-sm hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-50";
 
+const navButtonClass =
+  "inline-flex size-8 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40 transition-colors";
+
 function revealListeningTarget(root: HTMLElement | null, target: HTMLElement | null) {
   const enlarged = target?.closest<HTMLElement>(
     '.audio-listening-body[data-listening-magnified="true"] > .audio-listening-arabic',
@@ -196,23 +199,23 @@ export default function QuranListeningReader({
     <section ref={root} className="w-full" aria-label={t(language, "quranListening.reader")}>
       <div
         data-listening-controls=""
-        className="sticky top-0 z-10 flex flex-wrap items-center justify-center gap-1 bg-background"
+        className="sticky top-0 z-10 mx-auto flex items-center justify-center gap-1 rounded-full border border-border/50 bg-background/95 px-2.5 py-0.5 shadow-xs backdrop-blur-sm w-fit"
       >
         <button
           type="button"
-          className={buttonClass}
+          className={navButtonClass}
           aria-label={t(language, "common.previous")}
           disabled={index <= 0}
           onClick={() => browse(index - 1)}
         >
           {language === "ar" ? (
-            <ChevronRight size={18} aria-hidden="true" />
+            <ChevronRight size={16} aria-hidden="true" />
           ) : (
-            <ChevronLeft size={18} aria-hidden="true" />
+            <ChevronLeft size={16} aria-hidden="true" />
           )}
         </button>
         <span
-          className="text-sm"
+          className="text-xs font-bold px-1 tabular-nums text-foreground"
           role="status"
           aria-label={t(language, "mushaf.pageRegion", { page: formatNumerals(page.page, language) })}
         >
@@ -220,21 +223,21 @@ export default function QuranListeningReader({
         </span>
         <button
           type="button"
-          className={buttonClass}
+          className={navButtonClass}
           aria-label={t(language, "common.next")}
           disabled={index >= pages.length - 1}
           onClick={() => browse(index + 1)}
         >
           {language === "ar" ? (
-            <ChevronLeft size={18} aria-hidden="true" />
+            <ChevronLeft size={16} aria-hidden="true" />
           ) : (
-            <ChevronRight size={18} aria-hidden="true" />
+            <ChevronRight size={16} aria-hidden="true" />
           )}
         </button>
         <Popover.Root>
           <Popover.Trigger asChild>
-            <button type="button" className={buttonClass} aria-label={t(language, "quranListening.information")}>
-              <Info size={18} aria-hidden="true" />
+            <button type="button" className={navButtonClass} aria-label={t(language, "quranListening.information")}>
+              <Info size={15} aria-hidden="true" />
             </button>
           </Popover.Trigger>
           <Popover.Portal>

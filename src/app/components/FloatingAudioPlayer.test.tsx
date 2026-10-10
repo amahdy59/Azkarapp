@@ -89,6 +89,21 @@ function createController(): AudioController {
 
 describe("FloatingAudioPlayer", () => {
   afterEach(() => vi.restoreAllMocks());
+  it("preserves the compact clearance through expansion and releases it when playback closes", () => {
+    const main = document.createElement("main");
+    main.id = "main-content";
+    document.body.append(main);
+    const { unmount } = render(<FloatingAudioPlayer controller={createController()} language="en" />);
+    const clearance = main.style.getPropertyValue("--floating-audio-clearance");
+    expect(clearance).not.toBe("");
+    fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
+    expect(main.style.getPropertyValue("--floating-audio-clearance")).toBe(clearance);
+    fireEvent.click(screen.getByRole("button", { name: "Minimize player" }));
+    expect(main.style.getPropertyValue("--floating-audio-clearance")).toBe(clearance);
+    unmount();
+    expect(main.style.getPropertyValue("--floating-audio-clearance")).toBe("");
+    main.remove();
+  });
   it("reveals reviewed Arabic cues in the English interface and respects an explicit hide choice", async () => {
     const controller = createController();
     const arabic = "اللَّهُ";

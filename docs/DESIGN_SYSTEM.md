@@ -730,3 +730,11 @@ its usual compact width cap. The layout responds to available Reader width and
 falls back to the compact composition when narrow or enlarged text needs it.
 Tool reveal fades briefly using the existing fast motion token; the chevron
 rotates without moving layout. OS and app reduced motion disable that motion.
+
+### Offline downloads
+
+Use a compact bundled-content/storage summary, an explicitly scoped essentials action, grouped independent resource rows, and a native technical details disclosure. Download absence is neutral. Persistent labelled native progress exposes verified readiness; active audio progress advances after complete file verification, with screen-reader milestones rather than every update. Arabic numeric sizes are direction-isolated. Resource actions wrap at enlarged text sizes and retain 44px targets. Removal uses the shared alert dialog and explains shared daily recordings. The floating dock publishes measured clearance rather than fixed screen-specific padding. Sacred-text preludes remain controlled by reviewed content flags, never inferred from Quranic content type.
+
+Settings subpanel headings own focus after mounting, including when an outgoing panel delays the new panel's mount. Focus must not be sent to a heading that is leaving the DOM. Mushaf refits normalize measured text against its actual rendered font metrics so late fonts and repeated landscape resizing preserve readable type and canonical line slots.
+
+Keep the compact player's measured footprint reserved while its expanded overlay covers the page, and release it when playback leaves the floating layout. This preserves keyboard recovery and avoids stale inherited padding after collapse in WebKit.

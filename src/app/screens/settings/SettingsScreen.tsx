@@ -116,14 +116,6 @@ export function SettingsScreen({
     if (initialSub) setSub(initialSub);
   }, [initialSub]);
 
-  useEffect(() => {
-    if (sub === "root") return;
-    const frame = requestAnimationFrame(() => {
-      document.querySelector<HTMLElement>("[data-settings-subheading]")?.focus();
-    });
-    return () => cancelAnimationFrame(frame);
-  }, [isTwoPaneLayout, sub]);
-
   const forwardOffset = direction === "rtl" ? -28 : 28;
 
   const panelVariants = motionReduced

@@ -2,18 +2,18 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
 for (const language of ["ar", "en"] as const) {
-  test(`Reader contextual menus preserve settings, geometry and focus in ${language} @cross-browser`, async ({
-    page,
-  }, testInfo) => {
-    await page.addInitScript((language) => {
-      localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
-      localStorage.setItem(
-        "azkarapp.state.v1",
-        JSON.stringify({ settings: { language, reduceMotion: true }, profile: { isGuest: true } }),
-      );
-    }, language);
-    const ar = language === "ar";
-    for (const width of [320, 390, 599, 1440]) {
+  for (const width of [320, 390, 599, 1440]) {
+    test(`Reader contextual menus preserve settings, geometry and focus in ${language} at ${width}px @cross-browser`, async ({
+      page,
+    }, testInfo) => {
+      await page.addInitScript((language) => {
+        localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+        localStorage.setItem(
+          "azkarapp.state.v1",
+          JSON.stringify({ settings: { language, reduceMotion: true }, profile: { isGuest: true } }),
+        );
+      }, language);
+      const ar = language === "ar";
       await page.setViewportSize({ width, height: 740 });
       await page.goto("/#/azkar/morning/1");
       const aa = page.getByTestId("reader-settings-button");
@@ -80,6 +80,6 @@ for (const language of ["ar", "en"] as const) {
       await page.keyboard.press("Escape");
       await expect(menu).not.toBeVisible();
       await expect(trigger).toBeFocused();
-    }
-  });
+    });
+  }
 }

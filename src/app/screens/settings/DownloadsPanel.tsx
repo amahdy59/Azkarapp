@@ -1,26 +1,31 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Card } from "../../components/Card";
 import { Button } from "../../components/ui/button";
-import { ChevronDown, CloudOff, Database, Download, RotateCcw, X } from "../../components/icons";
+import { ChevronDown, CloudOff, Database, Download, RotateCcw } from "../../components/icons";
+import { DownloadProgress } from "../../components/DownloadProgress";
+import { OfflineResourceRow } from "../../components/OfflineResourceRow";
+import { getScrollViewport } from "../../components/scrollViewport";
 import { t } from "../../i18n";
-import type { AppLanguage } from "../../types";
+import type { AppLanguage, Zikr } from "../../types";
 import { formatNumerals } from "../../formatting";
 import { reportError } from "../../../lib/observability";
-import { InformationCard } from "./InformationCard";
 import { SubHeader } from "./SettingsPrimitives";
+import { applyContentReview } from "../../content/contentReview";
 import { getAzkarForMode } from "../../content/azkar";
 import { loadAudioPreferences } from "../../audio/audioPreferences";
 import {
   downloadAudioForZikrs,
   estimateAudioDownloadBytes,
   getDownloadedAudioSummary,
-  getAudioDownloadStatus,
-  removeDownloadedAudio,
+  getAudioDownloadStatuses,
+  removeAudioForZikrs,
 } from "../../audio/audioOfflineCache";
 import { downloadMushaf, getMushafDownloadStatus, removeDownloadedMushaf } from "../../content/mushafOfflineCache";
 import { hasDownloadSpace, isStorageQuotaError, MUSHAF_ESTIMATED_PAGE_BYTES } from "../../content/downloadStorage";
 import { prepareTravelDownloads } from "../../audio/travelPreparation";
 
+type AudioCollection = { id: string; titleKey: string; zikrs: readonly Zikr[]; byteSize: number };
+type AudioStatus = { completed: number; total: number; remainingBytes: number };
 type OfflineStatus = {
   cacheCount: number;
   serviceWorkerReady: boolean;
@@ -32,68 +37,72 @@ type OfflineStatus = {
   travelAudioCompleted: number;
   travelAudioTotal: number;
   travelAudioRemainingBytes: number;
+  audio: AudioStatus[];
 };
-
+type Job = { id: string; completed: number; total: number; group?: number };
 function formatMegabytes(bytes: number | undefined, language: AppLanguage) {
-  if (typeof bytes !== "number") {
-    return t(language, "downloads.unavailable");
-  }
-
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  return typeof bytes === "number"
+    ? formatNumerals((bytes / 1_000_000).toFixed(1), language) + " MB"
+    : t(language, "downloads.unavailable");
 }
 
 export function DownloadsPanel({ language, onBack }: { language: AppLanguage; onBack: () => void }) {
+  const [collections, setCollections] = useState<AudioCollection[]>([]);
   const [status, setStatus] = useState<OfflineStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [downloadProgress, setDownloadProgress] = useState<{ completed: number; total: number } | null>(null);
-  const [mushafProgress, setMushafProgress] = useState<{ completed: number; total: number } | null>(null);
-  const mushafAbortRef = useRef<AbortController | null>(null);
-  const audioAbortRef = useRef<AbortController | null>(null);
-  const travelAbortRef = useRef<AbortController | null>(null);
-  const [travelProgress, setTravelProgress] = useState<{ completed: number; total: number } | null>(null);
-  const [travelJobProgress, setTravelJobProgress] = useState<{
-    group: number;
-    completed: number;
-    total: number;
-  } | null>(null);
+  const [job, setJob] = useState<Job | null>(null);
+  const [removing, setRemoving] = useState(false);
+  const controllerRef = useRef<AbortController | null>(null);
+  const operationRef = useRef(false);
+  const mountedRef = useRef(true);
   const audioPreferences = useMemo(loadAudioPreferences, []);
-
-  const audioCollections = useMemo(
+  // Optional Quran corpora load only when this panel is opened.
+  const resourcePromise = useMemo(
     () =>
-      (["morning", "evening", "before_sleep"] as const).map((category) => {
-        const zikrs = getAzkarForMode(category, "core");
-        return { category, zikrs, byteSize: estimateAudioDownloadBytes(zikrs, audioPreferences) };
-      }),
+      Promise.all([import("../../content/fridayKahf"), import("../../content/baqarahSurah")]).then(
+        ([{ FRIDAY_KAHF }, { BAQARAH_SURAH }]) => {
+          const entries = [
+            ...(["morning", "evening", "before_sleep"] as const).map((id, index) => ({
+              id,
+              titleKey: ["downloads.morningCore", "downloads.eveningCore", "downloads.beforeSleepCore"][index]!,
+              zikrs: getAzkarForMode(id, "core"),
+            })),
+            { id: "kahf", titleKey: "downloads.kahf", zikrs: FRIDAY_KAHF },
+            { id: "baqarah", titleKey: "downloads.baqarah", zikrs: applyContentReview([BAQARAH_SURAH]) },
+          ];
+          return entries.map((entry) => ({
+            ...entry,
+            byteSize: estimateAudioDownloadBytes(entry.zikrs, audioPreferences),
+          }));
+        },
+      ),
     [audioPreferences],
   );
 
-  // Keep the optional Quran corpus lazy until the Downloads panel is opened.
-  const travelAudioCollections = useMemo(
-    () =>
-      import("../../content/fridayKahf").then(({ FRIDAY_KAHF }) => [
-        ...audioCollections.map((collection) => collection.zikrs),
-        FRIDAY_KAHF,
-      ]),
-    [audioCollections],
-  );
-
   const refreshStatus = useCallback(async () => {
+    setErrorMessage("");
+    setSuccessMessage("");
+    setIsLoading(true);
     try {
-      setErrorMessage("");
-      setSuccessMessage("");
-      setIsLoading(true);
-
+      const resources = await resourcePromise;
+      if (mountedRef.current) setCollections(resources);
       const [registration, cacheNames, storage, mushafStatus, audioStatus] = await Promise.all([
-        "serviceWorker" in navigator ? navigator.serviceWorker.getRegistration() : Promise.resolve(undefined),
-        "caches" in window ? caches.keys() : Promise.resolve([]),
-        navigator.storage?.estimate ? navigator.storage.estimate() : Promise.resolve({} as StorageEstimate),
+        "serviceWorker" in navigator ? navigator.serviceWorker.getRegistration() : undefined,
+        "caches" in window ? caches.keys() : [],
+        navigator.storage?.estimate?.().catch(() => ({}) as StorageEstimate) ?? {},
         getMushafDownloadStatus(),
-        travelAudioCollections.then((collections) => getAudioDownloadStatus(collections.flat(), audioPreferences)),
+        // The final group is the deduplicated essentials bundle; Baqarah remains opt-in.
+        getAudioDownloadStatuses(
+          [...resources.map((r) => r.zikrs), resources.slice(0, 4).flatMap((r) => r.zikrs)],
+          audioPreferences,
+        ),
       ]);
-
+      if (!mountedRef.current) return;
+      const bundle = audioStatus[resources.length]!;
       const audioSummary = getDownloadedAudioSummary();
+      setCollections(resources);
       setStatus({
         serviceWorkerReady: Boolean(registration?.active),
         cacheCount: cacheNames.length,
@@ -102,434 +111,363 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
         downloadedAudioAssets: audioSummary.assetCount,
         downloadedAudioBytes: audioSummary.byteSize,
         downloadedMushafPages: mushafStatus.downloadedPages,
-        travelAudioCompleted: audioStatus.completed,
-        travelAudioTotal: audioStatus.total,
-        travelAudioRemainingBytes: audioStatus.remainingBytes,
+        travelAudioCompleted: bundle.completed,
+        travelAudioTotal: bundle.total,
+        travelAudioRemainingBytes: bundle.remainingBytes,
+        audio: audioStatus.slice(0, resources.length),
       });
     } catch (error) {
       reportError(error, "offline-storage-status");
-      setErrorMessage(t(language, "downloads.statusError"));
+      if (mountedRef.current) setErrorMessage(t(language, "downloads.statusError"));
     } finally {
-      setIsLoading(false);
+      if (mountedRef.current) setIsLoading(false);
     }
-  }, [language, travelAudioCollections, audioPreferences]);
-
+  }, [language, resourcePromise, audioPreferences]);
   useEffect(() => {
+    mountedRef.current = true;
     void refreshStatus();
     return () => {
-      mushafAbortRef.current?.abort();
-      audioAbortRef.current?.abort();
-      travelAbortRef.current?.abort();
+      mountedRef.current = false;
+      controllerRef.current?.abort();
     };
   }, [refreshStatus]);
 
-  const downloadCollection = async (collection: (typeof audioCollections)[number]) => {
+  const runDownload = async (id: string, bytes: number, work: (controller: AbortController) => Promise<void>) => {
+    if (operationRef.current || isLoading || !status) return;
+    operationRef.current = true;
     const controller = new AbortController();
-    audioAbortRef.current = controller;
+    controllerRef.current = controller;
     setErrorMessage("");
     setSuccessMessage("");
-    setDownloadProgress({ completed: 0, total: collection.byteSize });
+    setJob({ id, completed: 0, total: id === "mushaf" ? 604 : bytes });
+    let message = "";
+    let failure = "";
     try {
-      if (!(await hasDownloadSpace(collection.byteSize))) throw new DOMException("Storage full", "QuotaExceededError");
-      await downloadAudioForZikrs(collection.zikrs, audioPreferences, {
-        signal: controller.signal,
-        onProgress: (completed, total) => setDownloadProgress({ completed, total }),
-      });
-      await refreshStatus();
-      setSuccessMessage(t(language, "downloads.downloadComplete"));
-    } catch (error) {
-      await refreshStatus();
-      if (controller.signal.aborted) {
-        setSuccessMessage(t(language, "downloads.downloadCancelled"));
-      } else {
-        reportError(error, "audio-download");
-        setErrorMessage(
-          t(language, isStorageQuotaError(error) ? "downloads.storageFull" : "downloads.downloadErrorDescription"),
-        );
-      }
-    } finally {
-      audioAbortRef.current = null;
-      setDownloadProgress(null);
-    }
-  };
-
-  const removeDownloads = async () => {
-    try {
-      setErrorMessage("");
-      setSuccessMessage("");
-      await removeDownloadedAudio();
-      await refreshStatus();
-      setSuccessMessage(t(language, "downloads.removeComplete"));
-    } catch (error) {
-      reportError(error, "audio-download-remove");
-      setErrorMessage(t(language, "downloads.removeError"));
-    }
-  };
-
-  const removeMushaf = async () => {
-    try {
-      setErrorMessage("");
-      setSuccessMessage("");
-      await removeDownloadedMushaf();
-      await refreshStatus();
-      setSuccessMessage(t(language, "downloads.mushafRemoveComplete"));
-    } catch (error) {
-      reportError(error, "mushaf-download-remove");
-      setErrorMessage(t(language, "downloads.removeError"));
-    }
-  };
-
-  const downloadCompleteMushaf = async () => {
-    const controller = new AbortController();
-    mushafAbortRef.current = controller;
-    setErrorMessage("");
-    setSuccessMessage("");
-    setMushafProgress({ completed: 0, total: 604 });
-    try {
-      if (
-        !(await hasDownloadSpace(Math.max(0, 604 - (status?.downloadedMushafPages ?? 0)) * MUSHAF_ESTIMATED_PAGE_BYTES))
-      ) {
-        throw new DOMException("Storage full", "QuotaExceededError");
-      }
-      await downloadMushaf({
-        signal: controller.signal,
-        onProgress: (completed, total) => setMushafProgress({ completed, total }),
-      });
-      await refreshStatus();
-      setSuccessMessage(t(language, "downloads.mushafDownloadComplete"));
-    } catch (error) {
-      await refreshStatus();
-      if (controller.signal.aborted) {
-        setSuccessMessage(t(language, "downloads.downloadCancelled"));
-      } else {
-        reportError(error, "mushaf-download");
-        setErrorMessage(
-          t(language, isStorageQuotaError(error) ? "downloads.storageFull" : "downloads.downloadErrorDescription"),
-        );
-      }
-    } finally {
-      mushafAbortRef.current = null;
-      setMushafProgress(null);
-    }
-  };
-
-  const prepareTravel = async () => {
-    if (travelAbortRef.current || !status) return;
-    const controller = new AbortController();
-    travelAbortRef.current = controller;
-    setErrorMessage("");
-    setSuccessMessage("");
-    setTravelProgress({ completed: 0, total: 5 });
-    try {
-      const bytes =
-        Math.max(0, 604 - status.downloadedMushafPages) * MUSHAF_ESTIMATED_PAGE_BYTES +
-        status.travelAudioRemainingBytes;
       if (!(await hasDownloadSpace(bytes))) throw new DOMException("Storage full", "QuotaExceededError");
-      const result = await prepareTravelDownloads(await travelAudioCollections, audioPreferences, {
-        signal: controller.signal,
-        onProgress: (completed, total) => setTravelProgress({ completed, total }),
-        onJobProgress: (group, completed, total) => setTravelJobProgress({ group, completed, total }),
-      });
-      await refreshStatus();
-      if (result.failures > 0) {
-        const labels = [
-          "downloads.mushafTitle",
-          "downloads.morningCore",
-          "downloads.eveningCore",
-          "downloads.beforeSleepCore",
-          "downloads.kahf",
-        ];
-        setErrorMessage(
-          `${t(language, "downloads.travelPartial")} ${result.failedJobs.map((index) => t(language, labels[index]!)).join("، ")}`,
-        );
-      } else setSuccessMessage(t(language, "downloads.travelChecked"));
+      controller.signal.throwIfAborted();
+      await work(controller);
+      message = t(
+        language,
+        id === "mushaf"
+          ? "downloads.mushafDownloadComplete"
+          : id === "bundle"
+            ? "downloads.travelChecked"
+            : "downloads.downloadComplete",
+      );
     } catch (error) {
-      await refreshStatus();
-      if (controller.signal.aborted) setSuccessMessage(t(language, "downloads.travelCancelled"));
+      if (controller.signal.aborted)
+        message = t(
+          language,
+          id === "mushaf"
+            ? "downloads.mushafCancelled"
+            : id === "bundle"
+              ? "downloads.travelCancelled"
+              : "downloads.downloadCancelled",
+        );
       else {
-        reportError(error, "travel-download");
-        setErrorMessage(t(language, isStorageQuotaError(error) ? "downloads.storageFull" : "downloads.travelPartial"));
+        reportError(error, "offline-download");
+        failure =
+          error instanceof Error && error.message.startsWith("bundle-partial:")
+            ? t(language, "downloads.travelPartial") + " " + error.message.slice("bundle-partial:".length)
+            : t(language, isStorageQuotaError(error) ? "downloads.storageFull" : "downloads.downloadErrorDescription");
       }
     } finally {
-      travelAbortRef.current = null;
-      setTravelProgress(null);
-      setTravelJobProgress(null);
+      if (mountedRef.current) {
+        await refreshStatus();
+        if (mountedRef.current) {
+          setJob(null);
+          setSuccessMessage(message);
+          if (failure) setErrorMessage(failure);
+        }
+      }
+      controllerRef.current = null;
+      operationRef.current = false;
     }
   };
-
-  const isAnyJobActive = downloadProgress !== null || mushafProgress !== null || travelProgress !== null;
+  const updateProgress = (id: string) => (completed: number, total: number) => {
+    if (mountedRef.current) setJob({ id, completed, total });
+  };
+  const mushafBytes = Math.max(0, 604 - (status?.downloadedMushafPages ?? 0)) * MUSHAF_ESTIMATED_PAGE_BYTES;
+  const prepareTravel = () =>
+    void runDownload("bundle", mushafBytes + (status?.travelAudioRemainingBytes ?? 0), async (controller) => {
+      const result = await prepareTravelDownloads(
+        collections.slice(0, 4).map((r) => r.zikrs),
+        audioPreferences,
+        {
+          signal: controller.signal,
+          onProgress: () => undefined,
+          onJobProgress: (group, completed, total) => {
+            if (mountedRef.current) setJob({ id: "bundle", group, completed, total });
+          },
+        },
+      );
+      if (result.failures > 0)
+        throw new Error(
+          "bundle-partial:" +
+            result.failedJobs
+              .map((index) => t(language, index === 0 ? "downloads.mushafTitle" : collections[index - 1]!.titleKey))
+              .join("، "),
+        );
+    });
+  const removeResource = async (id: string, collection?: AudioCollection) => {
+    if (operationRef.current || isLoading) return;
+    operationRef.current = true;
+    setRemoving(true);
+    setErrorMessage("");
+    setSuccessMessage("");
+    try {
+      if (id === "mushaf") await removeDownloadedMushaf();
+      else if (collection) await removeAudioForZikrs(collection.zikrs, audioPreferences);
+      await refreshStatus();
+      if (mountedRef.current)
+        setSuccessMessage(t(language, id === "mushaf" ? "downloads.mushafRemoveComplete" : "downloads.removeComplete"));
+    } catch (error) {
+      reportError(error, "offline-download-remove");
+      if (mountedRef.current) await refreshStatus();
+      if (mountedRef.current) setErrorMessage(t(language, "downloads.removeError"));
+    } finally {
+      operationRef.current = false;
+      if (mountedRef.current) setRemoving(false);
+    }
+  };
+  const isAnyJobActive = job !== null || removing;
   const travelReady =
     status?.downloadedMushafPages === 604 &&
     status.travelAudioTotal > 0 &&
     status.travelAudioCompleted === status.travelAudioTotal;
-
-  return (
-    <div className="slide-in-from-right flex h-full flex-col bg-background/50 backdrop-blur-md">
-      <SubHeader title={t(language, "downloads.title")} onBack={onBack} language={language} />
-      <div className="flex-1 space-y-4 overflow-y-auto px-4 pb-8 pt-3">
-        {/* Card 1: What works offline out of the box */}
-        <InformationCard
-          icon={<CloudOff size={20} aria-hidden="true" />}
-          title={t(language, "downloads.bundledTitle")}
-          body={t(language, "downloads.bundledBody")}
+  const numeric = (bytes: number | undefined) => <bdi dir="ltr">{formatMegabytes(bytes, language)}</bdi>;
+  const collectionState = (info: AudioStatus | undefined) =>
+    !info || isLoading
+      ? t(language, "downloads.checking")
+      : info.total === 0
+        ? t(language, "downloads.unavailable")
+        : t(language, "downloads.recordingCoverage", {
+            completed: formatNumerals(info.completed, language),
+            total: formatNumerals(info.total, language),
+          });
+  const audioRows = (resources: AudioCollection[]) =>
+    resources.map((resource) => {
+      const index = collections.indexOf(resource);
+      const saved = status?.audio[index];
+      const active = job?.id === resource.id;
+      const title = t(language, resource.titleKey);
+      const completed = active ? job.completed : (saved?.completed ?? 0);
+      const total = active ? job.total : (saved?.total ?? 0);
+      return (
+        <OfflineResourceRow
+          key={resource.id}
+          id={resource.id}
+          title={title}
+          detail={t(language, "downloads.audioResourceHint")}
+          state={active ? t(language, "downloads.verifyingAudio") : collectionState(saved)}
+          size={
+            <>
+              {t(language, "downloads.remainingSize")} {numeric(saved?.remainingBytes)}
+            </>
+          }
+          completed={completed}
+          total={total}
+          language={language}
+          disabled={isLoading || isAnyJobActive}
+          active={active}
+          action={t(
+            language,
+            saved?.completed && saved.completed < saved.total
+              ? "downloads.resumeResource"
+              : saved?.total && saved.completed === saved.total
+                ? "downloads.resourceReady"
+                : "downloads.downloadResource",
+          )}
+          onDownload={() =>
+            void runDownload(resource.id, saved?.remainingBytes ?? resource.byteSize, async (controller) => {
+              await downloadAudioForZikrs(resource.zikrs, audioPreferences, {
+                signal: controller.signal,
+                onProgress: updateProgress(resource.id),
+              });
+            })
+          }
+          onCancel={() => controllerRef.current?.abort()}
+          onRemove={() => void removeResource(resource.id, resource)}
         />
-
-        <Card as="section" padding="lg" aria-labelledby="travel-download-title" aria-busy={travelProgress !== null}>
-          <h2 id="travel-download-title" className="text-subtitle font-extrabold text-foreground">
+      );
+    });
+  return (
+    <div
+      className="slide-in-from-right flex h-full min-h-0 flex-col bg-background/50 backdrop-blur-md"
+      dir={language === "ar" ? "rtl" : "ltr"}
+    >
+      <SubHeader title={t(language, "downloads.title")} onBack={onBack} language={language} />
+      <div
+        className="flex-1 min-h-0 space-y-4 overflow-y-auto px-4 pt-3"
+        data-testid="downloads-scroll"
+        onFocusCapture={(event) => {
+          // Native focus scrolling sees the viewport, but not a floating dock.
+          const scroll = getScrollViewport(event.currentTarget);
+          const clearance =
+            Number.parseFloat(getComputedStyle(scroll).getPropertyValue("--floating-audio-clearance")) || 0;
+          const bottom = scroll.getBoundingClientRect().bottom - clearance;
+          const targetBottom = event.target.getBoundingClientRect().bottom;
+          if (targetBottom > bottom) scroll.scrollTop += targetBottom - bottom + 8;
+        }}
+        style={{
+          paddingBottom: "calc(2rem + var(--floating-audio-clearance, 0px))",
+          scrollPaddingBottom: "calc(2rem + var(--floating-audio-clearance, 0px))",
+        }}
+      >
+        <Card as="section" padding="md" aria-labelledby="offline-summary-title">
+          <h2 id="offline-summary-title" className="flex items-center gap-2 text-subtitle font-semibold">
+            <CloudOff size={20} aria-hidden="true" />
+            {t(language, "downloads.bundledTitle")}
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">{t(language, "downloads.bundledBody")}</p>
+          <p className="mt-2 text-xs text-muted-foreground">
+            {t(language, status?.serviceWorkerReady ? "downloads.appOfflineReady" : "downloads.appOfflinePending")}
+          </p>
+          <dl className="mt-3 flex flex-wrap gap-4 text-sm">
+            <div>
+              <dt className="text-muted-foreground">{t(language, "downloads.storageUsed")}</dt>
+              <dd>{numeric(status?.usageBytes)}</dd>
+            </div>
+            <div>
+              <dt className="text-muted-foreground">{t(language, "downloads.availableStorage")}</dt>
+              <dd>
+                {numeric(
+                  status?.quotaBytes === undefined || status.usageBytes === undefined
+                    ? undefined
+                    : Math.max(0, status.quotaBytes - status.usageBytes),
+                )}
+              </dd>
+            </div>
+          </dl>
+        </Card>
+        <Card as="section" padding="md" aria-labelledby="travel-download-title">
+          <h2 id="travel-download-title" className="text-subtitle font-semibold">
             {t(language, "downloads.travelTitle")}
           </h2>
-          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{t(language, "downloads.travelBody")}</p>
-          <p className="mt-3 text-sm font-semibold" data-testid="travel-readiness">
-            {t(language, travelReady ? "downloads.travelReady" : "downloads.travelNotReady")}
+          <p className="mt-1 text-sm text-muted-foreground">{t(language, "downloads.travelBody")}</p>
+          <ul className="mt-3 mb-3 list-disc ps-5 text-sm text-muted-foreground">
+            <li>{t(language, "downloads.mushafTitle")}</li>
+            <li>{t(language, "downloads.dailyAudio")}</li>
+            <li>{t(language, "downloads.kahf")}</li>
+          </ul>
+          <p className="text-sm font-semibold" data-testid="travel-readiness">
+            {isLoading
+              ? t(language, "downloads.checking")
+              : t(language, travelReady ? "downloads.travelReady" : "downloads.travelNotReady")}
           </p>
           {status && (
-            <p className="mt-1 text-sm text-muted-foreground">
-              {t(language, "downloads.travelCoverage", {
-                pages: formatNumerals(status.downloadedMushafPages, language),
-                completed: formatNumerals(status.travelAudioCompleted, language),
-                total: formatNumerals(status.travelAudioTotal, language),
-              })}
-            </p>
+            <>
+              <p className="my-2 text-sm text-muted-foreground">
+                {t(language, "downloads.travelCoverage", {
+                  pages: formatNumerals(status.downloadedMushafPages, language),
+                  completed: formatNumerals(status.travelAudioCompleted, language),
+                  total: formatNumerals(status.travelAudioTotal, language),
+                })}
+              </p>
+              <DownloadProgress
+                completed={status.downloadedMushafPages + status.travelAudioCompleted}
+                total={604 + status.travelAudioTotal}
+                label={t(language, "downloads.bundleReadiness")}
+                language={language}
+              />
+            </>
           )}
-          <p className="mt-1 text-xs text-muted-foreground">
-            {t(language, "downloads.estimatedRemaining", {
-              size: formatMegabytes(
-                status
-                  ? Math.max(0, 604 - status.downloadedMushafPages) * MUSHAF_ESTIMATED_PAGE_BYTES +
-                      status.travelAudioRemainingBytes
-                  : undefined,
-                language,
-              ),
-            })}
+          <p className="mt-2 text-xs text-muted-foreground">
+            {t(language, "downloads.remainingSize")}{" "}
+            {numeric(status ? mushafBytes + status.travelAudioRemainingBytes : undefined)}
           </p>
           <Button
-            type="button"
-            onClick={() => void prepareTravel()}
+            onClick={prepareTravel}
             disabled={isLoading || !status || isAnyJobActive || travelReady}
-            className="mt-4 w-full"
+            className="mt-3 h-auto min-h-11 w-full whitespace-normal py-2"
           >
             <Download size={18} aria-hidden="true" />
             {t(language, "downloads.prepareTravel")}
           </Button>
-          {travelProgress && (
-            <div className="mt-3">
-              <progress
-                className="w-full"
-                max={travelProgress.total}
-                value={travelProgress.completed}
-                aria-label={t(language, "downloads.travelProgressLabel")}
-              />
-              <p className="mt-1 text-sm" role="status">
-                {t(language, "downloads.travelProgress", {
-                  completed: formatNumerals(travelProgress.completed, language),
-                  total: formatNumerals(travelProgress.total, language),
-                })}
+          {job?.id === "bundle" && (
+            <div className="mt-3 space-y-2">
+              <p className="text-sm">
+                {t(
+                  language,
+                  job.group === 0
+                    ? "downloads.mushafTitle"
+                    : (collections[(job.group ?? 1) - 1]?.titleKey ?? "downloads.checking"),
+                )}
               </p>
-              {travelJobProgress && (
-                <div className="mt-2">
-                  <p className="text-sm">
-                    {t(
-                      language,
-                      [
-                        "downloads.mushafTitle",
-                        "downloads.morningCore",
-                        "downloads.eveningCore",
-                        "downloads.beforeSleepCore",
-                        "downloads.kahf",
-                      ][travelJobProgress.group]!,
-                    )}{" "}
-                    ·{" "}
-                    {t(language, "downloads.progressValue", {
-                      percent: formatNumerals(
-                        Math.round((100 * travelJobProgress.completed) / Math.max(1, travelJobProgress.total)),
+              <DownloadProgress
+                completed={job.completed}
+                total={job.total}
+                label={t(language, "downloads.travelProgressLabel")}
+                language={language}
+                active
+              />
+              <Button variant="outline" onClick={() => controllerRef.current?.abort()}>
+                {t(language, "downloads.cancelDownload")}
+              </Button>
+            </div>
+          )}
+        </Card>
+        <Card as="section" padding="md" aria-labelledby="resource-downloads-title">
+          <h2 id="resource-downloads-title" className="text-subtitle font-semibold">
+            {t(language, "downloads.manageResources")}
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">{t(language, "downloads.approvedOnly")}</p>
+          <div className="divide-y divide-border/40">
+            <OfflineResourceRow
+              id="mushaf"
+              title={t(language, "downloads.mushafTitle")}
+              detail={t(language, "downloads.mushafBody")}
+              state={
+                isLoading
+                  ? t(language, "downloads.checking")
+                  : t(language, "downloads.mushafProgressValue", {
+                      completed: formatNumerals(
+                        job?.id === "mushaf" ? job.completed : (status?.downloadedMushafPages ?? 0),
                         language,
                       ),
-                    })}
-                  </p>
-                  <progress
-                    className="w-full"
-                    value={travelJobProgress.completed}
-                    max={Math.max(1, travelJobProgress.total)}
-                    aria-label={t(
-                      language,
-                      travelJobProgress.group === 0 ? "downloads.mushafProgressLabel" : "downloads.progressLabel",
-                    )}
-                  />
-                </div>
-              )}
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => travelAbortRef.current?.abort()}
-                className="mt-2 w-full"
-              >
-                {t(language, "downloads.cancelDownload")}
-              </Button>
-            </div>
-          )}
-        </Card>
-
-        {/* Card 2: Complete Offline Mushaf */}
-        <Card as="section" padding="lg" aria-labelledby="mushaf-download-title">
-          <h2 id="mushaf-download-title" className="text-subtitle font-extrabold text-foreground">
-            {t(language, "downloads.mushafTitle")}
-          </h2>
-          <p className="mt-1 text-xs leading-5 text-muted-foreground">{t(language, "downloads.mushafBody")}</p>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {t(language, "downloads.mushafReady", {
-              count: formatNumerals(status?.downloadedMushafPages ?? 0, language),
-            })}
-          </p>
-          {(status?.downloadedMushafPages ?? 0) < 604 && (
-            <p className="mt-1 text-xs text-muted-foreground">
-              {t(language, "downloads.estimatedRemaining", {
-                size: formatMegabytes(
-                  (604 - (status?.downloadedMushafPages ?? 0)) * MUSHAF_ESTIMATED_PAGE_BYTES,
-                  language,
-                ),
-              })}
-            </p>
-          )}
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => void downloadCompleteMushaf()}
-            disabled={isLoading || isAnyJobActive || status?.downloadedMushafPages === 604}
-            className="mt-4 w-full"
-          >
-            <Download size={18} aria-hidden="true" />
-            {t(
-              language,
-              status?.downloadedMushafPages === 604
-                ? "downloads.mushafDownloaded"
-                : (status?.downloadedMushafPages ?? 0) > 0
-                  ? "downloads.resumeMushaf"
-                  : "downloads.downloadMushaf",
-            )}
-          </Button>
-          {mushafProgress && (
-            <div className="mt-3">
-              <progress
-                className="w-full"
-                max={mushafProgress.total}
-                value={mushafProgress.completed}
-                aria-label={t(language, "downloads.mushafProgressLabel")}
-              />
-              <p className="mt-1 text-center text-xs font-semibold text-muted-foreground" role="status">
-                {t(language, "downloads.mushafProgressValue", {
-                  completed: formatNumerals(mushafProgress.completed, language),
-                  total: formatNumerals(mushafProgress.total, language),
-                })}
-              </p>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => mushafAbortRef.current?.abort()}
-                className="mt-2 w-full border-border"
-              >
-                <X size={18} aria-hidden="true" />
-                {t(language, "downloads.cancelDownload")}
-              </Button>
-            </div>
-          )}
-
-          {Boolean(status?.downloadedMushafPages && status.downloadedMushafPages > 0) && mushafProgress === null && (
-            <Button
-              type="button"
-              variant="outline"
+                      total: formatNumerals(604, language),
+                    })
+              }
+              size={
+                <>
+                  {t(language, "downloads.remainingSize")} {numeric(status ? mushafBytes : undefined)}
+                </>
+              }
+              completed={job?.id === "mushaf" ? job.completed : (status?.downloadedMushafPages ?? 0)}
+              total={604}
+              language={language}
               disabled={isLoading || isAnyJobActive}
-              onClick={() => void removeMushaf()}
-              className="mt-3 w-full border-destructive/40 text-destructive"
-            >
-              {t(language, "downloads.removeDownloadedMushaf")}
-            </Button>
-          )}
-        </Card>
-
-        {/* Card 3: Optional Audio Downloads */}
-        <Card as="section" padding="lg" aria-labelledby="audio-downloads-title">
-          <h2 id="audio-downloads-title" className="text-subtitle font-extrabold text-foreground">
-            {t(language, "downloads.optionalAudioDownloads")}
-          </h2>
-          <p className="mt-1 text-xs leading-5 text-muted-foreground">{t(language, "downloads.approvedOnly")}</p>
-
-          <div className="mt-4 grid gap-2">
-            {audioCollections.map((collection) => {
-              const label = t(
+              active={job?.id === "mushaf"}
+              action={t(
                 language,
-                collection.category === "morning"
-                  ? "downloads.morningCore"
-                  : collection.category === "evening"
-                    ? "downloads.eveningCore"
-                    : "downloads.beforeSleepCore",
-              );
-              return (
-                <button
-                  key={collection.category}
-                  type="button"
-                  disabled={isLoading || collection.byteSize === 0 || isAnyJobActive}
-                  onClick={() => void downloadCollection(collection)}
-                  className="flex min-h-11 items-center justify-between gap-3 rounded-xl border border-border bg-background px-3 text-start font-semibold text-foreground disabled:opacity-50 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                >
-                  <span className="flex items-center gap-2">
-                    <Download size={18} aria-hidden="true" />
-                    {label}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    {collection.byteSize > 0
-                      ? formatMegabytes(collection.byteSize, language)
-                      : t(language, "downloads.unavailable")}
-                  </span>
-                </button>
-              );
-            })}
+                status?.downloadedMushafPages === 604
+                  ? "downloads.mushafDownloaded"
+                  : status?.downloadedMushafPages
+                    ? "downloads.resumeMushaf"
+                    : "downloads.downloadMushaf",
+              )}
+              onDownload={() =>
+                void runDownload("mushaf", mushafBytes, async (controller) => {
+                  await downloadMushaf({ signal: controller.signal, onProgress: updateProgress("mushaf") });
+                })
+              }
+              onCancel={() => controllerRef.current?.abort()}
+              onRemove={() => void removeResource("mushaf")}
+            />
+            {audioRows(collections.slice(3).reverse())}
           </div>
-
-          {downloadProgress && (
-            <div className="mt-3">
-              <progress
-                className="w-full"
-                max={Math.max(1, downloadProgress.total)}
-                value={downloadProgress.completed}
-                aria-label={t(language, "downloads.progressLabel")}
-                aria-describedby="audio-download-progress-value"
-              />
-              <p
-                id="audio-download-progress-value"
-                className="mt-1 text-center text-xs font-semibold text-muted-foreground"
-                role="status"
-                aria-live="polite"
-              >
-                {t(language, "downloads.progressValue", {
-                  percent: formatNumerals(
-                    Math.round((downloadProgress.completed / Math.max(1, downloadProgress.total)) * 100),
-                    language,
-                  ),
-                })}
-              </p>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => audioAbortRef.current?.abort()}
-                className="mt-2 w-full border-border"
-              >
-                <X size={18} aria-hidden="true" />
-                {t(language, "downloads.cancelDownload")}
-              </Button>
-            </div>
-          )}
-
-          <Button
-            type="button"
-            variant="outline"
-            disabled={isLoading || !status?.downloadedAudioAssets || isAnyJobActive}
-            onClick={() => void removeDownloads()}
-            className="mt-3 w-full border-destructive/40 text-destructive"
-          >
-            {t(language, "downloads.removeDownloadedAudio")}
-          </Button>
+          <h3 className="mt-3 text-sm font-semibold">{t(language, "downloads.dailyAudio")}</h3>
+          <p className="mt-1 text-xs text-muted-foreground">{t(language, "downloads.sharedRecordings")}</p>
+          <div className="divide-y divide-border/40">{audioRows(collections.slice(0, 3))}</div>
         </Card>
-
+        <div className="space-y-2" aria-busy={removing}>
+          <p role="alert" className="text-sm font-semibold text-destructive">
+            {errorMessage}
+          </p>
+          <p role="status" className="text-sm text-foreground">
+            {removing ? t(language, "downloads.removing") : successMessage}
+          </p>
+        </div>
         {/* Card 4: Technical Diagnostics in an expandable disclosure */}
         <details className="group rounded-2xl border border-border/60 bg-card p-4 transition-colors">
           <summary className="flex min-h-11 cursor-pointer select-none items-center justify-between rounded-lg text-subtitle font-semibold text-foreground transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
@@ -555,7 +493,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
               </p>
             ) : status ? (
               <dl className="space-y-2 text-sm">
-                <div className="flex justify-between gap-3">
+                <div className="flex flex-wrap justify-between gap-3">
                   <dt className="text-muted-foreground">{t(language, "downloads.serviceWorker")}</dt>
                   <dd className="font-medium text-foreground">
                     {status.serviceWorkerReady ? t(language, "downloads.active") : t(language, "downloads.inactive")}
@@ -600,25 +538,13 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
               variant="outline"
               onClick={() => void refreshStatus()}
               disabled={isLoading || isAnyJobActive}
-              className="mt-4 w-full"
+              className="mt-4 h-auto min-h-11 w-full whitespace-normal py-2"
             >
               <RotateCcw size={18} aria-hidden="true" />
               {t(language, "downloads.refresh")}
             </Button>
           </div>
         </details>
-
-        {/* Global Feedback Messages */}
-        {errorMessage && (
-          <p className="mt-3 text-center text-sm font-semibold text-destructive" role="alert">
-            {errorMessage}
-          </p>
-        )}
-        {successMessage && (
-          <p className="mt-3 text-center text-label font-semibold text-primary" role="status" aria-live="polite">
-            {successMessage}
-          </p>
-        )}
       </div>
     </div>
   );

@@ -645,8 +645,7 @@ describe("ReaderScreen audio identity", () => {
     expect(screen.getByTestId("counter-surface")).toBeInTheDocument();
     expect(screen.getByTestId("reader-benefit-dock-button")).toBeInTheDocument();
     expect(screen.getByTestId("reader-share-dock-button")).toHaveTextContent("مشاركة");
-    expect(screen.getByTestId("reader-focus-dock-button")).toBeInTheDocument();
-    expect(screen.getByTestId("reader-support-actions").querySelectorAll("button")).toHaveLength(4);
+    expect(screen.getByTestId("reader-support-actions").querySelectorAll("button")).toHaveLength(3);
   });
 
   it("morphs center slot into compact audio player when audioModeActive with stable outer slots", () => {
@@ -861,7 +860,7 @@ describe("ReaderScreen audio identity", () => {
     expect(onTextSizeChange).toHaveBeenCalledWith("large");
   });
 
-  it("enters and exits focus mode via the focus dock button", () => {
+  it("enters and exits focus mode via the focus menu toggle", async () => {
     render(
       <ReaderScreen
         catId="morning"
@@ -888,10 +887,13 @@ describe("ReaderScreen audio identity", () => {
       />,
     );
 
-    const focusBtn = screen.getByTestId("reader-focus-dock-button");
-    expect(focusBtn).toBeInTheDocument();
     expect(screen.getByTestId("reader-screen")).toHaveAttribute("data-reading-focus", "false");
 
+    const menuButton = screen.getAllByRole("button", { name: /خيارات القارئ|Reader options/i })[0]!;
+    fireEvent.pointerDown(menuButton, { button: 0, ctrlKey: false });
+
+    const focusBtn = await screen.findByTestId("reader-focus-toggle");
+    expect(focusBtn).toBeInTheDocument();
     fireEvent.click(focusBtn);
     expect(screen.getByTestId("reader-screen")).toHaveAttribute("data-reading-focus", "true");
 

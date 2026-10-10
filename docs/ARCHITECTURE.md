@@ -347,3 +347,7 @@ Owner follow-up: ReaderFooterTools and CounterTapHint reserve hidden-content dim
 ### Local Mushaf magnification
 
 Reading screens own session-local magnification; MushafMagnificationControl is controlled presentation with native input semantics and no persistence/network calls. MushafPageViewer enlarges its canvas inside the native paper scroll viewport. KhatmahReaderScreen and MushafImmersiveReader yield gestures and scroll keys to magnified reading. QuranListeningReader passes the same scale to read-only MushafListeningPage. Existing stored textScale and reviewed content remain unchanged.
+
+### Offline resource management
+
+DownloadsPanel coordinates controlled OfflineResourceRow and native DownloadProgress presentation. Audio services own verified grouped readiness, scoped removal and the existing normalized registry; visual components do not access storage or network. Grouped checks deduplicate selected variants and verify one cached recording at a time. The existing single active-job rule prevents bundle, individual download and removal races. Estimated remaining sizes subtract verified cached resources. FloatingAudioPlayer measures its actual compact overlap with main-content and publishes --floating-audio-clearance; the Downloads scroll area consumes it without adding bottom navigation or safe-area space a second time. Keyboard focus scrolling accounts for that overlap.
