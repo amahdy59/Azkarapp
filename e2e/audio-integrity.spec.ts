@@ -81,8 +81,12 @@ test("owner-reviewed Friday dua loads exact registered timings and clears cues o
   await page.getByTestId("reader-audio-dock-button").click();
   const player = page.getByRole("region", { name: "Audio player", exact: true });
   await player.getByRole("button", { name: "Expand player", exact: true }).click();
-  const emphasis = player.getByRole("button", { name: "Highlight words", exact: true });
+  const optionsTrigger = player.getByRole("button", { name: "Audio options", exact: true });
+  const options = page.getByRole("dialog", { name: "Audio options", exact: true });
+  await optionsTrigger.click();
+  const emphasis = options.getByRole("button", { name: "Highlight words", exact: true });
   await expect(emphasis).toHaveAttribute("aria-pressed", "true");
+  await page.keyboard.press("Escape");
   const clock = async (time: number) =>
     page.evaluate((time) => {
       const audio = (window as unknown as { __reviewAudio: HTMLAudioElement }).__reviewAudio;
@@ -93,12 +97,16 @@ test("owner-reviewed Friday dua loads exact registered timings and clears cues o
   await expect(player.locator("[data-listening-word]")).toHaveText("اللهم");
   await clock(1.2);
   await expect(player.locator("[data-listening-word]")).toHaveText("إني");
+  await optionsTrigger.click();
   await emphasis.click();
+  await page.keyboard.press("Escape");
   await expect(player.locator("[data-listening-word]")).toHaveCount(0);
   expect(
     await page.evaluate(() => (window as unknown as { __reviewAudio: HTMLAudioElement }).__reviewAudio.paused),
   ).toBe(false);
+  await optionsTrigger.click();
   await emphasis.click();
+  await page.keyboard.press("Escape");
   await clock(1.05);
   await expect(player.locator("[data-listening-word]")).toHaveCount(0);
   await clock(0.5);
@@ -108,10 +116,12 @@ test("owner-reviewed Friday dua loads exact registered timings and clears cues o
   await playEnglishTranslation(page);
   await player.getByRole("button", { name: "Expand player", exact: true }).click();
   await expect(player.locator('[data-listening-word]:has-text("اللهم")')).toHaveCount(0);
-  await expect(player.getByRole("button", { name: "Estimated word highlights", exact: true })).toHaveAttribute(
+  await optionsTrigger.click();
+  await expect(options.getByRole("button", { name: "Estimated word highlights", exact: true })).toHaveAttribute(
     "aria-pressed",
     "true",
   );
+  await page.keyboard.press("Escape");
   const pack: OwnerTimingPack = JSON.parse(
     gunzipSync(readFileSync(`public/data/listening-timings/owner-${OWNER_TIMING_PACK_SHA}.bin`)).toString(),
   );
@@ -139,10 +149,14 @@ test("owner-reviewed Friday dua loads exact registered timings and clears cues o
     height: word.getBoundingClientRect().height,
     font: getComputedStyle(word).fontSize,
   }));
-  const estimated = player.getByRole("button", { name: "Estimated word highlights", exact: true });
+  const estimated = options.getByRole("button", { name: "Estimated word highlights", exact: true });
+  await optionsTrigger.click();
   await estimated.click();
+  await page.keyboard.press("Escape");
   await expect(englishWord).toHaveCount(0);
+  await optionsTrigger.click();
   await estimated.click();
+  await page.keyboard.press("Escape");
   await expect(englishWord).toHaveCount(1);
   expect(
     await englishWord.evaluate((word) => ({
@@ -271,11 +285,14 @@ for (const id of ["m-hm-91", "e-hm-91", "misc-ref-3", "m-hm-96", "e-hm-96", "fri
       .poll(() => page.evaluate(() => (window as unknown as { __reviewAudio: HTMLAudioElement }).__reviewAudio.src))
       .toContain("/english-george/");
     await player.getByRole("button", { name: "Expand player", exact: true }).click();
-    await expect(player.getByTestId("audio-reciter-select")).toContainText("English Translation");
-    await player.getByTestId("audio-reciter-select").click();
+    await player.getByRole("button", { name: "Audio options", exact: true }).click();
+    const options = page.getByRole("dialog", { name: "Audio options", exact: true });
+    await expect(options.getByTestId("audio-reciter-select")).toContainText("English Translation");
+    await options.getByTestId("audio-reciter-select").click();
     await expect(page.getByRole("option", { name: "Abdullah Muhammad", exact: true })).not.toHaveAttribute(
       "data-disabled",
     );
+    await page.keyboard.press("Escape");
     await page.keyboard.press("Escape");
     await player.getByRole("button", { name: "Stop audio and close player", exact: true }).click();
     if (id !== "friday-dua-08") await expect(counter).toHaveAccessibleName(/1 \/ 100$/);
@@ -313,15 +330,17 @@ test("Al-Kahf offers only its approved reciter and Escape preserves the expanded
   await page.getByRole("button", { name: "Listen to surah", exact: true }).click();
   const player = page.getByRole("region", { name: "Audio player", exact: true });
   await player.getByRole("button", { name: "Expand player", exact: true }).click();
-  await expect(player.getByTestId("audio-reciter-select")).toContainText("Muhammad Shari");
-  await player.getByTestId("audio-reciter-select").click();
+  await player.getByRole("button", { name: "Audio options", exact: true }).click();
+  const options = page.getByRole("dialog", { name: "Audio options", exact: true });
+  await expect(options.getByTestId("audio-reciter-select")).toContainText("Muhammad Shari");
+  await options.getByTestId("audio-reciter-select").click();
   for (const name of ["English Translation", "Abdullah Muhammad", "Muhammad Moataz"]) {
     await expect(page.getByRole("option", { name, exact: true })).toHaveAttribute("data-disabled");
   }
   await expect(page.getByRole("option", { name: "Muhammad Shari", exact: true })).not.toHaveAttribute("data-disabled");
   await page.keyboard.press("Escape");
   await expect(player).toHaveAttribute("data-variant", "expanded");
-  await expect(player.getByTestId("audio-reciter-select")).toBeFocused();
+  await expect(options.getByTestId("audio-reciter-select")).toBeFocused();
   await expect
     .poll(() => page.evaluate(() => (window as unknown as { __reviewAudio: HTMLAudioElement }).__reviewAudio.src))
     .toContain("/muhammad-alshara/");

@@ -1,5 +1,20 @@
 [
   {
+    "release": "2026-10-10",
+    "ar": [
+      "اقرأ المعنى الإنجليزي بجانب المصحف، وكبّر الصفحة حتى ٢٠٠٪، واقرأ بخط عربي أوضح دون اتصال مع الحفاظ على ترتيب سطور الصفحة.",
+      "تابع التلاوة مباشرة في المصحف مع معنى إنجليزي أكبر، واستخدم أدوات مرتبة بتناسق في الأذكار والمسبحة والصلاة على النبي.",
+      "اضبط موقع الصلاة والتذكيرات في صفحات مستقلة، وتابع تسجيلاتك بمعدلات محسوبة حتى اليوم مع توضيح الأيام التي لا توجد لها سجلات.",
+      "شارك الآيات في صور طولية أو مربعة مع المعاني المتاحة، وشارك تذكير السورة من صورتها، وراجع التحديثات السابقة دون اتصال."
+    ],
+    "en": [
+      "Read English meaning beside the Mushaf, enlarge pages up to 200%, and use clearer offline Arabic lettering while preserving the printed line order.",
+      "Follow recitation directly on the Mushaf with larger English meaning, and use consistently arranged tools in Azkar, Masbaha and Salawat.",
+      "Manage prayer location and reminders on separate pages, and see recording rates calculated through today with days without records clearly explained.",
+      "Share ayahs as portrait or square images with available meanings, share surah reminders from their image, and read earlier updates offline."
+    ]
+  },
+  {
     "release": "2026-10-09.4",
     "ar": [
       "تبقى أزرار الصوت قابلة للوصول على الشاشات القصيرة، وتعرض المقاطع القرآنية القصيرة سطور المصحف مع متابعة الكلمات المتطابقة.",

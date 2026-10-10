@@ -63,6 +63,25 @@ describe("SegmentedControl", () => {
     expect(screen.getByRole("radio", { name: "Abbreviated" })).toHaveClass("unselected");
   });
 
+  it("pairs default selected text with its primary control surface", () => {
+    const onChange = vi.fn();
+    render(
+      <SegmentedControl
+        value="complete"
+        onChange={onChange}
+        options={OPTIONS}
+        direction="ltr"
+        aria-label="Routine mode"
+      />,
+    );
+
+    const checked = screen.getByRole("radio", { name: "Complete" });
+    const unchecked = screen.getByRole("radio", { name: "Abbreviated" });
+
+    expect(checked).toHaveClass("bg-primary", "text-primary-foreground");
+    expect(unchecked).toHaveClass("text-muted-foreground");
+  });
+
   it("passes through option test ids", () => {
     renderControl({
       options: [

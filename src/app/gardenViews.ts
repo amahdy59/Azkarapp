@@ -123,7 +123,7 @@ export function getWeekGardenStats(
     const d = new Date(startOfWeek);
     d.setDate(startOfWeek.getDate() + i);
     const dayKey = formatDayKey(d);
-    const entry = index.get(dayKey) ?? { categories: new Set<CategoryId>() };
+    const entry = (dayKey <= todayKey ? index.get(dayKey) : undefined) ?? { categories: new Set<CategoryId>() };
     const categories = entry.categories;
     const isToday = dayKey === todayKey;
 
@@ -200,7 +200,7 @@ export function getMonthGardenDays(
   return Array.from({ length: daysInMonth }, (_, dayIndex): MonthGardenDay => {
     const dayNum = dayIndex + 1;
     const dayKey = `${year}-${pad(zeroBasedMonth + 1)}-${pad(dayNum)}`;
-    const entry = index.get(dayKey) ?? { categories: new Set<CategoryId>() };
+    const entry = (dayKey <= todayKey ? index.get(dayKey) : undefined) ?? { categories: new Set<CategoryId>() };
     const categories = entry.categories;
     const completedCount = countMainCompletions(categories);
     const isPalm = MAIN_CATEGORY_IDS.every((category) => categories.has(category));
@@ -233,7 +233,7 @@ export function getMonthGardenDaysForDates(
   const todayKey = formatDayKey(new Date());
   return dates.map((date, dayIndex) => {
     const dayKey = formatDayKey(date);
-    const entry = index.get(dayKey) ?? { categories: new Set<CategoryId>() };
+    const entry = (dayKey <= todayKey ? index.get(dayKey) : undefined) ?? { categories: new Set<CategoryId>() };
     const categories = entry.categories;
     const completedCount = countMainCompletions(categories);
     const isPalm = MAIN_CATEGORY_IDS.every((category) => categories.has(category));
@@ -257,6 +257,8 @@ export function getMonthGardenDaysForDates(
 
 function summarizeMonthDays(days: MonthGardenDay[]): MonthDetailedStats {
   const daysInMonth = days.length;
+  const todayKey = formatDayKey(new Date());
+  const elapsedDays = days.filter((day) => day.dayKey <= todayKey).length;
   let fullDaysCount = 0;
   let totalActiveDays = 0;
   let totalCompletions = 0;
@@ -265,6 +267,7 @@ function summarizeMonthDays(days: MonthGardenDay[]): MonthDetailedStats {
   const routineCounts = new Map<CategoryId, number>(MAIN_CATEGORY_IDS.map((category) => [category, 0]));
 
   for (const day of days) {
+    if (day.dayKey > todayKey) continue;
     if (day.isPalm) {
       fullDaysCount += 1;
       currentStreak += 1;
@@ -274,7 +277,7 @@ function summarizeMonthDays(days: MonthGardenDay[]): MonthDetailedStats {
     }
     if (day.completedCount > 0) {
       totalActiveDays += 1;
-      totalCompletions += Math.min(4, day.completedCount);
+      totalCompletions += Math.min(MAIN_CATEGORY_IDS.length, day.completedCount);
     }
     day.categories.forEach((category) => {
       if (routineCounts.has(category)) routineCounts.set(category, routineCounts.get(category)! + 1);
@@ -289,7 +292,8 @@ function summarizeMonthDays(days: MonthGardenDay[]): MonthDetailedStats {
     days,
     fullDaysCount,
     totalActiveDays,
-    completionRate: daysInMonth > 0 ? Math.round((totalCompletions / (daysInMonth * 4)) * 100) : 0,
+    completionRate:
+      elapsedDays > 0 ? Math.round((totalCompletions / (elapsedDays * MAIN_CATEGORY_IDS.length)) * 100) : 0,
     longestStreak,
     bestRoutine: totalCompletions > 0 ? best[0] : null,
     daysInMonth,
@@ -350,7 +354,7 @@ export function getYearDetailedStats(index: DailyCompletionIndex, year: number):
 
   for (let m = 0; m < 12; m++) {
     const daysInMonth = new Date(year, m + 1, 0).getDate();
-    totalPossibleAllYear += daysInMonth * 4;
+    let elapsedDays = 0;
     let monthCompletions = 0;
     let fullDaysCount = 0;
     let activeDaysCount = 0;
@@ -359,13 +363,14 @@ export function getYearDetailedStats(index: DailyCompletionIndex, year: number):
     for (let i = 0; i < daysInMonth; i++) {
       const d = new Date(year, m, i + 1);
       const dayKey = formatDayKey(d);
-      const entry = index.get(dayKey);
+      const entry = dayKey <= todayKey ? index.get(dayKey) : undefined;
       const categories = entry ? entry.categories : new Set<CategoryId>();
 
       const count = countMainCompletions(categories);
       const isPalm = MAIN_CATEGORY_IDS.every((category) => categories.has(category));
 
       if (dayKey <= todayKey) {
+        elapsedDays++;
         if (isPalm) {
           currentStreak++;
           if (currentStreak > longestStreak) longestStreak = currentStreak;
@@ -382,7 +387,7 @@ export function getYearDetailedStats(index: DailyCompletionIndex, year: number):
       if (count > 0) {
         activeDaysCount++;
         activeDays++;
-        monthCompletions += Math.min(4, count);
+        monthCompletions += Math.min(MAIN_CATEGORY_IDS.length, count);
         totalCollections += count;
       }
 
@@ -394,7 +399,9 @@ export function getYearDetailedStats(index: DailyCompletionIndex, year: number):
       dayCells.push({ dayNum: i + 1, level, isPalm });
     }
 
-    const completionRate = Math.round((monthCompletions / (daysInMonth * 4)) * 100);
+    totalPossibleAllYear += elapsedDays * MAIN_CATEGORY_IDS.length;
+    const completionRate =
+      elapsedDays > 0 ? Math.round((monthCompletions / (elapsedDays * MAIN_CATEGORY_IDS.length)) * 100) : 0;
     if (completionRate > bestMonthRate) {
       bestMonthRate = completionRate;
       bestMonthIndex = m;
@@ -409,7 +416,8 @@ export function getYearDetailedStats(index: DailyCompletionIndex, year: number):
     });
   }
 
-  const overallCompletionRate = Math.round((totalCollections / totalPossibleAllYear) * 100);
+  const overallCompletionRate =
+    totalPossibleAllYear > 0 ? Math.round((totalCollections / totalPossibleAllYear) * 100) : 0;
 
   const routineCounts = [
     { id: "morning" as CategoryId, count: morningTotal },
@@ -451,19 +459,19 @@ export function getYearDetailedStatsForPeriods(
 
   periods.forEach((period, monthIndex) => {
     const days = getMonthGardenDaysForDates(index, period.dates, period.dayNumbers);
-    totalPossibleAllYear += days.length * 4;
+    const elapsedDays = days.filter((day) => day.dayKey <= todayKey).length;
+    totalPossibleAllYear += elapsedDays * MAIN_CATEGORY_IDS.length;
     let monthCompletions = 0;
     let fullDaysCount = 0;
     let activeDaysCount = 0;
 
     days.forEach((day) => {
-      if (day.dayKey <= todayKey) {
-        if (day.isPalm) {
-          currentStreak += 1;
-          longestStreak = Math.max(longestStreak, currentStreak);
-        } else {
-          currentStreak = 0;
-        }
+      if (day.dayKey > todayKey) return;
+      if (day.isPalm) {
+        currentStreak += 1;
+        longestStreak = Math.max(longestStreak, currentStreak);
+      } else {
+        currentStreak = 0;
       }
       if (day.isPalm) {
         fullDaysCount += 1;
@@ -472,7 +480,7 @@ export function getYearDetailedStatsForPeriods(
       if (day.completedCount > 0) {
         activeDaysCount += 1;
         activeDays += 1;
-        monthCompletions += Math.min(4, day.completedCount);
+        monthCompletions += Math.min(MAIN_CATEGORY_IDS.length, day.completedCount);
         totalCollections += day.completedCount;
       }
       day.categories.forEach((category) => {
@@ -480,7 +488,8 @@ export function getYearDetailedStatsForPeriods(
       });
     });
 
-    const completionRate = days.length > 0 ? Math.round((monthCompletions / (days.length * 4)) * 100) : 0;
+    const completionRate =
+      elapsedDays > 0 ? Math.round((monthCompletions / (elapsedDays * MAIN_CATEGORY_IDS.length)) * 100) : 0;
     if (completionRate > bestMonthRate) {
       bestMonthRate = completionRate;
       bestMonthIndex = monthIndex;

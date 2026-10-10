@@ -92,7 +92,7 @@ export function PrayerRoutineCard({
                 itemClassName={(selected) =>
                   `flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                     selected
-                      ? "bg-primary text-primary-foreground shadow-sm"
+                      ? "bg-primary text-primary-foreground"
                       : onGlass
                         ? "text-on-media-muted hover:bg-on-media-surface/60 hover:text-on-media"
                         : "text-muted-foreground hover:bg-card hover:text-foreground"
@@ -181,8 +181,10 @@ export function PrayerRoutineCard({
           onClick={onOpen}
           className="group mt-3 flex min-h-[52px] w-full items-center justify-center gap-2.5 rounded-2xl bg-primary px-4 text-title font-black text-primary-foreground shadow-raised transition-transform hover:brightness-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
         >
-          <span>{ctaLabel}</span>
-          <ArrowNext size={20} className="transition-transform group-hover:scale-110" />
+          <span className="min-w-0 truncate" title={ctaLabel}>
+            {ctaLabel}
+          </span>
+          <ArrowNext size={20} className="shrink-0 transition-transform group-hover:scale-110" aria-hidden="true" />
         </button>
       </HomeCard>
     </section>

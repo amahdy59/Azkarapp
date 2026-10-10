@@ -104,7 +104,7 @@ describe("Mushaf page data", () => {
 
   it("serves a second request for the same page from memory", async () => {
     const json = [{ k: "5:1", w: [[1, 8, 0, "يَـٰٓأَيُّهَا", "ﱁ"]] }];
-    const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => json });
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify(json)));
     vi.stubGlobal("fetch", fetchMock);
 
     const first = await loadMushafPage(511);
@@ -116,7 +116,7 @@ describe("Mushaf page data", () => {
 
   it("shares one in-flight request between the reader and the neighbour prefetch", async () => {
     const json = [{ k: "5:1", w: [[1, 8, 0, "يَـٰٓأَيُّهَا", "ﱁ"]] }];
-    const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => json });
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify(json)));
     vi.stubGlobal("fetch", fetchMock);
 
     const [a, b] = await Promise.all([loadMushafPage(512), loadMushafPage(512)]);
@@ -128,7 +128,7 @@ describe("Mushaf page data", () => {
   it("prepares the requested page data and font as one navigation-intent task", async () => {
     const originalFonts = Object.getOwnPropertyDescriptor(document, "fonts");
     const json = [{ k: "5:1", w: [[1, 8, 0, "يَـٰٓأَيُّهَا", "ﱁ"]] }];
-    const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => json });
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify(json)));
     const load = vi.fn().mockResolvedValue({ family: "qcf-v2-page-513" });
     class TestFontFace {
       load = load;

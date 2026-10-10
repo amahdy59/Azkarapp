@@ -8,9 +8,12 @@ export async function playEnglishTranslation(page: Page) {
   await page.getByTestId("reader-audio-dock-button").click();
   const player = page.getByRole("region", { name: t("en", "audioPlayer.region"), exact: true });
   await player.getByRole("button", { name: t("en", "audioPlayer.expand"), exact: true }).click();
-  await player.getByTestId("audio-reciter-select").click();
+  await player.getByRole("button", { name: "Audio options", exact: true }).click();
+  const options = page.getByRole("dialog", { name: "Audio options", exact: true });
+  await options.getByTestId("audio-reciter-select").click();
   await page.getByRole("option", { name: "English Translation", exact: true }).click();
-  await expect(player.getByTestId("audio-reciter-select")).toContainText("English Translation");
+  await expect(options.getByTestId("audio-reciter-select")).toContainText("English Translation");
+  await page.keyboard.press("Escape");
   await player.getByRole("button", { name: t("en", "audioPlayer.collapse"), exact: true }).click();
 }
 

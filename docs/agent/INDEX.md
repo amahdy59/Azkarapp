@@ -1,5 +1,7 @@
 # AI Improvement System Index
 
+[Latest changes release, 2026-10-10](phases/LATEST_CHANGES_RELEASE_2026_10_10.md) records the owner's superseding publication authorization, integrated source review, translation verification, compatibility safeguards and release evidence.
+
 [Phase 95](phases/PHASE_95_READER_SIMPLIFICATION_AND_AYAH_SHARING.md) applies the owner's corrected reading-only Benefit placement, removes redundant overflow actions, and adds complete ayah image cards with optional reviewed content.
 
 [Phase 94](phases/PHASE_94_RELEASE_HISTORY.md) gives bilingual updates a lasting offline release history and enforces archiving future summaries.
@@ -7,6 +9,9 @@
 [Phase 93](phases/PHASE_93_PLAYER_CONTAINMENT_AND_SNIPPETS.md) addresses clipped playback controls and canonical Mushaf excerpts for short Quran passages. Phase 95 supersedes its initial playback Benefit assumption.
 
 [Phase 92](phases/PHASE_92_READER_MENUS_AND_BENEFITS.md) covers the owner's colored narration highlights, compact contextual menus, bottom Benefit action and additional sourced Al-Kahf narration.
+[Paired Quran translation](phases/PAIRED_QURAN_TRANSLATION.md) records the owner-requested local-only page meaning, responsive paired reading, synchronized verse emphasis and native background-media following.
+
+[Reading-first audio layout](phases/READING_FIRST_AUDIO_LAYOUT.md) applies the owner-approved desktop, mobile and collapsed player refinement.
 
 [Phase 91](phases/PHASE_91_OWNER_ACCEPTED_AUDIO_HIGHLIGHTS.md) records the owner's explicit batch acceptance of generated Arabic/English/Quran timings for app testing, with full review deferred and uncertain intervals left as gaps.
 
@@ -235,3 +240,13 @@ Apple/Microsoft-informed control spacing and alignment improvements.
 [Phase 85](phases/PHASE_85_STARTUP_PERFORMANCE.md) records throttled startup evidence, deferred cache maintenance and audio loading at reading intent.
 
 [Phase 86](phases/PHASE_86_READER_OPTIONS.md) records the owner-approved compact Reader options sheet, explicit list selector and scoped action labels.
+
+[Settings and Progress clarity](phases/SETTINGS_AND_PROGRESS_CLARITY.md) records the active owner-approved local-only metric, Settings navigation and responsive accessibility refinements.
+
+[Pending changes review](phases/PENDING_CHANGES_REVIEW_2026_10_09.md) records verified sharing, Settings and Progress repairs across the pending working tree, local verification, and the continued publication hold. [Sharing recommendations review](reports/SHARING_REVIEW_2026_10_09.md) compares the proposed window, controls, palettes and card artwork with current approved contracts; visual redesign remains unimplemented.
+
+[Reader footer tools disclosure](phases/READER_FOOTER_TOOLS_DISCLOSURE.md) records the owner-approved collapsible Benefit, Listen and Share row, retained primary controls and local verification.
+
+[Stable Reader disclosures](phases/STABLE_READER_DISCLOSURES.md) records the owner's superseding fixed-geometry toggle behavior, refined controls, standard sharing glyph and local review.
+
+[Responsive Reader controls and Mushaf magnification](phases/RESPONSIVE_READER_CONTROL_REFINEMENT.md) is the active local owner-review phase for balanced footer/audio controls and 100–200% printed-page enlargement.

@@ -1,10 +1,11 @@
 import { progressFillStyle } from "./progressFillStyle";
 import { useMemo } from "react";
 import { AppLanguage, PrayerName, PrayerTrackingRecord } from "../types";
+import { getElapsedPeriod } from "../elapsedPeriod";
 import { getPeriodRange } from "../calendarPeriods";
 import { CalendarType } from "../calendarPeriods";
 import { PRAYER_ORDER } from "./PrayerTrackerCards";
-import { formatNumerals, formatRatio } from "../formatting";
+import { formatNumerals, formatRatio, formatPercentage } from "../formatting";
 import { t } from "../i18n";
 import { Building, Check, ChevronDown, Sparkles, Sun } from "./icons";
 
@@ -21,23 +22,23 @@ export function PrayerTrackerStats({
   displayDate,
   language,
   calendarType,
+  now = new Date(),
 }: {
   records: readonly PrayerTrackingRecord[];
   activeTab: "week" | "month" | "year";
   displayDate: Date;
   language: AppLanguage;
   calendarType: CalendarType;
+  now?: Date;
 }) {
-  const { startKey, endKey } = useMemo(
+  const period = useMemo(
     () => getPeriodRange(activeTab, displayDate, language, calendarType),
     [activeTab, displayDate, language, calendarType],
   );
 
-  const stats = useMemo(() => {
-    const start = new Date(startKey);
-    const end = new Date(endKey);
-    const daysInPeriod = Math.max(1, Math.round((end.getTime() - start.getTime()) / 86400000) + 1);
+  const { startKey, endKey, days: daysInPeriod } = getElapsedPeriod(period.startKey, period.endKey, now);
 
+  const stats = useMemo(() => {
     const counts: Record<PrayerName, PrayerPeriodCounts> = {
       fajr: { fard: 0, mosque: 0, rawatib: 0, adhkar: 0 },
       dhuhr: { fard: 0, mosque: 0, rawatib: 0, adhkar: 0 },
@@ -55,7 +56,7 @@ export function PrayerTrackerStats({
       if (r.dayKey >= startKey && r.dayKey <= endKey && counts[r.prayer]) {
         const isFard = r.location === "mosque" || r.location === "home" || r.mosque;
         const isMosque = r.location === "mosque" || r.mosque;
-        const isRawatib = Boolean(r.sunnah || r.sunnahBefore || r.sunnahAfter);
+        const isRawatib = r.prayer !== "asr" && Boolean(r.sunnah || r.sunnahBefore || r.sunnahAfter);
         const isAdhkar = Boolean(r.adhkar);
 
         if (isFard) {
@@ -80,19 +81,29 @@ export function PrayerTrackerStats({
     const maxTotalPrayers = daysInPeriod * 5;
 
     return { counts, daysInPeriod, totalFard, totalMosque, totalRawatib, totalAdhkar, maxTotalPrayers };
-  }, [records, startKey, endKey]);
+  }, [records, startKey, endKey, daysInPeriod]);
+
+  const recordingRate = (count: number, total: number) =>
+    total === 0 ? "—" : formatPercentage(Math.round((count / total) * 100), language);
 
   return (
     <div className="flex flex-col gap-4 px-4 pb-4 sm:px-6">
+      <p className="text-xs leading-5 text-muted-foreground" data-testid="prayer-coverage-hint">
+        {t(language, "progress.recordingCoverageHint", { days: formatNumerals(daysInPeriod, language) })}
+      </p>
       {/* Overview Totals for the Selected Period */}
       <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
         <div className="flex flex-col gap-1 rounded-2xl border border-border/60 bg-card p-3 shadow-xs">
           <div className="flex items-center gap-1.5 text-micro font-bold text-muted-foreground">
             <Sun className="size-3.5 text-primary" />
-            <span className="truncate">{t(language, "prayerTracking.prayersSummary")}</span>
+            <span className="truncate">
+              {t(language, activeTab === "year" ? "progress.prayerRecordingRate" : "prayerTracking.prayersSummary")}
+            </span>
           </div>
           <div className="text-base font-black text-foreground">
-            {formatRatio(stats.totalFard, stats.maxTotalPrayers, language)}
+            {activeTab === "year"
+              ? recordingRate(stats.totalFard, stats.maxTotalPrayers)
+              : formatRatio(stats.totalFard, stats.maxTotalPrayers, language)}
           </div>
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
             <div
@@ -112,7 +123,9 @@ export function PrayerTrackerStats({
             <span className="truncate">{t(language, "prayerTracking.mosqueSummary")}</span>
           </div>
           <div className="text-base font-black text-foreground">
-            {formatRatio(stats.totalMosque, stats.maxTotalPrayers, language)}
+            {activeTab === "year"
+              ? recordingRate(stats.totalMosque, stats.maxTotalPrayers)
+              : formatRatio(stats.totalMosque, stats.maxTotalPrayers, language)}
           </div>
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
             <div
@@ -131,7 +144,11 @@ export function PrayerTrackerStats({
             <Sparkles className="size-3.5 text-secondary" />
             <span className="truncate">{t(language, "prayerTracking.rawatibSummary")}</span>
           </div>
-          <div className="text-base font-black text-foreground">{formatNumerals(stats.totalRawatib, language)}</div>
+          <div className="text-base font-black text-foreground">
+            {activeTab === "year"
+              ? recordingRate(stats.totalRawatib, stats.daysInPeriod * 4)
+              : formatNumerals(stats.totalRawatib, language)}
+          </div>
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
             <div
               className="h-full rounded-full bg-secondary progress-fill-transform"
@@ -150,7 +167,9 @@ export function PrayerTrackerStats({
             <span className="truncate">{t(language, "prayerTracking.adhkarSummary")}</span>
           </div>
           <div className="text-base font-black text-foreground">
-            {formatRatio(stats.totalAdhkar, stats.maxTotalPrayers, language)}
+            {activeTab === "year"
+              ? recordingRate(stats.totalAdhkar, stats.maxTotalPrayers)
+              : formatRatio(stats.totalAdhkar, stats.maxTotalPrayers, language)}
           </div>
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
             <div
@@ -190,7 +209,9 @@ export function PrayerTrackerStats({
                 <div className="flex items-center justify-between">
                   <span className="font-extrabold text-subtitle text-foreground">{prayerName}</span>
                   <span className="text-xs font-bold text-muted-foreground">
-                    {formatRatio(fard, stats.daysInPeriod, language)}
+                    {activeTab === "year"
+                      ? recordingRate(fard, stats.daysInPeriod)
+                      : formatRatio(fard, stats.daysInPeriod, language)}
                   </span>
                 </div>
 
@@ -199,7 +220,11 @@ export function PrayerTrackerStats({
                   <div className="flex flex-col gap-1">
                     <div className="flex justify-between items-center text-micro font-semibold text-muted-foreground">
                       <span>{t(language, "prayerTracking.fard")}</span>
-                      <bdi className="font-bold text-foreground">{formatRatio(fard, stats.daysInPeriod, language)}</bdi>
+                      <bdi className="font-bold text-foreground">
+                        {activeTab === "year"
+                          ? recordingRate(fard, stats.daysInPeriod)
+                          : formatRatio(fard, stats.daysInPeriod, language)}
+                      </bdi>
                     </div>
                     <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
                       <div
@@ -218,7 +243,9 @@ export function PrayerTrackerStats({
                     <div className="flex justify-between items-center text-micro font-semibold text-muted-foreground">
                       <span>{t(language, "prayerTracking.atMosque")}</span>
                       <bdi className="font-bold text-foreground">
-                        {formatRatio(mosque, stats.daysInPeriod, language)}
+                        {activeTab === "year"
+                          ? recordingRate(mosque, stats.daysInPeriod)
+                          : formatRatio(mosque, stats.daysInPeriod, language)}
                       </bdi>
                     </div>
                     <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
@@ -238,7 +265,11 @@ export function PrayerTrackerStats({
                     <div className="flex justify-between items-center text-micro font-semibold text-muted-foreground">
                       <span>{t(language, "prayerTracking.rawatib")}</span>
                       <bdi className="font-bold text-foreground">
-                        {hasRawatib ? formatRatio(rawatib, stats.daysInPeriod, language) : "—"}
+                        {hasRawatib
+                          ? activeTab === "year"
+                            ? recordingRate(rawatib, stats.daysInPeriod)
+                            : formatRatio(rawatib, stats.daysInPeriod, language)
+                          : "—"}
                       </bdi>
                     </div>
                     <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
@@ -260,7 +291,9 @@ export function PrayerTrackerStats({
                     <div className="flex justify-between items-center text-micro font-semibold text-muted-foreground">
                       <span>{t(language, "prayerTracking.adhkar")}</span>
                       <bdi className="font-bold text-foreground">
-                        {formatRatio(adhkar, stats.daysInPeriod, language)}
+                        {activeTab === "year"
+                          ? recordingRate(adhkar, stats.daysInPeriod)
+                          : formatRatio(adhkar, stats.daysInPeriod, language)}
                       </bdi>
                     </div>
                     <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">

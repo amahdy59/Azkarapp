@@ -1,6 +1,7 @@
 import { progressFillStyle } from "./progressFillStyle";
 import { useMemo } from "react";
 import { AppLanguage } from "../types";
+import { getElapsedPeriod } from "../elapsedPeriod";
 import { getPeriodRange } from "../calendarPeriods";
 import { CalendarType } from "../calendarPeriods";
 import { getFridaySummary } from "../fridaySummary";
@@ -14,21 +15,25 @@ export function FridayProgressStats({
   language,
   calendarType,
   direction,
+  now = new Date(),
 }: {
   activeTab: "week" | "month" | "year";
   displayDate: Date;
   language: AppLanguage;
   calendarType: CalendarType;
   direction: "rtl" | "ltr";
+  now?: Date;
 }) {
-  const { startKey, endKey } = useMemo(
+  const period = useMemo(
     () => getPeriodRange(activeTab, displayDate, language, calendarType),
     [activeTab, displayDate, language, calendarType],
   );
 
+  const { startKey, endKey } = getElapsedPeriod(period.startKey, period.endKey, now);
+
   const stats = useMemo(() => {
-    const start = new Date(startKey);
-    const end = new Date(endKey);
+    const start = new Date(`${startKey}T12:00:00`);
+    const end = new Date(`${endKey}T12:00:00`);
     const fridays: string[] = [];
 
     // Find all Fridays in range
@@ -116,12 +121,14 @@ export function FridayProgressStats({
           </div>
         </div>
 
-        <div className="flex flex-col gap-2">
-          <div className="flex justify-between items-center text-sm font-bold">
-            <span>{t(language, "friday.salawatCount")}</span>
-            <bdi className="text-sm font-bold text-primary">{formatNumerals(stats.salawatCount, language)}</bdi>
+        {activeTab !== "year" && (
+          <div className="flex flex-col gap-2">
+            <div className="flex justify-between items-center text-sm font-bold">
+              <span>{t(language, "friday.salawatCount")}</span>
+              <bdi className="text-sm font-bold text-primary">{formatNumerals(stats.salawatCount, language)}</bdi>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

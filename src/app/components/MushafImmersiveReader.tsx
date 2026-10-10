@@ -254,6 +254,7 @@ export function MushafImmersiveReader({
   const pageCount = pageNumbers.length;
 
   const shell = useMushafShell();
+  const [pageMagnification, setPageMagnification] = useState(100);
 
   /**
    * The facing page, when there is room and when it belongs to this surah.
@@ -261,9 +262,12 @@ export function MushafImmersiveReader({
    * A Mushaf opens with page 1 on the right, so pairs run (1,2), (3,4). The
    * odd page is always on the right and the even page on the left.
    */
-  const rightNumber = shell.spreadRoom ? spreadStart(currentPage) : currentPage;
+  const rightNumber = pageMagnification === 100 && shell.spreadRoom ? spreadStart(currentPage) : currentPage;
   const leftNumber =
-    shell.spreadRoom && pageNumbers.includes(rightNumber) && pageNumbers.includes(rightNumber + 1)
+    pageMagnification === 100 &&
+    shell.spreadRoom &&
+    pageNumbers.includes(rightNumber) &&
+    pageNumbers.includes(rightNumber + 1)
       ? rightNumber + 1
       : null;
   const hasSpread = leftNumber !== null;
@@ -348,12 +352,19 @@ export function MushafImmersiveReader({
   // page, and Escape steps back when no nested ayah sheet is open.
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (activeAyah) return;
-      const target = e.target as HTMLElement | null;
+      if (activeAyah || isSettingsOpen || isIndexOpen || isQuickMenuOpen || isShortcutsOpen) return;
+      const target = e.target instanceof Element ? e.target : null;
       // Text entry and composite widgets own the arrow keys; a plain button
       // does not. Excluding buttons made the page keys dead from the moment
       // this view opened, because it now autofocuses a control on the rail.
       // The Mushaf's own guard has always been this one.
+      if (target?.closest("input, textarea, select, [role=combobox], [role=dialog]")) return;
+      if (
+        pageMagnification > 100 &&
+        target?.closest(".mushaf-paper") &&
+        ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "].includes(e.key)
+      )
+        return;
       if (e.key === "Escape") {
         e.preventDefault();
         if (isFocusMode) {
@@ -394,7 +405,19 @@ export function MushafImmersiveReader({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeAyah, isFocusMode, onClose, paginate, pageCount, setPageTuple]);
+  }, [
+    activeAyah,
+    isSettingsOpen,
+    isIndexOpen,
+    isQuickMenuOpen,
+    isShortcutsOpen,
+    pageMagnification,
+    isFocusMode,
+    onClose,
+    paginate,
+    pageCount,
+    setPageTuple,
+  ]);
 
   /**
    * One gesture, shared with the reader.
@@ -704,11 +727,14 @@ export function MushafImmersiveReader({
       <div
         data-testid="mushaf-immersive-track"
         className="relative flex min-h-0 flex-1 flex-col overflow-hidden"
-        {...pointerProps}
+        {...(pageMagnification === 100 ? pointerProps : {})}
         /* The surface itself never scrolls: the paper inside it does when a
            short screen makes it taller than the viewport. Leaving the browser
            a vertical axis to claim here is what let a drag move the page. */
-        style={{ touchAction: "pan-y pinch-zoom", overscrollBehavior: "none" }}
+        style={{
+          touchAction: pageMagnification > 100 ? "pan-x pan-y pinch-zoom" : "pan-y pinch-zoom",
+          overscrollBehavior: "none",
+        }}
       >
         {/* The page turn animates the paper, not the chrome.
             This wrapped the whole viewer in AnimatePresence, so every turn
@@ -761,7 +787,8 @@ export function MushafImmersiveReader({
             onCenterTap={() => setIsFocusMode((prev) => !prev)}
             progressBar={progressBar}
             paperRef={paperRef}
-            verticalGestures
+            verticalGestures={pageMagnification === 100}
+            magnification={pageMagnification}
             showFloatingPageIndicator={!isFocusMode}
             reduceMotion={reducedMotion}
             textScale={textScale}
@@ -910,6 +937,8 @@ export function MushafImmersiveReader({
           mushafLayout={mushafSettings.layout}
           onSelectLayout={mushafSettings.onSelectLayout}
           autoSpreadRoom={shell.spreadRoom}
+          magnification={pageMagnification}
+          onSelectMagnification={setPageMagnification}
           textScale={textScale}
           onSelectTextScale={mushafSettings.onSelectTextScale}
           textScaleApplies={shell.pageAspect >= PAPER_ASPECT}

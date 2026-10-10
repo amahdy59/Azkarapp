@@ -45,7 +45,7 @@ export function ProgressPanel({
 
   return (
     <div className="slide-in-from-right flex h-full flex-col bg-background/50 backdrop-blur-md">
-      <SubHeader title={t(language, "progressPanel.title")} onBack={onBack} language={language} />
+      <SubHeader title={t(language, "settings.progressPreferences")} onBack={onBack} language={language} />
       <div className="flex-1 space-y-4 overflow-y-auto p-5">
         {/* Garden toggle */}
         <section

@@ -36,7 +36,7 @@ export function CounterTapHint({
           <button
             type="button"
             data-testid="counter-guidance-reopen"
-            className="flex size-11 shrink-0 items-center justify-center rounded-full text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border bg-card text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             aria-label={toggleLabel}
             title={toggleLabel}
             aria-expanded={expanded}
@@ -52,7 +52,12 @@ export function CounterTapHint({
           <HandTap size={24} className="shrink-0 text-muted-foreground" aria-hidden="true" />
         )}
         {keyboardHelp && <div className="hidden shrink-0 md:block">{keyboardHelp}</div>}
-        <span id={explanationId} hidden={!expanded} className="min-w-0 flex-1">
+        <span
+          id={explanationId}
+          aria-hidden={!expanded}
+          style={{ display: "block", visibility: expanded ? "visible" : "hidden" }}
+          className="min-w-0 flex-1"
+        >
           <span className={desktopText ? "md:hidden" : undefined}>{text}</span>
           {desktopText && <span className="hidden md:inline">{desktopText}</span>}
         </span>

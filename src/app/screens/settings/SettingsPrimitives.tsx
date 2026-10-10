@@ -25,12 +25,14 @@ export function SubHeader({
     return (
       <div className="flex items-center justify-between px-4 pt-4 pb-2 shrink-0">
         <h2
+          data-settings-subheading
+          tabIndex={-1}
           aria-label={
             title === t(language, "settings.accessibility")
               ? t(language, "settings.accessibilityDetailHeading")
               : undefined
           }
-          className="block min-w-0 flex-1 truncate whitespace-nowrap font-sans text-2xl font-extrabold leading-tight text-foreground"
+          className="block min-w-0 flex-1 break-words font-sans text-2xl font-extrabold leading-tight text-foreground outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           {title}
         </h2>
@@ -40,14 +42,14 @@ export function SubHeader({
   }
 
   return (
-    <div className="flex items-center justify-between px-4 shrink-0" style={{ height: 56 }}>
+    <div className="flex items-center justify-between px-4 shrink-0" style={{ minHeight: 56 }}>
       <IconButton onClick={onBack} label={t(language, "common.back")}>
         <ArrowPrevious size={20} className="text-foreground" />
       </IconButton>
       <h1
         data-settings-subheading
         tabIndex={-1}
-        className="block min-w-0 flex-1 truncate whitespace-nowrap text-center font-sans text-xl font-extrabold leading-tight text-foreground outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:text-2xl"
+        className="block min-w-0 flex-1 break-words text-center font-sans text-xl font-extrabold leading-tight text-foreground outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:text-2xl"
       >
         {title}
       </h1>

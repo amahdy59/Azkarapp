@@ -10,6 +10,7 @@ import {
   getYearDetailedStats,
   getYearDetailedStatsForPeriods,
 } from "./gardenViews";
+import { getCalendarYearPeriods } from "./calendarPeriods";
 import type { DailyCollectionCompletion } from "./types";
 
 const records: DailyCollectionCompletion[] = [
@@ -28,6 +29,40 @@ const records: DailyCollectionCompletion[] = [
 ];
 
 describe("garden view selectors", () => {
+  it("uses three canonical routines and elapsed days in current month/year rates", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 0, 2, 12));
+    const complete = ["morning", "evening", "before_sleep"] as const;
+    const index = createDailyCompletionIndex(
+      complete.flatMap((category) => [
+        { dayKey: "2026-01-01", category, timeZone: "Africa/Cairo" },
+        { dayKey: "2026-01-03", category, timeZone: "Africa/Cairo" },
+      ]),
+    );
+    expect(getMonthDetailedStats(index, 2026, 0)).toMatchObject({ completionRate: 50, totalActiveDays: 1 });
+    expect(getYearDetailedStats(index, 2026)).toMatchObject({
+      overallCompletionRate: 50,
+      activeDays: 1,
+      totalCollections: 3,
+    });
+    expect(getYearDetailedStats(index, 2027)).toMatchObject({ overallCompletionRate: 0, totalCollections: 0 });
+    const periods = getCalendarYearPeriods(new Date(2026, 0, 2, 12), "hijri", "ar");
+    const expectedDays = periods.flatMap((p) => p.dates).filter((date) => date <= new Date(2026, 0, 2, 12)).length;
+    expect(getYearDetailedStatsForPeriods(index, periods).overallCompletionRate).toBe(Math.round(100 / expectedDays));
+  });
+  it("reports 100 percent for all three routines on every elapsed day", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 0, 1, 12));
+    const index = createDailyCompletionIndex(
+      (["morning", "evening", "before_sleep"] as const).map((category) => ({
+        dayKey: "2026-01-01",
+        category,
+        timeZone: "Africa/Cairo",
+      })),
+    );
+    expect(getMonthDetailedStats(index, 2026, 0).completionRate).toBe(100);
+    expect(getYearDetailedStats(index, 2026).overallCompletionRate).toBe(100);
+  });
   it("deduplicates categories and marks a palm only when all core collections are present", () => {
     const index = createDailyCompletionIndex(records);
     const days = getMonthGardenDays(index, 2024, 1);

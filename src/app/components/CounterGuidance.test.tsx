@@ -28,6 +28,14 @@ describe("combined counting guidance", () => {
     expect(screen.getByRole("dialog")).not.toHaveTextContent("Navigate");
   });
 
+  it("lets the Reader header own keyboard help without mounting a second shortcut dialog", () => {
+    render(<CounterGuidance language="en" direction="ltr" reader showKeyboardHelp={false} />);
+    expect(screen.queryByRole("button", { name: "Keyboard shortcuts" })).not.toBeInTheDocument();
+    fireEvent.keyDown(window, { key: "?" });
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(screen.getByTestId("counter-tap-hint")).toBeVisible();
+  });
+
   it("collapses after the first count and can be reopened with the hand button", async () => {
     const view = render(<CounterGuidance language="en" direction="ltr" hasStarted={false} />);
     expect(screen.getByTestId("counter-tap-hint")).toBeInTheDocument();
@@ -64,7 +72,8 @@ describe("combined counting guidance", () => {
       fireEvent.click(hand);
       expect(hand).toHaveAttribute("aria-expanded", String(click % 2 === 0));
       const explanation = document.getElementById(hand.getAttribute("aria-controls")!);
-      expect(explanation?.hidden).toBe(click % 2 !== 0);
+      expect(explanation).toHaveAttribute("aria-hidden", String(click % 2 !== 0));
+      expect(explanation).toHaveStyle({ visibility: click % 2 === 0 ? "visible" : "hidden" });
     }
   });
 });

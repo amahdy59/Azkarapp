@@ -151,6 +151,7 @@ export interface MushafToolRailProps {
   onOpenMore?: () => void;
   /** Omitted where the surah has no reviewed recitation to offer. */
   surahAudio?: SurahAudioControl;
+  playbackFollowing?: { enabled: boolean; onToggle: () => void };
   /** Omitted on surfaces with no keyboard to describe, which is every phone. */
   onOpenShortcuts?: () => void;
   onComplete?: () => void;
@@ -182,6 +183,7 @@ export function MushafToolRail({
   onOpenSettings,
   onOpenMore,
   surahAudio,
+  playbackFollowing,
   onOpenShortcuts,
   onComplete,
 }: MushafToolRailProps) {
@@ -194,6 +196,18 @@ export function MushafToolRail({
   const isPreparingRecitation = surahAudio?.status === "loading" || surahAudio?.status === "buffering";
 
   const audioTools: MushafToolRailAction[] = [
+    ...(playbackFollowing
+      ? [
+          {
+            id: "follow-recitation",
+            label: t(language, "quranListening.follow"),
+            icon: <Eye size={iconSize} />,
+            pressed: playbackFollowing.enabled,
+            onClick: playbackFollowing.onToggle,
+            testId: "mushaf-playback-follow",
+          },
+        ]
+      : []),
     ...(surahAudio
       ? [
           {

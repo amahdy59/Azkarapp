@@ -117,7 +117,10 @@ for (const language of ["en", "ar"] as const) {
       const routineCardTops = await routineCards.evaluateAll((cards) =>
         cards.map((card) => Math.round(card.getBoundingClientRect().top)),
       );
-      expect(new Set(routineCardTops).size).toBe(1);
+      // The approved photograph-free Day layout uses two columns, preserving
+      // source/keyboard order with the third routine on the next row.
+      expect(routineCardTops[0]).toBe(routineCardTops[1]);
+      expect(routineCardTops[2]).toBeGreaterThan(routineCardTops[1]);
     }).toPass();
     await expect(page.locator("html")).toHaveAttribute("dir", language === "ar" ? "rtl" : "ltr");
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(1280);

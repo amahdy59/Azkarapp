@@ -1,6 +1,7 @@
 import { ReferenceCard } from "../components/ReferenceCard";
 import { useCallback, useEffect, useState } from "react";
-import { DevotionalAction, DevotionalFooter } from "../components/DevotionalControls";
+import { DevotionalAction } from "../components/DevotionalControls";
+import { StandaloneCounterFooter } from "../components/StandaloneCounterFooter";
 import { CounterTargetPicker } from "../components/CounterTargetPicker";
 import {
   ArrowPrevious,
@@ -326,8 +327,13 @@ export function FridaySalawatScreen({
               />
               <footer className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
                 <div data-testid="reader-counter-stack">
-                  <DevotionalFooter>
-                    <div className="flex w-full items-center justify-center gap-3">
+                  <StandaloneCounterFooter
+                    language={language}
+                    soundEnabled={soundEnabled}
+                    onToggleSound={toggleSound}
+                    onReset={reset}
+                    resetDisabled={progress.count === 0}
+                    benefit={
                       <DevotionalAction
                         type="button"
                         onClick={(e) => {
@@ -342,25 +348,21 @@ export function FridaySalawatScreen({
                         <Lightbulb size={20} aria-hidden="true" />
                         <span className="text-label font-semibold">{t(language, "reader.referencesButton")}</span>
                       </DevotionalAction>
-                    </div>
-                    <div className="w-full pb-1" data-testid="counter-panel">
-                      <div className="adaptive-counter-row flex w-full items-center justify-center gap-2.5">
-                        <div className="flex min-w-0 flex-1 justify-center">
-                          <ZikrCounterSurface
-                            count={progress.count}
-                            total={progress.target}
-                            complete={complete}
-                            onTap={increment}
-                            onCompleteTap={() => setShowCompletionModal(true)}
-                            language={language}
-                            instructionText={t(language, "reader.tapAnywhere")}
-                            testId="salawat-counter"
-                            reduceMotion={reduceMotion}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </DevotionalFooter>
+                    }
+                    counter={
+                      <ZikrCounterSurface
+                        count={progress.count}
+                        total={progress.target}
+                        complete={complete}
+                        onTap={increment}
+                        onCompleteTap={() => setShowCompletionModal(true)}
+                        language={language}
+                        instructionText={t(language, "reader.tapAnywhere")}
+                        testId="salawat-counter"
+                        reduceMotion={reduceMotion}
+                      />
+                    }
+                  />
                   <CounterGuidance
                     language={language}
                     direction={direction}

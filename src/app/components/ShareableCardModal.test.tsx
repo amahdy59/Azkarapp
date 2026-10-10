@@ -5,6 +5,7 @@ import { ShareableCardModal } from "./ShareableCardModal";
 describe("ShareableCardModal", () => {
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.unstubAllEnvs();
   });
 
   it("reports a cancelled native share without presenting it as an error", async () => {
@@ -31,6 +32,32 @@ describe("ShareableCardModal", () => {
     fireEvent.click(action);
     expect(await screen.findByRole("alert")).toHaveTextContent("Could not share this achievement");
     expect(action).not.toBeDisabled();
+  });
+
+  it("shares the deployed application base rather than only the hosting origin", async () => {
+    vi.stubEnv("BASE_URL", "/Azkarapp/");
+    const share = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "share", { configurable: true, value: share });
+    render(<ShareableCardModal palms={1} golden={2} green={3} dateStr="12 August" language="en" onClose={vi.fn()} />);
+    fireEvent.click(screen.getByRole("button", { name: "Share Milestone" }));
+    expect(share).toHaveBeenCalledWith(
+      expect.objectContaining({ url: new URL("/Azkarapp/", window.location.origin).href }),
+    );
+  });
+
+  it("copies the same summary and application link when native sharing is unavailable", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "share", { configurable: true, value: undefined });
+    Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText } });
+    render(<ShareableCardModal palms={1} golden={2} green={3} dateStr="12 August" language="en" onClose={vi.fn()} />);
+    fireEvent.click(screen.getByRole("button", { name: "Share Milestone" }));
+    expect(writeText).toHaveBeenCalledWith(
+      expect.stringContaining("2 daily routines and 3 additional practices. Palm days: 1."),
+    );
+    expect(writeText).toHaveBeenCalledWith(
+      expect.stringContaining(new URL(import.meta.env.BASE_URL, window.location.origin).href),
+    );
+    expect(await screen.findByRole("status")).toHaveTextContent(/copied/i);
   });
 
   it("uses RTL semantics and labelled statistics for Arabic", () => {

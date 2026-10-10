@@ -1,7 +1,7 @@
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
-import { AlignRight, Check, Contrast, Droplets, Eye, Info, Pause, Smartphone, TypeIcon } from "../../components/icons";
+import { AlignRight, Contrast, Droplets, Eye, Info, Pause, Smartphone, TypeIcon } from "../../components/icons";
 import { t } from "../../i18n";
-import type { AppLanguage, ColorBlindSupport, TextSizeOption, ZikrFontOption } from "../../types";
+import type { AppLanguage, ColorBlindSupport } from "../../types";
 import { SectionLabel, SettingsToggleRow, SubHeader } from "./SettingsPrimitives";
 
 function formatColorBlindSupport(value: ColorBlindSupport, language: AppLanguage) {
@@ -37,30 +37,9 @@ function PanelRadioOption({ value, active, label }: { value: string; active: boo
   );
 }
 
-/**
- * The three faces, as CSS stacks, for the preview tiles only.
- *
- * The live text takes its family from `--font-zikr`, which the theme sets on
- * the root; these tiles each need to render a *different* face at once, which a
- * single custom property cannot do. Kept beside the token they mirror so the
- * two cannot drift apart unnoticed.
- */
-const ZIKR_FONT_STACKS: Record<ZikrFontOption, string> = {
-  humanist: '"IBM Plex Sans Arabic", "Noto Sans Arabic Variable", sans-serif',
-  clear: '"Noto Sans Arabic Variable", "IBM Plex Sans Arabic", sans-serif',
-  naskh: '"Amiri Quran", "IBM Plex Sans Arabic", "Noto Sans Arabic Variable", serif',
-};
-
-/** Short enough to fit a tile, long enough to show the letterforms that differ. */
-const ZIKR_FONT_SAMPLE = "الحمد لله";
-
 export function AccessibilityPanel({
   language,
   direction,
-  textSize,
-  zikrFont = "humanist",
-  showTranslation,
-  showTransliteration,
   highContrast,
   boldText,
   reduceMotion,
@@ -68,10 +47,6 @@ export function AccessibilityPanel({
   hapticFeedback,
   forceRtl,
   colorBlindSupport,
-  onTextSizeChange,
-  onZikrFontChange,
-  onShowTranslationChange,
-  onShowTransliterationChange,
   onHighContrastChange,
   onBoldTextChange,
   onReduceMotionChange,
@@ -79,13 +54,11 @@ export function AccessibilityPanel({
   onHapticFeedbackChange,
   onForceRtlChange,
   onColorBlindSupportChange,
+  onOpenReading,
   onBack,
 }: {
   language: AppLanguage;
   direction: "ltr" | "rtl";
-  textSize: TextSizeOption;
-  showTranslation: boolean;
-  showTransliteration: boolean;
   highContrast: boolean;
   boldText: boolean;
   reduceMotion: boolean;
@@ -93,11 +66,6 @@ export function AccessibilityPanel({
   hapticFeedback: boolean;
   forceRtl: boolean;
   colorBlindSupport: ColorBlindSupport;
-  zikrFont?: ZikrFontOption;
-  onTextSizeChange: (value: TextSizeOption) => void;
-  onZikrFontChange: (value: ZikrFontOption) => void;
-  onShowTranslationChange: (value: boolean) => void;
-  onShowTransliterationChange: (value: boolean) => void;
   onHighContrastChange: (value: boolean) => void;
   onBoldTextChange: (value: boolean) => void;
   onReduceMotionChange: (value: boolean) => void;
@@ -105,6 +73,7 @@ export function AccessibilityPanel({
   onHapticFeedbackChange: (value: boolean) => void;
   onForceRtlChange: (value: boolean) => void;
   onColorBlindSupportChange: (value: ColorBlindSupport) => void;
+  onOpenReading: () => void;
   onBack: () => void;
 }) {
   const colorBlindOptions: ColorBlindSupport[] = ["none", "deuteranopia", "protanopia", "tritanopia"];
@@ -119,106 +88,15 @@ export function AccessibilityPanel({
             "Visual" label. It is a locale preference, not an accessibility aid,
             and now lives beside Language in Settings → Preferences. */}
 
-        <section className="mx-4 mb-6 mt-2" aria-labelledby="text-size-title">
-          <h3 id="text-size-title" className="mb-3 text-sm font-semibold text-foreground">
-            {t(language, "settings.textSize")}
-          </h3>
-          <RadioGroupPrimitive.Root
-            dir={direction}
-            value={textSize}
-            onValueChange={(value) => onTextSizeChange(value as TextSizeOption)}
-            className="grid grid-cols-3 gap-2"
-            aria-labelledby="text-size-title"
+        <div className="mx-4 mb-4">
+          <button
+            type="button"
+            onClick={onOpenReading}
+            className="flex min-h-11 w-full items-center justify-between gap-3 rounded-xl border border-border bg-card p-3 text-start text-sm font-bold text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           >
-            {(
-              [
-                { value: "small", label: t(language, "settings.textSmall"), sampleSize: "text-subtitle" },
-                { value: "medium", label: t(language, "settings.medium"), sampleSize: "text-lg" },
-                { value: "large", label: t(language, "settings.textLarge"), sampleSize: "text-headline" },
-              ] as const
-            ).map((option) => {
-              const selected = textSize === option.value;
-              return (
-                <RadioGroupPrimitive.Item
-                  key={option.value}
-                  value={option.value}
-                  data-testid={`text-size-option-${option.value}`}
-                  className={`relative flex min-h-[76px] flex-col items-center justify-center gap-1 rounded-3xl border px-2 py-2 text-center transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring backdrop-blur-xl shadow-sm ${
-                    selected
-                      ? "border-primary bg-primary/10 text-foreground"
-                      : "border-border/40 bg-card text-muted-foreground"
-                  }`}
-                >
-                  <span className={`font-bold leading-none ${option.sampleSize}`} aria-hidden="true">
-                    Aa
-                  </span>
-                  <span className="text-xs font-semibold leading-4">{option.label}</span>
-                  {selected && (
-                    <span className="absolute end-1.5 top-1.5 text-primary" aria-hidden="true">
-                      <Check size={14} strokeWidth={2.5} />
-                    </span>
-                  )}
-                </RadioGroupPrimitive.Item>
-              );
-            })}
-          </RadioGroupPrimitive.Root>
-        </section>
-
-        <section className="mx-4 mb-6" aria-labelledby="zikr-font-title">
-          <h3 id="zikr-font-title" className="mb-1 text-sm font-semibold text-foreground">
-            {t(language, "settings.zikrFont")}
-          </h3>
-          <p className="mb-3 text-xs leading-snug text-muted-foreground">{t(language, "settings.zikrFontHint")}</p>
-          <RadioGroupPrimitive.Root
-            dir={direction}
-            value={zikrFont}
-            onValueChange={(value) => onZikrFontChange(value as ZikrFontOption)}
-            className="grid grid-cols-3 gap-2"
-            aria-labelledby="zikr-font-title"
-          >
-            {(
-              [
-                { value: "humanist", label: t(language, "settings.zikrFontHumanist") },
-                { value: "clear", label: t(language, "settings.zikrFontClear") },
-                { value: "naskh", label: t(language, "settings.zikrFontNaskh") },
-              ] as const
-            ).map((option) => {
-              const selected = zikrFont === option.value;
-              return (
-                <RadioGroupPrimitive.Item
-                  key={option.value}
-                  value={option.value}
-                  data-testid={`zikr-font-option-${option.value}`}
-                  className={`relative flex min-h-[88px] flex-col items-center justify-center gap-1.5 rounded-3xl border px-2 py-2 text-center transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring shadow-sm ${
-                    selected
-                      ? "border-primary bg-primary/10 text-foreground"
-                      : "border-border/40 bg-card text-muted-foreground"
-                  }`}
-                >
-                  {/* The sample is set in the face it offers. A font picker that
-                      names three families without showing them asks the reader
-                      to choose by memory of what a name looks like. */}
-                  <span
-                    aria-hidden="true"
-                    dir="rtl"
-                    lang="ar"
-                    className="text-headline leading-tight text-foreground"
-                    style={{ fontFamily: ZIKR_FONT_STACKS[option.value] }}
-                  >
-                    {ZIKR_FONT_SAMPLE}
-                  </span>
-                  <span className="text-xs font-semibold leading-4">{option.label}</span>
-                  {selected && (
-                    <span className="absolute end-1.5 top-1.5 text-primary" aria-hidden="true">
-                      <Check size={14} strokeWidth={2.5} />
-                    </span>
-                  )}
-                </RadioGroupPrimitive.Item>
-              );
-            })}
-          </RadioGroupPrimitive.Root>
-        </section>
-
+            {t(language, "settings.readingControlsLink")}
+          </button>
+        </div>
         <div className="mx-4 overflow-hidden rounded-3xl border border-border/40 bg-card shadow-raised">
           <SettingsToggleRow
             iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
@@ -298,20 +176,6 @@ export function AccessibilityPanel({
 
         <SectionLabel label={t(language, "settings.reading")} />
         <div className="mx-4 overflow-hidden rounded-3xl border border-border/40 bg-card shadow-raised">
-          <SettingsToggleRow
-            iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
-            icon={<TypeIcon size={20} className="text-primary" />}
-            label={t(language, "settings.showTranslation")}
-            checked={showTranslation}
-            onChange={() => onShowTranslationChange(!showTranslation)}
-          />
-          <SettingsToggleRow
-            iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
-            icon={<TypeIcon size={20} className="text-primary" />}
-            label={t(language, "settings.showTransliteration")}
-            checked={showTransliteration}
-            onChange={() => onShowTransliterationChange(!showTransliteration)}
-          />
           <SettingsToggleRow
             iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
             icon={<AlignRight size={20} className="text-primary" />}

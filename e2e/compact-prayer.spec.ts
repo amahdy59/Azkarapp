@@ -84,8 +84,15 @@ async function checkGeometry(page: Page) {
   const bounds = (await panel.boundingBox())!;
   expect(bounds.x).toBeGreaterThanOrEqual(0);
   expect(bounds.x + bounds.width).toBeLessThanOrEqual((await page.evaluate(() => innerWidth)) + 1);
-  for (const control of await panel.locator("input[type=checkbox], button").all()) {
-    const bounds = (await control.boundingBox())!;
+  // Read all targets in one browser call: serial geometry round trips can
+  // exhaust WebKit's deadline without a geometry assertion failing.
+  const controlBounds = await panel.locator("input[type=checkbox], button").evaluateAll((controls) =>
+    controls.map((control) => {
+      const { width, height } = control.getBoundingClientRect();
+      return { width, height };
+    }),
+  );
+  for (const bounds of controlBounds) {
     // Firefox rect subtraction can return 43.999969 for a 44px CSS target.
     // Normalize only floating-point noise; retain the same 44px requirement.
     expect(Number(bounds.width.toFixed(3))).toBeGreaterThanOrEqual(44);

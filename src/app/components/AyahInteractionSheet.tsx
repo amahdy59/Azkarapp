@@ -7,6 +7,7 @@ import { getSurahDisplayName } from "../content/surahInfo";
 import { formatNumerals } from "../formatting";
 import { reportError } from "../../lib/observability";
 import { getAyahWordMeanings, loadSurahWordMeanings, type QuranWordMeaning } from "../content/quranWordMeanings";
+import { loadAyahEnglishTranslation } from "../content/quranTranslations";
 
 type Feedback = { message: string; error: boolean } | null;
 const AyahShareStudio = lazy(() => import("./AyahShareStudio"));
@@ -32,6 +33,8 @@ export function AyahInteractionSheet({
   const [copied, setCopied] = useState(false);
   const [feedback, setFeedback] = useState<Feedback>(null);
   const [meanings, setMeanings] = useState<QuranWordMeaning[]>([]);
+  const [loadedTranslation, setLoadedTranslation] = useState<{ verseKey: string; text: string | null } | null>(null);
+  const translation = loadedTranslation?.verseKey === verseKey ? loadedTranslation.text : null;
   const [imageShare, setImageShare] = useState(false);
   const imageTrigger = useRef<HTMLButtonElement>(null);
   useEffect(() => setImageShare(false), [verseKey, isOpen]);
@@ -39,12 +42,16 @@ export function AyahInteractionSheet({
   useEffect(() => {
     if (!isOpen || !verseKey) {
       setMeanings([]);
+      setLoadedTranslation(null);
       return;
     }
     const [surah] = verseKey.split(":");
     if (!surah) return;
 
     let cancelled = false;
+    void loadAyahEnglishTranslation(verseKey).then((text) => {
+      if (!cancelled) setLoadedTranslation({ verseKey, text });
+    });
     void loadSurahWordMeanings(surah).then(() => {
       if (!cancelled) {
         setMeanings(getAyahWordMeanings(verseKey));
@@ -71,21 +78,22 @@ export function AyahInteractionSheet({
   const handleCopy = useCallback(async () => {
     if (!text) return;
     try {
-      await navigator.clipboard.writeText(text);
+      await navigator.clipboard.writeText(translation ? `${text}\n\n${translation}\n— Saheeh International` : text);
       setCopied(true);
       setFeedback({ message: t(language, "reader.ayahCopied"), error: false });
     } catch (error) {
       reportError(error, "mushaf-ayah-copy");
       setFeedback({ message: t(language, "reader.copyError"), error: true });
     }
-  }, [language, text]);
+  }, [language, text, translation]);
 
   const handleShare = useCallback(async () => {
     if (!verseKey || !text) return;
     const [surah, ayah] = verseKey.split(":");
     const surahName = getSurahDisplayName(Number(surah), language);
     const ayahLabel = t(language, "reader.ayahLabel", { ayah: formatNumerals(Number(ayah), language) });
-    const shareText = `${text}\n\n[${surahName} · ${ayahLabel}]`;
+    const content = translation ? `${text}\n\n${translation}\n— Saheeh International` : text;
+    const shareText = `${content}\n\n[${surahName} · ${ayahLabel}]`;
 
     try {
       if (navigator.share) {
@@ -104,7 +112,7 @@ export function AyahInteractionSheet({
       reportError(error, "mushaf-ayah-share");
       setFeedback({ message: t(language, "reader.shareError"), error: true });
     }
-  }, [language, text, verseKey]);
+  }, [language, text, translation, verseKey]);
 
   let headerTitle = "";
   if (verseKey) {
@@ -173,6 +181,21 @@ export function AyahInteractionSheet({
               )}
             </div>
 
+            {translation && (
+              <div
+                className="mx-5 mb-3 rounded-xl border border-border bg-card/60 px-4 py-3 text-start"
+                dir="ltr"
+                lang="en"
+                data-testid="ayah-sheet-translation-container"
+              >
+                <h4 className="mb-1 text-micro font-bold text-muted-foreground">
+                  {t(language, "quranListening.translation")} · Saheeh International
+                </h4>
+                <p className="text-sm leading-relaxed text-foreground" data-testid="ayah-sheet-translation">
+                  {translation}
+                </p>
+              </div>
+            )}
             {meanings.length > 0 && (
               <div
                 className="mx-5 mb-3 rounded-xl border border-primary/20 bg-primary/5 p-3"

@@ -1,5 +1,52 @@
 # Decision Log
 
+## Unicode Mushaf fallback — 2026-10-10
+
+The owner requests a more polished fallback while preserving the specific page lines and reading appearance. Refine the existing locally bundled Amiri Quran face, remove artificial QCF ink thickening from Unicode rendering, and use font-relative natural word spacing. Preserve canonical Arabic bytes, word-to-line assignments, fifteen line slots and the existing diacritic fitting contract. Verify ordinary and dense end pages on phone/desktop and all three engines; no new font dependency or religious-content edit is authorized or required.
+
+## Standalone counter alignment — 2026-10-10
+
+The owner explicitly includes Masbaha and صلاة على النبي in the current visual update. Reuse the Zikr footer's grid, spacing, icon alignment and tools disclosure while preserving standalone targets, counting, sound, reset, benefits and saved progress. This extends the authorized release scope; it does not authorize devotional content changes.
+
+## Main Mushaf listening and single-line actions — 2026-10-10
+
+The owner explicitly requests audio synchronization on the main paired reading page, with the expanded player reflecting the same desktop arrangement. Reuse the single audio controller and exact-recording annotations for page, Arabic-word and English-verse emphasis. Manual navigation or native meaning scrolling pauses following; provide return controls in the rail and Reading options. Listening changes page position without recording completion. Prefer compact playback on entry and reserve the dock's measured height. English meaning starts beside Arabic without an enclosing card and uses slightly larger shared type. Arabic timestamps cannot establish English phrase or word correspondence; retain verse-level emphasis. The owner also requests single-line action labels with abbreviation or ellipsis, retaining complete accessible names. Include these explicit follow-ups in the already authorized release after verification.
+
+## Release authority — 2026-10-10
+
+Owner follow-up requests improved Audio options menu, tools collapse/expand
+control and footer feel. Refine hierarchy with labelled, aligned settings rows
+and consistent secondary action surfaces. Preserve the two-row anatomy and
+stable reading geometry while collapsed. Include this refinement in the same
+authorized release after targeted and full verification.
+
+Owner screenshot follow-up requires more separation between footer rows,
+centered icon/text groups and corrected mobile disclosure direction. Use an
+18px row gap, centered navigation groups and down-to-hide/up-to-show chevrons;
+retain hidden-row geometry, counting, RTL semantics and 44px minimum targets.
+
+Owner desktop screenshot follow-up authorizes a shared four-column footer grid
+with a counter spanning the middle two cells. Use available container width,
+retain compact mobile fallback and add only calm opacity/chevron state motion,
+disabled under OS or application reduced motion. No reading layout animation.
+
+The owner requests review and publication of all pending application changes,
+superseding the earlier local-only holds for these completed refinements. Integrate
+current origin/main without replacing newer reading-only Benefit, ayah sharing or
+release-history behavior. Review the complete English meaning corpus against its
+identified source and publish it without editing reviewed Arabic or interpreting
+religious sources. The owner explicitly allows the pending **11 MiB total output
+limit for this release**; all other bundle ceilings, growth checks, coverage and
+accessibility checks remain enforced. Preserve plain Mushaf JSON endpoints for
+previously installed readers. Pre-existing workplace notes and the unrelated
+credential file remain local and are excluded from application publication.
+
+## Paired Quran translation — 2026-10-09
+
+Owner visual follow-up: reduce excessive English ayah gaps, make Arabic slightly larger through the shared renderer with consistent sizing rules, and contain enlarged text inside reading boundaries. English uses 1.65 leading and compact verse spacing; enlarged listening pages stack above meaning rather than exceeding a half-width column. Preserve the canonical fifteen-line page and reviewed wording. Owner reiterates all work stays local and uncommitted for a later push.
+
+Owner asks to limit English meaning to the Arabic page being shown, improve reading measure/leading, pair the two pages, highlight translated text with recitation, automatically scroll and follow pages even when the site loses focus. Apply locally without committing or pushing. Reuse frozen page/range metadata and exact-recording owner-accepted verse cues; preserve reviewed text. English emphasizes the corresponding complete verse, since Arabic word timings do not establish English word correspondence. Wide canvases pair the panes; narrow/enlarged canvases stack without squeezing either text. Native media updates drive background following and focus/visibility restoration reconciles the actual clock. Manual navigation pauses following and remains explicitly resumable. Browser-level freezing is outside application control.
+
 ## Mushaf spacing, Home loading and startup performance — 2026-10-07
 
 The owner requests natural printed Mushaf spacing, Al-Baqarah recitation on the right toolbar, stable Home photograph loading and lower startup cost on older devices. Implement these as phases 83, 84 and 85 with separate coherent commits. Preserve reviewed content, the single audio controller, offline reading, normalized progress, prayer calculations and the approved React/Vite/Tailwind architecture. Retain explicit audio requests while code loads, defer optional cache maintenance, and avoid initializing audio on Home. The owner cannot provide the affected Samsung's browser version; do not claim Android 6/7 engine compatibility from modern-browser simulation. Existing autonomous main-branch release authority applies after the required gates.
@@ -4320,3 +4367,35 @@ The owner explicitly corrects the earlier assumption: Benefit must not appear in
 The owner requests ayah image sharing with portrait and square formats, optional Arabic word meanings and optional English Quran translation. Preserve the complete canonical Arabic text and Mushaf font, continue long content across cards at readable type sizes, and reuse reviewed content with accurate source labels. Missing optional data stays unavailable rather than inferred. Add preview, native sharing/download recovery, accessible text, keyboard focus recovery and export evidence. No reviewed religious wording, recordings, timings or persisted state change.
 
 Release regression follow-up: full-surah sharing remains reachable through a secondary 44px Share control on its image, outside the four reading actions and overflow menu. Home/End on the focused player reading region scroll that region explicitly, pause automatic following, and leave embedded controls and modified shortcuts untouched. This preserves the existing sourced-surah reminder export and keyboard access at enlarged text sizes.
+
+## Reading-first audio layout — 2026-10-09
+
+The owner approved the complete screenshot-based recommendations. Expanded listening retains its opaque canvas, centered fitting zikr, top-start overflow and independent native reading scroll. A container-aware transport dock places speed and volume/options beside centered transport at 48rem of available control width; smaller canvases use a compact utility row. Queue and repetition progress and the active continuation/repetition mode remain visible. Repeat and continuation settings use one labelled Radix popover with Escape/focus recovery. Compact context is now a named native expand button, preserving independent Stop/Play/Expand controls and one passive waveform. Header edge controls share circular anatomy. Seeking labels include ten seconds.
+
+The read-only Mushaf listening page grows to the available reading-region height minus its compact toolbar, with the existing 36rem minimum protecting canonical fifteen-line legibility on short windows. The shared fitter preserves canonical word geometry; short/enlarged windows retain native vertical scrolling. No content, timing provenance, audio controller, persistence or offline boundary changes. Following and estimated cue behavior retain the owner's phase 91 decisions. Targets stay at least 44px, and no drag handle, glow, new dependency or autoplay hiding is introduced.
+
+Owner follow-up on 2026-10-09: complete this audio layout phase locally without committing or pushing; the owner is releasing changes elsewhere. Release notes remain the responsibility of that coordinated release.
+
+## Settings and Progress clarity — 2026-10-09
+
+The owner approves the qualified Settings/Progress recommendations and explicitly withholds pushing. Implement one focused local phase: recording rates through today with explicit denominators and missing-data meaning, correct three-routine coverage, separate location from notification scheduling, centralize Reading controls with an Accessibility shortcut, clarify progress preferences, retain the already photograph-free Day view and prayer-first native disclosure, and verify narrow calendar targets and visible chart labels. This refines DEC-188/DEC-191 without adding a combined worship score, inferring missed worship, changing reviewed content or migrating records. Preserve concurrent audio work. No commit, push, deployment or release-note changes. See phases/SETTINGS_AND_PROGRESS_CLARITY.md.
+
+## Pending changes review — 2026-10-09
+
+The owner asks to continue the sharing review and repair problems in previous changes, then explicitly clarifies “All pending application changes”. Review the pending sharing, Settings, Progress and audio work together and repair demonstrated defects with regression tests. The earlier instruction not to implement the sharing visual redesign remains in force, as do the active phases' local-only publication boundaries. No commit, push, deployment or release-note changes. See phases/PENDING_CHANGES_REVIEW_2026_10_09.md and reports/SHARING_REVIEW_2026_10_09.md.
+
+## Reader footer tools disclosure — 2026-10-09
+
+The owner clarifies that Benefit, Listen and Share are frequently used and must stay in the footer. They approve one explicit Hide tools / Show tools disclosure for that row, preserving the roomy primary counting/navigation row, choice across items, focus-mode hiding and independent playback access. The chevron controls tools; the hand remains counting guidance. Implement this focused phase locally; earlier no-commit/no-push/no-deployment holds remain. Quran snippet spacing and broader focus-mode redesign are separate proposals. See phases/READER_FOOTER_TOOLS_DISCLOSURE.md.
+
+## Stable Reader disclosure geometry — 2026-10-09
+
+The owner supersedes the space-reclaiming footer behavior: tools and counting-guidance toggles must not change text geometry or position. Retain their measured layout space while hidden, excluding hidden content from keyboard/accessibility navigation. Refine the tools pill and hand target with semantic surfaces, stable label width and visible focus. Use the standard connected-nodes Share07 icon for share actions through the existing icon export layer. All changes are local for owner review; no publication.
+
+## Local responsive controls and low-vision sizing — 2026-10-09
+
+Owner authorized all footer/audio recommendations locally before pushing; requested a calmer compact player and desktop/mobile Mushaf enlargement; emphasized symmetry. Apply container-based grouping and progressive disclosure while preserving geometry. Add 100–200% session-local page magnification preserving canonical text/lines, native panning and explicit page navigation. No publication authorized in this phase. See RESPONSIVE_READER_CONTROL_REFINEMENT.md.
+
+### Owner correction: centered two-row Reader footer (2026-10-09)
+
+The owner rejected the wide single-row arrangement after local review: it broke perceived symmetry and wrapped button labels. Use two centered action rows at every width, equal tool cells, non-wrapping labels, and centered Previous / Done / Next. Center fitting devotional text vertically and horizontally; overflowing text scrolls within the reading region above the footer. All work remains local and uncommitted pending owner testing.

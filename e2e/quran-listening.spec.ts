@@ -4,84 +4,47 @@ import { getAzkarForMode } from "../src/app/content/azkar";
 import { FRIDAY_KAHF } from "../src/app/content/fridayKahf";
 import { t } from "../src/app/i18n";
 import { splitMushafPages } from "../src/app/content/mushafPages";
-import { readFileSync } from "node:fs";
-import { gunzipSync } from "node:zlib";
-import { OWNER_TIMING_PACK_SHA, expandOwnerTiming, type OwnerTimingPack } from "../src/app/audio/ownerTimingPreviews";
+import { listeningCases, listeningTiming, openListeningPage } from "./helpers/quran-listening";
 
-const timingPack: OwnerTimingPack = JSON.parse(
-  gunzipSync(readFileSync(`public/data/listening-timings/owner-${OWNER_TIMING_PACK_SHA}.bin`)).toString(),
-);
-
-for (const item of [
-  { id: "ir-baqarah", category: "illness_ruqyah", route: "illness-ruqyah", first: 2, next: 3 },
-  { id: "friday-kahf", category: "friday_kahf", route: "friday-kahf", first: 293, next: 294 },
-  { id: "s-hm-110a", category: "before_sleep", route: "before-sleep", first: 415, next: 416 },
-  { id: "s-hm-110b", category: "before_sleep", route: "before-sleep", first: 562, next: 563 },
-] as const) {
+for (const item of listeningCases) {
   for (const language of ["en", "ar"] as const) {
     test(`Mushaf listening ${item.id} ${language} preserves audio and reading state @cross-browser`, async ({
       page,
     }, testInfo) => {
-      await page.setViewportSize({ width: 390, height: 844 });
-      await page.route("https://verses.quran.foundation/fonts/**", (route) => route.abort());
-      await page.addInitScript((language) => {
-        localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
-        localStorage.setItem(
-          "azkarapp.state.v1",
-          JSON.stringify({
-            settings: { language, routineMode: "complete", reduceMotion: true },
-            routineMode: "complete",
-            profile: { isGuest: true },
-            khatmahPage: 42,
-          }),
-        );
-        class ListeningAudio extends EventTarget {
-          src = "";
-          currentTime = 30;
-          duration = 120;
-          volume = 1;
-          muted = false;
-          playbackRate = 1;
-          paused = true;
-          ended = false;
-          constructor() {
-            super();
-            Object.assign(window, {
-              __listeningAudio: this,
-              __listeningAudioCount:
-                ((window as unknown as { __listeningAudioCount?: number }).__listeningAudioCount ?? 0) + 1,
-            });
-          }
-          load() {
-            this.dispatchEvent(new Event("loadedmetadata"));
-            this.dispatchEvent(new Event("canplay"));
-          }
-          play() {
-            this.paused = false;
-            this.dispatchEvent(new Event("playing"));
-            return Promise.resolve();
-          }
-          pause() {
-            this.paused = true;
-            this.dispatchEvent(new Event("pause"));
-          }
-          removeAttribute() {
-            this.src = "";
-          }
-        }
-        Object.defineProperty(window, "Audio", { value: ListeningAudio });
-      }, language);
-      const index =
-        item.id === "friday-kahf"
-          ? 0
-          : getAzkarForMode(item.category, "complete").findIndex((zikr) => zikr.id === item.id);
-      await page.goto(`/#/azkar/${item.route}/${index + 1}`);
+      const player = await openListeningPage(page, item, language);
       await expect(page.getByTestId("reader-screen")).toHaveAttribute("data-zikr-id", item.id);
-      await page.getByRole("button", { name: t(language, "reader.listenToSurah"), exact: true }).click();
-      const player = page.getByRole("region", { name: t(language, "audioPlayer.region"), exact: true });
-      await player.getByRole("button", { name: t(language, "audioPlayer.expand"), exact: true }).click();
       const paper = player.locator(`[data-mushaf-page="${item.first}"]`);
       await expect(paper).toHaveAttribute("data-mushaf-rendering", "unicode-fallback");
+      const translation = player.getByTestId("quran-page-translation");
+      if (language === "en") {
+        await expect(translation).toHaveAttribute("open", "");
+        const visibleKeys = await paper
+          .locator("[data-listening-verse]")
+          .evaluateAll((words) => [...new Set(words.map((word) => word.getAttribute("data-listening-verse")))]);
+        const translatedKeys = await translation
+          .locator("[data-translation-verse]")
+          .evaluateAll((verses) => verses.map((verse) => verse.getAttribute("data-translation-verse")));
+        expect(translatedKeys.length).toBeGreaterThan(0);
+        expect(translatedKeys.every((key) => visibleKeys.includes(key))).toBe(true);
+        const typography = await translation.locator("[role=region]").evaluate((region) => {
+          const verse = getComputedStyle(region.querySelector("p")!);
+          const fontSize = parseFloat(getComputedStyle(region).fontSize);
+          return {
+            direction: getComputedStyle(region).direction,
+            align: getComputedStyle(region).textAlign,
+            leading: parseFloat(getComputedStyle(region).lineHeight) / fontSize,
+            verseGap:
+              (parseFloat(verse.marginBottom) + parseFloat(verse.paddingTop) + parseFloat(verse.paddingBottom)) /
+              fontSize,
+          };
+        });
+        expect(typography.direction).toBe("ltr");
+        expect(typography.align).toBe("start");
+        expect(typography.leading).toBeCloseTo(1.65, 5);
+        expect(typography.verseGap).toBeLessThanOrEqual(1);
+      } else {
+        await expect(translation).toHaveCount(0);
+      }
       const wordOrder = await paper.evaluate((element) => {
         const line = Array.from(element.querySelectorAll("[data-mushaf-line-content]")).find(
           (row) => row.querySelectorAll("[data-listening-verse]").length > 1,
@@ -130,15 +93,7 @@ for (const item of [
       await page.keyboard.press("Escape");
       await expect(explanation).toHaveCount(0);
       await expect(information).toBeFocused();
-      const record = timingPack.records.find(
-        (record) =>
-          record.q &&
-          record.v.some((id) =>
-            id.startsWith(item.id === "ir-baqarah" ? "quran-002" : item.id === "friday-kahf" ? "quran-018" : item.id),
-          ),
-      )!;
-      const annotation = expandOwnerTiming(timingPack, record);
-      if (!("verses" in annotation)) throw new Error("Expected Quran timings");
+      const annotation = listeningTiming(item);
       const first = annotation.verses.find((verse) => verse.words?.length)!;
       await page.evaluate(
         (time) => {
@@ -156,6 +111,12 @@ for (const item of [
         )
         .toBe(true);
       expect(await active.evaluate((word) => getComputedStyle(word).backgroundColor)).not.toBe("rgba(0, 0, 0, 0)");
+      if (language === "en") {
+        await expect(translation.locator('[aria-current="true"]')).toHaveAttribute(
+          "data-translation-verse",
+          first.verseKey,
+        );
+      }
       const metrics = await active.evaluate((word) => {
         const bounds = word.getBoundingClientRect(),
           view = word.closest(".audio-expanded-text")!.getBoundingClientRect();
@@ -246,6 +207,18 @@ for (const item of [
       await next.focus();
       await page.keyboard.press("Enter");
       await expect(player.locator(`[data-mushaf-page="${item.next}"]`)).toBeVisible();
+      if (language === "en") {
+        const nextKeys = await player
+          .locator(`[data-mushaf-page="${item.next}"] [data-listening-verse]`)
+          .evaluateAll((words) => [...new Set(words.map((word) => word.getAttribute("data-listening-verse")))]);
+        const translatedKeys = await translation
+          .locator("[data-translation-verse]")
+          .evaluateAll((verses) => verses.map((verse) => verse.getAttribute("data-translation-verse")));
+        expect(translatedKeys.every((key) => nextKeys.includes(key))).toBe(true);
+        await expect(translation.locator('[aria-current="true"]')).toHaveCount(
+          nextKeys.includes(lastVerse.verseKey) ? 1 : 0,
+        );
+      }
       await expect(next).toBeFocused();
       // A not-yet-cached page must retain the reviewed text while offline.
       const zikr =
@@ -292,6 +265,17 @@ for (const item of [
       await expect.poll(() => paper.evaluate((element) => element.scrollWidth <= element.clientWidth + 1)).toBe(true);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
       await player.screenshot({ path: testInfo.outputPath(`${item.id}-mushaf-listening-narrow.png`) });
+      await page.setViewportSize({ width: 1440, height: 1100 });
+      await page.getByTestId("reader-sidebar-close").click();
+      if ((await player.getAttribute("data-variant")) === "compact") {
+        await player.getByRole("button", { name: t(language, "audioPlayer.expand"), exact: true }).click();
+      }
+      await expect
+        .poll(() => player.locator(".audio-listening-page").evaluate((el) => el.clientHeight))
+        .toBeGreaterThan(576);
+      const dock = player.locator(".audio-expanded-controls");
+      expect((await dock.boundingBox())!.height).toBeLessThanOrEqual(150);
+      await player.screenshot({ path: testInfo.outputPath(`${item.id}-mushaf-listening-desktop.png`) });
     });
   }
 }

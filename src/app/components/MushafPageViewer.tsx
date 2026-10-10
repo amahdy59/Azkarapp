@@ -10,6 +10,7 @@ import {
   type MutableRefObject,
   type CSSProperties,
 } from "react";
+import "./mushaf-magnification.css";
 import type { AppLanguage, MushafPageTheme, MushafTextScale } from "../types";
 import { getQuranWordMeaningEntry, type QuranWordMeaning } from "../content/quranWordMeanings";
 import { t } from "../i18n";
@@ -275,7 +276,7 @@ const MushafTextLine = memo(function MushafTextLine({
         className={`flex shrink-0 flex-nowrap items-baseline whitespace-nowrap ${
           justifyCenter
             ? `w-auto justify-center ${useQcfGlyphs ? "gap-x-1 min-[360px]:gap-x-1.5" : "gap-x-1.5 min-[360px]:gap-x-2"}`
-            : `w-full justify-center ${useQcfGlyphs ? "gap-x-0" : "gap-x-0.5"}`
+            : `w-full justify-center ${useQcfGlyphs ? "gap-x-0" : "gap-x-[0.16em]"}`
         }`}
         style={justifyCenter ? undefined : { maxWidth: "var(--mushaf-measure, 100%)" }}
       >
@@ -306,8 +307,9 @@ const MushafTextLine = memo(function MushafTextLine({
                 key={key}
                 type="button"
                 className={`inline-block shrink-0 select-none rounded-sm border-0 bg-transparent p-0 [font:inherit] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                  highlightedVerseKey === w.verseKey ? "bg-primary/20" : ""
+                  highlightedVerseKey === w.verseKey ? "bg-primary/20 ring-2 ring-primary/55" : ""
                 }`}
+                aria-current={highlightedVerseKey === w.verseKey ? "true" : undefined}
                 style={{ lineHeight: "inherit", verticalAlign: "baseline" }}
                 aria-label={t(language, "reader.openAyahActions", {
                   ayah: formatNumerals(w.verseKey.split(":")[1] || w.text, language),
@@ -480,7 +482,12 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
     if (!canvas) return;
 
     let frame = 0;
+    let containmentFrame = 0;
     let cancelled = false;
+    let fittedScale = "1";
+    let fittedMeasure = 0;
+    let hasMagnified = false;
+    let fittedViewport = "";
 
     const fit = () => {
       const column = canvas.firstElementChild as HTMLElement | null;
@@ -493,6 +500,18 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
          owns its own measure: the vars are set on its canvas and inherited by
          its column. */
       const page = canvas;
+      const magnification = Number.parseFloat(getComputedStyle(canvas).getPropertyValue("--mushaf-magnification")) || 1;
+      const paper = canvas.closest(".mushaf-paper, .audio-listening-arabic");
+      const bounds = paper?.getBoundingClientRect();
+      // Native scrollbar space changes clientWidth during enlargement. It
+      // must not be mistaken for a new reading viewport and refit the ink.
+      const viewport = `${bounds?.width}:${bounds?.height}`;
+      if (magnification > 1) hasMagnified = true;
+      if (hasMagnified && fittedMeasure > 0 && viewport === fittedViewport) {
+        page.style.setProperty("--mushaf-fit", fittedScale);
+        page.style.setProperty("--mushaf-measure", `${Math.round(fittedMeasure * magnification)}px`);
+        return;
+      }
 
       // Reset measure & fit to base before measuring
       page.style.setProperty("--mushaf-measure", "100%");
@@ -519,7 +538,9 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
         let natural = gap * Math.max(0, childCount - 1);
         const children = content.children;
         for (let j = 0; j < childCount; j++) {
-          natural += (children[j] as HTMLElement).offsetWidth;
+          // Fractional advances matter across a whole Arabic line; rounding
+          // every word can accumulate several pixels of overflow in Chromium.
+          natural += (children[j] as HTMLElement).getBoundingClientRect().width;
         }
         if (content.scrollWidth > content.clientWidth) {
           natural = Math.max(natural, content.scrollWidth);
@@ -532,14 +553,16 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
 
       const lineHeight = first.offsetHeight;
       if (!widest) widest = Math.max(...naturalWidths);
-      const responsiveInkAllowance = window.innerWidth >= 768 ? Math.max(0.58, inkAllowance - 0.06) : inkAllowance;
-      const verticalScale = lineHeight > 0 ? (slotHeight * responsiveInkAllowance) / lineHeight : 1;
+      const verticalScale = lineHeight > 0 ? (slotHeight * inkAllowance) / lineHeight : 1;
       const measure = Math.min(widest * verticalScale, available);
       const scale = Math.min(Math.max(widest > 0 ? measure / widest : 1, 0.6), 2.4);
 
       // Single write pass: apply calculated scale and transforms
       page.style.setProperty("--mushaf-measure", `${Math.round(measure)}px`);
       page.style.setProperty("--mushaf-fit", scale.toFixed(3));
+      fittedScale = scale.toFixed(3);
+      fittedMeasure = measure / magnification;
+      fittedViewport = viewport;
 
       for (let i = 0; i < lineCount; i++) {
         const content = contents[i]!;
@@ -552,6 +575,32 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
         // justification must never distribute spare page width between words.
         content.style.justifyContent = "center";
       }
+
+      // Font fitting changes hinting and em-based gaps. Measure the resulting
+      // advances once more, then contain any residual overrun without reflow.
+      cancelAnimationFrame(containmentFrame);
+      containmentFrame = requestAnimationFrame(() => {
+        const corrections = contents.map((content) => {
+          const parent = content.parentElement!.getBoundingClientRect();
+          const boxes = Array.from(content.children, (child) => child.getBoundingClientRect());
+          if (!boxes.length) return null;
+          const left = Math.min(...boxes.map((box) => box.left));
+          const right = Math.max(...boxes.map((box) => box.right));
+          if (left >= parent.left && right <= parent.right) return null;
+          const width = right - left;
+          const factor = Math.min(1, parent.width / width);
+          const contentBox = content.getBoundingClientRect();
+          const origin = contentBox.left + contentBox.width / 2;
+          const center = origin + ((left + right) / 2 - origin) * factor;
+          const shift = parent.left + parent.width / 2 - center;
+          const current = content.style.transform ? Number(content.style.transform.match(/scale\(([^)]+)\)/)?.[1]) : 1;
+          return `translateX(${shift.toFixed(5)}px) scale(${(current * factor).toFixed(5)})`;
+        });
+        contents.forEach((content, index) => {
+          const correction = corrections[index];
+          if (correction) content.style.transform = correction;
+        });
+      });
     };
 
     const schedule = () => {
@@ -566,11 +615,15 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
     void document.fonts?.ready?.then?.(() => {
       if (!cancelled) schedule();
     });
+    // A swap can begin after the initial ready promise has resolved.
+    document.fonts?.addEventListener("loadingdone", schedule);
 
     return () => {
       cancelled = true;
       cancelAnimationFrame(frame);
+      cancelAnimationFrame(containmentFrame);
       observer.disconnect();
+      document.fonts?.removeEventListener("loadingdone", schedule);
     };
   }, [dependencyKey, inkAllowance]);
 
@@ -937,7 +990,9 @@ function MushafPageCanvas({
                 fontSize: useQcfGlyphs
                   ? "calc(min(4.6cqi, 4.6cqh) * var(--mushaf-fit, 1))"
                   : "calc(min(3.6cqi, 4.1cqh) * var(--mushaf-fit, 1))",
-                WebkitTextStrokeWidth: inkStroke,
+                fontWeight: 400,
+                fontSynthesis: "none",
+                WebkitTextStrokeWidth: useQcfGlyphs ? inkStroke : "0px",
                 WebkitTextStrokeColor: "currentColor",
               }}
             >
@@ -1011,7 +1066,9 @@ function MushafPageCanvas({
               fontSize: useQcfGlyphs
                 ? "calc(min(4.6cqi, 4.6cqh) * var(--mushaf-fit, 1))"
                 : "calc(min(3.6cqi, 4.1cqh) * var(--mushaf-fit, 1))",
-              WebkitTextStrokeWidth: inkStroke,
+              fontWeight: 400,
+              fontSynthesis: "none",
+              WebkitTextStrokeWidth: useQcfGlyphs ? inkStroke : "0px",
               WebkitTextStrokeColor: "currentColor",
             }}
           >
@@ -1128,6 +1185,7 @@ export function MushafPageViewer({
   theme = "light",
   isBookmarked = false,
   paperStyle,
+  magnification = 100,
   useQcfGlyphs = false,
   showWordMeanings = false,
   headerContent,
@@ -1143,8 +1201,10 @@ export function MushafPageViewer({
   hapticFeedback = false,
   textScale = "medium",
   facingPage,
+  facingContent,
   onAyahAction,
   highlightedVerseKey,
+  highlightedWord,
   onSurahClick,
   onJuzClick,
   onPageClick,
@@ -1164,6 +1224,7 @@ export function MushafPageViewer({
   pageNumber: number;
   /** The left-hand page of a spread, when the screen has room for one. */
   facingPage?: { pageNumber: number; lines: MushafWordToken[][]; useQcfGlyphs: boolean };
+  facingContent?: ReactNode;
   surahName: string;
   juzNumber: number;
   direction: "ltr" | "rtl";
@@ -1195,6 +1256,7 @@ export function MushafPageViewer({
    * whole screen appear to slide rather than the page.
    */
   paperStyle?: CSSProperties;
+  magnification?: number;
   pageTransitionDirection?: "forward" | "backward";
   reduceMotion?: boolean;
   hapticFeedback?: boolean;
@@ -1202,6 +1264,7 @@ export function MushafPageViewer({
   textScale?: MushafTextScale;
   onAyahAction?: (verseKey: string, pageNumber: number) => void;
   highlightedVerseKey?: string | null;
+  highlightedWord?: { verseKey: string; position: number } | null;
   onSurahClick?: () => void;
   onJuzClick?: () => void;
   onPageClick?: () => void;
@@ -1217,6 +1280,16 @@ export function MushafPageViewer({
   onNext?: () => void;
 }) {
   const formattedJuz = `${t(language, "common.juz")} ${formatNumerals(juzNumber, language)}`;
+
+  useLayoutEffect(() => {
+    const paper = paperRef?.current;
+    if (!paper) return;
+    const updateHeight = () => paper.style.setProperty("--mushaf-page-height", `${paper.clientHeight}px`);
+    updateHeight();
+    const observer = new ResizeObserver(updateHeight);
+    observer.observe(paper);
+    return () => observer.disconnect();
+  }, [paperRef, pageNumber]);
 
   useLayoutEffect(() => {
     const paper = paperRef?.current;
@@ -1523,11 +1596,21 @@ export function MushafPageViewer({
       <div
         key={`${pageNumber}:${facingPage?.pageNumber ?? "single"}`}
         ref={paperRef}
-        style={paperStyle}
-        className={`mushaf-paper flex min-h-0 min-w-0 flex-1 ${facingPage ? "mushaf-spread" : ""}`}
+        style={
+          { ...paperStyle, "--mushaf-magnification": Math.max(1, Math.min(2, magnification / 100)) } as CSSProperties
+        }
+        data-magnified={magnification > 100}
+        role={magnification > 100 ? "region" : undefined}
+        aria-label={magnification > 100 ? t(language, "mushaf.magnification") : undefined}
+        tabIndex={magnification > 100 ? 0 : undefined}
+        className={`mushaf-paper flex min-h-0 min-w-0 flex-1 ${facingPage || facingContent ? "mushaf-spread" : ""}`}
         data-page-transition={pageTransitionDirection}
         dir="rtl"
         onPointerDown={(event) => {
+          if (event.target instanceof Element && event.target.closest("[data-mushaf-meaning]")) {
+            paperTap.current = null;
+            return;
+          }
           paperTap.current = {
             id: event.pointerId,
             x: event.clientX,
@@ -1543,7 +1626,7 @@ export function MushafPageViewer({
         onPointerCancel={() => {
           paperTap.current = null;
         }}
-        onPointerUp={handlePaperPointerUp}
+        onPointerUp={magnification > 100 ? undefined : handlePaperPointerUp}
       >
         {/* Plain visual words step aside from the accessibility tree until
             study mode is enabled; ayah-marker buttons remain operable in
@@ -1559,7 +1642,7 @@ export function MushafPageViewer({
             useQcfGlyphs={useQcfGlyphs}
             showWordMeanings={showWordMeanings}
             inkStroke={inkStroke}
-            spreadSide={facingPage ? "right" : undefined}
+            spreadSide={facingPage || facingContent ? "right" : undefined}
             textScale={textScale}
             showPageIdentity={showPageIdentity}
             hasTopCenterControl={Boolean(topCenterControl)}
@@ -1567,6 +1650,7 @@ export function MushafPageViewer({
             isFloatingLayout={isFloatingLayout}
             onAyahAction={onAyahAction}
             highlightedVerseKey={highlightedVerseKey}
+            highlightedWord={highlightedWord}
             onSurahClick={onSurahClick}
             onJuzClick={onJuzClick}
             onPageClick={onPageClick}
@@ -1590,10 +1674,22 @@ export function MushafPageViewer({
                 isFloatingLayout={false}
                 onAyahAction={onAyahAction}
                 highlightedVerseKey={highlightedVerseKey}
+                highlightedWord={highlightedWord}
                 onSurahClick={onSurahClick}
                 onJuzClick={onJuzClick}
                 onPageClick={onPageClick}
               />
+            </>
+          )}
+          {facingContent && !facingPage && (
+            <>
+              <div className="mushaf-spread__gutter" aria-hidden="true" />
+              <div
+                className="mushaf-spread__page flex min-h-0 min-w-0 flex-1 items-stretch justify-center"
+                data-mushaf-meaning=""
+              >
+                {facingContent}
+              </div>
             </>
           )}
         </div>
@@ -1601,7 +1697,12 @@ export function MushafPageViewer({
         {/* The cohesive verse text, cleanly readable for screen readers when they aren't in study mode. */}
         {!showWordMeanings && (
           <div className="sr-only">
-            <ScreenReaderVerses lines={lines} language={language} pageNumber={pageNumber} />
+            <ScreenReaderVerses
+              lines={lines}
+              language={language}
+              pageNumber={pageNumber}
+              highlightedVerseKey={highlightedVerseKey}
+            />
             {facingPage && (
               <ScreenReaderVerses lines={facingPage.lines} language={language} pageNumber={facingPage.pageNumber} />
             )}
@@ -1696,6 +1797,7 @@ export function MushafListeningPage({
   highlightedWord,
   theme = "light",
   textScale = "medium",
+  magnification = 100,
 }: {
   lines: MushafWordToken[][];
   language: AppLanguage;
@@ -1703,17 +1805,24 @@ export function MushafListeningPage({
   useQcfGlyphs: boolean;
   theme?: MushafPageTheme;
   textScale?: MushafTextScale;
+  magnification?: number;
   highlightedVerseKey?: string | null;
   highlightedWord?: { verseKey: string; position: number } | null;
 }) {
   return (
     <>
       <div
+        style={
+          {
+            "--mushaf-magnification": Math.max(1, Math.min(2, magnification / 100)),
+            width: `${magnification}%`,
+            height: `max(${(36 * magnification) / 100}rem, calc(100cqh * ${magnification / 100} - 3rem))`,
+          } as CSSProperties
+        }
         aria-hidden="true"
-        className={`theme-${theme} relative isolate flex w-full flex-col rounded-lg bg-background text-foreground`}
+        className={`audio-listening-page theme-${theme} relative isolate flex w-full flex-col rounded-lg bg-background text-foreground`}
         dir="rtl"
         lang="ar"
-        style={{ height: "36rem", minHeight: "36rem" }}
       >
         <MushafPageCanvas
           lines={lines}

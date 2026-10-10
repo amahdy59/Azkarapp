@@ -16,7 +16,6 @@ export function useQuranPlaybackCue(
     if (!timing || !playing || !readTime) return;
     let frame = 0;
     const sample = () => {
-      if (document.visibilityState === "hidden") return;
       const cue = getQuranPlaybackCue(timing, readTime());
       setLive((previous) =>
         previous?.timing === timing &&
@@ -25,17 +24,21 @@ export function useQuranPlaybackCue(
           ? previous
           : { timing, cue },
       );
-      frame = requestAnimationFrame(sample);
+      if (document.visibilityState !== "hidden") frame = requestAnimationFrame(sample);
     };
     const visibility = () => {
       cancelAnimationFrame(frame);
-      if (document.visibilityState !== "hidden") sample();
+      sample();
     };
     visibility();
     document.addEventListener("visibilitychange", visibility);
+    window.addEventListener("focus", visibility);
+    window.addEventListener("pageshow", visibility);
     return () => {
       cancelAnimationFrame(frame);
       document.removeEventListener("visibilitychange", visibility);
+      window.removeEventListener("focus", visibility);
+      window.removeEventListener("pageshow", visibility);
     };
   }, [timing, playing, readTime, currentTime]);
   // Reconcile seeks and pause immediately, even between native timeupdate events.

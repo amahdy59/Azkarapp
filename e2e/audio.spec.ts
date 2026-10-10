@@ -51,18 +51,26 @@ for (const language of ["ar", "en"] as const) {
       await playEnglishTranslation(page);
     }
     const player = page.getByRole("region", { name: language === "ar" ? "مشغل الصوت" : "Audio player", exact: true });
-    await expect(player.getByRole("button")).toHaveCount(3); // Close, Play and Expand; context is not a duplicate button.
+    await expect(player.getByRole("button")).toHaveCount(4); // Stop, title expansion, Play and Expand are keyboard actions.
     await expect(player.getByRole("slider")).toHaveCount(0);
     await player.getByTestId("audio-compact-title").click();
-    const continuation = player.getByRole("switch", {
+    const options = page.getByRole("button", {
+      name: language === "ar" ? "خيارات الصوت" : "Audio options",
+      exact: true,
+    });
+    await options.click();
+    const continuation = page.getByRole("switch", {
       name: language === "ar" ? "تشغيل الذكر التالي تلقائيًا" : "Play next zikr automatically",
     });
     await expect(continuation).toHaveAttribute("aria-checked", "false");
+    await page.keyboard.press("Escape");
     const reader = page.getByTestId("reader-screen");
     const firstId = await reader.getAttribute("data-zikr-id");
     await player.getByRole("button", { name: language === "ar" ? "الذكر التالي" : "Next item", exact: true }).click();
     await expect(reader).not.toHaveAttribute("data-zikr-id", firstId!);
+    await options.click();
     await expect(continuation).toHaveAttribute("aria-checked", "false");
+    await page.keyboard.press("Escape");
     await player
       .getByRole("button", { name: language === "ar" ? "الذكر السابق" : "Previous item", exact: true })
       .click();
@@ -93,7 +101,9 @@ for (const language of ["ar", "en"] as const) {
     await expect
       .poll(() => page.evaluate(() => (window as unknown as { __seekAudio: HTMLMediaElement }).__seekAudio.currentTime))
       .toBeLessThan(80);
+    await options.click();
     await expect(continuation).toHaveAttribute("aria-checked", "false");
+    await page.keyboard.press("Escape");
   });
 }
 
@@ -148,7 +158,8 @@ test("100-count tawhid offers prescribed repeat and shows each repetition", asyn
   await page.getByTestId("reader-audio-dock-button").click();
   const player = page.getByRole("region", { name: "Audio player", exact: true });
   await player.getByRole("button", { name: "Expand player" }).click();
-  await expect(player.getByRole("button", { name: "Repeat 100 times", exact: true })).toHaveAttribute(
+  await player.getByRole("button", { name: "Audio options", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Repeat 100 times", exact: true })).toHaveAttribute(
     "aria-pressed",
     "true",
   );
@@ -167,11 +178,12 @@ test("100-count tawhid offers prescribed repeat and shows each repetition", asyn
     (window as unknown as { repetitionAudio: EventTarget }).repetitionAudio.dispatchEvent(new Event("ended")),
   );
   await expect(player).toContainText("2 / 100");
-  await player.getByRole("button", { name: "Repeat 100 times", exact: true }).click();
-  await expect(player.getByRole("button", { name: "Repeat 100 times", exact: true })).toHaveAttribute(
+  await page.getByRole("button", { name: "Repeat 100 times", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Repeat 100 times", exact: true })).toHaveAttribute(
     "aria-pressed",
     "false",
   );
+  await page.keyboard.press("Escape");
   await player.getByRole("button", { name: "Stop audio and close player" }).click();
   await expect(page.getByTestId("counter-surface")).toBeFocused();
 });
@@ -319,8 +331,8 @@ test("Al-Kahf queues an intentional listen press while the audio module loads", 
   const expandedPlayBox = await player
     .getByRole("button", { name: /^(تشغيل الصوت|إيقاف الصوت مؤقتًا)$/ })
     .boundingBox();
-  expect(expandedPlayBox?.width).toBeGreaterThanOrEqual(60);
-  expect(expandedPlayBox?.width).toBeLessThanOrEqual(68);
+  expect(expandedPlayBox?.width).toBe(52);
+  expect(expandedPlayBox?.height).toBe(52);
 
   const expandedMinimizeBox = await player.getByRole("button", { name: "تصغير المشغل" }).boundingBox();
   const expandedCloseBox = await player.getByRole("button", { name: "إيقاف الصوت وإغلاق المشغل" }).boundingBox();
@@ -334,7 +346,11 @@ test("Al-Kahf queues an intentional listen press while the audio module loads", 
     "style",
     /linear-gradient\(to left/,
   );
-  await player.getByRole("button", { name: "مستوى الصوت", exact: true }).click();
+  await player.getByRole("button", { name: "خيارات الصوت", exact: true }).click();
+  await page
+    .getByRole("dialog", { name: "خيارات الصوت", exact: true })
+    .getByRole("button", { name: "مستوى الصوت", exact: true })
+    .click();
   const volume = page.getByTestId("audio-volume-popover").getByRole("slider", { name: "مستوى الصوت" });
   await expect(volume).toBeVisible();
   await expect(volume).toHaveAttribute("aria-orientation", "vertical");
@@ -364,7 +380,10 @@ test("desktop player stays inside the main canvas and reveals vertical volume on
   await player.getByRole("button", { name: "توسيع المشغل", exact: true }).click();
   const timeline = player.getByRole("slider", { name: "تقديم أو تأخير الصوت" });
   await expect(timeline).toBeVisible();
-  const volume = player.getByRole("button", { name: "مستوى الصوت", exact: true });
+  await player.getByRole("button", { name: "خيارات الصوت", exact: true }).click();
+  const volume = page
+    .getByRole("dialog", { name: "خيارات الصوت", exact: true })
+    .getByRole("button", { name: "مستوى الصوت", exact: true });
   await volume.hover();
   await expect(page.getByTestId("audio-volume-popover")).toHaveCount(0);
   await volume.click();
@@ -386,6 +405,12 @@ test("desktop player stays inside the main canvas and reveals vertical volume on
   await expect(popover).toHaveCount(0);
   await expect(volume).toBeFocused();
   await expect(player).toHaveAttribute("data-variant", "expanded");
+  const options = page.getByRole("dialog", { name: "خيارات الصوت", exact: true });
+  await expect(options).toBeVisible();
+  const optionsBounds = (await options.boundingBox())!;
+  expect(optionsBounds.x).toBeGreaterThanOrEqual(0);
+  expect(optionsBounds.x + optionsBounds.width).toBeLessThanOrEqual(1440);
+  await page.screenshot({ path: testInfo.outputPath("audio-options-refined.png") });
 
   const [mainBox, playerBox] = await Promise.all([page.locator(".app-main").boundingBox(), player.boundingBox()]);
   expect(mainBox && playerBox).toBeTruthy();
@@ -449,7 +474,8 @@ test("expanded queue controls stay inside a 320px phone viewport", async ({ page
   await expect(page.getByRole("dialog", { name: "Audio player" })).toHaveCount(0);
   const textViewport = player.getByRole("region", { name: "Now playing" });
   expect((await textViewport.boundingBox())?.height).toBeGreaterThanOrEqual(44);
-  const voice = player.getByTestId("audio-reciter-select");
+  await player.getByRole("button", { name: "Audio options", exact: true }).click();
+  const voice = page.getByRole("dialog", { name: "Audio options" }).getByTestId("audio-reciter-select");
   await voice.click();
   await expect(page.getByRole("listbox")).toBeVisible();
   await page.keyboard.press("Escape");
@@ -460,6 +486,7 @@ test("expanded queue controls stay inside a 320px phone viewport", async ({ page
     expect(bounds?.width, await button.getAttribute("aria-label")).toBeGreaterThanOrEqual(44);
     expect(bounds?.height).toBeGreaterThanOrEqual(44);
   }
+  await page.keyboard.press("Escape");
   await player.screenshot({ path: testInfo.outputPath("audio-expanded-320-en.png") });
   await page.keyboard.press("Escape");
   await expect(player).toHaveAttribute("data-variant", "compact");

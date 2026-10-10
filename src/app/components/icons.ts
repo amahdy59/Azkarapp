@@ -92,7 +92,7 @@ export {
   SearchMd as SearchIcon,
   Settings01 as Settings,
   Share07 as Share2,
-  Share01 as ShareExport,
+  Share07 as ShareExport,
   Signal03 as Signal,
   SkipBack,
   SkipForward,

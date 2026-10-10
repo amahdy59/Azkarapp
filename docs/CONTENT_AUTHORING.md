@@ -114,6 +114,26 @@ Changing a page range requires the same independent source review as adding it. 
 
 The comprehensive dua collection is the reference example for lazy session content: `comprehensiveDuas.ts` contains an optional introduction, 20 essential items, and reviewed additional items with direct Arabic benefits, sources, contexts, and attribution types. Its Azkar Library category opens the standard collection, counter, completion, progress, and saved-item flow; Friday Mode references that same content and can start the same session. Keep large optional collections lazy and inject them into the shared session components rather than duplicating either content or UI.
 
+## Full English Quran meaning assets
+
+`public/data/translations/en/1.json` through `114.json` store the Saheeh International
+meaning from [Al Quran Cloud's en.sahih edition](https://api.alquran.cloud/v1/quran/en.sahih),
+identified by the provider's edition metadata. The coding agent reviewed the owner's
+requested release on 2026-10-10: all 114 chapters and 6,236 numbered verses matched
+the source response exactly, with zero mismatches. This verifies source fidelity and
+coverage of an identified existing translation; it is not a new theological
+interpretation or independent scholarly endorsement of its wording.
+
+Regenerate with `node scripts/prepare-quran-translations.mjs`; it validates edition,
+chapter coverage, verse order and nonempty text before writing any chapter. Review
+any changed wording against that source, retain Saheeh International attribution,
+and run `scripts/quran-translation-data.test.mjs` through the repository test suite.
+Assets are fetched from the application's own origin on demand and cached after
+reading; first access while offline can show unavailable meaning without disrupting
+Arabic reading. Existing reviewed Arabic, repetition counts, sources and recording
+timings are unchanged. Source comparison evidence is retained locally in
+`output/quran-translation-source-verification.json`.
+
 ## Listening timestamp review
 
 Quran text and audio alignment have separate reviews. Do not invent or interpolate approved timestamps. Register only independently reviewed timings for the exact approved variant checksum, following [Quran timing authoring](audio/QURAN_TIMING_AUTHORING.md). `node scripts/validate-quran-timings.mjs` is part of `pnpm check` and checks recording identity, complete ordered verse coverage and shipped semantic word positions.

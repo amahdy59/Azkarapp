@@ -60,4 +60,25 @@ describe("bounded listening media clock", () => {
     unmount();
     visibility.mockRestore();
   });
+  it("follows native time updates while hidden and catches up on focus without a new timeupdate", () => {
+    const visibility = vi.spyOn(document, "visibilityState", "get").mockReturnValue("hidden");
+    const frame = vi.fn(() => 1);
+    vi.stubGlobal("requestAnimationFrame", frame);
+    vi.stubGlobal("cancelAnimationFrame", vi.fn());
+    let seconds = 0.2;
+    const readTime = () => seconds;
+    const { result, rerender, unmount } = renderHook(
+      ({ currentTime }) => useQuranPlaybackCue(timing, currentTime, true, readTime),
+      { initialProps: { currentTime: seconds } },
+    );
+    seconds = 1.3;
+    rerender({ currentTime: seconds });
+    expect(result.current.word?.position).toBe(2);
+    expect(frame).not.toHaveBeenCalled();
+    seconds = 3;
+    act(() => window.dispatchEvent(new Event("focus")));
+    expect(result.current.verseKey).toBeNull();
+    unmount();
+    visibility.mockRestore();
+  });
 });

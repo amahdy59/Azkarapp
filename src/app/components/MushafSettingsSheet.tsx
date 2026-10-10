@@ -1,3 +1,4 @@
+import { MushafMagnificationControl } from "./MushafMagnificationControl";
 import { Modal, SheetHeader, SidePanel } from "./ResponsiveSheet";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
@@ -16,6 +17,8 @@ export interface MushafSettingsSheetProps {
   mushafLayout: MushafLayout;
   onSelectLayout?: (layout: MushafLayout) => void;
   autoSpreadRoom?: boolean;
+  magnification?: number;
+  onSelectMagnification?: (value: number) => void;
   textScale: MushafTextScale;
   onSelectTextScale?: (scale: MushafTextScale) => void;
   /**
@@ -91,6 +94,8 @@ export function MushafSettingsSheet({
   mushafLayout,
   onSelectLayout,
   autoSpreadRoom = false,
+  magnification = 100,
+  onSelectMagnification,
   textScale,
   onSelectTextScale,
   textScaleApplies = true,
@@ -147,6 +152,9 @@ export function MushafSettingsSheet({
       />
 
       <div className="flex flex-col gap-5 p-5 sm:p-6 overflow-y-auto min-h-0 flex-1">
+        {onSelectMagnification && (
+          <MushafMagnificationControl language={language} value={magnification} onChange={onSelectMagnification} />
+        )}
         {/* Section 1: Reading type size. Only shown when the page aspect allows
             scaling (e.g. landscape or wide tablet/desktop). On portrait mobile,
             the line already spans the full width and words cannot reflow without

@@ -12,18 +12,23 @@ export function CounterGuidance({
   reader = false,
   placement,
   hasStarted = false,
+  hideWhenDismissed = false,
+  showKeyboardHelp = true,
 }: {
   language: AppLanguage;
   direction: "ltr" | "rtl";
   reader?: boolean;
   placement?: "above" | "below";
   hasStarted?: boolean;
+  hideWhenDismissed?: boolean;
+  showKeyboardHelp?: boolean;
 }) {
   const wide = useMediaQuery("(min-width: 768px)");
   const { expanded, reopen, dismiss } = useCounterGuidance(hasStarted);
   if ((placement === "above" && wide) || (placement === "below" && !wide)) return null;
+  if (hideWhenDismissed && !expanded) return null;
   return (
-    <div className="w-full shrink-0" data-reading-shortcuts={placement === "below" ? true : undefined}>
+    <div className="w-full shrink-0" data-reading-shortcuts>
       <CounterTapHint
         expanded={expanded}
         onToggle={expanded ? dismiss : reopen}
@@ -31,17 +36,19 @@ export function CounterGuidance({
         text={t(language, "reader.tapAnywhere")}
         desktopText={t(language, "reader.tapAnywhereDesktop")}
         keyboardHelp={
-          <CounterKeyboardHelp
-            compact
-            language={language}
-            direction={direction}
-            shortcuts={[
-              { keys: ["Space"], label: t(language, "reader.shortcutCount") },
-              ...(reader ? [{ keys: ["→", "←"], label: t(language, "reader.shortcutNavigate") }] : []),
-              { keys: ["R"], label: t(language, "reader.shortcutReset") },
-              ...(reader ? [{ keys: ["Esc"], label: t(language, "reader.shortcutBack") }] : []),
-            ]}
-          />
+          showKeyboardHelp && (
+            <CounterKeyboardHelp
+              compact
+              language={language}
+              direction={direction}
+              shortcuts={[
+                { keys: ["Space"], label: t(language, "reader.shortcutCount") },
+                ...(reader ? [{ keys: ["→", "←"], label: t(language, "reader.shortcutNavigate") }] : []),
+                { keys: ["R"], label: t(language, "reader.shortcutReset") },
+                ...(reader ? [{ keys: ["Esc"], label: t(language, "reader.shortcutBack") }] : []),
+              ]}
+            />
+          )
         }
       />
     </div>

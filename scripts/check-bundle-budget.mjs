@@ -25,9 +25,10 @@ import { gzipSync } from "node:zlib";
  * Everything copied verbatim from public/ lands outside dist/assets, so until
  * DEC-066 this gate could not see it at all — roughly 24 MB of unreferenced
  * masters, design sources and superseded imagery shipped on every release
- * without the budget noticing (F24/F25). Measured output after that cleanup is
- * ~6.2 MB, so these ceilings hold real headroom while still failing loudly if
- * a source tree is dropped back into public/.
+ * without the budget noticing (F24/F25). The owner explicitly approved an
+ * 11 MiB total-output exception on 2026-10-10 for the complete English Quran
+ * corpus. Keep existing Mushaf JSON URLs readable by installed older clients.
+ * All per-file, compressed, initial-route and baseline growth guards remain.
  */
 const limits = {
   javascript: 480 * 1024,
@@ -36,7 +37,7 @@ const limits = {
   javascriptGzip: 140 * 1024,
   cssGzip: 28 * 1024,
   initialGzip: 250 * 1024,
-  totalOutput: 9 * 1024 * 1024,
+  totalOutput: 11 * 1024 * 1024,
   largestFile: 2 * 1024 * 1024,
 };
 /**

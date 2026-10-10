@@ -2420,6 +2420,8 @@ function AppContent({
                   direction={layoutDirection}
                   onBack={pop}
                   khatmahPage={khatmahPage}
+                  audioController={audioController}
+                  textSize={textSize}
                   baqarahAudio={{
                     available: Boolean(baqarahZikr?.audioAssetId),
                     status: baqarahAudioStatus,
@@ -2507,7 +2509,10 @@ function AppContent({
               mushafTextScale={mushafTextScale}
               language={selectedLang}
               direction={layoutDirection}
-              overReadingSurface={view === "reader" || view === "custom_counter" || view === "friday_salawat"}
+              overReadingSurface={
+                view === "khatmah" || view === "reader" || view === "custom_counter" || view === "friday_salawat"
+              }
+              preferCompactReading={view === "khatmah"}
             />
           </Suspense>
         )}

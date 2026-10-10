@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useMemo } from "react";
-import { formatNumerals, formatRatio } from "../formatting";
+import React, { useEffect, useState, useMemo, useId } from "react";
+import { formatNumerals, formatRatio, formatPercentage } from "../formatting";
 import { t } from "../i18n";
 import { HomeCard } from "./HomeCard";
 import type { AppLanguage, CategoryId } from "../types";
@@ -250,7 +250,6 @@ function MainDhikrGroupCard({
     <button
       type="button"
       onClick={onPress}
-      aria-pressed={isCompleted}
       className={`stagger-content group relative flex w-full rounded-2xl border transition-[background-color,border-color] duration-standard focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 ${
         compact
           ? onMedia
@@ -558,7 +557,11 @@ export function ProgressDayView({
 
         <div
           className={`stagger-in mt-5 grid grid-cols-1 gap-2.5 sm:mt-6 sm:gap-3 md:gap-4 ${
-            isHomeSubset ? "sm:grid-cols-2 lg:grid-cols-4" : "sm:grid-cols-2 xl:grid-cols-4"
+            !onMedia
+              ? "sm:grid-cols-2"
+              : isHomeSubset
+                ? "sm:grid-cols-2 lg:grid-cols-4"
+                : "sm:grid-cols-2 xl:grid-cols-4"
           }`}
         >
           {displayCategories.map((col) => {
@@ -1105,6 +1108,7 @@ export function ProgressMonthView({
     [monthStats.days, selectedDayNum],
   );
 
+  const calendarHintId = useId();
   const firstDayOffset = period.startDate.getDay();
   const offset = isArabic ? (firstDayOffset + 1) % 7 : firstDayOffset;
 
@@ -1165,96 +1169,109 @@ export function ProgressMonthView({
           <dt className="mb-0.5 text-micro font-bold text-muted-foreground">
             {t(language, "progress.completionRate")}
           </dt>
-          <dd className="text-sm font-black text-primary">%{formatNumerals(monthStats.completionRate, language)}</dd>
+          <dd className="text-sm font-black text-primary">{formatPercentage(monthStats.completionRate, language)}</dd>
         </div>
       </dl>
 
+      <p className="text-xs leading-5 text-muted-foreground">{t(language, "progress.routineCoverageHint")}</p>
       {/* Main Month View: Calendar Grid + Selected Day Details */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Calendar Grid Card (2 Columns on desktop) */}
         <div data-testid="garden-month-calendar" className="rounded-2xl border border-border bg-card p-4 md:col-span-2">
-          {/* Weekday headers */}
-          <div className="grid grid-cols-7 gap-1 mb-2 text-center">
-            {weekdays.map((day) => (
-              /* Steps down on a phone and clips rather than pushing the column
+          <p id={calendarHintId} className="mb-3 text-xs leading-5 text-muted-foreground">
+            {t(language, "progress.calendarScrollHint")}
+          </p>
+          <div
+            role="region"
+            aria-label={t(language, "progress.calendarDates")}
+            aria-describedby={calendarHintId}
+            className="overflow-x-auto pb-2"
+          >
+            <div className="min-w-[21rem]">
+              {/* Weekday headers */}
+              <div className="grid grid-cols-7 gap-1 mb-2 text-center">
+                {weekdays.map((day) => (
+                  /* Steps down on a phone and clips rather than pushing the column
                  open: the longest Arabic weekday needs 44px in a 40px cell, and
                  Intl's "short" form for Arabic is the full word, so there is no
                  shorter label to fall back on. */
-              <div key={day} className="truncate text-micro font-bold text-muted-foreground py-1 sm:text-xs">
-                {day}
-              </div>
-            ))}
-          </div>
-
-          {/* Day Grid */}
-          <div className="grid grid-cols-7 gap-1 sm:gap-2">
-            {Array.from({ length: offset }).map((_, i) => (
-              <div key={`offset-${i}`} className="aspect-square" />
-            ))}
-
-            {monthStats.days.map((day) => {
-              const isSelected = day.dayNum === selectedDayNum;
-              const isPalm = day.isPalm;
-              const count = day.completedCount;
-
-              return (
-                <button
-                  type="button"
-                  key={day.dayKey}
-                  onClick={() => setSelectedDayNum(day.dayNum)}
-                  aria-label={t(language, "progress.monthDayAria", {
-                    day: formatNumerals(day.dayNum, language),
-                    status: isPalm
-                      ? t(language, "progress.monthDayComplete")
-                      : count > 0
-                        ? t(language, "progress.monthDayPartial", {
-                            count: formatNumerals(count, language),
-                            total: formatNumerals(3, language),
-                          })
-                        : t(language, "progress.monthDayUnstarted"),
-                  })}
-                  aria-pressed={isSelected}
-                  className={`flex flex-col items-center justify-center aspect-square rounded-2xl border transition-[color,background-color,border-color,box-shadow] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 ${
-                    isSelected
-                      ? "border-primary ring-2 ring-primary/50 bg-primary/20 scale-105 z-10"
-                      : isPalm
-                        ? "bg-success/15 border-success/30 text-success"
-                        : count > 0
-                          ? "bg-info/10 border-info/30 text-info"
-                          : "bg-white/30 dark:bg-white/5 border-white/20 dark:border-white/10 text-muted-foreground/60"
-                  }`}
-                >
-                  <span className="text-micro sm:text-xs font-bold">{formatNumerals(day.dayNum, language)}</span>
-                  <div className="flex h-4 items-center justify-center mt-0.5">
-                    {isPalm ? (
-                      <Check size={12} strokeWidth={3} className="text-success" />
-                    ) : count > 0 ? (
-                      <bdi className="text-micro font-extrabold text-info">{formatRatio(count, 3, language)}</bdi>
-                    ) : (
-                      <span className="text-micro text-muted-foreground/40">-</span>
-                    )}
+                  <div key={day} className="truncate text-micro font-bold text-muted-foreground py-1 sm:text-xs">
+                    {day}
                   </div>
-                </button>
-              );
-            })}
-          </div>
+                ))}
+              </div>
 
-          {/* Bottom Grid Legend */}
-          <div className="mt-4 pt-3 border-t border-white/20 dark:border-white/10 flex items-center justify-center gap-4 text-micro font-bold text-muted-foreground flex-wrap">
-            <div className="flex items-center gap-1">
-              <Check size={12} strokeWidth={3} className="text-success" />
-              <span>{t(language, "progress.complete")}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-2 h-2 rounded-full bg-info" />
-              <span>{t(language, "progress.partialRange")}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-2 h-2 rounded-full border border-primary" />
-              <span>{t(language, "progress.unstarted")}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <span>- {t(language, "progress.noData")}</span>
+              {/* Day Grid */}
+              <div className="grid grid-cols-7 gap-1">
+                {Array.from({ length: offset }).map((_, i) => (
+                  <div key={`offset-${i}`} className="aspect-square" />
+                ))}
+
+                {monthStats.days.map((day) => {
+                  const isSelected = day.dayNum === selectedDayNum;
+                  const isPalm = day.isPalm;
+                  const count = day.completedCount;
+
+                  return (
+                    <button
+                      type="button"
+                      key={day.dayKey}
+                      onClick={() => setSelectedDayNum(day.dayNum)}
+                      aria-label={t(language, "progress.monthDayAria", {
+                        day: formatNumerals(day.dayNum, language),
+                        status: isPalm
+                          ? t(language, "progress.monthDayComplete")
+                          : count > 0
+                            ? t(language, "progress.monthDayPartial", {
+                                count: formatNumerals(count, language),
+                                total: formatNumerals(3, language),
+                              })
+                            : t(language, "progress.monthDayUnstarted"),
+                      })}
+                      aria-pressed={isSelected}
+                      className={`flex min-h-11 flex-col items-center justify-center aspect-square rounded-2xl border transition-[color,background-color,border-color,box-shadow] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                        isSelected
+                          ? "border-primary ring-2 ring-primary/50 bg-primary/20 z-10"
+                          : isPalm
+                            ? "bg-success/15 border-success/30 text-success"
+                            : count > 0
+                              ? "bg-info/10 border-info/30 text-info"
+                              : "bg-white/30 dark:bg-white/5 border-white/20 dark:border-white/10 text-muted-foreground/60"
+                      }`}
+                    >
+                      <span className="text-micro sm:text-xs font-bold">{formatNumerals(day.dayNum, language)}</span>
+                      <div className="flex h-4 items-center justify-center mt-0.5">
+                        {isPalm ? (
+                          <Check size={12} strokeWidth={3} className="text-success" />
+                        ) : count > 0 ? (
+                          <bdi className="text-micro font-extrabold text-info">{formatRatio(count, 3, language)}</bdi>
+                        ) : (
+                          <span className="text-micro text-muted-foreground/40">-</span>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Bottom Grid Legend */}
+              <div className="mt-4 pt-3 border-t border-white/20 dark:border-white/10 flex items-center justify-center gap-4 text-micro font-bold text-muted-foreground flex-wrap">
+                <div className="flex items-center gap-1">
+                  <Check size={12} strokeWidth={3} className="text-success" />
+                  <span>{t(language, "progress.complete")}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 rounded-full bg-info" />
+                  <span>{t(language, "progress.partialRange")}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 rounded-full border border-primary" />
+                  <span>{t(language, "progress.unstarted")}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span>- {t(language, "progress.noData")}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1392,6 +1409,8 @@ export function ProgressYearView({
         ? yearPeriods.map((period) => period.monthLabel)
         : GREGORIAN_MONTH_NAMES_EN
       : yearPeriods.map((period) => period.monthLabel);
+  const endOfToday = new Date();
+  endOfToday.setHours(23, 59, 59, 999);
   const bestMonthName =
     yearStats.bestMonthIndex === null ? getCategoryName(null, language) : monthNames[yearStats.bestMonthIndex];
 
@@ -1408,7 +1427,7 @@ export function ProgressYearView({
             {t(language, "progress.completionRate")}
           </dt>
           <dd className="text-subtitle font-black text-primary">
-            %{formatNumerals(yearStats.overallCompletionRate, language)}
+            {formatPercentage(yearStats.overallCompletionRate, language)}
           </dd>
         </div>
 
@@ -1452,12 +1471,20 @@ export function ProgressYearView({
               {t(language, "progress.monthlyCompletionRate")}
             </h2>
           </div>
-          <p className="text-xs font-semibold text-muted-foreground mb-4">{t(language, "garden.yearChartHint")}</p>
+          <p className="text-xs font-semibold text-muted-foreground mb-4">
+            {t(language, "progress.routineCoverageHint")}
+          </p>
 
           {/* Bar Chart */}
-          <div className="flex-1 flex items-end justify-between gap-1 sm:gap-1.5 pt-6 pb-2 min-h-[140px]">
+          <div
+            data-testid="year-monthly-chart"
+            aria-hidden="true"
+            className="grid items-end gap-2 pt-6 pb-2"
+            style={{ gridTemplateColumns: "repeat(auto-fit, minmax(3rem, 1fr))" }}
+          >
             {yearStats.months.map((m, idx) => {
               const rate = m.completionRate;
+              const hasElapsedDays = (yearPeriods[idx]?.startDate.getTime() ?? Infinity) <= endOfToday.getTime();
               const isBest = yearStats.bestMonthIndex !== null && idx === yearStats.bestMonthIndex;
 
               return (
@@ -1467,11 +1494,11 @@ export function ProgressYearView({
                    overflow up through four ancestors. The label already truncates. */
                 <div key={idx} className="flex-1 min-w-0 flex flex-col items-center h-full justify-end group">
                   <span
-                    className={`text-micro font-black mb-1 opacity-0 group-hover:opacity-100 transition-opacity ${
-                      isBest ? "opacity-100 text-primary" : "text-muted-foreground"
+                    className={`text-micro font-black mb-1 transition-opacity ${
+                      isBest ? "opacity-100 text-primary" : rate > 0 ? "text-muted-foreground" : "text-muted-foreground"
                     }`}
                   >
-                    %{formatNumerals(rate, language)}
+                    {hasElapsedDays ? formatPercentage(rate, language) : "—"}
                   </span>
                   <div className="w-full bg-black/10 dark:bg-white/10 rounded-t-lg h-[90px] flex items-end">
                     <div
@@ -1493,7 +1520,10 @@ export function ProgressYearView({
           <ul className="sr-only overflow-hidden">
             {yearStats.months.map((month, index) => (
               <li key={month.monthIndex} className="overflow-hidden">
-                {monthNames[index]}: {formatNumerals(month.completionRate, language)}%
+                {monthNames[index]}:{" "}
+                {(yearPeriods[index]?.startDate.getTime() ?? Infinity) <= endOfToday.getTime()
+                  ? formatPercentage(month.completionRate, language)
+                  : "—"}
               </li>
             ))}
           </ul>
@@ -1549,6 +1579,7 @@ export function ProgressYearView({
         {yearStats.months.map((m, idx) => {
           const isBest = yearStats.bestMonthIndex !== null && idx === yearStats.bestMonthIndex;
           const rate = m.completionRate;
+          const hasElapsedDays = (yearPeriods[idx]?.startDate.getTime() ?? Infinity) <= endOfToday.getTime();
 
           return (
             <div
@@ -1559,7 +1590,9 @@ export function ProgressYearView({
             >
               <div className="flex items-center justify-between mb-1.5 text-xs font-extrabold">
                 <span className="text-foreground truncate">{monthNames[idx]}</span>
-                <span className="text-muted-foreground text-micro">%{formatNumerals(rate, language)}</span>
+                <span className="text-muted-foreground text-micro">
+                  {hasElapsedDays ? formatPercentage(rate, language) : "—"}
+                </span>
               </div>
 
               {/* Mini day grid */}

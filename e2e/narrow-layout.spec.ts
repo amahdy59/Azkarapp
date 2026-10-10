@@ -72,6 +72,32 @@ test("core app screens do not overflow a 320px viewport", async ({ page }) => {
   await expectNoHorizontalOverflow(page, "Settings");
 });
 
+test("Home's long continuation action keeps one line and its complete accessible label", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 700 });
+  await enterEnglishGuestMode(page);
+  const action = page.getByTestId("home-primary-cta");
+  await expect(action).toBeVisible();
+  const label = await action.locator("span").first().textContent();
+  await expect(action).toHaveAccessibleName(label!);
+  await page.evaluate(() => {
+    document.documentElement.style.fontSize = "200%";
+  });
+  expect(
+    await action
+      .locator("span")
+      .first()
+      .evaluate((element) => {
+        const style = getComputedStyle(element);
+        const range = document.createRange();
+        range.selectNodeContents(element);
+        const lineTops = new Set(Array.from(range.getClientRects(), (rect) => Math.round(rect.top)));
+        return { whiteSpace: style.whiteSpace, textOverflow: style.textOverflow, lines: lineTops.size };
+      }),
+  ).toEqual({ whiteSpace: "nowrap", textOverflow: "ellipsis", lines: 1 });
+  expect(await action.evaluate((element) => element.getBoundingClientRect().height >= 44)).toBe(true);
+  await expectNoHorizontalOverflow(page, "Home continuation action");
+});
+
 test("Arabic large text remains readable at 320px", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 700 });
   await enterEnglishGuestMode(page);
@@ -82,8 +108,8 @@ test("Arabic large text remains readable at 320px", async ({ page }) => {
   } else {
     await page.getByTestId("nav-settings").click();
   }
-  await page.getByRole("button", { name: "Accessibility", exact: true }).click();
-  await page.getByTestId("text-size-option-large").click();
+  await page.getByTestId("settings-sub-reading").click();
+  await page.getByTestId("reading-text-size-large").click();
   await page.getByRole("button", { name: "Back", exact: true }).click();
   await page.getByTestId("settings-language-ar").click();
   await page.getByTestId("nav-home").click();

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   isCounterShortcutBlocked,
   setCharacterShortcutsEnabled,
@@ -9,22 +9,36 @@ import type { AppLanguage } from "../types";
 import type { CounterShortcut } from "./ZikrComponents";
 import { ResponsiveSheet, SheetHeader } from "./ResponsiveSheet";
 import { Button } from "./ui/button";
-import { Keyboard } from "./icons";
+import { Keyboard, HandTap } from "./icons";
 
 export function CounterKeyboardHelp({
   shortcuts,
   language,
   direction,
   compact = false,
+  open: controlledOpen,
+  onOpenChange,
+  showTrigger = true,
 }: {
   shortcuts: readonly CounterShortcut[];
   language: AppLanguage;
   direction: "ltr" | "rtl";
   compact?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  showTrigger?: boolean;
 }) {
-  const [open, setOpen] = useState(false);
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
+  const isOpen = controlledOpen !== undefined ? controlledOpen : uncontrolledOpen;
+  const onOpenChangeRef = useRef(onOpenChange);
+  onOpenChangeRef.current = onOpenChange;
+  const setOpen = useCallback((val: boolean) => {
+    setUncontrolledOpen(val);
+    onOpenChangeRef.current?.(val);
+  }, []);
   const enabled = useCharacterShortcutsEnabled();
   useEffect(() => {
+    if (!enabled) return;
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== "?" || isCounterShortcutBlocked(event)) return;
       event.preventDefault();
@@ -32,31 +46,33 @@ export function CounterKeyboardHelp({
     };
     window.addEventListener("keydown", onKeyDown, true);
     return () => window.removeEventListener("keydown", onKeyDown, true);
-  }, []);
+  }, [enabled, setOpen]);
 
   return (
     <>
-      <Button
-        type="button"
-        variant="ghost"
-        onClick={(event) => {
-          event.stopPropagation();
-          event.currentTarget.focus({ preventScroll: true });
-          setOpen(true);
-        }}
-        aria-label={t(language, "reader.keyboardShortcuts")}
-        title={t(language, "reader.keyboardShortcuts")}
-        aria-haspopup="dialog"
-        className={compact ? "hidden size-11 shrink-0 p-0 md:flex" : "mx-auto mt-1 hidden md:flex"}
-      >
-        {compact ? (
-          <Keyboard size={24} className="size-6" aria-hidden="true" />
-        ) : (
-          t(language, "reader.keyboardShortcuts")
-        )}
-      </Button>
+      {showTrigger && (
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={(event) => {
+            event.stopPropagation();
+            event.currentTarget.focus({ preventScroll: true });
+            setOpen(true);
+          }}
+          aria-label={t(language, "reader.keyboardShortcuts")}
+          title={t(language, "reader.keyboardShortcuts")}
+          aria-haspopup="dialog"
+          className={compact ? "hidden size-11 shrink-0 p-0 md:flex" : "mx-auto mt-1 hidden md:flex"}
+        >
+          {compact ? (
+            <Keyboard size={24} className="size-6" aria-hidden="true" />
+          ) : (
+            t(language, "reader.keyboardShortcuts")
+          )}
+        </Button>
+      )}
       <ResponsiveSheet
-        open={open}
+        open={isOpen}
         onClose={() => setOpen(false)}
         title={t(language, "reader.keyboardShortcuts")}
         language={language}
@@ -74,6 +90,15 @@ export function CounterKeyboardHelp({
             direction={direction}
           />
           <div className="min-h-0 flex-1 overflow-y-auto p-5 sm:p-6">
+            <div className="mb-5 rounded-xl border border-border/70 bg-card p-3.5 text-sm shadow-xs">
+              <div className="mb-1 flex items-center gap-2 font-semibold text-foreground">
+                <HandTap size={20} aria-hidden="true" className="text-primary shrink-0" />
+                <span>{t(language, "reader.showCountingGuidance")}</span>
+              </div>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {t(language, "reader.tapAnywhereDesktop")}
+              </p>
+            </div>
             <dl className="space-y-3">
               {[...shortcuts, { keys: ["?"], label: t(language, "reader.shortcutHelp") }].map((shortcut) => (
                 <div key={shortcut.label} className="flex items-center justify-between gap-4">

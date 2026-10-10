@@ -1,26 +1,12 @@
-import { useEffect, useRef, useState } from "react";
-import { FIELD_CONTROL_CLASS, FIELD_LABEL_CLASS, FormField } from "../../components/FormField";
+import { useState } from "react";
+import { FIELD_CONTROL_CLASS } from "../../components/FormField";
 import { Button } from "../../components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
-import { Bell, CheckCircle2, Info, MapPin } from "../../components/icons";
+import { Bell, CheckCircle2, Info } from "../../components/icons";
 import { t } from "../../i18n";
 import { formatNumerals } from "../../formatting";
 import { InformationCard } from "./InformationCard";
-import {
-  CALCULATION_METHODS,
-  DEFAULT_LOCATION,
-  detectUserCoordinates,
-  formatUtcOffset,
-  getTimeZoneStatus,
-} from "../../content/prayerCalculation";
-import { searchPrayerLocations, type PrayerLocationPreset } from "../../content/prayerLocations";
-import type {
-  AppLanguage,
-  LocationSettings,
-  PrayerName,
-  PrayerReminderLeadMinutes,
-  ReminderSettings,
-} from "../../types";
+import type { AppLanguage, PrayerName, PrayerReminderLeadMinutes, ReminderSettings } from "../../types";
 import { SubHeader } from "./SettingsPrimitives";
 
 type BrowserNotificationPermission = NotificationPermission | "unsupported";
@@ -117,154 +103,20 @@ function ReminderScheduleRow({
 export function NotificationsPanel({
   language,
   reminders,
-  locationSettings,
   onRemindersChange,
-  onLocationChange,
   onBack,
 }: {
   language: AppLanguage;
   reminders: ReminderSettings;
-  locationSettings?: LocationSettings;
   onRemindersChange: (value: ReminderSettings) => void;
-  onLocationChange?: (value: LocationSettings) => void;
   onBack: () => void;
 }) {
   const isArabic = language === "ar";
   const [permission, setPermission] = useState<BrowserNotificationPermission>(readNotificationPermission);
   const [isRequesting, setIsRequesting] = useState(false);
   const [hasRequestError, setHasRequestError] = useState(false);
-  const [isDetectingLocation, setIsDetectingLocation] = useState(false);
-  const [locationStatus, setLocationStatus] = useState<string | null>(null);
-  const [locationStatusIsError, setLocationStatusIsError] = useState(false);
   const [permissionAttemptBlocked, setPermissionAttemptBlocked] = useState(false);
-  const [activeSection, setActiveSection] = useState<"notifications" | "location">("notifications");
   const [testStatus, setTestStatus] = useState<string | null>(null);
-  const [latitudeDraft, setLatitudeDraft] = useState(String(locationSettings?.latitude ?? ""));
-  const [longitudeDraft, setLongitudeDraft] = useState(String(locationSettings?.longitude ?? ""));
-  const [cityDraft, setCityDraft] = useState(locationSettings?.cityName ?? "");
-  const [timeZoneDraft, setTimeZoneDraft] = useState(locationSettings?.timeZone ?? "");
-  const [citySearch, setCitySearch] = useState("");
-  // Which coordinate the last save attempt rejected, so the message can sit on
-  // that field rather than only in the status line under the form.
-  const [invalidCoordinates, setInvalidCoordinates] = useState({ latitude: false, longitude: false });
-  const locationRequestId = useRef(0);
-  const timeZoneStatus = getTimeZoneStatus(new Date(), locationSettings?.timeZone ?? DEFAULT_LOCATION.timeZone);
-  const cityResults = searchPrayerLocations(citySearch);
-
-  useEffect(() => {
-    setLatitudeDraft(String(locationSettings?.latitude ?? ""));
-    setLongitudeDraft(String(locationSettings?.longitude ?? ""));
-    setCityDraft(locationSettings?.cityName ?? "");
-    setTimeZoneDraft(locationSettings?.timeZone ?? "");
-  }, [locationSettings?.cityName, locationSettings?.latitude, locationSettings?.longitude, locationSettings?.timeZone]);
-
-  const handleDetectLocation = async () => {
-    const requestId = ++locationRequestId.current;
-    setIsDetectingLocation(true);
-    setLocationStatus(null);
-    setLocationStatusIsError(false);
-    const result = await detectUserCoordinates();
-    if (requestId !== locationRequestId.current) return;
-
-    if (result.ok && onLocationChange) {
-      const detectedLocation: LocationSettings = {
-        ...(locationSettings ?? DEFAULT_LOCATION),
-        latitude: result.latitude,
-        longitude: result.longitude,
-        cityName: `${result.latitude.toFixed(2)}°, ${result.longitude.toFixed(2)}°`,
-        autoDetect: true,
-        timeZone: result.timeZone ?? DEFAULT_LOCATION.timeZone,
-      };
-      onLocationChange(detectedLocation);
-
-      /* The time zone came back from the prayer-times API's metadata, which
-         meant sending the reader's coordinates to a third party to learn
-         something the device already knows: `detectUserCoordinates` reads it
-         from `Intl.DateTimeFormat`. Times are calculated here, so there is
-         nothing left to wait for and nothing deferred to report. */
-      setLocationStatus(t(language, "notifications.locationUpdated"));
-    } else {
-      const reasonKey =
-        result.ok || result.reason === "unknown"
-          ? "Error"
-          : `${result.reason[0]!.toUpperCase()}${result.reason.slice(1)}`;
-      const key = `notifications.location${reasonKey}`;
-      setLocationStatus(t(language, key));
-      setLocationStatusIsError(true);
-    }
-    if (requestId === locationRequestId.current) {
-      setIsDetectingLocation(false);
-    }
-  };
-
-  const handleMethodChange = async (methodId: number) => {
-    if (!onLocationChange) return;
-    // The request counter guarded an async response; the method now applies
-    // locally, so there is no later answer to race.
-    setIsDetectingLocation(false);
-
-    const updatedLocation = {
-      ...(locationSettings ?? DEFAULT_LOCATION),
-      calculationMethod: methodId,
-    };
-    onLocationChange(updatedLocation);
-
-    /* Changing the method used to refetch. The calculation is local, so the
-       new method applies to the next render without a request. */
-  };
-
-  const handleManualLocationSave = () => {
-    const latitude = Number(latitudeDraft);
-    const longitude = Number(longitudeDraft);
-    const latitudeInvalid = !Number.isFinite(latitude) || latitude < -90 || latitude > 90;
-    const longitudeInvalid = !Number.isFinite(longitude) || longitude < -180 || longitude > 180;
-    setInvalidCoordinates({ latitude: latitudeInvalid, longitude: longitudeInvalid });
-    if (latitudeInvalid || longitudeInvalid) {
-      setLocationStatus(t(language, "notifications.invalidCoordinates"));
-      setLocationStatusIsError(true);
-      return;
-    }
-    locationRequestId.current += 1;
-    onLocationChange?.({
-      ...(locationSettings ?? DEFAULT_LOCATION),
-      latitude,
-      longitude,
-      cityName: cityDraft.trim() || `${latitude.toFixed(2)}°, ${longitude.toFixed(2)}°`,
-      autoDetect: false,
-      timeZone: timeZoneDraft.trim() || Intl.DateTimeFormat().resolvedOptions().timeZone,
-    });
-    setLocationStatus(t(language, "notifications.manualLocationSaved"));
-    setLocationStatusIsError(false);
-  };
-
-  const handleCitySelect = (location: PrayerLocationPreset) => {
-    locationRequestId.current += 1;
-    const localizedCityName = isArabic ? location.nameArabic : location.nameEnglish;
-    setCityDraft(location.nameEnglish);
-    setTimeZoneDraft(location.timeZone);
-    setLatitudeDraft(String(location.latitude));
-    setLongitudeDraft(String(location.longitude));
-    onLocationChange?.({
-      ...(locationSettings ?? DEFAULT_LOCATION),
-      latitude: location.latitude,
-      longitude: location.longitude,
-      cityName: location.nameEnglish,
-      autoDetect: false,
-      timeZone: location.timeZone,
-    });
-    setLocationStatus(t(language, "notifications.citySelected", { city: localizedCityName }));
-    setLocationStatusIsError(false);
-  };
-
-  const handleAdjustmentChange = (prayer: keyof NonNullable<LocationSettings["adjustments"]>, value: number) => {
-    onLocationChange?.({
-      ...(locationSettings ?? DEFAULT_LOCATION),
-      adjustments: {
-        ...locationSettings?.adjustments,
-        [prayer]: Math.max(-120, Math.min(120, Number.isFinite(value) ? Math.round(value) : 0)),
-      },
-    });
-  };
 
   const requestPermission = async () => {
     if (!("Notification" in window)) {
@@ -316,13 +168,8 @@ export function NotificationsPanel({
 
   const toggleSchedule = async (kind: ReminderKind) => {
     const enabling = !reminders[kind].enabled;
-    if (enabling && permission === "default") {
-      const next = await requestPermission();
-      if (next !== "granted") {
-        return;
-      }
-    }
-    if (enabling && permission !== "granted") {
+    const effectivePermission = enabling && permission === "default" ? await requestPermission() : permission;
+    if (enabling && effectivePermission !== "granted") {
       setPermissionAttemptBlocked(true);
       return;
     }
@@ -331,11 +178,8 @@ export function NotificationsPanel({
 
   const togglePrayerReminder = async () => {
     const enabling = !reminders.prayer.enabled;
-    if (enabling && permission === "default") {
-      const next = await requestPermission();
-      if (next !== "granted") return;
-    }
-    if (enabling && permission !== "granted") {
+    const effectivePermission = enabling && permission === "default" ? await requestPermission() : permission;
+    if (enabling && effectivePermission !== "granted") {
       setPermissionAttemptBlocked(true);
       return;
     }
@@ -353,538 +197,237 @@ export function NotificationsPanel({
     <div className="slide-in-from-right flex h-full flex-col bg-background/50 backdrop-blur-md">
       <SubHeader title={t(language, "notifications.title")} onBack={onBack} language={language} />
       <div className="flex-1 space-y-4 overflow-y-auto px-4 pb-8 pt-3">
-        <div
-          role="tablist"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-            gap: 8,
-            padding: 4,
-            border: "1px solid var(--border)",
-            borderRadius: 16,
-          }}
+        <InformationCard
+          icon={<Info size={20} aria-hidden="true" />}
+          title={t(language, "notifications.availability")}
+          body={t(language, "notifications.availabilityBody")}
+        />
+
+        <section
+          className="rounded-3xl border border-border/40 bg-card p-5 shadow-raised"
+          aria-labelledby="notification-permission"
         >
-          {(["notifications", "location"] as const).map((section) => (
-            <button
-              key={section}
+          <div className="flex items-start gap-3">
+            <span
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-muted"
+              aria-hidden="true"
+            >
+              {permission === "granted" ? (
+                <CheckCircle2 size={22} className="text-primary" />
+              ) : (
+                <Bell size={22} className="text-primary" />
+              )}
+            </span>
+            <div className="min-w-0 flex-1">
+              <h2 id="notification-permission" className="text-title font-semibold text-foreground">
+                {t(language, "notifications.permission")}
+              </h2>
+              <p className="mt-1 text-sm leading-[22px] text-muted-foreground">
+                {permissionCopy(permission, language)}
+              </p>
+            </div>
+          </div>
+
+          {permission === "default" && (
+            <Button
               type="button"
-              role="tab"
-              aria-selected={activeSection === section}
-              onClick={() => setActiveSection(section)}
-              style={{
-                minHeight: 44,
-                borderRadius: 12,
-                padding: "8px 12px",
-                fontSize: 14,
-                fontWeight: 700,
-                color: activeSection === section ? "var(--foreground)" : "var(--muted-foreground)",
-                background: activeSection === section ? "var(--card)" : "transparent",
-              }}
+              onClick={() => void requestPermission()}
+              disabled={isRequesting}
+              className="mt-4 w-full"
             >
-              {t(
-                language,
-                section === "notifications" ? "notifications.notificationsTab" : "notifications.locationTab",
-              )}
-            </button>
-          ))}
-        </div>
-        {activeSection === "location" && (
-          <>
-            {/* Location & Prayer Times Section */}
-            <section
-              className="rounded-3xl border border-border/40 bg-card p-5 shadow-raised"
-              aria-labelledby="prayer-location-title"
-            >
-              <div className="flex items-start gap-3">
-                <span
-                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"
-                  aria-hidden="true"
-                >
-                  <MapPin size={22} />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <h2 id="prayer-location-title" className="text-title font-semibold text-foreground">
-                    {t(language, "notifications.locationPrayerTimes")}
-                  </h2>
-                  <p className="mt-1 text-sm leading-[22px] text-muted-foreground">
-                    {t(language, "notifications.prayerCalculationDescription")}
-                  </p>
-                </div>
-              </div>
+              {isRequesting
+                ? t(language, "notifications.requestingPermission")
+                : t(language, "notifications.requestPermission")}
+            </Button>
+          )}
 
-              <div
-                className="mt-4 rounded-xl border border-border bg-muted/50 p-3"
-                data-testid="daylight-saving-status"
-                aria-live="polite"
+          {hasRequestError && (
+            <p className="mt-3 text-sm text-destructive" role="alert">
+              {t(language, "notifications.permissionError")}
+            </p>
+          )}
+          {(permission === "denied" || permission === "unsupported") && (
+            <p className="mt-3 rounded-xl bg-muted px-3 py-2 text-label leading-5 text-foreground">
+              {t(language, "notifications.permissionBlockedAction")}
+            </p>
+          )}
+          {permissionAttemptBlocked && (
+            <p className="mt-3 text-sm font-semibold text-destructive" role="alert">
+              {t(language, "notifications.permissionRequired")}
+            </p>
+          )}
+        </section>
+
+        <section
+          className="rounded-3xl border border-border/40 bg-card p-5 shadow-raised"
+          aria-labelledby="prayer-reminders-title"
+        >
+          <div className="flex items-center gap-3">
+            <span
+              className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"
+              aria-hidden="true"
+            >
+              <Bell size={21} />
+            </span>
+            <span className="min-w-0 flex-1 text-start">
+              <h2 id="prayer-reminders-title" className="text-title font-bold text-foreground">
+                {t(language, "notifications.prayerReminders")}
+              </h2>
+              <span className="mt-1 block text-label leading-5 text-muted-foreground">
+                {t(language, "notifications.prayerRemindersHint")}
+              </span>
+            </span>
+            <button
+              type="button"
+              role="switch"
+              aria-label={t(language, "notifications.prayerReminders")}
+              aria-checked={reminders.prayer.enabled}
+              onClick={() => void togglePrayerReminder()}
+              className="flex h-11 w-12 shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            >
+              <span
+                aria-hidden="true"
+                className={`relative h-7 w-12 rounded-full border transition-colors ${reminders.prayer.enabled ? "border-primary bg-primary" : "border-border-control bg-muted"}`}
               >
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <strong className="text-label text-foreground" dir="ltr">
-                    {timeZoneStatus.timeZone}
-                  </strong>
-                  <span className="rounded-full bg-primary/10 px-2 py-1 text-xs font-bold text-primary" dir="ltr">
-                    {formatUtcOffset(timeZoneStatus.currentOffsetHours)}
-                  </span>
-                </div>
-                <p className="mt-2 text-label font-semibold text-foreground">
-                  {t(
-                    language,
-                    timeZoneStatus.daylightSavingActive
-                      ? "notifications.daylightSavingActive"
-                      : timeZoneStatus.observesDaylightSaving
-                        ? "notifications.standardTimeActive"
-                        : "notifications.noSeasonalTimeChange",
-                  )}
-                </p>
-                <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                  {t(
-                    language,
-                    locationSettings?.autoDetect
-                      ? "notifications.automaticTimeZoneHint"
-                      : "notifications.manualTimeZoneHint",
-                  )}
-                </p>
-              </div>
-
-              <div className="mt-4 space-y-3">
-                <Button type="button" onClick={handleDetectLocation} disabled={isDetectingLocation} className="w-full">
-                  {isDetectingLocation
-                    ? t(language, "notifications.detectingLocation")
-                    : t(language, "notifications.detectLocation")}
-                </Button>
-
-                {locationStatus && (
-                  <p
-                    className={`rounded-lg p-2.5 text-label font-medium ${locationStatusIsError ? "bg-destructive/10 text-destructive" : "bg-muted text-foreground"}`}
-                    role={locationStatusIsError ? "alert" : "status"}
-                  >
-                    {locationStatus}
-                  </p>
-                )}
-
-                <div className="pt-2">
-                  <p id="calculation-method-label" className="mb-1.5 block text-sm font-bold text-foreground">
-                    {t(language, "notifications.calculationMethod")}
-                  </p>
-                  <Select
-                    value={String(locationSettings?.calculationMethod ?? 5)}
-                    onValueChange={(value) => void handleMethodChange(Number(value))}
-                    dir={isArabic ? "rtl" : "ltr"}
-                  >
-                    <SelectTrigger
-                      id="calculation-method-select"
-                      aria-labelledby="calculation-method-label"
-                      className="font-semibold"
-                    >
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.values(CALCULATION_METHODS).map((method) => (
-                        <SelectItem key={method.id} value={String(method.id)}>
-                          {isArabic ? method.nameArabic : method.nameEnglish}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <fieldset className="space-y-2 border-t border-border pt-4">
-                  <legend className="mb-2 text-sm font-bold text-foreground">
-                    {t(language, "notifications.chooseCity")}
-                  </legend>
-                  <p className="text-xs leading-5 text-muted-foreground">
-                    {t(language, "notifications.citySearchHint")}
-                  </p>
-                  <div className="flex flex-col gap-1.5">
-                    <label htmlFor="city-search" className={FIELD_LABEL_CLASS}>
-                      {t(language, "notifications.citySearchLabel")}
-                    </label>
-                    <input
-                      id="city-search"
-                      type="search"
-                      value={citySearch}
-                      onChange={(event) => setCitySearch(event.target.value)}
-                      placeholder={t(language, "notifications.citySearchPlaceholder")}
-                      className={FIELD_CONTROL_CLASS}
-                    />
-                  </div>
-                  <p className="text-xs font-semibold text-muted-foreground">
-                    {t(language, citySearch.trim() ? "notifications.cityResults" : "notifications.popularCities")}
-                  </p>
-                  {cityResults.length > 0 ? (
-                    <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                      {cityResults.map((location) => {
-                        const cityName = isArabic ? location.nameArabic : location.nameEnglish;
-                        const countryName = isArabic ? location.countryArabic : location.countryEnglish;
-                        const isSelected =
-                          locationSettings?.latitude === location.latitude &&
-                          locationSettings?.longitude === location.longitude;
-                        return (
-                          <li key={location.id}>
-                            <button
-                              type="button"
-                              onClick={() => handleCitySelect(location)}
-                              aria-pressed={isSelected}
-                              className="flex min-h-11 w-full items-center gap-2 rounded-xl border border-border-control bg-background px-3 py-2 text-start text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring aria-pressed:border-primary aria-pressed:bg-primary/10"
-                            >
-                              <MapPin size={17} className="shrink-0 text-primary" aria-hidden="true" />
-                              <span className="min-w-0">
-                                <span className="block text-label font-bold">{cityName}</span>
-                                <span className="block text-xs text-muted-foreground">{countryName}</span>
-                              </span>
-                            </button>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  ) : (
-                    <p className="rounded-xl bg-muted p-3 text-label text-muted-foreground" role="status">
-                      {t(language, "notifications.noCitiesFound")}
-                    </p>
-                  )}
-                </fieldset>
-
-                <fieldset className="space-y-2 border-t border-border pt-4">
-                  <legend className="mb-2 text-sm font-bold text-foreground">
-                    {t(language, "notifications.manualLocation")}
-                  </legend>
-                  <FormField
-                    label={t(language, "notifications.cityName")}
-                    type="text"
-                    value={cityDraft}
-                    onChange={(event) => setCityDraft(event.target.value)}
-                  />
-                  <FormField
-                    label={t(language, "notifications.timeZoneLabel")}
-                    type="text"
-                    value={timeZoneDraft}
-                    onChange={(event) => setTimeZoneDraft(event.target.value)}
-                    placeholder={t(language, "notifications.timeZonePlaceholder")}
-                    dir="ltr"
-                  />
-                  <div className="grid grid-cols-2 gap-2">
-                    <FormField
-                      label={t(language, "notifications.latitude")}
-                      type="number"
-                      min="-90"
-                      max="90"
-                      step="0.0001"
-                      value={latitudeDraft}
-                      onChange={(event) => {
-                        setLatitudeDraft(event.target.value);
-                        setInvalidCoordinates((current) => ({ ...current, latitude: false }));
-                      }}
-                      error={invalidCoordinates.latitude ? t(language, "notifications.latitudeRange") : undefined}
-                      inputMode="decimal"
-                      dir="ltr"
-                    />
-                    <FormField
-                      label={t(language, "notifications.longitude")}
-                      type="number"
-                      min="-180"
-                      max="180"
-                      step="0.0001"
-                      value={longitudeDraft}
-                      onChange={(event) => {
-                        setLongitudeDraft(event.target.value);
-                        setInvalidCoordinates((current) => ({ ...current, longitude: false }));
-                      }}
-                      error={invalidCoordinates.longitude ? t(language, "notifications.longitudeRange") : undefined}
-                      inputMode="decimal"
-                      dir="ltr"
-                    />
-                  </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleManualLocationSave}
-                    className="w-full border-primary text-primary hover:bg-primary/5"
-                  >
-                    {t(language, "notifications.saveLocation")}
-                  </Button>
-                </fieldset>
-
-                <fieldset className="border-t border-border pt-4">
-                  <legend className="mb-2 text-sm font-bold text-foreground">
-                    {t(language, "notifications.manualMinuteAdjustments")}
-                  </legend>
-                  <p className="mb-3 text-xs leading-5 text-muted-foreground">
-                    {t(language, "notifications.minuteAdjustmentHint")}
-                  </p>
-                  <div className="grid grid-cols-2 gap-2">
-                    {(
-                      [
-                        ["fajr", t(language, "notifications.fajr")],
-                        ["dhuhr", t(language, "notifications.dhuhr")],
-                        ["asr", t(language, "notifications.asr")],
-                        ["maghrib", t(language, "notifications.maghrib")],
-                        ["isha", t(language, "notifications.isha")],
-                      ] as const
-                    ).map(([prayer, label]) => (
-                      <label key={prayer} className="text-xs font-semibold text-muted-foreground">
-                        {label}
-                        <input
-                          type="number"
-                          min="-120"
-                          max="120"
-                          value={locationSettings?.adjustments?.[prayer] ?? 0}
-                          onChange={(event) => handleAdjustmentChange(prayer, Number(event.target.value))}
-                          inputMode="numeric"
-                          onWheel={(event) => event.currentTarget.blur()}
-                          dir="ltr"
-                          className="mt-1 h-10 w-full rounded-lg border border-border-control bg-background px-2 text-center text-sm text-foreground"
-                        />
-                      </label>
-                    ))}
-                  </div>
-                </fieldset>
-              </div>
-            </section>
-          </>
-        )}
-
-        {activeSection === "notifications" && (
-          <>
-            <InformationCard
-              icon={<Info size={20} aria-hidden="true" />}
-              title={t(language, "notifications.availability")}
-              body={t(language, "notifications.availabilityBody")}
-            />
-
-            <section
-              className="rounded-3xl border border-border/40 bg-card p-5 shadow-raised"
-              aria-labelledby="notification-permission"
-            >
-              <div className="flex items-start gap-3">
                 <span
-                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-muted"
-                  aria-hidden="true"
-                >
-                  {permission === "granted" ? (
-                    <CheckCircle2 size={22} className="text-primary" />
-                  ) : (
-                    <Bell size={22} className="text-primary" />
-                  )}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <h2 id="notification-permission" className="text-title font-semibold text-foreground">
-                    {t(language, "notifications.permission")}
-                  </h2>
-                  <p className="mt-1 text-sm leading-[22px] text-muted-foreground">
-                    {permissionCopy(permission, language)}
-                  </p>
-                </div>
-              </div>
-
-              {permission === "default" && (
-                <Button
-                  type="button"
-                  onClick={() => void requestPermission()}
-                  disabled={isRequesting}
-                  className="mt-4 w-full"
-                >
-                  {isRequesting
-                    ? t(language, "notifications.requestingPermission")
-                    : t(language, "notifications.requestPermission")}
-                </Button>
-              )}
-
-              {hasRequestError && (
-                <p className="mt-3 text-sm text-destructive" role="alert">
-                  {t(language, "notifications.permissionError")}
-                </p>
-              )}
-              {(permission === "denied" || permission === "unsupported") && (
-                <p className="mt-3 rounded-xl bg-muted px-3 py-2 text-label leading-5 text-foreground">
-                  {t(language, "notifications.permissionBlockedAction")}
-                </p>
-              )}
-              {permissionAttemptBlocked && (
-                <p className="mt-3 text-sm font-semibold text-destructive" role="alert">
-                  {t(language, "notifications.permissionRequired")}
-                </p>
-              )}
-            </section>
-
-            <section
-              className="rounded-3xl border border-border/40 bg-card p-5 shadow-raised"
-              aria-labelledby="prayer-reminders-title"
-            >
-              <div className="flex items-center gap-3">
-                <span
-                  className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"
-                  aria-hidden="true"
-                >
-                  <Bell size={21} />
-                </span>
-                <span className="min-w-0 flex-1 text-start">
-                  <h2 id="prayer-reminders-title" className="text-title font-bold text-foreground">
-                    {t(language, "notifications.prayerReminders")}
-                  </h2>
-                  <span className="mt-1 block text-label leading-5 text-muted-foreground">
-                    {t(language, "notifications.prayerRemindersHint")}
-                  </span>
-                </span>
-                <button
-                  type="button"
-                  role="switch"
-                  aria-label={t(language, "notifications.prayerReminders")}
-                  aria-checked={reminders.prayer.enabled}
-                  onClick={() => void togglePrayerReminder()}
-                  className="flex h-11 w-12 shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                >
-                  <span
-                    aria-hidden="true"
-                    className={`relative h-7 w-12 rounded-full border transition-colors ${reminders.prayer.enabled ? "border-primary bg-primary" : "border-border-control bg-muted"}`}
-                  >
-                    <span
-                      className={`absolute top-1 size-5 rounded-full shadow-sm transition-[inset] ${reminders.prayer.enabled ? "bg-primary-foreground" : "bg-foreground"}`}
-                      style={{ insetInlineStart: reminders.prayer.enabled ? "1.5rem" : "0.25rem" }}
-                    />
-                  </span>
-                </button>
-              </div>
-
-              <div className="mt-4 flex flex-col gap-1.5 text-label font-bold text-foreground">
-                <span id="prayer-reminder-lead-label">{t(language, "notifications.prayerReminderLead")}</span>
-                <Select
-                  value={String(reminders.prayer.leadMinutes)}
-                  disabled={!reminders.prayer.enabled}
-                  onValueChange={(value) =>
-                    onRemindersChange({
-                      ...reminders,
-                      prayer: {
-                        ...reminders.prayer,
-                        leadMinutes: Number(value) as PrayerReminderLeadMinutes,
-                      },
-                    })
-                  }
-                  dir={isArabic ? "rtl" : "ltr"}
-                >
-                  <SelectTrigger
-                    id="prayer-reminder-lead"
-                    aria-labelledby="prayer-reminder-lead-label"
-                    className="font-semibold"
-                  >
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {[0, 5, 10, 15, 20, 30].map((minutes) => (
-                      <SelectItem key={minutes} value={String(minutes)}>
-                        {minutes === 0
-                          ? t(language, "notifications.atPrayerTime")
-                          : t(language, "notifications.minutesBefore", { minutes: formatNumerals(minutes, language) })}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <fieldset className="mt-4 space-y-2">
-                <legend className="text-label font-bold text-foreground">
-                  {t(language, "notifications.prayerSelection")}
-                </legend>
-                <div className="grid grid-cols-2 gap-2">
-                  {(["fajr", "dhuhr", "asr", "maghrib", "isha"] as const).map((prayer: PrayerName) => {
-                    const selected = reminders.prayer.prayers?.includes(prayer) ?? true;
-                    return (
-                      <label
-                        key={prayer}
-                        className="flex min-h-11 items-center gap-2 rounded-xl border border-border/50 px-3 text-sm font-semibold"
-                      >
-                        <input
-                          type="checkbox"
-                          disabled={!reminders.prayer.enabled}
-                          checked={selected}
-                          onChange={() =>
-                            onRemindersChange({
-                              ...reminders,
-                              prayer: {
-                                ...reminders.prayer,
-                                prayers: selected
-                                  ? (reminders.prayer.prayers ?? ["fajr", "dhuhr", "asr", "maghrib", "isha"]).filter(
-                                      (item) => item !== prayer,
-                                    )
-                                  : [...(reminders.prayer.prayers ?? []), prayer],
-                              },
-                            })
-                          }
-                          className="size-4 accent-primary"
-                        />
-                        {t(language, `notifications.${prayer}`)}
-                      </label>
-                    );
-                  })}
-                </div>
-              </fieldset>
-              {permission === "granted" && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="mt-4 w-full"
-                  onClick={() => void sendTestNotification()}
-                >
-                  {t(language, "notifications.testNotification")}
-                </Button>
-              )}
-              {testStatus && (
-                <p className="mt-2 text-label text-muted-foreground" role="status">
-                  {testStatus}
-                </p>
-              )}
-            </section>
-
-            <section aria-labelledby="gentle-reminders-title">
-              <div className="mb-3 px-1">
-                <h2 id="gentle-reminders-title" className="text-title font-bold text-foreground">
-                  {t(language, "notifications.scheduleTitle")}
-                </h2>
-                <p className="mt-1 text-label leading-5 text-muted-foreground">
-                  {t(language, "notifications.scheduleHint")}
-                </p>
-              </div>
-              <div className="space-y-3">
-                {(["morning", "evening", "before_sleep", "after_prayer"] as const).map((kind) => (
-                  <ReminderScheduleRow
-                    key={kind}
-                    kind={kind}
-                    language={language}
-                    schedule={reminders[kind]}
-                    onToggle={() => void toggleSchedule(kind)}
-                    onTimeChange={(time) => updateSchedule(kind, { time })}
-                  />
-                ))}
-              </div>
-              <label
-                htmlFor="only-when-incomplete"
-                className="mt-3 flex min-h-11 cursor-pointer items-start gap-3 rounded-3xl border border-border/40 bg-card p-4 text-start shadow-raised focus-within:ring-[3px] focus-within:ring-ring"
-              >
-                <input
-                  id="only-when-incomplete"
-                  type="checkbox"
-                  aria-label={t(language, "notifications.onlyIfIncomplete")}
-                  checked={reminders.onlyWhenIncomplete}
-                  onChange={(event) => onRemindersChange({ ...reminders, onlyWhenIncomplete: event.target.checked })}
-                  className="mt-0.5 size-5 accent-primary"
+                  className={`absolute top-1 size-5 rounded-full shadow-sm transition-[inset] ${reminders.prayer.enabled ? "bg-primary-foreground" : "bg-foreground"}`}
+                  style={{ insetInlineStart: reminders.prayer.enabled ? "1.5rem" : "0.25rem" }}
                 />
-                <span>
-                  <span className="block text-sm font-bold text-foreground">
-                    {t(language, "notifications.onlyIfIncomplete")}
-                  </span>
-                  <span className="mt-1 block text-label leading-5 text-muted-foreground">
-                    {t(language, "notifications.onlyIfIncompleteHint")}
-                  </span>
-                </span>
-              </label>
-              {anyReminderEnabled && permission === "granted" && (
-                <p
-                  className="mt-3 rounded-xl bg-primary/10 px-4 py-3 text-label leading-5 text-foreground"
-                  role="status"
-                >
-                  {t(language, "notifications.activeNotice")}
-                </p>
-              )}
-            </section>
-          </>
-        )}
+              </span>
+            </button>
+          </div>
+
+          <div className="mt-4 flex flex-col gap-1.5 text-label font-bold text-foreground">
+            <span id="prayer-reminder-lead-label">{t(language, "notifications.prayerReminderLead")}</span>
+            <Select
+              value={String(reminders.prayer.leadMinutes)}
+              disabled={!reminders.prayer.enabled}
+              onValueChange={(value) =>
+                onRemindersChange({
+                  ...reminders,
+                  prayer: {
+                    ...reminders.prayer,
+                    leadMinutes: Number(value) as PrayerReminderLeadMinutes,
+                  },
+                })
+              }
+              dir={isArabic ? "rtl" : "ltr"}
+            >
+              <SelectTrigger
+                id="prayer-reminder-lead"
+                aria-labelledby="prayer-reminder-lead-label"
+                className="font-semibold"
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {[0, 5, 10, 15, 20, 30].map((minutes) => (
+                  <SelectItem key={minutes} value={String(minutes)}>
+                    {minutes === 0
+                      ? t(language, "notifications.atPrayerTime")
+                      : t(language, "notifications.minutesBefore", { minutes: formatNumerals(minutes, language) })}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <fieldset className="mt-4 space-y-2">
+            <legend className="text-label font-bold text-foreground">
+              {t(language, "notifications.prayerSelection")}
+            </legend>
+            <div className="grid grid-cols-2 gap-2">
+              {(["fajr", "dhuhr", "asr", "maghrib", "isha"] as const).map((prayer: PrayerName) => {
+                const selected = reminders.prayer.prayers?.includes(prayer) ?? true;
+                return (
+                  <label
+                    key={prayer}
+                    className="flex min-h-11 items-center gap-2 rounded-xl border border-border/50 px-3 text-sm font-semibold"
+                  >
+                    <input
+                      type="checkbox"
+                      disabled={!reminders.prayer.enabled}
+                      checked={selected}
+                      onChange={() =>
+                        onRemindersChange({
+                          ...reminders,
+                          prayer: {
+                            ...reminders.prayer,
+                            prayers: selected
+                              ? (reminders.prayer.prayers ?? ["fajr", "dhuhr", "asr", "maghrib", "isha"]).filter(
+                                  (item) => item !== prayer,
+                                )
+                              : [...(reminders.prayer.prayers ?? []), prayer],
+                          },
+                        })
+                      }
+                      className="size-4 accent-primary"
+                    />
+                    {t(language, `notifications.${prayer}`)}
+                  </label>
+                );
+              })}
+            </div>
+          </fieldset>
+          {permission === "granted" && (
+            <Button type="button" variant="outline" className="mt-4 w-full" onClick={() => void sendTestNotification()}>
+              {t(language, "notifications.testNotification")}
+            </Button>
+          )}
+          {testStatus && (
+            <p className="mt-2 text-label text-muted-foreground" role="status">
+              {testStatus}
+            </p>
+          )}
+        </section>
+
+        <section aria-labelledby="gentle-reminders-title">
+          <div className="mb-3 px-1">
+            <h2 id="gentle-reminders-title" className="text-title font-bold text-foreground">
+              {t(language, "notifications.scheduleTitle")}
+            </h2>
+            <p className="mt-1 text-label leading-5 text-muted-foreground">
+              {t(language, "notifications.scheduleHint")}
+            </p>
+          </div>
+          <div className="space-y-3">
+            {(["morning", "evening", "before_sleep", "after_prayer"] as const).map((kind) => (
+              <ReminderScheduleRow
+                key={kind}
+                kind={kind}
+                language={language}
+                schedule={reminders[kind]}
+                onToggle={() => void toggleSchedule(kind)}
+                onTimeChange={(time) => updateSchedule(kind, { time })}
+              />
+            ))}
+          </div>
+          <label
+            htmlFor="only-when-incomplete"
+            className="mt-3 flex min-h-11 cursor-pointer items-start gap-3 rounded-3xl border border-border/40 bg-card p-4 text-start shadow-raised focus-within:ring-[3px] focus-within:ring-ring"
+          >
+            <input
+              id="only-when-incomplete"
+              type="checkbox"
+              aria-label={t(language, "notifications.onlyIfIncomplete")}
+              checked={reminders.onlyWhenIncomplete}
+              onChange={(event) => onRemindersChange({ ...reminders, onlyWhenIncomplete: event.target.checked })}
+              className="mt-0.5 size-5 accent-primary"
+            />
+            <span>
+              <span className="block text-sm font-bold text-foreground">
+                {t(language, "notifications.onlyIfIncomplete")}
+              </span>
+              <span className="mt-1 block text-label leading-5 text-muted-foreground">
+                {t(language, "notifications.onlyIfIncompleteHint")}
+              </span>
+            </span>
+          </label>
+          {anyReminderEnabled && permission === "granted" && (
+            <p className="mt-3 rounded-xl bg-primary/10 px-4 py-3 text-label leading-5 text-foreground" role="status">
+              {t(language, "notifications.activeNotice")}
+            </p>
+          )}
+        </section>
       </div>
     </div>
   );

@@ -1,0 +1,20 @@
+/* Enlarge the canvas so the line fitter cannot cancel magnification. */
+.mushaf-paper[data-magnified="true"] {
+  display: block;
+  overflow: auto;
+  touch-action: pan-x pan-y pinch-zoom;
+}
+.mushaf-paper[data-magnified="true"] .mushaf-page-canvas {
+  width: calc(100% * var(--mushaf-magnification));
+  height: calc(max(var(--mushaf-page-height, 36rem), 32rem) * var(--mushaf-magnification));
+  min-height: calc(32rem * var(--mushaf-magnification));
+  max-width: none;
+}
+.mushaf-paper[data-magnified="true"]:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: -3px;
+}
+
+.reader-swipe-surface:has(.mushaf-paper[data-magnified="true"]) {
+  touch-action: pan-x pan-y pinch-zoom;
+}

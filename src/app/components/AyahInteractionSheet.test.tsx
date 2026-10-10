@@ -1,10 +1,14 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AyahInteractionSheet } from "./AyahInteractionSheet";
 import { t } from "../i18n";
+import { __resetQuranTranslationsCacheForTesting } from "../content/quranTranslations";
 
 describe("AyahInteractionSheet", () => {
+  beforeEach(() => {
+    __resetQuranTranslationsCacheForTesting();
+  });
   afterEach(() => vi.restoreAllMocks());
 
   it("copies the supplied canonical Unicode text and toggles the verse bookmark", async () => {
@@ -88,5 +92,45 @@ describe("AyahInteractionSheet", () => {
 
     expect(await screen.findByTestId("ayah-meanings-container")).toBeInTheDocument();
     expect(screen.getByText(t("ar", "reader.wordMeaningsTitle"))).toBeInTheDocument();
+  });
+
+  it("renders English translation when available and copies both Arabic and English", async () => {
+    const user = userEvent.setup();
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText } });
+
+    vi.spyOn(globalThis, "fetch").mockImplementation(async (url) => {
+      if (String(url).includes("2.json")) {
+        return {
+          ok: true,
+          json: async () => ({
+            "255": "Allah - there is no deity except Him, the Ever-Living, the Sustainer of all existence.",
+          }),
+        } as Response;
+      }
+      return { ok: false } as Response;
+    });
+
+    render(
+      <AyahInteractionSheet
+        isOpen
+        onClose={vi.fn()}
+        verseKey="2:255"
+        text="ٱللَّهُ لَآ إِلَـٰهَ إِلَّا هُوَ"
+        language="en"
+        isBookmarked={false}
+        onBookmark={vi.fn()}
+      />,
+    );
+
+    const translation = await screen.findByTestId("ayah-sheet-translation");
+    expect(translation).toHaveTextContent(
+      "Allah - there is no deity except Him, the Ever-Living, the Sustainer of all existence.",
+    );
+
+    await user.click(screen.getByRole("button", { name: "Copy ayah" }));
+    expect(writeText).toHaveBeenCalledWith(
+      "ٱللَّهُ لَآ إِلَـٰهَ إِلَّا هُوَ\n\nAllah - there is no deity except Him, the Ever-Living, the Sustainer of all existence.\n— Saheeh International",
+    );
   });
 });

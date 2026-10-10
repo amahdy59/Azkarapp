@@ -289,7 +289,17 @@ test("the Reader counter keeps one rectangular shape across phone, tablet, and d
       expect(box).not.toBeNull();
       if (box) {
         expect(Math.round(box.height)).toBe(48);
-        expect(box.width).toBeLessThanOrEqual(220);
+        const layout = await counter.evaluate((element) => {
+          const row = element.closest(".adaptive-counter-row")!;
+          const style = getComputedStyle(row);
+          const columns = style.gridTemplateColumns.split(" ").map(parseFloat);
+          return {
+            grid: style.display === "grid",
+            expectedWidth: columns[1] + columns[2] + parseFloat(style.columnGap),
+          };
+        });
+        if (layout.grid) expect(Math.abs(box.width - layout.expectedWidth)).toBeLessThanOrEqual(1);
+        else expect(box.width).toBeLessThanOrEqual(220);
         expect(box.width).toBeGreaterThanOrEqual(160);
         expect(box.x).toBeGreaterThanOrEqual(0);
         expect(box.x + box.width).toBeLessThanOrEqual(viewport.width);
@@ -360,7 +370,9 @@ test("Space counts without outlining the full Reader text region", async ({ page
   }
 });
 
-test("desktop and tablet keep navigation below reading text and keyboard help inside guidance", async ({ page }) => {
+test("desktop and tablet keep navigation below reading text and one reachable keyboard help action", async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await openFirstMorningZikr(page);
 
@@ -384,9 +396,16 @@ test("desktop and tablet keep navigation below reading text and keyboard help in
     await expect(card.getByTestId("reader-side-navigation")).toHaveCount(0);
     await expect(navigation.getByRole("button", { name: "Prev", exact: true })).toBeVisible();
     await expect(navigation.getByRole("button", { name: "Next", exact: true })).toBeVisible();
-    await expect(shortcutGuide.getByRole("button", { name: "Keyboard shortcuts", exact: true })).toBeVisible();
+    const keyboardHelp = page.getByRole("button", { name: "Keyboard shortcuts", exact: true });
+    await expect(keyboardHelp).toHaveCount(1);
+    await expect(keyboardHelp).toBeVisible();
+    await keyboardHelp.click();
+    await expect(page.getByRole("dialog", { name: "Keyboard shortcuts", exact: true })).toHaveCount(1);
+    await expect(page.getByRole("dialog", { name: "Keyboard shortcuts", exact: true })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(keyboardHelp).toBeFocused();
     await expect(page.getByTestId("reader-keyboard-shortcuts")).toHaveCount(0);
-    await expect(counter).toHaveAccessibleName(/Click the dhikr, counter, or press Space to count/);
+    await expect(counter).toHaveAccessibleName(/Click the dhikr or press Space 0 \/ 1/);
 
     const zikrText = card.getByTestId("zikr-text").first();
     const [textBox, navigationBox, counterBox, guideBox] = await Promise.all([
@@ -417,7 +436,8 @@ test("desktop and tablet keep navigation below reading text and keyboard help in
   await expect(collectionToggle).toBeVisible();
   await expect(collectionToggle).toHaveAttribute("aria-expanded", "false");
   await expect(heroActions.getByRole("button", { name: "Appearance", exact: true })).toBeVisible();
-  await expect(heroActions.locator("button:visible")).toHaveCount(3);
+  await expect(heroActions.getByRole("button", { name: "Keyboard shortcuts", exact: true })).toBeVisible();
+  await expect(heroActions.locator("button:visible")).toHaveCount(4);
   await collectionToggle.click();
   await expect(page.getByTestId("reader-collection-drawer")).toBeVisible();
   await expect(collectionToggle).toHaveAttribute("aria-expanded", "true");
@@ -982,20 +1002,20 @@ test("the reader header keeps options and wide collection navigation together", 
     const collectionPanel = page.getByTestId("reader-collection-navigator");
     await expect(collectionPanel).toBeVisible();
     await expect(collectionToggle).toBeHidden();
-    await expect(actions.locator("button:visible")).toHaveCount(2);
+    await expect(actions.locator("button:visible")).toHaveCount(3);
     await page.getByTestId("reader-sidebar-close").click();
     await expect(collectionPanel).toBeHidden();
     await expect(collectionToggle).toBeVisible();
     await expect(collectionToggle).toBeFocused();
     await expect(collectionToggle).toHaveAttribute("aria-expanded", "false");
-    await expect(actions.locator("button:visible")).toHaveCount(3);
+    await expect(actions.locator("button:visible")).toHaveCount(4);
     await collectionToggle.click();
     await expect(collectionPanel).toBeVisible();
     await expect(collectionToggle).toBeHidden();
     await expect(page.getByTestId("reader-sidebar-close")).toBeFocused();
-    await expect(actions.locator("button:visible")).toHaveCount(2);
+    await expect(actions.locator("button:visible")).toHaveCount(3);
   } else {
-    await expect(actions.locator("button:visible")).toHaveCount(width >= 768 ? 3 : 2);
+    await expect(actions.locator("button:visible")).toHaveCount(width >= 768 ? 4 : 2);
   }
   await expect(actions.getByRole("button", { name: "Benefit", exact: true })).toHaveCount(0);
   await expect(actions.getByRole("button", { name: "Appearance", exact: true })).toBeVisible();

@@ -28,20 +28,21 @@ export function ShareableCardModal({ palms, golden, green, dateStr, language, on
     try {
       setIsSharing(true);
       setShareStatus({ message: t(language, "shareModal.sharing"), error: false });
+      const text = t(language, "shareModal.text", {
+        palms: formatNumerals(palms, language),
+        golden: formatNumerals(golden, language),
+        green: formatNumerals(green, language),
+      });
+      const url = new URL(import.meta.env.BASE_URL, window.location.origin).href;
       if (navigator.share) {
         await navigator.share({
           title: t(language, "shareModal.title"),
-          text: t(language, "shareModal.text", {
-            palms: formatNumerals(palms, language),
-            golden: formatNumerals(golden, language),
-            green: formatNumerals(green, language),
-          }),
-          url: window.location.origin,
+          text,
+          url,
         });
         setShareStatus({ message: t(language, "shareModal.shared"), error: false });
       } else {
-        const text = t(language, "shareModal.copyText");
-        await navigator.clipboard.writeText(text);
+        await navigator.clipboard.writeText(`${text}\n${url}`);
         setShareStatus({ message: t(language, "shareModal.copied"), error: false });
       }
     } catch (error) {

@@ -437,6 +437,7 @@ describe("AudioProvider integration", () => {
     fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
 
     // Where the reader is in a prescribed repetition, said once.
+    fireEvent.click(screen.getByRole("button", { name: "Audio options" }));
     expect(screen.getByRole("button", { name: "Repeat 3 times" })).toBeInTheDocument();
 
     // Select a rate directly and verify the real controller updates the displayed value.
@@ -464,6 +465,7 @@ describe("AudioProvider integration", () => {
     fireEvent.click(screen.getByRole("button", { name: "Start" }));
     fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
 
+    fireEvent.click(screen.getByRole("button", { name: "Audio options" }));
     fireEvent.click(screen.getByRole("button", { name: "Volume" }));
     const volume = screen.getByRole("slider", { name: "Volume" });
     expect(volume).toHaveAttribute("aria-orientation", "vertical");
@@ -487,6 +489,7 @@ describe("AudioProvider integration", () => {
     expect(timeline.getAttribute("style")).toContain("to left");
     expect(timeline).toHaveValue("0");
 
+    fireEvent.click(screen.getByRole("button", { name: "خيارات الصوت" }));
     fireEvent.click(screen.getByTestId("audio-reciter-select"));
     expect(screen.queryByTestId("audio-recording-source")).not.toBeInTheDocument();
     expect(screen.getByTestId("audio-reciter-select")).not.toHaveTextContent("المصدر");

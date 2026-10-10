@@ -1,0 +1,168 @@
+/* Two centered action rows retain their geometry when tools are hidden. */
+[data-testid="reader-counter-stack"] {
+  container: reader-footer / inline-size;
+}
+.reader-session-footer {
+  max-width: 42rem;
+}
+.reader-footer-composition {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: center;
+  gap: 12px;
+  row-gap: 18px;
+  max-width: 42rem;
+  margin-inline: auto;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+.reader-tools-actions {
+  grid-column: 1 / 4;
+  grid-row: 1;
+}
+.reader-tools-disclosure {
+  grid-column: 4;
+  grid-row: 1;
+  padding-block: 0;
+}
+.reader-tools-disclosure button {
+  width: 100%;
+  padding-inline: 12px;
+  white-space: nowrap;
+}
+.reader-tools-toggle[aria-expanded="false"] {
+  border-style: dashed;
+  background: var(--card);
+}
+.reader-dock .reader-tools-toggle {
+  border-radius: 12px;
+}
+.reader-dock .reader-tools-toggle .reader-tools-chevron {
+  background: var(--background);
+}
+.reader-primary-actions {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  width: min(100%, 35rem);
+  justify-self: center;
+}
+[data-testid="reader-support-actions"] {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+[data-testid="reader-support-actions"] .devotional-secondary-action {
+  width: 100%;
+  min-width: 0;
+  padding-inline: 12px;
+}
+[data-testid="reader-support-actions"] .devotional-secondary-action > span {
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+.reader-text-scroll .reading-measure > div {
+  min-height: 100%;
+}
+@container reader-footer (max-width: 37.5rem) {
+  .reader-footer-composition {
+    grid-template-columns: repeat(4, minmax(44px, 1fr));
+    gap: 8px;
+    row-gap: 18px;
+  }
+  [data-testid="reader-support-actions"] {
+    gap: 8px;
+  }
+  [data-testid="reader-support-actions"] .devotional-secondary-action {
+    padding-inline: 0;
+  }
+  [data-testid="reader-support-actions"] .devotional-secondary-action > span {
+    display: none;
+  }
+  .reader-tools-disclosure button {
+    font-size: 0.875rem;
+    padding-inline: 8px;
+    gap: 4px;
+  }
+  .reader-tools-disclosure button > span {
+    display: none;
+  }
+  .reader-tools-disclosure .reader-tools-chevron {
+    display: flex;
+  }
+}
+
+.reader-session-footer .adaptive-counter-nav {
+  justify-content: center;
+  gap: 8px;
+}
+.reader-session-footer .adaptive-counter-nav > span {
+  flex: 0 1 auto;
+}
+.reader-session-footer button > svg,
+.reader-tools-chevron > svg {
+  display: block;
+  flex-shrink: 0;
+}
+.reader-session-footer .devotional-secondary-action > span {
+  line-height: 1.25;
+}
+
+.standalone-counter-row {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+.standalone-counter-row > div {
+  display: flex;
+  min-width: 0;
+  width: 100%;
+  justify-content: center;
+}
+
+@container reader-footer (min-width: 37.5rem) {
+  .standalone-counter-row {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .standalone-counter-row > div {
+    grid-column: 2 / span 2;
+  }
+  .standalone-counter-row .adaptive-counter-surface {
+    width: 100%;
+    max-width: none;
+  }
+  .reader-primary-actions {
+    width: 100%;
+  }
+  .reader-primary-actions .adaptive-counter-row {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .reader-primary-actions .adaptive-counter-row > div:nth-child(2) {
+    grid-column: span 2;
+  }
+  .reader-primary-actions .adaptive-counter-nav,
+  .reader-primary-actions .adaptive-counter-surface {
+    width: 100%;
+    max-width: none;
+  }
+}
+.reader-tools-chevron > svg {
+  transition: transform var(--motion-duration-fast) var(--motion-ease-standard);
+}
+.reader-footer-composition[data-expanded="true"] .reader-tools-actions {
+  animation: fade-in var(--motion-duration-fast) var(--motion-ease-enter);
+}
+.reduce-motion .reader-tools-actions {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reader-tools-actions {
+    animation: none;
+  }
+  .reader-tools-chevron > svg {
+    transition: none;
+  }
+}

@@ -4,7 +4,7 @@ This document is the source of truth for Azkarapp's prayer-time pipeline. It exp
 
 ## User-visible behavior
 
-The Home prayer header displays the next prayer and a live countdown. Settings → Prayer Times & Location allows the user to:
+The Home prayer header displays the next prayer and a live countdown. Settings → Prayer times & location allows the user to:
 
 - Detect the current location
 - Review the effective IANA timezone and current UTC offset
@@ -13,7 +13,7 @@ The Home prayer header displays the next prayer and a live countdown. Settings �
 - Search and select a built-in city without sharing GPS data; the preset coordinates and IANA timezone remain available offline
 - Enter a manual city, timezone, latitude, and longitude when the built-in list does not include the required location
 - Apply a minute adjustment to each prayer
-- Enable one reminder before every daily prayer and choose a 10- or 15-minute lead time
+  Prayer-time alert selection and lead time live separately in Settings → Notifications & reminders. The saved location, timezone, calculation method and minute adjustments still drive those alerts.
 
 The five trackable prayers are Fajr, Dhuhr, Asr, Maghrib, and Isha. The same calculation also exposes Sunrise (Shrouk) as supporting Fajr-window context; it is never treated as a sixth prayer or given tracking controls.
 
@@ -122,18 +122,18 @@ The API timeout is bounded. Geolocation is user-initiated and requires HTTPS or 
 
 ## Code map
 
-| File                                              | Responsibility                                                     |
-| ------------------------------------------------- | ------------------------------------------------------------------ |
-| `src/app/content/prayerCalculation.ts`            | Timezone/DST, astronomical calculation, adjustments, geolocation   |
-| `src/app/content/prayerTimes.ts`                  | Current/next prayer selection and countdown formatting             |
-| `src/app/screens/HomeScreen.tsx`                  | Immediate fallback rendering and background refresh                |
-| `src/app/screens/settings/NotificationsPanel.tsx` | Location, timezone status, methods, and adjustments UI             |
-| `src/app/hooks/useForegroundReminders.ts`         | Exact next-due routine/prayer scheduling and notification delivery |
-| `src/app/types.ts`                                | `LocationSettings` persistence contract                            |
-| `src/app/state.ts`                                | Defaults, validation, merge, and persistence                       |
-| `src/app/content/prayerCalculation.test.ts`       | Parser, timezone/DST, offline, adjustment, and fallback unit tests |
-| `e2e/narrow-layout.spec.ts`                       | Narrow prayer-header overflow regression                           |
-| `e2e/responsive.spec.ts`                          | Arabic RTL prayer-header fit                                       |
+| File                                               | Responsibility                                                     |
+| -------------------------------------------------- | ------------------------------------------------------------------ |
+| `src/app/content/prayerCalculation.ts`             | Timezone/DST, astronomical calculation, adjustments, geolocation   |
+| `src/app/content/prayerTimes.ts`                   | Current/next prayer selection and countdown formatting             |
+| `src/app/screens/HomeScreen.tsx`                   | Immediate fallback rendering and background refresh                |
+| `src/app/screens/settings/PrayerLocationPanel.tsx` | Location, timezone status, methods, and adjustments UI             |
+| `src/app/hooks/useForegroundReminders.ts`          | Exact next-due routine/prayer scheduling and notification delivery |
+| `src/app/types.ts`                                 | `LocationSettings` persistence contract                            |
+| `src/app/state.ts`                                 | Defaults, validation, merge, and persistence                       |
+| `src/app/content/prayerCalculation.test.ts`        | Parser, timezone/DST, offline, adjustment, and fallback unit tests |
+| `e2e/narrow-layout.spec.ts`                        | Narrow prayer-header overflow regression                           |
+| `e2e/responsive.spec.ts`                           | Arabic RTL prayer-header fit                                       |
 
 ## Verification
 

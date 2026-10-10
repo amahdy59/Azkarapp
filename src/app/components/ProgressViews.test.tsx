@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { ProgressDayView, ProgressWeekView, ProgressMonthView, ProgressYearView } from "./ProgressViews";
 import type { GardenSummary } from "../progress";
 import type { DailyCollectionCompletion } from "../types";
@@ -40,6 +40,42 @@ const mockCompletions: DailyCollectionCompletion[] = [
 ];
 
 describe("ProgressViews components", () => {
+  afterEach(() => vi.useRealTimers());
+
+  it("shows no rate for future heatmaps and formats elapsed rates consistently", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 0, 2, 12));
+    render(
+      <ProgressYearView
+        language="en"
+        targetYear={2026}
+        dailyCompletions={[{ dayKey: "2026-01-01", category: "morning", timeZone: "Africa/Cairo" }]}
+      />,
+    );
+    const january = screen.getByTestId("year-heatmap-0").parentElement!;
+    const february = screen.getByTestId("year-heatmap-1").parentElement!;
+    expect(january).toHaveTextContent("17%");
+    expect(february).toHaveTextContent("—");
+    expect(february).not.toHaveTextContent("0%");
+  });
+  it("keeps Progress rows photograph-free and uses ordinary navigation buttons", () => {
+    const onSelectCategory = vi.fn();
+    const { container } = render(
+      <ProgressDayView
+        summary={mockSummary}
+        language="en"
+        dynamicSubtitle="Recorded routines"
+        visibleCategoryIds={["morning", "evening", "before_sleep"]}
+        onMedia={false}
+        onSelectCategory={onSelectCategory}
+      />,
+    );
+    expect(container.querySelector("img")).toBeNull();
+    const morning = screen.getByRole("button", { name: "Morning Azkar - Completed" });
+    expect(morning).not.toHaveAttribute("aria-pressed");
+    fireEvent.click(morning);
+    expect(onSelectCategory).toHaveBeenCalledWith("morning");
+  });
   it("renders ProgressDayView with a responsive routine card grid in Arabic", () => {
     render(
       <ProgressDayView summary={mockSummary} language="ar" dynamicSubtitle="أكملت 1 من أصل 3 أوراد رئيسية اليوم" />,
@@ -171,7 +207,7 @@ describe("ProgressViews components", () => {
 
     rerender(<ProgressYearView language="en" targetYear={2026} dailyCompletions={[]} />);
 
-    expect(screen.getByText("Recorded completion rate by month.")).toBeInTheDocument();
+    expect(screen.getByText(/Recorded completion of Morning, Evening and Sleep/)).toBeInTheDocument();
     expect(screen.getByText("Complete a routine to begin your yearly record.")).toBeInTheDocument();
     expect(screen.queryByText(/improved by 12%/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/14367|214 active|32 days|78/)).not.toBeInTheDocument();

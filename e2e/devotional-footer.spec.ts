@@ -3,6 +3,144 @@ import AxeBuilder from "@axe-core/playwright";
 import { getAzkarForMode } from "../src/app/content/azkar";
 
 for (const language of ["ar", "en"] as const) {
+  for (const width of [320, 390, 820, 1440]) {
+    test(`footer tools collapse without changing counting or item choice in ${language} at ${width}px @cross-browser`, async ({
+      page,
+    }, testInfo) => {
+      const ar = language === "ar";
+      await page.setViewportSize({ width, height: 844 });
+      await page.addInitScript((language) => {
+        localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+        localStorage.setItem(
+          "azkarapp.state.v1",
+          JSON.stringify({
+            settings: { language, reduceMotion: true, routineModes: { morning: "complete" } },
+            profile: { isGuest: true },
+          }),
+        );
+      }, language);
+      await page.goto("/#/azkar/morning/1");
+      const tools = page.getByTestId("reader-support-actions");
+      const counter = page.getByTestId("counter-surface");
+      await expect(tools).toBeVisible();
+      const toolBounds = (await tools.boundingBox())!;
+      const primaryBounds = (await page.getByTestId("counter-panel").boundingBox())!;
+      expect(primaryBounds.y - toolBounds.y - toolBounds.height).toBeGreaterThanOrEqual(16);
+      for (const button of await tools.getByRole("button").all()) {
+        const alignment = await button.evaluate((element) => {
+          const icon = element.querySelector("svg")!.getBoundingClientRect();
+          const button = element.getBoundingClientRect();
+          const label = element.querySelector("span");
+          const text = label?.getBoundingClientRect();
+          return {
+            iconOffset: Math.abs(icon.y + icon.height / 2 - (button.y + button.height / 2)),
+            textOffset: text?.height ? Math.abs(text.y + text.height / 2 - (button.y + button.height / 2)) : 0,
+          };
+        });
+        expect(alignment.iconOffset).toBeLessThanOrEqual(1);
+        expect(alignment.textOffset).toBeLessThanOrEqual(1);
+      }
+      await page.evaluate(() => document.fonts.ready);
+      if (width === 1440) {
+        await page.getByTestId("reader-sidebar-close").click();
+        const row = await page.locator(".reader-footer-composition").evaluate((el) => {
+          const actions = el.querySelector(".reader-tools-actions")!.getBoundingClientRect();
+          const primary = el.querySelector(".reader-primary-actions")!.getBoundingClientRect();
+          const toggle = el.querySelector(".reader-tools-disclosure")!.getBoundingClientRect();
+          const centers = [actions, toggle].map((box) => box.y + box.height / 2);
+          const composition = el.getBoundingClientRect();
+          const toolCells = Array.from(el.querySelectorAll('[data-testid="reader-support-actions"] button')).map(
+            (button) => button.getBoundingClientRect(),
+          );
+          const previous = el.querySelector(".adaptive-counter-row > div:first-child button")!.getBoundingClientRect();
+          const next = el.querySelector(".adaptive-counter-row > div:last-child button")!.getBoundingClientRect();
+          const counter = el.querySelector('[data-testid="counter-surface"]')!.getBoundingClientRect();
+          const edges = [...toolCells, toggle].sort((a, b) => a.x - b.x);
+          const navigation = [previous, next].sort((a, b) => a.x - b.x);
+          return {
+            alignment: Math.max(...centers) - Math.min(...centers),
+            twoRows: primary.top >= actions.bottom,
+            labelsFit: Array.from(el.querySelectorAll("[data-testid=reader-support-actions] button > span")).every(
+              (label) => label.scrollWidth <= label.clientWidth + 1,
+            ),
+            symmetry: Math.abs(primary.x + primary.width / 2 - (composition.x + composition.width / 2)),
+            gridEdges: Math.max(
+              Math.abs(navigation[0].x - edges[0].x),
+              Math.abs(navigation[0].right - edges[0].right),
+              Math.abs(counter.x - edges[1].x),
+              Math.abs(counter.right - edges[2].right),
+              Math.abs(navigation[1].x - edges[3].x),
+              Math.abs(navigation[1].right - edges[3].right),
+            ),
+          };
+        });
+        expect(row.alignment).toBeLessThanOrEqual(2);
+        expect(row.symmetry).toBeLessThanOrEqual(1);
+        expect(row.twoRows).toBe(true);
+        expect(row.labelsFit).toBe(true);
+        expect(row.gridEdges).toBeLessThanOrEqual(1);
+      }
+
+      const reading = page.locator(".reader-text-scroll");
+      const expandedReadingHeight = (await reading.boundingBox())!.height;
+      if (width === 1440) {
+        const frame = reading.getByTestId("reading-text-transition");
+        await expect
+          .poll(async () => {
+            const region = (await reading.boundingBox())!;
+            const text = (await frame.boundingBox())!;
+            return Math.abs(text.y + text.height / 2 - (region.y + region.height / 2));
+          })
+          .toBeLessThanOrEqual(3);
+        const region = (await reading.boundingBox())!;
+        const footer = (await page.getByTestId("reader-counter-stack").boundingBox())!;
+        expect(region.y + region.height).toBeLessThanOrEqual(footer.y + 1);
+      }
+      const initialReadingBounds = (await reading.boundingBox())!;
+      const initialCount = await counter.getAttribute("aria-label");
+      const toggle = page.getByTestId("reader-tools-toggle");
+      await expect(toggle.locator("svg")).not.toHaveClass(/rotate-180/);
+      await toggle.focus();
+      await page.keyboard.press("Enter");
+      await expect(tools).toBeHidden();
+      await expect(toggle).toBeFocused();
+      await expect.poll(async () => (await reading.boundingBox())!.height).toBeCloseTo(expandedReadingHeight, 0);
+      expect((await reading.boundingBox())!.y).toBeCloseTo(initialReadingBounds.y, 0);
+      const guidance = page.getByTestId("counter-guidance-reopen");
+      if (await guidance.isVisible()) {
+        const before = (await reading.boundingBox())!;
+        await guidance.click();
+        expect((await reading.boundingBox())!.height).toBeGreaterThanOrEqual(before.height);
+        expect((await reading.boundingBox())!.y).toBeCloseTo(before.y, 0);
+      }
+      await expect(toggle).toHaveAttribute("aria-expanded", "false");
+      await expect(toggle.locator("svg")).toHaveClass(/rotate-180/);
+      await expect(toggle).toHaveAccessibleName(ar ? "إظهار الأدوات" : "Show tools");
+      await page.screenshot({ path: testInfo.outputPath(`footer-collapsed-${language}-${width}.png`) });
+      await expect(counter).toHaveAttribute("aria-label", initialCount!);
+      await page
+        .getByTestId("counter-panel")
+        .getByRole("button", { name: ar ? "التالي" : "Next", exact: true })
+        .click();
+      await expect(page.getByTestId("reader-screen")).toHaveAttribute("data-zikr-index", "1");
+      await expect(tools).toBeHidden();
+      await page.getByRole("button", { name: ar ? "إظهار الأدوات" : "Show tools", exact: true }).click();
+      await expect(tools).toBeVisible();
+      await page.getByRole("button", { name: ar ? "خيارات القارئ" : "Reader options", exact: true }).click();
+      await page.getByTestId("reader-focus-toggle").click();
+      await expect(tools).toBeHidden();
+      await expect(page.getByRole("button", { name: ar ? "إخفاء الأدوات" : "Hide tools", exact: true })).toBeHidden();
+      await page.getByRole("button", { name: ar ? "إنهاء وضع التركيز" : "Exit reading focus", exact: true }).click();
+      await expect(tools).toBeVisible();
+      await page.screenshot({ path: testInfo.outputPath(`footer-${language}-${width}.png`) });
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      const scan = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag22aa"]).analyze();
+      expect(scan.violations).toEqual([]);
+    });
+  }
+}
+
+for (const language of ["ar", "en"] as const) {
   test(`counter labels stay on one line and fill starts empty in ${language} @cross-browser`, async ({ page }) => {
     await page.addInitScript((language) => {
       localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
@@ -177,7 +315,7 @@ for (const language of ["ar", "en"] as const) {
       await expect(actions).toBeVisible();
       await expect(actions.getByRole("button")).toHaveCount(3);
       await expect(hint).toBeVisible();
-      await expect(hint.locator("svg:visible")).toHaveCount(width < 768 ? 1 : 2);
+      await expect(hint.locator("svg:visible")).toHaveCount(1);
       await expect(
         hint.getByRole("button", { name: language === "ar" ? "إخفاء إرشادات العد" : "Hide counting guidance" }),
       ).toHaveAttribute("aria-expanded", "true");
@@ -187,9 +325,19 @@ for (const language of ["ar", "en"] as const) {
         const panelBox = (await page.getByTestId("counter-panel").boundingBox())!;
         if (width < 768) expect(hintBox.y + hintBox.height).toBeLessThanOrEqual(supportBox.y);
         else expect(panelBox.y + panelBox.height).toBeLessThanOrEqual(hintBox.y);
-        expect(Math.abs(hintBox.x - supportBox.x)).toBeLessThanOrEqual(1);
-        expect(Math.abs(panelBox.x - supportBox.x)).toBeLessThanOrEqual(1);
-        expect(Math.abs(panelBox.width - supportBox.width)).toBeLessThanOrEqual(1);
+        // The tool group uses the space beside the primary on wide canvases.
+        const dockBox = (await page.getByTestId("reader-dock").boundingBox())!;
+        expect(supportBox.x).toBeGreaterThanOrEqual(dockBox.x);
+        expect(panelBox.x + panelBox.width).toBeLessThanOrEqual(dockBox.x + dockBox.width + 1);
+        const lines = await hint.locator("span[aria-hidden]").evaluate((element) => {
+          const visible = Array.from(element.querySelectorAll("span")).find(
+            (child) => getComputedStyle(child).display !== "none",
+          )!;
+          const range = document.createRange();
+          range.selectNodeContents(visible);
+          return range.getClientRects().length;
+        });
+        expect(lines).toBe(1);
         expect(await hint.evaluate((element) => element.closest('[data-testid="reader-dock"]') === null)).toBe(true);
         for (const button of await actions.getByRole("button").all()) {
           const box = await button.boundingBox();
@@ -235,7 +383,7 @@ for (const language of ["ar", "en"] as const) {
           }
           expect(new Set(navigationWidths).size).toBe(1);
           const supportBox = (await actions.boundingBox())!;
-          expect(Math.round(box!.y - supportBox.y - supportBox.height)).toBe(12);
+          expect(box!.y).toBeGreaterThanOrEqual(supportBox.y + supportBox.height);
         } else {
           for (const button of await page.getByTestId("reader-side-navigation").getByRole("button").all()) {
             const geometry = await button.evaluate((element) => {

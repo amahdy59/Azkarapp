@@ -1,7 +1,9 @@
 import { expect, test, type Page } from "@playwright/test";
 import { getAzkarByCategory } from "../src/app/content/azkar";
 
-const ikhlasPosition = getAzkarByCategory("morning").findIndex((zikr) => zikr.id === "m-hm-76a") + 1;
+// Canvas counting guidance applies to ordinary azkar; complete surahs use the
+// counter-only Mushaf reader with its own instruction.
+const countingPosition = getAzkarByCategory("morning").findIndex((zikr) => zikr.id === "m-hm-91") + 1;
 
 async function returningGuest(page: Page, language: "ar" | "en") {
   await page.addInitScript((language) => {
@@ -24,7 +26,7 @@ for (const language of ["ar", "en"] as const) {
     }) => {
       await page.setViewportSize({ width, height: 900 });
       await returningGuest(page, language);
-      await page.goto(`/#/azkar/morning/${ikhlasPosition}?mode=complete`);
+      await page.goto(`/#/azkar/morning/${countingPosition}?mode=complete`);
       const counter = page.getByTestId("counter-surface");
       await expect(counter).toBeVisible();
       await counter.click();

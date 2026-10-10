@@ -49,6 +49,7 @@ import {
   Maximize,
   RefreshCw,
   Share2,
+  Keyboard,
 } from "../components/icons";
 import { t } from "../i18n";
 import { shouldReduceMotion, vibrateIfEnabled } from "../motionPreferences";
@@ -59,6 +60,8 @@ import type { AppLanguage, CategoryId, RoutineMode, MushafTextScale, TextSizeOpt
 import { isPrayerName } from "../content/prayerTimes";
 import { ProgressBar } from "../components/ProgressBar";
 import { CounterGuidance } from "../components/CounterGuidance";
+import { CounterKeyboardHelp } from "../components/CounterKeyboardHelp";
+import { ReaderFooterTools } from "../components/ReaderFooterTools";
 import { DevotionalAction, DevotionalFooter } from "../components/DevotionalControls";
 import { ZikrCounterSurface } from "../components/ZikrComponents";
 import { ToggleTrack } from "../components/SettingsRow";
@@ -322,6 +325,7 @@ export function ReaderScreen({
   }, [onMushafModeChange, showMushaf]);
   const [benefitOpen, setBenefitOpen] = useState(false);
   const [focusMode, setFocusMode] = useState(false);
+  const [footerToolsExpanded, setFooterToolsExpanded] = useState(true);
   const focusExitRef = useRef<HTMLButtonElement>(null);
   const focusRequestedRef = useRef(false);
   const previousFocusMode = useRef(false);
@@ -330,6 +334,7 @@ export function ReaderScreen({
   const [shareMessage, setShareMessage] = useState("");
   const [shareOpen, setShareOpen] = useState(false);
   const [collectionShareOpen, setCollectionShareOpen] = useState(false);
+  const [keyboardHelpOpen, setKeyboardHelpOpen] = useState(false);
   const [wordMeaningSelection, setWordMeaningSelection] = useState<WordMeaningSelection | null>(null);
   /* The popover answers the tap; the sheet is the deliberate "all meanings"
      step, so the same selection drives both and only this flag differs. */
@@ -871,9 +876,9 @@ export function ReaderScreen({
         }
       >
         {isPrevious ? (
-          <ChevronPrevious size={18} className="mx-auto shrink-0" aria-hidden="true" />
+          <ChevronPrevious size={18} className="shrink-0" aria-hidden="true" />
         ) : (
-          <ChevronNext size={18} className="order-2 mx-auto shrink-0" aria-hidden="true" />
+          <ChevronNext size={18} className="order-2 shrink-0" aria-hidden="true" />
         )}
         {!inDock && (
           <span className="min-w-0 flex-1 hidden min-[360px]:inline text-center text-label font-semibold [overflow-wrap:anywhere]">
@@ -1233,33 +1238,49 @@ export function ReaderScreen({
 
     return (
       <div data-testid="reader-counter-stack">
-        <DevotionalFooter>
-          <div className="flex w-full flex-wrap items-center justify-center gap-2" data-testid="reader-support-actions">
-            {renderBenefitDockButton()}
-            {renderAudioDockButton()}
-            <DevotionalAction
-              type="button"
-              onClick={(event) => {
-                event.stopPropagation();
-                // Safari pointer activation does not focus buttons by default;
-                // give the sharing dialog a concrete focus-return target.
-                event.currentTarget.focus({ preventScroll: true });
-                handleShare();
-              }}
-              aria-haspopup="dialog"
-              aria-label={t(language, "reader.shareCurrent")}
-              data-testid="reader-share-dock-button"
-              className="min-w-[5rem] flex-1 shadow-sm"
+        <DevotionalFooter className="reader-session-footer">
+          <ReaderFooterTools
+            language={language}
+            expanded={footerToolsExpanded}
+            onToggle={() => setFooterToolsExpanded((expanded) => !expanded)}
+            primary={renderCounterPanel()}
+          >
+            <div
+              className="flex w-full flex-wrap items-center justify-center gap-2"
+              data-testid="reader-support-actions"
             >
-              <ShareExport size={20} aria-hidden="true" />
-              <span className="min-w-0 text-label font-semibold [overflow-wrap:anywhere]">
-                {t(language, "reader.shareAction")}
-              </span>
-            </DevotionalAction>
-          </div>
-          {renderCounterPanel()}
+              {renderBenefitDockButton()}
+              {renderAudioDockButton()}
+              <DevotionalAction
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  // Safari pointer activation does not focus buttons by default;
+                  // give the sharing dialog a concrete focus-return target.
+                  event.currentTarget.focus({ preventScroll: true });
+                  handleShare();
+                }}
+                aria-haspopup="dialog"
+                aria-label={t(language, "reader.shareCurrent")}
+                data-testid="reader-share-dock-button"
+                className="min-w-[5rem] flex-1 shadow-sm"
+              >
+                <Share2 size={20} aria-hidden="true" />
+                <span className="min-w-0 text-label font-semibold [overflow-wrap:anywhere]">
+                  {t(language, "reader.shareAction")}
+                </span>
+              </DevotionalAction>
+            </div>
+          </ReaderFooterTools>
         </DevotionalFooter>
-        <CounterGuidance language={language} direction={direction} reader hasStarted={count > 0} placement="below" />
+        <CounterGuidance
+          language={language}
+          direction={direction}
+          reader
+          hasStarted={count > 0}
+          placement="below"
+          showKeyboardHelp={false}
+        />
       </div>
     );
   };
@@ -1407,6 +1428,14 @@ export function ReaderScreen({
           </>
         )}
 
+        <ReaderOptionsAction
+          onClick={() => setKeyboardHelpOpen(true)}
+          data-testid="reader-menu-keyboard-help"
+          className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted"
+        >
+          <Keyboard size={16} aria-hidden="true" />
+          <span>{t(language, "reader.keyboardShortcuts")}</span>
+        </ReaderOptionsAction>
         {onReset && (
           <>
             <ReaderOptionsDivider className="my-1 h-px bg-border/60" />
@@ -1578,6 +1607,20 @@ export function ReaderScreen({
 
                   {/* Hero actions: appearance and contextual actions. */}
                   <div className="flex flex-wrap items-center justify-end gap-2" data-testid="reader-hero-actions">
+                    <button
+                      type="button"
+                      data-testid="reader-help-trigger"
+                      aria-label={t(language, "reader.keyboardShortcuts")}
+                      title={t(language, "reader.keyboardShortcuts")}
+                      aria-expanded={keyboardHelpOpen}
+                      className={READER_WIDE_HEADER_ACTION_CLASS}
+                      onClick={(event) => {
+                        event.currentTarget.focus({ preventScroll: true });
+                        setKeyboardHelpOpen((prev) => !prev);
+                      }}
+                    >
+                      <Keyboard size={20} aria-hidden="true" />
+                    </button>
                     {renderAppearanceMenu(READER_WIDE_HEADER_ACTION_CLASS)}
                     <DropdownMenu dir={direction}>
                       <DropdownMenuTrigger
@@ -1715,7 +1758,7 @@ export function ReaderScreen({
                               index={idx}
                               direction={direction}
                               reduceMotion={reducedMotion || longSurah}
-                              className={`${longSurah ? "mb-auto mt-1" : "my-2"} w-full`}
+                              className={`${longSurah ? "mb-auto mt-2" : "my-auto"} w-full`}
                             >
                               <div
                                 style={pressStyle}
@@ -1737,6 +1780,7 @@ export function ReaderScreen({
                         reader
                         hasStarted={count > 0}
                         placement="above"
+                        showKeyboardHelp={false}
                       />
                     )}
                     {<footer className={`shrink-0 pt-1.5 ${audioModeActive ? "pb-0" : "pb-2"}`}>{renderDock()}</footer>}
@@ -1785,6 +1829,20 @@ export function ReaderScreen({
                   // a per-zikr primary. Both share the header's ghost
                   // icon-button treatment so the row reads as one set.
                   <div className="flex items-center gap-1" data-testid="reader-actions">
+                    <button
+                      type="button"
+                      data-testid="reader-help-trigger"
+                      aria-label={t(language, "reader.keyboardShortcuts")}
+                      title={t(language, "reader.keyboardShortcuts")}
+                      aria-expanded={keyboardHelpOpen}
+                      className={`${READER_HEADER_ACTION_CLASS} max-md:hidden`}
+                      onClick={(event) => {
+                        event.currentTarget.focus({ preventScroll: true });
+                        setKeyboardHelpOpen((prev) => !prev);
+                      }}
+                    >
+                      <Keyboard size={18} aria-hidden="true" />
+                    </button>
                     {renderAppearanceMenu(READER_HEADER_ACTION_CLASS)}
 
                     <DropdownMenu dir={direction}>
@@ -1921,6 +1979,7 @@ export function ReaderScreen({
                   reader
                   hasStarted={count > 0}
                   placement="above"
+                  showKeyboardHelp={false}
                 />
               )}
               {/* The screen sets !pb-0 and the tab bar is hidden here, so the
@@ -2044,6 +2103,20 @@ export function ReaderScreen({
           </button>
         </div>
       )}
+      <CounterKeyboardHelp
+        compact
+        language={language}
+        direction={direction}
+        open={keyboardHelpOpen}
+        onOpenChange={setKeyboardHelpOpen}
+        showTrigger={false}
+        shortcuts={[
+          { keys: ["Space"], label: t(language, "reader.shortcutCount") },
+          { keys: ["→", "←"], label: t(language, "reader.shortcutNavigate") },
+          { keys: ["R"], label: t(language, "reader.shortcutReset") },
+          { keys: ["Esc"], label: t(language, "reader.shortcutBack") },
+        ]}
+      />
     </ScreenContainer>
   );
 }

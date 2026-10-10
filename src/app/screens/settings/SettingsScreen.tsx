@@ -16,6 +16,7 @@ import {
   HelpPanel,
   LegalPanel,
   NotificationsPanel,
+  PrayerLocationPanel,
   ProgressPanel,
   ReadingPanel,
   SettingsRootPanel,
@@ -116,7 +117,7 @@ export function SettingsScreen({
   }, [initialSub]);
 
   useEffect(() => {
-    if (isTwoPaneLayout || sub === "root") return;
+    if (sub === "root") return;
     const frame = requestAnimationFrame(() => {
       document.querySelector<HTMLElement>("[data-settings-subheading]")?.focus();
     });
@@ -269,10 +270,6 @@ export function SettingsScreen({
           <AccessibilityPanel
             language={language}
             direction={direction}
-            textSize={textSize}
-            zikrFont={zikrFont}
-            showTranslation={showTranslation}
-            showTransliteration={showTransliteration}
             highContrast={highContrast}
             boldText={boldText}
             reduceMotion={reduceMotion}
@@ -280,10 +277,6 @@ export function SettingsScreen({
             hapticFeedback={hapticFeedback}
             forceRtl={forceRtl}
             colorBlindSupport={colorBlindSupport}
-            onTextSizeChange={onTextSizeChange}
-            onZikrFontChange={onZikrFontChange}
-            onShowTranslationChange={onShowTranslationChange}
-            onShowTransliterationChange={onShowTransliterationChange}
             onHighContrastChange={onHighContrastChange}
             onBoldTextChange={onBoldTextChange}
             onReduceMotionChange={onReduceMotionChange}
@@ -292,18 +285,26 @@ export function SettingsScreen({
             onForceRtlChange={onForceRtlChange}
             onColorBlindSupportChange={onColorBlindSupportChange}
             onBack={goBack}
+            onOpenReading={() => openSubPanel("reading")}
           />
         );
       case "downloads":
         return <DownloadsPanel language={language} onBack={goBack} />;
+      case "location":
+        return (
+          <PrayerLocationPanel
+            language={language}
+            locationSettings={locationSettings}
+            onLocationChange={onLocationChange}
+            onBack={goBack}
+          />
+        );
       case "notifications":
         return (
           <NotificationsPanel
             language={language}
             reminders={reminders}
-            locationSettings={locationSettings}
             onRemindersChange={onRemindersChange}
-            onLocationChange={onLocationChange}
             onBack={goBack}
           />
         );

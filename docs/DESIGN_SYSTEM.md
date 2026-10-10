@@ -1,5 +1,13 @@
 # Azkar design system
 
+Owner fallback refinement (2026-10-10): keep the bundled Amiri Quran font at its native regular weight without synthetic bold or the QCF-specific ink stroke. Unicode word gaps scale at 0.16em; they do not distribute unused width. The existing canonical fifteen slots, headings, verse markers, line fitter and diacritic allowance remain unchanged. Unicode fallback preserves page/line identity but cannot reproduce the page-specific QCF glyph outlines exactly.
+
+Owner standalone-counter follow-up (2026-10-10): Masbaha and صلاة على النبي share the Zikr footer anatomy, four-column tools grid, 18px row separation, centered icon/label groups and down-to-hide/up-to-show disclosure. Their counter spans the two middle desktop columns. Benefit, sound and reset retain each screen's existing behavior; target selection remains above the devotional text. Collapsing tools preserves counter and reading geometry, with reduced-motion support.
+
+Owner reading-page follow-up (2026-10-10): synchronize recitation on the main Mushaf while retaining a compact transport dock. The dock's measured clearance protects the complete reading area. Page meaning uses the open reading surface without a surrounding card; its heading begins at the Arabic page heading and both text panes begin together. Shared English presentation increases the type steps to 18/20/24px with the existing 1.65 leading, bounded measure and native independent scrolling. Expanded desktop listening mirrors the page's physical order: English left, Arabic right, paired from 56rem of reading width. Magnified and narrow listening remain stacked. Highlight the corresponding English verse without inferring English word timing. Home's primary routine action stays on one line with an ellipsis when space is insufficient, preserving its complete accessible name and ordinary target height.
+
+Owner Quran-meaning follow-up (2026-10-09): expanded English Quran listening pairs the current printed page with its English meaning, open by default. At 62rem of available reading width the two panes sit side by side; narrower canvases stack them with a native meaning disclosure and independent English scrolling. Meaning uses left-aligned scalable 16/18/22px text, 1.65 leading, a maximum 64ch measure, 0.375rem paragraph gaps and 0.25rem vertical verse padding. The English pane stays bounded and sticky beside the Arabic page in short wide windows; resizing reveals the current cue without moving focus. Page magnification above 100% stacks the Arabic page above meaning, containing canonical-page scrolling in its own named keyboard-reachable pane rather than crossing the translation boundary. Only the selected surah's verse keys actually printed on the loaded page appear, including a verse continuing across pages. Offline Unicode fallback uses the reviewed page range. Reviewed wording remains untouched. The current verse has a quiet semantic tint and a margin rule; no English word timing is inferred from Arabic recitation. Following moves both panes without focus changes, pauses on manual browsing/scrolling, and catches up from native media updates while hidden and on focus/visibility restoration.
+
 Owner Mushaf-spacing correction (2026-10-07): equal paper frames do not imply spreading words across their full width. Printed lines respect the fitter's measure and preserve natural QCF glyph advances; flex layout never adds distributed gaps. Home photographs become visible only after complete decoding, keeping their established placeholder and on-media surfaces stable during loading.
 
 Owner responsive follow-up (2026-10-07): compact reading headers use one opaque semantic background without scene artwork or backdrop blur. Wide reader heroes retain their existing scenes. Learned counting guidance collapses to a 44px hand disclosure rather than a full-width empty strip. Facing Mushaf frames share a bounded page-shaped measure (at most 72% of canvas height); spread eligibility accounts for the side toolbar. Menu headings and player-duplicate repeat actions are removed to reduce vertical clutter while unique actions remain reachable.
@@ -668,3 +676,57 @@ The expanded player uses the existing fifteen-line Mushaf canvas and matching pe
 Ayah image sharing uses a cream manuscript surface, dark green ink, restrained gold framing and Amiri Quran text at 64 export pixels. Portrait 1080×1350 and square 1080×1080 preserve the entire ayah and continue onto additional cards. Optional existing English translations and reviewed Arabic word meanings have distinct source labels and readable type. The preview exposes the original text separately, uses native radio/checkbox controls, and restores focus when returning to ayah actions. Missing optional content is explained and disabled; export never invents or clips sacred text.
 
 Full-surah landing photography includes a quiet 44px Share control on an opaque semantic card surface. It remains secondary to the four full-width reading actions and does not duplicate an overflow item. Focused listening text owns Home/End scrolling; embedded controls retain their native keyboard behavior.
+The expanded player uses the existing fifteen-line Mushaf canvas and matching per-page QCF glyph/font pair for reviewed long surahs. Unicode Quran passages use `--font-mushaf` (Amiri Quran), independently of the ordinary zikr font. Listening pages have no inline ayah action buttons. Future reviewed cues use quiet verse shading and optional word underlining/outline, with no word live announcements or focus movement. Following starts off; manual page turns or scrolling pause it.
+
+## Reading-first audio layout — 2026-10-09
+
+The owner approved the complete screenshot-based recommendations. Expanded listening retains its opaque canvas, centered fitting zikr, top-start overflow and independent native reading scroll. A container-aware transport dock places speed and volume/options beside centered transport at 48rem of available control width; smaller canvases use a compact utility row. Queue and repetition progress and the active continuation/repetition mode remain visible. Repeat and continuation settings use one labelled Radix popover with Escape/focus recovery. Compact context is now a named native expand button, preserving independent Stop/Play/Expand controls and one passive waveform. Header edge controls share circular anatomy. Seeking labels include ten seconds.
+
+The read-only Mushaf listening page grows to the available reading-region height minus its compact toolbar, with the existing 36rem minimum protecting canonical fifteen-line legibility on short windows. The shared fitter preserves canonical word geometry; short/enlarged windows retain native vertical scrolling. No content, timing provenance, audio controller, persistence or offline boundary changes. Following and estimated cue behavior retain the owner's phase 91 decisions. Targets stay at least 44px, and no drag handle, glow, new dependency or autoplay hiding is introduced.
+
+## Settings and Progress clarity — 2026-10-09
+
+Prayer location/calculation and notification scheduling use separate Settings destinations. Typography and translation options live in Reading, linked visibly from Accessibility. Progress preferences remain distinct from the main Progress dashboard; goals stay with those preferences. Subsection headings wrap and accept managed keyboard focus in compact and two-pane Settings.
+
+Progress remains prayer-first with native summary/detail disclosure and photograph-free Day continuation rows. Navigation rows have ordinary button semantics rather than implying that opening a routine toggles its completion. Plain Day rows use two columns when space permits, preserving reading order and actions. There is no new combined prayer/Quran/azkar score.
+
+Annual prayer percentages describe app recording coverage through today, never consistency of worship. The explanatory copy includes the elapsed day count, exclusion of future days and the recorded/unrecorded distinction. Month/year azkar rates use the three canonical routines across elapsed days; Quran stays separate. Current periods include all of today, without inferring due prayer slots or the reader's tracking start date. Annual Salawat totals are omitted from the overview only; data and shorter-period counts remain.
+
+Month calendars retain seven date columns with a 21rem minimum internal measure in a named horizontal scroll region and explicit scroll guidance. Native date buttons retain 44px targets and scroll into view through keyboard traversal, with no document overflow or shrunken hit areas. Year bars use content-driven columns with a 3rem minimum, reflowing with enlarged text and reaching twelve columns when space permits, with permanently visible labels and an equivalent semantic list. Upcoming months show a dash rather than a failure percentage. Physical-device and human assistive-technology evidence remain separate from automated checks.
+
+### Reader footer tools disclosure — 2026-10-09
+
+Owner-approved frequently used Benefit, Listen and Share actions remain in a footer row above the unchanged primary navigation/counter row. A labelled 44px native Hide tools / Show tools chevron disclosure starts expanded and retains the Reader's transient choice across item changes. Hidden tools leave layout and keyboard/accessibility order; no overlay or automatic hiding is introduced. Focus mode hides tools/disclosure and counting guidance at both placements, while the existing counter/navigation and exit remain. Active audio retains its independent transport dock. The hand still controls counting guidance. No new stored preference or content change.
+
+### Stable Reader disclosure geometry — 2026-10-09
+
+The owner's follow-up supersedes reclaiming footer space on collapse. Tools and counting instructions retain their natural layout dimensions while invisible; toggling does not move or resize the passage. Hidden content uses hidden semantics and visibility exclusion with reserved layout space. The tools disclosure has a centered bordered pill, quiet dividers, a 44px target and label width reserved for both states. The hand retains its separate counting-guidance meaning with a bordered circular target. Share actions use the standard connected-nodes Share07 glyph through the shared exports. Focus mode retains its explicit separate layout behavior.
+
+### Local responsive Reader and magnification refinement (2026-10-09)
+
+The owner-approved local footer uses one row at 56rem of Reader container width, with equal side areas around centered primary navigation/counting. Below that width tools and primary actions use separate groups; below 37.5rem the three secondary tools display icons with retained accessible names. Show/Hide tools retains layout geometry. Counting guidance uses shorter single-line copy.
+
+Mushaf page magnification is separate from subtle ink-size preferences and is available on mobile, tablet and desktop. A native 100–200% range enlarges the page canvas, retains fifteen printed lines and scrolls in both axes. Magnification uses one page, preserves explicit navigation, disables competing swipe/page-key gestures and restores normal fit/spread on reset. Session-local preview preference, no persisted schema change.
+
+Reader footer correction (2026-10-09): the owner-approved arrangement is two centered action rows, including on wide canvases. Benefit, Listen, Share and disclosure share the upper row; primary navigation/counting sits below. Tool labels never wrap. Compact screens retain accessible names with icons. Fitting text centers in the bounded reading region; long passages scroll without covering the footer. This supersedes the single-row experiment.
+
+Owner refinement (2026-10-10): Audio options uses an opaque, bounded menu with a
+quiet heading, full-width voice selector, labelled speed/volume rows and aligned
+trailing state indicators. Controls retain native semantics and 44px targets;
+nested menus preserve Escape and focus recovery. The Reader footer has a subtle
+top rule, equal secondary tool cells and a rounded rectangular disclosure with
+a small chevron surface. Collapse retains both the tool row and toggle geometry
+while hiding tools from interaction; the reading region and primary action stay
+fixed. No new persisted preference, devotional copy or automatic hiding.
+
+Owner spacing correction: the footer rows have an 18px gap at every width.
+Previous/Next use centered icon-and-label groups, with consistent icon boxes
+and label line height. The tools chevron points down when expanded (hide tools)
+and up when collapsed (reveal tools), including mobile and both text directions.
+
+Desktop uses the same four equal columns for both footer rows. Previous and Next
+each occupy one column; the progress counter fills the two middle columns without
+its usual compact width cap. The layout responds to available Reader width and
+falls back to the compact composition when narrow or enlarged text needs it.
+Tool reveal fades briefly using the existing fast motion token; the chevron
+rotates without moving layout. OS and app reduced motion disable that motion.

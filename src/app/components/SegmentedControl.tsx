@@ -20,6 +20,11 @@ export interface SegmentedControlOption<T extends string> {
  * appearance/mode choices must use radio-group semantics — not
  * role="group" + aria-pressed.
  */
+const defaultItemClassName = (selected: boolean) =>
+  `min-h-11 flex-1 rounded-lg py-2.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+    selected ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+  }`;
+
 export function SegmentedControl<T extends string>({
   value,
   onChange,
@@ -29,15 +34,15 @@ export function SegmentedControl<T extends string>({
   itemClassName,
   "aria-label": ariaLabel,
   "aria-describedby": ariaDescribedBy,
-  indicatorClassName = "bg-primary/15",
+  indicatorClassName = "bg-primary shadow-xs",
 }: {
   value: T;
   onChange: (value: T) => void;
   options: ReadonlyArray<SegmentedControlOption<T>>;
   direction: "ltr" | "rtl";
   className?: string;
-  /** Per-item classes; receives the selected state so callers can style their own tone. */
-  itemClassName: (selected: boolean) => string;
+  /** Per-item classes; receives selected state. Defaults to paired primary surface/ink tokens. */
+  itemClassName?: (selected: boolean) => string;
   "aria-label": string;
   "aria-describedby"?: string;
   indicatorClassName?: string;
@@ -47,6 +52,7 @@ export function SegmentedControl<T extends string>({
   const motionReduced =
     systemReducedMotion ||
     (typeof document !== "undefined" && document.documentElement.classList.contains("reduce-motion"));
+  const resolveItemClass = itemClassName ?? defaultItemClassName;
   return (
     <LayoutGroup id={indicatorId}>
       <RadioGroupPrimitive.Root
@@ -62,7 +68,7 @@ export function SegmentedControl<T extends string>({
             key={option.value}
             value={option.value}
             data-testid={option.testId}
-            className={`relative isolate overflow-hidden ${itemClassName(value === option.value)}`}
+            className={`relative isolate overflow-hidden ${resolveItemClass(value === option.value)}`}
           >
             {value === option.value && (
               <motion.span

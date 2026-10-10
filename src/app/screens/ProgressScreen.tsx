@@ -458,6 +458,7 @@ export function ProgressScreen({
               <PrayerTrackerStats
                 records={prayerTracking}
                 activeTab={activeTab}
+                now={now}
                 displayDate={displayDate}
                 language={language}
                 calendarType={calendarType}
@@ -644,6 +645,7 @@ export function ProgressScreen({
         ) : (
           <FridayProgressStats
             activeTab={activeTab}
+            now={now}
             displayDate={displayDate}
             language={language}
             calendarType={calendarType}

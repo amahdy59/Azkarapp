@@ -33,7 +33,7 @@ describe("FormField", () => {
   });
 
   it("leaves no manual-location field labelled only by its placeholder", () => {
-    const panel = readFileSync("src/app/screens/settings/NotificationsPanel.tsx", "utf8");
+    const panel = readFileSync("src/app/screens/settings/PrayerLocationPanel.tsx", "utf8");
     // A placeholder is a hint. Where one stood in for the label, an `aria-label`
     // was carrying the name invisibly; both patterns are gone from this block.
     expect(panel).not.toMatch(
@@ -69,7 +69,7 @@ describe("FormField", () => {
       "src/app/components/CounterTargetPicker.tsx",
       "src/app/components/MushafNavigationModal.tsx",
       "src/app/screens/QuranWirdScreen.tsx",
-      "src/app/screens/settings/NotificationsPanel.tsx",
+      "src/app/screens/settings/PrayerLocationPanel.tsx",
     ];
     for (const file of files) {
       const source = readFileSync(file, "utf8");
@@ -105,7 +105,7 @@ describe("FormField", () => {
     const files = [
       "src/app/screens/auth/RevampedAuthScreens.tsx",
       "src/app/components/MushafNavigationModal.tsx",
-      "src/app/screens/settings/NotificationsPanel.tsx",
+      "src/app/screens/settings/PrayerLocationPanel.tsx",
       "src/app/screens/SearchScreen.tsx",
       "src/app/screens/AzkarLibraryScreen.tsx",
     ];

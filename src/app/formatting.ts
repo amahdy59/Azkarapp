@@ -91,3 +91,7 @@ export function formatDisplayDate(
   }
   return formatHijriDate(date, language, offsetDays);
 }
+
+export function formatPercentage(value: number, language: AppLanguage) {
+  return `${formatNumerals(value, language)}${language === "ar" ? "٪" : "%"}`;
+}

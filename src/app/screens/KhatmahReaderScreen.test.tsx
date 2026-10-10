@@ -52,8 +52,19 @@ beforeEach(() => {
   vi.stubGlobal(
     "fetch",
     vi.fn(async (input: string) => {
-      const page = Number(String(input).match(/(\d+)\.json(?:\?.*)?$/)?.[1] ?? 1);
-      return { ok: true, json: async () => pageFixture(page) };
+      const urlStr = String(input);
+      if (urlStr.includes("/translations/")) {
+        return {
+          ok: true,
+          json: async () => ({
+            "1": "Sample English translation for verse 1",
+            "2": "Sample English translation for verse 2",
+            "3": "Sample English translation for verse 3",
+          }),
+        };
+      }
+      const page = Number(urlStr.match(/(\d+)\.json(?:\?.*)?$/)?.[1] ?? 1);
+      return new Response(JSON.stringify(pageFixture(page)));
     }),
   );
 });
@@ -562,6 +573,12 @@ describe("KhatmahReaderScreen reading type size", () => {
     // A phone page is width-bound: the control does not apply, so it is omitted
     // to keep the reading settings surface calm and uncluttered.
     expect(sheet.queryByTestId("mushaf-text-size-group")).not.toBeInTheDocument();
+    const zoom = sheet.getByRole("slider", { name: "Page magnification" });
+    fireEvent.change(zoom, { target: { value: "200" } });
+    expect(document.querySelector(".mushaf-paper")).toHaveAttribute("data-magnified", "true");
+    expect(document.querySelector(".mushaf-spread")).not.toBeInTheDocument();
+    await user.click(sheet.getByRole("button", { name: "Fit page" }));
+    expect(document.querySelector(".mushaf-paper")).toHaveAttribute("data-magnified", "false");
   });
 
   it("offers the size where the page is fitted to its height instead", async () => {
@@ -633,5 +650,51 @@ describe("KhatmahReaderScreen wird completion notice", () => {
     expect(screen.queryByTestId("mushaf-top-left-back")).toBeNull();
     fireEvent.keyDown(document.body, { key: "Escape" });
     expect(screen.getByTestId("mushaf-top-left-back")).toBeInTheDocument();
+  });
+
+  it("toggles between mushaf page mode and bilingual stream view via the options menu", async () => {
+    const user = userEvent.setup();
+    setViewport(390, 844);
+    renderReader({ language: "en", direction: "ltr" });
+    await screen.findByRole("article", { name: "Page 42" });
+
+    // Open more menu
+    await user.click(screen.getByTestId("mushaf-more-actions"));
+    await screen.findByTestId("mushaf-quick-menu");
+
+    // Select bilingual mode
+    const bilingualBtn = screen.getByTestId("quick-mode-bilingual");
+    fireEvent.click(bilingualBtn);
+
+    // Bilingual stream view should now be displayed
+    const bilingualView = await screen.findByTestId("bilingual-stream-view");
+    expect(bilingualView).toBeInTheDocument();
+
+    // From bilingual view, open more menu and switch back to mushaf
+    fireEvent.click(screen.getByTestId("bilingual-more-button"));
+    await screen.findByTestId("mushaf-quick-menu");
+    fireEvent.click(screen.getByTestId("quick-mode-mushaf"));
+
+    // Mushaf page should be restored
+    await screen.findByRole("article", { name: "Page 42" });
+    expect(screen.queryByTestId("bilingual-stream-view")).not.toBeInTheDocument();
+  });
+
+  it("toggles paired page translation beside the mushaf page on desktop", async () => {
+    const user = userEvent.setup();
+    setViewport(1440, 900);
+    renderReader({ language: "en", direction: "ltr", mushafLayout: "spread" });
+    await screen.findByRole("article");
+
+    // Open quick menu via tool rail more action
+    await user.click(screen.getByTestId("mushaf-rail-more"));
+    await screen.findByTestId("mushaf-quick-menu");
+
+    // Toggle paired page translation
+    const translationToggle = screen.getByTestId("quick-page-translation-switch");
+    await user.click(translationToggle);
+
+    // Translation panel should now be in the document
+    expect(await screen.findByRole("region", { name: "Page translation" })).toBeInTheDocument();
   });
 });

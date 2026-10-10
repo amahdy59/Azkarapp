@@ -26,6 +26,7 @@ vi.mock("../hooks/useListeningMushafPage", () => ({
 const entry = {
   entryId: "test",
   arabicText: Array.from({ length: 30 }, (_, index) => `fixture ﴿${index + 1}﴾`).join(" "),
+  translation: Array.from({ length: 30 }, (_, index) => `Meaning ${index + 1} (${index + 1})`).join(" "),
   quranRange: { surah: 67, ayahStart: 1, ayahEnd: 30 },
   mushafPages: [
     { page: 562, startAyah: 1, endAyah: 12 },
@@ -55,13 +56,34 @@ describe("read-only listening controls", () => {
     vi.spyOn(timings, "resolveQuranTiming").mockReturnValue(null);
   });
   afterEach(() => vi.restoreAllMocks());
+  it("contains enlarged Arabic in a named keyboard-scrollable pane without changing the page or meaning", () => {
+    const { container, rerender } = render(
+      <QuranListeningReader entry={entry} segment={null} currentTime={0} language="en" magnification={150} />,
+    );
+    const body = container.querySelector(".audio-listening-body")!;
+    const pane = screen.getByRole("region", { name: "Page magnification" });
+    expect(body).toHaveAttribute("data-listening-magnified", "true");
+    expect(pane).toHaveAttribute("tabindex", "0");
+    expect(pane.querySelector('[data-mushaf-page="562"]')).not.toBeNull();
+    expect(
+      screen.getByTestId("quran-page-translation").querySelector('[data-translation-verse="67:1"]'),
+    ).not.toBeNull();
+    rerender(<QuranListeningReader entry={entry} segment={null} currentTime={0} language="en" magnification={100} />);
+    expect(body).toHaveAttribute("data-listening-magnified", "false");
+    expect(pane).not.toHaveAttribute("tabindex");
+  });
   it("retains the reviewed page text outside the live status when layout data is unavailable and recovers on retry", () => {
     loader.error = true;
-    const { container } = render(<QuranListeningReader entry={entry} segment={null} currentTime={0} language="en" />);
+    const { container } = render(
+      <QuranListeningReader entry={entry} segment={null} currentTime={0} language="en" magnification={200} />,
+    );
     const fallback = screen.getByTestId("audio-quran-fallback-text");
     expect(fallback.textContent).toBe(Array.from({ length: 12 }, (_, index) => `fixture ﴿${index + 1}﴾`).join(" "));
     expect(fallback.closest("[role=status]")).toBeNull();
     expect(fallback).toHaveAttribute("lang", "ar");
+    const expectedSize = document.createElement("span");
+    expectedSize.style.fontSize = "calc(1.5rem * 2)";
+    expect(fallback.style.fontSize).toBe(expectedSize.style.fontSize);
     loader.error = false;
     fireEvent.click(screen.getByRole("button", { name: "Retry" }));
     expect(screen.queryByTestId("audio-quran-fallback-text")).toBeNull();
@@ -129,5 +151,34 @@ describe("read-only listening controls", () => {
       />,
     );
     expect(container.querySelector('[data-playback-word="true"]')).toBeNull();
+  });
+  it("pairs meaning with the actual visible verse keys and follows audio without retaining the previous page", () => {
+    vi.mocked(timings.resolveQuranTiming).mockReturnValue(annotation);
+    const { container, rerender } = render(
+      <QuranListeningReader entry={entry} segment={null} currentTime={1} language="en" />,
+    );
+    const translation = screen.getByTestId("quran-page-translation");
+    expect(translation).toHaveAttribute("open");
+    expect(translation.querySelector('[data-translation-verse="67:1"]')).toHaveAttribute("aria-current", "true");
+    expect(translation.querySelector('[data-translation-verse="67:2"]')).toBeNull();
+    expect(translation.closest("[aria-live]")).toBeNull();
+    rerender(<QuranListeningReader entry={entry} segment={null} currentTime={3} language="en" />);
+    expect(container.querySelector('[data-mushaf-page="563"]')).not.toBeNull();
+    expect(translation.querySelector('[data-translation-verse="67:1"]')).toBeNull();
+    expect(translation.querySelector('[data-translation-verse="67:13"]')).toHaveAttribute("aria-current", "true");
+    fireEvent.click(screen.getByRole("button", { name: "Previous" }));
+    expect(translation.querySelector('[data-translation-verse="67:1"]')).not.toBeNull();
+    expect(translation.querySelector('[aria-current="true"]')).toBeNull();
+  });
+  it("keeps only the selected fallback page meanings offline and hides English in Arabic mode", () => {
+    loader.error = true;
+    const { rerender } = render(<QuranListeningReader entry={entry} segment={null} currentTime={0} language="en" />);
+    expect(screen.getByTestId("quran-page-translation").querySelectorAll("[data-translation-verse]")).toHaveLength(12);
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    const verses = screen.getByTestId("quran-page-translation").querySelectorAll("[data-translation-verse]");
+    expect(verses).toHaveLength(14);
+    expect(verses[0]).toHaveAttribute("data-translation-verse", "67:13");
+    rerender(<QuranListeningReader entry={entry} segment={null} currentTime={0} language="ar" />);
+    expect(screen.queryByTestId("quran-page-translation")).toBeNull();
   });
 });

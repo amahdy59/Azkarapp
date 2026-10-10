@@ -95,7 +95,7 @@ export function SettingsRootPanel({
       id: "notifications",
       icon: <Bell size={20} className="text-primary" />,
       title: t(language, "settings.notificationsAndReminders"),
-      description: locationSettings?.cityName || t(language, "settings.locationNotSet"),
+      description: t(language, "notifications.scheduleHint"),
       keywords: [
         "notifications",
         "notification",
@@ -126,6 +126,25 @@ export function SettingsRootPanel({
         "العصر",
         "المغرب",
         "العشاء",
+      ],
+    },
+    {
+      id: "location",
+      icon: <MapPin size={20} className="text-primary" />,
+      title: t(language, "settings.prayerTimesAndLocation"),
+      description: locationSettings?.cityName || t(language, "settings.locationNotSet"),
+      keywords: [
+        "location",
+        "city",
+        "gps",
+        "calculation",
+        "timezone",
+        "prayer times",
+        "موقع",
+        "مدينة",
+        "حساب",
+        "مواقيت",
+        "توقيت",
       ],
     },
     {
@@ -163,7 +182,7 @@ export function SettingsRootPanel({
     {
       id: "progress",
       icon: <Sparkles size={20} className="text-primary" />,
-      title: t(language, "settings.myProgress"),
+      title: t(language, "settings.progressPreferences"),
       description: quietProgressEnabled ? t(language, "settings.gardenActive") : t(language, "settings.gardenHidden"),
       keywords: [
         "progress",
@@ -420,7 +439,9 @@ export function SettingsRootPanel({
                 className="flex bg-muted/80 p-1 rounded-xl"
                 itemClassName={(selected) =>
                   `min-h-11 flex-1 rounded-lg py-2.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                    selected ? "bg-background text-foreground shadow-sm" : "text-foreground hover:bg-muted/40"
+                    selected
+                      ? "bg-primary text-primary-foreground font-bold"
+                      : "text-muted-foreground hover:text-foreground font-semibold"
                   }`
                 }
                 options={LANGUAGES_LIST.map((opt) => ({
@@ -451,7 +472,9 @@ export function SettingsRootPanel({
                   className="flex bg-muted/80 p-1 rounded-xl"
                   itemClassName={(selected) =>
                     `min-h-11 flex-1 rounded-lg py-2.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                      selected ? "bg-background text-foreground shadow-sm" : "text-foreground hover:bg-muted/40"
+                      selected
+                        ? "bg-primary text-primary-foreground font-bold"
+                        : "text-muted-foreground hover:text-foreground font-semibold"
                     }`
                   }
                   options={[
@@ -487,7 +510,9 @@ export function SettingsRootPanel({
                       className="flex bg-muted/80 p-1 rounded-xl"
                       itemClassName={(selected) =>
                         `min-h-11 flex-1 rounded-lg py-2 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                          selected ? "bg-background text-foreground shadow-sm" : "text-foreground hover:bg-muted/40"
+                          selected
+                            ? "bg-primary text-primary-foreground font-bold"
+                            : "text-muted-foreground hover:text-foreground font-semibold"
                         }`
                       }
                       options={[
@@ -518,16 +543,16 @@ export function SettingsRootPanel({
             <SettingsRowItem
               iconBg={iconBackground}
               icon={<MapPin size={20} className="text-primary" />}
-              label={t(language, "settings.prayerTimesAndReminders")}
+              label={t(language, "settings.prayerTimesAndLocation")}
               right={<RowValue value={locationSettings?.cityName || t(language, "settings.locationNotSet")} />}
-              onPress={() => onNav("notifications")}
+              onPress={() => onNav("location")}
               hasDivider={true}
-              testId="settings-sub-location"
+              {...itemProps("location")}
             />
             <SettingsRowItem
               iconBg={iconBackground}
               icon={<Sparkles size={20} className="text-primary" />}
-              label={t(language, "settings.myProgress")}
+              label={t(language, "settings.progressPreferences")}
               right={
                 <RowValue
                   value={

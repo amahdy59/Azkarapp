@@ -29,9 +29,7 @@ describe("NotificationsPanel", () => {
       <NotificationsPanel
         language="en"
         reminders={DEFAULT_APP_STATE.settings.reminders}
-        locationSettings={DEFAULT_APP_STATE.settings.location}
         onRemindersChange={onRemindersChange}
-        onLocationChange={vi.fn()}
         onBack={vi.fn()}
       />,
     );
@@ -41,6 +39,31 @@ describe("NotificationsPanel", () => {
     expect(screen.getByRole("alert")).toHaveTextContent("Notifications remain off");
     expect(onRemindersChange).not.toHaveBeenCalled();
   });
+
+  for (const name of ["Morning reminder", "Prayer-time reminders"]) {
+    it(`enables ${name} immediately after a newly granted permission`, async () => {
+      Object.defineProperty(window, "Notification", {
+        configurable: true,
+        value: { permission: "default", requestPermission: vi.fn().mockResolvedValue("granted") },
+      });
+      const onRemindersChange = vi.fn();
+      render(
+        <NotificationsPanel
+          language="en"
+          reminders={DEFAULT_APP_STATE.settings.reminders}
+          onRemindersChange={onRemindersChange}
+          onBack={vi.fn()}
+        />,
+      );
+      fireEvent.click(screen.getByRole("switch", { name }));
+      await vi.waitFor(() => expect(onRemindersChange).toHaveBeenCalledOnce());
+      expect(onRemindersChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          [name === "Morning reminder" ? "morning" : "prayer"]: expect.objectContaining({ enabled: true }),
+        }),
+      );
+    });
+  }
 
   it("enables prayer reminders only with permission and saves the selected lead time", async () => {
     const user = userEvent.setup();
@@ -53,9 +76,7 @@ describe("NotificationsPanel", () => {
       <NotificationsPanel
         language="en"
         reminders={DEFAULT_APP_STATE.settings.reminders}
-        locationSettings={DEFAULT_APP_STATE.settings.location}
         onRemindersChange={onRemindersChange}
-        onLocationChange={vi.fn()}
         onBack={vi.fn()}
       />,
     );
@@ -71,84 +92,12 @@ describe("NotificationsPanel", () => {
       prayer: { enabled: true, leadMinutes: 15 as const, prayers: ["fajr", "dhuhr", "asr", "maghrib", "isha"] },
     };
     rerender(
-      <NotificationsPanel
-        language="en"
-        reminders={enabled}
-        locationSettings={DEFAULT_APP_STATE.settings.location}
-        onRemindersChange={onRemindersChange}
-        onLocationChange={vi.fn()}
-        onBack={vi.fn()}
-      />,
+      <NotificationsPanel language="en" reminders={enabled} onRemindersChange={onRemindersChange} onBack={vi.fn()} />,
     );
     await user.click(screen.getByRole("combobox", { name: "Reminder time" }));
     await user.click(screen.getByRole("option", { name: "10 minutes before prayer" }));
     expect(onRemindersChange).toHaveBeenLastCalledWith(
       expect.objectContaining({ prayer: expect.objectContaining({ enabled: true, leadMinutes: 10 }) }),
     );
-  });
-
-  it("selects and saves a built-in city without requesting GPS", () => {
-    Object.defineProperty(window, "Notification", {
-      configurable: true,
-      value: { permission: "default", requestPermission: vi.fn() },
-    });
-    const onLocationChange = vi.fn();
-    render(
-      <NotificationsPanel
-        language="en"
-        reminders={DEFAULT_APP_STATE.settings.reminders}
-        locationSettings={DEFAULT_APP_STATE.settings.location}
-        onRemindersChange={vi.fn()}
-        onLocationChange={onLocationChange}
-        onBack={vi.fn()}
-      />,
-    );
-
-    fireEvent.click(screen.getByRole("tab", { name: "Location & prayer times" }));
-
-    fireEvent.change(screen.getByRole("searchbox", { name: "Search cities and countries" }), {
-      target: { value: "London" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: /London.*United Kingdom/i }));
-
-    expect(onLocationChange).toHaveBeenCalledWith(
-      expect.objectContaining({
-        cityName: "London",
-        latitude: 51.5074,
-        longitude: -0.1278,
-        timeZone: "Europe/London",
-        autoDetect: false,
-      }),
-    );
-    expect(screen.getByRole("status")).toHaveTextContent("London selected and saved.");
-    expect(screen.getByLabelText("IANA time zone")).toHaveValue("Europe/London");
-  });
-
-  it("keeps the persisted city label stable when selecting from Arabic UI", () => {
-    Object.defineProperty(window, "Notification", {
-      configurable: true,
-      value: { permission: "default", requestPermission: vi.fn() },
-    });
-    const onLocationChange = vi.fn();
-    render(
-      <NotificationsPanel
-        language="ar"
-        reminders={DEFAULT_APP_STATE.settings.reminders}
-        locationSettings={DEFAULT_APP_STATE.settings.location}
-        onRemindersChange={vi.fn()}
-        onLocationChange={onLocationChange}
-        onBack={vi.fn()}
-      />,
-    );
-
-    fireEvent.click(screen.getByRole("tab", { name: "الموقع ومواقيت الصلاة" }));
-
-    fireEvent.change(screen.getByRole("searchbox", { name: "البحث في المدن والدول" }), {
-      target: { value: "لندن" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: /لندن.*المملكة المتحدة/ }));
-
-    expect(onLocationChange).toHaveBeenCalledWith(expect.objectContaining({ cityName: "London" }));
-    expect(screen.getByRole("status")).toHaveTextContent("تم اختيار لندن وحفظها.");
   });
 });

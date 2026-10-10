@@ -12,6 +12,8 @@
 
 .audio-compact-card {
   container: audio-dock / inline-size;
+  max-width: 52rem;
+  margin-inline: auto;
 }
 
 .audio-compact-row {
@@ -22,7 +24,7 @@
   padding: 8px;
 }
 
-.audio-compact-row > button,
+.audio-compact-row > button:not(.audio-compact-context),
 .audio-expanded-header > button {
   width: 44px;
   height: 44px;
@@ -38,7 +40,7 @@
 }
 
 .audio-compact-voice {
-  flex: 1 1 6rem;
+  flex: 0 1 auto;
   min-width: 0;
   max-width: 100%;
 }
@@ -47,7 +49,7 @@
   position: relative;
   display: flex;
   align-items: center;
-  height: 28px;
+  height: 2px;
   margin: 0 16px 8px;
 }
 
@@ -100,33 +102,34 @@
 /* Equal side slots keep the primary on the exact centre, in both languages. */
 .audio-expanded-transport {
   display: grid;
-  grid-template-columns: repeat(2, minmax(44px, 1fr)) min(4rem, 16vw) repeat(2, minmax(44px, 1fr));
-  align-items: start;
+  grid-template-columns: repeat(2, minmax(44px, 1fr)) 52px repeat(2, minmax(44px, 1fr));
+  align-items: center;
   justify-items: center;
   gap: 0.25rem;
 }
 .audio-expanded-transport[data-tracks="single"] {
-  grid-template-columns: minmax(44px, 1fr) min(4rem, 16vw) minmax(44px, 1fr);
+  grid-template-columns: minmax(44px, 1fr) 52px minmax(44px, 1fr);
 }
 .audio-expanded-transport > button {
   max-width: none;
 }
-.audio-expanded-transport > button:not(.size-16) {
-  width: 100%;
+.audio-expanded-transport > button:not(.size-\[52px\]):not(.size-16) {
+  width: 44px;
+  height: 44px;
   padding: 0;
   gap: 0;
+  border-radius: 9999px;
 }
-.audio-expanded-transport > button:not(.size-16) > svg {
-  box-sizing: content-box;
+.audio-expanded-transport > button:not(.size-\[52px\]):not(.size-16) > svg {
+  box-sizing: border-box;
+  width: 20px;
   height: 20px;
-  padding-block: calc((min(4rem, 16vw) - 20px) / 2);
+  padding: 0;
 }
+.audio-expanded-transport > button.size-\[52px\],
 .audio-expanded-transport > button.size-16 {
-  width: min(4rem, 16vw);
-  height: min(4rem, 16vw);
-}
-.audio-expanded-transport > button > span {
-  overflow-wrap: anywhere;
+  width: 52px;
+  height: 52px;
 }
 .audio-expanded-options {
   align-items: center;
@@ -290,6 +293,53 @@
 
 .audio-expanded-text {
   min-height: 90px;
+  container-type: size;
+}
+
+/* Grow the printed page with the reading canvas; short windows scroll
+   rather than squeezing fifteen canonical lines into illegible slots. */
+.audio-listening-page {
+  height: max(36rem, calc(100cqh - 3rem));
+  min-height: 36rem;
+}
+
+.audio-expanded-controls {
+  container: audio-controls / inline-size;
+}
+
+.audio-expanded-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.audio-expanded-actions > .audio-expanded-transport {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  margin: 0;
+}
+
+.audio-expanded-options:empty {
+  display: none;
+}
+
+@container audio-controls (min-width: 48rem) {
+  .audio-expanded-actions {
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 1.5fr) minmax(0, 1fr);
+    gap: 0.5rem;
+  }
+  .audio-expanded-actions > .audio-expanded-transport {
+    grid-column: 2;
+  }
+  .audio-expanded-speed {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .audio-expanded-utilities {
+    grid-column: 3;
+    grid-row: 1;
+  }
 }
 
 /* Auto margins center passages that fit and resolve to zero for overflow,
@@ -458,4 +508,76 @@
   .app-shell:not(.app-shell--navigation-hidden) .floating-audio-player:not(.floating-audio-player--docked) {
     inset-inline-start: calc(var(--nav-sidebar-width) + 0.75rem);
   }
+}
+
+/* Quiet, bounded playback dock; the range keeps its full 44px interaction area. */
+.audio-expanded-controls {
+  max-width: 52rem;
+}
+.audio-expanded-controls .audio-seek-waveform,
+.audio-expanded-controls .audio-seek-waveform-played {
+  gap: 2px;
+}
+.audio-expanded-controls .audio-seek-waveform > span,
+.audio-expanded-controls .audio-seek-waveform-played > span {
+  flex: 0 1 2px;
+  width: 2px;
+  border-radius: 1px;
+}
+.audio-expanded-actions {
+  grid-template-columns: minmax(0, 1fr) minmax(20rem, 1.4fr) minmax(0, 1fr);
+  gap: 8px;
+}
+.audio-expanded-actions > .audio-expanded-transport {
+  grid-column: 2;
+  grid-row: 1;
+  width: min(100%, 22rem);
+  justify-self: center;
+}
+.audio-expanded-utilities {
+  grid-column: 3;
+  grid-row: 1;
+}
+@container audio-controls (max-width: 40rem) {
+  .audio-expanded-actions {
+    grid-template-columns: 1fr;
+  }
+  .audio-expanded-actions > .audio-expanded-transport {
+    grid-column: 1;
+  }
+  .audio-expanded-utilities {
+    grid-column: 1;
+    grid-row: 2;
+  }
+}
+.audio-options-heading {
+  margin: 0;
+  padding: 2px 4px 8px;
+  border-bottom: 1px solid var(--border);
+}
+.audio-options-menu > .text-xs {
+  padding-inline: 4px;
+}
+.audio-options-row {
+  min-height: 44px;
+  padding-inline: 10px;
+}
+.audio-option-check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--background);
+}
+.audio-option-check--on {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+.audio-options-close {
+  margin-top: 4px;
 }

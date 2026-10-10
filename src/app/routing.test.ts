@@ -2,6 +2,12 @@ import { describe, expect, it } from "vitest";
 import { parseHash, parseLocation, routeToHash } from "./routing";
 
 describe("routeToHash", () => {
+  it("round trips the dedicated prayer location panel and preserves notifications links", () => {
+    for (const settingsPanel of ["location", "notifications"] as const) {
+      const route = { view: "settings" as const, settingsPanel };
+      expect(parseHash(routeToHash(route)!)).toEqual(route);
+    }
+  });
   it("round trips temporary routine and prayer context without changing legacy routes", () => {
     const route = {
       view: "reader" as const,

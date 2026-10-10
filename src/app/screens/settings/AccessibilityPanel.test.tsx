@@ -6,9 +6,6 @@ function renderPanel(overrides: Partial<Parameters<typeof AccessibilityPanel>[0]
   const props = {
     language: "en" as const,
     direction: "ltr" as const,
-    textSize: "medium" as const,
-    showTranslation: true,
-    showTransliteration: true,
     highContrast: false,
     boldText: false,
     reduceMotion: false,
@@ -16,9 +13,6 @@ function renderPanel(overrides: Partial<Parameters<typeof AccessibilityPanel>[0]
     hapticFeedback: true,
     forceRtl: false,
     colorBlindSupport: "none" as const,
-    onTextSizeChange: vi.fn(),
-    onShowTranslationChange: vi.fn(),
-    onShowTransliterationChange: vi.fn(),
     onHighContrastChange: vi.fn(),
     onBoldTextChange: vi.fn(),
     onReduceMotionChange: vi.fn(),
@@ -26,6 +20,7 @@ function renderPanel(overrides: Partial<Parameters<typeof AccessibilityPanel>[0]
     onHapticFeedbackChange: vi.fn(),
     onForceRtlChange: vi.fn(),
     onColorBlindSupportChange: vi.fn(),
+    onOpenReading: vi.fn(),
     onBack: vi.fn(),
     ...overrides,
   };
@@ -34,6 +29,13 @@ function renderPanel(overrides: Partial<Parameters<typeof AccessibilityPanel>[0]
 }
 
 describe("AccessibilityPanel", () => {
+  it("links to the authoritative Reading options without duplicate pickers", () => {
+    const { onOpenReading } = renderPanel();
+    expect(screen.queryByRole("radiogroup", { name: "Text size" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("switch", { name: "Show translation" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Text size, fonts & reading options" }));
+    expect(onOpenReading).toHaveBeenCalledOnce();
+  });
   it("exposes colour-blind support as one exclusive radio group, not four toggles", () => {
     renderPanel({ colorBlindSupport: "deuteranopia" });
 

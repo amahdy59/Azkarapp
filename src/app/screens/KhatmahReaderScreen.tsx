@@ -12,7 +12,10 @@ import type {
   QuranVerseBookmark,
   QuranWirdPlan,
   ThemeMode,
+  TextSizeOption,
 } from "../types";
+import type { AudioController } from "../audio/AudioProvider";
+import { useMushafPlayback } from "../hooks/useMushafPlayback";
 import {
   ArrowPrevious,
   CheckCircle2,
@@ -32,6 +35,8 @@ import { AyahInteractionSheet } from "../components/AyahInteractionSheet";
 import { MushafSettingsSheet } from "../components/MushafSettingsSheet";
 import { MUSHAF_RAIL_WIDTH, MushafToolRail, type SurahAudioControl } from "../components/MushafToolRail";
 import { MushafQuickMenu } from "../components/MushafQuickMenu";
+import { QuranPageTranslationPanel } from "../components/QuranPageTranslationPanel";
+import { QuranBilingualStreamView } from "../components/QuranBilingualStreamView";
 import {
   getSurahDisplayName,
   getSurahShortName,
@@ -150,6 +155,8 @@ export function KhatmahReaderScreen({
   reduceMotion = false,
   hapticFeedback = false,
   baqarahAudio,
+  audioController = null,
+  textSize = "medium",
 }: {
   language: AppLanguage;
   direction: "ltr" | "rtl";
@@ -160,6 +167,8 @@ export function KhatmahReaderScreen({
   appTheme?: ThemeMode;
   setMushafTheme?: (theme: MushafTheme) => void;
   baqarahAudio?: SurahAudioControl;
+  audioController?: AudioController | null;
+  textSize?: TextSizeOption;
   mushafLayout?: MushafLayout;
   setMushafLayout?: (layout: MushafLayout) => void;
   mushafToolbarSide?: MushafToolbarSide;
@@ -182,6 +191,15 @@ export function KhatmahReaderScreen({
   hapticFeedback?: boolean;
 }) {
   const currentPage = Math.max(1, Math.min(LAST_PAGE, khatmahPage || 1));
+  const playback = useMushafPlayback(audioController, currentPage, setKhatmahPage);
+  const { pauseFollowing } = playback;
+  const selectPage = useCallback(
+    (page: number) => {
+      pauseFollowing();
+      setKhatmahPage(page);
+    },
+    [pauseFollowing, setKhatmahPage],
+  );
 
   const [theme, setTheme] = useState<MushafTheme>(initialTheme);
   const resolvedTheme = theme === "follow-app" ? appTheme : theme;
@@ -232,11 +250,28 @@ export function KhatmahReaderScreen({
     return () => window.clearTimeout(timer);
   }, [highlightedVerseKey]);
 
+  const [readingMode, setReadingMode] = useState<"mushaf" | "bilingual">("mushaf");
+  const [showPageTranslation, setShowPageTranslation] = useState(false);
+  const [internalLayout, setInternalLayout] = useState<MushafLayout>(mushafLayout);
+
+  useEffect(() => {
+    if (mushafLayout) setInternalLayout(mushafLayout);
+  }, [mushafLayout]);
+
+  const handleSelectLayout = useCallback(
+    (newLayout: MushafLayout) => {
+      setInternalLayout(newLayout);
+      setMushafLayout?.(newLayout);
+    },
+    [setMushafLayout],
+  );
+
   const shell = useMushafShell();
 
   // The Mushaf always keeps one canonical page. Wide landscape surfaces place
   // the same reading actions in a right-side rail so the page gains vertical
   // room; compact and portrait surfaces retain the four corner actions.
+  const [pageMagnification, setPageMagnification] = useState(100);
   const autoSpreadRoom = shell.spreadRoom && shell.pageAspect >= 0.78;
   /**
    * Whether the reading type size can change anything here.
@@ -248,7 +283,11 @@ export function KhatmahReaderScreen({
   const typeSizeApplies = shell.pageAspect >= PAPER_ASPECT;
   // A stored desktop preference never forces two pages onto a phone or tall
   // tablet. The physical fit gate is authoritative; settings only opt out.
-  const spreadRoom = shell.spreadRoom && (mushafLayout === "spread" || (mushafLayout === "auto" && autoSpreadRoom));
+  const spreadRoom =
+    pageMagnification === 100 &&
+    shell.spreadRoom &&
+    !showPageTranslation &&
+    (internalLayout === "spread" || (internalLayout === "auto" && autoSpreadRoom));
   const useRail = shell.rail;
 
   // Re-resolve both visible pages when a timed-out QCF font finishes later.
@@ -578,9 +617,9 @@ export function KhatmahReaderScreen({
       const nextPage = currentPage + delta * pageStep;
       if (nextPage < 1 || nextPage > LAST_PAGE) return;
       if (delta > 0) recordCurrentSpread();
-      setKhatmahPage(nextPage);
+      selectPage(nextPage);
     },
-    [currentPage, pageStep, setKhatmahPage, recordCurrentSpread],
+    [currentPage, pageStep, selectPage, recordCurrentSpread],
   );
 
   /** Physical direction is the product rule: right advances, left goes back.
@@ -591,13 +630,19 @@ export function KhatmahReaderScreen({
       const target = e.target as HTMLElement | null;
       const root = readerRootRef.current;
       if (target && target !== document.body && target.id !== "main-content" && !root?.contains(target)) return;
-      if (target?.closest("input, textarea, select, [contenteditable='true']")) return;
+      if (target?.closest("input, textarea, select, [contenteditable='true'], .quran-meaning-text")) return;
       if (e.altKey || e.ctrlKey || e.metaKey) return;
+      if (
+        pageMagnification > 100 &&
+        target?.closest(".mushaf-paper") &&
+        ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End"].includes(e.key)
+      )
+        return;
       let handled = true;
       if (e.key === "ArrowLeft" || e.key === "PageDown") paginate(1);
       else if (e.key === "ArrowRight" || e.key === "PageUp") paginate(-1);
-      else if (e.key === "Home") setKhatmahPage(1);
-      else if (e.key === "End") setKhatmahPage(LAST_PAGE);
+      else if (e.key === "Home") selectPage(1);
+      else if (e.key === "End") selectPage(LAST_PAGE);
       else if (e.key === "Escape") {
         if (isFocusMode) {
           setIsFocusMode(false);
@@ -614,6 +659,7 @@ export function KhatmahReaderScreen({
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [
+    pageMagnification,
     activeAyah,
     baqarahAudio,
     pageData,
@@ -623,7 +669,7 @@ export function KhatmahReaderScreen({
     isQuickMenuOpen,
     onBack,
     paginate,
-    setKhatmahPage,
+    selectPage,
   ]);
 
   // Pointer-driven page turn. The transform is written straight to the node, so
@@ -679,6 +725,7 @@ export function KhatmahReaderScreen({
 
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if (event.button !== 0) return;
+    if (event.target instanceof Element && event.target.closest(".quran-meaning-text")) return;
     if ((event.target as HTMLElement).closest("button, a, [role='switch']")) return;
     drag.current = {
       pointerId: event.pointerId,
@@ -891,6 +938,9 @@ export function KhatmahReaderScreen({
       onOpenSettings={() => setIsOptionsMenuOpen(true)}
       onOpenMore={() => setIsQuickMenuOpen(true)}
       surahAudio={pageData?.[0]?.k.startsWith("2:") ? baqarahAudio : undefined}
+      playbackFollowing={
+        playback.available ? { enabled: playback.follow, onToggle: playback.toggleFollowing } : undefined
+      }
     />
   );
 
@@ -936,6 +986,7 @@ export function KhatmahReaderScreen({
       dir={direction}
       edgeToEdge
       screenName={t(language, "common.mushaf")}
+      style={{ paddingBlockEnd: "var(--mushaf-audio-clearance, 0px)" }}
       className="relative flex h-full select-none flex-col overflow-hidden bg-background"
     >
       {/* The Mushaf page is the screen: no card, no gutter, no letterbox. */}
@@ -946,11 +997,18 @@ export function KhatmahReaderScreen({
         ref={readerRootRef}
         tabIndex={-1}
         className="relative flex min-h-0 flex-1 flex-col overflow-hidden outline-none"
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerEnd}
-        onPointerCancel={onPointerCancel}
-        style={{ touchAction: "pan-y pinch-zoom" }}
+        onPointerDown={readingMode === "mushaf" && pageMagnification === 100 ? onPointerDown : undefined}
+        onPointerMove={readingMode === "mushaf" && pageMagnification === 100 ? onPointerMove : undefined}
+        onPointerUp={readingMode === "mushaf" && pageMagnification === 100 ? onPointerEnd : undefined}
+        onPointerCancel={readingMode === "mushaf" ? onPointerCancel : undefined}
+        style={{
+          touchAction:
+            readingMode === "mushaf" && pageMagnification > 100
+              ? "pan-x pan-y pinch-zoom"
+              : readingMode === "mushaf"
+                ? "pan-y pinch-zoom"
+                : "auto",
+        }}
       >
         {!pageData && !error && <MushafLoadingPlaceholder language={language} spread={spreadRoom} />}
 
@@ -968,7 +1026,33 @@ export function KhatmahReaderScreen({
           </div>
         )}
 
-        {pageData && (
+        {pageData && readingMode === "bilingual" ? (
+          <QuranBilingualStreamView
+            pageNumber={displayPage}
+            surahName={surahName}
+            juzNumber={juzNumber}
+            pageData={pageData}
+            language={language}
+            direction={direction}
+            bookmarkedVerses={initialVerseBookmarks}
+            onToggleVerseBookmark={(verseKey, pageNum) => {
+              const exists = initialVerseBookmarks.some((b) => b.verseKey === verseKey);
+              const next = exists
+                ? initialVerseBookmarks.filter((b) => b.verseKey !== verseKey)
+                : [...initialVerseBookmarks, { verseKey, page: pageNum }];
+              onUpdateVerseBookmarks?.(next);
+            }}
+            onAyahAction={handleAyahAction}
+            showWordMeanings={showWordMeanings}
+            onPaginate={paginate}
+            atFirstPage={currentPage <= 1}
+            atLastPage={currentPage >= LAST_PAGE}
+            theme={theme}
+            appTheme={appTheme}
+            onBack={onBack}
+            onOpenMore={() => setIsQuickMenuOpen(true)}
+          />
+        ) : pageData ? (
           <div className="h-full w-full">
             <MushafPageViewer
               lines={spreadReady && rightSide ? rightSide.lines : lines}
@@ -981,11 +1065,27 @@ export function KhatmahReaderScreen({
               isBookmarked={isPageBookmarked}
               useQcfGlyphs={spreadReady && rightSide ? (spreadRoom ? spreadQcf : rightSide.qcf) : useQcfGlyphs}
               showWordMeanings={showWordMeanings}
-              highlightedVerseKey={highlightedVerseKey}
+              highlightedVerseKey={playback.cue.verseKey ?? highlightedVerseKey}
+              highlightedWord={playback.cue.word}
               facingPage={
                 spreadReady && leftSide
                   ? { pageNumber: leftSide.page, lines: leftSide.lines, useQcfGlyphs: spreadQcf }
                   : undefined
+              }
+              facingContent={
+                showPageTranslation && shell.spreadRoom && pageData ? (
+                  <QuranPageTranslationPanel
+                    pageNumber={displayPage}
+                    surahName={surahName}
+                    verses={pageData}
+                    language={language}
+                    direction={direction}
+                    activeVerseKey={playback.cue.verseKey}
+                    follow={playback.follow}
+                    textSize={textSize}
+                    onManualBrowse={playback.pauseFollowing}
+                  />
+                ) : undefined
               }
               headerContent={undefined}
               footerContent={undefined}
@@ -1018,7 +1118,8 @@ export function KhatmahReaderScreen({
               onNext={() => paginate(1)}
               progressBar={wirdProgressBar}
               paperRef={paperRef}
-              verticalGestures
+              verticalGestures={pageMagnification === 100}
+              magnification={pageMagnification}
               showFloatingPageIndicator={!isFocusMode}
               pageTransitionDirection={pageTransitionDirection}
               reduceMotion={reduceMotion}
@@ -1028,7 +1129,7 @@ export function KhatmahReaderScreen({
             />
             {isFocusMode && focusHandle}
           </div>
-        )}
+        ) : null}
         {isFocusMode && (
           <p className="sr-only" role="status" aria-live="polite">
             {t(language, "mushaf.focusModeActive")}
@@ -1135,9 +1236,11 @@ export function KhatmahReaderScreen({
         theme={theme}
         appTheme={appTheme}
         onSelectTheme={handleSelectTheme}
-        mushafLayout={mushafLayout}
-        onSelectLayout={setMushafLayout}
+        mushafLayout={internalLayout}
+        onSelectLayout={handleSelectLayout}
         autoSpreadRoom={shell.spreadRoom}
+        magnification={pageMagnification}
+        onSelectMagnification={setPageMagnification}
         textScale={mushafTextScale}
         onSelectTextScale={setMushafTextScale}
         textScaleApplies={typeSizeApplies}
@@ -1160,6 +1263,19 @@ export function KhatmahReaderScreen({
         surahName={surahName}
         juzNumber={juzNumber}
         pageNumber={displayPage}
+        readingMode={readingMode}
+        playbackFollowing={
+          playback.available ? { enabled: playback.follow, onToggle: playback.toggleFollowing } : undefined
+        }
+        onSelectReadingMode={setReadingMode}
+        mushafLayout={internalLayout}
+        onSelectLayout={handleSelectLayout}
+        showLayoutOptions={shell.spreadRoom}
+        showPageTranslation={showPageTranslation}
+        onTogglePageTranslation={shell.spreadRoom ? () => setShowPageTranslation((prev) => !prev) : undefined}
+        theme={theme}
+        appTheme={appTheme}
+        onSelectTheme={handleSelectTheme}
         showWordMeanings={showWordMeanings}
         isLoadingWordMeanings={isLoadingWordMeanings}
         isPageBookmarked={isPageBookmarked}
@@ -1184,7 +1300,7 @@ export function KhatmahReaderScreen({
         initialTab={indexTab}
         currentPage={currentPage}
         onClose={() => setIsIndexOpen(false)}
-        onSelectPage={setKhatmahPage}
+        onSelectPage={selectPage}
         language={language}
         direction={direction}
         bookmarks={initialBookmarks}

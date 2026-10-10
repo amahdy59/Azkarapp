@@ -26,6 +26,7 @@ export type SettingsRoutePanel =
   | "audio"
   | "accessibility"
   | "downloads"
+  | "location"
   | "notifications"
   | "progress"
   | "account-data"
@@ -161,6 +162,7 @@ export function parseHash(hash: string): RouteState | null {
       "audio",
       "accessibility",
       "downloads",
+      "location",
       "notifications",
       "progress",
       "account-data",
