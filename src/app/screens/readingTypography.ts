@@ -64,8 +64,14 @@ export function getReadingFontSizePx({ textSize, arabicLength, longSurah, isSura
   const base = BASE_PX[textSize];
   if (longSurah) return base;
   if (isSurah) {
-    const surahScale = 1.48;
-    return Math.round(base * surahScale * 100) / 100;
+    // Short Quranic passages carry intricate diacritics requiring clarity,
+    // but scale must stay proportional to text length so long verses (e.g. Ayat al-Kursi)
+    // fit comfortably on screen without overwhelming the viewport.
+    const surahScale = arabicLength < 60 ? 1.36 : arabicLength < 140 ? 1.25 : 1.12;
+    const raw = base * surahScale;
+    const floor =
+      textSize === "small" && arabicLength < 140 ? MIN_READING_FONT_SIZE_PX + 0.4 : MIN_READING_FONT_SIZE_PX;
+    return Math.round(Math.max(raw, floor) * 100) / 100;
   }
 
   const step = LENGTH_STEPS.find(({ underLength }) => arabicLength < underLength);

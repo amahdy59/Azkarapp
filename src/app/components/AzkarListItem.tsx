@@ -78,6 +78,7 @@ export function AzkarListItem({
   const showTiming = hasSpecificRecommendedTiming(z);
   const timingText = getLocalizedPreferredTiming(z, language);
   const longSurah = isLongSurah(z);
+  const isQuranicText = isArabic && Boolean(z.quranText || z.isSurah || z.attributionType === "quranic_supplication");
   const visibleText = isArabic ? z.arabicText : z.translation;
   const { summaryRef, overflows } = useClampedTextOverflow(expanded, visibleText);
   const hasExpandedOnlyContent =
@@ -97,12 +98,18 @@ export function AzkarListItem({
   const readingContent = (
     <>
       {expanded && isArabic && z.hasSeekRefuge && (
-        <span className="zikr-text mb-1 block text-label font-bold text-primary/90">
+        <span
+          className="zikr-text mb-1 block text-label font-bold text-primary/90"
+          style={{ fontFamily: "var(--font-mushaf)" }}
+        >
           أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ
         </span>
       )}
       {expanded && isArabic && (z.hasBasmalah || z.isSurah) && (
-        <span className="zikr-text mb-1 block text-subtitle font-bold text-primary/90">
+        <span
+          className="zikr-text mb-1 block text-subtitle font-bold text-primary/90"
+          style={{ fontFamily: "var(--font-mushaf)" }}
+        >
           بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
         </span>
       )}
@@ -110,9 +117,12 @@ export function AzkarListItem({
         ref={summaryRef}
         id={summaryId}
         data-testid={summaryId}
-        className={`${isArabic ? "zikr-text" : "font-sans"} text-title font-bold leading-[1.85] text-foreground whitespace-pre-line ${
+        className={`${isArabic ? "zikr-text" : "font-sans"} text-title font-bold ${
+          isQuranicText ? "leading-[1.7]" : "leading-[1.85]"
+        } text-foreground whitespace-pre-line ${
           expanded ? `block ${longSurah ? "max-h-64 overflow-y-auto pe-1" : ""}` : "line-clamp-2"
         }`}
+        style={isQuranicText ? { fontFamily: "var(--font-mushaf)", lineHeight: 1.7 } : undefined}
         lang={isArabic ? "ar" : "en"}
         dir={isArabic ? "rtl" : "ltr"}
       >

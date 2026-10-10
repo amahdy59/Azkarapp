@@ -1760,9 +1760,9 @@ export function MushafExcerptCanvas({
       .join(",")}`,
     1.4,
   );
-  const baseRem = textSize === "small" ? 1.65 : textSize === "large" ? 2.6 : 2.1;
-  const maxRem = textSize === "small" ? 2.25 : textSize === "large" ? 3.5 : 2.85;
-  const cqi = textSize === "small" ? "6.2cqi" : textSize === "large" ? "9cqi" : "7.5cqi";
+  const baseRem = textSize === "small" ? 1.15 : textSize === "large" ? 1.45 : 1.28;
+  const maxRem = textSize === "small" ? 1.35 : textSize === "large" ? 1.7 : 1.5;
+  const cqi = textSize === "small" ? "3.8cqi" : textSize === "large" ? "5cqi" : "4.3cqi";
 
   return (
     <>
@@ -1776,21 +1776,22 @@ export function MushafExcerptCanvas({
       >
         <div
           style={{
-            fontFamily: useQcfGlyphs ? `qcf-v2-page-${pageNumber}, var(--font-mushaf)` : "var(--font-mushaf)",
+            fontFamily: "var(--font-mushaf)",
             fontSize: `calc(clamp(${baseRem}rem, ${cqi}, ${maxRem}rem) * var(--mushaf-fit, 1))`,
+            lineHeight: 1.65,
           }}
         >
           {lines.map((words, index) => (
             <div
               key={index}
-              className="flex items-center justify-center py-2"
-              style={{ minHeight: "2.5em", width: "100%" }}
+              className="flex items-center justify-center py-0.5"
+              style={{ minHeight: "1.65em", width: "100%", lineHeight: 1.65 }}
             >
               <MushafTextLine
                 words={words}
                 language={language}
                 theme={theme}
-                useQcfGlyphs={useQcfGlyphs}
+                useQcfGlyphs={false}
                 showWordMeanings={false}
                 meanings={new Map()}
                 activeWord={null}

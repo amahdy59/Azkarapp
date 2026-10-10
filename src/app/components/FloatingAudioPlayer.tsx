@@ -709,7 +709,7 @@ export function FloatingAudioPlayer({
                         data-testid={englishFirst ? "audio-player-arabic-text" : "audio-player-zikr-text"}
                         className={`zikr-text text-center font-medium ${
                           currentEntry.quranText || currentEntry.contentKind === "quran"
-                            ? "leading-[2.1]"
+                            ? "leading-[1.7]"
                             : "leading-relaxed"
                         } text-foreground ${hasExcerpt ? "w-full" : ""} ${englishFirst ? "mt-2 w-full border-t border-border pt-3" : ""}`}
                         style={{
@@ -717,7 +717,7 @@ export function FloatingAudioPlayer({
                             currentEntry.quranText || currentEntry.contentKind === "quran"
                               ? "var(--font-mushaf)"
                               : undefined,
-                          lineHeight: currentEntry.quranText || currentEntry.contentKind === "quran" ? 2.1 : undefined,
+                          lineHeight: currentEntry.quranText || currentEntry.contentKind === "quran" ? 1.7 : undefined,
                           fontSize: getReadingFontSizeRem({
                             textSize,
                             arabicLength: zikrArabicText.length,

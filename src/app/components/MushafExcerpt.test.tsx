@@ -37,7 +37,7 @@ describe("MushafExcerpt", () => {
     expect(screen.queryByTestId("mushaf-excerpt")).not.toBeInTheDocument();
     expect(screen.getByText("Fallback text")).toBeInTheDocument();
   });
-  it("retains semantic text with QCF glyphs and maps only the current cue without changing type size", () => {
+  it("retains semantic text with Mushaf font and maps only the current cue without changing type size", () => {
     useListeningMushafPage.mockReturnValue({ result: { page: 604, lines: [words], qcf: true } });
     const { container, rerender } = render(
       <MushafExcerpt
@@ -50,7 +50,7 @@ describe("MushafExcerpt", () => {
     );
     expect(screen.getByTestId("mushaf-excerpt")).toHaveAttribute("aria-hidden", "true");
     expect(screen.getByTestId("mushaf-excerpt").nextElementSibling).toHaveTextContent("قُلْ هُوَ");
-    expect(container.querySelector("[data-listening-word]")).toHaveTextContent("A");
+    expect(container.querySelector("[data-listening-word]")).toHaveTextContent("قُلْ");
     const style = container.querySelector("[data-mushaf-line]")!.parentElement!.parentElement!.getAttribute("style");
     rerender(
       <MushafExcerpt
@@ -61,7 +61,7 @@ describe("MushafExcerpt", () => {
         fallback="Fallback"
       />,
     );
-    expect(container.querySelector("[data-listening-word]")).toHaveTextContent("B");
+    expect(container.querySelector("[data-listening-word]")).toHaveTextContent("هُوَ");
     expect(container.querySelector("[data-mushaf-line]")!.parentElement!.parentElement!.getAttribute("style")).toBe(
       style,
     );

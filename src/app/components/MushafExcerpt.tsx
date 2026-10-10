@@ -37,7 +37,7 @@ export default function MushafExcerpt({
         lines={selection.lines}
         pageNumber={range.page}
         language={language}
-        useQcfGlyphs={result.qcf}
+        useQcfGlyphs={false}
         highlightedWord={excerptActiveWord(selection.mapping, cue)}
         textSize={textSize}
         theme={theme}

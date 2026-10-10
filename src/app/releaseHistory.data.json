@@ -1,5 +1,18 @@
 [
   {
+    "release": "2026-10-10.2",
+    "ar": [
+      "توحيد خط المصحف الشريف لجميع الآيات والسور في القارئ والمشغل الصوتي وقوائم الأذكار لمظهر متناسق ومريح للعين.",
+      "تقليص المسافات الرأسية بين أسطر الآيات وضبط تباعد الأسطر ليتسع النص القرآني كاملاً داخل شاشة القراءة ومشغل الصوت دون هدر في المساحة.",
+      "تحسين أحجام الخطوط القرآنية لتتكيف بمرونة مع حجم الشاشة وطول الآيات بدقة، مما يسهل قراءة الآيات الطويلة مثل آية الكرسي كاملة بوضوح."
+    ],
+    "en": [
+      "Unified the Quranic Mushaf typeface across the reader, audio player, and azkar lists for a calm, consistent reading experience.",
+      "Reduced vertical line spacing and tightened line gaps so Quranic verses and passages fit comfortably on screen without wasted space.",
+      "Optimized Quranic font sizing to adapt flexibly to screen viewports and verse lengths, allowing long verses like Ayat al-Kursi to be read clearly without excessive scrolling."
+    ]
+  },
+  {
     "release": "2026-10-10.1",
     "ar": [
       "الوصول المباشر لجميع أدوات القارئ في شريط أسفل الشاشة (المراجع، الصوتيات، المشاركة، والتركيز) دون الحاجة لفتح قوائم مطوية.",

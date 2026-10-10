@@ -807,21 +807,21 @@ export function ReaderScreen({
                 style={{
                   fontFamily: readingFontFamily,
                   fontSize: readingFontSize,
-                  lineHeight: isQuranicText ? 2.1 : undefined,
+                  lineHeight: isQuranicText ? 1.7 : undefined,
                 }}
                 onSelectMeanings={setWordMeaningSelection}
                 activeWordId={activeWordId}
               />
             ) : (
               <p
-                className={`zikr-text pointer-events-none text-center font-medium ${isQuranicText ? "leading-[2.1]" : "leading-[1.85]"} text-foreground`}
+                className={`zikr-text pointer-events-none text-center font-medium ${isQuranicText ? "leading-[1.7]" : "leading-[1.85]"} text-foreground`}
                 data-testid="zikr-text"
                 dir="rtl"
                 lang="ar"
                 style={{
                   fontFamily: readingFontFamily,
                   fontSize: readingFontSize,
-                  lineHeight: isQuranicText ? 2.1 : undefined,
+                  lineHeight: isQuranicText ? 1.7 : undefined,
                 }}
               >
                 {displayArabicText}
