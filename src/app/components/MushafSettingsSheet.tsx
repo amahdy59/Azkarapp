@@ -3,7 +3,7 @@ import { Modal, SheetHeader, SidePanel } from "./ResponsiveSheet";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage, MushafLayout, MushafTextScale, MushafToolbarSide, MushafTheme, ThemeMode } from "../types";
-import { Check, Minus, Plus, SlidersHorizontal } from "./icons";
+import { Check, SlidersHorizontal } from "./icons";
 import { MushafKeyboardShortcutList } from "./MushafKeyboardShortcuts";
 
 export interface MushafSettingsSheetProps {
@@ -19,12 +19,8 @@ export interface MushafSettingsSheetProps {
   autoSpreadRoom?: boolean;
   magnification?: number;
   onSelectMagnification?: (value: number) => void;
-  textScale: MushafTextScale;
+  textScale?: MushafTextScale;
   onSelectTextScale?: (scale: MushafTextScale) => void;
-  /**
-   * False where the page is width-bound and the size choice cannot act — the
-   * line already runs margin to margin, and the words on a line are page data.
-   */
   textScaleApplies?: boolean;
   toolbarSide: MushafToolbarSide;
   onSelectToolbarSide?: (side: MushafToolbarSide) => void;
@@ -96,9 +92,6 @@ export function MushafSettingsSheet({
   autoSpreadRoom = false,
   magnification = 100,
   onSelectMagnification,
-  textScale,
-  onSelectTextScale,
-  textScaleApplies = true,
   toolbarSide,
   onSelectToolbarSide,
   showToolbarSide = false,
@@ -119,12 +112,6 @@ export function MushafSettingsSheet({
     ["auto", t(language, "mushaf.layoutAuto")],
     ["single", t(language, "mushaf.layoutSingle")],
     ["spread", t(language, "mushaf.layoutSpread")],
-  ] as const;
-
-  const textScaleOptions = [
-    ["small", t(language, "mushaf.textSizeSmall")],
-    ["medium", t(language, "mushaf.textSizeMedium")],
-    ["large", t(language, "mushaf.textSizeLarge")],
   ] as const;
 
   const toolbarSideOptions = [
@@ -155,56 +142,8 @@ export function MushafSettingsSheet({
         {onSelectMagnification && (
           <MushafMagnificationControl language={language} value={magnification} onChange={onSelectMagnification} />
         )}
-        {/* Section 1: Reading type size. Only shown when the page aspect allows
-            scaling (e.g. landscape or wide tablet/desktop). On portrait mobile,
-            the line already spans the full width and words cannot reflow without
-            breaking the 15-line Medina Mushaf layout. */}
-        {onSelectTextScale && textScaleApplies && (
-          <section aria-labelledby="mushaf-text-size-heading" className="flex flex-col gap-2.5">
-            <h3
-              id="mushaf-text-size-heading"
-              className="text-xs font-bold uppercase tracking-wider text-muted-foreground"
-            >
-              {t(language, "mushaf.textSizeTitle")}
-            </h3>
-            <div
-              role="radiogroup"
-              aria-labelledby="mushaf-text-size-heading"
-              aria-describedby="mushaf-text-size-hint"
-              data-testid="mushaf-text-size-group"
-              className="grid grid-cols-3 gap-1.5 rounded-xl border border-border/60 bg-muted/40 p-1"
-            >
-              {textScaleOptions.map(([id, label]) => {
-                const isSelected = textScale === id;
-                return (
-                  <button
-                    key={id}
-                    type="button"
-                    role="radio"
-                    aria-checked={isSelected}
-                    data-testid={`mushaf-text-size-option-${id}`}
-                    onClick={() => onSelectTextScale(id)}
-                    className={segmentClass(isSelected)}
-                  >
-                    {id === "small" && <Minus size={13} aria-hidden="true" className="shrink-0" />}
-                    {id === "large" && <Plus size={13} aria-hidden="true" className="shrink-0" />}
-                    <span
-                      className="truncate"
-                      style={{ fontSize: id === "small" ? "0.6875rem" : id === "large" ? "0.875rem" : undefined }}
-                    >
-                      {label}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-            <p id="mushaf-text-size-hint" className="text-micro font-medium leading-snug text-muted-foreground">
-              {t(language, "mushaf.textSizeHint")}
-            </p>
-          </section>
-        )}
 
-        {/* Section 2: Themes (Clean Swatches + App Theme Badge) */}
+        {/* Section: Themes (Clean Swatches + App Theme Badge) */}
         <section aria-labelledby="mushaf-theme-heading" className="flex flex-col gap-2.5">
           <h3 id="mushaf-theme-heading" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
             {t(language, "mushaf.themeTitle")}

@@ -51,6 +51,8 @@ export type ReadingSizeInput = {
   arabicLength: number;
   /** Reviewed multi-page surahs (Kahf, Sajda, Mulk) — deliberately unscaled. */
   longSurah: boolean;
+  /** Short Quranic surahs (Ikhlas, Falaq, Nas, Kafirun) or verses with full diacritics. */
+  isSurah?: boolean;
 };
 
 /**
@@ -58,9 +60,13 @@ export type ReadingSizeInput = {
  * and the floor, so a reviewed Mushaf page keeps the line breaks it was
  * reviewed with.
  */
-export function getReadingFontSizePx({ textSize, arabicLength, longSurah }: ReadingSizeInput): number {
+export function getReadingFontSizePx({ textSize, arabicLength, longSurah, isSurah }: ReadingSizeInput): number {
   const base = BASE_PX[textSize];
   if (longSurah) return base;
+  if (isSurah) {
+    const surahScale = 1.48;
+    return Math.round(base * surahScale * 100) / 100;
+  }
 
   const step = LENGTH_STEPS.find(({ underLength }) => arabicLength < underLength);
   const scaled = base * (step?.scale ?? LONGEST_TEXT_SCALE);

@@ -5,17 +5,7 @@
    the split was strictly sequential so the cascade is unchanged. Moving a rule
    between parts, or reordering the imports, can change which declaration wins. */
 
-/* Hide native scrollbar on compact touch screens; show elegant thin scrollbars on tablet & desktop */
-@media (max-width: 767px) {
-  .app-shell,
-  .app-shell * {
-    scrollbar-width: none;
-  }
-
-  .app-shell *::-webkit-scrollbar {
-    display: none;
-  }
-}
+/* Thin scrollbars on tablet & desktop; compact screens inherit global scrollbar-width: none from index.css */
 
 @media (min-width: 768px) {
   .app-shell,

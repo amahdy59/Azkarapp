@@ -262,12 +262,12 @@ const MushafTextLine = memo(function MushafTextLine({
       data-mushaf-line=""
       className={`flex h-full w-full min-w-0 items-center justify-center ${readOnly ? "relative" : ""}`}
     >
-      {readOnly && highlightedVerseKey && words.some((word) => word.verseKey === highlightedVerseKey) && (
+      {highlightedVerseKey && words.some((word) => word.verseKey === highlightedVerseKey) && (
         <span
           aria-hidden="true"
           data-playback-line=""
-          className="absolute h-3 w-1 rounded-full bg-current"
-          style={{ insetInlineStart: "-0.25rem" }}
+          className="absolute h-3.5 w-1 rounded-full bg-primary"
+          style={{ insetInlineStart: "-0.35rem" }}
         />
       )}
       {/* QCF glyph advances preserve printed spacing; the canvas never stretches word gaps. */}
@@ -290,7 +290,7 @@ const MushafTextLine = memo(function MushafTextLine({
                 key={key}
                 aria-hidden="true"
                 className={
-                  highlightedVerseKey === w.verseKey ? "bg-primary/20 rounded-sm ring-2 ring-primary/55" : undefined
+                  highlightedVerseKey === w.verseKey ? "bg-primary/25 rounded-sm ring-2 ring-primary/60" : undefined
                 }
               >
                 {useQcfGlyphs && w.qcfCode ? (
@@ -307,7 +307,7 @@ const MushafTextLine = memo(function MushafTextLine({
                 key={key}
                 type="button"
                 className={`inline-block shrink-0 select-none rounded-sm border-0 bg-transparent p-0 [font:inherit] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                  highlightedVerseKey === w.verseKey ? "bg-primary/20 ring-2 ring-primary/55" : ""
+                  highlightedVerseKey === w.verseKey ? "bg-primary/25 ring-2 ring-primary/60" : ""
                 }`}
                 aria-current={highlightedVerseKey === w.verseKey ? "true" : undefined}
                 style={{ lineHeight: "inherit", verticalAlign: "baseline" }}
@@ -403,11 +403,11 @@ const MushafTextLine = memo(function MushafTextLine({
                     }
                   : undefined
               }
-              className={`shrink-0 ${
+              className={`shrink-0 transition-colors ${
                 isWordHighlighted
-                  ? "rounded-md bg-primary/20 text-primary underline underline-offset-4"
+                  ? "rounded-md bg-primary/25 text-primary underline underline-offset-4 ring-1 ring-primary/60"
                   : isVerseActive
-                    ? "rounded-sm bg-primary/10 text-foreground"
+                    ? "rounded-sm bg-primary/20 text-foreground ring-1 ring-primary/45"
                     : "rounded-sm"
               }`}
               aria-hidden={!showWordMeanings}
@@ -492,9 +492,6 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
     let frame = 0;
     let containmentFrame = 0;
     let cancelled = false;
-    let fittedScale = "1";
-    let fittedMeasure = 0;
-    let fittedViewport = "";
 
     const fit = () => {
       const column = canvas.firstElementChild as HTMLElement | null;
@@ -507,17 +504,8 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
          owns its own measure: the vars are set on its canvas and inherited by
          its column. */
       const page = canvas;
-      const magnification = Number.parseFloat(getComputedStyle(canvas).getPropertyValue("--mushaf-magnification")) || 1;
-      // Native scrollbar space changes clientWidth during enlargement. It
-      // must not be mistaken for a new reading viewport and refit the ink.
-      const viewport = `${window.innerWidth}:${window.innerHeight}`;
-      if (magnification > 1 && fittedMeasure > 0 && viewport === fittedViewport) {
-        page.style.setProperty("--mushaf-fit", fittedScale);
-        page.style.setProperty("--mushaf-measure", `${Math.round(fittedMeasure * magnification)}px`);
-        return;
-      }
-
-      const currentFit = Number.parseFloat(page.style.getPropertyValue("--mushaf-fit")) || 1;
+      page.style.setProperty("--mushaf-measure", "100%");
+      page.style.setProperty("--mushaf-fit", "1");
 
       for (let i = 0; i < contents.length; i++) {
         const content = contents[i]!;
@@ -525,7 +513,7 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
         content.style.justifyContent = "";
       }
 
-      const available = first.clientWidth;
+      const available = (first.parentElement as HTMLElement | null)?.clientWidth ?? first.clientWidth;
       const slotHeight = (first.parentElement as HTMLElement | null)?.clientHeight ?? 0;
       if (available <= 0 || slotHeight <= 0) return;
 
@@ -556,25 +544,17 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
 
       const lineHeight = first.offsetHeight;
       if (!widest) widest = Math.max(...naturalWidths);
-      const effectiveFit = (currentFit > 0 ? currentFit : 1) * magnification;
-      const baseWidest = effectiveFit > 0 ? widest / effectiveFit : widest;
-      const baseLineHeight = effectiveFit > 0 ? lineHeight / effectiveFit : lineHeight;
-      const baseSlotHeight = slotHeight / magnification;
-      const baseAvailable = available / magnification;
-      const verticalScale = baseLineHeight > 0 ? (baseSlotHeight * inkAllowance) / baseLineHeight : 1;
-      const measure = Math.min(baseWidest * verticalScale, baseAvailable);
-      const scale = Math.min(Math.max(baseWidest > 0 ? measure / baseWidest : 1, 0.6), 2.4);
+      const verticalScale = lineHeight > 0 ? (slotHeight * inkAllowance) / lineHeight : 1;
+      const measure = Math.min(widest * verticalScale, available);
+      const scale = Math.min(Math.max(widest > 0 ? measure / widest : 1, 0.6), 2.8);
 
-      // Single write pass: apply calculated scale and transforms
-      page.style.setProperty("--mushaf-measure", `${Math.round(measure * magnification)}px`);
+      // Single write pass: apply calculated scale and transforms bounded by available width
+      page.style.setProperty("--mushaf-measure", `${Math.round(measure)}px`);
       page.style.setProperty("--mushaf-fit", scale.toFixed(3));
-      fittedScale = scale.toFixed(3);
-      fittedMeasure = measure;
-      fittedViewport = viewport;
 
       for (let i = 0; i < lineCount; i++) {
         const content = contents[i]!;
-        const nat = effectiveFit > 0 ? naturalWidths[i]! / effectiveFit : naturalWidths[i]!;
+        const nat = naturalWidths[i]!;
         const scaledNat = nat * scale;
         const fill = measure > 0 ? scaledNat / measure : 1;
 
@@ -851,6 +831,7 @@ function MushafPageCanvas({
   inkStroke,
   spreadSide,
   textScale,
+  magnification = 100,
   showPageIdentity,
   hasTopCenterControl: _hasTopCenterControl = false,
   hasFloatingControls = false,
@@ -873,6 +854,7 @@ function MushafPageCanvas({
   inkStroke: string;
   spreadSide?: "right" | "left";
   textScale: MushafTextScale;
+  magnification?: number;
   /**
    * Whether the page names itself.
    *
@@ -923,7 +905,7 @@ function MushafPageCanvas({
   const lineDetails = useLineDetails(lines, pageNumber);
   const isOpening = OPENING_PAGES.has(pageNumber);
   const canvasRef = useLineFitter(
-    `${pageNumber}:${useQcfGlyphs}:${lines.length}:${textScale}`,
+    `${pageNumber}:${useQcfGlyphs}:${lines.length}:${magnification}:${textScale}`,
     resolveInkAllowance(useQcfGlyphs, textScale),
   );
 
@@ -1652,6 +1634,7 @@ export function MushafPageViewer({
             inkStroke={inkStroke}
             spreadSide={facingPage || facingContent ? "right" : undefined}
             textScale={textScale}
+            magnification={magnification}
             showPageIdentity={showPageIdentity}
             hasTopCenterControl={Boolean(topCenterControl)}
             hasFloatingControls={hasFloatingControls}
@@ -1677,6 +1660,7 @@ export function MushafPageViewer({
                 inkStroke={inkStroke}
                 spreadSide="left"
                 textScale={textScale}
+                magnification={magnification}
                 showPageIdentity={showPageIdentity}
                 hasFloatingControls={false}
                 isFloatingLayout={false}
@@ -1693,10 +1677,27 @@ export function MushafPageViewer({
             <>
               <div className="mushaf-spread__gutter" aria-hidden="true" />
               <div
-                className="mushaf-spread__page flex min-h-0 min-w-0 flex-1 items-stretch justify-center"
+                className={`relative mushaf-spread__page mushaf-page-canvas min-h-0 min-w-0 px-1 sm:px-5 ${
+                  isFloatingLayout ? "" : "py-1 sm:py-2"
+                }`}
+                style={{
+                  containerType: "size",
+                  ...(isFloatingLayout
+                    ? {
+                        minHeight: "calc(32rem + 2.65rem)",
+                        paddingTop: "calc(3.25rem + env(safe-area-inset-top))",
+                        paddingBottom: "calc(3.25rem + env(safe-area-inset-bottom))",
+                      }
+                    : {}),
+                }}
                 data-mushaf-meaning=""
               >
-                {facingContent}
+                <div
+                  className="mushaf-page-frame relative z-10 mx-auto flex h-full w-full min-h-0 flex-col"
+                  style={{ maxWidth: "min(100%, 72cqh)" }}
+                >
+                  {facingContent}
+                </div>
               </div>
             </>
           )}
@@ -1742,6 +1743,7 @@ export function MushafExcerptCanvas({
   useQcfGlyphs,
   highlightedWord,
   textSize = "medium",
+  theme = "light",
 }: {
   lines: MushafWordToken[][];
   pageNumber: number;
@@ -1749,15 +1751,19 @@ export function MushafExcerptCanvas({
   useQcfGlyphs: boolean;
   highlightedWord?: { verseKey: string; position: number } | null;
   textSize?: TextSizeOption;
+  theme?: MushafPageTheme;
 }) {
   const canvasRef = useLineFitter(
     `${pageNumber}:${useQcfGlyphs}:${lines
       .flat()
       .map((w) => `${w.verseKey}:${w.position}`)
       .join(",")}`,
-    useQcfGlyphs ? 0.9 : 0.72,
+    1.4,
   );
-  const baseSize = textSize === "small" ? "1.2rem" : textSize === "large" ? "1.55rem" : "1.35rem";
+  const baseRem = textSize === "small" ? 1.65 : textSize === "large" ? 2.6 : 2.1;
+  const maxRem = textSize === "small" ? 2.25 : textSize === "large" ? 3.5 : 2.85;
+  const cqi = textSize === "small" ? "6.2cqi" : textSize === "large" ? "9cqi" : "7.5cqi";
+
   return (
     <>
       <div
@@ -1771,15 +1777,19 @@ export function MushafExcerptCanvas({
         <div
           style={{
             fontFamily: useQcfGlyphs ? `qcf-v2-page-${pageNumber}, var(--font-mushaf)` : "var(--font-mushaf)",
-            fontSize: `calc(min(max(${baseSize}, 5.2cqi), 1.75rem) * var(--mushaf-fit, 1))`,
+            fontSize: `calc(clamp(${baseRem}rem, ${cqi}, ${maxRem}rem) * var(--mushaf-fit, 1))`,
           }}
         >
           {lines.map((words, index) => (
-            <div key={index} style={{ minHeight: "1.7em", height: "1.7em", width: "100%" }}>
+            <div
+              key={index}
+              className="flex items-center justify-center py-2"
+              style={{ minHeight: "2.5em", width: "100%" }}
+            >
               <MushafTextLine
                 words={words}
                 language={language}
-                theme="light"
+                theme={theme}
                 useQcfGlyphs={useQcfGlyphs}
                 showWordMeanings={false}
                 meanings={new Map()}
@@ -1826,7 +1836,8 @@ export function MushafListeningPage({
         style={
           {
             "--mushaf-magnification": Math.max(1, Math.min(2, magnification / 100)),
-            width: `${magnification}%`,
+            width: "100%",
+            maxWidth: "100%",
             height: `max(${(36 * magnification) / 100}rem, calc(100cqh * ${magnification / 100} - 3rem))`,
           } as CSSProperties
         }
@@ -1845,6 +1856,7 @@ export function MushafListeningPage({
           showWordMeanings={false}
           inkStroke={{ midnight: "0.016em", dark: "0.016em", oled: "0.012em", light: "0.021em" }[theme]}
           textScale={textScale}
+          magnification={magnification}
           showPageIdentity={false}
           readOnly
           highlightedVerseKey={highlightedVerseKey}

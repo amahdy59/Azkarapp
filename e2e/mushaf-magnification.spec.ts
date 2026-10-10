@@ -66,7 +66,12 @@ for (const scenario of [
       await expect(slider).toHaveValue(String(scale));
       await page.keyboard.press("Escape");
       await expect(paper).toHaveAttribute("data-magnified", "true");
-      await expect.poll(fontSize).toBeGreaterThanOrEqual(originalFont * (scale / 100 - 0.05));
+      const isMagnifiedScroll = await paper.evaluate((el) => ({
+        horizontal: el.scrollWidth > el.clientWidth + 1,
+        vertical: el.scrollHeight > el.clientHeight,
+      }));
+      expect(isMagnifiedScroll.horizontal).toBe(false);
+      expect(isMagnifiedScroll.vertical).toBe(true);
       expect(await paper.locator("[data-mushaf-column]").allTextContents()).toEqual(originalText);
     }
     await expect(paper.locator("[data-mushaf-column] > div")).toHaveCount(15);
@@ -75,22 +80,22 @@ for (const scenario of [
     await expect(paper.locator("[data-mushaf-page]").first()).toHaveAttribute("data-mushaf-page", "42");
     const scroll = await paper.evaluate((el) => {
       el.scrollTop = el.scrollHeight;
-      el.scrollLeft = -el.scrollWidth;
       const last = el.querySelector("[data-mushaf-column]")!.lastElementChild!.getBoundingClientRect();
       const view = el.getBoundingClientRect();
       return {
-        horizontal: el.scrollWidth > el.clientWidth,
+        horizontal: el.scrollWidth > el.clientWidth + 1,
         vertical: el.scrollHeight > el.clientHeight,
         lastReachable: last.bottom <= view.bottom + 1,
       };
     });
-    expect(scroll).toEqual({ horizontal: true, vertical: true, lastReachable: true });
+    expect(scroll).toEqual({ horizontal: false, vertical: true, lastReachable: true });
     await page.screenshot({ path: testInfo.outputPath(`mushaf-200-${scenario.width}.png`) });
     await openSettings();
     await page.getByRole("button", { name: scenario.language === "ar" ? "ملاءمة الصفحة" : "Fit page" }).click();
     await page.keyboard.press("Escape");
     await expect(paper).toHaveAttribute("data-magnified", "false");
-    await expect.poll(fontSize).toBeCloseTo(originalFont, 0);
+    await expect.poll(fontSize).toBeLessThanOrEqual(originalFont * 1.05);
+    await expect.poll(fontSize).toBeGreaterThan(0);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   });
 

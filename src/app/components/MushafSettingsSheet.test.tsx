@@ -101,14 +101,12 @@ describe("MushafSettingsSheet reading choices", () => {
     return props;
   }
 
-  it("offers a reading type size and says what it does not change", () => {
-    const onSelectTextScale = vi.fn();
-    renderSheet({ onSelectTextScale });
+  it("focuses on page magnification as the primary sizing control and omits text size segmented control", () => {
+    const onSelectMagnification = vi.fn();
+    renderSheet({ onSelectMagnification, magnification: 125 });
 
-    expect(screen.getByTestId("mushaf-text-size-option-medium")).toHaveAttribute("aria-checked", "true");
-    fireEvent.click(screen.getByTestId("mushaf-text-size-option-large"));
-    expect(onSelectTextScale).toHaveBeenCalledWith("large");
-    expect(screen.getByText(/الخمسة عشر/)).toBeInTheDocument();
+    expect(screen.queryByTestId("mushaf-text-size-group")).not.toBeInTheDocument();
+    expect(screen.getByRole("slider", { name: "تكبير الصفحة" })).toHaveValue("125");
   });
 
   it("offers the toolbar edge only where a rail is actually shown", () => {
@@ -123,13 +121,6 @@ describe("MushafSettingsSheet reading choices", () => {
     expect(screen.getByTestId("mushaf-toolbar-side-option-right")).toHaveAttribute("aria-checked", "true");
     fireEvent.click(screen.getByTestId("mushaf-toolbar-side-option-left"));
     expect(onSelectToolbarSide).toHaveBeenCalledWith("left");
-  });
-
-  it("omits the text size section when textScaleApplies is false to prevent mobile clutter", () => {
-    const onSelectTextScale = vi.fn();
-    renderSheet({ onSelectTextScale, textScaleApplies: false });
-
-    expect(screen.queryByTestId("mushaf-text-size-group")).not.toBeInTheDocument();
   });
 
   it("shows app theme badge on the theme matching appTheme", () => {
@@ -178,9 +169,9 @@ describe("MushafSettingsSheet docked panel", () => {
   });
 
   it("keeps every reading control it has as a sheet, and still names itself", () => {
-    renderPanel({ onSelectTextScale: vi.fn() });
-    expect(screen.getByTestId("mushaf-text-size-option-medium")).toBeInTheDocument();
-    expect(screen.getByTestId("mushaf-theme-option-midnight")).toBeInTheDocument();
+    renderPanel({ onSelectMagnification: vi.fn() });
+    expect(screen.getByRole("slider", { name: "تكبير الصفحة" })).toBeInTheDocument();
+    expect(screen.queryByTestId("mushaf-text-size-group")).not.toBeInTheDocument();
     expect(screen.getByTestId("mushaf-theme-option-midnight")).toBeInTheDocument();
     expect(screen.getByRole("dialog", { name: "إعدادات القراءة" })).toBeInTheDocument();
   });

@@ -1164,7 +1164,7 @@ const ar = {
     toolbarSideHint: "يظهر شريط الأدوات الرأسي على الشاشات العريضة فقط.",
     magnification: "تكبير الصفحة",
     magnificationReset: "ملاءمة الصفحة",
-    magnificationHint: "كبّر حتى ٢٠٠٪. مرّر أفقيًا وعموديًا للقراءة، واستخدم أزرار الصفحات للتنقل.",
+    magnificationHint: "كبّر حتى ٢٠٠٪. مرّر عموديًا للقراءة، واستخدم أزرار الصفحات للتنقل.",
     textSizeTitle: "حجم النص",
     textSizeSmall: "صغير",
     textSizeMedium: "متوسط",

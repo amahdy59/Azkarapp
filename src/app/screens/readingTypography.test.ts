@@ -77,4 +77,12 @@ describe("reading typography", () => {
       expect(large, `large must exceed medium at ${arabicLength} chars`).toBeGreaterThan(medium);
     }
   });
+
+  it("scales short surahs appropriately for Quranic legibility", () => {
+    for (const textSize of SIZES) {
+      const size = getReadingFontSizePx({ textSize, arabicLength: 111, longSurah: false, isSurah: true });
+      const ordinary = getReadingFontSizePx({ textSize, arabicLength: 111, longSurah: false });
+      expect(size).toBeGreaterThan(ordinary);
+    }
+  });
 });

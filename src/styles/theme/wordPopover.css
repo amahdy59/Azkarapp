@@ -29,8 +29,8 @@
     0 1px 2px rgb(0 0 0 / 0.28),
     0 12px 28px -10px rgb(0 0 0 / 0.45);
   padding: 0.625rem 0.75rem;
-  /* Cheap to composite and cheap to repaint: no blur, no filter. */
-  will-change: transform, opacity;
+  transform-origin: var(--caret-x, 50%) 0;
+  animation: quran-word-popover-in var(--motion-duration-fast) var(--motion-ease-enter) both;
 }
 
 @supports (anchor-name: --a) {
@@ -84,11 +84,6 @@
     opacity: 1;
     transform: translateY(0) scale(1);
   }
-}
-
-.quran-word-popover {
-  transform-origin: var(--caret-x, 50%) 0;
-  animation: quran-word-popover-in var(--motion-duration-fast) var(--motion-ease-enter) both;
 }
 
 .quran-word-popover[data-above="true"] {

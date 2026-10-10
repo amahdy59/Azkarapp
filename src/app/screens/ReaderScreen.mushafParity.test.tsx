@@ -101,7 +101,7 @@ describe("the surah view is the Mushaf", () => {
     expect(settingsShowing()).toBe(false);
     fireEvent.click(screen.getByTestId("mushaf-settings-trigger"));
     expect(settingsShowing()).toBe(true);
-    expect(document.body.textContent).toContain("حجم النص");
+    expect(document.body.textContent).toContain("تكبير الصفحة");
   });
 
   it("opens the surah list from the index button and scopes page jump to the current surah", () => {

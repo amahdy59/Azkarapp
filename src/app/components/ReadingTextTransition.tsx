@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState, type ReactNode } from "react";
+import { Fragment, useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import { AnimatePresence, motion, useIsPresent } from "motion/react";
 
 /** Slide the reading text like a light sheet, without moving its surrounding controls. */
@@ -8,6 +8,7 @@ export function ReadingTextTransition({
   direction,
   reduceMotion,
   className,
+  style,
   children,
 }: {
   entryId: string;
@@ -15,6 +16,7 @@ export function ReadingTextTransition({
   direction: "ltr" | "rtl";
   reduceMotion: boolean;
   className?: string;
+  style?: CSSProperties;
   children: ReactNode;
 }) {
   const [position, setPosition] = useState({
@@ -46,7 +48,7 @@ export function ReadingTextTransition({
   }, [entryId, position.interrupted]);
 
   return (
-    <div className={className} data-testid="reading-text-transition" data-direction={position.sign}>
+    <div className={className} style={style} data-testid="reading-text-transition" data-direction={position.sign}>
       <AnimatePresence
         key={reduceMotion ? "reduced" : position.generation}
         initial={false}

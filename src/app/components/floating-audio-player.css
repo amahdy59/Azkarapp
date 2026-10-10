@@ -529,11 +529,6 @@
   background: var(--border);
   border-radius: 9999px;
 }
-.audio-options-heading {
-  margin: 0;
-  padding: 2px 4px 8px;
-  border-bottom: 1px solid var(--border);
-}
 .audio-options-menu > .text-xs {
   padding-inline: 4px;
 }

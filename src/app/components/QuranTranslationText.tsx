@@ -3,6 +3,19 @@ import type { TextSizeOption } from "../types";
 import type { QuranTranslationVerse } from "../content/quranTranslation";
 import "./quran-listening-translation.css";
 
+const FONT_SIZES: Record<"listening" | "page", Record<TextSizeOption, string>> = {
+  listening: {
+    small: "1.125rem",
+    medium: "1.25rem",
+    large: "1.5rem",
+  },
+  page: {
+    small: "0.875rem",
+    medium: "0.9375rem",
+    large: "1.125rem",
+  },
+};
+
 /** Shared English presentation; playback and content loading belong to its caller. */
 export const QuranTranslationText = memo(function QuranTranslationText({
   verses,
@@ -10,6 +23,7 @@ export const QuranTranslationText = memo(function QuranTranslationText({
   follow,
   pageNumber,
   textSize = "medium",
+  variant = "listening",
   label,
   className = "",
   onManualBrowse,
@@ -19,6 +33,7 @@ export const QuranTranslationText = memo(function QuranTranslationText({
   follow: boolean;
   pageNumber: number;
   textSize?: TextSizeOption;
+  variant?: "listening" | "page";
   label: string;
   className?: string;
   onManualBrowse?: () => void;
@@ -50,7 +65,7 @@ export const QuranTranslationText = memo(function QuranTranslationText({
     const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(reveal);
     observer?.observe(region);
     return () => observer?.disconnect();
-  }, [activeVerseKey, follow, pageNumber, verses, textSize]);
+  }, [activeVerseKey, follow, pageNumber, verses, textSize, variant]);
   return (
     <div
       ref={viewport}
@@ -61,7 +76,7 @@ export const QuranTranslationText = memo(function QuranTranslationText({
       dir="ltr"
       lang="en"
       className={`quran-meaning-text ${className} focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring`}
-      style={{ fontSize: textSize === "small" ? "1.125rem" : textSize === "large" ? "1.5rem" : "1.25rem" }}
+      style={{ fontSize: FONT_SIZES[variant][textSize] }}
       onWheel={onManualBrowse}
       onTouchMove={onManualBrowse}
       onPointerDown={onManualBrowse}

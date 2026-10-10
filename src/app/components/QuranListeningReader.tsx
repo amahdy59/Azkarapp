@@ -27,17 +27,9 @@ function revealListeningTarget(root: HTMLElement | null, target: HTMLElement | n
   const toolbarHeight = enlarged
     ? 0
     : (root?.querySelector("[data-listening-controls]")?.getBoundingClientRect().height ?? 0);
-  const horizontal = enlarged
-    ? bounds.left < view.left
-      ? bounds.left - view.left
-      : bounds.right > view.right
-        ? bounds.right - view.right
-        : 0
-    : 0;
-  if (bounds.top < view.top + toolbarHeight || bounds.bottom > view.bottom || horizontal) {
+  if (bounds.top < view.top + toolbarHeight || bounds.bottom > view.bottom) {
     viewport.scrollTo?.({
       top: Math.max(0, viewport.scrollTop + bounds.top - view.top - toolbarHeight - 8),
-      ...(enlarged ? { left: Math.max(0, viewport.scrollLeft + horizontal) } : {}),
       behavior: "instant",
     });
   }
@@ -131,7 +123,6 @@ export default function QuranListeningReader({
     if (!changed && !follow) return;
     let frame = 0;
     const position = () => {
-      region.scrollLeft = Math.max(0, (region.scrollWidth - region.clientWidth) / 2);
       const current = follow
         ? (canvas.querySelector<HTMLElement>('[data-playback-word="true"]') ??
           canvas.querySelector<HTMLElement>("[data-playback-verse]"))

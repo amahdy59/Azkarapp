@@ -1,5 +1,18 @@
 [
   {
+    "release": "2026-10-10.1",
+    "ar": [
+      "الوصول المباشر لجميع أدوات القارئ في شريط أسفل الشاشة (المراجع، الصوتيات، المشاركة، والتركيز) دون الحاجة لفتح قوائم مطوية.",
+      "تحسين وضوح وحجم الخط للآيات والسور القرآنية، مع متابعة تلقائية سلسة للآية والكلمة أثناء الاستماع مع دعم التكبير والتمرير.",
+      "تحديث مشغل الصوتيات وخيارات التلاوة، مع تحسين البحث في مكتبة الأذكار وعرض عدد النتائج الدقيقة ومعلومات السور."
+    ],
+    "en": [
+      "Direct access to all reader actions in the bottom footer (references, audio, sharing, and focus) without collapsed disclosure menus.",
+      "Enhanced typography and sizing for Quranic verses and surahs, with smooth auto-following of active verses during audio recitation while scrolling or magnified.",
+      "Updated audio player interface and recitation options, with improved library search displaying exact result counts and surah details."
+    ]
+  },
+  {
     "release": "2026-10-10",
     "ar": [
       "اقرأ المعنى الإنجليزي بجانب المصحف، وكبّر الصفحة حتى ٢٠٠٪، واقرأ بخط عربي أوضح دون اتصال مع الحفاظ على ترتيب سطور الصفحة.",

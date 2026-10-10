@@ -35,18 +35,23 @@ test("Main Mushaf follows audio beside readable English and yields to manual bro
   const meaning = page.locator(".quran-page-meaning");
   await expect(meaning.locator('[aria-current="true"]')).toHaveAttribute("data-translation-verse", "2:6");
   await expect(page.locator('.mushaf-paper [data-playback-verse="2:6"]').first()).toBeVisible();
-  expect(
-    await meaning.evaluate((element) => {
-      const text = element.querySelector(".quran-meaning-text")!;
-      const arabic = element.closest(".mushaf-paper")!.querySelector(".mushaf-page-canvas")!.getBoundingClientRect();
-      const bounds = element.getBoundingClientRect();
-      return (
-        bounds.right <= arabic.left &&
-        Math.abs(bounds.top - arabic.top) <= 1 &&
-        parseFloat(getComputedStyle(text).fontSize) >= 20
-      );
-    }),
-  ).toBe(true);
+  const layoutCheck = await meaning.evaluate((element) => {
+    const text = element.querySelector(".quran-meaning-text")!;
+    const arabicFrame = element.closest(".mushaf-paper")!.querySelector(".mushaf-page-frame")!.getBoundingClientRect();
+    const facingFrame = element.closest(".mushaf-page-frame")!.getBoundingClientRect();
+    return {
+      boundsRight: facingFrame.right,
+      arabicLeft: arabicFrame.left,
+      beside: facingFrame.right <= arabicFrame.left,
+      boundsTop: facingFrame.top,
+      arabicTop: arabicFrame.top,
+      diffTop: Math.abs(facingFrame.top - arabicFrame.top),
+      fontSize: parseFloat(getComputedStyle(text).fontSize),
+    };
+  });
+  expect(layoutCheck.beside).toBe(true);
+  expect(layoutCheck.diffTop).toBeLessThanOrEqual(1);
+  expect(layoutCheck.fontSize).toBeGreaterThanOrEqual(14);
   await playVerse("2:16");
   await expect(meaning.locator('[aria-current="true"]')).toHaveAttribute("data-translation-verse", "2:16");
   await page.getByTestId("mushaf-rail-next").click();

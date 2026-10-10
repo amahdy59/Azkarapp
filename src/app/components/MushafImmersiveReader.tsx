@@ -56,6 +56,8 @@ import { MushafPageViewer } from "./MushafPageViewer";
 import { MushafLoadingPlaceholder } from "./MushafLoadingPlaceholder";
 import { AyahInteractionSheet } from "./AyahInteractionSheet";
 import { reportError } from "../../lib/observability";
+import type { AudioController } from "../audio/AudioProvider";
+import { useMushafPlayback } from "../hooks/useMushafPlayback";
 export type { SurahAudioControl } from "./MushafToolRail";
 
 const FONT_WAIT_MS = 1200;
@@ -133,6 +135,7 @@ export function MushafImmersiveReader({
   onTogglePageBookmark,
   mushafSettings,
   surahAudio,
+  audioController,
   onClose,
   onComplete,
   onReadExternally,
@@ -161,6 +164,7 @@ export function MushafImmersiveReader({
   mushafSettings?: MushafSurahSettings;
   /** The surah's recitation, driven by the app's one audio controller. */
   surahAudio?: SurahAudioControl;
+  audioController?: AudioController | null;
   textStyle?: CSSProperties;
   onSelectMeanings?: (selection: WordMeaningSelection) => void;
   activeWordId?: string | null;
@@ -253,8 +257,50 @@ export function MushafImmersiveReader({
   const currentPage = pageNumbers[pageIndex] ?? pageNumbers[0]!;
   const pageCount = pageNumbers.length;
 
+  const playback = useMushafPlayback(audioController ?? null, currentPage, (page) => {
+    const index = pageNumbers.indexOf(page);
+    if (index >= 0) setPageTuple([index, 0]);
+  });
+
   const shell = useMushafShell();
   const [pageMagnification, setPageMagnification] = useState(100);
+
+  // When audio is reciting and page is vertically scrolled or magnified, keep active verse in view
+  useEffect(() => {
+    if (!playback.follow || !playback.cue.verseKey) return;
+    const paper = paperRef.current;
+    if (!paper) return;
+    if (paper.scrollHeight <= paper.clientHeight + 1) return;
+    const target =
+      paper.querySelector<HTMLElement>('[data-playback-word="true"]') ??
+      paper.querySelector<HTMLElement>(`[data-playback-verse="${playback.cue.verseKey}"]`) ??
+      paper.querySelector<HTMLElement>("[data-playback-verse]");
+    if (!target) return;
+    const paperBounds = paper.getBoundingClientRect();
+    const targetBounds = target.getBoundingClientRect();
+    const topMargin = 48;
+    const bottomMargin = 48;
+    if (targetBounds.top < paperBounds.top + topMargin || targetBounds.bottom > paperBounds.bottom - bottomMargin) {
+      paper.scrollTo({
+        top: Math.max(0, paper.scrollTop + targetBounds.top - paperBounds.top - topMargin),
+        behavior: "smooth",
+      });
+    }
+  }, [playback.follow, playback.cue.verseKey, playback.cue.word?.position, pageMagnification]);
+
+  useEffect(() => {
+    const paper = paperRef.current;
+    if (!paper) return;
+    const pause = () => {
+      if (playback.follow) playback.pauseFollowing();
+    };
+    paper.addEventListener("wheel", pause, { passive: true });
+    paper.addEventListener("touchmove", pause, { passive: true });
+    return () => {
+      paper.removeEventListener("wheel", pause);
+      paper.removeEventListener("touchmove", pause);
+    };
+  }, [playback]);
 
   /**
    * The facing page, when there is room and when it belongs to this surah.
@@ -761,6 +807,8 @@ export function MushafImmersiveReader({
             isBookmarked={isPageBookmarked}
             useQcfGlyphs={spreadQcf}
             showWordMeanings={showWordMeanings}
+            highlightedVerseKey={playback.cue.verseKey}
+            highlightedWord={playback.cue.word}
             {...(shell.rail && !isFocusMode ? { railContent: toolRail, railSide: "right" as const } : {})}
             topLeftControl={mobileTopLeft}
             topRightControl={mobileTopRight}

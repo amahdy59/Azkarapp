@@ -1186,7 +1186,7 @@ const en = {
     toolbarSideHint: "The vertical toolbar appears on wide screens only.",
     magnification: "Page magnification",
     magnificationReset: "Fit page",
-    magnificationHint: "Enlarge up to 200%. Scroll across and down to read; use the page controls to turn pages.",
+    magnificationHint: "Enlarge up to 200%. Scroll vertically to read; use the page controls to turn pages.",
     textSizeTitle: "Text size",
     textSizeSmall: "Small",
     textSizeMedium: "Medium",

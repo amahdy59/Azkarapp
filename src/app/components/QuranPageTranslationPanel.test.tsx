@@ -46,10 +46,53 @@ describe("QuranPageTranslationPanel", () => {
     const verse = screen.getByText("[All] praise is [due] to Allah, Lord of the worlds -").closest("p");
     expect(verse).toHaveAttribute("aria-current", "true");
     const region = verse!.closest('[role="region"]')!;
+    expect(region).toHaveStyle({ fontSize: "0.9375rem" });
+    const header = document.querySelector(".quran-meaning-header");
+    expect(header).toHaveClass("mushaf-page-furniture");
+    const footer = document.querySelector(".mushaf-page-furniture--foot");
+    expect(footer).toBeInTheDocument();
+    expect(footer).toHaveTextContent("Saheeh International");
     fireEvent.wheel(region);
     fireEvent.keyDown(region, { key: "PageDown" });
     fireEvent.pointerDown(region);
     expect(onManualBrowse).toHaveBeenCalledTimes(3);
+  });
+
+  it("scales typography cleanly with textSize option", async () => {
+    vi.spyOn(globalThis, "fetch").mockImplementation(
+      async () =>
+        ({
+          ok: true,
+          json: async () => ({ "1": "In the name of Allah." }),
+        }) as Response,
+    );
+
+    const { rerender } = render(
+      <QuranPageTranslationPanel
+        pageNumber={1}
+        surahName="Al-Fatihah"
+        verses={[{ k: "1:1" }]}
+        language="en"
+        direction="ltr"
+        textSize="small"
+      />,
+    );
+
+    const verseText = await screen.findByText("In the name of Allah.");
+    const region = verseText.closest('[role="region"]')!;
+    expect(region).toHaveStyle({ fontSize: "0.875rem" });
+
+    rerender(
+      <QuranPageTranslationPanel
+        pageNumber={1}
+        surahName="Al-Fatihah"
+        verses={[{ k: "1:1" }]}
+        language="en"
+        direction="ltr"
+        textSize="large"
+      />,
+    );
+    expect(region).toHaveStyle({ fontSize: "1.125rem" });
   });
 
   it("displays loading indicator when translations are being retrieved", () => {

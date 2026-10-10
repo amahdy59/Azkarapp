@@ -401,13 +401,8 @@
 .mushaf-page-furniture--foot {
   position: relative;
   z-index: 20;
-  height: 2.875rem;
   min-height: 2.875rem;
-  padding-top: 0.125rem;
-  padding-bottom: 0;
-  padding-inline: 0;
-  opacity: 1;
-  transform: none;
+  padding: 0.125rem 0 0;
 }
 
 /* ---------------------------------------------------------------------------

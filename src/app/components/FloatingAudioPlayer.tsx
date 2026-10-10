@@ -680,7 +680,7 @@ export function FloatingAudioPlayer({
                     index={state.entryIndex}
                     direction={direction}
                     reduceMotion={Boolean(motionReduced)}
-                    className="w-full max-w-2xl shrink-0 py-2 text-center"
+                    className={`w-full ${hasExcerpt ? "max-w-4xl" : "max-w-2xl"} shrink-0 py-2 text-center`}
                   >
                     <div className="flex w-full flex-col items-center justify-center">
                       {englishFirst && (
@@ -709,7 +709,7 @@ export function FloatingAudioPlayer({
                         data-testid={englishFirst ? "audio-player-arabic-text" : "audio-player-zikr-text"}
                         className={`zikr-text text-center font-medium ${
                           currentEntry.quranText || currentEntry.contentKind === "quran"
-                            ? "leading-[1.65]"
+                            ? "leading-[2.1]"
                             : "leading-relaxed"
                         } text-foreground ${hasExcerpt ? "w-full" : ""} ${englishFirst ? "mt-2 w-full border-t border-border pt-3" : ""}`}
                         style={{
@@ -717,7 +717,7 @@ export function FloatingAudioPlayer({
                             currentEntry.quranText || currentEntry.contentKind === "quran"
                               ? "var(--font-mushaf)"
                               : undefined,
-                          lineHeight: currentEntry.quranText || currentEntry.contentKind === "quran" ? 1.65 : undefined,
+                          lineHeight: currentEntry.quranText || currentEntry.contentKind === "quran" ? 2.1 : undefined,
                           fontSize: getReadingFontSizeRem({
                             textSize,
                             arabicLength: zikrArabicText.length,
@@ -742,6 +742,7 @@ export function FloatingAudioPlayer({
                               language={language}
                               cue={spokenLanguage === "ar" ? listeningCue : null}
                               textSize={textSize}
+                              theme={mushafTheme}
                               fallback={
                                 <ListeningWordText
                                   text={zikrArabicText}

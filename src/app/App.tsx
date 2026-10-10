@@ -2193,6 +2193,7 @@ function AppContent({
                     status: activeZikrAudioStatus,
                     onToggle: toggleActiveZikrAudio,
                   }}
+                  audioController={audioController}
                   mushafTextScale={mushafTextScale}
                   mushafBookmarks={mushafBookmarks}
                   surahReadingPages={surahReadingPages}

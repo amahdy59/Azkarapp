@@ -56,6 +56,7 @@ import { shouldReduceMotion, vibrateIfEnabled } from "../motionPreferences";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarForMode, isRoutineCategory } from "../content/azkar";
 import { isLongSurah } from "../content/mushafPages";
+import type { AudioController } from "../audio/AudioProvider";
 import type { AppLanguage, CategoryId, RoutineMode, MushafTextScale, TextSizeOption, ThemeMode, Zikr } from "../types";
 import { isPrayerName } from "../content/prayerTimes";
 import { ProgressBar } from "../components/ProgressBar";
@@ -190,6 +191,7 @@ export function ReaderScreen({
   onPartialZikrCountChange,
   counterResetKey,
   audioPlayer,
+  audioController,
 }: {
   catId: CategoryId;
   subCategory?: string;
@@ -256,6 +258,7 @@ export function ReaderScreen({
   onPartialZikrCountChange?: (zikrId: string, count: number) => void;
   counterResetKey?: string;
   audioPlayer?: React.ReactNode | ((onClose: () => void) => React.ReactNode);
+  audioController?: AudioController | null;
 }) {
   const vibrate = useCallback(
     (pattern: number | number[]) => vibrateIfEnabled(hapticFeedback, pattern),
@@ -691,12 +694,13 @@ export function ReaderScreen({
   // Shorter azkar read larger, long surahs stay at the size their Mushaf pages
   // were reviewed at, and nothing drops below the legibility floor. The table
   // and both guarantees live in readingTypography.ts, under test.
+  const isQuranicText = Boolean(z.quranText || z.isSurah || z.attributionType === "quranic_supplication");
   const readingFontSize = getReadingFontSize({
     textSize,
     arabicLength: z.arabicText.length,
     longSurah,
+    isSurah: isQuranicText,
   });
-  const isQuranicText = Boolean(z.quranText || z.isSurah || z.attributionType === "quranic_supplication");
   const readingFontFamily = isQuranicText ? "var(--font-mushaf)" : "var(--font-zikr)";
   const readingPercent = azkar.length > 0 ? Math.round((readingProgressValue / azkar.length) * 100) : 0;
   const readerZikrTitle = getReaderZikrTitle(z, language);
@@ -803,21 +807,21 @@ export function ReaderScreen({
                 style={{
                   fontFamily: readingFontFamily,
                   fontSize: readingFontSize,
-                  lineHeight: isQuranicText ? 1.7 : undefined,
+                  lineHeight: isQuranicText ? 2.1 : undefined,
                 }}
                 onSelectMeanings={setWordMeaningSelection}
                 activeWordId={activeWordId}
               />
             ) : (
               <p
-                className={`zikr-text pointer-events-none text-center font-medium ${isQuranicText ? "leading-[1.7]" : "leading-[1.85]"} text-foreground`}
+                className={`zikr-text pointer-events-none text-center font-medium ${isQuranicText ? "leading-[2.1]" : "leading-[1.85]"} text-foreground`}
                 data-testid="zikr-text"
                 dir="rtl"
                 lang="ar"
                 style={{
                   fontFamily: readingFontFamily,
                   fontSize: readingFontSize,
-                  lineHeight: isQuranicText ? 1.7 : undefined,
+                  lineHeight: isQuranicText ? 2.1 : undefined,
                 }}
               >
                 {displayArabicText}
@@ -1554,6 +1558,7 @@ export function ReaderScreen({
           onTogglePageBookmark={onToggleMushafBookmark}
           mushafSettings={mushafSettings}
           surahAudio={surahAudio}
+          audioController={audioController}
           benefitAction={renderBenefitDockButton()}
           onClose={() => setImmersiveOpen(false)}
           onReadExternally={() => {

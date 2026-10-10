@@ -311,13 +311,49 @@ export function KhatmahReaderScreen({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isQuickMenuOpen, setIsQuickMenuOpen] = useState(false);
   const [indexTab, setIndexTab] = useState<"surahs" | "juzs" | "jump" | "bookmarks">("surahs");
-
   useEffect(() => {
     const sync = () => setIsFullscreen(Boolean(document.fullscreenElement));
     document.addEventListener("fullscreenchange", sync);
     sync();
     return () => document.removeEventListener("fullscreenchange", sync);
   }, []);
+
+  // When audio is reciting and page is vertically scrolled or magnified, keep active verse in view
+  useEffect(() => {
+    if (!playback.follow || !playback.cue.verseKey) return;
+    const paper = paperRef.current;
+    if (!paper) return;
+    if (paper.scrollHeight <= paper.clientHeight + 1) return;
+    const target =
+      paper.querySelector<HTMLElement>('[data-playback-word="true"]') ??
+      paper.querySelector<HTMLElement>(`[data-playback-verse="${playback.cue.verseKey}"]`) ??
+      paper.querySelector<HTMLElement>("[data-playback-verse]");
+    if (!target) return;
+    const paperBounds = paper.getBoundingClientRect();
+    const targetBounds = target.getBoundingClientRect();
+    const topMargin = 48;
+    const bottomMargin = 48;
+    if (targetBounds.top < paperBounds.top + topMargin || targetBounds.bottom > paperBounds.bottom - bottomMargin) {
+      paper.scrollTo({
+        top: Math.max(0, paper.scrollTop + targetBounds.top - paperBounds.top - topMargin),
+        behavior: "smooth",
+      });
+    }
+  }, [playback.follow, playback.cue.verseKey, playback.cue.word?.position, pageMagnification]);
+
+  useEffect(() => {
+    const paper = paperRef.current;
+    if (!paper) return;
+    const pause = () => {
+      if (playback.follow) playback.pauseFollowing();
+    };
+    paper.addEventListener("wheel", pause, { passive: true });
+    paper.addEventListener("touchmove", pause, { passive: true });
+    return () => {
+      paper.removeEventListener("wheel", pause);
+      paper.removeEventListener("touchmove", pause);
+    };
+  }, [playback]);
 
   /** Browser chrome is the last thing between the reader and the page. Not
    *  every browser grants this (iOS Safari has no Fullscreen API on the

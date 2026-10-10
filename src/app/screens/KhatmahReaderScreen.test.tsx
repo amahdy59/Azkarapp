@@ -557,10 +557,10 @@ describe("KhatmahReaderScreen settings presentation", () => {
   });
 });
 
-describe("KhatmahReaderScreen reading type size", () => {
+describe("KhatmahReaderScreen magnification and sizing", () => {
   afterEach(() => setViewport(1024, 768));
 
-  it("omits the text size control where the line already fills the page width to avoid clutter", async () => {
+  it("omits the redundant 3-option text size control in favor of direct page magnification", async () => {
     const user = userEvent.setup();
     setViewport(390, 844);
     renderReader({ language: "en", direction: "ltr", setMushafTextScale: vi.fn() });
@@ -570,8 +570,6 @@ describe("KhatmahReaderScreen reading type size", () => {
     await user.click(await screen.findByTestId("mushaf-quick-settings"));
     const sheet = within(await screen.findByTestId("mushaf-settings-sheet"));
 
-    // A phone page is width-bound: the control does not apply, so it is omitted
-    // to keep the reading settings surface calm and uncluttered.
     expect(sheet.queryByTestId("mushaf-text-size-group")).not.toBeInTheDocument();
     const zoom = sheet.getByRole("slider", { name: "Page magnification" });
     fireEvent.change(zoom, { target: { value: "200" } });
@@ -581,7 +579,7 @@ describe("KhatmahReaderScreen reading type size", () => {
     expect(document.querySelector(".mushaf-paper")).toHaveAttribute("data-magnified", "false");
   });
 
-  it("offers the size where the page is fitted to its height instead", async () => {
+  it("retains zero text size clutter on wide screens and controls zoom cleanly", async () => {
     const user = userEvent.setup();
     setViewport(834, 1112);
     renderReader({ language: "en", direction: "ltr", setMushafTextScale: vi.fn() });
@@ -591,8 +589,8 @@ describe("KhatmahReaderScreen reading type size", () => {
     await user.click(await screen.findByTestId("mushaf-quick-settings"));
     const sheet = within(await screen.findByTestId("mushaf-settings-sheet"));
 
-    expect(sheet.getByTestId("mushaf-text-size-option-large")).toBeEnabled();
-    expect(sheet.getByText(/without changing its fifteen lines/i)).toBeInTheDocument();
+    expect(sheet.queryByTestId("mushaf-text-size-group")).not.toBeInTheDocument();
+    expect(sheet.getByRole("slider", { name: "Page magnification" })).toBeInTheDocument();
   });
 });
 
