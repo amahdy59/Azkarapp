@@ -4403,3 +4403,7 @@ The owner rejected the wide single-row arrangement after local review: it broke 
 ## Offline downloads and coordinated release — 2026-10-10
 
 The owner approves all qualified offline-download recommendations from the review and requests implementation, review of the supplied test report, and publication of all pending application changes. This supersedes the previous local-only release holds for those pending changes. Keep the existing essentials scope, expose independent Al-Baqarah/Al-Kahf and daily controls, use truthful origin storage and verified cache readiness, preserve cancellation/rollback and reviewed content, and repair demonstrated CI regressions without weakening tests. No new dependencies or persistence migrations. See phases/OFFLINE_DOWNLOADS_AND_RELEASE_2026_10_10.md.
+
+## Uniform Quran snippets — 2026-10-10
+
+The owner reports inconsistent Quran text scale/type in Reader and expanded audio screenshots and requests a complete app-wide correction. Use one regular Amiri Quran role and stable size per app setting across snippets, natural excerpt reflow without page-fitting transforms, shared numeric verse markers, and explicit Quran font metadata for exports. Preserve reviewed wording, prelude flags, semantic timing identity, offline behavior and the canonical full-page Mushaf. This supersedes printed-line fitting for short excerpts only. Apply normal release gates and publish under the standing main-branch authority. See phases/UNIFORM_QURAN_SNIPPETS_2026_10_10.md.

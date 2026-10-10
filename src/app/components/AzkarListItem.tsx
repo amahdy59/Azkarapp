@@ -1,3 +1,5 @@
+import { QuranVerseText } from "./QuranVerseText";
+import { QURAN_TEXT_STYLE } from "../quranTypography";
 import { useLayoutEffect, useRef, useState } from "react";
 import { BookOpen, Check, ChevronDown } from "./icons";
 import { t } from "../i18n";
@@ -107,18 +109,12 @@ export function AzkarListItem({
   const readingContent = (
     <>
       {expanded && isArabic && z.hasSeekRefuge && (
-        <span
-          className="zikr-text mb-1 block text-label font-bold text-primary/90"
-          style={{ fontFamily: "var(--font-mushaf)" }}
-        >
+        <span className="zikr-text mb-1 block text-label font-bold text-primary/90" style={QURAN_TEXT_STYLE}>
           أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ
         </span>
       )}
       {expanded && isArabic && (z.hasBasmalah || z.isSurah) && (
-        <span
-          className="zikr-text mb-1 block text-subtitle font-bold text-primary/90"
-          style={{ fontFamily: "var(--font-mushaf)" }}
-        >
+        <span className="zikr-text mb-1 block text-subtitle font-bold text-primary/90" style={QURAN_TEXT_STYLE}>
           بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
         </span>
       )}
@@ -131,11 +127,11 @@ export function AzkarListItem({
         } text-foreground whitespace-pre-line ${
           expanded ? `block ${longSurah ? "max-h-64 overflow-y-auto pe-1" : ""}` : "line-clamp-2"
         }`}
-        style={isQuranicText ? { fontFamily: "var(--font-mushaf)", lineHeight: 1.7 } : undefined}
+        style={isQuranicText ? QURAN_TEXT_STYLE : undefined}
         lang={isArabic ? "ar" : "en"}
         dir={isArabic ? "rtl" : "ltr"}
       >
-        {visibleText}
+        {isQuranicText ? <QuranVerseText text={visibleText} language={language} /> : visibleText}
       </span>
       {longSurah && expanded && (
         <span className="mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-primary">

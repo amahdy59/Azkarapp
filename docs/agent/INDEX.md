@@ -252,3 +252,5 @@ Apple/Microsoft-informed control spacing and alignment improvements.
 [Responsive Reader controls and Mushaf magnification](phases/RESPONSIVE_READER_CONTROL_REFINEMENT.md) is the active local owner-review phase for balanced footer/audio controls and 100–200% printed-page enlargement.
 
 [Offline downloads and coordinated release](phases/OFFLINE_DOWNLOADS_AND_RELEASE_2026_10_10.md) is the active owner-approved phase: independent downloads, honest storage/readiness, accessible responsive controls, verification of pending changes and full main/Pages release. The owner explicitly supersedes earlier publication holds.
+
+[Uniform Quran snippets](phases/UNIFORM_QURAN_SNIPPETS_2026_10_10.md) is the active owner-requested correction for inconsistent snippet typography and scale across reading, playback, previews, benefits, help and sharing; full Mushaf pagination remains unchanged.

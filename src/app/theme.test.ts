@@ -2,6 +2,15 @@ import { afterEach, describe, expect, it } from "vitest";
 import { applyAppAppearance } from "./theme";
 
 describe("app appearance", () => {
+  it("applies Quran size independently of the chosen zikr family", () => {
+    for (const textSize of ["small", "medium", "large"] as const) {
+      applyAppAppearance({ themeMode: "midnight", textSize, zikrFont: "clear" });
+      const size = document.documentElement.style.getPropertyValue("--quran-font-size");
+      expect(size).not.toBe("");
+      applyAppAppearance({ themeMode: "midnight", textSize, zikrFont: "naskh" });
+      expect(document.documentElement.style.getPropertyValue("--quran-font-size")).toBe(size);
+    }
+  });
   afterEach(() => {
     document.documentElement.className = "";
     document.documentElement.removeAttribute("style");

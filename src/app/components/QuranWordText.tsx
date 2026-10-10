@@ -3,6 +3,8 @@ import { buildQuranTextSegments, type QuranWordMeaning, type WordMeaningSelectio
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
+import { QURAN_TEXT_STYLE } from "../quranTypography";
+import { QuranVerseText } from "./QuranVerseText";
 
 export function QuranWordText({
   text,
@@ -34,10 +36,15 @@ export function QuranWordText({
       dir="rtl"
       lang="ar"
       translate="no"
-      style={style}
+      style={{ ...style, ...QURAN_TEXT_STYLE }}
     >
       {segments.map((segment, index) => {
-        if (!segment.meanings) return <span key={`text-${index}`}>{segment.text}</span>;
+        if (!segment.meanings)
+          return (
+            <span key={`text-${index}`}>
+              <QuranVerseText text={segment.text} language={language} />
+            </span>
+          );
         groupIndex += 1;
         const currentGroupIndex = groupIndex;
         return (
@@ -56,6 +63,7 @@ export function QuranWordText({
               word: segment.text,
               ayah: formatNumerals(segment.meanings[0]!.ayahNumber, language),
             })}
+            style={{ fontFamily: "inherit", fontWeight: "inherit", letterSpacing: "inherit" }}
             // A button does not inherit font-size or line-height from its
             // paragraph — the UA sheet gives it a 16px default — so a
             // highlighted word rendered several pixels smaller than the ayah

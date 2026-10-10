@@ -11,6 +11,8 @@ import {
 import { dataUrlToBlob } from "./zikrShareCard";
 import {
   SHARE_ARABIC_FONT,
+  SHARE_QURAN_FONT,
+  getShareSectionFont,
   SHARE_UI_FONT,
   SHARE_DIMENSIONS,
   defaultShareAppearance,
@@ -237,7 +239,7 @@ export function renderCollectionStoryPage(input: CollectionStoryPageInput): HTML
         drawInkTop(ctx, t(language, `shareStudio.${section.key}`), textX, sectionY);
         sectionY += 44;
       }
-      ctx.font = `${section.key === "arabic" ? 500 : 400} ${section.fontSize}px ${section.direction === "rtl" ? SHARE_ARABIC_FONT : SHARE_UI_FONT}`;
+      ctx.font = getShareSectionFont(section, section.fontSize);
       ctx.fillStyle = section.key === "source" ? palette.secondary : palette.text;
       for (const line of section.lines) {
         // Isolate reference numbers without changing the reviewed text payload.
@@ -389,6 +391,7 @@ export async function generateAllCollectionStoryPages(
     if (typeof document !== "undefined" && document.fonts)
       await Promise.all([
         document.fonts.load(`500 52px ${SHARE_ARABIC_FONT}`, "اللَّهُمَّ"),
+        document.fonts.load(`400 64px ${SHARE_QURAN_FONT}`, "قُلْ"),
         document.fonts.load(`400 36px ${SHARE_ARABIC_FONT}`, "المصدر"),
         document.fonts.load(`600 60px ${SHARE_ARABIC_FONT}`, "أذكار"),
         document.fonts.load(`700 60px ${SHARE_ARABIC_FONT}`, "أذكار"),
@@ -433,6 +436,7 @@ export async function getCompatibleShareFormats(
   if (document.fonts) {
     await Promise.all([
       document.fonts.load(`500 64px ${SHARE_ARABIC_FONT}`, "اللَّهُمَّ"),
+      document.fonts.load(`400 64px ${SHARE_QURAN_FONT}`, "قُلْ"),
       document.fonts.load(`600 40px ${SHARE_ARABIC_FONT}`, "سورة"),
       document.fonts.load(`400 36px ${SHARE_ARABIC_FONT}`, "المصدر"),
       document.fonts.load(`400 36px ${SHARE_UI_FONT}`, "Meaning and source"),

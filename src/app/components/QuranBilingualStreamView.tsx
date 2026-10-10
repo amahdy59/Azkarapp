@@ -1,3 +1,4 @@
+import { QURAN_TEXT_STYLE } from "../quranTypography";
 import { useEffect, useState } from "react";
 import { ArrowPrevious, Bookmark, ChevronLeft, ChevronRight, MoreVertical } from "./icons";
 import { formatNumerals } from "../formatting";
@@ -171,6 +172,7 @@ export function QuranBilingualStreamView({
               {/* Arabic Verse Text */}
               <p
                 className="zikr-text text-start text-xl sm:text-2xl leading-loose font-normal text-foreground mb-3"
+                style={QURAN_TEXT_STYLE}
                 dir="rtl"
                 lang="ar"
               >

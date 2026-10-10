@@ -3,6 +3,7 @@ import { t } from "../i18n";
 import { isLongSurah } from "../content/mushafPages";
 import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content/localizedZikr";
 import { buildQuranTextSegments, getQuranWordMeanings, QURAN_WORD_MEANING_SOURCE } from "../content/quranWordMeanings";
+import { isQuranPassage } from "../quranTypography";
 
 export type ShareFormat = "story" | "square" | "portrait" | "tall";
 export type ShareAppearance = "olive" | "gold" | "lavender";
@@ -14,6 +15,7 @@ export const SHARE_DIMENSIONS: Record<ShareFormat, { width: number; height: numb
 };
 export const SHARE_ARABIC_FONT = '"IBM Plex Sans Arabic", "Noto Sans Arabic Variable", sans-serif';
 export const SHARE_UI_FONT = '"Noto Sans Arabic Variable", system-ui, sans-serif';
+export const SHARE_QURAN_FONT = '"Amiri Quran", "IBM Plex Sans Arabic", serif';
 /** Export pixels: protect the reading text's diacritics below the badge. */
 export const SHARE_PILL = { top: 28, height: 50, gap: 16, textTop: 94, bottom: 36 } as const;
 /** Clear space on each side of a divider, measured from visible glyphs. */
@@ -42,10 +44,12 @@ export interface ShareSection {
   key: "arabic" | "translation" | "wordMeanings" | "transliteration" | "benefit" | "source" | "reading";
   text: string;
   direction: "rtl" | "ltr";
+  quranText?: boolean;
 }
 export interface ShareItem {
   id: string;
   arabicText: string;
+  quranText?: boolean;
   title?: string;
   translation?: string;
   wordMeanings?: string;
@@ -69,6 +73,7 @@ export function toShareItem(zikr: Zikr, language: AppLanguage, baseUrl?: string)
   return {
     id: zikr.id,
     arabicText: reminder ? "" : zikr.arabicText,
+    ...(isQuranPassage(zikr) ? { quranText: true } : {}),
     title: language === "ar" ? zikr.surahNameArabic : zikr.surahNameEnglish,
     translation: reminder ? undefined : zikr.translation,
     wordMeanings: !reminder && language === "ar" ? getReviewedShareWordMeanings(zikr) : undefined,
@@ -169,7 +174,9 @@ export function defaultShareAppearance(category?: string, theme?: ThemeMode): Sh
 }
 
 export function getShareSections(item: ShareItem, options: ShareContentOptions = {}): ShareSection[] {
-  const sections: ShareSection[] = item.reminder ? [] : [{ key: "arabic", text: item.arabicText, direction: "rtl" }];
+  const sections: ShareSection[] = item.reminder
+    ? []
+    : [{ key: "arabic", text: item.arabicText, direction: "rtl", ...(item.quranText ? { quranText: true } : {}) }];
   if (options.meaning && item.translation?.trim())
     sections.push({ key: "translation", text: item.translation, direction: "ltr" });
   if (options.wordMeanings && item.language === "ar" && item.wordMeanings?.trim())
@@ -255,7 +262,7 @@ export function measureShareSection(
 ): MeasuredSection {
   const fontSize =
     section.key === "arabic" ? (single ? (compact ? 52 : 64) : 52) : primary ? 52 : section.key === "source" ? 34 : 36;
-  ctx.font = `${section.key === "arabic" ? 500 : 400} ${fontSize}px ${section.direction === "rtl" ? SHARE_ARABIC_FONT : SHARE_UI_FONT}`;
+  ctx.font = getShareSectionFont(section, fontSize);
   ctx.textBaseline = "alphabetic";
   const lines = wrapShareText(section.text, (value) => ctx.measureText(shareDisplayDigits(value)).width, width);
   // Keep the final reference together when it fits on the next line. The
@@ -278,8 +285,14 @@ export function measureShareSection(
       return (bounds.actualBoundingBoxAscent ?? fontSize * 0.8) + (bounds.actualBoundingBoxDescent ?? fontSize * 0.2);
     }),
   );
-  const lineHeight = Math.ceil(Math.max(fontSize * (section.direction === "rtl" ? 1.65 : 1.5), inkHeight + 8));
+  const lineHeight = Math.ceil(
+    Math.max(fontSize * (section.quranText ? 1.85 : section.direction === "rtl" ? 1.65 : 1.5), inkHeight + 8),
+  );
   return { ...section, lines, fontSize, lineHeight, height: lines.length * lineHeight + labelHeight };
+}
+
+export function getShareSectionFont(section: ShareSection, fontSize: number) {
+  return `${section.quranText ? 400 : section.key === "arabic" ? 500 : 400} ${fontSize}px ${section.quranText ? SHARE_QURAN_FONT : section.direction === "rtl" ? SHARE_ARABIC_FONT : SHARE_UI_FONT}`;
 }
 
 /** Image-only source summary: first reviewed reference, never a ranked/invented source. */

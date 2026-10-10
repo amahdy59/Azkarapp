@@ -1,3 +1,4 @@
+import { QURAN_TEXT_STYLE, isQuranPassage } from "../quranTypography";
 import { useCallback, useDeferredValue, useEffect, useId, useMemo, useRef, useState } from "react";
 import { Search, Bookmark, ChevronNext, Lightbulb, X, Grid } from "../components/icons";
 import { ScreenContainer } from "../components/ScreenContainer";
@@ -25,7 +26,10 @@ import { categorySlug } from "../routing";
 import { vibrateIfEnabled } from "../motionPreferences";
 
 export type LibrarySection = "collections" | "saved";
-type SavedLibraryItem = Pick<Zikr, "id" | "category" | "arabicText" | "translation" | "transliteration"> & {
+type SavedLibraryItem = Pick<
+  Zikr,
+  "id" | "category" | "arabicText" | "translation" | "transliteration" | "quranText" | "isSurah" | "attributionType"
+> & {
   lazyCollection?: "friday_kahf";
 };
 
@@ -583,6 +587,7 @@ export function AzkarLibraryScreen({
                                 {isArabic ? (
                                   <p
                                     className="zikr-text mt-1 line-clamp-3 w-full text-start text-subtitle font-bold leading-relaxed text-foreground"
+                                    style={isQuranPassage(zikr) ? QURAN_TEXT_STYLE : undefined}
                                     dir="rtl"
                                     lang="ar"
                                   >
@@ -782,6 +787,7 @@ export function AzkarLibraryScreen({
                         {isArabic ? (
                           <span
                             className="zikr-text mt-1 line-clamp-3 block text-start text-subtitle font-semibold leading-7 text-foreground"
+                            style={isQuranPassage(zikr) ? QURAN_TEXT_STYLE : undefined}
                             dir="rtl"
                             lang="ar"
                           >

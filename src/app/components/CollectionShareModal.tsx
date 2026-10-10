@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Check, ChevronNext, ChevronPrevious, Copy, Download, Share2 } from "./icons";
 import { t } from "../i18n";
 import { FIELD_LABEL_CLASS } from "./FormField";
+import { QURAN_TEXT_STYLE } from "../quranTypography";
 import { SharingDisclosure } from "./SharingDisclosure";
 import { SharingChoiceLabel, SHARING_SELECTED_CLASS } from "./SharingChoiceLabel";
 import { useLayoutMode } from "../hooks/useLayoutMode";
@@ -549,6 +550,7 @@ export function CollectionShareModal({
                                   lang={section.direction === "rtl" ? "ar" : "en"}
                                   dir={section.direction}
                                   className={`whitespace-pre-wrap break-words text-base leading-relaxed ${section.direction === "rtl" ? "zikr-text" : ""}`}
+                                  style={section.quranText ? QURAN_TEXT_STYLE : undefined}
                                 >
                                   {section.key !== "arabic" && section.key !== "source" && (
                                     <strong className="block text-sm">

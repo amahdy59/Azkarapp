@@ -48,6 +48,7 @@ import { useReviewedListeningTiming } from "../hooks/useReviewedListeningTiming"
 import { useListeningWordCue } from "../hooks/useListeningWordCue";
 import { useListeningTextFollowing } from "../hooks/useListeningTextFollowing";
 import { MUSHAF_EXCERPTS } from "../content/mushafExcerpts";
+import { QURAN_TEXT_STYLE, getQuranReadingSize } from "../quranTypography";
 
 const QuranListeningReader = lazy(() => import("./QuranListeningReader"));
 const MushafExcerpt = lazy(() => import("./MushafExcerpt"));
@@ -740,7 +741,7 @@ export function FloatingAudioPlayer({
                     index={state.entryIndex}
                     direction={direction}
                     reduceMotion={Boolean(motionReduced)}
-                    className={`w-full ${hasExcerpt ? "max-w-4xl" : "max-w-2xl"} shrink-0 py-2 text-center`}
+                    className={`w-full max-w-2xl shrink-0 py-2 text-center`}
                   >
                     <div className="flex w-full flex-col items-center justify-center">
                       {englishFirst && (
@@ -778,12 +779,15 @@ export function FloatingAudioPlayer({
                             currentEntry.quranText || currentEntry.contentKind === "quran"
                               ? "var(--font-mushaf)"
                               : undefined,
-                          lineHeight: currentEntry.quranText || currentEntry.contentKind === "quran" ? 1.7 : undefined,
-                          fontSize: getReadingFontSizeRem({
-                            textSize,
-                            arabicLength: zikrArabicText.length,
-                            longSurah: false,
-                          }),
+                          ...(currentEntry.quranText || currentEntry.contentKind === "quran" ? QURAN_TEXT_STYLE : {}),
+                          fontSize:
+                            currentEntry.quranText || currentEntry.contentKind === "quran"
+                              ? getQuranReadingSize(textSize)
+                              : getReadingFontSizeRem({
+                                  textSize,
+                                  arabicLength: zikrArabicText.length,
+                                  longSurah: false,
+                                }),
                         }}
                         dir="rtl"
                         lang="ar"
@@ -793,6 +797,9 @@ export function FloatingAudioPlayer({
                             fallback={
                               <ListeningWordText
                                 text={zikrArabicText}
+                                quranLanguage={
+                                  currentEntry.quranText || currentEntry.contentKind === "quran" ? language : undefined
+                                }
                                 cue={spokenLanguage === "ar" ? listeningCue : null}
                               />
                             }
@@ -807,6 +814,11 @@ export function FloatingAudioPlayer({
                               fallback={
                                 <ListeningWordText
                                   text={zikrArabicText}
+                                  quranLanguage={
+                                    currentEntry.quranText || currentEntry.contentKind === "quran"
+                                      ? language
+                                      : undefined
+                                  }
                                   cue={spokenLanguage === "ar" ? listeningCue : null}
                                 />
                               }
@@ -815,6 +827,9 @@ export function FloatingAudioPlayer({
                         ) : (
                           <ListeningWordText
                             text={zikrArabicText}
+                            quranLanguage={
+                              currentEntry.quranText || currentEntry.contentKind === "quran" ? language : undefined
+                            }
                             cue={spokenLanguage === "ar" ? listeningCue : null}
                           />
                         )}

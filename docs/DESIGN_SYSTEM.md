@@ -738,3 +738,11 @@ Use a compact bundled-content/storage summary, an explicitly scoped essentials a
 Settings subpanel headings own focus after mounting, including when an outgoing panel delays the new panel's mount. Focus must not be sent to a heading that is leaving the DOM. Mushaf refits normalize measured text against its actual rendered font metrics so late fonts and repeated landscape resizing preserve readable type and canonical line slots.
 
 Keep the compact player's measured footprint reserved while its expanded overlay covers the page, and release it when playback leaves the floating layout. This preserves keyboard recovery and avoids stale inherited padding after collapse in WebKit.
+
+### Uniform Quran snippets — owner correction, 2026-10-10
+
+Flowing Quran snippets use the bundled Amiri Quran face at native weight 400, with font synthesis disabled, normal tracking and 1.85 leading. `quranTypography.ts` defines a single 22/24/28px reading scale for the three app settings, expressed in rem through the root `--quran-font-size`. Snippet size never depends on passage length, canonical line width or current highlight. This covers Reader, expanded short-recording playback, list/saved/search previews, Quran benefits, daily Quran evidence, word-help surfaces and accessible sharing previews. Export images use regular Amiri Quran at their existing fixed readable export sizes and identical measure/draw metrics.
+
+Canonical short excerpts retain reviewed word order, verse identities and exact timing mapping, but flow naturally at the shared size. Do not apply the printed-page fitter, per-line transforms, container-dependent type or synthetic bold to a snippet. Numeric verse boundaries use the shared AyahMarker while preserving the original marker in accessible text; enclosing quotation brackets are not inferred verse numbers. Prelude visibility remains controlled by reviewed flags.
+
+This owner correction supersedes Phase 93's printed-line presentation for short excerpts. Complete Mushaf pages retain QCF glyphs, fifteen canonical slots, page fitting and independent magnification; Unicode fallback keeps its regular Quran face. UI labels and explanatory prose retain interface/devotional roles. No reviewed text, timings or persistence change.

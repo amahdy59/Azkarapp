@@ -1,5 +1,6 @@
 import type { AppLanguage, ColorBlindSupport, TextSizeOption, ZikrFontOption, ThemeMode } from "./types";
 import { t } from "./i18n";
+import { getQuranReadingSize } from "./quranTypography";
 
 const PRODUCT_THEME_CLASSES = ["theme-midnight", "theme-light", "theme-dark"] as const;
 /** Mirrors the --background value per theme in src/styles/theme.css, for the theme-color meta tag. */
@@ -59,6 +60,7 @@ export function applyAppAppearance({
   root.lang = language;
   root.dir = language === "ar" || forceRtl ? "rtl" : "ltr";
   root.style.setProperty("--font-size", fontSizes[textSize]);
+  root.style.setProperty("--quran-font-size", getQuranReadingSize(textSize));
   root.style.setProperty("--font-weight-medium", boldText ? "700" : "500");
   root.style.setProperty("--font-weight-normal", boldText ? "500" : "400");
   root.dataset.colorBlindSupport = colorBlindSupport;

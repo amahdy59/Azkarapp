@@ -1,9 +1,19 @@
 import type { ListeningWordTiming } from "../audio/listeningTimings";
 import { Fragment, useMemo } from "react";
+import type { AppLanguage } from "../types";
+import { QuranVerseText } from "./QuranVerseText";
 
 /** Pure presentation: preserves the exact string, direction and inherited Quran font. */
-export function ListeningWordText({ text, cue }: { text: string; cue: ListeningWordTiming | null }) {
-  const tokens = useMemo(() => [...text.matchAll(/[\p{L}\p{N}][\p{L}\p{M}\p{N}'’-]*/gu)], [text]);
+export function ListeningWordText({
+  text,
+  cue,
+  quranLanguage,
+}: {
+  text: string;
+  cue: ListeningWordTiming | null;
+  quranLanguage?: AppLanguage;
+}) {
+  const tokens = useMemo(() => [...text.matchAll(/﴿[٠-٩0-9]+﴾|[\p{L}\p{N}][\p{L}\p{M}\p{N}'’-]*/gu)], [text]);
   return (
     <>
       {tokens.map((token, index) => {
@@ -28,7 +38,11 @@ export function ListeningWordText({ text, cue }: { text: string; cue: ListeningW
                   : undefined
               }
             >
-              {token[0]}
+              {quranLanguage && token[0].startsWith("﴿") ? (
+                <QuranVerseText text={token[0]} language={quranLanguage} />
+              ) : (
+                token[0]
+              )}
             </span>
           </Fragment>
         );

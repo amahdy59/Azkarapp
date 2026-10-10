@@ -18,8 +18,21 @@ import {
   shareDisplayDigits,
   formatShareNumber,
   measureShareCitation,
+  getShareSectionFont,
   type ShareFormat,
 } from "./shareLayout";
+
+it("measures and exports reviewed Quran passages in the regular Quran face", () => {
+  const zikr = ALL_AZKAR.find((item) => item.id === "m-hm-75")!;
+  const item = toShareItem(zikr, "ar");
+  const section = getShareSections(item)[0]!;
+  expect(section.quranText).toBe(true);
+  expect(section.text).toBe(zikr.arabicText);
+  expect(getShareSectionFont(section, 64)).toBe('400 64px "Amiri Quran", "IBM Plex Sans Arabic", serif');
+  const ctx = context();
+  measureShareSection(ctx, section, true, 848);
+  expect(ctx.font).toContain('400 64px "Amiri Quran"');
+});
 
 function context() {
   // A conservative font-dependent measure; browser tests verify actual glyph bounds.

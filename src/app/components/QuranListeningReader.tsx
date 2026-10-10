@@ -1,3 +1,4 @@
+import { QURAN_TEXT_STYLE } from "../quranTypography";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { AppLanguage, MushafPageTheme, MushafTextScale, TextSizeOption } from "../types";
 import type { PlaybackEntry, ResolvedAudioSegment } from "../audio/audioTypes";
@@ -315,9 +316,8 @@ export default function QuranListeningReader({
                 dir="rtl"
                 lang="ar"
                 style={{
-                  fontFamily: "var(--font-mushaf)",
+                  ...QURAN_TEXT_STYLE,
                   fontSize: `calc(${textScale === "small" ? "1.25rem" : textScale === "large" ? "1.75rem" : "1.5rem"} * ${magnification / 100})`,
-                  lineHeight: 1.7,
                 }}
               >
                 {fallbackPages[index]?.text ?? entry.arabicText}

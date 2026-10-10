@@ -1,3 +1,4 @@
+import { QURAN_TEXT_STYLE, isQuranPassage } from "../quranTypography";
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useDeferredValue, useId, useMemo, useState } from "react";
 import { ArrowPrevious, Search, X } from "../components/icons";
@@ -299,6 +300,7 @@ export function SearchScreen({
                     <div className="flex min-w-0 flex-1 flex-col items-start gap-1">
                       <p
                         className={`w-full truncate text-start ${isArabic ? "zikr-text" : "font-sans"} text-title font-semibold leading-[24px] text-foreground`}
+                        style={isArabic && !surahTitle && isQuranPassage(z) ? QURAN_TEXT_STYLE : undefined}
                         dir={isArabic ? "rtl" : "ltr"}
                         lang={isArabic ? "ar" : "en"}
                       >
@@ -308,6 +310,7 @@ export function SearchScreen({
                         // Two lines rather than one: Arabic previews lose their
                         // sense far earlier than Latin text when clipped mid-phrase.
                         className="line-clamp-2 w-full text-start font-sans text-sm leading-[22px] text-muted-foreground"
+                        style={isArabic && surahTitle && isQuranPassage(z) ? QURAN_TEXT_STYLE : undefined}
                         dir={isArabic ? "rtl" : "ltr"}
                         lang={isArabic ? "ar" : "en"}
                       >

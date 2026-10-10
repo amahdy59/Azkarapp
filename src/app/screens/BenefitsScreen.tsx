@@ -1,3 +1,4 @@
+import { QURAN_TEXT_STYLE } from "../quranTypography";
 /* The scroll region is intentionally keyboard-focusable so Page Down/arrow
    scrolling works before a user reaches its first link. */
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
@@ -76,6 +77,7 @@ function EvidenceCard({ item, language }: { item: BenefitEvidence; language: App
       )}
       <p
         className={`font-semibold text-foreground ${item.kind === "quran" ? "zikr-text text-lg leading-[2.05]" : "mt-3 text-subtitle leading-7"}`}
+        style={item.kind === "quran" ? QURAN_TEXT_STYLE : undefined}
         dir={item.kind === "quran" ? "rtl" : "auto"}
         lang={item.kind === "quran" ? "ar" : undefined}
       >

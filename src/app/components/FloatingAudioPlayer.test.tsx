@@ -501,6 +501,8 @@ describe("FloatingAudioPlayer", () => {
     const controller = createController();
     const shortEntry: PlaybackEntry = {
       ...entry,
+      contentKind: "dua",
+      canonicalKey: "test-dhikr",
       arabicText: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",
     };
     controller.currentEntry = shortEntry;
@@ -591,6 +593,7 @@ describe("FloatingAudioPlayer", () => {
     const text = screen.getByTestId("audio-player-zikr-text");
     expect(text).toHaveStyle({
       fontSize: getReadingFontSizeRem({
+        isSurah: true,
         textSize: "small",
         arabicLength: controller.currentEntry.arabicText!.length,
         longSurah: false,
@@ -599,6 +602,7 @@ describe("FloatingAudioPlayer", () => {
     rerender(<FloatingAudioPlayer controller={controller} language="ar" textSize="large" />);
     expect(text).toHaveStyle({
       fontSize: getReadingFontSizeRem({
+        isSurah: true,
         textSize: "large",
         arabicLength: controller.currentEntry.arabicText!.length,
         longSurah: false,

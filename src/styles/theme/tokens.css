@@ -40,6 +40,7 @@
      perceived movement, not a uniform number. */
   --motion-scale-pressed-compact: 0.92;
   --font-size: 16px;
+  --quran-font-size: 1.5rem;
   --font-ui-latin: "Noto Sans Arabic Variable", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-ui-arabic:
     "Noto Sans Arabic Variable", "Noto Sans Arabic", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",

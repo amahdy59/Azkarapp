@@ -1,3 +1,4 @@
+import { QURAN_TEXT_STYLE } from "../quranTypography";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { AppLanguage } from "../types";
 import { t } from "../i18n";
@@ -230,12 +231,7 @@ export default function AyahShareStudio({
         <summary className="min-h-11 cursor-pointer text-sm font-semibold">
           {t(language, "reader.ayahCardText")}
         </summary>
-        <p
-          lang="ar"
-          dir="rtl"
-          className="zikr-text text-xl leading-[1.7]"
-          style={{ fontFamily: "var(--font-mushaf)", lineHeight: 1.7 }}
-        >
+        <p lang="ar" dir="rtl" className="zikr-text text-xl leading-[1.7]" style={QURAN_TEXT_STYLE}>
           {text}
         </p>
         {input.translation && (

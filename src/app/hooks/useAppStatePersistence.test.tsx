@@ -1,4 +1,5 @@
-import { act, renderHook } from "@testing-library/react";
+import { act, renderHook, render } from "@testing-library/react";
+import { useLayoutEffect } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_APP_STATE, saveAppState } from "../state";
 import { useAppStatePersistence } from "./useAppStatePersistence";
@@ -50,6 +51,22 @@ describe("debounced application persistence", () => {
     expect(saveAppState).toHaveBeenCalledWith(DEFAULT_APP_STATE);
     expect(result).toHaveBeenCalledWith(false);
     visibility.mockRestore();
+  });
+
+  it("publishes changed progress before another layout effect can begin leaving the page", () => {
+    const onResult = vi.fn();
+    function LeavingPage({ snapshot }: { snapshot: typeof DEFAULT_APP_STATE }) {
+      useAppStatePersistence(snapshot, onResult);
+      useLayoutEffect(() => {
+        window.dispatchEvent(new Event("pagehide"));
+      }, [snapshot]);
+      return null;
+    }
+    const { rerender } = render(<LeavingPage snapshot={DEFAULT_APP_STATE} />);
+    vi.mocked(saveAppState).mockClear();
+    const latest = { ...DEFAULT_APP_STATE, khatmahPage: 19 };
+    rerender(<LeavingPage snapshot={latest} />);
+    expect(saveAppState).toHaveBeenCalledExactlyOnceWith(latest);
   });
 
   it("flushes on unmount and removes lifecycle handlers and timers", () => {

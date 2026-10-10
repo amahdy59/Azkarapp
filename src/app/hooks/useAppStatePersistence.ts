@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { saveAppState } from "../state";
 import type { AppStateSnapshot } from "../types";
 
@@ -7,7 +7,9 @@ export function useAppStatePersistence(snapshot: AppStateSnapshot, onResult: (sa
   const pending = useRef(false);
   const latest = useRef({ snapshot, onResult });
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    // A reload may start as soon as updated progress is painted. Make its
+    // snapshot available to pagehide before passive effects can be deferred.
     latest.current = { snapshot, onResult };
     pending.current = true;
     const timer = window.setTimeout(() => {

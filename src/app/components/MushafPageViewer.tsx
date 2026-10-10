@@ -1,4 +1,7 @@
+import { QURAN_TEXT_STYLE, getQuranReadingSize } from "../quranTypography";
+import { AyahMarker } from "./AyahMarker";
 import {
+  Fragment,
   memo,
   useCallback,
   useEffect,
@@ -50,76 +53,7 @@ const OPENING_PAGES = new Set([1, 2]);
  */
 const CHROME_MEASURE = "min(100%, max(var(--mushaf-measure, 100%), 22rem))";
 
-export function AyahMarker({
-  number,
-  language,
-  theme = "light",
-  isHighlighted = false,
-}: {
-  number: string | number;
-  language: AppLanguage;
-  theme?: MushafPageTheme;
-  isHighlighted?: boolean;
-}) {
-  const displayNum = formatNumerals(number, language);
-  const isOled = theme === "oled";
-
-  return (
-    <span
-      className="relative inline-flex shrink-0 select-none items-center justify-center align-middle mx-0.5"
-      role="img"
-      aria-label={t(language, "reader.ayahLabel", { ayah: displayNum })}
-    >
-      {/* Authentic Madani Octagram Rosette in manuscript gold ink */}
-      <svg width="1.3em" height="1.3em" viewBox="0 0 32 32" fill="none" className="select-none" aria-hidden="true">
-        <rect
-          x="5.5"
-          y="5.5"
-          width="21"
-          height="21"
-          rx="3.5"
-          stroke="var(--mushaf-rule-ink, var(--accent, #d4b47c))"
-          strokeWidth={isHighlighted ? "1.5" : "1.2"}
-          strokeOpacity={isHighlighted ? "1" : "0.85"}
-        />
-        <rect
-          x="5.5"
-          y="5.5"
-          width="21"
-          height="21"
-          rx="3.5"
-          stroke="var(--mushaf-rule-ink, var(--accent, #d4b47c))"
-          strokeWidth={isHighlighted ? "1.5" : "1.2"}
-          strokeOpacity={isHighlighted ? "1" : "0.85"}
-          transform="rotate(45 16 16)"
-        />
-        <circle
-          cx="16"
-          cy="16"
-          r="8.5"
-          fill={isHighlighted ? "var(--primary)" : "none"}
-          fillOpacity={isHighlighted ? 0.35 : undefined}
-          stroke="var(--mushaf-rule-ink, var(--accent, #d4b47c))"
-          strokeWidth={isHighlighted ? "1.5" : "1"}
-          strokeOpacity={isHighlighted ? "1" : "0.75"}
-        />
-        <circle cx="16" cy="3.5" r="1.1" fill="var(--mushaf-rule-ink, var(--accent, #d4b47c))" />
-        <circle cx="16" cy="28.5" r="1.1" fill="var(--mushaf-rule-ink, var(--accent, #d4b47c))" />
-        <circle cx="3.5" cy="16" r="1.1" fill="var(--mushaf-rule-ink, var(--accent, #d4b47c))" />
-        <circle cx="28.5" cy="16" r="1.1" fill="var(--mushaf-rule-ink, var(--accent, #d4b47c))" />
-      </svg>
-      <span
-        className={`absolute inset-0 flex items-center justify-center font-sans text-[0.42em] font-bold leading-none ${
-          isHighlighted ? "text-primary font-black" : isOled ? "text-white" : "text-foreground"
-        }`}
-        style={{ fontVariantNumeric: "tabular-nums" }}
-        aria-hidden="true"
-      >
-        {displayNum}
-      </span>
-    </span>
-  );
-}
+export { AyahMarker } from "./AyahMarker";
 
 /**
  * A Surah title is presentation around the Quran, never Quran data. This
@@ -1784,12 +1718,11 @@ export function MushafPageViewer({
 }
 
 /** Read-only listening presentation: no reader actions or progress callbacks. */
-/** A selection of canonical printed lines, without the unused page slots. */
+/** Canonical excerpt words flow at the shared reading size without a page fitter. */
 export function MushafExcerptCanvas({
   lines,
   pageNumber,
   language,
-  useQcfGlyphs,
   highlightedWord,
   textSize = "medium",
   theme = "light",
@@ -1802,55 +1735,44 @@ export function MushafExcerptCanvas({
   textSize?: TextSizeOption;
   theme?: MushafPageTheme;
 }) {
-  const canvasRef = useLineFitter(
-    `${pageNumber}:${useQcfGlyphs}:${lines
-      .flat()
-      .map((w) => `${w.verseKey}:${w.position}`)
-      .join(",")}`,
-    1.4,
-  );
-  const baseRem = textSize === "small" ? 1.15 : textSize === "large" ? 1.45 : 1.28;
-  const maxRem = textSize === "small" ? 1.35 : textSize === "large" ? 1.7 : 1.5;
-  const cqi = textSize === "small" ? "3.8cqi" : textSize === "large" ? "5cqi" : "4.3cqi";
-
   return (
     <>
       <div
-        ref={canvasRef}
         aria-hidden="true"
         dir="rtl"
         lang="ar"
         data-testid="mushaf-excerpt"
-        style={{ containerType: "inline-size", width: "100%" }}
+        className="w-full text-center"
+        style={{ ...QURAN_TEXT_STYLE, fontSize: getQuranReadingSize(textSize) }}
       >
-        <div
-          style={{
-            fontFamily: "var(--font-mushaf)",
-            fontSize: `calc(clamp(${baseRem}rem, ${cqi}, ${maxRem}rem) * var(--mushaf-fit, 1))`,
-            lineHeight: 1.65,
-          }}
-        >
-          {lines.map((words, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-center py-0.5"
-              style={{ minHeight: "1.65em", width: "100%", lineHeight: 1.65 }}
-            >
-              <MushafTextLine
-                words={words}
-                language={language}
-                theme={theme}
-                useQcfGlyphs={false}
-                showWordMeanings={false}
-                meanings={new Map()}
-                activeWord={null}
-                readOnly
-                highlightedWord={highlightedWord}
-                onActiveWordChange={() => {}}
-              />
-            </div>
-          ))}
-        </div>
+        {lines.flat().map((word, index) => (
+          <Fragment key={`${word.verseKey}:${word.position}:${index}`}>
+            {index > 0 ? " " : ""}
+            {word.isEnd ? (
+              <AyahMarker number={word.verseKey.split(":")[1]!} language={language} theme={theme} />
+            ) : (
+              <span
+                data-listening-word={
+                  highlightedWord?.verseKey === word.verseKey && highlightedWord.position === word.position
+                    ? ""
+                    : undefined
+                }
+                style={
+                  highlightedWord?.verseKey === word.verseKey && highlightedWord.position === word.position
+                    ? {
+                        textDecoration: "underline",
+                        textUnderlineOffset: "0.18em",
+                        backgroundColor: "color-mix(in srgb, var(--primary) 20%, transparent)",
+                        color: "color-mix(in srgb, var(--primary) 60%, var(--foreground))",
+                      }
+                    : undefined
+                }
+              >
+                {word.text}
+              </span>
+            )}
+          </Fragment>
+        ))}
       </div>
       <div className="sr-only">
         <ScreenReaderVerses lines={lines} language={language} pageNumber={pageNumber} />
@@ -1858,7 +1780,6 @@ export function MushafExcerptCanvas({
     </>
   );
 }
-
 export function MushafListeningPage({
   lines,
   language,

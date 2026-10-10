@@ -14,6 +14,15 @@ const SIZE_BEFORE_THE_INCREASE = 18.5 * 1.15;
 const SIZES = ["small", "medium", "large"] as const;
 
 describe("reading typography", () => {
+  it("keeps every Quran passage at one uniform size per setting regardless of length", () => {
+    for (const textSize of SIZES) {
+      const sizes = [10, 111, 700, 1400].map((arabicLength) =>
+        getReadingFontSizePx({ textSize, arabicLength, longSurah: false, isSurah: true }),
+      );
+      expect(new Set(sizes).size).toBe(1);
+      expect(sizes[0]).toBeGreaterThanOrEqual(MIN_READING_FONT_SIZE_PX);
+    }
+  });
   it("matches Reader sizes in scalable units at each application root size", () => {
     const roots = { small: 14, medium: 16, large: 18 };
     for (const textSize of SIZES) {

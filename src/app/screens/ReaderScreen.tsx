@@ -76,6 +76,8 @@ import { Header } from "../components/LayoutShells";
 import { ReaderSceneArt } from "../components/ReaderSceneArt";
 import { QuranPrelude, QuranSurahHeader } from "../components/QuranChrome";
 import { QuranWordText } from "../components/QuranWordText";
+import { QuranVerseText } from "../components/QuranVerseText";
+import { QURAN_TEXT_STYLE, getQuranReadingSize } from "../quranTypography";
 import {
   MushafImmersiveReader,
   type MushafSurahSettings,
@@ -696,12 +698,14 @@ export function ReaderScreen({
   // were reviewed at, and nothing drops below the legibility floor. The table
   // and both guarantees live in readingTypography.ts, under test.
   const isQuranicText = Boolean(z.quranText || z.isSurah || z.attributionType === "quranic_supplication");
-  const readingFontSize = getReadingFontSize({
-    textSize,
-    arabicLength: z.arabicText.length,
-    longSurah,
-    isSurah: isQuranicText,
-  });
+  const readingFontSize = isQuranicText
+    ? getQuranReadingSize(textSize)
+    : getReadingFontSize({
+        textSize,
+        arabicLength: z.arabicText.length,
+        longSurah,
+        isSurah: isQuranicText,
+      });
   const readingFontFamily = isQuranicText ? "var(--font-mushaf)" : "var(--font-zikr)";
   const readingPercent = azkar.length > 0 ? Math.round((readingProgressValue / azkar.length) * 100) : 0;
   const readerZikrTitle = getReaderZikrTitle(z, language);
@@ -808,7 +812,7 @@ export function ReaderScreen({
                 style={{
                   fontFamily: readingFontFamily,
                   fontSize: readingFontSize,
-                  lineHeight: isQuranicText ? 1.7 : undefined,
+                  ...(isQuranicText ? QURAN_TEXT_STYLE : {}),
                 }}
                 onSelectMeanings={setWordMeaningSelection}
                 activeWordId={activeWordId}
@@ -822,10 +826,10 @@ export function ReaderScreen({
                 style={{
                   fontFamily: readingFontFamily,
                   fontSize: readingFontSize,
-                  lineHeight: isQuranicText ? 1.7 : undefined,
+                  ...(isQuranicText ? QURAN_TEXT_STYLE : {}),
                 }}
               >
-                {displayArabicText}
+                {isQuranicText ? <QuranVerseText text={displayArabicText} language={language} /> : displayArabicText}
               </p>
             )}
           </div>
@@ -1493,6 +1497,7 @@ export function ReaderScreen({
       data-zikr-index={idx}
       data-zikr-id={z.id}
       data-counting-mode={longSurah ? "counter-only" : "canvas"}
+      data-reader-layout={isDesktopReader ? "desktop" : "mobile"}
       dir={direction}
       data-reader-category={catId}
       data-reading-focus={focusMode && !showMushaf ? "true" : "false"}

@@ -1,3 +1,5 @@
+import { QuranVerseText } from "./QuranVerseText";
+import { QURAN_TEXT_STYLE } from "../quranTypography";
 import { progressFillStyle } from "./progressFillStyle";
 import { t } from "../i18n";
 import type { DailyEvidence } from "../dailyEvidence";
@@ -466,26 +468,6 @@ export function FridayHomeCard({
  * the only place in the app making a claim it could not support, so
  * {@link getDailyEvidence} will not return an entry that lacks one.
  */
-function renderEvidenceHadithContent(text: string, isQuran?: boolean, onGlass = false) {
-  if (!isQuran) return text;
-  const parts = text.split(/(﴿[^﴾]+﴾)/g);
-  if (parts.length === 1) return text;
-  return parts.map((part, index) => {
-    if (part.startsWith("﴿") && part.endsWith("﴾")) {
-      return (
-        <span
-          key={index}
-          className={`inline-block font-bold px-1 ${onGlass ? "text-on-media" : "text-foreground"}`}
-          style={{ fontVariantNumeric: "tabular-nums" }}
-        >
-          {part}
-        </span>
-      );
-    }
-    return part;
-  });
-}
-
 export function DailyEvidenceCard({
   language,
   direction,
@@ -565,12 +547,12 @@ export function DailyEvidenceCard({
         className={`font-medium ${
           evidence.isQuran ? "text-xl sm:text-2xl font-normal leading-relaxed tracking-wide" : "text-title leading-[2]"
         } ${onGlass ? "text-on-media" : "text-foreground"} ${evidence.hadithInArabic ? "zikr-text" : ""}`}
-        style={evidence.isQuran ? { fontFamily: "var(--font-mushaf)", lineHeight: 1.85 } : undefined}
+        style={evidence.isQuran ? QURAN_TEXT_STYLE : undefined}
         dir={evidence.hadithInArabic ? "rtl" : "ltr"}
         lang={evidence.hadithInArabic ? "ar" : "en"}
         data-testid="daily-evidence-hadith"
       >
-        {renderEvidenceHadithContent(evidence.hadith, evidence.isQuran, onGlass)}
+        {evidence.isQuran ? <QuranVerseText text={evidence.hadith} language={language} /> : evidence.hadith}
       </blockquote>
 
       <p

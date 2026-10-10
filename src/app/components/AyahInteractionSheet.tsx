@@ -1,3 +1,4 @@
+import { QURAN_TEXT_STYLE } from "../quranTypography";
 import { lazy, Suspense, useCallback, useEffect, useId, useRef, useState } from "react";
 import { Bookmark, BookOpen, Check, Copy, Share2 } from "./icons";
 import { ResponsiveSheet, SheetHeader } from "./ResponsiveSheet";
@@ -171,7 +172,13 @@ export function AyahInteractionSheet({
 
             <div className="mx-5 mb-3 max-h-36 overflow-y-auto rounded-xl bg-muted/55 px-4 py-3">
               {text ? (
-                <p className="zikr-text text-start text-xl leading-9" lang="ar" dir="rtl" data-testid="ayah-sheet-text">
+                <p
+                  className="zikr-text text-start text-xl leading-9"
+                  lang="ar"
+                  dir="rtl"
+                  data-testid="ayah-sheet-text"
+                  style={QURAN_TEXT_STYLE}
+                >
                   {text}
                 </p>
               ) : (

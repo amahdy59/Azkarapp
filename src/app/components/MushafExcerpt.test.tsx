@@ -23,6 +23,7 @@ describe("MushafExcerpt", () => {
         fallback={<p>Fallback text</p>}
       />,
     );
+    expect(useListeningMushafPage).toHaveBeenLastCalledWith(604, 0, false);
     expect(screen.getByText("Fallback text")).toBeInTheDocument();
     useListeningMushafPage.mockReturnValue({ result: { page: 604, lines: [words], qcf: false } });
     rerender(
@@ -51,7 +52,9 @@ describe("MushafExcerpt", () => {
     expect(screen.getByTestId("mushaf-excerpt")).toHaveAttribute("aria-hidden", "true");
     expect(screen.getByTestId("mushaf-excerpt").nextElementSibling).toHaveTextContent("قُلْ هُوَ");
     expect(container.querySelector("[data-listening-word]")).toHaveTextContent("قُلْ");
-    const style = container.querySelector("[data-mushaf-line]")!.parentElement!.parentElement!.getAttribute("style");
+    expect(container.querySelector("[data-mushaf-line]")).toBeNull();
+    expect(screen.getByTestId("mushaf-excerpt")).toHaveStyle({ fontWeight: "400", lineHeight: "1.85" });
+    const style = screen.getByTestId("mushaf-excerpt").getAttribute("style");
     rerender(
       <MushafExcerpt
         canonicalKey="quran-112"
@@ -62,8 +65,6 @@ describe("MushafExcerpt", () => {
       />,
     );
     expect(container.querySelector("[data-listening-word]")).toHaveTextContent("هُوَ");
-    expect(container.querySelector("[data-mushaf-line]")!.parentElement!.parentElement!.getAttribute("style")).toBe(
-      style,
-    );
+    expect(screen.getByTestId("mushaf-excerpt").getAttribute("style")).toBe(style);
   });
 });

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { isQcfFontReady, loadMushafPage, loadQcfFont, pageHasQcfGlyphs } from "../content/qcfMushaf";
 import type { MushafWordToken } from "../components/MushafPageViewer";
 
-export function useListeningMushafPage(page: number, retry: number) {
+export function useListeningMushafPage(page: number, retry: number, loadPageFont = true) {
   const [result, setResult] = useState<{ page: number; lines: MushafWordToken[][]; qcf: boolean } | null>(null);
   const [errorPage, setErrorPage] = useState<number | null>(null);
   useEffect(() => {
@@ -14,6 +14,7 @@ export function useListeningMushafPage(page: number, retry: number) {
       try {
         const data = await loadMushafPage(page);
         const qcf =
+          loadPageFont &&
           pageHasQcfGlyphs(data) &&
           (isQcfFontReady(page) ||
             (await Promise.race([
@@ -37,6 +38,6 @@ export function useListeningMushafPage(page: number, retry: number) {
       cancelled = true;
       if (timer) clearTimeout(timer);
     };
-  }, [page, retry]);
+  }, [page, retry, loadPageFont]);
   return { result: result?.page === page ? result : null, error: errorPage === page };
 }

@@ -1,3 +1,4 @@
+import { QURAN_TEXT_STYLE } from "../quranTypography";
 import type { AppLanguage, Zikr } from "../types";
 import { formatNumerals, numeralFontFamily } from "../formatting";
 import { t } from "../i18n";
@@ -11,7 +12,7 @@ export function QuranPrelude({ zikr, className = "" }: { zikr: Zikr; className?:
       {zikr.hasSeekRefuge && (
         <p
           className={`zikr-text mb-3 text-center text-title font-bold tracking-wide text-primary/90 ${className}`}
-          style={{ fontFamily: "var(--font-mushaf)", lineHeight: 1.7 }}
+          style={QURAN_TEXT_STYLE}
           dir="rtl"
           lang="ar"
         >
@@ -21,7 +22,7 @@ export function QuranPrelude({ zikr, className = "" }: { zikr: Zikr; className?:
       {(zikr.hasBasmalah || zikr.isSurah) && (
         <p
           className={`zikr-text mb-2 text-center text-lg font-bold tracking-wide text-primary/90 ${className}`}
-          style={{ fontFamily: "var(--font-mushaf)", lineHeight: 1.7 }}
+          style={QURAN_TEXT_STYLE}
           dir="rtl"
           lang="ar"
         >

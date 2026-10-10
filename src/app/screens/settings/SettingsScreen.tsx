@@ -110,6 +110,13 @@ export function SettingsScreen({
     focusReturnSub.current = next;
     setSub(next);
     onSubChange?.(next);
+    if (next === effectiveSub) {
+      // The desktop default panel is already mounted, so its mount effect
+      // cannot transfer focus when its navigation row is explicitly chosen.
+      requestAnimationFrame(() => {
+        document.querySelector<HTMLElement>("[data-settings-subheading]")?.focus();
+      });
+    }
   };
 
   useEffect(() => {

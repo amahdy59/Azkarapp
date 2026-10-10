@@ -1,5 +1,20 @@
 [
   {
+    "release": "2026-10-10.5",
+    "ar": [
+      "اقرأ المقاطع القرآنية بخط وحجم متناسقين في القارئ ومشغل الصوت والبحث والمحفوظات، دون تكبير سطر على حساب آخر.",
+      "اختر تنزيل تسجيل البقرة أو الكهف أو الأذكار وصفحات المصحف كلًّا على حدة، وتحقق من الحجم قبل التنزيل والحذف.",
+      "تابع المعنى الإنجليزي بجانب المصحف، وكبّر الصفحة حتى ٢٠٠٪، واستعد إرشادات العد من أدوات القراءة والصوت.",
+      "شارك النص القرآني بخط أوضح، واحتفظ بتقدمك عند إعادة التحميل فورًا، وتنقّل في الإعدادات بلوحة المفاتيح وراجع التحديثات دون اتصال."
+    ],
+    "en": [
+      "Read Quran passages with consistent type and size in the reader, audio player, search, and saved items, without individually enlarged lines.",
+      "Choose Al-Baqarah, Al-Kahf, daily adhkar audio, and Mushaf page downloads independently, with sizes and removal confirmation.",
+      "Follow English meaning beside the Mushaf, enlarge pages up to 200%, and reopen counting guidance from clearer reader and audio tools.",
+      "Share Quran text in a clearer font, keep progress through immediate reloads, navigate settings by keyboard, and read update history offline."
+    ]
+  },
+  {
     "release": "2026-10-10.4",
     "ar": [
       "نزّل صفحات المصحف وتسجيلات البقرة والكهف والأذكار اليومية بشكل مستقل، مع أحجام واضحة وحذف آمن لكل تنزيل.",

@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-10.4",
+  "release": "2026-10-10.5",
   "ar": [
-    "نزّل صفحات المصحف وتسجيلات البقرة والكهف والأذكار اليومية بشكل مستقل، مع أحجام واضحة وحذف آمن لكل تنزيل.",
-    "اقرأ المعنى الإنجليزي بجانب المصحف وكبّر الصفحة حتى ٢٠٠٪، مع الحفاظ على النص وترتيب السطور عند تعذر تحميل الخط.",
-    "استخدم أدوات قراءة وصوت مرتبة، وأعد فتح إرشادات العد، وتابع التلاوة بإبراز الكلمة الحالية دون تحريك النص.",
-    "شارك الآيات وتذكيرات السور بصور أوضح، واضبط الصلاة والتذكيرات من صفحات مستقلة، وراجع تحديثات التطبيق دون اتصال."
+    "اقرأ المقاطع القرآنية بخط وحجم متناسقين في القارئ ومشغل الصوت والبحث والمحفوظات، دون تكبير سطر على حساب آخر.",
+    "اختر تنزيل تسجيل البقرة أو الكهف أو الأذكار وصفحات المصحف كلًّا على حدة، وتحقق من الحجم قبل التنزيل والحذف.",
+    "تابع المعنى الإنجليزي بجانب المصحف، وكبّر الصفحة حتى ٢٠٠٪، واستعد إرشادات العد من أدوات القراءة والصوت.",
+    "شارك النص القرآني بخط أوضح، واحتفظ بتقدمك عند إعادة التحميل فورًا، وتنقّل في الإعدادات بلوحة المفاتيح وراجع التحديثات دون اتصال."
   ],
   "en": [
-    "Download Mushaf pages, Al-Baqarah, Al-Kahf, and daily adhkar audio separately, with clear sizes and confirmed removal.",
-    "Read English meaning beside the Mushaf and enlarge pages up to 200%, with preserved text and line order when fonts cannot load.",
-    "Use clearer reader and audio controls, reopen counting guidance, and follow recitation with current-word highlights that keep text in place.",
-    "Share clearer verse cards and surah reminders, manage prayer and reminders in separate settings, and review past updates offline."
+    "Read Quran passages with consistent type and size in the reader, audio player, search, and saved items, without individually enlarged lines.",
+    "Choose Al-Baqarah, Al-Kahf, daily adhkar audio, and Mushaf page downloads independently, with sizes and removal confirmation.",
+    "Follow English meaning beside the Mushaf, enlarge pages up to 200%, and reopen counting guidance from clearer reader and audio tools.",
+    "Share Quran text in a clearer font, keep progress through immediate reloads, navigate settings by keyboard, and read update history offline."
   ]
 }
