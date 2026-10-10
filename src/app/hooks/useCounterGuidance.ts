@@ -16,7 +16,9 @@ function browserStorage(): GuidanceStorage | undefined {
 function readDismissed(storage: GuidanceStorage | undefined = browserStorage()): boolean {
   if (!storage) return false;
   try {
-    return storage.getItem(COUNTER_GUIDANCE_DISMISSED_KEY) === "true";
+    if (storage.getItem(COUNTER_GUIDANCE_DISMISSED_KEY) === "true") return true;
+    if (storage.getItem("azkarapp.onboarding-complete.v1") === "true") return true;
+    return false;
   } catch {
     return false;
   }
@@ -32,25 +34,21 @@ function writeDismissed(storage: GuidanceStorage | undefined = browserStorage())
 
 /** Keeps the first-use counting explanation out of the way after the first count. */
 export function useCounterGuidance(hasStarted: boolean) {
-  const [expanded, setExpanded] = useState(() => !hasStarted && !readDismissed());
-  // A reopened explanation must remain open even when the current zikr was
-  // already partly counted before the component mounted.
-  const [hasAutoDismissed, setHasAutoDismissed] = useState(() => hasStarted);
+  const [dismissed, setDismissed] = useState(() => readDismissed());
 
   useEffect(() => {
-    if (!hasStarted || hasAutoDismissed) return;
+    if (!hasStarted || dismissed) return;
     writeDismissed();
-    setHasAutoDismissed(true);
-    setExpanded(false);
-  }, [hasAutoDismissed, hasStarted]);
+    setDismissed(true);
+  }, [hasStarted, dismissed]);
 
   return {
-    expanded,
-    reopen: () => setExpanded(true),
+    isFirstTime: !dismissed && !hasStarted,
+    expanded: !dismissed && !hasStarted,
+    reopen: () => undefined,
     dismiss: () => {
       writeDismissed();
-      setHasAutoDismissed(true);
-      setExpanded(false);
+      setDismissed(true);
     },
   };
 }

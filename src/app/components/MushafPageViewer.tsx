@@ -11,7 +11,7 @@ import {
   type CSSProperties,
 } from "react";
 import "./mushaf-magnification.css";
-import type { AppLanguage, MushafPageTheme, MushafTextScale } from "../types";
+import type { AppLanguage, MushafPageTheme, MushafTextScale, TextSizeOption } from "../types";
 import { getQuranWordMeaningEntry, type QuranWordMeaning } from "../content/quranWordMeanings";
 import { t } from "../i18n";
 import { Bookmark } from "./icons";
@@ -385,23 +385,31 @@ const MushafTextLine = memo(function MushafTextLine({
             );
           }
 
+          const isWordHighlighted = highlightedWord?.verseKey === w.verseKey && highlightedWord.position === w.position;
+          const isVerseActive = highlightedVerseKey === w.verseKey;
+
           return (
             <span
               key={key}
-              data-playback-verse={highlightedVerseKey === w.verseKey ? w.verseKey : undefined}
+              data-playback-verse={isVerseActive ? w.verseKey : undefined}
               data-listening-verse={readOnly ? w.verseKey : undefined}
-              data-playback-word={
-                highlightedWord?.verseKey === w.verseKey && highlightedWord.position === w.position ? "true" : undefined
-              }
-              data-listening-word={
-                highlightedWord?.verseKey === w.verseKey && highlightedWord.position === w.position ? "" : undefined
-              }
+              data-playback-word={isWordHighlighted ? "true" : undefined}
+              data-listening-word={isWordHighlighted ? "" : undefined}
               style={
-                highlightedWord?.verseKey === w.verseKey && highlightedWord.position === w.position
-                  ? { color: "color-mix(in srgb, var(--primary) 60%, var(--foreground))" }
+                isWordHighlighted
+                  ? {
+                      color: "color-mix(in srgb, var(--primary) 70%, var(--foreground))",
+                      boxShadow: "0 0 0 1px var(--primary)",
+                    }
                   : undefined
               }
-              className={`shrink-0 rounded-sm ${highlightedWord?.verseKey === w.verseKey && highlightedWord.position === w.position ? "bg-primary/20 text-primary underline underline-offset-4" : ""}`}
+              className={`shrink-0 ${
+                isWordHighlighted
+                  ? "rounded-md bg-primary/20 text-primary underline underline-offset-4"
+                  : isVerseActive
+                    ? "rounded-sm bg-primary/10 text-foreground"
+                    : "rounded-sm"
+              }`}
               aria-hidden={!showWordMeanings}
               onContextMenu={(e) => {
                 e.preventDefault();
@@ -486,7 +494,6 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
     let cancelled = false;
     let fittedScale = "1";
     let fittedMeasure = 0;
-    let hasMagnified = false;
     let fittedViewport = "";
 
     const fit = () => {
@@ -501,21 +508,17 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
          its column. */
       const page = canvas;
       const magnification = Number.parseFloat(getComputedStyle(canvas).getPropertyValue("--mushaf-magnification")) || 1;
-      const paper = canvas.closest(".mushaf-paper, .audio-listening-arabic");
-      const bounds = paper?.getBoundingClientRect();
       // Native scrollbar space changes clientWidth during enlargement. It
       // must not be mistaken for a new reading viewport and refit the ink.
-      const viewport = `${bounds?.width}:${bounds?.height}`;
-      if (magnification > 1) hasMagnified = true;
-      if (hasMagnified && fittedMeasure > 0 && viewport === fittedViewport) {
+      const viewport = `${window.innerWidth}:${window.innerHeight}`;
+      if (magnification > 1 && fittedMeasure > 0 && viewport === fittedViewport) {
         page.style.setProperty("--mushaf-fit", fittedScale);
         page.style.setProperty("--mushaf-measure", `${Math.round(fittedMeasure * magnification)}px`);
         return;
       }
 
-      // Reset measure & fit to base before measuring
-      page.style.setProperty("--mushaf-measure", "100%");
-      page.style.setProperty("--mushaf-fit", "1");
+      const currentFit = Number.parseFloat(page.style.getPropertyValue("--mushaf-fit")) || 1;
+
       for (let i = 0; i < contents.length; i++) {
         const content = contents[i]!;
         content.style.transform = "";
@@ -553,20 +556,25 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
 
       const lineHeight = first.offsetHeight;
       if (!widest) widest = Math.max(...naturalWidths);
-      const verticalScale = lineHeight > 0 ? (slotHeight * inkAllowance) / lineHeight : 1;
-      const measure = Math.min(widest * verticalScale, available);
-      const scale = Math.min(Math.max(widest > 0 ? measure / widest : 1, 0.6), 2.4);
+      const effectiveFit = (currentFit > 0 ? currentFit : 1) * magnification;
+      const baseWidest = effectiveFit > 0 ? widest / effectiveFit : widest;
+      const baseLineHeight = effectiveFit > 0 ? lineHeight / effectiveFit : lineHeight;
+      const baseSlotHeight = slotHeight / magnification;
+      const baseAvailable = available / magnification;
+      const verticalScale = baseLineHeight > 0 ? (baseSlotHeight * inkAllowance) / baseLineHeight : 1;
+      const measure = Math.min(baseWidest * verticalScale, baseAvailable);
+      const scale = Math.min(Math.max(baseWidest > 0 ? measure / baseWidest : 1, 0.6), 2.4);
 
       // Single write pass: apply calculated scale and transforms
-      page.style.setProperty("--mushaf-measure", `${Math.round(measure)}px`);
+      page.style.setProperty("--mushaf-measure", `${Math.round(measure * magnification)}px`);
       page.style.setProperty("--mushaf-fit", scale.toFixed(3));
       fittedScale = scale.toFixed(3);
-      fittedMeasure = measure / magnification;
+      fittedMeasure = measure;
       fittedViewport = viewport;
 
       for (let i = 0; i < lineCount; i++) {
         const content = contents[i]!;
-        const nat = naturalWidths[i]!;
+        const nat = effectiveFit > 0 ? naturalWidths[i]! / effectiveFit : naturalWidths[i]!;
         const scaledNat = nat * scale;
         const fill = measure > 0 ? scaledNat / measure : 1;
 
@@ -1733,12 +1741,14 @@ export function MushafExcerptCanvas({
   language,
   useQcfGlyphs,
   highlightedWord,
+  textSize = "medium",
 }: {
   lines: MushafWordToken[][];
   pageNumber: number;
   language: AppLanguage;
   useQcfGlyphs: boolean;
   highlightedWord?: { verseKey: string; position: number } | null;
+  textSize?: TextSizeOption;
 }) {
   const canvasRef = useLineFitter(
     `${pageNumber}:${useQcfGlyphs}:${lines
@@ -1747,6 +1757,7 @@ export function MushafExcerptCanvas({
       .join(",")}`,
     useQcfGlyphs ? 0.9 : 0.72,
   );
+  const baseSize = textSize === "small" ? "1.2rem" : textSize === "large" ? "1.55rem" : "1.35rem";
   return (
     <>
       <div
@@ -1760,11 +1771,11 @@ export function MushafExcerptCanvas({
         <div
           style={{
             fontFamily: useQcfGlyphs ? `qcf-v2-page-${pageNumber}, var(--font-mushaf)` : "var(--font-mushaf)",
-            fontSize: "calc(5cqi * var(--mushaf-fit, 1))",
+            fontSize: `calc(min(max(${baseSize}, 5.2cqi), 1.75rem) * var(--mushaf-fit, 1))`,
           }}
         >
           {lines.map((words, index) => (
-            <div key={index} style={{ height: "4rem", width: "100%" }}>
+            <div key={index} style={{ minHeight: "1.7em", height: "1.7em", width: "100%" }}>
               <MushafTextLine
                 words={words}
                 language={language}

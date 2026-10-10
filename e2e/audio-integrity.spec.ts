@@ -6,6 +6,8 @@ import { readFileSync } from "node:fs";
 import { gunzipSync } from "node:zlib";
 import { OWNER_TIMING_PACK_SHA, expandOwnerTiming, type OwnerTimingPack } from "../src/app/audio/ownerTimingPreviews";
 
+test.use({ serviceWorkers: "block" });
+
 async function prepareAudio(page: Page) {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.addInitScript(() => {

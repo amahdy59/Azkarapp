@@ -5,6 +5,8 @@ export interface TabDefinition<T extends string> {
   value: T;
   label: ReactNode;
   testId?: string;
+  ariaLabel?: string;
+  title?: string;
 }
 
 export function tabId(idPrefix: string, value: string) {
@@ -110,6 +112,8 @@ export function TabList<T extends string>({
               id={tabId(idPrefix, tab.value)}
               aria-selected={selected}
               aria-controls={tabPanelId(idPrefix, tab.value)}
+              aria-label={tab.ariaLabel}
+              title={tab.title}
               tabIndex={selected ? 0 : -1}
               data-testid={tab.testId}
               onClick={() => onChange(tab.value)}

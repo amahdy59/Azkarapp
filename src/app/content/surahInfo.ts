@@ -1,4 +1,5 @@
 import type { AppLanguage } from "../types";
+import { normalizeSearchText } from "./searchNormalization";
 
 export type RevelationType = "meccan" | "medinan";
 
@@ -1002,7 +1003,7 @@ export function getSurahShortName(surahNumber: number | string, language: AppLan
 }
 
 export function searchSurahs(query: string, _language?: AppLanguage): SurahMeta[] {
-  const clean = query.trim().toLowerCase();
+  const clean = query.trim();
   if (!clean) return [...SURAHS];
 
   const num = parseInt(clean, 10);
@@ -1011,9 +1012,14 @@ export function searchSurahs(query: string, _language?: AppLanguage): SurahMeta[
     return exact ? [exact] : [];
   }
 
+  const normalized = normalizeSearchText(clean);
+  const lowerClean = clean.toLowerCase();
+
   return SURAHS.filter((s) => {
     return (
-      s.nameArabic.includes(clean) || s.nameEnglish.toLowerCase().includes(clean) || s.number.toString().includes(clean)
+      normalizeSearchText(s.nameArabic).includes(normalized) ||
+      s.nameEnglish.toLowerCase().includes(lowerClean) ||
+      s.number.toString().includes(clean)
     );
   });
 }

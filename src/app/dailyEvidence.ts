@@ -37,6 +37,8 @@ export interface DailyEvidence {
    * screen readers pronouncing it with an Arabic voice.
    */
   hadithInArabic: boolean;
+  /** Whether the text is a Qur'anic verse. */
+  isQuran?: boolean;
   /** Its grading and where it is recorded. */
   authenticity: string;
   /** What the practice is for, in the reader's language where available. */
@@ -255,6 +257,7 @@ function shapeLibrarySource(
          as the line underneath rather than in place of the verse. */
       hadith: verse.arabic,
       hadithInArabic: true,
+      isQuran: true,
       authenticity: isArabic
         ? `${verse.referenceArabic} — ${verse.surahArabic}`
         : `${verse.reference} — ${verse.surahEnglish}`,

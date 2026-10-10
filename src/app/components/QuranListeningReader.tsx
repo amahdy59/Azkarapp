@@ -323,7 +323,7 @@ export default function QuranListeningReader({
                 style={{
                   fontFamily: "var(--font-mushaf)",
                   fontSize: `calc(${textScale === "small" ? "1.25rem" : textScale === "large" ? "1.75rem" : "1.5rem"} * ${magnification / 100})`,
-                  lineHeight: 2,
+                  lineHeight: 1.7,
                 }}
               >
                 {fallbackPages[index]?.text ?? entry.arabicText}

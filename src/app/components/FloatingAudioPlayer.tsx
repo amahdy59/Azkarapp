@@ -24,6 +24,7 @@ import {
   ClockFastForward,
   SkipBack,
   SkipForward,
+  SlidersHorizontal,
   X,
 } from "./icons";
 import type { AppLanguage, TextSizeOption, MushafPageTheme, MushafTextScale } from "../types";
@@ -740,6 +741,7 @@ export function FloatingAudioPlayer({
                               transcript={zikrArabicText}
                               language={language}
                               cue={spokenLanguage === "ar" ? listeningCue : null}
+                              textSize={textSize}
                               fallback={
                                 <ListeningWordText
                                   text={zikrArabicText}
@@ -871,48 +873,97 @@ export function FloatingAudioPlayer({
                   </TransportButton>
                 )}
               </div>
+            </div>
 
-              <div className="audio-expanded-utilities flex flex-wrap items-center justify-center gap-2">
-                {
-                  <Popover.Root>
-                    <Popover.Trigger asChild>
-                      <button
-                        type="button"
-                        aria-label={t(language, "audioPlayer.options")}
-                        className="inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full border border-border bg-card px-3 text-xs font-semibold text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                      >
-                        <span>{t(language, "audioPlayer.options")}</span>
-                        <ChevronUp size={16} aria-hidden="true" />
-                      </button>
-                    </Popover.Trigger>
-                    <Popover.Portal>
-                      <Popover.Content
-                        side="top"
-                        collisionPadding={8}
-                        sideOffset={8}
-                        dir={direction}
-                        aria-label={t(language, "audioPlayer.options")}
-                        onEscapeKeyDown={(event) => {
-                          event.stopPropagation();
-                          // A nested select owns this Escape; keep options open
-                          // until its focus has returned to the select trigger.
-                          if (voiceMenuOpen || speedMenuOpen) event.preventDefault();
-                        }}
-                        onInteractOutside={(event) => {
-                          if (voiceMenuOpen || speedMenuOpen) event.preventDefault();
-                        }}
-                        className="audio-options-menu z-50 flex max-h-[70dvh] w-[20rem] max-w-[calc(100vw-1rem)] flex-col gap-2 overflow-y-auto rounded-2xl border border-border bg-card p-3 text-foreground shadow-overlay"
-                      >
-                        <p className="audio-options-heading text-sm font-semibold">
-                          {t(language, "audioPlayer.options")}
-                        </p>
-                        {currentEntry.contentKind === "quran" && (
-                          <MushafMagnificationControl
-                            language={language}
-                            value={pageMagnification}
-                            onChange={setPageMagnification}
-                          />
-                        )}
+            <div
+              className="audio-expanded-options flex flex-wrap items-center justify-center gap-3 pt-3 text-xs text-muted-foreground"
+              dir={direction}
+            >
+              {positionChip && (
+                <span data-testid="audio-queue-position" className="sr-only">
+                  {t(language, "audioPlayer.track")} <span dir="ltr">{queuePosition}</span>
+                </span>
+              )}
+              {repetitionProgress && (
+                <span data-testid="audio-repetition-progress" className="sr-only">
+                  {t(language, "audioPlayer.repetitionChip")} <span dir="ltr">{repetitionProgress}</span>
+                </span>
+              )}
+              {canRepeat && (
+                <button
+                  type="button"
+                  aria-pressed={repeatEnabled}
+                  onClick={() => controller.setPlaybackMode(repeatEnabled ? "play-once" : "repeat-prescribed-count")}
+                  className={`audio-repeat-option flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-full border px-4 text-xs font-semibold hover:bg-muted transition-colors duration-fast focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                    repeatEnabled
+                      ? "border-primary/40 bg-primary/10 text-primary"
+                      : "border-border bg-card text-muted-foreground hover:text-foreground"
+                  }`}
+                  aria-label={repeatLabel}
+                  title={repeatLabel}
+                >
+                  <Repeat
+                    size={15}
+                    className={repeatEnabled ? "text-primary" : "text-muted-foreground"}
+                    aria-hidden="true"
+                  />
+                  <span className={repeatEnabled ? "text-primary font-bold" : "text-foreground font-semibold"}>
+                    {repeatLabel}
+                  </span>
+                </button>
+              )}
+              <Popover.Root>
+                <Popover.Trigger asChild>
+                  <button
+                    type="button"
+                    aria-label={t(language, "audioPlayer.options")}
+                    className="inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full border border-border bg-card px-4 text-xs font-semibold text-foreground hover:bg-muted transition-colors duration-fast focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                  >
+                    <span>{t(language, "audioPlayer.options")}</span>
+                    <ChevronUp size={16} aria-hidden="true" />
+                  </button>
+                </Popover.Trigger>
+                <Popover.Portal>
+                  <Popover.Content
+                    side="top"
+                    collisionPadding={8}
+                    sideOffset={8}
+                    dir={direction}
+                    aria-label={t(language, "audioPlayer.options")}
+                    onEscapeKeyDown={(event) => {
+                      event.stopPropagation();
+                      // A nested select owns this Escape; keep options open
+                      // until its focus has returned to the select trigger.
+                      if (voiceMenuOpen || speedMenuOpen) event.preventDefault();
+                    }}
+                    onInteractOutside={(event) => {
+                      if (voiceMenuOpen || speedMenuOpen) event.preventDefault();
+                    }}
+                    className="audio-options-menu z-50 flex max-h-[75dvh] sm:max-h-[80dvh] w-[22rem] sm:w-[24rem] max-w-[calc(100vw-1.5rem)] flex-col gap-3 overflow-y-auto rounded-2xl border border-border bg-card p-3.5 text-foreground shadow-overlay"
+                  >
+                    <div className="flex items-center justify-between pb-2 border-b border-border/60">
+                      <div className="flex items-center gap-2">
+                        <div className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                          <SlidersHorizontal size={15} aria-hidden="true" />
+                        </div>
+                        <span className="text-sm font-bold text-foreground">{t(language, "audioPlayer.options")}</span>
+                      </div>
+                      <Popover.Close asChild>
+                        <button
+                          type="button"
+                          aria-label={t(language, "common.close")}
+                          className="flex size-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors cursor-pointer"
+                        >
+                          <X size={16} aria-hidden="true" />
+                        </button>
+                      </Popover.Close>
+                    </div>
+
+                    <div className="flex flex-col rounded-xl border border-border/60 bg-muted/20 divide-y divide-border/40">
+                      <div className="flex flex-col gap-1.5 p-2.5">
+                        <span className="text-micro font-medium text-muted-foreground px-0.5">
+                          {t(language, "audioPlayer.reciterShort")}
+                        </span>
                         <Select
                           open={voiceMenuOpen}
                           onOpenChange={setVoiceMenuOpen}
@@ -924,10 +975,12 @@ export function FloatingAudioPlayer({
                             aria-label={t(language, "audioPlayer.voice")}
                             data-testid="audio-reciter-select"
                             size="sm"
-                            className="h-11 w-full min-w-0 shrink justify-between gap-2 rounded-xl border-border-control bg-background px-3 py-1 text-sm font-semibold text-foreground shadow-none transition-colors hover:bg-muted focus-visible:ring-[3px] focus-visible:ring-ring"
+                            className="h-11 w-full min-w-0 shrink justify-between gap-2 rounded-xl border-border bg-card px-3 py-1 text-sm font-medium text-foreground shadow-2xs transition-colors hover:bg-muted focus-visible:ring-[3px] focus-visible:ring-ring"
                           >
-                            <Headphones size={14} className="shrink-0 text-primary" aria-hidden="true" />
-                            <SelectValue className="truncate text-center">{reciterDisplayName}</SelectValue>
+                            <Headphones size={15} className="shrink-0 text-primary" aria-hidden="true" />
+                            <SelectValue className="truncate text-start font-medium flex-1">
+                              {reciterDisplayName}
+                            </SelectValue>
                           </SelectTrigger>
                           <SelectContent
                             align="center"
@@ -954,7 +1007,7 @@ export function FloatingAudioPlayer({
                           </SelectContent>
                         </Select>
                         {language === "en" && (
-                          <span className="text-xs text-muted-foreground">
+                          <span className="text-micro text-muted-foreground px-1">
                             {t(
                               language,
                               currentVoiceId === "english-george"
@@ -963,65 +1016,84 @@ export function FloatingAudioPlayer({
                             )}
                           </span>
                         )}
+                      </div>
 
-                        <div className="audio-options-row audio-expanded-speed flex items-center justify-between gap-3">
-                          <span className="text-sm font-medium">{t(language, "audioPlayer.speedShort")}</span>
-                          <Select
-                            open={speedMenuOpen}
-                            onOpenChange={setSpeedMenuOpen}
-                            value={String(state.playbackRate)}
-                            onValueChange={(value) => controller.setPlaybackRate(Number(value))}
-                            dir={direction}
+                      <div className="audio-options-row audio-expanded-speed flex min-h-11 items-center justify-between gap-3 px-3 py-1.5">
+                        <span className="text-sm font-medium text-foreground">
+                          {t(language, "audioPlayer.speedShort")}
+                        </span>
+                        <Select
+                          open={speedMenuOpen}
+                          onOpenChange={setSpeedMenuOpen}
+                          value={String(state.playbackRate)}
+                          onValueChange={(value) => controller.setPlaybackRate(Number(value))}
+                          dir={direction}
+                        >
+                          <SelectTrigger
+                            size="sm"
+                            aria-label={`${t(language, "audioPlayer.speedShort")}: ${formatNumerals(state.playbackRate, language)}×`}
+                            className="audio-speed-select w-auto min-h-11 gap-2 rounded-xl border border-border bg-card px-3 text-xs font-bold text-foreground shadow-2xs hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                           >
-                            <SelectTrigger
-                              size="sm"
-                              aria-label={`${t(language, "audioPlayer.speedShort")}: ${formatNumerals(state.playbackRate, language)}×`}
-                              className="audio-speed-select w-auto min-h-11 gap-2 rounded-full border border-border bg-card text-foreground hover:bg-muted text-xs font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                            >
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent
-                              onEscapeKeyDown={(event) => {
-                                event.preventDefault();
-                                event.stopPropagation();
-                                setSpeedMenuOpen(false);
-                              }}
-                            >
-                              {PLAYBACK_RATES.map((rate) => (
-                                <SelectItem key={rate} value={String(rate)}>
-                                  <span dir="ltr">{formatNumerals(rate, language)}×</span>
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="audio-options-row flex items-center justify-between gap-3">
-                          <span className="text-sm font-medium">{t(language, "audioPlayer.volume")}</span>
-                          <AudioVolumeControl controller={controller} language={language} />
-                        </div>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent
+                            onEscapeKeyDown={(event) => {
+                              event.preventDefault();
+                              event.stopPropagation();
+                              setSpeedMenuOpen(false);
+                            }}
+                          >
+                            {PLAYBACK_RATES.map((rate) => (
+                              <SelectItem key={rate} value={String(rate)}>
+                                <span dir="ltr">{formatNumerals(rate, language)}×</span>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="audio-options-row flex min-h-11 items-center justify-between gap-3 px-3 py-1.5">
+                        <span className="text-sm font-medium text-foreground">{t(language, "audioPlayer.volume")}</span>
+                        <AudioVolumeControl controller={controller} language={language} />
+                      </div>
+                    </div>
+
+                    {(currentEntry.contentKind === "quran" || englishFirst || listeningTiming) && (
+                      <div className="flex flex-col rounded-xl border border-border/60 bg-muted/20 divide-y divide-border/40">
+                        {currentEntry.contentKind === "quran" && (
+                          <div className="p-2.5">
+                            <MushafMagnificationControl
+                              language={language}
+                              value={pageMagnification}
+                              onChange={setPageMagnification}
+                            />
+                          </div>
+                        )}
+
                         {englishFirst && (
                           <button
                             type="button"
                             aria-expanded={showArabic}
                             aria-controls={arabicTextId}
                             onClick={() => setArabicVisibility(showArabic ? "hide" : "show")}
-                            className="audio-options-row inline-flex min-h-11 items-center justify-between gap-3 rounded-xl px-3 text-sm font-medium text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                            className="audio-options-row flex min-h-11 items-center justify-between gap-3 px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted/70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-colors cursor-pointer"
                           >
-                            {t(language, showArabic ? "audioPlayer.hideArabic" : "audioPlayer.showArabic")}
+                            <span>{t(language, showArabic ? "audioPlayer.hideArabic" : "audioPlayer.showArabic")}</span>
                             {showArabic ? (
-                              <ChevronUp size={16} aria-hidden="true" />
+                              <ChevronUp size={16} aria-hidden="true" className="shrink-0 text-muted-foreground" />
                             ) : (
-                              <ChevronDown size={16} aria-hidden="true" />
+                              <ChevronDown size={16} aria-hidden="true" className="shrink-0 text-muted-foreground" />
                             )}
                           </button>
                         )}
+
                         {listeningTiming && (
-                          <div data-listening-controls="" className="flex flex-col items-stretch">
+                          <div data-listening-controls="" className="flex flex-col divide-y divide-border/40">
                             <button
                               type="button"
                               aria-pressed={showListeningWords}
                               onClick={() => setShowListeningWords((value) => !value)}
-                              className="audio-options-row inline-flex min-h-11 min-w-11 items-center justify-between gap-3 rounded-xl px-3 text-sm hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                              className="audio-options-row flex min-h-11 items-center justify-between gap-3 px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted/70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-colors cursor-pointer"
                             >
                               <span>
                                 {t(
@@ -1042,9 +1114,9 @@ export function FloatingAudioPlayer({
                               type="button"
                               aria-pressed={followListeningText}
                               onClick={() => setFollowListeningText((value) => !value)}
-                              className="audio-options-row inline-flex min-h-11 min-w-11 items-center justify-between gap-3 rounded-xl px-3 text-sm hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                              className="audio-options-row flex min-h-11 items-center justify-between gap-3 px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted/70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-colors cursor-pointer"
                             >
-                              {t(language, "quranListening.followText")}
+                              <span>{t(language, "quranListening.followText")}</span>
                               <span
                                 aria-hidden="true"
                                 className={`audio-option-check ${followListeningText ? "audio-option-check--on" : ""}`}
@@ -1054,76 +1126,48 @@ export function FloatingAudioPlayer({
                             </button>
                           </div>
                         )}
-                        {totalTracks > 1 && (
-                          <button
-                            type="button"
-                            role="switch"
-                            aria-label={t(language, "audioPlayer.autoAdvance")}
-                            aria-checked={controller.autoAdvance}
-                            onClick={() => controller.setAutoAdvance(!controller.autoAdvance)}
-                            className="audio-options-row audio-auto-advance flex min-h-11 items-center justify-between gap-3 rounded-xl text-foreground px-3 text-sm font-medium hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                          >
-                            <span>{t(language, "audioPlayer.playAllShort")}</span>
-                            <span
-                              aria-hidden="true"
-                              className={`audio-switch-track ${controller.autoAdvance ? "audio-switch-track--on" : ""}`}
-                            >
-                              <span />
-                            </span>
-                          </button>
-                        )}
+                      </div>
+                    )}
 
-                        <Popover.Close asChild>
-                          <button
-                            type="button"
-                            className="audio-options-close min-h-11 rounded-xl border border-border bg-muted/40 px-3 text-sm font-semibold hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                    {totalTracks > 1 && (
+                      <div className="rounded-xl border border-border/60 bg-muted/20">
+                        <button
+                          type="button"
+                          role="switch"
+                          aria-label={t(language, "audioPlayer.autoAdvance")}
+                          aria-checked={controller.autoAdvance}
+                          onClick={() => controller.setAutoAdvance(!controller.autoAdvance)}
+                          className="audio-options-row audio-auto-advance flex min-h-11 w-full items-center justify-between gap-3 px-3 py-2 text-sm font-medium text-foreground hover:bg-muted/70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-colors cursor-pointer"
+                        >
+                          <div className="flex flex-col items-start text-start">
+                            <span className="font-semibold text-foreground">
+                              {t(language, "audioPlayer.playAllShort")}
+                            </span>
+                            <span className="text-micro text-muted-foreground">
+                              {t(language, "audioPlayer.autoAdvance")}
+                            </span>
+                          </div>
+                          <span
+                            aria-hidden="true"
+                            className={`audio-switch-track ${controller.autoAdvance ? "audio-switch-track--on" : ""}`}
                           >
-                            {t(language, "common.close")}
-                          </button>
-                        </Popover.Close>
-                      </Popover.Content>
-                    </Popover.Portal>
-                  </Popover.Root>
-                }
-              </div>
-            </div>
-            <div
-              className="audio-expanded-options flex flex-wrap items-center justify-center gap-2 pt-1 text-xs text-muted-foreground"
-              dir={direction}
-            >
-              {positionChip && (
-                <span data-testid="audio-queue-position" className="sr-only">
-                  {t(language, "audioPlayer.track")} <span dir="ltr">{queuePosition}</span>
-                </span>
-              )}
-              {repetitionProgress && (
-                <span data-testid="audio-repetition-progress" className="sr-only">
-                  {t(language, "audioPlayer.repetitionChip")} <span dir="ltr">{repetitionProgress}</span>
-                </span>
-              )}
-              {canRepeat && (
-                <button
-                  type="button"
-                  aria-pressed={repeatEnabled}
-                  onClick={() => controller.setPlaybackMode(repeatEnabled ? "play-once" : "repeat-prescribed-count")}
-                  className={`audio-repeat-option flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-full border px-3 text-xs font-semibold hover:bg-muted transition-colors duration-fast focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                    repeatEnabled
-                      ? "border-primary/40 bg-primary/10 text-primary"
-                      : "border-border bg-card text-muted-foreground hover:text-foreground"
-                  }`}
-                  aria-label={repeatLabel}
-                  title={repeatLabel}
-                >
-                  <Repeat
-                    size={15}
-                    className={repeatEnabled ? "text-primary" : "text-muted-foreground"}
-                    aria-hidden="true"
-                  />
-                  <span className={repeatEnabled ? "text-primary font-bold" : "text-foreground font-semibold"}>
-                    {repeatLabel}
-                  </span>
-                </button>
-              )}
+                            <span />
+                          </span>
+                        </button>
+                      </div>
+                    )}
+
+                    <Popover.Close asChild>
+                      <button
+                        type="button"
+                        className="audio-options-close min-h-11 w-full rounded-xl border border-border bg-muted/40 px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-colors shadow-2xs cursor-pointer"
+                      >
+                        {t(language, "common.close")}
+                      </button>
+                    </Popover.Close>
+                  </Popover.Content>
+                </Popover.Portal>
+              </Popover.Root>
             </div>
 
             {/* Error state */}

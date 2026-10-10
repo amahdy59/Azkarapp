@@ -230,7 +230,12 @@ export default function AyahShareStudio({
         <summary className="min-h-11 cursor-pointer text-sm font-semibold">
           {t(language, "reader.ayahCardText")}
         </summary>
-        <p lang="ar" dir="rtl" className="zikr-text text-xl leading-loose" style={{ fontFamily: "var(--font-mushaf)" }}>
+        <p
+          lang="ar"
+          dir="rtl"
+          className="zikr-text text-xl leading-[1.7]"
+          style={{ fontFamily: "var(--font-mushaf)", lineHeight: 1.7 }}
+        >
           {text}
         </p>
         {input.translation && (

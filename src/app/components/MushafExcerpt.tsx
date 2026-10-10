@@ -2,7 +2,7 @@ import { useMemo, type ReactNode } from "react";
 import { useListeningMushafPage } from "../hooks/useListeningMushafPage";
 import { excerptActiveWord, excerptWordMapping, MUSHAF_EXCERPTS, selectMushafExcerpt } from "../content/mushafExcerpts";
 import type { ListeningWordTiming } from "../audio/listeningTimings";
-import type { AppLanguage } from "../types";
+import type { AppLanguage, TextSizeOption } from "../types";
 import { MushafExcerptCanvas } from "./MushafPageViewer";
 
 export default function MushafExcerpt({
@@ -11,12 +11,14 @@ export default function MushafExcerpt({
   language,
   cue,
   fallback,
+  textSize = "medium",
 }: {
   canonicalKey: string;
   transcript: string;
   language: AppLanguage;
   cue: ListeningWordTiming | null;
   fallback: ReactNode;
+  textSize?: TextSizeOption;
 }) {
   const range = MUSHAF_EXCERPTS[canonicalKey]!;
   const { result } = useListeningMushafPage(range.page, 0);
@@ -35,6 +37,7 @@ export default function MushafExcerpt({
         language={language}
         useQcfGlyphs={result.qcf}
         highlightedWord={excerptActiveWord(selection.mapping, cue)}
+        textSize={textSize}
       />
     </div>
   );

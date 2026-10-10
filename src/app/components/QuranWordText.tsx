@@ -29,7 +29,7 @@ export function QuranWordText({
 
   return (
     <p
-      className="zikr-text text-center font-medium leading-[2.1] text-foreground"
+      className="zikr-text text-center font-medium leading-[1.7] text-foreground"
       data-testid="zikr-text"
       dir="rtl"
       lang="ar"

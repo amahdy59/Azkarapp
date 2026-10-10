@@ -24,7 +24,7 @@ export function AudioVolumeControl({ controller, language }: { controller: Audio
         <button
           type="button"
           aria-label={volumeLabel}
-          className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border bg-card text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-border bg-card text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring shadow-2xs transition-colors"
         >
           {icon}
         </button>
@@ -39,7 +39,7 @@ export function AudioVolumeControl({ controller, language }: { controller: Audio
           data-testid="audio-volume-popover"
           dir={language === "ar" ? "rtl" : "ltr"}
           onEscapeKeyDown={(event) => event.stopPropagation()}
-          className="audio-volume-popover z-50 flex flex-col items-center gap-2 rounded-2xl border border-border bg-card p-2 text-foreground shadow-overlay"
+          className="audio-volume-popover z-[120] flex flex-col items-center gap-2 rounded-2xl border border-border bg-card p-2 text-foreground shadow-overlay"
         >
           <span className="text-micro font-bold tabular-nums">{formatNumerals(percentage, language)}%</span>
           <input

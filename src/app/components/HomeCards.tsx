@@ -541,9 +541,10 @@ export function DailyEvidenceCard({
           `lang` and `dir` follow the text that is actually rendered, and the
           Arabic face is only applied when the text is Arabic. */}
       <blockquote
-        className={`text-title font-medium leading-[2] ${onGlass ? "text-on-media" : "text-foreground"} ${
-          evidence.hadithInArabic ? "zikr-text" : ""
-        }`}
+        className={`text-title font-medium ${evidence.isQuran ? "leading-[1.7]" : "leading-[2]"} ${
+          onGlass ? "text-on-media" : "text-foreground"
+        } ${evidence.hadithInArabic ? "zikr-text" : ""}`}
+        style={evidence.isQuran ? { fontFamily: "var(--font-mushaf)", lineHeight: 1.7 } : undefined}
         dir={evidence.hadithInArabic ? "rtl" : "ltr"}
         lang={evidence.hadithInArabic ? "ar" : "en"}
         data-testid="daily-evidence-hadith"

@@ -65,7 +65,7 @@ test("submitting the Library query opens Search and preserves it", async ({ page
 test("Library search and responsive section controls stay bounded at every tier", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   const input = await openArabicLibrary(page);
-  const tabs = page.getByRole("tablist", { name: "مكتبة الأذكار" });
+  const tabs = page.getByRole("tablist", { name: "أذكار" });
 
   const desktopInput = await input.boundingBox();
   const desktopTabs = await tabs.boundingBox();

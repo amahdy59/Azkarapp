@@ -331,4 +331,73 @@ describe("AzkarLibraryScreen", () => {
     expect(screen.getByTestId("library-scroll-fade-start")).toBeInTheDocument();
     expect(screen.getByTestId("library-scroll-fade-end")).toBeInTheDocument();
   });
+
+  it("renders Arabic title as 'أذكار' and expressive icons with saved count badge", () => {
+    render(
+      <AzkarLibraryScreen
+        completed={{} as Record<CategoryId, Set<string>>}
+        language="ar"
+        direction="rtl"
+        routineModes={{ morning: "core", evening: "core", before_sleep: "core", after_prayer: "core" }}
+        onCategory={() => undefined}
+        onZikr={() => undefined}
+        onSearch={() => undefined}
+        savedZikrIds={new Set(["morning-1", "morning-2"])}
+      />,
+    );
+
+    // Heading is 'أذكار'
+    expect(screen.getByRole("heading", { name: "أذكار", level: 1 })).toBeInTheDocument();
+
+    // Tablist has aria-label 'أذكار'
+    const tablist = screen.getByRole("tablist", { name: "أذكار" });
+    expect(tablist).toBeInTheDocument();
+
+    // Collections tab has accessible name 'المجموعات'
+    const collectionsTab = screen.getByTestId("library-section-collections");
+    expect(collectionsTab).toHaveAttribute("aria-label", "المجموعات");
+
+    // Saved tab has accessible name 'المحفوظة (٢)'
+    const savedTab = screen.getByTestId("library-section-saved");
+    expect(savedTab).toHaveAttribute("aria-label", "المحفوظة (٢)");
+
+    // Badge with formatted count is rendered
+    expect(savedTab).toHaveTextContent("٢");
+
+    // Search input uses the distinct library placeholder
+    const searchInput = screen.getByRole("textbox");
+    expect(searchInput).toHaveAttribute("placeholder", "ابحث بنص الذكر أو اسم المجموعة...");
+  });
+
+  it("triggers haptic vibration when changing sections and filter groups with haptics enabled", () => {
+    const vibrate = vi.fn();
+    Object.defineProperty(navigator, "vibrate", { configurable: true, value: vibrate });
+
+    render(
+      <AzkarLibraryScreen
+        completed={{} as Record<CategoryId, Set<string>>}
+        language="ar"
+        direction="rtl"
+        routineModes={{ morning: "core", evening: "core", before_sleep: "core", after_prayer: "core" }}
+        onCategory={() => undefined}
+        onZikr={() => undefined}
+        onSearch={() => undefined}
+        savedZikrIds={new Set()}
+        hapticFeedback={true}
+      />,
+    );
+
+    const savedTab = screen.getByTestId("library-section-saved");
+    fireEvent.click(savedTab);
+    expect(vibrate).toHaveBeenCalledWith(10);
+
+    const collectionsTab = screen.getByTestId("library-section-collections");
+    fireEvent.click(collectionsTab);
+    expect(vibrate).toHaveBeenCalledWith(10);
+
+    // Filter pill click
+    const dailyPill = screen.getByRole("button", { name: "أذكار اليوم" });
+    fireEvent.click(dailyPill);
+    expect(vibrate).toHaveBeenCalledWith(8);
+  });
 });

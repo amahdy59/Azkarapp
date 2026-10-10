@@ -622,6 +622,24 @@ export function KhatmahReaderScreen({
     [currentPage, pageStep, selectPage, recordCurrentSpread],
   );
 
+  const activeAudioControl: SurahAudioControl | undefined = useMemo(() => {
+    if (baqarahAudio?.available && pageData?.[0]?.k.startsWith("2:")) {
+      return baqarahAudio;
+    }
+    if (audioController?.state.plan && audioController.currentEntry) {
+      const isReciting = audioController.state.status === "playing" || audioController.state.status === "buffering";
+      return {
+        available: true,
+        status: audioController.state.status,
+        onToggle: () => {
+          if (isReciting) audioController.pause();
+          else audioController.play();
+        },
+      };
+    }
+    return undefined;
+  }, [baqarahAudio, pageData, audioController]);
+
   /** Physical direction is the product rule: right advances, left goes back.
    *  Buttons, keys, and swipes all call the same signed paginator. */
   useEffect(() => {
@@ -651,8 +669,8 @@ export function KhatmahReaderScreen({
         }
       } else if (e.key === "f" || e.key === "F") {
         setIsFocusMode((prev) => !prev);
-      } else if ((e.key === "l" || e.key === "L") && baqarahAudio?.available && pageData?.[0]?.k.startsWith("2:")) {
-        baqarahAudio.onToggle();
+      } else if ((e.key === " " || e.key === "l" || e.key === "L") && activeAudioControl?.available) {
+        activeAudioControl.onToggle();
       } else handled = false;
       if (handled) e.preventDefault();
     };
@@ -661,7 +679,7 @@ export function KhatmahReaderScreen({
   }, [
     pageMagnification,
     activeAyah,
-    baqarahAudio,
+    activeAudioControl,
     pageData,
     isFocusMode,
     isIndexOpen,
@@ -937,7 +955,7 @@ export function KhatmahReaderScreen({
       onEnterFocusMode={() => setIsFocusMode(true)}
       onOpenSettings={() => setIsOptionsMenuOpen(true)}
       onOpenMore={() => setIsQuickMenuOpen(true)}
-      surahAudio={pageData?.[0]?.k.startsWith("2:") ? baqarahAudio : undefined}
+      surahAudio={activeAudioControl}
       playbackFollowing={
         playback.available ? { enabled: playback.follow, onToggle: playback.toggleFollowing } : undefined
       }
@@ -1267,6 +1285,7 @@ export function KhatmahReaderScreen({
         playbackFollowing={
           playback.available ? { enabled: playback.follow, onToggle: playback.toggleFollowing } : undefined
         }
+        surahAudio={activeAudioControl}
         onSelectReadingMode={setReadingMode}
         mushafLayout={internalLayout}
         onSelectLayout={handleSelectLayout}

@@ -434,6 +434,7 @@ const en = {
     title: "Azkar Library",
     subtitle: "Search, continue, or save a remembrance for later.",
     search: "Search azkar and duas",
+    searchPlaceholder: "Search by text, benefit, or collection...",
     collections: "Collections",
     saved: "Saved",
     savedTitle: "Saved remembrance",
@@ -1074,6 +1075,9 @@ const en = {
     englishRecording: "English translation audio",
     arabicRecording: "Arabic recitation",
     repetitionCountLabel: "Repetition {current} of {total}",
+    ambientMode: "Ambient listening (hide player)",
+    ambientModeActive: "Ambient listening active — stop anytime from the tool rail or corner control",
+    expandFromAmbient: "Show audio player",
   },
   category: {
     openZikrInReader: "Open dhikr {number} in the reader",

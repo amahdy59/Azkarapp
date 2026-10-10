@@ -1,5 +1,5 @@
 import { useCallback, useDeferredValue, useEffect, useId, useMemo, useRef, useState } from "react";
-import { Search, Bookmark, ChevronNext, Lightbulb, X } from "../components/icons";
+import { Search, Bookmark, ChevronNext, Lightbulb, X, Grid } from "../components/icons";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { CategoryCard } from "../components/CategoryCard";
 import { StatePanel } from "../components/StatePanel";
@@ -22,6 +22,7 @@ import { FIELD_LABEL_CLASS } from "../components/FormField";
 import { t } from "../i18n";
 import type { AppLanguage, CategoryId, RoutineCategoryId, RoutineMode, Zikr } from "../types";
 import { categorySlug } from "../routing";
+import { vibrateIfEnabled } from "../motionPreferences";
 
 export type LibrarySection = "collections" | "saved";
 type SavedLibraryItem = Pick<Zikr, "id" | "category" | "arabicText" | "translation" | "transliteration"> & {
@@ -40,6 +41,7 @@ export function AzkarLibraryScreen({
   onOpenBenefits,
   initialSection = "collections",
   onSectionChange,
+  hapticFeedback = true,
 }: {
   completed: Record<CategoryId, Set<string>>;
   language: AppLanguage;
@@ -52,11 +54,15 @@ export function AzkarLibraryScreen({
   onOpenBenefits?: () => void;
   initialSection?: LibrarySection;
   onSectionChange?: (section: LibrarySection) => void;
+  hapticFeedback?: boolean;
 }) {
   const [section, setSection] = useState<LibrarySection>(initialSection);
   useEffect(() => setSection(initialSection), [initialSection]);
 
   const changeSection = (next: LibrarySection) => {
+    if (next !== section) {
+      vibrateIfEnabled(Boolean(hapticFeedback), 10);
+    }
     setEntranceActive(false);
     setSection(next);
     onSectionChange?.(next);
@@ -199,7 +205,7 @@ export function AzkarLibraryScreen({
   return (
     <ScreenContainer dir={direction} className="relative" screenName={t(language, "library.title")}>
       <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col min-h-screen">
-        <header className="shrink-0 px-5 pb-3 pt-3 sm:pb-4 lg:pt-5">
+        <header className="shrink-0 border-b border-border-control/25 bg-background/95 px-5 pb-3 pt-3 backdrop-blur-xs sm:pb-4 lg:pt-5">
           <div className="flex min-w-0 items-center justify-between gap-3">
             <div className="min-w-0">
               <h1 className="block max-w-full truncate whitespace-nowrap text-xl font-extrabold text-foreground sm:text-2xl">
@@ -215,16 +221,46 @@ export function AzkarLibraryScreen({
               idPrefix="library-sections"
               aria-label={t(language, "library.title")}
               indicatorClassName="bg-primary shadow-sm"
-              className="grid shrink-0 grid-cols-2 rounded-2xl border border-border-control/60 bg-card p-1 shadow-xs sm:min-w-64"
-              tabs={(["collections", "saved"] as const).map((value) => ({
-                value,
-                testId: `library-section-${value}`,
-                label: `${t(language, `library.${value}`)}${
-                  value === "saved" && savedZikrIds.size > 0 ? ` (${formatNumerals(savedZikrIds.size, language)})` : ""
-                }`,
-              }))}
+              className="grid shrink-0 grid-cols-2 rounded-2xl border border-border-control/60 bg-card p-1 shadow-xs min-w-[96px] sm:min-w-64"
+              tabs={(["collections", "saved"] as const).map((value) => {
+                const isCollections = value === "collections";
+                const count = savedZikrIds.size;
+                const countStr = count > 0 ? formatNumerals(count, language) : "";
+                const fullLabel = `${t(language, `library.${value}`)}${
+                  value === "saved" && count > 0 ? ` (${countStr})` : ""
+                }`;
+
+                return {
+                  value,
+                  testId: `library-section-${value}`,
+                  ariaLabel: fullLabel,
+                  title: fullLabel,
+                  label: (
+                    <span className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap">
+                      {isCollections ? (
+                        <Grid size={18} aria-hidden="true" className="shrink-0" />
+                      ) : (
+                        <Bookmark size={18} aria-hidden="true" className="shrink-0" />
+                      )}
+                      <span className="hidden sm:inline">{t(language, `library.${value}`)}</span>
+                      {value === "saved" && count > 0 && (
+                        <span
+                          className={`inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[11px] font-bold leading-none transition-colors ${
+                            section === "saved"
+                              ? "bg-primary-foreground/25 text-primary-foreground"
+                              : "bg-primary/15 text-primary"
+                          }`}
+                          aria-hidden="true"
+                        >
+                          {countStr}
+                        </span>
+                      )}
+                    </span>
+                  ),
+                };
+              })}
               itemClassName={(selected) =>
-                `min-h-11 rounded-xl px-3 text-xs sm:text-sm font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                `min-h-11 min-w-11 rounded-xl px-2.5 sm:px-3 text-xs sm:text-sm font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                   selected
                     ? "bg-primary text-primary-foreground"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -251,7 +287,7 @@ export function AzkarLibraryScreen({
                   id={searchInputId}
                   type="text"
                   value={searchQuery}
-                  placeholder={t(language, "search.placeholder")}
+                  placeholder={t(language, "library.searchPlaceholder")}
                   dir={searchQuery.trim() ? "auto" : direction}
                   lang={language}
                   autoComplete="off"
@@ -308,6 +344,9 @@ export function AzkarLibraryScreen({
                     ref={selectedGroupId === "all" ? selectedGroupRef : undefined}
                     aria-pressed={selectedGroupId === "all"}
                     onClick={() => {
+                      if (selectedGroupId !== "all") {
+                        vibrateIfEnabled(Boolean(hapticFeedback), 8);
+                      }
                       setEntranceActive(false);
                       setSelectedGroupId("all");
                     }}
@@ -326,6 +365,9 @@ export function AzkarLibraryScreen({
                       ref={selectedGroupId === group.id ? selectedGroupRef : undefined}
                       aria-pressed={selectedGroupId === group.id}
                       onClick={() => {
+                        if (selectedGroupId !== group.id) {
+                          vibrateIfEnabled(Boolean(hapticFeedback), 8);
+                        }
                         setEntranceActive(false);
                         setSelectedGroupId(group.id);
                       }}

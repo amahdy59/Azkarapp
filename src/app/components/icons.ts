@@ -63,6 +63,7 @@ export {
   InfoCircle as Info,
   Keyboard01 as Keyboard,
   Globe01 as Globe,
+  Grid01 as Grid,
   LayoutLeft as PanelLeftIcon,
   Lightbulb05 as Lightbulb,
   LinkExternal01 as ExternalLink,

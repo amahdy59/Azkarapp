@@ -36,44 +36,27 @@ describe("combined counting guidance", () => {
     expect(screen.getByTestId("counter-tap-hint")).toBeVisible();
   });
 
-  it("collapses after the first count and can be reopened with the hand button", async () => {
+  it("shows guidance for first-time use without a toggle and hides completely once counted", async () => {
     const view = render(<CounterGuidance language="en" direction="ltr" hasStarted={false} />);
     expect(screen.getByTestId("counter-tap-hint")).toBeInTheDocument();
+    expect(screen.queryByTestId("counter-guidance-reopen")).not.toBeInTheDocument();
 
     view.rerender(<CounterGuidance language="en" direction="ltr" hasStarted />);
-    await waitFor(() => expect(screen.getByRole("button", { name: "Show counting guidance" })).toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByTestId("counter-tap-hint")).not.toBeInTheDocument());
     expect(window.localStorage.getItem("azkarapp.counter-guidance.v1")).toBe("true");
-    expect(screen.getByTestId("counter-tap-hint")).toHaveAttribute("data-expanded", "false");
-    expect(screen.getByTestId("counter-tap-hint").parentElement).not.toHaveStyle({ width: "max-content" });
-
-    fireEvent.click(screen.getByTestId("counter-guidance-reopen"));
-    expect(screen.getByRole("button", { name: "Hide counting guidance" })).toHaveAttribute("aria-expanded", "true");
-    expect(screen.getByText(t("en", "reader.tapAnywhereDesktop"))).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Hide counting guidance" }));
-    expect(screen.getByRole("button", { name: "Show counting guidance" })).toHaveAttribute("aria-expanded", "false");
-    fireEvent.click(screen.getByRole("button", { name: "Keyboard shortcuts" }));
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(screen.queryByTestId("counter-guidance-reopen")).not.toBeInTheDocument();
   });
 
-  it("keeps guidance collapsed on return and allows a restored count to reopen it", () => {
+  it("remains hidden on return and does not render a toggle button", () => {
     window.localStorage.setItem("azkarapp.counter-guidance.v1", "true");
-    render(<CounterGuidance language="en" direction="ltr" hasStarted />);
-    const hand = screen.getByRole("button", { name: "Show counting guidance" });
-    fireEvent.click(hand);
-    expect(hand).toHaveAttribute("aria-expanded", "true");
+    render(<CounterGuidance language="en" direction="ltr" hasStarted={false} />);
+    expect(screen.queryByTestId("counter-tap-hint")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("counter-guidance-reopen")).not.toBeInTheDocument();
   });
 
-  it("does not immediately auto-close a manual reopen after counting with dismissed guidance", () => {
-    window.localStorage.setItem("azkarapp.counter-guidance.v1", "true");
-    const view = render(<CounterGuidance language="en" direction="ltr" hasStarted={false} />);
-    view.rerender(<CounterGuidance language="en" direction="ltr" hasStarted />);
-    const hand = screen.getByTestId("counter-guidance-reopen");
-    for (let click = 0; click < 8; click++) {
-      fireEvent.click(hand);
-      expect(hand).toHaveAttribute("aria-expanded", String(click % 2 === 0));
-      const explanation = document.getElementById(hand.getAttribute("aria-controls")!);
-      expect(explanation).toHaveAttribute("aria-hidden", String(click % 2 !== 0));
-      expect(explanation).toHaveStyle({ visibility: click % 2 === 0 ? "visible" : "hidden" });
-    }
+  it("treats completed onboarding as not first-time and hides guidance", () => {
+    window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+    render(<CounterGuidance language="en" direction="ltr" hasStarted={false} />);
+    expect(screen.queryByTestId("counter-tap-hint")).not.toBeInTheDocument();
   });
 });

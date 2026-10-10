@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ReaderScreen } from "./ReaderScreen";
 import { getAzkarForMode, registerLazyCollection } from "../content/azkar";
 import { FRIDAY_KAHF } from "../content/fridayKahf";
+import { t } from "../i18n";
 
 beforeEach(() => {
   window.localStorage.clear();
@@ -644,7 +645,8 @@ describe("ReaderScreen audio identity", () => {
     expect(screen.getByTestId("counter-surface")).toBeInTheDocument();
     expect(screen.getByTestId("reader-benefit-dock-button")).toBeInTheDocument();
     expect(screen.getByTestId("reader-share-dock-button")).toHaveTextContent("مشاركة");
-    expect(screen.getByTestId("reader-support-actions").querySelectorAll("button")).toHaveLength(3);
+    expect(screen.getByTestId("reader-focus-dock-button")).toBeInTheDocument();
+    expect(screen.getByTestId("reader-support-actions").querySelectorAll("button")).toHaveLength(4);
   });
 
   it("morphs center slot into compact audio player when audioModeActive with stable outer slots", () => {
@@ -857,5 +859,45 @@ describe("ReaderScreen audio identity", () => {
     const largeOption = screen.getByTestId("reader-display-text-size-large");
     fireEvent.click(largeOption);
     expect(onTextSizeChange).toHaveBeenCalledWith("large");
+  });
+
+  it("enters and exits focus mode via the focus dock button", () => {
+    render(
+      <ReaderScreen
+        catId="morning"
+        idx={0}
+        routineMode="complete"
+        isArabic
+        direction="rtl"
+        themeMode="light"
+        isDone={false}
+        collectionCompletedCount={0}
+        hapticFeedback={false}
+        showTranslation={false}
+        showTransliteration={false}
+        textSize="medium"
+        onTextSizeChange={() => undefined}
+        savedZikrIds={new Set()}
+        onBack={() => undefined}
+        onComplete={() => undefined}
+        onAdvance={() => undefined}
+        onNext={() => undefined}
+        onPrev={() => undefined}
+        onToggleSaved={() => undefined}
+        audioAvailable={false}
+      />,
+    );
+
+    const focusBtn = screen.getByTestId("reader-focus-dock-button");
+    expect(focusBtn).toBeInTheDocument();
+    expect(screen.getByTestId("reader-screen")).toHaveAttribute("data-reading-focus", "false");
+
+    fireEvent.click(focusBtn);
+    expect(screen.getByTestId("reader-screen")).toHaveAttribute("data-reading-focus", "true");
+
+    const exitBtn = screen.getByRole("button", { name: t("ar", "reader.exitFocus") });
+    expect(exitBtn).toBeInTheDocument();
+    fireEvent.click(exitBtn);
+    expect(screen.getByTestId("reader-screen")).toHaveAttribute("data-reading-focus", "false");
   });
 });

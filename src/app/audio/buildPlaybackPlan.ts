@@ -214,7 +214,7 @@ export function buildPlaybackPlan({
       ...(zikr.translation ? { translation: zikr.translation } : {}),
       ...(zikr.transliteration ? { transliteration: zikr.transliteration } : {}),
       contentKind: resolution.asset.contentKind,
-      ...(zikr.quranText || zikr.attributionType === "quranic_supplication" ? { quranText: true } : {}),
+      ...(zikr.quranText || zikr.isSurah || zikr.attributionType === "quranic_supplication" ? { quranText: true } : {}),
       ...(resolution.asset.requiredQuranRange ? { quranRange: { ...resolution.asset.requiredQuranRange } } : {}),
       ...(zikr.mushafPages ? { mushafPages: zikr.mushafPages.map((page) => ({ ...page })) } : {}),
       repetitions,

@@ -94,6 +94,29 @@ describe("TabList", () => {
     fireEvent.keyDown(screen.getByRole("tab", { name: "Week" }), { key: "Home" });
     expect(onChange).toHaveBeenCalledWith("day");
   });
+
+  it("supports explicit ariaLabel and title when provided", () => {
+    const onChange = vi.fn();
+    render(
+      <TabList
+        value="first"
+        onChange={onChange}
+        tabs={[
+          { value: "first", label: <span data-testid="icon-1" />, ariaLabel: "First tab", title: "First tab tooltip" },
+          { value: "second", label: <span data-testid="icon-2" />, ariaLabel: "Second tab" },
+        ]}
+        direction="ltr"
+        idPrefix="custom"
+        aria-label="Custom tabs"
+        itemClassName={() => ""}
+      />,
+    );
+
+    const firstTab = screen.getByRole("tab", { name: "First tab" });
+    expect(firstTab).toBeInTheDocument();
+    expect(firstTab).toHaveAttribute("title", "First tab tooltip");
+    expect(screen.getByRole("tab", { name: "Second tab" })).toBeInTheDocument();
+  });
 });
 
 describe("tabPanelProps", () => {

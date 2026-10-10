@@ -325,7 +325,6 @@ export function ReaderScreen({
   }, [onMushafModeChange, showMushaf]);
   const [benefitOpen, setBenefitOpen] = useState(false);
   const [focusMode, setFocusMode] = useState(false);
-  const [footerToolsExpanded, setFooterToolsExpanded] = useState(true);
   const focusExitRef = useRef<HTMLButtonElement>(null);
   const focusRequestedRef = useRef(false);
   const previousFocusMode = useRef(false);
@@ -697,8 +696,8 @@ export function ReaderScreen({
     arabicLength: z.arabicText.length,
     longSurah,
   });
-  const readingFontFamily =
-    z.quranText || z.attributionType === "quranic_supplication" ? "var(--font-mushaf)" : "var(--font-zikr)";
+  const isQuranicText = Boolean(z.quranText || z.isSurah || z.attributionType === "quranic_supplication");
+  const readingFontFamily = isQuranicText ? "var(--font-mushaf)" : "var(--font-zikr)";
   const readingPercent = azkar.length > 0 ? Math.round((readingProgressValue / azkar.length) * 100) : 0;
   const readerZikrTitle = getReaderZikrTitle(z, language);
   const localizedReadingPercent = formatNumerals(readingPercent, language);
@@ -801,17 +800,25 @@ export function ReaderScreen({
                 text={displayArabicText}
                 meanings={wordMeanings}
                 language={language}
-                style={{ fontFamily: readingFontFamily, fontSize: readingFontSize }}
+                style={{
+                  fontFamily: readingFontFamily,
+                  fontSize: readingFontSize,
+                  lineHeight: isQuranicText ? 1.7 : undefined,
+                }}
                 onSelectMeanings={setWordMeaningSelection}
                 activeWordId={activeWordId}
               />
             ) : (
               <p
-                className="zikr-text pointer-events-none text-center font-medium leading-[2.1] text-foreground"
+                className={`zikr-text pointer-events-none text-center font-medium ${isQuranicText ? "leading-[1.7]" : "leading-[1.85]"} text-foreground`}
                 data-testid="zikr-text"
                 dir="rtl"
                 lang="ar"
-                style={{ fontFamily: readingFontFamily, fontSize: readingFontSize }}
+                style={{
+                  fontFamily: readingFontFamily,
+                  fontSize: readingFontSize,
+                  lineHeight: isQuranicText ? 1.7 : undefined,
+                }}
               >
                 {displayArabicText}
               </p>
@@ -1145,7 +1152,7 @@ export function ReaderScreen({
                 : t(language, "reader.arabicAudioUnavailable")
         }
         data-testid="reader-audio-dock-button"
-        className={`min-w-[5rem] flex-1 ${audioModeActive ? "" : "shadow-sm"}`}
+        className={`min-w-0 flex-1 ${audioModeActive ? "" : "shadow-sm"}`}
       >
         <Headphones size={20} className="shrink-0" aria-hidden="true" />
         <span className="min-w-0 text-label font-semibold [overflow-wrap:anywhere]">
@@ -1170,11 +1177,31 @@ export function ReaderScreen({
       aria-label={t(language, "reader.referencesButton")}
       title={t(language, "reader.referencesButton")}
       data-testid="reader-benefit-dock-button"
-      className={fullWidth ? "w-full rounded-2xl px-6 py-4 shadow-sm" : "min-w-[5rem] flex-1 shadow-sm"}
+      className={fullWidth ? "w-full rounded-2xl px-6 py-4 shadow-sm" : "min-w-0 flex-1 shadow-sm"}
     >
       <Lightbulb size={20} aria-hidden="true" />
       <span className="min-w-0 text-label font-semibold [overflow-wrap:anywhere]">
         {t(language, "reader.referencesButton")}
+      </span>
+    </DevotionalAction>
+  );
+
+  const renderFocusDockButton = () => (
+    <DevotionalAction
+      type="button"
+      onClick={(e) => {
+        e.stopPropagation();
+        focusRequestedRef.current = true;
+        setFocusMode(true);
+      }}
+      aria-label={t(language, "reader.enterFocus")}
+      title={t(language, "reader.enterFocus")}
+      data-testid="reader-focus-dock-button"
+      className="min-w-0 flex-1 shadow-sm"
+    >
+      <Maximize size={20} aria-hidden="true" />
+      <span className="min-w-0 text-label font-semibold [overflow-wrap:anywhere]">
+        {t(language, "reader.enterFocus")}
       </span>
     </DevotionalAction>
   );
@@ -1239,16 +1266,8 @@ export function ReaderScreen({
     return (
       <div data-testid="reader-counter-stack">
         <DevotionalFooter className="reader-session-footer">
-          <ReaderFooterTools
-            language={language}
-            expanded={footerToolsExpanded}
-            onToggle={() => setFooterToolsExpanded((expanded) => !expanded)}
-            primary={renderCounterPanel()}
-          >
-            <div
-              className="flex w-full flex-wrap items-center justify-center gap-2"
-              data-testid="reader-support-actions"
-            >
+          <ReaderFooterTools language={language} primary={renderCounterPanel()}>
+            <div className="flex w-full items-center justify-center gap-2" data-testid="reader-support-actions">
               {renderBenefitDockButton()}
               {renderAudioDockButton()}
               <DevotionalAction
@@ -1262,14 +1281,16 @@ export function ReaderScreen({
                 }}
                 aria-haspopup="dialog"
                 aria-label={t(language, "reader.shareCurrent")}
+                title={t(language, "reader.shareCurrent")}
                 data-testid="reader-share-dock-button"
-                className="min-w-[5rem] flex-1 shadow-sm"
+                className="min-w-0 flex-1 shadow-sm"
               >
                 <Share2 size={20} aria-hidden="true" />
                 <span className="min-w-0 text-label font-semibold [overflow-wrap:anywhere]">
                   {t(language, "reader.shareAction")}
                 </span>
               </DevotionalAction>
+              {renderFocusDockButton()}
             </div>
           </ReaderFooterTools>
         </DevotionalFooter>

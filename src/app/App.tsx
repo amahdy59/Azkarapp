@@ -1895,6 +1895,7 @@ function AppContent({
                   initialSection={librarySection}
                   onSectionChange={navigateLibrarySection}
                   onOpenBenefits={() => push("benefits")}
+                  hapticFeedback={hapticFeedback}
                 />
               )}
               {view === "progress" && (

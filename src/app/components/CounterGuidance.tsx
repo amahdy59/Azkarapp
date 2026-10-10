@@ -12,7 +12,6 @@ export function CounterGuidance({
   reader = false,
   placement,
   hasStarted = false,
-  hideWhenDismissed = false,
   showKeyboardHelp = true,
 }: {
   language: AppLanguage;
@@ -24,15 +23,13 @@ export function CounterGuidance({
   showKeyboardHelp?: boolean;
 }) {
   const wide = useMediaQuery("(min-width: 768px)");
-  const { expanded, reopen, dismiss } = useCounterGuidance(hasStarted);
+  const { expanded } = useCounterGuidance(hasStarted);
   if ((placement === "above" && wide) || (placement === "below" && !wide)) return null;
-  if (hideWhenDismissed && !expanded) return null;
+  if (!expanded) return null;
   return (
     <div className="w-full shrink-0" data-reading-shortcuts>
       <CounterTapHint
-        expanded={expanded}
-        onToggle={expanded ? dismiss : reopen}
-        toggleLabel={t(language, expanded ? "reader.hideCountingGuidance" : "reader.showCountingGuidance")}
+        expanded={true}
         text={t(language, "reader.tapAnywhere")}
         desktopText={t(language, "reader.tapAnywhereDesktop")}
         keyboardHelp={
