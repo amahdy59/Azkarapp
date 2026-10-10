@@ -34,6 +34,13 @@
   border-style: dashed;
   background: var(--card);
 }
+.reader-footer-composition[data-focus-mode="true"] {
+  border-top-color: transparent;
+}
+.reader-tools-toggle[data-focus-active="true"] {
+  background: var(--muted);
+  border-color: var(--border);
+}
 .reader-dock .reader-tools-toggle {
   border-radius: 12px;
 }

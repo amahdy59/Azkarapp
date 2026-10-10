@@ -330,7 +330,6 @@ export function ReaderScreen({
   }, [onMushafModeChange, showMushaf]);
   const [benefitOpen, setBenefitOpen] = useState(false);
   const [focusMode, setFocusMode] = useState(false);
-  const [footerToolsExpanded, setFooterToolsExpanded] = useState(true);
   const focusExitRef = useRef<HTMLButtonElement>(null);
   const focusRequestedRef = useRef(false);
   const previousFocusMode = useRef(false);
@@ -1257,8 +1256,9 @@ export function ReaderScreen({
         <DevotionalFooter className="reader-session-footer">
           <ReaderFooterTools
             language={language}
-            expanded={footerToolsExpanded}
-            onToggle={() => setFooterToolsExpanded((expanded) => !expanded)}
+            focusMode={focusMode}
+            onToggleFocus={() => setFocusMode((prev) => !prev)}
+            focusToggleRef={focusExitRef}
             primary={renderCounterPanel()}
           >
             <div
@@ -1290,14 +1290,6 @@ export function ReaderScreen({
             </div>
           </ReaderFooterTools>
         </DevotionalFooter>
-        <CounterGuidance
-          language={language}
-          direction={direction}
-          reader
-          hasStarted={count > 0}
-          placement="below"
-          showKeyboardHelp={false}
-        />
       </div>
     );
   };
@@ -1506,22 +1498,7 @@ export function ReaderScreen({
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
-      {focusMode && !showMushaf && (
-        <div
-          className="flex shrink-0 items-center justify-end px-4 pb-2 pt-[max(0.5rem,env(safe-area-inset-top))]"
-          data-prevent-count="true"
-        >
-          <h1 className="sr-only">{displayCategoryName}</h1>
-          <button
-            ref={focusExitRef}
-            type="button"
-            onClick={() => setFocusMode(false)}
-            className="min-h-11 rounded-xl border border-border bg-card px-4 py-2 text-sm font-semibold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-          >
-            {t(language, "reader.exitFocus")}
-          </button>
-        </div>
-      )}
+      {focusMode && !showMushaf && <h1 className="sr-only">{displayCategoryName}</h1>}
       <div className="sr-only" aria-live="polite">
         {shareMessage}
       </div>

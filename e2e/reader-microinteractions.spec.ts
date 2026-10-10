@@ -419,7 +419,7 @@ test("desktop and tablet keep navigation below reading text and one reachable ke
     expect(counterBox).not.toBeNull();
     expect(guideBox).not.toBeNull();
     if (textBox && navigationBox) expect(textBox.y + textBox.height).toBeLessThanOrEqual(navigationBox.y);
-    if (counterBox && guideBox) expect(counterBox.y + counterBox.height).toBeLessThanOrEqual(guideBox.y);
+    if (counterBox && guideBox) expect(guideBox.y + guideBox.height).toBeLessThanOrEqual(counterBox.y);
   }
 
   await expect(desktopHero).toBeVisible();

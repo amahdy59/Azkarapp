@@ -5,7 +5,7 @@ import { t } from "../src/app/i18n";
 for (const language of ["ar", "en"] as const) {
   test(`ayah image preview exports complete portrait and square cards in ${language} @cross-browser`, async ({
     page,
-  }) => {
+  }, testInfo) => {
     await page.setViewportSize({ width: 360, height: 740 });
     await page.route("https://verses.quran.foundation/**", (route) => route.abort());
     await page.addInitScript((language) => {
@@ -49,9 +49,11 @@ for (const language of ["ar", "en"] as const) {
       await save.click();
       const download = await downloadPromise;
       expect(download.suggestedFilename()).toBe(`ayah-2-255-${format}-1.png`);
-      await download.saveAs(`output/ayah-card-${language}-${format}-${test.info().project.name}.png`);
+      await download.saveAs(testInfo.outputPath(`ayah-card-${language}-${format}-${testInfo.project.name}.png`));
       await preview.scrollIntoViewIfNeeded();
-      await page.screenshot({ path: `output/ayah-studio-${language}-${format}-${test.info().project.name}.png` });
+      await page.screenshot({
+        path: testInfo.outputPath(`ayah-studio-${language}-${format}-${testInfo.project.name}.png`),
+      });
       expect(await studio.evaluate((element) => element.scrollWidth <= element.clientWidth + 1)).toBe(true);
     }
     const results = await new AxeBuilder({ page })

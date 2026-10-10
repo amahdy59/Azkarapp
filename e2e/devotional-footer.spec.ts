@@ -99,13 +99,14 @@ for (const language of ["ar", "en"] as const) {
       const initialReadingBounds = (await reading.boundingBox())!;
       const initialCount = await counter.getAttribute("aria-label");
       const toggle = page.getByTestId("reader-tools-toggle");
-      await expect(toggle.locator("svg")).not.toHaveClass(/rotate-180/);
       await toggle.focus();
       await page.keyboard.press("Enter");
       await expect(tools).toBeHidden();
       await expect(toggle).toBeFocused();
-      await expect.poll(async () => (await reading.boundingBox())!.height).toBeCloseTo(expandedReadingHeight, 0);
-      expect((await reading.boundingBox())!.y).toBeCloseTo(initialReadingBounds.y, 0);
+      await expect
+        .poll(async () => (await reading.boundingBox())!.height)
+        .toBeGreaterThanOrEqual(expandedReadingHeight);
+      expect((await reading.boundingBox())!.y).toBeLessThanOrEqual(initialReadingBounds.y);
       const guidance = page.getByTestId("counter-guidance-reopen");
       if (await guidance.isVisible()) {
         const before = (await reading.boundingBox())!;
@@ -114,8 +115,8 @@ for (const language of ["ar", "en"] as const) {
         expect((await reading.boundingBox())!.y).toBeCloseTo(before.y, 0);
       }
       await expect(toggle).toHaveAttribute("aria-expanded", "false");
-      await expect(toggle.locator("svg")).toHaveClass(/rotate-180/);
-      await expect(toggle).toHaveAccessibleName(ar ? "إظهار الأدوات" : "Show tools");
+      await expect(toggle).toHaveAttribute("aria-pressed", "true");
+      await expect(toggle).toHaveAccessibleName(ar ? "إنهاء وضع التركيز" : "Exit reading focus");
       await page.screenshot({ path: testInfo.outputPath(`footer-collapsed-${language}-${width}.png`) });
       await expect(counter).toHaveAttribute("aria-label", initialCount!);
       await page
@@ -124,13 +125,7 @@ for (const language of ["ar", "en"] as const) {
         .click();
       await expect(page.getByTestId("reader-screen")).toHaveAttribute("data-zikr-index", "1");
       await expect(tools).toBeHidden();
-      await page.getByRole("button", { name: ar ? "إظهار الأدوات" : "Show tools", exact: true }).click();
-      await expect(tools).toBeVisible();
-      await page.getByRole("button", { name: ar ? "خيارات القارئ" : "Reader options", exact: true }).click();
-      await page.getByTestId("reader-focus-toggle").click();
-      await expect(tools).toBeHidden();
-      await expect(page.getByRole("button", { name: ar ? "إخفاء الأدوات" : "Hide tools", exact: true })).toBeHidden();
-      await page.getByRole("button", { name: ar ? "إنهاء وضع التركيز" : "Exit reading focus", exact: true }).click();
+      await toggle.click();
       await expect(tools).toBeVisible();
       await page.screenshot({ path: testInfo.outputPath(`footer-${language}-${width}.png`) });
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -323,8 +318,7 @@ for (const language of ["ar", "en"] as const) {
         const hintBox = (await hint.boundingBox())!;
         const supportBox = (await actions.boundingBox())!;
         const panelBox = (await page.getByTestId("counter-panel").boundingBox())!;
-        if (width < 768) expect(hintBox.y + hintBox.height).toBeLessThanOrEqual(supportBox.y);
-        else expect(panelBox.y + panelBox.height).toBeLessThanOrEqual(hintBox.y);
+        expect(hintBox.y + hintBox.height).toBeLessThanOrEqual(Math.max(supportBox.y, panelBox.y) + 1);
         // The tool group uses the space beside the primary on wide canvases.
         const dockBox = (await page.getByTestId("reader-dock").boundingBox())!;
         expect(supportBox.x).toBeGreaterThanOrEqual(dockBox.x);

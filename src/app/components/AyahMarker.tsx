@@ -1,5 +1,5 @@
 import type { AppLanguage, MushafPageTheme } from "../types";
-import { formatNumerals } from "../formatting";
+import { formatNumerals, numeralFontFamily } from "../formatting";
 import { t } from "../i18n";
 export function AyahMarker({
   number,
@@ -60,10 +60,13 @@ export function AyahMarker({
         <circle cx="28.5" cy="16" r="1.1" fill="var(--mushaf-rule-ink, var(--accent, #d4b47c))" />
       </svg>
       <span
-        className={`absolute inset-0 flex items-center justify-center font-sans text-[0.42em] font-bold leading-none ${
+        className={`absolute inset-0 flex items-center justify-center text-[0.42em] font-bold leading-none ${
           isHighlighted ? "text-primary font-black" : isOled ? "text-white" : "text-foreground"
         }`}
-        style={{ fontVariantNumeric: "tabular-nums" }}
+        style={{
+          fontFamily: numeralFontFamily(language),
+          fontVariantNumeric: "tabular-nums",
+        }}
         aria-hidden="true"
       >
         {displayNum}

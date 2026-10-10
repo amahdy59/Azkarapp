@@ -39,3 +39,30 @@ it("renders tools and primary counter without a disclosure toggle when onToggle 
   expect(screen.getByTestId("counter")).toBeVisible();
   expect(screen.queryByTestId("reader-tools-toggle")).not.toBeInTheDocument();
 });
+
+it.each(["en", "ar"] as const)("toggles focus mode with onToggleFocus in %s", async (language) => {
+  function FocusExample() {
+    const [focusMode, setFocusMode] = useState(false);
+    return (
+      <ReaderFooterTools language={language} focusMode={focusMode} onToggleFocus={() => setFocusMode(!focusMode)}>
+        <button data-testid="action-share">Share</button>
+      </ReaderFooterTools>
+    );
+  }
+  const user = userEvent.setup();
+  render(<FocusExample />);
+  const toggle = screen.getByTestId("reader-tools-toggle");
+  expect(toggle).toHaveAttribute("aria-pressed", "false");
+  expect(toggle).toHaveAttribute("aria-expanded", "true");
+  expect(screen.getByTestId("action-share")).toBeVisible();
+
+  await user.click(toggle);
+  expect(toggle).toHaveAttribute("aria-pressed", "true");
+  expect(toggle).toHaveAttribute("aria-expanded", "false");
+  expect(screen.queryByTestId("action-share")).not.toBeVisible();
+
+  await user.click(toggle);
+  expect(toggle).toHaveAttribute("aria-pressed", "false");
+  expect(toggle).toHaveAttribute("aria-expanded", "true");
+  expect(screen.getByTestId("action-share")).toBeVisible();
+});

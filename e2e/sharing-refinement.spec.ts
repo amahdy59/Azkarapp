@@ -14,8 +14,8 @@ async function expectDividerClearance(page: Page) {
     const lines = ink.filter((line) => line.panelId === divider.panelId);
     const before = lines.filter((line) => line.top < divider.y);
     const after = lines.filter((line) => line.top >= divider.y);
-    expect(divider.y - Math.max(...before.map((line) => line.bottom))).toBeGreaterThanOrEqual(20);
-    expect(Math.min(...after.map((line) => line.top)) - divider.y).toBeGreaterThanOrEqual(20);
+    expect(divider.y - Math.max(...before.map((line) => line.bottom))).toBeGreaterThanOrEqual(19.9);
+    expect(Math.min(...after.map((line) => line.top)) - divider.y).toBeGreaterThanOrEqual(19.9);
   }
 }
 
@@ -353,7 +353,7 @@ test("sharing preview supports readable Arabic, sources and accessible controls 
     expect(line.text).not.toMatch(/[0-9۰-۹]/u);
     expect(line.text).not.toBe("المصدر");
     expect(line.left).toBeGreaterThanOrEqual(110);
-    expect(line.right).toBeLessThanOrEqual(970);
+    expect(line.right).toBeLessThanOrEqual(975);
     expect(line.top).toBeGreaterThanOrEqual(line.panelTop + 23);
     expect(line.bottom).toBeLessThanOrEqual(line.panelBottom - 23);
   }

@@ -21,8 +21,12 @@ export function QuranPrelude({ zikr, className = "" }: { zikr: Zikr; className?:
       )}
       {(zikr.hasBasmalah || zikr.isSurah) && (
         <p
-          className={`zikr-text mb-2 text-center text-lg font-bold tracking-wide text-primary/90 ${className}`}
-          style={QURAN_TEXT_STYLE}
+          className={`zikr-text mb-4 text-center font-bold tracking-wide text-foreground/90 ${className}`}
+          style={{
+            ...QURAN_TEXT_STYLE,
+            fontSize: "clamp(1.15rem, 4vw, 1.35rem)",
+            lineHeight: 2,
+          }}
           dir="rtl"
           lang="ar"
         >
@@ -30,6 +34,23 @@ export function QuranPrelude({ zikr, className = "" }: { zikr: Zikr; className?:
         </p>
       )}
     </>
+  );
+}
+
+function SurahFlourishRule({ flip = false }: { flip?: boolean }) {
+  return (
+    <svg
+      width="120"
+      height="14"
+      viewBox="0 0 120 14"
+      fill="none"
+      className={`shrink select-none opacity-80 ${flip ? "-scale-x-100" : ""}`}
+      aria-hidden="true"
+    >
+      <polygon points="4,7 7,4 10,7 7,10" fill="var(--mushaf-rule-ink, var(--accent, #c6a772))" />
+      <line x1="12" y1="7" x2="108" y2="7" stroke="var(--mushaf-rule-ink, var(--accent, #c6a772))" strokeWidth="1.2" />
+      <circle cx="114" cy="7" r="2.5" stroke="var(--mushaf-rule-ink, var(--accent, #c6a772))" strokeWidth="1" />
+    </svg>
   );
 }
 
@@ -44,6 +65,11 @@ export function QuranSurahHeader({
 }) {
   if (!zikr.isSurah && !zikr.surahNameArabic) return null;
 
+  const surahName =
+    zikr.isSurah && zikr.surahNameArabic
+      ? `سُورَةُ ${zikr.surahNameArabic}`
+      : (zikr.surahNameArabic ?? "الْقُرْآنُ الْكَرِيمُ");
+
   const surahType = zikr.surahType
     ? language === "ar"
       ? zikr.surahType === "Medinan" || zikr.surahType === "مدنية"
@@ -57,22 +83,39 @@ export function QuranSurahHeader({
     : undefined;
 
   return (
-    <div className={`mb-2 text-center ${sticky ? "sticky top-3 z-20 pointer-events-none" : "pointer-events-none"}`}>
-      <div className="inline-flex items-center gap-1.5 rounded-2xl border border-border/40 bg-card/60 backdrop-blur-md px-3 py-1.5 shadow-sm">
-        {surahType && <span className="text-micro font-semibold text-primary/80">{surahType}</span>}
-        <span className="zikr-text text-sm font-bold text-primary" dir="rtl" lang="ar">
-          {zikr.isSurah && zikr.surahNameArabic
-            ? `سُورَةُ ${zikr.surahNameArabic}`
-            : (zikr.surahNameArabic ?? "الْقُرْآنُ الْكَرِيمُ")}
-        </span>
-        {zikr.verseCount && (
-          <span
-            className="text-micro font-semibold text-primary/80"
-            style={{ fontFamily: numeralFontFamily(language) }}
+    <div
+      className={`my-3 w-full max-w-[30rem] mx-auto text-center ${
+        sticky ? "sticky top-3 z-20 pointer-events-none" : "pointer-events-none"
+      }`}
+      dir="rtl"
+      data-testid="quran-surah-header"
+    >
+      <div className="flex items-center justify-center gap-2.5 sm:gap-4 px-2">
+        <SurahFlourishRule />
+
+        {/* Surah Title */}
+        <div className="flex flex-col items-center px-1">
+          <h2
+            className="text-base sm:text-lg font-bold tracking-wide text-foreground whitespace-nowrap select-none"
+            style={{ fontFamily: "var(--font-mushaf)" }}
+            data-testid="quran-surah-title"
           >
-            {t(language, "reader.ayahs")} {formatNumerals(zikr.verseCount, language)}
-          </span>
-        )}
+            {surahName}
+          </h2>
+          {(surahType || zikr.verseCount) && (
+            <div className="mt-0.5 flex items-center gap-1.5 text-micro font-medium text-muted-foreground/80">
+              {surahType && <span>{surahType}</span>}
+              {surahType && zikr.verseCount && <span>·</span>}
+              {zikr.verseCount && (
+                <span style={{ fontFamily: numeralFontFamily(language) }}>
+                  {t(language, "reader.ayahs")} {formatNumerals(zikr.verseCount, language)}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+
+        <SurahFlourishRule flip />
       </div>
     </div>
   );

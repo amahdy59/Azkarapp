@@ -1,5 +1,20 @@
 [
   {
+    "release": "2026-10-10.6",
+    "ar": [
+      "التبديل بين وضع التركيز والوضع العادي بسهولة من أسفل الشاشة مع ثبات موضع الزر في متناول الإبهام.",
+      "إزالة تلميحات العد من أسفل القارئ لتوفير مساحة قراءة هادئة ونقية خالية من المشتتات.",
+      "استماع هادئ لتلاوة المصحف دون تحريك أسطر الصفحة أو رفعها للأعلى مع إمكانية إخفاء المشغل بنقرة على الشاشة.",
+      "عرض السور القصيرة ومقاطع القرآن داخل الأذكار بتصميم مصحف المدينة المتكامل مع الزخرفة والبسملة وأرقام الآيات الشرقية."
+    ],
+    "en": [
+      "Easily toggle focus mode from the bottom toolbar with a button that stays right under your thumb to quickly return.",
+      "Removed tap hints from the bottom of the reader for a clean, distraction-free devotional reading surface.",
+      "Listen to Mushaf recitations with a stable page layout that never pushes text upward, with smooth fade on screen tap.",
+      "Read short surahs and Quran snippets within adhkar styled with authentic Medina Mushaf banners, centered Basmalah, and rosette numerals."
+    ]
+  },
+  {
     "release": "2026-10-10.5",
     "ar": [
       "اقرأ المقاطع القرآنية بخط وحجم متناسقين في القارئ ومشغل الصوت والبحث والمحفوظات، دون تكبير سطر على حساب آخر.",

@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-10.5",
+  "release": "2026-10-10.6",
   "ar": [
-    "اقرأ المقاطع القرآنية بخط وحجم متناسقين في القارئ ومشغل الصوت والبحث والمحفوظات، دون تكبير سطر على حساب آخر.",
-    "اختر تنزيل تسجيل البقرة أو الكهف أو الأذكار وصفحات المصحف كلًّا على حدة، وتحقق من الحجم قبل التنزيل والحذف.",
-    "تابع المعنى الإنجليزي بجانب المصحف، وكبّر الصفحة حتى ٢٠٠٪، واستعد إرشادات العد من أدوات القراءة والصوت.",
-    "شارك النص القرآني بخط أوضح، واحتفظ بتقدمك عند إعادة التحميل فورًا، وتنقّل في الإعدادات بلوحة المفاتيح وراجع التحديثات دون اتصال."
+    "التبديل بين وضع التركيز والوضع العادي بسهولة من أسفل الشاشة مع ثبات موضع الزر في متناول الإبهام.",
+    "إزالة تلميحات العد من أسفل القارئ لتوفير مساحة قراءة هادئة ونقية خالية من المشتتات.",
+    "استماع هادئ لتلاوة المصحف دون تحريك أسطر الصفحة أو رفعها للأعلى مع إمكانية إخفاء المشغل بنقرة على الشاشة.",
+    "عرض السور القصيرة ومقاطع القرآن داخل الأذكار بتصميم مصحف المدينة المتكامل مع الزخرفة والبسملة وأرقام الآيات الشرقية."
   ],
   "en": [
-    "Read Quran passages with consistent type and size in the reader, audio player, search, and saved items, without individually enlarged lines.",
-    "Choose Al-Baqarah, Al-Kahf, daily adhkar audio, and Mushaf page downloads independently, with sizes and removal confirmation.",
-    "Follow English meaning beside the Mushaf, enlarge pages up to 200%, and reopen counting guidance from clearer reader and audio tools.",
-    "Share Quran text in a clearer font, keep progress through immediate reloads, navigate settings by keyboard, and read update history offline."
+    "Easily toggle focus mode from the bottom toolbar with a button that stays right under your thumb to quickly return.",
+    "Removed tap hints from the bottom of the reader for a clean, distraction-free devotional reading surface.",
+    "Listen to Mushaf recitations with a stable page layout that never pushes text upward, with smooth fade on screen tap.",
+    "Read short surahs and Quran snippets within adhkar styled with authentic Medina Mushaf banners, centered Basmalah, and rosette numerals."
   ]
 }

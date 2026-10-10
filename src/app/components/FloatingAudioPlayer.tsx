@@ -201,8 +201,11 @@ export function FloatingAudioPlayer({
         Math.ceil(main.getBoundingClientRect().bottom - dock.getBoundingClientRect().top) + 8,
       );
       main.style.setProperty("--floating-audio-clearance", `${clearance}px`);
-      if (preferCompactReading) main.style.setProperty("--mushaf-audio-clearance", `${clearance}px`);
-      else main.style.removeProperty("--mushaf-audio-clearance");
+      if (preferCompactReading && window.innerWidth >= 768) {
+        main.style.setProperty("--mushaf-audio-clearance", `${clearance}px`);
+      } else {
+        main.style.removeProperty("--mushaf-audio-clearance");
+      }
       const focused = document.activeElement;
       if (focused instanceof HTMLElement && main.contains(focused) && !dock.contains(focused)) {
         const scroll = getScrollViewport(focused);

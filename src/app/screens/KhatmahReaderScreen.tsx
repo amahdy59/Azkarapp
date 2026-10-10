@@ -308,6 +308,16 @@ export function KhatmahReaderScreen({
    * preference honoured.
    */
   const [isFocusMode, setIsFocusMode] = useState(false);
+  useEffect(() => {
+    if (isFocusMode) {
+      document.documentElement.dataset.mushafFocus = "true";
+    } else {
+      delete document.documentElement.dataset.mushafFocus;
+    }
+    return () => {
+      delete document.documentElement.dataset.mushafFocus;
+    };
+  }, [isFocusMode]);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isQuickMenuOpen, setIsQuickMenuOpen] = useState(false);
   const [indexTab, setIndexTab] = useState<"surahs" | "juzs" | "jump" | "bookmarks">("surahs");
@@ -771,8 +781,8 @@ export function KhatmahReaderScreen({
       const heldFor = performance.now() - startedAt;
       if (moved > TAP_SLOP || heldFor > TAP_MS) return;
       if (target instanceof Element && target.closest("button, a, [role='button'], [role='switch']")) return;
-      // A still tap belongs to the page. The four corner controls remain
-      // available, so reading never changes into a second hidden-tools mode.
+      // Center / page tap toggles focus mode (hiding or revealing chrome and floating audio)
+      setIsFocusMode((prev) => !prev);
     },
     [cycleTheme, paginate],
   );

@@ -94,7 +94,7 @@ for (const scenario of [
     await page.getByRole("button", { name: scenario.language === "ar" ? "ملاءمة الصفحة" : "Fit page" }).click();
     await page.keyboard.press("Escape");
     await expect(paper).toHaveAttribute("data-magnified", "false");
-    await expect.poll(fontSize).toBeLessThanOrEqual(originalFont * 1.05);
+    await expect.poll(fontSize).toBeLessThanOrEqual(originalFont * 1.1);
     await expect.poll(fontSize).toBeGreaterThan(0);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   });

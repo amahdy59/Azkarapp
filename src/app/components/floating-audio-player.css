@@ -4,6 +4,22 @@
 .floating-audio-player {
   inset-inline: 0.5rem;
   bottom: calc(4.5rem + env(safe-area-inset-bottom) + 0.5rem);
+  transition:
+    opacity var(--motion-duration-fast) var(--motion-ease-standard),
+    transform var(--motion-duration-fast) var(--motion-ease-standard);
+}
+
+html[data-mushaf-focus="true"] .floating-audio-player {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(16px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .floating-audio-player,
+  html[data-mushaf-focus="true"] .floating-audio-player {
+    transition: none;
+  }
 }
 
 .app-main-view {
