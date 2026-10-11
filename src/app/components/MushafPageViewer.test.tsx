@@ -33,6 +33,40 @@ describe("MushafPageViewer", () => {
     ],
   ];
 
+  it("matches the English frame to the measured Arabic page rather than a separate container-unit estimate", () => {
+    const bounds = vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function () {
+      return {
+        width: this.matches("[data-mushaf-page] .mushaf-page-frame") ? 360.5 : 0,
+        height: 0,
+        top: 0,
+        left: 0,
+        bottom: 0,
+        right: 0,
+        x: 0,
+        y: 0,
+        toJSON: () => {},
+      };
+    });
+    try {
+      const { container } = render(
+        <MushafPageViewer
+          lines={sampleLines}
+          language="en"
+          pageNumber={3}
+          surahName="Al-Baqarah"
+          juzNumber={1}
+          direction="rtl"
+          facingContent={<p>Meaning</p>}
+        />,
+      );
+      expect(container.querySelector<HTMLElement>("[data-mushaf-meaning] .mushaf-page-frame")?.style.maxWidth).toBe(
+        "360.5px",
+      );
+    } finally {
+      bounds.mockRestore();
+    }
+  });
+
   it("renders one semantic page with surah and juz context", () => {
     render(
       <MushafPageViewer

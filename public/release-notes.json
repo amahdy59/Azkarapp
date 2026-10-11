@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-11",
+  "release": "2026-10-11.1",
   "ar": [
-    "قراءة الترجمة الإنجليزية في مساحة مستقلة للتمرير، مع سهولة التبديل بينها وبين الصفحة العربية على الهاتف.",
-    "خيارات الصوت والتنقل بين صفحات التلاوة معًا فوق النص، مع مساحة قراءة أوضح عند تكبير الخط.",
-    "تنزيلات أوضح بثلاث مجموعات فقط: الأذكار والأدعية، وتلاوات الكهف والبقرة، وصفحات المصحف، مع إدارة التفاصيل عند الحاجة.",
-    "حروف المصحف في المقاطع القرآنية اليومية حتى دون اتصال بعد تثبيت التطبيق، وإخفاء إرشادات العد وزرها بعد الاستخدام الأول."
+    "صفحة إنجليزية بمحاذاة الصفحة العربية وتمرير مستقل للمعاني، مع اختيار لغة القراءة بسهولة على الهاتف.",
+    "تنقل وخيارات صوت ثابتة فوق نص التلاوة، مع إبقاء الكلمة الحالية ظاهرة ومساحة مريحة عند تكبير النص.",
+    "تنظيم التنزيلات في الأذكار والأدعية، وتلاوات الكهف والبقرة، وصفحات المصحف، وإظهار التفاصيل عند فتح المجموعة.",
+    "المقاطع القرآنية اليومية بحروف المصحف دون اتصال بعد التثبيت، وحفظ العد عند إعادة تحميل الصفحة، وإرشادات تظهر عند الاستخدام الأول فقط."
   ],
   "en": [
-    "Scroll English meanings independently, and switch easily between English and Arabic pages on your phone.",
-    "Find audio options and recitation page controls together above the text, with clearer reading space at larger text sizes.",
-    "Choose from three clear download groups: adhkar and duas, Kahf and Baqarah recitations, or Mushaf pages, with detailed management available when needed.",
-    "Read verified daily Quran passages with Mushaf lettering offline after installing the app, with counting guidance and its button gone after first use."
+    "Read English beside a matching Arabic page, scroll meanings independently, and choose your reading language on your phone.",
+    "Keep recitation navigation and audio options above the text, with the current word in view and comfortable space for enlarged reading.",
+    "Browse downloads in three groups: adhkar and duas, Kahf and Baqarah recitations, and Mushaf pages, opening each group for details.",
+    "Enjoy verified daily Quran passages in offline Mushaf lettering after installation, retain counts on page reload, and see counting guidance only on first use."
   ]
 }

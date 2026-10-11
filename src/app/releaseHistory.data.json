@@ -1,5 +1,20 @@
 [
   {
+    "release": "2026-10-11.1",
+    "ar": [
+      "صفحة إنجليزية بمحاذاة الصفحة العربية وتمرير مستقل للمعاني، مع اختيار لغة القراءة بسهولة على الهاتف.",
+      "تنقل وخيارات صوت ثابتة فوق نص التلاوة، مع إبقاء الكلمة الحالية ظاهرة ومساحة مريحة عند تكبير النص.",
+      "تنظيم التنزيلات في الأذكار والأدعية، وتلاوات الكهف والبقرة، وصفحات المصحف، وإظهار التفاصيل عند فتح المجموعة.",
+      "المقاطع القرآنية اليومية بحروف المصحف دون اتصال بعد التثبيت، وحفظ العد عند إعادة تحميل الصفحة، وإرشادات تظهر عند الاستخدام الأول فقط."
+    ],
+    "en": [
+      "Read English beside a matching Arabic page, scroll meanings independently, and choose your reading language on your phone.",
+      "Keep recitation navigation and audio options above the text, with the current word in view and comfortable space for enlarged reading.",
+      "Browse downloads in three groups: adhkar and duas, Kahf and Baqarah recitations, and Mushaf pages, opening each group for details.",
+      "Enjoy verified daily Quran passages in offline Mushaf lettering after installation, retain counts on page reload, and see counting guidance only on first use."
+    ]
+  },
+  {
     "release": "2026-10-11",
     "ar": [
       "قراءة الترجمة الإنجليزية في مساحة مستقلة للتمرير، مع سهولة التبديل بينها وبين الصفحة العربية على الهاتف.",

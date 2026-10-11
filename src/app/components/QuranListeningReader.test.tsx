@@ -56,6 +56,35 @@ describe("read-only listening controls", () => {
     vi.spyOn(timings, "resolveQuranTiming").mockReturnValue(null);
   });
   afterEach(() => vi.restoreAllMocks());
+  it("reveals a cue covered by navigation portalled above the reading pane", () => {
+    vi.mocked(timings.resolveQuranTiming).mockReturnValue(annotation);
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function () {
+      const top = this.matches(".audio-expanded-text") ? 100 : this.matches("[data-playback-word]") ? 120 : 0;
+      const bottom = this.matches("[data-listening-controls]")
+        ? 160
+        : this.matches(".audio-expanded-text")
+          ? 300
+          : top + 20;
+      return { top, bottom, left: 0, right: 200, width: 200, height: bottom - top, x: 0, y: top, toJSON: () => {} };
+    });
+    const wrapper = document.createElement("div");
+    wrapper.className = "floating-audio-player--expanded";
+    const host = document.createElement("div");
+    const viewport = document.createElement("div");
+    viewport.className = "audio-expanded-text";
+    viewport.scrollTop = 100;
+    const scrollTo = vi.fn();
+    viewport.scrollTo = scrollTo;
+    wrapper.append(host, viewport);
+    document.body.append(wrapper);
+    const { unmount } = render(
+      <QuranListeningReader entry={entry} segment={null} currentTime={1} language="en" controlsHost={host} />,
+      { container: viewport },
+    );
+    expect(scrollTo).toHaveBeenCalledWith({ top: 52, behavior: "instant" });
+    unmount();
+    wrapper.remove();
+  });
   it("discloses following preferences in the shared options host without an Info button or resetting state", () => {
     vi.mocked(timings.resolveQuranTiming).mockReturnValue(annotation);
     const host = document.createElement("div");

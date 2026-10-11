@@ -63,6 +63,14 @@ Feature regressions cover guidance persistence, verified QCF/fallback mappings, 
 
 ## Visual/manual evidence
 
+### First CI result and scoped repair
+
+Commit `22135450` passed the tracked local hook (fresh quality 108.9s, fast browser smoke 26 passed, Pages build 8.03s), but Quality run `38146754093` failed: 1,063 passed, 1 skipped, 5 failed and 3 passed on retry in 56.1m. Three Firefox cases lost a partial counter on immediate reload; two Linux WebKit cases rendered unequal paired frame widths. A WebKit recitation-following check also failed once before passing on retry. The QCF lettering checks passed.
+
+The repair retains the immediate-reload and one-pixel layout assertions. Add a deduplicated `beforeunload` flush through the existing save boundary, mirror the fitted Arabic frame's measured width onto English, and calculate recitation visibility using the actual fixed toolbar plus observe the fitted frame during following. No reviewed text, counts, schemas, dependencies, coverage or bundle ceilings change. Focused unit coverage checks latest-counter lifecycle deduplication, measured frame matching and a cue covered by portalled navigation. Linux-only reload behavior was not reproduced in 18 repeated local Firefox cases; the lifecycle fallback therefore requires confirmation in CI rather than being described as a proven local reproduction.
+
+Repair verification: 40 focused units passed in 3 files; typecheck and scoped lint passed. The three affected browser files produced 79 passes and 2 WebKit geometry failures in 9.6m. Their traces showed the English frame still holding the previous Arabic measure immediately before the observer updated it. The geometry test now waits for that observer alignment with the same one-pixel limit, then retains every original frame/body/overflow/keyboard/axe assertion. The complete paired-page file subsequently passed all 12 cases in 1.6m across Chromium, Firefox and WebKit. Fresh bilingual release notes use stamp `2026-10-11.1`, covering the combined features and these reliability fixes; 243 archived releases are retained.
+
 Feature screenshots remain in ignored output directories. Inspected Reader phone/desktop, expanded English at enlarged text and enlarged Downloads evidence. Completed integrated browser evidence is in `output/playwright/consolidated-full-e2e-final/`; focus before/after traces, the corrected accessibility suite and JSON reports are retained separately. The interrupted initial matrix remains as diagnostic evidence. Emulation does not establish physical-device accessibility compliance.
 
 ## Documentation updated

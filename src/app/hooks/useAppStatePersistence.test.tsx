@@ -53,6 +53,22 @@ describe("debounced application persistence", () => {
     visibility.mockRestore();
   });
 
+  it("saves the latest counter on reload even when pagehide is delayed, without saving twice", () => {
+    const onResult = vi.fn();
+    const { rerender, unmount } = renderHook(({ snapshot }) => useAppStatePersistence(snapshot, onResult), {
+      initialProps: { snapshot: DEFAULT_APP_STATE },
+    });
+    const latest = { ...DEFAULT_APP_STATE, partialZikrCounts: { "m-hm-91": 1 } };
+    rerender({ snapshot: latest });
+    act(() => window.dispatchEvent(new Event("beforeunload")));
+    expect(saveAppState).toHaveBeenCalledExactlyOnceWith(latest);
+    act(() => window.dispatchEvent(new Event("pagehide")));
+    act(() => vi.advanceTimersByTime(400));
+    unmount();
+    window.dispatchEvent(new Event("beforeunload"));
+    expect(saveAppState).toHaveBeenCalledExactlyOnceWith(latest);
+  });
+
   it("publishes changed progress before another layout effect can begin leaving the page", () => {
     const onResult = vi.fn();
     function LeavingPage({ snapshot }: { snapshot: typeof DEFAULT_APP_STATE }) {

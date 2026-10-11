@@ -28,12 +28,11 @@ function revealListeningTarget(root: HTMLElement | null, target: HTMLElement | n
   if (!viewport || !target) return;
   const view = viewport.getBoundingClientRect();
   const bounds = target.getBoundingClientRect();
-  const toolbarHeight = enlarged
-    ? 0
-    : (root?.querySelector("[data-listening-controls]")?.getBoundingClientRect().height ?? 0);
-  if (bounds.top < view.top + toolbarHeight || bounds.bottom > view.bottom) {
+  const controls = root?.closest(".floating-audio-player--expanded")?.querySelector("[data-listening-controls]");
+  const visibleTop = enlarged ? view.top : Math.max(view.top, controls?.getBoundingClientRect().bottom ?? view.top);
+  if (bounds.top < visibleTop || bounds.bottom > view.bottom) {
     viewport.scrollTo?.({
-      top: Math.max(0, viewport.scrollTop + bounds.top - view.top - toolbarHeight - 8),
+      top: Math.max(0, viewport.scrollTop + bounds.top - visibleTop - 8),
       behavior: "instant",
     });
   }
@@ -137,6 +136,8 @@ export default function QuranListeningReader({
     observer.observe(root.current);
     const target = cueTarget ?? firstWord ?? heading;
     if (target) observer.observe(target);
+    const pageFrame = target?.closest(".mushaf-page-frame");
+    if (pageFrame) observer.observe(pageFrame);
     if (viewport) observer.observe(viewport);
     return () => {
       observer.disconnect();

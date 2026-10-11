@@ -28,6 +28,19 @@ for (const language of ["ar", "en"] as const) {
 
     test("Independent geometry and keyboard reading @cross-browser", async ({ page }, testInfo) => {
       const english = page.locator(".quran-meaning-text");
+      // Page fitting and the paired ResizeObserver complete on browser frames.
+      // Assert their settled geometry, retaining the same one-pixel limit.
+      await expect
+        .poll(() =>
+          english.evaluate((region) => {
+            const arabic = region.closest(".mushaf-paper")!.querySelector("[data-mushaf-column]")!;
+            return Math.abs(
+              region.closest(".mushaf-page-frame")!.getBoundingClientRect().width -
+                arabic.closest(".mushaf-page-frame")!.getBoundingClientRect().width,
+            );
+          }),
+        )
+        .toBeLessThanOrEqual(1);
       const geometry = await english.evaluate((region) => {
         const paper = region.closest(".mushaf-paper")!;
         const arabic = paper.querySelector("[data-mushaf-column]")!;

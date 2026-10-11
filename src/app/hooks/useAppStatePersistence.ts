@@ -30,9 +30,11 @@ export function useAppStatePersistence(snapshot: AppStateSnapshot, onResult: (sa
       if (document.visibilityState === "hidden") flush();
     };
     window.addEventListener("pagehide", flush);
+    window.addEventListener("beforeunload", flush);
     document.addEventListener("visibilitychange", onVisibility);
     return () => {
       window.removeEventListener("pagehide", flush);
+      window.removeEventListener("beforeunload", flush);
       document.removeEventListener("visibilitychange", onVisibility);
       flush();
     };

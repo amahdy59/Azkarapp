@@ -1262,6 +1262,24 @@ export function MushafPageViewer({
   onNext?: () => void;
 }) {
   const formattedJuz = `${t(language, "common.juz")} ${formatNumerals(juzNumber, language)}`;
+  const meaningFrameRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const meaningFrame = meaningFrameRef.current;
+    const paper = meaningFrame?.closest(".mushaf-paper");
+    const arabicFrame = paper?.querySelector<HTMLElement>("[data-mushaf-page] .mushaf-page-frame");
+    if (!meaningFrame || !arabicFrame) return;
+    // The Arabic fitter owns the printed page's measure. Container units can
+    // resolve differently in WebKit; mirror the actual fitted frame instead.
+    const align = () => {
+      const width = arabicFrame.getBoundingClientRect().width;
+      if (width > 0) meaningFrame.style.maxWidth = `${width}px`;
+    };
+    align();
+    const observer = new ResizeObserver(align);
+    observer.observe(arabicFrame);
+    return () => observer.disconnect();
+  }, [facingContent, facingPage, pageNumber]);
 
   useLayoutEffect(() => {
     const paper = paperRef?.current;
@@ -1685,6 +1703,7 @@ export function MushafPageViewer({
                 data-mushaf-meaning=""
               >
                 <div
+                  ref={meaningFrameRef}
                   className="mushaf-page-frame relative z-10 mx-auto flex h-full w-full min-h-0 flex-col"
                   style={{ maxWidth: "min(100%, 72cqh)" }}
                 >
