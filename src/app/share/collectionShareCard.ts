@@ -1,4 +1,5 @@
 import type { AppLanguage, ThemeMode } from "../types";
+import { prepareQuranGlyphs } from "./quranGlyphs";
 import { t } from "../i18n";
 import {
   DAYLIGHT_BOTANICAL_PALETTE,
@@ -400,12 +401,15 @@ export async function generateAllCollectionStoryPages(
         document.fonts.ready,
       ]);
     const { ctx } = createCanvas();
-    const items = options.allItems.map((item) => ({
-      ...item,
-      language: item.language ?? options.language ?? "ar",
-      benefit: item.benefit ?? item.benefitArabic,
-      title: item.title ?? item.surahNameArabic ?? (options.single ? options.collectionTitle : undefined),
-    }));
+    const items = await Promise.all(
+      options.allItems.map(async (item) => ({
+        ...item,
+        language: item.language ?? options.language ?? "ar",
+        benefit: item.benefit ?? item.benefitArabic,
+        title: item.title ?? item.surahNameArabic ?? (options.single ? options.collectionTitle : undefined),
+        quranRendering: item.quranText ? await prepareQuranGlyphs(item.arabicText, item.canonicalKey) : undefined,
+      })),
+    );
     const layouts = layoutSharePages(ctx, items, options.format ?? "story", options.content, options.single);
     for (const layout of layouts) {
       if (options.signal?.aborted) throw new DOMException("Cancelled", "AbortError");
@@ -445,9 +449,15 @@ export async function getCompatibleShareFormats(
     ]);
   }
   const { ctx } = createCanvas();
+  const prepared = await Promise.all(
+    items.map(async (item) => ({
+      ...item,
+      quranRendering: item.quranText ? await prepareQuranGlyphs(item.arabicText, item.canonicalKey) : undefined,
+    })),
+  );
   return (Object.keys(SHARE_DIMENSIONS) as ShareFormat[]).filter((format) => {
     try {
-      layoutSharePages(ctx, items, format, content, single);
+      layoutSharePages(ctx, prepared, format, content, single);
       return true;
     } catch (error) {
       if (error instanceof RangeError) return false;

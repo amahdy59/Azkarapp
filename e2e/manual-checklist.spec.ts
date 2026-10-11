@@ -397,6 +397,7 @@ test("prayer times: effective timezone and offset are surfaced and survive going
   } else {
     await page.getByTestId("nav-settings").click();
   }
+  await page.getByTestId("settings-sub-prayer").click();
   await page.getByTestId("settings-sub-location").click();
 
   const status = page.getByTestId("daylight-saving-status");

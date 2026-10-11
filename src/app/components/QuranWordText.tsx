@@ -4,7 +4,8 @@ import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
 import { QURAN_TEXT_STYLE } from "../quranTypography";
-import { QuranVerseText } from "./QuranVerseText";
+import { QuranVerseText, QuranGlyphSlice } from "./QuranVerseText";
+import { useQuranSnippet } from "../hooks/useQuranSnippet";
 
 export function QuranWordText({
   text,
@@ -13,6 +14,7 @@ export function QuranWordText({
   style,
   onSelectMeanings,
   activeWordId,
+  canonicalKey,
 }: {
   text: string;
   meanings: readonly QuranWordMeaning[];
@@ -21,13 +23,16 @@ export function QuranWordText({
   onSelectMeanings: (selection: WordMeaningSelection) => void;
   /** The word the popover is currently anchored to, so it can mark itself. */
   activeWordId?: string | null;
+  canonicalKey?: string;
 }) {
   const segments = useMemo(() => buildQuranTextSegments(text, meanings), [meanings, text]);
+  const snippet = useQuranSnippet(text, canonicalKey);
 
   /* Reading order, so "next word" in the sheet matches the next highlight the
      eye reaches on the page. */
   const groups = useMemo(() => segments.flatMap((segment) => (segment.meanings ? [segment.meanings] : [])), [segments]);
   let groupIndex = -1;
+  let offset = 0;
 
   return (
     <p
@@ -39,12 +44,14 @@ export function QuranWordText({
       style={{ ...style, ...QURAN_TEXT_STYLE }}
     >
       {segments.map((segment, index) => {
-        if (!segment.meanings)
-          return (
-            <span key={`text-${index}`}>
-              <QuranVerseText text={segment.text} language={language} />
-            </span>
-          );
+        const start = offset;
+        offset += segment.text.length;
+        const content = snippet ? (
+          <QuranGlyphSlice text={segment.text} offset={start} snippet={snippet} language={language} preserveLines />
+        ) : (
+          <QuranVerseText text={segment.text} language={language} />
+        );
+        if (!segment.meanings) return <span key={`text-${index}`}>{content}</span>;
         groupIndex += 1;
         const currentGroupIndex = groupIndex;
         return (
@@ -70,9 +77,9 @@ export function QuranWordText({
             // around it, and the gap grew with the reading-size setting.
             // Inherited explicitly; bold is intentionally omitted so the
             // highlight relies on color and dotted underline only.
-            className="relative -mx-0.5 inline cursor-help rounded-md bg-primary/10 px-0.5 text-[length:inherit] leading-[inherit] text-primary underline decoration-primary/60 decoration-dotted underline-offset-[0.22em] transition-colors hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            className="relative inline cursor-help rounded-md bg-primary/10 px-0.5 text-[length:inherit] leading-[inherit] text-primary underline decoration-primary/60 decoration-dotted underline-offset-[0.22em] transition-colors hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           >
-            {segment.text}
+            {content}
           </button>
         );
       })}

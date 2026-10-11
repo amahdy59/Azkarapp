@@ -9,21 +9,20 @@ async function returningGuest(page: Page, language: "ar" | "en") {
   await page.addInitScript((language) => {
     localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
     localStorage.setItem("azkarapp.counter-guidance.v1", "true");
-    localStorage.setItem(
-      "azkarapp.state.v1",
-      JSON.stringify({
-        settings: { language, reduceMotion: true, hapticFeedback: false, routineModes: { morning: "core" } },
-        profile: { isGuest: true },
-      }),
-    );
+    if (!localStorage.getItem("azkarapp.state.v1"))
+      localStorage.setItem(
+        "azkarapp.state.v1",
+        JSON.stringify({
+          settings: { language, reduceMotion: true, hapticFeedback: false, routineModes: { morning: "core" } },
+          profile: { isGuest: true },
+        }),
+      );
   }, language);
 }
 
 for (const language of ["ar", "en"] as const) {
   for (const width of [390, 1200]) {
-    test(`hand guidance toggles once at a stationary pointer in ${language} at ${width}px @cross-browser`, async ({
-      page,
-    }) => {
+    test(`returning Reader removes counting guidance in ${language} at ${width}px @cross-browser`, async ({ page }) => {
       await page.setViewportSize({ width, height: 900 });
       await returningGuest(page, language);
       await page.goto(`/#/azkar/morning/${countingPosition}?mode=complete`);
@@ -32,26 +31,14 @@ for (const language of ["ar", "en"] as const) {
       await counter.click();
       const countName = await counter.getAttribute("aria-label");
       const hand = page.getByTestId("counter-guidance-reopen");
-      await expect(hand).toHaveAttribute("aria-expanded", "false");
-      const initial = (await hand.boundingBox())!;
-      const x = initial.x + initial.width / 2;
-      const y = initial.y + initial.height / 2;
-      for (let click = 0; click < 8; click++) {
-        await page.mouse.click(x, y);
-        await expect(hand).toHaveAttribute("aria-expanded", String(click % 2 === 0));
-        await expect(counter).toHaveAttribute("aria-label", countName!);
-        const box = (await hand.boundingBox())!;
-        expect(x).toBeGreaterThanOrEqual(box.x);
-        expect(x).toBeLessThanOrEqual(box.x + box.width);
-        expect(y).toBeGreaterThanOrEqual(box.y);
-        expect(y).toBeLessThanOrEqual(box.y + box.height);
-      }
-      await hand.focus();
-      await page.keyboard.press("Enter");
-      await expect(hand).toHaveAttribute("aria-expanded", "true");
-      await page.keyboard.press("Space");
-      await expect(hand).toHaveAttribute("aria-expanded", "false");
+      await expect(hand).toHaveCount(0);
+      await expect(page.getByTestId("counter-tap-hint")).toHaveCount(0);
+      await expect(page.locator("[data-reading-shortcuts]")).toHaveCount(0);
       await expect(counter).toHaveAttribute("aria-label", countName!);
+      await page.reload();
+      await expect(counter).toHaveAttribute("aria-label", countName!);
+      await expect(hand).toHaveCount(0);
+      await expect(page.getByTestId("counter-tap-hint")).toHaveCount(0);
       await page.screenshot({ path: `output/playwright/review-reliability/guidance-${language}-${width}.png` });
     });
   }

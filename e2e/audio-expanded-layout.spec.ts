@@ -129,7 +129,7 @@ for (const scenario of [
     await expand.focus();
     await page.keyboard.press("Enter");
     await expect(player).toHaveAttribute("data-variant", "expanded");
-    await expect(player.getByTestId("audio-queue-position")).toBeVisible();
+    await expect(player.getByTestId("audio-queue-position")).toHaveCount(0);
     await expect(player.getByTestId("audio-expanded-identity")).not.toContainText(arabic ? "المقطع" : "Track");
     const waveformContrast = await player.getByTestId("audio-seek-waveform").evaluate((element) => {
       const canvas = document.createElement("canvas");
@@ -222,11 +222,22 @@ for (const scenario of [
     await expect(optionsTrigger).toBeFocused();
     await expect(player).toHaveAttribute("data-variant", "expanded");
     const options = player.locator(".audio-expanded-options");
+    const header = player.locator(".audio-expanded-header");
+    await expect(header).toContainText(arabic ? "خيارات الصوت" : "Audio options");
+    const headerBounds = (await header.boundingBox())!;
+    const optionsBounds = (await options.boundingBox())!;
     const transport = (await player.locator(".audio-expanded-transport").boundingBox())!;
-    expect((await options.boundingBox())!.y).toBeGreaterThanOrEqual(transport.y + transport.height);
+    const controlsBounds = (await player.locator(".audio-expanded-controls").boundingBox())!;
     expect(
-      await options.evaluate((el) => Boolean(el.previousElementSibling?.classList.contains("audio-expanded-actions"))),
-    ).toBe(true);
+      Math.abs(optionsBounds.x + optionsBounds.width / 2 - (headerBounds.x + headerBounds.width / 2)),
+    ).toBeLessThanOrEqual(1);
+    expect(optionsBounds.y + optionsBounds.height).toBeLessThanOrEqual((await reading.boundingBox())!.y + 1);
+    expect(
+      Math.abs(transport.x + transport.width / 2 - (controlsBounds.x + controlsBounds.width / 2)),
+    ).toBeLessThanOrEqual(1);
+    expect(optionsBounds.x).toBeGreaterThanOrEqual(headerBounds.x - 1);
+    expect(optionsBounds.x + optionsBounds.width).toBeLessThanOrEqual(headerBounds.x + headerBounds.width + 1);
+    await expect(player.locator(".audio-expanded-controls .audio-options-trigger")).toHaveCount(0);
     await expect(reading).toBeVisible();
     if (!arabic) {
       await expect(player.getByTestId("audio-player-zikr-text")).toHaveAttribute("lang", "en");

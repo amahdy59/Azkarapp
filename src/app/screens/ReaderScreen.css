@@ -5,9 +5,13 @@
 /* Same reading measure as the text; compact entry tools retain their own
    existing spacing. The small scrollbar gutter remains owned by the reader. */
 .reader-entry-tools--wide {
-  width: calc(100% - 3rem);
+  width: calc(100% - 5rem);
   max-width: var(--content-reading);
   margin-inline: auto;
+}
+
+[data-testid="canonical-surah-passage"] {
+  padding-block: 0.75rem 1.5rem;
 }
 
 .collection-panel-resizer:hover .collection-panel-resizer-grip,

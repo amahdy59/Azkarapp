@@ -1,12 +1,10 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   Bell,
-  Calendar,
   BookOpen,
   Database,
   Download,
   FileText,
-  Globe,
   Headphones,
   HelpCircle,
   Info,
@@ -19,14 +17,11 @@ import {
   X,
 } from "../../components/icons";
 import { t } from "../../i18n";
-import { LANGUAGES_LIST } from "../../languageOptions";
-import type { AppLanguage, LocationSettings, TextSizeOption, ThemeMode, ZikrFontOption } from "../../types";
-import { SegmentedControl } from "../../components/SegmentedControl";
-import { Button } from "../../components/ui/button";
-import { formatNumerals } from "../../formatting";
-import { RowChevron, RowValue, SettingsRowItem, SettingsSection } from "./SettingsPrimitives";
 
-import { ThemeModeSelector } from "./ThemeModeSelector";
+import type { AppLanguage, LocationSettings, TextSizeOption, ThemeMode, ZikrFontOption } from "../../types";
+
+import { RowChevron, SettingsRowItem, SettingsSection } from "./SettingsPrimitives";
+
 import type { SettingsRoutePanel } from "../../routing";
 
 export type SettingsSubScreen = SettingsRoutePanel;
@@ -38,22 +33,14 @@ export function SettingsRootPanel({
   language,
   direction,
   themeMode,
-  highContrast,
-  onThemeModeChange,
-  onDisableHighContrast,
-  onLanguageChange,
   isGuest,
   isSyncing,
   syncError,
   quietProgressEnabled,
   locationSettings,
-  calendarType = "hijri",
-  onCalendarTypeChange,
-  hijriDateOffset = 0,
-  onHijriDateOffsetChange,
   textSize,
-  zikrFont,
   activeSub,
+  focusOnMount,
 }: {
   onNav: (screen: SettingsSubScreen) => void;
   language: AppLanguage;
@@ -76,8 +63,17 @@ export function SettingsRootPanel({
   zikrFont?: ZikrFontOption;
   /** When set, highlights the matching row (two-pane layout). */
   activeSub?: SettingsSubScreen;
+  focusOnMount?: SettingsSubScreen;
 }) {
   const [searchQuery, setSearchQuery] = useState("");
+  const panelRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!focusOnMount) return;
+    const frame = requestAnimationFrame(() =>
+      panelRef.current?.querySelector<HTMLElement>(`[data-testid="settings-sub-${focusOnMount}"]`)?.focus(),
+    );
+    return () => cancelAnimationFrame(frame);
+  }, [focusOnMount]);
 
   const itemProps = (screen: SettingsSubScreen) => ({
     current: activeSub === screen,
@@ -309,6 +305,89 @@ export function SettingsRootPanel({
     },
   ];
 
+  const mainItems: Array<{ id: SettingsSubScreen; title: string; icon: ReactNode; value?: string }> = [
+    {
+      id: "appearance",
+      title: t(language, "settings.appearanceLanguage"),
+      icon: <Moon size={20} className="text-primary" />,
+      value: t(
+        language,
+        themeMode === "light"
+          ? "settings.themeLight"
+          : themeMode === "dark"
+            ? "settings.themeDark"
+            : "settings.themeMidnight",
+      ),
+    },
+    {
+      id: "reading",
+      title: t(language, "settings.readingAndTypography"),
+      icon: <TypeIcon size={20} className="text-primary" />,
+      value: textSize
+        ? t(
+            language,
+            textSize === "small"
+              ? "settings.textSmall"
+              : textSize === "large"
+                ? "settings.textLarge"
+                : "settings.medium",
+          )
+        : undefined,
+    },
+    {
+      id: "prayer",
+      title: t(language, "settings.prayerReminders"),
+      icon: <Bell size={20} className="text-primary" />,
+      value: locationSettings?.cityName,
+    },
+    {
+      id: "audio",
+      title: t(language, "settings.audioDownloads"),
+      icon: <Headphones size={20} className="text-primary" />,
+    },
+    {
+      id: "progress",
+      title: t(language, "settings.progressPreferences"),
+      icon: <Sparkles size={20} className="text-primary" />,
+      value: quietProgressEnabled ? t(language, "settings.gardenActive") : t(language, "settings.gardenHidden"),
+    },
+    {
+      id: "accessibility",
+      title: t(language, "settings.accessibility"),
+      icon: <User size={20} className="text-primary" />,
+    },
+    {
+      id: "account-data",
+      title: t(language, "settings.accountData"),
+      icon: <Database size={20} className="text-primary" />,
+      value: isGuest
+        ? t(language, "settings.activateAccount")
+        : isSyncing
+          ? t(language, "common.syncing")
+          : syncError
+            ? t(language, "accountData.needsAttention")
+            : t(language, "settings.accountUpToDate"),
+    },
+  ];
+  searchableItems.unshift({
+    id: "appearance",
+    title: t(language, "settings.appearanceLanguage"),
+    description: t(language, "settings.language"),
+    icon: <Moon size={20} className="text-primary" />,
+    keywords: [
+      "theme",
+      "appearance",
+      "language",
+      "calendar",
+      "hijri",
+      "المظهر",
+      "لغة",
+      "تقويم",
+      "هجري",
+      "فاتح",
+      "داكن",
+    ],
+  });
   const trimmedQuery = searchQuery.trim().toLowerCase();
   const filteredItems = trimmedQuery
     ? searchableItems.filter(
@@ -320,7 +399,7 @@ export function SettingsRootPanel({
     : [];
 
   return (
-    <div className="flex-1 overflow-y-auto pb-8">
+    <div ref={panelRef} className="flex-1 overflow-y-auto pb-8" dir={direction}>
       {/* ── Client-side Instant Search Bar ── */}
       <div className="px-4 pt-3 pb-1">
         <div className="relative">
@@ -352,7 +431,7 @@ export function SettingsRootPanel({
               type="button"
               onClick={() => setSearchQuery("")}
               aria-label={t(language, "settings.clearSearch")}
-              className="absolute end-2 top-1/2 -translate-y-1/2 flex size-8 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              className="absolute end-1 top-1/2 -translate-y-1/2 flex size-11 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
               <X size={16} aria-hidden="true" />
             </button>
@@ -386,315 +465,37 @@ export function SettingsRootPanel({
           )}
         </div>
       ) : (
-        /* ── Default Settings Hierarchy ── */
         <>
-          {/* ── 1. Preferences: Appearance & Regional Locale ── */}
-          <SettingsSection label={t(language, "settings.preferences")} variant="content">
-            <div className="mb-3 flex items-center gap-3">
-              <span
-                className="flex size-10 shrink-0 items-center justify-center rounded-xl"
-                style={{ background: iconBackground }}
-                aria-hidden="true"
-              >
-                <Moon size={20} className="text-primary" />
-              </span>
-              <h3 className="text-base font-semibold text-foreground">{t(language, "settings.displayTheme")}</h3>
-            </div>
-            <ThemeModeSelector
-              language={language}
-              direction={direction}
-              value={themeMode}
-              onChange={onThemeModeChange}
-            />
-            {highContrast && (
-              <aside className="mt-3 rounded-2xl border border-primary/40 bg-primary/10 p-3" aria-live="polite">
-                <h4 className="text-sm font-semibold text-foreground">{t(language, "appearance.highContrastTitle")}</h4>
-                <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                  {t(language, "appearance.highContrastBody")}
-                </p>
-                <Button type="button" size="sm" onClick={onDisableHighContrast} className="mt-2 text-xs">
-                  {t(language, "appearance.disableHighContrast")}
-                </Button>
-              </aside>
-            )}
-          </SettingsSection>
-
           <SettingsSection className="mt-3">
-            <div className="p-4 border-b border-border/50">
-              <div className="mb-3 flex items-center gap-3">
-                <span
-                  className="flex size-10 shrink-0 items-center justify-center rounded-xl"
-                  style={{ backgroundColor: iconBackground }}
-                  aria-hidden="true"
-                >
-                  <Globe size={20} className="text-primary" />
-                </span>
-                <h3 className="text-base font-semibold text-foreground">{t(language, "settings.language")}</h3>
-              </div>
-              <SegmentedControl
-                value={language}
-                onChange={onLanguageChange}
-                direction={direction}
-                aria-label={t(language, "settings.language")}
-                className="flex bg-muted/80 p-1 rounded-xl"
-                itemClassName={(selected) =>
-                  `min-h-11 flex-1 rounded-lg py-2.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                    selected
-                      ? "bg-primary text-primary-foreground font-bold"
-                      : "text-muted-foreground hover:text-foreground font-semibold"
-                  }`
-                }
-                options={LANGUAGES_LIST.map((opt) => ({
-                  value: opt.code as AppLanguage,
-                  label: opt.native,
-                  testId: `settings-language-${opt.code}`,
-                }))}
+            {mainItems.map((item, index) => (
+              <SettingsRowItem
+                key={item.id}
+                iconBg={iconBackground}
+                icon={item.icon}
+                label={item.title}
+                description={item.value}
+                right={<RowChevron />}
+                onPress={() => onNav(item.id)}
+                hasDivider={index < mainItems.length - 1}
+                {...itemProps(item.id)}
               />
-            </div>
-
-            {onCalendarTypeChange && (
-              <div className="p-4">
-                <div className="mb-3 flex items-center gap-3">
-                  <span
-                    className="flex size-10 shrink-0 items-center justify-center rounded-xl"
-                    style={{ backgroundColor: iconBackground }}
-                    aria-hidden="true"
-                  >
-                    <Calendar size={20} className="text-primary" />
-                  </span>
-                  <h3 className="text-base font-semibold text-foreground">{t(language, "settings.calendarSystem")}</h3>
-                </div>
-                <SegmentedControl
-                  value={calendarType}
-                  onChange={onCalendarTypeChange}
-                  direction={direction}
-                  aria-label={t(language, "settings.calendarSystem")}
-                  className="flex bg-muted/80 p-1 rounded-xl"
-                  itemClassName={(selected) =>
-                    `min-h-11 flex-1 rounded-lg py-2.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                      selected
-                        ? "bg-primary text-primary-foreground font-bold"
-                        : "text-muted-foreground hover:text-foreground font-semibold"
-                    }`
-                  }
-                  options={[
-                    {
-                      value: "hijri" as const,
-                      label: t(language, "settings.calendarHijri"),
-                      testId: "calendar-hijri",
-                    },
-                    {
-                      value: "gregorian" as const,
-                      label: t(language, "settings.calendarGregorian"),
-                      testId: "calendar-gregorian",
-                    },
-                  ]}
-                />
-
-                {/* Regional Hijri Calendar offset */}
-                {calendarType === "hijri" && onHijriDateOffsetChange && (
-                  <div className="mt-3.5 pt-3.5 border-t border-border/40">
-                    <div className="mb-2">
-                      <h4 className="text-xs font-semibold text-foreground">
-                        {t(language, "settings.hijriOffsetTitle")}
-                      </h4>
-                      <p className="text-micro leading-snug text-muted-foreground">
-                        {t(language, "settings.hijriOffsetHint")}
-                      </p>
-                    </div>
-                    <SegmentedControl
-                      value={String(hijriDateOffset ?? 0)}
-                      onChange={(val) => onHijriDateOffsetChange(Number(val))}
-                      direction={direction}
-                      aria-label={t(language, "settings.hijriOffsetTitle")}
-                      className="flex bg-muted/80 p-1 rounded-xl"
-                      itemClassName={(selected) =>
-                        `min-h-11 flex-1 rounded-lg py-2 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                          selected
-                            ? "bg-primary text-primary-foreground font-bold"
-                            : "text-muted-foreground hover:text-foreground font-semibold"
-                        }`
-                      }
-                      options={[
-                        { value: "-2", label: formatNumerals("-2", language), testId: "offset-minus-2" },
-                        { value: "-1", label: formatNumerals("-1", language), testId: "offset-minus-1" },
-                        { value: "0", label: formatNumerals("0", language), testId: "offset-0" },
-                        { value: "1", label: formatNumerals("+1", language), testId: "offset-plus-1" },
-                        { value: "2", label: formatNumerals("+2", language), testId: "offset-plus-2" },
-                      ]}
-                    />
-                  </div>
-                )}
-              </div>
-            )}
+            ))}
           </SettingsSection>
-
-          {/* ── 2. Devotional Routine: Prayer Times & Wird Progress ── */}
-          <SettingsSection label={t(language, "settings.routineAndReminders")}>
-            <SettingsRowItem
-              iconBg={iconBackground}
-              icon={<Bell size={20} className="text-primary" />}
-              label={t(language, "settings.notificationsAndReminders")}
-              right={<RowChevron />}
-              onPress={() => onNav("notifications")}
-              hasDivider={true}
-              {...itemProps("notifications")}
-            />
-            <SettingsRowItem
-              iconBg={iconBackground}
-              icon={<MapPin size={20} className="text-primary" />}
-              label={t(language, "settings.prayerTimesAndLocation")}
-              right={<RowValue value={locationSettings?.cityName || t(language, "settings.locationNotSet")} />}
-              onPress={() => onNav("location")}
-              hasDivider={true}
-              {...itemProps("location")}
-            />
-            <SettingsRowItem
-              iconBg={iconBackground}
-              icon={<Sparkles size={20} className="text-primary" />}
-              label={t(language, "settings.progressPreferences")}
-              right={
-                <RowValue
-                  value={
-                    quietProgressEnabled ? t(language, "settings.gardenActive") : t(language, "settings.gardenHidden")
-                  }
-                />
-              }
-              onPress={() => onNav("progress")}
-              hasDivider={false}
-              {...itemProps("progress")}
-            />
-          </SettingsSection>
-
-          {/* ── 3. Reading & Typography ── */}
-          <SettingsSection label={t(language, "settings.readingAndTypography")}>
-            <SettingsRowItem
-              iconBg={iconBackground}
-              icon={<TypeIcon size={20} className="text-primary" />}
-              label={t(language, "settings.readingAndTypography")}
-              right={
-                <RowValue
-                  value={
-                    textSize
-                      ? `${t(
-                          language,
-                          textSize === "small"
-                            ? "settings.textSmall"
-                            : textSize === "large"
-                              ? "settings.textLarge"
-                              : "settings.medium",
-                        )} · ${t(
-                          language,
-                          zikrFont === "clear"
-                            ? "settings.zikrFontClear"
-                            : zikrFont === "naskh"
-                              ? "settings.zikrFontNaskh"
-                              : "settings.zikrFontHumanist",
-                        )}`
-                      : t(language, "common.settings")
-                  }
-                />
-              }
-              onPress={() => onNav("reading")}
-              hasDivider={true}
-              {...itemProps("reading")}
-            />
-            <SettingsRowItem
-              iconBg={iconBackground}
-              icon={<Headphones size={20} className="text-primary" />}
-              label={t(language, "settings.audioRecitations")}
-              right={<RowChevron />}
-              onPress={() => onNav("audio")}
-              hasDivider={false}
-              {...itemProps("audio")}
-            />
-          </SettingsSection>
-
-          {/* ── 4. Accessibility & Offline Access ── */}
-          <SettingsSection label={t(language, "settings.accessibilitySection")}>
-            <SettingsRowItem
-              iconBg={iconBackground}
-              icon={<User size={20} className="text-primary" />}
-              label={t(language, "settings.accessibility")}
-              right={<RowChevron />}
-              onPress={() => onNav("accessibility")}
-              hasDivider={true}
-              {...itemProps("accessibility")}
-            />
-            <SettingsRowItem
-              iconBg={iconBackground}
-              icon={<Download size={20} className="text-primary" />}
-              label={t(language, "settings.offlineAccess")}
-              right={<RowValue value={t(language, "settings.included")} />}
-              onPress={() => onNav("downloads")}
-              hasDivider={false}
-              {...itemProps("downloads")}
-            />
-          </SettingsSection>
-
-          {/* ── 5. Account & Synchronization ── */}
-          <SettingsSection label={t(language, "settings.accountSection")}>
-            <SettingsRowItem
-              iconBg={iconBackground}
-              icon={<Database size={20} className="text-primary" />}
-              label={t(language, "settings.accountData")}
-              right={
-                <RowValue
-                  value={
-                    isGuest
-                      ? t(language, "settings.activateAccount")
-                      : syncError
-                        ? t(language, "settings.accountNeedsAttention")
-                        : isSyncing
-                          ? t(language, "common.syncing")
-                          : t(language, "settings.accountUpToDate")
-                  }
-                />
-              }
-              onPress={() => onNav("account-data")}
-              hasDivider={false}
-              {...itemProps("account-data")}
-            />
-          </SettingsSection>
-
-          {/* ── 6. About & Support ── */}
           <SettingsSection label={t(language, "settings.supportSection")}>
-            <SettingsRowItem
-              iconBg={iconBackground}
-              icon={<BookOpen size={20} className="text-primary" />}
-              label={t(language, "settings.contentSources")}
-              right={<RowChevron />}
-              onPress={() => onNav("sources")}
-              hasDivider={true}
-              {...itemProps("sources")}
-            />
-            <SettingsRowItem
-              iconBg={iconBackground}
-              icon={<HelpCircle size={20} className="text-primary" />}
-              label={t(language, "settings.helpFaq")}
-              right={<RowChevron />}
-              onPress={() => onNav("help")}
-              hasDivider={true}
-              {...itemProps("help")}
-            />
-            <SettingsRowItem
-              iconBg={iconBackground}
-              icon={<FileText size={20} className="text-primary" />}
-              label={t(language, "settings.privacyTerms")}
-              right={<RowChevron />}
-              onPress={() => onNav("legal")}
-              hasDivider={true}
-              {...itemProps("legal")}
-            />
-            <SettingsRowItem
-              iconBg={iconBackground}
-              icon={<Info size={20} className="text-primary" />}
-              label={t(language, "settings.aboutHelp")}
-              right={<RowChevron />}
-              onPress={() => onNav("about")}
-              hasDivider={false}
-              {...itemProps("about")}
-            />
+            {searchableItems
+              .filter((item) => ["help", "sources", "legal", "about"].includes(item.id))
+              .map((item, index) => (
+                <SettingsRowItem
+                  key={item.id}
+                  iconBg={iconBackground}
+                  icon={item.icon}
+                  label={item.title}
+                  right={<RowChevron />}
+                  onPress={() => onNav(item.id)}
+                  hasDivider={index < 3}
+                  {...itemProps(item.id)}
+                />
+              ))}
           </SettingsSection>
         </>
       )}

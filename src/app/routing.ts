@@ -22,6 +22,8 @@ export type LibraryRouteSection = "collections" | "saved";
 export type ProgressRoutePeriod = "day" | "week" | "month" | "year";
 export type SettingsRoutePanel =
   | "root"
+  | "appearance"
+  | "prayer"
   | "reading"
   | "audio"
   | "accessibility"
@@ -158,6 +160,8 @@ export function parseHash(hash: string): RouteState | null {
   if (segments[0] === "settings" && segments.length === 2) {
     const panel = segments[1] as SettingsRoutePanel;
     const panels: readonly SettingsRoutePanel[] = [
+      "appearance",
+      "prayer",
       "reading",
       "audio",
       "accessibility",

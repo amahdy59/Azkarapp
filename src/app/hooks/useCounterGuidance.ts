@@ -32,12 +32,13 @@ function writeDismissed(storage: GuidanceStorage | undefined = browserStorage())
 
 /** Keeps the first-use counting explanation out of the way after the first count. */
 export function useCounterGuidance(hasStarted: boolean) {
-  const [expanded, setExpanded] = useState(() => !readDismissed());
+  const [expanded, setExpanded] = useState(() => !hasStarted && !readDismissed());
   // A reopened explanation must remain open even when the current zikr was
   // already partly counted before the component mounted.
   const [hasAutoDismissed, setHasAutoDismissed] = useState(() => hasStarted || readDismissed());
 
   useEffect(() => {
+    if (hasStarted) writeDismissed();
     if (!hasStarted || !expanded || hasAutoDismissed) return;
     writeDismissed();
     setHasAutoDismissed(true);

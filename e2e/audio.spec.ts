@@ -163,13 +163,13 @@ test("100-count tawhid offers prescribed repeat and shows each repetition", asyn
     "aria-pressed",
     "true",
   );
-  await player.getByRole("button", { name: "Repeat 100 times", exact: true }).click();
-  await expect(player.getByRole("button", { name: "Repeat 100 times", exact: true })).toHaveAttribute(
+  await page.getByRole("button", { name: "Repeat 100 times", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Repeat 100 times", exact: true })).toHaveAttribute(
     "aria-pressed",
     "false",
   );
-  await player.getByRole("button", { name: "Repeat 100 times", exact: true }).click();
-  await expect(player.getByRole("button", { name: "Repeat 100 times", exact: true })).toHaveAttribute(
+  await page.getByRole("button", { name: "Repeat 100 times", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Repeat 100 times", exact: true })).toHaveAttribute(
     "aria-pressed",
     "true",
   );

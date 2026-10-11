@@ -27,7 +27,7 @@ export function CounterGuidance({
   const { expanded, reopen, dismiss } = useCounterGuidance(hasStarted);
   if (reader && placement === "below") return null;
   if (!reader && ((placement === "above" && wide) || (placement === "below" && !wide))) return null;
-  if (hideWhenDismissed && !expanded) return null;
+  if ((reader || hideWhenDismissed) && !expanded) return null;
   return (
     <div className="w-full shrink-0" data-reading-shortcuts>
       <CounterTapHint

@@ -18,7 +18,7 @@ test("Settings navigation via keyboard is fully operable", async ({ page }) => {
   } else {
     await page.getByTestId("nav-settings").click();
   }
-  await expect(page.getByRole("heading", { name: "Preferences" })).toBeVisible();
+  await expect(page.getByTestId("settings-sub-appearance")).toBeVisible();
 
   // Test navigating into a sub-panel to verify full focus trap / keyboard flow
   const accessibilityRow = page.getByRole("button", { name: /Accessibility/i });
@@ -27,7 +27,7 @@ test("Settings navigation via keyboard is fully operable", async ({ page }) => {
   await accessibilityRow.press("Enter");
 
   // Now in Accessibility panel
-  await expect(page.getByRole("heading", { name: "Accessibility", exact: true }).last()).toBeVisible();
+  await expect(page.getByRole("heading", { name: /^Accessibility(?: settings)?$/ })).toBeVisible();
   const compactSubheading = page.locator("[data-settings-subheading]");
   if (await compactSubheading.isVisible()) {
     await expect(compactSubheading).toBeFocused();
@@ -47,9 +47,11 @@ test("Settings navigation via keyboard is fully operable", async ({ page }) => {
     await backBtn.focus();
     await expect(backBtn).toBeFocused();
     await backBtn.press("Enter");
+    await expect(page.getByTestId("settings-sub-accessibility")).toBeFocused();
   }
 
-  await expect(page.getByRole("heading", { name: /Preferences/i }).first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Settings", exact: true })).toBeVisible();
+  await expect(page.getByTestId("settings-sub-accessibility")).toBeVisible();
 });
 
 test("Counters keyboard navigation and reset", async ({ page }) => {

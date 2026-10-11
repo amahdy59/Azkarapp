@@ -356,7 +356,7 @@ export function MushafQuickMenu({
                     <span className="block text-sm font-bold leading-tight">
                       {t(language, "mushaf.pairedTranslation")}
                     </span>
-                    <span className="block text-xs text-muted-foreground truncate">
+                    <span className="block text-xs text-muted-foreground">
                       {t(language, "mushaf.pairedTranslationDesc")}
                     </span>
                   </div>

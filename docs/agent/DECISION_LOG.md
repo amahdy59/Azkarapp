@@ -1,5 +1,21 @@
 # Decision Log
 
+## Owner authorization — Consolidated release, 2026-10-11
+
+The owner instructs this session to consolidate all settled working-session changes and push them now. This supersedes the publication hold recorded below. This session owns the combined review, required local gates, commit/push to main, workflow monitoring and production verification; completed feature work is preserved.
+
+## Owner confirmation — Publication hold, 2026-10-11
+
+After clarification of the conflicting publication instructions, the owner explicitly selected “Keep the release on hold”. Continue approved local verification only; do not commit, push or deploy until renewed publication authorization.
+
+## Owner correction — Reader Mushaf lettering, 2026-10-11
+
+The owner approved all reader presentation recommendations locally and confirmed an active Quran Foundation developer account. In Reader, the first-use count strip and its hand button disappear completely after counting or dismissal; no learned disclosure or reserved space remains. This supersedes earlier learned-hand guidance contracts for Reader only. Standalone counters retain their existing help.
+
+Explicitly identified Quran passages and cited quotations may use matching QCF v2 page glyphs after display-only source verification. Original reviewed text, semantic text, copy payloads, timing hashes and repetition counts remain unchanged. Missing fonts or uncertain mappings retain the shared Amiri Quran fallback. Full Mushaf page fitting stays unchanged; snippets wrap naturally and short surahs retain canonical line boundaries where space allows.
+
+Four daily page fonts (42, 49, 603, 604) are bundled with provenance and Quran Foundation attribution under its developer terms; their page JSON and fonts are precached. Credentials stay in the ignored local environment file and are not required for public font assets. No commit, push or deployment is part of this local request.
+
 ## Unicode Mushaf fallback — 2026-10-10
 
 The owner requests a more polished fallback while preserving the specific page lines and reading appearance. Refine the existing locally bundled Amiri Quran face, remove artificial QCF ink thickening from Unicode rendering, and use font-relative natural word spacing. Preserve canonical Arabic bytes, word-to-line assignments, fifteen line slots and the existing diacritic fitting contract. Verify ordinary and dense end pages on phone/desktop and all three engines; no new font dependency or religious-content edit is authorized or required.
@@ -4404,6 +4420,36 @@ The owner rejected the wide single-row arrangement after local review: it broke 
 
 The owner approves all qualified offline-download recommendations from the review and requests implementation, review of the supplied test report, and publication of all pending application changes. This supersedes the previous local-only release holds for those pending changes. Keep the existing essentials scope, expose independent Al-Baqarah/Al-Kahf and daily controls, use truthful origin storage and verified cache readiness, preserve cancellation/rollback and reviewed content, and repair demonstrated CI regressions without weakening tests. No new dependencies or persistence migrations. See phases/OFFLINE_DOWNLOADS_AND_RELEASE_2026_10_10.md.
 
+## Paired Quran page refinement — 2026-10-11
+
+The owner authorizes applying all screenshot-review recommendations locally: independent English-body scrolling, matched page margins and bands, stable verse-number gutters, shared scalable English typography, clearer translated headings/attribution, a softer divider, quieter glossary highlights, explicit recitation-follow resumption, and responsive pane selection. Native overflow remains for short/magnified Arabic. This supersedes the smaller English page text scale and desktop-only translation toggle. Preserve reviewed text, canonical pagination, offline reading, timing identity and persisted progress. No commit, push, deployment or release-note edits. See phases/PAIRED_QURAN_PAGE_REFINEMENT_2026_10_11.md.
+
 ## Uniform Quran snippets — 2026-10-10
 
 The owner reports inconsistent Quran text scale/type in Reader and expanded audio screenshots and requests a complete app-wide correction. Use one regular Amiri Quran role and stable size per app setting across snippets, natural excerpt reflow without page-fitting transforms, shared numeric verse markers, and explicit Quran font metadata for exports. Preserve reviewed wording, prelude flags, semantic timing identity, offline behavior and the canonical full-page Mushaf. This supersedes printed-line fitting for short excerpts only. Apply normal release gates and publish under the standing main-branch authority. See phases/UNIFORM_QURAN_SNIPPETS_2026_10_10.md.
+
+## Expanded listening hierarchy — owner-approved local refinement, 2026-10-11
+
+The owner asks to apply the expanded-player UX, accessibility, responsive and visual review locally. Remove the redundant centered reciter, put full-surah page navigation in the fixed player header, and place Audio options beside centered transport when the available control width permits. This explicitly supersedes the earlier reciter-header and separate bottom-options-row presentation only. The selected reciter remains visible in Audio options; the surrounding Reader retains its title. Standalone non-Mushaf playback has a concise recording title.
+
+Retain integrated nonmodal playback, locale-aware media direction, independent native reading scroll, canonical full-page geometry, shared flowing-snippet typography, reviewed text/timings, offline recovery and controller/persistence boundaries. Show queue/repetition and active mode feedback, distinguish page-navigation names from recording navigation, enlarge page/info and options-close targets, expose Arabic manual-browse recovery, and verify narrow/enlarged and short-window behavior. Preserve existing local translation/Mushaf work. This request authorizes local edits and verification only: no commit, push, deployment or release-note changes.
+
+### Owner screenshot follow-up — 2026-10-11
+
+The owner finds the bottom Audio options control detached and asks for a symmetrical placement above the zikr, while removing the redundant recording-position number already shown in the progress bar. This supersedes this phase's initial controller-adjacent options placement. Center the labelled Audio options pill between Stop and Minimize on mobile and desktop, keep full-surah page navigation in its own centered header row, and leave the transport centered and uncluttered. Remove the additional recording-position label; retain repetition and relevant mode context. The local-only scope remains.
+
+## Settings and downloads simplification — 2026-10-11
+
+The owner approves all recommendations for exactly three main download categories (available approved adhkar/dua recordings, Kahf and Baqarah recitations, complete Mushaf pages), seven main Settings destinations, and progressive disclosure of management, diagnostics and advanced controls. Apply locally only: no commit, push, deployment or release-note edits. This supersedes the visible essentials bundle and top-level individual daily download controls from the 2026-10-10 phase. Individual resource removal/download controls, exact verification, cancellation/rollback, independent prayer calculation/reminder services and existing deep links remain. Expand the adhkar group to all available approved recordings without changing reviewed text, recording approvals, cache formats, progress or synchronization. See phases/SETTINGS_DOWNLOADS_SIMPLIFICATION_2026_10_11.md.
+
+### Owner correction: combined listening utilities — 2026-10-11
+
+The owner asks to place Audio options and page navigation side by side and remove the Info icon. This supersedes the separate utilities rows in the prior screenshot follow-up. Keep one centered group above the devotional text, adapting its placement below the corner buttons on narrow surfaces without shrinking targets. Move full-surah following and word-emphasis preferences into the existing Audio options panel, preserving reader-owned state, keyboard disclosure and focus recovery. Apply locally only; do not commit, push or deploy.
+
+## Coordinated release — 2026-10-11
+
+The owner instructs this release chat: “ensure you coordinate well between all working sesison. after they finish, push all changes here.” This explicitly authorizes messaging the existing Azkarapp sessions, collecting their scoped handoffs, preserving and verifying their combined changes, committing and pushing to origin/main, and completing the normal Quality/Pages/production cycle. It supersedes earlier local-only publication holds for the completed paired-page, expanded-player, Reader Mushaf presentation, and Settings/downloads work. No unrelated feature, reviewed religious-content change, dependency replacement, or weakened gate is authorized. This chat owns the combined commit/push; feature sessions leave publication to it. See phases/COORDINATED_RELEASE_2026_10_11.md.
+
+### Coordinated release publication hold — 2026-10-11
+
+The owner subsequently instructs: “continuecontinue without pushing changes yet”. Continue coordination, local repairs and combined verification only. Do not commit, push or deploy until renewed owner authorization. Prepared release notes/history are a local draft and must be refreshed against the actual deployment range when publication resumes.

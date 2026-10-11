@@ -3,6 +3,32 @@ import { describe, expect, it, vi } from "vitest";
 import { SettingsRootPanel } from "./SettingsRootPanel";
 
 describe("SettingsRootPanel", () => {
+  it("shows seven primary destinations without inline controls and preserves search for downloads", () => {
+    const onNav = vi.fn();
+    render(
+      <SettingsRootPanel
+        language="en"
+        direction="ltr"
+        themeMode="midnight"
+        highContrast={false}
+        onThemeModeChange={vi.fn()}
+        onDisableHighContrast={vi.fn()}
+        onLanguageChange={vi.fn()}
+        isGuest
+        isSyncing={false}
+        syncError=""
+        quietProgressEnabled={false}
+        onNav={onNav}
+      />,
+    );
+    const ids = ["appearance", "reading", "prayer", "audio", "progress", "accessibility", "account-data"];
+    for (const id of ids) expect(screen.getByTestId("settings-sub-" + id)).toBeInTheDocument();
+    expect(screen.queryByRole("radiogroup")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("settings-sub-downloads")).not.toBeInTheDocument();
+    fireEvent.change(screen.getByRole("searchbox"), { target: { value: "download" } });
+    fireEvent.click(screen.getByTestId("settings-sub-downloads"));
+    expect(onNav).toHaveBeenCalledWith("downloads");
+  });
   it("displays gardenActive when quietProgressEnabled is true", () => {
     render(
       <SettingsRootPanel
@@ -100,33 +126,6 @@ describe("SettingsRootPanel", () => {
     expect(screen.getAllByText("إمكانية الوصول").length).toBeGreaterThan(0);
   });
 
-  it("allows selecting regional Hijri date offset", () => {
-    const onOffsetChange = vi.fn();
-    render(
-      <SettingsRootPanel
-        onNav={vi.fn()}
-        language="ar"
-        direction="rtl"
-        calendarType="hijri"
-        onCalendarTypeChange={vi.fn()}
-        themeMode="system"
-        highContrast={false}
-        onThemeModeChange={vi.fn()}
-        onDisableHighContrast={vi.fn()}
-        onLanguageChange={vi.fn()}
-        isGuest={true}
-        isSyncing={false}
-        syncError=""
-        hijriDateOffset={0}
-        onHijriDateOffsetChange={onOffsetChange}
-      />,
-    );
-
-    const plusOneBtn = screen.getByTestId("offset-plus-1");
-    fireEvent.click(plusOneBtn);
-    expect(onOffsetChange).toHaveBeenCalledWith(1);
-  });
-
   it("exposes notifications settings row and matches notification search terms", () => {
     const onNav = vi.fn();
     render(
@@ -145,12 +144,12 @@ describe("SettingsRootPanel", () => {
       />,
     );
 
-    const notificationsRow = screen.getByTestId("settings-sub-notifications");
+    const notificationsRow = screen.getByTestId("settings-sub-prayer");
     expect(notificationsRow).toBeInTheDocument();
-    expect(screen.getByText("الإشعارات والتذكيرات")).toBeInTheDocument();
+    expect(screen.getByText("الصلاة والتذكيرات")).toBeInTheDocument();
 
     fireEvent.click(notificationsRow);
-    expect(onNav).toHaveBeenCalledWith("notifications");
+    expect(onNav).toHaveBeenCalledWith("prayer");
 
     // Search for notifications in Arabic
     const searchInput = screen.getByRole("searchbox");

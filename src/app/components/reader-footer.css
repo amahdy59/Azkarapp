@@ -63,6 +63,7 @@
   width: 100%;
   min-width: 0;
   padding-inline: 12px;
+  background: transparent;
 }
 [data-testid="reader-support-actions"] .devotional-secondary-action > span {
   white-space: nowrap;

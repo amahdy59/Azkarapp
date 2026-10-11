@@ -30,6 +30,7 @@ test("all product themes apply atomically and remain accessible", async ({ page 
   await enterEnglishGuestMode(page);
   await openSettings(page);
 
+  await page.getByTestId("settings-sub-appearance").click();
   const themePicker = page.getByRole("radiogroup", { name: "Choose a color theme" });
   await expect(themePicker).toBeVisible();
   await expect(themePicker.getByRole("radio")).toHaveCount(3);
@@ -64,6 +65,7 @@ test("high contrast explains why a selected theme is visually overridden", async
     await backBtn3.click();
   }
 
+  await page.getByTestId("settings-sub-appearance").click();
   await expect(page.getByRole("heading", { name: "High contrast is overriding theme colors" })).toBeVisible();
   await page.getByRole("button", { name: "Turn off high contrast" }).click();
   await expect(page.getByRole("heading", { name: "High contrast is overriding theme colors" })).toHaveCount(0);
@@ -88,6 +90,7 @@ test("language changes in place from the Settings selector", async ({ page }) =>
   await enterEnglishGuestMode(page);
   await openSettings(page);
 
+  await page.getByTestId("settings-sub-appearance").click();
   const settingsUrl = page.url();
   const historyLength = await page.evaluate(() => window.history.length);
 
@@ -103,9 +106,7 @@ test("language changes in place from the Settings selector", async ({ page }) =>
   await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
   await expect(arabicButton).toBeVisible();
   await expect(arabicButton).toHaveAttribute("aria-checked", "true");
-  await expect(
-    page.getByRole("heading", { name: "\u0627\u0644\u0625\u0639\u062f\u0627\u062f\u0627\u062a", exact: true }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "المظهر واللغة", exact: true })).toBeVisible();
   expect(page.url()).toBe(settingsUrl);
   expect(await page.evaluate(() => window.history.length)).toBe(historyLength);
 });
@@ -114,6 +115,7 @@ test("segmented controls expose radio-group semantics and arrow-key focus moveme
   await enterEnglishGuestMode(page);
   await openSettings(page);
 
+  await page.getByTestId("settings-sub-appearance").click();
   const group = page.getByRole("radiogroup", { name: "Language" });
   const englishButton = page.getByTestId("settings-language-en");
   const arabicButton = page.getByTestId("settings-language-ar");
@@ -152,6 +154,7 @@ test("forced RTL updates settings controls and their keyboard direction", async 
   await enterEnglishGuestMode(page);
   await openSettings(page);
 
+  await page.getByTestId("settings-sub-appearance").click();
   const themePicker = page.getByRole("radiogroup", { name: "Choose a color theme" });
   await expect(themePicker).toHaveAttribute("dir", "ltr");
 
@@ -166,6 +169,7 @@ test("forced RTL updates settings controls and their keyboard direction", async 
   if (await backBtn2.isVisible()) {
     await backBtn2.click();
   }
+  await page.getByTestId("settings-sub-appearance").click();
   await expect(themePicker).toHaveAttribute("dir", "rtl");
 });
 
@@ -173,6 +177,7 @@ test("launch-critical settings screens are discoverable and accessible", async (
   await enterEnglishGuestMode(page);
   await openSettings(page);
 
+  await page.getByTestId("settings-sub-prayer").click();
   await page.getByTestId("settings-sub-location").click();
   await expect(page).toHaveURL(/#\/settings\/location$/);
   await expect(page.getByRole("heading", { name: "Location & Prayer Times", exact: true })).toBeVisible();
@@ -180,6 +185,7 @@ test("launch-critical settings screens are discoverable and accessible", async (
   await expect(page.getByTestId("daylight-saving-status")).toContainText(/UTC\+0[23]:00/);
   const locationBack = page.getByRole("button", { name: "Back", exact: true });
   if (await locationBack.isVisible()) await locationBack.click();
+  else await page.getByTestId("settings-sub-prayer").click();
   await page.getByTestId("settings-sub-notifications").click();
   await expect(page.getByRole("switch", { name: "Prayer-time reminders" })).toHaveAttribute("aria-checked", "false");
   await expect(page.locator("#prayer-reminder-lead")).toBeDisabled();
@@ -226,6 +232,7 @@ test("prayer reminder lead time is configurable and persisted after opt-in", asy
   await page.reload();
   await page.getByRole("navigation").first().waitFor();
   await openSettings(page);
+  await page.getByTestId("settings-sub-prayer").click();
   await page.getByTestId("settings-sub-notifications").click();
 
   const reminderSwitch = page.getByRole("switch", { name: "Prayer-time reminders" });
@@ -238,6 +245,7 @@ test("prayer reminder lead time is configurable and persisted after opt-in", asy
   await page.reload();
   await page.getByRole("navigation").first().waitFor();
   await openSettings(page);
+  await page.getByTestId("settings-sub-prayer").click();
   await page.getByTestId("settings-sub-notifications").click();
   await expect(page.getByRole("switch", { name: "Prayer-time reminders" })).toHaveAttribute("aria-checked", "true");
   await expect(page.locator("#prayer-reminder-lead")).toHaveText("10 minutes before prayer");

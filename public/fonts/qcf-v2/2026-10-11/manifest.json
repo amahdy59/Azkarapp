@@ -1,0 +1,32 @@
+{
+  "version": "2026-10-11",
+  "provider": "Quran Foundation",
+  "credit": "https://quran.foundation",
+  "terms": "https://api-docs.quran.com/legal/developer-terms/",
+  "fonts": [
+    {
+      "page": 42,
+      "source": "https://verses.quran.foundation/fonts/quran/hafs/v2/woff2/p42.woff2",
+      "bytes": 131572,
+      "sha256": "16e0693b74ec839694debcfddae70d1eeae9721c2fa8d7a1f5874ccd9eb51c6c"
+    },
+    {
+      "page": 49,
+      "source": "https://verses.quran.foundation/fonts/quran/hafs/v2/woff2/p49.woff2",
+      "bytes": 124424,
+      "sha256": "c50fe27340b8b3974ec93009e583dd937742c69273e1aa7170c54758b3e04dd2"
+    },
+    {
+      "page": 603,
+      "source": "https://verses.quran.foundation/fonts/quran/hafs/v2/woff2/p603.woff2",
+      "bytes": 64896,
+      "sha256": "02842d594c06d8a5aee166a35eb6f577535c08d3ac14ae8d44b22b576382b777"
+    },
+    {
+      "page": 604,
+      "source": "https://verses.quran.foundation/fonts/quran/hafs/v2/woff2/p604.woff2",
+      "bytes": 53340,
+      "sha256": "66c3b04ae7a5313dbe1a4a31125df3f6dd0f3bd7b729ea0e8814330e893600bd"
+    }
+  ]
+}

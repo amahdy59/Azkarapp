@@ -34,6 +34,7 @@ for (const language of ["ar", "en"] as const) {
       const position = getAzkarForMode(passage.category, "complete").findIndex((z) => z.id === passage.id) + 1;
       expect(position).toBeGreaterThan(0);
       await page.route("https://verses.quran.foundation/fonts/**", (route) => route.abort());
+      await page.route("**/fonts/qcf-v2/**", (route) => route.abort());
       await page.goto(`/#/azkar/${passage.route}/${position}`);
       const reader = page.getByTestId("zikr-text");
       await expect(reader).toBeVisible();

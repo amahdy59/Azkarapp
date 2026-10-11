@@ -12,7 +12,7 @@ describe("paired English reading", () => {
   it("scrolls only its own pane to the active verse while preserving keyboard focus and manual control", () => {
     const props = { verses, textSize: "medium" as const, pageNumber: 562, follow: true };
     const { rerender } = render(<QuranListeningTranslation {...props} activeVerseKey="67:1" />);
-    const region = screen.getByRole("region", { name: "English meaning" });
+    const region = screen.getByRole("region", { name: "English translation" });
     const active = region.querySelector<HTMLElement>('[data-translation-verse="67:2"]')!;
     Object.defineProperties(region, { clientHeight: { value: 200 }, scrollHeight: { value: 1000 } });
     region.getBoundingClientRect = () => ({ top: 0, bottom: 200 }) as DOMRect;
@@ -36,7 +36,7 @@ describe("paired English reading", () => {
     const props = { verses, activeVerseKey: null, follow: true, pageNumber: 562 };
     const { rerender } = render(<QuranListeningTranslation {...props} textSize="small" />);
     const disclosure = screen.getByTestId("quran-page-translation");
-    const region = screen.getByRole("region", { name: "English meaning" });
+    const region = screen.getByRole("region", { name: "English translation" });
     expect(region.style.fontSize).toBe("1.125rem");
     rerender(<QuranListeningTranslation {...props} textSize="large" />);
     expect(region.style.fontSize).toBe("1.5rem");
@@ -60,7 +60,7 @@ describe("paired English reading", () => {
     );
     const props = { verses, textSize: "medium" as const, pageNumber: 562, follow: true, activeVerseKey: "67:2" };
     const { rerender } = render(<QuranListeningTranslation {...props} />);
-    const region = screen.getByRole("region", { name: "English meaning" });
+    const region = screen.getByRole("region", { name: "English translation" });
     Object.defineProperties(region, { clientHeight: { value: 200 }, scrollHeight: { value: 1000 } });
     region.getBoundingClientRect = () => ({ top: 0, bottom: 200 }) as DOMRect;
     region.querySelector<HTMLElement>('[aria-current="true"]')!.getBoundingClientRect = () =>
@@ -71,5 +71,28 @@ describe("paired English reading", () => {
     expect(scroll).toHaveBeenCalledWith({ top: 400, behavior: "instant" });
     rerender(<QuranListeningTranslation {...props} follow={false} />);
     expect(disconnect).toHaveBeenCalledOnce();
+  });
+
+  it("hands manual scrolling and resumption to the playback owner", () => {
+    const onManualBrowse = vi.fn();
+    const onResumeFollowing = vi.fn();
+    render(
+      <QuranListeningTranslation
+        verses={verses}
+        textSize="medium"
+        pageNumber={562}
+        activeVerseKey="67:1"
+        follow={false}
+        onManualBrowse={onManualBrowse}
+        onResumeFollowing={onResumeFollowing}
+      />,
+    );
+    const region = screen.getByRole("region", { name: "English translation" });
+    fireEvent.pointerDown(region);
+    fireEvent.wheel(region);
+    fireEvent.keyDown(region, { key: "PageDown" });
+    expect(onManualBrowse).toHaveBeenCalledTimes(3);
+    fireEvent.click(screen.getByRole("button", { name: "Resume following" }));
+    expect(onResumeFollowing).toHaveBeenCalledOnce();
   });
 });

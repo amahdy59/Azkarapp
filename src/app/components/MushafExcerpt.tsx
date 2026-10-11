@@ -23,9 +23,7 @@ export default function MushafExcerpt({
   theme?: MushafPageTheme;
 }) {
   const range = MUSHAF_EXCERPTS[canonicalKey]!;
-  // Flowing excerpts use bundled Amiri; fetching a full-page QCF font only
-  // delays their canonical words and adds an unnecessary network request.
-  const { result } = useListeningMushafPage(range.page, 0, false);
+  const { result } = useListeningMushafPage(range.page, 0);
   const selection = useMemo(() => {
     if (!result) return null;
     const lines = selectMushafExcerpt(result.lines, range.from, range.to);
@@ -39,7 +37,7 @@ export default function MushafExcerpt({
         lines={selection.lines}
         pageNumber={range.page}
         language={language}
-        useQcfGlyphs={false}
+        useQcfGlyphs={result.qcf}
         highlightedWord={excerptActiveWord(selection.mapping, cue)}
         textSize={textSize}
         theme={theme}

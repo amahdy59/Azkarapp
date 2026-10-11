@@ -12,17 +12,23 @@ export function QuranListeningTranslation({
   follow,
   textSize,
   pageNumber,
+  onManualBrowse,
+  onResumeFollowing,
 }: {
   verses: readonly QuranTranslationVerse[];
   activeVerseKey: string | null;
   follow: boolean;
   textSize: TextSizeOption;
   pageNumber: number;
+  onManualBrowse?: () => void;
+  onResumeFollowing?: () => void;
 }) {
   const [open, setOpen] = useState(true);
   return (
     <details
       className="audio-listening-translation"
+      dir="ltr"
+      lang="en"
       open={open}
       onToggle={(event) => setOpen(event.currentTarget.open)}
       data-testid="quran-page-translation"
@@ -45,9 +51,15 @@ export function QuranListeningTranslation({
           textSize={textSize}
           label={t("en", "quranListening.translation")}
           className="audio-listening-translation-text"
+          onManualBrowse={onManualBrowse}
         />
       ) : (
         <p>{t("en", "quranListening.translationUnavailable")}</p>
+      )}
+      {!follow && onResumeFollowing && (
+        <button type="button" className="quran-meaning-resume" onClick={onResumeFollowing}>
+          {t("en", "quranListening.resumeFollowing")}
+        </button>
       )}
     </details>
   );

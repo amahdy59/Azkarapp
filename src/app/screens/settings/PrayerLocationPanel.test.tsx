@@ -15,6 +15,7 @@ describe("PrayerLocationPanel", () => {
         onBack={vi.fn()}
       />,
     );
+    fireEvent.click(screen.getByText("Advanced adjustments"));
     fireEvent.change(screen.getByLabelText("Latitude"), { target: { value: "" } });
     fireEvent.change(screen.getByLabelText("Longitude"), { target: { value: "" } });
     fireEvent.click(screen.getByRole("button", { name: /^Save location$/i }));
@@ -41,6 +42,7 @@ describe("PrayerLocationPanel", () => {
       />,
     );
     fireEvent.click(screen.getByRole("button", { name: "Detect My Location" }));
+    fireEvent.click(screen.getByText("Advanced adjustments"));
     fireEvent.change(screen.getByRole("spinbutton", { name: "Fajr" }), { target: { value: "5" } });
     await act(async () => finish({ ok: true, latitude: 30, longitude: 31, timeZone: "Africa/Cairo" }));
     expect(onLocationChange).toHaveBeenCalledOnce();

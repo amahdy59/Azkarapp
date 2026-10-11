@@ -1,5 +1,6 @@
 import { QURAN_TEXT_STYLE } from "../quranTypography";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import type { AppLanguage, MushafPageTheme, MushafTextScale, TextSizeOption } from "../types";
 import type { PlaybackEntry, ResolvedAudioSegment } from "../audio/audioTypes";
 import { useReviewedQuranTiming } from "../hooks/useReviewedListeningTiming";
@@ -11,14 +12,13 @@ import { formatNumerals } from "../formatting";
 import { splitMushafPages } from "../content/mushafPages";
 import { splitQuranTranslation } from "../content/quranTranslation";
 import { QuranListeningTranslation } from "./QuranListeningTranslation";
-import * as Popover from "@radix-ui/react-popover";
-import { Check, ChevronLeft, ChevronRight, Info, X } from "./icons";
+import { Check, ChevronLeft, ChevronRight } from "./icons";
 
 const buttonClass =
   "inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-lg px-3 text-sm hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-50";
 
 const navButtonClass =
-  "inline-flex size-8 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40 transition-colors";
+  "inline-flex size-11 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40 transition-colors";
 
 function revealListeningTarget(root: HTMLElement | null, target: HTMLElement | null) {
   const enlarged = target?.closest<HTMLElement>(
@@ -50,6 +50,8 @@ export default function QuranListeningReader({
   textScale = "medium",
   magnification = 100,
   textSize = "medium",
+  controlsHost,
+  preferencesHost,
 }: {
   entry: PlaybackEntry;
   segment: ResolvedAudioSegment | null;
@@ -61,6 +63,8 @@ export default function QuranListeningReader({
   textScale?: MushafTextScale;
   magnification?: number;
   textSize?: TextSizeOption;
+  controlsHost?: HTMLElement | null;
+  preferencesHost?: HTMLElement | null;
 }) {
   const pages = useMemo(() => entry.mushafPages ?? [], [entry.mushafPages]);
   const [manualIndex, setManualIndex] = useState(0);
@@ -104,15 +108,49 @@ export default function QuranListeningReader({
     setManualIndex(next);
   };
   useEffect(() => {
-    if (follow && result && cue.verseKey) {
-      revealListeningTarget(
-        root.current,
-        root.current?.querySelector<HTMLElement>('[data-playback-word="true"]') ??
-          root.current?.querySelector<HTMLElement>("[data-playback-verse]") ??
-          null,
-      );
-    }
-  }, [follow, result, cue.verseKey, cue.word?.position, magnification]);
+    if (!follow || !result) return;
+    const cueTarget =
+      root.current?.querySelector<HTMLElement>('[data-playback-word="true"]') ??
+      root.current?.querySelector<HTMLElement>("[data-playback-verse]");
+    const heading = root.current?.querySelector<HTMLElement>(`[data-mushaf-surah-number="${entry.quranRange?.surah}"]`);
+    const firstWord =
+      root.current?.querySelector<HTMLElement>(
+        `[data-listening-verse="${entry.quranRange?.surah}:${entry.quranRange?.ayahStart}"]`,
+      ) ?? root.current?.querySelector<HTMLElement>("[data-listening-verse]");
+    if (!root.current || !(cueTarget ?? heading ?? firstWord)) return;
+    const viewport = root.current.closest<HTMLElement>(".audio-expanded-text");
+    const reveal = () => {
+      const openingFits =
+        heading && firstWord && viewport
+          ? firstWord.getBoundingClientRect().bottom - heading.getBoundingClientRect().top <= viewport.clientHeight - 16
+          : true;
+      revealListeningTarget(root.current, cueTarget ?? (openingFits ? (heading ?? firstWord) : firstWord) ?? null);
+    };
+    reveal();
+    // Text resizing and page fitting can move a stationary playback cue.
+    // Observe geometry only while following, leaving manual browsing alone.
+    let frame = 0;
+    const observer = new ResizeObserver(() => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(reveal);
+    });
+    observer.observe(root.current);
+    const target = cueTarget ?? firstWord ?? heading;
+    if (target) observer.observe(target);
+    if (viewport) observer.observe(viewport);
+    return () => {
+      observer.disconnect();
+      cancelAnimationFrame(frame);
+    };
+  }, [
+    follow,
+    result,
+    cue.verseKey,
+    cue.word?.position,
+    magnification,
+    entry.quranRange?.surah,
+    entry.quranRange?.ayahStart,
+  ]);
   useEffect(() => {
     if (magnification <= 100 || !result) {
       positionedZoom.current = "";
@@ -196,104 +234,102 @@ export default function QuranListeningReader({
       viewport?.removeEventListener("touchmove", pauseFollowing);
     };
   }, [follow, index]);
+  const controls = (
+    <div
+      data-listening-controls=""
+      className="audio-listening-navigation mx-auto flex w-fit max-w-full items-center justify-center bg-background"
+      dir={language === "ar" ? "rtl" : "ltr"}
+    >
+      <button
+        type="button"
+        className={navButtonClass}
+        aria-label={t(language, "quranListening.previousPage")}
+        title={t(language, "quranListening.previousPage")}
+        disabled={index <= 0}
+        onClick={() => browse(index - 1)}
+      >
+        {language === "ar" ? (
+          <ChevronRight size={16} aria-hidden="true" />
+        ) : (
+          <ChevronLeft size={16} aria-hidden="true" />
+        )}
+      </button>
+      <span
+        className="text-xs font-bold px-1 tabular-nums text-foreground"
+        role="status"
+        aria-label={t(language, "mushaf.pageRegion", { page: formatNumerals(page.page, language) })}
+      >
+        {t(language, "quranListening.page", { page: formatNumerals(page.page, language) })}
+      </span>
+      <button
+        type="button"
+        className={navButtonClass}
+        aria-label={t(language, "quranListening.nextPage")}
+        title={t(language, "quranListening.nextPage")}
+        disabled={index >= pages.length - 1}
+        onClick={() => browse(index + 1)}
+      >
+        {language === "ar" ? (
+          <ChevronLeft size={16} aria-hidden="true" />
+        ) : (
+          <ChevronRight size={16} aria-hidden="true" />
+        )}
+      </button>
+    </div>
+  );
+  const preferences = (
+    <div
+      data-testid="quran-listening-preferences"
+      className="flex flex-col gap-2"
+      dir={language === "ar" ? "rtl" : "ltr"}
+    >
+      <p className="text-sm">{t(language, timing ? "quranListening.browseHint" : "quranListening.unavailable")}</p>
+      {timing && (
+        <button
+          type="button"
+          className={buttonClass}
+          aria-pressed={follow && !error}
+          disabled={error}
+          onClick={() => {
+            setManualIndex(index);
+            setFollow((value) => !value);
+          }}
+        >
+          {t(language, "quranListening.follow")}
+          {follow ? <Check size={16} aria-hidden="true" /> : null}
+        </button>
+      )}
+      {hasWords && (
+        <button type="button" className={buttonClass} aria-pressed={words} onClick={() => setWords((value) => !value)}>
+          {t(
+            language,
+            timing?.reviewStatus === "owner-preview" ? "quranListening.estimatedWords" : "quranListening.words",
+          )}
+          {words ? <Check size={16} aria-hidden="true" /> : null}
+        </button>
+      )}
+    </div>
+  );
   return (
     <section ref={root} className="w-full" aria-label={t(language, "quranListening.reader")}>
-      <div
-        data-listening-controls=""
-        className="sticky top-0 z-10 mx-auto flex items-center justify-center gap-1 rounded-full border border-border/50 bg-background/95 px-2.5 py-0.5 shadow-xs backdrop-blur-sm w-fit"
-      >
+      {controlsHost ? createPortal(controls, controlsHost) : controls}
+      {preferencesHost
+        ? createPortal(preferences, preferencesHost)
+        : preferencesHost === undefined
+          ? preferences
+          : null}
+      {language === "ar" && timing && !follow && !error && (
         <button
           type="button"
-          className={navButtonClass}
-          aria-label={t(language, "common.previous")}
-          disabled={index <= 0}
-          onClick={() => browse(index - 1)}
+          className={`${buttonClass} audio-listening-resume mx-auto flex`}
+          onClick={() => {
+            setFollow(true);
+            root.current?.closest<HTMLElement>(".audio-expanded-text")?.focus({ preventScroll: true });
+          }}
         >
-          {language === "ar" ? (
-            <ChevronRight size={16} aria-hidden="true" />
-          ) : (
-            <ChevronLeft size={16} aria-hidden="true" />
-          )}
+          {t(language, "quranListening.returnToVerse")}
         </button>
-        <span
-          className="text-xs font-bold px-1 tabular-nums text-foreground"
-          role="status"
-          aria-label={t(language, "mushaf.pageRegion", { page: formatNumerals(page.page, language) })}
-        >
-          {t(language, "quranListening.page", { page: formatNumerals(page.page, language) })}
-        </span>
-        <button
-          type="button"
-          className={navButtonClass}
-          aria-label={t(language, "common.next")}
-          disabled={index >= pages.length - 1}
-          onClick={() => browse(index + 1)}
-        >
-          {language === "ar" ? (
-            <ChevronLeft size={16} aria-hidden="true" />
-          ) : (
-            <ChevronRight size={16} aria-hidden="true" />
-          )}
-        </button>
-        <Popover.Root>
-          <Popover.Trigger asChild>
-            <button type="button" className={navButtonClass} aria-label={t(language, "quranListening.information")}>
-              <Info size={15} aria-hidden="true" />
-            </button>
-          </Popover.Trigger>
-          <Popover.Portal>
-            <Popover.Content
-              side="bottom"
-              sideOffset={8}
-              collisionPadding={8}
-              aria-label={t(language, "quranListening.information")}
-              data-testid="quran-follow-info"
-              dir={language === "ar" ? "rtl" : "ltr"}
-              onEscapeKeyDown={(event) => event.stopPropagation()}
-              className="z-50 rounded-2xl border border-border bg-card p-3 text-foreground shadow-overlay"
-              style={{ width: "min(18rem, calc(100vw - 2rem))" }}
-            >
-              <p className="text-sm">
-                {t(language, timing ? "quranListening.browseHint" : "quranListening.unavailable")}
-              </p>
-              {timing && (
-                <button
-                  type="button"
-                  className={buttonClass}
-                  aria-pressed={follow && !error}
-                  disabled={error}
-                  onClick={() => {
-                    setManualIndex(index);
-                    setFollow((value) => !value);
-                  }}
-                >
-                  {t(language, "quranListening.follow")}
-                  {follow ? <Check size={16} aria-hidden="true" /> : null}
-                </button>
-              )}
-              {hasWords && (
-                <button
-                  type="button"
-                  className={buttonClass}
-                  aria-pressed={words}
-                  onClick={() => setWords((value) => !value)}
-                >
-                  {t(
-                    language,
-                    timing?.reviewStatus === "owner-preview" ? "quranListening.estimatedWords" : "quranListening.words",
-                  )}
-                  {words ? <Check size={16} aria-hidden="true" /> : null}
-                </button>
-              )}
-              <Popover.Close asChild>
-                <button type="button" className={buttonClass} aria-label={t(language, "common.close")}>
-                  <X size={18} aria-hidden="true" />
-                </button>
-              </Popover.Close>
-            </Popover.Content>
-          </Popover.Portal>
-        </Popover.Root>
-      </div>
+      )}
       <div className="audio-listening-body min-w-0" data-listening-magnified={magnification > 100}>
         <div
           className="audio-listening-arabic min-w-0"
@@ -348,6 +384,11 @@ export default function QuranListeningReader({
             follow={follow}
             textSize={textSize}
             pageNumber={page.page}
+            onManualBrowse={() => {
+              setManualIndex(index);
+              setFollow(false);
+            }}
+            onResumeFollowing={timing ? () => setFollow(true) : undefined}
           />
         )}
       </div>

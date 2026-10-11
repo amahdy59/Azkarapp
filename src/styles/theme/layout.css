@@ -302,6 +302,11 @@
   background: color-mix(in srgb, currentColor 18%, transparent);
 }
 
+.mushaf-meaning-gutter::after {
+  inset-block: 2.75rem 2.875rem;
+  background: color-mix(in srgb, currentColor 12%, transparent);
+}
+
 /* The inner padding remains on the outer paper edges, not at the spine. */
 .mushaf-spread__page:first-child {
   padding-left: 0;

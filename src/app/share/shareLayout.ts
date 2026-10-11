@@ -45,9 +45,12 @@ export interface ShareSection {
   text: string;
   direction: "rtl" | "ltr";
   quranText?: boolean;
+  quranRendering?: { text: string; fontFamily: string };
 }
 export interface ShareItem {
   id: string;
+  canonicalKey?: string;
+  quranRendering?: { text: string; fontFamily: string };
   arabicText: string;
   quranText?: boolean;
   title?: string;
@@ -72,6 +75,7 @@ export function toShareItem(zikr: Zikr, language: AppLanguage, baseUrl?: string)
   const reminder = isLongSurah(zikr);
   return {
     id: zikr.id,
+    canonicalKey: zikr.canonicalKey,
     arabicText: reminder ? "" : zikr.arabicText,
     ...(isQuranPassage(zikr) ? { quranText: true } : {}),
     title: language === "ar" ? zikr.surahNameArabic : zikr.surahNameEnglish,
@@ -176,7 +180,14 @@ export function defaultShareAppearance(category?: string, theme?: ThemeMode): Sh
 export function getShareSections(item: ShareItem, options: ShareContentOptions = {}): ShareSection[] {
   const sections: ShareSection[] = item.reminder
     ? []
-    : [{ key: "arabic", text: item.arabicText, direction: "rtl", ...(item.quranText ? { quranText: true } : {}) }];
+    : [
+        {
+          key: "arabic",
+          text: item.arabicText,
+          direction: "rtl",
+          ...(item.quranText ? { quranText: true, quranRendering: item.quranRendering } : {}),
+        },
+      ];
   if (options.meaning && item.translation?.trim())
     sections.push({ key: "translation", text: item.translation, direction: "ltr" });
   if (options.wordMeanings && item.language === "ar" && item.wordMeanings?.trim())
@@ -264,7 +275,11 @@ export function measureShareSection(
     section.key === "arabic" ? (single ? (compact ? 52 : 64) : 52) : primary ? 52 : section.key === "source" ? 34 : 36;
   ctx.font = getShareSectionFont(section, fontSize);
   ctx.textBaseline = "alphabetic";
-  const lines = wrapShareText(section.text, (value) => ctx.measureText(shareDisplayDigits(value)).width, width);
+  const lines = wrapShareText(
+    section.quranRendering?.text ?? section.text,
+    (value) => ctx.measureText(shareDisplayDigits(value)).width,
+    width,
+  );
   // Keep the final reference together when it fits on the next line. The
   // joined reviewed payload stays identical, including its whitespace.
   if (section.key === "source" && lines.length > 1) {
@@ -292,7 +307,7 @@ export function measureShareSection(
 }
 
 export function getShareSectionFont(section: ShareSection, fontSize: number) {
-  return `${section.quranText ? 400 : section.key === "arabic" ? 500 : 400} ${fontSize}px ${section.quranText ? SHARE_QURAN_FONT : section.direction === "rtl" ? SHARE_ARABIC_FONT : SHARE_UI_FONT}`;
+  return `${section.quranText ? 400 : section.key === "arabic" ? 500 : 400} ${fontSize}px ${section.quranRendering?.fontFamily ?? (section.quranText ? SHARE_QURAN_FONT : section.direction === "rtl" ? SHARE_ARABIC_FONT : SHARE_UI_FONT)}`;
 }
 
 /** Image-only source summary: first reviewed reference, never a ranked/invented source. */

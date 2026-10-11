@@ -16,6 +16,7 @@ export interface QuranPageTranslationPanelProps {
   follow?: boolean;
   textSize?: TextSizeOption;
   onManualBrowse?: () => void;
+  onResumeFollowing?: () => void;
 }
 
 export function QuranPageTranslationPanel({
@@ -29,6 +30,7 @@ export function QuranPageTranslationPanel({
   follow = false,
   textSize = "medium",
   onManualBrowse,
+  onResumeFollowing,
 }: QuranPageTranslationPanelProps) {
   const [translations, setTranslations] = useState<QuranPageVerseTranslation[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -68,19 +70,19 @@ export function QuranPageTranslationPanel({
     <section
       aria-label={t(language, "quranListening.pageTranslation")}
       dir="ltr"
-      lang="en"
       className={`quran-page-meaning ${className}`}
     >
       <header className="mushaf-page-furniture quran-meaning-header" dir="ltr">
-        <div className="flex min-w-0 items-center gap-1.5">
-          <span className="text-xs font-bold uppercase tracking-wider text-primary">
+        <div className="min-w-0">
+          <h2 className="text-sm font-semibold text-foreground" lang={language} dir={language === "ar" ? "rtl" : "ltr"}>
             {t(language, "quranListening.translation")}
-          </span>
-          <span className="text-xs text-muted-foreground truncate">· {surahName}</span>
+          </h2>
+          <p className="text-xs text-muted-foreground" dir="auto">
+            {surahName} · {t(language, "mushaf.pageLabel", { page: formatNumerals(pageNumber, language) })}
+            {translatedVerses.length > 0 &&
+              ` · ${t(language, "quranListening.verseRange", { first: translatedVerses[0]!.marker, last: translatedVerses.at(-1)!.marker })}`}
+          </p>
         </div>
-        <span className="text-xs font-semibold tabular-nums text-muted-foreground shrink-0">
-          {t(language, "mushaf.pageLabel", { page: formatNumerals(pageNumber, language) })}
-        </span>
       </header>
 
       {loading ? (
@@ -104,10 +106,21 @@ export function QuranPageTranslationPanel({
         </p>
       )}
 
-      <footer className="mushaf-page-furniture mushaf-page-furniture--foot" dir="ltr">
+      <footer className="mushaf-page-furniture mushaf-page-furniture--foot quran-meaning-footer" dir="ltr">
         <span className="text-xs text-muted-foreground font-medium" lang="en" dir="ltr">
           Saheeh International
         </span>
+        {onResumeFollowing && !follow && (
+          <button
+            type="button"
+            className="quran-meaning-resume"
+            onClick={onResumeFollowing}
+            lang={language}
+            dir={language === "ar" ? "rtl" : "ltr"}
+          >
+            {t(language, "quranListening.resumeFollowing")}
+          </button>
+        )}
       </footer>
     </section>
   );

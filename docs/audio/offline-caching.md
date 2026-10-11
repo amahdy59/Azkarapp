@@ -1,6 +1,6 @@
 # Offline audio caching
 
-Audio is excluded from Workbox precaching. Users may explicitly download Morning Core, Evening Core, or Before-Sleep Core from Downloads settings once approved assets exist.
+Audio is excluded from Workbox precaching. Downloads settings groups all available approved morning, evening, before-sleep and other adhkar/dua recordings under one category. Only approved assets in the selected voice are eligible; unavailable recordings are never invented or substituted.
 
 Partial voice coverage never substitutes English narration in an Arabic download or Arabic recitation in an English narration download. Manifest 7 invalidates older downloaded catalogs after two Arabic variants fail their approved checksums; their separately approved English variants remain downloadable when explicitly selected.
 
@@ -16,6 +16,6 @@ Cached audio is checked against MIME type, full-response status, exact length, a
 
 ## Independent download management — 2026-10-10
 
-Offline access presents an essentials bundle (Mushaf, Morning Core, Evening Core, Before-Sleep Core, Al-Kahf) and independent Mushaf, Al-Baqarah, Al-Kahf and daily collection controls. Al-Baqarah remains excluded from essentials. Recording sizes derive from selected approved variants and use decimal MB. Readiness checks deduplicate variants across groups and verify sequentially, limiting simultaneous large-file buffers. The selected recordings can be removed without a registry entry; unrelated recordings and other voice variants are retained. Shared daily recordings affect the readiness of every collection that uses them, which the screen discloses.
+The owner-approved 2026-10-11 presentation replaces the essentials bundle with three categories: all available approved adhkar/dua recordings, Al-Kahf plus Al-Baqarah recitations, and the complete Mushaf. Adhkar includes the complete daily lists and other registered collections, including comprehensive duas; full Al-Baqarah stays exclusively in the recitations category. Individual daily/other/Kahf/Baqarah controls remain inside management. Recording sizes derive from selected approved variants and use decimal MB. Readiness checks deduplicate variants across groups and verify sequentially, limiting simultaneous large-file buffers. The selected recordings can be removed without a registry entry; unrelated recordings and other voice variants are retained. Shared daily recordings affect the readiness of every collection that uses them, which management discloses. Group downloads reuse the existing transactional rollback and preserve previously verified files.
 
 Storage quota is advisory origin storage, not device free space. Offline app loading is described separately from downloaded page/font readiness. Progress updates after verified whole audio files; cancellation rolls back newly added files and preserves prior verified files. Cancellation is rechecked after checksum verification before cache publication. The bundle preserves successful groups when another group fails and identifies failed groups. No new ownership registry, resumable byte ranges, content changes or concurrent jobs are introduced.

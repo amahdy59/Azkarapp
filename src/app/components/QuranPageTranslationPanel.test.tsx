@@ -46,7 +46,11 @@ describe("QuranPageTranslationPanel", () => {
     const verse = screen.getByText("[All] praise is [due] to Allah, Lord of the worlds -").closest("p");
     expect(verse).toHaveAttribute("aria-current", "true");
     const region = verse!.closest('[role="region"]')!;
-    expect(region).toHaveStyle({ fontSize: "0.9375rem" });
+    expect(region).toHaveStyle({ fontSize: "1.25rem" });
+    expect(region).toHaveAttribute("tabindex", "0");
+    expect(region).toHaveAttribute("dir", "ltr");
+    expect(region).toHaveAttribute("lang", "en");
+    expect(screen.getByRole("heading", { name: "English translation" })).toBeVisible();
     const header = document.querySelector(".quran-meaning-header");
     expect(header).toHaveClass("mushaf-page-furniture");
     const footer = document.querySelector(".mushaf-page-furniture--foot");
@@ -80,7 +84,7 @@ describe("QuranPageTranslationPanel", () => {
 
     const verseText = await screen.findByText("In the name of Allah.");
     const region = verseText.closest('[role="region"]')!;
-    expect(region).toHaveStyle({ fontSize: "0.875rem" });
+    expect(region).toHaveStyle({ fontSize: "1.125rem" });
 
     rerender(
       <QuranPageTranslationPanel
@@ -92,7 +96,7 @@ describe("QuranPageTranslationPanel", () => {
         textSize="large"
       />,
     );
-    expect(region).toHaveStyle({ fontSize: "1.125rem" });
+    expect(region).toHaveStyle({ fontSize: "1.5rem" });
   });
 
   it("displays loading indicator when translations are being retrieved", () => {
@@ -109,5 +113,23 @@ describe("QuranPageTranslationPanel", () => {
     );
 
     expect(screen.getByRole("status")).toHaveTextContent("Loading…");
+  });
+
+  it("offers localized resumption only when following is paused and available", () => {
+    vi.spyOn(globalThis, "fetch").mockReturnValue(new Promise(() => {}));
+    const onResumeFollowing = vi.fn();
+    const props = {
+      pageNumber: 3,
+      surahName: "البقرة",
+      verses: [{ k: "2:6" }],
+      language: "ar" as const,
+      onResumeFollowing,
+    };
+    const { rerender } = render(<QuranPageTranslationPanel {...props} follow={false} />);
+    fireEvent.click(screen.getByRole("button", { name: "استئناف المتابعة" }));
+    expect(onResumeFollowing).toHaveBeenCalledOnce();
+    expect(screen.getByRole("heading", { name: "الترجمة الإنجليزية" })).toHaveAttribute("lang", "ar");
+    rerender(<QuranPageTranslationPanel {...props} follow />);
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
   });
 });

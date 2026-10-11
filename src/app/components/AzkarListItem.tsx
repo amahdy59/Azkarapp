@@ -131,7 +131,11 @@ export function AzkarListItem({
         lang={isArabic ? "ar" : "en"}
         dir={isArabic ? "rtl" : "ltr"}
       >
-        {isQuranicText ? <QuranVerseText text={visibleText} language={language} /> : visibleText}
+        {isQuranicText ? (
+          <QuranVerseText text={visibleText} language={language} canonicalKey={z.canonicalKey} />
+        ) : (
+          visibleText
+        )}
       </span>
       {longSurah && expanded && (
         <span className="mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-primary">

@@ -2,10 +2,10 @@ import { useState } from "react";
 import { FIELD_CONTROL_CLASS } from "../../components/FormField";
 import { Button } from "../../components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
-import { Bell, CheckCircle2, Info } from "../../components/icons";
+import { Bell, CheckCircle2, ChevronDown } from "../../components/icons";
 import { t } from "../../i18n";
 import { formatNumerals } from "../../formatting";
-import { InformationCard } from "./InformationCard";
+
 import type { AppLanguage, PrayerName, PrayerReminderLeadMinutes, ReminderSettings } from "../../types";
 import { SubHeader } from "./SettingsPrimitives";
 
@@ -48,7 +48,7 @@ function ReminderScheduleRow({
 }) {
   const label = t(language, `notifications.${kind}`);
   return (
-    <div className="rounded-3xl border border-border/40 bg-card p-4.5 shadow-raised">
+    <div className="border-b border-border/40 p-4 last:border-b-0">
       <div className="flex items-center gap-3">
         <span
           className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"
@@ -197,11 +197,7 @@ export function NotificationsPanel({
     <div className="slide-in-from-right flex h-full flex-col bg-background/50 backdrop-blur-md">
       <SubHeader title={t(language, "notifications.title")} onBack={onBack} language={language} />
       <div className="flex-1 space-y-4 overflow-y-auto px-4 pb-8 pt-3">
-        <InformationCard
-          icon={<Info size={20} aria-hidden="true" />}
-          title={t(language, "notifications.availability")}
-          body={t(language, "notifications.availabilityBody")}
-        />
+        <p className="text-sm text-muted-foreground">{t(language, "notifications.availabilityShort")}</p>
 
         <section
           className="rounded-3xl border border-border/40 bg-card p-5 shadow-raised"
@@ -273,9 +269,6 @@ export function NotificationsPanel({
               <h2 id="prayer-reminders-title" className="text-title font-bold text-foreground">
                 {t(language, "notifications.prayerReminders")}
               </h2>
-              <span className="mt-1 block text-label leading-5 text-muted-foreground">
-                {t(language, "notifications.prayerRemindersHint")}
-              </span>
             </span>
             <button
               type="button"
@@ -385,11 +378,8 @@ export function NotificationsPanel({
             <h2 id="gentle-reminders-title" className="text-title font-bold text-foreground">
               {t(language, "notifications.scheduleTitle")}
             </h2>
-            <p className="mt-1 text-label leading-5 text-muted-foreground">
-              {t(language, "notifications.scheduleHint")}
-            </p>
           </div>
-          <div className="space-y-3">
+          <div className="overflow-hidden rounded-2xl border border-border/40 bg-card">
             {(["morning", "evening", "before_sleep", "after_prayer"] as const).map((kind) => (
               <ReminderScheduleRow
                 key={kind}
@@ -428,6 +418,13 @@ export function NotificationsPanel({
             </p>
           )}
         </section>
+        <details className="group border-t border-border/40">
+          <summary className="flex min-h-11 cursor-pointer items-center justify-between rounded-lg text-sm font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+            {t(language, "settings.moreDetails")}
+            <ChevronDown size={16} aria-hidden="true" className="transition-transform group-open:rotate-180" />
+          </summary>
+          <p className="text-sm text-muted-foreground">{t(language, "notifications.availabilityBody")}</p>
+        </details>
       </div>
     </div>
   );

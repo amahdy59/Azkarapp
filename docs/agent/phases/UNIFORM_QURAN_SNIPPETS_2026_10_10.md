@@ -78,3 +78,9 @@ Breakpoint changes remount the player. The new regression waits for the actual r
 ## Recommended next step
 
 Complete the normal push gates and CI deployment, verify the live SHA and production snippet rendering, then review the actual Android device shown in the owner's screenshots.
+
+## Follow-up audit — 2026-10-11, 01:43 Cairo
+
+Quality run 38077804692 for `168c75772d7e0dcc86cb6478db4c00fcbd029527` failed: 988 passed, 2 failed, 3 flaky, 1 skipped (47.8 minutes). The complete failed-job log was inspected and retained in ignored `output/quran-168-ci-failure.log`. Blocking cases were Firefox immediate reload of m-hm-96 returning the counter to 0/100, and WebKit share-image glyph ink reaching x=974.109375 outside the x=970 panel limit. Assertions were not relaxed. The passing local reload and sharing runs do not override these CI failures. Pages for this commit was skipped, so it was not declared live.
+
+A subsequent owner/workspace release, `e49686c3cb382a80d6b61ee25118fa1d86136273`, superseded this commit and is being checked by Quality run 38091738798. Additional ongoing local translation/Mushaf edits were found and preserved. No heartbeat commit or push was made from those unverified edits. Exact-SHA production verification remains pending the newest successful Quality and Pages deployment.

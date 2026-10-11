@@ -2,6 +2,8 @@ import { QURAN_TEXT_STYLE } from "../quranTypography";
 import type { AppLanguage, Zikr } from "../types";
 import { formatNumerals, numeralFontFamily } from "../formatting";
 import { t } from "../i18n";
+import { MushafBismillahArt } from "./MushafBismillahArt";
+import { MushafSurahHeaderArt } from "./MushafSurahHeaderArt";
 
 export const SEEK_REFUGE_ARABIC = "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ";
 export const BASMALAH_ARABIC = "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ";
@@ -20,37 +22,18 @@ export function QuranPrelude({ zikr, className = "" }: { zikr: Zikr; className?:
         </p>
       )}
       {(zikr.hasBasmalah || zikr.isSurah) && (
-        <p
-          className={`zikr-text mb-4 text-center font-bold tracking-wide text-foreground/90 ${className}`}
-          style={{
-            ...QURAN_TEXT_STYLE,
-            fontSize: "clamp(1.15rem, 4vw, 1.35rem)",
-            lineHeight: 2,
-          }}
+        <div
+          className={`mx-auto mb-5 mt-3 flex w-full justify-center text-foreground ${className}`}
           dir="rtl"
           lang="ar"
         >
-          {BASMALAH_ARABIC}
-        </p>
+          <span aria-hidden="true">
+            <MushafBismillahArt className="h-auto w-[13rem] max-w-full" />
+          </span>
+          <span className="sr-only">{BASMALAH_ARABIC}</span>
+        </div>
       )}
     </>
-  );
-}
-
-function SurahFlourishRule({ flip = false }: { flip?: boolean }) {
-  return (
-    <svg
-      width="120"
-      height="14"
-      viewBox="0 0 120 14"
-      fill="none"
-      className={`shrink select-none opacity-80 ${flip ? "-scale-x-100" : ""}`}
-      aria-hidden="true"
-    >
-      <polygon points="4,7 7,4 10,7 7,10" fill="var(--mushaf-rule-ink, var(--accent, #c6a772))" />
-      <line x1="12" y1="7" x2="108" y2="7" stroke="var(--mushaf-rule-ink, var(--accent, #c6a772))" strokeWidth="1.2" />
-      <circle cx="114" cy="7" r="2.5" stroke="var(--mushaf-rule-ink, var(--accent, #c6a772))" strokeWidth="1" />
-    </svg>
   );
 }
 
@@ -90,14 +73,15 @@ export function QuranSurahHeader({
       dir="rtl"
       data-testid="quran-surah-header"
     >
-      <div className="flex items-center justify-center gap-2.5 sm:gap-4 px-2">
-        <SurahFlourishRule />
+      <div className="relative flex items-center justify-center px-2">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-9" aria-hidden="true">
+          <MushafSurahHeaderArt className="h-full w-full" />
+        </div>
 
         {/* Surah Title */}
         <div className="flex flex-col items-center px-1">
           <h2
-            className="text-base sm:text-lg font-bold tracking-wide text-foreground whitespace-nowrap select-none"
-            style={{ fontFamily: "var(--font-mushaf)" }}
+            className="arabic-ui relative flex min-h-9 items-center text-base font-bold text-foreground whitespace-nowrap select-none"
             data-testid="quran-surah-title"
           >
             {surahName}
@@ -114,8 +98,6 @@ export function QuranSurahHeader({
             </div>
           )}
         </div>
-
-        <SurahFlourishRule flip />
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ export interface SettingsRowProps {
   icon: React.ReactNode;
   iconBg?: string;
   label: string;
+  description?: string;
   labelColor?: string;
   right?: React.ReactNode;
   onPress?: () => void;
@@ -18,6 +19,7 @@ export function SettingsRowItem({
   icon,
   iconBg = "var(--muted)",
   label,
+  description,
   labelColor = "text-foreground",
   right,
   onPress,
@@ -30,12 +32,15 @@ export function SettingsRowItem({
       <div className="flex size-10 shrink-0 items-center justify-center rounded-xl" style={{ background: iconBg }}>
         {icon}
       </div>
-      <p
-        className={`min-w-0 flex-1 break-normal text-start font-sans text-subtitle md:text-base leading-snug ${current ? "font-bold text-primary" : "font-semibold text-foreground"}`}
-        style={{ color: current ? undefined : labelColor === "text-foreground" ? "var(--foreground)" : undefined }}
-      >
-        {label}
-      </p>
+      <div className="min-w-0 flex-1">
+        <p
+          className={`min-w-0 flex-1 break-normal text-start font-sans text-subtitle md:text-base leading-snug ${current ? "font-bold text-primary" : "font-semibold text-foreground"}`}
+          style={{ color: current ? undefined : labelColor === "text-foreground" ? "var(--foreground)" : undefined }}
+        >
+          {label}
+        </p>
+        {description && <p className="mt-0.5 text-start text-sm text-muted-foreground">{description}</p>}
+      </div>
       {right}
     </>
   );

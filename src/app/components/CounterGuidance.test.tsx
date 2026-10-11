@@ -6,6 +6,31 @@ import { t } from "../i18n";
 describe("combined counting guidance", () => {
   beforeEach(() => window.localStorage.clear());
 
+  it("removes Reader instructions and their button after the first count, including after reload", async () => {
+    const view = render(<CounterGuidance language="en" direction="ltr" reader />);
+    expect(screen.getByTestId("counter-tap-hint")).toBeVisible();
+    view.rerender(<CounterGuidance language="en" direction="ltr" reader hasStarted />);
+    await waitFor(() => expect(screen.queryByTestId("counter-tap-hint")).not.toBeInTheDocument());
+    expect(screen.queryByTestId("counter-guidance-reopen")).not.toBeInTheDocument();
+    expect(view.container).toBeEmptyDOMElement();
+    view.unmount();
+    render(<CounterGuidance language="en" direction="ltr" reader />);
+    expect(screen.queryByTestId("counter-tap-hint")).not.toBeInTheDocument();
+  });
+
+  it("dismisses first-use Reader guidance permanently without counting", () => {
+    const view = render(<CounterGuidance language="en" direction="ltr" reader />);
+    fireEvent.click(screen.getByRole("button", { name: "Hide counting guidance" }));
+    expect(view.container).toBeEmptyDOMElement();
+    expect(window.localStorage.getItem("azkarapp.counter-guidance.v1")).toBe("true");
+  });
+
+  it("recognizes restored progress as learned counting on a legacy device", () => {
+    render(<CounterGuidance language="en" direction="ltr" reader hasStarted />);
+    expect(screen.queryByTestId("counter-tap-hint")).not.toBeInTheDocument();
+    expect(window.localStorage.getItem("azkarapp.counter-guidance.v1")).toBe("true");
+  });
+
   it.each(["ar", "en"] as const)(
     "keeps keyboard help complete and restores the icon trigger in %s",
     async (language) => {

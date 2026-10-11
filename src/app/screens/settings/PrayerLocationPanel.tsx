@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { FIELD_CONTROL_CLASS, FIELD_LABEL_CLASS, FormField } from "../../components/FormField";
 import { Button } from "../../components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
-import { MapPin } from "../../components/icons";
+import { ChevronDown, MapPin } from "../../components/icons";
 import { t } from "../../i18n";
 import {
   CALCULATION_METHODS,
@@ -189,9 +189,6 @@ export function PrayerLocationPanel({
               <h2 id="prayer-location-title" className="text-title font-semibold text-foreground">
                 {t(language, "notifications.locationPrayerTimes")}
               </h2>
-              <p className="mt-1 text-sm leading-[22px] text-muted-foreground">
-                {t(language, "notifications.prayerCalculationDescription")}
-              </p>
             </div>
           </div>
 
@@ -274,7 +271,7 @@ export function PrayerLocationPanel({
               <legend className="mb-2 text-sm font-bold text-foreground">
                 {t(language, "notifications.chooseCity")}
               </legend>
-              <p className="text-xs leading-5 text-muted-foreground">{t(language, "notifications.citySearchHint")}</p>
+
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="city-search" className={FIELD_LABEL_CLASS}>
                   {t(language, "notifications.citySearchLabel")}
@@ -324,100 +321,108 @@ export function PrayerLocationPanel({
               )}
             </fieldset>
 
-            <fieldset className="space-y-2 border-t border-border pt-4">
-              <legend className="mb-2 text-sm font-bold text-foreground">
-                {t(language, "notifications.manualLocation")}
-              </legend>
-              <FormField
-                label={t(language, "notifications.cityName")}
-                type="text"
-                value={cityDraft}
-                onChange={(event) => setCityDraft(event.target.value)}
-              />
-              <FormField
-                label={t(language, "notifications.timeZoneLabel")}
-                type="text"
-                value={timeZoneDraft}
-                onChange={(event) => setTimeZoneDraft(event.target.value)}
-                placeholder={t(language, "notifications.timeZonePlaceholder")}
-                dir="ltr"
-              />
-              <div className="grid grid-cols-2 gap-2">
-                <FormField
-                  label={t(language, "notifications.latitude")}
-                  type="number"
-                  min="-90"
-                  max="90"
-                  step="0.0001"
-                  value={latitudeDraft}
-                  onChange={(event) => {
-                    setLatitudeDraft(event.target.value);
-                    setInvalidCoordinates((current) => ({ ...current, latitude: false }));
-                  }}
-                  error={invalidCoordinates.latitude ? t(language, "notifications.latitudeRange") : undefined}
-                  inputMode="decimal"
-                  dir="ltr"
-                />
-                <FormField
-                  label={t(language, "notifications.longitude")}
-                  type="number"
-                  min="-180"
-                  max="180"
-                  step="0.0001"
-                  value={longitudeDraft}
-                  onChange={(event) => {
-                    setLongitudeDraft(event.target.value);
-                    setInvalidCoordinates((current) => ({ ...current, longitude: false }));
-                  }}
-                  error={invalidCoordinates.longitude ? t(language, "notifications.longitudeRange") : undefined}
-                  inputMode="decimal"
-                  dir="ltr"
-                />
-              </div>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleManualLocationSave}
-                className="w-full border-primary text-primary hover:bg-primary/5"
-              >
-                {t(language, "notifications.saveLocation")}
-              </Button>
-            </fieldset>
-
-            <fieldset className="border-t border-border pt-4">
-              <legend className="mb-2 text-sm font-bold text-foreground">
-                {t(language, "notifications.manualMinuteAdjustments")}
-              </legend>
-              <p className="mb-3 text-xs leading-5 text-muted-foreground">
-                {t(language, "notifications.minuteAdjustmentHint")}
-              </p>
-              <div className="grid grid-cols-2 gap-2">
-                {(
-                  [
-                    ["fajr", t(language, "notifications.fajr")],
-                    ["dhuhr", t(language, "notifications.dhuhr")],
-                    ["asr", t(language, "notifications.asr")],
-                    ["maghrib", t(language, "notifications.maghrib")],
-                    ["isha", t(language, "notifications.isha")],
-                  ] as const
-                ).map(([prayer, label]) => (
-                  <label key={prayer} className="text-xs font-semibold text-muted-foreground">
-                    {label}
-                    <input
+            <details className="group border-t border-border pt-2">
+              <summary className="flex min-h-11 cursor-pointer items-center justify-between rounded-lg text-sm font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+                {t(language, "settings.advancedPrayer")}
+                <ChevronDown size={16} aria-hidden="true" className="transition-transform group-open:rotate-180" />
+              </summary>
+              <div className="space-y-4 pt-2">
+                <fieldset className="space-y-2 border-t border-border pt-4">
+                  <legend className="mb-2 text-sm font-bold text-foreground">
+                    {t(language, "notifications.manualLocation")}
+                  </legend>
+                  <FormField
+                    label={t(language, "notifications.cityName")}
+                    type="text"
+                    value={cityDraft}
+                    onChange={(event) => setCityDraft(event.target.value)}
+                  />
+                  <FormField
+                    label={t(language, "notifications.timeZoneLabel")}
+                    type="text"
+                    value={timeZoneDraft}
+                    onChange={(event) => setTimeZoneDraft(event.target.value)}
+                    placeholder={t(language, "notifications.timeZonePlaceholder")}
+                    dir="ltr"
+                  />
+                  <div className="grid grid-cols-2 gap-2">
+                    <FormField
+                      label={t(language, "notifications.latitude")}
                       type="number"
-                      min="-120"
-                      max="120"
-                      value={locationSettings?.adjustments?.[prayer] ?? 0}
-                      onChange={(event) => handleAdjustmentChange(prayer, Number(event.target.value))}
-                      inputMode="numeric"
-                      onWheel={(event) => event.currentTarget.blur()}
+                      min="-90"
+                      max="90"
+                      step="0.0001"
+                      value={latitudeDraft}
+                      onChange={(event) => {
+                        setLatitudeDraft(event.target.value);
+                        setInvalidCoordinates((current) => ({ ...current, latitude: false }));
+                      }}
+                      error={invalidCoordinates.latitude ? t(language, "notifications.latitudeRange") : undefined}
+                      inputMode="decimal"
                       dir="ltr"
-                      className="mt-1 min-h-11 w-full rounded-lg border border-border-control bg-background px-2 text-center text-sm text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                     />
-                  </label>
-                ))}
+                    <FormField
+                      label={t(language, "notifications.longitude")}
+                      type="number"
+                      min="-180"
+                      max="180"
+                      step="0.0001"
+                      value={longitudeDraft}
+                      onChange={(event) => {
+                        setLongitudeDraft(event.target.value);
+                        setInvalidCoordinates((current) => ({ ...current, longitude: false }));
+                      }}
+                      error={invalidCoordinates.longitude ? t(language, "notifications.longitudeRange") : undefined}
+                      inputMode="decimal"
+                      dir="ltr"
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleManualLocationSave}
+                    className="w-full border-primary text-primary hover:bg-primary/5"
+                  >
+                    {t(language, "notifications.saveLocation")}
+                  </Button>
+                </fieldset>
+
+                <fieldset className="border-t border-border pt-4">
+                  <legend className="mb-2 text-sm font-bold text-foreground">
+                    {t(language, "notifications.manualMinuteAdjustments")}
+                  </legend>
+                  <p className="mb-3 text-xs leading-5 text-muted-foreground">
+                    {t(language, "notifications.minuteAdjustmentHint")}
+                  </p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {(
+                      [
+                        ["fajr", t(language, "notifications.fajr")],
+                        ["dhuhr", t(language, "notifications.dhuhr")],
+                        ["asr", t(language, "notifications.asr")],
+                        ["maghrib", t(language, "notifications.maghrib")],
+                        ["isha", t(language, "notifications.isha")],
+                      ] as const
+                    ).map(([prayer, label]) => (
+                      <label key={prayer} className="text-xs font-semibold text-muted-foreground">
+                        {label}
+                        <input
+                          type="number"
+                          min="-120"
+                          max="120"
+                          value={locationSettings?.adjustments?.[prayer] ?? 0}
+                          onChange={(event) => handleAdjustmentChange(prayer, Number(event.target.value))}
+                          inputMode="numeric"
+                          onWheel={(event) => event.currentTarget.blur()}
+                          dir="ltr"
+                          className="mt-1 min-h-11 w-full rounded-lg border border-border-control bg-background px-2 text-center text-sm text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                        />
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
               </div>
-            </fieldset>
+            </details>
           </div>
         </section>
       </div>

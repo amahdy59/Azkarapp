@@ -55,9 +55,9 @@ export function ReadingPanel({
           >
             {(
               [
-                { value: "small", label: t(language, "settings.textSmall"), sampleSize: "text-subtitle" },
-                { value: "medium", label: t(language, "settings.medium"), sampleSize: "text-lg" },
-                { value: "large", label: t(language, "settings.textLarge"), sampleSize: "text-headline" },
+                { value: "small", label: t(language, "settings.textSmall") },
+                { value: "medium", label: t(language, "settings.medium") },
+                { value: "large", label: t(language, "settings.textLarge") },
               ] as const
             ).map((option) => {
               const selected = textSize === option.value;
@@ -66,16 +66,13 @@ export function ReadingPanel({
                   key={option.value}
                   value={option.value}
                   data-testid={`reading-text-size-${option.value}`}
-                  className={`relative flex min-h-[76px] flex-col items-center justify-center gap-1 rounded-3xl border px-2 py-2 text-center transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring backdrop-blur-xl shadow-sm ${
+                  className={`relative flex min-h-11 items-center justify-center gap-1 rounded-xl border px-2 py-2 text-center transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                     selected
                       ? "border-primary bg-primary/10 text-foreground"
                       : "border-border/40 bg-card text-muted-foreground"
                   }`}
                 >
-                  <span className={`font-bold leading-none ${option.sampleSize}`} aria-hidden="true">
-                    Aa
-                  </span>
-                  <span className="text-xs font-semibold leading-4">{option.label}</span>
+                  <span className="text-sm font-semibold">{option.label}</span>
                   {selected && (
                     <span className="absolute end-1.5 top-1.5 text-primary" aria-hidden="true">
                       <Check size={14} strokeWidth={2.5} />
@@ -92,7 +89,6 @@ export function ReadingPanel({
           <h3 id="reading-zikr-font-title" className="sr-only">
             {t(language, "settings.zikrFont")}
           </h3>
-          <p className="mb-3 text-xs leading-snug text-muted-foreground">{t(language, "settings.zikrFontHint")}</p>
           <RadioGroupPrimitive.Root
             dir={direction}
             value={zikrFont}
@@ -113,22 +109,15 @@ export function ReadingPanel({
                   key={option.value}
                   value={option.value}
                   data-testid={`reading-zikr-font-${option.value}`}
-                  className={`relative flex min-h-[88px] flex-col items-center justify-center gap-1.5 rounded-3xl border px-2 py-2 text-center transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring shadow-sm ${
+                  className={`relative flex min-h-11 items-center justify-center gap-1.5 rounded-xl border px-2 py-2 text-center transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                     selected
                       ? "border-primary bg-primary/10 text-foreground"
                       : "border-border/40 bg-card text-muted-foreground"
                   }`}
                 >
-                  <span
-                    aria-hidden="true"
-                    dir="rtl"
-                    lang="ar"
-                    className="text-headline leading-tight text-foreground"
-                    style={{ fontFamily: ZIKR_FONT_STACKS[option.value] }}
-                  >
-                    {ZIKR_FONT_SAMPLE}
+                  <span className="text-sm font-semibold" style={{ fontFamily: ZIKR_FONT_STACKS[option.value] }}>
+                    {option.label}
                   </span>
-                  <span className="text-xs font-semibold leading-4">{option.label}</span>
                   {selected && (
                     <span className="absolute end-1.5 top-1.5 text-primary" aria-hidden="true">
                       <Check size={14} strokeWidth={2.5} />
@@ -140,6 +129,27 @@ export function ReadingPanel({
           </RadioGroupPrimitive.Root>
         </section>
 
+        <section
+          className="mx-4 rounded-2xl border border-border/40 bg-card p-4"
+          aria-labelledby="reading-preview-title"
+        >
+          <h2 id="reading-preview-title" className="text-sm font-semibold text-muted-foreground">
+            {t(language, "settings.readingPreview")}
+          </h2>
+          <p
+            data-testid="reading-preview"
+            lang="ar"
+            dir="rtl"
+            className="py-4 text-center leading-relaxed text-foreground"
+            style={{
+              fontFamily: ZIKR_FONT_STACKS[zikrFont],
+              fontSize: textSize === "small" ? "1.375rem" : textSize === "large" ? "1.75rem" : "1.5rem",
+            }}
+          >
+            {ZIKR_FONT_SAMPLE}
+          </p>
+          <p className="text-xs text-muted-foreground">{t(language, "settings.readingPreviewHint")}</p>
+        </section>
         <SectionLabel label={t(language, "settings.reading")} />
         <div className="mx-4 overflow-hidden rounded-3xl border border-border/40 bg-card shadow-raised">
           <SettingsToggleRow

@@ -111,6 +111,7 @@ test("Arabic large text remains readable at 320px", async ({ page }) => {
   await page.getByTestId("settings-sub-reading").click();
   await page.getByTestId("reading-text-size-large").click();
   await page.getByRole("button", { name: "Back", exact: true }).click();
+  await page.getByTestId("settings-sub-appearance").click();
   await page.getByTestId("settings-language-ar").click();
   await page.getByTestId("nav-home").click();
 

@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
-import { isQcfFontReady, loadMushafPage, loadQcfFont, pageHasQcfGlyphs } from "../content/qcfMushaf";
+import {
+  isQcfFontReady,
+  loadMushafPage,
+  loadQcfFont,
+  pageHasQcfGlyphs,
+  subscribeQcfFontLoaded,
+} from "../content/qcfMushaf";
 import type { MushafWordToken } from "../components/MushafPageViewer";
 
 export function useListeningMushafPage(page: number, retry: number, loadPageFont = true) {
@@ -10,6 +16,13 @@ export function useListeningMushafPage(page: number, retry: number, loadPageFont
     let timer: ReturnType<typeof setTimeout> | undefined;
     setResult(null);
     setErrorPage(null);
+    if (page < 1 || page > 604) return;
+    const unsubscribe = loadPageFont
+      ? subscribeQcfFontLoaded((loadedPage) => {
+          if (loadedPage === page && !cancelled)
+            setResult((current) => (current?.page === page ? { ...current, qcf: true } : current));
+        })
+      : undefined;
     void (async () => {
       try {
         const data = await loadMushafPage(page);
@@ -36,6 +49,7 @@ export function useListeningMushafPage(page: number, retry: number, loadPageFont
     })();
     return () => {
       cancelled = true;
+      unsubscribe?.();
       if (timer) clearTimeout(timer);
     };
   }, [page, retry, loadPageFont]);

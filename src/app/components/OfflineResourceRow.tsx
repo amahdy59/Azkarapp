@@ -2,7 +2,7 @@ import { useRef, type ReactNode } from "react";
 import type { AppLanguage } from "../types";
 import { t } from "../i18n";
 import { Button } from "./ui/button";
-import { Download, X } from "./icons";
+import { Check, Download, X } from "./icons";
 import { DownloadProgress } from "./DownloadProgress";
 import {
   AlertDialog,
@@ -31,6 +31,10 @@ export function OfflineResourceRow({
   onDownload,
   onCancel,
   onRemove,
+  compact = false,
+  hideRemove = false,
+  showDownload = true,
+  direction = language === "ar" ? "rtl" : "ltr",
 }: {
   id: string;
   title: string;
@@ -46,13 +50,21 @@ export function OfflineResourceRow({
   onDownload: () => void;
   onCancel: () => void;
   onRemove: () => void;
+  compact?: boolean;
+  hideRemove?: boolean;
+  showDownload?: boolean;
+  direction?: "ltr" | "rtl";
 }) {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const removeRequestedRef = useRef(false);
   return (
-    <section className="space-y-3 py-4" aria-labelledby={`${id}-title`} data-testid={`offline-resource-${id}`}>
+    <section
+      className={compact ? "space-y-2 py-2" : "space-y-3 py-4"}
+      aria-labelledby={`${id}-title`}
+      data-testid={`offline-resource-${id}`}
+    >
       <div className="flex flex-wrap items-start justify-between gap-2">
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1" style={{ minWidth: "min(100%, 10rem)" }}>
           <h3
             ref={headingRef}
             tabIndex={-1}
@@ -61,16 +73,21 @@ export function OfflineResourceRow({
           >
             {title}
           </h3>
-          <p className="text-sm text-muted-foreground">{detail}</p>
         </div>
-        <span className="text-xs text-muted-foreground">{size}</span>
+        {completed < total && <span className="text-sm text-muted-foreground">{size}</span>}
       </div>
-      <p className="text-sm text-foreground">{state}</p>
-      {total > 0 && (
+      {detail && <p className="text-sm text-muted-foreground">{detail}</p>}
+      {(!compact || active || completed > 0 || total === 0) && (
+        <p className="flex items-center gap-2 text-sm text-foreground">
+          {total > 0 && completed >= total && <Check size={18} aria-hidden="true" />}
+          {state}
+        </p>
+      )}
+      {total > 0 && (!compact || active) && (
         <DownloadProgress completed={completed} total={total} label={title} language={language} active={active} />
       )}
       <div className="flex flex-wrap gap-2">
-        {active ? (
+        {!showDownload ? null : active ? (
           <Button
             className="h-auto min-h-11 max-w-full whitespace-normal py-2"
             variant="outline"
@@ -80,7 +97,7 @@ export function OfflineResourceRow({
             <X size={18} aria-hidden="true" />
             {t(language, "downloads.cancelDownload")}
           </Button>
-        ) : (
+        ) : compact && total > 0 && completed >= total ? null : (
           <Button
             className="h-auto min-h-11 max-w-full whitespace-normal py-2"
             variant="outline"
@@ -88,11 +105,15 @@ export function OfflineResourceRow({
             onClick={onDownload}
             aria-label={`${action} · ${title}`}
           >
-            <Download size={18} aria-hidden="true" />
+            {total > 0 && completed >= total ? (
+              <Check size={18} aria-hidden="true" />
+            ) : (
+              <Download size={18} aria-hidden="true" />
+            )}
             {action}
           </Button>
         )}
-        {completed > 0 && (
+        {completed > 0 && !hideRemove && (
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button
@@ -104,7 +125,7 @@ export function OfflineResourceRow({
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent
-              dir={language === "ar" ? "rtl" : "ltr"}
+              dir={direction}
               onCloseAutoFocus={(event) => {
                 // The confirmed removal may unmount its trigger. Restore to the resource.
                 if (!removeRequestedRef.current) return;

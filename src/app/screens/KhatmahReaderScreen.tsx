@@ -18,6 +18,7 @@ import type { AudioController } from "../audio/AudioProvider";
 import { useMushafPlayback } from "../hooks/useMushafPlayback";
 import {
   ArrowPrevious,
+  ArrowNext,
   CheckCircle2,
   ChevronDown,
   X,
@@ -252,6 +253,7 @@ export function KhatmahReaderScreen({
 
   const [readingMode, setReadingMode] = useState<"mushaf" | "bilingual">("mushaf");
   const [showPageTranslation, setShowPageTranslation] = useState(false);
+  const [compactMeaningPane, setCompactMeaningPane] = useState<"arabic" | "english">("arabic");
   const [internalLayout, setInternalLayout] = useState<MushafLayout>(mushafLayout);
 
   useEffect(() => {
@@ -272,6 +274,7 @@ export function KhatmahReaderScreen({
   // the same reading actions in a right-side rail so the page gains vertical
   // room; compact and portrait surfaces retain the four corner actions.
   const [pageMagnification, setPageMagnification] = useState(100);
+  const pairedMeaning = shell.spreadRoom && pageMagnification === 100;
   const autoSpreadRoom = shell.spreadRoom && shell.pageAspect >= 0.78;
   /**
    * Whether the reading type size can change anything here.
@@ -780,7 +783,11 @@ export function KhatmahReaderScreen({
       const moved = Math.hypot(clientX - startX, clientY - startY);
       const heldFor = performance.now() - startedAt;
       if (moved > TAP_SLOP || heldFor > TAP_MS) return;
-      if (target instanceof Element && target.closest("button, a, [role='button'], [role='switch']")) return;
+      if (
+        target instanceof Element &&
+        target.closest("button, a, input, label, select, textarea, [role='button'], [role='switch']")
+      )
+        return;
       // Center / page tap toggles focus mode (hiding or revealing chrome and floating audio)
       setIsFocusMode((prev) => !prev);
     },
@@ -789,8 +796,8 @@ export function KhatmahReaderScreen({
 
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if (event.button !== 0) return;
-    if (event.target instanceof Element && event.target.closest(".quran-meaning-text")) return;
-    if ((event.target as HTMLElement).closest("button, a, [role='switch']")) return;
+    if (event.target instanceof Element && event.target.closest(".quran-page-meaning")) return;
+    if ((event.target as HTMLElement).closest("button, a, input, label, select, textarea, [role='switch']")) return;
     drag.current = {
       pointerId: event.pointerId,
       startX: event.clientX,
@@ -1060,7 +1067,7 @@ export function KhatmahReaderScreen({
       <div
         ref={readerRootRef}
         tabIndex={-1}
-        className="relative flex min-h-0 flex-1 flex-col overflow-hidden outline-none"
+        className={`relative flex min-h-0 flex-1 flex-col overflow-hidden bg-background text-foreground outline-none theme-${resolvedTheme}`}
         onPointerDown={readingMode === "mushaf" && pageMagnification === 100 ? onPointerDown : undefined}
         onPointerMove={readingMode === "mushaf" && pageMagnification === 100 ? onPointerMove : undefined}
         onPointerUp={readingMode === "mushaf" && pageMagnification === 100 ? onPointerEnd : undefined}
@@ -1090,7 +1097,94 @@ export function KhatmahReaderScreen({
           </div>
         )}
 
-        {pageData && readingMode === "bilingual" ? (
+        {pageData && showPageTranslation && !pairedMeaning && readingMode === "mushaf" && (
+          <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 bg-background px-2 py-1">
+            <button
+              type="button"
+              onClick={onBack}
+              aria-label={t(language, "common.back")}
+              className="flex size-11 shrink-0 items-center justify-center rounded-full focus-visible:ring-[3px] focus-visible:ring-ring"
+            >
+              <ArrowPrevious size={18} aria-hidden="true" />
+            </button>
+            <fieldset className="quran-pane-selector flex min-w-0 items-center justify-center gap-1">
+              <legend className="sr-only">{t(language, "quranListening.readingLanguage")}</legend>
+              {(["arabic", "english"] as const).map((pane) => (
+                <label
+                  key={pane}
+                  className="quran-pane-choice relative flex min-h-11 min-w-0 flex-1 cursor-pointer items-center justify-center rounded-lg px-1 text-sm"
+                >
+                  <input
+                    type="radio"
+                    name="compact-mushaf-pane"
+                    value={pane}
+                    checked={compactMeaningPane === pane}
+                    onChange={() => setCompactMeaningPane(pane)}
+                    className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                  />
+                  <span className="min-w-0 break-words rounded-lg px-1 py-2 text-center">
+                    {t(language, pane === "arabic" ? "quranListening.arabicPage" : "quranListening.englishPage")}
+                  </span>
+                </label>
+              ))}
+            </fieldset>
+            <button
+              type="button"
+              onClick={() => setIsQuickMenuOpen(true)}
+              aria-label={t(language, "mushaf.moreActions")}
+              className="flex size-11 shrink-0 items-center justify-center rounded-full focus-visible:ring-[3px] focus-visible:ring-ring"
+            >
+              <MoreVertical size={18} aria-hidden="true" />
+            </button>
+          </div>
+        )}
+        {pageData &&
+        readingMode === "mushaf" &&
+        showPageTranslation &&
+        !pairedMeaning &&
+        compactMeaningPane === "english" ? (
+          <div className="flex min-h-0 flex-1 flex-col px-4 sm:px-6">
+            <div className="min-h-0 flex-1">
+              <QuranPageTranslationPanel
+                pageNumber={displayPage}
+                surahName={surahName}
+                verses={pageData}
+                language={language}
+                activeVerseKey={playback.cue.verseKey}
+                follow={playback.follow}
+                textSize={textSize}
+                onManualBrowse={playback.pauseFollowing}
+                onResumeFollowing={playback.available ? playback.toggleFollowing : undefined}
+              />
+            </div>
+            <nav
+              aria-label={t(language, "mushaf.pageNavigation")}
+              className="flex shrink-0 items-center justify-between gap-2 py-1"
+            >
+              <button
+                type="button"
+                disabled={currentPage <= 1}
+                onClick={() => paginate(-1)}
+                aria-label={t(language, "common.previous")}
+                title={t(language, "common.previous")}
+                className="flex size-11 items-center justify-center rounded-lg disabled:opacity-40 focus-visible:ring-[3px] focus-visible:ring-ring"
+              >
+                <ArrowPrevious size={18} aria-hidden="true" />
+              </button>
+              <span className="text-xs tabular-nums">{formatNumerals(displayPage, language)}</span>
+              <button
+                type="button"
+                disabled={currentPage >= LAST_PAGE}
+                onClick={() => paginate(1)}
+                aria-label={t(language, "common.next")}
+                title={t(language, "common.next")}
+                className="flex size-11 items-center justify-center rounded-lg disabled:opacity-40 focus-visible:ring-[3px] focus-visible:ring-ring"
+              >
+                <ArrowNext size={18} aria-hidden="true" />
+              </button>
+            </nav>
+          </div>
+        ) : pageData && readingMode === "bilingual" ? (
           <QuranBilingualStreamView
             pageNumber={displayPage}
             surahName={surahName}
@@ -1117,7 +1211,7 @@ export function KhatmahReaderScreen({
             onOpenMore={() => setIsQuickMenuOpen(true)}
           />
         ) : pageData ? (
-          <div className="h-full w-full">
+          <div className="min-h-0 flex-1 w-full">
             <MushafPageViewer
               lines={spreadReady && rightSide ? rightSide.lines : lines}
               language={language}
@@ -1137,7 +1231,7 @@ export function KhatmahReaderScreen({
                   : undefined
               }
               facingContent={
-                showPageTranslation && shell.spreadRoom && pageData ? (
+                showPageTranslation && pairedMeaning && pageData ? (
                   <QuranPageTranslationPanel
                     pageNumber={displayPage}
                     surahName={surahName}
@@ -1148,6 +1242,7 @@ export function KhatmahReaderScreen({
                     follow={playback.follow}
                     textSize={textSize}
                     onManualBrowse={playback.pauseFollowing}
+                    onResumeFollowing={playback.available ? playback.toggleFollowing : undefined}
                   />
                 ) : undefined
               }
@@ -1337,7 +1432,7 @@ export function KhatmahReaderScreen({
         onSelectLayout={handleSelectLayout}
         showLayoutOptions={shell.spreadRoom}
         showPageTranslation={showPageTranslation}
-        onTogglePageTranslation={shell.spreadRoom ? () => setShowPageTranslation((prev) => !prev) : undefined}
+        onTogglePageTranslation={() => setShowPageTranslation((prev) => !prev)}
         theme={theme}
         appTheme={appTheme}
         onSelectTheme={handleSelectTheme}

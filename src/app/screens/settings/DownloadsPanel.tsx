@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Card } from "../../components/Card";
 import { Button } from "../../components/ui/button";
-import { ChevronDown, CloudOff, Database, Download, RotateCcw } from "../../components/icons";
-import { DownloadProgress } from "../../components/DownloadProgress";
+import { ChevronDown, Database, RotateCcw } from "../../components/icons";
 import { OfflineResourceRow } from "../../components/OfflineResourceRow";
 import { getScrollViewport } from "../../components/scrollViewport";
 import { t } from "../../i18n";
@@ -11,7 +10,7 @@ import { formatNumerals } from "../../formatting";
 import { reportError } from "../../../lib/observability";
 import { SubHeader } from "./SettingsPrimitives";
 import { applyContentReview } from "../../content/contentReview";
-import { getAzkarForMode } from "../../content/azkar";
+import { ALL_AZKAR, getAzkarForMode } from "../../content/azkar";
 import { loadAudioPreferences } from "../../audio/audioPreferences";
 import {
   downloadAudioForZikrs,
@@ -22,7 +21,6 @@ import {
 } from "../../audio/audioOfflineCache";
 import { downloadMushaf, getMushafDownloadStatus, removeDownloadedMushaf } from "../../content/mushafOfflineCache";
 import { hasDownloadSpace, isStorageQuotaError, MUSHAF_ESTIMATED_PAGE_BYTES } from "../../content/downloadStorage";
-import { prepareTravelDownloads } from "../../audio/travelPreparation";
 
 type AudioCollection = { id: string; titleKey: string; zikrs: readonly Zikr[]; byteSize: number };
 type AudioStatus = { completed: number; total: number; remainingBytes: number };
@@ -34,9 +32,7 @@ type OfflineStatus = {
   downloadedAudioAssets: number;
   downloadedAudioBytes: number;
   downloadedMushafPages: number;
-  travelAudioCompleted: number;
-  travelAudioTotal: number;
-  travelAudioRemainingBytes: number;
+  groups: AudioStatus[];
   audio: AudioStatus[];
 };
 type Job = { id: string; completed: number; total: number; group?: number };
@@ -46,61 +42,89 @@ function formatMegabytes(bytes: number | undefined, language: AppLanguage) {
     : t(language, "downloads.unavailable");
 }
 
-export function DownloadsPanel({ language, onBack }: { language: AppLanguage; onBack: () => void }) {
+export function DownloadsPanel({
+  language,
+  onBack,
+  direction = language === "ar" ? "rtl" : "ltr",
+}: {
+  language: AppLanguage;
+  onBack: () => void;
+  direction?: "ltr" | "rtl";
+}) {
   const [collections, setCollections] = useState<AudioCollection[]>([]);
   const [status, setStatus] = useState<OfflineStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [job, setJob] = useState<Job | null>(null);
+  const [failedId, setFailedId] = useState<string | null>(null);
   const [removing, setRemoving] = useState(false);
   const controllerRef = useRef<AbortController | null>(null);
   const operationRef = useRef(false);
   const mountedRef = useRef(true);
+  const statusRequestRef = useRef(0);
   const audioPreferences = useMemo(loadAudioPreferences, []);
   // Optional Quran corpora load only when this panel is opened.
   const resourcePromise = useMemo(
     () =>
-      Promise.all([import("../../content/fridayKahf"), import("../../content/baqarahSurah")]).then(
-        ([{ FRIDAY_KAHF }, { BAQARAH_SURAH }]) => {
-          const entries = [
-            ...(["morning", "evening", "before_sleep"] as const).map((id, index) => ({
-              id,
-              titleKey: ["downloads.morningCore", "downloads.eveningCore", "downloads.beforeSleepCore"][index]!,
-              zikrs: getAzkarForMode(id, "core"),
-            })),
-            { id: "kahf", titleKey: "downloads.kahf", zikrs: FRIDAY_KAHF },
-            { id: "baqarah", titleKey: "downloads.baqarah", zikrs: applyContentReview([BAQARAH_SURAH]) },
-          ];
-          return entries.map((entry) => ({
-            ...entry,
-            byteSize: estimateAudioDownloadBytes(entry.zikrs, audioPreferences),
-          }));
-        },
-      ),
+      Promise.all([
+        import("../../content/fridayKahf"),
+        import("../../content/baqarahSurah"),
+        import("../../content/comprehensiveDuas"),
+      ]).then(([{ FRIDAY_KAHF }, { BAQARAH_SURAH }, { COMPREHENSIVE_DUAS }]) => {
+        const entries = [
+          ...(["morning", "evening", "before_sleep"] as const).map((id, index) => ({
+            id,
+            titleKey: ["downloads.morningFull", "downloads.eveningFull", "downloads.sleepFull"][index]!,
+            zikrs: getAzkarForMode(id, "complete").filter((z) => z.id !== BAQARAH_SURAH.id),
+          })),
+          {
+            id: "other",
+            titleKey: "downloads.otherAdhkar",
+            zikrs: [...ALL_AZKAR, ...COMPREHENSIVE_DUAS].filter(
+              (z) =>
+                !z.isCollectionIntroduction &&
+                z.id !== BAQARAH_SURAH.id &&
+                !["morning", "evening", "before_sleep"].includes(z.category),
+            ),
+          },
+          { id: "kahf", titleKey: "downloads.kahf", zikrs: FRIDAY_KAHF },
+          { id: "baqarah", titleKey: "downloads.baqarah", zikrs: applyContentReview([BAQARAH_SURAH]) },
+        ];
+        return entries.map((entry) => ({
+          ...entry,
+          byteSize: estimateAudioDownloadBytes(entry.zikrs, audioPreferences),
+        }));
+      }),
     [audioPreferences],
   );
 
   const refreshStatus = useCallback(async () => {
+    const request = ++statusRequestRef.current;
     setErrorMessage("");
     setSuccessMessage("");
     setIsLoading(true);
     try {
       const resources = await resourcePromise;
-      if (mountedRef.current) setCollections(resources);
+      if (!mountedRef.current || request !== statusRequestRef.current) return;
+      setCollections(resources);
       const [registration, cacheNames, storage, mushafStatus, audioStatus] = await Promise.all([
         "serviceWorker" in navigator ? navigator.serviceWorker.getRegistration() : undefined,
         "caches" in window ? caches.keys() : [],
         navigator.storage?.estimate?.().catch(() => ({}) as StorageEstimate) ?? {},
         getMushafDownloadStatus(),
-        // The final group is the deduplicated essentials bundle; Baqarah remains opt-in.
+        // Aggregate groups use the same exact-variant deduplication and verification as individual downloads.
         getAudioDownloadStatuses(
-          [...resources.map((r) => r.zikrs), resources.slice(0, 4).flatMap((r) => r.zikrs)],
+          [
+            ...resources.map((r) => r.zikrs),
+            resources.slice(0, 4).flatMap((r) => r.zikrs),
+            resources.slice(4).flatMap((r) => r.zikrs),
+          ],
           audioPreferences,
         ),
       ]);
-      if (!mountedRef.current) return;
-      const bundle = audioStatus[resources.length]!;
+      if (!mountedRef.current || request !== statusRequestRef.current) return;
+
       const audioSummary = getDownloadedAudioSummary();
       setCollections(resources);
       setStatus({
@@ -111,16 +135,15 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
         downloadedAudioAssets: audioSummary.assetCount,
         downloadedAudioBytes: audioSummary.byteSize,
         downloadedMushafPages: mushafStatus.downloadedPages,
-        travelAudioCompleted: bundle.completed,
-        travelAudioTotal: bundle.total,
-        travelAudioRemainingBytes: bundle.remainingBytes,
+        groups: audioStatus.slice(resources.length),
         audio: audioStatus.slice(0, resources.length),
       });
     } catch (error) {
       reportError(error, "offline-storage-status");
-      if (mountedRef.current) setErrorMessage(t(language, "downloads.statusError"));
+      if (mountedRef.current && request === statusRequestRef.current)
+        setErrorMessage(t(language, "downloads.statusError"));
     } finally {
-      if (mountedRef.current) setIsLoading(false);
+      if (mountedRef.current && request === statusRequestRef.current) setIsLoading(false);
     }
   }, [language, resourcePromise, audioPreferences]);
   useEffect(() => {
@@ -128,6 +151,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
     void refreshStatus();
     return () => {
       mountedRef.current = false;
+      statusRequestRef.current += 1;
       controllerRef.current?.abort();
     };
   }, [refreshStatus]);
@@ -139,6 +163,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
     controllerRef.current = controller;
     setErrorMessage("");
     setSuccessMessage("");
+    setFailedId(null);
     setJob({ id, completed: 0, total: id === "mushaf" ? 604 : bytes });
     let message = "";
     let failure = "";
@@ -146,30 +171,16 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
       if (!(await hasDownloadSpace(bytes))) throw new DOMException("Storage full", "QuotaExceededError");
       controller.signal.throwIfAborted();
       await work(controller);
-      message = t(
-        language,
-        id === "mushaf"
-          ? "downloads.mushafDownloadComplete"
-          : id === "bundle"
-            ? "downloads.travelChecked"
-            : "downloads.downloadComplete",
-      );
+      message = t(language, id === "mushaf" ? "downloads.mushafDownloadComplete" : "downloads.downloadComplete");
     } catch (error) {
       if (controller.signal.aborted)
-        message = t(
-          language,
-          id === "mushaf"
-            ? "downloads.mushafCancelled"
-            : id === "bundle"
-              ? "downloads.travelCancelled"
-              : "downloads.downloadCancelled",
-        );
+        message = t(language, id === "mushaf" ? "downloads.mushafCancelled" : "downloads.downloadCancelled");
       else {
         reportError(error, "offline-download");
-        failure =
-          error instanceof Error && error.message.startsWith("bundle-partial:")
-            ? t(language, "downloads.travelPartial") + " " + error.message.slice("bundle-partial:".length)
-            : t(language, isStorageQuotaError(error) ? "downloads.storageFull" : "downloads.downloadErrorDescription");
+        failure = t(
+          language,
+          isStorageQuotaError(error) ? "downloads.storageFull" : "downloads.downloadErrorDescription",
+        );
       }
     } finally {
       if (mountedRef.current) {
@@ -177,7 +188,10 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
         if (mountedRef.current) {
           setJob(null);
           setSuccessMessage(message);
-          if (failure) setErrorMessage(failure);
+          if (failure) {
+            setErrorMessage(failure);
+            setFailedId(id);
+          }
         }
       }
       controllerRef.current = null;
@@ -188,27 +202,6 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
     if (mountedRef.current) setJob({ id, completed, total });
   };
   const mushafBytes = Math.max(0, 604 - (status?.downloadedMushafPages ?? 0)) * MUSHAF_ESTIMATED_PAGE_BYTES;
-  const prepareTravel = () =>
-    void runDownload("bundle", mushafBytes + (status?.travelAudioRemainingBytes ?? 0), async (controller) => {
-      const result = await prepareTravelDownloads(
-        collections.slice(0, 4).map((r) => r.zikrs),
-        audioPreferences,
-        {
-          signal: controller.signal,
-          onProgress: () => undefined,
-          onJobProgress: (group, completed, total) => {
-            if (mountedRef.current) setJob({ id: "bundle", group, completed, total });
-          },
-        },
-      );
-      if (result.failures > 0)
-        throw new Error(
-          "bundle-partial:" +
-            result.failedJobs
-              .map((index) => t(language, index === 0 ? "downloads.mushafTitle" : collections[index - 1]!.titleKey))
-              .join("، "),
-        );
-    });
   const removeResource = async (id: string, collection?: AudioCollection) => {
     if (operationRef.current || isLoading) return;
     operationRef.current = true;
@@ -231,25 +224,45 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
     }
   };
   const isAnyJobActive = job !== null || removing;
-  const travelReady =
-    status?.downloadedMushafPages === 604 &&
-    status.travelAudioTotal > 0 &&
-    status.travelAudioCompleted === status.travelAudioTotal;
   const numeric = (bytes: number | undefined) => <bdi dir="ltr">{formatMegabytes(bytes, language)}</bdi>;
   const collectionState = (info: AudioStatus | undefined) =>
     !info || isLoading
       ? t(language, "downloads.checking")
       : info.total === 0
         ? t(language, "downloads.unavailable")
-        : t(language, "downloads.recordingCoverage", {
-            completed: formatNumerals(info.completed, language),
-            total: formatNumerals(info.total, language),
-          });
-  const audioRows = (resources: AudioCollection[]) =>
+        : t(
+            language,
+            info.completed === info.total
+              ? "downloads.downloaded"
+              : info.completed > 0
+                ? "downloads.partial"
+                : "downloads.notDownloaded",
+          );
+  const groupedResources: AudioCollection[] = [
+    {
+      id: "adhkar",
+      titleKey: "downloads.adhkarTitle",
+      zikrs: collections.slice(0, 4).flatMap((r) => r.zikrs),
+      byteSize: 0,
+    },
+    {
+      id: "recitations",
+      titleKey: "downloads.recitationsTitle",
+      zikrs: collections.slice(4).flatMap((r) => r.zikrs),
+      byteSize: 0,
+    },
+  ];
+  const audioRows = (resources: AudioCollection[], grouped = false) =>
     resources.map((resource) => {
       const index = collections.indexOf(resource);
-      const saved = status?.audio[index];
-      const active = job?.id === resource.id;
+      const saved = grouped ? status?.groups[resource.id === "adhkar" ? 0 : 1] : status?.audio[index];
+      const active =
+        job !== null &&
+        (job.id === resource.id ||
+          (grouped &&
+            collections
+              .slice(resource.id === "adhkar" ? 0 : 4, resource.id === "adhkar" ? 4 : undefined)
+              .some((collection) => collection.id === job.id)));
       const title = t(language, resource.titleKey);
       const completed = active ? job.completed : (saved?.completed ?? 0);
       const total = active ? job.total : (saved?.total ?? 0);
@@ -258,25 +271,33 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
           key={resource.id}
           id={resource.id}
           title={title}
-          detail={t(language, "downloads.audioResourceHint")}
-          state={active ? t(language, "downloads.verifyingAudio") : collectionState(saved)}
-          size={
-            <>
-              {t(language, "downloads.remainingSize")} {numeric(saved?.remainingBytes)}
-            </>
+          detail={
+            grouped
+              ? t(
+                  language,
+                  resource.id === "adhkar" ? "downloads.adhkarDescription" : "downloads.recitationsDescription",
+                )
+              : ""
           }
+          state={active ? t(language, "downloads.downloading") : collectionState(saved)}
+          size={numeric(saved?.remainingBytes)}
           completed={completed}
           total={total}
           language={language}
+          direction={direction}
+          compact
+          hideRemove={grouped}
           disabled={isLoading || isAnyJobActive}
           active={active}
           action={t(
             language,
-            saved?.completed && saved.completed < saved.total
-              ? "downloads.resumeResource"
-              : saved?.total && saved.completed === saved.total
-                ? "downloads.resourceReady"
-                : "downloads.downloadResource",
+            failedId === resource.id
+              ? "downloads.retry"
+              : saved?.completed && saved.completed < saved.total
+                ? "downloads.resumeResource"
+                : saved?.total && saved.completed === saved.total
+                  ? "downloads.resourceReady"
+                  : "downloads.downloadResource",
           )}
           onDownload={() =>
             void runDownload(resource.id, saved?.remainingBytes ?? resource.byteSize, async (controller) => {
@@ -292,10 +313,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
       );
     });
   return (
-    <div
-      className="slide-in-from-right flex h-full min-h-0 flex-col bg-background/50 backdrop-blur-md"
-      dir={language === "ar" ? "rtl" : "ltr"}
-    >
+    <div className="slide-in-from-right flex h-full min-h-0 flex-col bg-background/50 backdrop-blur-md" dir={direction}>
       <SubHeader title={t(language, "downloads.title")} onBack={onBack} language={language} />
       <div
         className="flex-1 min-h-0 space-y-4 overflow-y-auto px-4 pt-3"
@@ -314,138 +332,103 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
           scrollPaddingBottom: "calc(2rem + var(--floating-audio-clearance, 0px))",
         }}
       >
-        <Card as="section" padding="md" aria-labelledby="offline-summary-title">
-          <h2 id="offline-summary-title" className="flex items-center gap-2 text-subtitle font-semibold">
-            <CloudOff size={20} aria-hidden="true" />
-            {t(language, "downloads.bundledTitle")}
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">{t(language, "downloads.bundledBody")}</p>
-          <p className="mt-2 text-xs text-muted-foreground">
-            {t(language, status?.serviceWorkerReady ? "downloads.appOfflineReady" : "downloads.appOfflinePending")}
+        <p className="text-sm text-muted-foreground">{t(language, "downloads.includedText")}</p>
+        {status && !status.serviceWorkerReady && (
+          <p role="status" className="text-sm text-muted-foreground">
+            {t(language, "downloads.checkApp")}
           </p>
-          <dl className="mt-3 flex flex-wrap gap-4 text-sm">
-            <div>
-              <dt className="text-muted-foreground">{t(language, "downloads.storageUsed")}</dt>
-              <dd>{numeric(status?.usageBytes)}</dd>
-            </div>
-            <div>
-              <dt className="text-muted-foreground">{t(language, "downloads.availableStorage")}</dt>
-              <dd>
-                {numeric(
-                  status?.quotaBytes === undefined || status.usageBytes === undefined
-                    ? undefined
-                    : Math.max(0, status.quotaBytes - status.usageBytes),
-                )}
-              </dd>
-            </div>
-          </dl>
-        </Card>
-        <Card as="section" padding="md" aria-labelledby="travel-download-title">
-          <h2 id="travel-download-title" className="text-subtitle font-semibold">
-            {t(language, "downloads.travelTitle")}
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">{t(language, "downloads.travelBody")}</p>
-          <ul className="mt-3 mb-3 list-disc ps-5 text-sm text-muted-foreground">
-            <li>{t(language, "downloads.mushafTitle")}</li>
-            <li>{t(language, "downloads.dailyAudio")}</li>
-            <li>{t(language, "downloads.kahf")}</li>
-          </ul>
-          <p className="text-sm font-semibold" data-testid="travel-readiness">
-            {isLoading
-              ? t(language, "downloads.checking")
-              : t(language, travelReady ? "downloads.travelReady" : "downloads.travelNotReady")}
-          </p>
-          {status && (
-            <>
-              <p className="my-2 text-sm text-muted-foreground">
-                {t(language, "downloads.travelCoverage", {
-                  pages: formatNumerals(status.downloadedMushafPages, language),
-                  completed: formatNumerals(status.travelAudioCompleted, language),
-                  total: formatNumerals(status.travelAudioTotal, language),
-                })}
-              </p>
-              <DownloadProgress
-                completed={status.downloadedMushafPages + status.travelAudioCompleted}
-                total={604 + status.travelAudioTotal}
-                label={t(language, "downloads.bundleReadiness")}
-                language={language}
-              />
-            </>
-          )}
-          <p className="mt-2 text-xs text-muted-foreground">
-            {t(language, "downloads.remainingSize")}{" "}
-            {numeric(status ? mushafBytes + status.travelAudioRemainingBytes : undefined)}
-          </p>
-          <Button
-            onClick={prepareTravel}
-            disabled={isLoading || !status || isAnyJobActive || travelReady}
-            className="mt-3 h-auto min-h-11 w-full whitespace-normal py-2"
-          >
-            <Download size={18} aria-hidden="true" />
-            {t(language, "downloads.prepareTravel")}
-          </Button>
-          {job?.id === "bundle" && (
-            <div className="mt-3 space-y-2">
-              <p className="text-sm">
-                {t(
-                  language,
-                  job.group === 0
-                    ? "downloads.mushafTitle"
-                    : (collections[(job.group ?? 1) - 1]?.titleKey ?? "downloads.checking"),
-                )}
-              </p>
-              <DownloadProgress
-                completed={job.completed}
-                total={job.total}
-                label={t(language, "downloads.travelProgressLabel")}
-                language={language}
-                active
-              />
-              <Button variant="outline" onClick={() => controllerRef.current?.abort()}>
-                {t(language, "downloads.cancelDownload")}
-              </Button>
-            </div>
-          )}
-        </Card>
-        <Card as="section" padding="md" aria-labelledby="resource-downloads-title">
-          <h2 id="resource-downloads-title" className="text-subtitle font-semibold">
-            {t(language, "downloads.manageResources")}
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">{t(language, "downloads.approvedOnly")}</p>
-          <div className="divide-y divide-border/40">
+        )}
+        {groupedResources.map((resource, index) => (
+          <Card key={resource.id} as="section" padding="md" data-testid={"download-category-" + resource.id}>
+            {audioRows([resource], true)}
+            <details className="group border-t border-border/40">
+              <summary
+                className="flex min-h-11 cursor-pointer items-center justify-between rounded-lg text-sm font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                aria-label={t(language, "downloads.manage") + " · " + t(language, resource.titleKey)}
+              >
+                {t(language, "downloads.manage")}
+                <ChevronDown size={16} aria-hidden="true" className="transition-transform group-open:rotate-180" />
+              </summary>
+              <p className="text-xs text-muted-foreground">{t(language, "downloads.availableOnly")}</p>
+              {index === 0 && (
+                <p className="mt-1 text-xs text-muted-foreground">{t(language, "downloads.sharedRecordings")}</p>
+              )}
+              <div className="divide-y divide-border/40">
+                {audioRows(index === 0 ? collections.slice(0, 4) : collections.slice(4))}
+              </div>
+            </details>
+          </Card>
+        ))}
+        <Card as="section" padding="md" data-testid="download-category-mushaf">
+          <OfflineResourceRow
+            id="mushaf"
+            title={t(language, "downloads.pagesTitle")}
+            detail={t(language, "downloads.pagesDescription")}
+            state={
+              job?.id === "mushaf"
+                ? t(language, "downloads.mushafProgressValue", {
+                    completed: formatNumerals(job.completed, language),
+                    total: formatNumerals(604, language),
+                  })
+                : collectionState(
+                    status
+                      ? { completed: status.downloadedMushafPages, total: 604, remainingBytes: mushafBytes }
+                      : undefined,
+                  )
+            }
+            size={numeric(status ? mushafBytes : undefined)}
+            completed={job?.id === "mushaf" ? job.completed : (status?.downloadedMushafPages ?? 0)}
+            total={604}
+            language={language}
+            direction={direction}
+            compact
+            hideRemove
+            disabled={isLoading || isAnyJobActive}
+            active={job?.id === "mushaf"}
+            action={t(
+              language,
+              failedId === "mushaf"
+                ? "downloads.retry"
+                : status?.downloadedMushafPages === 604
+                  ? "downloads.downloaded"
+                  : status?.downloadedMushafPages
+                    ? "downloads.resumeResource"
+                    : "downloads.downloadResource",
+            )}
+            onDownload={() =>
+              void runDownload("mushaf", mushafBytes, async (controller) => {
+                await downloadMushaf({ signal: controller.signal, onProgress: updateProgress("mushaf") });
+              })
+            }
+            onCancel={() => controllerRef.current?.abort()}
+            onRemove={() => void removeResource("mushaf")}
+          />
+          <details className="group border-t border-border/40">
+            <summary
+              className="flex min-h-11 cursor-pointer items-center justify-between rounded-lg text-sm font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              aria-label={t(language, "downloads.manage") + " · " + t(language, "downloads.pagesTitle")}
+            >
+              {t(language, "downloads.manage")}
+              <ChevronDown size={16} aria-hidden="true" className="transition-transform group-open:rotate-180" />
+            </summary>
             <OfflineResourceRow
-              id="mushaf"
-              title={t(language, "downloads.mushafTitle")}
-              detail={t(language, "downloads.mushafBody")}
-              state={
-                isLoading
-                  ? t(language, "downloads.checking")
-                  : t(language, "downloads.mushafProgressValue", {
-                      completed: formatNumerals(
-                        job?.id === "mushaf" ? job.completed : (status?.downloadedMushafPages ?? 0),
-                        language,
-                      ),
-                      total: formatNumerals(604, language),
-                    })
-              }
-              size={
-                <>
-                  {t(language, "downloads.remainingSize")} {numeric(status ? mushafBytes : undefined)}
-                </>
-              }
-              completed={job?.id === "mushaf" ? job.completed : (status?.downloadedMushafPages ?? 0)}
+              id="mushaf-management"
+              title={t(language, "downloads.pagesTitle")}
+              detail=""
+              state={t(language, "downloads.mushafProgressValue", {
+                completed: formatNumerals(status?.downloadedMushafPages ?? 0, language),
+                total: formatNumerals(604, language),
+              })}
+              size={numeric(status ? mushafBytes : undefined)}
+              completed={status?.downloadedMushafPages ?? 0}
               total={604}
               language={language}
+              direction={direction}
               disabled={isLoading || isAnyJobActive}
               active={job?.id === "mushaf"}
-              action={t(
-                language,
-                status?.downloadedMushafPages === 604
-                  ? "downloads.mushafDownloaded"
-                  : status?.downloadedMushafPages
-                    ? "downloads.resumeMushaf"
-                    : "downloads.downloadMushaf",
-              )}
+              compact
+              showDownload={false}
+              action={t(language, "downloads.downloadResource")}
               onDownload={() =>
                 void runDownload("mushaf", mushafBytes, async (controller) => {
                   await downloadMushaf({ signal: controller.signal, onProgress: updateProgress("mushaf") });
@@ -454,11 +437,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
               onCancel={() => controllerRef.current?.abort()}
               onRemove={() => void removeResource("mushaf")}
             />
-            {audioRows(collections.slice(3).reverse())}
-          </div>
-          <h3 className="mt-3 text-sm font-semibold">{t(language, "downloads.dailyAudio")}</h3>
-          <p className="mt-1 text-xs text-muted-foreground">{t(language, "downloads.sharedRecordings")}</p>
-          <div className="divide-y divide-border/40">{audioRows(collections.slice(0, 3))}</div>
+          </details>
         </Card>
         <div className="space-y-2" aria-busy={removing}>
           <p role="alert" className="text-sm font-semibold text-destructive">
@@ -473,7 +452,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
           <summary className="flex min-h-11 cursor-pointer select-none items-center justify-between rounded-lg text-subtitle font-semibold text-foreground transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
             <span className="flex items-center gap-2">
               <Database size={18} className="text-primary" aria-hidden="true" />
-              {t(language, "downloads.statusTitle")}
+              {t(language, "downloads.storageDetails")}
             </span>
             <div className="flex items-center gap-2">
               <span className="text-xs font-semibold text-muted-foreground">
@@ -487,6 +466,9 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
             </div>
           </summary>
           <div className="mt-3 border-t border-border/60 pt-3">
+            <p className="mb-3 text-xs text-muted-foreground">
+              {t(language, status?.serviceWorkerReady ? "downloads.appOfflineReady" : "downloads.appOfflinePending")}
+            </p>
             {isLoading ? (
               <p className="text-sm text-muted-foreground" role="status">
                 {t(language, "downloads.checking")}

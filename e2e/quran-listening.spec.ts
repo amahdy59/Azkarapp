@@ -6,6 +6,126 @@ import { t } from "../src/app/i18n";
 import { splitMushafPages } from "../src/app/content/mushafPages";
 import { listeningCases, listeningTiming, openListeningPage } from "./helpers/quran-listening";
 
+for (const scenario of [
+  { name: "narrow-ar", width: 320, height: 568, language: "ar", enlarged: false },
+  { name: "narrow-en-enlarged", width: 320, height: 568, language: "en", enlarged: true },
+  { name: "phone-ar-enlarged", width: 390, height: 844, language: "ar", enlarged: true },
+  { name: "landscape-ar", width: 844, height: 390, language: "ar", enlarged: false },
+] as const) {
+  test(`fixed listening header and transport remain reachable: ${scenario.name} @cross-browser`, async ({
+    page,
+  }, testInfo) => {
+    const player = await openListeningPage(page, listeningCases[0], scenario.language);
+    await page.setViewportSize({ width: scenario.width, height: scenario.height });
+    if (scenario.enlarged)
+      await page.locator("html").evaluate((element) => {
+        element.style.fontSize = "32px";
+      });
+    // The existing Reader shell remounts its dock at the desktop breakpoint.
+    await expect(page.getByTestId("reader-screen")).toHaveAttribute(
+      "data-reader-layout",
+      scenario.width >= 768 ? "desktop" : "mobile",
+    );
+    if ((await player.getAttribute("data-variant")) === "compact") {
+      await player.getByRole("button", { name: t(scenario.language, "audioPlayer.expand"), exact: true }).click();
+    }
+    const header = player.locator(".audio-expanded-header");
+    await expect(header.locator("[data-listening-controls]")).toHaveCount(1);
+    await expect(player.locator("[data-mushaf-page]")).toBeVisible();
+    await testInfo.attach("reading-layout", {
+      contentType: "application/json",
+      body: JSON.stringify(
+        await player.evaluate((element) => {
+          const viewport = element.querySelector(".audio-expanded-text")!;
+          const bounds = viewport.getBoundingClientRect();
+          const words = Array.from(viewport.querySelectorAll("[data-listening-verse]")).map((word) => {
+            const ink = word.getBoundingClientRect();
+            return { top: ink.top, bottom: ink.bottom, height: ink.height };
+          });
+          return {
+            reading: { top: bounds.top, bottom: bounds.bottom, height: bounds.height, scrollTop: viewport.scrollTop },
+            words,
+          };
+        }),
+      ),
+    });
+    await expect
+      .poll(() =>
+        player.locator(".audio-expanded-text").evaluate((viewport) => {
+          const bounds = viewport.getBoundingClientRect();
+          const visibleInk = Array.from(viewport.querySelectorAll("[data-listening-verse]")).some((word) => {
+            const ink = word.getBoundingClientRect();
+            return ink.bottom > bounds.top && ink.top < bounds.bottom && ink.width > 0 && ink.height > 0;
+          });
+          return { visibleInk, readingHeight: bounds.height, scrollTop: viewport.scrollTop };
+        }),
+      )
+      .toMatchObject({ visibleInk: true });
+    const regions = await player.evaluate((element) => {
+      const header = element.querySelector(".audio-expanded-header")!.getBoundingClientRect();
+      const reading = element.querySelector(".audio-expanded-text")!.getBoundingClientRect();
+      return { gap: reading.top - header.bottom, overflow: element.scrollWidth - element.clientWidth };
+    });
+    expect(regions.gap).toBeGreaterThanOrEqual(-1);
+    expect(regions.overflow).toBeLessThanOrEqual(1);
+    const targets = await header.getByRole("button").evaluateAll((buttons) =>
+      buttons.map((button) => {
+        const bounds = button.getBoundingClientRect();
+        const header = button.closest(".audio-expanded-header")!.getBoundingClientRect();
+        return {
+          width: bounds.width,
+          height: bounds.height,
+          inside:
+            bounds.left >= header.left - 1 &&
+            bounds.right <= header.right + 1 &&
+            bounds.top >= header.top - 1 &&
+            bounds.bottom <= header.bottom + 1,
+        };
+      }),
+    );
+    for (const target of targets) {
+      expect(target.width).toBeGreaterThanOrEqual(44);
+      expect(target.height).toBeGreaterThanOrEqual(44);
+      expect(target.inside).toBe(true);
+    }
+    const options = player.getByRole("button", { name: t(scenario.language, "audioPlayer.options"), exact: true });
+    await expect(
+      header.getByRole("button", { name: t(scenario.language, "quranListening.information"), exact: true }),
+    ).toHaveCount(0);
+    const alignment = await header.evaluate((element) => {
+      const options = element.querySelector(".audio-options-trigger")!.getBoundingClientRect();
+      const navigation = element.querySelector("[data-listening-controls]")!.getBoundingClientRect();
+      const header = element.getBoundingClientRect();
+      return {
+        centerOffset:
+          (Math.min(options.left, navigation.left) + Math.max(options.right, navigation.right)) / 2 -
+          (header.left + header.width / 2),
+        rowOffset: options.top + options.height / 2 - navigation.top - navigation.height / 2,
+      };
+    });
+    expect(Math.abs(alignment.centerOffset)).toBeLessThanOrEqual(2);
+    if (!scenario.enlarged) expect(Math.abs(alignment.rowOffset)).toBeLessThanOrEqual(2);
+    await options.focus();
+    await page.keyboard.press("Enter");
+    const dialog = page.getByRole("dialog", { name: t(scenario.language, "audioPlayer.options"), exact: true });
+    await expect(dialog).toBeVisible();
+    expect((await new AxeBuilder({ page }).include('[role="dialog"]').analyze()).violations).toEqual([]);
+    await page.keyboard.press("Escape");
+    await expect(options).toBeFocused();
+    await expect(header.locator("[data-listening-controls]")).toBeVisible();
+    const navigationBounds = await header.locator("[data-listening-controls]").boundingBox();
+    const headerBounds = await header.boundingBox();
+    expect(navigationBounds!.y + navigationBounds!.height).toBeLessThanOrEqual(
+      headerBounds!.y + headerBounds!.height + 1,
+    );
+    await header.getByRole("button", { name: t(scenario.language, "audioPlayer.collapse"), exact: true }).focus();
+    await player.locator(".audio-expanded-layout").evaluate((element) => {
+      element.scrollTop = 0;
+    });
+    await player.screenshot({ path: testInfo.outputPath(`quran-header-${scenario.name}.png`) });
+  });
+}
+
 for (const item of listeningCases) {
   for (const language of ["en", "ar"] as const) {
     test(`Mushaf listening ${item.id} ${language} preserves audio and reading state @cross-browser`, async ({
@@ -74,11 +194,26 @@ for (const item of listeningCases) {
       expect(initialLayout.controlsHeight).toBeLessThanOrEqual(48);
       expect(initialLayout.headingTop).toBeGreaterThanOrEqual(initialLayout.controlsBottom - 1);
       expect(initialLayout.headingBottom).toBeLessThanOrEqual(initialLayout.viewportBottom + 1);
+      const header = player.locator(".audio-expanded-header");
+      await expect(header.locator("[data-listening-controls]")).toHaveCount(1);
+      await expect(player.locator(".audio-expanded-text [data-listening-controls]")).toHaveCount(0);
+      const navigationTargets = await header.getByRole("button").evaluateAll((buttons) =>
+        buttons.map((button) => {
+          const { width, height, left, right } = button.getBoundingClientRect();
+          const header = button.closest(".audio-expanded-header")!.getBoundingClientRect();
+          return { width, height, inside: left >= header.left - 1 && right <= header.right + 1 };
+        }),
+      );
+      for (const target of navigationTargets) {
+        expect(target.width).toBeGreaterThanOrEqual(44);
+        expect(target.height).toBeGreaterThanOrEqual(44);
+        expect(target.inside).toBe(true);
+      }
       await expect(page.getByText(t(language, "quranListening.unavailable"), { exact: true })).toHaveCount(0);
-      const information = player.getByRole("button", { name: t(language, "quranListening.information"), exact: true });
+      const information = player.getByRole("button", { name: t(language, "audioPlayer.options"), exact: true });
       await information.focus();
       await page.keyboard.press("Enter");
-      const explanation = page.getByTestId("quran-follow-info");
+      const explanation = page.getByTestId("quran-listening-preferences");
       await expect(explanation).toBeVisible();
       await expect(explanation.locator("p")).toHaveText(t(language, "quranListening.browseHint"));
       await expect(
@@ -88,7 +223,7 @@ for (const item of listeningCases) {
         explanation.getByRole("button", { name: t(language, "quranListening.estimatedWords"), exact: true }),
       ).toHaveAttribute("aria-pressed", "true");
       expect(
-        (await new AxeBuilder({ page }).include('[data-testid="quran-follow-info"]').analyze()).violations,
+        (await new AxeBuilder({ page }).include('[data-testid="quran-listening-preferences"]').analyze()).violations,
       ).toEqual([]);
       await page.keyboard.press("Escape");
       await expect(explanation).toHaveCount(0);
@@ -165,8 +300,14 @@ for (const item of listeningCases) {
             const view = word.closest(".audio-expanded-text")!,
               bounds = word.getBoundingClientRect();
             return (
-              bounds.top >= view.querySelector("[data-listening-controls]")!.getBoundingClientRect().bottom &&
-              bounds.bottom <= view.getBoundingClientRect().bottom
+              bounds.top >=
+                Math.max(
+                  view.getBoundingClientRect().top,
+                  word
+                    .closest(".floating-audio-player--expanded")!
+                    .querySelector("[data-listening-controls]")!
+                    .getBoundingClientRect().bottom,
+                ) && bounds.bottom <= view.getBoundingClientRect().bottom
             );
           }),
         )
@@ -180,20 +321,26 @@ for (const item of listeningCases) {
       await following.click();
       await expect(following).toHaveAttribute("aria-pressed", "true");
       await page.keyboard.press("Escape");
+      const headerTop = (await header.boundingBox())!.y;
       for (const offset of [0, 120, 240]) {
         const scrollLayout = await player.evaluate((element, offset) => {
           const viewport = element.querySelector<HTMLElement>(".audio-expanded-text")!;
           viewport.scrollTop = offset;
           const view = viewport.getBoundingClientRect();
           const toolbar = element.querySelector("[data-listening-controls]")!.getBoundingClientRect();
-          const hit = document.elementFromPoint(view.left + view.width / 2, view.top + 1);
-          return { gap: toolbar.top - view.top, toolbarHit: Boolean(hit?.closest("[data-listening-controls]")) };
+          const hit = document.elementFromPoint(toolbar.left + toolbar.width / 2, toolbar.top + toolbar.height / 2);
+          return {
+            gap: view.top - toolbar.bottom,
+            headerTop: element.querySelector(".audio-expanded-header")!.getBoundingClientRect().top,
+            toolbarHit: Boolean(hit?.closest("[data-listening-controls]")),
+          };
         }, offset);
-        expect(Math.abs(scrollLayout.gap)).toBeLessThanOrEqual(1);
+        expect(scrollLayout.gap).toBeGreaterThanOrEqual(-1);
+        expect(Math.abs(scrollLayout.headerTop - headerTop)).toBeLessThanOrEqual(1);
         expect(scrollLayout.toolbarHit).toBe(true);
       }
       await expect(paper.getByRole("button")).toHaveCount(0);
-      const next = player.getByRole("button", { name: t(language, "common.next"), exact: true });
+      const next = player.getByRole("button", { name: t(language, "quranListening.nextPage"), exact: true });
       expect(
         await next.evaluate((button) => {
           const bounds = button.getBoundingClientRect();

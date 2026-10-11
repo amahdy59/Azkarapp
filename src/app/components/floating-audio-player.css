@@ -82,6 +82,7 @@ html[data-mushaf-focus="true"] .floating-audio-player {
 }
 
 .audio-player-surface {
+  container: audio-surface / inline-size;
   position: absolute;
   inset: 0;
   z-index: 30;
@@ -97,7 +98,9 @@ html[data-mushaf-focus="true"] .floating-audio-player {
 
 .audio-expanded-layout {
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  /* Enlarged utility labels must not collapse the devotional reading region.
+     Exceptionally short surfaces can scroll the complete player. */
+  grid-template-rows: max-content minmax(min(12rem, 30dvh), 1fr) auto;
   height: 100%;
   min-height: 0;
   overflow: auto;
@@ -109,6 +112,29 @@ html[data-mushaf-focus="true"] .floating-audio-player {
 .audio-expanded-header {
   width: 100%;
   grid-template-columns: 44px minmax(0, 1fr) 44px;
+  min-height: 44px;
+  background: var(--background);
+}
+
+.audio-expanded-header[data-has-page-controls="true"] {
+  min-height: min-content;
+}
+
+.audio-expanded-identity {
+  padding-inline: 0;
+}
+
+.audio-listening-navigation {
+  min-height: 44px;
+}
+
+.audio-listening-navigation > button {
+  width: 44px;
+  height: 44px;
+}
+
+.audio-listening-navigation > [role="status"] {
+  white-space: nowrap;
 }
 
 .audio-expanded-controls {
@@ -148,6 +174,7 @@ html[data-mushaf-focus="true"] .floating-audio-player {
   height: 52px;
 }
 .audio-expanded-options {
+  padding-block-start: 0;
   align-items: center;
 }
 .audio-expanded-options > .audio-auto-advance {
@@ -159,8 +186,9 @@ html[data-mushaf-focus="true"] .floating-audio-player {
   min-width: 0;
 }
 .audio-seek-row > span {
-  width: 3rem;
-  min-width: 3rem;
+  flex: 0 0 auto;
+  min-width: 3.5em;
+  white-space: nowrap;
 }
 [data-testid="audio-reciter-select"] {
   height: 2.75rem;
@@ -229,16 +257,12 @@ html[data-mushaf-focus="true"] .floating-audio-player {
   transform: translateY(-50%);
   pointer-events: none;
   z-index: 2;
-  box-shadow: 0 0 4px color-mix(in srgb, var(--primary) 45%, transparent);
-  transition:
-    transform 120ms ease,
-    box-shadow 120ms ease;
+  transition: transform 120ms ease;
 }
 
 .audio-seek-control:hover .audio-seek-waveform-playhead,
 .audio-seek-control:focus-within .audio-seek-waveform-playhead {
   transform: translateY(-50%) scaleY(1.15);
-  box-shadow: 0 0 6px var(--primary);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -323,12 +347,16 @@ html[data-mushaf-focus="true"] .floating-audio-player {
 .audio-expanded-text {
   min-height: 90px;
   container-type: size;
+  width: 100%;
+  max-width: 72rem;
+  margin-inline: auto;
+  padding-block-end: 1rem;
 }
 
 /* Grow the printed page with the reading canvas; short windows scroll
    rather than squeezing fifteen canonical lines into illegible slots. */
 .audio-listening-page {
-  height: max(36rem, calc(100cqh - 3rem));
+  height: max(36rem, calc(100cqh - 1rem));
   min-height: 36rem;
 }
 
@@ -348,6 +376,71 @@ html[data-mushaf-focus="true"] .floating-audio-player {
   margin: 0 auto;
 }
 
+.audio-expanded-page-controls {
+  flex-shrink: 0;
+}
+
+@container audio-surface (max-width: 32rem) {
+  .audio-expanded-header[data-has-page-controls="true"] > .audio-expanded-identity {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .audio-expanded-header[data-has-page-controls="true"] > button:last-child {
+    grid-column: 3;
+    grid-row: 1;
+  }
+}
+
+.audio-expanded-feedback:not(:empty) {
+  padding-block: 0.25rem;
+}
+
+.audio-expanded-feedback:empty {
+  display: none;
+}
+
+.audio-options-trigger {
+  width: auto;
+  max-width: 100%;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 6px 12px;
+  flex-shrink: 0;
+}
+
+.audio-options-trigger > span {
+  min-width: 0;
+}
+
+.audio-ten-second-icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+}
+
+.audio-ten-second-icon > svg {
+  width: 28px;
+  height: 28px;
+}
+
+.audio-ten-second-icon > span {
+  position: absolute;
+  inset: 8px 6px;
+  background: var(--background);
+  font-size: 10px;
+  line-height: 12px;
+  font-weight: 600;
+}
+
+@container audio-surface (max-width: 23rem) {
+  .audio-expanded-layout {
+    padding-inline: max(0.5rem, env(safe-area-inset-left)) max(0.5rem, env(safe-area-inset-right));
+  }
+}
+
 .audio-expanded-options:empty {
   display: none;
 }
@@ -359,6 +452,7 @@ html[data-mushaf-focus="true"] .floating-audio-player {
 }
 
 .audio-expanded-meta {
+  min-height: 1.25rem;
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
@@ -370,6 +464,7 @@ html[data-mushaf-focus="true"] .floating-audio-player {
 }
 .audio-expanded-meta > [role="status"] {
   flex-basis: 100%;
+  margin-block: 0;
 }
 
 .floating-audio-player--compact {
@@ -400,7 +495,7 @@ html[data-mushaf-focus="true"] .floating-audio-player {
 @media (min-width: 37.5rem) and (max-height: 34rem) {
   .audio-expanded-layout {
     grid-template-columns: minmax(0, 1fr) minmax(16rem, 0.75fr);
-    grid-template-rows: auto minmax(11rem, 1fr);
+    grid-template-rows: max-content minmax(11rem, 1fr);
     column-gap: 1rem;
     padding-block: 0.25rem max(0.25rem, env(safe-area-inset-bottom));
   }
@@ -413,7 +508,7 @@ html[data-mushaf-focus="true"] .floating-audio-player {
     align-self: center;
     border-top: 0;
     border-inline-start: 1px solid var(--border);
-    padding-inline-start: 1rem;
+    padding-inline: 0.25rem;
     padding-block-start: 0;
   }
 
@@ -522,7 +617,7 @@ html[data-mushaf-focus="true"] .floating-audio-player {
 
 /* Quiet, bounded playback dock; the range keeps its full 44px interaction area. */
 .audio-expanded-controls {
-  max-width: 52rem;
+  max-width: 46rem;
 }
 .audio-expanded-controls .audio-seek-waveform,
 .audio-expanded-controls .audio-seek-waveform-played {

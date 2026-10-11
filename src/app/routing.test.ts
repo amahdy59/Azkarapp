@@ -3,7 +3,7 @@ import { parseHash, parseLocation, routeToHash } from "./routing";
 
 describe("routeToHash", () => {
   it("round trips the dedicated prayer location panel and preserves notifications links", () => {
-    for (const settingsPanel of ["location", "notifications"] as const) {
+    for (const settingsPanel of ["appearance", "prayer", "location", "notifications", "audio", "downloads"] as const) {
       const route = { view: "settings" as const, settingsPanel };
       expect(parseHash(routeToHash(route)!)).toEqual(route);
     }

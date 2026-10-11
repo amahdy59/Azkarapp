@@ -206,13 +206,15 @@ test("keyboard help disables character actions while preserving native counting"
   await expect(page.getByTestId("reader-screen")).toHaveAttribute("data-reader-category", "after_prayer");
 });
 
-test("travel preparation discloses verified coverage without starting downloads", async ({ page }) => {
+test("offline categories disclose verified readiness without starting downloads", async ({ page }) => {
   await returningReader(page, "en");
   await page.goto("/#/settings/downloads");
-  const prepare = page.getByRole("button", { name: "Download essentials" });
+  const prepare = page.getByRole("button", { name: "Download · Adhkar & duas" });
   await expect(prepare).toBeEnabled();
-  await expect(page.getByTestId("travel-readiness")).toHaveText("Essentials are not fully downloaded");
-  await expect(page.getByText(/0 \/ 604 Mushaf pages/)).toBeVisible();
+  await expect(page.getByTestId("offline-resource-adhkar")).toContainText("Adhkar & duas");
+  await expect(page.getByTestId("offline-resource-mushaf")).toContainText("Mushaf pages");
+  await expect(page.getByTestId("downloads-scroll").locator('[data-testid^="download-category-"]')).toHaveCount(3);
+  await expect(page.getByRole("button", { name: "Download essentials" })).toHaveCount(0);
   await page.screenshot({ path: "output/playwright/phase78/travel-downloads-en.png" });
 });
 

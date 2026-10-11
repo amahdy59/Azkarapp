@@ -1,4 +1,5 @@
 import { QURAN_TEXT_STYLE } from "../quranTypography";
+import { QuranVerseText } from "../components/QuranVerseText";
 /* The scroll region is intentionally keyboard-focusable so Page Down/arrow
    scrolling works before a user reaches its first link. */
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
@@ -81,7 +82,7 @@ function EvidenceCard({ item, language }: { item: BenefitEvidence; language: App
         dir={item.kind === "quran" ? "rtl" : "auto"}
         lang={item.kind === "quran" ? "ar" : undefined}
       >
-        {text}
+        {item.kind === "quran" ? <QuranVerseText text={text} language={language} canonicalKey={item.id} /> : text}
       </p>
       {meaning && <p className="mt-3 text-sm font-semibold leading-7 text-muted-foreground">{meaning}</p>}
       <footer className="mt-auto flex items-center justify-between gap-3 pt-4">

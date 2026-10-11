@@ -14,3 +14,6 @@ export { LegalPanel } from "./LegalPanel";
 export { SourcesPanel } from "./SourcesPanel";
 export { WhatsNewPanel } from "./WhatsNewPanel";
 export { PrayerLocationPanel } from "./PrayerLocationPanel";
+
+export { AppearancePanel } from "./AppearancePanel";
+export { PrayerSettingsPanel } from "./PrayerSettingsPanel";

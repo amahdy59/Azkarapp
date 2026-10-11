@@ -3,8 +3,9 @@ import { expect, test } from "@playwright/test";
 
 test.beforeEach(async ({ page }) => {
   // The reader no longer talks to api.quran.com at all; blocking the remote
-  // page font keeps the run deterministic on the shipped Unicode fallback.
+  // page fonts, including bundled daily fonts, keep this fallback suite deterministic.
   await page.route("https://verses.quran.foundation/**", (route) => route.abort());
+  await page.route("**/fonts/qcf-v2/**", (route) => route.abort());
   await page.addInitScript(() => {
     window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
     window.localStorage.setItem(
@@ -30,7 +31,7 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   await expect
     .poll(() =>
       page.evaluate(() =>
-        performance.getEntriesByType("resource").some((entry) => entry.name.includes("/data/mushaf/42.json?v=3")),
+        performance.getEntriesByType("resource").some((entry) => entry.name.includes("/data/mushaf/42.json")),
       ),
     )
     .toBe(true);

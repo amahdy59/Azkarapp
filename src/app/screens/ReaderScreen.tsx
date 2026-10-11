@@ -815,6 +815,7 @@ export function ReaderScreen({
                 }}
                 onSelectMeanings={setWordMeaningSelection}
                 activeWordId={activeWordId}
+                canonicalKey={z.canonicalKey}
               />
             ) : (
               <p
@@ -828,7 +829,16 @@ export function ReaderScreen({
                   ...(isQuranicText ? QURAN_TEXT_STYLE : {}),
                 }}
               >
-                {isQuranicText ? <QuranVerseText text={displayArabicText} language={language} /> : displayArabicText}
+                {isQuranicText ? (
+                  <QuranVerseText
+                    text={displayArabicText}
+                    language={language}
+                    canonicalKey={z.canonicalKey}
+                    preserveLines={showSurahChrome}
+                  />
+                ) : (
+                  displayArabicText
+                )}
               </p>
             )}
           </div>

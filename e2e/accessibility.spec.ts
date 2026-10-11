@@ -229,11 +229,12 @@ test("home and settings flows have no automatically detectable WCAG A/AA violati
   } else {
     await page.getByTestId("nav-settings").click();
   }
-  await expect(page.getByRole("heading", { name: "Preferences" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Settings", exact: true })).toBeVisible();
+  await expect(page.getByTestId("settings-sub-appearance")).toBeVisible();
   await expectNoWcagViolations(page);
 
   await page.getByRole("button", { name: "Accessibility", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Accessibility", exact: true }).first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: /^Accessibility(?: settings)?$/ })).toBeVisible();
   await expectNoWcagViolations(page);
 });
 
@@ -320,6 +321,7 @@ test("theme emulation (forced colors/high contrast) has no automatically detecta
 test("custom counter has no automatically detectable WCAG A/AA violations", async ({ page }) => {
   await enterEnglishGuestMode(page);
   await page.getByTestId("nav-settings").click();
+  await page.getByTestId("settings-sub-appearance").click();
   await page.getByTestId("theme-option-light").click();
   await page.goto("/#/counter");
   await expect(page.getByRole("heading", { name: "Masbaha" })).toBeVisible();
@@ -329,6 +331,7 @@ test("custom counter has no automatically detectable WCAG A/AA violations", asyn
 test("Light Home keeps Qibla and Masbaha copy on the on-media palette", async ({ page }) => {
   await enterEnglishGuestMode(page);
   await page.getByTestId("nav-settings").click();
+  await page.getByTestId("settings-sub-appearance").click();
   await page.getByTestId("theme-option-light").click();
   await page.goto("/#/home");
 
@@ -353,6 +356,7 @@ test("Light Home keeps Qibla and Masbaha copy on the on-media palette", async ({
 test("audio voice choices use the rounded themed menu in Light mode", async ({ page }) => {
   await enterEnglishGuestMode(page);
   await page.getByTestId("nav-settings").click();
+  await page.getByTestId("settings-sub-appearance").click();
   await page.getByTestId("theme-option-light").click();
   await page.goto("/#/settings/audio");
 
@@ -379,6 +383,7 @@ test("audio voice choices use the rounded themed menu in Light mode", async ({ p
 test("More and Qibla have no automatically detectable WCAG A/AA violations", async ({ page }) => {
   await enterEnglishGuestMode(page);
   await page.getByTestId("nav-settings").click();
+  await page.getByTestId("settings-sub-appearance").click();
   await page.getByTestId("theme-option-light").click();
   await page.goto("/#/home");
   if (await page.getByTestId("nav-more").isVisible()) {

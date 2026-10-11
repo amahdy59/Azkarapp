@@ -2,11 +2,18 @@ import { useEffect, useState } from "react";
 import type { AudioController } from "../../audio/AudioProvider";
 import { loadAudioPreferences, saveAudioPreferences } from "../../audio/audioPreferences";
 import { getAudioVoices } from "../../audio/audioVoices";
-import { Headphones } from "../../components/icons";
+import { Download, Headphones } from "../../components/icons";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
 import { t } from "../../i18n";
 import type { AppLanguage } from "../../types";
-import { SectionLabel, SettingsToggleRow, SubHeader } from "./SettingsPrimitives";
+import {
+  RowChevron,
+  SettingsRowItem,
+  SettingsSection,
+  SettingsToggleRow,
+  SubHeader,
+  useSettingsReturnFocus,
+} from "./SettingsPrimitives";
 
 const PLAYBACK_RATES = [0.75, 1, 1.25] as const;
 
@@ -14,11 +21,18 @@ export function AudioSettingsPanel({
   language,
   controller,
   onBack,
+  onOpenDownloads,
+  focusOnMount = false,
+  direction = language === "ar" ? "rtl" : "ltr",
 }: {
   language: AppLanguage;
   controller: AudioController | null;
   onBack: () => void;
+  onOpenDownloads?: () => void;
+  focusOnMount?: boolean;
+  direction?: "ltr" | "rtl";
 }) {
+  const panelRef = useSettingsReturnFocus(focusOnMount ? "settings-sub-downloads" : undefined);
   const [preferences, setPreferences] = useState(() => controller?.preferences ?? loadAudioPreferences());
   const voices = getAudioVoices(language);
 
@@ -45,19 +59,29 @@ export function AudioSettingsPanel({
   };
 
   return (
-    <div className="slide-in-from-right flex h-full flex-col bg-background/50 backdrop-blur-md">
-      <SubHeader title={t(language, "settings.audioRecitations")} onBack={onBack} language={language} />
+    <div ref={panelRef} className="slide-in-from-right flex h-full flex-col bg-background/50 backdrop-blur-md">
+      <SubHeader title={t(language, "settings.audioDownloads")} onBack={onBack} language={language} />
       <div className="flex-1 overflow-y-auto pb-8">
-        <SectionLabel label={t(language, "settings.audioVoice")} />
-        <div className="mx-4 mt-2 rounded-3xl border border-border/40 bg-card p-4 shadow-raised">
+        {onOpenDownloads && (
+          <SettingsSection className="mt-3">
+            <SettingsRowItem
+              icon={<Download size={20} className="text-primary" />}
+              label={t(language, "downloads.title")}
+              right={<RowChevron />}
+              onPress={onOpenDownloads}
+              testId="settings-sub-downloads"
+              hasDivider={false}
+            />
+          </SettingsSection>
+        )}
+        <div className="mx-4 mt-3 rounded-2xl border border-border/40 bg-card p-4">
           <p id="preferred-audio-voice-label" className="text-sm font-semibold text-foreground">
             {t(language, "settings.preferredReciter")}
           </p>
-          <p className="mt-1 text-xs leading-5 text-muted-foreground">{t(language, "settings.preferredReciterHint")}</p>
           <Select
             value={voices.some((voice) => voice.id === preferences.duaVoiceId) ? preferences.duaVoiceId : voices[0]?.id}
             onValueChange={saveVoice}
-            dir={language === "ar" ? "rtl" : "ltr"}
+            dir={direction}
           >
             <SelectTrigger
               id="preferred-audio-voice"
@@ -74,42 +98,38 @@ export function AudioSettingsPanel({
               ))}
             </SelectContent>
           </Select>
-        </div>
+          <h2 className="mt-4 border-t border-border/40 pt-4 text-sm font-semibold">
+            {t(language, "settings.playbackSpeed")}
+          </h2>
+          <div className="mt-2 grid grid-cols-3 gap-2" role="group" aria-label={t(language, "settings.playbackSpeed")}>
+            {PLAYBACK_RATES.map((rate) => (
+              <button
+                key={rate}
+                type="button"
+                aria-pressed={preferences.playbackRate === rate}
+                onClick={() => saveRate(rate)}
+                className={`min-h-11 rounded-xl border px-3 text-sm font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                  preferences.playbackRate === rate
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border-control bg-card text-foreground"
+                }`}
+              >
+                {rate}×
+              </button>
+            ))}
+          </div>
 
-        <SectionLabel label={t(language, "settings.playbackSpeed")} />
-        <div
-          className="mx-4 mt-2 grid grid-cols-3 gap-2"
-          role="group"
-          aria-label={t(language, "settings.playbackSpeed")}
-        >
-          {PLAYBACK_RATES.map((rate) => (
-            <button
-              key={rate}
-              type="button"
-              aria-pressed={preferences.playbackRate === rate}
-              onClick={() => saveRate(rate)}
-              className={`min-h-11 rounded-xl border px-3 text-sm font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                preferences.playbackRate === rate
-                  ? "border-primary bg-primary/10 text-primary"
-                  : "border-border-control bg-card text-foreground"
-              }`}
-            >
-              {rate}×
-            </button>
-          ))}
-        </div>
+          <div className="mt-4 overflow-hidden border-t border-border/40">
+            <SettingsToggleRow
+              iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
+              icon={<Headphones size={20} className="text-primary" />}
+              label={t(language, "settings.continueAudioNavigation")}
 
-        <SectionLabel label={t(language, "settings.audioBehavior")} />
-        <div className="mx-4 mt-2 overflow-hidden rounded-3xl border border-border/40 bg-card shadow-raised">
-          <SettingsToggleRow
-            iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
-            icon={<Headphones size={20} className="text-primary" />}
-            label={t(language, "settings.continueAudioNavigation")}
-            description={t(language, "settings.continueAudioNavigationHint")}
-            checked={preferences.continueOnNavigation}
-            onChange={() => saveContinue(!preferences.continueOnNavigation)}
-            hasDivider={false}
-          />
+              checked={preferences.continueOnNavigation}
+              onChange={() => saveContinue(!preferences.continueOnNavigation)}
+              hasDivider={false}
+            />
+          </div>
         </div>
       </div>
     </div>

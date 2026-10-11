@@ -7,6 +7,7 @@ import { Check, ChevronNext, ChevronPrevious, Copy, Download, Share2 } from "./i
 import { t } from "../i18n";
 import { FIELD_LABEL_CLASS } from "./FormField";
 import { QURAN_TEXT_STYLE } from "../quranTypography";
+import { QuranVerseText } from "./QuranVerseText";
 import { SharingDisclosure } from "./SharingDisclosure";
 import { SharingChoiceLabel, SHARING_SELECTED_CLASS } from "./SharingChoiceLabel";
 import { useLayoutMode } from "../hooks/useLayoutMode";
@@ -557,7 +558,15 @@ export function CollectionShareModal({
                                       {t(exportLanguage, `shareStudio.${section.key}`)}
                                     </strong>
                                   )}
-                                  {shareDisplayDigits(section.displayText ?? section.text)}
+                                  {section.quranText ? (
+                                    <QuranVerseText
+                                      text={section.text}
+                                      language={exportLanguage}
+                                      canonicalKey={fragment.item.canonicalKey}
+                                    />
+                                  ) : (
+                                    shareDisplayDigits(section.displayText ?? section.text)
+                                  )}
                                 </p>
                               ),
                             )}

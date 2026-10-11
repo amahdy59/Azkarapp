@@ -1,4 +1,5 @@
 import { QURAN_TEXT_STYLE, isQuranPassage } from "../quranTypography";
+import { QuranVerseText } from "../components/QuranVerseText";
 import { useCallback, useDeferredValue, useEffect, useId, useMemo, useRef, useState } from "react";
 import { Search, Bookmark, ChevronNext, Lightbulb, X, Grid } from "../components/icons";
 import { ScreenContainer } from "../components/ScreenContainer";
@@ -31,6 +32,7 @@ type SavedLibraryItem = Pick<
   "id" | "category" | "arabicText" | "translation" | "transliteration" | "quranText" | "isSurah" | "attributionType"
 > & {
   lazyCollection?: "friday_kahf";
+  canonicalKey?: string;
 };
 
 export function AzkarLibraryScreen({
@@ -591,7 +593,15 @@ export function AzkarLibraryScreen({
                                     dir="rtl"
                                     lang="ar"
                                   >
-                                    {zikr.arabicText}
+                                    {isQuranPassage(zikr) ? (
+                                      <QuranVerseText
+                                        text={zikr.arabicText}
+                                        language={language}
+                                        canonicalKey={zikr.canonicalKey}
+                                      />
+                                    ) : (
+                                      zikr.arabicText
+                                    )}
                                   </p>
                                 ) : (
                                   <div className="mt-1 flex flex-col gap-0.5 w-full">
@@ -791,7 +801,15 @@ export function AzkarLibraryScreen({
                             dir="rtl"
                             lang="ar"
                           >
-                            {zikr.arabicText}
+                            {isQuranPassage(zikr) ? (
+                              <QuranVerseText
+                                text={zikr.arabicText}
+                                language={language}
+                                canonicalKey={zikr.canonicalKey}
+                              />
+                            ) : (
+                              zikr.arabicText
+                            )}
                           </span>
                         ) : (
                           <>

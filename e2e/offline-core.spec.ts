@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { getAzkarForMode } from "../src/app/content/azkar";
 
 test("core Reader and Settings are available on a first offline visit after install", async ({
   page,
@@ -11,15 +12,16 @@ test("core Reader and Settings are available on a first offline visit after inst
 
   await page.addInitScript(() => {
     window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
-    window.localStorage.setItem(
-      "azkarapp.state.v1",
-      JSON.stringify({
-        settings: { language: "en", themeMode: "midnight", reduceMotion: true },
-        profile: { displayName: "Guest", isGuest: true },
-        completed: { morning: [], evening: [], before_sleep: [] },
-        sessions: [],
-      }),
-    );
+    if (!window.localStorage.getItem("azkarapp.state.v1"))
+      window.localStorage.setItem(
+        "azkarapp.state.v1",
+        JSON.stringify({
+          settings: { language: "en", themeMode: "midnight", reduceMotion: true },
+          profile: { displayName: "Guest", isGuest: true },
+          completed: { morning: [], evening: [], before_sleep: [] },
+          sessions: [],
+        }),
+      );
   });
 
   await page.goto("/");
@@ -40,7 +42,23 @@ test("core Reader and Settings are available on a first offline visit after inst
     // The accessible name, not the visible digits. `toContainText("1")` passed
     // on the unclicked "0 / 1" too, so it could not fail for the reason it was
     // written; this asserts the count actually registered offline.
-    await expect(counter).toHaveAccessibleName(/Completed\s*1\s*\/\s*1/);
+    await expect
+      .poll(() =>
+        page.evaluate(() => {
+          const saved = JSON.parse(localStorage.getItem("azkarapp.state.v1") ?? "{}");
+          return saved.completed?.morning?.length ?? 0;
+        }),
+      )
+      .toBe(1);
+
+    // Neither this page nor its QCF font has been opened before going offline.
+    const ikhlas = getAzkarForMode("morning", "complete").findIndex((zikr) => zikr.id === "m-hm-76a") + 1;
+    await page.goto(`/#/azkar/morning/${ikhlas}?mode=complete`);
+    const glyph = page.getByTestId("zikr-text").locator("[data-quran-glyph]").first();
+    await expect(glyph).toBeVisible();
+    expect(await glyph.evaluate((el) => getComputedStyle(el).fontFamily)).toContain("qcf-v2-page-604");
+    await expect(page.getByTestId("counter-tap-hint")).toHaveCount(0);
+    await page.screenshot({ path: testInfo.outputPath("first-offline-mushaf-lettering.png") });
 
     await page.goto("/");
     if (await page.getByTestId("nav-more").isVisible()) {

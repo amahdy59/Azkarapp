@@ -1,4 +1,5 @@
 import "./floating-audio-player.css";
+import { createPortal } from "react-dom";
 import { MushafMagnificationControl } from "./MushafMagnificationControl";
 import { getScrollViewport } from "./scrollViewport";
 import {
@@ -179,6 +180,9 @@ export function FloatingAudioPlayer({
   const hasRoomBesideReading = useMediaQuery("(min-width: 768px)");
   const coversReading = overReadingSurface && (preferCompactReading || !hasRoomBesideReading);
   const [isMinimized, setIsMinimized] = useState(true);
+  const [audioOptionsHost, setAudioOptionsHost] = useState<HTMLDivElement | null>(null);
+  const [listeningControlsHost, setListeningControlsHost] = useState<HTMLDivElement | null>(null);
+  const [quranPreferencesHost, setQuranPreferencesHost] = useState<HTMLDivElement | null>(null);
   const compactRootRef = useRef<HTMLElement>(null);
   const reserveClearanceRef = useRef<(() => void) | null>(null);
   useLayoutEffect(() => {
@@ -662,7 +666,10 @@ export function FloatingAudioPlayer({
           className="audio-expanded-layout"
         >
           {/* Minimize and close retain the same logical edges in both player sizes. */}
-          <div className="audio-expanded-header relative grid shrink-0 items-center">
+          <div
+            className="audio-expanded-header relative grid shrink-0 items-center"
+            data-has-page-controls={Boolean(currentEntry.quranRange && currentEntry.mushafPages?.length)}
+          >
             <button
               type="button"
               onClick={() => {
@@ -676,10 +683,13 @@ export function FloatingAudioPlayer({
               <X size={19} aria-hidden="true" />
             </button>
             <div
-              className="audio-expanded-identity flex min-w-0 items-center justify-center px-1"
+              className="audio-expanded-identity flex min-w-0 flex-wrap items-center justify-center gap-2 px-1"
               data-testid="audio-expanded-identity"
             >
-              <span className="truncate text-sm font-semibold">{reciterDisplayName}</span>
+              <div className="min-w-0 max-w-full" ref={setAudioOptionsHost} />
+              {currentEntry.contentKind === "quran" && currentEntry.quranRange && currentEntry.mushafPages?.length ? (
+                <div className="audio-expanded-page-controls" ref={setListeningControlsHost} />
+              ) : null}
             </div>
             <button
               ref={collapseButtonRef}
@@ -687,6 +697,7 @@ export function FloatingAudioPlayer({
               type="button"
               onClick={() => setIsMinimized(true)}
               aria-label={t(language, "audioPlayer.collapse")}
+              title={t(language, "audioPlayer.collapse")}
               className="flex size-11 items-center justify-center rounded-full text-muted-foreground transition-colors duration-fast active:scale-95 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
               <ChevronDown size={22} aria-hidden="true" />
@@ -697,6 +708,9 @@ export function FloatingAudioPlayer({
           <div className="audio-expanded-reading flex min-h-0 flex-col overflow-hidden">
             <div className="flex min-h-0 flex-1 flex-col items-center">
               <div className="audio-expanded-meta w-full shrink-0 flex items-center px-3 text-center">
+                {!dockedInReader && !currentEntry.mushafPages?.length && (
+                  <span className="text-sm font-semibold">{title}</span>
+                )}
                 {isBusy && (
                   <p className="mt-1 text-xs font-semibold text-primary" role="status">
                     {state.status === "buffering"
@@ -713,7 +727,7 @@ export function FloatingAudioPlayer({
                 tabIndex={0}
                 role="region"
                 aria-label={t(language, "audioPlayer.nowPlaying")}
-                className="audio-expanded-text mt-2 flex min-h-0 w-full flex-1 flex-col items-center overflow-y-auto overscroll-contain px-4 py-1 sm:px-8 select-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-ring/40"
+                className="audio-expanded-text mt-2 flex min-h-0 w-full flex-1 flex-col items-center overflow-y-auto overscroll-contain px-4 py-1 sm:px-8 select-text focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
                 style={{
                   scrollbarGutter: "stable both-edges",
                   paddingBlockStart:
@@ -726,6 +740,8 @@ export function FloatingAudioPlayer({
                   <Suspense fallback={<p role="status">{t(language, "quranListening.loading")}</p>}>
                     <QuranListeningReader
                       key={currentEntry.entryId}
+                      controlsHost={listeningControlsHost}
+                      preferencesHost={quranPreferencesHost}
                       entry={currentEntry}
                       segment={controller.currentSegment}
                       currentTime={state.currentTime}
@@ -860,7 +876,8 @@ export function FloatingAudioPlayer({
           <div className="audio-expanded-controls mx-auto w-full max-w-5xl shrink-0 border-t border-border pt-1">
             {/* One waveform seek control with balanced time labels. */}
             <div className="audio-seek-row flex items-center gap-2 px-1" dir={direction}>
-              <span className="w-10 text-center text-micro font-bold tabular-nums text-muted-foreground">
+              <span dir="ltr" className="text-center text-xs font-medium tabular-nums text-muted-foreground">
+                <span className="sr-only">{t(language, "audioPlayer.elapsed")}: </span>
                 {formatTime(state.currentTime, language)}
               </span>
               <div
@@ -887,11 +904,24 @@ export function FloatingAudioPlayer({
                   className="audio-timeline-range h-11 w-full cursor-pointer appearance-none accent-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 />
               </div>
-              <span className="w-10 text-center text-micro font-bold tabular-nums text-muted-foreground">
+              <span dir="ltr" className="text-center text-xs font-medium tabular-nums text-muted-foreground">
+                <span className="sr-only">{t(language, "audioPlayer.totalTime")}: </span>
                 {formatTime(state.duration, language)}
               </span>
             </div>
 
+            <div
+              className="audio-expanded-feedback flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-muted-foreground"
+              dir={direction}
+            >
+              {repetitionProgress && (
+                <span data-testid="audio-repetition-progress">
+                  {t(language, "audioPlayer.repetitionChip")} <bdi dir="ltr">{repetitionProgress}</bdi>
+                </span>
+              )}
+              {canRepeat && <span>{repeatLabel}</span>}
+              {totalTracks > 1 && controller.autoAdvance && <span>{t(language, "audioPlayer.playAllShort")}</span>}
+            </div>
             <div className="audio-expanded-actions" dir={direction}>
               {/* Primary Universal Audio Controller Row: Strict Symmetry Maintained */}
               <div
@@ -917,7 +947,10 @@ export function FloatingAudioPlayer({
                   onClick={() => jumpSeconds(-10)}
                   disabled={state.duration <= 0}
                 >
-                  <ClockRewind className="size-5" aria-hidden="true" data-rtl-flip />
+                  <span className="audio-ten-second-icon" aria-hidden="true">
+                    <ClockRewind className="size-5" data-rtl-flip />
+                    <span>{formatNumerals(10, language)}</span>
+                  </span>
                 </TransportButton>
 
                 <button
@@ -938,7 +971,10 @@ export function FloatingAudioPlayer({
                   onClick={() => jumpSeconds(10)}
                   disabled={state.duration <= 0}
                 >
-                  <ClockFastForward className="size-5" aria-hidden="true" data-rtl-flip />
+                  <span className="audio-ten-second-icon" aria-hidden="true">
+                    <ClockFastForward className="size-5" data-rtl-flip />
+                    <span>{formatNumerals(10, language)}</span>
+                  </span>
                 </TransportButton>
 
                 {totalTracks > 1 && (
@@ -955,300 +991,317 @@ export function FloatingAudioPlayer({
               </div>
             </div>
 
-            <div
-              className="audio-expanded-options flex flex-wrap items-center justify-center gap-2 pt-1 text-xs text-muted-foreground"
-              dir={direction}
-            >
-              {positionChip && (
-                <span data-testid="audio-queue-position" className="sr-only">
-                  {t(language, "audioPlayer.track")} <span dir="ltr">{queuePosition}</span>
-                </span>
-              )}
-              {repetitionProgress && (
-                <span data-testid="audio-repetition-progress" className="sr-only">
-                  {t(language, "audioPlayer.repetitionChip")} <span dir="ltr">{repetitionProgress}</span>
-                </span>
-              )}
-              {canRepeat && (
-                <button
-                  type="button"
-                  aria-pressed={repeatEnabled}
-                  onClick={() => controller.setPlaybackMode(repeatEnabled ? "play-once" : "repeat-prescribed-count")}
-                  className={`audio-repeat-option flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-full border px-4 text-xs font-semibold hover:bg-muted transition-colors duration-fast focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                    repeatEnabled
-                      ? "border-primary/40 bg-primary/10 text-primary"
-                      : "border-border bg-card text-muted-foreground hover:text-foreground"
-                  }`}
-                  aria-label={repeatLabel}
-                  title={repeatLabel}
+            {audioOptionsHost &&
+              createPortal(
+                <div
+                  className="audio-expanded-options flex flex-wrap items-center justify-center gap-2 pt-1 text-xs text-muted-foreground"
+                  dir={direction}
                 >
-                  <Repeat
-                    size={15}
-                    className={repeatEnabled ? "text-primary" : "text-muted-foreground"}
-                    aria-hidden="true"
-                  />
-                  <span className={repeatEnabled ? "text-primary font-bold" : "text-foreground font-semibold"}>
-                    {repeatLabel}
-                  </span>
-                </button>
-              )}
-              <Popover.Root>
-                <Popover.Trigger asChild>
-                  <button
-                    type="button"
-                    aria-label={t(language, "audioPlayer.options")}
-                    className="inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full border border-border bg-card px-4 text-xs font-semibold text-foreground hover:bg-muted transition-colors duration-fast focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                  >
-                    <span>{t(language, "audioPlayer.options")}</span>
-                    <ChevronUp size={16} aria-hidden="true" />
-                  </button>
-                </Popover.Trigger>
-                <Popover.Portal>
-                  <Popover.Content
-                    side="top"
-                    collisionPadding={8}
-                    sideOffset={8}
-                    dir={direction}
-                    aria-label={t(language, "audioPlayer.options")}
-                    onEscapeKeyDown={(event) => {
-                      event.stopPropagation();
-                      // A nested select owns this Escape; keep options open
-                      // until its focus has returned to the select trigger.
-                      if (voiceMenuOpen || speedMenuOpen) event.preventDefault();
-                    }}
-                    onInteractOutside={(event) => {
-                      if (voiceMenuOpen || speedMenuOpen) event.preventDefault();
-                    }}
-                    className="audio-options-menu z-50 flex max-h-[75dvh] sm:max-h-[80dvh] w-[22rem] sm:w-[24rem] max-w-[calc(100vw-1.5rem)] flex-col gap-3 overflow-y-auto rounded-2xl border border-border bg-card p-3.5 text-foreground shadow-overlay"
-                  >
-                    <div className="flex items-center justify-between pb-2 border-b border-border/60">
-                      <div className="flex items-center gap-2">
-                        <div className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                          <SlidersHorizontal size={15} aria-hidden="true" />
+                  <Popover.Root>
+                    <Popover.Trigger asChild>
+                      <button
+                        type="button"
+                        aria-label={t(language, "audioPlayer.options")}
+                        title={t(language, "audioPlayer.options")}
+                        className="audio-options-trigger inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full border border-border bg-card px-4 text-xs font-semibold text-foreground hover:bg-muted transition-colors duration-fast focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                      >
+                        <SlidersHorizontal size={18} aria-hidden="true" />
+                        <span>{t(language, "audioPlayer.options")}</span>
+                      </button>
+                    </Popover.Trigger>
+                    <Popover.Portal>
+                      <Popover.Content
+                        side="bottom"
+                        collisionPadding={8}
+                        sideOffset={8}
+                        dir={direction}
+                        aria-label={t(language, "audioPlayer.options")}
+                        onEscapeKeyDown={(event) => {
+                          event.stopPropagation();
+                          // A nested select owns this Escape; keep options open
+                          // until its focus has returned to the select trigger.
+                          if (voiceMenuOpen || speedMenuOpen) event.preventDefault();
+                        }}
+                        onInteractOutside={(event) => {
+                          if (voiceMenuOpen || speedMenuOpen) event.preventDefault();
+                        }}
+                        className="audio-options-menu z-50 flex max-h-[75dvh] sm:max-h-[80dvh] w-[22rem] sm:w-[24rem] max-w-[calc(100vw-1.5rem)] flex-col gap-3 overflow-y-auto rounded-2xl border border-border bg-card p-3.5 text-foreground shadow-overlay"
+                      >
+                        <div className="flex items-center justify-between pb-2 border-b border-border/60">
+                          <div className="flex items-center gap-2">
+                            <div className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                              <SlidersHorizontal size={15} aria-hidden="true" />
+                            </div>
+                            <span className="text-sm font-bold text-foreground">
+                              {t(language, "audioPlayer.options")}
+                            </span>
+                          </div>
+                          <Popover.Close asChild>
+                            <button
+                              type="button"
+                              aria-label={t(language, "common.close")}
+                              className="flex size-11 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors cursor-pointer"
+                            >
+                              <X size={16} aria-hidden="true" />
+                            </button>
+                          </Popover.Close>
                         </div>
-                        <span className="text-sm font-bold text-foreground">{t(language, "audioPlayer.options")}</span>
-                      </div>
-                      <Popover.Close asChild>
-                        <button
-                          type="button"
-                          aria-label={t(language, "common.close")}
-                          className="flex size-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors cursor-pointer"
-                        >
-                          <X size={16} aria-hidden="true" />
-                        </button>
-                      </Popover.Close>
-                    </div>
 
-                    <div className="flex flex-col rounded-xl border border-border/60 bg-muted/20 divide-y divide-border/40">
-                      <div className="flex flex-col gap-1.5 p-2.5">
-                        <span className="text-micro font-medium text-muted-foreground px-0.5">
-                          {t(language, "audioPlayer.reciterShort")}
-                        </span>
-                        <Select
-                          open={voiceMenuOpen}
-                          onOpenChange={setVoiceMenuOpen}
-                          value={displayedVoiceId}
-                          onValueChange={controller.setVoice}
-                          dir={language === "ar" ? "rtl" : "ltr"}
-                        >
-                          <SelectTrigger
-                            aria-label={t(language, "audioPlayer.voice")}
-                            data-testid="audio-reciter-select"
-                            size="sm"
-                            className="h-11 w-full min-w-0 shrink justify-between gap-2 rounded-xl border-border bg-card px-3 py-1 text-sm font-medium text-foreground shadow-2xs transition-colors hover:bg-muted focus-visible:ring-[3px] focus-visible:ring-ring"
-                          >
-                            <Headphones size={15} className="shrink-0 text-primary" aria-hidden="true" />
-                            <SelectValue className="truncate text-start font-medium flex-1">
-                              {reciterDisplayName}
-                            </SelectValue>
-                          </SelectTrigger>
-                          <SelectContent
-                            align="center"
-                            className="z-[110] min-w-[10rem] max-w-[min(18rem,calc(100vw-2rem))]"
-                            onEscapeKeyDown={(event) => {
-                              event.preventDefault();
-                              event.stopPropagation();
-                              setVoiceMenuOpen(false);
-                            }}
-                          >
-                            <SelectGroup>
-                              {reciterOptions.map((option) => (
-                                <SelectItem
-                                  key={option.id}
-                                  value={option.id}
-                                  disabled={option.disabled}
-                                  tabIndex={option.id === displayedVoiceId ? 0 : -1}
-                                  aria-label={option.label}
-                                >
-                                  {option.label}
-                                </SelectItem>
-                              ))}
-                            </SelectGroup>
-                          </SelectContent>
-                        </Select>
-                        {language === "en" && (
-                          <span className="text-micro text-muted-foreground px-1">
-                            {t(
-                              language,
-                              currentVoiceId === "english-george"
-                                ? "audioPlayer.englishRecording"
-                                : "audioPlayer.arabicRecording",
+                        {currentEntry.quranRange && currentEntry.mushafPages?.length ? (
+                          <div
+                            ref={setQuranPreferencesHost}
+                            className="rounded-xl border border-border/60 bg-muted/20 p-2.5"
+                          />
+                        ) : null}
+
+                        <div className="flex flex-col rounded-xl border border-border/60 bg-muted/20 divide-y divide-border/40">
+                          <div className="flex flex-col gap-1.5 p-2.5">
+                            <span className="text-micro font-medium text-muted-foreground px-0.5">
+                              {t(language, "audioPlayer.reciterShort")}
+                            </span>
+                            <Select
+                              open={voiceMenuOpen}
+                              onOpenChange={setVoiceMenuOpen}
+                              value={displayedVoiceId}
+                              onValueChange={controller.setVoice}
+                              dir={language === "ar" ? "rtl" : "ltr"}
+                            >
+                              <SelectTrigger
+                                aria-label={t(language, "audioPlayer.voice")}
+                                data-testid="audio-reciter-select"
+                                size="sm"
+                                className="h-11 w-full min-w-0 shrink justify-between gap-2 rounded-xl border-border bg-card px-3 py-1 text-sm font-medium text-foreground shadow-2xs transition-colors hover:bg-muted focus-visible:ring-[3px] focus-visible:ring-ring"
+                              >
+                                <Headphones size={15} className="shrink-0 text-primary" aria-hidden="true" />
+                                <SelectValue className="truncate text-start font-medium flex-1">
+                                  {reciterDisplayName}
+                                </SelectValue>
+                              </SelectTrigger>
+                              <SelectContent
+                                align="center"
+                                className="z-[110] min-w-[10rem] max-w-[min(18rem,calc(100vw-2rem))]"
+                                onEscapeKeyDown={(event) => {
+                                  event.preventDefault();
+                                  event.stopPropagation();
+                                  setVoiceMenuOpen(false);
+                                }}
+                              >
+                                <SelectGroup>
+                                  {reciterOptions.map((option) => (
+                                    <SelectItem
+                                      key={option.id}
+                                      value={option.id}
+                                      disabled={option.disabled}
+                                      tabIndex={option.id === displayedVoiceId ? 0 : -1}
+                                      aria-label={option.label}
+                                    >
+                                      {option.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
+                            {language === "en" && (
+                              <span className="text-micro text-muted-foreground px-1">
+                                {t(
+                                  language,
+                                  currentVoiceId === "english-george"
+                                    ? "audioPlayer.englishRecording"
+                                    : "audioPlayer.arabicRecording",
+                                )}
+                              </span>
                             )}
-                          </span>
-                        )}
-                      </div>
+                          </div>
 
-                      <div className="audio-options-row audio-expanded-speed flex min-h-11 items-center justify-between gap-3 px-3 py-1.5">
-                        <span className="text-sm font-medium text-foreground">
-                          {t(language, "audioPlayer.speedShort")}
-                        </span>
-                        <Select
-                          open={speedMenuOpen}
-                          onOpenChange={setSpeedMenuOpen}
-                          value={String(state.playbackRate)}
-                          onValueChange={(value) => controller.setPlaybackRate(Number(value))}
-                          dir={direction}
-                        >
-                          <SelectTrigger
-                            size="sm"
-                            aria-label={`${t(language, "audioPlayer.speedShort")}: ${formatNumerals(state.playbackRate, language)}×`}
-                            className="audio-speed-select w-auto min-h-11 gap-2 rounded-xl border border-border bg-card px-3 text-xs font-bold text-foreground shadow-2xs hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                          >
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent
-                            onEscapeKeyDown={(event) => {
-                              event.preventDefault();
-                              event.stopPropagation();
-                              setSpeedMenuOpen(false);
-                            }}
-                          >
-                            {PLAYBACK_RATES.map((rate) => (
-                              <SelectItem key={rate} value={String(rate)}>
-                                <span dir="ltr">{formatNumerals(rate, language)}×</span>
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
+                          <div className="audio-options-row audio-expanded-speed flex min-h-11 items-center justify-between gap-3 px-3 py-1.5">
+                            <span className="text-sm font-medium text-foreground">
+                              {t(language, "audioPlayer.speedShort")}
+                            </span>
+                            <Select
+                              open={speedMenuOpen}
+                              onOpenChange={setSpeedMenuOpen}
+                              value={String(state.playbackRate)}
+                              onValueChange={(value) => controller.setPlaybackRate(Number(value))}
+                              dir={direction}
+                            >
+                              <SelectTrigger
+                                size="sm"
+                                aria-label={`${t(language, "audioPlayer.speedShort")}: ${formatNumerals(state.playbackRate, language)}×`}
+                                className="audio-speed-select w-auto min-h-11 gap-2 rounded-xl border border-border bg-card px-3 text-xs font-bold text-foreground shadow-2xs hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                              >
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent
+                                onEscapeKeyDown={(event) => {
+                                  event.preventDefault();
+                                  event.stopPropagation();
+                                  setSpeedMenuOpen(false);
+                                }}
+                              >
+                                {PLAYBACK_RATES.map((rate) => (
+                                  <SelectItem key={rate} value={String(rate)}>
+                                    <span dir="ltr">{formatNumerals(rate, language)}×</span>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
 
-                      <div className="audio-options-row flex min-h-11 items-center justify-between gap-3 px-3 py-1.5">
-                        <span className="text-sm font-medium text-foreground">{t(language, "audioPlayer.volume")}</span>
-                        <AudioVolumeControl controller={controller} language={language} />
-                      </div>
-                    </div>
+                          <div className="audio-options-row flex min-h-11 items-center justify-between gap-3 px-3 py-1.5">
+                            <span className="text-sm font-medium text-foreground">
+                              {t(language, "audioPlayer.volume")}
+                            </span>
+                            <AudioVolumeControl controller={controller} language={language} />
+                          </div>
+                        </div>
 
-                    {(currentEntry.contentKind === "quran" || englishFirst || listeningTiming) && (
-                      <div className="flex flex-col rounded-xl border border-border/60 bg-muted/20 divide-y divide-border/40">
-                        {currentEntry.contentKind === "quran" && (
-                          <div className="p-2.5">
-                            <MushafMagnificationControl
-                              language={language}
-                              value={pageMagnification}
-                              onChange={setPageMagnification}
-                            />
+                        {(currentEntry.contentKind === "quran" || englishFirst || listeningTiming) && (
+                          <div className="flex flex-col rounded-xl border border-border/60 bg-muted/20 divide-y divide-border/40">
+                            {currentEntry.contentKind === "quran" && (
+                              <div className="p-2.5">
+                                <MushafMagnificationControl
+                                  language={language}
+                                  value={pageMagnification}
+                                  onChange={setPageMagnification}
+                                />
+                              </div>
+                            )}
+
+                            {englishFirst && (
+                              <button
+                                type="button"
+                                aria-expanded={showArabic}
+                                aria-controls={arabicTextId}
+                                onClick={() => setArabicVisibility(showArabic ? "hide" : "show")}
+                                className="audio-options-row flex min-h-11 items-center justify-between gap-3 px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted/70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-colors cursor-pointer"
+                              >
+                                <span>
+                                  {t(language, showArabic ? "audioPlayer.hideArabic" : "audioPlayer.showArabic")}
+                                </span>
+                                {showArabic ? (
+                                  <ChevronUp size={16} aria-hidden="true" className="shrink-0 text-muted-foreground" />
+                                ) : (
+                                  <ChevronDown
+                                    size={16}
+                                    aria-hidden="true"
+                                    className="shrink-0 text-muted-foreground"
+                                  />
+                                )}
+                              </button>
+                            )}
+
+                            {listeningTiming && (
+                              <div data-listening-controls="" className="flex flex-col divide-y divide-border/40">
+                                <button
+                                  type="button"
+                                  aria-pressed={showListeningWords}
+                                  onClick={() => setShowListeningWords((value) => !value)}
+                                  className="audio-options-row flex min-h-11 items-center justify-between gap-3 px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted/70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-colors cursor-pointer"
+                                >
+                                  <span>
+                                    {t(
+                                      language,
+                                      listeningTiming.reviewStatus === "owner-preview"
+                                        ? "quranListening.estimatedWords"
+                                        : "quranListening.words",
+                                    )}
+                                  </span>
+                                  <span
+                                    aria-hidden="true"
+                                    className={`audio-option-check ${showListeningWords ? "audio-option-check--on" : ""}`}
+                                  >
+                                    {showListeningWords && <Check size={14} />}
+                                  </span>
+                                </button>
+                                <button
+                                  type="button"
+                                  aria-pressed={followListeningText}
+                                  onClick={() => setFollowListeningText((value) => !value)}
+                                  className="audio-options-row flex min-h-11 items-center justify-between gap-3 px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted/70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-colors cursor-pointer"
+                                >
+                                  <span>{t(language, "quranListening.followText")}</span>
+                                  <span
+                                    aria-hidden="true"
+                                    className={`audio-option-check ${followListeningText ? "audio-option-check--on" : ""}`}
+                                  >
+                                    {followListeningText && <Check size={14} />}
+                                  </span>
+                                </button>
+                              </div>
+                            )}
                           </div>
                         )}
 
-                        {englishFirst && (
+                        {canRepeat && (
                           <button
                             type="button"
-                            aria-expanded={showArabic}
-                            aria-controls={arabicTextId}
-                            onClick={() => setArabicVisibility(showArabic ? "hide" : "show")}
-                            className="audio-options-row flex min-h-11 items-center justify-between gap-3 px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted/70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-colors cursor-pointer"
+                            aria-pressed={repeatEnabled}
+                            onClick={() =>
+                              controller.setPlaybackMode(repeatEnabled ? "play-once" : "repeat-prescribed-count")
+                            }
+                            className={`audio-repeat-option flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-full border px-4 text-xs font-semibold hover:bg-muted transition-colors duration-fast focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                              repeatEnabled
+                                ? "border-primary/40 bg-primary/10 text-primary"
+                                : "border-border bg-card text-muted-foreground hover:text-foreground"
+                            }`}
+                            aria-label={repeatLabel}
+                            title={repeatLabel}
                           >
-                            <span>{t(language, showArabic ? "audioPlayer.hideArabic" : "audioPlayer.showArabic")}</span>
-                            {showArabic ? (
-                              <ChevronUp size={16} aria-hidden="true" className="shrink-0 text-muted-foreground" />
-                            ) : (
-                              <ChevronDown size={16} aria-hidden="true" className="shrink-0 text-muted-foreground" />
-                            )}
+                            <Repeat
+                              size={15}
+                              className={repeatEnabled ? "text-primary" : "text-muted-foreground"}
+                              aria-hidden="true"
+                            />
+                            <span
+                              className={repeatEnabled ? "text-primary font-bold" : "text-foreground font-semibold"}
+                            >
+                              {repeatLabel}
+                            </span>
                           </button>
                         )}
 
-                        {listeningTiming && (
-                          <div data-listening-controls="" className="flex flex-col divide-y divide-border/40">
+                        {totalTracks > 1 && (
+                          <div className="rounded-xl border border-border/60 bg-muted/20">
                             <button
                               type="button"
-                              aria-pressed={showListeningWords}
-                              onClick={() => setShowListeningWords((value) => !value)}
-                              className="audio-options-row flex min-h-11 items-center justify-between gap-3 px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted/70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-colors cursor-pointer"
+                              role="switch"
+                              aria-label={t(language, "audioPlayer.autoAdvance")}
+                              aria-checked={controller.autoAdvance}
+                              onClick={() => controller.setAutoAdvance(!controller.autoAdvance)}
+                              className="audio-options-row audio-auto-advance flex min-h-11 w-full items-center justify-between gap-3 px-3 py-2 text-sm font-medium text-foreground hover:bg-muted/70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-colors cursor-pointer"
                             >
-                              <span>
-                                {t(
-                                  language,
-                                  listeningTiming.reviewStatus === "owner-preview"
-                                    ? "quranListening.estimatedWords"
-                                    : "quranListening.words",
-                                )}
-                              </span>
+                              <div className="flex flex-col items-start text-start">
+                                <span className="font-semibold text-foreground">
+                                  {t(language, "audioPlayer.playAllShort")}
+                                </span>
+                                <span className="text-micro text-muted-foreground">
+                                  {t(language, "audioPlayer.autoAdvance")}
+                                </span>
+                              </div>
                               <span
                                 aria-hidden="true"
-                                className={`audio-option-check ${showListeningWords ? "audio-option-check--on" : ""}`}
+                                className={`audio-switch-track ${controller.autoAdvance ? "audio-switch-track--on" : ""}`}
                               >
-                                {showListeningWords && <Check size={14} />}
-                              </span>
-                            </button>
-                            <button
-                              type="button"
-                              aria-pressed={followListeningText}
-                              onClick={() => setFollowListeningText((value) => !value)}
-                              className="audio-options-row flex min-h-11 items-center justify-between gap-3 px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted/70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-colors cursor-pointer"
-                            >
-                              <span>{t(language, "quranListening.followText")}</span>
-                              <span
-                                aria-hidden="true"
-                                className={`audio-option-check ${followListeningText ? "audio-option-check--on" : ""}`}
-                              >
-                                {followListeningText && <Check size={14} />}
+                                <span />
                               </span>
                             </button>
                           </div>
                         )}
-                      </div>
-                    )}
 
-                    {totalTracks > 1 && (
-                      <div className="rounded-xl border border-border/60 bg-muted/20">
-                        <button
-                          type="button"
-                          role="switch"
-                          aria-label={t(language, "audioPlayer.autoAdvance")}
-                          aria-checked={controller.autoAdvance}
-                          onClick={() => controller.setAutoAdvance(!controller.autoAdvance)}
-                          className="audio-options-row audio-auto-advance flex min-h-11 w-full items-center justify-between gap-3 px-3 py-2 text-sm font-medium text-foreground hover:bg-muted/70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-colors cursor-pointer"
-                        >
-                          <div className="flex flex-col items-start text-start">
-                            <span className="font-semibold text-foreground">
-                              {t(language, "audioPlayer.playAllShort")}
-                            </span>
-                            <span className="text-micro text-muted-foreground">
-                              {t(language, "audioPlayer.autoAdvance")}
-                            </span>
-                          </div>
-                          <span
-                            aria-hidden="true"
-                            className={`audio-switch-track ${controller.autoAdvance ? "audio-switch-track--on" : ""}`}
+                        <Popover.Close asChild>
+                          <button
+                            type="button"
+                            className="audio-options-close min-h-11 w-full rounded-xl border border-border bg-muted/40 px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-colors shadow-2xs cursor-pointer"
                           >
-                            <span />
-                          </span>
-                        </button>
-                      </div>
-                    )}
-
-                    <Popover.Close asChild>
-                      <button
-                        type="button"
-                        className="audio-options-close min-h-11 w-full rounded-xl border border-border bg-muted/40 px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-colors shadow-2xs cursor-pointer"
-                      >
-                        {t(language, "common.close")}
-                      </button>
-                    </Popover.Close>
-                  </Popover.Content>
-                </Popover.Portal>
-              </Popover.Root>
-            </div>
+                            {t(language, "common.close")}
+                          </button>
+                        </Popover.Close>
+                      </Popover.Content>
+                    </Popover.Portal>
+                  </Popover.Root>
+                </div>,
+                audioOptionsHost,
+              )}
 
             {/* Error state */}
             {state.status === "error" && (

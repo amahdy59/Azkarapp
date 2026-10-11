@@ -46,12 +46,16 @@ for (const scenario of [
       });
     const player = page.getByRole("region", { name: t(scenario.language, "audioPlayer.region"), exact: true });
     await expect(player).toHaveAttribute("data-variant", "compact");
+    await page.getByTestId("download-category-recitations").locator("summary").click();
     await expect(page.getByTestId("offline-resource-baqarah")).toContainText(
       scenario.language === "ar" ? "٢٧٣" : "273",
     );
     await expect(page.getByTestId("offline-resource-kahf")).toContainText(scenario.language === "ar" ? "٧٧" : "77");
     const refresh = scroll.getByRole("button", { name: t(scenario.language, "downloads.refresh"), exact: true });
-    await scroll.locator("summary").click();
+    await scroll
+      .locator("summary")
+      .filter({ hasText: t(scenario.language, "downloads.storageDetails") })
+      .click();
     await refresh.focus();
     await viewport.evaluate((el) => {
       el.scrollTop = el.scrollHeight;

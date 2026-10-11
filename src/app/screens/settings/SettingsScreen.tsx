@@ -8,6 +8,8 @@ import { useScreenFocus } from "../../hooks/useScreenFocus";
 import "./SettingsScreen.css";
 import type { SettingsScreenProps } from "./SettingsScreen.types";
 import {
+  AppearancePanel,
+  PrayerSettingsPanel,
   AboutPanel,
   AccessibilityPanel,
   AccountDataPanel,
@@ -92,21 +94,29 @@ export function SettingsScreen({
     () => initialSub ?? (new URLSearchParams(window.location.search).has("pair") ? "account-data" : "root"),
   );
   const focusReturnSub = useRef<SettingsSubScreen>("root");
+  const [returnFocusSub, setReturnFocusSub] = useState<SettingsSubScreen>();
   const goBack = () => {
     const returnSub = focusReturnSub.current;
-    setSub("root");
+    const parent: SettingsSubScreen =
+      sub === "location" || sub === "notifications" ? "prayer" : sub === "downloads" ? "audio" : "root";
+    setSub(parent);
+    setReturnFocusSub(returnSub);
     onSubBack?.();
-    requestAnimationFrame(() => {
-      document.querySelector<HTMLElement>(`[data-testid="settings-sub-${returnSub}"]`)?.focus();
-    });
   };
   const layoutMode = useLayoutMode();
   const isTwoPaneLayout = layoutMode === "expanded" || layoutMode === "large";
   const motionReduced = shouldReduceMotion(reduceMotion);
-  // On two-pane layout, auto-select accessibility panel if user hasn't chosen one
-  const effectiveSub = isTwoPaneLayout && sub === "root" ? "accessibility" : sub;
+  // The same first category is selected by default on wide layouts.
+  const effectiveSub = isTwoPaneLayout && sub === "root" ? "appearance" : sub;
+  const rootFocusSub =
+    returnFocusSub === "location" || returnFocusSub === "notifications"
+      ? "prayer"
+      : returnFocusSub === "downloads"
+        ? "audio"
+        : returnFocusSub;
 
   const openSubPanel = (next: SettingsSubScreen) => {
+    setReturnFocusSub(undefined);
     focusReturnSub.current = next;
     setSub(next);
     onSubChange?.(next);
@@ -184,7 +194,14 @@ export function SettingsScreen({
               onHijriDateOffsetChange={onHijriDateOffsetChange}
               textSize={textSize}
               zikrFont={zikrFont}
-              activeSub={effectiveSub}
+              activeSub={
+                effectiveSub === "location" || effectiveSub === "notifications"
+                  ? "prayer"
+                  : effectiveSub === "downloads"
+                    ? "audio"
+                    : effectiveSub
+              }
+              focusOnMount={rootFocusSub}
             />
           </div>
           {/* Right: detail panel */}
@@ -225,6 +242,7 @@ export function SettingsScreen({
                 onHijriDateOffsetChange={onHijriDateOffsetChange}
                 textSize={textSize}
                 zikrFont={zikrFont}
+                focusOnMount={rootFocusSub}
               />
             </motion.div>
           ) : (
@@ -246,8 +264,46 @@ export function SettingsScreen({
 
   function renderSubPanel(panel: SettingsSubScreen) {
     switch (panel) {
+      case "appearance":
+        return (
+          <AppearancePanel
+            language={language}
+            direction={direction}
+            themeMode={themeMode}
+            highContrast={highContrast}
+            onThemeModeChange={onThemeModeChange}
+            onDisableHighContrast={() => onHighContrastChange(false)}
+            onLanguageChange={onLanguageChange}
+            calendarType={calendarType}
+            onCalendarTypeChange={onCalendarTypeChange}
+            hijriDateOffset={hijriDateOffset}
+            onHijriDateOffsetChange={onHijriDateOffsetChange}
+            onBack={goBack}
+          />
+        );
+      case "prayer":
+        return (
+          <PrayerSettingsPanel
+            language={language}
+            cityName={locationSettings?.cityName}
+            focusOnMount={
+              returnFocusSub === "location" || returnFocusSub === "notifications" ? returnFocusSub : undefined
+            }
+            onNav={openSubPanel}
+            onBack={goBack}
+          />
+        );
       case "audio":
-        return <AudioSettingsPanel language={language} controller={audioController} onBack={goBack} />;
+        return (
+          <AudioSettingsPanel
+            language={language}
+            direction={direction}
+            controller={audioController}
+            onBack={goBack}
+            onOpenDownloads={() => openSubPanel("downloads")}
+            focusOnMount={returnFocusSub === "downloads"}
+          />
+        );
       case "reading":
         return (
           <ReadingPanel
@@ -288,7 +344,7 @@ export function SettingsScreen({
           />
         );
       case "downloads":
-        return <DownloadsPanel language={language} onBack={goBack} />;
+        return <DownloadsPanel language={language} direction={direction} onBack={goBack} />;
       case "location":
         return (
           <PrayerLocationPanel

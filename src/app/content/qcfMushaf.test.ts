@@ -17,6 +17,12 @@ afterEach(() => {
 });
 
 describe("Mushaf page data", () => {
+  it("serves daily passage fonts and page data from the same application origin", () => {
+    for (const page of [42, 49, 603, 604]) {
+      expect(getQcfFontUrl(page)).toMatch(new RegExp(`/fonts/qcf-v2/2026-10-11/p${page}\\.woff2$`));
+      expect(getMushafPageUrl(page)).toMatch(new RegExp(`/data/mushaf/${page}\\.json$`));
+    }
+  });
   it("keeps both faces in fallback mode when either spread font is unavailable", () => {
     expect(resolveSpreadQcfMode(true, true)).toBe(true);
     expect(resolveSpreadQcfMode(true, false)).toBe(false);

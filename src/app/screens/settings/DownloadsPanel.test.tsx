@@ -8,7 +8,17 @@ const audioMocks = vi.hoisted(() => ({
 }));
 
 vi.mock("../../audio/audioPreferences", () => ({ loadAudioPreferences: () => ({}) }));
-vi.mock("../../content/azkar", () => ({ getAzkarForMode: () => [] }));
+vi.mock("../../content/azkar", () => ({
+  getAzkarForMode: (id: string) => [
+    { id: id + "-full", category: id },
+    { id: "ir-baqarah", category: id },
+  ],
+  ALL_AZKAR: [
+    { id: "after-prayer", category: "after_prayer" },
+    { id: "ir-baqarah", category: "illness_ruqyah" },
+    { id: "intro", category: "morning", isCollectionIntroduction: true },
+  ],
+}));
 vi.mock("../../audio/audioOfflineCache", () => ({
   downloadAudioForZikrs: audioMocks.download,
   estimateAudioDownloadBytes: () => 1024,
@@ -20,12 +30,65 @@ vi.mock("../../audio/audioOfflineCache", () => ({
 }));
 vi.mock("../../content/mushafOfflineCache", () => ({
   downloadMushaf: vi.fn(),
+  removeDownloadedMushaf: vi.fn().mockResolvedValue(undefined),
   getMushafDownloadStatus: vi.fn().mockResolvedValue({ downloadedPages: 0, totalPages: 604 }),
 }));
 
 import { DownloadsPanel } from "./DownloadsPanel";
 
+function openManagement(id: string) {
+  const category = screen.getByTestId("download-category-" + id);
+  fireEvent.click(category.querySelector("summary")!);
+}
+
 describe("DownloadsPanel", () => {
+  it("keeps cancellation reachable when individual management is collapsed", async () => {
+    Object.defineProperty(navigator, "storage", {
+      configurable: true,
+      value: { estimate: vi.fn().mockResolvedValue({ usage: 0, quota: 1e9 }) },
+    });
+    let signal: AbortSignal | undefined;
+    audioMocks.download.mockImplementation(async (_zikrs, _preferences, options) => {
+      signal = options.signal;
+      options.onProgress(100, 1000);
+      return new Promise((_resolve, reject) =>
+        options.signal.addEventListener("abort", () => reject(new DOMException("Cancelled", "AbortError"))),
+      );
+    });
+    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    openManagement("adhkar");
+    const download = await screen.findByRole("button", { name: "Download · Morning adhkar" });
+    await waitFor(() => expect(download).toBeEnabled());
+    fireEvent.click(download);
+    const cancel = await screen.findByRole("button", { name: "Cancel download · Adhkar & duas" });
+    openManagement("adhkar");
+    expect(screen.getByTestId("download-category-adhkar").querySelector("details")).not.toHaveAttribute("open");
+    fireEvent.click(cancel);
+    expect(signal?.aborted).toBe(true);
+    await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Audio download cancelled"));
+    expect(audioMocks.download).toHaveBeenCalledOnce();
+  });
+
+  it("shows verified completion and keeps Mushaf removal inside confirmed management", async () => {
+    const { getMushafDownloadStatus, removeDownloadedMushaf } = await import("../../content/mushafOfflineCache");
+    vi.mocked(getMushafDownloadStatus).mockResolvedValueOnce({
+      downloadedPages: 604,
+      downloadedFonts: 604,
+      totalPages: 604,
+      isComplete: true,
+    });
+    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    await waitFor(() =>
+      expect(within(screen.getByTestId("offline-resource-mushaf")).getByText("Downloaded")).toBeInTheDocument(),
+    );
+    expect(within(screen.getByTestId("offline-resource-mushaf")).queryByRole("button")).not.toBeInTheDocument();
+    openManagement("mushaf");
+    fireEvent.click(screen.getByRole("button", { name: "Remove download · Mushaf pages" }));
+    expect(removeDownloadedMushaf).not.toHaveBeenCalled();
+    expect(screen.getByRole("alertdialog")).toHaveTextContent("Your reading progress and preferences are kept");
+    fireEvent.click(screen.getByRole("button", { name: "Remove download", exact: true }));
+    await waitFor(() => expect(removeDownloadedMushaf).toHaveBeenCalledOnce());
+  });
   it.each(["baqarah", "kahf"])("downloads and removes %s independently with confirmation", async (id) => {
     const { getAudioDownloadStatuses } = await import("../../audio/audioOfflineCache");
     Object.defineProperty(navigator, "storage", {
@@ -34,12 +97,14 @@ describe("DownloadsPanel", () => {
     });
     audioMocks.download.mockResolvedValue({ assetCount: 1, byteSize: 1024 });
     render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    openManagement("recitations");
+    openManagement("adhkar");
     const row = await screen.findByTestId(`offline-resource-${id}`);
     const download = within(row).getByRole("button", { name: /^Download ·/ });
     await waitFor(() => expect(download).toBeEnabled());
     vi.mocked(getAudioDownloadStatuses).mockResolvedValue(
-      Array.from({ length: 6 }, (_, index) => ({
-        completed: index === (id === "kahf" ? 3 : 4) ? 4 : 0,
+      Array.from({ length: 8 }, (_, index) => ({
+        completed: index === (id === "kahf" ? 4 : 5) ? 4 : 0,
         total: 4,
         remainingBytes: 0,
       })),
@@ -61,23 +126,20 @@ describe("DownloadsPanel", () => {
   it("uses persisted verified coverage after reopening the panel and isolates numeric sizes", async () => {
     const { getAudioDownloadStatuses } = await import("../../audio/audioOfflineCache");
     vi.mocked(getAudioDownloadStatuses).mockResolvedValue(
-      Array.from({ length: 6 }, () => ({ completed: 1, total: 4, remainingBytes: 77_256_100 })),
+      Array.from({ length: 8 }, () => ({ completed: 1, total: 4, remainingBytes: 77_256_100 })),
     );
     const view = render(<DownloadsPanel language="ar" onBack={vi.fn()} />);
+    openManagement("recitations");
     await waitFor(() =>
-      expect(within(screen.getByTestId("offline-resource-kahf")).getByRole("progressbar")).toHaveAttribute(
-        "value",
-        "1",
-      ),
+      expect(within(screen.getByTestId("offline-resource-kahf")).getByText("تم التنزيل جزئيًا")).toBeInTheDocument(),
     );
     expect(screen.getByTestId("offline-resource-kahf").querySelector('bdi[dir="ltr"]')).toHaveTextContent("٧٧.٣ MB");
     view.unmount();
     render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    openManagement("recitations");
+    openManagement("adhkar");
     await waitFor(() =>
-      expect(within(screen.getByTestId("offline-resource-kahf")).getByRole("progressbar")).toHaveAttribute(
-        "value",
-        "1",
-      ),
+      expect(within(screen.getByTestId("offline-resource-kahf")).getByText("Partly downloaded")).toBeInTheDocument(),
     );
   });
   beforeEach(async () => {
@@ -86,7 +148,13 @@ describe("DownloadsPanel", () => {
     vi.mocked(getAudioDownloadStatuses).mockImplementation(async (groups) =>
       groups.map(() => ({ completed: 0, total: 4, remainingBytes: 4096 })),
     );
-    const { downloadMushaf } = await import("../../content/mushafOfflineCache");
+    await Promise.all([
+      import("../../content/fridayKahf"),
+      import("../../content/baqarahSurah"),
+      import("../../content/comprehensiveDuas"),
+    ]);
+    const { downloadMushaf, getMushafDownloadStatus } = await import("../../content/mushafOfflineCache");
+    vi.mocked(getMushafDownloadStatus).mockReset().mockResolvedValue({ downloadedPages: 0, totalPages: 604 });
     vi.mocked(downloadMushaf).mockReset();
     audioMocks.download.mockRejectedValue(new Error("raw download implementation detail"));
     audioMocks.remove.mockRejectedValue(new Error("raw cache implementation detail"));
@@ -107,17 +175,19 @@ describe("DownloadsPanel", () => {
   it("maps download and removal failures to localized actionable copy", async () => {
     const { getAudioDownloadStatuses } = await import("../../audio/audioOfflineCache");
     vi.mocked(getAudioDownloadStatuses).mockResolvedValue(
-      Array.from({ length: 6 }, () => ({ completed: 1, total: 4, remainingBytes: 4096 })),
+      Array.from({ length: 8 }, () => ({ completed: 1, total: 4, remainingBytes: 4096 })),
     );
     render(<DownloadsPanel language="en" onBack={vi.fn()} />);
-    const morningDownload = await screen.findByRole("button", { name: /^(Download|Resume) · Morning Core$/ });
+    openManagement("recitations");
+    openManagement("adhkar");
+    const morningDownload = await screen.findByRole("button", { name: /^(Download|Resume) · Morning adhkar$/ });
     await waitFor(() => expect(morningDownload).toBeEnabled());
     fireEvent.click(morningDownload);
     expect(await screen.findByRole("alert")).toHaveTextContent("Free some space or reconnect");
     expect(screen.queryByText(/raw download/i)).not.toBeInTheDocument();
 
-    await waitFor(() => expect(screen.getByRole("button", { name: "Remove download · Morning Core" })).toBeEnabled());
-    fireEvent.click(screen.getByRole("button", { name: "Remove download · Morning Core" }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Remove download · Morning adhkar" })).toBeEnabled());
+    fireEvent.click(screen.getByRole("button", { name: "Remove download · Morning adhkar" }));
     fireEvent.click(screen.getByRole("button", { name: "Remove download", exact: true }));
     await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("Could not remove downloaded audio"));
     expect(screen.queryByText(/raw cache/i)).not.toBeInTheDocument();
@@ -130,8 +200,10 @@ describe("DownloadsPanel", () => {
     });
     vi.mocked(navigator.storage.estimate).mockReturnValueOnce(storage);
     render(<DownloadsPanel language="en" onBack={vi.fn()} />);
-    const mushaf = screen.getByRole("button", { name: "Download complete Mushaf · Complete Mushaf offline" });
-    const audio = await screen.findByRole("button", { name: /^(Download|Resume) · Morning Core$/ });
+    openManagement("recitations");
+    openManagement("adhkar");
+    const mushaf = screen.getByRole("button", { name: "Download · Mushaf pages" });
+    const audio = await screen.findByRole("button", { name: /^(Download|Resume) · Morning adhkar$/ });
     expect(mushaf).toBeDisabled();
     expect(audio).toBeDisabled();
     fireEvent.click(mushaf);
@@ -165,15 +237,17 @@ describe("DownloadsPanel", () => {
     });
 
     render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    openManagement("recitations");
+    openManagement("adhkar");
 
     const downloadMushafBtn = await screen.findByRole("button", {
-      name: "Download complete Mushaf · Complete Mushaf offline",
+      name: "Download · Mushaf pages",
     });
     await waitFor(() => expect(downloadMushafBtn).toBeEnabled());
     fireEvent.click(downloadMushafBtn);
 
     // Shows progress and cancel button
-    const cancelBtn = await screen.findByRole("button", { name: "Cancel download · Complete Mushaf offline" });
+    const cancelBtn = await screen.findByRole("button", { name: "Cancel download · Mushaf pages" });
     expect(cancelBtn).toBeInTheDocument();
     expect(screen.getByText(/100 of 604 pages downloaded/i)).toBeInTheDocument();
 
@@ -188,8 +262,10 @@ describe("DownloadsPanel", () => {
   it("does not start a Mushaf download when estimated storage is insufficient", async () => {
     const { downloadMushaf } = await import("../../content/mushafOfflineCache");
     render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    openManagement("recitations");
+    openManagement("adhkar");
     const downloadMushafBtn = await screen.findByRole("button", {
-      name: "Download complete Mushaf · Complete Mushaf offline",
+      name: "Download · Mushaf pages",
     });
     await waitFor(() => expect(downloadMushafBtn).toBeEnabled());
     fireEvent.click(downloadMushafBtn);
@@ -197,38 +273,70 @@ describe("DownloadsPanel", () => {
     expect(downloadMushaf).not.toHaveBeenCalled();
   });
 
-  it("reports individual travel failures while preserving successful download groups", async () => {
-    Object.defineProperty(navigator, "storage", {
-      configurable: true,
-      value: { estimate: vi.fn().mockResolvedValue({ usage: 0, quota: 1024 * 1024 * 1024 }) },
-    });
-    const { downloadMushaf } = await import("../../content/mushafOfflineCache");
-    vi.mocked(downloadMushaf).mockRejectedValue(new Error("network"));
-    audioMocks.download.mockResolvedValue({ assetCount: 1, byteSize: 1024 });
+  it("exposes exactly three categories and no overlapping essentials bundle", async () => {
     render(<DownloadsPanel language="en" onBack={vi.fn()} />);
-    const prepare = screen.getByRole("button", { name: "Download essentials" });
-    await waitFor(() => expect(prepare).toBeEnabled());
-    fireEvent.click(prepare);
-    expect(await screen.findByRole("alert")).toHaveTextContent("Completed downloads are kept");
-    expect(screen.getByRole("alert")).toHaveTextContent("Complete Mushaf offline");
-    expect(audioMocks.download).toHaveBeenCalledTimes(4);
-    expect(audioMocks.download.mock.calls[3]?.[0]).not.toHaveLength(0);
+    await waitFor(() => expect(screen.getByRole("button", { name: "Download · Adhkar & duas" })).toBeEnabled());
+    expect(screen.getAllByTestId(/^download-category-/)).toHaveLength(3);
+    for (const id of ["adhkar", "recitations", "mushaf"]) {
+      expect(
+        within(screen.getByTestId("offline-resource-" + id)).getAllByRole("button", { name: /^Download ·/ }),
+      ).toHaveLength(1);
+      expect(screen.getByTestId("download-category-" + id).querySelector("details")).not.toHaveAttribute("open");
+    }
+    expect(screen.queryByRole("button", { name: "Download essentials" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
   });
 
-  it("does not claim travel readiness when there are no verified audio recordings", async () => {
-    const { getMushafDownloadStatus } = await import("../../content/mushafOfflineCache");
-    const { getAudioDownloadStatuses } = await import("../../audio/audioOfflineCache");
-    vi.mocked(getMushafDownloadStatus).mockResolvedValueOnce({
-      downloadedPages: 604,
-      downloadedFonts: 604,
-      totalPages: 604,
-      isComplete: true,
+  it("downloads complete daily and other adhkar together, excluding full Baqarah", async () => {
+    Object.defineProperty(navigator, "storage", {
+      configurable: true,
+      value: { estimate: vi.fn().mockResolvedValue({ usage: 0, quota: 1e9 }) },
     });
-    vi.mocked(getAudioDownloadStatuses).mockResolvedValueOnce(
-      Array.from({ length: 6 }, () => ({ completed: 0, total: 0, remainingBytes: 0 })),
+    audioMocks.download.mockResolvedValue({ assetCount: 1, byteSize: 1024 });
+    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    const download = screen.getByRole("button", { name: "Download · Adhkar & duas" });
+    await waitFor(() => expect(download).toBeEnabled());
+    fireEvent.click(download);
+    await waitFor(() => expect(audioMocks.download).toHaveBeenCalledOnce());
+    const ids = audioMocks.download.mock.calls[0]![0].map((z: { id: string }) => z.id);
+    expect(ids).toEqual(expect.arrayContaining(["morning-full", "evening-full", "before_sleep-full", "after-prayer"]));
+    expect(ids).not.toContain("ir-baqarah");
+    expect(ids).not.toContain("friday-kahf");
+    expect(ids).not.toContain("intro");
+    const { downloadMushaf } = await import("../../content/mushafOfflineCache");
+    expect(downloadMushaf).not.toHaveBeenCalled();
+  });
+
+  it("groups both surahs independently from Mushaf and gives a retry action after failure", async () => {
+    Object.defineProperty(navigator, "storage", {
+      configurable: true,
+      value: { estimate: vi.fn().mockResolvedValue({ usage: 0, quota: 1e9 }) },
+    });
+    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    const download = screen.getByRole("button", { name: "Download · Kahf & Baqarah recitations" });
+    await waitFor(() => expect(download).toBeEnabled());
+    fireEvent.click(download);
+    await waitFor(() => expect(audioMocks.download).toHaveBeenCalledOnce());
+    expect(audioMocks.download.mock.calls[0]![0].map((z: { id: string }) => z.id)).toEqual([
+      "friday-kahf",
+      "ir-baqarah",
+    ]);
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Try again · Kahf & Baqarah recitations" })).toBeEnabled(),
+    );
+    const { downloadMushaf } = await import("../../content/mushafOfflineCache");
+    expect(downloadMushaf).not.toHaveBeenCalled();
+  });
+
+  it("does not claim an audio category is downloaded without any verified recordings", async () => {
+    const { getAudioDownloadStatuses } = await import("../../audio/audioOfflineCache");
+    vi.mocked(getAudioDownloadStatuses).mockImplementation(async (groups) =>
+      groups.map(() => ({ completed: 0, total: 0, remainingBytes: 0 })),
     );
     render(<DownloadsPanel language="en" onBack={vi.fn()} />);
-    await waitFor(() => expect(screen.getByRole("button", { name: "Download essentials" })).toBeEnabled());
-    expect(screen.getByTestId("travel-readiness")).toHaveTextContent("not fully downloaded");
+    await waitFor(() =>
+      expect(within(screen.getByTestId("offline-resource-adhkar")).getByText("Unavailable")).toBeInTheDocument(),
+    );
+    expect(screen.getByRole("button", { name: "Download · Adhkar & duas" })).toBeDisabled();
   });
 });

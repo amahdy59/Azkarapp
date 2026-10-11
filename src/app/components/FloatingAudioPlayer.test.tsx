@@ -385,7 +385,7 @@ describe("FloatingAudioPlayer", () => {
     expect(screen.getByRole("button", { name: "Pause audio" })).toBeInTheDocument();
   });
 
-  it("renders one prescribed-repeat option separately from the timeline", () => {
+  it("keeps the repeat state visible and offers one prescribed-repeat control in audio options", () => {
     const controller = createController();
     const repeatableEntry: PlaybackEntry = {
       ...entry,
@@ -398,6 +398,8 @@ describe("FloatingAudioPlayer", () => {
     render(<FloatingAudioPlayer controller={controller} language="en" direction="ltr" />);
     fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
 
+    expect(screen.getByRole("region", { name: "Audio player" })).toHaveTextContent("Repeat 3 times");
+    fireEvent.click(screen.getByRole("button", { name: "Audio options" }));
     const repeatBtn = screen.getByRole("button", { name: "Repeat 3 times" });
     expect(repeatBtn).toBeInTheDocument();
     expect(repeatBtn).toHaveAttribute("aria-pressed", "true");
@@ -416,11 +418,10 @@ describe("FloatingAudioPlayer", () => {
     fireEvent.click(screen.getByRole("button", { name: "Audio options" }));
     expect(screen.getByTestId("audio-expanded-identity")).not.toHaveTextContent("1 / 2");
     expect(screen.getByTestId("audio-expanded-identity")).not.toHaveTextContent("Track");
-    expect(screen.getByTestId("audio-queue-position")).toHaveTextContent("Track 1 / 2");
-    expect(screen.getByTestId("audio-queue-position").closest(".audio-expanded-options")).not.toBeNull();
+    expect(screen.queryByTestId("audio-queue-position")).toBeNull();
     expect(screen.getByRole("region", { name: "Audio player" })).toHaveTextContent("49 / 100");
     const progress = screen.getByTestId("audio-repetition-progress");
-    expect(progress.closest(".audio-expanded-options")).not.toBeNull();
+    expect(progress.closest(".audio-expanded-feedback")).not.toBeNull();
     expect(screen.getByTestId("audio-expanded-identity")).not.toHaveTextContent("49 / 100");
   });
 
@@ -481,7 +482,7 @@ describe("FloatingAudioPlayer", () => {
     expect(forward10).toBeInTheDocument();
   });
 
-  it("uses the expanded header for center-aligned reciter without a duplicate zikr title or track position", () => {
+  it("keeps reciter selection in options and removes the duplicated header identity", () => {
     const controller = createController();
     render(<FloatingAudioPlayer controller={controller} language="ar" direction="rtl" />);
     fireEvent.click(screen.getByRole("button", { name: "توسيع المشغل" }));
@@ -490,10 +491,13 @@ describe("FloatingAudioPlayer", () => {
     const reciterSelect = screen.getByTestId("audio-reciter-select");
     const identity = screen.getByTestId("audio-expanded-identity");
     expect(identity).not.toContainElement(reciterSelect);
-    expect(identity).toHaveTextContent("Test reciter");
+    expect(identity).not.toHaveTextContent("Test reciter");
+    expect(reciterSelect).toHaveTextContent("Test reciter");
     expect(identity).toHaveClass("justify-center");
     expect(reciterSelect).toHaveClass("justify-between", "w-full", "rounded-xl");
     expect(identity).not.toHaveTextContent(entry.titleArabic);
+    expect(identity).toContainElement(screen.getByRole("button", { name: "خيارات الصوت" }));
+    expect(screen.getByRole("region", { name: "مشغل الصوت" })).toHaveTextContent(entry.titleArabic);
     expect(identity).not.toHaveTextContent("المقطع");
   });
 
@@ -806,5 +810,14 @@ describe("FloatingAudioPlayer", () => {
 
     const transportLtr = screen.getByRole("button", { name: "Next item" }).closest(".audio-expanded-transport");
     expect(transportLtr).toHaveAttribute("dir", "ltr");
+  });
+
+  it("exposes elapsed and total time as text without invalid span labels or live tick announcements", () => {
+    render(<FloatingAudioPlayer controller={createController()} language="en" direction="ltr" />);
+    fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
+    const row = screen.getByRole("slider", { name: "Seek audio" }).closest(".audio-seek-row")!;
+    expect(row.querySelectorAll("span[aria-label]")).toHaveLength(0);
+    expect(row.querySelectorAll(".sr-only")).toHaveLength(2);
+    expect(row.querySelector('[aria-live="polite"], [aria-live="assertive"]')).toBeNull();
   });
 });

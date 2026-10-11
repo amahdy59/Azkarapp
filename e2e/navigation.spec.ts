@@ -147,7 +147,7 @@ test("secondary app state is deep-linkable and browser Back restores Settings ro
   await page.getByTestId("nav-settings").click();
   await page.getByTestId("settings-sub-audio").click();
   await expect(page).toHaveURL(/#\/settings\/audio$/);
-  await expect(page.getByRole("heading", { name: "Audio & recitations", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Audio & downloads", exact: true })).toBeVisible();
 
   await page.goBack();
   await expect(page).toHaveURL(/#\/settings$/);

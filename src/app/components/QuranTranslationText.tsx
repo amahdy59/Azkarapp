@@ -3,17 +3,10 @@ import type { TextSizeOption } from "../types";
 import type { QuranTranslationVerse } from "../content/quranTranslation";
 import "./quran-listening-translation.css";
 
-const FONT_SIZES: Record<"listening" | "page", Record<TextSizeOption, string>> = {
-  listening: {
-    small: "1.125rem",
-    medium: "1.25rem",
-    large: "1.5rem",
-  },
-  page: {
-    small: "0.875rem",
-    medium: "0.9375rem",
-    large: "1.125rem",
-  },
+const FONT_SIZES: Record<TextSizeOption, string> = {
+  small: "1.125rem",
+  medium: "1.25rem",
+  large: "1.5rem",
 };
 
 /** Shared English presentation; playback and content loading belong to its caller. */
@@ -76,7 +69,7 @@ export const QuranTranslationText = memo(function QuranTranslationText({
       dir="ltr"
       lang="en"
       className={`quran-meaning-text ${className} focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring`}
-      style={{ fontSize: FONT_SIZES[variant][textSize] }}
+      style={{ fontSize: FONT_SIZES[textSize] }}
       onWheel={onManualBrowse}
       onTouchMove={onManualBrowse}
       onPointerDown={onManualBrowse}
@@ -88,7 +81,7 @@ export const QuranTranslationText = memo(function QuranTranslationText({
           aria-current={activeVerseKey === verse.verseKey ? "true" : undefined}
         >
           <span className="audio-translation-marker">{verse.marker}</span>
-          <span>{verse.text}</span>
+          <span className="quran-meaning-verse-text min-w-0">{verse.text}</span>
         </p>
       ))}
     </div>

@@ -18,6 +18,14 @@ export function SourcesPanel({ language, onBack }: { language: AppLanguage; onBa
           body={t(language, "sources.approachBody")}
         />
         <InformationCard
+          icon={<BookOpen size={20} aria-hidden="true" />}
+          title={t(language, "sources.quranFontsTitle")}
+          body={t(language, "sources.quranFontsBody")}
+          actionLabel={t(language, "sources.quranFontsAction")}
+          actionIcon={<ExternalLink size={16} aria-hidden="true" />}
+          onAction={() => window.open("https://quran.foundation", "_blank", "noopener,noreferrer")}
+        />
+        <InformationCard
           icon={<Translate size={20} aria-hidden="true" />}
           title={t(language, "sources.quranWordMeaningsTitle")}
           body={t(language, "sources.quranWordMeaningsBody")}

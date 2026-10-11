@@ -297,12 +297,16 @@ const MushafTextLine = memo(function MushafTextLine({
 
           if (showWordMeanings && meaning) {
             const isOpen = activeWord?.verseKey === w.verseKey && activeWord?.wordPosition === w.position;
+            const isSpoken = highlightedWord?.verseKey === w.verseKey && highlightedWord.position === w.position;
             return (
               <span
                 key={key}
                 role="button"
                 tabIndex={0}
                 data-word-active={isOpen ? "true" : undefined}
+                aria-pressed={isOpen}
+                data-playback-word={isSpoken ? "true" : undefined}
+                data-playback-verse={highlightedVerseKey === w.verseKey ? w.verseKey : undefined}
                 onClick={(event) => {
                   onActiveWordChange(
                     isOpen
@@ -324,10 +328,15 @@ const MushafTextLine = memo(function MushafTextLine({
                   e.preventDefault();
                   onAyahAction?.(w.verseKey);
                 }}
-                className={`relative inline shrink-0 cursor-pointer appearance-none rounded-sm border-0 bg-primary/10 p-0 text-primary underline decoration-dotted underline-offset-4 transition-colors [font:inherit] hover:bg-primary/20 focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                  highlightedVerseKey === w.verseKey ? "ring-2 ring-primary/55" : ""
+                className={`relative inline shrink-0 cursor-pointer appearance-none rounded-sm border-0 p-0 underline underline-offset-4 transition-colors [font:inherit] hover:bg-primary/10 focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                  isOpen || isSpoken ? "bg-primary/15 text-foreground ring-2 ring-primary/55" : "text-foreground"
                 }`}
-                style={{ lineHeight: "inherit", verticalAlign: "baseline" }}
+                style={{
+                  lineHeight: "inherit",
+                  verticalAlign: "baseline",
+                  textDecorationColor: "color-mix(in srgb, var(--primary) 60%, transparent)",
+                  textDecorationStyle: isOpen || isSpoken ? "solid" : "dotted",
+                }}
                 aria-label={t(language, "mushaf.wordMeaning", { word: w.text })}
               >
                 {wordContent}
@@ -1658,7 +1667,7 @@ export function MushafPageViewer({
           )}
           {facingContent && !facingPage && (
             <>
-              <div className="mushaf-spread__gutter" aria-hidden="true" />
+              <div className="mushaf-spread__gutter mushaf-meaning-gutter" aria-hidden="true" />
               <div
                 className={`relative mushaf-spread__page mushaf-page-canvas min-h-0 min-w-0 px-1 sm:px-5 ${
                   isFloatingLayout ? "" : "py-1 sm:py-2"
@@ -1723,6 +1732,7 @@ export function MushafExcerptCanvas({
   lines,
   pageNumber,
   language,
+  useQcfGlyphs,
   highlightedWord,
   textSize = "medium",
   theme = "light",
@@ -1743,35 +1753,48 @@ export function MushafExcerptCanvas({
         lang="ar"
         data-testid="mushaf-excerpt"
         className="w-full text-center"
-        style={{ ...QURAN_TEXT_STYLE, fontSize: getQuranReadingSize(textSize) }}
+        data-mushaf-rendering={useQcfGlyphs ? "qcf-v2" : "unicode-fallback"}
+        style={{
+          ...QURAN_TEXT_STYLE,
+          fontSize: getQuranReadingSize(textSize),
+          fontFamily: useQcfGlyphs ? `qcf-v2-page-${pageNumber}` : QURAN_TEXT_STYLE.fontFamily,
+        }}
       >
-        {lines.flat().map((word, index) => (
-          <Fragment key={`${word.verseKey}:${word.position}:${index}`}>
-            {index > 0 ? " " : ""}
-            {word.isEnd ? (
-              <AyahMarker number={word.verseKey.split(":")[1]!} language={language} theme={theme} />
-            ) : (
-              <span
-                data-listening-word={
-                  highlightedWord?.verseKey === word.verseKey && highlightedWord.position === word.position
-                    ? ""
-                    : undefined
-                }
-                style={
-                  highlightedWord?.verseKey === word.verseKey && highlightedWord.position === word.position
-                    ? {
-                        textDecoration: "underline",
-                        textUnderlineOffset: "0.18em",
-                        backgroundColor: "color-mix(in srgb, var(--primary) 20%, transparent)",
-                        color: "color-mix(in srgb, var(--primary) 60%, var(--foreground))",
-                      }
-                    : undefined
-                }
-              >
-                {word.text}
-              </span>
-            )}
-          </Fragment>
+        {lines.map((line, lineIndex) => (
+          <span key={lineIndex} className="block">
+            {line.map((word, index) => (
+              <Fragment key={`${word.verseKey}:${word.position}:${index}`}>
+                {index > 0 ? " " : ""}
+                {word.isEnd ? (
+                  useQcfGlyphs ? (
+                    word.qcfCode
+                  ) : (
+                    <AyahMarker number={word.verseKey.split(":")[1]!} language={language} theme={theme} />
+                  )
+                ) : (
+                  <span
+                    data-listening-word={
+                      highlightedWord?.verseKey === word.verseKey && highlightedWord.position === word.position
+                        ? ""
+                        : undefined
+                    }
+                    style={
+                      highlightedWord?.verseKey === word.verseKey && highlightedWord.position === word.position
+                        ? {
+                            textDecoration: "underline",
+                            textUnderlineOffset: "0.18em",
+                            backgroundColor: "color-mix(in srgb, var(--primary) 20%, transparent)",
+                            color: "color-mix(in srgb, var(--primary) 60%, var(--foreground))",
+                          }
+                        : undefined
+                    }
+                  >
+                    {useQcfGlyphs ? word.qcfCode : word.text}
+                  </span>
+                )}
+              </Fragment>
+            ))}
+          </span>
         ))}
       </div>
       <div className="sr-only">

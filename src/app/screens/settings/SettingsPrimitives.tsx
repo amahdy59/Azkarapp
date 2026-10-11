@@ -7,6 +7,19 @@ import type { AppLanguage } from "../../types";
 
 import { useLayoutMode } from "../../hooks/useLayoutMode";
 
+/** Restore a nested panel's opener after its parent has actually mounted. */
+export function useSettingsReturnFocus(testId?: string) {
+  const root = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!testId) return;
+    const frame = requestAnimationFrame(() =>
+      root.current?.querySelector<HTMLElement>(`[data-testid="${testId}"]`)?.focus(),
+    );
+    return () => cancelAnimationFrame(frame);
+  }, [testId]);
+  return root;
+}
+
 export function SubHeader({
   title,
   onBack,

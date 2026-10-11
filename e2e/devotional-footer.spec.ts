@@ -401,6 +401,8 @@ for (const language of ["ar", "en"] as const) {
       if (width === 1440) {
         await hint.click();
         await expect(counter).toHaveAttribute("aria-label", language === "en" ? /1 \/ 100$/ : /١ \/ ١٠٠$/);
+        await expect(hint).toHaveCount(0);
+        await expect(page.getByTestId("counter-guidance-reopen")).toHaveCount(0);
         await page.getByTestId("reader-share-dock-button").click();
         await expect(page.getByRole("dialog")).toBeVisible();
         await expect(counter).toHaveAttribute("aria-label", language === "en" ? /1 \/ 100$/ : /١ \/ ١٠٠$/);
@@ -408,7 +410,6 @@ for (const language of ["ar", "en"] as const) {
         await expect(page.getByTestId("reader-share-dock-button")).toBeFocused();
         const scan = await new AxeBuilder({ page })
           .include('[data-testid="reader-dock"]')
-          .include('[data-testid="counter-tap-hint"]')
           .withTags(["wcag2a", "wcag2aa", "wcag22aa"])
           .analyze();
         expect(scan.violations).toEqual([]);

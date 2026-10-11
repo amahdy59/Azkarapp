@@ -31,7 +31,7 @@ for (const language of ["ar", "en"] as const) {
           Math.max(...geometry.map((item) => item.heading)) - Math.min(...geometry.map((item) => item.heading)),
         ).toBeLessThanOrEqual(1);
       }).toPass({ timeout: 15000 });
-      await page.goto("/#/settings");
+      await page.goto("/#/settings/appearance");
       await expect(page.getByTestId("theme-option-midnight")).toBeVisible();
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       await page.goto("/#/counter");

@@ -1,5 +1,13 @@
 # AI Improvement System Index
 
+[Coordinated release, 2026-10-11](phases/COORDINATED_RELEASE_2026_10_11.md) records the owner's renewed instruction to consolidate and push all settled changes from the Reader session. This supersedes the publication hold; final combined quality, browser, CI and production verification remain required.
+
+[Reader Mushaf presentation](phases/READER_MUSHAF_PRESENTATION_2026_10_11.md) records the owner-approved first-use guidance removal, verified QCF snippet lettering, daily offline font bundle and attribution. Publication belongs to the renewed coordinated release authorization above.
+
+[Settings and downloads simplification](phases/SETTINGS_DOWNLOADS_SIMPLIFICATION_2026_10_11.md) is the active owner-approved local-only three-category download and seven-row Settings refinement. Existing management and deep links remain; no publication is authorized by this request.
+
+[Paired Quran page refinement](phases/PAIRED_QURAN_PAGE_REFINEMENT_2026_10_11.md) is the active owner-approved local-only English scrolling, alignment, typography, glossary and responsive reading refinement. No commit, push or deployment is authorized for this phase.
+
 [Latest changes release, 2026-10-10](phases/LATEST_CHANGES_RELEASE_2026_10_10.md) records the owner's superseding publication authorization, integrated source review, translation verification, compatibility safeguards and release evidence.
 
 [Phase 95](phases/PHASE_95_READER_SIMPLIFICATION_AND_AYAH_SHARING.md) applies the owner's corrected reading-only Benefit placement, removes redundant overflow actions, and adds complete ayah image cards with optional reviewed content.
@@ -254,3 +262,5 @@ Apple/Microsoft-informed control spacing and alignment improvements.
 [Offline downloads and coordinated release](phases/OFFLINE_DOWNLOADS_AND_RELEASE_2026_10_10.md) is the active owner-approved phase: independent downloads, honest storage/readiness, accessible responsive controls, verification of pending changes and full main/Pages release. The owner explicitly supersedes earlier publication holds.
 
 [Uniform Quran snippets](phases/UNIFORM_QURAN_SNIPPETS_2026_10_10.md) is the active owner-requested correction for inconsistent snippet typography and scale across reading, playback, previews, benefits, help and sharing; full Mushaf pagination remains unchanged.
+
+[Expanded player refinement](phases/EXPANDED_PLAYER_REFINEMENT_2026_10_11.md) is the owner-approved local-only header, reading-clearance, centered header options, uncluttered transport and accessibility refinement; existing translation/Mushaf edits are preserved.
