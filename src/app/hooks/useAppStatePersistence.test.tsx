@@ -53,12 +53,12 @@ describe("debounced application persistence", () => {
     visibility.mockRestore();
   });
 
-  it("saves the latest counter on reload even when pagehide is delayed, without saving twice", () => {
+  it("saves pending progress on reload even when pagehide is delayed, without saving twice", () => {
     const onResult = vi.fn();
     const { rerender, unmount } = renderHook(({ snapshot }) => useAppStatePersistence(snapshot, onResult), {
       initialProps: { snapshot: DEFAULT_APP_STATE },
     });
-    const latest = { ...DEFAULT_APP_STATE, partialZikrCounts: { "m-hm-91": 1 } };
+    const latest = { ...DEFAULT_APP_STATE, khatmahPage: 17 };
     rerender({ snapshot: latest });
     act(() => window.dispatchEvent(new Event("beforeunload")));
     expect(saveAppState).toHaveBeenCalledExactlyOnceWith(latest);
@@ -67,6 +67,23 @@ describe("debounced application persistence", () => {
     unmount();
     window.dispatchEvent(new Event("beforeunload"));
     expect(saveAppState).toHaveBeenCalledExactlyOnceWith(latest);
+  });
+
+  it("persists each displayed partial count and its reset before paint without relying on unload events", () => {
+    const result = vi.fn();
+    const { rerender } = renderHook(({ snapshot }) => useAppStatePersistence(snapshot, result), {
+      initialProps: { snapshot: DEFAULT_APP_STATE },
+    });
+    const counted = { ...DEFAULT_APP_STATE, partialZikrCounts: { "e-hm-96": 1 } };
+    rerender({ snapshot: counted });
+    expect(saveAppState).toHaveBeenCalledExactlyOnceWith(counted);
+    const reset = { ...counted, partialZikrCounts: {} };
+    rerender({ snapshot: reset });
+    expect(saveAppState).toHaveBeenLastCalledWith(reset);
+    act(() => vi.advanceTimersByTime(400));
+    act(() => window.dispatchEvent(new Event("pagehide")));
+    expect(saveAppState).toHaveBeenCalledTimes(2);
+    expect(result).toHaveBeenCalledTimes(2);
   });
 
   it("publishes changed progress before another layout effect can begin leaving the page", () => {

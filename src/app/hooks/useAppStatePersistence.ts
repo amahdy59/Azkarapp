@@ -6,12 +6,21 @@ import type { AppStateSnapshot } from "../types";
 export function useAppStatePersistence(snapshot: AppStateSnapshot, onResult: (saved: boolean) => void) {
   const pending = useRef(false);
   const latest = useRef({ snapshot, onResult });
+  const previousPartialCounts = useRef(snapshot.partialZikrCounts);
 
   useLayoutEffect(() => {
     // A reload may start as soon as updated progress is painted. Make its
     // snapshot available to pagehide before passive effects can be deferred.
     latest.current = { snapshot, onResult };
     pending.current = true;
+    // A displayed tally must survive even a reload that skips lifecycle events.
+    // Keep other snapshot changes coalesced, using the same normalized save boundary.
+    if (previousPartialCounts.current !== snapshot.partialZikrCounts) {
+      previousPartialCounts.current = snapshot.partialZikrCounts;
+      pending.current = false;
+      onResult(saveAppState(snapshot));
+      return;
+    }
     const timer = window.setTimeout(() => {
       if (!pending.current) return;
       pending.current = false;

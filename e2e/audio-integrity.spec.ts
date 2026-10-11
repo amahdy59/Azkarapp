@@ -302,6 +302,28 @@ for (const id of ["m-hm-91", "e-hm-91", "misc-ref-3", "m-hm-96", "e-hm-96", "fri
   });
 }
 
+test("a displayed partial tally survives reload without lifecycle flushing @cross-browser", async ({ page }) => {
+  await prepareAudio(page);
+  const id = "e-hm-96";
+  const position = getAzkarForMode("evening", "complete").findIndex((zikr) => zikr.id === id) + 1;
+  await page.goto(`/#/azkar/evening/${position}?mode=complete`);
+  const counter = page.getByTestId("counter-surface");
+  await expect(page.getByTestId("reader-screen")).toHaveAttribute("data-zikr-id", id);
+  await page.evaluate(() => {
+    const block = (event: Event) => event.stopImmediatePropagation();
+    window.addEventListener("pagehide", block, { capture: true });
+    window.addEventListener("beforeunload", block, { capture: true });
+    document.addEventListener("visibilitychange", block, { capture: true });
+  });
+  await counter.click();
+  await expect(counter).toHaveAccessibleName(/1 \/ 100$/);
+  expect(
+    await page.evaluate((id) => JSON.parse(localStorage.getItem("azkarapp.state.v1")!).partialZikrCounts[id], id),
+  ).toBe(1);
+  await page.reload();
+  await expect(counter).toHaveAccessibleName(/1 \/ 100$/);
+});
+
 test("ordinary Reader retains an early Listen tap while audio code loads @cross-browser", async ({ page }) => {
   await prepareAudio(page);
   let release!: () => void;

@@ -42,7 +42,7 @@ flowchart TD
 2. `App.tsx` calls `loadAppState()` once and uses the normalized snapshot to initialize React state.
 3. `normalizeAppState()` validates every persisted field, applies defaults, repairs legacy values, and drops unsafe collection entries.
 4. `appStateSnapshot` recomposes the authoritative serializable state from React values.
-5. `useAppStatePersistence` coalesces rapid snapshot changes over 400 ms and writes through `saveAppState()`. Pending changes flush synchronously on hidden visibility, `pagehide`, `beforeunload` (reload fallback without a confirmation prompt), and unmount; closing/backgrounding the app does not depend on a delayed timer firing. The pending flag deduplicates lifecycle events. Storage failures retain the existing retry/dismiss feedback.
+5. `useAppStatePersistence` writes through `saveAppState()`. Changed partial zikr counts (including reset/completion removal) save synchronously in the layout effect before the updated tally paints, so reload durability does not depend on lifecycle-event delivery. Other snapshot changes coalesce over 400 ms. Pending changes flush synchronously on hidden visibility, `pagehide`, `beforeunload` (reload fallback without a confirmation prompt), and unmount. The pending flag deduplicates lifecycle events. Storage failures retain the existing retry/dismiss feedback.
 6. When authenticated sync returns remote data, `mergeAppStates()` applies deterministic merge rules and the result is normalized again before rendering.
 
 Never render untrusted persisted or remote data directly.
