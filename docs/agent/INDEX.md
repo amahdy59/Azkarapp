@@ -1,5 +1,7 @@
 # AI Improvement System Index
 
+[Measured testing efficiency, 2026-10-11](phases/TESTING_EFFICIENCY_2026_10_11.md) applies the owner's request to stop redundant full-suite waiting and improve developer selection, timing diagnostics and complete CI scheduling. All application tests, coverage, assertions and deployment gates remain.
+
 [Coordinated release, 2026-10-11](phases/COORDINATED_RELEASE_2026_10_11.md) records the owner's renewed instruction to consolidate and push all settled changes from the Reader session. This supersedes the publication hold; final combined quality, browser, CI and production verification remain required.
 
 [Reader Mushaf presentation](phases/READER_MUSHAF_PRESENTATION_2026_10_11.md) records the owner-approved first-use guidance removal, verified QCF snippet lettering, daily offline font bundle and attribution. Publication belongs to the renewed coordinated release authorization above.

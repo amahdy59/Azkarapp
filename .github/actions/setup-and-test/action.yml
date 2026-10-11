@@ -2,6 +2,16 @@ name: "Setup and Test"
 description: "Sets up Node, pnpm, and Playwright, and runs quality gates and tests."
 
 inputs:
+  scope:
+    description: "all, quality, or browser; Quality requires both scoped jobs"
+    required: false
+    default: "all"
+  browser-shard:
+    description: "Optional Playwright shard, for example 1/4"
+    required: false
+  browser-projects:
+    description: "Comma-separated existing browser projects; empty selects all"
+    required: false
   vite-audio-base-url:
     description: "VITE_AUDIO_BASE_URL environment variable"
     required: false
@@ -9,6 +19,16 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Validate gate scope
+      shell: bash
+      env:
+        GATE_SCOPE: ${{ inputs.scope }}
+        BROWSER_SHARD: ${{ inputs.browser-shard }}
+      run: |
+        case "$GATE_SCOPE" in all|quality|browser) ;; *) exit 1 ;; esac
+        if [ -n "$BROWSER_SHARD" ]; then
+          [[ "$BROWSER_SHARD" =~ ^[1-9][0-9]*/[1-9][0-9]*$ ]]
+        fi
     - name: Setup pnpm
       uses: pnpm/action-setup@v6
 
@@ -27,18 +47,21 @@ runs:
       shell: bash
 
     - name: Verify quality gates
+      if: inputs.scope != 'browser'
       run: pnpm check
       shell: bash
       env:
         VITE_AUDIO_BASE_URL: ${{ inputs.vite-audio-base-url }}
 
     - name: Verify every hosted audio recording
+      if: inputs.scope != 'browser'
       run: pnpm validate:audio
       shell: bash
       env:
         VITE_AUDIO_BASE_URL: ${{ inputs.vite-audio-base-url }}
 
     - name: Cache Playwright browsers
+      if: inputs.scope != 'quality'
       uses: actions/cache@v6
       id: playwright-cache
       with:
@@ -46,17 +69,37 @@ runs:
         key: playwright-browsers-v2-${{ runner.os }}-${{ env.ImageOS }}-${{ hashFiles('pnpm-lock.yaml') }}
 
     - name: Install Playwright browsers
-      if: steps.playwright-cache.outputs.cache-hit != 'true'
+      if: inputs.scope != 'quality' && steps.playwright-cache.outputs.cache-hit != 'true'
       run: pnpm exec playwright install --with-deps chromium firefox webkit
       shell: bash
 
     - name: Install Playwright system deps only (cached)
-      if: steps.playwright-cache.outputs.cache-hit == 'true'
+      if: inputs.scope != 'quality' && steps.playwright-cache.outputs.cache-hit == 'true'
       run: pnpm exec playwright install-deps chromium firefox webkit
       shell: bash
 
     - name: Run E2E tests
-      run: pnpm test:e2e
+      if: inputs.scope != 'quality'
+      run: |
+        if [ -n "$BROWSER_SHARD" ]; then
+          project_args=()
+          if [ -n "$BROWSER_PROJECTS" ]; then
+            IFS=, read -r -a projects <<< "$BROWSER_PROJECTS"
+            for project in "${projects[@]}"; do
+              case "$project" in
+                desktop-chromium|mobile-chromium|tablet-chromium|desktop-firefox-smoke|mobile-webkit-smoke) ;;
+                *) exit 1 ;;
+              esac
+              project_args+=(--project="$project")
+            done
+          fi
+          pnpm test:e2e --shard="$BROWSER_SHARD" "${project_args[@]}" --reporter=github,json,blob
+        else
+          pnpm test:e2e
+        fi
       shell: bash
       env:
+        BROWSER_SHARD: ${{ inputs.browser-shard }}
+        BROWSER_PROJECTS: ${{ inputs.browser-projects }}
+        PLAYWRIGHT_JSON_OUTPUT_FILE: output/e2e-results.json
         VITE_AUDIO_BASE_URL: ${{ inputs.vite-audio-base-url }}

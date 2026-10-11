@@ -23,6 +23,8 @@
     "setup:browsers": "playwright install chromium firefox webkit",
     "test": "vitest",
     "test:e2e": "playwright test",
+    "test:e2e:feature": "node scripts/run-feature-browser-tests.mjs",
+    "test:e2e:inventory": "node scripts/verify-browser-shards.mjs --collect",
     "test:e2e:fast": "playwright test e2e/settings-experience.spec.ts e2e/navigation.spec.ts e2e/legal-pages.spec.ts e2e/offline-core.spec.ts --project=desktop-chromium",
     "test:timings": "node scripts/report-browser-timings.mjs",
     "test:e2e:evidence": "playwright test e2e/evidence-capture.spec.ts",

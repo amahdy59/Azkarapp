@@ -35,6 +35,7 @@ test("ranks nested tests across projects and counts failed retry attempts", () =
   expect(summary.retried).toEqual([
     {
       title: "reader.spec.ts > offline > persists progress",
+      file: "reader.spec.ts",
       project: "chromium",
       status: "flaky",
       durationMs: 6000,
@@ -42,6 +43,13 @@ test("ranks nested tests across projects and counts failed retry attempts", () =
     },
   ]);
   expect(summary).toMatchObject({ unexpected: 1, flaky: 1, skipped: 1 });
+  expect(summary.projects).toEqual([
+    { name: "chromium", tests: 2, durationMs: 6000, attempts: 2, retriedTests: 1 },
+    { name: "webkit", tests: 1, durationMs: 5000, attempts: 1, retriedTests: 0 },
+  ]);
+  expect(summary.files).toEqual([
+    { name: "reader.spec.ts", tests: 3, durationMs: 11000, attempts: 3, retriedTests: 1 },
+  ]);
 });
 
 test("handles an empty run and rejects unrelated JSON instead of reporting success", () => {

@@ -20,18 +20,32 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  verify:
+  checks:
     runs-on: ubuntu-latest
-    # Browser system-package installation took 16m25s in run 37848744096;
-    # the previous successful full browser suite took 33m08s. Keep every gate
-    # while allowing runner setup plus the complete suite to finish.
     timeout-minutes: 75
+    outputs:
+      browser_matrix: ${{ steps.partitions.outputs.matrix }}
     steps:
       - uses: actions/checkout@v7
       - name: Setup and Test
         uses: ./.github/actions/setup-and-test
         with:
+          scope: quality
           vite-audio-base-url: ${{ vars.VITE_AUDIO_BASE_URL }}
+
+      - name: Prove every browser test belongs to exactly one shard
+        run: pnpm test:e2e:inventory
+      - name: Preserve the complete required inventory
+        uses: actions/upload-artifact@v7
+        with:
+          name: browser-inventory
+          path: output/browser-inventory/0.json
+          if-no-files-found: error
+          retention-days: 7
+      - name: Publish the verified browser schedule
+        id: partitions
+        run: |
+          node --input-type=module -e "import { BROWSER_PARTITIONS } from './scripts/browser-partitions.mjs'; console.log('matrix=' + JSON.stringify({include:BROWSER_PARTITIONS}));" >> "$GITHUB_OUTPUT"
 
       - name: Verify GitHub Pages build
         run: pnpm build:pages
@@ -41,17 +55,99 @@ jobs:
       - name: Audit production dependencies
         run: pnpm audit:prod
 
+  browser:
+    needs: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    strategy:
+      # Diagnose every shard even when another fails; never drop coverage.
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.checks.outputs.browser_matrix) }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Setup and test complete browser shard
+        uses: ./.github/actions/setup-and-test
+        with:
+          scope: browser
+          browser-shard: ${{ matrix.shard }}
+          browser-projects: ${{ matrix.projects }}
+          vite-audio-base-url: ${{ vars.VITE_AUDIO_BASE_URL }}
+
+      - name: Preserve mergeable browser report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: browser-blob-${{ matrix.name }}
+          path: blob-report/
+          if-no-files-found: error
+          retention-days: 7
+
       - name: Preserve browser failure evidence
         # A successful retry must not discard the failed attempt's trace.
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: browser-failure-evidence
+          name: browser-failure-evidence-${{ matrix.name }}
           path: test-results/
           if-no-files-found: ignore
           retention-days: 7
 
       - name: Preserve browser timings
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: browser-timings-${{ matrix.name }}
+          path: output/e2e-results.json
+          if-no-files-found: ignore
+          retention-days: 7
+
+  verify:
+    # Preserve the release gate's identity. A missing/failed/cancelled shard
+    # must fail this job even if its partial merged report looks successful.
+    if: always() && !cancelled()
+    needs: [checks, browser]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: ".nvmrc"
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - name: Collect all shard reports
+        uses: actions/download-artifact@v8
+        with:
+          pattern: browser-blob-*
+          path: blob-reports
+          merge-multiple: true
+      - name: Collect the complete required inventory
+        uses: actions/download-artifact@v8
+        with:
+          name: browser-inventory
+          path: browser-inventory
+      - name: Require every shard report
+        run: |
+          expected=$(node --input-type=module -e "import { BROWSER_PARTITIONS } from './scripts/browser-partitions.mjs'; console.log(BROWSER_PARTITIONS.length);")
+          test "$(find blob-reports -maxdepth 1 -name '*.zip' | wc -l)" -eq "$expected"
+      - name: Merge complete browser results
+        run: pnpm exec playwright merge-reports --reporter=github,json blob-reports
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_FILE: output/e2e-results.json
+      - name: Report browser timings and failures
+        run: pnpm test:timings
+      - name: Require the merged results to cover every test exactly once
+        run: node scripts/verify-browser-shards.mjs browser-inventory/0.json output/e2e-results.json
+      - name: Require all quality and browser jobs to succeed
+        if: always()
+        env:
+          CHECKS_RESULT: ${{ needs.checks.result }}
+          BROWSER_RESULT: ${{ needs.browser.result }}
+        run: |
+          test "$CHECKS_RESULT" = success
+          test "$BROWSER_RESULT" = success
+      - name: Preserve complete browser timings
         if: always()
         uses: actions/upload-artifact@v7
         with:

@@ -56,6 +56,10 @@ Use `nvm use` before setup when Node does not match `.nvmrc`. Install pnpm 11.19
 
 The frozen install activates the tracked pre-push hook. It verifies the toolchain and dependency graph, reuses an unchanged local quality pass or runs `pnpm check`, then runs core browser smoke tests and the Pages build before Git can push. The full browser suite runs in CI before deployment.
 
+During development, select a feature with `pnpm test:e2e:feature reader` (also `quran`, `audio`, `settings`, `sharing`, `offline`, or `persistence`). Pass ordinary Playwright filters, for example `pnpm test:e2e:feature persistence --grep reload --project=desktop-firefox-smoke`. These commands retain the selected specs' existing browser projects; they are development aids, not release gates. Use the full local suite for broad application changes, not to repeat an already successful exact-commit CI run.
+
+Quality runs non-browser checks once, then executes the complete browser inventory across six balanced Linux jobs: two desktop Chromium shards, two WebKit shards, Firefox, and mobile/tablet Chromium. `pnpm test:e2e:inventory` proves that every current test appears exactly once. `Quality / verify` requires all jobs and all six reports, merges results and preserves failures/timings before Pages can deploy. `pnpm test:timings` reports browser and file totals as well as the slowest individual cases.
+
 Vite prints the local development URL. To exercise browser tests on a new machine, install the repository-pinned browser engines once:
 
 ```bash

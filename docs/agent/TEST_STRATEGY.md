@@ -133,6 +133,11 @@ pnpm audit:prod
 
 ## Essential local testing
 
+- Feature commands: `pnpm test:e2e:feature reader|quran|audio|settings|sharing|offline|persistence`. Choose one name and optionally add `--grep`, `--project`, or `--list`; selection is explicit, not inferred coverage of the whole application.
+- Never start a second full local matrix solely to reconfirm an unchanged commit that already passed the complete CI suite. Diagnose a failed case with its trace and a targeted rerun. The pre-push hook still enforces frozen install, content-bound quality, core browser smoke and Pages build.
+- CI scheduling/reporting changes that do not alter browser scenarios or runtime configuration use exact inventory comparison and real split/merge regressions locally, followed by the complete CI suite. A broad application or browser-runtime change still warrants a full local run.
+- CI partitions come from `scripts/browser-partitions.mjs`. Verify their complete disjoint union with `pnpm test:e2e:inventory`; no test, engine, device, assertion or timeout is removed. `Quality / verify` fails if any dependency fails or a partition report is missing, and preserves a merged report including retry failures.
+
 - Documentation changes: check affected-file formatting and links.
 - Small behavior changes: select relevant unit files and browser specs. Prefer unit tests for calculation, normalization and state edge cases; use browsers for integration and user flows.
 - Layout/accessibility changes: exercise affected widths, Arabic/English, keyboard and relevant axe assertions. Preserve distinct engine and responsive assertions.

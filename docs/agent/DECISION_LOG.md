@@ -4453,3 +4453,7 @@ The owner instructs this release chat: “ensure you coordinate well between all
 ### Coordinated release publication hold — 2026-10-11
 
 The owner subsequently instructs: “continuecontinue without pushing changes yet”. Continue coordination, local repairs and combined verification only. Do not commit, push or deploy until renewed owner authorization. Prepared release notes/history are a local draft and must be refreshed against the actual deployment range when publication resumes.
+
+## Measured testing efficiency — 2026-10-11
+
+The owner requests faster, more efficient testing after the application release has passed exact-commit Quality, Pages and production smoke. Stop redundant full local reconfirmation. Preserve every existing test, assertion, engine/device project, timeout, retry policy, coverage threshold and bundle ceiling. Add explicit feature commands, browser/file timing diagnostics and six balanced Linux CI partitions whose exact disjoint union is checked automatically. Quality / verify still requires all checks, every browser job and every report before Pages deployment. CI-only scheduling/reporting changes use local inventory and real split/merge validation plus the complete CI suite; broad application or browser-runtime changes still warrant the full local suite. The latest owner publication request and autonomous main-release authority supersede the historical hold above. Tooling-only deployment has no reader-visible release note changes. See phases/TESTING_EFFICIENCY_2026_10_11.md.
