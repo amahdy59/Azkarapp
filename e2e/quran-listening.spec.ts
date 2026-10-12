@@ -412,13 +412,13 @@ for (const item of listeningCases.filter((item) => item.id === "ir-baqarah")) {
       await expect.poll(() => paper.evaluate((element) => element.scrollWidth <= element.clientWidth + 1)).toBe(true);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
       await player.screenshot({ path: testInfo.outputPath(`${item.id}-mushaf-listening-narrow.png`) });
+      // Fold while the current layout is stable. Resizing can remount the
+      // responsive player, detaching a Minimize target read from the old layout.
+      await player.getByRole("button", { name: t(language, "audioPlayer.collapse"), exact: true }).click();
+      await expect(player).toHaveAttribute("data-variant", "compact");
       await page.setViewportSize({ width: 1440, height: 1100 });
-      if ((await player.getAttribute("data-variant")) === "expanded")
-        await player.getByRole("button", { name: t(language, "audioPlayer.collapse"), exact: true }).click();
       await page.getByTestId("reader-sidebar-close").click();
-      if ((await player.getAttribute("data-variant")) === "compact") {
-        await player.getByRole("button", { name: t(language, "audioPlayer.expand"), exact: true }).click();
-      }
+      await player.getByRole("button", { name: t(language, "audioPlayer.expand"), exact: true }).click();
       await expect
         .poll(() => player.locator(".audio-listening-page").evaluate((el) => el.clientHeight))
         .toBeGreaterThan(576);
