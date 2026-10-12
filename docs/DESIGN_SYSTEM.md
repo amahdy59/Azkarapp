@@ -1,5 +1,13 @@
 # Azkar design system
 
+## Canonical Surah magnification — 2026-10-13
+
+The owner supersedes height-only enlargement and flowing long-surah listening. Magnification proportionally enlarges width and height; the normal fitted ink size is retained across zoom so the fitter cannot cancel letter growth. No additional leading multiplier is applied. Enlarged printed lines require native horizontal and vertical panning, with explicit reset and page navigation. Existing ordinary snippets continue to flow at the shared Quran size.
+
+Continuous Al-Kahf, As-Sajdah and Al-Mulk listening reuses the canonical fifteen-slot page renderer. Original page/line token placement is retained, including empty slots where adjacent surahs have been excluded; their headings are also excluded. The first listening view reveals the selected surah's canonical heading rather than preceding blank slots. Following reveals the exact active word, while manual browsing pauses following. Do not replace these pages with responsively rewrapped text. Missing page data retains complete reviewed Unicode with retry; its canonical geometry cannot be established until the layout data is available.
+
+After 15 seconds of unresolved screen loading, shared loading feedback offers an explicit Refresh app action and a localized explanation that progress is safe. Loading may still complete naturally; no forced reload, state reset or invented progress indicator is added.
+
 ## Calm Quran text and focused Reader options — 2026-10-12
 
 Owner mobile-gesture follow-up: on coarse-pointer, non-hover devices the shell, scroll regions and dialogs allow native horizontal/vertical panning without browser pinch magnification of the whole interface. This supersedes the earlier mobile whole-page pinch permission. Keep the viewport unrestricted: no user-scalable=no or maximum-scale=1. Settings/Reader text sizing, explicit 100–200% Mushaf magnification, browser-menu zoom and operating-system magnification remain available. Desktop gesture policy is unchanged. Browser accessibility overrides may intentionally permit zoom; do not fight those overrides or claim pinch restriction establishes complete accessibility conformance.

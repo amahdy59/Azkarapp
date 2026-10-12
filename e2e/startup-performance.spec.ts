@@ -31,6 +31,7 @@ test("Home retains a usable viewport without dynamic viewport units @cross-brows
 test("slow application code loading shows localized feedback instead of a blank screen @cross-browser", async ({
   page,
 }) => {
+  await page.clock.install();
   await page.addInitScript(() =>
     localStorage.setItem(
       "azkarapp.state.v1",
@@ -48,8 +49,11 @@ test("slow application code loading shows localized feedback instead of a blank 
   await page.goto("/", { waitUntil: "domcontentloaded" });
   await expect(page.getByRole("status")).toContainText("جارٍ التحميل");
   await expect(page.getByRole("status")).toHaveAttribute("aria-busy", "true");
+  await page.clock.fastForward(15_000);
+  await expect(page.getByRole("status")).toContainText("تقدمك المحلي محفوظ");
+  await expect(page.getByRole("button", { name: "تحديث التطبيق", exact: true })).toBeVisible();
   release();
-  await expect(page.getByRole("status").filter({ hasText: "جارٍ التحميل" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "تحديث التطبيق", exact: true })).toHaveCount(0);
 });
 
 test("Home opens under a six-times slower CPU and constrained connection", async ({ page, browserName }, testInfo) => {

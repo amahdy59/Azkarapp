@@ -6,7 +6,7 @@ import { useQuranPlaybackCue } from "../hooks/useQuranPlaybackCue";
 import { useListeningMushafPage } from "../hooks/useListeningMushafPage";
 import { splitMushafPages } from "../content/mushafPages";
 import { splitQuranTranslation } from "../content/quranTranslation";
-import { MushafExcerptCanvas } from "./MushafPageViewer";
+import { MushafListeningPage } from "./MushafPageViewer";
 import { QuranListeningTranslation } from "./QuranListeningTranslation";
 import { MushafBismillahArt } from "./MushafBismillahArt";
 import { BASMALAH_ARABIC } from "./QuranChrome";
@@ -17,7 +17,7 @@ import { t } from "../i18n";
 const actionClass =
   "inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
 
-/** One page's verified words, without printed-page fitting or adjacent surahs. */
+/** Keep the reference page's slots, filtering only adjacent surah content. */
 function Passage({
   page,
   fallback,
@@ -39,33 +39,46 @@ function Passage({
   const range = props.entry.quranRange!;
   const lines = useMemo(
     () =>
-      result?.lines
-        .map((line) =>
-          line.filter((token) => {
-            const [surah, ayah] = token.verseKey.split(":").map(Number);
-            return surah === range.surah && ayah! >= range.ayahStart && ayah! <= range.ayahEnd;
-          }),
-        )
-        .filter((line) => line.length),
+      result?.lines.map((line) =>
+        line.filter((token) => {
+          const [surah, ayah] = token.verseKey.split(":").map(Number);
+          return surah === range.surah && ayah! >= range.ayahStart && ayah! <= range.ayahEnd;
+        }),
+      ),
     [result, range],
   );
   useEffect(() => {
     if (!follow || !result) return;
-    const viewport = root.current?.closest<HTMLElement>(".audio-expanded-text");
-    if (!viewport) return;
+    const outerViewport = root.current?.closest<HTMLElement>(".audio-expanded-text");
+    if (!outerViewport) return;
     let frame = 0;
     const reveal = () => {
       const pageRange = props.entry.mushafPages?.find((item) => item.page === page);
       const ayah = Number(verseKey?.split(":")[1]);
+      const atOpening = !verseKey && page === props.entry.mushafPages?.[0]?.page;
       // A verse can straddle printed pages; without a word cue use its declared page.
-      if (!word && pageRange && (ayah < pageRange.startAyah || ayah > pageRange.endAyah)) return;
-      const target = word
-        ? root.current?.querySelector<HTMLElement>('[data-playback-word="true"]')
-        : root.current?.querySelector<HTMLElement>("[data-playback-verse]");
+      if (!atOpening && !word && pageRange && (ayah < pageRange.startAyah || ayah > pageRange.endAyah)) return;
+      const target = atOpening
+        ? root.current?.querySelector<HTMLElement>(`[data-mushaf-surah-number="${range.surah}"]`)
+        : word
+          ? root.current?.querySelector<HTMLElement>('[data-playback-word="true"]')
+          : root.current?.querySelector<HTMLElement>("[data-playback-verse]");
       if (!target) return;
+      const region = root.current?.closest<HTMLElement>(".audio-listening-arabic");
+      const viewport = region && region.scrollHeight > region.clientHeight + 1 ? region : outerViewport;
+      if (!atOpening && region && region.scrollWidth > region.clientWidth) {
+        const view = region.getBoundingClientRect();
+        const wordBounds = target.getBoundingClientRect();
+        if (wordBounds.left < view.left || wordBounds.right > view.right)
+          region.scrollBy({ left: wordBounds.left - view.left, behavior: "instant" });
+      }
       const bounds = viewport.getBoundingClientRect();
       const ink = target.getBoundingClientRect();
-      if (ink.top < bounds.top || ink.bottom > bounds.bottom - 56)
+      if (
+        (atOpening && Math.abs(ink.top - bounds.top - 8) > 1) ||
+        ink.top < bounds.top ||
+        ink.bottom > bounds.bottom - 56
+      )
         viewport.scrollTo({ top: Math.max(0, viewport.scrollTop + ink.top - bounds.top - 8), behavior: "instant" });
     };
     const schedule = () => {
@@ -77,30 +90,46 @@ function Passage({
     observer.observe(root.current!);
     const stream = root.current?.closest(".audio-listening-stream");
     if (stream) observer.observe(stream);
-    observer.observe(viewport);
+    observer.observe(outerViewport);
+    const region = root.current?.closest<HTMLElement>(".audio-listening-arabic");
+    if (region) observer.observe(region);
     return () => {
       observer.disconnect();
       cancelAnimationFrame(frame);
     };
-  }, [follow, result, verseKey, word, page, props.entry.mushafPages]);
+  }, [follow, result, verseKey, word, page, props.entry.mushafPages, range.surah]);
   const typeScale = props.textScale === "small" ? 0.9 : props.textScale === "large" ? 1.08 : 1;
   const scale = (typeScale * (props.magnification ?? 100)) / 100;
   return (
     <div ref={root} data-listening-passage={page} className="w-full">
-      {lines?.length ? (
-        <MushafExcerptCanvas
+      {lines?.some((line) => line.length) ? (
+        <MushafListeningPage
           lines={lines}
           pageNumber={page}
           language={props.language}
           useQcfGlyphs={result!.qcf}
           theme={props.theme}
-          textSize={props.textSize}
-          readingScale={scale}
+          textScale={props.textScale}
+          magnification={props.magnification}
+          onlySurah={range.surah}
           highlightedVerseKey={verseKey}
           highlightedWord={word}
         />
       ) : (
         <>
+          {page === props.entry.mushafPages?.[0]?.page && (
+            <>
+              <h2 className="mb-2 text-center text-lg font-bold">
+                {props.language === "ar" ? props.entry.titleArabic : props.entry.titleEnglish}
+              </h2>
+              <div className="mb-2 text-center" dir="rtl" lang="ar">
+                <span aria-hidden="true">
+                  <MushafBismillahArt className="mx-auto h-auto w-44 max-w-full" />
+                </span>
+                <span className="sr-only">{BASMALAH_ARABIC}</span>
+              </div>
+            </>
+          )}
           {error && (
             <div role="status" className="text-center text-sm">
               <p>{t(props.language, "quranListening.pageError")}</p>
@@ -231,17 +260,13 @@ export default function QuranSurahListeningReader(props: QuranListeningReaderPro
           ? preferences
           : null}
       {overlayHost ? createPortal(resume, overlayHost) : resume}
-      <h2 className="mb-2 text-center text-lg font-bold">
-        {language === "ar" ? entry.titleArabic : entry.titleEnglish}
-      </h2>
-      <div className="mb-2 text-center" dir="rtl" lang="ar" data-testid="quran-basmalah">
-        <span aria-hidden="true">
-          <MushafBismillahArt className="mx-auto h-auto w-44 max-w-full" />
-        </span>
-        <span className="sr-only">{BASMALAH_ARABIC}</span>
-      </div>
-      <div className="audio-listening-body">
-        <div className="audio-listening-arabic">
+      <div className="audio-listening-body" data-listening-magnified={(props.magnification ?? 100) > 100}>
+        <div
+          className="audio-listening-arabic"
+          tabIndex={(props.magnification ?? 100) > 100 ? 0 : undefined}
+          role={(props.magnification ?? 100) > 100 ? "region" : undefined}
+          aria-label={(props.magnification ?? 100) > 100 ? t(language, "mushaf.magnification") : undefined}
+        >
           {pages.map((page) => (
             <Passage
               key={page.page}

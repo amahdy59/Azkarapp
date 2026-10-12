@@ -624,7 +624,7 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
 
 /** Which of the fifteen slots carry words, and which carry a heading or the
  *  basmalah. Shared by both pages of a spread. */
-function useLineDetails(lines: MushafWordToken[][], pageNumber: number) {
+function useLineDetails(lines: MushafWordToken[][], pageNumber: number, onlySurah?: number) {
   return useMemo<LineDetail[]>(() => {
     const slots: LineDetail[] = Array.from({ length: MUSHAF_LINES_PER_PAGE }, () => ({ type: "empty" }));
 
@@ -639,6 +639,7 @@ function useLineDetails(lines: MushafWordToken[][], pageNumber: number) {
     // 2. Surah placements from canonical map
     for (const [sStr, pl] of Object.entries(SURAH_PLACEMENTS)) {
       const surahNum = Number(sStr);
+      if (onlySurah !== undefined && surahNum !== onlySurah) continue;
       if (pl.page === pageNumber) {
         const headerIdx = pl.line - 1;
         if (headerIdx >= 0 && headerIdx < MUSHAF_LINES_PER_PAGE && slots[headerIdx]?.type === "empty") {
@@ -658,6 +659,7 @@ function useLineDetails(lines: MushafWordToken[][], pageNumber: number) {
     // 3. If previous page had Surah header at line 15, page starts with Bismillah on line 1 (unless Surah 9)
     for (const [sStr, pl] of Object.entries(SURAH_PLACEMENTS)) {
       const surahNum = Number(sStr);
+      if (onlySurah !== undefined && surahNum !== onlySurah) continue;
       if (pl.page === pageNumber - 1 && pl.line === 15 && surahNum !== 9) {
         if (slots[0]?.type === "empty") {
           slots[0] = { type: "bismillah" };
@@ -666,7 +668,7 @@ function useLineDetails(lines: MushafWordToken[][], pageNumber: number) {
     }
 
     return slots;
-  }, [lines, pageNumber]);
+  }, [lines, pageNumber, onlySurah]);
 }
 
 /**
@@ -835,7 +837,6 @@ function MushafPageCanvas({
   inkStroke,
   spreadSide,
   textScale,
-  magnification = 100,
   showPageIdentity,
   hasTopCenterControl: _hasTopCenterControl = false,
   hasFloatingControls = false,
@@ -847,6 +848,7 @@ function MushafPageCanvas({
   onSurahClick,
   onJuzClick,
   onPageClick,
+  onlySurah,
 }: {
   lines: MushafWordToken[][];
   language: AppLanguage;
@@ -878,6 +880,7 @@ function MushafPageCanvas({
   onSurahClick?: () => void;
   onJuzClick?: () => void;
   onPageClick?: () => void;
+  onlySurah?: number;
 }) {
   const isFloating = isFloatingLayout ?? hasFloatingControls ?? false;
   const showPageFurnitureHead = Boolean(spreadSide) || (!isFloating && showPageIdentity);
@@ -906,10 +909,12 @@ function MushafPageCanvas({
     return found;
   }, [lines, showWordMeanings]);
 
-  const lineDetails = useLineDetails(lines, pageNumber);
+  const lineDetails = useLineDetails(lines, pageNumber, onlySurah);
   const isOpening = OPENING_PAGES.has(pageNumber);
   const canvasRef = useLineFitter(
-    `${pageNumber}:${useQcfGlyphs}:${lines.length}:${magnification}:${textScale}`,
+    // Retain the normal-page fit across enlargement. Restarting the fitter
+    // measures its previously fitted frame and cancels part of the zoom.
+    `${pageNumber}:${useQcfGlyphs}:${lines.length}:${textScale}`,
     resolveInkAllowance(useQcfGlyphs, textScale),
   );
 
@@ -1862,6 +1867,7 @@ export function MushafListeningPage({
   theme = "light",
   textScale = "medium",
   magnification = 100,
+  onlySurah,
 }: {
   lines: MushafWordToken[][];
   language: AppLanguage;
@@ -1870,6 +1876,7 @@ export function MushafListeningPage({
   theme?: MushafPageTheme;
   textScale?: MushafTextScale;
   magnification?: number;
+  onlySurah?: number;
   highlightedVerseKey?: string | null;
   highlightedWord?: { verseKey: string; position: number } | null;
 }) {
@@ -1879,9 +1886,9 @@ export function MushafListeningPage({
         style={
           {
             "--mushaf-magnification": Math.max(1, Math.min(2, magnification / 100)),
-            width: "100%",
-            maxWidth: "100%",
-            height: `max(${(36 * magnification) / 100}rem, calc(100cqh * ${magnification / 100} - 3rem))`,
+            width: `calc(100% * ${magnification / 100})`,
+            maxWidth: "none",
+            height: `calc(max(36rem, calc(100cqh - 3rem)) * ${magnification / 100})`,
           } as CSSProperties
         }
         aria-hidden="true"
@@ -1902,6 +1909,7 @@ export function MushafListeningPage({
           magnification={magnification}
           showPageIdentity={false}
           readOnly
+          onlySurah={onlySurah}
           highlightedVerseKey={highlightedVerseKey}
           highlightedWord={highlightedWord}
         />

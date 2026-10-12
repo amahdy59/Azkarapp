@@ -15,7 +15,7 @@ for (const item of listeningCases.filter((item) => item.id !== "ir-baqarah")) {
           : getAzkarForMode(item.category, "complete").find((zikr) => zikr.id === item.id)!;
       const passages = player.locator("[data-listening-passage]");
       await expect(passages).toHaveCount(zikr.mushafPages!.length);
-      await expect(player.locator('[data-testid="mushaf-excerpt"]')).toHaveCount(zikr.mushafPages!.length);
+      await expect(player.locator("[data-mushaf-page]")).toHaveCount(zikr.mushafPages!.length);
       await expect(player.getByRole("combobox")).toHaveCount(0);
       await expect(player.locator("[data-listening-controls]")).toHaveCount(0);
       await expect(player.locator(".audio-listening-stream")).toBeVisible();
@@ -48,17 +48,13 @@ for (const item of listeningCases.filter((item) => item.id !== "ir-baqarah")) {
         expect(target.height).toBeGreaterThanOrEqual(44);
         expect(target.reachable).toBe(true);
       }
-      const initialSize = await passages
-        .first()
-        .locator('[data-testid="mushaf-excerpt"]')
-        .evaluate((element) => parseFloat(getComputedStyle(element).fontSize));
-      expect(initialSize).toBeCloseTo(23, 1);
-      expect(
-        await passages
-          .first()
-          .locator('[data-testid="mushaf-excerpt"]')
-          .evaluate((element) => parseFloat(getComputedStyle(element).lineHeight)),
-      ).toBeCloseTo(23 * 1.65, 1);
+      const columns = passages.locator("[data-mushaf-column]");
+      for (const column of await columns.all()) await expect(column.locator(":scope > div")).toHaveCount(15);
+      const printedLines = await columns.evaluateAll((elements) =>
+        elements.map((element) => Array.from(element.children, (line) => line.textContent)),
+      );
+      const textLine = passages.first().locator("[data-mushaf-line-content]").first();
+      expect(await textLine.evaluate((element) => parseFloat(getComputedStyle(element).fontSize))).toBeGreaterThan(10);
       await page.screenshot({ path: testInfo.outputPath(`${item.id}-${language}-reading.png`) });
       await viewport.focus();
       const before = await passages.first().boundingBox();
@@ -107,6 +103,46 @@ for (const item of listeningCases.filter((item) => item.id !== "ir-baqarah")) {
       await expect(words).toHaveAttribute("aria-pressed", "true");
       await page.keyboard.press("Escape");
       await expect(options).toBeFocused();
+      await page.evaluate(() => document.fonts.ready);
+      const baseFont = await textLine.evaluate((element) => parseFloat(getComputedStyle(element).fontSize));
+      await options.click();
+      const magnification = page.getByRole("slider", { name: t(language, "mushaf.magnification"), exact: true });
+      await magnification.focus();
+      await page.keyboard.press("Home");
+      await page.keyboard.press("ArrowUp");
+      await page.keyboard.press("ArrowUp");
+      await expect(magnification).toHaveValue("150");
+      await page.keyboard.press("Escape");
+      await expect
+        .poll(() => textLine.evaluate((element) => parseFloat(getComputedStyle(element).fontSize)))
+        .toBeGreaterThan(baseFont * 1.35);
+      expect(
+        await columns.evaluateAll((elements) =>
+          elements.map((element) => Array.from(element.children, (line) => line.textContent)),
+        ),
+      ).toEqual(printedLines);
+      await page.screenshot({ path: testInfo.outputPath(`${item.id}-${language}-150.png`) });
+      await options.click();
+      await page.getByRole("button", { name: t(language, "mushaf.magnificationReset"), exact: true }).click();
+      await page.keyboard.press("Escape");
+      // Reset schedules fitting via ResizeObserver; record word geometry only
+      // after its font size and containment transform have settled.
+      await textLine.evaluate(async (element) => {
+        await document.fonts.ready;
+        await new Promise<void>((resolve) => {
+          let previous = "";
+          let unchanged = 0;
+          const sample = () => {
+            const box = element.getBoundingClientRect();
+            const value = `${getComputedStyle(element).fontSize}:${box.width}:${box.height}`;
+            unchanged = value === previous ? unchanged + 1 : 0;
+            previous = value;
+            if (unchanged >= 12) resolve();
+            else requestAnimationFrame(sample);
+          };
+          requestAnimationFrame(sample);
+        });
+      });
       const annotation = listeningTiming(item);
       const last = annotation.verses.filter((verse) => verse.words?.length).at(-1)!;
       await page.evaluate(
@@ -133,21 +169,35 @@ for (const item of listeningCases.filter((item) => item.id !== "ir-baqarah")) {
           "data-translation-verse",
           last.verseKey,
         );
+      await active.evaluate(async (element) => {
+        await new Promise<void>((resolve) => {
+          let previous = "";
+          let unchanged = 0;
+          const sample = () => {
+            const box = element.getBoundingClientRect();
+            const value = `${box.width}:${box.height}:${getComputedStyle(element).fontSize}`;
+            unchanged = value === previous ? unchanged + 1 : 0;
+            previous = value;
+            if (unchanged >= 12) resolve();
+            else requestAnimationFrame(sample);
+          };
+          requestAnimationFrame(sample);
+        });
+      });
       const geometry = await active.boundingBox();
       await options.click();
       await words.click();
       await expect(active).toHaveCount(0);
       await words.click();
       await expect(active).toHaveCount(1);
-      const restored = await active.boundingBox();
-      expect(restored!.width).toBeCloseTo(geometry!.width, 1);
-      expect(restored!.height).toBeCloseTo(geometry!.height, 1);
+      await expect.poll(async () => (await active.boundingBox())!.width).toBeCloseTo(geometry!.width, 1);
+      await expect.poll(async () => (await active.boundingBox())!.height).toBeCloseTo(geometry!.height, 1);
       await page.keyboard.press("Escape");
       await page.context().setOffline(true);
       await player.getByRole("button", { name: t(language, "audioPlayer.collapse"), exact: true }).click();
       await player.getByRole("button", { name: t(language, "audioPlayer.expand"), exact: true }).click();
       await expect(passages).toHaveCount(zikr.mushafPages!.length);
-      await expect(player.locator('[data-testid="mushaf-excerpt"]')).toHaveCount(zikr.mushafPages!.length);
+      await expect(player.locator("[data-mushaf-page]")).toHaveCount(zikr.mushafPages!.length);
       await page.context().setOffline(false);
       const state = await page.evaluate(() => ({
         state: JSON.parse(localStorage.getItem("azkarapp.state.v1")!),

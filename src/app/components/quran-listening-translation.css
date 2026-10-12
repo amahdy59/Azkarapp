@@ -212,7 +212,19 @@
   outline-offset: -2px;
 }
 
+/* The continuous surah keeps one vertical reading scrollport; enlarged
+   canonical pages share a horizontal pan area inside it. */
+.audio-listening-stream .audio-listening-arabic {
+  overflow-x: auto;
+}
+
 @container (min-width: 56rem) {
+  .audio-listening-stream
+    .audio-listening-body:not([data-listening-magnified="true"]):has(.audio-listening-translation[open])
+    > .audio-listening-arabic {
+    overflow: auto;
+    max-height: max(18rem, calc(100cqh - 3rem));
+  }
   .audio-listening-body:not([data-listening-magnified="true"]):has(.audio-listening-translation[open]) {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);

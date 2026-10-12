@@ -43,11 +43,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           VERIFIED_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
         run: |
-          current_sha=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq '.object.sha')
-          test "$VERIFIED_SHA" = "$current_sha"
-          passed=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow quality.yml --commit "$VERIFIED_SHA" --status completed --json conclusion --jq 'any(.[]; .conclusion == "success")')
-          test "$passed" = "true"
-          echo "sha=$VERIFIED_SHA" >> "$GITHUB_OUTPUT"
+          node scripts/verify-pages-candidate.mjs
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6

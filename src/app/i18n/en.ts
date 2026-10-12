@@ -46,6 +46,7 @@ const en = {
     skip: "Skip",
     comingSoon: "Coming Soon",
     loading: "Loading",
+    loadingSlow: "Loading is taking longer than usual. You can keep waiting or refresh. Your local progress is safe.",
     dismiss: "Dismiss",
     skipToMain: "Skip to main content",
     appName: "wa-zaker",
@@ -1290,7 +1291,8 @@ const en = {
     toolbarSideHint: "The vertical toolbar appears on wide screens only.",
     magnification: "Page magnification",
     magnificationReset: "Fit page",
-    magnificationHint: "Enlarge up to 200%. Scroll vertically to read; use the page controls to turn pages.",
+    magnificationHint:
+      "Enlarge up to 200%. Pan across and down to read the same printed lines; use the page controls to turn pages.",
     textSizeTitle: "Text size",
     textSizeSmall: "Small",
     textSizeMedium: "Medium",

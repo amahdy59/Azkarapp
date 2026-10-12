@@ -277,7 +277,7 @@ describe("continuous surah listening", () => {
     vi.spyOn(timings, "resolveQuranTiming").mockReturnValue(annotation);
   });
   afterEach(() => vi.restoreAllMocks());
-  it("scales flowing text with Quran settings and paints the chosen reading theme", () => {
+  it("retains fifteen canonical slots per passage and enlarges both page dimensions", () => {
     const { container, rerender } = render(
       <ContinuousReader
         entry={entry}
@@ -289,8 +289,11 @@ describe("continuous surah listening", () => {
         preferencesHost={null}
       />,
     );
-    const excerpt = screen.getAllByTestId("mushaf-excerpt")[0]!;
-    expect(excerpt).toHaveStyle({ fontSize: "calc(1.4375rem * 1)", lineHeight: "1.65" });
+    const pages = container.querySelectorAll(".audio-listening-page");
+    expect(pages).toHaveLength(3);
+    for (const page of pages) expect(page.querySelectorAll("[data-mushaf-column] > div")).toHaveLength(15);
+    expect(pages[0]).toHaveStyle({ width: "calc(100% * 1)" });
+    expect(container.querySelector('[data-mushaf-surah-number="68"]')).toBeNull();
     expect(container.querySelector(".audio-listening-stream")).toHaveClass("theme-light", "bg-background");
     rerender(
       <ContinuousReader
@@ -304,7 +307,8 @@ describe("continuous surah listening", () => {
         preferencesHost={null}
       />,
     );
-    expect(excerpt).toHaveStyle({ fontSize: "calc(1.4375rem * 1.62)" });
+    expect(pages[0]).toHaveStyle({ width: "calc(100% * 1.5)" });
+    for (const page of pages) expect(page.querySelectorAll("[data-mushaf-column] > div")).toHaveLength(15);
     expect(container.querySelector(".audio-listening-stream")).toHaveClass("theme-midnight");
   });
   it("keeps every passage mounted without page controls and restores following after keyboard browsing", () => {

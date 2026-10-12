@@ -4531,3 +4531,7 @@ The owner says, ‘I agree to these recommendations. go ahead.’ Implement the 
 ## Progress alignment and menu consistency — 2026-10-12
 
 The owner requests aligned cards and charts, refined look and feel, relevant trends and app-consistent dropdowns. Remove Week/Month nested width constraints and reuse the existing themed select. Preserve optional chart details, independent practice records and existing local publication holds.
+
+## Owner canonical Surah magnification and recovery — 2026-10-13
+
+The owner supplies three screenshots and requires zoom to increase letter size rather than merely spacing, with invariant page line counts for Al-Kahf, As-Sajdah and Al-Mulk. They approve the five follow-up recommendations and request continuation. This supersedes height-only/extra-leading magnification and flowing long-surah listening: proportionally enlarge canonical pages, retain the normal fitter result through zoom, preserve fifteen source slots and word lines, exclude adjacent surah content without compacting slots and pan natively across/down enlarged pages. Ordinary short snippets remain flowing. Reveal the selected surah opening on entry. Missing layout data retains complete reviewed Unicode rather than inventing line breaks. Authorized scoped recovery work adds delayed-loading refresh and bounded successful-Quality discovery, while preserving exact-main enforcement and complete release gates. Real-device and human screen-reader evidence remains explicitly pending.

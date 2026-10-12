@@ -1,17 +1,13 @@
-/* Magnification expands line height so text scales up comfortably.
-   The canvas width remains 100% within the page to ensure text stays
-   perfectly aligned without horizontal scrolling. */
+/* Enlarge the complete printed page proportionally. A fixed width lets the
+   line fitter cancel font growth and turns magnification into extra leading. */
 .mushaf-paper[data-magnified="true"] {
   display: block;
-  overflow-y: auto;
-  touch-action: pan-y pinch-zoom;
+  overflow: auto;
+  touch-action: pan-x pan-y;
 }
 .mushaf-paper[data-magnified="true"] .mushaf-page-canvas {
-  width: 100%;
-  height: calc(
-    max(var(--mushaf-page-height, 36rem), 32rem) * var(--mushaf-magnification) *
-      (1 + (var(--mushaf-magnification) - 1) * 0.04)
-  );
+  width: calc(100% * var(--mushaf-magnification));
+  height: calc(max(var(--mushaf-page-height, 36rem), 32rem) * var(--mushaf-magnification));
   min-height: calc(32rem * var(--mushaf-magnification));
 }
 .mushaf-paper[data-magnified="true"]:focus-visible {
@@ -20,5 +16,5 @@
 }
 
 .reader-swipe-surface:has(.mushaf-paper[data-magnified="true"]) {
-  touch-action: pan-y pinch-zoom;
+  touch-action: pan-x pan-y;
 }

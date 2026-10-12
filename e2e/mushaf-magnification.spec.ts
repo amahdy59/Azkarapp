@@ -70,7 +70,8 @@ for (const scenario of [
         horizontal: el.scrollWidth > el.clientWidth + 1,
         vertical: el.scrollHeight > el.clientHeight,
       }));
-      expect(isMagnifiedScroll.horizontal).toBe(false);
+      expect(isMagnifiedScroll.horizontal).toBe(true);
+      await expect.poll(fontSize).toBeGreaterThan(originalFont * (scale / 100) * 0.9);
       expect(isMagnifiedScroll.vertical).toBe(true);
       expect(await paper.locator("[data-mushaf-column]").allTextContents()).toEqual(originalText);
     }
@@ -88,7 +89,7 @@ for (const scenario of [
         lastReachable: last.bottom <= view.bottom + 1,
       };
     });
-    expect(scroll).toEqual({ horizontal: false, vertical: true, lastReachable: true });
+    expect(scroll).toEqual({ horizontal: true, vertical: true, lastReachable: true });
     await page.screenshot({ path: testInfo.outputPath(`mushaf-200-${scenario.width}.png`) });
     await openSettings();
     await page.getByRole("button", { name: scenario.language === "ar" ? "ملاءمة الصفحة" : "Fit page" }).click();

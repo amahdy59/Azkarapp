@@ -221,18 +221,26 @@ test("Enlarged paired Mushaf stays inside a keyboard-scrollable Arabic pane @cro
         const heading = region.querySelector('[data-mushaf-surah-number="2"]')!.getBoundingClientRect();
         const first = region.querySelector('[data-listening-verse="2:1"]')!.getBoundingClientRect();
         return (
-          heading.left >= view.left - 1 &&
-          heading.right <= view.right + 1 &&
           heading.top >= view.top - 1 &&
           heading.top <= view.top + 16 &&
           first.top >= view.top &&
-          first.bottom <= view.bottom &&
-          first.left >= view.left &&
-          first.right <= view.right
+          first.bottom <= view.bottom
         );
       }),
     )
     .toBe(true);
+  // Proportional enlargement intentionally requires horizontal panning;
+  // fitting the entire canonical line here would cancel the requested zoom.
+  expect(await arabic.evaluate((region) => region.scrollWidth > region.clientWidth)).toBe(true);
+  const originalLines = await arabic.locator("[data-mushaf-column]").allTextContents();
+  const horizontal = await arabic.evaluate((region) => {
+    const start = region.scrollLeft;
+    region.scrollLeft = start === 0 ? region.scrollWidth : 0;
+    if (region.scrollLeft === start) region.scrollLeft = -region.scrollWidth;
+    return region.scrollLeft !== start;
+  });
+  expect(horizontal).toBe(true);
+  expect(await arabic.locator("[data-mushaf-column]").allTextContents()).toEqual(originalLines);
   await arabic.focus();
   await page.keyboard.press("ArrowDown");
   await expect(arabic).toBeFocused();

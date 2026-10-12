@@ -1,5 +1,11 @@
 # Application architecture
 
+## Canonical Surah pages and bounded recovery — 2026-10-13
+
+QuranSurahListeningReader retains all fifteen source line slots from useListeningMushafPage, filtering adjacent surah tokens without shifting selected tokens. MushafListeningPage/MushafPageCanvas render selected-surah headings only. Magnification enlarges both canvas dimensions while the normal fitted measure survives zoom changes; page/font/text-scale changes still invalidate fitting. The complete passage remains mounted, with exact existing timing and semantic text. Missing page data uses complete reviewed Unicode; canonical line identity is available only with page layout data. No reviewed source asset, persistence or audio identity changes.
+
+ScreenFallback schedules one cancellable 15-second timer and then exposes safe user-requested refresh outside its polite status region. Ordinary loading remains unchanged and naturally resolving imports replace the fallback. Existing retryableScreen continues handling rejected chunks without discarding local state. Deployment candidate verification retries delayed visibility of successful Quality at most six times, ten seconds apart, and rejects a superseded main SHA immediately on every attempt. Every release still requires successful exact-commit Quality.
+
 ## Reading responsiveness and diagnostics — 2026-10-12
 
 useListeningMushafPage publishes complete local page words as soon as data resolves. A missing QCF font no longer blocks publication for 1.8 seconds: Unicode is usable immediately, with a matching-font notification/settlement upgrading the same page. Font failure preserves readable words; cancellation prevents a late request from upgrading another page. Font/data caching and exact verse identity checks remain in the existing service boundary.
