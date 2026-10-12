@@ -10,7 +10,7 @@ export const FEATURE_SPECS = {
   quran: ["quran-*.spec.ts", "mushaf-*.spec.ts", "khatmah-reader.spec.ts", "reader-mushaf-lettering.spec.ts"],
   audio: ["audio*.spec.ts", "quran-listening.spec.ts", "player-containment-benefits.spec.ts"],
   settings: ["settings-*.spec.ts", "offline-downloads.spec.ts"],
-  sharing: ["sharing-*.spec.ts", "ayah-image-sharing.spec.ts"],
+  sharing: ["sharing-*.spec.ts", "ayah-*.spec.ts"],
   offline: ["offline-*.spec.ts", "pwa-*.spec.ts", "reader-mushaf-lettering.spec.ts"],
   persistence: ["audio-integrity.spec.ts", "reading-reliability.spec.ts", "offline-core.spec.ts"],
 };

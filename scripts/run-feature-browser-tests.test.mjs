@@ -25,3 +25,13 @@ test("fails on missing, unknown or prototype names instead of silently selecting
     expect(() => featureBrowserArguments(feature)).toThrow("Choose a feature");
   }
 });
+
+test("focused sharing includes both image exports and offline ayah recovery", () => {
+  const filters = featureBrowserArguments("sharing")
+    .slice(1)
+    .map((pattern) => new RegExp(pattern));
+  for (const filename of ["ayah-image-sharing.spec.ts", "ayah-sharing-offline.spec.ts", "sharing-refinement.spec.ts"]) {
+    expect(filters.some((pattern) => pattern.test(`e2e/${filename}`))).toBe(true);
+  }
+  expect(filters.some((pattern) => pattern.test("e2e/settings-experience.spec.ts"))).toBe(false);
+});

@@ -1,6 +1,6 @@
 # Engineering and release checklist
 
-CI browser scheduling uses six balanced Linux jobs with the complete existing inventory. `pnpm test:e2e:inventory` rejects missing, extra or duplicate cases before publishing the matrix. `Quality / verify` requires the quality job, every browser job and every mergeable report; Pages still requires its successful exact-current-main workflow. Feature selection and the local smoke do not replace this full CI gate. Avoid another full local run merely to repeat an unchanged successful CI commit. See `docs/agent/TEST_STRATEGY.md` for focused development and scheduling-only validation.
+CI browser scheduling uses nine Linux jobs with the complete existing inventory; each installs only its required browser engines. `pnpm test:e2e:inventory` rejects missing, extra or duplicate cases before publishing the matrix. `Quality / verify` requires the quality job, every browser job and every mergeable report; Pages still requires its successful exact-current-main workflow. Feature selection and the local smoke do not replace this full CI gate. Avoid another full local run merely to repeat an unchanged successful CI commit. See `docs/agent/TEST_STRATEGY.md` for focused development and scheduling-only validation.
 
 ## Reading reliability follow-up
 

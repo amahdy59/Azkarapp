@@ -1,5 +1,9 @@
 # Decision Log
 
+## Owner request — Faster push verification, 2026-10-12
+
+While publication was finishing, the owner requested faster and more efficient tests on each push. Use measured browser-group costs to improve scheduling and setup, include offline ayah sharing in focused development, preserve the entire inventory and all quality/coverage/accessibility/source/bundle gates, and measure the complete next CI run. No application content or test assertion reduction is authorized or needed.
+
 ## Owner authorization — Combined release, 2026-10-12
 
 The owner now instructs this English sharing chat: “push all changes after completion.” This supersedes the local-only publication holds for the current combined workspace. Complete the card review and integrated source/diff review, update the bilingual release notes/history, pass the required local gates, then commit/push all completed changes to main and monitor exact-commit Quality/Pages and production smoke. No force push, hook bypass, weakened gates, dependency replacement or unrelated content interpretation is authorized.

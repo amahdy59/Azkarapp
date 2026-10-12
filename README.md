@@ -58,7 +58,9 @@ The frozen install activates the tracked pre-push hook. It verifies the toolchai
 
 During development, select a feature with `pnpm test:e2e:feature reader` (also `quran`, `audio`, `settings`, `sharing`, `offline`, or `persistence`). Pass ordinary Playwright filters, for example `pnpm test:e2e:feature persistence --grep reload --project=desktop-firefox-smoke`. These commands retain the selected specs' existing browser projects; they are development aids, not release gates. Use the full local suite for broad application changes, not to repeat an already successful exact-commit CI run.
 
-Quality runs non-browser checks once, then executes the complete browser inventory across six balanced Linux jobs: two desktop Chromium shards, two WebKit shards, Firefox, and mobile/tablet Chromium. `pnpm test:e2e:inventory` proves that every current test appears exactly once. `Quality / verify` requires all jobs and all six reports, merges results and preserves failures/timings before Pages can deploy. `pnpm test:timings` reports browser and file totals as well as the slowest individual cases.
+Quality runs non-browser checks once, then executes the complete browser inventory across nine Linux jobs: three desktop Chromium shards, three WebKit shards, two Firefox shards, and mobile/tablet Chromium. Each job installs only the engines its projects need. `pnpm test:e2e:inventory` proves that every current test appears exactly once. `Quality / verify` requires all jobs and all nine reports, merges results and preserves failures/timings before Pages can deploy. `pnpm test:timings` reports browser and file totals as well as the slowest individual cases.
+
+Finish code, tests and documentation before running `pnpm check`; its unchanged-snapshot pass can then be reused by the push hook for 24 hours. Run affected feature tests during development and let the hook enforce the final local gates once. CI still runs the complete suite fresh for every release.
 
 Vite prints the local development URL. To exercise browser tests on a new machine, install the repository-pinned browser engines once:
 

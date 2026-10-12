@@ -1,5 +1,7 @@
 # AI Improvement System Index
 
+[Push testing efficiency, 2026-10-12](phases/PUSH_TESTING_EFFICIENCY_2026_10_12.md) records the owner's follow-up request for faster pushes: measured nine-group complete CI scheduling, engine-specific setup and reliable focused sharing selection. The application release is already verified; tooling publication must preserve every release gate.
+
 [Combined refinements release, 2026-10-12](phases/COMBINED_REFINEMENTS_RELEASE_2026_10_12.md) records the owner's latest instruction to push all completed workspace changes after verification. This supersedes historical local-only publication holds below; this chat owns combined gates, publication and production evidence.
 
 [Audio file export, 2026-10-11](phases/AUDIO_FILE_EXPORT_2026_10_11.md) adds owner-requested local-only saving of verified downloaded audio to actual device files, without redownloading or removing the app cache. No commit or push is authorized.

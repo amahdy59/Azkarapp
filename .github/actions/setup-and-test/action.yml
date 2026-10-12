@@ -70,13 +70,21 @@ runs:
 
     - name: Install Playwright browsers
       if: inputs.scope != 'quality' && steps.playwright-cache.outputs.cache-hit != 'true'
-      run: pnpm exec playwright install --with-deps chromium firefox webkit
+      run: |
+        read -r -a engines <<< "$(node scripts/browser-engines.mjs "$BROWSER_PROJECTS")"
+        pnpm exec playwright install --with-deps "${engines[@]}"
       shell: bash
+      env:
+        BROWSER_PROJECTS: ${{ inputs.browser-projects }}
 
     - name: Install Playwright system deps only (cached)
       if: inputs.scope != 'quality' && steps.playwright-cache.outputs.cache-hit == 'true'
-      run: pnpm exec playwright install-deps chromium firefox webkit
+      run: |
+        read -r -a engines <<< "$(node scripts/browser-engines.mjs "$BROWSER_PROJECTS")"
+        pnpm exec playwright install-deps "${engines[@]}"
       shell: bash
+      env:
+        BROWSER_PROJECTS: ${{ inputs.browser-projects }}
 
     - name: Run E2E tests
       if: inputs.scope != 'quality'
