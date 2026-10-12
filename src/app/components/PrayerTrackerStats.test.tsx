@@ -16,7 +16,7 @@ describe("PrayerTrackerStats", () => {
       />,
     );
 
-    expect(screen.getByText("Total Obligatory Prayers")).toBeVisible();
+    expect(screen.getByText("Prayer records")).toBeVisible();
     const disclosure = screen.getByText("View each prayer").closest("details");
     expect(disclosure).not.toHaveAttribute("open");
 

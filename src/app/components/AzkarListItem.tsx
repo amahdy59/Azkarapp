@@ -22,6 +22,7 @@ export interface AzkarListItemProps {
   expandedOverride?: boolean;
   onToggleExpand?: () => void;
   ariaLabelOverride?: string;
+  grouped?: boolean;
 }
 
 function useClampedTextOverflow(expanded: boolean, content: string) {
@@ -71,6 +72,7 @@ export function AzkarListItem({
   expandedOverride,
   onToggleExpand,
   ariaLabelOverride,
+  grouped = false,
 }: AzkarListItemProps) {
   const [localExpanded, setLocalExpanded] = useState(false);
   const isControlled = expandedOverride !== undefined;
@@ -151,7 +153,7 @@ export function AzkarListItem({
       id={`zikr-card-${index}`}
       ref={isActive ? activeRef : undefined}
       aria-current={isActive ? "step" : undefined}
-      className={`group relative flex w-full flex-col rounded-2xl border transition-[background-color,border-color,box-shadow,opacity] duration-200 ${
+      className={`group relative flex w-full flex-col ${grouped ? "" : "rounded-2xl border"} transition-[background-color,border-color,box-shadow,opacity] duration-200 ${
         isActive
           ? "border-primary bg-primary/10 shadow-xs"
           : isCardCompleted

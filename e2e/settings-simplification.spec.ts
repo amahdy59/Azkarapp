@@ -48,6 +48,7 @@ for (const scenario of [
     await page.goto("/#/settings/audio");
     await page.getByTestId("settings-sub-downloads").click();
     await expect(page).toHaveURL(/settings\/downloads$/);
+    await expect(page.getByTestId("downloads-scroll")).toBeVisible();
     const downloads = page.getByTestId("downloads-scroll");
     await expect(downloads.locator('[data-testid^="download-category-"]')).toHaveCount(3);
     await expect(
@@ -107,12 +108,18 @@ for (const language of ["ar", "en"] as const) {
     await page.goto("/#/settings/audio");
     await page.getByTestId("settings-sub-downloads").click();
     await expect(page).toHaveURL(/settings\/downloads$/);
+    await expect(page.getByTestId("downloads-scroll")).toBeVisible();
     await page.getByRole("button", { name: t(language, "common.back"), exact: true }).click();
     await expect(page).toHaveURL(/settings\/audio$/);
     await expect(page.getByTestId("settings-sub-downloads")).toBeFocused();
     await page.goto("/#/settings/prayer");
     await page.getByTestId("settings-sub-location").click();
     await expect(page).toHaveURL(/settings\/location$/);
+    // Hash navigation completes before the outgoing animated panel unmounts.
+    // Wait for the destination so Back belongs to Location, not Prayer.
+    await expect(
+      page.getByRole("heading", { name: t(language, "settings.prayerTimesAndLocation"), exact: true }),
+    ).toBeVisible();
     await page.getByRole("button", { name: t(language, "common.back"), exact: true }).click();
     await expect(page).toHaveURL(/settings\/prayer$/);
     await expect(page.getByTestId("settings-sub-location")).toBeFocused();

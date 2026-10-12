@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 
-/** Replace only the reading canvas; the header and app navigation stay usable. */
+/** Expanded listening owns the main canvas, including the session header. */
 export function AudioPlayerSurface({
   dockedInReader,
   onCollapse,
@@ -21,9 +21,10 @@ export function AudioPlayerSurface({
     // Resolve after commit: playback status can replace the Reader's dock in
     // the same render. A document query during render can select its old canvas.
     setHost(
-      dockedInReader
-        ? (anchorRef.current?.closest<HTMLElement>('[data-testid="reader-card"]') ?? null)
-        : document.querySelector<HTMLElement>("#main-content"),
+      document.querySelector<HTMLElement>("#main-content") ??
+        anchorRef.current?.closest<HTMLElement>('[data-testid="reader-screen"]') ??
+        anchorRef.current?.closest<HTMLElement>('[data-testid="reader-card"]') ??
+        null,
     );
   }, [dockedInReader]);
 

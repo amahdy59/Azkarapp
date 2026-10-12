@@ -3909,33 +3909,24 @@ const ROUTINE_ARRANGEMENTS: Record<RoutineCategoryId, ArrangementGroup[]> = {
       groupId: "begin",
       items: [
         // Shared after every obligatory prayer (core)
-        { id: "ap-ref-1", core: true },
-        { id: "ap-ref-2", core: true },
-      ],
-    },
-    {
-      groupId: "quran_protection",
-      items: [
-        { id: "ap-ref-9", core: true }, // Ayat al-Kursi
-        { id: "ap-ref-12a", core: true, ritualGroupId: "three_quls" },
-        { id: "ap-ref-12b", core: true, ritualGroupId: "three_quls" },
-        { id: "ap-ref-12c", core: true, ritualGroupId: "three_quls" },
+        { id: "ap-ref-1", core: true, ritualGroupId: "prayer_opening" },
+        { id: "ap-ref-2", core: true, ritualGroupId: "prayer_opening" },
       ],
     },
     {
       groupId: "renew",
       items: [
-        { id: "ap-ref-3", core: true },
-        { id: "ap-ref-4", core: true },
+        { id: "ap-ref-3", core: true, ritualGroupId: "prayer_tahlil" },
+        { id: "ap-ref-4", core: true, ritualGroupId: "prayer_tahlil" },
       ],
     },
     {
       groupId: "repeat",
       items: [
-        { id: "ap-tasbeeh-subhanallah", core: true, ritualGroupId: "tasbih_fatimah" },
-        { id: "ap-tasbeeh-alhamdulillah", core: true, ritualGroupId: "tasbih_fatimah" },
-        { id: "ap-tasbeeh-allahuakbar", core: true, ritualGroupId: "tasbih_fatimah" },
-        { id: "ap-tasbeeh-tawhid", core: true },
+        { id: "ap-tasbeeh-subhanallah", core: true, ritualGroupId: "prayer_tasbih" },
+        { id: "ap-tasbeeh-alhamdulillah", core: true, ritualGroupId: "prayer_tasbih" },
+        { id: "ap-tasbeeh-allahuakbar", core: true, ritualGroupId: "prayer_tasbih" },
+        { id: "ap-tasbeeh-tawhid", core: true, ritualGroupId: "prayer_tasbih" },
       ],
     },
     {
@@ -3947,6 +3938,15 @@ const ROUTINE_ARRANGEMENTS: Record<RoutineCategoryId, ArrangementGroup[]> = {
         { id: "ap-ref-7", core: false }, // 10× Tawhid after Fajr/Maghrib
         { id: "ap-ref-11", core: false }, // 7× protection after Fajr/Maghrib
         { id: "ap-ref-10", core: false }, // Fajr dua for knowledge/provision
+      ],
+    },
+    {
+      groupId: "quran_protection",
+      items: [
+        { id: "ap-ref-12a", core: true, ritualGroupId: "three_quls" },
+        { id: "ap-ref-12b", core: true, ritualGroupId: "three_quls" },
+        { id: "ap-ref-12c", core: true, ritualGroupId: "three_quls" },
+        { id: "ap-ref-9", core: true }, // Ayat al-Kursi
       ],
     },
   ],

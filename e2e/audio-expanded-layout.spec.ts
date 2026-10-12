@@ -160,7 +160,7 @@ for (const scenario of [
     await expect
       .poll(async () => {
         const a = await player.boundingBox();
-        const b = await canvas.boundingBox();
+        const b = await page.locator("#main-content").boundingBox();
         return a && b
           ? Math.max(
               Math.abs(a.x - b.x),
@@ -323,8 +323,9 @@ for (const scenario of [
       el.scrollTop = 0;
     });
     await page.mouse.move(0, 0);
+    await optionsTrigger.focus();
     await page.screenshot({ path: testInfo.outputPath(`expanded-${scenario.name}.png`) });
-    await optionsTrigger.click();
+    await page.keyboard.press("Enter");
     const voice = page.getByTestId("audio-reciter-select");
     await voice.click();
     await expect(page.getByRole("listbox")).toBeVisible();

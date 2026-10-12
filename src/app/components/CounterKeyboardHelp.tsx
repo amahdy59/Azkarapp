@@ -37,6 +37,8 @@ export function CounterKeyboardHelp({
     onOpenChangeRef.current?.(val);
   }, []);
   const enabled = useCharacterShortcutsEnabled();
+  const focusResizeObserver = useRef<ResizeObserver | null>(null);
+  useEffect(() => () => focusResizeObserver.current?.disconnect(), [isOpen]);
   useEffect(() => {
     if (!enabled) return;
     const onKeyDown = (event: KeyboardEvent) => {
@@ -119,17 +121,24 @@ export function CounterKeyboardHelp({
                 checked={enabled}
                 onFocus={(event) => {
                   const input = event.currentTarget;
-                  // Safari can finish native focus scrolling before enlarged text
-                  // reflows. Keep the focused setting inside its own scrollport.
-                  requestAnimationFrame(() => {
+                  focusResizeObserver.current?.disconnect();
+                  // Native focus scrolling may precede font or sheet reflow.
+                  // Keep the focused setting visible when either size changes.
+                  const reveal = () => {
                     const scrollport = input.parentElement?.parentElement;
-                    if (!scrollport || !input.isConnected) return;
+                    if (!scrollport || !input.isConnected || document.activeElement !== input) return;
                     const control = input.getBoundingClientRect();
                     const visible = scrollport.getBoundingClientRect();
                     if (control.bottom > visible.bottom) scrollport.scrollTop += control.bottom - visible.bottom + 8;
                     else if (control.top < visible.top) scrollport.scrollTop -= visible.top - control.top + 8;
-                  });
+                  };
+                  requestAnimationFrame(reveal);
+                  const observer = new ResizeObserver(reveal);
+                  focusResizeObserver.current = observer;
+                  observer.observe(input.parentElement!);
+                  observer.observe(input.parentElement!.parentElement!);
                 }}
+                onBlur={() => focusResizeObserver.current?.disconnect()}
                 onChange={(event) => setCharacterShortcutsEnabled(event.target.checked)}
                 className="size-5 shrink-0 accent-primary focus-visible:ring-[3px] focus-visible:ring-ring"
               />

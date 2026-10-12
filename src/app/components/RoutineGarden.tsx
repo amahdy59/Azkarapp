@@ -3,13 +3,17 @@ import { CATEGORIES } from "../content/categories";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { type GardenMilestoneId, type GardenSummary, type GrowthEvent } from "../progress";
-import {
-  ProgressDayView,
-  ProgressWeekView,
-  ProgressMonthView,
-  ProgressYearView,
-  type QuranWirdTile,
-} from "./ProgressViews";
+import { ProgressDayView, type QuranWirdTile } from "./ProgressViews";
+import { retryableScreen } from "./RetryableScreen";
+const ProgressWeekView = retryableScreen(() =>
+  import("./ProgressPeriodViews").then((module) => ({ default: module.ProgressWeekView })),
+);
+const ProgressMonthView = retryableScreen(() =>
+  import("./ProgressPeriodViews").then((module) => ({ default: module.ProgressMonthView })),
+);
+const ProgressYearView = retryableScreen(() =>
+  import("./ProgressPeriodViews").then((module) => ({ default: module.ProgressYearView })),
+);
 import { tabPanelProps } from "./Tabs";
 import type { AppLanguage, CategoryId, DailyCollectionCompletion } from "../types";
 import { Zap } from "./icons";
@@ -58,6 +62,9 @@ export function TodayRoutineGarden({
   displayDate = new Date(),
   weeklyGoalDays,
   isQuranDoneForDay,
+  now,
+  progressDayStartHour,
+  onSelectMonth,
 }: {
   summary: GardenSummary;
   language: AppLanguage;
@@ -78,6 +85,9 @@ export function TodayRoutineGarden({
   activeTab?: "day" | "week" | "month" | "year";
   displayDate?: Date;
   weeklyGoalDays?: number;
+  now?: Date;
+  progressDayStartHour?: number;
+  onSelectMonth?: (date: Date) => void;
   isQuranDoneForDay?: (dayKey: string) => boolean;
 }) {
   const totalPalms = summary.lifetimePalms;
@@ -179,6 +189,9 @@ export function TodayRoutineGarden({
 
         {activeTab === "week" && (
           <ProgressWeekView
+            calendarType={calendarType}
+            now={now}
+            progressDayStartHour={progressDayStartHour}
             language={language}
             dailyCompletions={dailyCompletions}
             referenceDate={displayDate}
@@ -190,6 +203,8 @@ export function TodayRoutineGarden({
 
         {activeTab === "month" && (
           <ProgressMonthView
+            now={now}
+            progressDayStartHour={progressDayStartHour}
             language={language}
             referenceDate={displayDate}
             calendarType={calendarType}
@@ -199,6 +214,9 @@ export function TodayRoutineGarden({
 
         {activeTab === "year" && (
           <ProgressYearView
+            now={now}
+            progressDayStartHour={progressDayStartHour}
+            onSelectMonth={onSelectMonth}
             language={language}
             referenceDate={displayDate}
             calendarType={calendarType}

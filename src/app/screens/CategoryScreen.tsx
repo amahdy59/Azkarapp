@@ -117,6 +117,7 @@ export function CategoryScreen({
         z={z}
         index={index}
         isCardCompleted={isCardCompleted}
+        grouped={catId === "after_prayer" && Boolean(z.ritualGroupId)}
         language={language}
         isArabic={isArabic}
         direction={direction}

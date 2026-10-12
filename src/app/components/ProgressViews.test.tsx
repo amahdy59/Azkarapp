@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ProgressDayView, ProgressWeekView, ProgressMonthView, ProgressYearView } from "./ProgressViews";
 import type { GardenSummary } from "../progress";
@@ -42,7 +42,7 @@ const mockCompletions: DailyCollectionCompletion[] = [
 describe("ProgressViews components", () => {
   afterEach(() => vi.useRealTimers());
 
-  it("shows no rate for future heatmaps and formats elapsed rates consistently", () => {
+  it("shows neutral future chart data and formats elapsed rates consistently", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date(2026, 0, 2, 12));
     render(
@@ -52,11 +52,11 @@ describe("ProgressViews components", () => {
         dailyCompletions={[{ dayKey: "2026-01-01", category: "morning", timeZone: "Africa/Cairo" }]}
       />,
     );
-    const january = screen.getByTestId("year-heatmap-0").parentElement!;
-    const february = screen.getByTestId("year-heatmap-1").parentElement!;
-    expect(january).toHaveTextContent("17%");
-    expect(february).toHaveTextContent("—");
-    expect(february).not.toHaveTextContent("0%");
+    fireEvent.click(screen.getByText("View chart data"));
+    const rows = within(screen.getByRole("table")).getAllByRole("row");
+    expect(rows[1]).toHaveTextContent("17%");
+    expect(rows[2]).toHaveTextContent("Upcoming");
+    expect(rows[2]).not.toHaveTextContent("0%");
   });
   it("keeps Progress rows photograph-free and uses ordinary navigation buttons", () => {
     const onSelectCategory = vi.fn();
@@ -152,8 +152,9 @@ describe("ProgressViews components", () => {
     render(<ProgressWeekView language="ar" dailyCompletions={mockCompletions} referenceDate={new Date(2026, 7, 5)} />);
 
     expect(screen.getByText("التزامك هذا الأسبوع")).toBeInTheDocument();
-    expect(screen.getByText("ملخص الأوراد هذا الأسبوع")).toBeInTheDocument();
-    expect(screen.getByText("أكثر الأوراد حفظاً")).toBeInTheDocument();
+    expect(screen.getByRole("table")).toBeInTheDocument();
+    expect(screen.queryByText("ملخص الأوراد هذا الأسبوع")).not.toBeInTheDocument();
+    expect(screen.queryByText("أكثر الأوراد حفظاً")).not.toBeInTheDocument();
     expect(screen.queryByText("أكثر ورد فاتك")).not.toBeInTheDocument();
   });
 
@@ -171,23 +172,49 @@ describe("ProgressViews components", () => {
     expect(screen.getByText("Your seven-day intention")).toBeInTheDocument();
     expect(screen.getByText("2 of 4 active days")).toBeInTheDocument();
     expect(screen.queryByText("Partial")).not.toBeInTheDocument();
-    expect(screen.getAllByText(/of 7/).length).toBeGreaterThan(0);
+    expect(screen.getByRole("table")).toBeInTheDocument();
+    expect(screen.getAllByRole("progressbar")).toHaveLength(1);
   });
 
   it("renders ProgressMonthView with calendar matrix in Arabic", () => {
     render(<ProgressMonthView language="ar" targetYear={2026} targetMonth={7} dailyCompletions={mockCompletions} />);
 
     expect(screen.getByTestId("garden-month-calendar")).toBeInTheDocument();
-    expect(screen.getByText("سجل هذا الشهر")).toBeInTheDocument();
+    expect(screen.getByTestId("month-weekly-chart")).toBeInTheDocument();
+    expect(screen.getByTestId("garden-month-calendar")).not.toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: "التقويم" }));
+    expect(screen.getByTestId("garden-month-calendar")).toBeVisible();
+    expect(screen.queryByTestId("month-weekly-chart")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "الاتجاه" }));
+    expect(screen.getByTestId("month-weekly-chart")).toBeVisible();
   });
 
-  it("renders ProgressYearView with monthly completion rate and heatmaps in Arabic", () => {
+  it("compares routines using elapsed days and ignores future duplicate records", () => {
+    render(
+      <ProgressWeekView
+        language="en"
+        referenceDate={new Date(2026, 9, 12, 12)}
+        now={new Date(2026, 9, 12, 12)}
+        dailyCompletions={[
+          { dayKey: "2026-10-11", category: "morning", timeZone: "Africa/Cairo" },
+          { dayKey: "2026-10-11", category: "morning", timeZone: "Africa/Cairo" },
+          { dayKey: "2026-10-16", category: "morning", timeZone: "Africa/Cairo" },
+        ]}
+      />,
+    );
+    const disclosure = screen.getByText("Compare routines").closest("details")!;
+    expect(disclosure).not.toHaveAttribute("open");
+    fireEvent.click(screen.getByText("Compare routines"));
+    expect(within(disclosure).getByRole("img", { name: "Morning: 1 of 2 days" })).toBeVisible();
+  });
+
+  it("renders ProgressYearView with one trend and twelve selectable months in Arabic", () => {
     render(<ProgressYearView language="ar" targetYear={2026} dailyCompletions={mockCompletions} />);
 
-    expect(screen.getByText("معدل الاكتمال الشهري")).toBeInTheDocument();
-    expect(screen.getByText("نظرة سريعة")).toBeInTheDocument();
-    expect(screen.getByTestId("year-heatmap-0").children).toHaveLength(31);
-    expect(screen.getByTestId("year-heatmap-1").children).toHaveLength(28);
+    expect(screen.getByTestId("year-monthly-chart")).toBeInTheDocument();
+    expect(screen.queryByText("نظرة سريعة")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("year-heatmap-0")).not.toBeInTheDocument();
+    expect(screen.getByRole("combobox")).toHaveAttribute("data-slot", "select-trigger");
   });
 
   it("renders empty progress periods with recorded zero values and neutral guidance", () => {
@@ -195,20 +222,18 @@ describe("ProgressViews components", () => {
       <ProgressWeekView language="en" dailyCompletions={[]} referenceDate={new Date(2026, 7, 5)} />,
     );
 
-    expect(screen.getByText("Completed all three routines on 0 days")).toBeInTheDocument();
-    expect(screen.getByText("No routine activity recorded for this period.")).toBeInTheDocument();
-    expect(screen.getAllByText("0 of 7")).toHaveLength(4);
-
+    expect(screen.getByRole("table")).toBeInTheDocument();
+    expect(screen.getAllByRole("row")).toHaveLength(8);
+    expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
     rerender(<ProgressMonthView language="en" targetYear={2026} targetMonth={7} dailyCompletions={[]} />);
 
-    expect(screen.getByText("This month's record")).toBeInTheDocument();
-    expect(screen.getByText("0 full days recorded this month.")).toBeInTheDocument();
+    expect(screen.getByText(/Your record begins with a completed routine/)).toBeInTheDocument();
     expect(screen.queryByText("Your consistency improved")).not.toBeInTheDocument();
 
     rerender(<ProgressYearView language="en" targetYear={2026} dailyCompletions={[]} />);
 
-    expect(screen.getByText(/Recorded completion of Morning, Evening and Sleep/)).toBeInTheDocument();
-    expect(screen.getByText("Complete a routine to begin your yearly record.")).toBeInTheDocument();
+    expect(screen.getByText(/Morning, evening and sleep azkar/)).toBeInTheDocument();
+    expect(screen.getByText(/Your record begins with a completed routine/)).toBeInTheDocument();
     expect(screen.queryByText(/improved by 12%/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/14367|214 active|32 days|78/)).not.toBeInTheDocument();
   });

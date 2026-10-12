@@ -32,7 +32,7 @@ describe("ProgressScreen", () => {
     // Oasis Stage Card
     expect(screen.getByTestId("oasis-stage-card")).toBeInTheDocument();
     expect(screen.getByTestId("oasis-stage-card")).not.toHaveAttribute("open");
-    expect(screen.getByText("مرحلة الواحة الروحية")).toBeInTheDocument();
+    expect(screen.getByText("الواحة ومحطاتك السابقة")).toBeInTheDocument();
     expect(screen.getByText("تأمل لطيف فيما سجلته، وليس مقياساً للإيمان أو الأجر.")).toBeInTheDocument();
 
     // Prophetic Constancy Hadith Touchstone
@@ -78,7 +78,7 @@ describe("ProgressScreen", () => {
     );
 
     expect(screen.getByTestId("oasis-stage-card")).toBeInTheDocument();
-    expect(screen.getByText("Daily Oasis Stage")).toBeInTheDocument();
+    expect(screen.getByText("Garden and past milestones")).toBeInTheDocument();
     expect(screen.getByText("7-Day Rhythm")).toBeInTheDocument();
     expect(screen.getByTestId("today-garden-card")).toBeInTheDocument();
     expect(screen.getByText("Today's Wird")).toBeInTheDocument();
@@ -112,7 +112,7 @@ describe("ProgressScreen", () => {
     expect(onCycleMosqueHabit).not.toHaveBeenCalled();
   });
 
-  it("switches tabs between Day, Week, Month, and Year", () => {
+  it("switches tabs between Day, Week, Month, and Year", async () => {
     render(
       <ProgressScreen
         dailyCompletions={mockCompletions}
@@ -131,7 +131,8 @@ describe("ProgressScreen", () => {
     expect(weekTab).toHaveAttribute("aria-selected", "true");
     // Oasis stage card is exclusive to Day view
     expect(screen.queryByTestId("oasis-stage-card")).not.toBeInTheDocument();
-    expect(screen.getAllByRole("progressbar")).toHaveLength(3);
+    expect(await screen.findByRole("table")).toBeInTheDocument();
+    expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
 
     // Switch to Month tab
     const monthTab = screen.getByRole("tab", { name: "شهر" });
@@ -169,7 +170,7 @@ describe("ProgressScreen", () => {
     expect(onPrayerResume).toHaveBeenCalledWith("fajr");
   });
 
-  it("shows the configured weekly intention on the Week view", () => {
+  it("shows the configured weekly intention on the Week view", async () => {
     render(
       <ProgressScreen
         dailyCompletions={mockCompletions}
@@ -183,6 +184,6 @@ describe("ProgressScreen", () => {
     );
 
     fireEvent.click(screen.getByRole("tab", { name: "Week" }));
-    expect(screen.getByText("Your seven-day intention")).toBeInTheDocument();
+    expect(await screen.findByText("Your seven-day intention")).toBeInTheDocument();
   });
 });

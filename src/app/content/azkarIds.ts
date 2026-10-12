@@ -80,10 +80,6 @@ export const CATEGORY_ZIKR_IDS: Partial<Record<CategoryId, readonly string[]>> =
   after_prayer: [
     "ap-ref-1",
     "ap-ref-2",
-    "ap-ref-9",
-    "ap-ref-12a",
-    "ap-ref-12b",
-    "ap-ref-12c",
     "ap-ref-3",
     "ap-ref-4",
     "ap-tasbeeh-subhanallah",
@@ -94,6 +90,10 @@ export const CATEGORY_ZIKR_IDS: Partial<Record<CategoryId, readonly string[]>> =
     "ap-ref-8",
     "ap-ref-7",
     "ap-ref-10",
+    "ap-ref-12a",
+    "ap-ref-12b",
+    "ap-ref-12c",
+    "ap-ref-9",
   ],
   in_prayer: [
     "in-prayer-opening-forgiveness",

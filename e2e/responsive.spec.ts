@@ -518,6 +518,44 @@ for (const language of ["ar", "en"] as const) {
     await expect(collections.locator("span.hidden")).toBeVisible();
     await expect(saved.locator("span.hidden")).toBeVisible();
     await expect(tabs).toHaveCSS("padding", "4px");
+
+    // Nested inline-flex labels used to add baseline/descent space around the
+    // group. Measure the actual icon and text boxes, not just the tab container.
+    for (const width of [640, 768, 1280]) {
+      await page.setViewportSize({ width, height: 900 });
+      for (const scale of ["100%", "200%"]) {
+        await page.evaluate(async (scale) => {
+          document.documentElement.style.fontSize = scale;
+          await document.fonts.ready;
+          await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+        }, scale);
+        for (const tab of [collections, saved]) {
+          // Read in one layout frame: responsive shell updates can otherwise
+          // move the button between separate WebKit protocol round trips.
+          const { buttonBox, groupBox, iconBox, textBox } = await tab.evaluate((button) => ({
+            buttonBox: button.getBoundingClientRect().toJSON(),
+            groupBox: button.querySelector(":scope > span > span")!.getBoundingClientRect().toJSON(),
+            iconBox: button.querySelector("svg")!.getBoundingClientRect().toJSON(),
+            textBox: button.querySelector("span.hidden")!.getBoundingClientRect().toJSON(),
+          }));
+          const centreY = buttonBox.y + buttonBox.height / 2;
+          expect(Math.abs(groupBox.y + groupBox.height / 2 - centreY)).toBeLessThan(1);
+          expect(Math.abs(iconBox.y + iconBox.height / 2 - centreY)).toBeLessThan(1);
+          expect(Math.abs(textBox.y + textBox.height / 2 - centreY)).toBeLessThan(1);
+          expect(
+            Math.abs(groupBox.x + groupBox.width / 2 - buttonBox.x - buttonBox.width / 2),
+            JSON.stringify({ width, scale, buttonBox, groupBox, iconBox, textBox }),
+          ).toBeLessThan(1);
+          expect(groupBox.x).toBeGreaterThanOrEqual(buttonBox.x);
+          expect(groupBox.x + groupBox.width).toBeLessThanOrEqual(buttonBox.x + buttonBox.width);
+        }
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      }
+    }
+    await page.evaluate(() => {
+      document.documentElement.style.fontSize = "100%";
+    });
+    await page.screenshot({ path: `output/playwright/library-desktop-alignment-${language}.png` });
   });
 }
 

@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-12",
+  "release": "2026-10-12-2",
   "ar": [
-    "قراءة إنجليزية أكثر ترتيبًا ومساحة للنص، مع اسم السورة والجزء في رأس الصفحة وتبديل واضح للغة على الهاتف.",
-    "مشاركة الآيات بحروف المصحف ونص في الوسط، مع ضبط حجم الخط واحتواء آية الكرسي كاملة في بطاقة واحدة.",
-    "تنزيلات صوتية تحتفظ بالملفات المكتملة عند التعثر، مع تقدم أوضح وإمكانية حفظ التسجيلات المنزلة كملفات على الجهاز.",
-    "إكمال مقطع آل عمران من الآية ١٩٠ إلى ٢٠٠ وثبات النص عند إظهار المعاني، مع أدوات قراءة وتسبيح أكثر اتساقًا."
+    "تابع سجلاتك اليومية والأسبوعية والشهرية والسنوية بوضوح أكبر، مع مخططات اختيارية وتقويم وأدوات اختيار متناسقة.",
+    "استمع إلى الكهف والسجدة والملك بنص متصل وأكبر، مع مساحة قراءة أوسع ووضوح أفضل للصفحات الافتتاحية ومعاني الكلمات.",
+    "استمع مجددًا إلى مقطع آل عمران ١٩٠–٢٠٠، واحفظ جميع التسجيلات المتاحة في ملف ZIP واحد مع الاحتفاظ بنسخها دون اتصال.",
+    "تعلّم أذكار ما بعد الصلاة في مراحل ومجموعات واضحة مع تذكير بالأعداد، واستخدم أزرار المجموعات والمحفوظة بمحاذاة أدق."
   ],
   "en": [
-    "Read English meanings with clearer surah and juz headings, more room for text, and a simple language switch on phones.",
-    "Share centered ayah cards in Mushaf lettering, adjust text size, and keep the complete Ayat al-Kursi on one card.",
-    "Keep completed audio downloads when a transfer fails, see clearer progress, and save downloaded recordings as files on your device.",
-    "Read the complete Al-Imran passage from ayah 190 to 200, keep text steady when showing meanings, and use more consistent reading and counter controls."
+    "Explore clearer daily, weekly, monthly and yearly records with optional charts, a calendar and consistent period controls.",
+    "Listen to Al-Kahf, As-Sajdah and Al-Mulk with larger continuous text and more reading space, plus clearer opening pages and word meanings.",
+    "Listen again to Al-Imran 190–200 and save all available recordings in one ZIP file while keeping your offline copies.",
+    "Learn after-prayer azkar through clear stages and related groups with count reminders, and use better-aligned Collections and Saved controls."
   ]
 }

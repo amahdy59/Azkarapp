@@ -40,6 +40,9 @@ export function AzkarListLayout({
   );
 
   const groupLabel = (groupId: ZikrGroupId) => {
+    if (catId === "after_prayer") {
+      return t(language, `category.afterPrayerGroup.${groupId}`);
+    }
     const keys: Record<ZikrGroupId, string> = {
       begin: "category.groupBegin",
       quran_protection: "category.groupQuranProtection",
@@ -52,6 +55,17 @@ export function AzkarListLayout({
       final: "category.groupFinal",
     };
     return t(language, keys[groupId] || "category.groupBegin");
+  };
+
+  const ritualLabels: Record<RitualGroupId, { title: string; instruction: string }> = {
+    three_quls: {
+      title: "category.ritualThreeQuls",
+      instruction: catId === "before_sleep" ? "category.ritualSleepInstruction" : "category.ritualThreeQulsInstruction",
+    },
+    tasbih_fatimah: { title: "category.ritualTasbih", instruction: "category.ritualTasbihInstruction" },
+    prayer_opening: { title: "category.prayerOpening", instruction: "category.prayerOpeningInstruction" },
+    prayer_tahlil: { title: "category.prayerTahlil", instruction: "category.prayerTahlilInstruction" },
+    prayer_tasbih: { title: "category.prayerTasbih", instruction: "category.prayerTasbihInstruction" },
   };
 
   const ritualChunks = (items: typeof orderedAzkar) =>
@@ -107,6 +121,9 @@ export function AzkarListLayout({
 
   return (
     <div className="mb-6 flex flex-col gap-6">
+      {catId === "after_prayer" && (
+        <p className="text-sm leading-6 text-muted-foreground">{t(language, "category.afterPrayerLearningOrder")}</p>
+      )}
       {groupedAzkar.map((group) => {
         const groupProgress = stepProgress(group.items);
         return (
@@ -132,33 +149,25 @@ export function AzkarListLayout({
                   <div
                     key={chunk.ritualGroupId}
                     className={`rounded-3xl border ${
-                      routineMode === "core"
+                      routineMode === "core" || catId === "after_prayer"
                         ? "border-border/30 bg-card overflow-hidden"
                         : "border-primary/25 bg-primary/5 p-3"
                     }`}
                     data-ritual-group={chunk.ritualGroupId}
                   >
-                    <div className={`mb-3 px-1 ${routineMode === "core" ? "p-3 pb-0" : ""}`}>
+                    <div
+                      className={`mb-3 px-1 ${routineMode === "core" || catId === "after_prayer" ? "p-3 pb-0" : ""}`}
+                    >
                       <h3 className="text-label font-extrabold text-primary">
-                        {t(
-                          language,
-                          chunk.ritualGroupId === "three_quls" ? "category.ritualThreeQuls" : "category.ritualTasbih",
-                        )}
+                        {t(language, ritualLabels[chunk.ritualGroupId].title)}
                       </h3>
                       <p className="mt-1 text-xs font-semibold leading-5 text-muted-foreground">
-                        {t(
-                          language,
-                          chunk.ritualGroupId === "three_quls" && catId === "before_sleep"
-                            ? "category.ritualSleepInstruction"
-                            : chunk.ritualGroupId === "three_quls"
-                              ? "category.ritualThreeQulsInstruction"
-                              : "category.ritualTasbihInstruction",
-                        )}
+                        {t(language, ritualLabels[chunk.ritualGroupId].instruction)}
                       </p>
                     </div>
                     <div
                       className={`flex flex-col ${
-                        routineMode === "core" ? "gap-0 divide-y divide-border/20" : "gap-3"
+                        routineMode === "core" || catId === "after_prayer" ? "gap-0 divide-y divide-border/20" : "gap-3"
                       }`}
                     >
                       {chunk.items.map((item) => renderZikrCard(item, completed.has(item.z.id)))}

@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { QuranWordPopover } from "./QuranWordPopover";
 import { QuranWordMeaningSheet } from "./QuranWordMeaningSheet";
@@ -11,6 +11,32 @@ describe("QuranWordPopover and QuranWordMeaningSheet", () => {
     word: "الْوَسْوَاسِ",
     explanationArabic: "الذي يُلْقِي في النفس حديثًا خفيًا",
   };
+
+  it("consumes Escape before it can leave the surrounding reader", () => {
+    const anchorEl = document.createElement("button");
+    document.body.appendChild(anchorEl);
+    const onClose = vi.fn();
+    const readerShortcut = vi.fn();
+    window.addEventListener("keydown", readerShortcut);
+    const { unmount } = render(
+      <QuranWordPopover
+        meanings={[sampleMeaning]}
+        anchorEl={anchorEl}
+        language="ar"
+        direction="rtl"
+        onClose={onClose}
+      />,
+    );
+    try {
+      fireEvent.keyDown(anchorEl, { key: "Escape" });
+      expect(onClose).toHaveBeenCalledOnce();
+      expect(readerShortcut).not.toHaveBeenCalled();
+    } finally {
+      unmount();
+      window.removeEventListener("keydown", readerShortcut);
+      anchorEl.remove();
+    }
+  });
 
   it("renders word meaning popover without repetitive source attribution", () => {
     const anchorEl = document.createElement("button");

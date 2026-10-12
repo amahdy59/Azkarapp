@@ -108,6 +108,11 @@ describe("MushafPageViewer", () => {
     const word = screen.getByRole("button", { name: "Meaning of ٱلۡقَيُّومُ" });
     expect(word).toHaveClass("underline");
     expect(word).not.toHaveClass("px-0.5", "font-bold");
+    expect(word.style.backgroundColor).toBe("color-mix(in srgb, var(--primary) 10%, transparent)");
+    expect(word.style.color).toBe("color-mix(in srgb, var(--primary) 60%, var(--foreground))");
+    fireEvent.keyDown(word, { key: "Enter" });
+    expect(word).toHaveAttribute("aria-pressed", "true");
+    expect(word).toHaveClass("ring-2");
   });
 
   it("keeps difficult words visually clean when meanings are off", () => {

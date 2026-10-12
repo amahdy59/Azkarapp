@@ -285,6 +285,8 @@ npx wrangler r2 object put azkar-audio/dua/morning-asbahna/muhammad-moataz/v1/mo
 
 Keep the R2 CORS policy aligned with the app origins. At minimum, preserve local development and permit production `GET` and `HEAD` requests with the `Range` header. Run the verification commands in the previous section against a real uploaded object before marking anything `approved`, then download the full public object and compare its byte size and SHA-256 checksum with the reviewed local file.
 
+The production custom origin is `https://wa-zaker.com`; retain `https://amahdy59.github.io` and existing local origins too. Omitting the custom origin returns an otherwise valid HTTP 200 recording without `Access-Control-Allow-Origin`, so browsers cannot download it. The corrected policy is recorded in [r2-cors.json](r2-cors.json). Before reapplying it, inspect the current bucket policy and preserve any newly added origins or rules. Apply with `npx wrangler r2 bucket cors set azkar-audio --file docs/audio/r2-cors.json`, then verify a full GET, HEAD and range request with the actual production `Origin` header. The live policy was repaired on 2026-10-12 without an application deployment.
+
 The current `r2.dev` origin is Cloudflare's rate-limited public development URL. Migrate `VITE_AUDIO_BASE_URL` to an R2 custom domain before traffic requires production-grade caching and rate limits; do not change object keys during that migration.
 
 Note on format: recordings delivered as `.mp4`/`.m4a` are AAC and must be

@@ -705,7 +705,7 @@ export function FloatingAudioPlayer({
           </div>
 
           {/* Metadata stays still while the complete reviewed text scrolls independently. */}
-          <div className="audio-expanded-reading flex min-h-0 flex-col overflow-hidden">
+          <div className="audio-expanded-reading relative flex min-h-0 flex-col overflow-hidden">
             <div className="flex min-h-0 flex-1 flex-col items-center">
               <div className="audio-expanded-meta w-full shrink-0 flex items-center px-3 text-center">
                 {!dockedInReader && !currentEntry.mushafPages?.length && (
@@ -1007,6 +1007,7 @@ export function FloatingAudioPlayer({
                       >
                         <SlidersHorizontal size={18} aria-hidden="true" />
                         <span>{t(language, "audioPlayer.options")}</span>
+                        <ChevronDown size={16} aria-hidden="true" />
                       </button>
                     </Popover.Trigger>
                     <Popover.Portal>

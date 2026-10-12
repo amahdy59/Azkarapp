@@ -60,7 +60,7 @@ async function expectNoHorizontalOverflow(page: Page, context: string) {
  * `scrollHeight > clientHeight` is meaningless here: `line-clamp` renders the
  * heading as a `-webkit-box`, where the two differ even when nothing is cut.
  */
-async function expectUnclippedHeading(heading: Locator, context: string) {
+async function expectUnclippedHeading(heading: Locator, context: string, maxLines = 3) {
   await expect(heading).toBeVisible();
   await expect(async () => {
     const metrics = await heading.evaluate((element) => {
@@ -97,8 +97,8 @@ async function expectUnclippedHeading(heading: Locator, context: string) {
 
     expect(
       metrics.naturalLines,
-      `${context}: "${metrics.text}" needs more than three lines, so it is clipped`,
-    ).toBeLessThanOrEqual(3);
+      `${context}: "${metrics.text}" exceeds the ${maxLines}-line reading limit`,
+    ).toBeLessThanOrEqual(maxLines);
     expect(metrics.renderedLines, `${context}: heading hides part of its text`).toBeGreaterThanOrEqual(
       metrics.naturalLines,
     );
@@ -111,17 +111,24 @@ async function expectSingleLineHeading(heading: Locator, context: string) {
   await expect(heading).toBeVisible();
   const metrics = await heading.evaluate((element) => {
     const style = getComputedStyle(element);
+    const bounds = element.getBoundingClientRect();
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    const text = range.getBoundingClientRect();
     return {
       clientWidth: element.clientWidth,
       scrollWidth: element.scrollWidth,
       height: element.getBoundingClientRect().height,
       lineHeight: Number.parseFloat(style.lineHeight),
       fontSize: Number.parseFloat(style.fontSize),
-      whiteSpace: style.whiteSpace,
+      textWidth: text.width,
+      width: bounds.width,
     };
   });
 
-  expect(metrics.whiteSpace, `${context}: heading can wrap`).toBe("nowrap");
+  // Measure the real unwrapped text. An integer-width wrapping probe can turn
+  // an exactly fitting fractional-width label into two artificial lines.
+  expect(metrics.textWidth, `${context}: heading hides part of its text`).toBeLessThanOrEqual(metrics.width + 1);
   expect(metrics.height, `${context}: heading wrapped to more than one line`).toBeLessThanOrEqual(
     metrics.lineHeight + 1,
   );
@@ -177,13 +184,14 @@ for (const viewport of VIEWPORTS) {
 }
 
 for (const viewport of VIEWPORTS.filter((item) => item.width <= 412)) {
-  test(`mobile headings: ${viewport.name} keeps Progress titles readable on one line`, async ({ page }) => {
+  test(`mobile headings: ${viewport.name} keeps Progress titles readable without clipping`, async ({ page }) => {
     await page.setViewportSize({ width: viewport.width, height: viewport.height });
     await seedAndOpen(page);
     await page.getByTestId("nav-progress").click();
 
     // The page title is the shared header h1, which now wraps rather than
-    // truncates; the card headings below it keep the one-line contract.
+    // truncates. Day/Week stay on one line; the descriptive Month/Year chart
+    // heading may use two complete lines at narrow widths.
     await expectUnclippedHeading(
       page.getByRole("heading", { name: "Progress", exact: true, level: 1 }),
       `${viewport.name} page title`,
@@ -192,15 +200,15 @@ for (const viewport of VIEWPORTS.filter((item) => item.width <= 412)) {
     const tabs = page.getByRole("tab");
     for (let index = 0; index < 4; index += 1) {
       await tabs.nth(index).click();
-      await expectSingleLineHeading(
-        page.getByTestId("progress-primary-heading"),
-        `${viewport.name} Progress tab ${index + 1}`,
-      );
+      const heading = page.getByTestId("progress-primary-heading");
+      const context = `${viewport.name} Progress tab ${index + 1}`;
+      if (index < 2) await expectSingleLineHeading(heading, context);
+      else await expectUnclippedHeading(heading, context, 2);
     }
   });
 }
 
-test("mobile headings: OnePlus Nord 4 keeps Arabic Progress titles readable on one line", async ({ page }) => {
+test("mobile headings: OnePlus Nord 4 keeps Arabic Progress titles readable without clipping", async ({ page }) => {
   await page.setViewportSize({ width: 412, height: 924 });
   await seedAndOpen(page, { language: "ar" });
   await page.getByTestId("nav-progress").click();
@@ -208,10 +216,10 @@ test("mobile headings: OnePlus Nord 4 keeps Arabic Progress titles readable on o
   const tabs = page.getByRole("tab");
   for (let index = 0; index < 4; index += 1) {
     await tabs.nth(index).click();
-    await expectSingleLineHeading(
-      page.getByTestId("progress-primary-heading"),
-      `OnePlus Nord 4 Arabic Progress tab ${index + 1}`,
-    );
+    const heading = page.getByTestId("progress-primary-heading");
+    const context = `OnePlus Nord 4 Arabic Progress tab ${index + 1}`;
+    if (index < 2) await expectSingleLineHeading(heading, context);
+    else await expectUnclippedHeading(heading, context, 2);
   }
 });
 

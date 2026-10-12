@@ -1,12 +1,12 @@
 # Generated audio mapping report
 
-Generated: 2026-10-05T03:58:09.271Z
+Generated: 2026-10-12T06:36:51.191Z
 
 | Metric                    | Count |
 | ------------------------- | ----: |
-| Zikr instances            |   253 |
-| Total canonical zikrs     |   198 |
-| Approved audio mappings   |   195 |
+| Zikr instances            |   254 |
+| Total canonical zikrs     |   199 |
+| Approved audio mappings   |   196 |
 | Pending assets            |     0 |
 | Unmatched zikrs           |    58 |
 | Duplicate asset paths     |     7 |
@@ -106,7 +106,7 @@ Record one file per canonical row, not one file per screen instance. The filenam
 | `zikr:wu-hm-1`                                       | `wu-hm-1`                                 | `wu-hm-1.mp3`                                 | `dua/wu-hm-1/<voice-id>/v1/wu-hm-1.mp3`                                                                 | `wu-hm-1`                                                           |
 | `zikr:wu-hm-2`                                       | `wu-hm-2`                                 | `wu-hm-2.mp3`                                 | `dua/wu-hm-2/<voice-id>/v1/wu-hm-2.mp3`                                                                 | `wu-hm-2`                                                           |
 | `zikr:wu-hm-3`                                       | `wu-hm-3`                                 | `wu-hm-3.mp3`                                 | `dua/wu-hm-3/<voice-id>/v1/wu-hm-3.mp3`                                                                 | `wu-hm-3`                                                           |
-| `zikr:wu-hm-4`                                       | `wu-hm-4`                                 | `wu-hm-4.mp3`                                 | `dua/wu-hm-4/<voice-id>/v1/wu-hm-4.mp3`                                                                 | `wu-hm-4`                                                           |
+| `quran-003-190-200`                                  | `wu-hm-4`                                 | `wu-hm-4.mp3`                                 | `quran/wu-hm-4/<voice-id>/v1/wu-hm-4.mp3`                                                               | `wu-hm-4`                                                           |
 | `zikr:home-hm-15`                                    | `home-hm-15`                              | `home-hm-15.mp3`                              | `dua/home-hm-15/<voice-id>/v1/home-hm-15.mp3`                                                           | `home-hm-15`                                                        |
 | `zikr:home-hm-16`                                    | `home-hm-16`                              | `home-hm-16.mp3`                              | `dua/home-hm-16/<voice-id>/v1/home-hm-16.mp3`                                                           | `home-hm-16`                                                        |
 | `zikr:home-hm-17`                                    | `home-hm-17`                              | `home-hm-17.mp3`                              | `dua/home-hm-17/<voice-id>/v1/home-hm-17.mp3`                                                           | `home-hm-17`                                                        |
@@ -190,6 +190,7 @@ Record one file per canonical row, not one file per screen instance. The filenam
 | `zikr:ir-ref-5`                                      | `ir-ref-5`                                | `ir-ref-5.mp3`                                | `dua/ir-ref-5/<voice-id>/v1/ir-ref-5.mp3`                                                               | `ir-ref-5`                                                          |
 | `zikr:ir-ref-6`                                      | `ir-ref-6`                                | `ir-ref-6.mp3`                                | `dua/ir-ref-6/<voice-id>/v1/ir-ref-6.mp3`                                                               | `ir-ref-6`                                                          |
 | `zikr:ir-ref-7`                                      | `ir-ref-7`                                | `ir-ref-7.mp3`                                | `dua/ir-ref-7/<voice-id>/v1/ir-ref-7.mp3`                                                               | `ir-ref-7`                                                          |
+| `quran-002`                                          | `ir-baqarah`                              | `ir-baqarah.mp3`                              | `quran/ir-baqarah/<voice-id>/v1/ir-baqarah.mp3`                                                         | `ir-baqarah`                                                        |
 | `zikr:sc-ref-1`                                      | `sc-ref-1`                                | `sc-ref-1.mp3`                                | `dua/sc-ref-1/<voice-id>/v1/sc-ref-1.mp3`                                                               | `sc-ref-1`                                                          |
 | `zikr:sc-ref-2`                                      | `sc-ref-2`                                | `sc-ref-2.mp3`                                | `dua/sc-ref-2/<voice-id>/v1/sc-ref-2.mp3`                                                               | `sc-ref-2`                                                          |
 | `zikr:sc-ref-3`                                      | `sc-ref-3`                                | `sc-ref-3.mp3`                                | `dua/sc-ref-3/<voice-id>/v1/sc-ref-3.mp3`                                                               | `sc-ref-3`                                                          |

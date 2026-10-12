@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { createShareArchive, crc32 } from "./shareArchive";
+import { createShareArchive, createFileArchive, crc32 } from "./shareArchive";
 describe("share ZIP", () => {
+  it("cancels during chunked packaging before publishing an archive", async () => {
+    const controller = new AbortController();
+    const file = new File([new Uint8Array(2 * 1024 * 1024)], "large.mp3");
+    const task = createFileArchive([file], "audio.zip", { signal: controller.signal });
+    setTimeout(() => controller.abort(), 0);
+    await expect(task).rejects.toThrow();
+  });
   it("uses the standard CRC32 test vector", () => {
     expect(crc32(new TextEncoder().encode("123456789"))).toBe(0xcbf43926);
   });

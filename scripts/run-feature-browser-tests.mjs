@@ -7,8 +7,26 @@ import { fileURLToPath } from "node:url";
 // an inferred guarantee that unrelated features cannot be affected.
 export const FEATURE_SPECS = {
   reader: ["reader-*.spec.ts", "devotional-footer.spec.ts", "reading-reliability.spec.ts"],
-  quran: ["quran-*.spec.ts", "mushaf-*.spec.ts", "khatmah-reader.spec.ts", "reader-mushaf-lettering.spec.ts"],
-  audio: ["audio*.spec.ts", "quran-listening.spec.ts", "player-containment-benefits.spec.ts"],
+  quran: [
+    "quran-*.spec.ts",
+    "mushaf-*.spec.ts",
+    "khatmah-reader.spec.ts",
+    "reader-mushaf-lettering.spec.ts",
+    "audio-surah-stream.spec.ts",
+  ],
+  audio: [
+    "audio*.spec.ts",
+    "quran-listening.spec.ts",
+    "quran-translation.spec.ts",
+    "player-containment-benefits.spec.ts",
+  ],
+  progress: [
+    "progress-*.spec.ts",
+    "quiet-garden.spec.ts",
+    "settings-progress-clarity.spec.ts",
+    "manual-checklist.spec.ts",
+  ],
+  controls: ["responsive.spec.ts", "narrow-layout.spec.ts", "overlay-geometry.spec.ts", "settings-experience.spec.ts"],
   settings: ["settings-*.spec.ts", "offline-downloads.spec.ts"],
   sharing: ["sharing-*.spec.ts", "ayah-*.spec.ts"],
   offline: ["offline-*.spec.ts", "pwa-*.spec.ts", "reader-mushaf-lettering.spec.ts"],

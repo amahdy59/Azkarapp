@@ -3,6 +3,10 @@ import { getCalendarMonthPeriod, getCalendarYearPeriods, shiftCalendarDate } fro
 import { createDailyCompletionIndex, getMonthDetailedStatsForDates } from "./gardenViews";
 
 describe("calendar periods", () => {
+  it("keeps month-end navigation inside the requested Gregorian month", () => {
+    expect(shiftCalendarDate(new Date(2026, 2, 31, 12), "month", -1, "gregorian")).toEqual(new Date(2026, 1, 28, 12));
+    expect(shiftCalendarDate(new Date(2024, 0, 31, 12), "month", 1, "gregorian")).toEqual(new Date(2024, 1, 29, 12));
+  });
   it("builds a real Umm al-Qura month around the reference date", () => {
     const reference = new Date(2026, 7, 14, 12);
     const period = getCalendarMonthPeriod(reference, "hijri", "en");

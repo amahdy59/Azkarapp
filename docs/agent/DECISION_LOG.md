@@ -1,5 +1,15 @@
 # Decision Log
 
+## Owner-approved efficient release verification — 2026-10-12
+
+The owner reports excessive delay and credit use and asks how to make testing and deployment more efficient. End the redundant broad local browser run, retain its diagnostics, finish focused regressions for concrete integration repairs, and push through all existing local hooks. Complete exact-commit CI remains the full browser release gate and Pages deploys only after it passes. Update AGENTS/README to make this the future default, including broad releases: local affected feature/engine checks plus full non-browser quality, fast smoke and Pages build; one full matrix in CI. Full local runs remain available for explicit requests and failures that targeted reproduction cannot resolve. No test, engine, coverage, source, accessibility, security or bundle requirement is removed from CI. Preserve owner fixes. Keep monitoring concise and do not duplicate successful checks.
+
+## Owner authorization — Preserve and publish all pending fixes, 2026-10-12
+
+The owner instructs this chat to “push all changes to github and improve testing efficienty if need be, ensure you don't delete anything I've fixed.” This supersedes local-only holds for the current 91-file pending workspace. Preserve a hashed backup, review the combined implementation, refresh only the new bilingual release summary/history, record deliberate measured bundle growth without raising any hard ceiling, verify all required local gates and the complete browser inventory, then commit/push to main through the tracked hook. Monitor every exact-commit Quality/Pages job and smoke-test production. Retain the existing measured nine-group CI and exact-content local receipt optimization unless new evidence justifies a further change; no test, assertion, coverage, source or accessibility gate reduction.
+
+The owner's follow-up asks to reduce repeated testing and agent-credit cost per push. Add focused Progress/control development groups and preserve audio/meaning cross-feature coverage. Routine small changes use relevant feature tests and the unchanged pre-push hook once; complete local browser runs remain necessary for broad/cross-cutting work, browser infrastructure changes, uncertain scope and CI diagnosis. Finish tracked code/tests/docs before the final quality pass to preserve exact-content receipt reuse. Keep monitoring concise, retain full CI, and avoid rerunning unchanged successful checks without a new failure or changed input. This combined 91-file release still receives the complete local inventory.
+
 ## Owner request — Faster push verification, 2026-10-12
 
 While publication was finishing, the owner requested faster and more efficient tests on each push. Use measured browser-group costs to improve scheduling and setup, include offline ayah sharing in focused development, preserve the entire inventory and all quality/coverage/accessibility/source/bundle gates, and measure the complete next CI run. No application content or test assertion reduction is authorized or needed.
@@ -4487,3 +4497,31 @@ The owner approves applying the screenshot repair recommendations locally and ex
 ## Reader control consistency — owner request 2026-10-11
 
 Apply locally and do not push. Focus uses the same button appearance as its footer peers. Masbaha and Salawat share normal zikr reader controls/behavior where applicable, retaining their distinct counting targets and actions. Remove benefits beneath As-Sajdah, Al-Mulk and Al-Kahf in both reading choices and immersive Mushaf; retain contextual More/rail access to unchanged reviewed benefits. This explicitly supersedes the earlier footer placement. See phases/READER_CONTROL_CONSISTENCY_2026_10_11.md.
+
+## Audio CORS repair and persistent ZIP export — 2026-10-12
+
+The owner authorizes fixing the failed offline audio downloads and requests a persistent all-audio ZIP export, then explicitly prohibits pushing the improvements. Repair the live azkar-audio CORS policy by adding https://wa-zaker.com while retaining existing origins/methods/headers. Implement the ZIP action locally through existing selected-voice resolution, exact-byte/checksum verification, cache checkpoints and browser save handoff. Include available adhkar/dua and Kahf/Baqarah recordings, preserve individual exports and complete cached files, and refuse incomplete archives. This supersedes the prior single-file-only export scope and standing autonomous publication authority for this work. No commit, push, application deployment or release-note edits. See phases/AUDIO_CORS_AND_ZIP_2026_10_12.md.
+
+## Al-Imran recording scope confirmation — 2026-10-12
+
+The owner reports broken playback and explicitly confirms that the R2 recording matches the current closing Al-Imran text. This resolves the earlier unknown recording scope in the stable-snippet phase. Correct only the asset's incomplete transcript/fingerprint and Quran classification/range, reusing the existing reviewed 3:190–200 passage, then restore its exact assignment. Preserve immutable recording bytes, path, checksum, variant identity, source permissions and all resolver/timing safeguards. No old two-verse word cues are relabelled or extended. Verify hosted integrity and native playback. The owner subsequently explicitly instructs “continue, don't push changes. apply locally.” This repair and all concurrent work remain local: no commit, push, deployment or release-note edits. See phases/IMRAN_AUDIO_RESTORATION_2026_10_12.md.
+
+## After-salat learning order — 2026-10-12
+
+The owner requests a memorable after-salat arrangement and combining related separated entries, applied locally without pushing. Use stable numbered editorial stages and shared presentation groups for forgiveness/peace, tawhid/giving, and the complete 33/33/33 + 1 sequence. Preserve reviewed text, counts, IDs, sources, prayer filters and independent reader/counter/saved records. Explain that the complete arrangement is a learning aid, not a mandated religious order. The poster is a visual reference only. No commit, push, deployment or release-note changes. See phases/AFTER_PRAYER_LEARNING_ORDER_2026_10_12.md.
+
+## Expanded player reading space — owner request 2026-10-12
+
+The owner requests local application of the screenshot refinements: put Audio options and any page identity between Close/Collapse, remove page arrows and visible “Page” wording, omit page view for Tabarak/Al-Mulk, Al-Kahf and As-Sajdah, clarify the options disclosure, keep current-verse recovery from shifting text, increase scrollable Quran type and expand over the session title/progress. Continuous flowing listening for these three surahs supersedes their previous paginated presentation; printed Mushaf reading and reviewed content remain intact. All expanded players share the main-canvas/top-bar anatomy. No commit, push, deployment or release-note change. See phases/EXPANDED_SURAH_READING_SPACE_2026_10_12.md.
+
+## Progress trends approval — 2026-10-12
+
+The owner approves the screenshot/source review and proposed layout with “apply recomendations and create beautiful charts.” Apply one focused Progress phase: bring the Week checkmark matrix forward; replace Month/Year overview duplication with one clear azkar trend; disclose the Month calendar and exact chart data; simplify prayer summaries and group Day reflection. Supersede the old Month/Year presentation contract explicitly while preserving prayer-first ordering, independent Quran, recorded/elapsed-day semantics, selected calendar/day boundaries, offline records and existing religious content. No combined score, new dependency or state migration. Preserve all unrelated concurrent edits and publication holds. See phases/PROGRESS_TRENDS_CLARITY_2026_10_12.md.
+
+## Optional Progress charts approved — 2026-10-12
+
+The owner says, ‘I agree to these recommendations. go ahead.’ Implement the recommended Month heatmap switch and optional Week routine comparison, with one main Month visualization at a time. Preserve the Day continuation rows and Year monthly trend. This supersedes the calendar-disclosure-only presentation from the earlier Progress phase. Existing unrelated local publication holds remain in effect.
+
+## Progress alignment and menu consistency — 2026-10-12
+
+The owner requests aligned cards and charts, refined look and feel, relevant trends and app-consistent dropdowns. Remove Week/Month nested width constraints and reuse the existing themed select. Preserve optional chart details, independent practice records and existing local publication holds.

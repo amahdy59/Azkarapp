@@ -1,10 +1,14 @@
 # Application architecture
 
+## Expanded listening canvas — 2026-10-12
+
+Expanded AudioPlayerSurface portals into #main-content, covering the Reader title/progress as well as its card. Covered siblings are inert and hidden from assistive technology until collapse/stop; app navigation remains outside this boundary. QuranListeningReader routes Al-Kahf, As-Sajdah and Al-Mulk to QuranSurahListeningReader, a continuous passage composed from existing page/font cache hooks and range-filtered canonical words. It reuses MushafExcerptCanvas at 125% of shared flowing Quran type, with existing magnification applied on top. Original printed pages and Quran data are unchanged. Local following/word state, exact timing resolution and native media ownership remain unchanged. Each passage follows only its own exact active word; geometry recovery observes the complete stream. Manual wheel/touch/keyboard browsing pauses following. Recovery portals over the reading pane without changing text geometry. Remaining paginated listening uses a numeric native select instead of page arrows. No dependency, persistence, sync or recording change.
+
 ### Stable Quran word geometry and multipage excerpts (2026-10-11)
 
 Reader Quran passages always use QuranWordText/QuranVerseText. Meaning annotations attach actions and paint to existing word spans rather than fragmenting text into phrase buttons; toggling help does not remount words, change type metrics or insert breaks. Unicode fallback preserves the same word boundaries. Snippets wrap naturally, while full Mushaf pages keep their fifteen-line fitter.
 
-The explicit Al-Imran 3:190–200 range spans pages 75–76. Both pages must be ready before QCF display is selected; each token and end marker uses its own page font. Original semantic text remains the source for copy/accessibility. Pages 75–76 join the daily precache. The existing recording is retained but unassigned because its registered transcript is incomplete; resolver and timing hashes remain strict. Image export uses complete Unicode when one canvas font cannot represent a multipage glyph passage. See docs/agent/phases/QURAN_SNIPPET_GEOMETRY_AND_IMRAN_2026_10_11.md.
+The explicit Al-Imran 3:190–200 range spans pages 75–76. Both pages must be ready before QCF display is selected; each token and end marker uses its own page font. Original semantic text remains the source for copy/accessibility. Pages 75–76 join the daily precache. On 2026-10-12 the owner confirmed that the existing R2 recording matches this complete passage: its incomplete catalog transcript is corrected and its exact assignment restored. Recording bytes/path/checksum and strict resolver/timing checks remain unchanged; old short-transcript cues cannot match the expanded text. Image export uses complete Unicode when one canvas font cannot represent a multipage glyph passage. See docs/agent/phases/QURAN_SNIPPET_GEOMETRY_AND_IMRAN_2026_10_11.md and docs/agent/phases/IMRAN_AUDIO_RESTORATION_2026_10_12.md.
 
 ### Ayah sharing refinement (2026-10-11)
 

@@ -336,6 +336,13 @@ const MushafTextLine = memo(function MushafTextLine({
                 style={{
                   lineHeight: "inherit",
                   verticalAlign: "baseline",
+                  ...(!isOpen && !isSpoken
+                    ? {
+                        color: "color-mix(in srgb, var(--primary) 60%, var(--foreground))",
+                        backgroundColor: "color-mix(in srgb, var(--primary) 10%, transparent)",
+                        borderRadius: "0.15em",
+                      }
+                    : {}),
                   textDecorationColor: "color-mix(in srgb, var(--primary) 60%, transparent)",
                   textDecorationStyle: isOpen || isSpoken ? "solid" : "dotted",
                 }}
@@ -520,11 +527,14 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
       // Mobile Chromium may defer inherited container-unit font updates during
       // a resize. Normalize by the font actually used for these measurements,
       // rather than assuming that the requested fit has already been applied.
-      const canvasStyle = getComputedStyle(canvas);
+      // Opening pages own a narrower size container. Normalize against the
+      // container that actually supplies their font units, not the outer paper.
+      const typeContainer = canvas.querySelector<HTMLElement>(".mushaf-opening") ?? canvas;
+      const canvasStyle = getComputedStyle(typeContainer);
       const contentWidth =
-        canvas.clientWidth - parseFloat(canvasStyle.paddingLeft) - parseFloat(canvasStyle.paddingRight);
+        typeContainer.clientWidth - parseFloat(canvasStyle.paddingLeft) - parseFloat(canvasStyle.paddingRight);
       const contentHeight =
-        canvas.clientHeight - parseFloat(canvasStyle.paddingTop) - parseFloat(canvasStyle.paddingBottom);
+        typeContainer.clientHeight - parseFloat(canvasStyle.paddingTop) - parseFloat(canvasStyle.paddingBottom);
       const naturalFontSize =
         (canvas.dataset.mushafRendering === "qcf-v2"
           ? Math.min(contentWidth * 0.046, contentHeight * 0.046)
@@ -967,7 +977,7 @@ function MushafPageCanvas({
             )}
             <div
               data-mushaf-column=""
-              className="grid h-[54%] min-h-0 w-full self-center my-auto"
+              className="grid h-[58%] min-h-0 w-full self-center my-auto"
               style={{
                 gridTemplateRows: "repeat(8, minmax(0, 1fr))",
                 fontFamily: useQcfGlyphs ? `qcf-v2-page-${pageNumber}, var(--font-mushaf)` : "var(--font-mushaf)",
@@ -1757,6 +1767,8 @@ export function MushafExcerptCanvas({
   highlightedWord,
   textSize = "medium",
   theme = "light",
+  readingScale = 1,
+  highlightedVerseKey,
 }: {
   lines: MushafWordToken[][];
   pageNumber: number;
@@ -1765,6 +1777,8 @@ export function MushafExcerptCanvas({
   highlightedWord?: { verseKey: string; position: number } | null;
   textSize?: TextSizeOption;
   theme?: MushafPageTheme;
+  readingScale?: number;
+  highlightedVerseKey?: string | null;
 }) {
   return (
     <>
@@ -1777,7 +1791,7 @@ export function MushafExcerptCanvas({
         data-mushaf-rendering={useQcfGlyphs ? "qcf-v2" : "unicode-fallback"}
         style={{
           ...QURAN_TEXT_STYLE,
-          fontSize: getQuranReadingSize(textSize),
+          fontSize: `calc(${getQuranReadingSize(textSize)} * ${readingScale})`,
           fontFamily: useQcfGlyphs ? `qcf-v2-page-${pageNumber}` : QURAN_TEXT_STYLE.fontFamily,
         }}
       >
@@ -1795,6 +1809,13 @@ export function MushafExcerptCanvas({
                   )
                 ) : (
                   <span
+                    data-listening-verse={word.verseKey}
+                    data-playback-verse={highlightedVerseKey === word.verseKey ? "" : undefined}
+                    data-playback-word={
+                      highlightedWord?.verseKey === word.verseKey && highlightedWord.position === word.position
+                        ? "true"
+                        : undefined
+                    }
                     data-listening-word={
                       highlightedWord?.verseKey === word.verseKey && highlightedWord.position === word.position
                         ? ""
@@ -1821,7 +1842,12 @@ export function MushafExcerptCanvas({
         ))}
       </div>
       <div className="sr-only">
-        <ScreenReaderVerses lines={lines} language={language} pageNumber={pageNumber} />
+        <ScreenReaderVerses
+          lines={lines}
+          language={language}
+          pageNumber={pageNumber}
+          highlightedVerseKey={highlightedVerseKey}
+        />
       </div>
     </>
   );

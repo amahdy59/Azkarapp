@@ -71,5 +71,23 @@ for (const language of ["en", "ar"] as const) {
     await expect(page.getByText(t(language, "downloads.downloadCancelled"), { exact: true })).toBeVisible();
     await expect(row.getByRole("progressbar")).toHaveCount(0);
     await expect(row).toContainText(t(language, "downloads.notDownloaded"));
+    // The filesystem export remains available after storage protection is granted.
+    const archive = page.getByTestId("audio-archive-export");
+    const zip = archive.getByRole("button", { name: t(language, "downloads.archiveAll"), exact: true });
+    await expect(zip).toBeEnabled();
+    let downloads = 0;
+    page.on("download", () => downloads++);
+    await zip.focus();
+    await page.keyboard.press("Enter");
+    await expect(archive.getByRole("progressbar")).toHaveAttribute("value", "4096");
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+    await page.screenshot({ path: testInfo.outputPath(`audio-zip-progress-${language}.png`), fullPage: true });
+    const cancelZip = archive.getByRole("button", { name: t(language, "downloads.cancelDownload"), exact: true });
+    await cancelZip.focus();
+    await page.keyboard.press("Enter");
+    await expect(zip).toBeEnabled();
+    await expect(zip).toBeFocused();
+    await expect(archive.getByRole("progressbar")).toHaveCount(0);
+    expect(downloads).toBe(0);
   });
 }

@@ -7,6 +7,63 @@
  */
 import { formatNumerals } from "../formatting";
 import type { AppLanguage } from "../types";
+import { getCalendarMonthPeriod, getPeriodRange, type CalendarType } from "../calendarPeriods";
+import { t } from "../i18n";
+
+/** Compact visual hierarchy; the full spoken label describes the actual data
+ * window. Week records use real weekday boundaries, not week-of-month bins. */
+export function getProgressPeriodHeading(
+  date: Date,
+  tab: "day" | "week" | "month" | "year",
+  offset: number,
+  language: AppLanguage,
+  calendar: CalendarType,
+): { primary: string; secondary?: string; accessible: string } {
+  const locale =
+    calendar === "hijri"
+      ? language === "ar"
+        ? "ar-SA-u-ca-islamic-umalqura"
+        : "en-US-u-ca-islamic-umalqura"
+      : language === "ar"
+        ? "ar-EG"
+        : "en-GB";
+  const year = new Intl.DateTimeFormat(locale, {
+    year: "numeric",
+    ...(calendar === "hijri" ? { era: "short" as const } : {}),
+  });
+  if (tab === "day") {
+    const detail = new Intl.DateTimeFormat(locale, { day: "numeric", month: "long", year: "numeric" }).format(date);
+    return {
+      primary:
+        offset === 0
+          ? t(language, "progress.today")
+          : new Intl.DateTimeFormat(locale, { weekday: "long" }).format(date),
+      secondary: detail,
+      accessible: getGardenDateLabel(date, tab, offset, language, calendar),
+    };
+  }
+  if (tab === "week") {
+    const period = getPeriodRange("week", date, language, calendar);
+    const start = new Date(`${period.startKey}T12:00:00`);
+    const end = new Date(`${period.endKey}T12:00:00`);
+    const range = new Intl.DateTimeFormat(locale, { day: "numeric", month: "short" });
+    const full = new Intl.DateTimeFormat(locale, { day: "numeric", month: "long", year: "numeric" });
+    return {
+      primary: range.formatRange(start, end),
+      secondary: year.formatRange(start, end),
+      accessible: full.formatRange(start, end),
+    };
+  }
+  if (tab === "month") {
+    const period = getCalendarMonthPeriod(date, calendar, language);
+    return {
+      primary: period.monthLabel,
+      secondary: year.format(date),
+      accessible: getGardenDateLabel(date, tab, offset, language, calendar),
+    };
+  }
+  return { primary: year.format(date), accessible: getGardenDateLabel(date, tab, offset, language, calendar) };
+}
 
 // ─── Date Label Helper & Parsers ──────────────────────────────────────────────
 

@@ -1,4 +1,3 @@
-import { progressFillStyle } from "./progressFillStyle";
 import { useMemo } from "react";
 import { AppLanguage, PrayerName, PrayerTrackingRecord } from "../types";
 import { getElapsedPeriod } from "../elapsedPeriod";
@@ -7,7 +6,7 @@ import { CalendarType } from "../calendarPeriods";
 import { PRAYER_ORDER } from "./PrayerTrackerCards";
 import { formatNumerals, formatRatio, formatPercentage } from "../formatting";
 import { t } from "../i18n";
-import { Building, Check, ChevronDown, Sparkles, Sun } from "./icons";
+import { ChevronDown } from "./icons";
 
 interface PrayerPeriodCounts {
   fard: number;
@@ -87,228 +86,71 @@ export function PrayerTrackerStats({
     total === 0 ? "—" : formatPercentage(Math.round((count / total) * 100), language);
 
   return (
-    <div className="flex flex-col gap-4 px-4 pb-4 sm:px-6">
-      <p className="text-xs leading-5 text-muted-foreground" data-testid="prayer-coverage-hint">
+    <div className="flex flex-col gap-3 px-4 pb-4 sm:px-5">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <span className="text-sm font-bold text-foreground">{t(language, "progress.prayerRecordingRate")}</span>
+        <bdi className="text-xl font-black text-primary">
+          {activeTab === "year"
+            ? recordingRate(stats.totalFard, stats.maxTotalPrayers)
+            : formatRatio(stats.totalFard, stats.maxTotalPrayers, language)}
+        </bdi>
+      </div>
+      <p className="text-xs leading-relaxed text-muted-foreground" data-testid="prayer-coverage-hint">
         {t(language, "progress.recordingCoverageHint", { days: formatNumerals(daysInPeriod, language) })}
       </p>
-      {/* Overview Totals for the Selected Period */}
-      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
-        <div className="flex flex-col gap-1 rounded-2xl border border-border/60 bg-card p-3 shadow-xs">
-          <div className="flex items-center gap-1.5 text-micro font-bold text-muted-foreground">
-            <Sun className="size-3.5 text-primary" />
-            <span className="truncate">
-              {t(language, activeTab === "year" ? "progress.prayerRecordingRate" : "prayerTracking.prayersSummary")}
-            </span>
-          </div>
-          <div className="text-base font-black text-foreground">
-            {activeTab === "year"
-              ? recordingRate(stats.totalFard, stats.maxTotalPrayers)
-              : formatRatio(stats.totalFard, stats.maxTotalPrayers, language)}
-          </div>
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-            <div
-              className="h-full rounded-full bg-primary progress-fill-transform"
-              style={{
-                ...progressFillStyle(
-                  Math.min(100, Math.round((stats.totalFard / Math.max(1, stats.maxTotalPrayers)) * 100)) / 100,
-                ),
-              }}
-            />
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-1 rounded-2xl border border-border/60 bg-card p-3 shadow-xs">
-          <div className="flex items-center gap-1.5 text-micro font-bold text-muted-foreground">
-            <Building className="size-3.5 text-primary" />
-            <span className="truncate">{t(language, "prayerTracking.mosqueSummary")}</span>
-          </div>
-          <div className="text-base font-black text-foreground">
-            {activeTab === "year"
-              ? recordingRate(stats.totalMosque, stats.maxTotalPrayers)
-              : formatRatio(stats.totalMosque, stats.maxTotalPrayers, language)}
-          </div>
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-            <div
-              className="h-full rounded-full bg-primary progress-fill-transform"
-              style={{
-                ...progressFillStyle(
-                  Math.min(100, Math.round((stats.totalMosque / Math.max(1, stats.maxTotalPrayers)) * 100)) / 100,
-                ),
-              }}
-            />
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-1 rounded-2xl border border-border/60 bg-card p-3 shadow-xs">
-          <div className="flex items-center gap-1.5 text-micro font-bold text-muted-foreground">
-            <Sparkles className="size-3.5 text-secondary" />
-            <span className="truncate">{t(language, "prayerTracking.rawatibSummary")}</span>
-          </div>
-          <div className="text-base font-black text-foreground">
-            {activeTab === "year"
-              ? recordingRate(stats.totalRawatib, stats.daysInPeriod * 4)
-              : formatNumerals(stats.totalRawatib, language)}
-          </div>
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-            <div
-              className="h-full rounded-full bg-secondary progress-fill-transform"
-              style={{
-                ...progressFillStyle(
-                  Math.min(100, Math.round((stats.totalRawatib / Math.max(1, stats.daysInPeriod * 4)) * 100)) / 100,
-                ),
-              }}
-            />
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-1 rounded-2xl border border-border/60 bg-card p-3 shadow-xs">
-          <div className="flex items-center gap-1.5 text-micro font-bold text-muted-foreground">
-            <Check className="size-3.5 text-success" />
-            <span className="truncate">{t(language, "prayerTracking.adhkarSummary")}</span>
-          </div>
-          <div className="text-base font-black text-foreground">
-            {activeTab === "year"
-              ? recordingRate(stats.totalAdhkar, stats.maxTotalPrayers)
-              : formatRatio(stats.totalAdhkar, stats.maxTotalPrayers, language)}
-          </div>
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-            <div
-              className="h-full rounded-full bg-success progress-fill-transform"
-              style={{
-                ...progressFillStyle(
-                  Math.min(100, Math.round((stats.totalAdhkar / Math.max(1, stats.maxTotalPrayers)) * 100)) / 100,
-                ),
-              }}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* The totals answer the common question first. The five-prayer matrix is
-          useful for investigation, but too dense to lead every period view. */}
-      <details className="group overflow-hidden rounded-2xl border border-border/60 bg-card transition-colors">
-        <summary className="flex min-h-11 cursor-pointer select-none items-center justify-between px-3.5 py-3 text-sm font-extrabold text-foreground transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
-          <span>{t(language, "progress.showPrayerBreakdown")}</span>
-          <ChevronDown
-            size={18}
-            className="shrink-0 text-muted-foreground transition-transform duration-standard group-open:rotate-180"
-            aria-hidden="true"
-          />
+      <details className="group border-t border-border">
+        <summary className="flex min-h-11 cursor-pointer items-center justify-between gap-2 py-3 text-sm font-bold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+          {t(language, "progress.showPrayerBreakdown")}
+          <ChevronDown size={18} className="shrink-0 group-open:rotate-180" aria-hidden="true" />
         </summary>
-        <div className="flex flex-col gap-3 border-t border-border/60 p-3">
+        <dl className="divide-y divide-border">
+          {(
+            [
+              ["prayerTracking.mosqueSummary", stats.totalMosque, stats.maxTotalPrayers],
+              ["prayerTracking.rawatibSummary", stats.totalRawatib, stats.daysInPeriod * 4],
+              ["prayerTracking.adhkarSummary", stats.totalAdhkar, stats.maxTotalPrayers],
+            ] as const
+          ).map(([label, count, total]) => (
+            <div key={label} className="flex flex-wrap justify-between gap-2 py-3 text-sm">
+              <dt className="text-muted-foreground">{t(language, label)}</dt>
+              <dd className="font-bold text-foreground">
+                <bdi>{activeTab === "year" ? recordingRate(count, total) : formatRatio(count, total, language)}</bdi>
+              </dd>
+            </div>
+          ))}
+        </dl>
+        <div className="mt-3 divide-y divide-border">
           {PRAYER_ORDER.map((prayer) => {
             const { fard, mosque, rawatib, adhkar } = stats.counts[prayer];
-            const prayerName = t(language, `notifications.${prayer}`);
-            const hasRawatib = prayer !== "asr";
-
             return (
-              <div
-                key={prayer}
-                className="flex flex-col gap-2 rounded-2xl border border-border/50 bg-card p-3.5 shadow-xs"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-extrabold text-subtitle text-foreground">{prayerName}</span>
-                  <span className="text-xs font-bold text-muted-foreground">
-                    {activeTab === "year"
-                      ? recordingRate(fard, stats.daysInPeriod)
-                      : formatRatio(fard, stats.daysInPeriod, language)}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                  {/* Fard */}
-                  <div className="flex flex-col gap-1">
-                    <div className="flex justify-between items-center text-micro font-semibold text-muted-foreground">
-                      <span>{t(language, "prayerTracking.fard")}</span>
-                      <bdi className="font-bold text-foreground">
-                        {activeTab === "year"
-                          ? recordingRate(fard, stats.daysInPeriod)
-                          : formatRatio(fard, stats.daysInPeriod, language)}
-                      </bdi>
+              <section key={prayer} className="py-4">
+                <h3 className="mb-3 text-base font-bold text-foreground">
+                  {t(language, ("notifications." + prayer) as Parameters<typeof t>[1])}
+                </h3>
+                <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  {(
+                    [
+                      ["prayerTracking.fard", fard],
+                      ["prayerTracking.atMosque", mosque],
+                      ["prayerTracking.rawatib", prayer === "asr" ? null : rawatib],
+                      ["prayerTracking.adhkar", adhkar],
+                    ] as const
+                  ).map(([label, count]) => (
+                    <div key={label} className="min-w-0">
+                      <dt className="text-xs leading-relaxed text-muted-foreground">{t(language, label)}</dt>
+                      <dd className="mt-1 text-sm font-bold text-foreground">
+                        <bdi>
+                          {count === null
+                            ? "—"
+                            : activeTab === "year"
+                              ? recordingRate(count, stats.daysInPeriod)
+                              : formatRatio(count, stats.daysInPeriod, language)}
+                        </bdi>
+                      </dd>
                     </div>
-                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                      <div
-                        className="h-full rounded-full bg-primary progress-fill-transform"
-                        style={{
-                          ...progressFillStyle(
-                            Math.min(100, Math.round((fard / Math.max(1, stats.daysInPeriod)) * 100)) / 100,
-                          ),
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Mosque */}
-                  <div className="flex flex-col gap-1">
-                    <div className="flex justify-between items-center text-micro font-semibold text-muted-foreground">
-                      <span>{t(language, "prayerTracking.atMosque")}</span>
-                      <bdi className="font-bold text-foreground">
-                        {activeTab === "year"
-                          ? recordingRate(mosque, stats.daysInPeriod)
-                          : formatRatio(mosque, stats.daysInPeriod, language)}
-                      </bdi>
-                    </div>
-                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                      <div
-                        className="h-full rounded-full bg-primary/80 progress-fill-transform"
-                        style={{
-                          ...progressFillStyle(
-                            Math.min(100, Math.round((mosque / Math.max(1, stats.daysInPeriod)) * 100)) / 100,
-                          ),
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Rawatib (if applicable) */}
-                  <div className="flex flex-col gap-1">
-                    <div className="flex justify-between items-center text-micro font-semibold text-muted-foreground">
-                      <span>{t(language, "prayerTracking.rawatib")}</span>
-                      <bdi className="font-bold text-foreground">
-                        {hasRawatib
-                          ? activeTab === "year"
-                            ? recordingRate(rawatib, stats.daysInPeriod)
-                            : formatRatio(rawatib, stats.daysInPeriod, language)
-                          : "—"}
-                      </bdi>
-                    </div>
-                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                      <div
-                        className="h-full rounded-full bg-secondary progress-fill-transform"
-                        style={{
-                          ...progressFillStyle(
-                            hasRawatib
-                              ? Math.min(100, Math.round((rawatib / Math.max(1, stats.daysInPeriod)) * 100)) / 100
-                              : 0,
-                          ),
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Adhkar */}
-                  <div className="flex flex-col gap-1">
-                    <div className="flex justify-between items-center text-micro font-semibold text-muted-foreground">
-                      <span>{t(language, "prayerTracking.adhkar")}</span>
-                      <bdi className="font-bold text-foreground">
-                        {activeTab === "year"
-                          ? recordingRate(adhkar, stats.daysInPeriod)
-                          : formatRatio(adhkar, stats.daysInPeriod, language)}
-                      </bdi>
-                    </div>
-                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                      <div
-                        className="h-full rounded-full bg-success progress-fill-transform"
-                        style={{
-                          ...progressFillStyle(
-                            Math.min(100, Math.round((adhkar / Math.max(1, stats.daysInPeriod)) * 100)) / 100,
-                          ),
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
+                  ))}
+                </dl>
+              </section>
             );
           })}
         </div>

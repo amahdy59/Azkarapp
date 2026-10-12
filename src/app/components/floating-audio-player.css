@@ -85,7 +85,8 @@ html[data-mushaf-focus="true"] .floating-audio-player {
   container: audio-surface / inline-size;
   position: absolute;
   inset: 0;
-  z-index: 30;
+  /* Above the sticky session header (40), below portalled options (50). */
+  z-index: 45;
   overflow: hidden;
   background: var(--background);
   cursor: auto;
@@ -380,18 +381,6 @@ html[data-mushaf-focus="true"] .floating-audio-player {
   flex-shrink: 0;
 }
 
-@container audio-surface (max-width: 32rem) {
-  .audio-expanded-header[data-has-page-controls="true"] > .audio-expanded-identity {
-    grid-column: 1 / -1;
-    grid-row: 2;
-  }
-
-  .audio-expanded-header[data-has-page-controls="true"] > button:last-child {
-    grid-column: 3;
-    grid-row: 1;
-  }
-}
-
 .audio-expanded-feedback:not(:empty) {
   padding-block: 0.25rem;
 }
@@ -666,4 +655,48 @@ html[data-mushaf-focus="true"] .floating-audio-player {
 }
 .audio-options-close {
   margin-top: 4px;
+}
+
+/* Utilities wrap inside the centre slot at enlarged text sizes. */
+.audio-expanded-identity {
+  gap: 0.25rem;
+}
+.audio-options-trigger {
+  flex-shrink: 1;
+  padding-inline: 8px;
+  gap: 6px;
+}
+.audio-options-trigger > svg {
+  flex-shrink: 0;
+}
+.audio-options-trigger > svg:first-child {
+  display: none;
+}
+.audio-expanded-text {
+  padding-inline: 0.5rem;
+}
+.audio-listening-resume {
+  position: absolute;
+  z-index: 5;
+  inset-inline-end: 0.75rem;
+  bottom: 0.75rem;
+  max-width: calc(100% - 1.5rem);
+  background: var(--card);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+}
+.audio-listening-stream {
+  padding-block-end: 4rem;
+}
+.audio-listening-stream [data-playback-verse] {
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+.audio-listening-stream [data-playback-word="true"] {
+  outline: 1px solid var(--primary);
+  border-radius: 0.15em;
+}
+.audio-expanded-meta:empty {
+  display: none;
 }

@@ -1,4 +1,3 @@
-import { progressFillStyle } from "./progressFillStyle";
 import { useMemo } from "react";
 import { AppLanguage } from "../types";
 import { getElapsedPeriod } from "../elapsedPeriod";
@@ -65,10 +64,7 @@ export function FridayProgressStats({
   }, [startKey, endKey]);
 
   return (
-    <div
-      className="mt-4 w-full overflow-hidden rounded-3xl border border-border bg-card text-foreground shadow-raised"
-      dir={direction}
-    >
+    <div className="w-full overflow-hidden rounded-2xl border border-border bg-card text-foreground" dir={direction}>
       <div className="border-b border-primary/40 bg-gradient-to-b from-muted/45 to-transparent px-4 py-4 text-start sm:px-6">
         <h2 className="text-lg font-black leading-tight text-foreground" dir="auto">
           {t(language, "friday.progressTitle", { count: formatNumerals(stats.fridaysCount, language) })}
@@ -86,19 +82,7 @@ export function FridayProgressStats({
               {formatRatio(stats.practicesDoneCount, stats.practicesTotalCount, language)}
             </bdi>
           </div>
-          <div className="h-2 w-full rounded-full bg-black/5 dark:bg-white/10 overflow-hidden">
-            <div
-              className="h-full bg-primary rounded-full progress-fill-transform"
-              style={{
-                ...progressFillStyle(
-                  Math.min(100, Math.round((stats.practicesDoneCount / Math.max(1, stats.practicesTotalCount)) * 100)) /
-                    100,
-                ),
-              }}
-            />
-          </div>
         </div>
-
         <div className="flex flex-col gap-2">
           <div className="flex justify-between items-center text-sm font-bold">
             <div className="flex items-center gap-2">
@@ -109,18 +93,7 @@ export function FridayProgressStats({
               {formatRatio(stats.kahfOpenedCount, stats.fridaysCount, language)}
             </bdi>
           </div>
-          <div className="h-2 w-full rounded-full bg-black/5 dark:bg-white/10 overflow-hidden">
-            <div
-              className="h-full bg-success rounded-full progress-fill-transform"
-              style={{
-                ...progressFillStyle(
-                  Math.min(100, Math.round((stats.kahfOpenedCount / Math.max(1, stats.fridaysCount)) * 100)) / 100,
-                ),
-              }}
-            />
-          </div>
         </div>
-
         {activeTab !== "year" && (
           <div className="flex flex-col gap-2">
             <div className="flex justify-between items-center text-sm font-bold">

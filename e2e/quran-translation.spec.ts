@@ -86,7 +86,10 @@ test("Main Mushaf follows audio beside readable English and yields to manual bro
 for (const item of listeningCases) {
   test(`Paired translation ${item.id} follows hidden audio and reflows @cross-browser`, async ({ page }, testInfo) => {
     const player = await openListeningPage(page, item, "en");
-    await expect(player.locator(`[data-mushaf-page="${item.first}"]`)).toBeVisible();
+    const continuous = item.id !== "ir-baqarah";
+    const passage = (pageNumber: number) =>
+      player.locator(`[${continuous ? "data-listening-passage" : "data-mushaf-page"}="${pageNumber}"]`);
+    await expect(passage(item.first)).toBeVisible();
     await page.setViewportSize({ width: 1440, height: 1100 });
     await page.getByTestId("reader-sidebar-close").click();
     if ((await player.getAttribute("data-variant")) === "compact") {
@@ -95,7 +98,7 @@ for (const item of listeningCases) {
     const translation = player.getByTestId("quran-page-translation");
     await expect(translation).toHaveAttribute("open", "");
     const layout = await player.evaluate((element) => {
-      const paper = element.querySelector(".audio-listening-page")!.getBoundingClientRect();
+      const paper = element.querySelector(".audio-listening-arabic")!.getBoundingClientRect();
       const translation = element.querySelector(".audio-listening-translation")!.getBoundingClientRect();
       const text = element.querySelector(".audio-listening-translation-text")!.getBoundingClientRect();
       return {
@@ -152,7 +155,8 @@ for (const item of listeningCases) {
       },
       (nextPlayingVerse.words![0]!.startMs + 1) / 1000,
     );
-    await expect(player.locator(`[data-mushaf-page="${item.next}"]`)).toBeVisible();
+    await expect(passage(item.next)).toBeVisible();
+    if (continuous) await expect(passage(item.next).locator('[data-playback-word="true"]')).toHaveCount(1);
     await expect(translation.locator('[aria-current="true"]')).toHaveAttribute(
       "data-translation-verse",
       nextPlayingVerse.verseKey,

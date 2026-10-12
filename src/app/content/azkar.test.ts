@@ -248,6 +248,39 @@ describe("azkar content totals", () => {
     expect(allahuakbar?.repetitionCount).toBe(33);
   });
 
+  it("keeps a stable learning sequence and combines related post-prayer steps without changing their identities or counts", () => {
+    const azkar = getAzkarByCategory("after_prayer");
+    expect(azkar.map(({ id }) => id)).toEqual([
+      "ap-ref-1",
+      "ap-ref-2",
+      "ap-ref-3",
+      "ap-ref-4",
+      "ap-tasbeeh-subhanallah",
+      "ap-tasbeeh-alhamdulillah",
+      "ap-tasbeeh-allahuakbar",
+      "ap-tasbeeh-tawhid",
+      "ap-ref-6",
+      "ap-ref-8",
+      "ap-ref-7",
+      "ap-ref-10",
+      "ap-ref-12a",
+      "ap-ref-12b",
+      "ap-ref-12c",
+      "ap-ref-9",
+    ]);
+    for (const [group, counts] of [
+      ["prayer_opening", [3, 1]],
+      ["prayer_tahlil", [1, 1]],
+      ["prayer_tasbih", [33, 33, 33, 1]],
+    ] as const) {
+      expect(
+        azkar.filter(({ ritualGroupId }) => ritualGroupId === group).map(({ repetitionCount }) => repetitionCount),
+      ).toEqual(counts);
+    }
+    expect(getRoutineStepCount("after_prayer", "core")).toBe(6);
+    expect(getRoutineStepCount("after_prayer", "complete", "dhuhr")).toBe(7);
+  });
+
   it("builds five source-aware after-prayer flows without leaking timed additions", () => {
     const fajr = getAzkarForPrayer("fajr", "complete");
     const dhuhr = getAzkarForPrayer("dhuhr", "complete");

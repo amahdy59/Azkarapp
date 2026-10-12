@@ -12,13 +12,11 @@ import { formatNumerals } from "../formatting";
 import { splitMushafPages } from "../content/mushafPages";
 import { splitQuranTranslation } from "../content/quranTranslation";
 import { QuranListeningTranslation } from "./QuranListeningTranslation";
-import { Check, ChevronLeft, ChevronRight } from "./icons";
+import { Check } from "./icons";
+import QuranSurahListeningReader from "./QuranSurahListeningReader";
 
 const buttonClass =
   "inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-lg px-3 text-sm hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-50";
-
-const navButtonClass =
-  "inline-flex size-11 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40 transition-colors";
 
 function revealListeningTarget(root: HTMLElement | null, target: HTMLElement | null) {
   const enlarged = target?.closest<HTMLElement>(
@@ -38,7 +36,7 @@ function revealListeningTarget(root: HTMLElement | null, target: HTMLElement | n
   }
 }
 
-export default function QuranListeningReader({
+export function PagedQuranListeningReader({
   entry,
   segment,
   currentTime,
@@ -241,41 +239,18 @@ export default function QuranListeningReader({
       className="audio-listening-navigation mx-auto flex w-fit max-w-full items-center justify-center bg-background"
       dir={language === "ar" ? "rtl" : "ltr"}
     >
-      <button
-        type="button"
-        className={navButtonClass}
-        aria-label={t(language, "quranListening.previousPage")}
-        title={t(language, "quranListening.previousPage")}
-        disabled={index <= 0}
-        onClick={() => browse(index - 1)}
-      >
-        {language === "ar" ? (
-          <ChevronRight size={16} aria-hidden="true" />
-        ) : (
-          <ChevronLeft size={16} aria-hidden="true" />
-        )}
-      </button>
-      <span
-        className="text-xs font-bold px-1 tabular-nums text-foreground"
-        role="status"
+      <select
         aria-label={t(language, "mushaf.pageRegion", { page: formatNumerals(page.page, language) })}
+        className={buttonClass + " bg-background font-bold tabular-nums"}
+        value={index}
+        onChange={(event) => browse(Number(event.target.value))}
       >
-        {t(language, "quranListening.page", { page: formatNumerals(page.page, language) })}
-      </span>
-      <button
-        type="button"
-        className={navButtonClass}
-        aria-label={t(language, "quranListening.nextPage")}
-        title={t(language, "quranListening.nextPage")}
-        disabled={index >= pages.length - 1}
-        onClick={() => browse(index + 1)}
-      >
-        {language === "ar" ? (
-          <ChevronLeft size={16} aria-hidden="true" />
-        ) : (
-          <ChevronRight size={16} aria-hidden="true" />
-        )}
-      </button>
+        {pages.map((item, pageIndex) => (
+          <option key={item.page} value={pageIndex}>
+            {formatNumerals(item.page, language)}
+          </option>
+        ))}
+      </select>
     </div>
   );
   const preferences = (
@@ -311,6 +286,20 @@ export default function QuranListeningReader({
       )}
     </div>
   );
+  const resume =
+    language === "ar" && timing && !follow && !error ? (
+      <button
+        type="button"
+        className={`${buttonClass} audio-listening-resume mx-auto flex`}
+        onClick={() => {
+          setFollow(true);
+          root.current?.closest<HTMLElement>(".audio-expanded-text")?.focus({ preventScroll: true });
+        }}
+      >
+        {t(language, "quranListening.returnToVerse")}
+      </button>
+    ) : null;
+  const overlayHost = root.current?.closest(".audio-expanded-reading");
   return (
     <section ref={root} className="w-full" aria-label={t(language, "quranListening.reader")}>
       {controlsHost ? createPortal(controls, controlsHost) : controls}
@@ -319,18 +308,7 @@ export default function QuranListeningReader({
         : preferencesHost === undefined
           ? preferences
           : null}
-      {language === "ar" && timing && !follow && !error && (
-        <button
-          type="button"
-          className={`${buttonClass} audio-listening-resume mx-auto flex`}
-          onClick={() => {
-            setFollow(true);
-            root.current?.closest<HTMLElement>(".audio-expanded-text")?.focus({ preventScroll: true });
-          }}
-        >
-          {t(language, "quranListening.returnToVerse")}
-        </button>
-      )}
+      {overlayHost ? createPortal(resume, overlayHost) : resume}
       <div className="audio-listening-body min-w-0" data-listening-magnified={magnification > 100}>
         <div
           className="audio-listening-arabic min-w-0"
@@ -394,5 +372,14 @@ export default function QuranListeningReader({
         )}
       </div>
     </section>
+  );
+}
+
+export type QuranListeningReaderProps = Parameters<typeof PagedQuranListeningReader>[0];
+export default function QuranListeningReader(props: QuranListeningReaderProps) {
+  return [18, 32, 67].includes(props.entry.quranRange?.surah ?? 0) ? (
+    <QuranSurahListeningReader {...props} />
+  ) : (
+    <PagedQuranListeningReader {...props} />
   );
 }

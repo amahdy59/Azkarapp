@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Zikr } from "../types";
 import { DEFAULT_AUDIO_PREFERENCES } from "./audioPreferences";
+import { prepareAudioArchive } from "./audioArchive";
 import {
   downloadAudioForZikrs,
   getAudioDownloadStatus,
@@ -82,6 +83,52 @@ beforeEach(() => {
 });
 afterEach(() => {
   vi.unstubAllGlobals();
+});
+
+describe("complete audio archives", () => {
+  it("reuses verified files, downloads only missing audio and retains exact bytes in a deduplicated ZIP", async () => {
+    files.set(fixtures.urls[0]!, response());
+    const archive = await prepareAudioArchive([...zikrs, zikrs[0]!], DEFAULT_AUDIO_PREFERENCES);
+    expect(fetchMock).toHaveBeenCalledOnce();
+    expect(fetchMock).toHaveBeenCalledWith(fixtures.urls[1], expect.anything());
+    expect(files.size).toBe(2);
+    expect(archive.name).toBe("wa-zaker-audio.zip");
+    const bytes = new Uint8Array(await archive.arrayBuffer());
+    const view = new DataView(bytes.buffer);
+    const names: string[] = [];
+    let offset = 0;
+    while (view.getUint32(offset, true) === 0x04034b50) {
+      expect(view.getUint16(offset + 8, true)).toBe(0);
+      expect(view.getUint32(offset + 14, true)).toBe(0x55bc801d);
+      const size = view.getUint32(offset + 18, true);
+      const length = view.getUint16(offset + 26, true);
+      names.push(new TextDecoder().decode(bytes.slice(offset + 30, offset + 30 + length)));
+      offset += 30 + length;
+      expect([...bytes.slice(offset, offset + size)]).toEqual([1, 2, 3]);
+      offset += size;
+    }
+    expect(names).toEqual(["one.mp3", "two.mp3"]);
+    expect(view.getUint16(bytes.length - 14, true)).toBe(2);
+  });
+  it("cancels archive preparation without deleting completed offline files", async () => {
+    files.set(fixtures.urls[0]!, response());
+    files.set(fixtures.urls[1]!, response());
+    const controller = new AbortController();
+    await expect(
+      prepareAudioArchive(zikrs, DEFAULT_AUDIO_PREFERENCES, {
+        signal: controller.signal,
+        onArchiveProgress: () => controller.abort(),
+      }),
+    ).rejects.toThrow();
+    expect(files.size).toBe(2);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+  it("fails rather than exporting a partial archive after a later recording fails integrity", async () => {
+    fetchMock.mockResolvedValueOnce(response()).mockResolvedValueOnce(response([9, 9, 9]));
+    await expect(prepareAudioArchive(zikrs, DEFAULT_AUDIO_PREFERENCES)).rejects.toMatchObject({ code: "integrity" });
+    expect(files.has(fixtures.urls[0]!)).toBe(true);
+    expect(files.has(fixtures.urls[1]!)).toBe(false);
+  });
 });
 
 describe("verified offline audio", () => {

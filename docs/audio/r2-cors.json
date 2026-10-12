@@ -1,0 +1,20 @@
+{
+  "rules": [
+    {
+      "exposeHeaders": ["Accept-Ranges", "Content-Length", "Content-Range", "ETag"],
+      "allowed": {
+        "methods": ["GET", "HEAD"],
+        "headers": ["Range"],
+        "origins": [
+          "https://amahdy59.github.io",
+          "http://localhost:3000",
+          "http://localhost:5173",
+          "http://127.0.0.1:5173",
+          "http://127.0.0.1:4173",
+          "https://wa-zaker.com"
+        ]
+      },
+      "maxAgeSeconds": 3600
+    }
+  ]
+}

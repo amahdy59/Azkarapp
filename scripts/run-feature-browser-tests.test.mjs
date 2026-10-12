@@ -35,3 +35,42 @@ test("focused sharing includes both image exports and offline ayah recovery", ()
   }
   expect(filters.some((pattern) => pattern.test("e2e/settings-experience.spec.ts"))).toBe(false);
 });
+
+test("focused Progress includes trends, responsive layouts, recordings and heading reflow", () => {
+  const filters = featureBrowserArguments("progress")
+    .slice(1)
+    .map((pattern) => new RegExp(pattern));
+  for (const filename of [
+    "progress-trends.spec.ts",
+    "progress-responsive.spec.ts",
+    "quiet-garden.spec.ts",
+    "settings-progress-clarity.spec.ts",
+    "manual-checklist.spec.ts",
+  ])
+    expect(filters.some((pattern) => pattern.test(`e2e/${filename}`))).toBe(true);
+  expect(filters.some((pattern) => pattern.test("e2e/audio-integrity.spec.ts"))).toBe(false);
+});
+
+test("focused controls includes shared geometry and keyboard behavior without the entire reader suite", () => {
+  const filters = featureBrowserArguments("controls")
+    .slice(1)
+    .map((pattern) => new RegExp(pattern));
+  for (const filename of [
+    "responsive.spec.ts",
+    "narrow-layout.spec.ts",
+    "overlay-geometry.spec.ts",
+    "settings-experience.spec.ts",
+  ])
+    expect(filters.some((pattern) => pattern.test(`e2e/${filename}`))).toBe(true);
+  expect(filters.some((pattern) => pattern.test("e2e/reader-microinteractions.spec.ts"))).toBe(false);
+});
+
+test("audio and Quran focus groups both retain continuous listening and paired meaning regressions", () => {
+  for (const feature of ["audio", "quran"]) {
+    const filters = featureBrowserArguments(feature)
+      .slice(1)
+      .map((pattern) => new RegExp(pattern));
+    for (const filename of ["audio-surah-stream.spec.ts", "quran-listening.spec.ts", "quran-translation.spec.ts"])
+      expect(filters.some((pattern) => pattern.test(`e2e/${filename}`))).toBe(true);
+  }
+});

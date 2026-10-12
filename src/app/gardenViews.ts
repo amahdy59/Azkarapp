@@ -98,9 +98,9 @@ export function getWeekGardenStats(
   referenceDate: Date,
   language: AppLanguage,
   isQuranDoneForDay?: (dayKey: string) => boolean,
+  todayKey = formatDayKey(new Date()),
 ): WeekGardenStats {
   const isArabic = language === "ar";
-  const todayKey = formatDayKey(new Date());
 
   // Calculate start of week (Saturday for Arabic, Sunday for English / standard)
   const currentDayOfWeek = referenceDate.getDay(); // 0 = Sunday, 6 = Saturday
@@ -130,7 +130,7 @@ export function getWeekGardenStats(
     const hasMorning = categories.has("morning");
     const hasEvening = categories.has("evening");
     const hasSleep = categories.has("before_sleep");
-    const hasQuran = isQuranDoneForDay ? isQuranDoneForDay(dayKey) : false;
+    const hasQuran = dayKey <= todayKey && isQuranDoneForDay ? isQuranDoneForDay(dayKey) : false;
 
     if (hasMorning) morningCompletedCount++;
     if (hasEvening) eveningCompletedCount++;

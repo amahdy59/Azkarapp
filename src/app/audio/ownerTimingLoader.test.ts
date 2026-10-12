@@ -31,7 +31,8 @@ it("verifies and expands the real compressed library while preserving explicit g
   vi.stubGlobal("fetch", fetcher);
   const { loadOwnerTimingPack } = await import("./ownerTimingLoader");
   const pack = await loadOwnerTimingPack(new AbortController().signal);
-  expect(pack?.records).toHaveLength(290);
+  expect(pack?.records).toHaveLength(289);
+  expect(pack?.records.some((record) => record.v.includes("wu-hm-4-abdullah-muhammad-v1"))).toBe(false);
   expect(pack?.approval.reviewStatus).toBe("owner-preview");
   expect(pack?.approval.reviewedBy).toBe("");
   expect(await loadOwnerTimingPack(new AbortController().signal)).toBe(pack);

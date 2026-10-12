@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import * as timings from "../audio/quranTimings";
 import type { PlaybackEntry } from "../audio/audioTypes";
-import QuranListeningReader from "./QuranListeningReader";
+import ContinuousReader, { PagedQuranListeningReader as QuranListeningReader } from "./QuranListeningReader";
 
 const loader = vi.hoisted(() => ({ error: false }));
 
@@ -123,11 +123,11 @@ describe("read-only listening controls", () => {
     );
     expect(host.querySelector("[data-listening-controls]")).not.toBeNull();
     expect(container.querySelector("[data-listening-controls]")).toBeNull();
-    const next = screen.getByRole("button", { name: "Next page" });
+    const next = screen.getByRole("combobox");
     expect(host).toContainElement(next);
-    fireEvent.click(next);
+    fireEvent.change(next, { target: { value: "1" } });
     expect(container.querySelector('[data-mushaf-page="563"]')).not.toBeNull();
-    expect(screen.getByRole("status", { name: "Quran page 563" })).toHaveTextContent("Page 563");
+    expect(screen.getByRole("combobox", { name: "Quran page 563" })).toHaveValue("1");
     unmount();
     expect(host).toBeEmptyDOMElement();
     host.remove();
@@ -140,7 +140,7 @@ describe("read-only listening controls", () => {
       </div>,
     );
     expect(screen.queryByRole("button", { name: "العودة للآية الحالية" })).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: "الصفحة السابقة" }));
+    fireEvent.change(screen.getByRole("combobox"), { target: { value: "0" } });
     expect(container.querySelector('[data-mushaf-page="562"]')).not.toBeNull();
     const resume = screen.getByRole("button", { name: "العودة للآية الحالية" });
     resume.focus();
@@ -188,7 +188,7 @@ describe("read-only listening controls", () => {
     expect(screen.getByText(/Following is not available/)).toBeVisible();
     expect(screen.queryByRole("button", { name: "Highlight words" })).toBeNull();
     expect(container.querySelector('[data-mushaf-page="562"]')).not.toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: "Next page" }));
+    fireEvent.change(screen.getByRole("combobox"), { target: { value: "1" } });
     expect(container.querySelector('[data-mushaf-page="563"]')).not.toBeNull();
     expect(container.querySelector('[aria-hidden="true"] button')).toBeNull();
   });
@@ -207,7 +207,7 @@ describe("read-only listening controls", () => {
     rerender(show(3));
     expect(container.querySelector('[data-mushaf-page="563"]')).not.toBeNull();
     expect(follow).toHaveFocus();
-    fireEvent.click(screen.getByRole("button", { name: "Previous page" }));
+    fireEvent.change(screen.getByRole("combobox"), { target: { value: "0" } });
     expect(follow).toHaveAttribute("aria-pressed", "false");
     expect(container.querySelector('[data-mushaf-page="562"]')).not.toBeNull();
     fireEvent.click(follow);
@@ -254,7 +254,7 @@ describe("read-only listening controls", () => {
     expect(container.querySelector('[data-mushaf-page="563"]')).not.toBeNull();
     expect(translation.querySelector('[data-translation-verse="67:1"]')).toBeNull();
     expect(translation.querySelector('[data-translation-verse="67:13"]')).toHaveAttribute("aria-current", "true");
-    fireEvent.click(screen.getByRole("button", { name: "Previous page" }));
+    fireEvent.change(screen.getByRole("combobox"), { target: { value: "0" } });
     expect(translation.querySelector('[data-translation-verse="67:1"]')).not.toBeNull();
     expect(translation.querySelector('[aria-current="true"]')).toBeNull();
   });
@@ -262,11 +262,81 @@ describe("read-only listening controls", () => {
     loader.error = true;
     const { rerender } = render(<QuranListeningReader entry={entry} segment={null} currentTime={0} language="en" />);
     expect(screen.getByTestId("quran-page-translation").querySelectorAll("[data-translation-verse]")).toHaveLength(12);
-    fireEvent.click(screen.getByRole("button", { name: "Next page" }));
+    fireEvent.change(screen.getByRole("combobox"), { target: { value: "1" } });
     const verses = screen.getByTestId("quran-page-translation").querySelectorAll("[data-translation-verse]");
     expect(verses).toHaveLength(14);
     expect(verses[0]).toHaveAttribute("data-translation-verse", "67:13");
     rerender(<QuranListeningReader entry={entry} segment={null} currentTime={0} language="ar" />);
     expect(screen.queryByTestId("quran-page-translation")).toBeNull();
+  });
+});
+
+describe("continuous surah listening", () => {
+  beforeEach(() => {
+    loader.error = false;
+    vi.spyOn(timings, "resolveQuranTiming").mockReturnValue(annotation);
+  });
+  afterEach(() => vi.restoreAllMocks());
+  it("scales flowing text with Quran settings and paints the chosen reading theme", () => {
+    const { container, rerender } = render(
+      <ContinuousReader
+        entry={entry}
+        segment={null}
+        currentTime={0}
+        language="ar"
+        theme="light"
+        textScale="medium"
+        preferencesHost={null}
+      />,
+    );
+    const excerpt = screen.getAllByTestId("mushaf-excerpt")[0]!;
+    expect(excerpt).toHaveStyle({ fontSize: "calc(1.5rem * 1.25)" });
+    expect(container.querySelector(".audio-listening-stream")).toHaveClass("theme-light", "bg-background");
+    rerender(
+      <ContinuousReader
+        entry={entry}
+        segment={null}
+        currentTime={0}
+        language="ar"
+        theme="midnight"
+        textScale="large"
+        magnification={150}
+        preferencesHost={null}
+      />,
+    );
+    expect(excerpt).toHaveStyle({ fontSize: "calc(1.5rem * 2.0250000000000004)" });
+    expect(container.querySelector(".audio-listening-stream")).toHaveClass("theme-midnight");
+  });
+  it("keeps every passage mounted without page controls and restores following after keyboard browsing", () => {
+    const { container } = render(
+      <div className="audio-expanded-reading">
+        <div className="audio-expanded-text" tabIndex={-1} role="region" aria-label="Test reading">
+          <ContinuousReader entry={entry} segment={null} currentTime={1} language="ar" preferencesHost={null} />
+        </div>
+      </div>,
+    );
+    expect(container.querySelectorAll("[data-listening-passage]")).toHaveLength(3);
+    expect(screen.queryByRole("combobox")).toBeNull();
+    expect(screen.queryByRole("button", { name: "الصفحة التالية" })).toBeNull();
+    const viewport = container.querySelector<HTMLElement>(".audio-expanded-text")!;
+    fireEvent.keyDown(viewport, { key: "PageDown" });
+    const resume = screen.getByRole("button", { name: "العودة للآية الحالية" });
+    expect(resume.parentElement).toHaveClass("audio-expanded-reading");
+    fireEvent.click(resume);
+    expect(viewport).toHaveFocus();
+    expect(screen.queryByRole("button", { name: "العودة للآية الحالية" })).toBeNull();
+    expect(container.querySelectorAll("[data-listening-passage]")).toHaveLength(3);
+  });
+  it("retains the complete offline passage and meaning without a page picker", () => {
+    loader.error = true;
+    render(<ContinuousReader entry={entry} segment={null} currentTime={0} language="en" preferencesHost={null} />);
+    expect(
+      screen
+        .getAllByTestId("audio-quran-fallback-text")
+        .map((element) => element.textContent)
+        .join(""),
+    ).toBe(entry.arabicText);
+    expect(screen.getByTestId("quran-page-translation").querySelectorAll("[data-translation-verse]")).toHaveLength(30);
+    expect(screen.queryByRole("combobox")).toBeNull();
   });
 });

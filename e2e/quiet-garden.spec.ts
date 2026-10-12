@@ -142,6 +142,8 @@ test("Arabic large text keeps Progress controls and month details usable at comp
   }
 
   await tabs.nth(2).click();
+  if (!(await page.getByTestId("garden-month-calendar").isVisible()))
+    await page.getByRole("button", { name: /^(Calendar|التقويم)$/, exact: true }).click();
   await expect(page.getByTestId("garden-month-calendar")).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
 
@@ -216,6 +218,8 @@ test("month view shows the calendar without the removed summary card", async ({ 
   await page.getByRole("link", { name: "Progress", exact: true }).click();
   await page.getByRole("tab", { name: "Month", exact: true }).click();
 
+  if (!(await page.getByTestId("garden-month-calendar").isVisible()))
+    await page.getByText(/Calendar|التقويم/, { exact: true }).click();
   await expect(page.getByTestId("garden-month-calendar")).toBeVisible();
   await expect(page.getByText("Longest Streak", { exact: true })).toHaveCount(0);
   await expect(page.getByText("Adherence", { exact: true })).toHaveCount(0);
@@ -272,7 +276,7 @@ test("the week grid conveys completion as text, not shape alone", async ({ page 
   // screen reader announced the whole grid as blank.
   await expect(table.locator("td .sr-only")).toHaveCount(28);
   await expect(table).toContainText(/Morning: (Completed|Not completed)/);
-  await expect(table).toContainText(/Qur'?an: (Completed|Not completed)/);
+  await expect(table).toContainText(/Quran: (Completed|Not recorded|Upcoming)/);
   await expect(table).not.toContainText(/Post-Prayer: (Completed|Not completed)/);
 
   // Headers must be associated with their column for grid navigation.

@@ -5,7 +5,11 @@ const audioMocks = vi.hoisted(() => ({
   download: vi.fn(),
   remove: vi.fn(),
   summary: vi.fn(() => ({ assetCount: 1, byteSize: 1024 })),
+  archive: vi.fn(),
+  export: vi.fn(),
 }));
+vi.mock("../../audio/audioArchive", () => ({ prepareAudioArchive: audioMocks.archive }));
+vi.mock("../../share/shareDispatcher", () => ({ downloadFile: audioMocks.export }));
 
 vi.mock("../../audio/audioPreferences", () => ({ loadAudioPreferences: () => ({}) }));
 vi.mock("../../content/azkar", () => ({
@@ -43,6 +47,56 @@ function openManagement(id: string) {
 }
 
 describe("DownloadsPanel", () => {
+  it("offers a persistent ZIP export outside management, including adhkar and both recitations", async () => {
+    Object.defineProperty(navigator, "storage", {
+      configurable: true,
+      value: { persisted: async () => true, estimate: async () => ({ usage: 0, quota: 1e9 }) },
+    });
+    const file = new File(["zip"], "wa-zaker-audio.zip");
+    audioMocks.archive.mockResolvedValue(file);
+    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    const button = screen.getByRole("button", { name: "Download all audio as ZIP" });
+    await waitFor(() => expect(button).toBeEnabled());
+    expect(button.closest("details")).toBeNull();
+    fireEvent.click(button);
+    await waitFor(() => expect(audioMocks.export).toHaveBeenCalledWith(file));
+    expect(audioMocks.archive.mock.calls[0]![0].map((z: { id: string }) => z.id)).toEqual(
+      expect.arrayContaining([
+        "morning-full",
+        "evening-full",
+        "before_sleep-full",
+        "after-prayer",
+        "friday-kahf",
+        "ir-baqarah",
+      ]),
+    );
+    await waitFor(() => expect(button).toBeEnabled());
+    expect(screen.getByRole("button", { name: "Download all audio as ZIP" })).toBeVisible();
+    expect(screen.getByText("Sent to your browser for saving. Check Downloads/Files.")).toBeVisible();
+  });
+  it("cancels ZIP preparation and keeps the persistent export action available", async () => {
+    Object.defineProperty(navigator, "storage", {
+      configurable: true,
+      value: { estimate: async () => ({ usage: 0, quota: 1e9 }) },
+    });
+    audioMocks.archive.mockImplementation(async (_zikrs, _preferences, options) => {
+      options.onArchiveProgress(1, 3);
+      await new Promise((_resolve, reject) =>
+        options.signal.addEventListener("abort", () => reject(options.signal.reason), { once: true }),
+      );
+    });
+    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    const button = screen.getByRole("button", { name: "Download all audio as ZIP" });
+    await waitFor(() => expect(button).toBeEnabled());
+    fireEvent.click(button);
+    await screen.findByText("Preparing ZIP: 1 of 3 recordings");
+    fireEvent.click(
+      within(screen.getByTestId("audio-archive-export")).getByRole("button", { name: "Cancel download" }),
+    );
+    await waitFor(() => expect(screen.getByRole("button", { name: "Download all audio as ZIP" })).toBeEnabled());
+    expect(audioMocks.export).not.toHaveBeenCalled();
+    expect(screen.getByText(/Download cancelled. Saved audio is kept/)).toBeVisible();
+  });
   it("shows live transfer, verification and locally saved counts before completion", async () => {
     Object.defineProperty(navigator, "storage", {
       configurable: true,

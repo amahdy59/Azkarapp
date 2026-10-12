@@ -1,53 +1,13 @@
-import React, { useEffect, useState, useMemo, useId } from "react";
-import { formatNumerals, formatRatio, formatPercentage } from "../formatting";
+import React, { useState } from "react";
+import { formatNumerals, formatRatio } from "../formatting";
 import { t } from "../i18n";
 import { HomeCard } from "./HomeCard";
 import type { AppLanguage, CategoryId } from "../types";
-import {
-  getWeekGardenStats,
-  getMonthDetailedStats,
-  getMonthDetailedStatsForDates,
-  getYearDetailedStats,
-  getYearDetailedStatsForPeriods,
-  createDailyCompletionIndex,
-} from "../gardenViews";
-import { getCalendarMonthPeriod, getCalendarYearPeriods, type CalendarType } from "../calendarPeriods";
 import { type GardenSummary } from "../progress";
-import { ProgressBar } from "./ProgressBar";
-import {
-  Zap,
-  Check,
-  CheckCircle2,
-  Calendar,
-  Sun,
-  Sunrise,
-  Sunset,
-  MoonStar,
-  Star,
-  Sprout,
-  Sparkles,
-  BookOpen,
-  Info,
-} from "./icons";
+import { Check, Calendar, Sunrise, Sunset, MoonStar, Sparkles, BookOpen, Info, ChevronNext } from "./icons";
 
 function isAr(language: AppLanguage) {
   return language === "ar";
-}
-
-function getCategoryName(category: CategoryId | null | undefined, language: AppLanguage) {
-  if (!category) return t(language, "progress.none");
-  switch (category) {
-    case "morning":
-      return t(language, "progress.morningAzkar");
-    case "evening":
-      return t(language, "progress.eveningAzkar");
-    case "before_sleep":
-      return t(language, "progress.sleepAzkar");
-    case "after_prayer":
-      return t(language, "progress.postPrayerAzkar");
-    default:
-      return t(language, "progress.otherAzkar");
-  }
 }
 
 type DayGroupCardStatus = "completed" | "pending";
@@ -250,7 +210,7 @@ function MainDhikrGroupCard({
     <button
       type="button"
       onClick={onPress}
-      className={`stagger-content group relative flex w-full rounded-2xl border transition-[background-color,border-color] duration-standard focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 ${
+      className={`${onMedia ? "stagger-content" : ""} group relative flex w-full rounded-2xl border transition-[background-color,border-color] duration-standard focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 ${
         compact
           ? onMedia
             ? "min-h-[6.5rem] items-center gap-3 px-4 py-4 text-start sm:min-h-[13rem] sm:flex-col sm:justify-between sm:gap-4 sm:px-4 sm:py-5 sm:text-center lg:min-h-[11.5rem] lg:gap-2.5 lg:px-2.5 lg:py-4 xl:min-h-[11.5rem] xl:gap-3 xl:px-4 xl:py-4"
@@ -332,7 +292,8 @@ function MainDhikrGroupCard({
         )}
       </div>
 
-      {isCompleted ? (
+      {!onMedia && <ChevronNext size={18} className="shrink-0 text-muted-foreground" aria-hidden="true" />}
+      {isCompleted && onMedia ? (
         <span
           className="absolute end-3 top-3 flex size-6 items-center justify-center rounded-full border border-success bg-success text-success-foreground shadow-md sm:-end-1.5 sm:top-auto sm:bottom-3"
           aria-hidden="true"
@@ -343,21 +304,6 @@ function MainDhikrGroupCard({
     </button>
   );
 }
-
-const GREGORIAN_MONTH_NAMES_EN = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
 
 // ────────────────────────────────────────────────────────────────────────────
 // DAY VIEW (WIRD CARD & DAILY ROUTINE DASHBOARD)
@@ -457,7 +403,13 @@ export function ProgressDayView({
       dir={isArabic ? "rtl" : "ltr"}
     >
       <HomeCard onGlass={onGlass} className={`flex-col ${onGlass ? "flex-1" : ""}`}>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div
+          className={
+            onMedia
+              ? "flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
+              : "flex flex-wrap items-center justify-between gap-3"
+          }
+        >
           <div className="min-w-0">
             <div className="flex items-center gap-2">
               {onGlass && isHomeSubset && (
@@ -479,27 +431,29 @@ export function ProgressDayView({
               >
                 {t(language, "progress.todayWird")}
               </Heading>
-              <div>
-                <button
-                  type="button"
-                  aria-expanded={isWirdInfoOpen}
-                  aria-label={t(language, "garden.explanationLabel")}
-                  onClick={() => setIsWirdInfoOpen((open) => !open)}
-                  className={`flex size-11 shrink-0 items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                    onGlass
-                      ? "text-on-media-muted hover:bg-on-media-surface/60 hover:text-on-media"
-                      : "text-muted-foreground hover:bg-muted"
-                  }`}
-                >
-                  <Info size={18} aria-hidden="true" />
-                </button>
-              </div>
+              {onMedia && (
+                <div>
+                  <button
+                    type="button"
+                    aria-expanded={isWirdInfoOpen}
+                    aria-label={t(language, "garden.explanationLabel")}
+                    onClick={() => setIsWirdInfoOpen((open) => !open)}
+                    className={`flex size-11 shrink-0 items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                      onGlass
+                        ? "text-on-media-muted hover:bg-on-media-surface/60 hover:text-on-media"
+                        : "text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    <Info size={18} aria-hidden="true" />
+                  </button>
+                </div>
+              )}
             </div>
             {isHomeSubset && onGlass ? (
               <p className="mt-1 text-label font-semibold text-white/80 sm:text-sm" dir="auto">
                 {t(language, "progress.todayWirdSubtitle")}
               </p>
-            ) : !onGlass ? (
+            ) : !onGlass && onMedia ? (
               <p className="mt-1 text-label font-semibold text-muted-foreground sm:text-sm" dir="auto">
                 {dynamicSubtitle}
               </p>
@@ -518,26 +472,28 @@ export function ProgressDayView({
                   by the bidi algorithm and starts reading as "3 / 0". */}
               <bdi>{formatRatio(completedCount, totalCount, language)}</bdi>
             </div>
-            <div
-              data-testid="thimar-progress-badge"
-              className={`flex shrink-0 items-center gap-1 rounded-full border px-2.5 py-1.5 text-label font-bold ${
-                onGlass
-                  ? "border-white/20 bg-on-media-surface/60 text-on-media"
-                  : "border-primary/30 bg-primary/10 text-primary"
-              }`}
-              title={t(language, "progress.todayThimarProgress", {
-                earned: formatNumerals(completedCount * 5, language),
-                total: formatNumerals(totalCount * 5, language),
-              })}
-            >
-              <span aria-hidden="true">🌱</span>
-              <bdi>
-                {t(language, "progress.todayThimarProgress", {
+            {onMedia && (
+              <div
+                data-testid="thimar-progress-badge"
+                className={`flex shrink-0 items-center gap-1 rounded-full border px-2.5 py-1.5 text-label font-bold ${
+                  onGlass
+                    ? "border-white/20 bg-on-media-surface/60 text-on-media"
+                    : "border-primary/30 bg-primary/10 text-primary"
+                }`}
+                title={t(language, "progress.todayThimarProgress", {
                   earned: formatNumerals(completedCount * 5, language),
                   total: formatNumerals(totalCount * 5, language),
                 })}
-              </bdi>
-            </div>
+              >
+                <span aria-hidden="true">🌱</span>
+                <bdi>
+                  {t(language, "progress.todayThimarProgress", {
+                    earned: formatNumerals(completedCount * 5, language),
+                    total: formatNumerals(totalCount * 5, language),
+                  })}
+                </bdi>
+              </div>
+            )}
           </div>
         </div>
 
@@ -556,7 +512,7 @@ export function ProgressDayView({
         )}
 
         <div
-          className={`stagger-in mt-5 grid grid-cols-1 gap-2.5 sm:mt-6 sm:gap-3 md:gap-4 ${
+          className={`${onMedia ? "stagger-in" : ""} mt-5 grid grid-cols-1 gap-2.5 sm:mt-6 sm:gap-3 md:gap-4 ${
             !onMedia
               ? "sm:grid-cols-2"
               : isHomeSubset
@@ -703,928 +659,4 @@ export function ProgressDayView({
   );
 }
 
-// ────────────────────────────────────────────────────────────────────────────
-// WEEK VIEW (WEEKLY COMMITMENT MATRIX & ROUTINE PROGRESS BARS)
-// ────────────────────────────────────────────────────────────────────────────
-/**
- * One completion cell in the week table.
- *
- * The mark used to be a bare icon (or an empty bordered circle for "not done")
- * with no text and no label, so every cell in the week grid was announced as
- * empty and the whole view conveyed nothing to a screen reader.
- */
-function WeekStatusCell({
-  done,
-  label,
-  language,
-  subItems,
-}: {
-  done: boolean;
-  label: string;
-  language: AppLanguage;
-  subItems?: boolean[];
-}) {
-  const status = done ? t(language, "progress.completed") : t(language, "progress.notCompleted");
-  return (
-    <td className="py-3 px-2">
-      <div className="flex justify-center">
-        <span className="sr-only">{`${label}: ${status}`}</span>
-        {subItems ? (
-          <div aria-hidden="true" className="flex items-center gap-0.5">
-            {subItems.map((isCompleted, i) => (
-              <span
-                key={i}
-                className={`inline-block h-1.5 w-1.5 rounded-full ${isCompleted ? "bg-success" : "bg-white/10 dark:bg-white/10 bg-black/10"}`}
-              />
-            ))}
-          </div>
-        ) : done ? (
-          <div
-            aria-hidden="true"
-            className="flex items-center justify-center w-7 h-7 rounded-full bg-success/20 border border-success/50 text-success"
-          >
-            <Check size={15} strokeWidth={3} />
-          </div>
-        ) : (
-          <div aria-hidden="true" className="h-6 w-6 rounded-full border-2 border-border-control" />
-        )}
-      </div>
-    </td>
-  );
-}
-
-export function ProgressWeekView({
-  language,
-  dailyCompletions = [],
-  referenceDate = new Date(),
-  weeklyGoalDays,
-  activeDays = 0,
-  isQuranDoneForDay,
-}: {
-  language: AppLanguage;
-  dailyCompletions?: import("../types").DailyCollectionCompletion[];
-  referenceDate?: Date;
-  weeklyGoalDays?: number;
-  activeDays?: number;
-  isQuranDoneForDay?: (dayKey: string) => boolean;
-}) {
-  const isArabic = isAr(language);
-  const completionIndex = useMemo(() => createDailyCompletionIndex(dailyCompletions), [dailyCompletions]);
-
-  const weekStats = useMemo(
-    () => getWeekGardenStats(completionIndex, referenceDate, language, isQuranDoneForDay),
-    [completionIndex, referenceDate, language, isQuranDoneForDay],
-  );
-
-  const bestRoutineName = getCategoryName(weekStats.bestRoutine, language);
-
-  return (
-    <div
-      className="mx-auto flex w-full max-w-[44rem] flex-col gap-4 fade-in xl:max-w-[80rem]"
-      dir={isArabic ? "rtl" : "ltr"}
-    >
-      {weeklyGoalDays && (
-        <section className="rounded-2xl border border-border bg-card p-4" aria-labelledby="progress-weekly-goal">
-          <div className="mb-3 flex items-baseline justify-between gap-3">
-            <h2 id="progress-weekly-goal" className="text-subtitle font-black text-foreground">
-              {t(language, "progressPanel.weeklyGoal")}
-            </h2>
-            <p className="text-label font-bold text-muted-foreground">
-              {t(language, "progressPanel.goalProgress", {
-                done: formatNumerals(Math.min(activeDays, weeklyGoalDays), language),
-                goal: formatNumerals(weeklyGoalDays, language),
-              })}
-            </p>
-          </div>
-          <ProgressBar
-            value={Math.min(activeDays, weeklyGoalDays)}
-            max={weeklyGoalDays}
-            height={8}
-            trackColor="var(--muted)"
-            direction={isArabic ? "rtl" : "ltr"}
-            aria-label={t(language, "progressPanel.goalProgress", {
-              done: formatNumerals(Math.min(activeDays, weeklyGoalDays), language),
-              goal: formatNumerals(weeklyGoalDays, language),
-            })}
-          />
-        </section>
-      )}
-
-      <dl className="grid grid-cols-3 overflow-hidden rounded-2xl border border-border bg-card">
-        {/* Most Consistent Routine Card */}
-        <div className="flex min-w-0 flex-col items-center justify-center border-e border-border p-3 text-center">
-          <Sun size={20} className="text-primary mb-1" />
-          <dt className="mb-0.5 text-xs font-bold text-muted-foreground break-words">
-            {t(language, "progress.mostConsistentRoutine")}
-          </dt>
-          <dd className="max-w-full truncate text-sm font-black text-foreground">{bestRoutineName}</dd>
-        </div>
-
-        {/* Best Streak Card */}
-        <div className="flex min-w-0 flex-col items-center justify-center border-e border-border p-3 text-center">
-          <dt className="mb-0.5 text-xs font-bold text-muted-foreground break-words">
-            {t(language, "progress.bestStreak")}
-          </dt>
-          <dd className="text-subtitle font-black text-foreground">
-            {formatNumerals(weekStats.bestStreakDays, language)} {t(language, "progress.days")}
-          </dd>
-        </div>
-
-        {/* Completed Days Card */}
-        <div className="flex min-w-0 flex-col items-center justify-center p-3 text-center">
-          <CheckCircle2 size={20} className="text-success mb-1" />
-          <dt className="mb-0.5 text-xs font-bold text-muted-foreground break-words">
-            {t(language, "progress.completedDays")}
-          </dt>
-          <dd className="text-subtitle font-black text-foreground">
-            {formatNumerals(weekStats.completedDaysCount, language)} {t(language, "progress.ofSeven")}
-          </dd>
-        </div>
-      </dl>
-
-      {/* Main Weekly Commitment Matrix Card */}
-      <div className="w-full rounded-2xl border border-border bg-card p-4 md:p-5">
-        <h2
-          data-testid="progress-primary-heading"
-          className="mb-4 block max-w-full truncate whitespace-nowrap text-start text-base font-black text-foreground sm:text-lg md:text-xl"
-        >
-          {t(language, "progress.weekCommitment")}
-        </h2>
-
-        {/* Grid Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-center">
-            <thead>
-              <tr className="border-b border-white/30 dark:border-white/10">
-                <th scope="col" className="py-2.5 px-2 text-start text-label font-bold text-muted-foreground">
-                  <div className="flex items-center gap-1.5">
-                    <Calendar size={15} />
-                    <span>{t(language, "progress.day")}</span>
-                  </div>
-                </th>
-                <th scope="col" className="py-2.5 px-2 text-label font-bold text-muted-foreground">
-                  <div className="flex items-center justify-center gap-1">
-                    <Sunrise size={15} className="text-success" />
-                    <span>{t(language, "progress.morningShort")}</span>
-                  </div>
-                </th>
-                <th scope="col" className="py-2.5 px-2 text-label font-bold text-muted-foreground">
-                  <div className="flex items-center justify-center gap-1">
-                    <Sunset size={15} className="text-primary" />
-                    <span>{t(language, "progress.eveningShort")}</span>
-                  </div>
-                </th>
-                {weekStats.days.some((d) => d.quranStatus !== undefined) && (
-                  <th scope="col" className="py-2.5 px-2 text-label font-bold text-muted-foreground">
-                    <div className="flex items-center justify-center gap-1">
-                      <BookOpen size={15} className="text-primary" />
-                      <span>{t(language, "progress.quranShort")}</span>
-                    </div>
-                  </th>
-                )}
-                <th scope="col" className="py-2.5 px-2 text-label font-bold text-muted-foreground">
-                  <div className="flex items-center justify-center gap-1">
-                    <MoonStar size={15} className="text-sleep" />
-                    <span>{t(language, "progress.sleepShort")}</span>
-                  </div>
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/20 dark:divide-white/5">
-              {weekStats.days.map((day) => (
-                <tr key={day.dayKey} className="hover:bg-white/20 dark:hover:bg-white/5 transition-colors">
-                  <td className="py-3 px-2 text-start">
-                    <span
-                      className={`text-sm ${day.isToday ? "font-black text-primary" : "font-bold text-foreground"}`}
-                    >
-                      {day.weekdayName}
-                    </span>
-                  </td>
-
-                  <WeekStatusCell
-                    done={day.morningStatus === "complete"}
-                    label={t(language, "progress.morningShort")}
-                    language={language}
-                  />
-
-                  <WeekStatusCell
-                    done={day.eveningStatus === "complete"}
-                    label={t(language, "progress.eveningShort")}
-                    language={language}
-                  />
-
-                  {day.quranStatus !== undefined && (
-                    <WeekStatusCell
-                      done={day.quranStatus === "complete"}
-                      label={t(language, "progress.quranShort")}
-                      language={language}
-                    />
-                  )}
-
-                  <WeekStatusCell
-                    done={day.sleepStatus === "complete"}
-                    label={t(language, "progress.sleepShort")}
-                    language={language}
-                  />
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Legend */}
-        <div className="mt-4 pt-3 border-t border-white/20 dark:border-white/10 flex items-center justify-center gap-6 text-xs font-bold text-muted-foreground">
-          <div className="flex items-center gap-1.5">
-            <div className="flex items-center justify-center w-5 h-5 rounded-full bg-success/20 border border-success text-success">
-              <Check size={12} strokeWidth={3} />
-            </div>
-            <span>{t(language, "progress.complete")}</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="h-4 w-4 rounded-full border-2 border-border-control" />
-            <span>{t(language, "progress.missed")}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom Row: Insight Card & Routine Summary Card */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Insight Card */}
-        <div className="flex items-center gap-3 rounded-2xl border border-success/50 bg-success/5 p-4">
-          <div className="flex size-10 shrink-0 items-center justify-center text-success">
-            <Sparkles size={24} />
-          </div>
-          <div>
-            <h3 className="mb-1 block max-w-full truncate whitespace-nowrap text-subtitle font-black leading-snug text-foreground">
-              {t(language, "garden.weekCompletedDays", {
-                count: formatNumerals(weekStats.completedDaysCount, language),
-              })}
-            </h3>
-            <p className="text-label font-semibold text-muted-foreground">
-              {weekStats.bestRoutine
-                ? t(language, "garden.weekBestRoutine", {
-                    routine: getCategoryName(weekStats.bestRoutine, language),
-                  })
-                : t(language, "garden.noRecordedActivity")}
-            </p>
-          </div>
-        </div>
-
-        {/* Routine Summary Progress Bars Card */}
-        <div className="flex flex-col justify-center gap-3 rounded-2xl border border-border bg-card p-4">
-          <h3 className="mb-1 block max-w-full truncate whitespace-nowrap text-sm font-black text-foreground">
-            {t(language, "progress.weeklySummary")}
-          </h3>
-
-          {/* Morning Bar */}
-          <div className="flex items-center justify-between gap-3 text-xs font-bold">
-            <span className="text-muted-foreground w-14 shrink-0">
-              {formatNumerals(weekStats.morningCompletedCount, language)} {t(language, "progress.ofSeven")}
-            </span>
-            <div
-              className="h-2 flex-1 overflow-hidden rounded-full bg-black/10 dark:bg-white/10"
-              role="progressbar"
-              aria-label={t(language, "progress.morningAzkar")}
-              aria-valuemin={0}
-              aria-valuemax={7}
-              aria-valuenow={weekStats.morningCompletedCount}
-            >
-              <div
-                className="h-full bg-success rounded-full"
-                style={{ width: `${Math.round((weekStats.morningCompletedCount / 7) * 100)}%` }}
-              />
-            </div>
-            <div className="flex items-center gap-1 text-foreground shrink-0">
-              <span>{t(language, "progress.morningShort")}</span>
-              <Sunrise size={14} className="text-success" />
-            </div>
-          </div>
-
-          {/* Evening Bar */}
-          <div className="flex items-center justify-between gap-3 text-xs font-bold">
-            <span className="text-muted-foreground w-14 shrink-0">
-              {formatNumerals(weekStats.eveningCompletedCount, language)} {t(language, "progress.ofSeven")}
-            </span>
-            <div
-              className="h-2 flex-1 overflow-hidden rounded-full bg-black/10 dark:bg-white/10"
-              role="progressbar"
-              aria-label={t(language, "progress.eveningAzkar")}
-              aria-valuemin={0}
-              aria-valuemax={7}
-              aria-valuenow={weekStats.eveningCompletedCount}
-            >
-              <div
-                className="h-full bg-primary rounded-full"
-                style={{ width: `${Math.round((weekStats.eveningCompletedCount / 7) * 100)}%` }}
-              />
-            </div>
-            <div className="flex items-center gap-1 text-foreground shrink-0">
-              <span>{t(language, "progress.eveningShort")}</span>
-              <Sunset size={14} className="text-primary" />
-            </div>
-          </div>
-
-          {/* Sleep Bar */}
-          <div className="flex items-center justify-between gap-3 text-xs font-bold">
-            <span className="text-muted-foreground w-14 shrink-0">
-              {formatNumerals(weekStats.sleepCompletedCount, language)} {t(language, "progress.ofSeven")}
-            </span>
-            <div
-              className="h-2 flex-1 overflow-hidden rounded-full bg-black/10 dark:bg-white/10"
-              role="progressbar"
-              aria-label={t(language, "progress.sleepAzkar")}
-              aria-valuemin={0}
-              aria-valuemax={7}
-              aria-valuenow={weekStats.sleepCompletedCount}
-            >
-              <div
-                className="h-full bg-sleep rounded-full"
-                style={{ width: `${Math.round((weekStats.sleepCompletedCount / 7) * 100)}%` }}
-              />
-            </div>
-            <div className="flex items-center gap-1 text-foreground shrink-0">
-              <span>{t(language, "progress.sleepShort")}</span>
-              <MoonStar size={14} className="text-sleep" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ────────────────────────────────────────────────────────────────────────────
-// MONTH VIEW (CALENDAR MATRIX & DAY DETAILS BREAKDOWN)
-// ────────────────────────────────────────────────────────────────────────────
-export function ProgressMonthView({
-  language,
-  targetYear,
-  targetMonth,
-  referenceDate,
-  calendarType = "gregorian",
-  dailyCompletions = [],
-}: {
-  language: AppLanguage;
-  targetYear?: number;
-  targetMonth?: number;
-  referenceDate?: Date;
-  calendarType?: CalendarType;
-  dailyCompletions?: import("../types").DailyCollectionCompletion[];
-}) {
-  const isArabic = isAr(language);
-  const completionIndex = useMemo(() => createDailyCompletionIndex(dailyCompletions), [dailyCompletions]);
-
-  const resolvedReferenceDate = useMemo(
-    () =>
-      referenceDate ?? new Date(targetYear ?? new Date().getFullYear(), targetMonth ?? new Date().getMonth(), 15, 12),
-    [referenceDate, targetMonth, targetYear],
-  );
-  const period = useMemo(
-    () => getCalendarMonthPeriod(resolvedReferenceDate, calendarType, language),
-    [calendarType, language, resolvedReferenceDate],
-  );
-
-  const monthStats = useMemo(
-    () =>
-      calendarType === "gregorian" && targetYear !== undefined && targetMonth !== undefined && !referenceDate
-        ? getMonthDetailedStats(completionIndex, targetYear, targetMonth)
-        : getMonthDetailedStatsForDates(completionIndex, period.dates, period.dayNumbers),
-    [calendarType, completionIndex, period, referenceDate, targetMonth, targetYear],
-  );
-
-  const todayKey = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, "0")}-${String(
-    new Date().getDate(),
-  ).padStart(2, "0")}`;
-  const defaultSelectedDay =
-    monthStats.days.find((day) => day.dayKey === todayKey)?.dayNum ?? monthStats.days[0]?.dayNum ?? 1;
-  const [selectedDayNum, setSelectedDayNum] = useState<number>(defaultSelectedDay);
-
-  useEffect(() => {
-    setSelectedDayNum(defaultSelectedDay);
-  }, [defaultSelectedDay, period.startDate]);
-
-  const selectedDayRecord = useMemo(
-    () => monthStats.days.find((d) => d.dayNum === selectedDayNum) || monthStats.days[0],
-    [monthStats.days, selectedDayNum],
-  );
-
-  const calendarHintId = useId();
-  const firstDayOffset = period.startDate.getDay();
-  const offset = isArabic ? (firstDayOffset + 1) % 7 : firstDayOffset;
-
-  const weekdays = isArabic
-    ? [
-        t(language, "progress.weekdaySaturday"),
-        t(language, "progress.weekdaySunday"),
-        t(language, "progress.weekdayMonday"),
-        t(language, "progress.weekdayTuesday"),
-        t(language, "progress.weekdayWednesday"),
-        t(language, "progress.weekdayThursday"),
-        t(language, "progress.weekdayFriday"),
-      ]
-    : [
-        t(language, "progress.weekdaySunday"),
-        t(language, "progress.weekdayMonday"),
-        t(language, "progress.weekdayTuesday"),
-        t(language, "progress.weekdayWednesday"),
-        t(language, "progress.weekdayThursday"),
-        t(language, "progress.weekdayFriday"),
-        t(language, "progress.weekdaySaturday"),
-      ];
-
-  return (
-    <div
-      className="mx-auto flex w-full max-w-[44rem] flex-col gap-4 fade-in xl:max-w-[80rem]"
-      dir={isArabic ? "rtl" : "ltr"}
-    >
-      <dl className="grid grid-cols-2 overflow-hidden rounded-2xl border border-border bg-card sm:grid-cols-4">
-        {/* Best Routine */}
-        <div className="flex flex-col items-center justify-center p-3 text-center">
-          <Sun size={20} className="text-primary mb-1" />
-          <dt className="mb-0.5 text-micro font-bold text-muted-foreground">{t(language, "progress.bestRoutine")}</dt>
-          <dd className="max-w-full truncate text-label font-black text-foreground">
-            {getCategoryName(monthStats.bestRoutine, language)}
-          </dd>
-        </div>
-
-        {/* Longest Streak */}
-        <div className="flex flex-col items-center justify-center p-3 text-center">
-          <Zap className="h-5 w-5 text-primary fill-primary/20 mb-1" />
-          <dt className="mb-0.5 text-micro font-bold text-muted-foreground">{t(language, "progress.longestStreak")}</dt>
-          <dd className="text-sm font-black text-foreground">
-            {formatNumerals(monthStats.longestStreak, language)} {t(language, "progress.days")}
-          </dd>
-        </div>
-
-        {/* Full Days */}
-        <div className="flex flex-col items-center justify-center p-3 text-center">
-          <Calendar size={20} className="text-success mb-1" />
-          <dt className="mb-0.5 text-micro font-bold text-muted-foreground">{t(language, "progress.fullDays")}</dt>
-          <dd className="text-sm font-black text-foreground">{formatNumerals(monthStats.fullDaysCount, language)}</dd>
-        </div>
-
-        {/* Completion Rate */}
-        <div className="flex flex-col items-center justify-center p-3 text-center">
-          <Sprout size={20} className="text-success mb-1" />
-          <dt className="mb-0.5 text-micro font-bold text-muted-foreground">
-            {t(language, "progress.completionRate")}
-          </dt>
-          <dd className="text-sm font-black text-primary">{formatPercentage(monthStats.completionRate, language)}</dd>
-        </div>
-      </dl>
-
-      <p className="text-xs leading-5 text-muted-foreground">{t(language, "progress.routineCoverageHint")}</p>
-      {/* Main Month View: Calendar Grid + Selected Day Details */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Calendar Grid Card (2 Columns on desktop) */}
-        <div data-testid="garden-month-calendar" className="rounded-2xl border border-border bg-card p-4 md:col-span-2">
-          <p id={calendarHintId} className="mb-3 text-xs leading-5 text-muted-foreground">
-            {t(language, "progress.calendarScrollHint")}
-          </p>
-          <div
-            role="region"
-            aria-label={t(language, "progress.calendarDates")}
-            aria-describedby={calendarHintId}
-            className="overflow-x-auto pb-2"
-          >
-            <div className="min-w-[21rem]">
-              {/* Weekday headers */}
-              <div className="grid grid-cols-7 gap-1 mb-2 text-center">
-                {weekdays.map((day) => (
-                  /* Steps down on a phone and clips rather than pushing the column
-                 open: the longest Arabic weekday needs 44px in a 40px cell, and
-                 Intl's "short" form for Arabic is the full word, so there is no
-                 shorter label to fall back on. */
-                  <div key={day} className="truncate text-micro font-bold text-muted-foreground py-1 sm:text-xs">
-                    {day}
-                  </div>
-                ))}
-              </div>
-
-              {/* Day Grid */}
-              <div className="grid grid-cols-7 gap-1">
-                {Array.from({ length: offset }).map((_, i) => (
-                  <div key={`offset-${i}`} className="aspect-square" />
-                ))}
-
-                {monthStats.days.map((day) => {
-                  const isSelected = day.dayNum === selectedDayNum;
-                  const isPalm = day.isPalm;
-                  const count = day.completedCount;
-
-                  return (
-                    <button
-                      type="button"
-                      key={day.dayKey}
-                      onClick={() => setSelectedDayNum(day.dayNum)}
-                      aria-label={t(language, "progress.monthDayAria", {
-                        day: formatNumerals(day.dayNum, language),
-                        status: isPalm
-                          ? t(language, "progress.monthDayComplete")
-                          : count > 0
-                            ? t(language, "progress.monthDayPartial", {
-                                count: formatNumerals(count, language),
-                                total: formatNumerals(3, language),
-                              })
-                            : t(language, "progress.monthDayUnstarted"),
-                      })}
-                      aria-pressed={isSelected}
-                      className={`flex min-h-11 flex-col items-center justify-center aspect-square rounded-2xl border transition-[color,background-color,border-color,box-shadow] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 ${
-                        isSelected
-                          ? "border-primary ring-2 ring-primary/50 bg-primary/20 z-10"
-                          : isPalm
-                            ? "bg-success/15 border-success/30 text-success"
-                            : count > 0
-                              ? "bg-info/10 border-info/30 text-info"
-                              : "bg-white/30 dark:bg-white/5 border-white/20 dark:border-white/10 text-muted-foreground/60"
-                      }`}
-                    >
-                      <span className="text-micro sm:text-xs font-bold">{formatNumerals(day.dayNum, language)}</span>
-                      <div className="flex h-4 items-center justify-center mt-0.5">
-                        {isPalm ? (
-                          <Check size={12} strokeWidth={3} className="text-success" />
-                        ) : count > 0 ? (
-                          <bdi className="text-micro font-extrabold text-info">{formatRatio(count, 3, language)}</bdi>
-                        ) : (
-                          <span className="text-micro text-muted-foreground/40">-</span>
-                        )}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Bottom Grid Legend */}
-              <div className="mt-4 pt-3 border-t border-white/20 dark:border-white/10 flex items-center justify-center gap-4 text-micro font-bold text-muted-foreground flex-wrap">
-                <div className="flex items-center gap-1">
-                  <Check size={12} strokeWidth={3} className="text-success" />
-                  <span>{t(language, "progress.complete")}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 rounded-full bg-info" />
-                  <span>{t(language, "progress.partialRange")}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 rounded-full border border-primary" />
-                  <span>{t(language, "progress.unstarted")}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span>- {t(language, "progress.noData")}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Selected Day Details & Monthly Insight Card (1 Column on desktop) */}
-        <div className="flex flex-col gap-4">
-          {/* Day Details Card */}
-          <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4">
-            <div className="flex items-center justify-between border-b border-white/20 dark:border-white/10 pb-2">
-              <div className="min-w-0 flex-1">
-                <h2
-                  data-testid="progress-primary-heading"
-                  className="block max-w-full truncate whitespace-nowrap text-subtitle font-black text-foreground"
-                >
-                  {t(language, "progress.selectedDayDetails", {
-                    day: formatNumerals(selectedDayNum, language),
-                  })}
-                </h2>
-                <span className="text-micro font-semibold text-muted-foreground">{selectedDayRecord?.dayKey}</span>
-              </div>
-              <Calendar size={18} className="text-primary" />
-            </div>
-
-            {/* Morning Status */}
-            <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted border border-border">
-              <div className="flex items-center gap-2">
-                <Sunrise size={16} className="text-primary" />
-                <span className="text-label font-bold">{t(language, "progress.morningAzkar")}</span>
-              </div>
-              {selectedDayRecord?.categories.includes("morning") ? (
-                <span className="text-xs font-bold text-success">{t(language, "progress.done")}</span>
-              ) : (
-                <span className="text-xs font-bold text-primary">{t(language, "progress.notDone")}</span>
-              )}
-            </div>
-
-            {/* Evening Status */}
-            <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted border border-border">
-              <div className="flex items-center gap-2">
-                <Sunset size={16} className="text-evening" />
-                <span className="text-label font-bold">{t(language, "progress.eveningAzkar")}</span>
-              </div>
-              {selectedDayRecord?.categories.includes("evening") ? (
-                <span className="text-xs font-bold text-success">{t(language, "progress.done")}</span>
-              ) : (
-                <span className="text-xs font-bold text-primary">{t(language, "progress.notDone")}</span>
-              )}
-            </div>
-
-            {/* Sleep Status */}
-            <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted border border-border">
-              <div className="flex items-center gap-2">
-                <MoonStar size={16} className="text-sleep" />
-                <span className="text-label font-bold">{t(language, "progress.sleepAzkar")}</span>
-              </div>
-              {selectedDayRecord?.categories.includes("before_sleep") ? (
-                <span className="text-xs font-bold text-success">{t(language, "progress.done")}</span>
-              ) : (
-                <span className="text-xs font-bold text-primary">{t(language, "progress.notDone")}</span>
-              )}
-            </div>
-
-            {/* Post-Prayer Status */}
-            <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted border border-border">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 size={16} className="text-success" />
-                <span className="text-label font-bold">{t(language, "progress.postPrayerAzkar")}</span>
-              </div>
-              {selectedDayRecord?.categories.includes("after_prayer") ? (
-                <span className="text-xs font-bold text-success">{t(language, "progress.done")}</span>
-              ) : (
-                <span className="text-xs font-bold text-primary">{t(language, "progress.notDone")}</span>
-              )}
-            </div>
-          </div>
-
-          {/* Month Improvement Insight */}
-          <div className="flex items-start gap-3 rounded-2xl border border-success/50 bg-success/5 p-4">
-            <Sprout size={20} className="text-success shrink-0 mt-0.5" />
-            <div>
-              <h3 className="mb-1 block max-w-full truncate whitespace-nowrap text-sm font-black text-foreground">
-                {t(language, "garden.monthRecordTitle")}
-              </h3>
-              <p className="text-xs font-semibold text-muted-foreground">
-                {t(language, "garden.monthFullDays", {
-                  count: formatNumerals(monthStats.fullDaysCount, language),
-                })}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ────────────────────────────────────────────────────────────────────────────
-// YEAR VIEW (ANNUAL BAR CHART, QUICK GLANCE & 12 MINI HEATMAPS)
-// ────────────────────────────────────────────────────────────────────────────
-export function ProgressYearView({
-  language,
-  targetYear = new Date().getFullYear(),
-  referenceDate,
-  calendarType = "gregorian",
-  dailyCompletions = [],
-}: {
-  language: AppLanguage;
-  targetYear?: number;
-  referenceDate?: Date;
-  calendarType?: CalendarType;
-  dailyCompletions?: import("../types").DailyCollectionCompletion[];
-}) {
-  const isArabic = isAr(language);
-  const completionIndex = useMemo(() => createDailyCompletionIndex(dailyCompletions), [dailyCompletions]);
-  const resolvedReferenceDate = useMemo(
-    () => referenceDate ?? new Date(targetYear, 6, 1, 12),
-    [referenceDate, targetYear],
-  );
-  const yearPeriods = useMemo(
-    () => getCalendarYearPeriods(resolvedReferenceDate, calendarType, language),
-    [calendarType, language, resolvedReferenceDate],
-  );
-
-  const yearStats = useMemo(
-    () =>
-      calendarType === "gregorian" && !referenceDate
-        ? getYearDetailedStats(completionIndex, targetYear)
-        : getYearDetailedStatsForPeriods(completionIndex, yearPeriods),
-    [calendarType, completionIndex, referenceDate, targetYear, yearPeriods],
-  );
-
-  const monthNames =
-    calendarType === "gregorian" && !referenceDate
-      ? isArabic
-        ? yearPeriods.map((period) => period.monthLabel)
-        : GREGORIAN_MONTH_NAMES_EN
-      : yearPeriods.map((period) => period.monthLabel);
-  const endOfToday = new Date();
-  endOfToday.setHours(23, 59, 59, 999);
-  const bestMonthName =
-    yearStats.bestMonthIndex === null ? getCategoryName(null, language) : monthNames[yearStats.bestMonthIndex];
-
-  return (
-    <div
-      className="mx-auto flex w-full max-w-[44rem] flex-col gap-4 fade-in xl:max-w-[80rem]"
-      dir={isArabic ? "rtl" : "ltr"}
-    >
-      <dl className="grid grid-cols-2 overflow-hidden rounded-2xl border border-border bg-card sm:grid-cols-4">
-        {/* Completion Rate */}
-        <div className="flex flex-col items-center justify-center p-3 text-center">
-          <Sprout size={20} className="text-success mb-1" />
-          <dt className="mb-0.5 text-micro font-bold text-muted-foreground">
-            {t(language, "progress.completionRate")}
-          </dt>
-          <dd className="text-subtitle font-black text-primary">
-            {formatPercentage(yearStats.overallCompletionRate, language)}
-          </dd>
-        </div>
-
-        {/* Longest Streak */}
-        <div className="flex flex-col items-center justify-center p-3 text-center">
-          <Star size={20} className="text-primary mb-1" />
-          <dt className="mb-0.5 text-micro font-bold text-muted-foreground">{t(language, "progress.longestStreak")}</dt>
-          <dd className="text-sm font-black text-foreground">
-            {formatNumerals(yearStats.longestStreak, language)} {t(language, "progress.days")}
-          </dd>
-        </div>
-
-        {/* Current Streak */}
-        <div className="flex flex-col items-center justify-center p-3 text-center">
-          <Zap className="h-5 w-5 text-primary fill-primary/20 mb-1" />
-          <dt className="mb-0.5 text-micro font-bold text-muted-foreground">{t(language, "progress.currentStreak")}</dt>
-          <dd className="text-sm font-black text-foreground">
-            {formatNumerals(yearStats.currentStreak, language)} {t(language, "progress.days")}
-          </dd>
-        </div>
-
-        {/* Active Days */}
-        <div className="flex flex-col items-center justify-center p-3 text-center">
-          <Calendar size={20} className="text-success mb-1" />
-          <dt className="mb-0.5 text-micro font-bold text-muted-foreground">{t(language, "progress.activeDays")}</dt>
-          <dd className="text-sm font-black text-foreground">
-            {formatNumerals(yearStats.activeDays, language)} {t(language, "progress.activeSuffix")}
-          </dd>
-        </div>
-      </dl>
-
-      {/* Middle Section: Monthly Bar Chart + Quick Glance */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Monthly Completion Bar Chart (2 Columns on desktop) */}
-        <div className="flex flex-col rounded-2xl border border-border bg-card p-4 md:col-span-2">
-          <div className="flex items-center justify-between mb-1">
-            <h2
-              data-testid="progress-primary-heading"
-              className="block max-w-full truncate whitespace-nowrap text-subtitle font-black text-foreground"
-            >
-              {t(language, "progress.monthlyCompletionRate")}
-            </h2>
-          </div>
-          <p className="text-xs font-semibold text-muted-foreground mb-4">
-            {t(language, "progress.routineCoverageHint")}
-          </p>
-
-          {/* Bar Chart */}
-          <div
-            data-testid="year-monthly-chart"
-            aria-hidden="true"
-            className="grid items-end gap-2 pt-6 pb-2"
-            style={{ gridTemplateColumns: "repeat(auto-fit, minmax(3rem, 1fr))" }}
-          >
-            {yearStats.months.map((m, idx) => {
-              const rate = m.completionRate;
-              const hasElapsedDays = (yearPeriods[idx]?.startDate.getTime() ?? Infinity) <= endOfToday.getTime();
-              const isBest = yearStats.bestMonthIndex !== null && idx === yearStats.bestMonthIndex;
-
-              return (
-                /* min-w-0 because a flex item defaults to min-width:auto, so the month
-                   label underneath set a floor and twelve columns could not shrink to
-                   fit a phone: the row measured 338px inside 301px and pushed the
-                   overflow up through four ancestors. The label already truncates. */
-                <div key={idx} className="flex-1 min-w-0 flex flex-col items-center h-full justify-end group">
-                  <span
-                    className={`text-micro font-black mb-1 transition-opacity ${
-                      isBest ? "opacity-100 text-primary" : rate > 0 ? "text-muted-foreground" : "text-muted-foreground"
-                    }`}
-                  >
-                    {hasElapsedDays ? formatPercentage(rate, language) : "—"}
-                  </span>
-                  <div className="w-full bg-black/10 dark:bg-white/10 rounded-t-lg h-[90px] flex items-end">
-                    <div
-                      className={`w-full rounded-t-lg transition-colors duration-emphasis ${
-                        isBest
-                          ? "bg-primary shadow-md shadow-primary/30"
-                          : "bg-primary/40 dark:bg-primary/30 group-hover:bg-primary/70"
-                      }`}
-                      style={{ height: `${rate}%` }}
-                    />
-                  </div>
-                  <span className="mt-1.5 max-w-full truncate text-center text-micro font-bold text-muted-foreground">
-                    {monthNames[idx]?.slice(0, isArabic ? 6 : 3)}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-          <ul className="sr-only overflow-hidden">
-            {yearStats.months.map((month, index) => (
-              <li key={month.monthIndex} className="overflow-hidden">
-                {monthNames[index]}:{" "}
-                {(yearPeriods[index]?.startDate.getTime() ?? Infinity) <= endOfToday.getTime()
-                  ? formatPercentage(month.completionRate, language)
-                  : "—"}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Quick Glance Card (1 Column on desktop) */}
-        <div className="flex flex-col justify-between gap-3 rounded-2xl border border-border bg-card p-4">
-          <h2 className="block max-w-full truncate whitespace-nowrap border-b border-white/20 pb-2 text-subtitle font-black text-foreground dark:border-white/10">
-            {t(language, "progress.quickGlance")}
-          </h2>
-
-          {/* Best Month */}
-          <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted border border-border">
-            <div>
-              <span className="block text-micro font-bold text-muted-foreground">
-                {t(language, "progress.bestMonth")}
-              </span>
-              <span className="text-sm font-black text-foreground">{bestMonthName}</span>
-            </div>
-            <Star size={18} className="text-primary" />
-          </div>
-
-          {/* Most Consistent Routine */}
-          <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted border border-border">
-            <div>
-              <span className="block text-micro font-bold text-muted-foreground">
-                {t(language, "progress.mostConsistent")}
-              </span>
-              <span className="text-sm font-black text-foreground">
-                {getCategoryName(yearStats.mostConsistentRoutine, language)}
-              </span>
-            </div>
-            <Sun size={18} className="text-primary" />
-          </div>
-
-          {/* Total Azkar Completed */}
-          <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted border border-border">
-            <div>
-              <span className="block text-micro font-bold text-muted-foreground">
-                {t(language, "progress.totalCompleted")}
-              </span>
-              <span className="text-sm font-black text-foreground">
-                {formatNumerals(yearStats.totalCollections, language)}
-              </span>
-            </div>
-            <CheckCircle2 size={18} className="text-success" />
-          </div>
-        </div>
-      </div>
-
-      {/* 12-Month Mini Heatmap Matrices */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5">
-        {yearStats.months.map((m, idx) => {
-          const isBest = yearStats.bestMonthIndex !== null && idx === yearStats.bestMonthIndex;
-          const rate = m.completionRate;
-          const hasElapsedDays = (yearPeriods[idx]?.startDate.getTime() ?? Infinity) <= endOfToday.getTime();
-
-          return (
-            <div
-              key={idx}
-              className={`p-3 rounded-2xl bg-card border transition-colors ${
-                isBest ? "border-success/60 ring-1 ring-success/40 bg-success/5 shadow-md" : "border-border/40"
-              }`}
-            >
-              <div className="flex items-center justify-between mb-1.5 text-xs font-extrabold">
-                <span className="text-foreground truncate">{monthNames[idx]}</span>
-                <span className="text-muted-foreground text-micro">
-                  {hasElapsedDays ? formatPercentage(rate, language) : "—"}
-                </span>
-              </div>
-
-              {/* Mini day grid */}
-              <div className="grid grid-cols-7 gap-0.5" aria-hidden="true" data-testid={`year-heatmap-${idx}`}>
-                {m.dayCells.map((cell) => (
-                  <div
-                    key={cell.dayNum}
-                    className={`aspect-square rounded-[var(--ds-radius-micro)] ${
-                      cell.isPalm || cell.level === 2
-                        ? "bg-primary"
-                        : cell.level === 1
-                          ? "bg-primary/40"
-                          : "bg-black/10 dark:bg-white/10"
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Motivational Quote / Closing Prayer Card */}
-      <div className="flex items-center justify-center rounded-2xl bg-muted p-4 text-center">
-        <p className="text-sm font-bold text-foreground">
-          {yearStats.totalCollections > 0
-            ? t(language, "garden.yearActivitySummary", {
-                count: formatNumerals(yearStats.totalCollections, language),
-              })
-            : t(language, "garden.yearNoActivity")}
-        </p>
-      </div>
-    </div>
-  );
-}
+export { ProgressWeekView, ProgressMonthView, ProgressYearView } from "./ProgressPeriodViews";

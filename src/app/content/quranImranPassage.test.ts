@@ -31,6 +31,6 @@ it("keeps the waking entry identity/count while classifying the complete passage
     canonicalKey: "quran-003-190-200",
   });
   expect(entry.arabicText).toBe(QURAN_IMRAN_PASSAGE.arabicText);
-  expect(entry.audioAssetId).toBeUndefined();
-  expect(APPROVED_AUDIO_ASSIGNMENTS[entry.id]).toBeUndefined();
+  expect(entry.audioAssetId).toBe("wu-hm-4");
+  expect(APPROVED_AUDIO_ASSIGNMENTS[entry.id]).toBe("wu-hm-4");
 });

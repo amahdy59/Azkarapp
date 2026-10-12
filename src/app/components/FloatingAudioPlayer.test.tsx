@@ -615,10 +615,12 @@ describe("FloatingAudioPlayer", () => {
     expect(text.textContent).toBe(controller.currentEntry.arabicText);
   });
 
-  it("replaces only the reader canvas and restores covered controls and focus on collapse", () => {
+  it("covers the session header and restores covered controls and focus on collapse", () => {
     render(
-      <div>
-        <button type="button">Reader header</button>
+      <div id="main-content">
+        <div>
+          <button type="button">Reader header</button>
+        </div>
         <div data-testid="reader-card">
           <div data-testid="reading-content">
             <button type="button">Reading action</button>
@@ -630,9 +632,9 @@ describe("FloatingAudioPlayer", () => {
       </div>,
     );
     fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
-    expect(screen.getByTestId("reading-content")).toHaveAttribute("inert");
+    expect(screen.getByTestId("reading-content").closest('[data-testid="reader-card"]')).toHaveAttribute("inert");
     expect(screen.queryByRole("button", { name: "Reading action" })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Reader header" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Reader header" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Minimize player" })).toHaveFocus();
     fireEvent.keyDown(window, { key: "Escape" });
     expect(screen.getByTestId("reading-content")).not.toHaveAttribute("inert");

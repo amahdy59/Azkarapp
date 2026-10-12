@@ -114,8 +114,13 @@ export function shiftCalendarDate(
   if (unit === "week") return addDays(referenceDate, offset * 7);
   if (calendarType === "gregorian") {
     const shifted = atNoon(referenceDate);
-    if (unit === "month") shifted.setMonth(shifted.getMonth() + offset);
-    else shifted.setFullYear(shifted.getFullYear() + offset);
+    if (unit === "month") {
+      const day = shifted.getDate();
+      shifted.setDate(1);
+      shifted.setMonth(shifted.getMonth() + offset);
+      const lastDay = new Date(shifted.getFullYear(), shifted.getMonth() + 1, 0).getDate();
+      shifted.setDate(Math.min(day, lastDay));
+    } else shifted.setFullYear(shifted.getFullYear() + offset);
     return shifted;
   }
 

@@ -1,5 +1,21 @@
 # Azkar design system
 
+## Shared control label alignment — 2026-10-12
+
+Tabs and segmented choices render their foreground label group as a centered flex box above the selection indicator. Avoid inline baseline wrappers around nested icon/text groups: their descent space can shift the group within an otherwise centered button. Decorative icons retain a non-shrinking block box; labels retain native wrapping and caller-owned spacing. Library desktop labels, mobile icon-only pills, saved-count placement, target sizes and RTL keyboard order remain unchanged. Browser regressions measure icon, label and group centers at 320–1280px and 100%/200% text sizing.
+
+## Continuous expanded surah listening — 2026-10-12
+
+Owner-requested local refinement supersedes the expanded-player second header row and below-session-header containment. All expanded players occupy the main canvas. Close, Audio options with explicit downward chevron, optional numeric page selector and Collapse share one top bar; enlarged labels wrap inside the centre slot. Al-Kahf, As-Sajdah and Al-Mulk omit page controls and use continuous vertically scrollable passages, starting at 30px with the medium 16px root and scaling with app text size/magnification. Fonts, reviewed words and verse markers reuse existing Quran rendering. Return to current verse appears only after manual browsing as an opaque floating action above the transport; it remains until following resumes and never pushes text. Canonical printed Mushaf reading remains unchanged.
+
+### After-salat learning groups — 2026-10-12
+
+After-prayer overview uses five localized numbered stages with a brief learning-order explanation. Related passages share an opaque bordered surface and divided borderless rows, keeping independent 44px reading/completion actions. Opening forgiveness/peace, tawhid/giving and the full 33/33/33 + 1 sequence have explicit count instructions. Other routines retain their existing labels and anatomy. Core progress counts a group only after all members are complete; complete-mode item totals remain unchanged. Reader entries, saved identities, reviewed text and audio counts remain intact. See [the local phase](agent/phases/AFTER_PRAYER_LEARNING_ORDER_2026_10_12.md).
+
+### Mushaf opening-page readability — 2026-10-12
+
+Opening-page fitting measures the inner opening-page size container that supplies its typography units, preserving the eight printed slots while avoiding unintended shrinkage against the outer canvas. Their text area occupies 58% of the opening frame, up from 54%, with a modest corresponding increase in line spacing. Word-meaning affordances use the same semantic gold ink blend and soft filled surface as Quran snippets; dotted underlines supplement the fill, and selected/spoken words retain stronger outlines. These paint changes do not change word advances. Page magnification adds modest leading above proportional enlargement: 1% at 125%, rising to 4% at 200%, with native vertical scrolling and unchanged canonical line breaks.
+
 ### Stable Quran help geometry — 2026-10-11
 
 Owner-approved screenshot repair supersedes the Reader snippet's printed-line breaks and phrase-sized meaning buttons. Flowing snippets use one shared word renderer, natural wrapping, regular Quran type and identical word geometry with help off/on. Enabling help adds ink/background/dotted underline and keyboard/pointer actions only; no font, size, weight, spacing, padding, border, line-break or scroll change. Multiword explanations attach to each existing word and open the same sourced gloss. These inline text actions are the documented small-target exception; full explanation controls retain ordinary targets. Focus rings paint without affecting layout. First/last-line diacritics retain viewport clearance. Full fifteen-line pages and magnification are unchanged. Multipage snippets select glyph mode only with both page fonts ready and paint each page's glyphs in that font. The waking Al-Imran snippet includes every ayah 190–200 and labels that exact range. See [the local phase report](agent/phases/QURAN_SNIPPET_GEOMETRY_AND_IMRAN_2026_10_11.md).
@@ -789,3 +805,19 @@ When page meaning is enabled on compact Mushaf surfaces, the Arabic/English nati
 ### Reader control consistency — 2026-10-11
 
 The normal zikr reader, Masbaha and Salawat share the same footer focus button through DevotionalAction: peer pill corners, semantic surface/border, 20px icon and no inner icon badge. Standalone counters retain benefit/sound/reset where relevant and use visit-local reading focus, hiding header/target chrome and secondary tools while keeping the counter and explicit exit. Escape exits focus before navigation; focus returns to the labelled reading region. Full-surah benefits belong in compact More options or the desktop Mushaf rail, never in a footer beneath the Quran or as a fourth reading-choice button. This owner request supersedes earlier below-surah placements.
+
+## Progress trends and clarity — 2026-10-12
+
+The owner-approved Progress simplification supersedes the always-visible Month calendar, Year bars/mini calendars and duplicated overview statistics described in the 2026-10-09 section. Prayer remains first, with one recording overview and optional exact supporting records. Day uses plain continuation rows and one optional reflection group; Progress-only fruit badges and duplicated descriptive copy are omitted. Week retains the semantic checkmark matrix and optional configured intention, without separate routine bars or competing statistics.
+
+Month has one trend across seven-day buckets labelled by day ranges in the selected Hijri/Gregorian month; the existing large-target calendar is optional detail. Year has one monthly trend and selected-month exploration. Both use recorded morning/evening/sleep completion divided by three routines per elapsed progress day, including today, with a fixed 0–100% scale, straight segments, sparse gridlines and theme-token points. Quran remains independent. Future periods are unavailable rather than zero; incomplete periods say So far. A native labelled selector supplies exact values and an optional equivalent semantic table avoids visible duplication. Chart labels resize with the root font and measurement; no looped animation, remote analytics, dependency or persistence migration is introduced. Gregorian month-end navigation stays inside the requested month. See [the phase report](agent/phases/PROGRESS_TRENDS_CLARITY_2026_10_12.md).
+
+### Optional Progress comparisons — owner approval 2026-10-12
+
+Month offers a wrapping two-choice display switch: Trend or Calendar and daily records. Only the chosen visualization is visible. Calendar levels expose exact 1/3 and 2/3 counts, a completion checkmark and a neutral future state; selection reveals the existing independent day records. Week keeps its checkmark matrix primary and exposes three static, equally scaled routine bars through a closed Compare routines disclosure. Counts are deduplicated and limited to elapsed locale-week days, including today; future weeks show Upcoming. No combined Quran/prayer score, persistence or dependency change.
+
+### Progress alignment and themed period selection — owner refinement 2026-10-12
+
+All Progress period cards inherit the same 66rem screen measure. Week and Month do not introduce a narrower intermediate measure; prayer, chart and view-switch edges remain aligned at every breakpoint. Month uses short Trend/Calendar labels. Charts explain seven-day Month ranges or monthly Year points and omit the repeated decorative eyebrow. Period selection uses the shared ui/select components with localized direction, app popover/control tokens, selected checkmark, 44px options and Escape focus recovery. Exact chart data stays optional. No tracking, persistence or religious-content change.
+
+The centered Progress wrapper retains the shared opaque header's zero top-edge gap when scrolled. Day and Week primary titles remain on one readable line; descriptive Month and Year chart titles may use two complete lines at narrow widths rather than shrinking or clipping text. Surah listening preference buttons use the same centered icon/label spacing as paginated listening controls.

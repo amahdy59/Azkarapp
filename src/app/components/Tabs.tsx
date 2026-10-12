@@ -128,7 +128,9 @@ export function TabList<T extends string>({
                   aria-hidden="true"
                 />
               )}
-              <span className="relative z-10">{tab.label}</span>
+              <span className="relative z-10 flex min-w-0 items-center justify-center gap-2 [&>svg]:block [&>svg]:shrink-0">
+                {tab.label}
+              </span>
             </button>
           );
         })}

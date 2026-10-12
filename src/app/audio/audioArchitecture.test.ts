@@ -17,6 +17,7 @@ import { resolveAudioAsset } from "./resolveAudioAsset";
 import type { AudioAsset, AudioCatalog } from "./audioTypes";
 import { validateAudioCatalog } from "./validateAudioCatalog";
 import { FRIDAY_KAHF } from "../content/fridayKahf";
+import { QURAN_IMRAN_PASSAGE } from "../content/quranImranPassage";
 
 const SHA256 = "a".repeat(64);
 
@@ -428,6 +429,42 @@ describe("explicit audio content architecture", () => {
         expect(resolution.availableVoiceIds).toContain("english-george");
       }
     }
+  });
+
+  it("resolves the complete Al-Imran passage to its unchanged owner-confirmed Quran recording", () => {
+    const entry = ALL_AZKAR.find((item) => item.id === "wu-hm-4")!;
+    const resolution = resolveAudioAsset(entry);
+    expect(resolution.available).toBe(true);
+    if (!resolution.available) throw new Error(resolution.reason);
+    expect(resolution.asset).toMatchObject({
+      contentKind: "quran",
+      canonicalArabicText: QURAN_IMRAN_PASSAGE.arabicText,
+      normalizedTextHash: createArabicTextFingerprint(entry.arabicText),
+      requiredQuranRange: { surah: 3, ayahStart: 190, ayahEnd: 200 },
+    });
+    expect(resolution.asset.segments[0]).toMatchObject({
+      transcriptArabic: entry.arabicText,
+      normalizedTranscriptHash: createArabicTextFingerprint(entry.arabicText),
+      quranReference: { surah: 3, ayahStart: 190, ayahEnd: 200 },
+    });
+    expect(resolution.segmentsByVoice["abdullah-muhammad"]?.[0]).toMatchObject({
+      durationMs: 282432,
+      sha256: "f4ba5b49fef6bb91d693276907cb6d6bdfac22118b768fe13ebb1625516d4607",
+    });
+    expect(resolution.asset.segments[0]?.variants[0]?.byteSize).toBe(11297280);
+    expect(resolveAudioAsset({ ...entry, arabicText: entry.arabicText.split("﴿١٩١﴾")[0]! })).toEqual({
+      available: false,
+      reason: "text-mismatch",
+    });
+    const plan = buildPlaybackPlan({
+      zikrs: [entry],
+      preferences: { ...DEFAULT_AUDIO_PREFERENCES, quranReciterId: "abdullah-muhammad" },
+      context: { category: "waking_up", routineMode: "complete", source: "single" },
+    });
+    expect(plan.entries).toHaveLength(1);
+    expect(plan.entries[0]?.segmentsByVoice["abdullah-muhammad"]?.[0]?.url).toContain(
+      "quran/wu-hm-4/abdullah-muhammad/v1/wu-hm-4.mp3?sha256=f4ba5b49",
+    );
   });
 
   it("maps shared morning and evening adhkar to their matching Arabic recordings", () => {

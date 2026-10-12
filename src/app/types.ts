@@ -68,7 +68,7 @@ export type RoutineCategoryId = "morning" | "evening" | "before_sleep" | "after_
 export type RoutineMode = "core" | "complete";
 export type ZikrGroupId =
   "begin" | "quran_protection" | "dua_protection" | "renew" | "ask" | "repeat" | "prepare" | "settle" | "final";
-export type RitualGroupId = "three_quls" | "tasbih_fatimah";
+export type RitualGroupId = "three_quls" | "tasbih_fatimah" | "prayer_opening" | "prayer_tahlil" | "prayer_tasbih";
 export type ZikrAudioMode = "play-once" | "repeat-prescribed-count" | "repeat-custom";
 export interface ZikrAudioBehavior {
   defaultMode: ZikrAudioMode;

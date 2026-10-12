@@ -10,6 +10,8 @@ import { formatNumerals } from "../../formatting";
 import { reportError } from "../../../lib/observability";
 import { SubHeader } from "./SettingsPrimitives";
 import { AudioFileExports } from "./AudioFileExports";
+import { DownloadProgress } from "../../components/DownloadProgress";
+import { downloadFile } from "../../share/shareDispatcher";
 import { applyContentReview } from "../../content/contentReview";
 import { ALL_AZKAR, getAzkarForMode } from "../../content/azkar";
 import { loadAudioPreferences } from "../../audio/audioPreferences";
@@ -45,7 +47,7 @@ type OfflineStatus = {
   groups: AudioStatus[];
   audio: AudioStatus[];
 };
-type Job = { id: string; completed: number; total: number; detail?: AudioDownloadProgress };
+type Job = { id: string; completed: number; total: number; detail?: AudioDownloadProgress; archive?: boolean };
 function formatMegabytes(bytes: number | undefined, language: AppLanguage) {
   return typeof bytes === "number"
     ? formatNumerals((bytes / 1_000_000).toFixed(1), language) + " MB"
@@ -185,7 +187,14 @@ export function DownloadsPanel({
       if (!(await hasDownloadSpace(bytes))) throw new DOMException("Storage full", "QuotaExceededError");
       controller.signal.throwIfAborted();
       await work(controller);
-      message = t(language, id === "mushaf" ? "downloads.mushafDownloadComplete" : "downloads.downloadComplete");
+      message = t(
+        language,
+        id === "mushaf"
+          ? "downloads.mushafDownloadComplete"
+          : id === "archive"
+            ? "downloads.fileHandedToBrowser"
+            : "downloads.downloadComplete",
+      );
     } catch (error) {
       if (controller.signal.aborted)
         message = t(language, id === "mushaf" ? "downloads.mushafCancelled" : "downloads.downloadCancelled");
@@ -441,6 +450,66 @@ export function DownloadsPanel({
               {t(language, "downloads.keepDownloads")}
             </Button>
           )}
+        </div>
+        <div className="space-y-2 rounded-xl border border-border p-3" data-testid="audio-archive-export">
+          <p className="text-sm text-muted-foreground">{t(language, "downloads.archiveHelp")}</p>
+          {job?.id === "archive" && (
+            <>
+              <p role="status" className="text-sm">
+                {job.archive
+                  ? t(language, "downloads.archiveProgress", {
+                      completed: formatNumerals(job.completed, language),
+                      total: formatNumerals(job.total, language),
+                    })
+                  : t(language, "downloads.recordingCoverage", {
+                      completed: formatNumerals(job.detail?.completedFiles ?? 0, language),
+                      total: formatNumerals(job.detail?.totalFiles ?? 0, language),
+                    })}
+              </p>
+              <DownloadProgress
+                completed={job.completed}
+                total={job.total}
+                label={t(language, "downloads.archiveAll")}
+                language={language}
+              />
+            </>
+          )}
+          <Button
+            variant="outline"
+            className="h-auto min-h-11 max-w-full whitespace-normal py-2"
+            disabled={
+              job?.id !== "archive" &&
+              (isLoading || isAnyJobActive || !status || !collections.some((r) => r.byteSize > 0))
+            }
+            onClick={() => {
+              if (job?.id === "archive") {
+                controllerRef.current?.abort();
+                return;
+              }
+              void runDownload(
+                "archive",
+                status?.groups.reduce((sum, group) => sum + group.remainingBytes, 0) ?? 0,
+                async (controller) => {
+                  const { prepareAudioArchive } = await import("../../audio/audioArchive");
+                  const file = await prepareAudioArchive(
+                    collections.flatMap((resource) => resource.zikrs),
+                    audioPreferences,
+                    {
+                      signal: controller.signal,
+                      onDetail: updateAudioDetail("archive"),
+                      onArchiveProgress: (completed, total) => {
+                        if (mountedRef.current) setJob({ id: "archive", completed, total, archive: true });
+                      },
+                    },
+                  );
+                  controller.signal.throwIfAborted();
+                  if (mountedRef.current) downloadFile(file);
+                },
+              );
+            }}
+          >
+            {t(language, job?.id === "archive" ? "downloads.cancelDownload" : "downloads.archiveAll")}
+          </Button>
         </div>
         {status && !status.serviceWorkerReady && (
           <p role="status" className="text-sm text-muted-foreground">

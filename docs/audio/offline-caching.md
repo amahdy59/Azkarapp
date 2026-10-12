@@ -1,5 +1,9 @@
 # Offline audio caching
 
+## Complete filesystem ZIP — 2026-10-12 (local only)
+
+Downloads offers a persistent Download all audio as ZIP action outside management. It includes all available approved adhkar/dua and Kahf/Baqarah recordings for the current selected voices. Missing files use the existing full-response downloader and checkpoints first; all selected bytes are reverified before packaging. An incomplete set fails rather than exporting a partial archive. The ZIP preserves original recording bytes and stable filenames. Packaging uses bounded chunk reads and yields for cancellation; completed app-private offline copies remain after save, cancellation or error. The action remains available after storage protection and completed downloads. Browser feedback describes save handoff rather than a completed filesystem write. No runtime dependency, cache-format or religious-content change. The owner prohibits pushing this application improvement.
+
 Audio is excluded from Workbox precaching. Downloads settings groups all available approved morning, evening, before-sleep and other adhkar/dua recordings under one category. Only approved assets in the selected voice are eligible; unavailable recordings are never invented or substituted.
 
 Partial voice coverage never substitutes English narration in an Arabic download or Arabic recitation in an English narration download. Manifest 7 invalidates older downloaded catalogs after two Arabic variants fail their approved checksums; their separately approved English variants remain downloadable when explicitly selected.

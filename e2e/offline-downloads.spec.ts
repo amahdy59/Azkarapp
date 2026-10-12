@@ -2,6 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { t } from "../src/app/i18n";
 import { playEnglishTranslation } from "./reader-options";
+import { installStableLayoutAudio } from "./helpers/stable-layout-audio";
 
 for (const scenario of [
   { language: "ar", width: 320, height: 568, theme: "dark", scale: 1 },
@@ -24,13 +25,8 @@ for (const scenario of [
           profile: { displayName: "Guest", isGuest: true },
         }),
       );
-      HTMLMediaElement.prototype.play = function () {
-        Object.defineProperty(this, "duration", { configurable: true, value: 120 });
-        this.dispatchEvent(new Event("loadedmetadata"));
-        this.dispatchEvent(new Event("playing"));
-        return Promise.resolve();
-      };
     }, scenario);
+    await installStableLayoutAudio(page);
     await page.goto("/#/azkar/evening/1");
     if (scenario.language === "en") await playEnglishTranslation(page);
     else await page.getByTestId("reader-audio-dock-button").click();
@@ -52,10 +48,11 @@ for (const scenario of [
     );
     await expect(page.getByTestId("offline-resource-kahf")).toContainText(scenario.language === "ar" ? "٧٧" : "77");
     const refresh = scroll.getByRole("button", { name: t(scenario.language, "downloads.refresh"), exact: true });
-    await scroll
+    const storageDetails = scroll
       .locator("summary")
-      .filter({ hasText: t(scenario.language, "downloads.storageDetails") })
-      .click();
+      .filter({ hasText: t(scenario.language, "downloads.storageDetails") });
+    await storageDetails.focus();
+    await storageDetails.click();
     await refresh.focus();
     await viewport.evaluate((el) => {
       el.scrollTop = el.scrollHeight;

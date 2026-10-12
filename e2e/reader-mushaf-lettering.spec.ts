@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { getAzkarForMode } from "../src/app/content/azkar";
 import { t } from "../src/app/i18n";
+import { installStableLayoutAudio } from "./helpers/stable-layout-audio";
 
 const passages = [
   { category: "morning", route: "morning", id: "m-hm-75", page: 42 },
@@ -27,11 +28,8 @@ for (const language of ["ar", "en"] as const) {
             profile: { isGuest: true },
           }),
         );
-        HTMLMediaElement.prototype.play = function () {
-          this.dispatchEvent(new Event("playing"));
-          return Promise.resolve();
-        };
       }, language);
+      await installStableLayoutAudio(page);
       await page.route("https://verses.quran.foundation/fonts/**", (route) => route.abort());
       const position = getAzkarForMode(passage.category, "complete").findIndex((zikr) => zikr.id === passage.id) + 1;
       await page.setViewportSize({ width: 1200, height: 900 });

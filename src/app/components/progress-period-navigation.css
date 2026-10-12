@@ -1,0 +1,7 @@
+/* Preserve readable central dates at 200% text: the shared icon targets stay
+   44 CSS pixels, while the label and row can grow naturally. */
+.progress-period-navigation {
+  --ds-icon-size: 44px;
+  display: grid;
+  grid-template-columns: var(--ds-icon-size) minmax(0, 1fr) var(--ds-icon-size);
+}

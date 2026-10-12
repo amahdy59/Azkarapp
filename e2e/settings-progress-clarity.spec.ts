@@ -36,6 +36,13 @@ for (const language of ["ar", "en"] as const) {
       await expect(garden).toBeVisible();
       await expect(garden.locator("img")).toHaveCount(0);
       await page.getByRole("tab", { name: ar ? "شهر" : "Month", exact: true }).click();
+      const monthChart = page.getByTestId("month-weekly-chart");
+      await expect(monthChart).toBeVisible();
+      const prayerBounds = await page.getByTestId("progress-prayer-group").boundingBox();
+      const chartBounds = await monthChart.boundingBox();
+      expect(Math.abs(prayerBounds!.x - chartBounds!.x)).toBeLessThanOrEqual(1);
+      expect(Math.abs(prayerBounds!.width - chartBounds!.width)).toBeLessThanOrEqual(1);
+      await page.getByText(ar ? "التقويم" : "Calendar", { exact: true }).click();
       const calendar = page.getByRole("region", { name: ar ? "تواريخ التقويم" : "Calendar dates" });
       await expect(calendar).toBeVisible();
       const days = calendar.getByRole("button");
@@ -51,29 +58,40 @@ for (const language of ["ar", "en"] as const) {
       }
       await days.first().focus();
       await expect(days.first()).toBeFocused();
-      await days.last().focus();
-      await expect(days.last()).toBeInViewport();
+      await expect(days.last()).toBeDisabled();
+      await days.nth(1).focus();
+      await expect(days.nth(1)).toBeInViewport();
       await page.keyboard.press("Enter");
-      await expect(days.last()).toHaveAttribute("aria-pressed", "true");
+      await expect(days.nth(1)).toHaveAttribute("aria-pressed", "true");
       const directory = `output/playwright/settings-progress-clarity/${testInfo.project.name}`;
       await mkdir(directory, { recursive: true });
       await page.screenshot({ path: `${directory}/${language}-${width}-month.png` });
       await page.getByRole("tab", { name: ar ? "سنة" : "Year", exact: true }).click();
       const chart = page.getByTestId("year-monthly-chart");
       await expect(chart).toBeVisible();
-      const label = chart.locator(":scope > div > span").first();
-      await expect(label).toHaveText(ar ? "٥٠٪" : "50%");
-      const labelFits = await label.evaluate((node) => node.scrollWidth <= node.clientWidth + 1);
-      expect(labelFits).toBe(true);
+      await chart.getByRole("combobox").click();
+      await expect(page.locator('[data-slot="select-content"]')).toBeVisible();
+      await page.screenshot({ path: `${directory}/${language}-${width}-period-menu.png` });
+      await page.keyboard.press("Escape");
+      await expect(chart.getByRole("combobox")).toBeFocused();
+      await chart.getByRole("combobox").click();
+      await page.getByRole("option", { name: ar ? /^يناير/ : /^January/ }).click();
+      await expect(chart.getByRole("status")).toContainText(ar ? "٥٠٪" : "50%");
+      const axeProgress = await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+        .analyze();
+      expect(axeProgress.violations).toEqual([]);
       await page.screenshot({ path: `${directory}/${language}-${width}-year.png` });
       if (width === 320) {
         await page.evaluate(() => {
           document.documentElement.style.fontSize = "200%";
         });
-        const labelsFit = await chart
-          .locator(":scope > div > span")
-          .evaluateAll((nodes) => nodes.every((node) => node.scrollWidth <= node.clientWidth + 1));
-        expect(labelsFit).toBe(true);
+        await expect(chart.getByRole("combobox")).toBeVisible();
+        await chart.getByRole("combobox").click();
+        const menuBounds = await page.locator('[data-slot="select-content"]').boundingBox();
+        expect(menuBounds!.x).toBeGreaterThanOrEqual(0);
+        expect(menuBounds!.x + menuBounds!.width).toBeLessThanOrEqual(321);
+        await page.keyboard.press("Escape");
         expect(
           await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
         ).toBe(true);

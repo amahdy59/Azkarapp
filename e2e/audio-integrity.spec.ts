@@ -8,6 +8,44 @@ import { OWNER_TIMING_PACK_SHA, expandOwnerTiming, type OwnerTimingPack } from "
 
 test.use({ serviceWorkers: "block" });
 
+test("complete Al-Imran reading offers its exact recording without stale word cues @cross-browser", async ({
+  page,
+}) => {
+  await prepareAudio(page);
+  const collection = getAzkarForMode("waking_up", "complete");
+  const index = collection.findIndex((entry) => entry.id === "wu-hm-4");
+  expect(index).toBeGreaterThanOrEqual(0);
+  await page.goto(`/#/azkar/waking-up/${index + 1}?mode=complete`);
+  await expect(page.getByTestId("reader-screen")).toHaveAttribute("data-zikr-id", "wu-hm-4");
+  const listen = page.getByTestId("reader-audio-dock-button");
+  await expect(listen).toBeEnabled();
+  await listen.click();
+  const player = page.getByRole("region", { name: "Audio player", exact: true });
+  await expect(player).toBeVisible();
+  const source = await page.evaluate(
+    () => (window as unknown as { __reviewAudio: HTMLAudioElement }).__reviewAudio.src,
+  );
+  expect(source).toContain("quran/wu-hm-4/abdullah-muhammad/v1/wu-hm-4.mp3");
+  expect(new URL(source).searchParams.get("sha256")).toBe(
+    "f4ba5b49fef6bb91d693276907cb6d6bdfac22118b768fe13ebb1625516d4607",
+  );
+  await player.getByRole("button", { name: "Expand player", exact: true }).click();
+  await page.evaluate(() => {
+    const audio = (window as unknown as { __reviewAudio: HTMLAudioElement }).__reviewAudio;
+    audio.duration = 282.432;
+    audio.currentTime = 220;
+    audio.dispatchEvent(new Event("loadedmetadata"));
+    audio.dispatchEvent(new Event("timeupdate"));
+  });
+  await expect(player.locator("[data-listening-word]")).toHaveCount(0);
+  expect(
+    await page.evaluate(() => (window as unknown as { __reviewAudio: HTMLAudioElement }).__reviewAudio.paused),
+  ).toBe(false);
+  await player.getByRole("button", { name: "Stop audio and close player", exact: true }).click();
+  await expect(player).toHaveCount(0);
+  await expect(page.getByTestId("counter-surface")).toBeFocused();
+});
+
 async function prepareAudio(page: Page) {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.addInitScript(() => {

@@ -1,5 +1,19 @@
 # AI Improvement System Index
 
+[Preserved refinements release, 2026-10-12](phases/PRESERVED_REFINEMENTS_RELEASE_2026_10_12.md) records this chat's renewed authority to publish every pending owner fix, with hashed preservation, deliberate bundle-growth review, complete verification and exact-commit production evidence. Supersedes the local-only holds below for the current workspace.
+
+[Shared control alignment, 2026-10-12](phases/CONTROL_ALIGNMENT_2026_10_12.md) records the owner's local-only Library icon/text correction and shared tab/segmented-label audit, preserving responsive geometry and keyboard semantics. No publication.
+
+[Expanded surah reading space, 2026-10-12](phases/EXPANDED_SURAH_READING_SPACE_2026_10_12.md) records owner-requested local continuous listening, larger Quran type, compact top-bar options and full main-canvas expansion. No publication.
+
+[After-salat learning order, 2026-10-12](phases/AFTER_PRAYER_LEARNING_ORDER_2026_10_12.md) records the owner-requested local sequence and combined presentation groups, preserving reviewed wording, counts and saved identities. No commit, push or deployment.
+
+[Al-Imran audio restoration, 2026-10-12](phases/IMRAN_AUDIO_RESTORATION_2026_10_12.md) records the owner's confirmation that the existing recording matches 3:190–200, corrected transcript metadata, restored exact assignment and native live-playback verification. Concurrent local-only publication holds are preserved.
+
+[Audio CORS repair and persistent ZIP export, 2026-10-12](phases/AUDIO_CORS_AND_ZIP_2026_10_12.md) records the live hosting repair and owner-requested local all-audio ZIP action. The owner explicitly prohibits pushing these application improvements.
+
+[Mushaf opening-page readability, 2026-10-12](phases/MUSHAF_OPENING_READABILITY_2026_10_12.md) records the owner's local-only opening typography, modest magnification leading and restored filled glossary highlights. No commit, push or deployment is authorized.
+
 [Push testing efficiency, 2026-10-12](phases/PUSH_TESTING_EFFICIENCY_2026_10_12.md) records the owner's follow-up request for faster pushes: measured nine-group complete CI scheduling, engine-specific setup and reliable focused sharing selection. The application release is already verified; tooling publication must preserve every release gate.
 
 [Combined refinements release, 2026-10-12](phases/COMBINED_REFINEMENTS_RELEASE_2026_10_12.md) records the owner's latest instruction to push all completed workspace changes after verification. This supersedes historical local-only publication holds below; this chat owns combined gates, publication and production evidence.
@@ -284,3 +298,11 @@ Apple/Microsoft-informed control spacing and alignment improvements.
 [Compact mobile Mushaf translation](phases/MUSHAF_COMPACT_TRANSLATION_2026_10_11.md) records the owner-approved selector replacement, explicit exit, preserved reading geometry and local-only verification. Publication remains withheld.
 
 [Reader control consistency](phases/READER_CONTROL_CONSISTENCY_2026_10_11.md) records the owner-requested shared focus/standalone reader presentation and removal of below-surah benefit buttons. Local only; no push.
+
+## Progress trends and clarity — 2026-10-12
+
+[Progress trends and clarity](phases/PROGRESS_TRENDS_CLARITY_2026_10_12.md) is the owner's approved focused Progress simplification: clear Month/Year trends, retained Week checkmarks, optional exact records and calm spacing. Existing unrelated publication holds remain intact.
+
+[Optional Progress charts](phases/PROGRESS_OPTIONAL_CHARTS_2026_10_12.md) is the owner-approved follow-up: alternate Month heatmap and optional Week comparison bars, with local verification and preserved publication holds.
+
+[Progress alignment and controls](phases/PROGRESS_ALIGNMENT_CONTROLS_2026_10_12.md) records the owner's card alignment, shared themed period menus and clearer trend-caption refinement. Local only.
