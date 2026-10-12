@@ -5,6 +5,7 @@ import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 import { readFileSync } from "node:fs";
 import { AUDIO_MANIFEST_VERSION } from "./src/app/audio/audioManifest";
+import { ignoreGeneratedWatchPath } from "./scripts/generated-watch-paths";
 
 /**
  * The release this build is, stamped in at build time.
@@ -311,6 +312,9 @@ export default defineConfig(({ mode }) => {
         },
       }),
     ],
+    server: {
+      watch: { ignored: ignoreGeneratedWatchPath(path.resolve(__dirname)) },
+    },
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),

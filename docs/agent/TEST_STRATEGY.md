@@ -145,6 +145,7 @@ pnpm audit:prod
 - Persistence/offline/prayer/sync changes: include failure, recovery and boundary cases plus the affected end-to-end flow.
 - Shared shell, global styling, browser infrastructure or uncertain scope: run the full local browser suite once.
 - Do not run every individual static command before `pnpm check`: it already includes them. Let the pre-push hook reuse the successful unchanged quality snapshot.
+- Development file watching excludes generated output/coverage/browser-report roots. Validate source event delivery and generated-directory pruning if changing this boundary; do not disable source/public asset watching to reduce load.
 - Do not add tests that only repeat implementation details. Keep each regression's failure reason clear. Remove duplicated scenarios only when their unique assertions remain covered elsewhere.
 
 The fast gate includes settings/navigation/legal flows and the existing first-offline Reader/counting/Settings regression. Tooling suites use Node without React/jsdom setup; mock-sensitive application suites remain isolated. Browser tests use condition-based assertions instead of arbitrary readiness delays, and CI rejects focused `test.only` runs.

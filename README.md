@@ -62,6 +62,8 @@ Quality runs non-browser checks once, then executes the complete browser invento
 
 Finish code, tests and documentation before running `pnpm check`; its unchanged-snapshot pass can then be reused by the push hook for 24 hours. Run affected feature tests during development and let the hook enforce the final local gates once. CI still runs the complete suite fresh for every release.
 
+The development watcher ignores generated build, coverage, screenshot and report directories, so a running local app does not index or react to verification artifacts. Source and public asset edits remain watched.
+
 Vite prints the local development URL. To exercise browser tests on a new machine, install the repository-pinned browser engines once:
 
 ```bash
