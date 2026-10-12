@@ -31,7 +31,7 @@ test("Main Mushaf follows audio beside readable English and yields to manual bro
   await expect(page.locator('.mushaf-paper [data-mushaf-page="3"]')).toBeVisible();
   await page.getByTestId("mushaf-rail-more").click();
   await page.getByTestId("quick-page-translation-switch").click();
-  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("mushaf-quick-menu")).toBeHidden();
   const meaning = page.locator(".quran-page-meaning");
   await expect(meaning.locator('[aria-current="true"]')).toHaveAttribute("data-translation-verse", "2:6");
   await expect(page.locator('.mushaf-paper [data-playback-verse="2:6"]').first()).toBeVisible();

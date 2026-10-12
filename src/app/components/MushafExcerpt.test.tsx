@@ -23,7 +23,7 @@ describe("MushafExcerpt", () => {
         fallback={<p>Fallback text</p>}
       />,
     );
-    expect(useListeningMushafPage).toHaveBeenLastCalledWith(604, 0);
+    expect(useListeningMushafPage).toHaveBeenCalledWith(604, 0);
     expect(screen.getByText("Fallback text")).toBeInTheDocument();
     useListeningMushafPage.mockReturnValue({ result: { page: 604, lines: [words], qcf: false } });
     rerender(

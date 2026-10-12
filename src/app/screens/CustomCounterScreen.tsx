@@ -2,6 +2,7 @@ import { ReferenceCard } from "../components/ReferenceCard";
 import { useCallback, useEffect, useState } from "react";
 import { AuthenticZikrPicker } from "../components/AuthenticZikrPicker";
 import { DevotionalAction } from "../components/DevotionalControls";
+import { useStandaloneReadingFocus } from "../hooks/useStandaloneReadingFocus";
 import { StandaloneCounterFooter } from "../components/StandaloneCounterFooter";
 import { CounterTargetPicker } from "../components/CounterTargetPicker";
 import { ArrowPrevious, Check, Lightbulb, MoreVertical, Play, RotateCcw, Volume2, VolumeX } from "../components/icons";
@@ -76,6 +77,7 @@ export function CustomCounterScreen({
   progressDayStartHour?: number;
 }) {
   const language: AppLanguage = isArabic ? "ar" : "en";
+  const { focusMode, setFocusMode, focusToggleRef, readingScrollRef } = useStandaloneReadingFocus();
   const currentDayKey = getProgressDayKey(new Date(), progressDayStartHour);
 
   const initialSelectedAuthentic =
@@ -244,6 +246,16 @@ export function CustomCounterScreen({
         setShowReference(false);
         return;
       }
+      if (
+        event.key === "Escape" &&
+        focusMode &&
+        !event.defaultPrevented &&
+        !document.querySelector('[role="dialog"], [role="alertdialog"], [role="menu"]')
+      ) {
+        event.preventDefault();
+        setFocusMode(false);
+        return;
+      }
       if (isCounterShortcutBlocked(event)) return;
       const activeElement = document.activeElement;
       if (event.key === "Escape") {
@@ -268,7 +280,7 @@ export function CustomCounterScreen({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleTap, onBack, requestReset, showReference]);
+  }, [handleTap, onBack, requestReset, showReference, focusMode, setFocusMode]);
 
   const changeTarget = (nextTarget: number) => {
     setTarget(nextTarget);
@@ -294,79 +306,82 @@ export function CustomCounterScreen({
   return (
     <ScreenContainer
       dir={direction}
+      data-reading-focus={focusMode}
       className="relative flex flex-col overflow-y-auto h-full !pb-0 sm:!pt-0"
       screenName={t(language, "counter.tasbeehTitle")}
     >
       <div className="relative z-10 flex min-h-0 flex-1 flex-col">
-        <ReadingScreenChrome
-          language={language}
-          direction={direction}
-          title={t(language, "counter.tasbeehTitle")}
-          onBack={onBack}
-          testId="custom-counter"
-          /* An open target has nothing to fill, so it reports the tally and
+        <div data-reading-chrome>
+          <ReadingScreenChrome
+            language={language}
+            direction={direction}
+            title={t(language, "counter.tasbeehTitle")}
+            onBack={onBack}
+            testId="custom-counter"
+            /* An open target has nothing to fill, so it reports the tally and
              skips the bar rather than drawing a track that never moves. */
-          progress={{
-            value: count,
-            max: target,
-            percentLabel: `${formatNumerals(progressPercent, language)}%`,
-            countLabel: `${formatNumerals(count, language)} / ${formatNumerals(target, language)}`,
-            ariaLabel: t(language, "counter.targetLabel"),
-          }}
-          subRow={
-            <div className="w-full" data-prevent-count="true">
-              <div className="relative z-20 flex items-center gap-2 sm:gap-3" data-prevent-count="true">
-                <div className="min-w-0 flex-1">
-                  <AuthenticZikrPicker
-                    items={AUTHENTIC_AZKAR_COLLECTION}
-                    selected={selectedAuthentic}
-                    language={language}
-                    direction={direction}
-                    savedItems={liveSavedItems}
-                    onSelect={handleSelectAuthenticZikr}
-                  />
-                </div>
+            progress={{
+              value: count,
+              max: target,
+              percentLabel: `${formatNumerals(progressPercent, language)}%`,
+              countLabel: `${formatNumerals(count, language)} / ${formatNumerals(target, language)}`,
+              ariaLabel: t(language, "counter.targetLabel"),
+            }}
+            subRow={
+              <div className="w-full" data-prevent-count="true">
+                <div className="relative z-20 flex items-center gap-2 sm:gap-3" data-prevent-count="true">
+                  <div className="min-w-0 flex-1">
+                    <AuthenticZikrPicker
+                      items={AUTHENTIC_AZKAR_COLLECTION}
+                      selected={selectedAuthentic}
+                      language={language}
+                      direction={direction}
+                      savedItems={liveSavedItems}
+                      onSelect={handleSelectAuthenticZikr}
+                    />
+                  </div>
 
-                <div className="min-w-fit shrink-0">
-                  <CounterTargetPicker
-                    activeTarget={target}
-                    onTargetChange={changeTarget}
-                    language={language}
-                    direction={direction}
-                    allowOpen={false}
-                  />
+                  <div className="min-w-fit shrink-0">
+                    <CounterTargetPicker
+                      activeTarget={target}
+                      onTargetChange={changeTarget}
+                      language={language}
+                      direction={direction}
+                      allowOpen={false}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          }
-          actions={(tier) => {
-            const isWide = tier === "wide";
-            const actionClass = isWide ? HERO_ACTION_CLASS : HEADER_ACTION_CLASS;
-            return (
-              <div className="flex items-center gap-1.5">
-                <DropdownMenu dir={direction}>
-                  <DropdownMenuTrigger className={actionClass} aria-label={t(language, "common.moreOptions")}>
-                    <MoreVertical size={20} aria-hidden="true" />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={toggleSound}>
-                      {soundEnabled ? (
-                        <Volume2 size={16} className="text-primary me-2" aria-hidden="true" />
-                      ) : (
-                        <VolumeX size={16} className="text-muted-foreground me-2" aria-hidden="true" />
-                      )}
-                      <span>{t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={requestReset} disabled={count === 0 && laps === 0}>
-                      <RotateCcw size={16} className="text-muted-foreground me-2" aria-hidden="true" />
-                      <span>{t(language, "reader.resetCounter")}</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            );
-          }}
-        />
+            }
+            actions={(tier) => {
+              const isWide = tier === "wide";
+              const actionClass = isWide ? HERO_ACTION_CLASS : HEADER_ACTION_CLASS;
+              return (
+                <div className="flex items-center gap-1.5">
+                  <DropdownMenu dir={direction}>
+                    <DropdownMenuTrigger className={actionClass} aria-label={t(language, "common.moreOptions")}>
+                      <MoreVertical size={20} aria-hidden="true" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={toggleSound}>
+                        {soundEnabled ? (
+                          <Volume2 size={16} className="text-primary me-2" aria-hidden="true" />
+                        ) : (
+                          <VolumeX size={16} className="text-muted-foreground me-2" aria-hidden="true" />
+                        )}
+                        <span>{t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={requestReset} disabled={count === 0 && laps === 0}>
+                        <RotateCcw size={16} className="text-muted-foreground me-2" aria-hidden="true" />
+                        <span>{t(language, "reader.resetCounter")}</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              );
+            }}
+          />
+        </div>
 
         <div className="relative mx-4 mb-4 mt-4 flex min-h-0 flex-1 overflow-hidden bg-transparent">
           <div
@@ -380,7 +395,15 @@ export function CustomCounterScreen({
               data-testid="custom-counter-content"
             >
               <div className="relative flex min-h-0 flex-1">
-                <div className="reader-text-scroll h-full min-h-0 w-full overflow-y-auto ps-6 pe-7 md:px-20 py-4 outline-none focus-visible:outline-none focus:ring-0">
+                <div
+                  ref={readingScrollRef}
+                  // The reading viewport needs keyboard scrolling, matching ReaderScreen.
+                  // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+                  tabIndex={0}
+                  role="region"
+                  aria-label={t(language, "reader.readingText")}
+                  className="reader-text-scroll h-full min-h-0 w-full overflow-y-auto ps-6 pe-7 md:px-20 py-4 outline-none focus-visible:outline-none focus:ring-0"
+                >
                   <div className="reading-measure mx-auto flex min-h-full w-full flex-col py-4">
                     <div style={pressStyle} className="my-auto w-full flex flex-col items-center justify-center">
                       <p
@@ -416,6 +439,9 @@ export function CustomCounterScreen({
                 <div data-testid="reader-counter-stack">
                   <StandaloneCounterFooter
                     language={language}
+                    focusMode={focusMode}
+                    onToggleFocus={() => setFocusMode((value) => !value)}
+                    focusToggleRef={focusToggleRef}
                     soundEnabled={soundEnabled}
                     onToggleSound={toggleSound}
                     onReset={requestReset}

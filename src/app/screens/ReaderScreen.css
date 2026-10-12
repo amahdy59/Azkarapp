@@ -2,6 +2,11 @@
   max-height: min(82dvh, 720px);
 }
 
+/* Allow the first/last Quran diacritics to clear the native reading viewport. */
+.reader-text-scroll [data-quran-passage] {
+  padding-block: 0.5em;
+}
+
 /* Same reading measure as the text; compact entry tools retain their own
    existing spacing. The small scrollbar gutter remains owned by the reader. */
 .reader-entry-tools--wide {

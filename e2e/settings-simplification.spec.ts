@@ -67,7 +67,7 @@ for (const scenario of [
       downloads.getByRole("button", { name: t(scenario.language, "downloads.prepareTravel"), exact: true }),
     ).toHaveCount(0);
     await page.screenshot({ path: testInfo.outputPath("downloads-three-categories.png"), fullPage: true });
-    const manage = page.getByTestId("download-category-recitations").locator("summary");
+    const manage = page.getByTestId("download-category-recitations").locator(":scope > details > summary");
     await manage.focus();
     await page.keyboard.press("Enter");
     await expect(page.getByTestId("offline-resource-kahf")).toBeVisible();

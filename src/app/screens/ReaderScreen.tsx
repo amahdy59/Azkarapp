@@ -76,7 +76,6 @@ import { Header } from "../components/LayoutShells";
 import { ReaderSceneArt } from "../components/ReaderSceneArt";
 import { QuranPrelude, QuranSurahHeader } from "../components/QuranChrome";
 import { QuranWordText } from "../components/QuranWordText";
-import { QuranVerseText } from "../components/QuranVerseText";
 import { QURAN_TEXT_STYLE, getQuranReadingSize } from "../quranTypography";
 import {
   MushafImmersiveReader,
@@ -329,6 +328,7 @@ export function ReaderScreen({
     return () => onMushafModeChange?.(false);
   }, [onMushafModeChange, showMushaf]);
   const [benefitOpen, setBenefitOpen] = useState(false);
+  const surahBenefitReturnFocusRef = useRef<HTMLElement | null>(null);
   const [focusMode, setFocusMode] = useState(false);
   const focusExitRef = useRef<HTMLButtonElement>(null);
   const focusRequestedRef = useRef(false);
@@ -340,13 +340,22 @@ export function ReaderScreen({
   const [collectionShareOpen, setCollectionShareOpen] = useState(false);
   const [keyboardHelpOpen, setKeyboardHelpOpen] = useState(false);
   const [wordMeaningSelection, setWordMeaningSelection] = useState<WordMeaningSelection | null>(null);
+  useEffect(() => {
+    if (!showDifficultWords) setWordMeaningSelection(null);
+  }, [showDifficultWords]);
   /* The popover answers the tap; the sheet is the deliberate "all meanings"
      step, so the same selection drives both and only this flag differs. */
   const [wordSheetOpen, setWordSheetOpen] = useState(false);
   const activeWordId = wordSheetOpen
     ? null
     : (wordMeaningSelection?.groups[wordMeaningSelection.index]?.[0]?.id ?? null);
-  const closeReference = useCallback(() => setBenefitOpen(false), []);
+  const closeReference = useCallback(() => {
+    setBenefitOpen(false);
+    const returnTarget = surahBenefitReturnFocusRef.current;
+    surahBenefitReturnFocusRef.current = null;
+    if (returnTarget)
+      requestAnimationFrame(() => returnTarget.isConnected && returnTarget.focus({ preventScroll: true }));
+  }, []);
   const { soundEnabled, toggleSound, playClickFeedback } = useCounterClickFeedback();
 
   const readerMainRef = useRef<HTMLDivElement | null>(null);
@@ -690,7 +699,6 @@ export function ReaderScreen({
     longSurah ? "reader.tapCounterWhenFinished" : isDesktopReader ? "reader.tapAnywhereDesktop" : "reader.tapAnywhere",
   );
   const allWordMeanings = getQuranWordMeanings(z);
-  const wordMeanings = showDifficultWords ? allWordMeanings : [];
   const readingProgressValue = Math.min(collectionCompletedCount, azkar.length);
   const isSaved = savedZikrIds.has(z.id);
   // Shorter azkar read larger, long surahs stay at the size their Mushaf pages
@@ -788,7 +796,6 @@ export function ReaderScreen({
             <Check size={20} />
             {t(language, "reader.readExternally")}
           </button>
-          {renderBenefitDockButton(true)}
         </div>
       ) : (
         <>
@@ -803,10 +810,11 @@ export function ReaderScreen({
           >
             {z.isSurah && <QuranPrelude zikr={z} className="pointer-events-none mb-4" />}
 
-            {wordMeanings.length > 0 ? (
+            {isQuranicText ? (
               <QuranWordText
                 text={displayArabicText}
-                meanings={wordMeanings}
+                meanings={allWordMeanings}
+                showMeanings={showDifficultWords}
                 language={language}
                 style={{
                   fontFamily: readingFontFamily,
@@ -819,7 +827,7 @@ export function ReaderScreen({
               />
             ) : (
               <p
-                className={`zikr-text pointer-events-none text-center font-medium ${isQuranicText ? "leading-[1.7]" : "leading-[1.85]"} text-foreground`}
+                className="zikr-text pointer-events-none text-center font-medium leading-[1.85] text-foreground"
                 data-testid="zikr-text"
                 dir="rtl"
                 lang="ar"
@@ -829,16 +837,7 @@ export function ReaderScreen({
                   ...(isQuranicText ? QURAN_TEXT_STYLE : {}),
                 }}
               >
-                {isQuranicText ? (
-                  <QuranVerseText
-                    text={displayArabicText}
-                    language={language}
-                    canonicalKey={z.canonicalKey}
-                    preserveLines={showSurahChrome}
-                  />
-                ) : (
-                  displayArabicText
-                )}
+                {displayArabicText}
               </p>
             )}
           </div>
@@ -1180,7 +1179,7 @@ export function ReaderScreen({
     );
   };
 
-  const renderBenefitDockButton = (fullWidth = false) => (
+  const renderBenefitDockButton = () => (
     <DevotionalAction
       type="button"
       onClick={(e) => {
@@ -1195,7 +1194,7 @@ export function ReaderScreen({
       aria-label={t(language, "reader.referencesButton")}
       title={t(language, "reader.referencesButton")}
       data-testid="reader-benefit-dock-button"
-      className={fullWidth ? "w-full rounded-2xl px-6 py-4 shadow-sm" : "min-w-0 flex-1 shadow-sm"}
+      className="min-w-0 flex-1 shadow-sm"
     >
       <Lightbulb size={20} aria-hidden="true" />
       <span className="min-w-0 text-label font-semibold [overflow-wrap:anywhere]">
@@ -1539,7 +1538,13 @@ export function ReaderScreen({
           mushafSettings={mushafSettings}
           surahAudio={surahAudio}
           audioController={audioController}
-          benefitAction={renderBenefitDockButton()}
+          onOpenBenefit={() => {
+            surahBenefitReturnFocusRef.current = document.querySelector<HTMLElement>(
+              '[data-testid="mushaf-rail-benefit"], [data-testid="mushaf-immersive-more"]',
+            );
+            setHasOpenedBenefit(true);
+            setBenefitOpen(true);
+          }}
           onClose={() => setImmersiveOpen(false)}
           onReadExternally={() => {
             if (!isDone) handleZikrCompletion(idx);

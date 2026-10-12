@@ -1688,7 +1688,7 @@ const WAKING_UP_AZKAR: ZikrDraft[] = [
     translation:
       "Indeed, in the creation of the heavens and the earth and the alternation of the night and the day are signs for those of understanding—who remember Allah while standing or sitting or [lying] on their sides and give thought to the creation of the heavens and the earth: “Our Lord, You did not create this aimlessly; exalted are You; then protect us from the punishment of the Fire.”",
     benefit:
-      "Prophetic Sunnah to recite the concluding ten verses of Surah Aal-Imran (190-200) upon waking at night for Tahajjud prayer.",
+      "Prophetic Sunnah to recite the concluding ten verses of Surah Aal-Imran upon waking at night for Tahajjud prayer.",
     benefitArabic: "سنة نبوية عند الاستيقاظ لقيام الليل بقراءة الآيات العشر الخواتيم من سورة آل عمران.",
     repetitionCount: 1,
     countLabel: "1",
@@ -1699,7 +1699,7 @@ const WAKING_UP_AZKAR: ZikrDraft[] = [
     hadithTextEnglish:
       "Ibn ‘Abbas (may Allah be pleased with them both) said: The Prophet ﷺ woke up, sat up wiping sleep from his face with his hand, then recited the last ten verses of Surah Aal-Imran.",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
-    sourceUrl: "https://sunnah.com/bukhari%3A4569",
+    sourceUrl: "https://sunnah.com/muslim%3A763b",
   },
 ];
 

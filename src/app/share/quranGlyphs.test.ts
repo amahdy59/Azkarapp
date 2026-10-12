@@ -38,3 +38,10 @@ it("keeps unreferenced passages on the bundled readable font without a request",
   expect(await prepareQuranGlyphs("قُلْ هُوَ")).toBeUndefined();
   expect(mocks.load).not.toHaveBeenCalled();
 });
+
+it("never draws a multipage passage using one page's incompatible glyph font", async () => {
+  vi.stubGlobal("FontFace", class {});
+  mocks.load.mockClear();
+  expect(await prepareQuranGlyphs("complete multipage source", "quran-003-190-200")).toBeUndefined();
+  expect(mocks.load).not.toHaveBeenCalled();
+});

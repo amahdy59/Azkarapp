@@ -33,12 +33,17 @@ for (const language of ["ar", "en"] as const) {
       await page.goto(`/#/azkar/${route}`);
       await page.getByRole("button", { name: t(language, "reader.listenToSurah"), exact: true }).click();
       const player = page.getByRole("region", { name: t(language, "audioPlayer.region"), exact: true });
-      const benefit = page.getByTestId("surah-reading-actions").getByTestId("reader-benefit-dock-button");
       await expect(player.getByTestId("reader-benefit-dock-button")).toHaveCount(0);
-      await expect(benefit).toBeVisible();
-      await benefit.click();
+      await expect(page.getByTestId("surah-reading-actions").getByTestId("reader-benefit-dock-button")).toHaveCount(0);
+      await page.getByTestId("reader-mushaf-button").click();
+      await page.getByTestId("mushaf-immersive-more").click();
+      await page.getByTestId("mushaf-quick-benefit").click();
       await expect(page.getByTestId("reference-sheet")).toBeVisible();
       await page.keyboard.press("Escape");
+      await expect(page.getByTestId("reference-sheet")).toBeHidden();
+      await expect(page.getByTestId("mushaf-immersive-more")).toBeFocused();
+      await page.keyboard.press("Escape");
+      await expect(page.getByTestId("reader-mushaf-button")).toBeVisible();
       await player.getByRole("button", { name: t(language, "audioPlayer.expand"), exact: true }).click();
       await expect(player.getByTestId("reader-benefit-dock-button")).toHaveCount(0);
       for (const size of [

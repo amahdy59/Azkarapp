@@ -312,6 +312,8 @@ test("time-of-day imagery has no decorative overlay layer", async ({ page }) => 
   await expect(image).toBeVisible();
   await expect(hero.locator(".azkar-hero-particles, .azkar-hero__overlay")).toHaveCount(0);
   await expect(scene).toBeVisible();
+  // The scene deliberately keeps its placeholder until image decoding completes.
+  await expect(image).toHaveCSS("opacity", "1");
 
   const [sceneBox, imageOpacity, imageWidth] = await Promise.all([
     scene.boundingBox(),

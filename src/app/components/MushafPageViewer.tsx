@@ -32,6 +32,8 @@ export interface MushafWordToken {
   isEnd: number;
   text: string;
   qcfCode?: string;
+  /** Required when an excerpt spans multiple page-specific fonts. */
+  pageNumber?: number;
 }
 
 /** The reference page carries exactly fifteen lines (DEC-089). Rendering all
@@ -935,7 +937,7 @@ function MushafPageCanvas({
               // Reserve the new floating footer without taking space from the
               // existing fifteen-line minimum on short, scrolling viewports.
               minHeight: "calc(32rem + 2.65rem)",
-              paddingTop: "calc(3.25rem + env(safe-area-inset-top))",
+              paddingTop: "var(--mushaf-top-clearance, calc(3.25rem + env(safe-area-inset-top)))",
               paddingBottom: "calc(3.25rem + env(safe-area-inset-bottom))",
             }
           : {}),
@@ -1780,13 +1782,14 @@ export function MushafExcerptCanvas({
         }}
       >
         {lines.map((line, lineIndex) => (
-          <span key={lineIndex} className="block">
+          <Fragment key={lineIndex}>
+            {lineIndex > 0 ? " " : ""}
             {line.map((word, index) => (
               <Fragment key={`${word.verseKey}:${word.position}:${index}`}>
                 {index > 0 ? " " : ""}
                 {word.isEnd ? (
                   useQcfGlyphs ? (
-                    word.qcfCode
+                    <span style={{ fontFamily: `qcf-v2-page-${word.pageNumber ?? pageNumber}` }}>{word.qcfCode}</span>
                   ) : (
                     <AyahMarker number={word.verseKey.split(":")[1]!} language={language} theme={theme} />
                   )
@@ -1797,23 +1800,24 @@ export function MushafExcerptCanvas({
                         ? ""
                         : undefined
                     }
-                    style={
-                      highlightedWord?.verseKey === word.verseKey && highlightedWord.position === word.position
+                    style={{
+                      ...(useQcfGlyphs ? { fontFamily: `qcf-v2-page-${word.pageNumber ?? pageNumber}` } : {}),
+                      ...(highlightedWord?.verseKey === word.verseKey && highlightedWord.position === word.position
                         ? {
                             textDecoration: "underline",
                             textUnderlineOffset: "0.18em",
                             backgroundColor: "color-mix(in srgb, var(--primary) 20%, transparent)",
                             color: "color-mix(in srgb, var(--primary) 60%, var(--foreground))",
                           }
-                        : undefined
-                    }
+                        : {}),
+                    }}
                   >
                     {useQcfGlyphs ? word.qcfCode : word.text}
                   </span>
                 )}
               </Fragment>
             ))}
-          </span>
+          </Fragment>
         ))}
       </div>
       <div className="sr-only">

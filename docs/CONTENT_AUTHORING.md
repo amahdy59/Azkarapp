@@ -1,5 +1,11 @@
 # Content authoring guide
 
+## Al-Imran waking passage completion — 2026-10-11
+
+The owner explicitly requests completing `wu-hm-4` from its existing opening (3:190) through the surah's end (3:200). `scripts/prepare-imran-passage.mjs` copies the eleven complete verse records verbatim from reviewed Mushaf pages 75–76, including pause signs and numeric boundaries. English and transliteration use the existing Pickthall/alQuran.cloud editions. Sourced word meanings are copied unchanged from `public/data/word-meanings/3.json` for this range. Tests compare every Arabic word and boundary against the page data and require all eleven numbered English/transliteration verses. The item ID/count and hadith wording remain stable.
+
+The narration's “ten concluding verses” wording is supported by https://sunnah.com/muslim:763b and is not reinterpreted as an eleven-verse quotation. The displayed passage separately labels its actual 190–200 range; the inconsistent parenthetical range is removed from the English benefit. The exact recording has not been verified against the expanded range, so its original catalog/transcript/timings remain intact and its mismatched assignment is removed pending review. No matching/hash or timing-approval rule is relaxed. Source comparison: https://quran.com/ali-imran/190-200. Owner-authorized local completion does not claim a new independent human content review.
+
 Azkarapp keeps reviewed devotional content in `src/app/content` and treats wording, benefits, repetition counts, and citations as product data. Content changes should be small, traceable, bilingual, and independently reviewable.
 
 ## Add an item to an existing collection

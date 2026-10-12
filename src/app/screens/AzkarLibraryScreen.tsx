@@ -2,6 +2,7 @@ import { QURAN_TEXT_STYLE, isQuranPassage } from "../quranTypography";
 import { QuranVerseText } from "../components/QuranVerseText";
 import { useCallback, useDeferredValue, useEffect, useId, useMemo, useRef, useState } from "react";
 import { Search, Bookmark, ChevronNext, Lightbulb, X, Grid } from "../components/icons";
+import "./AzkarLibraryScreen.css";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { CategoryCard } from "../components/CategoryCard";
 import { StatePanel } from "../components/StatePanel";
@@ -227,7 +228,7 @@ export function AzkarLibraryScreen({
               idPrefix="library-sections"
               aria-label={t(language, "library.title")}
               indicatorClassName="bg-primary shadow-sm"
-              className="grid shrink-0 grid-cols-2 rounded-2xl border border-border-control/60 bg-card p-1 shadow-xs min-w-[96px] sm:min-w-64"
+              className="library-section-tabs grid shrink-0 grid-cols-2 rounded-2xl border border-border-control/60 bg-card p-1 shadow-xs sm:min-w-64"
               tabs={(["collections", "saved"] as const).map((value) => {
                 const isCollections = value === "collections";
                 const count = savedZikrIds.size;
@@ -251,7 +252,7 @@ export function AzkarLibraryScreen({
                       <span className="hidden sm:inline">{t(language, `library.${value}`)}</span>
                       {value === "saved" && count > 0 && (
                         <span
-                          className={`inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[11px] font-bold leading-none transition-colors ${
+                          className={`library-saved-count inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[11px] font-bold leading-none transition-colors ${
                             section === "saved"
                               ? "bg-primary-foreground/25 text-primary-foreground"
                               : "bg-primary/15 text-primary"
@@ -266,7 +267,7 @@ export function AzkarLibraryScreen({
                 };
               })}
               itemClassName={(selected) =>
-                `min-h-11 min-w-11 rounded-xl px-2.5 sm:px-3 text-xs sm:text-sm font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                `flex min-h-11 min-w-11 items-center justify-center rounded-2xl px-2.5 sm:rounded-xl sm:px-3 text-xs sm:text-sm font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                   selected
                     ? "bg-primary text-primary-foreground"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -275,7 +276,7 @@ export function AzkarLibraryScreen({
             />
           </div>
 
-          <div className="mt-3 sm:mt-4">
+          <div className="mt-2 sm:mt-4">
             <form
               className="min-w-0"
               onSubmit={(event) => {

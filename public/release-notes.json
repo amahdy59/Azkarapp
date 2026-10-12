@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-11.2",
+  "release": "2026-10-12",
   "ar": [
-    "الترجمة الإنجليزية بمحاذاة صفحة المصحف وتمرير خاص للمعاني، مع التبديل بين العربية والإنجليزية على الشاشات الصغيرة.",
-    "أدوات الصوت والتنقل بين صفحات التلاوة فوق القراءة، مع متابعة الكلمة الحالية وإبقاء النص المكبّر داخل مساحة واضحة.",
-    "ثلاث مجموعات تنزيل سهلة الوصول للأذكار والأدعية، وتلاوات الكهف والبقرة، وصفحات المصحف، مع تفاصيل تفتح عند الحاجة.",
-    "حفظ العد الظاهر للمتابعة بعد إعادة التحميل، وحروف المصحف للمقاطع القرآنية اليومية دون اتصال بعد التثبيت، وإرشادات العد عند البداية فقط."
+    "قراءة إنجليزية أكثر ترتيبًا ومساحة للنص، مع اسم السورة والجزء في رأس الصفحة وتبديل واضح للغة على الهاتف.",
+    "مشاركة الآيات بحروف المصحف ونص في الوسط، مع ضبط حجم الخط واحتواء آية الكرسي كاملة في بطاقة واحدة.",
+    "تنزيلات صوتية تحتفظ بالملفات المكتملة عند التعثر، مع تقدم أوضح وإمكانية حفظ التسجيلات المنزلة كملفات على الجهاز.",
+    "إكمال مقطع آل عمران من الآية ١٩٠ إلى ٢٠٠ وثبات النص عند إظهار المعاني، مع أدوات قراءة وتسبيح أكثر اتساقًا."
   ],
   "en": [
-    "Scroll English meanings in a pane aligned with the Mushaf page, and switch between Arabic and English on small screens.",
-    "Use audio options and page navigation above the recitation, follow the current word, and keep enlarged text inside a clear reading area.",
-    "Find three download groups for adhkar and duas, Kahf and Baqarah recitations, and Mushaf pages, with details available when you open a group.",
-    "Continue from your displayed count after reload, read verified daily Quran passages in offline Mushaf lettering after installation, and see counting guidance only at the start."
+    "Read English meanings with clearer surah and juz headings, more room for text, and a simple language switch on phones.",
+    "Share centered ayah cards in Mushaf lettering, adjust text size, and keep the complete Ayat al-Kursi on one card.",
+    "Keep completed audio downloads when a transfer fails, see clearer progress, and save downloaded recordings as files on your device.",
+    "Read the complete Al-Imran passage from ayah 190 to 200, keep text steady when showing meanings, and use more consistent reading and counter controls."
   ]
 }

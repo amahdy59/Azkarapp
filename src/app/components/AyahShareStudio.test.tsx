@@ -1,15 +1,17 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-const { generateAyahCards, loadAyahTranslation, shareMultipleFiles, downloadFile } = vi.hoisted(() => ({
-  generateAyahCards: vi.fn(),
-  loadAyahTranslation: vi.fn(),
-  shareMultipleFiles: vi.fn(),
-  downloadFile: vi.fn(),
-}));
+const { generateAyahCards, loadAyahEnglishTranslation, shareMultipleFiles, downloadFile, canShareMultipleFiles } =
+  vi.hoisted(() => ({
+    generateAyahCards: vi.fn(),
+    loadAyahEnglishTranslation: vi.fn(),
+    canShareMultipleFiles: vi.fn(),
+    shareMultipleFiles: vi.fn(),
+    downloadFile: vi.fn(),
+  }));
 vi.mock("../share/ayahShareCard", () => ({ generateAyahCards }));
-vi.mock("../content/ayahTranslations", () => ({ loadAyahTranslation }));
-vi.mock("../share/shareDispatcher", () => ({ shareMultipleFiles, downloadFile }));
+vi.mock("../content/quranTranslations", () => ({ loadAyahEnglishTranslation }));
+vi.mock("../share/shareDispatcher", () => ({ shareMultipleFiles, downloadFile, canShareMultipleFiles }));
 import AyahShareStudio from "./AyahShareStudio";
 const props = {
   verseKey: "112:1",
@@ -18,12 +20,64 @@ const props = {
   language: "en" as const,
   meanings: [{ id: "one", surahNumber: 112, ayahNumber: 1, word: "أَحَدٌ", explanationArabic: "واحد" }],
   onBack: vi.fn(),
+  onClose: vi.fn(),
 };
 describe("AyahShareStudio", () => {
+  it("regenerates bounded text size and respects the fit preference", async () => {
+    render(<AyahShareStudio {...props} />);
+    const size = screen.getByRole("slider", { name: /Text size/ });
+    expect(size).toHaveAttribute("min", "0.75");
+    expect(size).toHaveAttribute("max", "1.125");
+    fireEvent.change(size, { target: { value: "0.75" } });
+    await waitFor(() => expect(generateAyahCards.mock.lastCall![0]).toMatchObject({ textScale: 0.75, fitAyah: true }));
+    await userEvent.setup().click(screen.getByRole("checkbox", { name: "Fit ayah on one card" }));
+    await waitFor(() => expect(generateAyahCards.mock.lastCall![0]).toMatchObject({ textScale: 0.75, fitAyah: false }));
+  });
+  it("keeps focused controls reachable after content reflow and cleans up resize work", async () => {
+    let measure = () => {};
+    let frame: FrameRequestCallback = () => {};
+    const observe = vi.fn();
+    const disconnect = vi.fn();
+    const cancel = vi.fn();
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        constructor(callback: () => void) {
+          measure = callback;
+        }
+        observe = observe;
+        disconnect = disconnect;
+      },
+    );
+    vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => {
+      frame = callback;
+      return 1;
+    });
+    vi.stubGlobal("cancelAnimationFrame", cancel);
+    const { unmount } = render(<AyahShareStudio {...props} />);
+    const root = screen.getByTestId("ayah-share-studio");
+    Object.defineProperty(root, "clientHeight", { value: 400 });
+    Object.defineProperty(root.querySelector("header"), "offsetHeight", { value: 150 });
+    Object.defineProperty(root.querySelector("footer"), "offsetHeight", { value: 200 });
+    const button = screen.getByRole("button", { name: "Close" });
+    const reveal = vi.fn();
+    Object.defineProperty(button, "scrollIntoView", { value: reveal });
+    button.focus();
+    act(() => measure());
+    expect(root).toHaveAttribute("data-scroll-whole", "true");
+    expect(observe).toHaveBeenCalledWith(root.querySelector(".ayah-share-body"));
+    reveal.mockClear();
+    act(() => frame(0));
+    expect(reveal).toHaveBeenCalledWith({ block: "nearest", inline: "nearest" });
+    unmount();
+    expect(disconnect).toHaveBeenCalledOnce();
+    expect(cancel).toHaveBeenCalled();
+  });
   beforeEach(() => {
     vi.clearAllMocks();
     vi.stubGlobal("URL", Object.assign(URL, { revokeObjectURL: vi.fn() }));
-    loadAyahTranslation.mockResolvedValue({ text: "Say: He is Allah, the One!", source: "Pickthall" });
+    loadAyahEnglishTranslation.mockResolvedValue("Say: He is Allah, the One!");
+    canShareMultipleFiles.mockReturnValue(true);
     generateAyahCards.mockImplementation(async () => [
       {
         file: new File(["png"], "ayah.png", { type: "image/png" }),
@@ -39,40 +93,125 @@ describe("AyahShareStudio", () => {
   it("uses opt-in content, regenerates format, shares and cleans up previews", async () => {
     const user = userEvent.setup();
     const { unmount } = render(<AyahShareStudio {...props} />);
-    expect(screen.getByRole("heading", { name: "Ayah card" })).toHaveFocus();
-    await waitFor(() => expect(screen.getByRole("button", { name: "Share cards" })).toBeEnabled());
+    expect(screen.getByRole("heading", { name: "Share ayah" })).toHaveFocus();
+    await waitFor(() => expect(screen.getByRole("button", { name: "Share card" })).toBeEnabled());
     expect(generateAyahCards.mock.lastCall![0]).toMatchObject({
       text: props.text,
       format: "portrait",
       translation: undefined,
       meanings: undefined,
     });
-    await user.click(screen.getByRole("checkbox", { name: "English translation" }));
-    await user.click(screen.getByRole("checkbox", { name: "Arabic word meanings" }));
+    await user.click(screen.getByRole("checkbox", { name: "Include English translation" }));
+    await user.click(screen.getByRole("checkbox", { name: "Include Arabic word explanations" }));
     await user.click(screen.getByRole("radio", { name: /Square/ }));
     await waitFor(() =>
       expect(generateAyahCards.mock.lastCall![0]).toMatchObject({
         format: "square",
-        translation: { text: "Say: He is Allah, the One!", label: "English translation · Pickthall" },
+        translation: {
+          text: "Say: He is Allah, the One!",
+          label: "English translation · Saheeh International",
+        },
         meanings: { text: "أَحَدٌ: واحد" },
       }),
     );
-    await user.click(screen.getByRole("button", { name: "Share cards" }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Share card" })).toBeEnabled());
+    await user.click(screen.getByRole("button", { name: "Share card" }));
     expect(shareMultipleFiles).toHaveBeenCalledOnce();
     expect(await screen.findByRole("status")).toHaveTextContent("Sharing cancelled");
-    await user.click(screen.getByRole("button", { name: "Save this image" }));
+    expect(shareMultipleFiles.mock.lastCall![1]).toMatchObject({ downloadFallback: false });
+    expect(shareMultipleFiles.mock.lastCall![1].text).toContain("Saheeh International");
+    await user.click(screen.getByRole("button", { name: "Save this card" }));
     expect(downloadFile).toHaveBeenCalledOnce();
     unmount();
     expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:preview");
   });
   it("explains unavailable content and announces a generation error", async () => {
-    loadAyahTranslation.mockResolvedValue(null);
+    loadAyahEnglishTranslation.mockResolvedValue(null);
     generateAyahCards.mockRejectedValue(new Error("encoding failed"));
     render(<AyahShareStudio {...props} meanings={[]} />);
-    expect(await screen.findByText(/reviewed translation for this ayah/)).toBeInTheDocument();
-    expect(screen.getByRole("checkbox", { name: "English translation" })).toBeDisabled();
-    expect(screen.getByRole("checkbox", { name: "Arabic word meanings" })).toBeDisabled();
+    expect(await screen.findByText(/Translation is unavailable on this device/)).toBeInTheDocument();
+    expect(screen.getByRole("checkbox", { name: "Include English translation" })).toBeDisabled();
+    expect(screen.getByRole("checkbox", { name: "Include Arabic word explanations" })).toBeDisabled();
     expect(await screen.findByRole("alert")).toHaveTextContent(/could not|Unable|try again/i);
-    expect(screen.getByRole("button", { name: "Share cards" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Save this card" })).toBeDisabled();
+  });
+  it("offers explicit saving when native sharing is unsupported", async () => {
+    canShareMultipleFiles.mockReturnValue(false);
+    const user = userEvent.setup();
+    render(<AyahShareStudio {...props} />);
+    await waitFor(() => expect(screen.getByRole("button", { name: "Save this card" })).toBeEnabled());
+    expect(screen.getByRole("status")).toHaveTextContent("Image sharing is unavailable");
+    await user.click(screen.getByRole("button", { name: "Save this card" }));
+    expect(downloadFile).toHaveBeenCalledOnce();
+    expect(shareMultipleFiles).not.toHaveBeenCalled();
+    expect(screen.getByRole("status")).toHaveTextContent("Download started");
+  });
+  it("names the full sharing scope and saves only the displayed continuation", async () => {
+    const first = {
+      file: new File(["one"], "one.png"),
+      url: "blob:one",
+      width: 1080,
+      height: 1350,
+      page: { rows: [] },
+    };
+    const second = { ...first, file: new File(["two"], "two.png"), url: "blob:two" };
+    generateAyahCards.mockResolvedValue([first, second]);
+    const user = userEvent.setup();
+    render(<AyahShareStudio {...props} />);
+    await waitFor(() => expect(screen.getByRole("button", { name: "Share all 2 cards" })).toBeEnabled());
+    await user.click(screen.getByRole("button", { name: "Share all 2 cards" }));
+    expect(shareMultipleFiles.mock.lastCall![0]).toEqual([first.file, second.file]);
+    await user.click(screen.getByRole("button", { name: "Next" }));
+    expect(screen.getByRole("img")).toHaveAttribute("src", "blob:two");
+    await user.click(screen.getByRole("button", { name: "Save this card" }));
+    expect(downloadFile).toHaveBeenCalledWith(second.file);
+  });
+  it("can retry generation without silently downloading after a sharing failure", async () => {
+    generateAyahCards.mockRejectedValueOnce(new Error("encoding failed"));
+    const user = userEvent.setup();
+    render(<AyahShareStudio {...props} />);
+    await screen.findByRole("alert");
+    await user.click(screen.getByRole("button", { name: "Try again" }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Share card" })).toBeEnabled());
+    shareMultipleFiles.mockRejectedValueOnce(new Error("native service failed"));
+    await user.click(screen.getByRole("button", { name: "Share card" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("share");
+    expect(downloadFile).not.toHaveBeenCalled();
+    expect(screen.getByRole("button", { name: "Save this card" })).toBeEnabled();
+  });
+  it("retains the previous preview while blocking stale exports and cancels superseded generation", async () => {
+    const user = userEvent.setup();
+    render(<AyahShareStudio {...props} />);
+    await waitFor(() => expect(screen.getByRole("button", { name: "Share card" })).toBeEnabled());
+    const oldSignal = generateAyahCards.mock.lastCall![1] as AbortSignal;
+    let finish!: (value: unknown) => void;
+    generateAyahCards.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          finish = resolve;
+        }),
+    );
+    await user.click(screen.getByRole("radio", { name: /Square/ }));
+    expect(oldSignal.aborted).toBe(true);
+    expect(screen.getByRole("img")).toHaveAttribute("src", "blob:preview");
+    expect(screen.getByRole("button", { name: "Save this card" })).toBeDisabled();
+    await waitFor(() => expect(finish).toBeDefined());
+    finish([{ file: new File(["new"], "new.png"), url: "blob:new", width: 1080, height: 1080, page: { rows: [] } }]);
+    await waitFor(() => expect(screen.getByRole("button", { name: "Share card" })).toBeEnabled());
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:preview");
+  });
+  it("recovers generation and translation independently and exposes complete selectable text", async () => {
+    loadAyahEnglishTranslation.mockResolvedValueOnce(null);
+    const user = userEvent.setup();
+    render(<AyahShareStudio {...props} />);
+    await user.click(await screen.findByRole("button", { name: "Try again" }));
+    await waitFor(() => expect(screen.getByRole("checkbox", { name: "Include English translation" })).toBeEnabled());
+    await user.click(screen.getByRole("checkbox", { name: "Include English translation" }));
+    await user.click(screen.getByText("Read the card text"));
+    await user.click(screen.getByRole("button", { name: "Copy text" }));
+    expect(await screen.findByRole("status")).toHaveTextContent("Ayah copied");
+    expect(await navigator.clipboard.readText()).toContain("Saheeh International");
+    await user.click(screen.getByRole("button", { name: "Close" }));
+    expect(props.onClose).toHaveBeenCalled();
   });
 });

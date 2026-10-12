@@ -1,5 +1,20 @@
 [
   {
+    "release": "2026-10-12",
+    "ar": [
+      "قراءة إنجليزية أكثر ترتيبًا ومساحة للنص، مع اسم السورة والجزء في رأس الصفحة وتبديل واضح للغة على الهاتف.",
+      "مشاركة الآيات بحروف المصحف ونص في الوسط، مع ضبط حجم الخط واحتواء آية الكرسي كاملة في بطاقة واحدة.",
+      "تنزيلات صوتية تحتفظ بالملفات المكتملة عند التعثر، مع تقدم أوضح وإمكانية حفظ التسجيلات المنزلة كملفات على الجهاز.",
+      "إكمال مقطع آل عمران من الآية ١٩٠ إلى ٢٠٠ وثبات النص عند إظهار المعاني، مع أدوات قراءة وتسبيح أكثر اتساقًا."
+    ],
+    "en": [
+      "Read English meanings with clearer surah and juz headings, more room for text, and a simple language switch on phones.",
+      "Share centered ayah cards in Mushaf lettering, adjust text size, and keep the complete Ayat al-Kursi on one card.",
+      "Keep completed audio downloads when a transfer fails, see clearer progress, and save downloaded recordings as files on your device.",
+      "Read the complete Al-Imran passage from ayah 190 to 200, keep text steady when showing meanings, and use more consistent reading and counter controls."
+    ]
+  },
+  {
     "release": "2026-10-11.2",
     "ar": [
       "الترجمة الإنجليزية بمحاذاة صفحة المصحف وتمرير خاص للمعاني، مع التبديل بين العربية والإنجليزية على الشاشات الصغيرة.",

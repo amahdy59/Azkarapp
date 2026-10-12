@@ -195,5 +195,6 @@ export const APPROVED_AUDIO_ASSIGNMENTS: Readonly<Record<string, string>> = Obje
   "sc-ref-10": "pur-ref-6-english",
   "misc-ref-13": "comprehensive-dua-42",
   "wu-hm-3": "wu-hm-3",
-  "wu-hm-4": "wu-hm-4",
+  // Completed reading passage is 3:190–200; the old recording transcript is
+  // only 3:190–191. Retain the asset, but do not assign mismatched audio.
 });

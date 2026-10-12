@@ -9,6 +9,8 @@ import { formatNumerals } from "../formatting";
 import { reportError } from "../../lib/observability";
 import { getAyahWordMeanings, loadSurahWordMeanings, type QuranWordMeaning } from "../content/quranWordMeanings";
 import { loadAyahEnglishTranslation } from "../content/quranTranslations";
+import type { AyahShareOptions } from "./AyahShareStudio";
+import { AyahMushafText } from "./AyahMushafText";
 
 type Feedback = { message: string; error: boolean } | null;
 const AyahShareStudio = lazy(() => import("./AyahShareStudio"));
@@ -18,6 +20,7 @@ export function AyahInteractionSheet({
   onClose,
   verseKey,
   text,
+  pageNumber,
   language,
   isBookmarked,
   onBookmark,
@@ -26,6 +29,7 @@ export function AyahInteractionSheet({
   onClose: () => void;
   verseKey: string | null;
   text: string | null;
+  pageNumber?: number;
   language: AppLanguage;
   isBookmarked: boolean;
   onBookmark: () => void;
@@ -37,6 +41,11 @@ export function AyahInteractionSheet({
   const [loadedTranslation, setLoadedTranslation] = useState<{ verseKey: string; text: string | null } | null>(null);
   const translation = loadedTranslation?.verseKey === verseKey ? loadedTranslation.text : null;
   const [imageShare, setImageShare] = useState(false);
+  const [shareOptions, setShareOptions] = useState<AyahShareOptions>({
+    format: "portrait",
+    includeTranslation: false,
+    includeMeanings: false,
+  });
   const imageTrigger = useRef<HTMLButtonElement>(null);
   useEffect(() => setImageShare(false), [verseKey, isOpen]);
 
@@ -130,36 +139,59 @@ export function AyahInteractionSheet({
     <ResponsiveSheet
       open={isOpen}
       onClose={onClose}
-      title={headerTitle || t(language, "reader.interactionSheetAria")}
+      title={
+        imageShare ? t(language, "reader.ayahCardTitle") : headerTitle || t(language, "reader.interactionSheetAria")
+      }
       direction={language === "ar" ? "rtl" : "ltr"}
-      describedById={descriptionId}
+      describedById={imageShare ? undefined : descriptionId}
       testId="ayah-interaction-sheet"
       showCloseButton={false}
+      focusOnOpen
+      maxWidthClassName={imageShare ? "max-w-[52rem]" : undefined}
+      dialogClassName={imageShare ? "h-[85dvh]" : undefined}
+      drawerClassName={imageShare ? "h-[92dvh] !max-h-[92dvh] !pb-0" : undefined}
     >
-      <div className="flex min-h-0 flex-col overflow-y-auto overscroll-contain pb-6" data-vaul-no-drag>
-        <SheetHeader
-          title={headerTitle || t(language, "reader.interactionSheetAria")}
-          icon={<BookOpen size={20} aria-hidden="true" />}
-          onClose={onClose}
-          language={language}
-          direction={language === "ar" ? "rtl" : "ltr"}
-          descriptionId={descriptionId}
-          description={t(language, "reader.interactionSheetAria")}
-        />
+      <div
+        className={`flex min-h-0 flex-1 flex-col ${imageShare ? "overflow-hidden" : "overflow-y-auto overscroll-contain pb-6"}`}
+        data-vaul-no-drag
+      >
+        {!imageShare && (
+          <SheetHeader
+            title={headerTitle || t(language, "reader.interactionSheetAria")}
+            icon={<BookOpen size={20} aria-hidden="true" />}
+            onClose={onClose}
+            language={language}
+            direction={language === "ar" ? "rtl" : "ltr"}
+            descriptionId={descriptionId}
+            description={t(language, "reader.interactionSheetAria")}
+          />
+        )}
         {imageShare && verseKey && text ? (
           <Suspense
             fallback={
-              <p role="status" className="p-5">
-                {t(language, "reader.shareCardGenerating")}
-              </p>
+              <>
+                <SheetHeader
+                  title={t(language, "reader.ayahCardTitle")}
+                  subtitle={headerTitle}
+                  onClose={onClose}
+                  language={language}
+                />
+                <p role="status" className="p-5">
+                  {t(language, "reader.shareCardGenerating")}
+                </p>
+              </>
             }
           >
             <AyahShareStudio
               verseKey={verseKey}
               text={text}
+              pageNumber={pageNumber}
               title={headerTitle}
               meanings={meanings}
               language={language}
+              onClose={onClose}
+              options={shareOptions}
+              onOptionsChange={setShareOptions}
               onBack={() => {
                 setImageShare(false);
                 window.setTimeout(() => imageTrigger.current?.focus(), 0);
@@ -170,16 +202,16 @@ export function AyahInteractionSheet({
           <>
             <div className="pt-3" />
 
-            <div className="mx-5 mb-3 max-h-36 overflow-y-auto rounded-xl bg-muted/55 px-4 py-3">
+            <div className="mx-5 mb-3 rounded-xl bg-muted/55 px-4 py-3">
               {text ? (
                 <p
-                  className="zikr-text text-start text-xl leading-9"
+                  className="zikr-text text-center text-xl leading-9"
                   lang="ar"
                   dir="rtl"
                   data-testid="ayah-sheet-text"
                   style={QURAN_TEXT_STYLE}
                 >
-                  {text}
+                  <AyahMushafText text={text} verseKey={verseKey!} pageNumber={pageNumber} language={language} />
                 </p>
               ) : (
                 <p className="text-sm font-semibold text-muted-foreground" role="status">
@@ -195,10 +227,14 @@ export function AyahInteractionSheet({
                 lang="en"
                 data-testid="ayah-sheet-translation-container"
               >
-                <h4 className="mb-1 text-micro font-bold text-muted-foreground">
+                <h4
+                  className="mb-1 text-sm font-semibold text-muted-foreground"
+                  lang={language}
+                  dir={language === "ar" ? "rtl" : "ltr"}
+                >
                   {t(language, "quranListening.translation")} · Saheeh International
                 </h4>
-                <p className="text-sm leading-relaxed text-foreground" data-testid="ayah-sheet-translation">
+                <p className="text-base leading-[1.65] text-foreground" data-testid="ayah-sheet-translation">
                   {translation}
                 </p>
               </div>
@@ -209,9 +245,9 @@ export function AyahInteractionSheet({
                 data-testid="ayah-meanings-container"
               >
                 <h4 className="mb-2 text-xs font-bold text-primary">{t(language, "reader.wordMeaningsTitle")}</h4>
-                <div className="space-y-1.5 max-h-28 overflow-y-auto pe-1">
+                <div className="space-y-1.5 pe-1" lang="ar" dir="rtl">
                   {meanings.map((m) => (
-                    <div key={m.id} className="text-xs leading-5 flex items-baseline gap-2">
+                    <div key={m.id} className="text-sm leading-relaxed flex items-baseline gap-2">
                       <span className="font-bold text-foreground shrink-0">{m.word}:</span>
                       <span className="text-muted-foreground">{m.explanationArabic}</span>
                     </div>

@@ -56,7 +56,9 @@ for (const language of ["ar", "en"] as const) {
         await page.screenshot({ path: info.outputPath(`reader-mushaf-${language}.png`) });
         await page.getByRole("switch", { name: t(language, "settings.showDifficultWords") }).click();
         const word = page.getByTestId("quran-word-help").first();
-        await expect(word.locator("[data-quran-glyph]").first()).toBeVisible();
+        await expect(word).toHaveAttribute("data-quran-glyph", "");
+        await expect(word).toBeVisible();
+        await expect(word).toHaveCSS("font-family", `qcf-v2-page-${passage.page}`);
         await word.click();
         await expect(page.getByTestId("quran-word-popover").or(page.getByRole("dialog"))).toBeVisible();
         await page.keyboard.press("Escape");

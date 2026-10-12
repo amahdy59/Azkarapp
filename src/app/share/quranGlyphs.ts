@@ -13,7 +13,9 @@ export async function prepareQuranGlyphs(
   canonicalKey?: string,
 ): Promise<QuranGlyphRendering | undefined> {
   const range = canonicalKey ? MUSHAF_EXCERPTS[canonicalKey] : undefined;
-  if (!range || typeof FontFace === "undefined") return undefined;
+  // A single canvas font cannot paint glyph codes from two different pages.
+  // Keep the complete, readable Unicode export until multi-font drawing is supported.
+  if (!range || range.endPage || typeof FontFace === "undefined") return undefined;
   try {
     const data = await loadMushafPage(range.page);
     const lines: MushafWordToken[][] = Array.from({ length: 15 }, () => []);

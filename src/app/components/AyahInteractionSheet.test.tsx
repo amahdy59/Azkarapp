@@ -37,7 +37,7 @@ describe("AyahInteractionSheet", () => {
     expect(onBookmark).toHaveBeenCalledOnce();
   });
 
-  it("keeps the Arabic ayah and each icon-label pair aligned to logical start", () => {
+  it("centers the ayah preview and keeps action icon-label pairs at logical start", () => {
     render(
       <AyahInteractionSheet
         isOpen
@@ -51,7 +51,7 @@ describe("AyahInteractionSheet", () => {
     );
 
     const ayah = screen.getByTestId("ayah-sheet-text");
-    expect(ayah).toHaveClass("text-start");
+    expect(ayah).toHaveClass("text-center");
     expect(ayah).not.toHaveClass("text-end");
 
     const copy = screen.getByRole("button", { name: "نسخ الآية" });

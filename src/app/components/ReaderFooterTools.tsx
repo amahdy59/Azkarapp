@@ -3,6 +3,7 @@ import { ChevronDown, Maximize, Minimize } from "./icons";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
 import "./reader-footer.css";
+import { DevotionalAction } from "./DevotionalControls";
 
 export function ReaderFooterTools({
   language,
@@ -36,7 +37,7 @@ export function ReaderFooterTools({
       {language && (hasFocusToggle || hasToolsToggle) && (
         <div className="reader-tools-disclosure flex items-center justify-center gap-3 py-1">
           {hasFocusToggle ? (
-            <button
+            <DevotionalAction
               ref={focusToggleRef}
               type="button"
               data-testid="reader-tools-toggle"
@@ -50,8 +51,11 @@ export function ReaderFooterTools({
                 event.stopPropagation();
                 onToggleFocus?.();
               }}
-              className="reader-tools-toggle inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-xl border border-border bg-muted/40 px-3 text-label font-medium text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              className="reader-tools-toggle min-w-11 text-label font-semibold"
             >
+              <span className="reader-tools-chevron flex shrink-0 items-center justify-center" aria-hidden="true">
+                {focusMode ? <Minimize size={20} /> : <Maximize size={20} />}
+              </span>
               <span className="inline-grid">
                 <span className="col-start-1 row-start-1">
                   {t(language, focusMode ? "reader.exitFocus" : "reader.enterFocus")}
@@ -60,13 +64,7 @@ export function ReaderFooterTools({
                   {t(language, focusMode ? "reader.enterFocus" : "reader.exitFocus")}
                 </span>
               </span>
-              <span
-                className="reader-tools-chevron flex size-6 shrink-0 items-center justify-center rounded-full bg-card"
-                aria-hidden="true"
-              >
-                {focusMode ? <Minimize size={16} /> : <Maximize size={16} />}
-              </span>
-            </button>
+            </DevotionalAction>
           ) : (
             <button
               type="button"

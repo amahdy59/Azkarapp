@@ -46,11 +46,15 @@ for (const route of ["/counter", "/friday/salawat"]) {
         await expect(tools).toBeHidden();
         await expect(toggle).toBeFocused();
         await expect(toggle).toHaveAttribute("aria-expanded", "false");
-        await expect(toggle.locator("svg")).toHaveClass(/rotate-180/);
-        expect((await counter.boundingBox())!.y).toBeCloseTo(before.y, 0);
+        await expect(toggle).toHaveAttribute("aria-pressed", "true");
+        await expect(toggle).toHaveAttribute("data-focus-active", "true");
+        await expect(counter).toBeInViewport();
         await expect(counter).toHaveAttribute("aria-label", count!);
         await toggle.click();
         await expect(tools).toBeVisible();
+        await expect(toggle).toHaveAttribute("aria-pressed", "false");
+        await expect(toggle).toHaveAttribute("data-focus-active", "false");
+        expect((await counter.boundingBox())!.y).toBeCloseTo(before.y, 0);
         await expect(counter).toHaveAttribute("aria-label", count!);
         await page.screenshot({ path: testInfo.outputPath("standalone-footer.png") });
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);

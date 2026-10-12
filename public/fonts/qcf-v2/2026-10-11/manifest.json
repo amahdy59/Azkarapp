@@ -17,6 +17,18 @@
       "sha256": "c50fe27340b8b3974ec93009e583dd937742c69273e1aa7170c54758b3e04dd2"
     },
     {
+      "page": 75,
+      "source": "https://verses.quran.foundation/fonts/quran/hafs/v2/woff2/p75.woff2",
+      "bytes": 125196,
+      "sha256": "4730bb0269ec26e5d109ac179bd55418231df5dcee1dcea111d02701487e3ba6"
+    },
+    {
+      "page": 76,
+      "source": "https://verses.quran.foundation/fonts/quran/hafs/v2/woff2/p76.woff2",
+      "bytes": 149708,
+      "sha256": "0daa28b5a0525ea57594d2ec2cb9d8c7978934121b3988609a38ef8442c305ad"
+    },
+    {
       "page": 603,
       "source": "https://verses.quran.foundation/fonts/quran/hafs/v2/woff2/p603.woff2",
       "bytes": 64896,

@@ -35,6 +35,7 @@ vi.mock("../../content/mushafOfflineCache", () => ({
 }));
 
 import { DownloadsPanel } from "./DownloadsPanel";
+import { AudioDownloadError } from "../../audio/audioDownloadTransfer";
 
 function openManagement(id: string) {
   const category = screen.getByTestId("download-category-" + id);
@@ -42,6 +43,106 @@ function openManagement(id: string) {
 }
 
 describe("DownloadsPanel", () => {
+  it("shows live transfer, verification and locally saved counts before completion", async () => {
+    Object.defineProperty(navigator, "storage", {
+      configurable: true,
+      value: { estimate: vi.fn().mockResolvedValue({ usage: 0, quota: 1e9 }) },
+    });
+    let detail!: (value: unknown) => void;
+    let finish!: () => void;
+    audioMocks.download.mockImplementation(async (_zikrs, _preferences, options) => {
+      detail = options.onDetail;
+      return new Promise<void>((resolve) => {
+        finish = resolve;
+      });
+    });
+    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    const row = screen.getByTestId("offline-resource-adhkar");
+    const download = within(row).getByRole("button", { name: "Download · Adhkar & duas" });
+    await waitFor(() => expect(download).toBeEnabled());
+    fireEvent.click(download);
+    await waitFor(() => expect(detail).toBeDefined());
+    act(() =>
+      detail({
+        phase: "receiving",
+        completedFiles: 1,
+        totalFiles: 4,
+        fileNumber: 2,
+        attempt: 1,
+        receivedBytes: 500,
+        totalBytes: 1000,
+      }),
+    );
+    expect(within(row).getByRole("progressbar")).toHaveAttribute("value", "500");
+    expect(row).toHaveTextContent("50% downloaded");
+    expect(row).toHaveTextContent("1 of 4 recordings saved on this device");
+    expect(row).toHaveTextContent("Receiving recording 2 of 4");
+    act(() =>
+      detail({
+        phase: "verifying",
+        completedFiles: 1,
+        totalFiles: 4,
+        fileNumber: 2,
+        attempt: 1,
+        receivedBytes: 1000,
+        totalBytes: 1000,
+      }),
+    );
+    expect(row).toHaveTextContent("Checking recording 2 of 4");
+    expect(row).not.toHaveTextContent("Ready offline");
+    await act(async () => finish());
+  });
+
+  it.each(["network", "server", "integrity", "unsupported"] as const)(
+    "explains %s failures beside the affected card",
+    async (code) => {
+      Object.defineProperty(navigator, "storage", {
+        configurable: true,
+        value: { estimate: vi.fn().mockResolvedValue({ usage: 0, quota: 1e9 }) },
+      });
+      audioMocks.download.mockRejectedValue(new AudioDownloadError(code, "internal-id"));
+      render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+      const row = screen.getByTestId("offline-resource-adhkar");
+      const button = within(row).getByRole("button", { name: "Download · Adhkar & duas" });
+      await waitFor(() => expect(button).toBeEnabled());
+      fireEvent.click(button);
+      await waitFor(() => expect(within(row).getByRole("button", { name: "Try again · Adhkar & duas" })).toBeEnabled());
+      expect(row).toHaveTextContent(
+        code === "network"
+          ? "3 attempts"
+          : code === "server"
+            ? "Audio server unavailable"
+            : code === "integrity"
+              ? "failed verification"
+              : "This browser cannot store offline audio",
+      );
+      expect(row).not.toHaveTextContent("internal-id");
+    },
+  );
+
+  it("requests persistent device storage without promising protection if the browser declines", async () => {
+    const persist = vi.fn().mockResolvedValueOnce(false).mockResolvedValueOnce(true);
+    Object.defineProperty(navigator, "storage", {
+      configurable: true,
+      value: {
+        estimate: vi.fn().mockResolvedValue({ usage: 0, quota: 1e9 }),
+        persisted: vi.fn().mockResolvedValue(false),
+        persist,
+      },
+    });
+    render(<DownloadsPanel language="en" onBack={vi.fn()} />);
+    const button = await screen.findByRole("button", { name: "Keep downloads on this device" });
+    await waitFor(() => expect(button).toBeEnabled());
+    fireEvent.click(button);
+    await waitFor(() => expect(persist).toHaveBeenCalledOnce());
+    await waitFor(() => expect(button).toBeEnabled());
+    expect(screen.getByTestId("download-persistence")).toHaveTextContent("Storage protection not granted");
+    fireEvent.click(button);
+    await waitFor(() => expect(screen.getByTestId("download-persistence")).toHaveTextContent("Storage protected"));
+    expect(screen.queryByRole("button", { name: "Keep downloads on this device" })).not.toBeInTheDocument();
+    expect(screen.getByText(/not in the Files app/)).toBeInTheDocument();
+  });
+
   it("keeps cancellation reachable when individual management is collapsed", async () => {
     Object.defineProperty(navigator, "storage", {
       configurable: true,
@@ -65,7 +166,7 @@ describe("DownloadsPanel", () => {
     expect(screen.getByTestId("download-category-adhkar").querySelector("details")).not.toHaveAttribute("open");
     fireEvent.click(cancel);
     expect(signal?.aborted).toBe(true);
-    await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Audio download cancelled"));
+    await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Download cancelled"));
     expect(audioMocks.download).toHaveBeenCalledOnce();
   });
 

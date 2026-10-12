@@ -1,4 +1,4 @@
-import { memo, useEffect, useRef } from "react";
+import { memo, useEffect, useLayoutEffect, useRef, type CSSProperties } from "react";
 import type { TextSizeOption } from "../types";
 import type { QuranTranslationVerse } from "../content/quranTranslation";
 import "./quran-listening-translation.css";
@@ -32,7 +32,8 @@ export const QuranTranslationText = memo(function QuranTranslationText({
   onManualBrowse?: () => void;
 }) {
   const viewport = useRef<HTMLDivElement>(null);
-  useEffect(() => {
+  // Bind before the asynchronously loaded region becomes available to keyboard readers.
+  useLayoutEffect(() => {
     const region = viewport.current;
     const pause = (event: KeyboardEvent) => {
       if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End"].includes(event.key)) onManualBrowse?.();
@@ -69,7 +70,12 @@ export const QuranTranslationText = memo(function QuranTranslationText({
       dir="ltr"
       lang="en"
       className={`quran-meaning-text ${className} focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring`}
-      style={{ fontSize: FONT_SIZES[textSize] }}
+      style={
+        {
+          fontSize: FONT_SIZES[textSize],
+          "--quran-meaning-gutter": verses.some((verse) => verse.marker.length > 2) ? "2.5ch" : "2ch",
+        } as CSSProperties
+      }
       onWheel={onManualBrowse}
       onTouchMove={onManualBrowse}
       onPointerDown={onManualBrowse}

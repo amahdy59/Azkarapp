@@ -60,6 +60,7 @@ beforeEach(() => {
             "1": "Sample English translation for verse 1",
             "2": "Sample English translation for verse 2",
             "3": "Sample English translation for verse 3",
+            "255": "Sample English translation for verse 255",
           }),
         };
       }
@@ -694,5 +695,28 @@ describe("KhatmahReaderScreen wird completion notice", () => {
 
     // Translation panel should now be in the document
     expect(await screen.findByRole("region", { name: "Page translation" })).toBeInTheDocument();
+  });
+
+  it("replaces the compact index with languages and exits without changing the page", async () => {
+    setViewport(390, 844);
+    const { setKhatmahPage } = renderReader({ language: "en", direction: "ltr" });
+    await screen.findByTestId("mushaf-top-center-index");
+    fireEvent.click(screen.getByTestId("mushaf-more-actions"));
+    fireEvent.click(screen.getByTestId("quick-page-translation-switch"));
+    expect(screen.getByRole("radio", { name: "English", exact: true })).toBeChecked();
+    expect(screen.queryByTestId("mushaf-top-center-index")).not.toBeInTheDocument();
+    expect(screen.getAllByTestId("mushaf-more-actions")).toHaveLength(1);
+    const english = await screen.findByRole("region", { name: "Translation for page 42" });
+    english.scrollTop = 85;
+    fireEvent.click(screen.getByRole("radio", { name: "العربية", exact: true }));
+    expect(screen.getByRole("article", { name: "Page 42" })).toBeVisible();
+    fireEvent.click(screen.getByRole("radio", { name: "English", exact: true }));
+    expect(english.scrollTop).toBe(85);
+    setKhatmahPage.mockClear();
+    fireEvent.click(screen.getByRole("button", { name: "Exit translation mode" }));
+    expect(screen.queryByRole("radio", { name: "English", exact: true })).not.toBeInTheDocument();
+    expect(screen.getByRole("article", { name: "Page 42" })).toBeVisible();
+    await waitFor(() => expect(screen.getByTestId("mushaf-top-center-index")).toHaveFocus());
+    expect(setKhatmahPage).not.toHaveBeenCalled();
   });
 });

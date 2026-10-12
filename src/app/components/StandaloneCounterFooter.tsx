@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import type { ReactNode, Ref } from "react";
 import type { AppLanguage } from "../types";
 import { t } from "../i18n";
 import { DevotionalAction, DevotionalFooter } from "./DevotionalControls";
@@ -14,6 +14,9 @@ export function StandaloneCounterFooter({
   onToggleSound,
   onReset,
   resetDisabled,
+  focusMode,
+  onToggleFocus,
+  focusToggleRef,
 }: {
   language: AppLanguage;
   benefit: ReactNode;
@@ -22,15 +25,18 @@ export function StandaloneCounterFooter({
   onToggleSound: () => void;
   onReset: () => void;
   resetDisabled: boolean;
+  focusMode: boolean;
+  onToggleFocus: () => void;
+  focusToggleRef: Ref<HTMLButtonElement>;
 }) {
-  const [expanded, setExpanded] = useState(true);
   const soundLabel = t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound");
   return (
     <DevotionalFooter className="reader-session-footer mx-auto w-full">
       <ReaderFooterTools
         language={language}
-        expanded={expanded}
-        onToggle={() => setExpanded((value) => !value)}
+        focusMode={focusMode}
+        onToggleFocus={onToggleFocus}
+        focusToggleRef={focusToggleRef}
         primary={
           <div className="w-full pb-1" data-testid="counter-panel">
             <div className="standalone-counter-row">

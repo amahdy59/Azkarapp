@@ -1,9 +1,11 @@
-import { Fragment } from "react";
+import { Fragment, type HTMLAttributes } from "react";
+import { getQcfFontFamily } from "../content/qcfMushaf";
 import type { AppLanguage } from "../types";
 import { AyahMarker } from "./AyahMarker";
 import { useQuranSnippet } from "../hooks/useQuranSnippet";
 
 export type QuranSnippet = NonNullable<ReturnType<typeof useQuranSnippet>>;
+export type QuranWordAttributes = (start: number, end: number) => HTMLAttributes<HTMLSpanElement>;
 
 /** Replace only verified word offsets; semantic text and all intervening characters stay intact. */
 export function QuranGlyphSlice({
@@ -12,12 +14,14 @@ export function QuranGlyphSlice({
   snippet,
   language,
   preserveLines = false,
+  wordAttributes,
 }: {
   text: string;
   offset?: number;
   snippet: QuranSnippet;
   language: AppLanguage;
   preserveLines?: boolean;
+  wordAttributes?: QuranWordAttributes;
 }) {
   let cursor = 0;
   const pieces = snippet.mapping.filter((word) => word.startOffset >= offset && word.endOffset <= offset + text.length);
@@ -34,13 +38,17 @@ export function QuranGlyphSlice({
         const end = entry.endOffset - offset;
         const before = text.slice(cursor, start);
         cursor = end;
+        const attributes = wordAttributes?.(entry.startOffset, entry.endOffset);
         return (
           <Fragment key={entry.startOffset}>
             <UnicodeVerseText text={before} language={language} snippet={snippet} />
             {preserveLines && lineStarts.has(entry.word) && <br />}
             <span
+              {...attributes}
+              data-quran-word=""
               style={{
-                fontFamily: snippet.fontFamily,
+                ...attributes?.style,
+                fontFamily: entry.word.pageNumber ? getQcfFontFamily(entry.word.pageNumber) : snippet.fontFamily,
                 display: "inline-block",
                 position: "relative",
                 whiteSpace: "nowrap",
@@ -65,17 +73,25 @@ export function QuranVerseText({
   language,
   canonicalKey,
   preserveLines = false,
+  wordAttributes,
 }: {
   text: string;
   language: AppLanguage;
   canonicalKey?: string;
   preserveLines?: boolean;
+  wordAttributes?: QuranWordAttributes;
 }) {
   const snippet = useQuranSnippet(text, canonicalKey);
   return snippet ? (
-    <QuranGlyphSlice text={text} snippet={snippet} language={language} preserveLines={preserveLines} />
+    <QuranGlyphSlice
+      text={text}
+      snippet={snippet}
+      language={language}
+      preserveLines={preserveLines}
+      wordAttributes={wordAttributes}
+    />
   ) : (
-    <UnicodeVerseText text={text} language={language} />
+    <UnicodeVerseText text={text} language={language} wordAttributes={wordAttributes} />
   );
 }
 
@@ -84,14 +100,16 @@ function UnicodeVerseText({
   text,
   language,
   snippet,
+  wordAttributes,
 }: {
   text: string;
   language: AppLanguage;
   snippet?: QuranSnippet;
+  wordAttributes?: QuranWordAttributes;
 }) {
   // The verified QCF word already paints its Mushaf pause sign. Keep the
   // source sign semantic without painting it a second time between glyphs.
-  const gap = (value: string) =>
+  const gap = (value: string, base = 0) =>
     snippet
       ? value.split(/([ۖۗۘۙۚۛۜ])/u).map((part, index) =>
           /^[ۖۗۘۙۚۛۜ]$/u.test(part) ? (
@@ -102,25 +120,40 @@ function UnicodeVerseText({
             part
           ),
         )
-      : value;
+      : (() => {
+          let cursor = base;
+          return value.split(/(\S+)/u).map((part) => {
+            const start = cursor;
+            cursor += part.length;
+            return /\S/u.test(part) ? (
+              <span key={start} {...wordAttributes?.(start, cursor)} data-quran-word="">
+                {part}
+              </span>
+            ) : (
+              part
+            );
+          });
+        })();
   const markers = [...text.matchAll(/﴿([٠-٩0-9]+)﴾/gu)];
   let offset = 0;
   return (
     <>
       {markers.map((marker) => {
+        const beforeStart = offset;
         const before = text.slice(offset, marker.index);
         offset = marker.index + marker[0].length;
         const number = marker[1]!.replace(/[٠-٩]/g, (digit) => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)));
-        const glyph = snippet?.lines
-          .flat()
-          .find((word) => word.isEnd && word.verseKey.split(":")[1] === number)?.qcfCode;
+        const glyph = snippet?.lines.flat().find((word) => word.isEnd && word.verseKey.split(":")[1] === number);
         return (
           <Fragment key={marker.index}>
-            {gap(before)}
-            <span aria-hidden="true">
+            {gap(before, beforeStart)}
+            <span aria-hidden="true" data-quran-ayah={number}>
               {glyph ? (
-                <span style={{ fontFamily: snippet!.fontFamily }} className="select-none">
-                  {glyph}
+                <span
+                  style={{ fontFamily: glyph.pageNumber ? getQcfFontFamily(glyph.pageNumber) : snippet!.fontFamily }}
+                  className="select-none"
+                >
+                  {glyph.qcfCode}
                 </span>
               ) : (
                 <AyahMarker number={number} language={language} />
@@ -130,7 +163,7 @@ function UnicodeVerseText({
           </Fragment>
         );
       })}
-      {gap(text.slice(offset))}
+      {gap(text.slice(offset), offset)}
     </>
   );
 }

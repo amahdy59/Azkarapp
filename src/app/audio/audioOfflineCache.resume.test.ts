@@ -6,11 +6,22 @@ import {
   getAudioDownloadStatus,
   getAudioDownloadStatuses,
   removeAudioForZikrs,
+  getSavedAudioFiles,
+  prepareSavedAudioFile,
 } from "./audioOfflineCache";
 
 const fixtures = vi.hoisted(() => ({
   hash: "00".repeat(32),
   urls: ["https://audio.test/one", "https://audio.test/two"],
+}));
+vi.mock("./audioManifest", () => ({
+  AUDIO_MANIFEST_VERSION: 8,
+  AUDIO_CATALOG: {
+    assets: {
+      one: { titleArabic: "التسجيل الأول", titleEnglish: "First recording", segments: [] },
+      two: { titleArabic: "التسجيل الثاني", titleEnglish: "Second recording", segments: [] },
+    },
+  },
 }));
 vi.mock("./resolveAudioAsset", () => ({
   getPreferredVoiceId: () => "voice",
@@ -29,6 +40,7 @@ vi.mock("./resolveAudioAsset", () => ({
               reviewStatus: "approved",
               byteSize: 3,
               mimeType: "audio/mpeg",
+              voiceName: "Test reciter",
               sha256: fixtures.hash,
             },
           ],
@@ -73,6 +85,42 @@ afterEach(() => {
 });
 
 describe("verified offline audio", () => {
+  it("lists only verified cached files and exports the chosen recording without network or cache removal", async () => {
+    files.set(fixtures.urls[0]!, response());
+    files.set(fixtures.urls[1]!, response([9, 2, 3]));
+    expect(await getSavedAudioFiles(zikrs, DEFAULT_AUDIO_PREFERENCES)).toEqual([
+      {
+        id: "one",
+        titleArabic: "التسجيل الأول",
+        titleEnglish: "First recording",
+        voiceName: "Test reciter",
+        fileName: "one.mp3",
+        byteSize: 3,
+      },
+    ]);
+    const file = await prepareSavedAudioFile(zikrs, DEFAULT_AUDIO_PREFERENCES, "one");
+    expect(file.name).toBe("one.mp3");
+    expect(file.type).toBe("audio/mpeg");
+    expect(new Uint8Array(await file.arrayBuffer())).toEqual(new Uint8Array([1, 2, 3]));
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(files.has(fixtures.urls[0]!)).toBe(true);
+    await expect(prepareSavedAudioFile(zikrs, DEFAULT_AUDIO_PREFERENCES, "two")).rejects.toMatchObject({
+      code: "integrity",
+    });
+    await expect(prepareSavedAudioFile(zikrs, DEFAULT_AUDIO_PREFERENCES, "unknown")).rejects.toMatchObject({
+      code: "unsupported",
+    });
+  });
+
+  it("refuses an export if the cached recording disappeared after listing", async () => {
+    files.set(fixtures.urls[0]!, response());
+    expect(await getSavedAudioFiles(zikrs, DEFAULT_AUDIO_PREFERENCES)).toHaveLength(1);
+    files.clear();
+    await expect(prepareSavedAudioFile(zikrs, DEFAULT_AUDIO_PREFERENCES, "one")).rejects.toMatchObject({
+      code: "integrity",
+    });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
   it("verifies shared recordings only once across collection and bundle readiness", async () => {
     files.set(fixtures.urls[0]!, response());
     const result = await getAudioDownloadStatuses([zikrs, [zikrs[0]!], zikrs], DEFAULT_AUDIO_PREFERENCES);
@@ -114,7 +162,7 @@ describe("verified offline audio", () => {
     ).rejects.toThrow();
     expect(files.size).toBe(0);
   });
-  it("quota failure rolls back new files and keeps earlier verified downloads", async () => {
+  it("quota failure keeps earlier verified downloads and never publishes the failed file", async () => {
     files.set(fixtures.urls[0]!, response());
     vi.mocked(caches.open).mockResolvedValueOnce({
       match: async (url: string) => files.get(url)?.clone(),
@@ -157,12 +205,40 @@ describe("verified offline audio", () => {
   it("a failed retry preserves previously verified files", async () => {
     files.set(fixtures.urls[0]!, response());
     fetchMock.mockRejectedValue(new Error("offline"));
-    await expect(downloadAudioForZikrs(zikrs, DEFAULT_AUDIO_PREFERENCES)).rejects.toThrow("offline");
+    await expect(downloadAudioForZikrs(zikrs, DEFAULT_AUDIO_PREFERENCES)).rejects.toMatchObject({ code: "network" });
     expect(files.has(fixtures.urls[0]!)).toBe(true);
     expect(await getAudioDownloadStatus(zikrs, DEFAULT_AUDIO_PREFERENCES)).toEqual({
       completed: 1,
       total: 2,
       remainingBytes: 3,
     });
+  });
+
+  it("keeps new verified files after a later failure and fetches only the missing file on retry", async () => {
+    fetchMock
+      .mockImplementationOnce(async () => response())
+      .mockImplementationOnce(async () => new Response(null, { status: 404 }));
+    await expect(downloadAudioForZikrs(zikrs, DEFAULT_AUDIO_PREFERENCES)).rejects.toMatchObject({ code: "server" });
+    expect(files.has(fixtures.urls[0]!)).toBe(true);
+    expect(files.has(fixtures.urls[1]!)).toBe(false);
+    expect(JSON.parse(localStorage.getItem("azkar.audio-downloads.v1")!)).toHaveProperty("one");
+    fetchMock.mockClear();
+    await downloadAudioForZikrs(zikrs, DEFAULT_AUDIO_PREFERENCES);
+    expect(fetchMock).toHaveBeenCalledOnce();
+    expect(fetchMock).toHaveBeenCalledWith(fixtures.urls[1], expect.anything());
+  });
+
+  it("keeps completed files when cancelled between recordings", async () => {
+    const controller = new AbortController();
+    await expect(
+      downloadAudioForZikrs(zikrs, DEFAULT_AUDIO_PREFERENCES, {
+        signal: controller.signal,
+        onDetail: (detail) => {
+          if (detail.phase === "saved") controller.abort();
+        },
+      }),
+    ).rejects.toMatchObject({ name: "AbortError" });
+    expect(files.has(fixtures.urls[0]!)).toBe(true);
+    expect(files.has(fixtures.urls[1]!)).toBe(false);
   });
 });

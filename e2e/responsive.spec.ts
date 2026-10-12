@@ -439,6 +439,88 @@ test("the Library displays unified section tabs beside the heading across mobile
   }
 });
 
+for (const language of ["ar", "en"] as const) {
+  test(`Library mobile pills align with the title in ${language} @cross-browser`, async ({ page }) => {
+    await page.addInitScript((language) => {
+      localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+      localStorage.setItem(
+        "azkarapp.state.v1",
+        JSON.stringify({
+          settings: { language, themeMode: "midnight", reduceMotion: true },
+          savedZikrIds: ["m-hm-75"],
+        }),
+      );
+    }, language);
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/#/azkar");
+    const heading = page.locator("h1");
+    const tabs = page.locator('[role="tablist"]');
+    const collections = page.getByTestId("library-section-collections");
+    const saved = page.getByTestId("library-section-saved");
+    await expect(saved).toHaveAccessibleName(/\(1\)|\(١\)/);
+
+    for (const width of [390, 320]) {
+      await page.setViewportSize({ width, height: 844 });
+      for (const scale of ["100%", "200%"]) {
+        await page.evaluate((scale) => {
+          document.documentElement.style.fontSize = scale;
+        }, scale);
+        await page.evaluate(async () => {
+          await document.fonts.ready;
+          await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+        });
+        await expect(collections.locator("span.hidden")).toBeHidden();
+        await expect(saved.locator("span.hidden")).toBeHidden();
+        const [headingBox, tabsBox, collectionsBox, savedBox] = await Promise.all([
+          heading.boundingBox(),
+          tabs.boundingBox(),
+          collections.boundingBox(),
+          saved.boundingBox(),
+        ]);
+        expect(headingBox).not.toBeNull();
+        expect(tabsBox).not.toBeNull();
+        expect(collectionsBox).not.toBeNull();
+        expect(savedBox).not.toBeNull();
+        if (!headingBox || !tabsBox || !collectionsBox || !savedBox) return;
+        expect(Math.abs(headingBox.y + headingBox.height / 2 - tabsBox.y - tabsBox.height / 2)).toBeLessThan(1);
+        expect(collectionsBox.height).toBeGreaterThanOrEqual(44);
+        expect(savedBox.width).toBeGreaterThanOrEqual(44);
+        expect(tabsBox.height).toBeCloseTo(collectionsBox.height, 0);
+        expect(savedBox.width).toBeCloseTo(collectionsBox.width, 0);
+        expect(savedBox.height).toBeCloseTo(collectionsBox.height, 0);
+        for (const tab of [collections, saved]) {
+          const buttonBox = (await tab.boundingBox())!;
+          const iconBox = (await tab.locator("svg").boundingBox())!;
+          expect(Math.abs(iconBox.x + iconBox.width / 2 - buttonBox.x - buttonBox.width / 2)).toBeLessThan(1);
+          expect(Math.abs(iconBox.y + iconBox.height / 2 - buttonBox.y - buttonBox.height / 2)).toBeLessThan(1);
+        }
+        expect(tabsBox.width).toBeLessThanOrEqual(scale === "100%" ? 110 : 200);
+        const formBox = await page.locator("header form").boundingBox();
+        expect(formBox!.y - (tabsBox.y + tabsBox.height)).toBeCloseTo(scale === "100%" ? 8 : 16, 0);
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      }
+    }
+
+    await page.evaluate(() => {
+      document.documentElement.style.fontSize = "100%";
+    });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.evaluate(() => document.fonts.ready);
+    await page.screenshot({ path: `output/playwright/library-mobile-pills-${language}.png` });
+    await collections.focus();
+    await page.keyboard.press(language === "ar" ? "ArrowLeft" : "ArrowRight");
+    await expect(saved).toBeFocused();
+    await expect(saved).toHaveAttribute("aria-selected", "true");
+    await collections.click();
+    await expect(collections).toHaveAttribute("aria-selected", "true");
+
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await expect(collections.locator("span.hidden")).toBeVisible();
+    await expect(saved.locator("span.hidden")).toBeVisible();
+    await expect(tabs).toHaveCSS("padding", "4px");
+  });
+}
+
 test("shared screen headers stay opaque after scrolling without changing Home", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 700 });
   await enterEnglishGuestMode(page);

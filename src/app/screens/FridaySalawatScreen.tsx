@@ -1,6 +1,7 @@
 import { ReferenceCard } from "../components/ReferenceCard";
 import { useCallback, useEffect, useState } from "react";
 import { DevotionalAction } from "../components/DevotionalControls";
+import { useStandaloneReadingFocus } from "../hooks/useStandaloneReadingFocus";
 import { StandaloneCounterFooter } from "../components/StandaloneCounterFooter";
 import { CounterTargetPicker } from "../components/CounterTargetPicker";
 import {
@@ -111,6 +112,7 @@ export function FridaySalawatScreen({
   textSize?: TextSizeOption;
 }) {
   const copy = EVIDENCE[language];
+  const { focusMode, setFocusMode, focusToggleRef, readingScrollRef } = useStandaloneReadingFocus();
   const [progress, setProgress] = useState(readFridaySalawatProgress);
   const [showBenefits, setShowBenefits] = useState(false);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
@@ -177,6 +179,16 @@ export function FridaySalawatScreen({
         else setShowCompletionModal(false);
         return;
       }
+      if (
+        event.key === "Escape" &&
+        focusMode &&
+        !event.defaultPrevented &&
+        !document.querySelector('[role="dialog"], [role="alertdialog"], [role="menu"]')
+      ) {
+        event.preventDefault();
+        setFocusMode(false);
+        return;
+      }
       if (isCounterShortcutBlocked(event)) return;
       const activeElement = document.activeElement;
       const focusedControl =
@@ -206,72 +218,75 @@ export function FridaySalawatScreen({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [complete, increment, onBack, reset, showBenefits, showCompletionModal]);
+  }, [complete, increment, onBack, reset, showBenefits, showCompletionModal, focusMode, setFocusMode]);
 
   const { pressStyle, surfaceProps } = useCountingSurface({ onCount: increment, reduceMotion });
 
   return (
     <ScreenContainer
       dir={direction}
+      data-reading-focus={focusMode}
       className="relative flex flex-col overflow-y-auto h-full !pb-0 sm:!pt-0"
       screenName={t(language, "fridaySalawat.title")}
     >
       <div className="relative z-10 flex min-h-0 flex-1 flex-col">
-        <ReadingScreenChrome
-          language={language}
-          direction={direction}
-          title={t(language, "fridaySalawat.title")}
-          onBack={onBack}
-          testId="salawat"
-          progress={{
-            value: progress.count,
-            max: progress.target,
-            percentLabel: `${formatNumerals(progressPercent, language)}%`,
-            countLabel: `${formatNumerals(progress.count, language)} / ${formatNumerals(progress.target, language)}`,
-            ariaLabel: t(language, "fridaySalawat.target"),
-          }}
-          subRow={
-            <div className="w-full" data-prevent-count="true">
-              <CounterTargetPicker
-                activeTarget={progress.target}
-                onTargetChange={(target) => {
-                  persist(0, target);
-                  setShowCompletionModal(false);
-                }}
-                language={language}
-                direction={direction}
-                allowOpen={false}
-              />
-            </div>
-          }
-          actions={(tier) => {
-            const isWide = tier === "wide";
-            const actionClass = isWide ? HERO_ACTION_CLASS : HEADER_ACTION_CLASS;
-            return (
-              <div className="flex items-center gap-1.5">
-                <DropdownMenu dir={direction}>
-                  <DropdownMenuTrigger className={actionClass} aria-label={t(language, "common.moreOptions")}>
-                    <MoreVertical size={20} aria-hidden="true" />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={toggleSound}>
-                      {soundEnabled ? (
-                        <Volume2 size={16} className="text-primary me-2" aria-hidden="true" />
-                      ) : (
-                        <VolumeX size={16} className="text-muted-foreground me-2" aria-hidden="true" />
-                      )}
-                      <span>{t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={reset} disabled={progress.count === 0}>
-                      <RotateCcw size={16} className="text-muted-foreground me-2" aria-hidden="true" />
-                      <span>{t(language, "fridaySalawat.reset")}</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+        <div data-reading-chrome>
+          <ReadingScreenChrome
+            language={language}
+            direction={direction}
+            title={t(language, "fridaySalawat.title")}
+            onBack={onBack}
+            testId="salawat"
+            progress={{
+              value: progress.count,
+              max: progress.target,
+              percentLabel: `${formatNumerals(progressPercent, language)}%`,
+              countLabel: `${formatNumerals(progress.count, language)} / ${formatNumerals(progress.target, language)}`,
+              ariaLabel: t(language, "fridaySalawat.target"),
+            }}
+            subRow={
+              <div className="w-full" data-prevent-count="true">
+                <CounterTargetPicker
+                  activeTarget={progress.target}
+                  onTargetChange={(target) => {
+                    persist(0, target);
+                    setShowCompletionModal(false);
+                  }}
+                  language={language}
+                  direction={direction}
+                  allowOpen={false}
+                />
               </div>
-            );
-          }}
-        />
+            }
+            actions={(tier) => {
+              const isWide = tier === "wide";
+              const actionClass = isWide ? HERO_ACTION_CLASS : HEADER_ACTION_CLASS;
+              return (
+                <div className="flex items-center gap-1.5">
+                  <DropdownMenu dir={direction}>
+                    <DropdownMenuTrigger className={actionClass} aria-label={t(language, "common.moreOptions")}>
+                      <MoreVertical size={20} aria-hidden="true" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={toggleSound}>
+                        {soundEnabled ? (
+                          <Volume2 size={16} className="text-primary me-2" aria-hidden="true" />
+                        ) : (
+                          <VolumeX size={16} className="text-muted-foreground me-2" aria-hidden="true" />
+                        )}
+                        <span>{t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={reset} disabled={progress.count === 0}>
+                        <RotateCcw size={16} className="text-muted-foreground me-2" aria-hidden="true" />
+                        <span>{t(language, "fridaySalawat.reset")}</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              );
+            }}
+          />
+        </div>
         <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
           {complete ? t(language, "fridaySalawat.completed") : ""}
         </p>
@@ -288,7 +303,15 @@ export function FridaySalawatScreen({
               data-testid="salawat-content"
             >
               <div className="relative flex min-h-0 flex-1">
-                <div className="reader-text-scroll h-full min-h-0 w-full overflow-y-auto ps-6 pe-7 md:px-20 py-4 outline-none focus-visible:outline-none focus:ring-0">
+                <div
+                  ref={readingScrollRef}
+                  // The reading viewport needs keyboard scrolling, matching ReaderScreen.
+                  // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+                  tabIndex={0}
+                  role="region"
+                  aria-label={t(language, "reader.readingText")}
+                  className="reader-text-scroll h-full min-h-0 w-full overflow-y-auto ps-6 pe-7 md:px-20 py-4 outline-none focus-visible:outline-none focus:ring-0"
+                >
                   <div className="reading-measure mx-auto flex min-h-full w-full flex-col py-4">
                     <div style={pressStyle} className="my-auto w-full flex flex-col items-center justify-center">
                       <p
@@ -329,6 +352,9 @@ export function FridaySalawatScreen({
                 <div data-testid="reader-counter-stack">
                   <StandaloneCounterFooter
                     language={language}
+                    focusMode={focusMode}
+                    onToggleFocus={() => setFocusMode((value) => !value)}
+                    focusToggleRef={focusToggleRef}
                     soundEnabled={soundEnabled}
                     onToggleSound={toggleSound}
                     onReset={reset}

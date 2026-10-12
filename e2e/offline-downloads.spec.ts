@@ -46,7 +46,7 @@ for (const scenario of [
       });
     const player = page.getByRole("region", { name: t(scenario.language, "audioPlayer.region"), exact: true });
     await expect(player).toHaveAttribute("data-variant", "compact");
-    await page.getByTestId("download-category-recitations").locator("summary").click();
+    await page.getByTestId("download-category-recitations").locator(":scope > details > summary").click();
     await expect(page.getByTestId("offline-resource-baqarah")).toContainText(
       scenario.language === "ar" ? "٢٧٣" : "273",
     );

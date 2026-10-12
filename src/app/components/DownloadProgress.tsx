@@ -3,7 +3,7 @@ import { t } from "../i18n";
 import type { AppLanguage } from "../types";
 import "./download-progress.css";
 
-/** File verification can advance in steps; never imply streamed byte progress. */
+/** Transfer progress is distinct from verified offline readiness. */
 export function DownloadProgress({
   completed,
   total,
@@ -28,6 +28,9 @@ export function DownloadProgress({
         aria-label={label}
         aria-valuetext={t(language, "downloads.progressValue", { percent: formatNumerals(percent, language) })}
       />
+      <p className="text-sm tabular-nums text-muted-foreground" aria-hidden="true">
+        {t(language, "downloads.progressValue", { percent: formatNumerals(percent, language) })}
+      </p>
       <span className="sr-only" role="status">
         {active
           ? `${label}: ${t(language, "downloads.progressValue", { percent: formatNumerals(milestone, language) })}`

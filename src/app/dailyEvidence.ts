@@ -39,6 +39,7 @@ export interface DailyEvidence {
   hadithInArabic: boolean;
   /** Whether the text is a Qur'anic verse. */
   isQuran?: boolean;
+  canonicalKey?: string;
   /** Its grading and where it is recorded. */
   authenticity: string;
   /** What the practice is for, in the reader's language where available. */
@@ -258,6 +259,7 @@ function shapeLibrarySource(
       hadith: verse.arabic,
       hadithInArabic: true,
       isQuran: true,
+      canonicalKey: `home-quran-${source.id}`,
       authenticity: isArabic
         ? `${verse.referenceArabic} — ${verse.surahArabic}`
         : `${verse.reference} — ${verse.surahEnglish}`,

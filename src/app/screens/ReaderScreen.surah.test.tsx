@@ -97,6 +97,12 @@ function leaveMushaf() {
 }
 
 describe("the three surah readings", () => {
+  it.each(["s-hm-110a", "s-hm-110b"])("keeps benefits out of the reading choices for %s", (id) => {
+    renderReader("before_sleep", indexOf("before_sleep", id));
+    leaveMushaf();
+    expect(screen.queryByTestId("reader-benefit-dock-button")).not.toBeInTheDocument();
+    expect(screen.getByTestId("surah-reading-actions").querySelectorAll(":scope > button")).toHaveLength(3);
+  });
   it("shows the reading aids the reader asked for, on the surahs too", () => {
     renderReader("before_sleep", indexOf("before_sleep", "s-hm-110a"));
     leaveMushaf();

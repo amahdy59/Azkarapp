@@ -1,14 +1,18 @@
 import { drawInkTop, drawShareBrand, drawWebsiteText } from "./shareCardBrand";
 import { fillRoundedRect, strokeRoundedRect, drawOrnateFlourish } from "./canvasBotanicals";
 import { wrapShareText, SHARE_UI_FONT } from "./shareLayout";
-import { dataUrlToBlob } from "./zikrShareCard";
+import { prepareAyahMushafRendering } from "./ayahMushafRendering";
 
 export const AYAH_MUSHAF_FONT = '"Amiri Quran", serif';
 export interface AyahCardInput {
   verseKey: string;
+  pageNumber?: number;
+  arabicDrawing?: { text: string; fontFamily: string };
   text: string;
   title: string;
   format: "portrait" | "square";
+  textScale?: number;
+  fitAyah?: boolean;
   translation?: { text: string; label: string };
   meanings?: { text: string; label: string };
   continuation: string;
@@ -29,7 +33,33 @@ export interface AyahCardPage {
 /** Fixed readable type, complete ordered text, measured marks and continued cards. */
 export function layoutAyahCards(ctx: CanvasRenderingContext2D, input: AyahCardInput): AyahCardPage[] {
   const height = input.format === "portrait" ? 1350 : 1080;
-  const capacity = height - 420;
+  const capacity = height - 372;
+  const arabicText = input.arabicDrawing?.text ?? input.text;
+  const arabicFamily = input.arabicDrawing?.fontFamily ?? AYAH_MUSHAF_FONT;
+  const rowHeight = (line: string, size: number, direction: "rtl" | "ltr") => {
+    const metrics = ctx.measureText(line.trim());
+    return Math.ceil(
+      Math.max(
+        size * (direction === "rtl" ? 1.55 : 1.5),
+        (metrics.actualBoundingBoxAscent ?? size) +
+          (metrics.actualBoundingBoxDescent ?? 0) +
+          (direction === "rtl" ? 12 : 20),
+      ),
+    );
+  };
+  // Keep a complete ayah together whenever it fits at a readable export size.
+  const scale = Math.min(1.125, Math.max(0.75, Number.isFinite(input.textScale) ? input.textScale! : 1));
+  let arabicSize = Math.round(64 * scale);
+  for (let size = arabicSize; input.fitAyah !== false && size >= 48; size -= 2) {
+    ctx.font = `400 ${size}px ${arabicFamily}`;
+    const lines = wrapShareText(arabicText, (value) => ctx.measureText(value).width, 848);
+    if (lines.reduce((sum, line) => sum + rowHeight(line, size, "rtl"), 0) <= capacity) {
+      arabicSize = size;
+      break;
+    }
+  }
+  const englishSize = Math.max(36, Math.round(46 * scale));
+  const meaningsSize = Math.max(30, Math.round(34 * scale));
   const pages: AyahCardPage[] = [];
   let rows: AyahCardRow[] = [],
     used = 0;
@@ -44,32 +74,46 @@ export function layoutAyahCards(ctx: CanvasRenderingContext2D, input: AyahCardIn
     used += row.height;
   };
   for (const section of [
-    { text: input.text, font: `400 64px ${AYAH_MUSHAF_FONT}`, direction: "rtl" as const, size: 64, label: undefined },
+    {
+      text: arabicText,
+      font: `400 ${arabicSize}px ${arabicFamily}`,
+      direction: "rtl" as const,
+      size: arabicSize,
+      label: undefined,
+    },
     ...(input.translation
-      ? [{ ...input.translation, font: `400 36px ${SHARE_UI_FONT}`, direction: "ltr" as const, size: 36 }]
+      ? [
+          {
+            ...input.translation,
+            font: `400 ${englishSize}px ${SHARE_UI_FONT}`,
+            direction: "ltr" as const,
+            size: englishSize,
+          },
+        ]
       : []),
     ...(input.meanings
-      ? [{ ...input.meanings, font: `400 34px ${SHARE_UI_FONT}`, direction: "rtl" as const, size: 34 }]
+      ? [
+          {
+            ...input.meanings,
+            font: `400 ${meaningsSize}px ${SHARE_UI_FONT}`,
+            direction: "rtl" as const,
+            size: meaningsSize,
+          },
+        ]
       : []),
   ]) {
     ctx.font = section.font;
     const lines = wrapShareText(section.text, (value) => ctx.measureText(value).width, 848);
     const measure = (line: string) => {
-      const metrics = ctx.measureText(line.trim());
-      return Math.ceil(
-        Math.max(
-          section.size * (section.direction === "rtl" ? 1.7 : 1.5),
-          (metrics.actualBoundingBoxAscent ?? section.size) + (metrics.actualBoundingBoxDescent ?? 0) + 20,
-        ),
-      );
+      return rowHeight(line, section.size, section.direction);
     };
-    ctx.font = `600 28px ${SHARE_UI_FONT}`;
+    ctx.font = `600 32px ${SHARE_UI_FONT}`;
     const labelRows: AyahCardRow[] = section.label
       ? wrapShareText(section.label, (value) => ctx.measureText(value).width, 848).map((text) => ({
           text,
           font: ctx.font,
           direction: section.direction,
-          height: 52,
+          height: 56,
           label: true,
         }))
       : [];
@@ -103,22 +147,22 @@ export function renderAyahCard(input: AyahCardInput, page: AyahCardPage, index: 
   ctx.fillStyle = "#ede8dc";
   ctx.fillRect(0, 0, page.width, page.height);
   fillRoundedRect(ctx, 40, 40, page.width - 80, page.height - 80, 32, "#fffdf7");
-  strokeRoundedRect(ctx, 56, 56, page.width - 112, page.height - 112, 24, "#cbb58a", 2);
-  drawShareBrand(ctx, 86, "#223128", "#957038", "#e7dfca");
+  strokeRoundedRect(ctx, 40, 40, page.width - 80, page.height - 80, 32, "#cbb58a", 2);
+  drawShareBrand(ctx, 64, "#223128", "#957038", "#e7dfca");
   ctx.font = `600 38px ${SHARE_UI_FONT}`;
   ctx.fillStyle = "#223128";
   ctx.textAlign = "center";
   ctx.direction = /[\u0600-\u06ff]/u.test(input.title) ? "rtl" : "ltr";
-  drawInkTop(ctx, input.title, 540, 180);
-  drawOrnateFlourish(ctx, 540, 258, 320, "#9b773a");
+  drawInkTop(ctx, input.title, 540, 148);
+  drawOrnateFlourish(ctx, 540, 220, 240, "#9b773a");
   const contentHeight = page.rows.reduce((sum, row) => sum + row.height, 0);
-  let top = 302 + Math.max(0, (page.height - 420 - contentHeight) / 2);
+  let top = 252 + Math.min(96, Math.max(0, (page.height - 372 - contentHeight) / 2));
   for (const row of page.rows) {
     ctx.font = row.font;
     ctx.direction = row.direction;
-    ctx.textAlign = row.direction === "rtl" ? "right" : "left";
+    ctx.textAlign = "center";
     ctx.fillStyle = row.label ? "#735425" : "#223128";
-    drawInkTop(ctx, row.text.trim(), row.direction === "rtl" ? 964 : 116, top);
+    drawInkTop(ctx, row.text.trim(), 540, top);
     top += row.height;
   }
   ctx.direction = /[\u0600-\u06ff]/u.test(input.continuation) ? "rtl" : "ltr";
@@ -138,27 +182,40 @@ export function renderAyahCard(input: AyahCardInput, page: AyahCardPage, index: 
     ctx.direction = rtl ? "rtl" : "ltr";
     ctx.textAlign = rtl ? "right" : "left";
     drawInkTop(ctx, input.continuation, rtl ? left + numberWidth + 16 + labelWidth : left, page.height - 118);
-  } else drawInkTop(ctx, input.verseKey, 540, page.height - 104);
+  } else drawInkTop(ctx, input.verseKey, 540, page.height - 118);
   ctx.direction = "ltr";
   ctx.textAlign = "center";
-  drawWebsiteText(ctx, 540, page.height - 84, "#526055");
+  drawWebsiteText(ctx, 540, page.height - 72, "#526055");
   return canvas;
 }
 
-export async function generateAyahCards(input: AyahCardInput) {
+export async function generateAyahCards(input: AyahCardInput, signal?: AbortSignal) {
+  const checkCancelled = () => signal?.throwIfAborted();
+  checkCancelled();
+  const arabicDrawing = await prepareAyahMushafRendering(input.text, input.verseKey, input.pageNumber);
+  checkCancelled();
+  const drawingInput = arabicDrawing ? { ...input, arabicDrawing } : input;
   if (document.fonts)
     await Promise.all([
-      document.fonts.load(`400 64px ${AYAH_MUSHAF_FONT}`, input.text),
-      document.fonts.load(`400 36px ${SHARE_UI_FONT}`, "Translation المصدر"),
+      document.fonts.load(
+        `400 64px ${arabicDrawing?.fontFamily ?? AYAH_MUSHAF_FONT}`,
+        arabicDrawing?.text ?? input.text,
+      ),
+      document.fonts.load(`400 46px ${SHARE_UI_FONT}`, "Translation المصدر"),
       document.fonts.ready,
     ]);
+  checkCancelled();
   const measure = document.createElement("canvas").getContext("2d")!;
-  const pages = layoutAyahCards(measure, input);
+  const pages = layoutAyahCards(measure, drawingInput);
   const result: { file: File; url: string; page: AyahCardPage; width: number; height: number }[] = [];
   try {
-    pages.forEach((page, index) => {
-      const canvas = renderAyahCard(input, page, index, pages.length);
-      const blob = dataUrlToBlob(canvas.toDataURL("image/png"));
+    for (const [index, page] of pages.entries()) {
+      checkCancelled();
+      const canvas = renderAyahCard(drawingInput, page, index, pages.length);
+      const blob = await new Promise<Blob>((resolve, reject) =>
+        canvas.toBlob((value) => (value ? resolve(value) : reject(new Error("PNG encoding failed."))), "image/png"),
+      );
+      checkCancelled();
       result.push({
         file: new File([blob], `ayah-${input.verseKey.replace(":", "-")}-${input.format}-${index + 1}.png`, {
           type: "image/png",
@@ -168,7 +225,9 @@ export async function generateAyahCards(input: AyahCardInput) {
         width: canvas.width,
         height: canvas.height,
       });
-    });
+      // Give input and cancellation a turn between full-resolution cards.
+      await new Promise<void>((resolve) => setTimeout(resolve, 0));
+    }
     return result;
   } catch (cause) {
     result.forEach((page) => URL.revokeObjectURL(page.url));

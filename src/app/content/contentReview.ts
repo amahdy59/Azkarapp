@@ -1,8 +1,10 @@
 import type { Zikr, ZikrAudioBehavior, ZikrDraft } from "../types";
 import { APPROVED_AUDIO_ASSIGNMENTS } from "../audio/audioAssignments";
 import { QURAN_PASSAGES } from "./quranPassages";
+import { QURAN_IMRAN_PASSAGE } from "./quranImranPassage";
 
 const QURAN_CONTENT_BY_ID = {
+  "wu-hm-4": QURAN_IMRAN_PASSAGE,
   "m-hm-75": QURAN_PASSAGES.ayatAlKursi,
   "e-hm-75": QURAN_PASSAGES.ayatAlKursi,
   "s-hm-100": QURAN_PASSAGES.ayatAlKursi,
@@ -54,6 +56,7 @@ const SHARED_ZIKR_ALIASES: Readonly<Record<string, string>> = {
 
 /** Explicit identities only. No text similarity or citation matching is used. */
 const CANONICAL_KEY_BY_ID: Readonly<Record<string, string>> = {
+  "wu-hm-4": "quran-003-190-200",
   "m-hm-75": "quran-002-255",
   "e-hm-75": "quran-002-255",
   "s-hm-100": "quran-002-255",

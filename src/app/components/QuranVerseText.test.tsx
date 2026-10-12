@@ -1,8 +1,9 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, expect, it, vi } from "vitest";
 const { useListeningMushafPage } = vi.hoisted(() => ({ useListeningMushafPage: vi.fn() }));
 vi.mock("../hooks/useListeningMushafPage", () => ({ useListeningMushafPage }));
 import { QuranVerseText } from "./QuranVerseText";
+import { QuranWordText } from "./QuranWordText";
 beforeEach(() => useListeningMushafPage.mockReturnValue({ result: null }));
 
 const lines = [
@@ -56,4 +57,63 @@ it("does not treat enclosing Quran quotation brackets as an ayah number", () => 
   const { container } = render(<QuranVerseText text={text} language="en" />);
   expect(container.textContent).toBe(text);
   expect(container.querySelector("svg")).toBeNull();
+});
+
+for (const qcf of [true, false]) {
+  it(`keeps every word node and line break stable when meanings toggle (${qcf ? "QCF" : "Unicode"})`, () => {
+    useListeningMushafPage.mockReturnValue({ result: { qcf, lines } });
+    const select = vi.fn();
+    const props = {
+      text: "قُلْ هُوَ ﴿١﴾",
+      language: "ar" as const,
+      style: {},
+      canonicalKey: "quran-112",
+      meanings: [{ id: "meaning", surahNumber: 112, ayahNumber: 1, word: "قُلْ هُوَ", explanationArabic: "شرح" }],
+      onSelectMeanings: select,
+    };
+    const view = render(<QuranWordText {...props} showMeanings={false} />);
+    const nodes = [...view.container.querySelectorAll("[data-quran-word]")];
+    const typography = () =>
+      nodes.map((node) => {
+        const style = (node as HTMLElement).style;
+        return [
+          style.fontFamily,
+          style.fontSize,
+          style.fontWeight,
+          style.lineHeight,
+          style.letterSpacing,
+          style.display,
+          style.whiteSpace,
+        ];
+      });
+    const styles = typography();
+    view.rerender(<QuranWordText {...props} showMeanings />);
+    expect([...view.container.querySelectorAll("[data-quran-word]")]).toEqual(nodes);
+    expect(typography()).toEqual(styles);
+    expect(view.container.querySelector("br")).toBeNull();
+    expect(screen.getAllByTestId("quran-word-help")).toHaveLength(2);
+    fireEvent.keyDown(screen.getAllByTestId("quran-word-help")[1]!, { key: "Enter" });
+    expect(select).toHaveBeenCalledWith(expect.objectContaining({ index: 0 }));
+    view.rerender(<QuranWordText {...props} showMeanings={false} />);
+    expect(screen.queryByRole("button")).toBeNull();
+    expect([...view.container.querySelectorAll("[data-quran-word]")]).toEqual(nodes);
+  });
+}
+
+it("uses each page's own font for words and ayah markers in a multipage excerpt", () => {
+  const first = [{ ...lines[0]![0], verseKey: "3:190", text: "قُلْ", pageNumber: 75 }];
+  const last = [
+    { ...lines[0]![1], verseKey: "3:200", text: "هُوَ", pageNumber: 76 },
+    { ...lines[0]![2], verseKey: "3:200", pageNumber: 76 },
+  ];
+  useListeningMushafPage.mockImplementation((page) => ({
+    result: { qcf: true, lines: page === 75 ? [first] : [last] },
+  }));
+  const { container } = render(
+    <QuranVerseText text="قُلْ هُوَ ﴿٢٠٠﴾" language="ar" canonicalKey="quran-003-190-200" />,
+  );
+  const glyphs = container.querySelectorAll("[data-quran-glyph]");
+  expect(glyphs[0]).toHaveStyle({ fontFamily: "qcf-v2-page-75" });
+  expect(glyphs[1]).toHaveStyle({ fontFamily: "qcf-v2-page-76" });
+  expect(container.querySelector("span[aria-hidden] > span")).toHaveStyle({ fontFamily: "qcf-v2-page-76" });
 });

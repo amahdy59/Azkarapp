@@ -37,6 +37,7 @@ import { MushafSettingsSheet } from "../components/MushafSettingsSheet";
 import { MUSHAF_RAIL_WIDTH, MushafToolRail, type SurahAudioControl } from "../components/MushafToolRail";
 import { MushafQuickMenu } from "../components/MushafQuickMenu";
 import { QuranPageTranslationPanel } from "../components/QuranPageTranslationPanel";
+import { MushafTranslationControls } from "../components/MushafTranslationControls";
 import { QuranBilingualStreamView } from "../components/QuranBilingualStreamView";
 import {
   getSurahDisplayName,
@@ -311,6 +312,35 @@ export function KhatmahReaderScreen({
    * preference honoured.
    */
   const [isFocusMode, setIsFocusMode] = useState(false);
+  const compactTranslation = showPageTranslation && !pairedMeaning && readingMode === "mushaf";
+  const translationToolbarRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const toolbar = translationToolbarRef.current;
+    const root = readerRootRef.current;
+    if (!toolbar || !root || !compactTranslation || isFocusMode) return;
+    const measure = () =>
+      root.style.setProperty("--mushaf-top-clearance", `${toolbar.getBoundingClientRect().height}px`);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(toolbar);
+    return () => {
+      observer.disconnect();
+      root.style.removeProperty("--mushaf-top-clearance");
+    };
+  }, [compactTranslation, isFocusMode]);
+
+  const togglePageTranslation = () => {
+    if (!showPageTranslation) setCompactMeaningPane("english");
+    setShowPageTranslation(!showPageTranslation);
+    setIsQuickMenuOpen(false);
+  };
+  const exitTranslation = () => {
+    setShowPageTranslation(false);
+    setCompactMeaningPane("arabic");
+    requestAnimationFrame(() =>
+      readerRootRef.current?.querySelector<HTMLButtonElement>('[data-testid="mushaf-top-center-index"]')?.focus(),
+    );
+  };
   useEffect(() => {
     if (isFocusMode) {
       document.documentElement.dataset.mushafFocus = "true";
@@ -843,31 +873,51 @@ export function KhatmahReaderScreen({
   const isRtl = direction === "rtl";
 
   const mobileBack =
-    !useRail && !isFocusMode ? (
+    (!useRail || compactTranslation) && !isFocusMode ? (
       <button
         type="button"
         onClick={onBack}
         data-testid="mushaf-top-left-back"
         aria-label={t(language, "common.back")}
-        className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        className={
+          compactTranslation
+            ? "flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-full focus-visible:ring-[3px] focus-visible:ring-ring"
+            : "group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        }
       >
-        <span className="inline-flex h-8 min-w-[2.75rem] items-center justify-center gap-1 rounded-full border border-border/80 bg-card/90 px-3 text-foreground shadow-xs backdrop-blur-md transition-colors group-hover:bg-muted group-active:bg-muted">
+        <span
+          className={
+            compactTranslation
+              ? "inline-flex items-center justify-center text-foreground"
+              : "inline-flex h-8 min-w-[2.75rem] items-center justify-center gap-1 rounded-full border border-border/80 bg-card/90 px-3 text-foreground shadow-xs backdrop-blur-md transition-colors group-hover:bg-muted group-active:bg-muted"
+          }
+        >
           <ArrowPrevious size={16} aria-hidden="true" />
         </span>
       </button>
     ) : undefined;
 
   const mobileMore =
-    !useRail && !isFocusMode ? (
+    (!useRail || compactTranslation) && !isFocusMode ? (
       <button
         type="button"
         onClick={() => setIsQuickMenuOpen(true)}
         data-testid="mushaf-more-actions"
         aria-label={t(language, "mushaf.moreActions")}
         title={t(language, "mushaf.moreActions")}
-        className="group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        className={
+          compactTranslation
+            ? "flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-full focus-visible:ring-[3px] focus-visible:ring-ring"
+            : "group flex h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full px-1 transition-transform focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        }
       >
-        <span className="inline-flex h-8 min-w-[2.75rem] items-center justify-center gap-1 rounded-full border border-border/80 bg-card/90 px-3 text-foreground shadow-xs backdrop-blur-md transition-colors group-hover:bg-muted group-active:bg-muted">
+        <span
+          className={
+            compactTranslation
+              ? "inline-flex items-center justify-center text-foreground"
+              : "inline-flex h-8 min-w-[2.75rem] items-center justify-center gap-1 rounded-full border border-border/80 bg-card/90 px-3 text-foreground shadow-xs backdrop-blur-md transition-colors group-hover:bg-muted group-active:bg-muted"
+          }
+        >
           <MoreVertical size={16} aria-hidden="true" />
         </span>
       </button>
@@ -1097,53 +1147,33 @@ export function KhatmahReaderScreen({
           </div>
         )}
 
-        {pageData && showPageTranslation && !pairedMeaning && readingMode === "mushaf" && (
-          <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 bg-background px-2 py-1">
-            <button
-              type="button"
-              onClick={onBack}
-              aria-label={t(language, "common.back")}
-              className="flex size-11 shrink-0 items-center justify-center rounded-full focus-visible:ring-[3px] focus-visible:ring-ring"
-            >
-              <ArrowPrevious size={18} aria-hidden="true" />
-            </button>
-            <fieldset className="quran-pane-selector flex min-w-0 items-center justify-center gap-1">
-              <legend className="sr-only">{t(language, "quranListening.readingLanguage")}</legend>
-              {(["arabic", "english"] as const).map((pane) => (
-                <label
-                  key={pane}
-                  className="quran-pane-choice relative flex min-h-11 min-w-0 flex-1 cursor-pointer items-center justify-center rounded-lg px-1 text-sm"
-                >
-                  <input
-                    type="radio"
-                    name="compact-mushaf-pane"
-                    value={pane}
-                    checked={compactMeaningPane === pane}
-                    onChange={() => setCompactMeaningPane(pane)}
-                    className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-                  />
-                  <span className="min-w-0 break-words rounded-lg px-1 py-2 text-center">
-                    {t(language, pane === "arabic" ? "quranListening.arabicPage" : "quranListening.englishPage")}
-                  </span>
-                </label>
-              ))}
-            </fieldset>
-            <button
-              type="button"
-              onClick={() => setIsQuickMenuOpen(true)}
-              aria-label={t(language, "mushaf.moreActions")}
-              className="flex size-11 shrink-0 items-center justify-center rounded-full focus-visible:ring-[3px] focus-visible:ring-ring"
-            >
-              <MoreVertical size={18} aria-hidden="true" />
-            </button>
+        {pageData && compactTranslation && !isFocusMode && (
+          <div
+            ref={translationToolbarRef}
+            data-testid="mushaf-translation-toolbar"
+            dir="ltr"
+            className="absolute inset-x-0 top-0 z-30 grid grid-cols-[44px_minmax(0,1fr)_44px] items-center bg-background px-1"
+            style={{ paddingTop: "calc(4px + env(safe-area-inset-top))", paddingBottom: 4 }}
+          >
+            <div className="flex justify-center">{mobileTopLeft}</div>
+            <MushafTranslationControls
+              language={language}
+              pane={compactMeaningPane}
+              onSelect={setCompactMeaningPane}
+              onExit={exitTranslation}
+            />
+            <div className="flex justify-center">{mobileTopRight}</div>
           </div>
         )}
-        {pageData &&
-        readingMode === "mushaf" &&
-        showPageTranslation &&
-        !pairedMeaning &&
-        compactMeaningPane === "english" ? (
-          <div className="flex min-h-0 flex-1 flex-col px-4 sm:px-6">
+        {pageData && compactTranslation && (
+          <div
+            hidden={compactMeaningPane !== "english"}
+            style={{
+              display: compactMeaningPane !== "english" ? "none" : undefined,
+              paddingTop: "var(--mushaf-top-clearance, 52px)",
+            }}
+            className="flex min-h-0 flex-1 flex-col px-2 sm:px-4"
+          >
             <div className="min-h-0 flex-1">
               <QuranPageTranslationPanel
                 pageNumber={displayPage}
@@ -1184,7 +1214,8 @@ export function KhatmahReaderScreen({
               </button>
             </nav>
           </div>
-        ) : pageData && readingMode === "bilingual" ? (
+        )}
+        {pageData && readingMode === "bilingual" ? (
           <QuranBilingualStreamView
             pageNumber={displayPage}
             surahName={surahName}
@@ -1211,7 +1242,11 @@ export function KhatmahReaderScreen({
             onOpenMore={() => setIsQuickMenuOpen(true)}
           />
         ) : pageData ? (
-          <div className="min-h-0 flex-1 w-full">
+          <div
+            className="min-h-0 flex-1 w-full"
+            hidden={compactTranslation && compactMeaningPane === "english"}
+            style={{ display: compactTranslation && compactMeaningPane === "english" ? "none" : undefined }}
+          >
             <MushafPageViewer
               lines={spreadReady && rightSide ? rightSide.lines : lines}
               language={language}
@@ -1250,9 +1285,9 @@ export function KhatmahReaderScreen({
               footerContent={undefined}
               railContent={useRail && !isFocusMode ? toolRail : undefined}
               railSide={mushafToolbarSide}
-              topLeftControl={mobileTopLeft}
-              topRightControl={mobileTopRight}
-              topCenterControl={mobileTopCenter}
+              topLeftControl={compactTranslation ? undefined : mobileTopLeft}
+              topRightControl={compactTranslation ? undefined : mobileTopRight}
+              topCenterControl={compactTranslation ? undefined : mobileTopCenter}
               bottomLeftControl={mobileBottomLeft}
               bottomCenterControl={mobileBottomCenter}
               bottomRightControl={mobileBottomRight}
@@ -1313,6 +1348,7 @@ export function KhatmahReaderScreen({
         }}
         verseKey={activeAyah?.verseKey ?? null}
         text={activeAyah?.text ?? null}
+        pageNumber={activeAyah?.pageNumber}
         language={language}
         isBookmarked={
           activeAyah?.verseKey
@@ -1432,7 +1468,7 @@ export function KhatmahReaderScreen({
         onSelectLayout={handleSelectLayout}
         showLayoutOptions={shell.spreadRoom}
         showPageTranslation={showPageTranslation}
-        onTogglePageTranslation={() => setShowPageTranslation((prev) => !prev)}
+        onTogglePageTranslation={togglePageTranslation}
         theme={theme}
         appTheme={appTheme}
         onSelectTheme={handleSelectTheme}

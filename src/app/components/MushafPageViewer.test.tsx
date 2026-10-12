@@ -514,7 +514,9 @@ describe("MushafPageViewer invariant layout and center tap", () => {
 
     const canvasWithControls = withControls.querySelector(".mushaf-page-canvas") as HTMLElement;
     expect(canvasWithControls).toBeInTheDocument();
-    expect(canvasWithControls.style.paddingTop).toBe("calc(3.25rem + env(safe-area-inset-top))");
+    expect(canvasWithControls.style.paddingTop).toBe(
+      "var(--mushaf-top-clearance, calc(3.25rem + env(safe-area-inset-top)))",
+    );
     expect(canvasWithControls.style.paddingBottom).toMatch(/^calc\(3\.25rem\s*\+\s*env\(safe-area-inset-bottom\)\)$/);
     expect(canvasWithControls.querySelector("[data-testid='mushaf-furniture-surah']")).toBeNull();
 

@@ -1,5 +1,21 @@
 # Application architecture
 
+### Stable Quran word geometry and multipage excerpts (2026-10-11)
+
+Reader Quran passages always use QuranWordText/QuranVerseText. Meaning annotations attach actions and paint to existing word spans rather than fragmenting text into phrase buttons; toggling help does not remount words, change type metrics or insert breaks. Unicode fallback preserves the same word boundaries. Snippets wrap naturally, while full Mushaf pages keep their fifteen-line fitter.
+
+The explicit Al-Imran 3:190–200 range spans pages 75–76. Both pages must be ready before QCF display is selected; each token and end marker uses its own page font. Original semantic text remains the source for copy/accessibility. Pages 75–76 join the daily precache. The existing recording is retained but unassigned because its registered transcript is incomplete; resolver and timing hashes remain strict. Image export uses complete Unicode when one canvas font cannot represent a multipage glyph passage. See docs/agent/phases/QURAN_SNIPPET_GEOMETRY_AND_IMRAN_2026_10_11.md.
+
+### Ayah sharing refinement (2026-10-11)
+
+The reader supplies the selected ayah's explicit page identity. AyahMushafText reuses the existing cached page/font hook and QuranGlyphSlice. Image generation resolves the same complete semantic-to-glyph mapping with a bounded font wait; both require the first word, end marker and every glyph. Missing fonts or partial/mismatched page data retain complete Unicode. Glyph strings are rendering-only and never replace copy/share semantic text or persisted content.
+
+Card text scale and automatic ayah fitting are transient parent-owned choices. Layout clamps scale and uses measured ink/width to choose readable Arabic size, without changing the semantic payload. It keeps a complete fitting ayah on one card; supplemental sections retain continuation/source labels. Rendering centers every body row independently of RTL/LTR shaping. These controls do not affect reader typography or persisted settings.
+
+A scoped ResizeObserver detects insufficient studio reading space and falls back to scrolling the whole dialog; short viewports use the same fallback.
+
+AyahShareStudio uses the same cached local Saheeh International loader as Quran reading; this supersedes the earlier image-only numbered-passage translation selection without editing existing source assets. The parent owns transient share choices across Back/reopening; no share preferences enter persistence or sync. Studio owns one scrolling body, a fixed header/footer, readable/copyable matching text and explicit all-card sharing/current-card saving. Unsupported native file sharing offers existing ZIP/PNG downloads explicitly. Native failure or cancellation does not trigger fallback downloads. A short generation coalescer and AbortSignal prevent obsolete sets being published; the last preview remains visible but input identity disables stale exports. Encoding uses asynchronous toBlob, yields between cards and revokes every owned URL on replacement, abort/failure or unmount. See docs/agent/phases/ENGLISH_READER_AYAH_SHARING_2026_10_11.md.
+
 ### Verified Quran snippet lettering (2026-10-11)
 
 `useQuranSnippet` resolves explicit passage/evidence identities through the existing Mushaf loader. `excerptWordMapping` validates consecutive source tokens against the cited Uthmani words; only display normalization is applied, including orthographic joins. `QuranGlyphSlice` paints page-specific QCF glyphs while preserving the original accessible source and offsets. Unverified text or unavailable fonts use the shared Unicode fallback. A late font notification upgrades the fallback without blocking reading.

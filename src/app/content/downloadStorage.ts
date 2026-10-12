@@ -15,3 +15,24 @@ export async function hasDownloadSpace(bytes: number): Promise<boolean> {
 export function isStorageQuotaError(error: unknown): boolean {
   return error instanceof Error && error.name === "QuotaExceededError";
 }
+
+export type DownloadPersistence = "granted" | "denied" | "unsupported";
+
+export async function getDownloadPersistence(): Promise<DownloadPersistence> {
+  if (!navigator.storage?.persist || !navigator.storage?.persisted) return "unsupported";
+  try {
+    return (await navigator.storage.persisted()) ? "granted" : "denied";
+  } catch {
+    return "unsupported";
+  }
+}
+
+/** Called from an explicit user gesture; browser policy decides whether to grant it. */
+export async function requestDownloadPersistence(): Promise<DownloadPersistence> {
+  if (!navigator.storage?.persist) return "unsupported";
+  try {
+    return (await navigator.storage.persist()) ? "granted" : "denied";
+  } catch {
+    return "unsupported";
+  }
+}

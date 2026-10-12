@@ -1,5 +1,17 @@
 # AI Improvement System Index
 
+[Combined refinements release, 2026-10-12](phases/COMBINED_REFINEMENTS_RELEASE_2026_10_12.md) records the owner's latest instruction to push all completed workspace changes after verification. This supersedes historical local-only publication holds below; this chat owns combined gates, publication and production evidence.
+
+[Audio file export, 2026-10-11](phases/AUDIO_FILE_EXPORT_2026_10_11.md) adds owner-requested local-only saving of verified downloaded audio to actual device files, without redownloading or removing the app cache. No commit or push is authorized.
+
+[Audio download recovery, 2026-10-11](phases/AUDIO_DOWNLOAD_RECOVERY_2026_10_11.md) records owner-authorized local-only progress, verified-file checkpoints, retries and device storage protection. No commit or push is authorized.
+
+[Stable Quran snippets and complete Al-Imran](phases/QURAN_SNIPPET_GEOMETRY_AND_IMRAN_2026_10_11.md) records the owner-approved local repair: identical rare-word geometry, natural snippet wrapping, complete 3:190–200 across page-specific fonts, sourced meanings and strict audio boundaries. No commit, push or deployment is authorized.
+
+[English reader and ayah sharing refinement](phases/ENGLISH_READER_AYAH_SHARING_2026_10_11.md) records owner-approved preview-first sharing, clearer English/card typography, reader-consistent translation and cancellable asynchronous exports. This request is local only: do not commit, push or deploy these changes.
+
+[Mobile Library toggle sizing, 2026-10-11](phases/LIBRARY_MOBILE_PILLS_2026_10_11.md) records the owner-approved local-only icon-pill geometry, title alignment and reduced search-heading gap. No publication is authorized for this request.
+
 [Measured testing efficiency, 2026-10-11](phases/TESTING_EFFICIENCY_2026_10_11.md) applies the owner's request to stop redundant full-suite waiting and improve developer selection, timing diagnostics and complete CI scheduling. All application tests, coverage, assertions and deployment gates remain.
 
 [Coordinated release, 2026-10-11](phases/COORDINATED_RELEASE_2026_10_11.md) records the owner's renewed instruction to consolidate and push all settled changes from the Reader session. This supersedes the publication hold; final combined quality, browser, CI and production verification remain required.
@@ -266,3 +278,7 @@ Apple/Microsoft-informed control spacing and alignment improvements.
 [Uniform Quran snippets](phases/UNIFORM_QURAN_SNIPPETS_2026_10_10.md) is the active owner-requested correction for inconsistent snippet typography and scale across reading, playback, previews, benefits, help and sharing; full Mushaf pagination remains unchanged.
 
 [Expanded player refinement](phases/EXPANDED_PLAYER_REFINEMENT_2026_10_11.md) is the owner-approved local-only header, reading-clearance, centered header options, uncluttered transport and accessibility refinement; existing translation/Mushaf edits are preserved.
+
+[Compact mobile Mushaf translation](phases/MUSHAF_COMPACT_TRANSLATION_2026_10_11.md) records the owner-approved selector replacement, explicit exit, preserved reading geometry and local-only verification. Publication remains withheld.
+
+[Reader control consistency](phases/READER_CONTROL_CONSISTENCY_2026_10_11.md) records the owner-requested shared focus/standalone reader presentation and removal of below-surah benefit buttons. Local only; no push.

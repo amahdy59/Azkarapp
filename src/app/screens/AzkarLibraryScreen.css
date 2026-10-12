@@ -1,0 +1,42 @@
+/* Load this mobile-only presentation with the Library, outside the app shell CSS. */
+@media (width < 40rem) {
+  .library-section-tabs {
+    grid-template-columns: repeat(2, var(--ds-control-height-compact));
+  }
+
+  .library-section-tabs [role="tab"] {
+    height: var(--ds-control-height-compact);
+    padding: 0;
+  }
+
+  .library-section-tabs [role="tab"] > span,
+  .library-section-tabs [role="tab"] > span > span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    line-height: 1;
+  }
+
+  .library-section-tabs,
+  .library-section-tabs .library-saved-count {
+    border: 0;
+    padding: 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  .library-section-tabs .library-saved-count {
+    position: absolute;
+    inset-inline-end: 0.25rem;
+    top: 0.125rem;
+    height: auto;
+    min-width: 0;
+  }
+
+  .library-section-tabs [role="tab"][aria-selected="false"] {
+    background: var(--card);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--border-control) 60%, transparent);
+  }
+}

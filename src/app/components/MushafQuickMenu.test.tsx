@@ -27,6 +27,13 @@ describe("MushafQuickMenu", () => {
     expect(screen.getByRole("heading", { name: "Reading View & Options" })).toBeInTheDocument();
   });
 
+  it("opens the surah benefit from options when provided", async () => {
+    const onOpenBenefit = vi.fn();
+    render(<MushafQuickMenu {...defaultProps} onOpenBenefit={onOpenBenefit} />);
+    await userEvent.setup().click(screen.getByTestId("mushaf-quick-benefit"));
+    expect(onOpenBenefit).toHaveBeenCalledOnce();
+  });
+
   it("allows switching between Mushaf Page mode and Verse by Verse mode", async () => {
     const user = userEvent.setup();
     const onSelectReadingMode = vi.fn();

@@ -9,6 +9,7 @@ import type { AppLanguage, Zikr } from "../../types";
 import { formatNumerals } from "../../formatting";
 import { reportError } from "../../../lib/observability";
 import { SubHeader } from "./SettingsPrimitives";
+import { AudioFileExports } from "./AudioFileExports";
 import { applyContentReview } from "../../content/contentReview";
 import { ALL_AZKAR, getAzkarForMode } from "../../content/azkar";
 import { loadAudioPreferences } from "../../audio/audioPreferences";
@@ -18,9 +19,18 @@ import {
   getDownloadedAudioSummary,
   getAudioDownloadStatuses,
   removeAudioForZikrs,
+  type AudioDownloadProgress,
 } from "../../audio/audioOfflineCache";
+import { AudioDownloadError } from "../../audio/audioDownloadTransfer";
 import { downloadMushaf, getMushafDownloadStatus, removeDownloadedMushaf } from "../../content/mushafOfflineCache";
-import { hasDownloadSpace, isStorageQuotaError, MUSHAF_ESTIMATED_PAGE_BYTES } from "../../content/downloadStorage";
+import {
+  hasDownloadSpace,
+  isStorageQuotaError,
+  MUSHAF_ESTIMATED_PAGE_BYTES,
+  getDownloadPersistence,
+  requestDownloadPersistence,
+  type DownloadPersistence,
+} from "../../content/downloadStorage";
 
 type AudioCollection = { id: string; titleKey: string; zikrs: readonly Zikr[]; byteSize: number };
 type AudioStatus = { completed: number; total: number; remainingBytes: number };
@@ -35,7 +45,7 @@ type OfflineStatus = {
   groups: AudioStatus[];
   audio: AudioStatus[];
 };
-type Job = { id: string; completed: number; total: number; group?: number };
+type Job = { id: string; completed: number; total: number; detail?: AudioDownloadProgress };
 function formatMegabytes(bytes: number | undefined, language: AppLanguage) {
   return typeof bytes === "number"
     ? formatNumerals((bytes / 1_000_000).toFixed(1), language) + " MB"
@@ -59,6 +69,8 @@ export function DownloadsPanel({
   const [job, setJob] = useState<Job | null>(null);
   const [failedId, setFailedId] = useState<string | null>(null);
   const [removing, setRemoving] = useState(false);
+  const [persistence, setPersistence] = useState<DownloadPersistence>("unsupported");
+  const [requestingPersistence, setRequestingPersistence] = useState(false);
   const controllerRef = useRef<AbortController | null>(null);
   const operationRef = useRef(false);
   const mountedRef = useRef(true);
@@ -108,7 +120,7 @@ export function DownloadsPanel({
       const resources = await resourcePromise;
       if (!mountedRef.current || request !== statusRequestRef.current) return;
       setCollections(resources);
-      const [registration, cacheNames, storage, mushafStatus, audioStatus] = await Promise.all([
+      const [registration, cacheNames, storage, mushafStatus, audioStatus, storagePersistence] = await Promise.all([
         "serviceWorker" in navigator ? navigator.serviceWorker.getRegistration() : undefined,
         "caches" in window ? caches.keys() : [],
         navigator.storage?.estimate?.().catch(() => ({}) as StorageEstimate) ?? {},
@@ -122,10 +134,12 @@ export function DownloadsPanel({
           ],
           audioPreferences,
         ),
+        getDownloadPersistence(),
       ]);
       if (!mountedRef.current || request !== statusRequestRef.current) return;
 
       const audioSummary = getDownloadedAudioSummary();
+      setPersistence(storagePersistence);
       setCollections(resources);
       setStatus({
         serviceWorkerReady: Boolean(registration?.active),
@@ -179,7 +193,17 @@ export function DownloadsPanel({
         reportError(error, "offline-download");
         failure = t(
           language,
-          isStorageQuotaError(error) ? "downloads.storageFull" : "downloads.downloadErrorDescription",
+          isStorageQuotaError(error)
+            ? "downloads.storageFull"
+            : error instanceof AudioDownloadError
+              ? error.code === "integrity"
+                ? "downloads.integrityError"
+                : error.code === "unsupported"
+                  ? "downloads.unsupportedError"
+                  : error.code === "server"
+                    ? "downloads.serverError"
+                    : "downloads.networkError"
+              : "downloads.downloadErrorDescription",
         );
       }
     } finally {
@@ -199,7 +223,10 @@ export function DownloadsPanel({
     }
   };
   const updateProgress = (id: string) => (completed: number, total: number) => {
-    if (mountedRef.current) setJob({ id, completed, total });
+    if (mountedRef.current) setJob((previous) => ({ ...previous, id, completed, total }));
+  };
+  const updateAudioDetail = (id: string) => (detail: AudioDownloadProgress) => {
+    if (mountedRef.current) setJob({ id, completed: detail.receivedBytes, total: detail.totalBytes, detail });
   };
   const mushafBytes = Math.max(0, 604 - (status?.downloadedMushafPages ?? 0)) * MUSHAF_ESTIMATED_PAGE_BYTES;
   const removeResource = async (id: string, collection?: AudioCollection) => {
@@ -238,20 +265,23 @@ export function DownloadsPanel({
                 ? "downloads.partial"
                 : "downloads.notDownloaded",
           );
-  const groupedResources: AudioCollection[] = [
-    {
-      id: "adhkar",
-      titleKey: "downloads.adhkarTitle",
-      zikrs: collections.slice(0, 4).flatMap((r) => r.zikrs),
-      byteSize: 0,
-    },
-    {
-      id: "recitations",
-      titleKey: "downloads.recitationsTitle",
-      zikrs: collections.slice(4).flatMap((r) => r.zikrs),
-      byteSize: 0,
-    },
-  ];
+  const groupedResources: AudioCollection[] = useMemo(
+    () => [
+      {
+        id: "adhkar",
+        titleKey: "downloads.adhkarTitle",
+        zikrs: collections.slice(0, 4).flatMap((r) => r.zikrs),
+        byteSize: 0,
+      },
+      {
+        id: "recitations",
+        titleKey: "downloads.recitationsTitle",
+        zikrs: collections.slice(4).flatMap((r) => r.zikrs),
+        byteSize: 0,
+      },
+    ],
+    [collections],
+  );
   const audioRows = (resources: AudioCollection[], grouped = false) =>
     resources.map((resource) => {
       const index = collections.indexOf(resource);
@@ -264,6 +294,7 @@ export function DownloadsPanel({
               .slice(resource.id === "adhkar" ? 0 : 4, resource.id === "adhkar" ? 4 : undefined)
               .some((collection) => collection.id === job.id)));
       const title = t(language, resource.titleKey);
+      const detail = active ? job?.detail : undefined;
       const completed = active ? job.completed : (saved?.completed ?? 0);
       const total = active ? job.total : (saved?.total ?? 0);
       return (
@@ -280,12 +311,52 @@ export function DownloadsPanel({
               : ""
           }
           state={active ? t(language, "downloads.downloading") : collectionState(saved)}
+          feedback={
+            <>
+              {!isLoading && saved && (
+                <p>
+                  {t(language, "downloads.recordingCoverage", {
+                    completed: formatNumerals(detail?.completedFiles ?? saved?.completed ?? 0, language),
+                    total: formatNumerals(detail?.totalFiles ?? saved?.total ?? 0, language),
+                  })}
+                </p>
+              )}
+              {detail && (
+                <p>
+                  {t(
+                    language,
+                    detail.phase === "retrying"
+                      ? "downloads.retryingFile"
+                      : detail.phase === "verifying"
+                        ? "downloads.verifyingFile"
+                        : detail.phase === "saved"
+                          ? "downloads.fileSaved"
+                          : "downloads.receivingFile",
+                    {
+                      file: formatNumerals(detail.fileNumber, language),
+                      total: formatNumerals(detail.totalFiles, language),
+                      attempt: formatNumerals(detail.attempt, language),
+                    },
+                  )}
+                </p>
+              )}
+              {active && (
+                <p>
+                  <bdi dir="ltr">
+                    {formatMegabytes(completed, language)} / {formatMegabytes(total, language)}
+                  </bdi>
+                </p>
+              )}
+              {failedId === resource.id && <p className="text-destructive">{errorMessage}</p>}
+            </>
+          }
           size={numeric(saved?.remainingBytes)}
           completed={completed}
           total={total}
           language={language}
           direction={direction}
           compact
+          headingLevel={grouped ? 2 : 3}
           hideRemove={grouped}
           disabled={isLoading || isAnyJobActive}
           active={active}
@@ -304,6 +375,7 @@ export function DownloadsPanel({
               await downloadAudioForZikrs(resource.zikrs, audioPreferences, {
                 signal: controller.signal,
                 onProgress: updateProgress(resource.id),
+                onDetail: updateAudioDetail(resource.id),
               });
             })
           }
@@ -333,6 +405,43 @@ export function DownloadsPanel({
         }}
       >
         <p className="text-sm text-muted-foreground">{t(language, "downloads.includedText")}</p>
+        <p className="text-sm text-muted-foreground">{t(language, "downloads.localStorageHelp")}</p>
+        <div className="space-y-2 rounded-xl border border-border p-3">
+          <p
+            className="text-sm text-muted-foreground"
+            aria-live="polite"
+            aria-atomic="true"
+            data-testid="download-persistence"
+          >
+            {t(
+              language,
+              requestingPersistence
+                ? "downloads.requestingPersistence"
+                : persistence === "granted"
+                  ? "downloads.persistenceGranted"
+                  : persistence === "denied"
+                    ? "downloads.persistenceDenied"
+                    : "downloads.persistenceUnsupported",
+            )}
+          </p>
+          {persistence === "denied" && (
+            <Button
+              variant="outline"
+              disabled={requestingPersistence || isLoading}
+              className="h-auto min-h-11 max-w-full whitespace-normal py-2"
+              onClick={async () => {
+                setRequestingPersistence(true);
+                const result = await requestDownloadPersistence();
+                if (mountedRef.current) {
+                  setPersistence(result);
+                  setRequestingPersistence(false);
+                }
+              }}
+            >
+              {t(language, "downloads.keepDownloads")}
+            </Button>
+          )}
+        </div>
         {status && !status.serviceWorkerReady && (
           <p role="status" className="text-sm text-muted-foreground">
             {t(language, "downloads.checkApp")}
@@ -356,12 +465,20 @@ export function DownloadsPanel({
               <div className="divide-y divide-border/40">
                 {audioRows(index === 0 ? collections.slice(0, 4) : collections.slice(4))}
               </div>
+              <AudioFileExports
+                zikrs={resource.zikrs}
+                preferences={audioPreferences}
+                language={language}
+                disabled={isLoading || isAnyJobActive}
+                revision={status}
+              />
             </details>
           </Card>
         ))}
         <Card as="section" padding="md" data-testid="download-category-mushaf">
           <OfflineResourceRow
             id="mushaf"
+            headingLevel={2}
             title={t(language, "downloads.pagesTitle")}
             detail={t(language, "downloads.pagesDescription")}
             state={
@@ -375,6 +492,19 @@ export function DownloadsPanel({
                       ? { completed: status.downloadedMushafPages, total: 604, remainingBytes: mushafBytes }
                       : undefined,
                   )
+            }
+            feedback={
+              !isLoading && (
+                <>
+                  <p>
+                    {t(language, "downloads.mushafProgressValue", {
+                      completed: formatNumerals(status?.downloadedMushafPages ?? 0, language),
+                      total: formatNumerals(604, language),
+                    })}
+                  </p>
+                  {failedId === "mushaf" && <p className="text-destructive">{errorMessage}</p>}
+                </>
+              )
             }
             size={numeric(status ? mushafBytes : undefined)}
             completed={job?.id === "mushaf" ? job.completed : (status?.downloadedMushafPages ?? 0)}

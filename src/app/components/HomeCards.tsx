@@ -552,7 +552,11 @@ export function DailyEvidenceCard({
         lang={evidence.hadithInArabic ? "ar" : "en"}
         data-testid="daily-evidence-hadith"
       >
-        {evidence.isQuran ? <QuranVerseText text={evidence.hadith} language={language} /> : evidence.hadith}
+        {evidence.isQuran ? (
+          <QuranVerseText text={evidence.hadith} language={language} canonicalKey={evidence.canonicalKey} />
+        ) : (
+          evidence.hadith
+        )}
       </blockquote>
 
       <p

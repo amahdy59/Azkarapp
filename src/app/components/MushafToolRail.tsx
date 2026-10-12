@@ -10,6 +10,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Bookmark,
+  BookOpen,
   Eye,
   HelpCircle,
   Maximize,
@@ -148,6 +149,7 @@ export interface MushafToolRailProps {
    * interaction mode; immersive readers may still provide this action. */
   onEnterFocusMode?: () => void;
   onOpenSettings: () => void;
+  onOpenBenefit?: () => void;
   onOpenMore?: () => void;
   /** Omitted where the surah has no reviewed recitation to offer. */
   surahAudio?: SurahAudioControl;
@@ -181,6 +183,7 @@ export function MushafToolRail({
   onToggleFullscreen,
   onEnterFocusMode,
   onOpenSettings,
+  onOpenBenefit,
   onOpenMore,
   surahAudio,
   playbackFollowing,
@@ -301,6 +304,18 @@ export function MushafToolRail({
   const helpTools: MushafToolRailAction[] = onOpenMore
     ? []
     : [
+        ...(onOpenBenefit
+          ? [
+              {
+                id: "benefit",
+                label: t(language, "reader.referencesButton"),
+                caption: t(language, "reader.referencesButton"),
+                icon: <BookOpen size={iconSize} />,
+                onClick: onOpenBenefit,
+                testId: "mushaf-rail-benefit",
+              },
+            ]
+          : []),
         {
           id: "settings",
           label: t(language, "common.settings"),

@@ -10,19 +10,25 @@ import {
 import { QURAN_DHIKR_EVIDENCE } from "./zikrBenefits";
 import { WIRD_QURAN_EVIDENCE } from "./wirdBenefits";
 import { QURAN_PASSAGES } from "./quranPassages";
+import { QURAN_IMRAN_PASSAGE } from "./quranImranPassage";
+import { RELEVANT_NOW_VERSES } from "./relevantNowVerses";
 import type { MushafWordToken } from "../components/MushafPageViewer";
 import type { MushafVerseData } from "./qcfMushaf";
 
-const passageNames = ["ayatAlKursi", "lastTwoAlBaqarah", "alKafirun", "alIkhlas", "alFalaq", "anNas"] as const;
+const passages = [
+  QURAN_PASSAGES.ayatAlKursi,
+  QURAN_PASSAGES.lastTwoAlBaqarah,
+  QURAN_PASSAGES.alKafirun,
+  QURAN_PASSAGES.alIkhlas,
+  QURAN_PASSAGES.alFalaq,
+  QURAN_PASSAGES.anNas,
+  QURAN_IMRAN_PASSAGE,
+];
 describe("canonical Mushaf excerpts", () => {
   it("maps existing evidence quotations only within their explicit cited verses", () => {
     for (const item of [...QURAN_DHIKR_EVIDENCE, ...WIRD_QURAN_EVIDENCE]) {
       const range = QURAN_EVIDENCE_EXCERPTS[item.id]!;
-      const page = JSON.parse(readFileSync(`public/data/mushaf/${range.page}.json`, "utf8")) as MushafVerseData[];
-      const lines: MushafWordToken[][] = Array.from({ length: 15 }, () => []);
-      for (const verse of page)
-        for (const [position, line, isEnd, text, qcfCode] of verse.w)
-          lines[line - 1]!.push({ verseKey: verse.k, position, isEnd, text, qcfCode });
+      const { lines } = readExcerptPages(range);
       const selected = selectMushafExcerpt(lines, range.from, range.to);
       expect(selected.length, item.id).toBeGreaterThan(0);
       const mapping = excerptWordMapping(selected, item.text.ar, true);
@@ -32,11 +38,7 @@ describe("canonical Mushaf excerpts", () => {
   });
   for (const [index, [key, range]] of Object.entries(MUSHAF_EXCERPTS).entries()) {
     it(`selects only complete original verses and maps every source word for ${key}`, () => {
-      const page = JSON.parse(readFileSync(`public/data/mushaf/${range.page}.json`, "utf8")) as MushafVerseData[];
-      const lines: MushafWordToken[][] = Array.from({ length: 15 }, () => []);
-      for (const verse of page)
-        for (const [position, line, isEnd, text, qcfCode] of verse.w)
-          lines[line - 1]!.push({ verseKey: verse.k, position, isEnd, text, qcfCode });
+      const { page, lines } = readExcerptPages(range);
       const selected = selectMushafExcerpt(lines, range.from, range.to);
       expect(selected.flat()).toEqual(
         page
@@ -58,7 +60,7 @@ describe("canonical Mushaf excerpts", () => {
             })),
           ),
       );
-      const transcript = QURAN_PASSAGES[passageNames[index]!].arabicText;
+      const transcript = passages[index]!.arabicText;
       const mapping = excerptWordMapping(selected, transcript);
       expect(mapping).not.toBeNull();
       const last = mapping!.at(-1)!;
@@ -69,5 +71,27 @@ describe("canonical Mushaf excerpts", () => {
       expect(excerptWordMapping(selected, transcript + " extra")).toBeNull();
       expect(excerptActiveWord(mapping!, null)).toBeNull();
     });
+  }
+});
+
+function readExcerptPages(range: { page: number; endPage?: number }) {
+  const pages = [range.page, ...(range.endPage ? [range.endPage] : [])].map(
+    (number) => JSON.parse(readFileSync(`public/data/mushaf/${number}.json`, "utf8")) as MushafVerseData[],
+  );
+  const lines = pages.flatMap((page) => {
+    const rows: MushafWordToken[][] = Array.from({ length: 15 }, () => []);
+    for (const verse of page)
+      for (const [position, line, isEnd, text, qcfCode] of verse.w)
+        rows[line - 1]!.push({ verseKey: verse.k, position, isEnd, text, qcfCode });
+    return rows;
+  });
+  return { page: pages.flat(), lines };
+}
+
+it("maps all eighteen Home Quran passages against their explicit canonical ranges", () => {
+  for (const verse of RELEVANT_NOW_VERSES) {
+    const range = QURAN_EVIDENCE_EXCERPTS[`home-quran-${verse.id}`]!;
+    const { lines } = readExcerptPages(range);
+    expect(excerptWordMapping(selectMushafExcerpt(lines, range.from, range.to), verse.arabic), verse.id).not.toBeNull();
   }
 });

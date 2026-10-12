@@ -4,9 +4,9 @@ import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
 import { QURAN_TEXT_STYLE } from "../quranTypography";
-import { QuranVerseText, QuranGlyphSlice } from "./QuranVerseText";
-import { useQuranSnippet } from "../hooks/useQuranSnippet";
+import { QuranVerseText, type QuranWordAttributes } from "./QuranVerseText";
 
+/** Meanings decorate the existing word boxes; they never replace the text layout. */
 export function QuranWordText({
   text,
   meanings,
@@ -15,74 +15,76 @@ export function QuranWordText({
   onSelectMeanings,
   activeWordId,
   canonicalKey,
+  showMeanings = true,
 }: {
   text: string;
   meanings: readonly QuranWordMeaning[];
   language: AppLanguage;
   style: CSSProperties;
   onSelectMeanings: (selection: WordMeaningSelection) => void;
-  /** The word the popover is currently anchored to, so it can mark itself. */
   activeWordId?: string | null;
   canonicalKey?: string;
+  showMeanings?: boolean;
 }) {
-  const segments = useMemo(() => buildQuranTextSegments(text, meanings), [meanings, text]);
-  const snippet = useQuranSnippet(text, canonicalKey);
-
-  /* Reading order, so "next word" in the sheet matches the next highlight the
-     eye reaches on the page. */
-  const groups = useMemo(() => segments.flatMap((segment) => (segment.meanings ? [segment.meanings] : [])), [segments]);
-  let groupIndex = -1;
-  let offset = 0;
-
+  const annotations = useMemo(() => {
+    let offset = 0;
+    let index = 0;
+    return buildQuranTextSegments(text, meanings).flatMap((segment) => {
+      const start = offset;
+      offset += segment.text.length;
+      return segment.meanings ? [{ start, end: offset, meanings: segment.meanings, index: index++ }] : [];
+    });
+  }, [meanings, text]);
+  const groups = annotations.map((annotation) => annotation.meanings);
+  const wordAttributes: QuranWordAttributes = (start, end) => {
+    if (!showMeanings) return {};
+    const annotation = annotations.find((item) => item.start < end && item.end > start);
+    if (!annotation) return {};
+    const select = (anchor: HTMLElement) => onSelectMeanings({ groups, index: annotation.index, anchor });
+    return {
+      role: "button",
+      tabIndex: 0,
+      "data-testid": "quran-word-help",
+      "data-prevent-count": "true",
+      "data-word-active": annotation.meanings[0]!.id === activeWordId ? "true" : undefined,
+      "aria-label": t(language, "reader.wordMeaningAria", {
+        word: text.slice(annotation.start, annotation.end),
+        ayah: formatNumerals(annotation.meanings[0]!.ayahNumber, language),
+      }),
+      onPointerDown: (event) => event.stopPropagation(),
+      onClick: (event) => {
+        event.stopPropagation();
+        select(event.currentTarget);
+      },
+      onKeyDown: (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          event.stopPropagation();
+          select(event.currentTarget);
+        }
+      },
+      className: "cursor-help focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring",
+      style: {
+        color: "color-mix(in srgb, var(--primary) 60%, var(--foreground))",
+        backgroundColor: "color-mix(in srgb, var(--primary) 10%, transparent)",
+        borderRadius: "0.15em",
+        textDecoration: "underline dotted",
+        textDecorationColor: "color-mix(in srgb, var(--primary) 60%, transparent)",
+        textUnderlineOffset: "0.22em",
+      },
+    } as ReturnType<QuranWordAttributes>;
+  };
   return (
     <p
-      className="zikr-text text-center font-medium leading-[1.7] text-foreground"
+      className="zikr-text text-center text-foreground"
       data-testid="zikr-text"
+      data-quran-passage=""
       dir="rtl"
       lang="ar"
       translate="no"
       style={{ ...style, ...QURAN_TEXT_STYLE }}
     >
-      {segments.map((segment, index) => {
-        const start = offset;
-        offset += segment.text.length;
-        const content = snippet ? (
-          <QuranGlyphSlice text={segment.text} offset={start} snippet={snippet} language={language} preserveLines />
-        ) : (
-          <QuranVerseText text={segment.text} language={language} />
-        );
-        if (!segment.meanings) return <span key={`text-${index}`}>{content}</span>;
-        groupIndex += 1;
-        const currentGroupIndex = groupIndex;
-        return (
-          <button
-            key={segment.meanings.map((meaning) => meaning.id).join("-")}
-            type="button"
-            data-testid="quran-word-help"
-            data-prevent-count="true"
-            onPointerDown={(event) => event.stopPropagation()}
-            onClick={(event) => {
-              event.stopPropagation();
-              onSelectMeanings({ groups, index: currentGroupIndex, anchor: event.currentTarget });
-            }}
-            data-word-active={segment.meanings[0]!.id === activeWordId ? "true" : undefined}
-            aria-label={t(language, "reader.wordMeaningAria", {
-              word: segment.text,
-              ayah: formatNumerals(segment.meanings[0]!.ayahNumber, language),
-            })}
-            style={{ fontFamily: "inherit", fontWeight: "inherit", letterSpacing: "inherit" }}
-            // A button does not inherit font-size or line-height from its
-            // paragraph — the UA sheet gives it a 16px default — so a
-            // highlighted word rendered several pixels smaller than the ayah
-            // around it, and the gap grew with the reading-size setting.
-            // Inherited explicitly; bold is intentionally omitted so the
-            // highlight relies on color and dotted underline only.
-            className="relative inline cursor-help rounded-md bg-primary/10 px-0.5 text-[length:inherit] leading-[inherit] text-primary underline decoration-primary/60 decoration-dotted underline-offset-[0.22em] transition-colors hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-          >
-            {content}
-          </button>
-        );
-      })}
+      <QuranVerseText text={text} language={language} canonicalKey={canonicalKey} wordAttributes={wordAttributes} />
     </p>
   );
 }

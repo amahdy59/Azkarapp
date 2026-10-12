@@ -50,6 +50,7 @@ test.describe("immersive mushaf mode", () => {
       page.getByTestId("mushaf-rail-back"),
       page.getByTestId("mushaf-difficult-words-switch"),
       page.getByTestId("mushaf-rail-next"),
+      page.getByTestId("mushaf-rail-benefit"),
     ]) {
       const box = await control.boundingBox();
       expect(box?.width ?? 0).toBeGreaterThanOrEqual(44);
@@ -63,7 +64,7 @@ test.describe("immersive mushaf mode", () => {
     // control is reachable in order.
     await page.getByTestId("mushaf-rail-back").focus();
     const reached: string[] = [];
-    for (let index = 0; index < 9; index += 1) {
+    for (let index = 0; index < 10; index += 1) {
       reached.push(await page.evaluate(() => document.activeElement?.getAttribute("data-testid") ?? ""));
       await page.keyboard.press("Tab");
     }
@@ -72,6 +73,7 @@ test.describe("immersive mushaf mode", () => {
       "mushaf-rail-index",
       "mushaf-rail-next",
       "mushaf-rail-page-bookmark",
+      "mushaf-rail-benefit",
       "mushaf-settings-trigger",
     ]) {
       expect(reached, id).toContain(id);

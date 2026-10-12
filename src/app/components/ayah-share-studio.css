@@ -1,0 +1,140 @@
+.ayah-share-studio {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  color: var(--foreground);
+}
+.ayah-share-header {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  align-items: center;
+  gap: 0.25rem 0.5rem;
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.ayah-share-header > div {
+  display: contents;
+}
+.ayah-share-header button {
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+}
+.ayah-share-header h2 {
+  grid-column: 2;
+  grid-row: 1;
+}
+.ayah-share-header button:last-child {
+  grid-column: 3;
+  grid-row: 1;
+}
+.ayah-share-header p {
+  grid-column: 1 / -1;
+}
+.ayah-share-body {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  min-height: 0;
+  padding: 1rem;
+  display: grid;
+  align-content: start;
+  gap: 1rem;
+  scrollbar-gutter: stable;
+  scroll-padding-block: 1rem;
+}
+.ayah-share-body > * {
+  min-width: 0;
+}
+.ayah-share-body fieldset {
+  min-inline-size: 0;
+}
+.ayah-share-body button {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.ayah-share-studio[data-scroll-whole] {
+  overflow-y: auto;
+}
+.ayah-share-studio[data-scroll-whole] .ayah-share-body {
+  flex: 0 0 auto;
+  overflow: visible;
+}
+@media (max-height: 28rem) {
+  .ayah-share-studio {
+    overflow-y: auto;
+  }
+  .ayah-share-body {
+    flex: 0 0 auto;
+    overflow: visible;
+  }
+}
+.ayah-share-preview {
+  min-width: 0;
+}
+.ayah-share-preview img,
+.ayah-share-placeholder {
+  display: block;
+  width: 100%;
+  max-height: 34dvh;
+  object-fit: contain;
+  border-radius: var(--ds-radius-control);
+}
+.ayah-share-placeholder {
+  aspect-ratio: 4 / 5;
+  background: var(--muted);
+}
+.ayah-share-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-control);
+  border-radius: var(--ds-radius-control);
+  cursor: pointer;
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}
+.ayah-share-option:has(:checked) {
+  background: var(--muted);
+  border-color: var(--primary);
+  font-weight: 600;
+}
+.ayah-share-option:has(:focus-visible),
+.ayah-share-studio summary:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+}
+.ayah-share-option input {
+  accent-color: var(--primary);
+  flex-shrink: 0;
+}
+.ayah-share-footer {
+  flex-shrink: 0;
+  display: grid;
+  gap: 0.5rem;
+  border-top: 1px solid var(--border);
+  padding: 0.75rem 1rem max(0.75rem, env(safe-area-inset-bottom));
+  background: var(--card);
+}
+.ayah-share-footer button {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.ayah-share-header p {
+  overflow-wrap: anywhere;
+}
+@media (min-width: 768px) {
+  .ayah-share-body {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+  }
+  .ayah-share-preview img {
+    max-height: 45dvh;
+  }
+}

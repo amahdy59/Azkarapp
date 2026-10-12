@@ -21,6 +21,7 @@ export function OfflineResourceRow({
   title,
   detail,
   state,
+  feedback,
   size,
   completed,
   total,
@@ -35,11 +36,13 @@ export function OfflineResourceRow({
   hideRemove = false,
   showDownload = true,
   direction = language === "ar" ? "rtl" : "ltr",
+  headingLevel = 3,
 }: {
   id: string;
   title: string;
   detail: string;
   state: ReactNode;
+  feedback?: ReactNode;
   size: ReactNode;
   completed: number;
   total: number;
@@ -54,7 +57,9 @@ export function OfflineResourceRow({
   hideRemove?: boolean;
   showDownload?: boolean;
   direction?: "ltr" | "rtl";
+  headingLevel?: 2 | 3;
 }) {
+  const Heading = headingLevel === 2 ? "h2" : "h3";
   const headingRef = useRef<HTMLHeadingElement>(null);
   const removeRequestedRef = useRef(false);
   return (
@@ -65,24 +70,23 @@ export function OfflineResourceRow({
     >
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0 flex-1" style={{ minWidth: "min(100%, 10rem)" }}>
-          <h3
+          <Heading
             ref={headingRef}
             tabIndex={-1}
             id={`${id}-title`}
             className="text-subtitle font-semibold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           >
             {title}
-          </h3>
+          </Heading>
         </div>
         {completed < total && <span className="text-sm text-muted-foreground">{size}</span>}
       </div>
       {detail && <p className="text-sm text-muted-foreground">{detail}</p>}
-      {(!compact || active || completed > 0 || total === 0) && (
-        <p className="flex items-center gap-2 text-sm text-foreground">
-          {total > 0 && completed >= total && <Check size={18} aria-hidden="true" />}
-          {state}
-        </p>
-      )}
+      <p className="flex items-center gap-2 text-sm text-foreground">
+        {!active && total > 0 && completed >= total && <Check size={18} aria-hidden="true" />}
+        {state}
+      </p>
+      {feedback && <div className="space-y-1 text-sm text-muted-foreground">{feedback}</div>}
       {total > 0 && (!compact || active) && (
         <DownloadProgress completed={completed} total={total} label={title} language={language} active={active} />
       )}

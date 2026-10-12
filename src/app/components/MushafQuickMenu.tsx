@@ -49,6 +49,7 @@ export interface MushafQuickMenuProps {
   onTogglePageBookmark: () => void;
   onOpenSettings: () => void;
   onReadExternally?: () => void;
+  onOpenBenefit?: () => void;
   surahAudio?: SurahAudioControl;
   playbackFollowing?: { enabled: boolean; onToggle: () => void };
   showPageTools?: boolean;
@@ -101,6 +102,7 @@ export function MushafQuickMenu({
   onTogglePageBookmark,
   onOpenSettings,
   onReadExternally,
+  onOpenBenefit,
   surahAudio,
   playbackFollowing,
   showPageTools = true,
@@ -117,6 +119,18 @@ export function MushafQuickMenu({
   onSelectTheme,
 }: MushafQuickMenuProps) {
   const items: QuickMenuItem[] = [
+    ...(onOpenBenefit
+      ? [
+          {
+            id: "benefit",
+            label: t(language, "reader.referencesButton"),
+            icon: <BookOpen size={19} aria-hidden="true" />,
+            onSelect: onOpenBenefit,
+            opensSurface: true,
+            testId: "mushaf-quick-benefit",
+          },
+        ]
+      : []),
     ...(playbackFollowing
       ? [
           {

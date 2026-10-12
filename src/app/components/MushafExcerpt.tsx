@@ -24,12 +24,13 @@ export default function MushafExcerpt({
 }) {
   const range = MUSHAF_EXCERPTS[canonicalKey]!;
   const { result } = useListeningMushafPage(range.page, 0);
+  const { result: ending } = useListeningMushafPage(range.endPage ?? 0, 0, Boolean(range.endPage));
   const selection = useMemo(() => {
-    if (!result) return null;
-    const lines = selectMushafExcerpt(result.lines, range.from, range.to);
+    if (!result || (range.endPage && !ending)) return null;
+    const lines = selectMushafExcerpt([...result.lines, ...(range.endPage ? ending!.lines : [])], range.from, range.to);
     const mapping = excerptWordMapping(lines, transcript);
     return mapping ? { lines, mapping } : null;
-  }, [result, range, transcript]);
+  }, [result, ending, range, transcript]);
   if (!result || !selection) return fallback;
   return (
     <div className="w-full">
@@ -37,7 +38,7 @@ export default function MushafExcerpt({
         lines={selection.lines}
         pageNumber={range.page}
         language={language}
-        useQcfGlyphs={result.qcf}
+        useQcfGlyphs={result.qcf && (!range.endPage || Boolean(ending?.qcf))}
         highlightedWord={excerptActiveWord(selection.mapping, cue)}
         textSize={textSize}
         theme={theme}

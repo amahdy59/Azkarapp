@@ -39,7 +39,7 @@ export function useListeningMushafPage(page: number, retry: number, loadPageFont
         const lines: MushafWordToken[][] = Array.from({ length: 15 }, () => []);
         for (const verse of data)
           for (const [position, line, isEnd, text, qcfCode] of verse.w)
-            lines[line - 1]!.push({ verseKey: verse.k, position, isEnd, text, qcfCode });
+            lines[line - 1]!.push({ verseKey: verse.k, position, isEnd, text, qcfCode, pageNumber: page });
         if (!cancelled) setResult({ page, lines, qcf });
       } catch {
         if (!cancelled) setErrorPage(page);

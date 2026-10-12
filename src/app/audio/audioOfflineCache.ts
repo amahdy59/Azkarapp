@@ -2,6 +2,17 @@ import type { Zikr } from "../types";
 import { AUDIO_CATALOG, AUDIO_MANIFEST_VERSION } from "./audioManifest";
 import type { AudioPreferences, AudioVariant } from "./audioTypes";
 import { getPreferredVoiceId, resolveAudioAsset } from "./resolveAudioAsset";
+import { AudioDownloadError, transferAudio, type AudioDownloadPhase } from "./audioDownloadTransfer";
+
+export interface AudioDownloadProgress {
+  phase: AudioDownloadPhase;
+  completedFiles: number;
+  totalFiles: number;
+  fileNumber: number;
+  attempt: number;
+  receivedBytes: number;
+  totalBytes: number;
+}
 
 export const AUDIO_CACHE_NAME = `azkar-audio-v${AUDIO_MANIFEST_VERSION}`;
 const REGISTRY_KEY = "azkar.audio-downloads.v1";
@@ -45,9 +56,9 @@ function toHex(buffer: ArrayBuffer) {
 }
 
 async function verifyDownload(buffer: ArrayBuffer, variant: AudioVariant) {
-  if (buffer.byteLength !== variant.byteSize) throw new Error(`Incomplete audio download: ${variant.id}`);
+  if (buffer.byteLength !== variant.byteSize) throw new AudioDownloadError("integrity", variant.id);
   const digest = await crypto.subtle.digest("SHA-256", buffer);
-  if (toHex(digest) !== variant.sha256.toLowerCase()) throw new Error(`Audio checksum failed: ${variant.id}`);
+  if (toHex(digest) !== variant.sha256.toLowerCase()) throw new AudioDownloadError("integrity", variant.id);
 }
 
 function getDownloadVariants(zikrs: readonly Zikr[], preferences: AudioPreferences) {
@@ -83,6 +94,68 @@ function getDownloadVariants(zikrs: readonly Zikr[], preferences: AudioPreferenc
 
 export function estimateAudioDownloadBytes(zikrs: readonly Zikr[], preferences: AudioPreferences) {
   return getDownloadVariants(zikrs, preferences).reduce((total, item) => total + item.variant.byteSize, 0);
+}
+
+export interface SavedAudioFile {
+  id: string;
+  titleArabic: string;
+  titleEnglish: string;
+  voiceName: string;
+  fileName: string;
+  byteSize: number;
+}
+
+function audioFileName(variant: AudioVariant) {
+  const extension =
+    variant.mimeType === "audio/mpeg"
+      ? "mp3"
+      : variant.mimeType === "audio/wav"
+        ? "wav"
+        : variant.mimeType === "audio/ogg"
+          ? "ogg"
+          : "m4a";
+  return `${variant.id.replace(/[^a-zA-Z0-9_-]/g, "-")}.${extension}`;
+}
+
+/** Enumerate verified saved recordings without retaining their large byte buffers. */
+export async function getSavedAudioFiles(
+  zikrs: readonly Zikr[],
+  preferences: AudioPreferences,
+): Promise<SavedAudioFile[]> {
+  if (!("caches" in window)) return [];
+  const cache = await caches.open(AUDIO_CACHE_NAME);
+  const files: SavedAudioFile[] = [];
+  for (const item of getDownloadVariants(zikrs, preferences)) {
+    if (!(await isVerifiedCachedAudio(cache, item))) continue;
+    const asset = AUDIO_CATALOG.assets[item.assetId];
+    if (!asset) continue;
+    files.push({
+      id: item.variant.id,
+      titleArabic: asset.titleArabic,
+      titleEnglish: asset.titleEnglish,
+      voiceName: item.variant.voiceName,
+      fileName: audioFileName(item.variant),
+      byteSize: item.variant.byteSize,
+    });
+  }
+  return files;
+}
+
+/** Export only the selected approved, complete recording. Never redownload or export invalid bytes. */
+export async function prepareSavedAudioFile(zikrs: readonly Zikr[], preferences: AudioPreferences, id: string) {
+  const item = getDownloadVariants(zikrs, preferences).find((candidate) => candidate.variant.id === id);
+  if (!item || !("caches" in window)) throw new AudioDownloadError("unsupported", id);
+  const cache = await caches.open(AUDIO_CACHE_NAME);
+  const response = await cache.match(item.url);
+  if (
+    !response ||
+    response.status !== 200 ||
+    response.headers.get("content-type")?.split(";")[0]?.trim() !== item.variant.mimeType
+  )
+    throw new AudioDownloadError("integrity", id);
+  const buffer = await response.arrayBuffer();
+  await verifyDownload(buffer, item.variant);
+  return new File([buffer], audioFileName(item.variant), { type: item.variant.mimeType });
 }
 
 async function isVerifiedCachedAudio(cache: Cache, item: ReturnType<typeof getDownloadVariants>[number]) {
@@ -154,36 +227,52 @@ export async function removeAudioForZikrs(zikrs: readonly Zikr[], preferences: A
 export async function downloadAudioForZikrs(
   zikrs: readonly Zikr[],
   preferences: AudioPreferences,
-  options: { signal?: AbortSignal; onProgress?: (completedBytes: number, totalBytes: number) => void } = {},
+  options: {
+    signal?: AbortSignal;
+    onProgress?: (completedBytes: number, totalBytes: number) => void;
+    onDetail?: (progress: AudioDownloadProgress) => void;
+  } = {},
 ) {
-  if (!("caches" in window)) throw new Error("Offline audio is not supported in this browser.");
+  if (!("caches" in window)) throw new AudioDownloadError("unsupported", "");
   const downloads = getDownloadVariants(zikrs, preferences);
   const totalBytes = downloads.reduce((total, item) => total + item.variant.byteSize, 0);
   const cache = await caches.open(AUDIO_CACHE_NAME);
-  const storedUrls: string[] = [];
   const records = new Map<string, DownloadedAssetRecord>();
   let completedBytes = 0;
+  let completedFiles = 0;
+  const notify = (phase: AudioDownloadPhase, bytes = 0, attempt = 1) => {
+    options.onProgress?.(completedBytes + bytes, totalBytes);
+    options.onDetail?.({
+      phase,
+      completedFiles,
+      totalFiles: downloads.length,
+      fileNumber: Math.min(completedFiles + 1, downloads.length),
+      attempt,
+      receivedBytes: completedBytes + bytes,
+      totalBytes,
+    });
+  };
 
   try {
     for (const item of downloads) {
       options.signal?.throwIfAborted();
+      notify("verifying");
       const alreadyCached = await isVerifiedCachedAudio(cache, item);
       if (!alreadyCached) {
-        const response = await fetch(item.url, { cache: "no-store", credentials: "omit", signal: options.signal });
-        if (response.status !== 200 || !response.ok) throw new Error(`Audio download failed: ${item.variant.id}`);
-        const contentType = response.headers.get("content-type")?.split(";")[0]?.trim();
-        if (contentType !== item.variant.mimeType) throw new Error(`Unexpected audio MIME type: ${item.variant.id}`);
-        const buffer = await response.arrayBuffer();
+        const { buffer, headers: receivedHeaders } = await transferAudio(item.url, item.variant, {
+          signal: options.signal,
+          onTransfer: notify,
+        });
+        notify("verifying", item.variant.byteSize);
         await verifyDownload(buffer, item.variant);
         options.signal?.throwIfAborted();
-        const headers = new Headers(response.headers);
+        const headers = new Headers(receivedHeaders);
         headers.set("content-length", String(buffer.byteLength));
         headers.set("content-type", item.variant.mimeType);
         await cache.put(item.url, new Response(buffer, { status: 200, headers }));
-        storedUrls.push(item.url);
       }
       completedBytes += item.variant.byteSize;
-      options.onProgress?.(completedBytes, totalBytes);
+      completedFiles++;
 
       const record = records.get(item.assetId) ?? {
         assetId: item.assetId,
@@ -198,16 +287,34 @@ export async function downloadAudioForZikrs(
       record.urls.push(item.url);
       record.byteSize += item.variant.byteSize;
       records.set(item.assetId, record);
+      notify("saved");
     }
     options.signal?.throwIfAborted();
-  } catch (error) {
-    await Promise.all(storedUrls.map((url) => cache.delete(url)));
-    throw error;
+  } finally {
+    // Each verified complete file is a checkpoint, including cancellation/failure.
+    // An incomplete or corrupt response never enters the cache or registry.
+    const registry = loadRegistry();
+    for (const [assetId, record] of records) {
+      const previous = registry[assetId];
+      if (previous?.manifestVersion === AUDIO_MANIFEST_VERSION && previous.assetVersion === record.assetVersion) {
+        for (let index = 0; index < previous.variantIds.length; index++) {
+          const variantId = previous.variantIds[index]!;
+          if (!record.variantIds.includes(variantId)) {
+            const variant = AUDIO_CATALOG.assets[assetId]?.segments
+              .flatMap((segment) => segment.variants)
+              .find((candidate) => candidate.id === variantId);
+            if (variant && previous.urls[index]) {
+              record.variantIds.push(variantId);
+              record.urls.push(previous.urls[index]!);
+              record.byteSize += variant.byteSize;
+            }
+          }
+        }
+      }
+      registry[assetId] = record;
+    }
+    saveRegistry(registry);
   }
-
-  const registry = loadRegistry();
-  for (const [assetId, record] of records) registry[assetId] = record;
-  saveRegistry(registry);
   return { assetCount: records.size, byteSize: completedBytes };
 }
 
