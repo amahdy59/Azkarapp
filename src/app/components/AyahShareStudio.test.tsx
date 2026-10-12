@@ -209,7 +209,7 @@ describe("AyahShareStudio", () => {
     await user.click(screen.getByRole("checkbox", { name: "Include English translation" }));
     await user.click(screen.getByText("Read the card text"));
     await user.click(screen.getByRole("button", { name: "Copy text" }));
-    expect(await screen.findByRole("status")).toHaveTextContent("Ayah copied");
+    await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Ayah copied"));
     expect(await navigator.clipboard.readText()).toContain("Saheeh International");
     await user.click(screen.getByRole("button", { name: "Close" }));
     expect(props.onClose).toHaveBeenCalled();

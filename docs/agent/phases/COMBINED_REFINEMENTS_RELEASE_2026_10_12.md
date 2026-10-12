@@ -58,6 +58,8 @@ Physical share/save targets and human assistive-technology checks are not certif
 
 ## Out-of-scope findings
 
+Publication follow-up: b1dc4b3d was pushed after the unchanged pre-push hook passed full check in 144.5s, 26/26 core browser tests and the Pages build/budgets. Quality run 38203238676 failed one unit assertion because findByRole(status) could return the existing generation status before copy confirmation. The assertion now waits for the same exact “Ayah copied” text. The verify job also reported the absent inventory artifact because checks stopped before inventory creation; browser/Pages work was correctly blocked. No product logic, timeout, assertion strength or deployment gate changed. Targeted sharing tests and the full local hook are rerun for the remediation commit.
+
 Further suggestions remain proposals: collapsible typography settings, sticky desktop preview, supplemental-card identity, large preview, taller complete-ayah format and reader spacing preferences. No unrequested redesign is part of this release.
 
 ## Recommended next step
