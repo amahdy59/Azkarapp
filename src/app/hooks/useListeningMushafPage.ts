@@ -13,7 +13,6 @@ export function useListeningMushafPage(page: number, retry: number, loadPageFont
   const [errorPage, setErrorPage] = useState<number | null>(null);
   useEffect(() => {
     let cancelled = false;
-    let timer: ReturnType<typeof setTimeout> | undefined;
     setResult(null);
     setErrorPage(null);
     if (page < 1 || page > 604) return;
@@ -26,31 +25,27 @@ export function useListeningMushafPage(page: number, retry: number, loadPageFont
     void (async () => {
       try {
         const data = await loadMushafPage(page);
-        const qcf =
-          loadPageFont &&
-          pageHasQcfGlyphs(data) &&
-          (isQcfFontReady(page) ||
-            (await Promise.race([
-              loadQcfFont(page),
-              new Promise<boolean>((resolve) => {
-                timer = setTimeout(() => resolve(false), 1800);
-              }),
-            ])));
+        const hasGlyphs = loadPageFont && pageHasQcfGlyphs(data);
+        const qcf = hasGlyphs && isQcfFontReady(page);
         const lines: MushafWordToken[][] = Array.from({ length: 15 }, () => []);
         for (const verse of data)
           for (const [position, line, isEnd, text, qcfCode] of verse.w)
             lines[line - 1]!.push({ verseKey: verse.k, position, isEnd, text, qcfCode, pageNumber: page });
         if (!cancelled) setResult({ page, lines, qcf });
+        // Local words are usable now; font loading must never hold up reading.
+        // A cancelled request cannot upgrade another page or an unmounted reader.
+        if (!cancelled && hasGlyphs && !qcf) {
+          const ready = await loadQcfFont(page).catch(() => false);
+          if (ready && !cancelled)
+            setResult((current) => (current?.page === page ? { ...current, qcf: true } : current));
+        }
       } catch {
         if (!cancelled) setErrorPage(page);
-      } finally {
-        if (timer) clearTimeout(timer);
       }
     })();
     return () => {
       cancelled = true;
       unsubscribe?.();
-      if (timer) clearTimeout(timer);
     };
   }, [page, retry, loadPageFont]);
   return { result: result?.page === page ? result : null, error: errorPage === page };

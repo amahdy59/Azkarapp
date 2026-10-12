@@ -84,7 +84,7 @@ function Passage({
     };
   }, [follow, result, verseKey, word, page, props.entry.mushafPages]);
   const typeScale = props.textScale === "small" ? 0.9 : props.textScale === "large" ? 1.08 : 1;
-  const scale = (1.25 * typeScale * (props.magnification ?? 100)) / 100;
+  const scale = (typeScale * (props.magnification ?? 100)) / 100;
   return (
     <div ref={root} data-listening-passage={page} className="w-full">
       {lines?.length ? (
@@ -231,17 +231,17 @@ export default function QuranSurahListeningReader(props: QuranListeningReaderPro
           ? preferences
           : null}
       {overlayHost ? createPortal(resume, overlayHost) : resume}
-      <h2 className="mb-3 text-center text-lg font-bold">
+      <h2 className="mb-2 text-center text-lg font-bold">
         {language === "ar" ? entry.titleArabic : entry.titleEnglish}
       </h2>
-      <div className="mb-4 text-center" dir="rtl" lang="ar">
+      <div className="mb-2 text-center" dir="rtl" lang="ar" data-testid="quran-basmalah">
         <span aria-hidden="true">
-          <MushafBismillahArt className="mx-auto h-auto w-52 max-w-full" />
+          <MushafBismillahArt className="mx-auto h-auto w-44 max-w-full" />
         </span>
         <span className="sr-only">{BASMALAH_ARABIC}</span>
       </div>
       <div className="audio-listening-body">
-        <div className="audio-listening-arabic space-y-3">
+        <div className="audio-listening-arabic">
           {pages.map((page) => (
             <Passage
               key={page.page}

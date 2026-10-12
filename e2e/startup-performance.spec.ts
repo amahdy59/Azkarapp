@@ -63,6 +63,16 @@ test("Home opens under a six-times slower CPU and constrained connection", async
     );
     const tasks: number[] = [];
     (window as unknown as { startupTasks: number[] }).startupTasks = tasks;
+    const paint = new MutationObserver(() => {
+      if (!document.querySelector('[data-testid="home-utility-header"]')) return;
+      paint.disconnect();
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => {
+          (window as unknown as { homePaintMs: number }).homePaintMs = performance.now();
+        }),
+      );
+    });
+    paint.observe(document, { childList: true, subtree: true });
     new PerformanceObserver((list) => tasks.push(...list.getEntries().map((entry) => entry.duration))).observe({
       type: "longtask",
       buffered: true,
@@ -79,8 +89,12 @@ test("Home opens under a six-times slower CPU and constrained connection", async
   });
   await page.goto("/#/home", { waitUntil: "domcontentloaded" });
   await expect(page.getByTestId("home-utility-header")).toBeVisible();
+  await expect
+    .poll(() => page.evaluate(() => (window as unknown as { homePaintMs?: number }).homePaintMs ?? 0))
+    .toBeGreaterThan(0);
   const metrics = await page.evaluate(() => ({
-    homeVisibleMs: Math.round(performance.now()),
+    homeVisibleMs: Math.round((window as unknown as { homePaintMs: number }).homePaintMs),
+    automationObservedMs: Math.round(performance.now()),
     longTasksMs: (window as unknown as { startupTasks: number[] }).startupTasks,
     resources: performance
       .getEntriesByType("resource")

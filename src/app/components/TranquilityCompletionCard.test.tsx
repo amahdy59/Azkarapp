@@ -10,7 +10,7 @@ describe("TranquilityCompletionCard", () => {
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
   });
 
-  it("stages its exit and collapses its layout row", () => {
+  it("stages its exit while retaining the complete card until removal", () => {
     const { rerender } = render(<TranquilityCompletionCard categoryId="morning" language="en" />);
     rerender(<TranquilityCompletionCard categoryId="morning" language="en" isExiting />);
 

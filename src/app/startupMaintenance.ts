@@ -11,11 +11,33 @@ export async function hasAudioCacheMaintenance(): Promise<boolean> {
   return (await caches.keys()).some((name) => name.startsWith("azkar-audio-v"));
 }
 
-/** Called after the application commits; a frame and idle slot give reading priority. */
-export function scheduleStartupMaintenance() {
+/** Leave a paint between commit and optional work, with cancellable fallbacks. */
+export function scheduleIdleAfterPaint(task: () => void, { timeout = 10_000, fallbackDelay = 1500 } = {}) {
   let cancelled = false;
+  let frame = 0;
   let idle = 0;
   let timer = 0;
+  const run = () => {
+    if (!cancelled) task();
+  };
+  frame = requestAnimationFrame(() => {
+    frame = requestAnimationFrame(() => {
+      if (cancelled) return;
+      if (typeof window.requestIdleCallback === "function") idle = window.requestIdleCallback(run, { timeout });
+      else timer = window.setTimeout(run, fallbackDelay);
+    });
+  });
+  return () => {
+    cancelled = true;
+    cancelAnimationFrame(frame);
+    if (idle) window.cancelIdleCallback(idle);
+    if (timer) window.clearTimeout(timer);
+  };
+}
+
+/** Called after the application commits; paint and idle slots give reading priority. */
+export function scheduleStartupMaintenance() {
+  let cancelled = false;
   const maintain = async () => {
     if (cancelled) return;
     try {
@@ -29,15 +51,9 @@ export function scheduleStartupMaintenance() {
       // Offline cleanup is best-effort. Reading and retained downloads take priority.
     }
   };
-  const frame = requestAnimationFrame(() => {
-    if (typeof window.requestIdleCallback === "function")
-      idle = window.requestIdleCallback(() => void maintain(), { timeout: 10_000 });
-    else timer = window.setTimeout(() => void maintain(), 1500);
-  });
+  const cancelScheduled = scheduleIdleAfterPaint(() => void maintain());
   return () => {
     cancelled = true;
-    cancelAnimationFrame(frame);
-    if (idle) window.cancelIdleCallback(idle);
-    if (timer) window.clearTimeout(timer);
+    cancelScheduled();
   };
 }

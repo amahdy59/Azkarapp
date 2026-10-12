@@ -177,11 +177,9 @@
    exact reverse order: check, copy, then surface, so the next card can settle
    into place without an abrupt swap. */
 .tranquility-completion {
-  grid-template-rows: 1fr;
   opacity: 1;
   transform: scale(1);
   transition:
-    grid-template-rows var(--motion-duration-emphasis) var(--motion-ease-exit) 120ms,
     opacity 180ms var(--motion-ease-exit) 220ms,
     transform 220ms var(--motion-ease-exit) 180ms;
 }
@@ -230,7 +228,6 @@
 }
 
 .tranquility-completion.is-exiting {
-  grid-template-rows: 0fr;
   opacity: 0;
   transform: scale(0.97);
 }

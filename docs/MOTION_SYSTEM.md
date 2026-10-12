@@ -1,5 +1,9 @@
 # Azkarapp Motion System
 
+## Interaction polish — 2026-10-12
+
+Shared counter Enter/Space presses use the same finite pressed response as pointer activation. One deliberate keydown counts once; operating-system repeat events do not add unintended repetitions. Keyup, blur and pointer cancellation release the response; reduced motion retains counting without adding a pressed animation. Home completion exits retain their staged opacity/transform sequence but no longer interpolate grid row geometry per frame; the existing owner timer removes the faded card. Reader controls stay stationary and rapid text navigation retains latest-selection-wins interruption.
+
 ## 1. Motion Principles
 
 The motion system for Azkarapp is designed to be calm, responsive, lightweight, predictable, and respectful. Animation must serve a clear purpose and should remain stable during reading.
@@ -76,26 +80,26 @@ The following animation patterns are strictly prohibited:
 
 ## 6. Component Motion Matrix
 
-| Component               | Animation                         | Duration                  | Easing             | Reduced Motion Behavior         |
-| :---------------------- | :-------------------------------- | :------------------------ | :----------------- | :------------------------------ |
-| **Universal Press**     | Scale to 0.97; compact icons 0.92 | 90ms down / 420ms release | Standard / Release | Opacity change only, max 100ms  |
-| **Counter Number Pop**  | Scale/Opacity up                  | 160ms                     | Enter              | Opacity transition              |
-| **Counter Ring Pulse**  | Subtle scale outward              | 280ms                     | Enter              | Removed                         |
-| **Counter Readiness**   | Ready state indication            | 600ms                     | Enter              | Removed                         |
-| **Counter Completion**  | Final state animation             | 440ms                     | Enter              | Fade to completion state        |
-| **Home Completion**     | Surface/copy/icon in; reverse out | 500ms                     | Enter/Exit         | Instant reveal/removal          |
-| **Counter Tap Ripple**  | Scale/opacity from input          | 560ms                     | Ease-out           | Removed                         |
-| **Home Hero Particles** | Finite upward drift               | 3.9-4.8s                  | Ease-out           | Removed                         |
-| **Check Draw**          | SVG `stroke-dashoffset`           | 300ms                     | Enter              | Instant or fast opacity (100ms) |
-| **Navigation Active**   | Highlight state change            | 220ms                     | Enter              | Opacity fade                    |
-| **Favorite Pop**        | Scale and color shift             | 260ms                     | Enter              | Opacity/Color transition only   |
-| **Zikr Step**           | Enter / Exit translation          | 300ms/220ms               | Enter/Exit         | Crossfade only                  |
-| **Completion Screen**   | Enter transition                  | 240ms                     | Ease-out           | Crossfade only                  |
-| **Celebration Pop**     | Pop / Glow                        | 520ms/900ms               | Enter              | Opacity fade (max 100ms)        |
-| **Menu Pop**            | Context menu opening              | 160ms                     | Standard           | Opacity fade                    |
-| **Scrim In**            | Background dimming                | 180ms                     | Standard           | Instant or fast opacity         |
-| **Leaf Appear**         | Spring scale in                   | 380ms                     | Spring             | Opacity fade                    |
-| **Progress Ring**       | `stroke-dashoffset`               | 150ms                     | Standard           | Removed or fast opacity         |
+| Component               | Animation                         | Duration                   | Easing             | Reduced Motion Behavior         |
+| :---------------------- | :-------------------------------- | :------------------------- | :----------------- | :------------------------------ |
+| **Universal Press**     | Scale to 0.97; compact icons 0.92 | 90ms down / 420ms release  | Standard / Release | Opacity change only, max 100ms  |
+| **Counter Number Pop**  | Scale/Opacity up                  | 160ms                      | Enter              | Opacity transition              |
+| **Counter Ring Pulse**  | Subtle scale outward              | 280ms                      | Enter              | Removed                         |
+| **Counter Readiness**   | Ready state indication            | 600ms                      | Enter              | Removed                         |
+| **Counter Completion**  | Final state animation             | 440ms                      | Enter              | Fade to completion state        |
+| **Home Completion**     | Surface/copy/icon in; reverse out | 500ms                      | Enter/Exit         | Instant reveal/removal          |
+| **Counter Tap Ripple**  | Scale/opacity from input          | 560ms                      | Ease-out           | Removed                         |
+| **Home Hero Particles** | Finite upward drift               | 3.9-4.8s                   | Ease-out           | Removed                         |
+| **Check Draw**          | SVG `stroke-dashoffset`           | 300ms                      | Enter              | Instant or fast opacity (100ms) |
+| **Navigation Active**   | Highlight state change            | 220ms                      | Enter              | Opacity fade                    |
+| **Favorite Pop**        | Scale and color shift             | 260ms                      | Enter              | Opacity/Color transition only   |
+| **Zikr Step**           | Reading text only, 28px / 20px    | 240ms arrival / 100ms exit | Enter/Exit         | Immediate stable text           |
+| **Completion Screen**   | Enter transition                  | 240ms                      | Ease-out           | Crossfade only                  |
+| **Celebration Pop**     | Pop / Glow                        | 520ms/900ms                | Enter              | Opacity fade (max 100ms)        |
+| **Menu Pop**            | Context menu opening              | 160ms                      | Standard           | Opacity fade                    |
+| **Scrim In**            | Background dimming                | 180ms                      | Standard           | Instant or fast opacity         |
+| **Leaf Appear**         | Spring scale in                   | 380ms                      | Spring             | Opacity fade                    |
+| **Progress Ring**       | `stroke-dashoffset`               | 150ms                      | Standard           | Removed or fast opacity         |
 
 ## 7. Reduced Motion Behavior
 

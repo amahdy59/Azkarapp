@@ -2,6 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { getAzkarForMode } from "../src/app/content/azkar";
 import { formatNumerals } from "../src/app/formatting";
+import { t } from "../src/app/i18n";
 
 async function returningReader(
   page: Page,
@@ -147,10 +148,7 @@ for (const language of ["ar", "en"] as const) {
       const beforeCount = Number(
         beforeLabel.match(/([0-9٠-٩]+)\s*\//)![1]!.replace(/[٠-٩]/g, (digit) => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit))),
       );
-      await page
-        .getByRole("button", { name: language === "ar" ? "خيارات القارئ" : "Reader options", exact: true })
-        .click();
-      await page.getByTestId("reader-focus-toggle").click();
+      await page.getByRole("button", { name: t(language, "reader.enterFocus"), exact: true }).click();
       await expect(page.getByTestId("reader-screen")).toHaveAttribute("data-reading-focus", "true");
       const exit = page.getByRole("button", { name: language === "ar" ? "إنهاء وضع التركيز" : "Exit reading focus" });
       await expect(exit).toBeFocused();

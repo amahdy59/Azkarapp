@@ -1,5 +1,9 @@
 # Audio architecture
 
+## Calm flowing Quran presentation — 2026-10-12
+
+The owner's request supersedes the earlier automatic 125% enlargement in continuous Al-Kahf, As-Sajdah and Al-Mulk listening. Flowing Quran uses shared 21.5/23/27px typography and 1.65 leading; explicit text scale/magnification remain. Basmalah is compact and page-fragment margins no longer add gaps between verses. Complete local words render immediately while page fonts load, with page-specific late-font recovery and cancellation guards. No recording, timing annotation, verse range, media ownership or completion contract changes.
+
 ## Continuous surah listening — local refinement 2026-10-12
 
 Al-Kahf, As-Sajdah and Al-Mulk now compose their complete range from the existing cached Mushaf word/font data without page-switching controls. Flowing excerpts retain page-specific font identities, original semantic text, numbered verse markers and exact recording cues. Adjacent surahs are filtered by explicit Quran range. Missing layout/fonts preserve the complete reviewed fallback text and offer per-passage retry after errors. Following uses the existing media clock; manual wheel/touch/keyboard reading pauses it. Recovery overlays the reading canvas, preserving geometry and restoring keyboard reading focus. Every expanded player covers the main canvas including session chrome, with covered children made inert until collapse. Remaining paginated listening has a native numeric page selector without previous/next arrows. Playback, content, progress, downloads and storage boundaries are unchanged.

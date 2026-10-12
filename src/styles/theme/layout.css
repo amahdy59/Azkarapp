@@ -6,6 +6,19 @@
    between parts, or reordering the imports, can change which declaration wins. */
 
 /* App Shell Adaptive Grid */
+/* Keep mobile pinch gestures from magnifying navigation chrome. Browser/menu
+   zoom and the app's text-size/Mushaf magnification controls remain available. */
+@media (hover: none) and (pointer: coarse) {
+  html,
+  body,
+  .app-viewport,
+  .scroll-container,
+  [data-radix-scroll-area-viewport],
+  [role="dialog"] {
+    touch-action: pan-x pan-y;
+  }
+}
+
 /* A feature guard preserves this fallback through production CSS optimization. */
 @supports not (height: 100dvh) {
   .app-viewport {

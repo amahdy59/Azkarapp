@@ -23,12 +23,13 @@ export function QuranPrelude({ zikr, className = "" }: { zikr: Zikr; className?:
       )}
       {(zikr.hasBasmalah || zikr.isSurah) && (
         <div
-          className={`mx-auto mb-5 mt-3 flex w-full justify-center text-foreground ${className}`}
+          className={`mx-auto mb-2 mt-2 flex w-full justify-center text-foreground ${className}`}
           dir="rtl"
           lang="ar"
+          data-testid="quran-basmalah"
         >
           <span aria-hidden="true">
-            <MushafBismillahArt className="h-auto w-[13rem] max-w-full" />
+            <MushafBismillahArt className="h-auto w-44 max-w-full" />
           </span>
           <span className="sr-only">{BASMALAH_ARABIC}</span>
         </div>
@@ -67,7 +68,7 @@ export function QuranSurahHeader({
 
   return (
     <div
-      className={`my-3 w-full max-w-[30rem] mx-auto text-center ${
+      className={`mb-2 mt-0 w-full max-w-[30rem] mx-auto text-center ${
         sticky ? "sticky top-3 z-20 pointer-events-none" : "pointer-events-none"
       }`}
       dir="rtl"

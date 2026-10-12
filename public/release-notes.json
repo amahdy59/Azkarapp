@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-12-2",
+  "release": "2026-10-12-3",
   "ar": [
-    "تابع سجلاتك اليومية والأسبوعية والشهرية والسنوية بوضوح أكبر، مع مخططات اختيارية وتقويم وأدوات اختيار متناسقة.",
-    "استمع إلى الكهف والسجدة والملك بنص متصل وأكبر، مع مساحة قراءة أوسع ووضوح أفضل للصفحات الافتتاحية ومعاني الكلمات.",
-    "استمع مجددًا إلى مقطع آل عمران ١٩٠–٢٠٠، واحفظ جميع التسجيلات المتاحة في ملف ZIP واحد مع الاحتفاظ بنسخها دون اتصال.",
-    "تعلّم أذكار ما بعد الصلاة في مراحل ومجموعات واضحة مع تذكير بالأعداد، واستخدم أزرار المجموعات والمحفوظة بمحاذاة أدق."
+    "اقرأ المقاطع القرآنية واستمع إلى السور بنص أصغر ومتناسق ومسافات أهدأ بعد البسملة.",
+    "استخدم قائمة قارئ أبسط دون خيار القراءة مجددًا، وواجهة هاتف ثابتة دون تكبيرها بالقرص مع بقاء خيارات تكبير النص.",
+    "ابدأ قراءة النص القرآني فور توفره حتى أثناء تحميل الخط، وواصل القراءة إذا تعذر تحميله.",
+    "استخدم العدّاد بلوحة المفاتيح مع استجابة أوضح لكل ضغطة، واستمتع بحركة إكمال أهدأ."
   ],
   "en": [
-    "Explore clearer daily, weekly, monthly and yearly records with optional charts, a calendar and consistent period controls.",
-    "Listen to Al-Kahf, As-Sajdah and Al-Mulk with larger continuous text and more reading space, plus clearer opening pages and word meanings.",
-    "Listen again to Al-Imran 190–200 and save all available recordings in one ZIP file while keeping your offline copies.",
-    "Learn after-prayer azkar through clear stages and related groups with count reminders, and use better-aligned Collections and Saved controls."
+    "Read Quran passages and listen to surahs with smaller, consistent text and calmer spacing after the basmalah.",
+    "Use simpler Reader options without Read again and keep mobile controls steady during pinch gestures, with text enlargement still available.",
+    "Start reading Quran text as soon as it is available while its font loads, and keep reading if the font is unavailable.",
+    "Count with clearer feedback for each keyboard press and enjoy a calmer completion transition."
   ]
 }

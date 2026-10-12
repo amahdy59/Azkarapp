@@ -1,5 +1,20 @@
 [
   {
+    "release": "2026-10-12-3",
+    "ar": [
+      "اقرأ المقاطع القرآنية واستمع إلى السور بنص أصغر ومتناسق ومسافات أهدأ بعد البسملة.",
+      "استخدم قائمة قارئ أبسط دون خيار القراءة مجددًا، وواجهة هاتف ثابتة دون تكبيرها بالقرص مع بقاء خيارات تكبير النص.",
+      "ابدأ قراءة النص القرآني فور توفره حتى أثناء تحميل الخط، وواصل القراءة إذا تعذر تحميله.",
+      "استخدم العدّاد بلوحة المفاتيح مع استجابة أوضح لكل ضغطة، واستمتع بحركة إكمال أهدأ."
+    ],
+    "en": [
+      "Read Quran passages and listen to surahs with smaller, consistent text and calmer spacing after the basmalah.",
+      "Use simpler Reader options without Read again and keep mobile controls steady during pinch gestures, with text enlargement still available.",
+      "Start reading Quran text as soon as it is available while its font loads, and keep reading if the font is unavailable.",
+      "Count with clearer feedback for each keyboard press and enjoy a calmer completion transition."
+    ]
+  },
+  {
     "release": "2026-10-12-2",
     "ar": [
       "تابع سجلاتك اليومية والأسبوعية والشهرية والسنوية بوضوح أكبر، مع مخططات اختيارية وتقويم وأدوات اختيار متناسقة.",

@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
+import { scheduleIdleAfterPaint } from "../startupMaintenance";
 import { ArrowNext, Compass, Sparkles, Zap } from "../components/icons";
 import { getQiblaBearing } from "../qibla";
 import { PalmTreeMark } from "../components/GardenMarks";
@@ -416,7 +417,7 @@ export function HomeScreen({
      been recorded and its adhkar are what follows — so this adds no second
      clock and no second content library. Stable for the day within a context,
      so returning to Home does not re-roll it. */
-  const reminderContexts = useMemo(() => {
+  const currentReminderContexts = useMemo(() => {
     /* Every one of these is read from a clock the app already keeps. The
        weekday comes from `now`; the prayer window from the leading moment; the
        last third from the collection the hour already resolves to, which is
@@ -449,6 +450,13 @@ export function HomeScreen({
       dayMoments,
     });
   }, [leadingPrayer, locationSettings, now, reminderInfo.categoryId]);
+  // Clock ticks can recreate the same contexts. Keep optional loading tied to
+  // a meaningful context change rather than every new Date/array identity.
+  const reminderContextKey = currentReminderContexts.join("|");
+  const reminderContexts = useMemo(
+    () => (reminderContextKey ? (reminderContextKey.split("|") as ReminderContext[]) : []),
+    [reminderContextKey],
+  );
 
   const isExtendedDevotionalWindow =
     reminderContexts.includes("dhuha") ||
@@ -479,6 +487,7 @@ export function HomeScreen({
   const [libraryEvidence, setLibraryEvidence] = useState<ReturnType<typeof getContextualEvidence>>(null);
   useEffect(() => {
     let cancelled = false;
+    setLibraryEvidence(null);
     const load = async () => {
       const [{ RELEVANT_NOW_LIBRARY }, { RELEVANT_NOW_VERSES }] = await Promise.all([
         import("../content/relevantNowLibrary"),
@@ -497,19 +506,13 @@ export function HomeScreen({
       );
     };
 
-    /* Waited for idle rather than fired on mount. An effect runs while the
-       screen is still loading its own collections, so "after first paint" was
-       not what this did — it competed with them, and the first thing to suffer
-       is the load the reader is actually waiting on. The timeout keeps it from
-       being postponed indefinitely on a busy tab. */
-    const idle =
-      typeof window.requestIdleCallback === "function"
-        ? window.requestIdleCallback(() => void load(), { timeout: 2000 })
-        : window.setTimeout(() => void load(), 200);
+    const cancelScheduled = scheduleIdleAfterPaint(() => void load().catch(() => undefined), {
+      timeout: 2000,
+      fallbackDelay: 200,
+    });
     return () => {
       cancelled = true;
-      if (typeof window.cancelIdleCallback === "function") window.cancelIdleCallback(idle);
-      else window.clearTimeout(idle);
+      cancelScheduled();
     };
   }, [language, manualEvidenceOffset, reminderContexts, reminderSlotKey]);
 

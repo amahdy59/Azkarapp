@@ -76,4 +76,40 @@ describe("ZikrCounterSurface", () => {
     fireEvent.click(counter);
     expect(onTap).toHaveBeenCalledOnce();
   });
+
+  it.each(["Enter", " "])("confirms a deliberate %s press once and releases on keyup or blur", (key) => {
+    const onTap = vi.fn();
+    const { rerender } = render(<ZikrCounterSurface count={0} total={33} onTap={onTap} language="en" />);
+    const counter = screen.getByRole("button");
+    fireEvent.keyDown(counter, { key });
+    expect(counter).toHaveClass("is-pressed");
+    fireEvent.keyDown(counter, { key, repeat: true });
+    expect(onTap).toHaveBeenCalledOnce();
+    fireEvent.keyUp(counter, { key });
+    expect(counter).not.toHaveClass("is-pressed");
+    fireEvent.keyDown(counter, { key });
+    fireEvent.blur(counter);
+    expect(counter).not.toHaveClass("is-pressed");
+    rerender(<ZikrCounterSurface count={2} total={33} onTap={onTap} language="en" reduceMotion />);
+    fireEvent.keyDown(counter, { key });
+    expect(counter).not.toHaveClass("is-pressed");
+    expect(onTap).toHaveBeenCalledTimes(3);
+  });
+
+  it("reads the current OS motion preference at activation without waiting for a rerender", () => {
+    const media = vi.fn().mockReturnValue({ matches: false } as MediaQueryList);
+    vi.stubGlobal("matchMedia", media);
+    try {
+      render(<ZikrCounterSurface count={0} total={33} onTap={() => undefined} language="en" />);
+      const counter = screen.getByRole("button");
+      fireEvent.keyDown(counter, { key: "Enter" });
+      expect(counter).toHaveClass("is-pressed");
+      fireEvent.keyUp(counter, { key: "Enter" });
+      media.mockReturnValue({ matches: true } as MediaQueryList);
+      fireEvent.keyDown(counter, { key: "Enter" });
+      expect(counter).not.toHaveClass("is-pressed");
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
 });

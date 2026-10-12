@@ -55,7 +55,7 @@ describe("MushafExcerpt", () => {
     expect(screen.getByTestId("mushaf-excerpt")).toHaveAttribute("data-mushaf-rendering", "qcf-v2");
     expect(screen.getByTestId("mushaf-excerpt")).toHaveStyle({ fontFamily: "qcf-v2-page-604" });
     expect(container.querySelector("[data-mushaf-line]")).toBeNull();
-    expect(screen.getByTestId("mushaf-excerpt")).toHaveStyle({ fontWeight: "400", lineHeight: "1.85" });
+    expect(screen.getByTestId("mushaf-excerpt")).toHaveStyle({ fontWeight: "400", lineHeight: "1.65" });
     const style = screen.getByTestId("mushaf-excerpt").getAttribute("style");
     rerender(
       <MushafExcerpt

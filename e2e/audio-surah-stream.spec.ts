@@ -52,7 +52,14 @@ for (const item of listeningCases.filter((item) => item.id !== "ir-baqarah")) {
         .first()
         .locator('[data-testid="mushaf-excerpt"]')
         .evaluate((element) => parseFloat(getComputedStyle(element).fontSize));
-      expect(initialSize).toBeGreaterThanOrEqual(30);
+      expect(initialSize).toBeCloseTo(23, 1);
+      expect(
+        await passages
+          .first()
+          .locator('[data-testid="mushaf-excerpt"]')
+          .evaluate((element) => parseFloat(getComputedStyle(element).lineHeight)),
+      ).toBeCloseTo(23 * 1.65, 1);
+      await page.screenshot({ path: testInfo.outputPath(`${item.id}-${language}-reading.png`) });
       await viewport.focus();
       const before = await passages.first().boundingBox();
       await page.keyboard.press("ArrowDown");

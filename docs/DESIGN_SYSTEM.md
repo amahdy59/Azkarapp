@@ -1,5 +1,13 @@
 # Azkar design system
 
+## Calm Quran text and focused Reader options — 2026-10-12
+
+Owner mobile-gesture follow-up: on coarse-pointer, non-hover devices the shell, scroll regions and dialogs allow native horizontal/vertical panning without browser pinch magnification of the whole interface. This supersedes the earlier mobile whole-page pinch permission. Keep the viewport unrestricted: no user-scalable=no or maximum-scale=1. Settings/Reader text sizing, explicit 100–200% Mushaf magnification, browser-menu zoom and operating-system magnification remain available. Desktop gesture policy is unchanged. Browser accessibility overrides may intentionally permit zoom; do not fight those overrides or claim pinch restriction establishes complete accessibility conformance.
+
+The owner requests smaller Quran text outside the printed Mushaf, closer to its reading density, including continuous Al-Mulk/Tabarak listening. Shared flowing text now uses 21.5/23/27px at the three standard root sizes and 1.65 leading. This supersedes the prior 22/24/28px, 1.85 leading and automatic 125% continuous-listening enlargement. User-selected type scale and magnification still apply; the printed fifteen-line page fitter and geometry remain authoritative and unchanged. Flowing passages cannot duplicate fitted printed-page line breaks at every responsive width.
+
+Short-surah headers and basmalah use one compact rhythm: an 8px header margin, an 8px basmalah top/bottom gap and 11rem-wide calligraphy, with native enlarged-text scaling. Continuous listening uses the same calligraphy size and no additional gap between printed-page passage fragments. Reviewed prelude flags, words and verse identities remain intact. Reader options omit the ambiguous Read again action, duplicate Focus action and keyboard-help menu entry. Focus remains in the footer; the dedicated keyboard-help trigger is available on desktop/tablet and hidden on phones. Save, counter sound/reset, collection reset and collection navigation remain explicit.
+
 ## Shared control label alignment — 2026-10-12
 
 Tabs and segmented choices render their foreground label group as a centered flex box above the selection indicator. Avoid inline baseline wrappers around nested icon/text groups: their descent space can shift the group within an otherwise centered button. Decorative icons retain a non-shrinking block box; labels retain native wrapping and caller-owned spacing. Library desktop labels, mobile icon-only pills, saved-count placement, target sizes and RTL keyboard order remain unchanged. Browser regressions measure icon, label and group centers at 320–1280px and 100%/200% text sizing.

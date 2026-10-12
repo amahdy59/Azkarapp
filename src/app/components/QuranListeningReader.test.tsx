@@ -290,7 +290,7 @@ describe("continuous surah listening", () => {
       />,
     );
     const excerpt = screen.getAllByTestId("mushaf-excerpt")[0]!;
-    expect(excerpt).toHaveStyle({ fontSize: "calc(1.5rem * 1.25)" });
+    expect(excerpt).toHaveStyle({ fontSize: "calc(1.4375rem * 1)", lineHeight: "1.65" });
     expect(container.querySelector(".audio-listening-stream")).toHaveClass("theme-light", "bg-background");
     rerender(
       <ContinuousReader
@@ -304,7 +304,7 @@ describe("continuous surah listening", () => {
         preferencesHost={null}
       />,
     );
-    expect(excerpt).toHaveStyle({ fontSize: "calc(1.5rem * 2.0250000000000004)" });
+    expect(excerpt).toHaveStyle({ fontSize: "calc(1.4375rem * 1.62)" });
     expect(container.querySelector(".audio-listening-stream")).toHaveClass("theme-midnight");
   });
   it("keeps every passage mounted without page controls and restores following after keyboard browsing", () => {

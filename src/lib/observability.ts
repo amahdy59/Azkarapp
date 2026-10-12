@@ -17,9 +17,6 @@ type TelemetryEvent =
 type LayoutShiftEntry = PerformanceEntry & { value: number; hadRecentInput: boolean };
 type InteractionEntry = PerformanceEntry & { duration: number; interactionId?: number };
 
-const telemetryEndpoint = (import.meta.env.VITE_TELEMETRY_ENDPOINT as string | undefined)?.trim() ?? "";
-const enabled = Boolean(telemetryEndpoint) && navigator.doNotTrack !== "1";
-
 function baseEvent() {
   return {
     path: window.location.pathname,
@@ -39,22 +36,22 @@ export function createErrorEvent(error: unknown, source: string): TelemetryEvent
 
 function send(event: TelemetryEvent) {
   window.dispatchEvent(new CustomEvent("azkar:telemetry", { detail: event }));
-  if (!enabled) return;
+  const telemetryEndpoint = (import.meta.env.VITE_TELEMETRY_ENDPOINT as string | undefined)?.trim() ?? "";
+  if (!telemetryEndpoint || navigator.doNotTrack === "1") return;
 
-  const body = JSON.stringify(event);
-  if (navigator.sendBeacon) {
-    navigator.sendBeacon(telemetryEndpoint, new Blob([body], { type: "application/json" }));
-    return;
+  try {
+    const body = JSON.stringify(event);
+    if (navigator.sendBeacon?.(telemetryEndpoint, new Blob([body], { type: "application/json" }))) return;
+    void fetch(telemetryEndpoint, {
+      method: "POST",
+      body,
+      headers: { "content-type": "application/json" },
+      keepalive: true,
+      credentials: "omit",
+    }).catch(() => undefined);
+  } catch {
+    // A blocked or invalid collector must never break reading or recovery.
   }
-  void fetch(telemetryEndpoint, {
-    method: "POST",
-    body,
-    headers: { "content-type": "application/json" },
-    keepalive: true,
-    credentials: "omit",
-  }).catch(() => {
-    // Telemetry must never affect the application experience.
-  });
 }
 
 export function reportError(error: unknown, source: string) {
@@ -65,23 +62,32 @@ function reportMetric(name: Extract<TelemetryEvent, { type: "metric" }>["name"],
   send({ type: "metric", name, value: Math.round(value), ...baseEvent() });
 }
 
-/** Reports Core Web Vitals when supported, with no persistent or account identifiers. */
+/** Lightweight performance diagnostics; never include persistent or account identifiers. */
 export function startPerformanceMonitoring() {
-  if (typeof PerformanceObserver === "undefined") return () => {};
-
   const observers: PerformanceObserver[] = [];
+  const observedTypes = new Set<string>();
   let cls = 0;
-  let inp = 0;
+  let sessionScore = 0;
+  let sessionStart = 0;
+  let lastShift = 0;
+  let lcp = 0;
+  let firstInteraction = Infinity;
+  let lastInteraction = 0;
+  // INP discards one outlier per 50 interactions. Ten candidates bound memory
+  // even during long counter sessions; duplicate event entries share one ID.
+  const interactions = new Map<number, number>();
   const onWindowError = (event: ErrorEvent) => reportError(event.error, "window-error");
   const onUnhandledRejection = (event: PromiseRejectionEvent) => reportError(event.reason, "unhandled-rejection");
   window.addEventListener("error", onWindowError);
   window.addEventListener("unhandledrejection", onUnhandledRejection);
 
-  const observe = (type: string, callback: PerformanceObserverCallback) => {
+  const observe = (type: string, callback: PerformanceObserverCallback, durationThreshold?: number) => {
+    if (typeof PerformanceObserver === "undefined") return;
     try {
       const observer = new PerformanceObserver(callback);
-      observer.observe({ type, buffered: true });
+      observer.observe({ type, buffered: true, ...(durationThreshold === undefined ? {} : { durationThreshold }) });
       observers.push(observer);
+      observedTypes.add(type);
     } catch {
       // Older browsers may not implement every performance entry type.
     }
@@ -89,31 +95,61 @@ export function startPerformanceMonitoring() {
 
   observe("largest-contentful-paint", (list) => {
     const last = list.getEntries().at(-1);
-    if (last) reportMetric("LCP", last.startTime);
+    if (last) lcp = last.startTime;
   });
   observe("layout-shift", (list) => {
     for (const entry of list.getEntries() as LayoutShiftEntry[]) {
-      if (!entry.hadRecentInput) cls += entry.value;
+      if (entry.hadRecentInput) continue;
+      if (sessionScore > 0 && entry.startTime - lastShift < 1000 && entry.startTime - sessionStart < 5000) {
+        sessionScore += entry.value;
+      } else {
+        sessionScore = entry.value;
+        sessionStart = entry.startTime;
+      }
+      lastShift = entry.startTime;
+      cls = Math.max(cls, sessionScore);
     }
   });
-  observe("event", (list) => {
-    for (const entry of list.getEntries() as InteractionEntry[]) {
-      if ((entry.interactionId ?? 0) > 0) inp = Math.max(inp, entry.duration);
-    }
-  });
+  observe(
+    "event",
+    (list) => {
+      for (const entry of list.getEntries() as InteractionEntry[]) {
+        const id = entry.interactionId ?? 0;
+        if (id <= 0) continue;
+        firstInteraction = Math.min(firstInteraction, id);
+        lastInteraction = Math.max(lastInteraction, id);
+        interactions.set(id, Math.max(interactions.get(id) ?? 0, entry.duration));
+        if (interactions.size > 10) {
+          const shortest = [...interactions].sort((a, b) => a[1] - b[1])[0]!;
+          interactions.delete(shortest[0]);
+        }
+      }
+    },
+    16,
+  );
 
   const navigation = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
   if (navigation) reportMetric("TTFB", navigation.responseStart);
 
   const flush = () => {
-    reportMetric("CLS", cls * 1000);
-    if (inp > 0) reportMetric("INP", inp);
+    if (lcp > 0) reportMetric("LCP", lcp);
+    // Preserve the collector's historical CLS unit: thousandths of a score.
+    if (observedTypes.has("layout-shift")) reportMetric("CLS", cls * 1000);
+    const durations = [...interactions.values()].sort((a, b) => b - a);
+    const count =
+      (performance as Performance & { interactionCount?: number }).interactionCount ??
+      (lastInteraction > 0 ? (lastInteraction - firstInteraction) / 7 + 1 : 0);
+    const inp = durations[Math.min(durations.length - 1, Math.floor(count / 50))];
+    if (inp !== undefined) reportMetric("INP", inp);
   };
-  document.addEventListener("visibilitychange", flush);
+  const onVisibility = () => {
+    if (document.visibilityState === "hidden") flush();
+  };
+  document.addEventListener("visibilitychange", onVisibility);
 
   return () => {
     flush();
-    document.removeEventListener("visibilitychange", flush);
+    document.removeEventListener("visibilitychange", onVisibility);
     window.removeEventListener("error", onWindowError);
     window.removeEventListener("unhandledrejection", onUnhandledRejection);
     for (const observer of observers) observer.disconnect();

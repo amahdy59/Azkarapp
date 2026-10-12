@@ -46,7 +46,6 @@ import {
   SlidersHorizontal,
   Headphones,
   PanelLeftIcon,
-  Maximize,
   RefreshCw,
   Share2,
   Keyboard,
@@ -69,7 +68,6 @@ import { ToggleTrack } from "../components/SettingsRow";
 import { ReadingTextTransition } from "../components/ReadingTextTransition";
 import { ReaderReferenceSheet } from "../components/ReaderReferenceSheet";
 import { IconButton } from "../components/LayoutShells";
-import { prepareZikrShareCardFonts } from "../share/zikrShareCard";
 import { useCountingSurface } from "../components/countingSurface";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { Header } from "../components/LayoutShells";
@@ -331,7 +329,6 @@ export function ReaderScreen({
   const surahBenefitReturnFocusRef = useRef<HTMLElement | null>(null);
   const [focusMode, setFocusMode] = useState(false);
   const focusExitRef = useRef<HTMLButtonElement>(null);
-  const focusRequestedRef = useRef(false);
   const previousFocusMode = useRef(false);
   const [hasOpenedBenefit, setHasOpenedBenefit] = useState(false);
   const [showDifficultWords, setShowDifficultWords] = useState(false);
@@ -369,10 +366,6 @@ export function ReaderScreen({
       collectionMenuRequested.current = false;
       return;
     }
-    if (!focusRequestedRef.current) return;
-    event.preventDefault();
-    focusRequestedRef.current = false;
-    focusExitRef.current?.focus({ preventScroll: true });
   };
 
   useEffect(() => {
@@ -808,7 +801,7 @@ export function ReaderScreen({
             className={showSurahChrome ? "w-full max-w-[42rem]" : "contents"}
             data-testid={showSurahChrome ? "canonical-surah-passage" : undefined}
           >
-            {z.isSurah && <QuranPrelude zikr={z} className="pointer-events-none mb-4" />}
+            {z.isSurah && <QuranPrelude zikr={z} className="pointer-events-none" />}
 
             {isQuranicText ? (
               <QuranWordText
@@ -1375,25 +1368,6 @@ export function ReaderScreen({
             <span>{t(language, "reader.expandSidebar")}</span>
           </ReaderOptionsAction>
         )}
-        {/* 1. Primary immersion action: Focus Mode */}
-        {!longSurah && (
-          <>
-            <div>
-              <ReaderOptionsAction
-                onClick={() => {
-                  focusRequestedRef.current = true;
-                  setFocusMode(true);
-                }}
-                data-testid="reader-focus-toggle"
-                className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted"
-              >
-                <Maximize size={16} aria-hidden="true" />
-                <span>{t(language, "reader.enterFocus")}</span>
-              </ReaderOptionsAction>
-            </div>
-            <ReaderOptionsDivider className="my-1 h-px bg-border/60" />
-          </>
-        )}
 
         {/* 4. Saved state and reading recovery */}
         <div>
@@ -1410,18 +1384,6 @@ export function ReaderScreen({
             <span>{isSaved ? t(language, "reader.unsave") : t(language, "reader.save")}</span>
           </ReaderOptionsAction>
         </div>
-        {onRepeat && !longSurah && (
-          <ReaderOptionsSection title={t(language, "reader.moreActions")}>
-            <ReaderOptionsAction
-              onClick={onRepeat}
-              data-testid="reader-menu-repeat"
-              className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted"
-            >
-              <RefreshCw size={16} aria-hidden="true" />
-              <span>{t(language, "category.readAgain")}</span>
-            </ReaderOptionsAction>
-          </ReaderOptionsSection>
-        )}
         {!longSurah && (
           <>
             {/* 5. Counter feedback & recovery */}
@@ -1446,14 +1408,6 @@ export function ReaderScreen({
           </>
         )}
 
-        <ReaderOptionsAction
-          onClick={() => setKeyboardHelpOpen(true)}
-          data-testid="reader-menu-keyboard-help"
-          className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors hover:bg-muted"
-        >
-          <Keyboard size={16} aria-hidden="true" />
-          <span>{t(language, "reader.keyboardShortcuts")}</span>
-        </ReaderOptionsAction>
         {onReset && (
           <>
             <ReaderOptionsDivider className="my-1 h-px bg-border/60" />
@@ -1637,8 +1591,6 @@ export function ReaderScreen({
                       <DropdownMenuTrigger
                         ref={readerMenuRef}
                         aria-label={t(language, "reader.menu")}
-                        onPointerEnter={() => void prepareZikrShareCardFonts()}
-                        onFocus={() => void prepareZikrShareCardFonts()}
                         className={READER_WIDE_HEADER_ACTION_CLASS}
                       >
                         <MoreVertical size={20} />
@@ -1857,16 +1809,10 @@ export function ReaderScreen({
                     {renderAppearanceMenu(READER_HEADER_ACTION_CLASS)}
 
                     <DropdownMenu dir={direction}>
-                      {/* The share-card fonts used to be prefetched on the share
-                        button's own hover/focus. That button is in the menu
-                        now, so the trigger warms them instead — still ahead of
-                        the click, one step earlier in the same gesture. */}
                       <DropdownMenuTrigger
                         ref={readerMenuRef}
                         aria-label={t(language, "reader.menu")}
                         className={READER_HEADER_ACTION_CLASS}
-                        onPointerEnter={() => void prepareZikrShareCardFonts()}
-                        onFocus={() => void prepareZikrShareCardFonts()}
                       >
                         <MoreVertical size={20} />
                       </DropdownMenuTrigger>

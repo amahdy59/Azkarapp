@@ -186,7 +186,6 @@ export function ZikrCounterSurface({
   const [isPressed, setIsPressed] = useState(false);
   const defaultInstruction = t(language, "reader.tapToCount");
   const activeInstruction = instructionText || defaultInstruction;
-  const reducedMotion = shouldReduceMotion(reduceMotion);
 
   const localizedCount = formatNumerals(count, language);
   const localizedTotal = formatNumerals(total, language);
@@ -206,7 +205,7 @@ export function ZikrCounterSurface({
 
   const handlePointerDown = () => {
     if (disabled || (complete && !onCompleteTap)) return;
-    if (!reducedMotion) setIsPressed(true);
+    if (!shouldReduceMotion(reduceMotion)) setIsPressed(true);
   };
 
   const handlePointerUp = () => {
@@ -238,12 +237,18 @@ export function ZikrCounterSurface({
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerCancel}
       onPointerLeave={handlePointerCancel}
+      onBlur={handlePointerCancel}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
+          if (e.repeat) return;
+          handlePointerDown();
           if (!disabled && complete) onCompleteTap?.();
           else if (!disabled) onTap();
         }
+      }}
+      onKeyUp={(e) => {
+        if (e.key === "Enter" || e.key === " ") handlePointerUp();
       }}
       aria-disabled={disabled || (complete && !onCompleteTap)}
       aria-label={accessibleName}

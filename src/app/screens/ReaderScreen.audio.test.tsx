@@ -767,7 +767,7 @@ describe("ReaderScreen audio identity", () => {
     expect(toggleBtn.className).toContain("border border-border/80");
   });
 
-  it("includes repeat, share collection, routine mode, and reset collection progress in the reader options menu", async () => {
+  it("keeps useful recovery while removing repeated and ambiguous reader menu actions", async () => {
     const onRepeat = vi.fn();
     const onReset = vi.fn();
     const onRoutineModeChange = vi.fn();
@@ -807,13 +807,13 @@ describe("ReaderScreen audio identity", () => {
     // Share collection option
     expect(screen.queryByTestId("reader-menu-share-collection")).not.toBeInTheDocument();
     expect(screen.getByTestId("reader-share-dock-button")).toBeInTheDocument();
-    expect(screen.getByTestId("reader-menu-repeat")).toBeInTheDocument();
+    expect(screen.queryByTestId("reader-menu-repeat")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("reader-menu-keyboard-help")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("reader-focus-toggle")).not.toBeInTheDocument();
     expect(screen.queryByTestId("reader-menu-routine-mode")).not.toBeInTheDocument();
     expect(screen.getByTestId("reader-menu-reset-collection")).toBeInTheDocument();
 
-    // Repeat option click triggers onRepeat
-    fireEvent.click(screen.getByTestId("reader-menu-repeat"));
-    expect(onRepeat).toHaveBeenCalledOnce();
+    expect(onRepeat).not.toHaveBeenCalled();
   });
 
   it("provides a dedicated Aa button in the top reader toolbar to open reading display settings directly", async () => {
@@ -859,7 +859,7 @@ describe("ReaderScreen audio identity", () => {
     expect(onTextSizeChange).toHaveBeenCalledWith("large");
   });
 
-  it("enters and exits focus mode via the focus menu toggle", async () => {
+  it("enters and exits focus mode through the dedicated footer control", async () => {
     render(
       <ReaderScreen
         catId="morning"
@@ -888,10 +888,7 @@ describe("ReaderScreen audio identity", () => {
 
     expect(screen.getByTestId("reader-screen")).toHaveAttribute("data-reading-focus", "false");
 
-    const menuButton = screen.getAllByRole("button", { name: /خيارات القارئ|Reader options/i })[0]!;
-    fireEvent.pointerDown(menuButton, { button: 0, ctrlKey: false });
-
-    const focusBtn = await screen.findByTestId("reader-focus-toggle");
+    const focusBtn = screen.getByRole("button", { name: t("ar", "reader.enterFocus") });
     expect(focusBtn).toBeInTheDocument();
     fireEvent.click(focusBtn);
     expect(screen.getByTestId("reader-screen")).toHaveAttribute("data-reading-focus", "true");

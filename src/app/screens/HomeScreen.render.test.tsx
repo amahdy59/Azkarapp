@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { getAzkarForMode } from "../content/azkar";
 import * as dailyEvidence from "../dailyEvidence";
+import * as maintenance from "../startupMaintenance";
 import { CATEGORY_IDS, type CategoryId } from "../types";
 import { HomeScreen } from "./HomeScreen";
 
@@ -20,6 +21,26 @@ describe("HomeScreen quick access", () => {
   afterEach(() => {
     vi.restoreAllMocks();
     vi.useRealTimers();
+  });
+
+  it("does not reload optional reminder evidence on ordinary clock ticks and refreshes for a language change", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 7, 7, 9, 5));
+    const schedule = vi.spyOn(maintenance, "scheduleIdleAfterPaint").mockReturnValue(() => undefined);
+    const props = {
+      completed: emptyProgress(),
+      dailyCompletions: [],
+      quietProgressEnabled: false,
+      progressDayStartHour: 4,
+      onResume: () => undefined,
+      routineModes,
+    };
+    const view = render(<HomeScreen {...props} language="en" direction="ltr" />);
+    expect(schedule).toHaveBeenCalledOnce();
+    act(() => vi.advanceTimersByTime(60_000));
+    expect(schedule).toHaveBeenCalledOnce();
+    view.rerender(<HomeScreen {...props} language="ar" direction="rtl" />);
+    expect(schedule).toHaveBeenCalledTimes(2);
   });
 
   it("replaces the sleep routine card with a focused dua card in the last third of the night", () => {

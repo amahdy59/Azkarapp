@@ -6,13 +6,13 @@ export function isQuranPassage(zikr: Pick<Zikr, "quranText" | "isSurah" | "attri
 }
 
 /** Flowing Quran passages use one size per setting, regardless of their length. */
-export const QURAN_READING_PX: Record<TextSizeOption, number> = { small: 22, medium: 24, large: 28 };
+export const QURAN_READING_PX: Record<TextSizeOption, number> = { small: 21.5, medium: 23, large: 27 };
 export const QURAN_TEXT_STYLE: CSSProperties = {
   fontFamily: "var(--font-mushaf)",
-  fontSize: "var(--quran-font-size, 1.5rem)",
+  fontSize: "var(--quran-font-size, 1.4375rem)",
   fontWeight: 400,
   fontSynthesis: "none",
-  lineHeight: 1.85,
+  lineHeight: 1.65,
   letterSpacing: "normal",
 };
 export function getQuranReadingSize(textSize: TextSizeOption) {
