@@ -227,66 +227,75 @@ export function ProgressWeekView({
             <span>{t(language, "progressTrend.upcoming")}</span>
           </div>
         </div>
-      </div>
-      <details className="rounded-2xl border border-border bg-card p-4 md:p-5">
-        <summary className="min-h-11 cursor-pointer py-3 text-sm font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
-          {t(language, "progressTrend.compareRoutines")}
-        </summary>
-        <p className="mb-5 text-sm text-muted-foreground">{t(language, "progressTrend.elapsedDaysHint")}</p>
-        <div className="space-y-5">
-          {(["morning", "evening", "sleep"] as const).map((routine) => {
-            const elapsed = weekStats.days.filter((day) => day.dayKey <= todayKey);
-            const completed = elapsed.filter((day) => day[`${routine}Status`] === "complete").length;
-            const label = t(language, `progressTrend.${routine}`);
-            const value = elapsed.length
-              ? t(language, "progressTrend.recordedDays", {
-                  done: formatNumerals(completed, language),
-                  total: formatNumerals(elapsed.length, language),
-                })
-              : t(language, "progressTrend.upcoming");
-            return (
-              <div key={routine}>
-                <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2 text-sm">
-                  <span className="font-bold">{label}</span>
-                  <bdi className="text-muted-foreground">{value}</bdi>
-                </div>
-                <div role="img" aria-label={`${label}: ${value}`} className="h-3 overflow-hidden rounded-full bg-muted">
+
+        {/* Routine comparison disclosure inside the unified card */}
+        <details className="mt-4 border-t border-border pt-1">
+          <summary className="min-h-11 cursor-pointer py-3 text-sm font-bold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+            {t(language, "progressTrend.compareRoutines")}
+          </summary>
+          <p className="mb-4 text-xs leading-relaxed text-muted-foreground">
+            {t(language, "progressTrend.elapsedDaysHint")}
+          </p>
+          <div className="space-y-4">
+            {(["morning", "evening", "sleep"] as const).map((routine) => {
+              const elapsed = weekStats.days.filter((day) => day.dayKey <= todayKey);
+              const completed = elapsed.filter((day) => day[`${routine}Status`] === "complete").length;
+              const label = t(language, `progressTrend.${routine}`);
+              const value = elapsed.length
+                ? t(language, "progressTrend.recordedDays", {
+                    done: formatNumerals(completed, language),
+                    total: formatNumerals(elapsed.length, language),
+                  })
+                : t(language, "progressTrend.upcoming");
+              return (
+                <div key={routine}>
+                  <div className="mb-1.5 flex flex-wrap items-baseline justify-between gap-2 text-sm">
+                    <span className="font-bold text-foreground">{label}</span>
+                    <bdi className="text-xs font-semibold text-muted-foreground">{value}</bdi>
+                  </div>
                   <div
-                    className="h-full rounded-full bg-primary"
-                    style={{ width: `${elapsed.length ? (completed / elapsed.length) * 100 : 0}%` }}
-                  />
+                    role="img"
+                    aria-label={`${label}: ${value}`}
+                    className="h-2.5 overflow-hidden rounded-full bg-muted"
+                  >
+                    <div
+                      className="h-full rounded-full bg-primary"
+                      style={{ width: `${elapsed.length ? (completed / elapsed.length) * 100 : 0}%` }}
+                    />
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
-      </details>
-      {weeklyGoalDays && (
-        <section className="rounded-2xl border border-border bg-card p-4" aria-labelledby="progress-weekly-goal">
-          <div className="mb-3 flex flex-wrap items-baseline justify-between gap-3">
-            <h2 id="progress-weekly-goal" className="text-subtitle font-black text-foreground">
-              {t(language, "progressPanel.weeklyGoal")}
-            </h2>
-            <p className="text-label font-bold text-muted-foreground">
-              {t(language, "progressPanel.goalProgress", {
+              );
+            })}
+          </div>
+        </details>
+
+        {weeklyGoalDays && (
+          <div className="mt-4 border-t border-border pt-4" aria-labelledby="progress-weekly-goal">
+            <div className="mb-2.5 flex flex-wrap items-baseline justify-between gap-3">
+              <h3 id="progress-weekly-goal" className="text-subtitle font-black text-foreground">
+                {t(language, "progressPanel.weeklyGoal")}
+              </h3>
+              <p className="text-label font-bold text-muted-foreground">
+                {t(language, "progressPanel.goalProgress", {
+                  done: formatNumerals(Math.min(activeDays, weeklyGoalDays), language),
+                  goal: formatNumerals(weeklyGoalDays, language),
+                })}
+              </p>
+            </div>
+            <ProgressBar
+              value={Math.min(activeDays, weeklyGoalDays)}
+              max={weeklyGoalDays}
+              height={8}
+              trackColor="var(--muted)"
+              direction={isArabic ? "rtl" : "ltr"}
+              aria-label={t(language, "progressPanel.goalProgress", {
                 done: formatNumerals(Math.min(activeDays, weeklyGoalDays), language),
                 goal: formatNumerals(weeklyGoalDays, language),
               })}
-            </p>
+            />
           </div>
-          <ProgressBar
-            value={Math.min(activeDays, weeklyGoalDays)}
-            max={weeklyGoalDays}
-            height={8}
-            trackColor="var(--muted)"
-            direction={isArabic ? "rtl" : "ltr"}
-            aria-label={t(language, "progressPanel.goalProgress", {
-              done: formatNumerals(Math.min(activeDays, weeklyGoalDays), language),
-              goal: formatNumerals(weeklyGoalDays, language),
-            })}
-          />
-        </section>
-      )}
+        )}
+      </div>
     </div>
   );
 }
@@ -472,30 +481,39 @@ export function ProgressMonthView({
                                 : t(language, "progress.missed"),
                         })}
                         aria-pressed={isSelected}
-                        className={`flex min-h-11 flex-col items-center justify-center aspect-square rounded-2xl border transition-[color,background-color,border-color,box-shadow] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                        className={`flex min-h-11 flex-col items-center justify-center aspect-square rounded-xl border transition-[color,background-color,border-color,box-shadow] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 ${
                           isFuture
-                            ? "border-border bg-muted text-muted-foreground"
+                            ? "border-transparent bg-transparent opacity-30 text-muted-foreground"
                             : isSelected
-                              ? "border-primary ring-2 ring-primary/50 bg-primary/20 z-10"
+                              ? "border-primary ring-2 ring-primary ring-offset-2 bg-primary/20 z-10"
                               : isPalm
-                                ? "bg-success/15 border-success/30 text-success"
-                                : count > 0 && !isFuture
+                                ? "bg-success/20 border-success/30 text-success font-bold"
+                                : count > 0
                                   ? count === 2
-                                    ? "bg-primary/30 border-primary/50 text-foreground"
-                                    : "bg-primary/10 border-primary/30 text-foreground"
-                                  : "bg-white/30 dark:bg-white/5 border-white/20 dark:border-white/10 text-muted-foreground/60"
+                                    ? "bg-primary/30 border-primary/50 text-foreground font-semibold"
+                                    : "bg-primary/10 border-primary/30 text-foreground font-medium"
+                                  : "bg-muted/30 border-border text-muted-foreground/60 hover:bg-muted/60"
                         }`}
                       >
-                        <span className="text-micro sm:text-xs font-bold">{formatNumerals(day.dayNum, language)}</span>
-                        <div className="flex h-4 items-center justify-center mt-0.5">
+                        <span className="text-micro sm:text-xs font-bold leading-tight">
+                          {formatNumerals(day.dayNum, language)}
+                        </span>
+                        <div className="flex h-3.5 items-center justify-center mt-0.5">
                           {isPalm ? (
                             <Check size={12} strokeWidth={3} className="text-success" />
                           ) : count > 0 ? (
-                            <bdi dir="ltr" className="text-micro font-extrabold text-foreground">
-                              {formatRatio(count, 3, language)}
-                            </bdi>
+                            <div className="flex items-center gap-0.5" aria-hidden="true">
+                              {[0, 1, 2].map((i) => (
+                                <span
+                                  key={i}
+                                  className={`size-1 rounded-full ${
+                                    i < count ? "bg-primary" : "bg-muted-foreground/30"
+                                  }`}
+                                />
+                              ))}
+                            </div>
                           ) : (
-                            <span className="text-micro text-muted-foreground/40">-</span>
+                            <span className="text-micro text-muted-foreground/40 leading-none">-</span>
                           )}
                         </div>
                       </button>
@@ -504,7 +522,7 @@ export function ProgressMonthView({
                 </div>
 
                 {/* Bottom Grid Legend */}
-                <div className="mt-4 pt-3 border-t border-white/20 dark:border-white/10 flex items-center justify-center gap-4 text-micro font-bold text-muted-foreground flex-wrap">
+                <div className="mt-4 pt-3 border-t border-border flex items-center justify-center gap-4 text-micro font-bold text-muted-foreground flex-wrap">
                   <div className="flex items-center gap-1">
                     <Check size={12} strokeWidth={3} className="text-success" />
                     <span>{t(language, "progress.complete")}</span>
@@ -528,9 +546,9 @@ export function ProgressMonthView({
 
           {/* Selected Day Details & Monthly Insight Card (1 Column on desktop) */}
           <div className="flex flex-col gap-4">
-            {/* Day Details Card */}
+            {/* Day Details Card without cards-in-card */}
             <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4">
-              <div className="flex items-center justify-between border-b border-white/20 dark:border-white/10 pb-2">
+              <div className="flex items-center justify-between border-b border-border/40 pb-2">
                 <div className="min-w-0 flex-1">
                   <h2
                     data-testid="progress-selected-day-heading"
@@ -545,56 +563,81 @@ export function ProgressMonthView({
                 <Calendar size={18} className="text-primary" />
               </div>
 
-              {/* Morning Status */}
-              <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted border border-border">
-                <div className="flex items-center gap-2">
-                  <Sunrise size={16} className="text-primary" />
-                  <span className="text-label font-bold">{t(language, "progress.morningAzkar")}</span>
+              {/* Status rows - clean divided list without cards within cards */}
+              <div className="divide-y divide-border/30">
+                {/* Morning Status */}
+                <div className="flex items-center justify-between py-2.5">
+                  <div className="flex items-center gap-2">
+                    <Sunrise size={16} className="text-primary" />
+                    <span className="text-label font-bold text-foreground">{t(language, "progress.morningAzkar")}</span>
+                  </div>
+                  {selectedDayRecord?.categories.includes("morning") ? (
+                    <span className="inline-flex items-center gap-1 text-xs font-bold text-success">
+                      <Check size={13} strokeWidth={3} />
+                      {t(language, "progress.done")}
+                    </span>
+                  ) : (
+                    <span className="text-xs font-semibold text-muted-foreground">
+                      {t(language, "progress.missed")}
+                    </span>
+                  )}
                 </div>
-                {selectedDayRecord?.categories.includes("morning") ? (
-                  <span className="text-xs font-bold text-success">{t(language, "progress.done")}</span>
-                ) : (
-                  <span className="text-xs font-bold text-primary">{t(language, "progress.missed")}</span>
-                )}
-              </div>
 
-              {/* Evening Status */}
-              <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted border border-border">
-                <div className="flex items-center gap-2">
-                  <Sunset size={16} className="text-evening" />
-                  <span className="text-label font-bold">{t(language, "progress.eveningAzkar")}</span>
+                {/* Evening Status */}
+                <div className="flex items-center justify-between py-2.5">
+                  <div className="flex items-center gap-2">
+                    <Sunset size={16} className="text-evening" />
+                    <span className="text-label font-bold text-foreground">{t(language, "progress.eveningAzkar")}</span>
+                  </div>
+                  {selectedDayRecord?.categories.includes("evening") ? (
+                    <span className="inline-flex items-center gap-1 text-xs font-bold text-success">
+                      <Check size={13} strokeWidth={3} />
+                      {t(language, "progress.done")}
+                    </span>
+                  ) : (
+                    <span className="text-xs font-semibold text-muted-foreground">
+                      {t(language, "progress.missed")}
+                    </span>
+                  )}
                 </div>
-                {selectedDayRecord?.categories.includes("evening") ? (
-                  <span className="text-xs font-bold text-success">{t(language, "progress.done")}</span>
-                ) : (
-                  <span className="text-xs font-bold text-primary">{t(language, "progress.missed")}</span>
-                )}
-              </div>
 
-              {/* Sleep Status */}
-              <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted border border-border">
-                <div className="flex items-center gap-2">
-                  <MoonStar size={16} className="text-sleep" />
-                  <span className="text-label font-bold">{t(language, "progress.sleepAzkar")}</span>
+                {/* Sleep Status */}
+                <div className="flex items-center justify-between py-2.5">
+                  <div className="flex items-center gap-2">
+                    <MoonStar size={16} className="text-sleep" />
+                    <span className="text-label font-bold text-foreground">{t(language, "progress.sleepAzkar")}</span>
+                  </div>
+                  {selectedDayRecord?.categories.includes("before_sleep") ? (
+                    <span className="inline-flex items-center gap-1 text-xs font-bold text-success">
+                      <Check size={13} strokeWidth={3} />
+                      {t(language, "progress.done")}
+                    </span>
+                  ) : (
+                    <span className="text-xs font-semibold text-muted-foreground">
+                      {t(language, "progress.missed")}
+                    </span>
+                  )}
                 </div>
-                {selectedDayRecord?.categories.includes("before_sleep") ? (
-                  <span className="text-xs font-bold text-success">{t(language, "progress.done")}</span>
-                ) : (
-                  <span className="text-xs font-bold text-primary">{t(language, "progress.missed")}</span>
-                )}
-              </div>
 
-              {/* Post-Prayer Status */}
-              <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted border border-border">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 size={16} className="text-success" />
-                  <span className="text-label font-bold">{t(language, "progress.postPrayerAzkar")}</span>
+                {/* Post-Prayer Status */}
+                <div className="flex items-center justify-between py-2.5">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 size={16} className="text-success" />
+                    <span className="text-label font-bold text-foreground">
+                      {t(language, "progress.postPrayerAzkar")}
+                    </span>
+                  </div>
+                  {selectedDayRecord?.categories.includes("after_prayer") ? (
+                    <span className="inline-flex items-center gap-1 text-xs font-bold text-success">
+                      <Check size={13} strokeWidth={3} />
+                      {t(language, "progress.done")}
+                    </span>
+                  ) : (
+                    <span className="text-xs font-semibold text-muted-foreground">
+                      {t(language, "progress.missed")}
+                    </span>
+                  )}
                 </div>
-                {selectedDayRecord?.categories.includes("after_prayer") ? (
-                  <span className="text-xs font-bold text-success">{t(language, "progress.done")}</span>
-                ) : (
-                  <span className="text-xs font-bold text-primary">{t(language, "progress.missed")}</span>
-                )}
               </div>
             </div>
           </div>

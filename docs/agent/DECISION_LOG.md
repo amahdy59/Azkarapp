@@ -4547,3 +4547,7 @@ The owner supplies three screenshots and requires zoom to increase letter size r
 ## Daily reliability recommendations approved — 2026-10-13
 
 The owner says to apply the recommendations and leave widgets for now. Apply evidence-supported startup, continuation/recovery, offline/reminder clarity and accessible motion improvements within the existing web architecture. Widgets/native packaging are excluded. Preserve content and state boundaries; unavailable physical-phone and human screen-reader evidence remains pending. Existing autonomous main/Pages release authority applies. See phases/DAILY_RELIABILITY_POLISH_2026_10_13.md.
+
+## Progress surface unification and card de-nesting — 2026-10-13
+
+The owner approves the thorough review and plan: eliminate cards within cards within card, reduce visual clutter, add direct interactive SVG trend chart scrubbing with callouts, unify weekly cards into one cohesive surface, and refine month calendar cell luminosity with micro-pips. Preserve all independent practice records, offline data, and accessibility contracts. See phases/PROGRESS_SURFACE_UNIFICATION_2026_10_13.md.

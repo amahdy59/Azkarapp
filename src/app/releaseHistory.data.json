@@ -1,5 +1,20 @@
 [
   {
+    "release": "2026-10-13-6",
+    "ar": [
+      "أصبحت صفحة التقدم أكثر وضوحًا وهدوءًا بإزالة البطاقات المتداخلة وترتيب الأوراد في مساحات متناسقة.",
+      "يمكنك الآن استكشاف منحنى التقدم مباشرة باللمس أو النقر لمعرفة نسب الإنجاز وتفاصيل الفترات.",
+      "تجمع شاشة الأسبوع تفاصيل المداومة ومقارنة الأوراد والهدف في مساحة واحدة موحدة.",
+      "يبرز تقويم الشهر مستويات الإنجاز بتدرجات لونية هادئة ومؤشرات واضحة لكل يوم."
+    ],
+    "en": [
+      "The Progress page is calmer and clearer with unified surfaces that eliminate nested boxes and cards.",
+      "You can now touch or click data points on the trend chart to inspect completion details directly.",
+      "The Week view unifies your weekly commitment, routine comparisons, and goal in one cohesive surface.",
+      "The Month calendar displays completion levels with quiet surface tones and clear day indicators."
+    ]
+  },
+  {
     "release": "2026-10-13-5",
     "ar": [
       "تظهر الأزرار والخيارات والقوائم بتصميم أكثر اتساقًا، وتختار مفاتيح الأسهم خيارًا واحدًا في مجموعات الاختيار.",

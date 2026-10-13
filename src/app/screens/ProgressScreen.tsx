@@ -587,8 +587,8 @@ export function ProgressScreen({
                         role="listitem"
                         className={`flex flex-col items-center justify-center rounded-xl p-1.5 sm:p-2 transition-colors ${
                           day.isToday
-                            ? "border-2 border-primary bg-primary/10 shadow-sm"
-                            : "border border-border/40 bg-muted/20 hover:bg-muted/40"
+                            ? "bg-primary/15 font-black text-primary ring-1 ring-primary/40 shadow-xs"
+                            : "bg-muted/30 hover:bg-muted/50 text-muted-foreground"
                         }`}
                       >
                         <span className="text-micro font-bold text-muted-foreground">{day.dayLabel}</span>
@@ -603,13 +603,12 @@ export function ProgressScreen({
                   })}
                 </div>
               </div>
-              {/* Legacy rhythm and palm records remain available, but as reflection
-            after today's practices rather than as the definition of the day. */}
+              {/* Legacy rhythm and palm records remain available, seamlessly integrated as a divided strip without nested card borders */}
               <dl
                 data-testid="progress-summary-strip"
-                className="mb-5 grid w-full grid-cols-2 overflow-hidden rounded-2xl border border-border bg-card"
+                className="grid w-full grid-cols-2 border-t border-border bg-muted/20 divide-x rtl:divide-x-reverse divide-border"
               >
-                <div className="flex min-w-0 items-center gap-2.5 border-e border-border p-3">
+                <div className="flex min-w-0 items-center gap-2.5 p-3">
                   <div className="flex size-8 shrink-0 items-center justify-center text-primary">
                     <Zap className="size-5" />
                   </div>

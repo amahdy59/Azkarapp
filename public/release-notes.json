@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-13-5",
+  "release": "2026-10-13-6",
   "ar": [
-    "تظهر الأزرار والخيارات والقوائم بتصميم أكثر اتساقًا، وتختار مفاتيح الأسهم خيارًا واحدًا في مجموعات الاختيار.",
-    "أصبحت صفحات الأذكار والإعدادات والتقدم أكثر تناسقًا، مع مساحة قراءة ثابتة للتذكير في الرئيسية.",
-    "توضح أدوات القارئ وظائفها، وتعرض القبلة إرشادًا أبسط، وتصبح خيارات خطة القراءة أسهل في التصفح.",
-    "تشغل مخططات التقدم الفارغة مساحة أقل، وتظهر تفاصيل التخزين عند طلبها، ويبرز حفظ بطاقة المشاركة عند تعذر المشاركة المباشرة."
+    "أصبحت صفحة التقدم أكثر وضوحًا وهدوءًا بإزالة البطاقات المتداخلة وترتيب الأوراد في مساحات متناسقة.",
+    "يمكنك الآن استكشاف منحنى التقدم مباشرة باللمس أو النقر لمعرفة نسب الإنجاز وتفاصيل الفترات.",
+    "تجمع شاشة الأسبوع تفاصيل المداومة ومقارنة الأوراد والهدف في مساحة واحدة موحدة.",
+    "يبرز تقويم الشهر مستويات الإنجاز بتدرجات لونية هادئة ومؤشرات واضحة لكل يوم."
   ],
   "en": [
-    "Buttons, choices and menus have a more consistent appearance, and arrow keys select an option in ordinary radio groups.",
-    "Azkar, Settings and Progress pages align more consistently, with a stable reading surface for the Home reminder.",
-    "Reader tools show clearer labels, Qibla guidance is simpler, and reading-plan choices are easier to browse.",
-    "Empty progress charts take less space, storage details open on request, and Save stands out when direct sharing is unavailable."
+    "The Progress page is calmer and clearer with unified surfaces that eliminate nested boxes and cards.",
+    "You can now touch or click data points on the trend chart to inspect completion details directly.",
+    "The Week view unifies your weekly commitment, routine comparisons, and goal in one cohesive surface.",
+    "The Month calendar displays completion levels with quiet surface tones and clear day indicators."
   ]
 }

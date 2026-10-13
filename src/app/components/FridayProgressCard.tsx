@@ -53,15 +53,15 @@ export function FridayProgressCard({
     <section
       data-testid="progress-friday"
       dir={direction}
-      className="mt-4 w-full overflow-hidden rounded-3xl border border-border/60 bg-card/90 text-foreground shadow-raised backdrop-blur-md"
+      className="mt-5 w-full overflow-hidden rounded-2xl border border-border bg-card text-foreground"
     >
-      <div className="border-b border-border/60 bg-muted/40 px-4 py-4 text-start sm:px-6">
-        <h2 className="text-lg font-black leading-tight text-foreground" dir="auto">
+      <div className="border-b border-border px-4 py-3.5 text-start sm:px-5">
+        <h2 className="text-base font-black leading-tight text-foreground sm:text-lg" dir="auto">
           {t(language, "friday.weeklyProgress")}
         </h2>
       </div>
 
-      <div className="stagger-in grid gap-2.5 px-4 py-4 sm:grid-cols-3 sm:px-6">
+      <div className="stagger-in grid gap-2.5 p-3 sm:p-4 sm:grid-cols-3">
         {rows.map((row) => (
           <button
             key={row.id}
@@ -69,25 +69,23 @@ export function FridayProgressCard({
             onClick={onOpen}
             disabled={!onOpen}
             data-testid={`progress-friday-${row.id}`}
-            className={`stagger-content group flex min-h-[4.5rem] w-full items-center gap-3 rounded-2xl border px-3 py-3 text-start transition-[background-color,border-color,box-shadow] duration-standard focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-default ${
-              row.done
-                ? "border-primary/55 bg-primary/10 enabled:hover:border-primary/70"
-                : "border-border bg-background enabled:hover:border-primary/45 enabled:hover:bg-muted"
+            className={`stagger-content group flex min-h-[4.25rem] w-full items-center gap-3 rounded-xl p-3 text-start transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-default ${
+              row.done ? "bg-primary/10 enabled:hover:bg-primary/15" : "bg-muted/40 enabled:hover:bg-muted/70"
             }`}
           >
             <span
-              className={`flex size-11 shrink-0 items-center justify-center rounded-full border ${
-                row.done ? "border-primary/50 bg-primary/15 text-primary" : "border-border bg-muted text-primary"
+              className={`flex size-10 shrink-0 items-center justify-center rounded-xl transition-colors ${
+                row.done ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"
               }`}
             >
               {row.icon}
             </span>
             <span className="flex min-w-0 flex-col">
-              <span dir="auto" className="truncate text-subtitle font-black leading-snug text-foreground">
+              <span dir="auto" className="truncate text-sm font-black leading-snug text-foreground">
                 {row.label}
               </span>
               {/* Isolated so a Latin "3 / 7" cannot reorder against Arabic around it. */}
-              <bdi className="mt-1 text-label font-bold text-muted-foreground">{row.value}</bdi>
+              <bdi className="mt-0.5 text-xs font-semibold text-muted-foreground">{row.value}</bdi>
             </span>
           </button>
         ))}

@@ -1,5 +1,7 @@
 # AI Improvement System Index
 
+[Progress surface unification and clarity](phases/PROGRESS_SURFACE_UNIFICATION_2026_10_13.md) is the owner-approved Progress page refinement: de-nested cards, eliminated cardception visual clutter, added SVG scrubber interaction, unified weekly cards and refined calendar heatmap cells.
+
 [Visual coherence](phases/VISUAL_COHERENCE_2026_10_13.md) is the owner-approved sequential visual/control implementation. Preserve Mushaf button sizes and alignment. Reliability release is complete; this session owns visual changes and their verification/publication.
 
 [Daily reliability and interaction polish](phases/DAILY_RELIABILITY_POLISH_2026_10_13.md) is the current owner-approved phase: measured startup, reminder recovery and truthful availability, existing offline/continuation verification and shared accessible switch motion. Widgets are deferred. Complete release authority and gates apply.

@@ -148,16 +148,50 @@ export function ProgressTrendChart({
           ))}
           {points.map((point, index) =>
             point.rate === null ? null : (
-              <g key={point.key}>
+              <g key={point.key} className="cursor-pointer" onClick={() => setSelectedKey(point.key)}>
+                {/* Generous touch / click hit box that does not increment circle count */}
+                <rect
+                  x={x(index) - 16}
+                  y={y(point.rate) - 16}
+                  width={32}
+                  height={32}
+                  fill="transparent"
+                  className="cursor-pointer"
+                />
                 {selected?.key === point.key && (
-                  <line
-                    x1={x(index)}
-                    x2={x(index)}
-                    y1={top}
-                    y2={bottom}
-                    stroke="var(--muted-foreground)"
-                    strokeDasharray="3 5"
-                  />
+                  <>
+                    <line
+                      x1={x(index)}
+                      x2={x(index)}
+                      y1={top}
+                      y2={bottom}
+                      stroke="var(--muted-foreground)"
+                      strokeDasharray="3 5"
+                    />
+                    <g pointerEvents="none" aria-hidden="true">
+                      <rect
+                        x={Math.max(left, Math.min(right - 58, x(index) - 29))}
+                        y={Math.max(top, y(point.rate) - 30)}
+                        width={58}
+                        height={22}
+                        rx={6}
+                        fill="var(--popover)"
+                        stroke="var(--border)"
+                        strokeWidth={1}
+                        className="shadow-sm"
+                      />
+                      <text
+                        x={Math.max(left, Math.min(right - 58, x(index) - 29)) + 29}
+                        y={Math.max(top, y(point.rate) - 30) + 15}
+                        textAnchor="middle"
+                        fill="var(--popover-foreground)"
+                        fontSize={11}
+                        fontWeight="bold"
+                      >
+                        {value(point)}
+                      </text>
+                    </g>
+                  </>
                 )}
                 <circle
                   cx={x(index)}

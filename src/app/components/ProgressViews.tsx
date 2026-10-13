@@ -220,7 +220,7 @@ function MainDhikrGroupCard({
             : "border-primary/55 bg-primary/10 text-foreground"
           : onMedia
             ? "hero-glass home-glass-surface border-white/20 text-on-media shadow-raised hover:border-white/40"
-            : "border-border bg-background text-foreground hover:border-primary/45 hover:bg-muted"
+            : "border-border/50 bg-muted/40 text-foreground hover:border-primary/45 hover:bg-muted/70"
       }`}
       // The recommendation is added to the name, never substituted for the
       // status: swapping them told a screen-reader user this routine was
