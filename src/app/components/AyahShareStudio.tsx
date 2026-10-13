@@ -1,3 +1,4 @@
+import { NATIVE_RADIO } from "./ui/controlStyles";
 import { QURAN_TEXT_STYLE } from "../quranTypography";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { AppLanguage } from "../types";
@@ -331,6 +332,7 @@ export default function AyahShareStudio({
                 <label key={value} className="ayah-share-option">
                   <input
                     type="radio"
+                    className={NATIVE_RADIO}
                     name="ayah-card-format"
                     value={value}
                     checked={format === value}

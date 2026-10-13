@@ -1,5 +1,6 @@
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
-import { Check, Contrast, Moon, Sun } from "../../components/icons";
+import { Contrast, Moon, Sun } from "../../components/icons";
+import { ChoiceRadioItem } from "../../components/ChoiceRadioItem";
 import { t } from "../../i18n";
 import type { AppLanguage, ThemeMode } from "../../types";
 
@@ -35,24 +36,15 @@ export function ThemeModeSelector({
       {THEME_OPTIONS.map(({ mode, icon: Icon, labelKey }) => {
         const selected = value === mode;
         return (
-          <RadioGroupPrimitive.Item
+          <ChoiceRadioItem
             key={mode}
             value={mode}
             data-testid={`theme-option-${mode}`}
-            className={`interactive-elem relative flex min-h-[84px] flex-col items-center justify-center gap-2 rounded-xl border px-2 py-3 text-center transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-              selected
-                ? "border-primary bg-primary/10 text-foreground"
-                : "border-border-control bg-background text-muted-foreground hover:border-primary"
-            }`}
+            className="min-h-[84px] flex-col gap-2 px-2 py-3"
           >
             <Icon size={20} className={selected ? "text-primary" : "text-muted-foreground"} aria-hidden="true" />
             <span className="text-xs font-semibold leading-4">{t(language, labelKey)}</span>
-            {selected && (
-              <span className="absolute end-1.5 top-1.5 text-primary element-pop" aria-hidden="true">
-                <Check size={14} strokeWidth={2.5} />
-              </span>
-            )}
-          </RadioGroupPrimitive.Item>
+          </ChoiceRadioItem>
         );
       })}
     </RadioGroupPrimitive.Root>

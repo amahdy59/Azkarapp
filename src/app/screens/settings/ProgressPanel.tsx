@@ -3,6 +3,7 @@ import { CheckCircle2 } from "../../components/icons";
 import { PalmTreeMark } from "../../components/RoutineGarden";
 import { CATEGORIES } from "../../content/categories";
 import { formatNumerals } from "../../formatting";
+import { ChoiceRadioItem } from "../../components/ChoiceRadioItem";
 import { t } from "../../i18n";
 import { getGardenSummary } from "../../progress";
 import type { AppLanguage, CategoryId, DailyCollectionCompletion, StoredSession } from "../../types";
@@ -112,17 +113,9 @@ export function ProgressPanel({
                 </p>
                 <div className="grid grid-cols-4 gap-2">
                   {[3, 4, 5, 7].map((goal) => (
-                    <RadioGroupPrimitive.Item
-                      key={goal}
-                      value={String(goal)}
-                      className={`min-h-11 rounded-xl border px-2 text-label font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                        weeklyGoalDays === goal
-                          ? "border-primary bg-primary text-primary-foreground"
-                          : "border-border-control text-foreground"
-                      }`}
-                    >
+                    <ChoiceRadioItem key={goal} value={String(goal)} className="px-2">
                       {formatNumerals(goal, language)}
-                    </RadioGroupPrimitive.Item>
+                    </ChoiceRadioItem>
                   ))}
                 </div>
               </RadioGroupPrimitive.Root>

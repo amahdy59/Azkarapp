@@ -1,5 +1,6 @@
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { AlignRight, Contrast, Droplets, Eye, Info, Pause, Smartphone, TypeIcon } from "../../components/icons";
+import { ChoiceRadioItem } from "../../components/ChoiceRadioItem";
 import { t } from "../../i18n";
 import type { AppLanguage, ColorBlindSupport } from "../../types";
 import { SectionLabel, SettingsToggleRow, SubHeader } from "./SettingsPrimitives";
@@ -24,16 +25,11 @@ function formatColorBlindSupport(value: ColorBlindSupport, language: AppLanguage
  * their container's `aria-label` sat on a roleless div where it is ignored.
  * Now a Radix radio item, matching Text size in this same panel.
  */
-function PanelRadioOption({ value, active, label }: { value: string; active: boolean; label: string }) {
+function PanelRadioOption({ value, label }: { value: string; label: string }) {
   return (
-    <RadioGroupPrimitive.Item
-      value={value}
-      className={`min-h-11 flex-1 rounded-2xl border px-3 py-3 text-label font-semibold transition-[color,background-color,border-color,box-shadow,transform] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-        active ? "border-primary bg-primary text-primary-foreground" : "border-border/40 bg-card text-foreground"
-      }`}
-    >
+    <ChoiceRadioItem value={value} className="flex-1 px-3 py-3">
       {label}
-    </RadioGroupPrimitive.Item>
+    </ChoiceRadioItem>
   );
 }
 
@@ -144,12 +140,7 @@ export function AccessibilityPanel({
               aria-labelledby="color-blind-title"
             >
               {colorBlindOptions.map((option) => (
-                <PanelRadioOption
-                  key={option}
-                  value={option}
-                  active={colorBlindSupport === option}
-                  label={formatColorBlindSupport(option, language)}
-                />
+                <PanelRadioOption key={option} value={option} label={formatColorBlindSupport(option, language)} />
               ))}
             </RadioGroupPrimitive.Root>
           </div>

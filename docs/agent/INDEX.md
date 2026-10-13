@@ -1,5 +1,7 @@
 # AI Improvement System Index
 
+[Visual coherence](phases/VISUAL_COHERENCE_2026_10_13.md) is the owner-approved sequential visual/control implementation. Preserve Mushaf button sizes and alignment. Reliability release is complete; this session owns visual changes and their verification/publication.
+
 [Daily reliability and interaction polish](phases/DAILY_RELIABILITY_POLISH_2026_10_13.md) is the current owner-approved phase: measured startup, reminder recovery and truthful availability, existing offline/continuation verification and shared accessible switch motion. Widgets are deferred. Complete release authority and gates apply.
 
 [Performance, motion and Quran refinement](phases/PERFORMANCE_MOTION_QURAN_REFINEMENT_2026_10_12.md) is the current owner-requested phase: apply measured responsiveness/recovery improvements, polish counter and completion motion, reduce flowing Quran typography and basmalah gaps, simplify Reader options and provide screenshot references. Existing release authority and complete verification gates apply.

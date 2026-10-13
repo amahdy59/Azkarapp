@@ -1,5 +1,6 @@
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
-import { Check, Translate, TypeIcon } from "../../components/icons";
+import { Translate, TypeIcon } from "../../components/icons";
+import { ChoiceRadioItem } from "../../components/ChoiceRadioItem";
 import { t } from "../../i18n";
 import type { AppLanguage, TextSizeOption, ZikrFontOption } from "../../types";
 import { SectionLabel, SettingsToggleRow, SubHeader } from "./SettingsPrimitives";
@@ -60,25 +61,15 @@ export function ReadingPanel({
                 { value: "large", label: t(language, "settings.textLarge") },
               ] as const
             ).map((option) => {
-              const selected = textSize === option.value;
               return (
-                <RadioGroupPrimitive.Item
+                <ChoiceRadioItem
                   key={option.value}
                   value={option.value}
                   data-testid={`reading-text-size-${option.value}`}
-                  className={`relative flex min-h-11 items-center justify-center gap-1 rounded-xl border px-2 py-2 text-center transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                    selected
-                      ? "border-primary bg-primary/10 text-foreground"
-                      : "border-border/40 bg-card text-muted-foreground"
-                  }`}
+                  className="px-2 py-2"
                 >
                   <span className="text-sm font-semibold">{option.label}</span>
-                  {selected && (
-                    <span className="absolute end-1.5 top-1.5 text-primary" aria-hidden="true">
-                      <Check size={14} strokeWidth={2.5} />
-                    </span>
-                  )}
-                </RadioGroupPrimitive.Item>
+                </ChoiceRadioItem>
               );
             })}
           </RadioGroupPrimitive.Root>
@@ -103,27 +94,17 @@ export function ReadingPanel({
                 { value: "naskh", label: t(language, "settings.zikrFontNaskh") },
               ] as const
             ).map((option) => {
-              const selected = zikrFont === option.value;
               return (
-                <RadioGroupPrimitive.Item
+                <ChoiceRadioItem
                   key={option.value}
                   value={option.value}
                   data-testid={`reading-zikr-font-${option.value}`}
-                  className={`relative flex min-h-11 items-center justify-center gap-1.5 rounded-xl border px-2 py-2 text-center transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                    selected
-                      ? "border-primary bg-primary/10 text-foreground"
-                      : "border-border/40 bg-card text-muted-foreground"
-                  }`}
+                  className="px-2 py-2"
                 >
                   <span className="text-sm font-semibold" style={{ fontFamily: ZIKR_FONT_STACKS[option.value] }}>
                     {option.label}
                   </span>
-                  {selected && (
-                    <span className="absolute end-1.5 top-1.5 text-primary" aria-hidden="true">
-                      <Check size={14} strokeWidth={2.5} />
-                    </span>
-                  )}
-                </RadioGroupPrimitive.Item>
+                </ChoiceRadioItem>
               );
             })}
           </RadioGroupPrimitive.Root>

@@ -1,5 +1,9 @@
 # Decision Log
 
+## Visual coherence approval — 2026-10-13
+
+The owner approves this chat's complete visual/UX review and adds consistent radio buttons, buttons, dropdown menus and related controls. Apply in scoped sequential phases through existing shared components and semantic tokens. This supersedes conflicting ordinary-page presentation choices only as explicitly documented by the phase. Mushaf is already solid: preserve all control dimensions/alignment and canonical reading geometry. No sacred text, persistence, prayer semantics or architecture changes. The owner explicitly authorizes coordination with the running performance/polish chat; it confirms reliability release dd448416 is complete, clean workspace, no running gates and no further planned edits/releases. Visual/control/page work and release ownership belong to this session. See phases/VISUAL_COHERENCE_2026_10_13.md.
+
 ## Performance, motion and Quran density — owner request, 2026-10-12
 
 Follow-up: the owner supplies a magnified mobile Library screenshot and explicitly asks to prevent whole-interface pinch zoom, allowing more accessible alternatives. Apply coarse-pointer gesture policy with native panning; preserve unrestricted viewport/browser zoom, app text-size choices and explicit 100–200% Mushaf magnification. This supersedes prior mobile pinch behavior without suppressing platform accessibility overrides. Verify pinch scale, scrolling, 200% text and automated accessibility; physical device gestures remain a separate manual check.

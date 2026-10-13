@@ -1,3 +1,4 @@
+import { CHOICE_SURFACE, NATIVE_RADIO } from "../components/ui/controlStyles";
 import { useMemo, useState } from "react";
 import { Header } from "../components/LayoutShells";
 import { ProgressBar } from "../components/ProgressBar";
@@ -586,9 +587,7 @@ export function QuranWirdScreen({
                         key={kind}
                         htmlFor={`quran-wird-plan-${kind}`}
                         aria-label={t(language, titleKey)}
-                        className={`flex min-h-16 cursor-pointer items-start gap-3 rounded-xl border p-3 text-foreground transition-colors hover:bg-muted focus-within:ring-[3px] focus-within:ring-ring ${
-                          isSelected ? "border-primary bg-primary/10" : "border-border bg-background"
-                        }`}
+                        className={`${CHOICE_SURFACE} flex min-h-16 cursor-pointer items-start gap-3 p-3`}
                       >
                         <input
                           id={`quran-wird-plan-${kind}`}
@@ -597,7 +596,7 @@ export function QuranWirdScreen({
                           value={kind}
                           checked={isSelected}
                           onChange={() => setDraftPlan(createPlan(kind, now, todayKey, position, draftPlan))}
-                          className="mt-0.5 size-5 shrink-0 accent-primary"
+                          className={`${NATIVE_RADIO} mt-0.5`}
                         />
                         <span className={`flex min-w-0 flex-col ${textAlignment}`}>
                           <span className="text-sm font-bold">{t(language, titleKey)}</span>

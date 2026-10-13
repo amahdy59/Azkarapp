@@ -5,6 +5,7 @@ import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { CheckIcon, ChevronRightIcon } from "../icons";
 
 import { cn } from "./utils";
+import { MENU_OPTION_STATE } from "./controlStyles";
 
 function DropdownMenu({
   modal = false,
@@ -116,7 +117,8 @@ function DropdownMenuCheckboxItem({
     <DropdownMenuPrimitive.CheckboxItem
       data-slot="dropdown-menu-checkbox-item"
       className={cn(
-        "focus:bg-muted focus:text-foreground data-[state=checked]:bg-primary/10 data-[state=checked]:text-primary relative flex min-h-11 cursor-default items-center justify-between gap-2 rounded-xl py-2 ps-3 pe-8 text-sm text-start outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        MENU_OPTION_STATE,
+        "relative flex min-h-11 cursor-default items-center justify-between gap-2 rounded-xl py-2 ps-3 pe-8 text-sm text-start outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       checked={checked}
@@ -152,7 +154,8 @@ function DropdownMenuRadioItem({
     <DropdownMenuPrimitive.RadioItem
       data-slot="dropdown-menu-radio-item"
       className={cn(
-        "focus:bg-muted focus:text-foreground data-[state=checked]:bg-primary/10 data-[state=checked]:text-primary relative flex min-h-11 cursor-default items-center justify-between gap-2 rounded-xl py-2 ps-3 pe-8 text-sm text-start outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        MENU_OPTION_STATE,
+        "relative flex min-h-11 cursor-default items-center justify-between gap-2 rounded-xl py-2 ps-3 pe-8 text-sm text-start outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       {...props}
