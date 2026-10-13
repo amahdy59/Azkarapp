@@ -841,7 +841,7 @@ export function HomeScreen({
                             direction={direction}
                             evidence={dailyEvidence}
                             onRefresh={() => setManualEvidenceOffset((prev) => prev + 1)}
-                            onGlass={homeVisualEffects}
+                            onGlass={false}
                           />
                         </div>
                       ) : null}

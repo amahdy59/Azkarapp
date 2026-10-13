@@ -1,9 +1,17 @@
+.settings-root-panel {
+  --settings-gutter: var(--spacing-page);
+}
+
 @media (min-width: 56.25rem) {
   .settings-two-pane {
     display: grid;
     grid-template-columns: minmax(21rem, 24rem) minmax(0, 1fr);
     height: 100%;
     overflow: hidden;
+  }
+
+  .settings-root-panel {
+    --settings-gutter: 1rem;
   }
 
   .settings-nav-pane {

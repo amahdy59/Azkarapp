@@ -94,6 +94,7 @@ export function Header({
   backButtonClassName,
   style,
   titleStyle,
+  pageGutters = false,
 }: {
   title: string;
   subtitle?: string;
@@ -106,6 +107,8 @@ export function Header({
   backButtonClassName?: string;
   style?: React.CSSProperties;
   titleStyle?: React.CSSProperties;
+  /** Ordinary pages use the responsive page gutter; devotional chrome retains its inset. */
+  pageGutters?: boolean;
 }) {
   const headerRef = useRef<HTMLDivElement>(null);
   const [hasScrolledContent, setHasScrolledContent] = useState(false);
@@ -140,7 +143,7 @@ export function Header({
       data-testid="shared-screen-header"
       data-scrolled={isScrolled || undefined}
       data-header-contrast="solid"
-      className={`shared-screen-header ${decoration ? "isolate" : ""} sticky top-0 z-40 flex w-full shrink-0 items-center gap-2 border-b border-transparent bg-background px-4 pt-2 pb-1 shadow-xs transition-colors duration-standard ${
+      className={`shared-screen-header ${decoration ? "isolate" : ""} sticky top-0 z-40 flex w-full shrink-0 items-center gap-2 border-b border-transparent bg-background ${pageGutters ? "px-page" : "px-4"} pt-2 pb-1 shadow-xs transition-colors duration-standard ${
         isScrolled ? "border-border shadow-sm" : "border-transparent"
       }`}
       style={{ minHeight: 56, ...style }}

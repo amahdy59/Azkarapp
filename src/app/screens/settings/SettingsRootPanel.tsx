@@ -399,9 +399,9 @@ export function SettingsRootPanel({
     : [];
 
   return (
-    <div ref={panelRef} className="flex-1 overflow-y-auto pb-8" dir={direction}>
+    <div ref={panelRef} className="settings-root-panel flex-1 overflow-y-auto pb-8" dir={direction}>
       {/* ── Client-side Instant Search Bar ── */}
-      <div className="px-4 pt-3 pb-1">
+      <div className="px-[var(--settings-gutter,1rem)] pt-3 pb-1">
         <div className="relative">
           <label htmlFor="settings-search-input" className="sr-only">
             {t(language, "settings.searchPlaceholder")}
@@ -458,7 +458,7 @@ export function SettingsRootPanel({
               ))}
             </SettingsSection>
           ) : (
-            <div className="mx-4 mt-6 rounded-2xl border border-border/50 bg-card p-6 text-center shadow-xs">
+            <div className="mx-[var(--settings-gutter,1rem)] mt-6 rounded-2xl border border-border/50 bg-card p-6 text-center shadow-xs">
               <Search size={28} className="mx-auto mb-2 text-muted-foreground/60" aria-hidden="true" />
               <p className="text-sm font-semibold text-foreground">{t(language, "settings.noSearchResults")}</p>
             </div>

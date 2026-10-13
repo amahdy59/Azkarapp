@@ -27,25 +27,21 @@ const WIRD_CARD_CONFIG = {
     subtitleKey: "progress.morningCardSubtitle",
     image: "assets/cards/wird-morning.jpg",
     badgeStyle: { backgroundColor: "#f59e0b", color: "#020617" },
-    btnStyle: { backgroundColor: "#f59e0b", color: "#020617" },
   },
   evening: {
     subtitleKey: "progress.eveningCardSubtitle",
     image: "assets/cards/wird-evening.jpg",
     badgeStyle: { backgroundColor: "#6366f1", color: "#ffffff" },
-    btnStyle: { backgroundColor: "#6366f1", color: "#ffffff" },
   },
   before_sleep: {
     subtitleKey: "progress.sleepCardSubtitle",
     image: "assets/cards/wird-sleep.jpg",
     badgeStyle: { backgroundColor: "#3b82f6", color: "#ffffff" },
-    btnStyle: { backgroundColor: "#3b82f6", color: "#ffffff" },
   },
   quran: {
     subtitleKey: "progress.quranCardSubtitle",
     image: "assets/cards/wird-quran.jpg",
     badgeStyle: { backgroundColor: "#10b981", color: "#020617" },
-    btnStyle: { backgroundColor: "#10b981", color: "#020617" },
   },
 } as const;
 
@@ -132,16 +128,17 @@ function WirdCategoryCard({
 
       {/* Content: name, subtitle, CTA */}
       <div className="relative z-10 mt-auto flex w-full flex-col items-start gap-1 pt-4">
-        <p className="text-lg font-black leading-tight text-white drop-shadow-md" dir="auto">
+        <p className="text-lg font-bold leading-tight text-on-media drop-shadow-md" dir="auto">
           {name}
         </p>
         <p className="line-clamp-2 text-xs font-semibold leading-snug text-white/80 drop-shadow-sm" dir="auto">
           {subtitle}
         </p>
         <span
-          style={!isCompleted ? config.btnStyle : undefined}
-          className={`mt-2.5 inline-flex h-9 items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-black shadow-md transition-opacity hover:opacity-95 ${
-            isCompleted ? "bg-success text-success-foreground" : ""
+          className={`mt-2.5 inline-flex h-9 items-center gap-1.5 rounded-xl px-4 py-1.5 text-xs font-semibold shadow-xs transition-opacity hover:opacity-95 ${
+            isCompleted
+              ? "bg-success text-success-foreground"
+              : "border border-white/35 bg-on-media-surface/80 text-on-media"
           }`}
         >
           {isCompleted ? (

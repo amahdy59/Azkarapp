@@ -221,7 +221,7 @@ export function SettingsScreen({
               exit="exit"
               className="absolute inset-0 flex h-full w-full flex-col"
             >
-              <Header title={t(language, "common.settings")} language={language} />
+              <Header title={t(language, "common.settings")} language={language} pageGutters />
               <SettingsRootPanel
                 onNav={openSubPanel}
                 language={language}

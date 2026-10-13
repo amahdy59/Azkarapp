@@ -26,14 +26,12 @@ describe("shared radio choice", () => {
       render(<Choices dir={dir} />);
       await user.tab();
       expect(screen.getByRole("radio", { name: "First" })).toHaveFocus();
-      await user.keyboard(dir === "rtl" ? "{ArrowLeft>}" : "{ArrowRight>}");
+      await user.keyboard(dir === "rtl" ? "{ArrowLeft}" : "{ArrowRight}");
       await waitFor(() => expect(screen.getByRole("radio", { name: "Second" })).toBeChecked());
-      await user.keyboard(dir === "rtl" ? "{/ArrowLeft}" : "{/ArrowRight}");
       expect(screen.getByRole("radio", { name: "First" })).not.toBeChecked();
       expect(screen.getByRole("radio", { name: "Second" })).toHaveFocus();
-      await user.keyboard(dir === "rtl" ? "{ArrowLeft>}" : "{ArrowRight>}");
+      await user.keyboard(dir === "rtl" ? "{ArrowLeft}" : "{ArrowRight}");
       await waitFor(() => expect(screen.getByRole("radio", { name: "First" })).toBeChecked());
-      await user.keyboard(dir === "rtl" ? "{/ArrowLeft}" : "{/ArrowRight}");
       expect(screen.getByRole("radio", { name: "Unavailable" })).toBeDisabled();
     },
   );

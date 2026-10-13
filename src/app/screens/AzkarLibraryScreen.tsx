@@ -212,10 +212,10 @@ export function AzkarLibraryScreen({
   return (
     <ScreenContainer dir={direction} className="relative" screenName={t(language, "library.title")}>
       <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col min-h-screen">
-        <header className="shrink-0 border-b border-border-control/25 bg-background/95 px-5 pb-3 pt-3 backdrop-blur-xs sm:pb-4 lg:pt-5">
-          <div className="flex min-w-0 items-center justify-between gap-3">
+        <header className="shrink-0 border-b border-border-control/25 bg-background px-page pb-3 pt-2 sm:pb-4">
+          <div className="flex min-h-11 min-w-0 items-center justify-between gap-3">
             <div className="min-w-0">
-              <h1 className="block max-w-full truncate whitespace-nowrap text-xl font-extrabold text-foreground sm:text-2xl">
+              <h1 className="block max-w-full break-words text-lg min-[360px]:text-xl font-extrabold text-foreground sm:text-2xl">
                 {t(language, "library.title")}
               </h1>
               <p className="mt-1 hidden text-sm text-muted-foreground lg:block">{t(language, "library.subtitle")}</p>
@@ -418,7 +418,7 @@ export function AzkarLibraryScreen({
         </header>
 
         <div
-          className="min-h-0 flex-1 overflow-y-auto px-5 pb-5 page-content-center outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
+          className="min-h-0 flex-1 overflow-y-auto px-page pb-5 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
           {...tabPanelProps("library-sections", section)}
         >
           {section === "collections" ? (

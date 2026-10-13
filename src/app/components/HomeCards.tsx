@@ -181,7 +181,7 @@ export function PrayerRoutineCard({
           data-testid="home-primary-cta"
           aria-describedby={progressId}
           onClick={onOpen}
-          className="group mt-3 flex min-h-[52px] w-full items-center justify-center gap-2.5 rounded-2xl bg-primary px-4 text-title font-black text-primary-foreground shadow-raised transition-transform hover:brightness-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
+          className="group mt-3 flex min-h-[52px] w-full items-center justify-center gap-2.5 rounded-2xl bg-primary px-4 text-title font-bold text-primary-foreground shadow-raised transition-transform hover:brightness-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <span className="min-w-0 truncate" title={ctaLabel}>
             {ctaLabel}
