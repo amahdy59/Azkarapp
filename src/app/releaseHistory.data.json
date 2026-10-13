@@ -1,5 +1,18 @@
 [
   {
+    "release": "2026-10-13-3",
+    "ar": [
+      "تفتح الرئيسية دون تحميل أدوات العد الخاصة بالقارئ مسبقًا.",
+      "يتحدث إذن الإشعارات عند العودة من إعدادات المتصفح، ويظهر نجاح الإشعار التجريبي أو تعذره دون انتظار دائم.",
+      "توضح التذكيرات حدود وصولها في الخلفية وبعد إغلاق التطبيق، وتتحرك مفاتيح الإعدادات بهدوء مع احترام تقليل الحركة."
+    ],
+    "en": [
+      "Home opens without loading the reader’s counter tools in advance.",
+      "Notification permission refreshes when you return from browser settings, and test notifications report success or failure without waiting indefinitely.",
+      "Reminders explain background and closed-app delivery limits, while settings switches move consistently and respect reduced motion."
+    ]
+  },
+  {
     "release": "2026-10-13-2",
     "ar": [
       "كبّر صفحات المصحف بحروف أكبر مع بقاء ترتيب السطور، ومرّر أفقيًا وعموديًا للوصول إلى النص كاملًا.",

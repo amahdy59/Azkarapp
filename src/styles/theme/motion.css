@@ -288,3 +288,23 @@
 .tracking-check[data-checked="true"] > svg {
   animation: favorite-pop var(--motion-duration-fast) var(--motion-ease-enter) 60ms both;
 }
+.settings-toggle-thumb {
+  transform: translateX(0);
+  transition:
+    transform var(--motion-duration-fast) var(--motion-ease-standard),
+    background-color var(--motion-duration-fast) var(--motion-ease-standard);
+}
+
+.settings-toggle-track[data-checked="true"] > .settings-toggle-thumb {
+  transform: translateX(18px);
+}
+
+.settings-toggle-track:dir(rtl)[data-checked="true"] > .settings-toggle-thumb {
+  transform: translateX(-18px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-toggle-thumb {
+    transition-duration: 0.01ms;
+  }
+}

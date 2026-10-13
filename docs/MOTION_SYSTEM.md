@@ -1,5 +1,9 @@
 # Azkarapp Motion System
 
+## Shared switch feedback — 2026-10-13
+
+Settings and reminder switches reuse ToggleTrack. Its thumb uses a 150ms token-based transform, mirrored by actual CSS direction, instead of animating inset layout. OS reduced motion and the app preference make the position change immediate. Logical start stays fixed; switch semantics, focus and at least 44px targets remain with each action owner.
+
 ## Interaction polish — 2026-10-12
 
 Shared counter Enter/Space presses use the same finite pressed response as pointer activation. One deliberate keydown counts once; operating-system repeat events do not add unintended repetitions. Keyup, blur and pointer cancellation release the response; reduced motion retains counting without adding a pressed animation. Home completion exits retain their staged opacity/transform sequence but no longer interpolate grid row geometry per frame; the existing owner timer removes the faded card. Reader controls stay stationary and rapid text navigation retains latest-selection-wins interruption.

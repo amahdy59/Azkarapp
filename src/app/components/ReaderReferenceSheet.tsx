@@ -4,7 +4,7 @@ import { t } from "../i18n";
 import type { AppLanguage, Zikr } from "../types";
 import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content/localizedZikr";
 import { ResponsiveSheet, SheetHeader } from "./ResponsiveSheet";
-import { HadithWeakChainBadge } from "./ZikrComponents";
+import { HadithWeakChainBadge } from "./HadithWeakChainBadge";
 import { ReferenceCard } from "./ReferenceCard";
 
 function ReferenceContent({

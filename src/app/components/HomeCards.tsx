@@ -9,7 +9,7 @@ import { HomeCard } from "./HomeCard";
 import { ProductImage } from "./ProductImage";
 import { SegmentedControl } from "./SegmentedControl";
 import { ArrowNext, Bookmark, BookOpen, Clock, Sparkles, Heart, Sun, MoonStar, Moon, RefreshCw } from "./icons";
-import { HadithWeakChainBadge } from "./ZikrComponents";
+import { HadithWeakChainBadge } from "./HadithWeakChainBadge";
 
 export type HomeSavedSource = "main" | "comprehensive" | "friday";
 

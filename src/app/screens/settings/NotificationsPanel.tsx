@@ -1,4 +1,10 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import {
+  readNotificationPermission,
+  showBrowserNotification,
+  type BrowserNotificationPermission,
+} from "../../notifications";
+import { ToggleTrack } from "../../components/SettingsRow";
 import { FIELD_CONTROL_CLASS } from "../../components/FormField";
 import { Button } from "../../components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
@@ -9,16 +15,7 @@ import { formatNumerals } from "../../formatting";
 import type { AppLanguage, PrayerName, PrayerReminderLeadMinutes, ReminderSettings } from "../../types";
 import { SubHeader } from "./SettingsPrimitives";
 
-type BrowserNotificationPermission = NotificationPermission | "unsupported";
 type ReminderKind = "morning" | "evening" | "before_sleep" | "after_prayer";
-
-function readNotificationPermission(): BrowserNotificationPermission {
-  if (typeof window === "undefined" || !("Notification" in window)) {
-    return "unsupported";
-  }
-
-  return Notification.permission;
-}
 
 function permissionCopy(permission: BrowserNotificationPermission, language: AppLanguage) {
   switch (permission) {
@@ -70,15 +67,7 @@ function ReminderScheduleRow({
           onClick={onToggle}
           className="flex h-11 w-12 shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
-          <span
-            aria-hidden="true"
-            className={`relative h-7 w-12 rounded-full border transition-colors ${schedule.enabled ? "border-primary bg-primary" : "border-border-control bg-muted"}`}
-          >
-            <span
-              className={`absolute top-1 size-5 rounded-full shadow-sm transition-[inset] ${schedule.enabled ? "bg-primary-foreground" : "bg-foreground"}`}
-              style={{ insetInlineStart: schedule.enabled ? "1.5rem" : "0.25rem" }}
-            />
-          </span>
+          <ToggleTrack checked={schedule.enabled} />
         </button>
       </div>
       <label
@@ -117,6 +106,26 @@ export function NotificationsPanel({
   const [hasRequestError, setHasRequestError] = useState(false);
   const [permissionAttemptBlocked, setPermissionAttemptBlocked] = useState(false);
   const [testStatus, setTestStatus] = useState<string | null>(null);
+  const [isTesting, setIsTesting] = useState(false);
+  const testPending = useRef(false);
+  const mounted = useRef(true);
+
+  useEffect(() => {
+    mounted.current = true;
+    const refreshPermission = () => {
+      if (document.visibilityState !== "visible") return;
+      setPermission(readNotificationPermission());
+      setPermissionAttemptBlocked(false);
+      setHasRequestError(false);
+    };
+    window.addEventListener("focus", refreshPermission);
+    document.addEventListener("visibilitychange", refreshPermission);
+    return () => {
+      mounted.current = false;
+      window.removeEventListener("focus", refreshPermission);
+      document.removeEventListener("visibilitychange", refreshPermission);
+    };
+  }, []);
 
   const requestPermission = async () => {
     if (!("Notification" in window)) {
@@ -141,9 +150,11 @@ export function NotificationsPanel({
   };
 
   const sendTestNotification = async () => {
+    if (testPending.current) return;
+    testPending.current = true;
+    setIsTesting(true);
     setTestStatus(null);
     try {
-      const registration = "serviceWorker" in navigator ? await navigator.serviceWorker.ready : undefined;
       const options: NotificationOptions = {
         body: t(language, "notifications.testBody"),
         icon: `${window.location.origin}${import.meta.env.BASE_URL}192.png`,
@@ -151,11 +162,18 @@ export function NotificationsPanel({
         tag: "azkar-test",
         data: { url: `${import.meta.env.BASE_URL}#/settings/notifications` },
       };
-      if (registration) await registration.showNotification(t(language, "notifications.testTitle"), options);
-      else new Notification(t(language, "notifications.testTitle"), options);
-      setTestStatus(t(language, "notifications.testSent"));
-    } catch {
-      setTestStatus(t(language, "notifications.testFailed"));
+      const sent = await showBrowserNotification(
+        t(language, "notifications.testTitle"),
+        options,
+        () => mounted.current,
+      );
+      if (mounted.current) {
+        setPermission(readNotificationPermission());
+        setTestStatus(t(language, sent ? "notifications.testSent" : "notifications.testFailed"));
+      }
+    } finally {
+      testPending.current = false;
+      if (mounted.current) setIsTesting(false);
     }
   };
 
@@ -278,15 +296,7 @@ export function NotificationsPanel({
               onClick={() => void togglePrayerReminder()}
               className="flex h-11 w-12 shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
-              <span
-                aria-hidden="true"
-                className={`relative h-7 w-12 rounded-full border transition-colors ${reminders.prayer.enabled ? "border-primary bg-primary" : "border-border-control bg-muted"}`}
-              >
-                <span
-                  className={`absolute top-1 size-5 rounded-full shadow-sm transition-[inset] ${reminders.prayer.enabled ? "bg-primary-foreground" : "bg-foreground"}`}
-                  style={{ insetInlineStart: reminders.prayer.enabled ? "1.5rem" : "0.25rem" }}
-                />
-              </span>
+              <ToggleTrack checked={reminders.prayer.enabled} />
             </button>
           </div>
 
@@ -362,8 +372,14 @@ export function NotificationsPanel({
             </div>
           </fieldset>
           {permission === "granted" && (
-            <Button type="button" variant="outline" className="mt-4 w-full" onClick={() => void sendTestNotification()}>
-              {t(language, "notifications.testNotification")}
+            <Button
+              type="button"
+              variant="outline"
+              className="mt-4 w-full"
+              disabled={isTesting}
+              onClick={() => void sendTestNotification()}
+            >
+              {t(language, isTesting ? "notifications.testSending" : "notifications.testNotification")}
             </Button>
           )}
           {testStatus && (

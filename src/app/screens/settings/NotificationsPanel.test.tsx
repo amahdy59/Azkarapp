@@ -6,17 +6,72 @@ import { NotificationsPanel } from "./NotificationsPanel";
 
 describe("NotificationsPanel", () => {
   const originalNotification = window.Notification;
+  const originalWorker = Object.getOwnPropertyDescriptor(navigator, "serviceWorker");
 
   beforeEach(() => {
     Element.prototype.scrollIntoView = vi.fn();
   });
 
   afterEach(() => {
+    if (originalWorker) Object.defineProperty(navigator, "serviceWorker", originalWorker);
+    else Reflect.deleteProperty(navigator, "serviceWorker");
     if (originalNotification) {
       Object.defineProperty(window, "Notification", { configurable: true, value: originalNotification });
     } else {
       Reflect.deleteProperty(window, "Notification");
     }
+  });
+
+  it("refreshes permission after returning from browser settings without changing saved choices", () => {
+    const notification = { permission: "denied", requestPermission: vi.fn() };
+    Object.defineProperty(window, "Notification", { configurable: true, value: notification });
+    const onRemindersChange = vi.fn();
+    render(
+      <NotificationsPanel
+        language="en"
+        reminders={DEFAULT_APP_STATE.settings.reminders}
+        onRemindersChange={onRemindersChange}
+        onBack={vi.fn()}
+      />,
+    );
+    notification.permission = "granted";
+    fireEvent.focus(window);
+    expect(screen.getByText("Browser permission is granted.")).toBeInTheDocument();
+    notification.permission = "denied";
+    fireEvent(document, new Event("visibilitychange"));
+    expect(screen.queryByRole("button", { name: "Send a test notification" })).not.toBeInTheDocument();
+    expect(onRemindersChange).not.toHaveBeenCalled();
+  });
+
+  it("prevents duplicate test sends and announces failure when worker delivery is unavailable", async () => {
+    Object.defineProperty(window, "Notification", { configurable: true, value: { permission: "granted" } });
+    let resolve!: (value: undefined) => void;
+    const getRegistration = vi.fn(
+      () =>
+        new Promise<undefined>((done) => {
+          resolve = done;
+        }),
+    );
+    Object.defineProperty(navigator, "serviceWorker", {
+      configurable: true,
+      value: { getRegistration, ready: new Promise(() => {}) },
+    });
+    render(
+      <NotificationsPanel
+        language="en"
+        reminders={DEFAULT_APP_STATE.settings.reminders}
+        onRemindersChange={vi.fn()}
+        onBack={vi.fn()}
+      />,
+    );
+    const button = screen.getByRole("button", { name: "Send a test notification" });
+    fireEvent.click(button);
+    expect(button).toBeDisabled();
+    fireEvent.click(button);
+    expect(getRegistration).toHaveBeenCalledOnce();
+    resolve(undefined);
+    expect(await screen.findByText("The test notification could not be sent.")).toHaveAttribute("role", "status");
+    expect(button).toBeEnabled();
   });
 
   it("explains why a denied permission prevents enabling a reminder", () => {

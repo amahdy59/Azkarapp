@@ -111,4 +111,5 @@ test("Home opens under a six-times slower CPU and constrained connection", async
   });
   console.log(JSON.stringify(metrics));
   expect(metrics.resources.some((resource) => /^audio(?:-|OfflineCache)/.test(resource.file ?? ""))).toBe(false);
+  expect(metrics.resources.some((resource) => /^ZikrComponents-/.test(resource.file ?? ""))).toBe(false);
 });

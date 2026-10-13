@@ -1,5 +1,7 @@
 # Prayer times, location, timezone, and DST
 
+Reminder reliability, 2026-10-13: permission changes are rechecked after returning from browser settings. Delivery uses an already active service-worker registration, avoiding an indefinite ready wait when none exists; supported desktop browsers may use their Notification constructor. Mobile rejection is reported as failure, with existing scheduled retry. Settings shows a pending test state and accurate background/closed-app limits. Prayer formulas and reminder times are unchanged.
+
 This document is the source of truth for Azkarapp's prayer-time pipeline. It explains how times are calculated on the device, how daylight saving is applied, and how maintainers can verify or extend the feature safely.
 
 ## User-visible behavior

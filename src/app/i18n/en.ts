@@ -471,7 +471,8 @@ const en = {
     hint: "Try Arabic, English, or transliteration",
   },
   notifications: {
-    availabilityShort: "Reminders work while the app is open or running in the background.",
+    availabilityShort:
+      "Keep Azkar open for reminders. Background delivery may be delayed; reminders do not run after you fully close the app.",
     invalidCoordinates: "Enter a latitude from -90 to 90 and longitude from -180 to 180.",
     prayerCalculationDescription: "Prayer times are calculated accurately based on your location and local DST.",
     daylightSavingActive: "Daylight saving time is active automatically for this date.",
@@ -517,7 +518,7 @@ const en = {
     locationTab: "Location & prayer times",
     availability: "Reminder availability",
     availabilityBody:
-      "Reminders work while Azkar is open or running in the background. Delivery after the app is fully closed requires a connected push service.",
+      "Reminders are checked while Azkar is running. Your browser may pause the app in the background. This version cannot deliver reminders after the app is fully closed; notification permission alone does not enable that.",
     permission: "Browser permission",
     permissionGranted: "Browser permission is granted.",
     permissionDenied: "Browser permission is blocked. Change it in your browser or device settings.",
@@ -545,7 +546,7 @@ const en = {
     disabled: "Off",
     onlyIfIncomplete: "Only when unfinished",
     onlyIfIncompleteHint: "Avoid a reminder after you have completed that collection today.",
-    activeNotice: "This browser will show reminders while Azkar is open or running in the background.",
+    activeNotice: "Reminders are enabled while Azkar is running. Your browser may delay them in the background.",
     prayerReminders: "Prayer-time reminders",
     prayerRemindersHint: "Remind me before each of the five daily prayers.",
     prayerReminderLead: "Reminder time",
@@ -553,6 +554,7 @@ const en = {
     atPrayerTime: "At prayer time",
     prayerSelection: "Prayers to notify",
     testNotification: "Send a test notification",
+    testSending: "Sending test notification…",
     testTitle: "Azkar test notification",
     testBody: "Notifications are working on this device.",
     testSent: "Test notification sent.",

@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { readNotificationPermission, showBrowserNotification } from "../notifications";
 import { getEstimatedPrayerTimes, PRAYER_NAMES, type PrayerTimes } from "../content/prayerTimes";
 import { t } from "../i18n";
 import { formatNumerals } from "../formatting";
@@ -175,7 +176,12 @@ function recordNotification(key: ReminderHistoryKey, now: Date, progressDayStart
   }
 }
 
-async function deliverNotification(reminder: DueReminder, language: AppLanguage, dayKey: string) {
+async function deliverNotification(
+  reminder: DueReminder,
+  language: AppLanguage,
+  dayKey: string,
+  isCurrent: () => boolean,
+) {
   const isPrayer = reminder.kind === "prayer";
   const prayerName = isPrayer ? t(language, `notifications.${reminder.prayer}`) : "";
   const options: NotificationOptions = {
@@ -196,19 +202,7 @@ async function deliverNotification(reminder: DueReminder, language: AppLanguage,
   };
   const title = isPrayer ? t(language, "notifications.prayerReminderTitle", { prayer: prayerName }) : "Azkar";
 
-  try {
-    if ("serviceWorker" in navigator) {
-      const registration = await navigator.serviceWorker.ready;
-      await registration.showNotification(title, options);
-      return true;
-    }
-
-    new Notification(title, options);
-    return true;
-  } catch {
-    // Some mobile browsers expose Notification but only permit service-worker delivery.
-    return false;
-  }
+  return showBrowserNotification(title, options, isCurrent);
 }
 
 /**
@@ -230,10 +224,6 @@ export function useForegroundReminders({
   location?: LocationSettings;
 }) {
   useEffect(() => {
-    if (!("Notification" in window) || Notification.permission !== "granted") {
-      return;
-    }
-
     let isDelivering = false;
     let cancelled = false;
     let timerId: number | undefined;
@@ -250,6 +240,8 @@ export function useForegroundReminders({
       if (cancelled || isDelivering) {
         return;
       }
+      if (timerId !== undefined) window.clearTimeout(timerId);
+      if (readNotificationPermission() !== "granted") return;
       const now = new Date();
       const wasAlreadyNotified = (key: ReminderHistoryKey) => hasAlreadyNotified(key, now, progressDayStartHour);
       const due =
@@ -258,7 +250,12 @@ export function useForegroundReminders({
       if (!due) return scheduleNextCheck();
 
       isDelivering = true;
-      const delivered = await deliverNotification(due, language, getProgressDayKey(now, progressDayStartHour));
+      const delivered = await deliverNotification(
+        due,
+        language,
+        getProgressDayKey(now, progressDayStartHour),
+        () => !cancelled,
+      );
       isDelivering = false;
       if (cancelled) return;
       if (delivered) {

@@ -1,5 +1,11 @@
 # Application architecture
 
+## Daily reliability — 2026-10-13
+
+The shared notification service checks current permission before and after the active service-worker lookup. It uses getRegistration rather than waiting indefinitely for ready on unregistered pages; desktop Notification construction is the fallback, and unsupported mobile delivery returns failure. Callers provide a cancellation predicate so obsolete requests do not notify. Reminder lifecycle listeners remain registered while permission is blocked and reconcile on visible return; revocation stops scheduled delivery. Settings refreshes permission on return and prevents concurrent test requests. These foreground reminders do not promise background or closed-app delivery.
+
+HomeCards imports a standalone reviewed-source badge rather than the reader counter component module. This removes the reader counter chunk and its stylesheet dependency from Home's required loading graph without changing content or rendering.
+
 ## Canonical Surah pages and bounded recovery — 2026-10-13
 
 QuranSurahListeningReader retains all fifteen source line slots from useListeningMushafPage, filtering adjacent surah tokens without shifting selected tokens. MushafListeningPage/MushafPageCanvas render selected-surah headings only. Magnification enlarges both canvas dimensions while the normal fitted measure survives zoom changes; page/font/text-scale changes still invalidate fitting. The complete passage remains mounted, with exact existing timing and semantic text. Missing page data uses complete reviewed Unicode; canonical line identity is available only with page layout data. No reviewed source asset, persistence or audio identity changes.
