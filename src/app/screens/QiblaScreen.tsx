@@ -319,12 +319,13 @@ export function QiblaScreen({
   return (
     <ScreenContainer className="overflow-y-auto" dir={direction} screenName={t(language, "qibla.title")}>
       <Header
+        pageGutters
         title={t(language, "qibla.title")}
         subtitle={t(language, "qibla.subtitle")}
         onBack={onBack}
         language={language}
       />
-      <div className="mx-auto grid w-full max-w-5xl content-start items-start gap-4 px-4 py-4 sm:px-6 lg:grid-cols-[minmax(20rem,1fr)_minmax(16rem,0.7fr)]">
+      <div className="mx-auto grid w-full max-w-5xl content-start items-start gap-4 px-page py-4 lg:grid-cols-[minmax(20rem,1fr)_minmax(16rem,0.7fr)]">
         <section
           className="flex flex-col items-center rounded-3xl border border-border/50 bg-card p-4 shadow-raised sm:p-6"
           aria-labelledby="qibla-bearing"
@@ -362,10 +363,10 @@ export function QiblaScreen({
                 {t(language, "qibla.bearing", { degrees: formatNumerals(roundedBearing!, language) })}
               </h2>
               <p className="mt-1 text-center text-sm font-semibold text-muted-foreground">
-                {t(language, `qibla.${cardinalKey(bearing)}`)} · {formatNumerals(roundedBearing!, language)}°
+                {t(language, `qibla.${cardinalKey(bearing)}`)}
               </p>
               {distanceKm !== null && (
-                <p className="mt-1 text-center text-xs font-bold text-primary">
+                <p className="mt-1 text-center text-xs font-medium text-muted-foreground">
                   {t(language, "qibla.distanceToKaaba", {
                     distance: formatNumerals(distanceKm.toLocaleString(), language),
                   })}
@@ -381,10 +382,7 @@ export function QiblaScreen({
                 >
                   <Check size={15} strokeWidth={3} />
                 </span>
-                {guidance ??
-                  t(language, "qibla.staticDirection", {
-                    degrees: formatNumerals(roundedBearing!, language),
-                  })}
+                {guidance ?? t(language, "qibla.staticHint")}
               </h3>
               {!showDesktopGuide && (
                 <Button
@@ -427,7 +425,12 @@ export function QiblaScreen({
                 </p>
               </div>
             </div>
-            <Button className="mt-4 min-h-11 w-full" onClick={() => void detectLocation()} disabled={isLocating}>
+            <Button
+              variant={bearing === null ? "default" : "outline"}
+              className="mt-4 min-h-11 w-full"
+              onClick={() => void detectLocation()}
+              disabled={isLocating}
+            >
               {isLocating ? t(language, "qibla.locating") : t(language, "qibla.useCurrentLocation")}
             </Button>
             {locationMessage && (

@@ -22,13 +22,13 @@ describe("QiblaScreen Task-First Experience", () => {
 
     // Bearing & Cardinal
     expect(screen.getByText(/Qibla is 136° from north/i)).toBeInTheDocument();
-    expect(screen.getByText(/South-east · 136°/i)).toBeInTheDocument();
+    expect(screen.getByText(/South-east/i)).toBeInTheDocument();
 
     // Distance to Kaaba
     expect(screen.getByText(/1,287 km to the Holy Kaaba/i)).toBeInTheDocument();
 
     expect(screen.getByRole("img", { name: /Visual direction to the Kaaba at 136 degrees/ })).toBeVisible();
-    expect(screen.getByText("Kaaba direction: 136° clockwise from North")).toBeVisible();
+    expect(screen.getByText("Find north, then turn clockwise to the bearing above.")).toBeVisible();
     expect(screen.getByRole("button", { name: "Enable live compass" })).toBeVisible();
   });
 
@@ -51,13 +51,13 @@ describe("QiblaScreen Task-First Experience", () => {
 
     // Bearing & Cardinal in Arabic
     expect(screen.getByText(/اتجاه القبلة ١٣٦° من الشمال/)).toBeInTheDocument();
-    expect(screen.getByText(/الجنوب الشرقي · ١٣٦°/)).toBeInTheDocument();
+    expect(screen.getByText(/الجنوب الشرقي/)).toBeInTheDocument();
 
     // Distance in Arabic numerals
     expect(screen.getByText(/١[,٬]?٢٨٧ كم إلى الكعبة المشرفة/)).toBeInTheDocument();
 
     expect(screen.getByRole("img", { name: /اتجاه مرئي إلى الكعبة بزاوية ١٣٦ درجة/ })).toBeVisible();
-    expect(screen.getByText("اتجاه الكعبة: ١٣٦° مع عقارب الساعة من الشمال")).toBeVisible();
+    expect(screen.getByText("حدّد الشمال، ثم اتجه مع عقارب الساعة إلى الزاوية الموضحة أعلاه.")).toBeVisible();
     expect(screen.getByRole("button", { name: "تشغيل البوصلة المباشرة" })).toBeVisible();
   });
 });

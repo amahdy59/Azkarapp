@@ -1,3 +1,4 @@
+import { Button } from "../components/ui/button";
 import { CHOICE_SURFACE, NATIVE_RADIO } from "../components/ui/controlStyles";
 import { useMemo, useState } from "react";
 import { Header } from "../components/LayoutShells";
@@ -307,13 +308,13 @@ export function QuranWirdScreen({
 
   return (
     <ScreenContainer dir={direction} screenName={t(language, "mushaf.wirdTitle")} className="overflow-y-auto">
-      <Header title={t(language, "mushaf.wirdTitle")} onBack={onBack} language={language} />
+      <Header pageGutters title={t(language, "mushaf.wirdTitle")} onBack={onBack} language={language} />
       <div
         data-testid="quran-wird-content"
-        className={`mx-auto grid w-full grid-cols-1 gap-4 px-4 pb-8 pt-3 sm:px-6 lg:max-w-6xl lg:grid-cols-2 lg:items-start ${textAlignment}`}
+        className={`mx-auto grid w-full grid-cols-1 gap-4 px-page pb-8 pt-3 lg:max-w-6xl lg:grid-cols-2 lg:items-start ${textAlignment}`}
       >
         <section
-          className="rounded-3xl border border-primary/50 bg-card p-5 shadow-raised sm:p-6 lg:col-span-2"
+          className="rounded-3xl border border-primary/50 bg-card p-5 shadow-raised sm:p-6 lg:col-span-2 lg:mx-auto lg:w-full lg:max-w-[var(--content-form)]"
           aria-labelledby="wird-today-title"
         >
           <div className="mb-3 flex items-center justify-between gap-2">
@@ -570,7 +571,7 @@ export function QuranWirdScreen({
                   {t(language, "mushaf.chooseReadingStyle")}
                 </legend>
                 <p className="mb-3 text-sm text-muted-foreground">{t(language, "mushaf.chooseReadingStyleHint")}</p>
-                <div className="grid gap-2 sm:grid-cols-2">
+                <div className="grid gap-2 min-[360px]:grid-cols-2">
                   {(
                     [
                       ["repeating", "mushaf.planRepeating", "mushaf.planRepeatingHint"],
@@ -1037,26 +1038,27 @@ export function QuranWirdScreen({
               </div>
 
               <div className="mt-2 flex gap-3">
-                <button
+                <Button
                   type="button"
                   onClick={() => {
                     setDraftPlan(plan);
                     setIsDrafting(false);
                   }}
-                  className="min-h-11 flex-1 rounded-xl border border-border px-3 font-bold hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                  variant="outline"
+                  className="flex-1"
                 >
                   {t(language, "mushaf.cancelPlan")}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
                   onClick={() => {
                     onPlanChange(normalizedDraft);
                     setIsDrafting(false);
                   }}
-                  className="min-h-11 flex-1 rounded-xl bg-primary px-3 font-bold text-primary-foreground hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                  className="flex-1"
                 >
                   {t(language, "mushaf.savePlan")}
-                </button>
+                </Button>
               </div>
             </div>
           )}

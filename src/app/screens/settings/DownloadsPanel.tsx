@@ -414,7 +414,14 @@ export function DownloadsPanel({
         }}
       >
         <p className="text-sm text-muted-foreground">{t(language, "downloads.includedText")}</p>
-        <p className="text-sm text-muted-foreground">{t(language, "downloads.localStorageHelp")}</p>
+        <details className="rounded-xl border border-border bg-card px-3">
+          <summary className="min-h-11 cursor-pointer py-3 text-sm font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+            {t(language, "downloads.offlineHelp")}
+          </summary>
+          <p className="pb-3 text-sm leading-relaxed text-muted-foreground">
+            {t(language, "downloads.localStorageHelp")}
+          </p>
+        </details>
         <div className="space-y-2 rounded-xl border border-border p-3">
           <p
             className="text-sm text-muted-foreground"

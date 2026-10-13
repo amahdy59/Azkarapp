@@ -63,6 +63,10 @@
 .reader-text-scroll .reading-measure > div {
   min-height: 100%;
 }
+.reader-tool-short-label {
+  display: none;
+}
+
 @container reader-footer (max-width: 37.5rem) {
   .reader-footer-composition {
     grid-template-columns: repeat(4, minmax(44px, 1fr));
@@ -88,6 +92,22 @@
   }
   .reader-tools-disclosure .reader-tools-chevron {
     display: flex;
+  }
+  [data-testid="reader-support-actions"] .devotional-secondary-action:has(.reader-tool-label),
+  .reader-tools-disclosure button:has(.reader-tool-short-label) {
+    flex-direction: column;
+    gap: 2px;
+    padding-block: 2px;
+  }
+  [data-testid="reader-support-actions"] .devotional-secondary-action > .reader-tool-label,
+  .reader-tools-disclosure button > .reader-tool-short-label {
+    display: block;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.6875rem;
+    line-height: 1.25;
   }
 }
 

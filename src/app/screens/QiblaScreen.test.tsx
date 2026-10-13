@@ -52,7 +52,7 @@ describe("QiblaScreen", () => {
     expect(screen.getByText("Cairo")).toBeVisible();
     expect(screen.getByRole("button", { name: "Enable live compass" })).toHaveAttribute("aria-pressed", "false");
     expect(screen.getByRole("img", { name: /Visual direction to the Kaaba at 136 degrees/ })).toBeVisible();
-    expect(screen.getByText("Kaaba direction: 136° clockwise from North")).toBeVisible();
+    expect(screen.getByText("Find north, then turn clockwise to the bearing above.")).toBeVisible();
     expect(screen.getByTestId("kaaba-target")).toBeInTheDocument();
     expect(screen.getByTestId("compass-rose")).toHaveAttribute("transform", "rotate(0 160 160)");
     expect(screen.getByRole("heading", { name: "Qibla" }).closest(".app-screen-surface")).toHaveClass(

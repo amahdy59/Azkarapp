@@ -241,7 +241,7 @@ export function CategoryScreen({
                   <button
                     type="button"
                     onClick={onPlayAllAudio}
-                    className="order-4 flex h-11 items-center justify-center gap-1.5 rounded-btn border border-primary/30 bg-primary/10 px-3.5 text-label font-bold text-primary shadow-xs transition-[color,background-color,border-color,box-shadow,transform] hover:bg-primary/20 active:scale-95 dark:text-primary"
+                    className="order-4 flex h-11 items-center justify-center gap-1.5 rounded-btn border border-border-control bg-card px-3.5 text-label font-semibold text-foreground shadow-xs transition-[color,background-color,border-color,box-shadow,transform] hover:bg-muted active:scale-95"
                     aria-label={t(language, "category.playAllAudio")}
                     title={
                       audioCoverage

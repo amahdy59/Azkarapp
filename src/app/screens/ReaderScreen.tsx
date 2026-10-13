@@ -1180,7 +1180,7 @@ export function ReaderScreen({
         className={`min-w-0 flex-1 ${audioModeActive ? "" : "shadow-sm"}`}
       >
         <Headphones size={20} className="shrink-0" aria-hidden="true" />
-        <span className="min-w-0 text-label font-semibold [overflow-wrap:anywhere]">
+        <span className="reader-tool-label min-w-0 text-label font-semibold [overflow-wrap:anywhere]">
           {t(language, "reader.menuAudio")}
         </span>
       </DevotionalAction>
@@ -1205,7 +1205,7 @@ export function ReaderScreen({
       className="min-w-0 flex-1 shadow-sm"
     >
       <Lightbulb size={20} aria-hidden="true" />
-      <span className="min-w-0 text-label font-semibold [overflow-wrap:anywhere]">
+      <span className="reader-tool-label min-w-0 text-label font-semibold [overflow-wrap:anywhere]">
         {t(language, "reader.referencesButton")}
       </span>
     </DevotionalAction>
@@ -1295,7 +1295,7 @@ export function ReaderScreen({
                 className="min-w-[5rem] flex-1 shadow-sm"
               >
                 <Share2 size={20} aria-hidden="true" />
-                <span className="min-w-0 text-label font-semibold [overflow-wrap:anywhere]">
+                <span className="reader-tool-label min-w-0 text-label font-semibold [overflow-wrap:anywhere]">
                   {t(language, "reader.shareAction")}
                 </span>
               </DevotionalAction>

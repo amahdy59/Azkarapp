@@ -574,6 +574,7 @@ const en = {
     preparingFile: "Preparing audio file…",
     fileHandedToBrowser: "Sent to your browser for saving. Check Downloads/Files.",
     exportError: "Could not verify this file. Refresh status and download missing audio.",
+    offlineHelp: "How offline storage works",
     localStorageHelp:
       "Offline audio stays in this browser, not in the Files app. For a separate file, use Manage → Save audio files to device.",
     receivingFile: "Receiving recording {file} of {total}…",
@@ -1477,6 +1478,8 @@ const en = {
     characterShortcuts: "Enable single-key shortcuts for this visit",
     shortcutSafety:
       "Turn this off to disable letter, symbol, and question-mark shortcuts. Space and arrow keys still work on the reading surface. Controls keep their own keyboard behavior.",
+    focusShort: "Focus",
+    exitFocusShort: "Exit focus",
     enterFocus: "Focus on reading",
     exitFocus: "Exit reading focus",
     interactionSheetAria: "Ayah actions",
@@ -1870,6 +1873,7 @@ const en = {
     compassDenied:
       "Motion sensors are blocked for this site. Check its sensor permission in your browser settings (Chrome: Settings → Site settings → Motion sensors), then reopen the app and try again. The bearing from north remains available.",
     compassStatic: "Static bearing — the arrow moves only when the live compass receives a heading.",
+    staticHint: "Find north, then turn clockwise to the bearing above.",
     staticDirection: "Kaaba direction: {degrees}° clockwise from North",
     directionVisualLabel: "Visual direction to the Kaaba at {degrees} degrees clockwise from North",
     accuracyTips: "Accuracy and calibration tips",

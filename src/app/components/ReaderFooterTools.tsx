@@ -56,6 +56,9 @@ export function ReaderFooterTools({
               <span className="reader-tools-chevron flex shrink-0 items-center justify-center" aria-hidden="true">
                 {focusMode ? <Minimize size={20} /> : <Maximize size={20} />}
               </span>
+              <span className="reader-tool-short-label" aria-hidden="true">
+                {t(language, focusMode ? "reader.exitFocusShort" : "reader.focusShort")}
+              </span>
               <span className="inline-grid">
                 <span className="col-start-1 row-start-1">
                   {t(language, focusMode ? "reader.exitFocus" : "reader.enterFocus")}

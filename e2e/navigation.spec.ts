@@ -120,7 +120,7 @@ test("Qibla keeps the static bearing and explains Android sensor denial", async 
   await page.getByRole("button", { name: "Enable live compass" }).click();
   await expect(page.getByText(/Settings → Site settings → Motion sensors/)).toBeVisible();
   await expect(page.getByRole("button", { name: "Enable live compass" })).toHaveAttribute("aria-pressed", "false");
-  await expect(page.getByText("Kaaba direction: 136° clockwise from North")).toBeVisible();
+  await expect(page.getByText("Find north, then turn clockwise to the bearing above.")).toBeVisible();
   await expect(page.getByTestId("qibla-arrow")).toHaveAttribute("transform", /^rotate\(136\./);
 });
 
