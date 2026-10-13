@@ -6,6 +6,8 @@ QuranSurahListeningReader retains all fifteen source line slots from useListenin
 
 ScreenFallback schedules one cancellable 15-second timer and then exposes safe user-requested refresh outside its polite status region. Ordinary loading remains unchanged and naturally resolving imports replace the fallback. Existing retryableScreen continues handling rejected chunks without discarding local state. Deployment candidate verification retries delayed visibility of successful Quality at most six times, ten seconds apart, and rejects a superseded main SHA immediately on every attempt. Every release still requires successful exact-commit Quality.
 
+Stopping docked playback records a focus-return request in ReaderScreen. A layout effect waits for the inactive audio state to commit, then restores the counter or surah-reading action after a frame, with cancellation on unmount. It replaces the fixed 50ms guess so slow rendering cannot consume the return request while reading controls are still absent or inert.
+
 ## Reading responsiveness and diagnostics — 2026-10-12
 
 useListeningMushafPage publishes complete local page words as soon as data resolves. A missing QCF font no longer blocks publication for 1.8 seconds: Unicode is usable immediately, with a matching-font notification/settlement upgrading the same page. Font failure preserves readable words; cancellation prevents a late request from upgrading another page. Font/data caching and exact verse identity checks remain in the existing service boundary.

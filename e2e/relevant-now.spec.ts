@@ -29,7 +29,13 @@ const narration = async (page: Page) => {
   const card = page.getByTestId("home-daily-evidence");
   await card.scrollIntoViewIfNeeded();
   await expect(card).toBeVisible();
-  return (await card.textContent()) ?? "";
+  // A late page font swaps decorative glyphs, never the reviewed narration.
+  // Compare the semantic source and citation, excluding aria-hidden artwork.
+  return card.evaluate((element) => {
+    const copy = element.cloneNode(true) as HTMLElement;
+    copy.querySelectorAll('[aria-hidden="true"]').forEach((node) => node.remove());
+    return copy.textContent ?? "";
+  });
 };
 
 test("the card is named for the moment rather than the day", async ({ page }) => {

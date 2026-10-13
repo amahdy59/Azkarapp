@@ -1,13 +1,15 @@
 {
-  "release": "2026-10-13",
+  "release": "2026-10-13-2",
   "ar": [
     "كبّر صفحات المصحف بحروف أكبر مع بقاء ترتيب السطور، ومرّر أفقيًا وعموديًا للوصول إلى النص كاملًا.",
     "استمع إلى الكهف والسجدة والملك مع سطور صفحات المصحف نفسها، وابدأ من عنوان السورة دون فراغات سابقة.",
-    "إذا طال التحميل، يمكنك الانتظار أو تحديث التطبيق من خيار واضح مع الاحتفاظ بتقدمك المحلي."
+    "إذا طال التحميل، يمكنك الانتظار أو تحديث التطبيق من خيار واضح مع الاحتفاظ بتقدمك المحلي.",
+    "عند إيقاف الاستماع، تعود لوحة المفاتيح إلى أدوات القراءة بعد ظهورها، حتى إذا تأخر عرضها."
   ],
   "en": [
     "Enlarge Mushaf pages with bigger letters and the same printed lines, then pan across and down to reach all the text.",
     "Listen to Al-Kahf, As-Sajdah and Al-Mulk with their Mushaf page lines, starting at the surah heading instead of preceding empty space.",
-    "If loading takes longer, choose to keep waiting or refresh from a clear recovery action while your local progress stays safe."
+    "If loading takes longer, choose to keep waiting or refresh from a clear recovery action while your local progress stays safe.",
+    "When you stop listening, keyboard focus returns to the reading controls once they are ready, even if rendering takes longer."
   ]
 }

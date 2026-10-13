@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ReaderScreen } from "./ReaderScreen";
@@ -35,6 +35,44 @@ afterEach(() => {
 });
 
 describe("ReaderScreen audio identity", () => {
+  it("restores focus after a delayed stopped-player commit rather than a fixed timer", () => {
+    let frame: FrameRequestCallback | undefined;
+    vi.spyOn(window, "requestAnimationFrame").mockImplementation((callback) => {
+      frame = callback;
+      return 1;
+    });
+    const props = {
+      catId: "morning" as const,
+      idx: 0,
+      routineMode: "core" as const,
+      isArabic: true,
+      direction: "rtl" as const,
+      themeMode: "light" as const,
+      isDone: false,
+      collectionCompletedCount: 0,
+      hapticFeedback: false,
+      showTranslation: false,
+      showTransliteration: false,
+      textSize: "medium" as const,
+      onTextSizeChange: vi.fn(),
+      savedZikrIds: new Set<string>(),
+      onBack: vi.fn(),
+      onComplete: vi.fn(),
+      onAdvance: vi.fn(),
+      onNext: vi.fn(),
+      onPrev: vi.fn(),
+      onToggleSaved: vi.fn(),
+      audioAvailable: true,
+      audioPlayer: (onClose: () => void) => <button onClick={onClose}>Stop fixture</button>,
+    };
+    const { rerender } = render(<ReaderScreen {...props} audioModeActive />);
+    fireEvent.click(screen.getByRole("button", { name: "Stop fixture" }));
+    expect(screen.queryByTestId("counter-surface")).toBeNull();
+    // The reading controls can commit arbitrarily later than the stop action.
+    rerender(<ReaderScreen {...props} audioModeActive={false} />);
+    act(() => frame?.(0));
+    expect(screen.getByTestId("counter-surface")).toHaveFocus();
+  });
   it.each(["morning", "evening", "before_sleep"] as const)(
     "uses the concise Ayah Al-Kursi heading in %s without changing source metadata",
     (catId) => {

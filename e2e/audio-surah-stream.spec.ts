@@ -49,9 +49,8 @@ for (const item of listeningCases.filter((item) => item.id !== "ir-baqarah")) {
         expect(target.reachable).toBe(true);
       }
       const columns = passages.locator("[data-mushaf-column]");
-      for (const column of await columns.all()) await expect(column.locator(":scope > div")).toHaveCount(15);
-      const printedLines = await columns.evaluateAll((elements) =>
-        elements.map((element) => Array.from(element.children, (line) => line.textContent)),
+      expect(await columns.evaluateAll((elements) => elements.map((element) => element.children.length))).toEqual(
+        Array(zikr.mushafPages!.length).fill(15),
       );
       const textLine = passages.first().locator("[data-mushaf-line-content]").first();
       expect(await textLine.evaluate((element) => parseFloat(getComputedStyle(element).fontSize))).toBeGreaterThan(10);
@@ -103,46 +102,6 @@ for (const item of listeningCases.filter((item) => item.id !== "ir-baqarah")) {
       await expect(words).toHaveAttribute("aria-pressed", "true");
       await page.keyboard.press("Escape");
       await expect(options).toBeFocused();
-      await page.evaluate(() => document.fonts.ready);
-      const baseFont = await textLine.evaluate((element) => parseFloat(getComputedStyle(element).fontSize));
-      await options.click();
-      const magnification = page.getByRole("slider", { name: t(language, "mushaf.magnification"), exact: true });
-      await magnification.focus();
-      await page.keyboard.press("Home");
-      await page.keyboard.press("ArrowUp");
-      await page.keyboard.press("ArrowUp");
-      await expect(magnification).toHaveValue("150");
-      await page.keyboard.press("Escape");
-      await expect
-        .poll(() => textLine.evaluate((element) => parseFloat(getComputedStyle(element).fontSize)))
-        .toBeGreaterThan(baseFont * 1.35);
-      expect(
-        await columns.evaluateAll((elements) =>
-          elements.map((element) => Array.from(element.children, (line) => line.textContent)),
-        ),
-      ).toEqual(printedLines);
-      await page.screenshot({ path: testInfo.outputPath(`${item.id}-${language}-150.png`) });
-      await options.click();
-      await page.getByRole("button", { name: t(language, "mushaf.magnificationReset"), exact: true }).click();
-      await page.keyboard.press("Escape");
-      // Reset schedules fitting via ResizeObserver; record word geometry only
-      // after its font size and containment transform have settled.
-      await textLine.evaluate(async (element) => {
-        await document.fonts.ready;
-        await new Promise<void>((resolve) => {
-          let previous = "";
-          let unchanged = 0;
-          const sample = () => {
-            const box = element.getBoundingClientRect();
-            const value = `${getComputedStyle(element).fontSize}:${box.width}:${box.height}`;
-            unchanged = value === previous ? unchanged + 1 : 0;
-            previous = value;
-            if (unchanged >= 12) resolve();
-            else requestAnimationFrame(sample);
-          };
-          requestAnimationFrame(sample);
-        });
-      });
       const annotation = listeningTiming(item);
       const last = annotation.verses.filter((verse) => verse.words?.length).at(-1)!;
       await page.evaluate(
@@ -209,6 +168,69 @@ for (const item of listeningCases.filter((item) => item.id !== "ir-baqarah")) {
       await viewport.focus();
       await page.keyboard.press("Home");
       await player.screenshot({ path: testInfo.outputPath(`${item.id}-${language}-stream.png`), scale: "css" });
+    });
+    test(`canonical surah magnification ${item.id} ${language} @cross-browser`, async ({ page }, testInfo) => {
+      const player = await openListeningPage(page, item, language);
+      const passages = player.locator("[data-listening-passage]");
+      const columns = passages.locator("[data-mushaf-column]");
+      const textLine = passages.first().locator("[data-mushaf-line-content]").first();
+      const options = player.getByRole("button", { name: t(language, "audioPlayer.options"), exact: true });
+      const zikr =
+        item.id === "friday-kahf"
+          ? FRIDAY_KAHF[0]!
+          : getAzkarForMode(item.category, "complete").find((entry) => entry.id === item.id)!;
+      await expect(columns).toHaveCount(zikr.mushafPages!.length);
+      expect(await columns.evaluateAll((elements) => elements.map((element) => element.children.length))).toEqual(
+        Array(zikr.mushafPages!.length).fill(15),
+      );
+      const printedLines = await columns.evaluateAll((elements) =>
+        elements.map((element) => Array.from(element.children, (line) => line.textContent)),
+      );
+      await page.evaluate(() => document.fonts.ready);
+      const baseFont = await textLine.evaluate((element) => parseFloat(getComputedStyle(element).fontSize));
+      await options.click();
+      const magnification = page.getByRole("slider", { name: t(language, "mushaf.magnification"), exact: true });
+      await magnification.focus();
+      await page.keyboard.press("Home");
+      await page.keyboard.press("ArrowUp");
+      await page.keyboard.press("ArrowUp");
+      await expect(magnification).toHaveValue("150");
+      await page.keyboard.press("Escape");
+      await expect
+        .poll(() => textLine.evaluate((element) => parseFloat(getComputedStyle(element).fontSize)))
+        .toBeGreaterThan(baseFont * 1.35);
+      expect(
+        await columns.evaluateAll((elements) =>
+          elements.map((element) => Array.from(element.children, (line) => line.textContent)),
+        ),
+      ).toEqual(printedLines);
+      await page.screenshot({ path: testInfo.outputPath(`${item.id}-${language}-150.png`) });
+      await options.click();
+      await page.getByRole("button", { name: t(language, "mushaf.magnificationReset"), exact: true }).click();
+      await page.keyboard.press("Escape");
+      // Reset schedules fitting via ResizeObserver; record word geometry only
+      // after its font size and containment transform have settled.
+      await textLine.evaluate(async (element) => {
+        await document.fonts.ready;
+        await new Promise<void>((resolve) => {
+          let previous = "";
+          let unchanged = 0;
+          const sample = () => {
+            const box = element.getBoundingClientRect();
+            const value = `${getComputedStyle(element).fontSize}:${box.width}:${box.height}`;
+            unchanged = value === previous ? unchanged + 1 : 0;
+            previous = value;
+            if (unchanged >= 12) resolve();
+            else requestAnimationFrame(sample);
+          };
+          requestAnimationFrame(sample);
+        });
+      });
+    });
+    test(`responsive surah listening ${item.id} ${language} @cross-browser`, async ({ page }, testInfo) => {
+      const player = await openListeningPage(page, item, language);
+      const options = player.getByRole("button", { name: t(language, "audioPlayer.options"), exact: true });
+      const viewport = player.locator(".audio-expanded-text");
       for (const size of [
         { width: 320, height: 568 },
         { width: 1440, height: 1100 },

@@ -290,6 +290,21 @@ export function ReaderScreen({
   /** A surah short enough to be read here rather than in the Mushaf view. */
   const showSurahChrome = Boolean(z?.isSurah) && !longSurah;
   const [immersiveOpen, setImmersiveOpen] = useState(false);
+  const restoreAudioFocusRef = useRef(false);
+  useLayoutEffect(() => {
+    if (audioModeActive || !restoreAudioFocusRef.current) return;
+    // Wait for the stopped player's commit and inert cleanup, rather than
+    // guessing how quickly the normal reading controls will remount.
+    const frame = requestAnimationFrame(() => {
+      restoreAudioFocusRef.current = false;
+      const root = document.querySelector<HTMLElement>('[data-testid="reader-screen"]');
+      const target =
+        root?.querySelector<HTMLElement>('[data-testid="counter-surface"]') ??
+        root?.querySelector<HTMLElement>('[data-testid="reader-mushaf-button"]');
+      target?.focus({ preventScroll: true });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [audioModeActive]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const sidebarToggleRef = useRef<HTMLButtonElement>(null);
   const readerMenuRef = useRef<HTMLButtonElement>(null);
@@ -1226,12 +1241,7 @@ export function ReaderScreen({
   const renderDock = () => {
     if (audioModeActive && audioPlayer) {
       const onClose = () => {
-        setTimeout(() => {
-          const target =
-            document.querySelector<HTMLElement>('[data-testid="counter-surface"]') ??
-            document.querySelector<HTMLElement>('[data-testid="reader-mushaf-button"]');
-          target?.focus();
-        }, 50);
+        restoreAudioFocusRef.current = true;
       };
       const player =
         typeof audioPlayer === "function"
