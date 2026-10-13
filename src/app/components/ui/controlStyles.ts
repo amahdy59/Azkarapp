@@ -6,3 +6,5 @@ export const CHOICE_SURFACE =
   "rounded-xl border border-border-control bg-card text-foreground transition-colors duration-fast hover:bg-muted has-[:checked]:border-primary has-[:checked]:bg-primary/10 focus-within:ring-[3px] focus-within:ring-ring";
 
 export const NATIVE_RADIO = "size-5 shrink-0 accent-primary";
+
+export const PEER_TAB_SELECTED = "bg-primary/10 text-foreground shadow-xs ring-1 ring-inset ring-primary/50";

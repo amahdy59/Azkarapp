@@ -1479,7 +1479,7 @@ const en = {
     shortcutSafety:
       "Turn this off to disable letter, symbol, and question-mark shortcuts. Space and arrow keys still work on the reading surface. Controls keep their own keyboard behavior.",
     focusShort: "Focus",
-    exitFocusShort: "Exit focus",
+    exitFocusShort: "Exit",
     enterFocus: "Focus on reading",
     exitFocus: "Exit reading focus",
     interactionSheetAria: "Ayah actions",

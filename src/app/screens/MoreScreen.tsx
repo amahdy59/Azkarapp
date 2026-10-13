@@ -56,8 +56,13 @@ export function MoreScreen({
 }) {
   return (
     <ScreenContainer dir={direction} screenName={t(language, "more.title")}>
-      <Header title={t(language, "more.title")} subtitle={t(language, "more.subtitle")} language={language} />
-      <div className="mx-auto grid w-full max-w-5xl grid-cols-1 gap-3 px-4 py-4 sm:grid-cols-2 sm:px-6 md:grid-cols-2 lg:grid-cols-3">
+      <Header
+        pageGutters
+        title={t(language, "more.title")}
+        subtitle={t(language, "more.subtitle")}
+        language={language}
+      />
+      <div className="mx-auto grid w-full max-w-5xl grid-cols-1 gap-3 px-page py-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
         <ToolCard
           title={t(language, "qibla.title")}
           description={t(language, "more.qiblaDescription")}

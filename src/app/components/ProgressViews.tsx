@@ -414,15 +414,8 @@ export function ProgressDayView({
               )}
               <Heading
                 data-testid="progress-primary-heading"
-                className={`block max-w-full truncate whitespace-nowrap text-xl font-black tracking-tight sm:text-headline md:text-2xl ${
-                  onGlass
-                    ? "text-on-media-accent drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
-                    : isHomeSubset
-                      ? // Off the photograph the gold has to come from the theme rather
-                        // than the fixed on-media accent, which is the same colour in
-                        // every mode because its ground is an image.
-                        "text-primary"
-                      : "text-foreground"
+                className={`block max-w-full truncate whitespace-nowrap text-xl font-bold tracking-tight sm:text-headline md:text-2xl ${
+                  onGlass ? "text-on-media drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" : "text-foreground"
                 }`}
                 dir="auto"
               >

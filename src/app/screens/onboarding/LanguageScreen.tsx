@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
-import { Check } from "../../components/icons";
+import { ChoiceRadioItem } from "../../components/ChoiceRadioItem";
+import { Button } from "../../components/ui/button";
 import { PreAppLayout } from "../../components/PreAppLayout";
 import { t } from "../../i18n";
 import { LANGUAGES_LIST } from "../../languageOptions";
@@ -52,43 +53,34 @@ export function LanguageScreen({
         aria-label={t(language, "onboarding.availableLanguages")}
       >
         {LANGUAGES_LIST.map((lang) => {
-          const active = selected === lang.code;
           return (
-            <RadioGroupPrimitive.Item
+            <ChoiceRadioItem
               key={lang.code}
               value={lang.code}
               data-testid={`language-option-${lang.code}`}
-              className={`relative flex items-center justify-center gap-3 rounded-2xl px-4 w-full transition-[color,background-color,border-color,box-shadow,transform] h-[64px] bg-card border focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                active ? "border-primary shadow-sm" : "border-border-control"
-              }`}
+              className="min-h-16 w-full px-4"
               dir={lang.code === "ar" ? "rtl" : "ltr"}
               lang={lang.code}
             >
               <div className="flex items-center justify-center gap-3 w-full">
-                {active && (
-                  <div className="absolute start-4">
-                    <Check size={20} className="text-primary" aria-hidden="true" />
-                  </div>
-                )}
-
                 <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider" aria-hidden="true">
                   {lang.code}
                 </span>
                 <span className="text-title font-semibold text-foreground">{lang.native}</span>
               </div>
-            </RadioGroupPrimitive.Item>
+            </ChoiceRadioItem>
           );
         })}
       </RadioGroupPrimitive.Root>
 
       <div className="shrink-0 px-6 pb-8 min-[900px]:pt-3">
-        <button
+        <Button
           data-testid="confirm-language"
           onClick={() => onContinue(selected)}
-          className="w-full flex items-center justify-center rounded-2xl transition-[color,background-color,border-color,box-shadow,transform] active:scale-95 h-[56px] bg-primary text-title font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="min-h-14 w-full text-title"
         >
           {t(language, "common.continue")}
-        </button>
+        </Button>
       </div>
     </PreAppLayout>
   );

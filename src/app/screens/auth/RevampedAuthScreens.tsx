@@ -1,3 +1,4 @@
+import { buttonVariants } from "../../components/ui/button";
 import { useEffect, useRef, useState } from "react";
 import { FIELD_LABEL_CLASS } from "../../components/FormField";
 import { ArrowPrevious, Clock } from "../../components/icons";
@@ -39,7 +40,11 @@ function ProviderButton({ label, onClick, disabled }: { label: string; onClick: 
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="min-h-12 w-full rounded-xl border border-border-control bg-card px-4 text-subtitle font-semibold text-foreground hover:bg-muted disabled:cursor-wait disabled:opacity-55"
+      className={buttonVariants({
+        variant: "outline",
+        size: "lg",
+        className: "w-full text-subtitle disabled:cursor-wait",
+      })}
     >
       {label}
     </button>
@@ -111,7 +116,7 @@ export function LoginScreen({
           data-testid="continue-as-guest"
           type="button"
           onClick={onGuest}
-          className="h-12 w-full rounded-xl bg-secondary text-subtitle font-semibold text-secondary-foreground"
+          className={buttonVariants({ variant: "secondary", size: "lg", className: "w-full text-subtitle" })}
         >
           {t(language, "auth.continueAsGuest")}
         </button>
@@ -191,7 +196,7 @@ export function EmailInputScreen({
           type="button"
           onClick={canSend && !isSending ? () => onSend(email.trim()) : undefined}
           disabled={!canSend || isSending}
-          className="h-[52px] w-full rounded-2xl bg-primary text-base font-bold text-primary-foreground disabled:opacity-45"
+          className={buttonVariants({ size: "lg", className: "min-h-[52px] w-full text-base" })}
         >
           {isSending ? t(language, "common.sending") : t(language, "auth.sendVerificationCode")}
         </button>
@@ -297,7 +302,7 @@ export function OTPScreen({
           type="button"
           onClick={token.length === 6 && !isVerifying ? () => onVerify(token) : undefined}
           disabled={token.length !== 6 || isVerifying}
-          className="h-[52px] rounded-2xl bg-primary font-bold text-primary-foreground disabled:opacity-45"
+          className={buttonVariants({ size: "lg", className: "min-h-[52px]" })}
         >
           {isVerifying ? t(language, "common.verifying") : t(language, "common.verify")}
         </button>
@@ -380,7 +385,7 @@ export function ProfileCompletionScreen({
         disabled={!displayName.trim() || isSaving}
         aria-busy={isSaving || undefined}
         onClick={() => onSave(displayName)}
-        className="h-12 rounded-xl bg-primary font-bold text-primary-foreground disabled:opacity-50 min-[900px]:mt-8"
+        className={buttonVariants({ size: "lg", className: "min-[900px]:mt-8" })}
       >
         {isSaving ? t(language, "auth.saving") : t(language, "auth.continue")}
       </button>

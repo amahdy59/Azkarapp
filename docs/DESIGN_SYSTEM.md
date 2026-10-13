@@ -1,5 +1,17 @@
 # Azkar design system
 
+## Visual coherence — owner-approved, 2026-10-13
+
+Ordinary choice cards use ChoiceRadioItem: the shared control radius, passive control border, opaque card surface, selected primary tint/border and a non-color check indicator. Theme, reading, accessibility, weekly goal and onboarding pickers retain their existing layout/dimensions. Native Quran-plan and export-format radios use shared choice/native paint recipes. Ordinary radio arrows now focus and select immediately; Home/End and disabled-option skipping are supported. This explicitly supersedes DEC-022’s focus-only limitation; menus/selects retain focus-then-activation semantics.
+
+Library, Progress and Benefits peer tabs share PEER_TAB_SELECTED, with a subtle primary tint, outline and readable foreground. Main action buttons remain solid primary; selections are not presented as competing primary actions. Shared Select/DropdownMenu use neutral focus and persistent checked tint/checkmarks. Destructive Button consumes its theme’s paired foreground token. No global button size/radius override is added.
+
+Ordinary browse headers may opt into responsive page gutters; Library and compact Settings share them, while desktop Settings panes retain their bounded form/navigation measures. Home’s evidence card is opaque; atmospheric primary/photo cards remain controlled media surfaces. Photo-tile actions use a quiet common media treatment. Qibla presents one bearing and one practical instruction; location is secondary when a bearing exists. Quran continuation is bounded on desktop and initial choices form a two-column grid at 360px and wider. Download storage explanation is disclosed while availability/persistence remain visible.
+
+Reader mobile support/focus tools show concise micro labels inside their existing targets without moving the default footer anchors. Empty Progress plots are compact while exact zero/future/denominator data remain available. Sharing promotes Save when native sharing is unavailable. All reviewed text and data semantics stay intact.
+
+**Mushaf protection:** no control enlargement, alignment change, canonical page/line/word change, font adjustment or magnification change is authorized by this polish. Existing Mushaf view chrome is retained.
+
 ## Canonical Surah magnification — 2026-10-13
 
 The owner supersedes height-only enlargement and flowing long-surah listening. Magnification proportionally enlarges width and height; the normal fitted ink size is retained across zoom so the fitter cannot cancel letter growth. No additional leading multiplier is applied. Enlarged printed lines require native horizontal and vertical panning, with explicit reset and page navigation. Existing ordinary snippets continue to flow at the shared Quran size.

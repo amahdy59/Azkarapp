@@ -976,6 +976,7 @@ export function CollectionShareModal({
         )}
         <div className={`grid grid-cols-[repeat(auto-fit,minmax(5rem,1fr))] gap-2 ${wide ? "ms-auto max-w-md" : ""}`}>
           <Button
+            variant={(mode === "image" ? scopedNative : nativeText) ? "default" : "outline"}
             className="min-h-12 gap-1 px-2 whitespace-nowrap"
             aria-describedby={
               !(mode === "image" ? scopedNative : nativeText) ? shareHintId : actionHint ? actionHintId : undefined
@@ -1008,7 +1009,7 @@ export function CollectionShareModal({
             {t(language, "shareStudio.share")}
           </Button>
           <Button
-            variant="outline"
+            variant={(mode === "image" ? scopedNative : nativeText) ? "outline" : "default"}
             className="min-h-12 gap-1 px-2 whitespace-nowrap"
             disabled={busy || (mode === "image" ? !scopeReady : !payloadReady)}
             aria-describedby={actionHint ? actionHintId : undefined}

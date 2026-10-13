@@ -1,5 +1,20 @@
 [
   {
+    "release": "2026-10-13-4",
+    "ar": [
+      "تظهر الأزرار والخيارات والقوائم بتصميم أكثر اتساقًا، وتختار مفاتيح الأسهم خيارًا واحدًا في مجموعات الاختيار.",
+      "أصبحت صفحات الأذكار والإعدادات والتقدم أكثر تناسقًا، مع مساحة قراءة ثابتة للتذكير في الرئيسية.",
+      "توضح أدوات القارئ وظائفها، وتعرض القبلة إرشادًا أبسط، وتصبح خيارات خطة القراءة أسهل في التصفح.",
+      "تشغل مخططات التقدم الفارغة مساحة أقل، وتظهر تفاصيل التخزين عند طلبها، ويبرز حفظ بطاقة المشاركة عند تعذر المشاركة المباشرة."
+    ],
+    "en": [
+      "Buttons, choices and menus have a more consistent appearance, and arrow keys select an option in ordinary radio groups.",
+      "Azkar, Settings and Progress pages align more consistently, with a stable reading surface for the Home reminder.",
+      "Reader tools show clearer labels, Qibla guidance is simpler, and reading-plan choices are easier to browse.",
+      "Empty progress charts take less space, storage details open on request, and Save stands out when direct sharing is unavailable."
+    ]
+  },
+  {
     "release": "2026-10-13-3",
     "ar": [
       "تفتح الرئيسية دون تحميل أدوات العد الخاصة بالقارئ مسبقًا.",

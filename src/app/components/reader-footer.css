@@ -95,18 +95,15 @@
   }
   [data-testid="reader-support-actions"] .devotional-secondary-action:has(.reader-tool-label),
   .reader-tools-disclosure button:has(.reader-tool-short-label) {
-    flex-direction: column;
     gap: 2px;
-    padding-block: 2px;
   }
   [data-testid="reader-support-actions"] .devotional-secondary-action > .reader-tool-label,
   .reader-tools-disclosure button > .reader-tool-short-label {
     display: block;
     max-width: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-size: 0.6875rem;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    font-size: var(--text-micro);
     line-height: 1.25;
   }
 }

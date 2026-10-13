@@ -135,13 +135,12 @@ test("segmented controls expose radio-group semantics and arrow-key focus moveme
   await expect(englishButton).toHaveAttribute("tabindex", "0");
   await expect(arabicButton).toHaveAttribute("tabindex", "-1");
 
-  // Arrow keys move focus within the group. Note: selection does not follow
-  // focus in the pinned Radix version (verified identical on the pre-existing
-  // theme radiogroup, so this is app-wide upstream behavior, not specific to
-  // this control) — see DEC-022. Activation still requires Space/Enter/click.
+  // Owner-approved ordinary radio navigation commits focus and selection together.
   await page.keyboard.press("ArrowRight");
   await expect(arabicButton).toHaveAttribute("tabindex", "0");
   await expect(englishButton).toHaveAttribute("tabindex", "-1");
+  await expect(arabicButton).toHaveAttribute("aria-checked", "true");
+  await expect(englishButton).toHaveAttribute("aria-checked", "false");
 
   await page.keyboard.press("Space");
   await expect(arabicButton).toHaveAttribute("aria-checked", "true");

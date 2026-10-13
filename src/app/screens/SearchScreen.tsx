@@ -165,7 +165,7 @@ export function SearchScreen({
     <div className="flex flex-col h-full bg-background slide-in-from-right" dir={direction}>
       <h1 className="sr-only">{t(language, "search.inputAriaLabel")}</h1>
       {/* Search bar */}
-      <div className="flex shrink-0 items-end gap-3 px-5 py-3">
+      <div className="flex shrink-0 items-end gap-3 px-page py-3">
         <IconButton onClick={onBack} label={t(language, "common.back")} className="shrink-0">
           <ArrowPrevious size={20} className="text-foreground" />
         </IconButton>
@@ -206,7 +206,7 @@ export function SearchScreen({
         role="region"
         aria-label={t(language, "search.placeholder")}
         tabIndex={0}
-        className="flex-1 overflow-y-auto px-5 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
+        className="flex-1 overflow-y-auto px-page outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
       >
         {/* Recent searches — shown when input is empty and there is history */}
         {!q && recents.length > 0 && (

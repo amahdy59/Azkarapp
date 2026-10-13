@@ -40,15 +40,16 @@ export function ProgressTrendChart({
   }, []);
   const left = Math.max(44, labelSize * 3.5);
   const right = width - 14;
+  const hasActivity = points.some((point) => point.completed > 0);
+  const chartHeight = hasActivity ? 220 : 160;
   const top = 18;
-  const bottom = 180;
+  const bottom = chartHeight - 40;
   const x = (index: number) => {
     const position = points.length <= 1 ? 0.5 : index / (points.length - 1);
     return left + (rtl ? 1 - position : position) * (right - left);
   };
   const y = (rate: number) => bottom - (rate / 100) * (bottom - top);
   const recorded = points.filter((point) => point.rate !== null);
-  const hasActivity = points.some((point) => point.completed > 0);
   const segments: string[] = [];
   let segment = "";
   points.forEach((point, index) => {
@@ -70,7 +71,7 @@ export function ProgressTrendChart({
       data-testid={testId}
     >
       <div className="mb-5">
-        <h2 id={`${id}-title`} data-testid="progress-primary-heading" className="text-xl font-black text-foreground">
+        <h2 id={`${id}-title`} data-testid="progress-primary-heading" className="text-xl font-bold text-foreground">
           {t(language, "progressTrend.title")}
         </h2>
         <p id={`${id}-description`} className="mt-2 text-sm leading-relaxed text-muted-foreground">
@@ -84,7 +85,13 @@ export function ProgressTrendChart({
         aria-labelledby={`${id}-title`}
         aria-describedby={`${id}-description ${id}-data-hint`}
       >
-        <svg viewBox={`0 0 ${width} 220`} width="100%" height="220" aria-hidden="true" focusable="false">
+        <svg
+          viewBox={`0 0 ${width} ${chartHeight}`}
+          width="100%"
+          height={chartHeight}
+          aria-hidden="true"
+          focusable="false"
+        >
           <defs>
             <linearGradient id={`${id}-wash`} x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.16" />

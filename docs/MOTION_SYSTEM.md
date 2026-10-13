@@ -25,9 +25,9 @@ The motion system for Azkarapp is designed to be calm, responsive, lightweight, 
 Animations are categorized into four levels based on their purpose and duration:
 
 - **Level 1 — Immediate feedback (70-120ms):** Used for button presses, card interactions, counter updates, and navigation selections.
-- **Level 2 — State transition (120-200ms):** Used for selectors, navigation drawer/tabs, bookmarking actions, and progress updates.
+- **Level 2 — State transition (120-220ms):** Used for selectors, navigation drawer/tabs, bookmarking actions, and progress updates.
 - **Level 3 — Content transition (180-300ms):** Used for screen transitions, reader views, dialogs, and bottom sheets.
-- **Level 4 — Meaningful completion (300-450ms):** Reserved exclusively for zikr or routine completion celebrations.
+- **Level 4 — Meaningful completion (440-600ms):** Reserved exclusively for zikr or routine completion celebrations.
 
 ## 3. Motion Tokens
 

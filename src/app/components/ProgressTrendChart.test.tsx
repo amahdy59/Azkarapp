@@ -24,6 +24,16 @@ const points: ProgressTrendPoint[] = [
   },
 ];
 describe("progress trend chart", () => {
+  it("uses a compact empty plot while preserving exact zero and future records", () => {
+    const empty = points.map((point) => ({ ...point, completed: 0, rate: point.rate === null ? null : 0 }));
+    const { container, rerender } = render(<ProgressTrendChart language="en" points={empty} />);
+    expect(container.querySelector("svg[viewBox]")).toHaveAttribute("height", "160");
+    fireEvent.click(screen.getByText("View chart data"));
+    expect(screen.getByRole("table")).toHaveTextContent("0 / 6");
+    expect(screen.getByRole("table")).toHaveTextContent("Upcoming");
+    rerender(<ProgressTrendChart language="en" points={points} />);
+    expect(container.querySelector("svg[viewBox]")).toHaveAttribute("height", "220");
+  });
   it("provides exact records and neutral future data through themed selection and a table", async () => {
     const user = userEvent.setup();
     const onExplore = vi.fn();

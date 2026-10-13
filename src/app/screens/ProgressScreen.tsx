@@ -1,3 +1,4 @@
+import { PEER_TAB_SELECTED } from "../components/ui/controlStyles";
 import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { Header, IconButton } from "../components/LayoutShells";
 import { TodayRoutineGarden } from "../components/RoutineGarden";
@@ -359,11 +360,11 @@ export function ProgressScreen({
             direction={isArabic ? "rtl" : "ltr"}
             idPrefix="global-progress"
             aria-label={t(language, "garden.viewMode")}
-            indicatorClassName="bg-card shadow-sm"
+            indicatorClassName="bg-primary/10"
             className="flex rounded-xl bg-muted p-1"
             itemClassName={(selected) =>
               `flex min-h-11 flex-1 items-center justify-center rounded-lg px-1 py-2 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 ${
-                selected ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                selected ? PEER_TAB_SELECTED : "text-muted-foreground hover:text-foreground"
               }`
             }
             tabs={(["day", "week", "month", "year"] as const).map((tab) => ({

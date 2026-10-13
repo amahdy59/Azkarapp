@@ -7,13 +7,13 @@ This file maps the supplied July 2026 design specification to implementation evi
 - Splash → language → login/guest → localized onboarding → Home flow.
 - Morning, Evening, and Sleep session cards with not-started, partial, and complete progress states.
 - Category browsing, zikr reader/counter, audio controls, completion summary, search, settings, and download/notification panels.
-- Home / Azkar / Settings primary navigation, with persisted week/month/year progress views under Settings.
+- Home / Mushaf / Azkar / Progress / Settings primary navigation; Progress has Day/Week/Month/Year views.
 - Midnight, Light, and true-black Dark themes using the supplied semantic colors. The six supplied frames were verified with Dark active in Figma; the resolved OLED palette is `#0d0d0d` background, `#171717` cards, `#222222` tertiary surfaces, `#555555` borders, `#f5f0e8` primary text, `#d4d0e0` secondary text, `#b0aed0` tertiary text, `#d4a020` gold, and `#1a7060` teal.
 - Supplied spacing/radius primitives and the offline system-typography contract for English UI, Arabic UI, and zikr content. See `DESIGN_SYSTEM.md`.
-- Responsive phone canvas: full-bleed at widths up to 430 px and a centered 390 px Figma frame on tablet/desktop viewports, with safe areas, RTL direction, and mirrored directional icons.
+- Adaptive app canvas: bottom navigation at compact/medium widths, a rail at expanded widths and a sidebar on large screens, with safe areas, RTL direction and mirrored directional icons. The 390px Figma frame is a design reference rather than the current desktop shell.
 - Reader content uses one contained vertical scroll region, keeping Arabic text, controls, counter, and footer actions reachable on short-height viewports. Verified from 320 px narrow phones through tablet and desktop; Playwright guards the shell geometry.
 - Reader counting accepts the full non-control canvas, while buttons, menus, dialogs, inputs, and scrollbars are excluded. The in-canvas Benefit sheet provides strictly localized Arabic or English supporting content.
-- Settings changes language in place with a native selector, and the selected language immediately updates document language, direction, and visible copy.
+- Settings changes language in place with an accessible segmented radio control; ordinary dropdown fields use the shared themed Select. Language updates document language, direction and visible copy.
 - Zikr and collection sharing use an on-device preview with Story, Square, Portrait and Tall PNGs, olive/gold/lavender palettes, indivisible zikr cards, sourced long-surah name/benefit reminders with mandatory Mushaf QR, optional English meaning/benefit/pronunciation and ordinary-card QR, explicit current/selected/all scope, exact links, accessible text alternatives and matching ZIP saving. Sharing/copy failures are explicit; available native targets are device-dependent. Physical-device social-app and screen-reader validation remain pending.
 - Reusable empty search, network, offline, audio, download, interrupted-session, and skeleton state components.
 - Desktop marketing page at `/landing` with a 1440px-ready responsive layout.

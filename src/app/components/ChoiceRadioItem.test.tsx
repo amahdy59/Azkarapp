@@ -33,6 +33,13 @@ describe("shared radio choice", () => {
       await user.keyboard(dir === "rtl" ? "{ArrowLeft}" : "{ArrowRight}");
       await waitFor(() => expect(screen.getByRole("radio", { name: "First" })).toBeChecked());
       expect(screen.getByRole("radio", { name: "Unavailable" })).toBeDisabled();
+      await user.keyboard("{End}");
+      expect(screen.getByRole("radio", { name: "Second" })).toBeChecked();
+      await user.keyboard("{Home}");
+      expect(screen.getByRole("radio", { name: "First" })).toBeChecked();
+      screen.getByRole("radio", { name: "Second" }).focus();
+      await user.keyboard("{Enter}");
+      expect(screen.getByRole("radio", { name: "Second" })).toBeChecked();
     },
   );
 });

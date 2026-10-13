@@ -1,3 +1,4 @@
+import { PEER_TAB_SELECTED } from "../components/ui/controlStyles";
 import { QURAN_TEXT_STYLE } from "../quranTypography";
 import { QuranVerseText } from "../components/QuranVerseText";
 /* The scroll region is intentionally keyboard-focusable so Page Down/arrow
@@ -135,6 +136,7 @@ export function BenefitsScreen({
   return (
     <ScreenContainer dir={direction} className="relative !pb-0" screenName={t(language, "benefits.title")}>
       <Header
+        pageGutters
         title={t(language, "benefits.title")}
         subtitle={t(language, "benefits.subtitle")}
         onBack={onBack}
@@ -150,7 +152,10 @@ export function BenefitsScreen({
           all, so cards surfaced in a strip above the filter and down both
           sides of it. A sibling of the scroll region cannot be scrolled over
           at any width, and needs no bleed to prove it. */}
-      <div className="page-content-center shrink-0 px-5 pb-3 pt-3" data-testid="benefits-filter-bar">
+      <div
+        className="mx-auto w-full max-w-[var(--content-dashboard)] shrink-0 px-page pb-3 pt-3"
+        data-testid="benefits-filter-bar"
+      >
         <TabList
           value={activeSection}
           onChange={setActiveSection}
@@ -158,11 +163,11 @@ export function BenefitsScreen({
           direction={direction}
           idPrefix="benefits"
           aria-label={t(language, "benefits.sectionsLabel")}
-          indicatorClassName="bg-primary shadow-sm"
-          className="grid grid-cols-2 gap-2 rounded-3xl border border-border bg-card p-2"
+          indicatorClassName="bg-primary/10"
+          className="grid grid-cols-2 gap-2 rounded-2xl border border-border bg-card p-1"
           itemClassName={(selected) =>
-            `min-h-11 rounded-2xl px-3 py-2 text-label font-black transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-              selected ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-muted"
+            `min-h-11 rounded-xl px-3 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+              selected ? PEER_TAB_SELECTED : "text-muted-foreground hover:bg-muted"
             }`
           }
         />
@@ -172,7 +177,7 @@ export function BenefitsScreen({
         role="region"
         aria-label={t(language, "benefits.title")}
         tabIndex={0}
-        className="page-content-center min-h-0 flex-1 overflow-y-auto px-5 pb-8 pt-1 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
+        className="mx-auto w-full max-w-[var(--content-dashboard)] min-h-0 flex-1 overflow-y-auto px-page pb-8 pt-1 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
         data-testid="benefits-scroll-region"
       >
         <section

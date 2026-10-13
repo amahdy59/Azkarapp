@@ -1,3 +1,4 @@
+import { handleRadioNavigation } from "./radioNavigation";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { useId, type ReactNode } from "react";
 import { LayoutGroup, motion, useReducedMotion } from "motion/react";
@@ -11,8 +12,8 @@ export interface SegmentedControlOption<T extends string> {
 /**
  * Mutually exclusive choice control with correct radio-group semantics.
  *
- * Owns semantics and keyboard behavior only (role="radiogroup"/"radio", roving
- * tabindex, RTL-aware arrow-key navigation — all via Radix). Callers own their
+ * Owns semantics and keyboard behavior only (Radix radio roles/roving tabindex
+ * with shared immediate, direction-aware radio navigation). Callers own their
  * own visuals through `className`/`itemClassName`, so this stays a semantics
  * primitive rather than a configurable "god component".
  *
@@ -67,6 +68,7 @@ export function SegmentedControl<T extends string>({
           <RadioGroupPrimitive.Item
             key={option.value}
             value={option.value}
+            onKeyDownCapture={handleRadioNavigation}
             data-testid={option.testId}
             className={`relative isolate overflow-hidden ${resolveItemClass(value === option.value)}`}
           >

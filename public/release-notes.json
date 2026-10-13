@@ -1,13 +1,15 @@
 {
-  "release": "2026-10-13-3",
+  "release": "2026-10-13-4",
   "ar": [
-    "تفتح الرئيسية دون تحميل أدوات العد الخاصة بالقارئ مسبقًا.",
-    "يتحدث إذن الإشعارات عند العودة من إعدادات المتصفح، ويظهر نجاح الإشعار التجريبي أو تعذره دون انتظار دائم.",
-    "توضح التذكيرات حدود وصولها في الخلفية وبعد إغلاق التطبيق، وتتحرك مفاتيح الإعدادات بهدوء مع احترام تقليل الحركة."
+    "تظهر الأزرار والخيارات والقوائم بتصميم أكثر اتساقًا، وتختار مفاتيح الأسهم خيارًا واحدًا في مجموعات الاختيار.",
+    "أصبحت صفحات الأذكار والإعدادات والتقدم أكثر تناسقًا، مع مساحة قراءة ثابتة للتذكير في الرئيسية.",
+    "توضح أدوات القارئ وظائفها، وتعرض القبلة إرشادًا أبسط، وتصبح خيارات خطة القراءة أسهل في التصفح.",
+    "تشغل مخططات التقدم الفارغة مساحة أقل، وتظهر تفاصيل التخزين عند طلبها، ويبرز حفظ بطاقة المشاركة عند تعذر المشاركة المباشرة."
   ],
   "en": [
-    "Home opens without loading the reader’s counter tools in advance.",
-    "Notification permission refreshes when you return from browser settings, and test notifications report success or failure without waiting indefinitely.",
-    "Reminders explain background and closed-app delivery limits, while settings switches move consistently and respect reduced motion."
+    "Buttons, choices and menus have a more consistent appearance, and arrow keys select an option in ordinary radio groups.",
+    "Azkar, Settings and Progress pages align more consistently, with a stable reading surface for the Home reminder.",
+    "Reader tools show clearer labels, Qibla guidance is simpler, and reading-plan choices are easier to browse.",
+    "Empty progress charts take less space, storage details open on request, and Save stands out when direct sharing is unavailable."
   ]
 }
