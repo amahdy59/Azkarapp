@@ -88,7 +88,13 @@ function createController(): AudioController {
 }
 
 describe("FloatingAudioPlayer", () => {
-  afterEach(() => vi.restoreAllMocks());
+  beforeEach(() => {
+    document.documentElement.classList.add("reduce-motion");
+  });
+  afterEach(() => {
+    document.documentElement.classList.remove("reduce-motion");
+    vi.restoreAllMocks();
+  });
   it("preserves the compact clearance through expansion and releases it when playback closes", () => {
     const main = document.createElement("main");
     main.id = "main-content";
