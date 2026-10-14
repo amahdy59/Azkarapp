@@ -44,6 +44,12 @@ Regression tests for failed cache migration, missing/HTML image responses, gener
 | `pnpm audit:prod`                                                      | No known vulnerabilities                                                                                                               |
 | `pnpm test:e2e:inventory`                                              | 1,415 tests assigned exactly once across nine shards                                                                                   |
 | `git diff --check`                                                     | Passed                                                                                                                                 |
+| Final combined `pnpm check` before d28aba18                            | All 14 stages passed in 96.3 seconds; exact-snapshot receipt recorded                                                                  |
+| d28aba18 pre-push hook                                                 | Frozen install, receipt reuse, 26 core browser tests and Pages build passed                                                            |
+| Optimized curated-card regressions                                     | 7 passed across Chromium, Firefox and WebKit, including first offline visit                                                            |
+| Header reproduction after repair                                       | 6 passed across desktop, phone and tablet Chromium                                                                                     |
+| Header/prayer/Benefits remediation browser checks                      | 19 passed across Chromium, Firefox and WebKit                                                                                          |
+| Narrow counter/footer checks after repair                              | 13 passed across Chromium, Firefox and WebKit                                                                                          |
 
 The owner explicitly approved local conversion of image copies. All five original JPGs remain tracked unchanged in design-sources/curated-routines, with SHA-256 identities in manifest.json. Deployed WebP copies retain 900×1600 resolution and total 271,726 bytes (550,174 bytes smaller). All five decoded copies were visually inspected for Arabic text legibility; background textures are lossy. No budget ceiling changes. Final exact-candidate hook and CI outcomes are reported with the release result.
 
@@ -58,6 +64,12 @@ This report, existing pending architecture/decision/phase documents, current bil
 ## Decisions recorded
 
 Owner approval to publish all combined changes now. No hooks, assertions, coverage thresholds, browser inventory or bundle ceilings are weakened.
+
+### CI remediation
+
+Commit d28aba18 passed local gates and GitHub non-browser checks, but the responsive shard exposed four mobile/tablet header regressions: the nested ordinary-page header retained an 8px screen-padding strip. The existing no-padding selector now recognizes any immediate ordinary-page wrapper containing the shared header, preserving sticky coverage without changing user-approved page widths or Mushaf geometry. Existing browser assertions remain unchanged. Final exact-commit CI and production outcomes accompany the release report.
+
+All eight failed browser-job logs were inspected. Other failures were the corresponding desktop/Firefox/WebKit header cases, obsolete expectations for WhatsApp sharing and Home's former 70rem frame, and a 172px Masbaha counter on a 320px phone. The Benefits browser test now verifies complete evidence/citation text and exact downloaded payload; the former URL encoder unit test remains. Home tests reflect the owner's approved 80rem Library-aligned frame and add exact header/content width and origin assertions while retaining the existing 40rem prayer-panel bound. A narrowly scoped footer rule preserves the counter's existing 200px minimum while retaining 44px navigation targets within the phone viewport; the browser regression now explicitly measures those targets. No assertion is removed to hide an application defect.
 
 ## Known limitations or remaining risks
 

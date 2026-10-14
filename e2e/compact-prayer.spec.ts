@@ -35,6 +35,7 @@ async function checkGeometry(page: Page) {
   const measures = await page.evaluate(() => {
     const rootSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
     const content = document.querySelector('[data-testid="home-content-grid"]')!.getBoundingClientRect();
+    const header = document.querySelector('[data-testid="home-utility-header"]')!.getBoundingClientRect();
     const strip = document.querySelector('[data-testid="home-prayer-strip"]')!.getBoundingClientRect();
     const panel = document.querySelector('[data-testid="home-prayer-moment"]')!.getBoundingClientRect();
     const quote = document.querySelector('[data-testid="prayer-moment-virtue"] p[lang]')!;
@@ -42,6 +43,8 @@ async function checkGeometry(page: Page) {
     return {
       rootSize,
       contentWidth: content.width,
+      headerWidth: header.width,
+      headerAlignment: content.x - header.x,
       stripWidth: strip.width,
       panelWidth: panel.width,
       centerOffset:
@@ -56,7 +59,10 @@ async function checkGeometry(page: Page) {
       ].some((el) => el.scrollWidth > el.clientWidth + 1),
     };
   });
-  expect(measures.contentWidth).toBeLessThanOrEqual(70 * measures.rootSize);
+  // The owner-approved page frame now matches the Library's 80rem measure.
+  expect(measures.contentWidth).toBeLessThanOrEqual(80 * measures.rootSize);
+  expect(measures.contentWidth).toBeCloseTo(measures.headerWidth, 0);
+  expect(Math.abs(measures.headerAlignment)).toBeLessThanOrEqual(1);
   expect(measures.stripWidth).toBeLessThanOrEqual(40 * measures.rootSize);
   expect(measures.panelWidth).toBeLessThanOrEqual(40 * measures.rootSize);
   expect(Math.abs(measures.centerOffset)).toBeLessThanOrEqual(1);

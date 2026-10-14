@@ -129,6 +129,19 @@
   width: 100%;
   justify-content: center;
 }
+
+@media (max-width: 359px) {
+  .standalone-counter-navigation {
+    width: calc(100% + 16px);
+    margin-inline: -8px;
+    gap: 4px;
+  }
+  .standalone-counter-navigation .adaptive-counter-nav {
+    width: 44px;
+    min-width: 44px;
+    padding-inline: 0;
+  }
+}
 .standalone-counter-row > div {
   display: flex;
   min-width: 0;

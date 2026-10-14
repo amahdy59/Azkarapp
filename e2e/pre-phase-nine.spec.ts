@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { readFile } from "node:fs/promises";
 
 test("onboarding offers a visible skip action for pointer and keyboard users", async ({ page }) => {
   await page.goto("/");
@@ -116,7 +117,7 @@ test("Home utility status stays on one line without horizontal overflow", async 
   }
 });
 
-test("Library Benefits entry opens the dedicated collection with encoded WhatsApp sharing", async ({ page }) => {
+test("Library Benefits entry shares complete evidence and attribution through the studio", async ({ page }) => {
   await openReturningGuest(page);
   await page.getByTestId("nav-azkar").click();
   await page.getByTestId("library-benefits-tool").click();
@@ -134,12 +135,22 @@ test("Library Benefits entry opens the dedicated collection with encoded WhatsAp
   await expect(page.getByTestId("benefits-list").locator("article")).toHaveCount(21);
   await expect(page.locator("details")).toHaveCount(0);
 
-  const shareLink = page.getByRole("link", { name: /WhatsApp/ }).first();
-  const href = await shareLink.getAttribute("href");
-  expect(href).toMatch(/^https:\/\/wa\.me\/\?text=/);
-  expect(href).toContain("%0A");
-  expect(href).not.toMatch(/[\r\n ]/);
-  expect(new URL(href!).searchParams.get("text")).toBeTruthy();
+  const evidence = page.getByTestId("benefits-list").locator("article").first();
+  const body = await evidence.locator("p").first().innerText();
+  const source = await evidence.getByRole("link").innerText();
+  await evidence.getByRole("button", { name: /^Share .+ benefit$/ }).click();
+  const studio = page.getByTestId("collection-share-modal");
+  await expect(studio).toBeVisible();
+  await studio.getByRole("button", { name: "Text", exact: true }).click();
+  const payload = await studio.getByRole("textbox").inputValue();
+  expect(payload).toContain(body);
+  expect(payload).toContain(source);
+  expect(payload).toContain("\n");
+  const download = page.waitForEvent("download");
+  await studio.getByRole("button", { name: "Save", exact: true }).click();
+  const saved = await download;
+  expect(saved.suggestedFilename()).toBe("azkar.txt");
+  expect(await readFile((await saved.path())!, "utf8")).toBe(payload);
 });
 
 test("the Library exposes the full Saved state", async ({ page }) => {

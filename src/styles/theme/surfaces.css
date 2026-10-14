@@ -70,7 +70,7 @@
    The header owns its internal top spacing; headerless and immersive screens
    retain their existing padding and safe-area contracts. */
 .app-screen-surface:has(> .shared-screen-header),
-.app-screen-surface:has(> .progress-screen-content > .shared-screen-header) {
+.app-screen-surface:has(> div > .shared-screen-header) {
   padding-block-start: 0;
 }
 

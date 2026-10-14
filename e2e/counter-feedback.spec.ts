@@ -384,6 +384,13 @@ test("the custom counter stays bounded on a short phone and isolates focused-con
     expect(counterBox.x).toBeGreaterThanOrEqual(0);
     expect(counterBox.x + counterBox.width).toBeLessThanOrEqual(320);
   }
+  for (const id of ["custom-counter-prev-btn", "custom-counter-next-btn"]) {
+    const bounds = (await page.getByTestId(id).boundingBox())!;
+    expect(bounds.width).toBeGreaterThanOrEqual(44);
+    expect(bounds.height).toBeGreaterThanOrEqual(44);
+    expect(bounds.x).toBeGreaterThanOrEqual(0);
+    expect(bounds.x + bounds.width).toBeLessThanOrEqual(320);
+  }
 
   const geometry = await screen.evaluate((element) => ({
     clientWidth: element.clientWidth,

@@ -46,7 +46,7 @@ export function StandaloneCounterFooter({
         primary={
           <div className="w-full pb-1" data-testid="counter-panel">
             {previous || next ? (
-              <div className="adaptive-counter-row flex items-center justify-between gap-2 sm:gap-3 w-full">
+              <div className="standalone-counter-navigation adaptive-counter-row flex items-center justify-between gap-2 sm:gap-3 w-full">
                 <div className="shrink-0">{previous}</div>
                 <div className="flex-1 min-w-0">{counter}</div>
                 <div className="shrink-0">{next}</div>
