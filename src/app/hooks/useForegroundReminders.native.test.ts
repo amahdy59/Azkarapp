@@ -21,8 +21,8 @@ describe("native reminder delivery", () => {
     nativeNotifications.schedule.mockResolvedValue({ notifications: [] });
     vi.doMock("@capacitor/core", () => ({
       Capacitor: { isNativePlatform: () => true, getPlatform: () => "android" },
+      registerPlugin: () => nativeNotifications,
     }));
-    vi.doMock("@capacitor/local-notifications", () => ({ LocalNotifications: nativeNotifications }));
   });
 
   it("hands enabled reminders to Android instead of starting browser timers", async () => {

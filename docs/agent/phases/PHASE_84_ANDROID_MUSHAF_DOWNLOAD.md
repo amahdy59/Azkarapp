@@ -29,10 +29,10 @@ No controls or focus flows changed; the existing status and error announcements 
 
 ## Tests and commands
 
-| Command | Result |
-| ------- | ------ |
-| Focused Mushaf/native-download Vitest suites | Passed: 2 files, 4 tests. |
-| `pnpm typecheck` | Passed. |
+| Command                                           | Result                      |
+| ------------------------------------------------- | --------------------------- |
+| Focused Mushaf/native-download Vitest suites      | Passed: 2 files, 4 tests.   |
+| `pnpm typecheck`                                  | Passed.                     |
 | Capacitor synchronization and Android debug build | Pending final verification. |
 
 ## Evidence and limitations

@@ -39,12 +39,12 @@ No controls or focus flows changed. Existing player labels, progress, status ann
 
 ## Commands run
 
-| Command | Result |
-| ------- | ------ |
-| Focused audio cache and provider Vitest suites | Passed: 3 files, 26 tests. |
-| `pnpm typecheck` | Passed. |
-| `pnpm build:android` | Passed; synchronized the updated web bundle to Android. |
-| Android `:app:assembleDebug` | Passed; debug APK assembled. |
+| Command                                        | Result                                                  |
+| ---------------------------------------------- | ------------------------------------------------------- |
+| Focused audio cache and provider Vitest suites | Passed: 3 files, 26 tests.                              |
+| `pnpm typecheck`                               | Passed.                                                 |
+| `pnpm build:android`                           | Passed; synchronized the updated web bundle to Android. |
+| Android `:app:assembleDebug`                   | Passed; debug APK assembled.                            |
 
 ## Visual/manual evidence
 

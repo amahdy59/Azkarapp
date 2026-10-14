@@ -4,7 +4,6 @@ import { AUDIO_CATALOG, AUDIO_MANIFEST_VERSION } from "./audioManifest";
 import type { AudioPreferences, AudioVariant } from "./audioTypes";
 import { getPreferredVoiceId, resolveAudioAsset } from "./resolveAudioAsset";
 import { AudioDownloadError, transferAudio, type AudioDownloadPhase } from "./audioDownloadTransfer";
-import { fetchNativeBinaryResource } from "../content/nativeMushafDownload";
 
 export interface AudioDownloadProgress {
   phase: AudioDownloadPhase;

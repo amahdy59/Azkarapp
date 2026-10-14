@@ -34,7 +34,10 @@ async function receiveAudio(
   };
   keepAlive();
   try {
-    const response = await fetchNativeBinaryResource(url, controller.signal, { cache: "no-store", credentials: "omit" });
+    const response = await fetchNativeBinaryResource(url, controller.signal, {
+      cache: "no-store",
+      credentials: "omit",
+    });
     if (response.status !== 200 || !response.ok) {
       const retryAfter = response.headers.get("retry-after");
       const seconds = retryAfter === null ? NaN : Number(retryAfter);

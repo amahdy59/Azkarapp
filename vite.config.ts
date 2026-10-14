@@ -319,6 +319,17 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
+        ...(isGithubPages
+          ? {
+              [path.resolve("src/app/content/nativeMushafDownload.ts")]: path.resolve(
+                "src/app/content/nativeMushafDownload.browser.ts",
+              ),
+              [path.resolve("src/app/share/nativeSharing.ts")]: path.resolve("src/app/share/nativeSharing.browser.ts"),
+              [path.resolve("src/app/hooks/nativeReminderScheduling.ts")]: path.resolve(
+                "src/app/hooks/nativeReminderScheduling.browser.ts",
+              ),
+            }
+          : {}),
       },
     },
     // File types to support raw imports. Never add .css, .tsx, or .ts files to this.
