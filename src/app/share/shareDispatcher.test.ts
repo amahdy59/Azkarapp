@@ -8,9 +8,9 @@ import {
   shareMultipleFiles,
   shareSingleFile,
 } from "./shareDispatcher";
-import { isNativeAndroid, saveWithAndroid, shareWithAndroid } from "./nativeSharing";
+import { isNativeAndroid, saveWithAndroid, shareWithAndroid } from "@azkar/native-sharing";
 
-vi.mock("./nativeSharing", () => ({
+vi.mock("@azkar/native-sharing", () => ({
   isNativeAndroid: vi.fn(() => false),
   saveWithAndroid: vi.fn().mockResolvedValue(undefined),
   shareWithAndroid: vi.fn().mockResolvedValue(undefined),

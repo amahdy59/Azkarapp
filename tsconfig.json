@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "allowImportingTsExtensions": true,
+    "baseUrl": ".",
     "isolatedModules": true,
     "jsx": "react-jsx",
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
@@ -13,7 +14,12 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "ES2022",
-    "types": ["vite/client", "vite-plugin-pwa/client"]
+    "types": ["vite/client", "vite-plugin-pwa/client"],
+    "paths": {
+      "@azkar/native-mushaf-download": ["src/app/content/nativeMushafDownload.ts"],
+      "@azkar/native-sharing": ["src/app/share/nativeSharing.ts"],
+      "@azkar/native-reminders": ["src/app/hooks/nativeReminderScheduling.ts"]
+    }
   },
   "include": ["src", "vite.config.ts"],
   "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"]

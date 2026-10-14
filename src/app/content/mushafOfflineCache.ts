@@ -1,5 +1,5 @@
 import { FONT_CACHE_NAME, getMushafPageUrl, getQcfFontUrl, MUSHAF_CACHE_NAME } from "./qcfMushaf";
-import { fetchNativeBinaryResource } from "./nativeMushafDownload";
+import { fetchNativeBinaryResource } from "@azkar/native-mushaf-download";
 
 const PAGE_COUNT = 604;
 const CONCURRENCY_LIMIT = 8;

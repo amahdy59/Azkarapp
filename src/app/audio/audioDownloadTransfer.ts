@@ -1,5 +1,5 @@
 import type { AudioVariant } from "./audioTypes";
-import { fetchNativeBinaryResource } from "../content/nativeMushafDownload";
+import { fetchNativeBinaryResource } from "@azkar/native-mushaf-download";
 
 export type AudioDownloadPhase = "receiving" | "retrying" | "verifying" | "saved";
 export type AudioDownloadFailure = "network" | "server" | "integrity" | "unsupported";

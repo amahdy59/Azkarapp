@@ -13,9 +13,9 @@ import type {
   PrayerReminderLeadMinutes,
   ReminderSettings,
 } from "../types";
-import { isNativeAndroid, rescheduleNativeReminders } from "./nativeReminderScheduling";
+import { isNativeAndroid, rescheduleNativeReminders } from "@azkar/native-reminders";
 
-export { getUpcomingNativeReminders } from "./nativeReminderScheduling";
+export { getUpcomingNativeReminders } from "@azkar/native-reminders";
 
 const REMINDER_HISTORY_KEY = "azkarapp.foreground-reminders.v1";
 const REMINDER_WINDOW_MS = 5 * 60_000;
