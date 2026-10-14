@@ -354,7 +354,7 @@ describe("CustomCounterScreen Component", () => {
 
     // One more click reaches target 33
     fireEvent.click(screen.getByTestId("custom-counter-surface"));
-    expect(screen.getByRole("dialog", { name: /Goal Reached!/i })).toBeInTheDocument();
+    expect(await screen.findByRole("dialog", { name: /Goal Reached!/i })).toBeInTheDocument();
     expect(screen.getByTestId("custom-counter-return-btn")).toBeInTheDocument();
 
     await user.click(screen.getByTestId("custom-counter-return-btn"));
