@@ -71,6 +71,10 @@ Owner explicitly approved all recommendations, paused for another session, then 
 
 ## Known limitations or remaining risks
 
+### Exact-commit CI remediation
+
+The first published candidate 66b411e7 passed checks and responsive/Chromium-1/Chromium-3/Firefox shards, but Chromium-2 failed the pre-existing quiet-garden weekly-grid test. Its raw table.first() selector now found the newly disclosed hidden exact prayer table. Job 115727492289 logs were inspected: the weekly-grid visibility check was the only persistent failure; an unrelated Mushaf magnification case passed on retry and remains unchanged. The test now selects the visible semantic table, fixes its clock, asserts all 16 named practice cells across four elapsed days, excludes Upcoming, and retains the original 28-cell/five-header assertion after navigating to a completed week. Targeted Chromium reproduction passed (1 test, exit 0). No assertions, retries, timeouts, inventories or budgets were weakened. This test-only remediation retains the same not-yet-deployed release manifest; final intact hook and exact-commit CI results accompany the release response.
+
 Missing records do not prove missed worship. Current periods include all of today under the existing contract. No forecast, inferred start-of-tracking date or new combined devotional score.
 
 ## Out-of-scope findings

@@ -263,21 +263,31 @@ test("both Home and Progress keep prayer tracking outside the wird card", async 
 });
 
 test("the week grid conveys completion as text, not shape alone", async ({ page }) => {
+  await page.clock.setFixedTime(new Date("2026-10-14T12:00:00+03:00"));
   await seedReturningGardenUser(page, { completedToday: ["morning"] });
   await openReturningHome(page);
 
   await page.getByRole("link", { name: "Progress", exact: true }).click();
   await page.getByRole("tab", { name: "Week", exact: true }).click();
 
-  const table = page.locator("table").first();
+  const table = page.getByRole("table");
   await expect(table).toBeVisible();
 
   // Cells used to contain only an icon or an empty bordered circle, so a
   // screen reader announced the whole grid as blank.
-  await expect(table.locator("td .sr-only")).toHaveCount(28);
+  // Sunday through Wednesday: four elapsed days, with four named practices.
+  // Future days must not masquerade as historical recording opportunities.
+  await expect(table.locator("td .sr-only")).toHaveCount(16);
+  await expect(table.getByRole("row")).toHaveCount(5);
   await expect(table).toContainText(/Morning: (Completed|Not completed)/);
   await expect(table).toContainText(/Quran: (Completed|Not recorded|Upcoming)/);
   await expect(table).not.toContainText(/Post-Prayer: (Completed|Not completed)/);
+  await expect(table).not.toContainText("Upcoming");
+
+  // A completed historical week still exposes every day and all four practices.
+  await page.getByRole("button", { name: "Previous period", exact: true }).click();
+  await expect(table.locator("td .sr-only")).toHaveCount(28);
+  await expect(table.getByRole("row")).toHaveCount(8);
 
   // Headers must be associated with their column for grid navigation.
   const scoped = await table.locator("th[scope='col']").count();
