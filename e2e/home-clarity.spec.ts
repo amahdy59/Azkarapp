@@ -48,6 +48,25 @@ for (const language of ["ar", "en"] as const) {
       await expect(page.getByTestId("prayer-card-asr")).toHaveAttribute("data-prayer-state", "next");
       await strip.getByRole("button", { name: t(language, "settings.showAllPrayers") }).click();
       await expect(strip.locator('[data-density="summary"]')).toHaveCount(5);
+      const allRow = page.getByTestId("home-all-prayers-row");
+      const prayerTops = await allRow
+        .locator("article")
+        .evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect().top));
+      expect(Math.max(...prayerTops) - Math.min(...prayerTops)).toBeLessThanOrEqual(1);
+      await allRow.locator("article").last().scrollIntoViewIfNeeded();
+      const lastReachable = await allRow.evaluate((row) => {
+        const viewport = row.getBoundingClientRect();
+        const last = row.querySelector("article:last-child")!.getBoundingClientRect();
+        return last.left >= viewport.left - 1 && last.right <= viewport.right + 1;
+      });
+      expect(lastReachable).toBe(true);
+      const prayerTime = allRow.locator('[id^="prayer-summary-time-"]').first();
+      expect(await prayerTime.evaluate((node) => parseFloat(getComputedStyle(node).fontSize))).toBeGreaterThanOrEqual(
+        width < 640 ? 16 : 15,
+      );
+      expect(await prayerTime.evaluate((node) => Number(getComputedStyle(node).fontWeight))).toBeGreaterThanOrEqual(
+        800,
+      );
       await strip.getByRole("button", { name: t(language, "settings.showFocusedPrayers") }).click();
       await expect(strip.locator('[data-density="summary"]')).toHaveCount(2);
       const path = page.getByTestId("home-header-routine-summary");
@@ -55,6 +74,12 @@ for (const language of ["ar", "en"] as const) {
       else await expect(path).toBeHidden();
       const cards = page.getByTestId("wird-category-card");
       await expect(cards).toHaveCount(4);
+      if (width < 640) {
+        const positions = await cards.evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect().top));
+        expect(Math.abs(positions[0]! - positions[1]!)).toBeLessThanOrEqual(1);
+        expect(Math.abs(positions[2]! - positions[3]!)).toBeLessThanOrEqual(1);
+        expect(positions[2]!).toBeGreaterThan(positions[0]!);
+      }
       await expect(cards.locator("img")).toHaveCount(0);
       await expect(page.getByTestId("daily-evidence-hadith")).toBeVisible();
       await expect(page.getByTestId("open-wird-benefits")).toBeVisible();

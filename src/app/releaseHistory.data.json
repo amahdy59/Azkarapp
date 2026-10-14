@@ -1,5 +1,18 @@
 [
   {
+    "release": "2026-10-15",
+    "ar": [
+      "يمتد شريط الرئيسية على الحاسوب إلى الحواف، وتكشف البطاقات الزجاجية الخلفية مع الحفاظ على وضوح النص.",
+      "يمكن عرض الصلوات الخمس على الهاتف في صف واحد يُمرَّر أفقيًا، مع أوقات أكبر وأوضح.",
+      "تظهر بطاقات ورد اليوم في عمودين على الهاتف، مع أسهم بجانب النص ومدخل واحد واضح لفوائد الورد وشرح النخلة."
+    ],
+    "en": [
+      "The desktop Home header spans the content area, with translucent cards that preserve readable text.",
+      "Show all five prayers in one horizontally scrolling phone row, with larger, bolder prayer times.",
+      "Today’s wird uses two phone columns, arrows beside the text, and one clear entry for wird benefits and palm help."
+    ]
+  },
+  {
     "release": "2026-10-14-7",
     "ar": [
       "يمتد شريط الرئيسية على الحاسوب إلى حواف مساحة المحتوى، مع بقاء عناصره مصطفّة مع البطاقات.",

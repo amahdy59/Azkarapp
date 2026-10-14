@@ -36,7 +36,7 @@ async function checkGeometry(page: Page) {
   const measures = await page.evaluate(() => {
     const rootSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
     const content = document.querySelector('[data-testid="home-content-grid"]')!.getBoundingClientRect();
-    const header = document.querySelector('[data-testid="home-utility-header"]')!.getBoundingClientRect();
+    const header = document.querySelector('[data-testid="home-header-content"]')!.getBoundingClientRect();
     const strip = document.querySelector('[data-testid="home-prayer-strip"]')!.getBoundingClientRect();
     const panel = document.querySelector('[data-testid="home-prayer-moment"]')!.getBoundingClientRect();
     const quote = document.querySelector('[data-testid="prayer-moment-virtue"] p[lang]')!;
@@ -163,9 +163,7 @@ for (const language of ["ar", "en"] as const) {
             })),
           );
           expect(
-            timeStyles.every(
-              (time) => time.size === `${width < 360 ? 12 : width < 640 ? 14 : 15}px` && Number(time.weight) >= 700,
-            ),
+            timeStyles.every((time) => time.size === `${width < 640 ? 16 : 15}px` && Number(time.weight) >= 800),
           ).toBe(true);
           if ((width === 390 && prayer === "fajr") || (width === 1440 && prayer === "dhuhr")) {
             await page.getByTestId("home-prayer-strip").scrollIntoViewIfNeeded();
@@ -218,7 +216,10 @@ for (const language of ["ar", "en"] as const) {
     const tileRows = await page
       .locator('[data-density="summary"]')
       .evaluateAll((tiles) => new Set(tiles.map((el) => el.getBoundingClientRect().y)).size);
-    expect(tileRows).toBeGreaterThan(1);
+    expect(tileRows).toBe(1);
+    const row = page.getByTestId("home-all-prayers-row");
+    await row.locator("article").last().scrollIntoViewIfNeeded();
+    await expect(row.locator("article").last()).toBeInViewport();
     const input = page.getByTestId("prayer-action-location").locator("input");
     await input.focus();
     await page.keyboard.press("Space");

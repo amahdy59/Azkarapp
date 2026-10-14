@@ -5,7 +5,6 @@ import type { AppLanguage, CategoryId } from "../types";
 import type { GardenSummary } from "../progress";
 import type { QuranWirdTile } from "./ProgressViews";
 import "./home-wird.css";
-import { useId, useState } from "react";
 
 const ROUTINES = [
   { id: "morning", label: "progress.morningAzkar", Icon: Sunrise, image: "wird-morning.jpg" },
@@ -33,8 +32,6 @@ export function HomeWirdSection({
   recommendedCategoryId?: CategoryId;
   onGlass?: boolean;
 }) {
-  const [showPalmInfo, setShowPalmInfo] = useState(false);
-  const palmInfoId = useId();
   const items = [
     ...ROUTINES.map(({ id, label, Icon, image }) => ({
       id,
@@ -77,16 +74,6 @@ export function HomeWirdSection({
         >
           <Calendar size={22} aria-hidden="true" />
           {t(language, "progress.todayWird")}
-          <button
-            type="button"
-            aria-label={t(language, "garden.explanationLabel")}
-            aria-expanded={showPalmInfo}
-            aria-controls={palmInfoId}
-            onClick={() => setShowPalmInfo((value) => !value)}
-            className="flex size-11 shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-          >
-            <Info size={18} aria-hidden="true" />
-          </button>
         </h2>
         {onOpenWirdBenefits && (
           <button
@@ -100,15 +87,6 @@ export function HomeWirdSection({
           </button>
         )}
       </div>
-      {showPalmInfo && (
-        <div
-          id={palmInfoId}
-          role="tooltip"
-          className="mb-3 rounded-xl border border-border bg-popover p-3 text-sm text-popover-foreground"
-        >
-          {t(language, "garden.explanationWithQuran")}
-        </div>
-      )}
       <div className="home-wird-grid">
         {items.map(({ id, name, Icon, image, complete, status, onPress }) => (
           <button
@@ -124,7 +102,7 @@ export function HomeWirdSection({
             data-testid="wird-category-card"
             data-category={id}
             data-images={showImages ? "true" : "false"}
-            className={`home-wird-tile ${showImages ? "home-wird-photo" : onGlass ? "hero-glass home-glass-surface" : "home-wird-solid"}`}
+            className={`home-wird-tile focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 ${showImages ? "home-wird-photo" : onGlass ? "hero-glass home-glass-surface" : "border border-border bg-card text-foreground"}`}
           >
             {showImages && (
               <img
@@ -137,12 +115,20 @@ export function HomeWirdSection({
             <div
               className={`home-wird-caption ${showImages ? (onGlass ? "hero-glass home-glass-surface" : "home-wird-photo-solid") : ""}`}
             >
-              <Icon size={28} className="home-wird-icon" aria-hidden="true" />
-              <span className="text-base font-bold">{name}</span>
-              <span className="text-sm home-wird-status">{status}</span>
-              <span className="mt-1 flex items-center gap-2">
-                {complete && <Check size={18} aria-hidden="true" />}
-                <ChevronNext size={18} data-rtl-flip aria-hidden="true" />
+              <Icon
+                size={28}
+                className={onGlass || showImages ? "text-on-media-accent" : "text-primary"}
+                aria-hidden="true"
+              />
+              <span className="flex w-full min-w-0 items-center justify-between gap-2">
+                <span className="flex min-w-0 flex-col gap-2">
+                  <span className="text-base font-bold">{name}</span>
+                  <span className="text-sm text-muted-foreground">{status}</span>
+                </span>
+                <span className="flex shrink-0 items-center gap-2" aria-hidden="true">
+                  {complete && <Check size={18} />}
+                  <ChevronNext size={18} data-rtl-flip />
+                </span>
               </span>
             </div>
           </button>

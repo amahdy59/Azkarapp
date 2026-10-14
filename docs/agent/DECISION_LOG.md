@@ -4596,3 +4596,7 @@ After requesting publication of all changes, the owner explicitly answered "yes"
 ## Home glass and edge-to-edge desktop header approved — 2026-10-14
 
 The owner explicitly agrees to the recommended full-width header surface with aligned inner content and visibly translucent Home cards. Replace excessive cumulative fills with shared standard/reading/header materials, preserve text contrast and user/system reduced-transparency fallbacks, and verify all scenes and responsive widths. Reuse existing components; no content, persistence, dependency or budget-limit changes. Normal autonomous release authority applies.
+
+## Mobile Home follow-up approved — 2026-10-15
+
+The owner requests all five prayers side by side in one mobile row, a two-by-two mobile daily-wird arrangement, and larger/bolder prayer times. A scrollable prayer row preserves readable card widths; a single-column wird fallback supports enlarged text. Include this in the pending full-width header/glass release; preserve existing quality ceilings and recording/content contracts.

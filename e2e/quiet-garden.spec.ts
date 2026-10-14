@@ -189,13 +189,14 @@ test("three completed main collections stay concise and explain the palm on dema
   await expect(garden.getByText("Masha'Allah! All today's routines completed! 🌴", { exact: false })).toHaveCount(0);
   await expect(garden.getByRole("button", { name: /Completed|مكتملة/ })).toHaveCount(3);
   await expect(garden).not.toContainText(/points?|rank|leaderboard/i);
-  await garden.getByRole("button", { name: "How a palm is earned" }).click();
-  const tooltip = garden.getByRole("tooltip");
-  await expect(tooltip).toHaveText(
+  await expect(garden.getByRole("button", { name: "How a palm is earned" })).toHaveCount(0);
+  await garden.getByTestId("open-wird-benefits").click();
+  const explanation = page.getByText(
     "A palm is planted in your oasis when you complete all of today's awrad (Morning, Evening, and Before Sleep azkar, and Qur'an wird).",
   );
-  await tooltip.scrollIntoViewIfNeeded();
-  await expect(tooltip).toBeInViewport();
+  await expect(page.getByRole("heading", { name: "How a palm is earned" })).toBeVisible();
+  await explanation.scrollIntoViewIfNeeded();
+  await expect(explanation).toBeInViewport();
 });
 
 test("legacy garden visibility preferences no longer hide the current Wird or add a Progress toggle", async ({

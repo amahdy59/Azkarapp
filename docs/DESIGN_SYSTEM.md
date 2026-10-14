@@ -869,3 +869,9 @@ Home has two focused prayer summaries and an explicit all-prayer disclosure, one
 ## Home frosted surfaces and full-width chrome — 2026-10-14
 
 Owner-approved Home refinement: the sticky header surface spans the main canvas, excluding the sidebar; its inner controls retain the content grid measure. Shared standard glass uses 48% navy, reading/header 58%, 18px blur and a 6% maximum white highlight. Keep the page scrim and pale-gold on-media text to preserve contrast against bright scenery. Photo captions use 66% tint without the page scrim. Insets use one light darkening layer and no additional backdrop filter; primary actions stay solid. Application/system reduced-transparency preferences retain opaque materials. Header edges, inner alignment, OS/app fallbacks and conservative bright-photo contrast are covered by browser checks.
+
+### Mobile Home layout — owner follow-up 2026-10-15
+
+All-prayer disclosure uses one horizontally scrollable row, a 7rem minimum card width and a labelled focusable region. The collapse action remains separate. Phone prayer times use 16px extra-bold text. Daily wird uses two columns at ordinary phone text sizes, returning to one when its container is narrower than 15rem; wide desktop retains four columns. Preserve native scroll, logical RTL order and keyboard focus visibility. Home-only chrome/reading/inset variants load with the Home stylesheet to avoid increasing initial-route CSS.
+
+Wird navigation arrows sit at the logical trailing edge beside the title/status block and remain decorative within the full-card button. Home offers one labelled benefits action; the benefits screen includes the original palm-earning explanation as a separate section. Avoid adjacent duplicate info icons. Progress retains its existing help presentation.

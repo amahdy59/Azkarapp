@@ -38,3 +38,17 @@ Design system, decision log, agent index, this phase, fresh bilingual release no
 ## Remaining limitations and recommended next step
 
 Physical device/screen-reader acceptance remains separate. Complete intact local hook, full CI and production smoke, then owner review of deployed appearance.
+
+## Owner mobile follow-up — 2026-10-15
+
+Before publication, the owner requested a single side-by-side row when revealing all prayers on mobile, two daily-wird cards per row, and stronger prayer times. Implement a labelled keyboard-focusable horizontal prayer region with five columns and a 7rem minimum width; preserve chronological DOM order, native scrolling, focus visibility and a separate collapse action. At ordinary phone sizes use two equal wird columns; a container query returns to one column when the available measure is below 15rem, including enlarged-text cases. Prayer time uses 16px/800 on mobile and existing 15px subtitle measure/800 on wider screens. All original no-overflow, keyboard and target assertions remain; update only superseded row/size expectations and header inner alignment. No recording, persistence or content changes.
+
+The first pre-push gate blocked publication for a 47-byte compressed stylesheet excess. No budget was raised. Consolidated reusable utilities and moved Home-only header/reading/inset variants to the existing lazy Home stylesheet rather than the global initial stylesheet. Final budget and full hook verification remain required. The unpublished 2026-10-14-7 notes are superseded by fresh 2026-10-15 notes covering both approved refinements.
+
+## Card arrow and help clarity follow-up
+
+The owner asks for arrows beside the text rather than at the bottom, and a clearer alternative to two info icons. Move the decorative chevron/check to the logical trailing edge of a flex row containing the title/status. Keep the whole card as the single accessible button. Consolidate Home help into the existing labelled benefits entry; move the original translated palm explanation into that screen without editing religious content. Progress help is unchanged. An optional preference question was offered; after allowing time for a reply, proceeded with the stated recommended combined-entry approach. Existing quiet-garden browser coverage now verifies the explanation through that help route.
+
+Final mobile Chromium regression run: 33 passed (1.8m), including all-prayer single-row scrolling, both language order, two-column phone cards, enlarged-text reflow and compact-prayer controls. Earlier diagnostic failures came from superseded row/font/header expectations and were repaired without dropping geometry/keyboard/axe assertions. Final bundle proof passed after moving Home-only variants to the lazy stylesheet; the fixed compressed ceiling remains intact. Final combined help/three-engine run and release hook pending.
+
+Final combined regression evidence: 31 passed across Chromium, Firefox and WebKit (5.5m), including one-row all-prayer reachability in RTL/LTR, two-by-two normal phone tiles, enlarged-text fallback, labelled combined benefits/palm route, independent appearance preferences, 1920px edge alignment and axe checks. Final 22 focused units passed (11.34s). Full pre-push and exact-commit CI remain required.

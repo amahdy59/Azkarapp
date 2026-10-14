@@ -82,11 +82,13 @@ test("the Home Wird keeps semantic order while mirroring Arabic placement and ex
   const mobileBoxes = await Promise.all([0, 1, 2].map((index) => ltrCards.nth(index).boundingBox()));
   expect(mobileBoxes.every(Boolean)).toBe(true);
   if (mobileBoxes[0] && mobileBoxes[1] && mobileBoxes[2]) {
-    expect(mobileBoxes[0].width).toBeGreaterThanOrEqual(160);
+    expect(mobileBoxes[0].width).toBeGreaterThanOrEqual(120);
+    expect(mobileBoxes[0].y).toBeCloseTo(mobileBoxes[1].y, 0);
+    expect(mobileBoxes[2].y).toBeGreaterThan(mobileBoxes[0].y);
     expect(mobileBoxes[0].height).toBeLessThanOrEqual(202);
   }
   const mobileCardPresentation = await ltrWirdCards.first().evaluate((card) => {
-    const [title, subtitle] = card.querySelectorAll(".home-wird-caption > span");
+    const [title, subtitle] = card.querySelectorAll(".home-wird-caption > span > span:first-child > span");
     return {
       titleSize: title ? window.getComputedStyle(title).fontSize : "",
       subtitleSize: subtitle ? window.getComputedStyle(subtitle).fontSize : "",

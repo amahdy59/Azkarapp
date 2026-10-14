@@ -1,24 +1,17 @@
+.home-wird-section {
+  container-type: inline-size;
+}
 .home-wird-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.75rem;
 }
 .home-wird-tile {
   position: relative;
   overflow: hidden;
   min-width: 0;
-  min-height: 10rem;
   border-radius: var(--ds-radius-card, 1rem);
   text-align: start;
-}
-.home-wird-tile:focus-visible {
-  outline: 3px solid var(--ring);
-  outline-offset: 3px;
-}
-.home-wird-solid {
-  background: var(--card);
-  color: var(--foreground);
-  border: 1px solid var(--border);
 }
 .home-wird-caption {
   position: relative;
@@ -30,15 +23,6 @@
   justify-content: center;
   gap: 0.5rem;
   padding: 1rem;
-}
-.home-wird-status {
-  color: var(--muted-foreground);
-}
-.home-wird-icon {
-  color: var(--primary);
-}
-.home-glass-surface .home-wird-icon {
-  color: var(--on-media-accent);
 }
 .home-wird-photo {
   min-height: 13rem;
@@ -71,9 +55,9 @@
   --muted-foreground: var(--on-media-muted);
   --primary: var(--on-media-accent);
 }
-@media (min-width: 40rem) {
+@container (max-width: 15rem) {
   .home-wird-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 @media (min-width: 80rem) {
@@ -81,9 +65,26 @@
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
-@media (prefers-reduced-transparency: reduce) {
-  .home-wird-photo .hero-glass.home-glass-surface {
-    background: var(--on-media-surface);
-    backdrop-filter: none;
-  }
+
+.home-all-prayers-row {
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(7rem, 1fr);
+}
+
+/* Home-only chrome and inset variants load with the Home screen. */
+.hero-glass.home-glass-reading,
+.hero-glass.home-glass-header {
+  --home-glass-tint: rgb(15 23 42 / 0.58);
+}
+.hero-glass.home-glass-header {
+  border-width: 0 0 1px;
+  box-shadow: none;
+}
+
+/* Insets tint the existing frosted parent without another backdrop filter. */
+.home-glass-inset {
+  background-color: rgb(2 6 23 / 0.12);
+}
+.home-glass-inset:hover {
+  background-color: rgb(2 6 23 / 0.2);
 }
