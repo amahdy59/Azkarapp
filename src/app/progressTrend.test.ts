@@ -34,7 +34,7 @@ describe("recorded routine trends", () => {
       3,
     );
     expect(points[0]).toMatchObject({ possible: 93, partial: false });
-    expect(points[1]).toMatchObject({ possible: 0, completed: 0, rate: null, partial: false });
+    expect(points).toHaveLength(1);
   });
   it("counts leap-year and Hijri elapsed days without assuming month lengths", () => {
     for (const calendar of ["gregorian", "hijri"] as const) {
@@ -60,7 +60,28 @@ describe("recorded routine trends", () => {
       ],
       new Date(2026, 0, 2, 12),
     );
-    expect(points.map((p) => p.rate)).toEqual([100, null, null]);
+    expect(points.map((p) => p.rate)).toEqual([100]);
     expect(points[0]?.partial).toBe(false);
+  });
+  it("clips current ranges and explains their deduplicated routine composition", () => {
+    const point = buildProgressTrend(
+      [record("2026-01-01", "morning"), record("2026-01-01", "morning"), record("2026-01-02", "evening")],
+      [
+        {
+          label: "1–7",
+          dates: Array.from({ length: 7 }, (_, i) => new Date(2026, 0, i + 1, 12)),
+          elapsedLabel: (length) => `1–${length}`,
+        },
+      ],
+      new Date(2026, 0, 2, 12),
+    )[0];
+    expect(point).toMatchObject({
+      label: "1–2",
+      possible: 6,
+      completed: 2,
+      routines: { morning: 1, evening: 1, before_sleep: 0 },
+      partial: true,
+    });
+    expect(point?.dates).toHaveLength(2);
   });
 });

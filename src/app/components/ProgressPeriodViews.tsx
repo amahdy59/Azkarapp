@@ -162,50 +162,52 @@ export function ProgressWeekView({
               </tr>
             </thead>
             <tbody className="divide-y divide-white/20 dark:divide-white/5">
-              {weekStats.days.map((day) => (
-                <tr key={day.dayKey} className="hover:bg-white/20 dark:hover:bg-white/5 transition-colors">
-                  <th scope="row" className="py-3 px-2 text-start">
-                    <span
-                      className={`text-sm ${day.isToday ? "font-black text-primary" : "font-bold text-foreground"}`}
-                    >
-                      {day.weekdayName}
-                    </span>
-                    <span className="mt-0.5 block text-xs font-medium text-muted-foreground">
-                      <bdi>{dayFormatter.format(day.date)}</bdi>
-                    </span>
-                  </th>
+              {weekStats.days
+                .filter((day) => day.dayKey <= todayKey)
+                .map((day) => (
+                  <tr key={day.dayKey} className="hover:bg-white/20 dark:hover:bg-white/5 transition-colors">
+                    <th scope="row" className="py-3 px-2 text-start">
+                      <span
+                        className={`text-sm ${day.isToday ? "font-black text-primary" : "font-bold text-foreground"}`}
+                      >
+                        {day.weekdayName}
+                      </span>
+                      <span className="mt-0.5 block text-xs font-medium text-muted-foreground">
+                        <bdi>{dayFormatter.format(day.date)}</bdi>
+                      </span>
+                    </th>
 
-                  <WeekStatusCell
-                    future={day.dayKey > todayKey}
-                    done={day.morningStatus === "complete"}
-                    label={t(language, "progressTrend.morning")}
-                    language={language}
-                  />
-
-                  <WeekStatusCell
-                    future={day.dayKey > todayKey}
-                    done={day.eveningStatus === "complete"}
-                    label={t(language, "progressTrend.evening")}
-                    language={language}
-                  />
-
-                  {day.quranStatus !== undefined && (
                     <WeekStatusCell
                       future={day.dayKey > todayKey}
-                      done={day.quranStatus === "complete"}
-                      label={t(language, "progressTrend.quran")}
+                      done={day.morningStatus === "complete"}
+                      label={t(language, "progressTrend.morning")}
                       language={language}
                     />
-                  )}
 
-                  <WeekStatusCell
-                    future={day.dayKey > todayKey}
-                    done={day.sleepStatus === "complete"}
-                    label={t(language, "progressTrend.sleep")}
-                    language={language}
-                  />
-                </tr>
-              ))}
+                    <WeekStatusCell
+                      future={day.dayKey > todayKey}
+                      done={day.eveningStatus === "complete"}
+                      label={t(language, "progressTrend.evening")}
+                      language={language}
+                    />
+
+                    {day.quranStatus !== undefined && (
+                      <WeekStatusCell
+                        future={day.dayKey > todayKey}
+                        done={day.quranStatus === "complete"}
+                        label={t(language, "progressTrend.quran")}
+                        language={language}
+                      />
+                    )}
+
+                    <WeekStatusCell
+                      future={day.dayKey > todayKey}
+                      done={day.sleepStatus === "complete"}
+                      label={t(language, "progressTrend.sleep")}
+                      language={language}
+                    />
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
@@ -221,10 +223,6 @@ export function ProgressWeekView({
           <div className="flex items-center gap-1.5">
             <div className="h-4 w-4 rounded-full border-2 border-border-control" />
             <span>{t(language, "progress.missed")}</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span aria-hidden="true">—</span>
-            <span>{t(language, "progressTrend.upcoming")}</span>
           </div>
         </div>
 
@@ -345,6 +343,10 @@ export function ProgressMonthView({
             "–" +
             formatNumerals(period.dayNumbers[Math.min(index * 7 + 6, period.dates.length - 1)] ?? 1, language),
           dates: period.dates.slice(index * 7, index * 7 + 7),
+          elapsedLabel: (length: number) =>
+            formatNumerals(period.dayNumbers[index * 7] ?? 1, language) +
+            "–" +
+            formatNumerals(period.dayNumbers[index * 7 + length - 1] ?? 1, language),
         })),
         now,
         progressDayStartHour,

@@ -1702,6 +1702,11 @@ const en = {
     completedSurah: "Completed",
   },
   progressTrend: {
+    selectMonth: "Select month",
+    selectRange: "Select date range",
+    peak: "Highest recording rate: {period} · {rate}",
+    interactionHint: "Select a period below for exact records. On wider screens, you can also select a point.",
+    chartRegion: "Historical azkar chart",
     weeklyDescription: "Morning, evening and sleep azkar, grouped into seven-day ranges within this month.",
     monthlyDescription: "Morning, evening and sleep azkar, month by month. Future months are excluded.",
     compareRoutines: "Compare routines",
@@ -1736,6 +1741,14 @@ const en = {
     timelineDirectionCurrent: "Current",
   },
   progress: {
+    recordedCount: "{done} of {total} recorded",
+    comparePrayerMetric: "Compare prayers",
+    prayerLocationBreakdown: "Prayer locations",
+    locationStackHint:
+      "Each bar covers elapsed days: mosque, home, or no prayer record. Connected practices are counted separately.",
+    prayerComparisonHint: "Each row uses the same elapsed-day scale. Select a measure to compare its records.",
+    prayerExactRecords: "View exact prayer records",
+    notApplicable: "Not applicable",
     prayerRecordingRate: "Prayer records",
     recordingCoverageHint:
       "Recorded share across {days} elapsed days in this period, through today. Future days are excluded. Unrecorded does not mean missed.",

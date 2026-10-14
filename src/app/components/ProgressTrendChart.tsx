@@ -4,10 +4,11 @@ import type { ProgressTrendPoint } from "../progressTrend";
 import { formatNumerals, formatPercentage, formatRatio } from "../formatting";
 import { t } from "../i18n";
 import { ChevronNext } from "./icons";
+import { RecordedComparisonBar } from "./RecordedComparisonBar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 
 export function ProgressTrendChart({
-  points,
+  points: suppliedPoints,
   language,
   onExplore,
   testId,
@@ -21,11 +22,13 @@ export function ProgressTrendChart({
 }) {
   const id = useId();
   const canvas = useRef<HTMLDivElement>(null);
-  const [width, setWidth] = useState(600);
+  const [availableWidth, setWidth] = useState(600);
   const [labelSize, setLabelSize] = useState(12);
   const [selectedKey, setSelectedKey] = useState("");
+  const points = suppliedPoints.filter((point) => point.rate !== null && point.possible > 0);
   const selected = points.find((point) => point.key === selectedKey);
   const rtl = language === "ar";
+  const columns = interval === "weekly";
   useEffect(() => {
     const node = canvas.current;
     if (!node || typeof ResizeObserver === "undefined") return;
@@ -38,275 +41,259 @@ export function ProgressTrendChart({
     observer.observe(node);
     return () => observer.disconnect();
   }, []);
-  const left = Math.max(44, labelSize * 3.5);
-  const right = width - 14;
+  const periodIdentity = points.map((point) => point.key).join("|");
+  useEffect(() => {
+    setSelectedKey("");
+  }, [periodIdentity]);
+  const left = Math.max(52, labelSize * 4);
+  const width = Math.max(availableWidth, left + 140);
+  const right = width - Math.max(28, labelSize * 3);
   const hasActivity = points.some((point) => point.completed > 0);
   const chartHeight = hasActivity ? 220 : 160;
-  const top = 18;
-  const bottom = chartHeight - 40;
-  const x = (index: number) => {
-    const position = points.length <= 1 ? 0.5 : index / (points.length - 1);
-    return left + (rtl ? 1 - position : position) * (right - left);
-  };
+  const top = Math.max(24, labelSize * 2);
+  const bottom = chartHeight - 44;
+  const step = (right - left) / Math.max(1, points.length);
+  const labelStride = Math.max(
+    1,
+    Math.ceil((Math.max(...points.map((point) => point.label.length), 1) * labelSize * 0.65 + 12) / step),
+  );
+  const x = (index: number) => left + (rtl ? points.length - index - 0.5 : index + 0.5) * step;
   const y = (rate: number) => bottom - (rate / 100) * (bottom - top);
-  const recorded = points.filter((point) => point.rate !== null);
-  const segments: string[] = [];
-  let segment = "";
-  points.forEach((point, index) => {
-    if (point.rate === null) {
-      if (segment) segments.push(segment);
-      segment = "";
-      return;
-    }
-    segment += `${segment ? " L" : "M"}${x(index)},${y(point.rate)}`;
-  });
-  if (segment) segments.push(segment);
-  const value = (point: ProgressTrendPoint) =>
-    point.rate === null ? t(language, "progressTrend.upcoming") : formatPercentage(point.rate, language);
-
-  const colWidth = Math.max(8, Math.min(22, (right - left) / Math.max(2, points.length * 1.6)));
-
+  const value = (point: ProgressTrendPoint) => formatPercentage(point.rate ?? 0, language);
+  const peak = hasActivity
+    ? points.reduce((best, point) => ((point.rate ?? 0) > (best.rate ?? 0) ? point : best), points[0]!)
+    : undefined;
+  const peakText = peak ? t(language, "progressTrend.peak", { period: peak.label, rate: value(peak) }) : "";
   return (
     <section
       className="rounded-2xl border border-border bg-card p-4 sm:p-5"
       aria-labelledby={`${id}-title`}
       data-testid={testId}
     >
-      <div className="mb-5">
+      <div className="mb-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 id={`${id}-title`} data-testid="progress-primary-heading" className="text-xl font-bold text-foreground">
             {t(language, "progressTrend.title")}
           </h2>
-          <div
-            className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-muted/30 px-2.5 py-0.5 text-micro font-bold text-muted-foreground"
-            dir={rtl ? "rtl" : "ltr"}
-          >
-            <span>{t(language, "progressTrend.timelineDirectionOldest")}</span>
-            <span className="font-black text-primary" aria-hidden="true">
-              {rtl ? "←" : "→"}
-            </span>
-            <span>{t(language, "progressTrend.timelineDirectionCurrent")}</span>
-          </div>
+          <p className="text-xs font-semibold text-muted-foreground" dir={rtl ? "rtl" : "ltr"}>
+            {t(language, "progressTrend.timelineDirectionOldest")} <span aria-hidden="true">{rtl ? "←" : "→"}</span>{" "}
+            {t(language, "progressTrend.timelineDirectionCurrent")}
+          </p>
         </div>
         <p id={`${id}-description`} className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          {t(language, interval === "weekly" ? "progressTrend.weeklyDescription" : "progressTrend.monthlyDescription")}
+          {t(language, columns ? "progressTrend.weeklyDescription" : "progressTrend.monthlyDescription")}
         </p>
+        {peak && (
+          <p className="mt-2 text-sm font-semibold text-foreground" data-testid="trend-peak">
+            {peakText}
+            {peak.partial ? ` · ${t(language, "progressTrend.soFar")}` : ""}
+          </p>
+        )}
       </div>
-      <div
-        ref={canvas}
-        className="min-w-0"
-        role="img"
-        aria-labelledby={`${id}-title`}
-        aria-describedby={`${id}-description ${id}-data-hint`}
-      >
-        <svg
-          viewBox={`0 0 ${width} ${chartHeight}`}
-          width="100%"
-          height={chartHeight}
-          aria-hidden="true"
-          focusable="false"
-        >
-          <defs>
-            <linearGradient id={`${id}-wash`} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.16" />
-              <stop offset="100%" stopColor="var(--primary)" stopOpacity="0" />
-            </linearGradient>
-          </defs>
-          {[0, 50, 100].map((rate) => (
-            <g key={rate}>
-              <line
-                x1={left}
-                x2={right}
-                y1={y(rate)}
-                y2={y(rate)}
-                stroke="var(--border)"
-                strokeDasharray={rate ? "3 6" : undefined}
-              />
-              <text
-                x={left - 10}
-                y={y(rate) + 4}
-                textAnchor="end"
-                fill="var(--muted-foreground)"
-                fontSize={labelSize}
-                direction="ltr"
+      {points.length > 0 && (
+        <div ref={canvas} className="min-w-0">
+          <p id={`${id}-interaction`} className="mb-2 text-xs leading-relaxed text-muted-foreground">
+            {t(language, "progressTrend.interactionHint")}
+          </p>
+          <div
+            className="overflow-x-auto rounded-lg focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            role="region"
+            aria-label={t(language, "progressTrend.chartRegion")}
+            // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- Named native chart scroll region remains keyboard-scrollable at enlarged text.
+            tabIndex={0}
+            aria-describedby={`${id}-interaction`}
+          >
+            <div className="relative" style={{ width, height: chartHeight }}>
+              <svg
+                viewBox={`0 0 ${width} ${chartHeight}`}
+                width={width}
+                height={chartHeight}
+                role="img"
+                aria-labelledby={`${id}-title`}
+                aria-describedby={`${id}-description ${id}-data-hint`}
               >
-                {formatPercentage(rate, language)}
-              </text>
-            </g>
-          ))}
-          {/* Subtle column bars under points for discrete period visualization */}
-          {points.map((point, index) => {
-            if (point.rate === null) return null;
-            const isSel = selected?.key === point.key;
-            const colH = Math.max(3, bottom - y(point.rate));
-            return (
-              <rect
-                key={`col-${point.key}`}
-                x={x(index) - colWidth / 2}
-                y={y(point.rate)}
-                width={colWidth}
-                height={colH}
-                rx={Math.min(4, colWidth / 3)}
-                className="cursor-pointer transition-opacity duration-fast"
-                fill="var(--primary)"
-                opacity={isSel ? 0.75 : 0.22}
-                onClick={() => setSelectedKey(point.key)}
-              />
-            );
-          })}
-          {/* Axis ticks */}
-          {points.map((point, index) => (
-            <line
-              key={`tick-${point.key}`}
-              x1={x(index)}
-              x2={x(index)}
-              y1={bottom}
-              y2={bottom + 4}
-              stroke="var(--border)"
-              strokeWidth="1.5"
-            />
-          ))}
-          {segments.map((path, index) => {
-            const coordinates = path
-              .replace(/^M/, "")
-              .split(" L")
-              .map((pair) => pair.split(",").map(Number));
-            const first = coordinates[0]?.[0];
-            const last = coordinates[coordinates.length - 1]?.[0];
-            return (
-              <path
-                key={index}
-                d={path + " L" + last + "," + bottom + " L" + first + "," + bottom + " Z"}
-                fill={"url(#" + id + "-wash)"}
-              />
-            );
-          })}
-          {segments.map((path, index) => (
-            <path
-              key={index}
-              d={path}
-              fill="none"
-              stroke="var(--primary)"
-              strokeWidth="3"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          ))}
-          {points.map((point, index) =>
-            point.rate === null ? null : (
-              <g key={point.key} className="cursor-pointer" onClick={() => setSelectedKey(point.key)}>
-                {/* Generous touch / click hit box that does not increment circle count */}
-                <rect
-                  x={x(index) - 16}
-                  y={y(point.rate) - 16}
-                  width={32}
-                  height={32}
-                  fill="transparent"
-                  className="cursor-pointer"
-                />
-                {selected?.key === point.key && (
-                  <>
+                <title>{t(language, "progressTrend.chartRegion")}</title>
+                {[0, 50, 100].map((rate) => (
+                  <g key={rate}>
                     <line
-                      x1={x(index)}
-                      x2={x(index)}
-                      y1={top}
-                      y2={bottom}
-                      stroke="var(--muted-foreground)"
-                      strokeDasharray="3 5"
+                      x1={left}
+                      x2={right}
+                      y1={y(rate)}
+                      y2={y(rate)}
+                      stroke="var(--border)"
+                      strokeDasharray={rate ? "3 6" : undefined}
                     />
-                    <g pointerEvents="none" aria-hidden="true">
+                    <text
+                      x={left - 10}
+                      y={y(rate) + 4}
+                      textAnchor="end"
+                      fill="var(--muted-foreground)"
+                      fontSize={labelSize}
+                      direction="ltr"
+                    >
+                      {formatPercentage(rate, language)}
+                    </text>
+                  </g>
+                ))}
+                {!columns && points.length > 1 && (
+                  <path
+                    d={points.map((point, index) => `${index ? "L" : "M"}${x(index)},${y(point.rate ?? 0)}`).join(" ")}
+                    fill="none"
+                    stroke="var(--primary)"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                )}
+                {points.map((point, index) => (
+                  <g key={point.key}>
+                    {columns ? (
                       <rect
-                        x={Math.max(left, Math.min(right - 58, x(index) - 29))}
-                        y={Math.max(top, y(point.rate) - 30)}
-                        width={58}
-                        height={22}
-                        rx={6}
-                        fill="var(--popover)"
-                        stroke="var(--border)"
-                        strokeWidth={1}
-                        className="shadow-sm"
+                        data-testid="trend-column"
+                        x={x(index) - Math.min(30, step / 4)}
+                        y={y(point.rate ?? 0)}
+                        width={Math.min(60, step / 2)}
+                        height={bottom - y(point.rate ?? 0)}
+                        rx={4}
+                        fill="var(--primary)"
                       />
+                    ) : (
+                      <circle
+                        cx={x(index)}
+                        cy={y(point.rate ?? 0)}
+                        r={selected?.key === point.key ? 6 : 4}
+                        fill="var(--card)"
+                        stroke="var(--primary)"
+                        strokeWidth="2.5"
+                      />
+                    )}
+                    {columns && step >= labelSize * 3 && (
                       <text
-                        x={Math.max(left, Math.min(right - 58, x(index) - 29)) + 29}
-                        y={Math.max(top, y(point.rate) - 30) + 15}
+                        x={x(index)}
+                        y={Math.max(labelSize, y(point.rate ?? 0) - 9)}
                         textAnchor="middle"
-                        fill="var(--popover-foreground)"
-                        fontSize={11}
-                        fontWeight="bold"
+                        fontSize={labelSize}
+                        fill="var(--foreground)"
+                        direction="ltr"
                       >
                         {value(point)}
                       </text>
-                    </g>
-                  </>
-                )}
-                <circle
-                  cx={x(index)}
-                  cy={y(point.rate)}
-                  r={selected?.key === point.key ? 6 : 4}
-                  fill="var(--card)"
-                  stroke="var(--primary)"
-                  strokeWidth="2.5"
-                />
-              </g>
-            ),
-          )}
-        </svg>
-        <div
-          aria-hidden="true"
-          className="-mt-3 mb-4 flex justify-between gap-5 text-xs font-semibold text-muted-foreground"
-        >
-          <span className="max-w-[45%]">{points[0]?.label}</span>
-          <span className="max-w-[45%] text-end">{points[points.length - 1]?.label}</span>
-        </div>
-      </div>
-      {!hasActivity && <p className="mb-4 text-sm text-muted-foreground">{t(language, "progressTrend.empty")}</p>}
-      <div className="border-t border-border pt-4">
-        <label htmlFor={`${id}-period`} className="mb-2 block text-sm font-bold text-foreground">
-          {t(language, "progressTrend.choosePeriod")}
-        </label>
-        <Select dir={rtl ? "rtl" : "ltr"} value={selected ? selectedKey : ""} onValueChange={setSelectedKey}>
-          <SelectTrigger id={`${id}-period`}>
-            <SelectValue placeholder={t(language, "progressTrend.selectPeriod")} />
-          </SelectTrigger>
-          <SelectContent collisionPadding={16} className="max-w-[calc(100vw-2rem)]">
-            {points.map((point) => (
-              <SelectItem key={point.key} value={point.key}>
-                {point.label}
-                {point.partial ? ` · ${t(language, "progressTrend.soFar")}` : ""}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {selected && (
-          <div className="mt-3 flex flex-wrap items-center justify-between gap-3" role="status" aria-atomic="true">
-            <p className="text-sm text-foreground">
-              <strong className="text-lg">{value(selected)}</strong>
-              {selected.rate !== null && (
-                <span className="ms-2 text-muted-foreground">
-                  {t(language, "progressTrend.recorded", {
-                    count: formatRatio(selected.completed, selected.possible, language),
-                  })}
-                </span>
-              )}
-              {selected.partial && (
-                <span className="ms-2 text-muted-foreground">{t(language, "progressTrend.soFar")}</span>
-              )}
-            </p>
-            {onExplore && selected.rate !== null && (
-              <button
-                type="button"
-                onClick={() => {
-                  if (selected.dates[0]) onExplore(selected.dates[0]);
-                }}
-                className="flex min-h-11 items-center gap-2 rounded-lg px-3 text-sm font-bold text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-              >
-                {t(language, "progressTrend.openMonth")}
-                <ChevronNext size={16} aria-hidden="true" />
-              </button>
-            )}
+                    )}
+                    {selected?.key === point.key && (
+                      <line
+                        x1={x(index)}
+                        x2={x(index)}
+                        y1={top}
+                        y2={bottom}
+                        stroke="var(--muted-foreground)"
+                        strokeDasharray="3 5"
+                      />
+                    )}
+                    {(index === 0 ||
+                      index === points.length - 1 ||
+                      (index % labelStride === 0 && index < points.length - labelStride)) && (
+                      <text
+                        x={x(index)}
+                        y={bottom + labelSize + 10}
+                        textAnchor="middle"
+                        fontSize={labelSize}
+                        fill="var(--muted-foreground)"
+                        direction={rtl ? "rtl" : "ltr"}
+                      >
+                        {point.label}
+                      </text>
+                    )}
+                  </g>
+                ))}
+              </svg>
+              {step >= 44 &&
+                points.map((point, index) => (
+                  <button
+                    key={point.key}
+                    type="button"
+                    aria-label={`${point.label}: ${value(point)}${point.partial ? ` · ${t(language, "progressTrend.soFar")}` : ""}`}
+                    aria-pressed={selected?.key === point.key}
+                    onClick={() => setSelectedKey(point.key)}
+                    className="absolute size-11 rounded-lg focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                    style={{ left: x(index) - 22, top: y(point.rate ?? 0) - 22, width: 44, height: 44 }}
+                  >
+                    <span className="sr-only">{point.label}</span>
+                  </button>
+                ))}
+            </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+      {!hasActivity && <p className="mb-4 text-sm text-muted-foreground">{t(language, "progressTrend.empty")}</p>}
+      {points.length > 0 && (
+        <div className="mt-4 border-t border-border pt-4">
+          <label htmlFor={`${id}-period`} className="mb-2 block text-sm font-bold text-foreground">
+            {t(language, columns ? "progressTrend.selectRange" : "progressTrend.selectMonth")}
+          </label>
+          <Select dir={rtl ? "rtl" : "ltr"} value={selected ? selectedKey : ""} onValueChange={setSelectedKey}>
+            <SelectTrigger id={`${id}-period`}>
+              <SelectValue placeholder={t(language, "progressTrend.selectPeriod")} />
+            </SelectTrigger>
+            <SelectContent collisionPadding={16} className="max-w-[calc(100vw-2rem)]">
+              {points.map((point) => (
+                <SelectItem key={point.key} value={point.key}>
+                  {point.label}
+                  {point.partial ? ` · ${t(language, "progressTrend.soFar")}` : ""}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {selected && (
+            <div className="mt-3 space-y-3" role="status" aria-atomic="true">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className="text-sm text-foreground">
+                  <strong>
+                    {selected.label} · {value(selected)}
+                  </strong>
+                  <span className="mt-1 block text-muted-foreground">
+                    {t(language, "progressTrend.recorded", {
+                      count: formatRatio(selected.completed, selected.possible, language),
+                    })}
+                    {selected.partial ? ` · ${t(language, "progressTrend.soFar")}` : ""}
+                  </span>
+                </p>
+                {onExplore && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (selected.dates[0]) onExplore(selected.dates[0]);
+                    }}
+                    className="flex min-h-11 items-center gap-2 rounded-lg px-3 text-sm font-bold text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                  >
+                    {t(language, "progressTrend.openMonth")}
+                    <ChevronNext size={16} aria-hidden="true" />
+                  </button>
+                )}
+              </div>
+              {selected.routines && (
+                <dl className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-3">
+                  {(["morning", "evening", "before_sleep"] as const).map((routine) => (
+                    <div key={routine} className="space-y-1">
+                      <dt className="text-muted-foreground">
+                        {t(language, routine === "before_sleep" ? "progressTrend.sleep" : `progressTrend.${routine}`)}
+                      </dt>
+                      <dd className="font-bold">
+                        <bdi dir="ltr">{formatRatio(selected.routines![routine], selected.possible / 3, language)}</bdi>
+                        <RecordedComparisonBar
+                          language={language}
+                          max={selected.possible / 3}
+                          label={`${t(language, routine === "before_sleep" ? "progressTrend.sleep" : `progressTrend.${routine}`)}: ${formatRatio(selected.routines![routine], selected.possible / 3, language)}`}
+                          segments={[{ label: routine, value: selected.routines![routine], color: "var(--primary)" }]}
+                        />
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
+            </div>
+          )}
+        </div>
+      )}
       <details className="mt-4 border-t border-border pt-1">
         <summary
           id={`${id}-data-hint`}
@@ -343,7 +330,7 @@ export function ProgressTrendChart({
                   <bdi>{value(point)}</bdi>
                 </td>
                 <td className="py-3 text-end">
-                  <bdi>{point.possible ? formatRatio(point.completed, point.possible, language) : "—"}</bdi>
+                  <bdi dir="ltr">{formatRatio(point.completed, point.possible, language)}</bdi>
                 </td>
               </tr>
             ))}
@@ -352,7 +339,7 @@ export function ProgressTrendChart({
         <span className="sr-only">
           {t(language, "progressTrend.elapsed", {
             days: formatNumerals(
-              recorded.reduce((sum, point) => sum + point.possible / 3, 0),
+              points.reduce((sum, point) => sum + point.possible / 3, 0),
               language,
             ),
           })}

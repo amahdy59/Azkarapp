@@ -55,8 +55,8 @@ describe("ProgressViews components", () => {
     fireEvent.click(screen.getByText("View chart data"));
     const rows = within(screen.getByRole("table")).getAllByRole("row");
     expect(rows[1]).toHaveTextContent("17%");
-    expect(rows[2]).toHaveTextContent("Upcoming");
-    expect(rows[2]).not.toHaveTextContent("0%");
+    expect(rows).toHaveLength(2);
+    expect(screen.getByRole("table")).not.toHaveTextContent("Upcoming");
   });
   it("keeps Progress rows photograph-free and uses ordinary navigation buttons", () => {
     const onSelectCategory = vi.fn();

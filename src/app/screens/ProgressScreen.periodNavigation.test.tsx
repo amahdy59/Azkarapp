@@ -29,10 +29,10 @@ describe("Progress month exploration and routing", () => {
   it("preserves the selected historical month when routing echoes the new period and restores keyboard context", async () => {
     const user = userEvent.setup();
     render(<RoutedProgress />);
-    await screen.findByRole("combobox", { name: "Explore a period" });
+    await screen.findByRole("combobox", { name: "Select month" });
     fireEvent.click(screen.getByRole("button", { name: "Previous period" }));
     await waitFor(() => expect(screen.getByTestId("garden-view-date")).toHaveTextContent("2025"));
-    await user.click(screen.getByRole("combobox"));
+    await user.click(screen.getByRole("combobox", { name: "Select month" }));
     await user.click(screen.getByRole("option", { name: "February" }));
     fireEvent.click(screen.getByRole("button", { name: "Explore this month" }));
     await screen.findByTestId("month-weekly-chart");

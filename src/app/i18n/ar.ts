@@ -1705,6 +1705,11 @@ const ar = {
     completedSurah: "تمت القراءة بنجاح",
   },
   progressTrend: {
+    selectMonth: "اختر شهرًا",
+    selectRange: "اختر فترة بالأيام",
+    peak: "أعلى نسبة تسجيل: {period} · {rate}",
+    interactionHint: "اختر فترة أدناه لعرض سجلاتها بالتفصيل. يمكنك أيضًا اختيار نقطة على الشاشات الواسعة.",
+    chartRegion: "رسم الأذكار السابقة",
     weeklyDescription: "أذكار الصباح والمساء والنوم، في فترات من سبعة أيام ضمن هذا الشهر.",
     monthlyDescription: "أذكار الصباح والمساء والنوم، شهرًا بعد شهر، دون الأشهر القادمة.",
     compareRoutines: "مقارنة الأوراد",
@@ -1739,6 +1744,14 @@ const ar = {
     timelineDirectionCurrent: "الأحدث",
   },
   progress: {
+    recordedCount: "المسجّل: {done} من {total}",
+    comparePrayerMetric: "مقارنة الصلوات",
+    prayerLocationBreakdown: "أماكن الصلاة",
+    locationStackHint:
+      "يمثل كل شريط الأيام المنقضية: المسجد أو المنزل أو دون تسجيل للصلاة. تُحسب الأعمال المتصلة بها منفصلة.",
+    prayerComparisonHint: "تستخدم الصفوف مقياس الأيام المنقضية نفسه. اختر ما تريد مقارنة سجلاته.",
+    prayerExactRecords: "عرض سجلات الصلاة بالتفصيل",
+    notApplicable: "لا ينطبق",
     prayerRecordingRate: "الصلوات المسجّلة",
     recordingCoverageHint:
       "نسبة التسجيل خلال {days} يومًا انقضت من الفترة حتى اليوم. تُستبعد الأيام القادمة، وعدم التسجيل لا يعني فوات العبادة.",

@@ -1,5 +1,9 @@
 # Decision Log
 
+## Historical Progress visualization — 2026-10-14
+
+The owner approves all screenshot-based Progress recommendations, welcomes multiple stacked bars where they make the data clearer, requests waiting for a concurrent session, then explicitly resumes this phase. Implement historical-only trends with correctly clipped ranges and synchronized selectors; monthly columns and an explained annual line; five-row prayer comparisons with mutually exclusive location stacks only; separate Rawatib/adhkar measures; optional exact records and accessible responsive controls. Preserve existing prayer-first ordering, today-inclusive recording denominators, reviewed Asr Rawatib applicability, independent Quran, offline state and merge boundaries. This supersedes future analytical placeholders and dense prayer metric cards. The existing autonomous main release authority applies after intact gates. See phases/PROGRESS_VISUAL_HISTORY_2026_10_14.md.
+
 ## Ordinary radio arrow-key approval — 2026-10-13
 
 The owner explicitly chooses “Use arrows to focus and select (recommended)”. This supersedes DEC-022’s focus-only limitation for ordinary ChoiceRadioItem and SegmentedControl groups, including onboarding language choices. Immediate capture navigation preserves direction, disabled-option skipping, loop behavior, Home/End, Space activation and single-value semantics. Mushaf controls and their geometry remain unchanged. The existing pinned Radix dependency is retained.
