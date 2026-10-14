@@ -1,5 +1,18 @@
 [
   {
+    "release": "2026-10-14-7",
+    "ar": [
+      "يمتد شريط الرئيسية على الحاسوب إلى حواف مساحة المحتوى، مع بقاء عناصره مصطفّة مع البطاقات.",
+      "تُظهر البطاقات الزجاجية الخلفية بوضوح أكبر، مع سطح أقوى لقراءة التذكير وألوان نص أوضح.",
+      "تحافظ إعدادات تقليل الشفافية على أسطح ثابتة، وتبقى الأزرار داخل البطاقات أبسط وأوضح."
+    ],
+    "en": [
+      "The desktop Home header now spans the content area, with its contents aligned to the cards.",
+      "Frosted cards reveal more of the background, with stronger reading surfaces and clearer text colors.",
+      "Reduced-transparency settings keep solid surfaces, while controls inside cards use simpler layers."
+    ]
+  },
+  {
     "release": "2026-10-14-6",
     "ar": [
       "تعرض الرئيسية الصلاة الحالية والقادمة مع خيار عرض الجميع، ويبقى مسار اليوم أعلى الشاشة مخصصًا للحاسوب.",

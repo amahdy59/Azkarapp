@@ -228,7 +228,7 @@ function PrayerCard({
         className={`relative flex min-w-0 flex-col rounded-xl border text-center transition-colors duration-standard ease-standard ${
           isCurrent
             ? onGlass
-              ? "border-on-media-accent bg-on-media-accent/15 text-on-media"
+              ? "border-on-media-accent home-glass-inset text-on-media"
               : "border-primary bg-primary/15 text-foreground"
             : selected
               ? onGlass
@@ -598,7 +598,7 @@ export function PrayerTrackerCards({
               aria-expanded={showAll}
               aria-controls="home-prayer-overview"
               onClick={() => setShowAll((value) => !value)}
-              className={`${showAll ? "col-span-full" : "col-span-full sm:col-span-1"} flex min-h-11 items-center justify-center rounded-xl border px-3 py-2 text-sm font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${onGlass ? "hero-glass home-glass-surface" : "border-border bg-muted"}`}
+              className={`${showAll ? "col-span-full" : "col-span-full sm:col-span-1"} flex min-h-11 items-center justify-center rounded-xl border px-3 py-2 text-sm font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${onGlass ? "border-white/20 home-glass-inset text-on-media" : "border-border bg-muted"}`}
             >
               {t(language, showAll ? "settings.showFocusedPrayers" : "settings.showAllPrayers")}
             </button>

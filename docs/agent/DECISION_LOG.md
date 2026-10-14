@@ -4592,3 +4592,7 @@ The owner approves the final Home image with current/next prayer summaries, all-
 ## Home release budget exception approved — 2026-10-14
 
 After requesting publication of all changes, the owner explicitly answered "yes" to increasing only the total-output limit from 11 MiB to 12 MiB. This supersedes the fixed total-output ceiling for this release and establishes the new 12 MiB backstop. The measured candidate was 11,941,511 bytes, including the original supplied sleep JPEGs and the offline page 207 font. Preserve every other budget, growth guard, content-integrity check and release gate. Publish the complete Home and follow-up changes after successful verification.
+
+## Home glass and edge-to-edge desktop header approved — 2026-10-14
+
+The owner explicitly agrees to the recommended full-width header surface with aligned inner content and visibly translucent Home cards. Replace excessive cumulative fills with shared standard/reading/header materials, preserve text contrast and user/system reduced-transparency fallbacks, and verify all scenes and responsive widths. Reuse existing components; no content, persistence, dependency or budget-limit changes. Normal autonomous release authority applies.

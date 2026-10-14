@@ -3,7 +3,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { t } from "../src/app/i18n";
 
 for (const language of ["ar", "en"] as const) {
-  for (const width of [320, 390, 900, 1440]) {
+  for (const width of [320, 390, 900, 1920]) {
     test(`@cross-browser ${language} clear Home and independent appearance at ${width}px`, async ({
       page,
     }, testInfo) => {
@@ -21,6 +21,27 @@ for (const language of ["ar", "en"] as const) {
         );
       }, language);
       await page.goto("/#/home");
+      const header = page.getByTestId("home-utility-header");
+      const frame = await header.evaluate((element) => {
+        const outer = element.getBoundingClientRect();
+        const canvas = element.closest('[role="region"]')!.getBoundingClientRect();
+        const inner = element.querySelector('[data-testid="home-header-content"]')!.getBoundingClientRect();
+        const grid = document.querySelector('[data-testid="home-content-grid"]')!.getBoundingClientRect();
+        return {
+          outerLeft: outer.left,
+          outerRight: outer.right,
+          canvasLeft: canvas.left,
+          canvasRight: canvas.right,
+          innerLeft: inner.left,
+          innerRight: inner.right,
+          gridLeft: grid.left,
+          gridRight: grid.right,
+        };
+      });
+      expect(Math.abs(frame.outerLeft - frame.canvasLeft)).toBeLessThanOrEqual(1);
+      expect(Math.abs(frame.outerRight - frame.canvasRight)).toBeLessThanOrEqual(1);
+      expect(Math.abs(frame.innerLeft - frame.gridLeft)).toBeLessThanOrEqual(1);
+      expect(Math.abs(frame.innerRight - frame.gridRight)).toBeLessThanOrEqual(1);
       const strip = page.getByTestId("home-prayer-strip");
       await expect(strip.locator('[data-density="summary"]')).toHaveCount(2);
       await expect(page.getByTestId("prayer-card-dhuhr")).toHaveAttribute("data-prayer-state", "current");

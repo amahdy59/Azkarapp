@@ -62,8 +62,8 @@
   margin-top: 4rem;
   border-radius: 0;
 }
-.home-wird-photo .hero-glass {
-  background-color: rgb(2 6 23 / 0.72);
+.home-wird-photo .hero-glass.home-glass-surface {
+  --home-glass-tint: rgb(2 6 23 / 0.66);
 }
 .home-wird-photo-solid {
   background: var(--on-media-surface);
@@ -82,7 +82,7 @@
   }
 }
 @media (prefers-reduced-transparency: reduce) {
-  .home-wird-photo .hero-glass {
+  .home-wird-photo .hero-glass.home-glass-surface {
     background: var(--on-media-surface);
     backdrop-filter: none;
   }

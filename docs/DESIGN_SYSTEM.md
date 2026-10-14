@@ -865,3 +865,7 @@ The centered Progress wrapper retains the shared opaque header's zero top-edge g
 ## Approved Home clarity reference — 2026-10-14
 
 Home has two focused prayer summaries and an explicit all-prayer disclosure, one primary routine with its complete/abbreviated selector, one directly visible reviewed reminder, open daily-wird tiles, adjacent benefits access and icon-labelled situational shortcuts. Wird photography is an independent opt-in Appearance preference; photographic captions and image-free tiles use the same glass material when transparency is enabled. Reduced transparency renders stable solid surfaces. Streak/palm indicators remain compact; Today’s path is desktop-only at the shared 900px breakpoint. Narrow/enlarged tiles stack rather than shrinking their labels.
+
+## Home frosted surfaces and full-width chrome — 2026-10-14
+
+Owner-approved Home refinement: the sticky header surface spans the main canvas, excluding the sidebar; its inner controls retain the content grid measure. Shared standard glass uses 48% navy, reading/header 58%, 18px blur and a 6% maximum white highlight. Keep the page scrim and pale-gold on-media text to preserve contrast against bright scenery. Photo captions use 66% tint without the page scrim. Insets use one light darkening layer and no additional backdrop filter; primary actions stay solid. Application/system reduced-transparency preferences retain opaque materials. Header edges, inner alignment, OS/app fallbacks and conservative bright-photo contrast are covered by browser checks.

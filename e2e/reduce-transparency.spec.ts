@@ -99,11 +99,48 @@ test("a card over the hero photograph goes opaque, not merely unblurred", async 
     };
   });
   expect(material.backgroundColor, "the hero card should visibly reveal the photograph by default").toBe(
-    "rgba(15, 23, 42, 0.68)",
+    "rgba(15, 23, 42, 0.58)",
   );
   expect(material.backgroundImage).toContain("linear-gradient");
-  expect(material.backdropFilter).toContain("blur(14px)");
-  expect(material.backdropFilter).toContain("saturate(1.35)");
+  expect(material.backdropFilter).toContain("blur(18px)");
+  expect(material.backdropFilter).toContain("saturate(1.2)");
+
+  const standard = page.getByTestId("prayer-tracker-cards");
+  const reading = page.getByTestId("home-daily-evidence");
+  await expect(standard).toHaveCSS("background-color", "rgba(15, 23, 42, 0.48)");
+  await expect(reading).toHaveCSS("background-color", "rgba(15, 23, 42, 0.58)");
+  const innerAction = standard.getByRole("button", { name: "Show all prayers", exact: true });
+  await expect(innerAction).toHaveCSS("backdrop-filter", "none");
+  // Bound contrast even if the brightest source photograph pixel is white.
+  // Read actual compositing colors rather than treating blur as a guarantee.
+  const contrast = await standard.evaluate((element) => {
+    const parse = (value: string) => value.match(/[\d.]+/g)!.map(Number);
+    const blend = (front: number[], back: number[]) =>
+      front.slice(0, 3).map((value, index) => value * (front[3] ?? 1) + back[index]! * (1 - (front[3] ?? 1)));
+    const luminance = (color: number[]) =>
+      color.slice(0, 3).reduce((sum, value, index) => {
+        const srgb = value / 255;
+        return (
+          sum + (srgb <= 0.04045 ? srgb / 12.92 : ((srgb + 0.055) / 1.055) ** 2.4) * [0.2126, 0.7152, 0.0722][index]!
+        );
+      }, 0);
+    const style = getComputedStyle(element);
+    const scrim = getComputedStyle(document.querySelector(".home-photo-scrim")!);
+    const scrimColors = scrim.backgroundImage.match(/rgba?\([^)]*\)/g)!.map(parse);
+    const lightestScrim = scrimColors.reduce((best, color) => (color[3]! < best[3]! ? color : best));
+    const highlight = parse(style.backgroundImage.match(/rgba?\([^)]*\)/)![0]);
+    const background = blend(highlight, blend(parse(style.backgroundColor), blend(lightestScrim, [255, 255, 255])));
+    const probe = document.createElement("span");
+    element.append(probe);
+    const result = ["text-on-media", "text-on-media-muted", "text-on-media-accent"].map((className) => {
+      probe.className = className;
+      const foreground = blend(parse(getComputedStyle(probe).color), background);
+      return (luminance(foreground) + 0.05) / (luminance(background) + 0.05);
+    });
+    probe.remove();
+    return result;
+  });
+  for (const ratio of contrast) expect(ratio).toBeGreaterThanOrEqual(4.5);
 
   await page.evaluate(() => document.documentElement.classList.add("reduce-transparency"));
 

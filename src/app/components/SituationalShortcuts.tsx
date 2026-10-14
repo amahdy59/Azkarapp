@@ -56,7 +56,7 @@ export function SituationalShortcuts({
             <a
               key={id}
               href={routeToHash({ view: "reader", categoryId: id, index: 0 })!}
-              className={`${onGlass ? "hero-glass home-glass-surface" : "bg-card"} flex min-h-12 items-center gap-2 rounded-xl border border-border px-3 py-2 text-sm font-semibold hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] ${onGlass ? "focus-visible:ring-on-media" : "focus-visible:ring-ring"}`}
+              className={`${onGlass ? "home-glass-inset" : "bg-card hover:bg-muted"} flex min-h-12 items-center gap-2 rounded-xl border border-border px-3 py-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-[3px] ${onGlass ? "focus-visible:ring-on-media" : "focus-visible:ring-ring"}`}
               onClick={(event) => {
                 if (event.button !== 0 || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
                 event.preventDefault();

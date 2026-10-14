@@ -1,15 +1,13 @@
 {
-  "release": "2026-10-14-6",
+  "release": "2026-10-14-7",
   "ar": [
-    "تعرض الرئيسية الصلاة الحالية والقادمة مع خيار عرض الجميع، ويبقى مسار اليوم أعلى الشاشة مخصصًا للحاسوب.",
-    "أصبح ورد اليوم أوضح، مع شرح طريقة كسب النخلة وخيارات مستقلة لصور البطاقات والشفافية.",
-    "يمكنك مشاركة أذكار النوم باستخدام بطاقتين جاهزتين مع معاينتهما وحفظهما معًا.",
-    "يظهر ذكر حسبي الله لا إله إلا هو بخط المصحف، مع الحفاظ على نصه وعدد تكراره وإتاحته دون اتصال."
+    "يمتد شريط الرئيسية على الحاسوب إلى حواف مساحة المحتوى، مع بقاء عناصره مصطفّة مع البطاقات.",
+    "تُظهر البطاقات الزجاجية الخلفية بوضوح أكبر، مع سطح أقوى لقراءة التذكير وألوان نص أوضح.",
+    "تحافظ إعدادات تقليل الشفافية على أسطح ثابتة، وتبقى الأزرار داخل البطاقات أبسط وأوضح."
   ],
   "en": [
-    "Home focuses on the current and next prayers with an option to show all, and keeps the top Today's path shortcut on desktop.",
-    "Today's wird is clearer, with palm-earning help and independent choices for card images and transparency.",
-    "Share before-sleep azkar using two supplied cards, with previews and one archive to save them together.",
-    "The Hasbi Allah reliance dhikr now uses Mushaf lettering offline while preserving its wording and repetition count."
+    "The desktop Home header now spans the content area, with its contents aligned to the cards.",
+    "Frosted cards reveal more of the background, with stronger reading surfaces and clearer text colors.",
+    "Reduced-transparency settings keep solid surfaces, while controls inside cards use simpler layers."
   ]
 }

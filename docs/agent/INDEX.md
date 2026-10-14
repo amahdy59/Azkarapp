@@ -325,3 +325,5 @@ The latest owner-approved continuation is [Canonical Surah magnification and rec
 [Stationary Progress controls](phases/PROGRESS_STATIONARY_CONTROLS_2026_10_14.md) is the active owner-requested screenshot follow-up: stationary title/period filters, actual-viewport bounds, safe focus recovery and separated enlarged chart labels. Historical visualization was deployed at a64b84c5; this follow-up has its own fresh release notes.
 
 [Home clarity and independent appearance](phases/HOME_CLARITY_2026_10_14.md) implements the owner-approved final concept and desktop-only Today’s path. [Supplied sleep cards and reliance lettering](phases/SLEEP_SHARING_AND_RELIANCE_LETTERING_2026_10_14.md) records the two subsequent owner requests. The owner explicitly approved a 12 MiB total-output exception and publication of all changes; intact release gates apply.
+
+[Home glass and desktop header](phases/HOME_GLASS_AND_HEADER_2026_10_14.md) is the active owner-approved refinement: full-width main-canvas header, visible photographic glass, stronger reading surfaces, simpler nested controls and intact accessibility preferences.

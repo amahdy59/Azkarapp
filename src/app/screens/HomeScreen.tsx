@@ -639,14 +639,14 @@ export function HomeScreen({
           <header
             data-testid="home-utility-header"
             data-scrolled={hasScrolledHomeContent || undefined}
-            className={`${homeVisualEffects ? "hero-glass home-glass-surface" : ""} px-page mx-auto flex w-full max-w-7xl items-center justify-between gap-3 transition-[background-color,backdrop-filter,box-shadow,padding] duration-standard ${
+            className={`${homeVisualEffects ? "hero-glass home-glass-surface home-glass-header" : ""} w-full transition-[background-color,backdrop-filter,box-shadow,padding] duration-standard ${
               hasScrolledHomeContent
                 ? "pt-[max(0.375rem,env(safe-area-inset-top))] pb-1"
                 : "pt-[max(0.5rem,env(safe-area-inset-top))] pb-1 sm:pt-3 sm:pb-2"
             } ${
               homeVisualEffects
                 ? hasScrolledHomeContent
-                  ? "border-b border-white/10 bg-on-media-surface/70 shadow-none backdrop-blur-xl"
+                  ? "border-b border-white/10 shadow-none"
                   : ""
                 : hasScrolledHomeContent
                   ? "border-b border-border bg-background/90 shadow-none"
@@ -655,44 +655,49 @@ export function HomeScreen({
             dir="ltr"
           >
             <div
-              data-testid="hijri-date"
-              className={`min-w-0 flex-1 truncate text-label font-bold sm:text-subtitle ${
-                homeVisualEffects ? "text-on-media-accent drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)]" : "text-primary"
-              }`}
+              data-testid="home-header-content"
+              className="px-page mx-auto flex w-full max-w-7xl items-center justify-between gap-3"
             >
-              <time className="truncate" dateTime={now.toISOString()}>
-                {formatDisplayDate(now, language, calendarType, hijriDateOffset)}
-              </time>
-            </div>
-            <div
-              className={`flex shrink-0 items-center gap-2 ${homeVisualEffects ? "text-on-media-accent" : "text-primary"}`}
-            >
-              <span
-                className="flex items-center gap-1 text-sm font-bold"
-                role="img"
-                title={t(language, "progress.lifetimePalmsSummary")}
-                aria-label={`${t(language, "progress.lifetimePalmsSummary")}: ${formatNumerals(gardenSummary.currentPalmRhythm ?? 0, language)}`}
+              <div
+                data-testid="hijri-date"
+                className={`min-w-0 flex-1 truncate text-label font-bold sm:text-subtitle ${
+                  homeVisualEffects ? "text-on-media-accent drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)]" : "text-primary"
+                }`}
               >
-                <PalmTreeMark size={18} />
-                <bdi>{formatNumerals(gardenSummary.currentPalmRhythm ?? 0, language)}</bdi>
-              </span>
-              <span
-                className="flex items-center gap-1 text-sm font-bold"
-                role="img"
-                title={t(language, "progress.activeStreakSummary")}
-                aria-label={`${t(language, "progress.activeStreakSummary")}: ${formatNumerals(gardenSummary.currentUsageStreak ?? 0, language)}`}
+                <time className="truncate" dateTime={now.toISOString()}>
+                  {formatDisplayDate(now, language, calendarType, hijriDateOffset)}
+                </time>
+              </div>
+              <div
+                className={`flex shrink-0 items-center gap-2 ${homeVisualEffects ? "text-on-media-accent" : "text-primary"}`}
               >
-                <Zap size={18} aria-hidden="true" />
-                <bdi>{formatNumerals(gardenSummary.currentUsageStreak ?? 0, language)}</bdi>
-              </span>
-              <button
-                type="button"
-                data-testid="home-header-routine-summary"
-                onClick={() => setPathSheetOpen(true)}
-                className="pointer-events-auto hidden min-h-11 items-center gap-2 rounded-xl border border-current px-3 text-sm font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring min-[900px]:flex"
-              >
-                {t(language, "dailyPath.title")}
-              </button>
+                <span
+                  className="flex items-center gap-1 text-sm font-bold"
+                  role="img"
+                  title={t(language, "progress.lifetimePalmsSummary")}
+                  aria-label={`${t(language, "progress.lifetimePalmsSummary")}: ${formatNumerals(gardenSummary.currentPalmRhythm ?? 0, language)}`}
+                >
+                  <PalmTreeMark size={18} />
+                  <bdi>{formatNumerals(gardenSummary.currentPalmRhythm ?? 0, language)}</bdi>
+                </span>
+                <span
+                  className="flex items-center gap-1 text-sm font-bold"
+                  role="img"
+                  title={t(language, "progress.activeStreakSummary")}
+                  aria-label={`${t(language, "progress.activeStreakSummary")}: ${formatNumerals(gardenSummary.currentUsageStreak ?? 0, language)}`}
+                >
+                  <Zap size={18} aria-hidden="true" />
+                  <bdi>{formatNumerals(gardenSummary.currentUsageStreak ?? 0, language)}</bdi>
+                </span>
+                <button
+                  type="button"
+                  data-testid="home-header-routine-summary"
+                  onClick={() => setPathSheetOpen(true)}
+                  className="pointer-events-auto hidden min-h-11 items-center gap-2 rounded-xl border border-current px-3 text-sm font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring min-[900px]:flex"
+                >
+                  {t(language, "dailyPath.title")}
+                </button>
+              </div>
             </div>
           </header>
         </div>
