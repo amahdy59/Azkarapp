@@ -1,0 +1,45 @@
+{
+  "encoder": "Pillow WebP, quality 30, method 6; original resolution preserved",
+  "cards": [
+    {
+      "source": "design-sources/curated-routines/routine-evening-1.jpg",
+      "sha256": "8848fa86295f6cbc00795d6187e6fb472aa3e598ed0fc429294c236934a19bda",
+      "output": "public/assets/cards/routine-evening-1.webp",
+      "outputBytes": 51324,
+      "width": 900,
+      "height": 1600
+    },
+    {
+      "source": "design-sources/curated-routines/routine-evening-2.jpg",
+      "sha256": "43fea404a2097b250f975e68922f5f1835a35957c144d735defbfc139767d501",
+      "output": "public/assets/cards/routine-evening-2.webp",
+      "outputBytes": 57152,
+      "width": 900,
+      "height": 1600
+    },
+    {
+      "source": "design-sources/curated-routines/routine-morning-1.jpg",
+      "sha256": "c2768084c6462e33ab82a5fd35378c1fbdf3f37e6f2e55399fa33a450274389e",
+      "output": "public/assets/cards/routine-morning-1.webp",
+      "outputBytes": 53622,
+      "width": 900,
+      "height": 1600
+    },
+    {
+      "source": "design-sources/curated-routines/routine-morning-2.jpg",
+      "sha256": "ce21eab55c37ec50e658b6e2e22bf79be8eddd885ddfa79cd0e4a200384827fa",
+      "output": "public/assets/cards/routine-morning-2.webp",
+      "outputBytes": 60654,
+      "width": 900,
+      "height": 1600
+    },
+    {
+      "source": "design-sources/curated-routines/routine-morning-3.jpg",
+      "sha256": "77e782cee314b5f82b2f9ffdc7ef879a4c6f78479d58150c1842d93e0e53cca1",
+      "output": "public/assets/cards/routine-morning-3.webp",
+      "outputBytes": 48974,
+      "width": 900,
+      "height": 1600
+    }
+  ]
+}

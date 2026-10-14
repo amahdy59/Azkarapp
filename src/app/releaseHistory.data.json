@@ -1,5 +1,20 @@
 [
   {
+    "release": "2026-10-14-1",
+    "ar": [
+      "تحافظ تحديثات التطبيق على تنزيلاتك، ويمكنك تصدير الصوت في مجلدات مرتبة بأسماء واضحة.",
+      "شارك فضائل الذكر وبطاقات الصباح والمساء، مع توفر البطاقات المصورة دون اتصال بعد تثبيت التطبيق.",
+      "أصبحت المسبحة والصلاة على النبي أكثر اتساقًا مع القارئ، مع خيارات لحجم النص والصيغ والمشاركة.",
+      "توضح إحصاءات الصلاة والجمعة نسب التسجيل، وتعرض مخططات التقدم اتجاه الزمن بوضوح."
+    ],
+    "en": [
+      "App updates preserve your downloads, and audio exports use organized folders with readable names.",
+      "Share remembrance benefits and supplied morning or evening cards, available offline after installation.",
+      "Masbaha and Salawat now share the reader's controls, with text sizing, formula choices, and sharing.",
+      "Prayer and Friday statistics show recording rates, while progress charts make the timeline direction clear."
+    ]
+  },
+  {
     "release": "2026-10-13-6",
     "ar": [
       "أصبحت صفحة التقدم أكثر وضوحًا وهدوءًا بإزالة البطاقات المتداخلة وترتيب الأوراد في مساحات متناسقة.",

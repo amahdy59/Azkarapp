@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { applyServiceWorkerUpdate, escapeStaleServiceWorker } from "./pwaUpdate";
+import { applyServiceWorkerUpdate, escapeStaleServiceWorker, isProtectedContentCache } from "./pwaUpdate";
 
 /** A worker whose state can be driven, as the browser drives a real one. */
 function fakeWorker(state: ServiceWorker["state"]) {
@@ -210,5 +210,45 @@ describe("escaping a worker that would not replace itself", () => {
     };
     expect(await escapeStaleServiceWorker(failing)).toBe(true);
     expect(reload).toHaveBeenCalledTimes(1);
+  });
+
+  it("identifies protected content caches", () => {
+    expect(isProtectedContentCache("azkar-audio-v8")).toBe(true);
+    expect(isProtectedContentCache("azkar-mushaf-v3")).toBe(true);
+    expect(isProtectedContentCache("azkar-qcf-fonts-v1")).toBe(true);
+    expect(isProtectedContentCache("azkar-listening-timings-v1")).toBe(true);
+    expect(isProtectedContentCache("workbox-precache-v2-abc")).toBe(false);
+    expect(isProtectedContentCache("azkar-routes-v1")).toBe(false);
+  });
+
+  it("deletes precache caches but preserves downloaded audio, mushaf, font and timing caches", async () => {
+    const deleted: string[] = [];
+    const fakeCaches = {
+      keys: vi.fn(async () => [
+        "workbox-precache-v2-https://localhost/",
+        "azkar-routes-v1",
+        "azkar-audio-v8",
+        "azkar-mushaf-v3",
+        "azkar-qcf-fonts-v1",
+        "azkar-listening-timings-v1",
+        "other-feature-cache",
+      ]),
+      delete: vi.fn(async (key: string) => {
+        deleted.push(key);
+        return true;
+      }),
+    };
+    vi.stubGlobal("caches", fakeCaches);
+    try {
+      const { args } = harness("2026-09-05.6");
+      expect(await escapeStaleServiceWorker(args)).toBe(true);
+      expect(deleted).toEqual(["workbox-precache-v2-https://localhost/", "azkar-routes-v1"]);
+      expect(deleted).not.toContain("azkar-audio-v8");
+      expect(deleted).not.toContain("azkar-mushaf-v3");
+      expect(deleted).not.toContain("azkar-qcf-fonts-v1");
+      expect(deleted).not.toContain("azkar-listening-timings-v1");
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 });

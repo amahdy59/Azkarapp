@@ -173,7 +173,7 @@ export function SettingsScreen({
         <div className="settings-two-pane h-full">
           {/* Left: category list */}
           <div className="settings-nav-pane">
-            <Header title={t(language, "common.settings")} language={language} />
+            <Header title={t(language, "common.settings")} language={language} pageGutters />
             <SettingsRootPanel
               onNav={openSubPanel}
               language={language}

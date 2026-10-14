@@ -64,6 +64,8 @@ export function ProgressTrendChart({
   const value = (point: ProgressTrendPoint) =>
     point.rate === null ? t(language, "progressTrend.upcoming") : formatPercentage(point.rate, language);
 
+  const colWidth = Math.max(8, Math.min(22, (right - left) / Math.max(2, points.length * 1.6)));
+
   return (
     <section
       className="rounded-2xl border border-border bg-card p-4 sm:p-5"
@@ -71,9 +73,21 @@ export function ProgressTrendChart({
       data-testid={testId}
     >
       <div className="mb-5">
-        <h2 id={`${id}-title`} data-testid="progress-primary-heading" className="text-xl font-bold text-foreground">
-          {t(language, "progressTrend.title")}
-        </h2>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 id={`${id}-title`} data-testid="progress-primary-heading" className="text-xl font-bold text-foreground">
+            {t(language, "progressTrend.title")}
+          </h2>
+          <div
+            className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-muted/30 px-2.5 py-0.5 text-micro font-bold text-muted-foreground"
+            dir={rtl ? "rtl" : "ltr"}
+          >
+            <span>{t(language, "progressTrend.timelineDirectionOldest")}</span>
+            <span className="font-black text-primary" aria-hidden="true">
+              {rtl ? "←" : "→"}
+            </span>
+            <span>{t(language, "progressTrend.timelineDirectionCurrent")}</span>
+          </div>
+        </div>
         <p id={`${id}-description`} className="mt-2 text-sm leading-relaxed text-muted-foreground">
           {t(language, interval === "weekly" ? "progressTrend.weeklyDescription" : "progressTrend.monthlyDescription")}
         </p>
@@ -119,6 +133,38 @@ export function ProgressTrendChart({
                 {formatPercentage(rate, language)}
               </text>
             </g>
+          ))}
+          {/* Subtle column bars under points for discrete period visualization */}
+          {points.map((point, index) => {
+            if (point.rate === null) return null;
+            const isSel = selected?.key === point.key;
+            const colH = Math.max(3, bottom - y(point.rate));
+            return (
+              <rect
+                key={`col-${point.key}`}
+                x={x(index) - colWidth / 2}
+                y={y(point.rate)}
+                width={colWidth}
+                height={colH}
+                rx={Math.min(4, colWidth / 3)}
+                className="cursor-pointer transition-opacity duration-fast"
+                fill="var(--primary)"
+                opacity={isSel ? 0.75 : 0.22}
+                onClick={() => setSelectedKey(point.key)}
+              />
+            );
+          })}
+          {/* Axis ticks */}
+          {points.map((point, index) => (
+            <line
+              key={`tick-${point.key}`}
+              x1={x(index)}
+              x2={x(index)}
+              y1={bottom}
+              y2={bottom + 4}
+              stroke="var(--border)"
+              strokeWidth="1.5"
+            />
           ))}
           {segments.map((path, index) => {
             const coordinates = path

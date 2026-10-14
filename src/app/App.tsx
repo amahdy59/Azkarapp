@@ -2011,6 +2011,7 @@ function AppContent({
                   reduceMotion={reduceMotion}
                   hapticFeedback={hapticFeedback}
                   textSize={textSize}
+                  onTextSizeChange={setTextSize}
                   onBack={() => replace("friday")}
                 />
               )}
@@ -2476,6 +2477,7 @@ function AppContent({
                   hapticFeedback={hapticFeedback}
                   reduceMotion={reduceMotion}
                   textSize={textSize}
+                  onTextSizeChange={setTextSize}
                   initialMasbahaState={masbahaState}
                   onSaveMasbahaState={setMasbahaState}
                   progressDayStartHour={progressDayStartHour}

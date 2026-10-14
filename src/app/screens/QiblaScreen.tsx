@@ -318,202 +318,204 @@ export function QiblaScreen({
 
   return (
     <ScreenContainer className="overflow-y-auto" dir={direction} screenName={t(language, "qibla.title")}>
-      <Header
-        pageGutters
-        title={t(language, "qibla.title")}
-        subtitle={t(language, "qibla.subtitle")}
-        onBack={onBack}
-        language={language}
-      />
-      <div className="mx-auto grid w-full max-w-5xl content-start items-start gap-4 px-page py-4 lg:grid-cols-[minmax(20rem,1fr)_minmax(16rem,0.7fr)]">
-        <section
-          className="flex flex-col items-center rounded-3xl border border-border/50 bg-card p-4 shadow-raised sm:p-6"
-          aria-labelledby="qibla-bearing"
-        >
-          {bearing === null ? (
-            <div className="flex flex-1 flex-col items-center justify-center py-12 text-center">
-              <MapPin size={40} className="text-primary" aria-hidden="true" />
-              <h2 id="qibla-bearing" className="mt-4 text-title font-extrabold text-foreground">
-                {t(language, "qibla.locationNeeded")}
-              </h2>
-              <p className="mt-2 max-w-md text-sm font-semibold leading-6 text-muted-foreground">
-                {t(language, "qibla.locationNeededHint")}
-              </p>
-            </div>
-          ) : (
-            <>
-              <figure
-                className="w-full"
-                role="img"
-                aria-label={t(language, "qibla.directionVisualLabel", {
-                  degrees: formatNumerals(roundedBearing!, language),
-                })}
-              >
-                <div className="mx-auto w-full max-w-[21rem]">
-                  <CompassDial
-                    rotation={dialRotation}
-                    northRotation={northRotation}
-                    reduceMotion={reduceMotion}
-                    language={language}
-                    aligned={isAligned}
-                  />
-                </div>
-              </figure>
-              <h2 id="qibla-bearing" className="mt-1 text-center text-title font-extrabold text-foreground">
-                {t(language, "qibla.bearing", { degrees: formatNumerals(roundedBearing!, language) })}
-              </h2>
-              <p className="mt-1 text-center text-sm font-semibold text-muted-foreground">
-                {t(language, `qibla.${cardinalKey(bearing)}`)}
-              </p>
-              {distanceKm !== null && (
-                <p className="mt-1 text-center text-xs font-medium text-muted-foreground">
-                  {t(language, "qibla.distanceToKaaba", {
-                    distance: formatNumerals(distanceKm.toLocaleString(), language),
-                  })}
-                </p>
-              )}
-              <h3
-                className="mt-3 flex min-h-6 items-center justify-center gap-2 text-center font-bold text-foreground"
-                aria-live="polite"
-              >
-                <span
-                  aria-hidden="true"
-                  className={`inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-[opacity,transform] duration-standard ${isAligned ? "scale-100 opacity-100" : "pointer-events-none scale-75 opacity-0"}`}
-                >
-                  <Check size={15} strokeWidth={3} />
-                </span>
-                {guidance ?? t(language, "qibla.staticHint")}
-              </h3>
-              {!showDesktopGuide && (
-                <Button
-                  className="mt-4 min-h-11 w-full max-w-sm"
-                  variant={compassEnabled ? "outline" : "default"}
-                  onClick={() => void toggleCompass()}
-                  aria-pressed={compassEnabled}
-                >
-                  {compassEnabled ? t(language, "qibla.stopCompass") : t(language, "qibla.startCompass")}
-                </Button>
-              )}
-              {compassStatus && (
-                <p
-                  className="mt-3 text-center text-sm font-semibold text-muted-foreground"
-                  role="status"
-                  aria-live="polite"
-                >
-                  {compassStatus}
-                </p>
-              )}
-            </>
-          )}
-        </section>
-
-        <aside className="flex flex-col gap-3">
-          <section className="rounded-3xl border border-border/50 bg-card p-5 shadow-raised">
-            <div className="flex items-start gap-3">
-              <span
-                className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary"
-                aria-hidden="true"
-              >
-                <MapPin size={22} />
-              </span>
-              <div className="min-w-0 flex-1">
-                <h2 className="text-subtitle font-extrabold text-foreground">{t(language, "qibla.locationTitle")}</h2>
-                <p className="mt-1 text-sm font-semibold leading-6 text-muted-foreground">
-                  {coordinates
-                    ? locationLabel || `${coordinates.latitude.toFixed(2)}°, ${coordinates.longitude.toFixed(2)}°`
-                    : t(language, "qibla.noLocation")}
+      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col min-h-screen">
+        <Header
+          pageGutters
+          title={t(language, "qibla.title")}
+          subtitle={t(language, "qibla.subtitle")}
+          onBack={onBack}
+          language={language}
+        />
+        <div className="grid w-full content-start items-start gap-4 px-page py-4 lg:grid-cols-[minmax(20rem,1fr)_minmax(16rem,0.7fr)]">
+          <section
+            className="flex flex-col items-center rounded-3xl border border-border/50 bg-card p-4 shadow-raised sm:p-6"
+            aria-labelledby="qibla-bearing"
+          >
+            {bearing === null ? (
+              <div className="flex flex-1 flex-col items-center justify-center py-12 text-center">
+                <MapPin size={40} className="text-primary" aria-hidden="true" />
+                <h2 id="qibla-bearing" className="mt-4 text-title font-extrabold text-foreground">
+                  {t(language, "qibla.locationNeeded")}
+                </h2>
+                <p className="mt-2 max-w-md text-sm font-semibold leading-6 text-muted-foreground">
+                  {t(language, "qibla.locationNeededHint")}
                 </p>
               </div>
-            </div>
-            <Button
-              variant={bearing === null ? "default" : "outline"}
-              className="mt-4 min-h-11 w-full"
-              onClick={() => void detectLocation()}
-              disabled={isLocating}
-            >
-              {isLocating ? t(language, "qibla.locating") : t(language, "qibla.useCurrentLocation")}
-            </Button>
-            {locationMessage && (
-              <p className="mt-3 text-sm font-semibold text-muted-foreground" role="status" aria-live="polite">
-                {locationMessage}
-              </p>
+            ) : (
+              <>
+                <figure
+                  className="w-full"
+                  role="img"
+                  aria-label={t(language, "qibla.directionVisualLabel", {
+                    degrees: formatNumerals(roundedBearing!, language),
+                  })}
+                >
+                  <div className="mx-auto w-full max-w-[21rem]">
+                    <CompassDial
+                      rotation={dialRotation}
+                      northRotation={northRotation}
+                      reduceMotion={reduceMotion}
+                      language={language}
+                      aligned={isAligned}
+                    />
+                  </div>
+                </figure>
+                <h2 id="qibla-bearing" className="mt-1 text-center text-title font-extrabold text-foreground">
+                  {t(language, "qibla.bearing", { degrees: formatNumerals(roundedBearing!, language) })}
+                </h2>
+                <p className="mt-1 text-center text-sm font-semibold text-muted-foreground">
+                  {t(language, `qibla.${cardinalKey(bearing)}`)}
+                </p>
+                {distanceKm !== null && (
+                  <p className="mt-1 text-center text-xs font-medium text-muted-foreground">
+                    {t(language, "qibla.distanceToKaaba", {
+                      distance: formatNumerals(distanceKm.toLocaleString(), language),
+                    })}
+                  </p>
+                )}
+                <h3
+                  className="mt-3 flex min-h-6 items-center justify-center gap-2 text-center font-bold text-foreground"
+                  aria-live="polite"
+                >
+                  <span
+                    aria-hidden="true"
+                    className={`inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-[opacity,transform] duration-standard ${isAligned ? "scale-100 opacity-100" : "pointer-events-none scale-75 opacity-0"}`}
+                  >
+                    <Check size={15} strokeWidth={3} />
+                  </span>
+                  {guidance ?? t(language, "qibla.staticHint")}
+                </h3>
+                {!showDesktopGuide && (
+                  <Button
+                    className="mt-4 min-h-11 w-full max-w-sm"
+                    variant={compassEnabled ? "outline" : "default"}
+                    onClick={() => void toggleCompass()}
+                    aria-pressed={compassEnabled}
+                  >
+                    {compassEnabled ? t(language, "qibla.stopCompass") : t(language, "qibla.startCompass")}
+                  </Button>
+                )}
+                {compassStatus && (
+                  <p
+                    className="mt-3 text-center text-sm font-semibold text-muted-foreground"
+                    role="status"
+                    aria-live="polite"
+                  >
+                    {compassStatus}
+                  </p>
+                )}
+              </>
             )}
-            <p className="mt-3 text-xs font-semibold leading-5 text-muted-foreground">
-              {t(language, "qibla.locationPrivacy")}
-            </p>
           </section>
 
-          {showDesktopGuide ? (
+          <aside className="flex flex-col gap-3">
             <section className="rounded-3xl border border-border/50 bg-card p-5 shadow-raised">
               <div className="flex items-start gap-3">
                 <span
                   className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary"
                   aria-hidden="true"
                 >
-                  <Compass size={22} />
+                  <MapPin size={22} />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <h2 className="text-subtitle font-extrabold text-foreground">
-                    {t(language, "qibla.desktopGuideTitle")}
-                  </h2>
+                  <h2 className="text-subtitle font-extrabold text-foreground">{t(language, "qibla.locationTitle")}</h2>
                   <p className="mt-1 text-sm font-semibold leading-6 text-muted-foreground">
-                    {bearing === null
-                      ? t(language, "qibla.desktopGuideNeedsLocation")
-                      : t(language, "qibla.desktopGuideHint", {
-                          degrees: formatNumerals(roundedBearing!, language),
-                        })}
+                    {coordinates
+                      ? locationLabel || `${coordinates.latitude.toFixed(2)}°, ${coordinates.longitude.toFixed(2)}°`
+                      : t(language, "qibla.noLocation")}
                   </p>
                 </div>
               </div>
-              {bearing !== null && (
-                <ol className="mt-4 space-y-3">
-                  {(["desktopGuideNorth", "desktopGuideTurn", "desktopGuideAlign"] as const).map((key, index) => (
-                    <li key={key} className="flex items-start gap-3 text-sm font-semibold leading-6 text-foreground">
-                      <span
-                        className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-extrabold text-primary"
-                        aria-hidden="true"
-                      >
-                        {formatNumerals(index + 1, language)}
-                      </span>
-                      <span>
-                        {t(language, `qibla.${key}`, {
-                          degrees: formatNumerals(roundedBearing!, language),
-                        })}
-                      </span>
-                    </li>
-                  ))}
-                </ol>
+              <Button
+                variant={bearing === null ? "default" : "outline"}
+                className="mt-4 min-h-11 w-full"
+                onClick={() => void detectLocation()}
+                disabled={isLocating}
+              >
+                {isLocating ? t(language, "qibla.locating") : t(language, "qibla.useCurrentLocation")}
+              </Button>
+              {locationMessage && (
+                <p className="mt-3 text-sm font-semibold text-muted-foreground" role="status" aria-live="polite">
+                  {locationMessage}
+                </p>
               )}
-            </section>
-          ) : (
-            <details className="group rounded-3xl border border-border/50 bg-card p-5 shadow-raised transition-colors">
-              <summary className="flex min-h-11 cursor-pointer select-none items-center justify-between font-bold text-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
-                <span>{t(language, "qibla.accuracyTips")}</span>
-                <ChevronDown
-                  size={18}
-                  className="shrink-0 text-muted-foreground transition-transform duration-standard group-open:rotate-180"
-                  aria-hidden="true"
-                />
-              </summary>
-              <div className="flex items-start gap-3">
-                <span
-                  className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary"
-                  aria-hidden="true"
-                >
-                  <Compass size={22} />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="mt-1 text-sm font-semibold leading-6 text-muted-foreground">
-                    {t(language, "qibla.calibrationHint")}
-                  </p>
-                </div>
-              </div>
               <p className="mt-3 text-xs font-semibold leading-5 text-muted-foreground">
-                {t(language, "qibla.liveCompassHint")}
+                {t(language, "qibla.locationPrivacy")}
               </p>
-            </details>
-          )}
-        </aside>
+            </section>
+
+            {showDesktopGuide ? (
+              <section className="rounded-3xl border border-border/50 bg-card p-5 shadow-raised">
+                <div className="flex items-start gap-3">
+                  <span
+                    className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary"
+                    aria-hidden="true"
+                  >
+                    <Compass size={22} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <h2 className="text-subtitle font-extrabold text-foreground">
+                      {t(language, "qibla.desktopGuideTitle")}
+                    </h2>
+                    <p className="mt-1 text-sm font-semibold leading-6 text-muted-foreground">
+                      {bearing === null
+                        ? t(language, "qibla.desktopGuideNeedsLocation")
+                        : t(language, "qibla.desktopGuideHint", {
+                            degrees: formatNumerals(roundedBearing!, language),
+                          })}
+                    </p>
+                  </div>
+                </div>
+                {bearing !== null && (
+                  <ol className="mt-4 space-y-3">
+                    {(["desktopGuideNorth", "desktopGuideTurn", "desktopGuideAlign"] as const).map((key, index) => (
+                      <li key={key} className="flex items-start gap-3 text-sm font-semibold leading-6 text-foreground">
+                        <span
+                          className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-extrabold text-primary"
+                          aria-hidden="true"
+                        >
+                          {formatNumerals(index + 1, language)}
+                        </span>
+                        <span>
+                          {t(language, `qibla.${key}`, {
+                            degrees: formatNumerals(roundedBearing!, language),
+                          })}
+                        </span>
+                      </li>
+                    ))}
+                  </ol>
+                )}
+              </section>
+            ) : (
+              <details className="group rounded-3xl border border-border/50 bg-card p-5 shadow-raised transition-colors">
+                <summary className="flex min-h-11 cursor-pointer select-none items-center justify-between font-bold text-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+                  <span>{t(language, "qibla.accuracyTips")}</span>
+                  <ChevronDown
+                    size={18}
+                    className="shrink-0 text-muted-foreground transition-transform duration-standard group-open:rotate-180"
+                    aria-hidden="true"
+                  />
+                </summary>
+                <div className="flex items-start gap-3">
+                  <span
+                    className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary"
+                    aria-hidden="true"
+                  >
+                    <Compass size={22} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="mt-1 text-sm font-semibold leading-6 text-muted-foreground">
+                      {t(language, "qibla.calibrationHint")}
+                    </p>
+                  </div>
+                </div>
+                <p className="mt-3 text-xs font-semibold leading-5 text-muted-foreground">
+                  {t(language, "qibla.liveCompassHint")}
+                </p>
+              </details>
+            )}
+          </aside>
+        </div>
       </div>
     </ScreenContainer>
   );

@@ -327,10 +327,10 @@ export function ProgressScreen({
     <ScreenContainer
       dir={direction}
       tabIndex={0}
-      className="relative overflow-y-auto px-page pb-2 page-content-center outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
+      className="relative overflow-y-auto outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
       screenName={t(language, "common.progress")}
     >
-      <div className="progress-screen-content relative z-10 mx-auto w-full max-w-[66rem] flex flex-col items-center">
+      <div className="progress-screen-content relative z-10 mx-auto flex min-h-screen w-full max-w-7xl flex-col items-center px-page pb-8">
         <Header
           title={t(language, "common.progress")}
           language={language}
@@ -573,9 +573,14 @@ export function ProgressScreen({
               </div>
               {/* 7-Day Rhythm Strip */}
               <div className="border-t border-border px-4 py-3 sm:px-5">
-                <span className="text-micro font-bold uppercase tracking-wider text-muted-foreground block mb-2">
-                  {t(language, "progress.sevenDayRhythm")}
-                </span>
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <span className="text-micro font-bold uppercase tracking-wider text-muted-foreground block">
+                    {t(language, "progress.sevenDayRhythm")}
+                  </span>
+                  <span className="text-micro font-semibold text-muted-foreground" dir={isArabic ? "rtl" : "ltr"}>
+                    {t(language, "progress.sevenDayRhythmDirection")}
+                  </span>
+                </div>
                 <div className="grid grid-cols-7 gap-1.5 sm:gap-2 text-center" role="list">
                   {weekDaysStatus.map((day) => {
                     const levelShortName = isArabic
@@ -601,6 +606,17 @@ export function ProgressScreen({
                       </div>
                     );
                   })}
+                </div>
+                {/* Visual Legend for the 7-day icons */}
+                <div className="mt-3 flex flex-wrap items-center justify-center gap-4 border-t border-border/40 pt-2 text-micro text-muted-foreground">
+                  <span className="inline-flex items-center gap-1">
+                    <span className="font-bold text-primary">🌴 {t(language, "progress.palmLabel")}</span>
+                    <span>{t(language, "progress.palmTreeLegend")}</span>
+                  </span>
+                  <span className="inline-flex items-center gap-1">
+                    <span className="font-bold text-primary">🌿 {t(language, "progress.branchLabel")}</span>
+                    <span>{t(language, "progress.branchLegend")}</span>
+                  </span>
                 </div>
               </div>
               {/* Legacy rhythm and palm records remain available, seamlessly integrated as a divided strip without nested card borders */}

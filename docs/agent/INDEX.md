@@ -1,5 +1,9 @@
 # AI Improvement System Index
 
+[Combined refinements release](phases/COMBINED_RELEASE_2026_10_14.md) records the owner's superseding instruction to verify and push all completed local changes, integration repairs, supplied curated images and exact-commit release evidence.
+
+[Persistent devotional downloads and human-readable archives](phases/PERSISTENT_DOWNLOADS_AND_HUMAN_READABLE_ARCHIVES_2026_10_13.md) protects offline audio, Mushaf pages, fonts and timings from service worker update wipes, migrates valid recordings across manifest updates without re-downloading, auto-requests persistent storage, and organizes exported ZIP audio into bilingual category folders with numbered, human-understandable track titles and localized reciter names. Local implementation only per owner instruction.
+
 [Progress surface unification and clarity](phases/PROGRESS_SURFACE_UNIFICATION_2026_10_13.md) is the owner-approved Progress page refinement: de-nested cards, eliminated cardception visual clutter, added SVG scrubber interaction, unified weekly cards and refined calendar heatmap cells.
 
 [Visual coherence](phases/VISUAL_COHERENCE_2026_10_13.md) is the owner-approved sequential visual/control implementation. Preserve Mushaf button sizes and alignment. Reliability release is complete; this session owns visual changes and their verification/publication.

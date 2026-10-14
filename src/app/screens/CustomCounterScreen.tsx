@@ -1,11 +1,23 @@
 import { ReferenceCard } from "../components/ReferenceCard";
-import { useCallback, useEffect, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { AuthenticZikrPicker } from "../components/AuthenticZikrPicker";
 import { DevotionalAction } from "../components/DevotionalControls";
 import { useStandaloneReadingFocus } from "../hooks/useStandaloneReadingFocus";
 import { StandaloneCounterFooter } from "../components/StandaloneCounterFooter";
 import { CounterTargetPicker } from "../components/CounterTargetPicker";
-import { ArrowPrevious, Check, Lightbulb, MoreVertical, Play, RotateCcw, Volume2, VolumeX } from "../components/icons";
+import {
+  ArrowPrevious,
+  Check,
+  ChevronNext,
+  ChevronPrevious,
+  Lightbulb,
+  MoreVertical,
+  Play,
+  RotateCcw,
+  Volume2,
+  VolumeX,
+} from "../components/icons";
+import { useSwipeGestures } from "../hooks/useSwipeGestures";
 import { ReadingScreenChrome } from "../components/ReadingScreenChrome";
 import { ResponsiveSheet, SheetHeader } from "../components/ResponsiveSheet";
 import { useCountingSurface } from "../components/countingSurface";
@@ -28,7 +40,32 @@ import { getProgressDayKey } from "../progress";
 import { useWakeLock } from "../hooks/useWakeLock";
 import { isCounterShortcutBlocked } from "../keyboardShortcuts";
 import { getReadingFontSize } from "./readingTypography";
-import type { AppLanguage, TextSizeOption } from "../types";
+import type { AppLanguage, TextSizeOption, Zikr } from "../types";
+
+const SharingPreview = lazy(() =>
+  import("../components/CollectionShareModal").then((module) => ({ default: module.CollectionShareModal })),
+);
+
+function authenticItemToShareZikr(item: AuthenticZikrItem): Zikr {
+  return {
+    id: item.id,
+    canonicalKey: item.id,
+    audioBehavior: { defaultMode: "play-once", supportedModes: ["play-once"] },
+    arabicText: item.textAr,
+    transliteration: item.textEn ?? "",
+    translation: item.textEn ?? "",
+    sourceReference: item.sourceRefEn ?? item.sourceRefAr,
+    sourceReferenceArabic: item.sourceRefAr,
+    benefit: item.virtueEn ?? item.virtueAr,
+    benefitArabic: item.virtueAr,
+    hadithText: item.hadithTextAr,
+    hadithTextEnglish: item.hadithTextEn,
+    sourceUrl: item.sourceUrl,
+    category: "miscellaneous",
+    orderIndex: 0,
+    repetitionCount: item.recommendedTarget,
+  };
+}
 
 const HEADER_ACTION_CLASS =
   "flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full text-foreground/80 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40";
@@ -62,6 +99,7 @@ export function CustomCounterScreen({
   hapticFeedback = true,
   reduceMotion = false,
   textSize = "medium",
+  onTextSizeChange,
   initialMasbahaState,
   onSaveMasbahaState,
   progressDayStartHour,
@@ -72,6 +110,7 @@ export function CustomCounterScreen({
   hapticFeedback?: boolean;
   reduceMotion?: boolean;
   textSize?: TextSizeOption;
+  onTextSizeChange?: (size: TextSizeOption) => void;
   initialMasbahaState?: MasbahaSavedState;
   onSaveMasbahaState?: (state: MasbahaSavedState) => void;
   progressDayStartHour?: number;
@@ -115,6 +154,18 @@ export function CustomCounterScreen({
   const [showCompletionDialog, setShowCompletionDialog] = useState(false);
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [pendingZikr, setPendingZikr] = useState<AuthenticZikrItem | null>(null);
+  const [currentTextSize, setCurrentTextSize] = useState<TextSizeOption>(textSize);
+  const [shareOpen, setShareOpen] = useState(false);
+
+  useEffect(() => {
+    setCurrentTextSize(textSize);
+  }, [textSize]);
+
+  const handleTextSizeChange = (newSize: TextSizeOption) => {
+    setCurrentTextSize(newSize);
+    onTextSizeChange?.(newSize);
+  };
+
   const { soundEnabled, toggleSound, playClickFeedback } = useCounterClickFeedback();
 
   useWakeLock(true);
@@ -182,45 +233,51 @@ export function CustomCounterScreen({
     });
   }, [selectedAuthentic.id]);
 
-  const switchToZikr = (item: AuthenticZikrItem, preserveCurrent: boolean) => {
-    const nextSavedItems: Record<string, MasbahaZikrItemState> = { ...savedItems };
+  const switchToZikr = useCallback(
+    (item: AuthenticZikrItem, preserveCurrent: boolean) => {
+      const nextSavedItems: Record<string, MasbahaZikrItemState> = { ...savedItems };
 
-    if (preserveCurrent && (count > 0 || laps > 0)) {
-      nextSavedItems[selectedAuthentic.id] = {
-        count,
-        target,
-        laps,
-        dayKey: currentDayKey,
-      };
-    } else {
-      delete nextSavedItems[selectedAuthentic.id];
-    }
+      if (preserveCurrent && (count > 0 || laps > 0)) {
+        nextSavedItems[selectedAuthentic.id] = {
+          count,
+          target,
+          laps,
+          dayKey: currentDayKey,
+        };
+      } else {
+        delete nextSavedItems[selectedAuthentic.id];
+      }
 
-    setSavedItems(nextSavedItems);
+      setSavedItems(nextSavedItems);
 
-    const savedForNew = nextSavedItems[item.id];
-    if (savedForNew && (!savedForNew.dayKey || savedForNew.dayKey === currentDayKey)) {
-      setCount(savedForNew.count);
-      setTarget(savedForNew.target > 0 ? savedForNew.target : item.recommendedTarget);
-      setLaps(savedForNew.laps);
-    } else {
-      setCount(0);
-      setTarget(item.recommendedTarget);
-      setLaps(0);
-    }
+      const savedForNew = nextSavedItems[item.id];
+      if (savedForNew && (!savedForNew.dayKey || savedForNew.dayKey === currentDayKey)) {
+        setCount(savedForNew.count);
+        setTarget(savedForNew.target > 0 ? savedForNew.target : item.recommendedTarget);
+        setLaps(savedForNew.laps);
+      } else {
+        setCount(0);
+        setTarget(item.recommendedTarget);
+        setLaps(0);
+      }
 
-    setSelectedAuthentic(item);
-    setShowCompletionDialog(false);
-  };
+      setSelectedAuthentic(item);
+      setShowCompletionDialog(false);
+    },
+    [count, currentDayKey, laps, savedItems, selectedAuthentic.id, target],
+  );
 
-  const handleSelectAuthenticZikr = (item: AuthenticZikrItem) => {
-    if (item.id === selectedAuthentic.id) return;
-    if (count > 0 || laps > 0) {
-      setPendingZikr(item);
-      return;
-    }
-    switchToZikr(item, false);
-  };
+  const handleSelectAuthenticZikr = useCallback(
+    (item: AuthenticZikrItem) => {
+      if (item.id === selectedAuthentic.id) return;
+      if (count > 0 || laps > 0) {
+        setPendingZikr(item);
+        return;
+      }
+      switchToZikr(item, false);
+    },
+    [count, laps, selectedAuthentic.id, switchToZikr],
+  );
 
   const handleSaveAndSwitch = (item: AuthenticZikrItem) => {
     switchToZikr(item, true);
@@ -232,7 +289,40 @@ export function CustomCounterScreen({
     setPendingZikr(null);
   };
 
-  const { pressStyle, surfaceProps } = useCountingSurface({ onCount: handleTap, reduceMotion });
+  const currentZikrIndex = AUTHENTIC_AZKAR_COLLECTION.findIndex((item) => item.id === selectedAuthentic.id);
+  const prevZikrItem =
+    AUTHENTIC_AZKAR_COLLECTION[
+      (currentZikrIndex - 1 + AUTHENTIC_AZKAR_COLLECTION.length) % AUTHENTIC_AZKAR_COLLECTION.length
+    ]!;
+  const nextZikrItem = AUTHENTIC_AZKAR_COLLECTION[(currentZikrIndex + 1) % AUTHENTIC_AZKAR_COLLECTION.length]!;
+
+  const handlePrevZikr = useCallback(() => {
+    handleSelectAuthenticZikr(prevZikrItem);
+  }, [handleSelectAuthenticZikr, prevZikrItem]);
+
+  const handleNextZikr = useCallback(() => {
+    handleSelectAuthenticZikr(nextZikrItem);
+  }, [handleSelectAuthenticZikr, nextZikrItem]);
+
+  const suppressTapRef = useRef(false);
+  const {
+    onTouchStart: swipeTouchStart,
+    onTouchMove: swipeTouchMove,
+    onTouchEnd: swipeTouchEnd,
+  } = useSwipeGestures({
+    direction,
+    onNext: handleNextZikr,
+    onPrev: handlePrevZikr,
+    suppressTap: suppressTapRef,
+    reduceMotion,
+  });
+
+  const { pressStyle, surfaceProps } = useCountingSurface({
+    onCount: () => {
+      if (!suppressTapRef.current) handleTap();
+    },
+    reduceMotion,
+  });
 
   const requestReset = useCallback(() => {
     if (count === 0 && laps === 0) return;
@@ -318,6 +408,9 @@ export function CustomCounterScreen({
             title={t(language, "counter.tasbeehTitle")}
             onBack={onBack}
             testId="custom-counter"
+            category="neutral"
+            textSize={currentTextSize}
+            onTextSizeChange={handleTextSizeChange}
             /* An open target has nothing to fill, so it reports the tally and
              skips the bar rather than drawing a track that never moves. */
             progress={{
@@ -389,6 +482,9 @@ export function CustomCounterScreen({
             data-testid="reader-card"
             data-counting-mode="canvas"
             {...surfaceProps}
+            onTouchStart={swipeTouchStart}
+            onTouchMove={swipeTouchMove}
+            onTouchEnd={swipeTouchEnd}
           >
             <div
               className="custom-counter-stage mx-auto flex min-h-0 w-full max-w-[44rem] flex-1 flex-col justify-between select-none relative"
@@ -413,7 +509,7 @@ export function CustomCounterScreen({
                         style={{
                           fontFamily: "var(--font-zikr)",
                           fontSize: getReadingFontSize({
-                            textSize,
+                            textSize: currentTextSize,
                             arabicLength: activeText.length,
                             longSurah: false,
                           }),
@@ -446,6 +542,39 @@ export function CustomCounterScreen({
                     onToggleSound={toggleSound}
                     onReset={requestReset}
                     resetDisabled={count === 0 && laps === 0}
+                    onShare={() => setShareOpen(true)}
+                    previous={
+                      <DevotionalAction
+                        type="button"
+                        aria-label={t(language, "audioPlayer.previous")}
+                        title={t(language, "audioPlayer.previous")}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePrevZikr();
+                        }}
+                        className="adaptive-counter-nav h-12 min-w-[3rem] px-3 font-semibold"
+                        data-testid="custom-counter-prev-btn"
+                      >
+                        <ChevronPrevious size={20} aria-hidden="true" />
+                        <span className="hidden sm:inline text-xs">{t(language, "common.previous")}</span>
+                      </DevotionalAction>
+                    }
+                    next={
+                      <DevotionalAction
+                        type="button"
+                        aria-label={t(language, "audioPlayer.next")}
+                        title={t(language, "audioPlayer.next")}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleNextZikr();
+                        }}
+                        className="adaptive-counter-nav h-12 min-w-[3rem] px-3 font-semibold"
+                        data-testid="custom-counter-next-btn"
+                      >
+                        <span className="hidden sm:inline text-xs">{t(language, "common.next")}</span>
+                        <ChevronNext size={20} aria-hidden="true" />
+                      </DevotionalAction>
+                    }
                     benefit={
                       <DevotionalAction
                         type="button"
@@ -698,6 +827,22 @@ export function CustomCounterScreen({
             </div>
           </div>
         </ResponsiveSheet>
+      )}
+
+      {shareOpen && (
+        <Suspense fallback={null}>
+          <SharingPreview
+            open
+            onClose={() => setShareOpen(false)}
+            single
+            collectionTitle={selectedAuthentic.shortNameAr || t(language, "counter.tasbeehTitle")}
+            collectionTitleArabic={selectedAuthentic.shortNameAr}
+            items={[authenticItemToShareZikr(selectedAuthentic)]}
+            readerIndex={0}
+            language={language}
+            themeMode="midnight"
+          />
+        </Suspense>
       )}
     </ScreenContainer>
   );

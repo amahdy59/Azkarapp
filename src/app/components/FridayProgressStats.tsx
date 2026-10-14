@@ -72,7 +72,7 @@ export function FridayProgressStats({
       </div>
 
       <div className="p-4 sm:p-6 flex flex-col gap-4">
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1.5">
           <div className="flex justify-between items-center text-sm font-bold">
             <div className="flex items-center gap-2">
               <CheckCircle2 size={16} className="text-primary" />
@@ -82,8 +82,18 @@ export function FridayProgressStats({
               {formatRatio(stats.practicesDoneCount, stats.practicesTotalCount, language)}
             </bdi>
           </div>
+          {stats.practicesTotalCount > 0 && (
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+              <div
+                className="h-full rounded-full bg-primary transition-all duration-standard"
+                style={{
+                  width: `${Math.min(100, Math.round((stats.practicesDoneCount / stats.practicesTotalCount) * 100))}%`,
+                }}
+              />
+            </div>
+          )}
         </div>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1.5">
           <div className="flex justify-between items-center text-sm font-bold">
             <div className="flex items-center gap-2">
               <BookOpen size={16} className="text-success" />
@@ -93,6 +103,16 @@ export function FridayProgressStats({
               {formatRatio(stats.kahfOpenedCount, stats.fridaysCount, language)}
             </bdi>
           </div>
+          {stats.fridaysCount > 0 && (
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+              <div
+                className="h-full rounded-full bg-success transition-all duration-standard"
+                style={{
+                  width: `${Math.min(100, Math.round((stats.kahfOpenedCount / stats.fridaysCount) * 100))}%`,
+                }}
+              />
+            </div>
+          )}
         </div>
         {activeTab !== "year" && (
           <div className="flex flex-col gap-2">

@@ -17,7 +17,7 @@ for (const route of ["/counter", "/friday/salawat"]) {
           );
         }, language);
         await page.goto(`/#${route}`);
-        const counter = page.getByTestId("counter-panel").getByRole("button");
+        const counter = page.getByTestId(route === "/counter" ? "custom-counter-surface" : "salawat-counter");
         const tools = page.getByTestId("reader-support-actions");
         const toggle = page.getByTestId("reader-tools-toggle");
         await expect(counter).toBeVisible();

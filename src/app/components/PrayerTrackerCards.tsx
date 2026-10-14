@@ -29,7 +29,7 @@ import { HomeCard } from "./HomeCard";
 
 const PRAYER_ORDER = ["fajr", "dhuhr", "asr", "maghrib", "isha"] as const satisfies readonly PrayerName[];
 
-const PRAYER_ICON: Record<PrayerName, typeof Sun> = {
+export const PRAYER_ICON: Record<PrayerName, typeof Sun> = {
   fajr: Sunrise,
   dhuhr: Sun,
   asr: CloudSun,
@@ -131,12 +131,16 @@ function TrackingCheckbox({
   return (
     <label
       htmlFor={id}
-      className={`relative flex h-11 items-center justify-between gap-2 rounded-xl px-2 transition-colors duration-fast ${
+      className={`relative flex min-h-11 items-center justify-between gap-2 rounded-xl px-2.5 py-1 my-0.5 border transition-all duration-standard ${
         disabled
-          ? "cursor-not-allowed opacity-45"
-          : onGlass
-            ? "cursor-pointer hover:bg-white/10 text-on-media"
-            : "cursor-pointer hover:bg-muted"
+          ? "cursor-not-allowed opacity-40 border-transparent bg-transparent"
+          : checked
+            ? onGlass
+              ? "cursor-pointer bg-white/15 border-white/30 text-on-media shadow-2xs"
+              : "cursor-pointer bg-primary/10 border-primary/30 text-foreground shadow-2xs"
+            : onGlass
+              ? "cursor-pointer hover:bg-white/10 border-transparent bg-transparent text-on-media/80"
+              : "cursor-pointer hover:bg-muted border-transparent bg-transparent text-muted-foreground hover:text-foreground"
       }`}
     >
       {/* The input *is* the row: it fills the full 48px rather than being

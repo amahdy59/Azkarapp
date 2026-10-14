@@ -29,6 +29,13 @@ import {
 } from "../share/shareDispatcher";
 import { createShareArchive } from "../share/shareArchive";
 import {
+  getCuratedRoutinePack,
+  resolveCuratedImageUrl,
+  fetchAllCuratedCardFiles,
+  copyCuratedCardImage,
+  type CuratedRoutineCard,
+} from "../share/curatedRoutineCards";
+import {
   defaultShareAppearance,
   getShareText,
   getShareRepetitionLabel,
@@ -104,6 +111,12 @@ export function CollectionShareModal({
   const [subtitle, setSubtitle] = useState(false);
   const [source, setSource] = useState(true);
   const [mode, setMode] = useState<"image" | "text" | "link">("image");
+  const curatedPack = useMemo(() => (!single ? getCuratedRoutinePack(categoryId) : null), [categoryId, single]);
+  const [imageSource, setImageSource] = useState<"curated" | "generated">("generated");
+  const [curatedIndex, setCuratedIndex] = useState(0);
+  const [curatedFiles, setCuratedFiles] = useState<File[]>([]);
+  const [curatedLoading, setCuratedLoading] = useState(false);
+  const [curatedUnavailable, setCuratedUnavailable] = useState(false);
   const [inspect, setInspect] = useState(false);
   const [pages, setPages] = useState<GeneratedCollectionStoryCard[]>([]);
   const [active, setActive] = useState(0);
@@ -176,8 +189,15 @@ export function CollectionShareModal({
         : current
           ? [current]
           : [];
-  const scopedNative = scopedPages.length > 0 && canShareMultipleFiles(scopedPages.map((page) => page.file));
-  const scopeReady = scopedPages.length > 0 && (scope === "current" ? ready : allReady);
+  const isCuratedActive = mode === "image" && Boolean(curatedPack) && imageSource === "curated";
+  const currentCuratedCard: CuratedRoutineCard | undefined = curatedPack?.cards[curatedIndex];
+  const totalCurated = curatedPack?.cards.length ?? 0;
+  const scopedNative = isCuratedActive
+    ? curatedFiles.length > 0 && canShareMultipleFiles(curatedFiles)
+    : scopedPages.length > 0 && canShareMultipleFiles(scopedPages.map((page) => page.file));
+  const scopeReady = isCuratedActive
+    ? curatedFiles.length > 0 && !curatedLoading
+    : scopedPages.length > 0 && (scope === "current" ? ready : allReady);
   const scopedText =
     scope === "current"
       ? getShareText(
@@ -199,7 +219,39 @@ export function CollectionShareModal({
   const nativeText = supportsTextShare(mode === "link" ? { title, url } : { title, text: scopedText });
   const payload = mode === "link" ? (url ?? "") : scopedText;
   const payloadReady = mode === "link" ? Boolean(url) : scope !== "selected" || selected.length > 0;
-  const copyAsImage = mode === "image" && scopedPages.length === 1 && canCopyImage();
+  const copyAsImage =
+    mode === "image" && (isCuratedActive ? canCopyImage() : scopedPages.length === 1 && canCopyImage());
+
+  useEffect(() => {
+    setImageSource("generated");
+    setCuratedIndex(0);
+  }, [curatedPack]);
+
+  useEffect(() => {
+    if (!open || !curatedPack) return;
+    let cancelled = false;
+    setCuratedFiles([]);
+    setCuratedUnavailable(false);
+    setCuratedLoading(true);
+    fetchAllCuratedCardFiles(curatedPack, exportLanguage)
+      .then((files) => {
+        if (!cancelled) {
+          setCuratedFiles(files);
+          setCuratedLoading(false);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setCuratedLoading(false);
+          setCuratedFiles([]);
+          setCuratedUnavailable(true);
+          setImageSource("generated");
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [open, curatedPack, exportLanguage]);
   useEffect(() => {
     if (current?.layout?.fragments[0]) activeItemRef.current = current.layout.fragments[0].item.id;
   }, [current]);
@@ -415,6 +467,39 @@ export function CollectionShareModal({
               </Button>
             ))}
           </div>
+          {curatedPack && !curatedUnavailable && mode === "image" && (
+            <div
+              role="group"
+              aria-label={t(language, "shareStudio.image")}
+              className="mt-3 grid gap-2 items-start"
+              style={{ gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,8rem),1fr))" }}
+            >
+              <Button
+                variant="outline"
+                aria-pressed={imageSource === "curated"}
+                onClick={() => setImageSource("curated")}
+                disabled={busy}
+                className={`min-h-11 h-auto whitespace-normal break-words ${imageSource === "curated" ? SHARING_SELECTED_CLASS : ""}`}
+                style={{ paddingInline: 4 }}
+              >
+                <SharingChoiceLabel selected={imageSource === "curated"}>
+                  {t(language, "shareStudio.curatedTab")}
+                </SharingChoiceLabel>
+              </Button>
+              <Button
+                variant="outline"
+                aria-pressed={imageSource === "generated"}
+                onClick={() => setImageSource("generated")}
+                disabled={busy}
+                className={`min-h-11 h-auto whitespace-normal break-words ${imageSource === "generated" ? SHARING_SELECTED_CLASS : ""}`}
+                style={{ paddingInline: 4 }}
+              >
+                <SharingChoiceLabel selected={imageSource === "generated"}>
+                  {t(language, "shareStudio.generatedTab")}
+                </SharingChoiceLabel>
+              </Button>
+            </div>
+          )}
         </div>
         <div className="px-[16px] pb-[16px] space-y-4">
           <div
@@ -427,7 +512,7 @@ export function CollectionShareModal({
             <section data-testid="sharing-preview" dir={direction} className="min-w-0 space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h2 className="text-title font-bold">{t(language, "shareStudio.previewHeading")}</h2>
-                {mode === "image" && ready && (
+                {mode === "image" && (isCuratedActive ? Boolean(currentCuratedCard) : ready) && (
                   <Button
                     variant="ghost"
                     size="sm"
@@ -473,6 +558,68 @@ export function CollectionShareModal({
                           </Button>
                         )}
                       </div>
+                    ) : isCuratedActive && currentCuratedCard ? (
+                      <div className="space-y-3">
+                        <button
+                          type="button"
+                          onKeyDown={onPreviewKeyDown}
+                          onClick={() => setInspect((value) => !value)}
+                          aria-label={t(language, inspect ? "shareStudio.closeInspect" : "shareStudio.inspect")}
+                          aria-pressed={inspect}
+                          className="flex w-full items-center justify-center rounded-2xl border border-border bg-muted/30 p-2 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                          style={{ height: inspect ? "min(75dvh,800px)" : "clamp(240px,calc(100dvh - 340px),640px)" }}
+                        >
+                          <img
+                            src={resolveCuratedImageUrl(currentCuratedCard.imagePath)}
+                            alt={language === "ar" ? currentCuratedCard.altText.ar : currentCuratedCard.altText.en}
+                            className="h-full max-w-full w-auto object-contain rounded-xl"
+                          />
+                        </button>
+                        {totalCurated > 1 && (
+                          <div className="mt-3 flex items-center justify-between gap-3">
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              disabled={curatedIndex <= 0 || busy}
+                              aria-label={t(language, "shareStoryPack.previousPage")}
+                              onKeyDown={onPreviewKeyDown}
+                              onClick={() => setCuratedIndex((value) => Math.max(0, value - 1))}
+                              className="size-11"
+                            >
+                              <ChevronPrevious data-rtl-flip aria-hidden="true" />
+                            </Button>
+                            <div className="flex flex-col items-center gap-1">
+                              <span aria-live="polite" aria-atomic="true" className="text-sm font-semibold">
+                                {t(language, "shareStudio.curatedCardPage", {
+                                  page: formatNumerals(curatedIndex + 1, language),
+                                  total: formatNumerals(totalCurated, language),
+                                })}
+                              </span>
+                              <div className="flex gap-1" aria-hidden="true">
+                                {curatedPack?.cards.map((_, dotIndex) => (
+                                  <span
+                                    key={dotIndex}
+                                    className={`size-1.5 rounded-full transition-colors ${
+                                      dotIndex === curatedIndex ? "bg-primary" : "bg-muted-foreground/30"
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              disabled={curatedIndex >= totalCurated - 1 || busy}
+                              aria-label={t(language, "shareStoryPack.nextPage")}
+                              onKeyDown={onPreviewKeyDown}
+                              onClick={() => setCuratedIndex((value) => Math.min(totalCurated - 1, value + 1))}
+                              className="size-11"
+                            >
+                              <ChevronNext data-rtl-flip aria-hidden="true" />
+                            </Button>
+                          </div>
+                        )}
+                      </div>
                     ) : current ? (
                       <button
                         type="button"
@@ -496,7 +643,7 @@ export function CollectionShareModal({
                         {t(language, "shareStoryPack.generating")}
                       </p>
                     )}
-                    {ready && total > 1 && (
+                    {!isCuratedActive && ready && total > 1 && (
                       <div className="mt-3 flex items-center justify-between gap-3">
                         <Button
                           variant="outline"
@@ -531,7 +678,7 @@ export function CollectionShareModal({
                       {t(language, "shareStudio.remaining")}
                     </p>
                   )}
-                  {current?.layout && (
+                  {!isCuratedActive && current?.layout && (
                     <SharingDisclosure label={t(language, "shareStudio.readCard")}>
                       <div className="pb-3 space-y-4">
                         {current.layout.fragments.map((fragment, index) => (
@@ -575,7 +722,7 @@ export function CollectionShareModal({
                       </div>
                     </SharingDisclosure>
                   )}
-                  {total > 1 && (
+                  {!isCuratedActive && total > 1 && (
                     <SharingDisclosure
                       open={scope === "selected" || undefined}
                       label={t(language, "shareStudio.overview")}
@@ -643,7 +790,45 @@ export function CollectionShareModal({
               )}
             </section>
             <section data-testid="sharing-settings" dir={direction} className="min-w-0 space-y-4">
-              {!single && mode !== "link" && total > 1 && (
+              {isCuratedActive && curatedPack && (
+                <div className="rounded-2xl border border-border bg-card p-4 space-y-3">
+                  <h3 className="font-bold text-sm text-foreground">{t(language, "shareStudio.overview")}</h3>
+                  <p className="text-xs text-muted-foreground">{t(language, "shareStudio.curatedHint")}</p>
+                  <div
+                    className="grid gap-2 pt-1"
+                    style={{ gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,6rem),1fr))" }}
+                  >
+                    {curatedPack.cards.map((card, idx) => (
+                      <button
+                        key={card.id}
+                        type="button"
+                        aria-label={t(language, "shareStudio.goToCard", {
+                          count: formatNumerals(idx + 1, language),
+                        })}
+                        aria-pressed={curatedIndex === idx}
+                        onClick={() => setCuratedIndex(idx)}
+                        disabled={busy}
+                        className={`relative min-h-11 w-full rounded-xl border p-1.5 transition-colors focus-visible:ring-[3px] focus-visible:ring-ring ${
+                          curatedIndex === idx ? "border-primary bg-muted/60" : "border-border hover:bg-muted/30"
+                        }`}
+                      >
+                        <img
+                          src={resolveCuratedImageUrl(card.imagePath)}
+                          alt=""
+                          className="mx-auto h-20 w-full object-contain rounded-lg"
+                        />
+                        <span className="block mt-1 text-xs font-semibold text-center">
+                          {formatNumerals(idx + 1, language)}
+                        </span>
+                        {curatedIndex === idx && (
+                          <Check aria-hidden="true" className="absolute end-1 top-1 size-4 text-primary" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {!isCuratedActive && !single && mode !== "link" && total > 1 && (
                 <fieldset>
                   <legend className="mb-2 text-sm font-semibold">{t(language, "shareStudio.scope")}</legend>
                   <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,4rem),1fr))] gap-2">
@@ -990,6 +1175,20 @@ export function CollectionShareModal({
               void run(async () => {
                 if (mode !== "image") {
                   await shareText(payload, mode === "link");
+                } else if (isCuratedActive) {
+                  if (curatedFiles.length === 1) {
+                    await shareSingleFile(curatedFiles[0]!, {
+                      title,
+                      downloadFallback: false,
+                      onStatus: notify,
+                    });
+                  } else {
+                    await shareMultipleFiles(curatedFiles, {
+                      title,
+                      downloadFallback: false,
+                      onStatus: notify,
+                    });
+                  }
                 } else if (scopedPages.length === 1) {
                   await shareSingleFile(scopedPages[0]!.file, { title, downloadFallback: false, onStatus: notify });
                 } else {
@@ -1018,12 +1217,16 @@ export function CollectionShareModal({
                 downloadFile(
                   mode !== "image"
                     ? new File([payload], "azkar.txt", { type: "text/plain;charset=utf-8" })
-                    : scopedPages.length === 1
-                      ? scopedPages[0]!.file
-                      : await createShareArchive(
-                          scopedPages.map((page) => page.file),
-                          scopedText,
-                        ),
+                    : isCuratedActive
+                      ? curatedFiles.length === 1
+                        ? curatedFiles[0]!
+                        : await createShareArchive(curatedFiles, scopedText)
+                      : scopedPages.length === 1
+                        ? scopedPages[0]!.file
+                        : await createShareArchive(
+                            scopedPages.map((page) => page.file),
+                            scopedText,
+                          ),
                 );
                 notify("downloaded");
               })
@@ -1040,7 +1243,14 @@ export function CollectionShareModal({
             disabled={busy || (mode === "image" ? !scopeReady : !payloadReady)}
             onClick={() =>
               void run(async () => {
-                if (copyAsImage) {
+                if (isCuratedActive && currentCuratedCard) {
+                  if (!(await copyCuratedCardImage(currentCuratedCard))) {
+                    setError(true);
+                    setStatus(t(language, "shareStudio.copyCuratedError"));
+                    return;
+                  }
+                  setStatus(t(language, "shareStudio.copyCuratedSuccess"));
+                } else if (copyAsImage) {
                   if (!(await copyImageToClipboard(scopedPages[0]!.blob))) {
                     setError(true);
                     setStatus(t(language, "shareStudio.copyFailed"));

@@ -62,7 +62,10 @@ async function verifyDownload(buffer: ArrayBuffer, variant: AudioVariant) {
 }
 
 function getDownloadVariants(zikrs: readonly Zikr[], preferences: AudioPreferences) {
-  const variants = new Map<string, { assetId: string; assetVersion: number; variant: AudioVariant; url: string }>();
+  const variants = new Map<
+    string,
+    { assetId: string; assetVersion: number; variant: AudioVariant; url: string; zikr?: Zikr }
+  >();
   for (const zikr of zikrs) {
     const resolution = resolveAudioAsset(zikr);
     if (!resolution.available) continue;
@@ -85,6 +88,7 @@ function getDownloadVariants(zikrs: readonly Zikr[], preferences: AudioPreferenc
           assetVersion: resolution.asset.version,
           variant,
           url: resolved.url,
+          zikr,
         });
       }
     }
@@ -101,8 +105,13 @@ export interface SavedAudioFile {
   titleArabic: string;
   titleEnglish: string;
   voiceName: string;
+  voiceId?: string;
   fileName: string;
   byteSize: number;
+  category?: string;
+  orderIndex?: number;
+  contentKind?: string;
+  surahNumber?: number;
 }
 
 function audioFileName(variant: AudioVariant) {
@@ -129,20 +138,31 @@ export async function getSavedAudioFiles(
     if (!(await isVerifiedCachedAudio(cache, item))) continue;
     const asset = AUDIO_CATALOG.assets[item.assetId];
     if (!asset) continue;
-    files.push({
+    const file: SavedAudioFile = {
       id: item.variant.id,
       titleArabic: asset.titleArabic,
       titleEnglish: asset.titleEnglish,
       voiceName: item.variant.voiceName,
       fileName: audioFileName(item.variant),
       byteSize: item.variant.byteSize,
-    });
+    };
+    if (item.variant.voiceId) file.voiceId = item.variant.voiceId;
+    if (item.zikr?.category) file.category = item.zikr.category;
+    if (typeof item.zikr?.orderIndex === "number") file.orderIndex = item.zikr.orderIndex;
+    if (asset.contentKind) file.contentKind = asset.contentKind;
+    if (typeof asset.requiredQuranRange?.surah === "number") file.surahNumber = asset.requiredQuranRange.surah;
+    files.push(file);
   }
   return files;
 }
 
 /** Export only the selected approved, complete recording. Never redownload or export invalid bytes. */
-export async function prepareSavedAudioFile(zikrs: readonly Zikr[], preferences: AudioPreferences, id: string) {
+export async function prepareSavedAudioFile(
+  zikrs: readonly Zikr[],
+  preferences: AudioPreferences,
+  id: string,
+  suggestedFileName?: string,
+) {
   const item = getDownloadVariants(zikrs, preferences).find((candidate) => candidate.variant.id === id);
   if (!item || !("caches" in window)) throw new AudioDownloadError("unsupported", id);
   const cache = await caches.open(AUDIO_CACHE_NAME);
@@ -155,7 +175,7 @@ export async function prepareSavedAudioFile(zikrs: readonly Zikr[], preferences:
     throw new AudioDownloadError("integrity", id);
   const buffer = await response.arrayBuffer();
   await verifyDownload(buffer, item.variant);
-  return new File([buffer], audioFileName(item.variant), { type: item.variant.mimeType });
+  return new File([buffer], suggestedFileName ?? audioFileName(item.variant), { type: item.variant.mimeType });
 }
 
 async function isVerifiedCachedAudio(cache: Cache, item: ReturnType<typeof getDownloadVariants>[number]) {
@@ -341,17 +361,57 @@ export function getDownloadedAudioSummary() {
 export async function cleanupStaleAudioDownloads() {
   if (!("caches" in window)) return;
   const registry = loadRegistry();
+  const activeCache = await caches.open(AUDIO_CACHE_NAME);
+  const cacheNames = await caches.keys();
+  const oldCacheNames = cacheNames.filter((name) => name.startsWith("azkar-audio-v") && name !== AUDIO_CACHE_NAME);
+
+  let registryChanged = false;
+  const migratedCacheNames: string[] = [];
+
+  // 1. Migrate still-valid downloads from older audio caches into the active cache
+  for (const oldName of oldCacheNames) {
+    try {
+      const oldCache = await caches.open(oldName);
+      for (const record of Object.values(registry)) {
+        const asset = AUDIO_CATALOG.assets[record.assetId];
+        if (!asset || record.assetVersion !== asset.version) continue;
+        for (const url of record.urls) {
+          const cachedInActive = await activeCache.match(url);
+          if (!cachedInActive) {
+            const cachedInOld = await oldCache.match(url);
+            if (cachedInOld) {
+              await activeCache.put(url, cachedInOld);
+            }
+          }
+        }
+        if (record.manifestVersion !== AUDIO_MANIFEST_VERSION) {
+          record.manifestVersion = AUDIO_MANIFEST_VERSION;
+          registryChanged = true;
+        }
+      }
+      migratedCacheNames.push(oldName);
+    } catch {
+      // Keep the source cache if any copy fails (for example, storage quota).
+      // A later maintenance pass can retry without losing the only offline copy.
+    }
+  }
+
+  // 2. Identify truly stale assets (removed from catalog or modified asset version)
   const staleIds = Object.values(registry)
     .filter((record) => {
       const asset = AUDIO_CATALOG.assets[record.assetId];
-      return !asset || record.manifestVersion !== AUDIO_MANIFEST_VERSION || record.assetVersion !== asset.version;
+      return !asset || record.assetVersion !== asset.version;
     })
     .map((record) => record.assetId);
-  await removeDownloadedAudio(staleIds);
-  const cacheNames = await caches.keys();
-  await Promise.all(
-    cacheNames
-      .filter((name) => name.startsWith("azkar-audio-v") && name !== AUDIO_CACHE_NAME)
-      .map((name) => caches.delete(name)),
-  );
+
+  if (registryChanged) {
+    saveRegistry(registry);
+  }
+
+  if (staleIds.length > 0) {
+    await removeDownloadedAudio(staleIds);
+  }
+
+  // 3. Remove retired older audio caches now that valid assets are migrated
+  await Promise.all(migratedCacheNames.map((name) => caches.delete(name)));
 }

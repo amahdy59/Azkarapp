@@ -65,6 +65,16 @@ describe("CustomCounterScreen Component", () => {
     expect(counter).toHaveTextContent("1");
   });
 
+  it("does not count the synthetic click after swiping to another zikr", () => {
+    render(<CustomCounterScreen isArabic={false} direction="ltr" onBack={vi.fn()} />);
+    const canvas = screen.getByTestId("custom-counter-content");
+    fireEvent.touchStart(canvas, { touches: [{ clientX: 200, clientY: 100 }] });
+    fireEvent.touchMove(canvas, { touches: [{ clientX: 100, clientY: 100 }] });
+    fireEvent.touchEnd(canvas, { changedTouches: [{ clientX: 100, clientY: 100 }] });
+    fireEvent.click(canvas);
+    expect(screen.getByTestId("custom-counter-surface")).toHaveTextContent("0/");
+  });
+
   it("persists a localized sound toggle with pressed-state semantics inside More Options menu", async () => {
     const user = userEvent.setup();
     const firstRender = render(<CustomCounterScreen isArabic={false} direction="ltr" onBack={vi.fn()} />);
@@ -349,5 +359,57 @@ describe("CustomCounterScreen Component", () => {
 
     await user.click(screen.getByTestId("custom-counter-return-btn"));
     expect(onBack).toHaveBeenCalledTimes(1);
+  });
+
+  it("supports navigating through azkar with next and previous buttons", async () => {
+    const user = userEvent.setup();
+    render(<CustomCounterScreen isArabic={true} direction="rtl" onBack={vi.fn()} />);
+
+    expect(screen.getByTestId("custom-counter-next-btn")).toBeInTheDocument();
+    expect(screen.getByTestId("custom-counter-prev-btn")).toBeInTheDocument();
+
+    // Click next to switch to second authentic dhikr
+    await user.click(screen.getByTestId("custom-counter-next-btn"));
+    expect(
+      screen.getByRole("button", { name: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ ، سُبْحَانَ اللَّهِ الْعَظِيمِ" }),
+    ).toBeInTheDocument();
+
+    // Click previous to switch back
+    await user.click(screen.getByTestId("custom-counter-prev-btn"));
+    expect(screen.getByRole("button", { name: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ" })).toBeInTheDocument();
+  });
+
+  it("opens share modal when share button is tapped", async () => {
+    const user = userEvent.setup();
+    render(<CustomCounterScreen isArabic={true} direction="rtl" onBack={vi.fn()} />);
+
+    const shareButton = screen.getByTestId("counter-share-button");
+    expect(shareButton).toBeInTheDocument();
+    await user.click(shareButton);
+
+    // Modal is opened
+    expect(await screen.findByRole("dialog")).toBeInTheDocument();
+  });
+
+  it("exposes the Aa typography menu to adjust text size", async () => {
+    const user = userEvent.setup();
+    const onTextSizeChange = vi.fn();
+    render(
+      <CustomCounterScreen
+        isArabic={true}
+        direction="rtl"
+        onBack={vi.fn()}
+        textSize="medium"
+        onTextSizeChange={onTextSizeChange}
+      />,
+    );
+
+    const typographyButton = screen.getByTestId("custom-counter-settings-button");
+    expect(typographyButton).toBeInTheDocument();
+    await user.click(typographyButton);
+
+    const largeOption = screen.getByTestId("custom-counter-display-text-size-large");
+    await user.click(largeOption);
+    expect(onTextSizeChange).toHaveBeenCalledWith("large");
   });
 });

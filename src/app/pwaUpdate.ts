@@ -155,6 +155,16 @@ function clearUpdateAttempt() {
  * Returns whether it escalated, so a caller can leave the notice up rather than
  * silently doing nothing.
  */
+/** Protected caches containing user-downloaded devotional audio and Quran files. */
+export function isProtectedContentCache(cacheName: string): boolean {
+  return (
+    cacheName.startsWith("azkar-audio-") ||
+    cacheName.startsWith("azkar-mushaf-") ||
+    cacheName.startsWith("azkar-qcf-fonts-") ||
+    cacheName.startsWith("azkar-listening-timings-")
+  );
+}
+
 export async function escapeStaleServiceWorker({
   deployedRelease,
   runningRelease,
@@ -182,7 +192,17 @@ export async function escapeStaleServiceWorker({
   if (typeof caches !== "undefined") {
     await caches
       .keys()
-      .then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
+      .then((keys) =>
+        Promise.all(
+          keys
+            .filter(
+              (key) =>
+                !isProtectedContentCache(key) &&
+                (key.startsWith("workbox-precache-") || key.startsWith("azkar-routes-")),
+            )
+            .map((key) => caches.delete(key)),
+        ),
+      )
       .catch(() => {
         // The precache is the likely culprit, but a browser that refuses to
         // enumerate it still gets the reload.

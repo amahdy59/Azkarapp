@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-13-6",
+  "release": "2026-10-14-1",
   "ar": [
-    "أصبحت صفحة التقدم أكثر وضوحًا وهدوءًا بإزالة البطاقات المتداخلة وترتيب الأوراد في مساحات متناسقة.",
-    "يمكنك الآن استكشاف منحنى التقدم مباشرة باللمس أو النقر لمعرفة نسب الإنجاز وتفاصيل الفترات.",
-    "تجمع شاشة الأسبوع تفاصيل المداومة ومقارنة الأوراد والهدف في مساحة واحدة موحدة.",
-    "يبرز تقويم الشهر مستويات الإنجاز بتدرجات لونية هادئة ومؤشرات واضحة لكل يوم."
+    "تحافظ تحديثات التطبيق على تنزيلاتك، ويمكنك تصدير الصوت في مجلدات مرتبة بأسماء واضحة.",
+    "شارك فضائل الذكر وبطاقات الصباح والمساء، مع توفر البطاقات المصورة دون اتصال بعد تثبيت التطبيق.",
+    "أصبحت المسبحة والصلاة على النبي أكثر اتساقًا مع القارئ، مع خيارات لحجم النص والصيغ والمشاركة.",
+    "توضح إحصاءات الصلاة والجمعة نسب التسجيل، وتعرض مخططات التقدم اتجاه الزمن بوضوح."
   ],
   "en": [
-    "The Progress page is calmer and clearer with unified surfaces that eliminate nested boxes and cards.",
-    "You can now touch or click data points on the trend chart to inspect completion details directly.",
-    "The Week view unifies your weekly commitment, routine comparisons, and goal in one cohesive surface.",
-    "The Month calendar displays completion levels with quiet surface tones and clear day indicators."
+    "App updates preserve your downloads, and audio exports use organized folders with readable names.",
+    "Share remembrance benefits and supplied morning or evening cards, available offline after installation.",
+    "Masbaha and Salawat now share the reader's controls, with text sizing, formula choices, and sharing.",
+    "Prayer and Friday statistics show recording rates, while progress charts make the timeline direction clear."
   ]
 }

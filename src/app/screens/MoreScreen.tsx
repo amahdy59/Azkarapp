@@ -56,32 +56,34 @@ export function MoreScreen({
 }) {
   return (
     <ScreenContainer dir={direction} screenName={t(language, "more.title")}>
-      <Header
-        pageGutters
-        title={t(language, "more.title")}
-        subtitle={t(language, "more.subtitle")}
-        language={language}
-      />
-      <div className="mx-auto grid w-full max-w-5xl grid-cols-1 gap-3 px-page py-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
-        <ToolCard
-          title={t(language, "qibla.title")}
-          description={t(language, "more.qiblaDescription")}
-          Icon={Compass}
-          onClick={onOpenQibla}
-          featured
+      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col min-h-screen">
+        <Header
+          pageGutters
+          title={t(language, "more.title")}
+          subtitle={t(language, "more.subtitle")}
+          language={language}
         />
-        <ToolCard
-          title={t(language, "counter.tasbeehTitle")}
-          description={t(language, "more.masbahaDescription")}
-          Icon={Sparkles}
-          onClick={onOpenMasbaha}
-        />
-        <ToolCard
-          title={t(language, "common.settings")}
-          description={t(language, "more.settingsDescription")}
-          Icon={Settings}
-          onClick={onOpenSettings}
-        />
+        <div className="grid w-full grid-cols-1 gap-3 px-page py-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
+          <ToolCard
+            title={t(language, "qibla.title")}
+            description={t(language, "more.qiblaDescription")}
+            Icon={Compass}
+            onClick={onOpenQibla}
+            featured
+          />
+          <ToolCard
+            title={t(language, "counter.tasbeehTitle")}
+            description={t(language, "more.masbahaDescription")}
+            Icon={Sparkles}
+            onClick={onOpenMasbaha}
+          />
+          <ToolCard
+            title={t(language, "common.settings")}
+            description={t(language, "more.settingsDescription")}
+            Icon={Settings}
+            onClick={onOpenSettings}
+          />
+        </div>
       </div>
     </ScreenContainer>
   );

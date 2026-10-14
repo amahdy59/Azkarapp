@@ -1,5 +1,13 @@
 # Application architecture
 
+## Combined release integration — 2026-10-14
+
+Audio migration retires an old cache only after its copy pass succeeds; quota/read/write failure retains the source for retry. Stale-worker recovery clears only application precache and route namespaces. Curated morning/evening artwork is supplied unchanged by the owner and explicitly precached for offline use. The interactive sharing studio remains the default; the supplied pack is an explicit alternate. Failed image fetches and non-image responses cannot become exported files, and failed pack loading returns to the generated studio without retaining obsolete files. Counter swipes suppress subsequent canvas clicks; Salawat totals accumulate actual completed counts rather than recalculating earlier rounds from a changed target. These additions do not change normalized persisted state or reviewed devotional source records.
+
+## Persistent devotional downloads and human-readable archives — 2026-10-13
+
+`escapeStaleServiceWorker` preserves user-downloaded devotional caches (`azkar-audio-`, `azkar-mushaf-`, `azkar-qcf-fonts-`, `azkar-listening-timings-`) while clearing only precache and route caches (`workbox-precache-`, `azkar-routes-`). `cleanupStaleAudioDownloads` migrates still-valid recordings across manifest version updates before deleting retired caches and decouples invalidation from manifest version bumps alone. Initiating any download auto-requests persistent storage permission (`requestDownloadPersistence()`). Exporting all audio as ZIP structures entries into cross-platform sanitized, numbered bilingual category folders (`01 - Morning Azkar (أذكار الصباح)`, `04 - Quran (القرآن الكريم)`, etc.) with human-readable track numbers, titles, and localized reciter names.
+
 ## Daily reliability — 2026-10-13
 
 The shared notification service checks current permission before and after the active service-worker lookup. It uses getRegistration rather than waiting indefinitely for ready on unregistered pages; desktop Notification construction is the fallback, and unsupported mobile delivery returns failure. Callers provide a cancellation predicate so obsolete requests do not notify. Reminder lifecycle listeners remain registered while permission is blocked and reconcile on visible return; revocation stops scheduled delivery. Settings refreshes permission on return and prevents concurrent test requests. These foreground reminders do not promise background or closed-app delivery.

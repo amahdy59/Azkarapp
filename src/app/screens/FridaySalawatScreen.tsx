@@ -1,5 +1,5 @@
 import { ReferenceCard } from "../components/ReferenceCard";
-import { useCallback, useEffect, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useState } from "react";
 import { DevotionalAction } from "../components/DevotionalControls";
 import { useStandaloneReadingFocus } from "../hooks/useStandaloneReadingFocus";
 import { StandaloneCounterFooter } from "../components/StandaloneCounterFooter";
@@ -36,10 +36,30 @@ import { useWakeLock } from "../hooks/useWakeLock";
 import { vibrateIfEnabled } from "../motionPreferences";
 import { t } from "../i18n";
 import { getReadingFontSize } from "./readingTypography";
-import type { AppLanguage, TextSizeOption } from "../types";
+import { SALAWAT_FORMULAS, SalawatFormulaPicker, type SalawatFormula } from "../components/SalawatFormulaPicker";
+import type { AppLanguage, TextSizeOption, Zikr } from "../types";
 
-const SALAWAT_ARABIC = "اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ";
-const SALAWAT_TRANSLITERATION = "Allahumma salli wa sallim ‘ala Nabiyyina Muhammad";
+const SharingPreview = lazy(() =>
+  import("../components/CollectionShareModal").then((module) => ({ default: module.CollectionShareModal })),
+);
+
+function salawatToShareZikr(formula: SalawatFormula): Zikr {
+  return {
+    id: formula.id,
+    canonicalKey: formula.id,
+    audioBehavior: { defaultMode: "play-once", supportedModes: ["play-once"] },
+    arabicText: formula.textAr,
+    transliteration: formula.transliterationEn,
+    translation: formula.transliterationEn,
+    sourceReference: "Sahih Muslim 408, Sunan Abi Dawud 1047",
+    sourceReferenceArabic: "صحيح مسلم ٤٠٨ ، سنن أبي داود ١٠٤٧",
+    benefit: "Whoever sends one blessing upon the Prophet ﷺ, Allah sends ten blessings upon that person.",
+    benefitArabic: "«مَنْ صَلَّى عَلَيَّ وَاحِدَةً صَلَّى اللَّهُ عَلَيْهِ عَشْرًا».",
+    category: "friday_kahf",
+    orderIndex: 0,
+    repetitionCount: 100,
+  };
+}
 
 const EVIDENCE = {
   en: {
@@ -102,6 +122,7 @@ export function FridaySalawatScreen({
   reduceMotion = false,
   hapticFeedback = true,
   textSize = "medium",
+  onTextSizeChange,
 }: {
   language: AppLanguage;
   direction: "ltr" | "rtl";
@@ -110,13 +131,28 @@ export function FridaySalawatScreen({
   /** Matches the reader and the Masbaha: counting is felt, not only heard. */
   hapticFeedback?: boolean;
   textSize?: TextSizeOption;
+  onTextSizeChange?: (size: TextSizeOption) => void;
 }) {
   const copy = EVIDENCE[language];
   const { focusMode, setFocusMode, focusToggleRef, readingScrollRef } = useStandaloneReadingFocus();
+  const [selectedFormula, setSelectedFormula] = useState<SalawatFormula>(() => SALAWAT_FORMULAS[0]!);
+  const [currentTextSize, setCurrentTextSize] = useState<TextSizeOption>(textSize);
+  const [shareOpen, setShareOpen] = useState(false);
+
+  useEffect(() => {
+    setCurrentTextSize(textSize);
+  }, [textSize]);
+
+  const handleTextSizeChange = (newSize: TextSizeOption) => {
+    setCurrentTextSize(newSize);
+    onTextSizeChange?.(newSize);
+  };
+
   const [progress, setProgress] = useState(readFridaySalawatProgress);
   const [showBenefits, setShowBenefits] = useState(false);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [rounds, setRounds] = useState(0);
+  const [completedRoundCount, setCompletedRoundCount] = useState(0);
   const complete = progress.count >= progress.target;
   const progressPercent = Math.min(100, Math.round((progress.count / progress.target) * 100));
 
@@ -141,7 +177,13 @@ export function FridaySalawatScreen({
     playClickFeedback();
     const next = progress.count + 1;
     const reachedTarget = next >= progress.target;
-    vibrateIfEnabled(hapticFeedback, reachedTarget ? [30, 50, 30, 50, 50] : 15);
+    if (reachedTarget) {
+      vibrateIfEnabled(hapticFeedback, [30, 50, 30, 50, 50]);
+    } else if (next > 0 && next % 33 === 0) {
+      vibrateIfEnabled(hapticFeedback, [25, 30, 25]);
+    } else {
+      vibrateIfEnabled(hapticFeedback, 15);
+    }
     persist(next, progress.target);
     if (reachedTarget) {
       setShowCompletionModal(true);
@@ -156,9 +198,10 @@ export function FridaySalawatScreen({
 
   const handleStartNewRound = useCallback(() => {
     setRounds((r) => r + 1);
+    setCompletedRoundCount((total) => total + progress.count);
     persist(0, progress.target);
     setShowCompletionModal(false);
-  }, [persist, progress.target]);
+  }, [persist, progress.count, progress.target]);
 
   const handleReturn = useCallback(() => {
     setShowCompletionModal(false);
@@ -168,6 +211,7 @@ export function FridaySalawatScreen({
   const reset = useCallback(() => {
     persist(0, progress.target);
     setRounds(0);
+    setCompletedRoundCount(0);
     setShowCompletionModal(false);
   }, [persist, progress.target]);
 
@@ -237,6 +281,9 @@ export function FridaySalawatScreen({
             title={t(language, "fridaySalawat.title")}
             onBack={onBack}
             testId="salawat"
+            category="neutral"
+            textSize={currentTextSize}
+            onTextSizeChange={handleTextSizeChange}
             progress={{
               value: progress.count,
               max: progress.target,
@@ -246,16 +293,29 @@ export function FridaySalawatScreen({
             }}
             subRow={
               <div className="w-full" data-prevent-count="true">
-                <CounterTargetPicker
-                  activeTarget={progress.target}
-                  onTargetChange={(target) => {
-                    persist(0, target);
-                    setShowCompletionModal(false);
-                  }}
-                  language={language}
-                  direction={direction}
-                  allowOpen={false}
-                />
+                <div className="relative z-20 flex items-center gap-2 sm:gap-3" data-prevent-count="true">
+                  <div className="min-w-0 flex-1">
+                    <SalawatFormulaPicker
+                      formulas={SALAWAT_FORMULAS}
+                      selected={selectedFormula}
+                      language={language}
+                      direction={direction}
+                      onSelect={(f) => setSelectedFormula(f)}
+                    />
+                  </div>
+                  <div className="min-w-fit shrink-0">
+                    <CounterTargetPicker
+                      activeTarget={progress.target}
+                      onTargetChange={(target) => {
+                        persist(0, target);
+                        setShowCompletionModal(false);
+                      }}
+                      language={language}
+                      direction={direction}
+                      allowOpen={false}
+                    />
+                  </div>
+                </div>
               </div>
             }
             actions={(tier) => {
@@ -321,20 +381,20 @@ export function FridaySalawatScreen({
                         style={{
                           fontFamily: "var(--font-zikr)",
                           fontSize: getReadingFontSize({
-                            textSize,
-                            arabicLength: SALAWAT_ARABIC.length,
+                            textSize: currentTextSize,
+                            arabicLength: selectedFormula.textAr.length,
                             longSurah: false,
                           }),
                         }}
                       >
-                        {SALAWAT_ARABIC}
+                        {selectedFormula.textAr}
                       </p>
                       {language !== "ar" && (
                         <p
                           className="mt-3 max-w-[34rem] text-center text-sm font-semibold leading-7 text-muted-foreground"
                           dir="ltr"
                         >
-                          {SALAWAT_TRANSLITERATION}
+                          {selectedFormula.transliterationEn}
                         </p>
                       )}
                     </div>
@@ -350,6 +410,14 @@ export function FridaySalawatScreen({
               />
               <footer className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
                 <div data-testid="reader-counter-stack">
+                  {rounds > 0 && (
+                    <div className="mb-2 text-center text-xs font-bold text-muted-foreground" aria-live="polite">
+                      {t(language, "fridaySalawat.roundTally", {
+                        round: formatNumerals(rounds + 1, language),
+                        total: formatNumerals(completedRoundCount + progress.count, language),
+                      })}
+                    </div>
+                  )}
                   <StandaloneCounterFooter
                     language={language}
                     focusMode={focusMode}
@@ -359,6 +427,7 @@ export function FridaySalawatScreen({
                     onToggleSound={toggleSound}
                     onReset={reset}
                     resetDisabled={progress.count === 0}
+                    onShare={() => setShareOpen(true)}
                     benefit={
                       <DevotionalAction
                         type="button"
@@ -510,6 +579,22 @@ export function FridaySalawatScreen({
             </div>
           </div>
         </ResponsiveSheet>
+      )}
+
+      {shareOpen && (
+        <Suspense fallback={null}>
+          <SharingPreview
+            open
+            onClose={() => setShareOpen(false)}
+            single
+            collectionTitle={selectedFormula.nameAr || t(language, "fridaySalawat.title")}
+            collectionTitleArabic={selectedFormula.nameAr}
+            items={[salawatToShareZikr(selectedFormula)]}
+            readerIndex={0}
+            language={language}
+            themeMode="midnight"
+          />
+        </Suspense>
       )}
     </ScreenContainer>
   );

@@ -107,7 +107,10 @@ describe("complete audio archives", () => {
       expect([...bytes.slice(offset, offset + size)]).toEqual([1, 2, 3]);
       offset += size;
     }
-    expect(names).toEqual(["one.mp3", "two.mp3"]);
+    expect(names).toEqual([
+      "07 - Duas & Other Azkar (أدعية وأذكار متنوعة)/01 - التسجيل الأول - Test reciter.mp3",
+      "07 - Duas & Other Azkar (أدعية وأذكار متنوعة)/02 - التسجيل الثاني - Test reciter.mp3",
+    ]);
     expect(view.getUint16(bytes.length - 14, true)).toBe(2);
   });
   it("cancels archive preparation without deleting completed offline files", async () => {
@@ -141,6 +144,7 @@ describe("verified offline audio", () => {
         titleArabic: "التسجيل الأول",
         titleEnglish: "First recording",
         voiceName: "Test reciter",
+        voiceId: "voice",
         fileName: "one.mp3",
         byteSize: 3,
       },

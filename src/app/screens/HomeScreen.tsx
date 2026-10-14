@@ -644,7 +644,7 @@ export function HomeScreen({
           <header
             data-testid="home-utility-header"
             data-scrolled={hasScrolledHomeContent || undefined}
-            className={`px-page mx-auto flex w-full max-w-[70rem] items-center justify-between gap-3 transition-[background-color,backdrop-filter,box-shadow,padding] duration-standard ${
+            className={`px-page mx-auto flex w-full max-w-7xl items-center justify-between gap-3 transition-[background-color,backdrop-filter,box-shadow,padding] duration-standard ${
               hasScrolledHomeContent
                 ? "pt-[max(0.375rem,env(safe-area-inset-top))] pb-1"
                 : "pt-[max(0.5rem,env(safe-area-inset-top))] pb-1 sm:pt-3 sm:pb-2"
@@ -693,7 +693,7 @@ export function HomeScreen({
             </button>
           </header>
         </div>
-        <div data-testid="home-content-grid" className="mx-auto grid w-full max-w-[70rem] grid-cols-1 gap-4 lg:gap-5">
+        <div data-testid="home-content-grid" className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-4 lg:gap-5">
           <div data-testid="home-hero" className="relative isolate w-full pt-12 sm:pt-14">
             {showHeroContent && (
               <div className="relative z-10 mx-auto flex w-full flex-col items-stretch justify-end gap-4 px-page pb-5 pt-1 sm:pb-6 sm:pt-2 lg:gap-5 lg:pb-8 lg:pt-3">

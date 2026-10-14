@@ -88,7 +88,14 @@ export function OfflineResourceRow({
       </p>
       {feedback && <div className="space-y-1 text-sm text-muted-foreground">{feedback}</div>}
       {total > 0 && (!compact || active) && (
-        <DownloadProgress completed={completed} total={total} label={title} language={language} active={active} />
+        <DownloadProgress
+          completed={completed}
+          total={total}
+          label={title}
+          language={language}
+          direction={direction}
+          active={active}
+        />
       )}
       <div className="flex flex-wrap gap-2">
         {!showDownload ? null : active ? (

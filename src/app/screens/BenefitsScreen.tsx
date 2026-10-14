@@ -4,11 +4,12 @@ import { QuranVerseText } from "../components/QuranVerseText";
 /* The scroll region is intentionally keyboard-focusable so Page Down/arrow
    scrolling works before a user reaches its first link. */
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, lazy, useEffect, useMemo, useState } from "react";
 import { Header } from "../components/LayoutShells";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { TabList, tabPanelProps } from "../components/Tabs";
 import { Share2 } from "../components/icons";
+import type { ShareItem } from "../share/shareLayout";
 import {
   HADITH_DHIKR_EVIDENCE,
   QURAN_DHIKR_EVIDENCE,
@@ -18,6 +19,10 @@ import {
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
+
+const CollectionShareModal = lazy(() =>
+  import("../components/CollectionShareModal").then((module) => ({ default: module.CollectionShareModal })),
+);
 
 const BENEFITS_BATCH_SIZE = 15;
 type BenefitsView = "quran" | "hadith";
@@ -46,29 +51,39 @@ function quranCitation(item: BenefitEvidence, language: AppLanguage) {
   return language === "ar" ? `سورة ${name} · ${reference}` : `Surah ${name} · ${reference}`;
 }
 
-function ShareLink({ language, label, message }: { language: AppLanguage; label: string; message: string }) {
-  return (
-    <a
-      href={buildWhatsAppBenefitUrl(message)}
-      target="_blank"
-      rel="noreferrer"
-      className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-border bg-background text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-      aria-label={t(language, "benefits.shareWhatsAppAria", { category: label })}
-      title={t(language, "benefits.shareWhatsApp")}
-    >
-      <Share2 size={18} aria-hidden="true" />
-    </a>
-  );
+export function benefitEvidenceToShareItem(item: BenefitEvidence, language: AppLanguage): ShareItem {
+  const isQuran = item.kind === "quran";
+  const title = localizeBenefitText(item.title, language);
+  const text = isQuran ? item.text.ar : localizeBenefitText(item.text, language);
+  const meaning = isQuran && language === "en" ? item.text.en : undefined;
+  const source = isQuran ? quranCitation(item, language) : localizeBenefitText(item.source, language);
+
+  return {
+    id: item.id,
+    canonicalKey: isQuran ? item.id : undefined,
+    arabicText: text,
+    quranText: isQuran,
+    title: item.kind === "hadith" ? title : undefined,
+    translation: meaning,
+    sourceReference: source,
+    readingUrl: item.sourceUrl,
+    language,
+  };
 }
 
-function EvidenceCard({ item, language }: { item: BenefitEvidence; language: AppLanguage }) {
+function EvidenceCard({
+  item,
+  language,
+  onShare,
+}: {
+  item: BenefitEvidence;
+  language: AppLanguage;
+  onShare: (item: BenefitEvidence) => void;
+}) {
   const title = localizeBenefitText(item.title, language);
   const text = item.kind === "quran" ? item.text.ar : localizeBenefitText(item.text, language);
   const meaning = item.kind === "quran" && language === "en" ? item.text.en : "";
   const source = item.kind === "quran" ? quranCitation(item, language) : localizeBenefitText(item.source, language);
-  const shareMessage = [t(language, "benefits.shareHeading"), title, text, meaning, source]
-    .filter(Boolean)
-    .join("\n\n");
 
   return (
     <article className="flex flex-col rounded-3xl border border-border bg-card p-5 text-start shadow-raised sm:p-6">
@@ -96,7 +111,15 @@ function EvidenceCard({ item, language }: { item: BenefitEvidence; language: App
         >
           {source}
         </a>
-        <ShareLink language={language} label={title} message={shareMessage} />
+        <button
+          type="button"
+          onClick={() => onShare(item)}
+          className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-border bg-background text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          aria-label={t(language, "benefits.shareBenefitAria", { category: title })}
+          title={t(language, "benefits.shareBenefit")}
+        >
+          <Share2 size={18} aria-hidden="true" />
+        </button>
       </footer>
     </article>
   );
@@ -113,6 +136,8 @@ export function BenefitsScreen({
 }) {
   const [activeSection, setActiveSection] = useState<BenefitsView>("quran");
   const [visibleCount, setVisibleCount] = useState(BENEFITS_BATCH_SIZE);
+  const [sharingEvidence, setSharingEvidence] = useState<BenefitEvidence | null>(null);
+  const [sharingAllTab, setSharingAllTab] = useState(false);
   const evidenceItems = activeSection === "quran" ? QURAN_DHIKR_EVIDENCE : HADITH_DHIKR_EVIDENCE;
   const total = evidenceItems.length;
   const visibleEvidence = evidenceItems.slice(0, visibleCount);
@@ -135,82 +160,129 @@ export function BenefitsScreen({
 
   return (
     <ScreenContainer dir={direction} className="relative !pb-0" screenName={t(language, "benefits.title")}>
-      <Header
-        pageGutters
-        title={t(language, "benefits.title")}
-        subtitle={t(language, "benefits.subtitle")}
-        onBack={onBack}
-        language={language}
-      />
-
-      {/* The filter sits outside the scroll region, not sticky inside it.
-          Sticky put it in the same scroll box as the cards, which meant its
-          background had to be stretched back over the region's gutters and its
-          top padding to hide them — and both of those bleeds were measured
-          against a 20px gutter the region only has on a phone. From the small
-          tier up the gutter is 24px and the top padding was never covered at
-          all, so cards surfaced in a strip above the filter and down both
-          sides of it. A sibling of the scroll region cannot be scrolled over
-          at any width, and needs no bleed to prove it. */}
-      <div
-        className="mx-auto w-full max-w-[var(--content-dashboard)] shrink-0 px-page pb-3 pt-3"
-        data-testid="benefits-filter-bar"
-      >
-        <TabList
-          value={activeSection}
-          onChange={setActiveSection}
-          tabs={tabs}
-          direction={direction}
-          idPrefix="benefits"
-          aria-label={t(language, "benefits.sectionsLabel")}
-          indicatorClassName="bg-primary/10"
-          className="grid grid-cols-2 gap-2 rounded-2xl border border-border bg-card p-1"
-          itemClassName={(selected) =>
-            `min-h-11 rounded-xl px-3 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-              selected ? PEER_TAB_SELECTED : "text-muted-foreground hover:bg-muted"
-            }`
-          }
+      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col min-h-screen">
+        <Header
+          pageGutters
+          title={t(language, "benefits.title")}
+          subtitle={t(language, "benefits.subtitle")}
+          onBack={onBack}
+          language={language}
         />
-      </div>
 
-      <div
-        role="region"
-        aria-label={t(language, "benefits.title")}
-        tabIndex={0}
-        className="mx-auto w-full max-w-[var(--content-dashboard)] min-h-0 flex-1 overflow-y-auto px-page pb-8 pt-1 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
-        data-testid="benefits-scroll-region"
-      >
-        <section
-          {...tabPanelProps("benefits", activeSection)}
-          className="rounded-xl outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-          data-testid={`benefits-panel-${activeSection}`}
+        {/* The filter sits outside the scroll region, not sticky inside it.
+            Sticky put it in the same scroll box as the cards, which meant its
+            background had to be stretched back over the region's gutters and its
+            top padding to hide them — and both of those bleeds were measured
+            against a 20px gutter the region only has on a phone. From the small
+            tier up the gutter is 24px and the top padding was never covered at
+            all, so cards surfaced in a strip above the filter and down both
+            sides of it. A sibling of the scroll region cannot be scrolled over
+            at any width, and needs no bleed to prove it. */}
+        <div
+          className="w-full shrink-0 px-page pb-3 pt-3 flex flex-wrap sm:flex-nowrap items-center gap-2"
+          data-testid="benefits-filter-bar"
         >
-          <div className="grid gap-3.5 lg:grid-cols-2" data-testid="benefits-list">
-            {visibleEvidence.map((item) => (
-              <EvidenceCard key={item.id} item={item} language={language} />
-            ))}
+          <div className="flex-1 min-w-0">
+            <TabList
+              value={activeSection}
+              onChange={setActiveSection}
+              tabs={tabs}
+              direction={direction}
+              idPrefix="benefits"
+              aria-label={t(language, "benefits.sectionsLabel")}
+              indicatorClassName="bg-primary/10"
+              className="grid grid-cols-2 gap-2 rounded-2xl border border-border bg-card p-1"
+              itemClassName={(selected) =>
+                `min-h-11 rounded-xl px-3 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                  selected ? PEER_TAB_SELECTED : "text-muted-foreground hover:bg-muted"
+                }`
+              }
+            />
           </div>
-
-          <p className="mt-4 text-center text-xs font-semibold text-muted-foreground" aria-live="polite">
-            {t(language, "benefits.showing", {
-              visible: formatNumerals(Math.min(visibleCount, total), language),
-              total: formatNumerals(total, language),
+          <button
+            type="button"
+            data-testid="share-benefits-collection-button"
+            onClick={() => setSharingAllTab(true)}
+            className="flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-btn border border-border bg-card px-3 text-label font-bold text-foreground shadow-xs transition-[color,background-color,border-color,box-shadow,transform] hover:bg-muted active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            aria-label={t(language, "benefits.shareTabCollectionAria", {
+              tab: t(language, `benefits.${activeSection}Tab`, { count: formatNumerals(total, language) }),
             })}
-          </p>
+            title={t(language, "benefits.shareTabCollection")}
+          >
+            <Share2 size={16} aria-hidden="true" />
+            <span className="hidden sm:inline">{t(language, "benefits.shareTabCollection")}</span>
+          </button>
+        </div>
 
-          {visibleCount < total && (
-            <button
-              type="button"
-              onClick={() => setVisibleCount((current) => Math.min(current + BENEFITS_BATCH_SIZE, total))}
-              className="mx-auto mt-3 flex min-h-11 items-center justify-center rounded-2xl border border-primary/35 bg-primary/10 px-5 text-sm font-black text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-              data-testid="benefits-load-more"
-            >
-              {t(language, "benefits.loadMore", {
-                count: formatNumerals(Math.min(BENEFITS_BATCH_SIZE, total - visibleCount), language),
+        <div
+          role="region"
+          aria-label={t(language, "benefits.title")}
+          tabIndex={0}
+          className="w-full min-h-0 flex-1 overflow-y-auto px-page pb-8 pt-1 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
+          data-testid="benefits-scroll-region"
+        >
+          <section
+            {...tabPanelProps("benefits", activeSection)}
+            className="rounded-xl outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            data-testid={`benefits-panel-${activeSection}`}
+          >
+            <div className="grid gap-3.5 lg:grid-cols-2" data-testid="benefits-list">
+              {visibleEvidence.map((item) => (
+                <EvidenceCard key={item.id} item={item} language={language} onShare={(ev) => setSharingEvidence(ev)} />
+              ))}
+            </div>
+
+            <p className="mt-4 text-center text-xs font-semibold text-muted-foreground" aria-live="polite">
+              {t(language, "benefits.showing", {
+                visible: formatNumerals(Math.min(visibleCount, total), language),
+                total: formatNumerals(total, language),
               })}
-            </button>
-          )}
-        </section>
+            </p>
+
+            {visibleCount < total && (
+              <button
+                type="button"
+                onClick={() => setVisibleCount((current) => Math.min(current + BENEFITS_BATCH_SIZE, total))}
+                className="mx-auto mt-3 flex min-h-11 items-center justify-center rounded-2xl border border-primary/35 bg-primary/10 px-5 text-sm font-black text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                data-testid="benefits-load-more"
+              >
+                {t(language, "benefits.loadMore", {
+                  count: formatNumerals(Math.min(BENEFITS_BATCH_SIZE, total - visibleCount), language),
+                })}
+              </button>
+            )}
+          </section>
+        </div>
+
+        {(sharingEvidence || sharingAllTab) && (
+          <Suspense fallback={null}>
+            <CollectionShareModal
+              open
+              onClose={() => {
+                setSharingEvidence(null);
+                setSharingAllTab(false);
+              }}
+              single={Boolean(sharingEvidence)}
+              collectionTitle={t(language, "benefits.title")}
+              collectionTitleArabic="فضائل الذكر"
+              collectionTitleEnglish="Virtues of Remembrance"
+              collectionSubtitle={
+                sharingEvidence
+                  ? sharingEvidence.kind === "quran"
+                    ? quranCitation(sharingEvidence, language)
+                    : localizeBenefitText(sharingEvidence.source, language)
+                  : t(language, `benefits.${activeSection}Heading`)
+              }
+              items={[]}
+              shareItems={
+                sharingEvidence
+                  ? [benefitEvidenceToShareItem(sharingEvidence, language)]
+                  : visibleEvidence.map((ev) => benefitEvidenceToShareItem(ev, language))
+              }
+              language={language}
+            />
+          </Suspense>
+        )}
       </div>
     </ScreenContainer>
   );

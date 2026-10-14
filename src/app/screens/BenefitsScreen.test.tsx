@@ -52,8 +52,10 @@ describe("BenefitsScreen", () => {
     render(<BenefitsScreen language="ar" direction="rtl" onBack={onBack} />);
 
     expect(screen.getByText("فوائد الذكر")).toBeVisible();
-    const share = screen.getAllByRole("link", { name: /مشاركة فائدة .* عبر واتساب/ })[0]!;
-    expect(decodeURIComponent(share.getAttribute("href")!)).toContain("سورة الرعد · ١٣:٢٨");
+    const shareButtons = screen.getAllByRole("button", { name: /مشاركة فائدة/ });
+    expect(shareButtons.length).toBeGreaterThan(0);
+    fireEvent.click(shareButtons[0]!);
+    expect(screen.getByTestId("share-benefits-collection-button")).toBeVisible();
     fireEvent.click(screen.getByRole("button", { name: "رجوع" }));
     expect(onBack).toHaveBeenCalledOnce();
   });

@@ -4551,3 +4551,28 @@ The owner says to apply the recommendations and leave widgets for now. Apply evi
 ## Progress surface unification and card de-nesting — 2026-10-13
 
 The owner approves the thorough review and plan: eliminate cards within cards within card, reduce visual clutter, add direct interactive SVG trend chart scrubbing with callouts, unify weekly cards into one cohesive surface, and refine month calendar cell luminosity with micro-pips. Preserve all independent practice records, offline data, and accessibility contracts. See phases/PROGRESS_SURFACE_UNIFICATION_2026_10_13.md.
+
+## Persistent devotional downloads and human-readable archives — 2026-10-13
+
+- **Authority:** The owner requested persistent offline storage for downloaded Azkar and Quran audio so they do not require re-downloading upon application updates (similar to YouTube/Spotify offline behavior), and requested human-readable filenames and categorized folders for full-audio ZIP downloads. The owner explicitly commanded: "ensure all changes are impelmented locally. as I'll consolidate all changes and push once."
+- **Decision:**
+  - Content Cache Protection: Guarded service-worker update cache eviction (`escapeStaleServiceWorker` in `pwaUpdate.ts`) with `isProtectedContentCache()` so caches prefixed with `azkar-audio-`, `azkar-mushaf-`, `azkar-qcf-fonts-`, and `azkar-listening-timings-` are strictly preserved during application code updates.
+  - Non-Destructive Audio Cache Migration: Updated `cleanupStaleAudioDownloads()` in `audioOfflineCache.ts` to migrate still-valid cached files from older audio caches (`azkar-audio-v*`) into the active cache before retiring old caches, decoupling manifest version bumps from asset invalidation unless an asset's version actually changed.
+  - Automatic Persistent Storage: Prompt for persistent storage (`requestDownloadPersistence()`) automatically upon initiating offline downloads in `DownloadsPanel.tsx`.
+  - Human-Readable Categorized ZIP Archives: Formatted all ZIP archive entries in `audioArchive.ts` into bilingual numbered category folders (`01 - Morning Azkar (أذكار الصباح)`, `04 - Quran (القرآن الكريم)`, etc.) with clean 2-digit and 3-digit zero-padded track numbers, track titles, and localized reciter names, sanitizing filesystem-illegal characters across platforms.
+- **Scope & Constraints:** Local only. Strictly no `git commit`, `git push`, or remote deployment.
+- **Reference:** See `docs/agent/phases/PERSISTENT_DOWNLOADS_AND_HUMAN_READABLE_ARCHIVES_2026_10_13.md`.
+
+## Masbaha and Friday Salawat Reader Alignment & Desktop Symmetry — 2026-10-13
+
+- **Authority:** The owner requested aligning the Masbaha (`CustomCounterScreen.tsx`) and Friday Salawat (`FridaySalawatScreen.tsx`) pages with the core devotional Reader (`ReaderScreen.tsx`) experience, ensuring symmetrical max-width between the top progress bar and bottom action footer (`max-w-[42rem]`) on desktop, and establishing shared components so improvements to zikr groups propagate automatically. The owner commanded: "ensure all changes are impelmented locally. as I'll consolidate all changes and push once."
+- **Decision:**
+  - Symmetrical Layout: Constrained reading/counting progress bar containers to `max-w-[42rem]` (672px), perfectly matching `.reader-session-footer` across `ReadingScreenChrome.tsx` and `ReaderScreen.tsx`.
+  - Reusable Appearance Menu (`AppearanceMenu.tsx`): Extracted `Aa` typography sizing dropdown into a shared component linked across `ReaderScreen.tsx`, `CustomCounterScreen.tsx`, and `FridaySalawatScreen.tsx`.
+  - Rich Chrome & Mosque Scene Art: Connected `ReaderSceneArt` desktop hero directly into `ReadingScreenChrome.tsx`, providing consistent atmospheric illumination and minaret skyline across all reading and counting modes.
+  - Flanking Counter Navigation: Added previous/next devotional buttons to `StandaloneCounterFooter.tsx` within `.adaptive-counter-row` and integrated horizontal swipe gestures (`useSwipeGestures`) in `CustomCounterScreen.tsx`.
+  - Friday Salawat Formulas Picker: Created `SalawatFormulaPicker.tsx` supporting the Concise formula, As-Salat Al-Ibrahimiyyah, and Short Tashahhud with full Arabic/English Uthmanic typography and narration sources.
+  - Friday Cumulative Rounds & Milestone Haptics: Added cumulative round tally indicator (`rounds > 0`) with polite announcements and 33-count milestone haptic feedback.
+  - Devotional Sharing: Enabled single-card `CollectionShareModal` export directly from the 4-action support dock across both screens.
+- **Scope & Constraints:** Local only. Strictly no git push or remote deployment.
+- **Reference:** See `docs/agent/phases/MASBAHA_AND_SALAWAT_READER_ALIGNMENT_2026_10_13.md`.

@@ -9,6 +9,8 @@ export function ProgressBar({
   fillColor = "var(--primary)",
   direction,
   "aria-label": ariaLabel,
+  "aria-valuetext": ariaValueText,
+  className,
 }: {
   value: number;
   max: number;
@@ -17,6 +19,8 @@ export function ProgressBar({
   fillColor?: string;
   direction?: "ltr" | "rtl";
   "aria-label": string;
+  "aria-valuetext"?: string;
+  className?: string;
 }) {
   const pct = max > 0 ? Math.max(0, Math.min(100, (value / max) * 100)) : 0;
   // The bar fills in from empty when it first appears, so arriving on a screen
@@ -32,15 +36,19 @@ export function ProgressBar({
 
   return (
     <div
-      className="flex w-full overflow-hidden rounded-full"
+      className={
+        className ? `flex w-full overflow-hidden rounded-full ${className}` : "flex w-full overflow-hidden rounded-full"
+      }
       data-slot="progress-track"
       style={{ height, background: trackColor }}
       role="progressbar"
       aria-valuenow={value}
       aria-valuemin={0}
       aria-valuemax={max}
+      aria-valuetext={ariaValueText}
       aria-label={ariaLabel}
       dir={direction}
+      {...({ value } as Record<string, unknown>)}
     >
       <div
         className="progress-fill-transform h-full rounded-full"

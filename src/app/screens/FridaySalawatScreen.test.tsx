@@ -160,6 +160,11 @@ describe("FridaySalawatScreen", () => {
     await user.click(screen.getByTestId("salawat-new-round-btn"));
     expect(readFridaySalawatProgress()).toEqual({ count: 0, target: 10 });
     expect(screen.queryByRole("dialog", { name: "Goal Reached!" })).not.toBeInTheDocument();
+    await user.click(screen.getByTestId("counter-target-filter"));
+    await user.click(screen.getByRole("menuitemradio", { name: "33" }));
+    expect(screen.getByText("Round 2 • Friday Total: 10")).toBeInTheDocument();
+    await user.click(screen.getByTestId("counter-target-filter"));
+    await user.click(screen.getByRole("menuitemradio", { name: "10" }));
 
     // Reach 10 again for round 2
     for (let count = 0; count < 10; count += 1) fireEvent.click(counter);
@@ -169,5 +174,55 @@ describe("FridaySalawatScreen", () => {
     // Click Return
     await user.click(screen.getByTestId("salawat-return-btn"));
     expect(onBack).toHaveBeenCalledTimes(1);
+  });
+
+  it("supports switching to As-Salat Al-Ibrahimiyyah formula", async () => {
+    const user = userEvent.setup();
+    render(<FridaySalawatScreen language="ar" direction="rtl" onBack={vi.fn()} />);
+
+    const formulaPicker = screen.getByTestId("salawat-formula-filter");
+    expect(formulaPicker).toBeInTheDocument();
+    await user.click(formulaPicker);
+
+    const ibrahimiyyahOption = screen.getByTestId("salawat-formula-option-salawat_ibrahimiyyah");
+    await user.click(ibrahimiyyahOption);
+
+    expect(
+      screen.getByText(/اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ، كَمَا صَلَّيْتَ عَلَى إِبْرَاهِيمَ/),
+    ).toBeInTheDocument();
+  });
+
+  it("opens share modal when share button is tapped", async () => {
+    await import("../components/CollectionShareModal");
+    const user = userEvent.setup();
+    render(<FridaySalawatScreen language="ar" direction="rtl" onBack={vi.fn()} />);
+
+    const shareButton = screen.getByTestId("counter-share-button");
+    expect(shareButton).toBeInTheDocument();
+    await user.click(shareButton);
+
+    expect(await screen.findByRole("dialog")).toBeInTheDocument();
+  });
+
+  it("exposes the Aa typography menu to adjust text size", async () => {
+    const user = userEvent.setup();
+    const onTextSizeChange = vi.fn();
+    render(
+      <FridaySalawatScreen
+        language="ar"
+        direction="rtl"
+        onBack={vi.fn()}
+        textSize="medium"
+        onTextSizeChange={onTextSizeChange}
+      />,
+    );
+
+    const typographyButton = screen.getByTestId("salawat-settings-button");
+    expect(typographyButton).toBeInTheDocument();
+    await user.click(typographyButton);
+
+    const largeOption = screen.getByTestId("salawat-display-text-size-large");
+    await user.click(largeOption);
+    expect(onTextSizeChange).toHaveBeenCalledWith("large");
   });
 });

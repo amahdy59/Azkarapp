@@ -185,6 +185,11 @@ export function DownloadsPanel({
     let failure = "";
     try {
       if (!(await hasDownloadSpace(bytes))) throw new DOMException("Storage full", "QuotaExceededError");
+      if (persistence !== "granted") {
+        void requestDownloadPersistence().then((result) => {
+          if (mountedRef.current && result === "granted") setPersistence(result);
+        });
+      }
       controller.signal.throwIfAborted();
       await work(controller);
       message = t(
@@ -478,6 +483,8 @@ export function DownloadsPanel({
                 total={job.total}
                 label={t(language, "downloads.archiveAll")}
                 language={language}
+                direction={direction}
+                active={true}
               />
             </>
           )}
@@ -502,6 +509,7 @@ export function DownloadsPanel({
                     collections.flatMap((resource) => resource.zikrs),
                     audioPreferences,
                     {
+                      language,
                       signal: controller.signal,
                       onDetail: updateAudioDetail("archive"),
                       onArchiveProgress: (completed, total) => {

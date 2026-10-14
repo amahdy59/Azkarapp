@@ -238,6 +238,7 @@ export default defineConfig(({ mode }) => {
           globPatterns: [
             "**/*.{js,css,html,svg,png,webp,avif,woff2}",
             "**/release-history-*.bin",
+            "assets/cards/routine-{morning,evening}-*.webp",
             "data/mushaf/{42,49,75,76,603,604}.json",
           ],
           // Only real exclusions belong here. The rest of this list used to name

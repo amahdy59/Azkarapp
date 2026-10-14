@@ -532,4 +532,62 @@ describe("CollectionShareModal", () => {
       else Reflect.deleteProperty(navigator, "clipboard");
     }
   });
+
+  it("renders curated routine cards and allows switching between curated and generated modes", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ ok: true, blob: async () => new Blob(["image"], { type: "image/jpeg" }) }),
+    );
+    const { shareMultipleFiles } = await import("../share/shareDispatcher");
+    vi.mocked(shareMultipleFiles).mockClear();
+
+    render(
+      <CollectionShareModal
+        open
+        onClose={vi.fn()}
+        collectionTitle="أذكار الصباح"
+        categoryId="morning"
+        items={SAMPLE_ITEMS}
+        language="ar"
+      />,
+    );
+
+    fireEvent.click(await screen.findByRole("button", { name: "البطاقات المعتمدة" }));
+    expect(await screen.findByAltText(/أذكار الصباح - البطاقة الأولى/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "البطاقات المعتمدة" })).toHaveAttribute("aria-pressed", "true");
+
+    const nextBtn = screen.getByRole("button", { name: "البطاقة التالية" });
+    fireEvent.click(nextBtn);
+    expect(await screen.findByAltText(/أذكار الصباح - البطاقة الثانية/)).toBeInTheDocument();
+
+    const shareBtn = screen.getByRole("button", { name: "مشاركة", exact: true });
+    fireEvent.click(shareBtn);
+    await waitFor(() => expect(shareMultipleFiles).toHaveBeenCalled());
+
+    const customStudioBtn = screen.getByRole("button", { name: "التصميم التفاعلي" });
+    fireEvent.click(customStudioBtn);
+    expect(customStudioBtn).toHaveAttribute("aria-pressed", "true");
+    expect(await screen.findByAltText("أذكار الصباح - صفحة 1 من 5")).toBeInTheDocument();
+    vi.unstubAllGlobals();
+  });
+
+  it("recovers to generated cards when curated artwork is missing", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false, status: 404 }));
+    try {
+      render(
+        <CollectionShareModal
+          open
+          onClose={vi.fn()}
+          collectionTitle="أذكار الصباح"
+          categoryId="morning"
+          items={SAMPLE_ITEMS}
+          language="ar"
+        />,
+      );
+      expect(await screen.findByAltText("أذكار الصباح - صفحة 1 من 5")).toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "البطاقات المعتمدة" })).not.toBeInTheDocument();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
 });
