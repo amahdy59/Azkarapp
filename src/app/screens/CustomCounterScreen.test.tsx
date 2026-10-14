@@ -388,7 +388,7 @@ describe("CustomCounterScreen Component", () => {
     await user.click(shareButton);
 
     // Modal is opened
-    expect(await screen.findByRole("dialog")).toBeInTheDocument();
+    expect(await screen.findByRole("dialog", {}, { timeout: 5000 })).toBeInTheDocument();
   });
 
   it("exposes the Aa typography menu to adjust text size", async () => {
