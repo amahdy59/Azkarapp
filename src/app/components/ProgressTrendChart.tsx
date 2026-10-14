@@ -46,8 +46,11 @@ export function ProgressTrendChart({
     setSelectedKey("");
   }, [periodIdentity]);
   const left = Math.max(52, labelSize * 4);
-  const width = Math.max(availableWidth, left + 140);
-  const right = width - Math.max(28, labelSize * 3);
+  const rightPadding = Math.max(28, labelSize * 3);
+  // Enlarged labels need a minimum plot span as well as room for the axes.
+  // Native region scrolling preserves readable labels instead of shrinking text.
+  const width = Math.max(availableWidth, left + rightPadding + Math.max(100, labelSize * 8));
+  const right = width - rightPadding;
   const hasActivity = points.some((point) => point.completed > 0);
   const chartHeight = hasActivity ? 220 : 160;
   const top = Math.max(24, labelSize * 2);
@@ -193,6 +196,7 @@ export function ProgressTrendChart({
                       index === points.length - 1 ||
                       (index % labelStride === 0 && index < points.length - labelStride)) && (
                       <text
+                        data-testid="trend-period-label"
                         x={x(index)}
                         y={bottom + labelSize + 10}
                         textAnchor="middle"

@@ -4580,3 +4580,7 @@ The owner approves the thorough review and plan: eliminate cards within cards wi
   - Devotional Sharing: Enabled single-card `CollectionShareModal` export directly from the 4-action support dock across both screens.
 - **Scope & Constraints:** Local only. Strictly no git push or remote deployment.
 - **Reference:** See `docs/agent/phases/MASBAHA_AND_SALAWAT_READER_ALIGNMENT_2026_10_13.md`.
+
+## Stationary Progress controls — 2026-10-14
+
+The owner explicitly requests keeping the Progress header and relevant filters visible while scrolling, based on the attached Day screenshot. Group the shared title, period tabs and date navigation in one opaque sticky owner with viewport-aware bounds and independently reachable short-screen controls. Preserve all recording/data contracts, DOM order and reviewed quotation text; supporting reflection may scroll outside the task chrome. Measured scroll padding and focus recovery must exclude portaled menus. Also complete the reproduced enlarged endpoint-label spacing repair without shrinking text or weakening geometry assertions. Follow normal intact release authority. See phases/PROGRESS_STATIONARY_CONTROLS_2026_10_14.md.

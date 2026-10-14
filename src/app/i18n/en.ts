@@ -1752,6 +1752,8 @@ const en = {
     prayerRecordingRate: "Prayer records",
     recordingCoverageHint:
       "Recorded share across {days} elapsed days in this period, through today. Future days are excluded. Unrecorded does not mean missed.",
+    monthCoverageHint:
+      "This month so far: {days} of {total} calendar days, including today. Recording rates use these elapsed days only; future days are excluded. Unrecorded does not mean missed.",
     routineCoverageHint:
       "Recorded completion of Morning, Evening and Sleep Azkar across elapsed days, through today. Quran progress is shown separately. Unrecorded does not mean missed.",
     calendarScrollHint: "Scroll across the calendar when needed. Select a date to review its records.",

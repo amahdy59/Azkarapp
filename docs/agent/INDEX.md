@@ -321,3 +321,5 @@ Apple/Microsoft-informed control spacing and alignment improvements.
 The latest owner-approved continuation is [Canonical Surah magnification and recovery](phases/CANONICAL_SURAH_ZOOM_AND_RECOVERY_2026_10_12.md): actual font enlargement, invariant Al-Kahf/As-Sajdah/Al-Mulk page lines, bounded loading/deployment recovery and measured session checks, with existing complete release authority.
 
 [Historical Progress visualization](phases/PROGRESS_VISUAL_HISTORY_2026_10_14.md) is the active owner-approved Progress phase: compact prayer comparisons, valid location stacks, monthly columns, explained annual trends, historical-only chart options and accessible exact records. The owner resumed work after the concurrent session completed.
+
+[Stationary Progress controls](phases/PROGRESS_STATIONARY_CONTROLS_2026_10_14.md) is the active owner-requested screenshot follow-up: stationary title/period filters, actual-viewport bounds, safe focus recovery and separated enlarged chart labels. Historical visualization was deployed at a64b84c5; this follow-up has its own fresh release notes.

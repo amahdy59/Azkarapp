@@ -1,4 +1,5 @@
 import { PEER_TAB_SELECTED } from "../components/ui/controlStyles";
+import "./progress-screen.css";
 import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { Header, IconButton } from "../components/LayoutShells";
 import { TodayRoutineGarden } from "../components/RoutineGarden";
@@ -124,6 +125,26 @@ export function ProgressScreen({
 
   const [activeTab, setActiveTab] = useState<"day" | "week" | "month" | "year">(initialPeriod);
   const [offset, setOffset] = useState(0);
+  const controlsRef = useRef<HTMLDivElement>(null);
+  const pointerFocus = useRef(false);
+  useEffect(() => {
+    const controls = controlsRef.current;
+    const scrollport = controls?.closest<HTMLElement>(".app-screen-surface");
+    if (!controls || !scrollport) return;
+    const measure = () => {
+      scrollport.style.setProperty("--progress-controls-max-height", `${scrollport.clientHeight * 0.6}px`);
+      scrollport.style.setProperty("--progress-controls-height", `${controls.getBoundingClientRect().height}px`);
+    };
+    measure();
+    const observer = typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(measure);
+    observer?.observe(controls);
+    observer?.observe(scrollport);
+    return () => {
+      observer?.disconnect();
+      scrollport.style.removeProperty("--progress-controls-height");
+      scrollport.style.removeProperty("--progress-controls-max-height");
+    };
+  }, []);
   const activePeriodRef = useRef(initialPeriod);
   useEffect(() => {
     if (initialPeriod === activePeriodRef.current) return;
@@ -327,69 +348,98 @@ export function ProgressScreen({
     <ScreenContainer
       dir={direction}
       tabIndex={0}
-      className="relative overflow-y-auto outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
+      className="progress-screen relative overflow-y-auto outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
+      onPointerDownCapture={(event) => {
+        pointerFocus.current = event.currentTarget.contains(event.target as Node);
+      }}
+      onPointerUpCapture={() => {
+        pointerFocus.current = false;
+      }}
+      onPointerCancelCapture={() => {
+        pointerFocus.current = false;
+      }}
+      onKeyDownCapture={() => {
+        pointerFocus.current = false;
+      }}
+      onFocusCapture={(event) => {
+        const controls = controlsRef.current;
+        const target = event.target;
+        if (
+          !controls ||
+          pointerFocus.current ||
+          !(target instanceof HTMLElement) ||
+          !event.currentTarget.contains(target) ||
+          controls.contains(target) ||
+          target === event.currentTarget
+        )
+          return;
+        const covered = controls.getBoundingClientRect().bottom - target.getBoundingClientRect().top;
+        if (covered > 0) event.currentTarget.scrollTop = Math.max(0, event.currentTarget.scrollTop - covered - 16);
+      }}
       screenName={t(language, "common.progress")}
     >
-      <div className="progress-screen-content relative z-10 mx-auto flex min-h-screen w-full max-w-7xl flex-col items-center px-page pb-8">
-        <Header
-          title={t(language, "common.progress")}
-          language={language}
-          style={{ paddingInline: 0, marginBottom: "0.75rem" }}
-          right={
-            onOpenShareModal ? (
-              <IconButton onClick={onOpenShareModal} label={t(language, "progress.shareProgressCard")}>
-                <Share2 size={20} className="text-foreground" />
-              </IconButton>
-            ) : undefined
-          }
-        />
+      <div className="progress-screen-content relative z-10 mx-auto flex min-h-screen w-full shrink-0 max-w-7xl flex-col items-center px-page pb-8">
+        <div ref={controlsRef} className="progress-screen-controls w-full" data-testid="progress-sticky-controls">
+          <Header
+            title={t(language, "common.progress")}
+            language={language}
+            style={{ paddingInline: 0, marginBottom: "0.75rem" }}
+            right={
+              onOpenShareModal ? (
+                <IconButton onClick={onOpenShareModal} label={t(language, "progress.shareProgressCard")}>
+                  <Share2 size={20} className="text-foreground" />
+                </IconButton>
+              ) : undefined
+            }
+          />
 
-        {/* A supporting note, not a second hero competing with the period data. */}
+          <div className="w-full">
+            <TabList
+              value={activeTab}
+              onChange={handleTabChange}
+              direction={isArabic ? "rtl" : "ltr"}
+              idPrefix="global-progress"
+              aria-label={t(language, "garden.viewMode")}
+              indicatorClassName="bg-primary/10"
+              className="flex rounded-xl bg-muted p-1"
+              itemClassName={(selected) =>
+                `flex min-h-11 flex-1 items-center justify-center rounded-lg px-1 py-2 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                  selected ? PEER_TAB_SELECTED : "text-muted-foreground hover:text-foreground"
+                }`
+              }
+              tabs={(["day", "week", "month", "year"] as const).map((tab) => ({
+                value: tab,
+                label: t(
+                  language,
+                  (
+                    {
+                      day: "garden.tabDay",
+                      week: "garden.tabWeek",
+                      month: "garden.tabMonth",
+                      year: "garden.tabYear",
+                    } as const
+                  )[tab],
+                ),
+              }))}
+            />
+
+            <ProgressPeriodNavigation
+              heading={periodHeading}
+              language={language}
+              onPrevious={() => setOffset((previous) => previous - 1)}
+              onNext={() => setOffset((previous) => previous + 1)}
+              nextDisabled={offset >= 0}
+            />
+          </div>
+        </div>
+
+        {/* Supporting reflection scrolls with records; the task controls stay visible. */}
         <div className="mb-3 hidden w-full items-start justify-center gap-2 px-2 text-center sm:flex">
           <Sparkles className="mt-0.5 size-3.5 shrink-0 text-primary" aria-hidden="true" />
           <p className="text-xs font-semibold leading-relaxed text-muted-foreground" dir="auto">
             <span>{t(language, "progress.constancyHadith")}</span>
             <span className="ms-1.5 text-micro">— {t(language, "progress.constancyHadithSource")}</span>
           </p>
-        </div>
-
-        <div className="mb-6 w-full">
-          <TabList
-            value={activeTab}
-            onChange={handleTabChange}
-            direction={isArabic ? "rtl" : "ltr"}
-            idPrefix="global-progress"
-            aria-label={t(language, "garden.viewMode")}
-            indicatorClassName="bg-primary/10"
-            className="flex rounded-xl bg-muted p-1"
-            itemClassName={(selected) =>
-              `flex min-h-11 flex-1 items-center justify-center rounded-lg px-1 py-2 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 ${
-                selected ? PEER_TAB_SELECTED : "text-muted-foreground hover:text-foreground"
-              }`
-            }
-            tabs={(["day", "week", "month", "year"] as const).map((tab) => ({
-              value: tab,
-              label: t(
-                language,
-                (
-                  {
-                    day: "garden.tabDay",
-                    week: "garden.tabWeek",
-                    month: "garden.tabMonth",
-                    year: "garden.tabYear",
-                  } as const
-                )[tab],
-              ),
-            }))}
-          />
-
-          <ProgressPeriodNavigation
-            heading={periodHeading}
-            language={language}
-            onPrevious={() => setOffset((previous) => previous - 1)}
-            onNext={() => setOffset((previous) => previous + 1)}
-            nextDisabled={offset >= 0}
-          />
         </div>
 
         <div

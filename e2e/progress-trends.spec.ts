@@ -191,6 +191,7 @@ for (const language of ["ar", "en"] as const) {
     await page.goto("/#/progress/month");
     const prayers = page.getByTestId("prayer-comparison");
     await expect(prayers.getByRole("img")).toHaveCount(5);
+    await expect(page.getByTestId("prayer-coverage-hint")).toContainText(ar ? "١٢ من ٣١" : "12 of 31 calendar days");
     await prayers.getByRole("combobox").click();
     await page.getByRole("option", { name: ar ? "أماكن الصلاة" : "Prayer locations", exact: true }).click();
     const fajr = page.getByTestId("prayer-comparison-fajr");
@@ -237,6 +238,16 @@ for (const language of ["ar", "en"] as const) {
       await page.evaluate((width) => {
         document.documentElement.style.fontSize = width === 320 ? "200%" : "";
       }, width);
+      const axis = page.getByTestId("month-weekly-chart").getByTestId("trend-period-label");
+      await expect(axis).toHaveCount(2);
+      await expect
+        .poll(() =>
+          axis.evaluateAll((nodes) => {
+            const rectangles = nodes.map((node) => node.getBoundingClientRect()).sort((a, b) => a.left - b.left);
+            return rectangles.every((rect, index) => index === 0 || rect.left >= rectangles[index - 1]!.right);
+          }),
+        )
+        .toBe(true);
       expect(
         await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
       ).toBe(true);
@@ -244,6 +255,56 @@ for (const language of ["ar", "en"] as const) {
       expect(axe.violations).toEqual([]);
       await prayers.scrollIntoViewIfNeeded();
       await page.screenshot({ path: testInfo.outputPath(`${language}-prayer-stacks-${width}.png`), fullPage: true });
+    });
+  }
+}
+
+for (const language of ["ar", "en"] as const) {
+  for (const width of [320, 390, 900, 1440]) {
+    test(`@cross-browser ${language} Progress title and period controls remain stationary at ${width}px`, async ({
+      page,
+    }, testInfo) => {
+      const ar = language === "ar";
+      await seedProgress(page, language);
+      await page.setViewportSize({ width, height: width === 320 ? 480 : 900 });
+      await page.goto("/#/progress/year");
+      if (width === 320)
+        await page.evaluate(() => {
+          document.documentElement.style.fontSize = "200%";
+        });
+      const controls = page.getByTestId("progress-sticky-controls");
+      const scrollport = page.locator(".progress-screen");
+      await expect(controls).toBeVisible();
+      const before = await controls.boundingBox();
+      await scrollport.evaluate((node) => {
+        node.scrollTop = 600;
+      });
+      await expect.poll(() => controls.evaluate((node) => node.getBoundingClientRect().top)).toBeCloseTo(before!.y, 0);
+      expect(await scrollport.evaluate((node) => node.scrollTop)).toBeGreaterThan(0);
+      await expect(page.getByRole("heading", { name: ar ? "التقدم" : "Progress", exact: true })).toBeInViewport();
+      const visibleHeight = await scrollport.evaluate((node) => node.clientHeight);
+      expect((await controls.boundingBox())!.height).toBeLessThanOrEqual(visibleHeight * 0.7);
+      await page.getByRole("tab", { name: ar ? "شهر" : "Month", exact: true }).click();
+      await expect(page.getByTestId("month-weekly-chart")).toBeVisible();
+      await controls.getByRole("button", { name: ar ? "الفترة السابقة" : "Previous period", exact: true }).click();
+      await expect(page.getByTestId("garden-view-date")).toContainText(ar ? "سبتمبر" : "September");
+      const metric = page.getByTestId("prayer-comparison").getByRole("combobox");
+      await metric.scrollIntoViewIfNeeded();
+      await metric.focus();
+      await expect(metric).toBeFocused();
+      await expect
+        .poll(async () => {
+          const target = await metric.boundingBox();
+          const chrome = await controls.boundingBox();
+          return target!.y >= chrome!.y + chrome!.height;
+        })
+        .toBe(true);
+      expect(
+        await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
+      ).toBe(true);
+      await controls.screenshot({ path: testInfo.outputPath(`${language}-stationary-controls-${width}.png`) });
+      const axe = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
+      expect(axe.violations).toEqual([]);
     });
   }
 }

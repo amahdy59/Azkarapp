@@ -1,7 +1,7 @@
 import { useId, useMemo, useState } from "react";
 import type { AppLanguage, PrayerTrackingRecord } from "../types";
 import { getElapsedPeriod } from "../elapsedPeriod";
-import { getPeriodRange, type CalendarType } from "../calendarPeriods";
+import { getCalendarMonthPeriod, getPeriodRange, type CalendarType } from "../calendarPeriods";
 import { getPrayerPeriodStats } from "../prayerPeriodStats";
 import { formatNumerals, formatRatio, formatPercentage } from "../formatting";
 import { t } from "../i18n";
@@ -38,6 +38,8 @@ export function PrayerTrackerStats({
   const period = getPeriodRange(activeTab, displayDate, language, calendarType);
   const elapsed = getElapsedPeriod(period.startKey, period.endKey, now);
   const { startKey, endKey, days } = elapsed;
+  const monthDays =
+    activeTab === "month" ? getCalendarMonthPeriod(displayDate, calendarType, language).dates.length : 0;
   const stats = useMemo(() => getPrayerPeriodStats(records, startKey, endKey, days), [records, startKey, endKey, days]);
   const pct = (count: number, possible: number) =>
     possible ? formatPercentage(Math.round((count / possible) * 100), language) : "—";
@@ -63,7 +65,10 @@ export function PrayerTrackerStats({
         </p>
       </div>
       <p className="text-xs leading-relaxed text-muted-foreground" data-testid="prayer-coverage-hint">
-        {t(language, "progress.recordingCoverageHint", { days: formatNumerals(days, language) })}
+        {t(language, days > 0 && days < monthDays ? "progress.monthCoverageHint" : "progress.recordingCoverageHint", {
+          days: formatNumerals(days, language),
+          total: formatNumerals(monthDays, language),
+        })}
       </p>
       <div className="border-t border-border pt-4">
         <label htmlFor={`${id}-metric`} className="mb-2 block text-sm font-bold">

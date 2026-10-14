@@ -1,0 +1,24 @@
+/* One sticky owner keeps the title, tabs and selected date together. Measured
+   scroll padding protects keyboard focus beneath the dynamically sized controls. */
+.app-screen-surface.progress-screen {
+  padding-block-start: 0;
+  scroll-padding-block-start: calc(var(--progress-controls-height, 12rem) + 1rem);
+}
+
+.progress-screen-controls {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 40;
+  flex-shrink: 0;
+  margin-block-end: 1.5rem;
+  padding-block-start: env(safe-area-inset-top);
+  background: var(--background);
+  max-block-size: var(--progress-controls-max-height, 60dvh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.progress-screen-controls .shared-screen-header {
+  position: sticky;
+  inset-block-start: 0;
+}

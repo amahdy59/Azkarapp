@@ -1,5 +1,20 @@
 [
   {
+    "release": "2026-10-14-4",
+    "ar": [
+      "يبقى عنوان التقدم وخيارات اليوم والأسبوع والشهر والسنة ظاهرين أثناء قراءة السجلات.",
+      "يمكنك الانتقال بين الفترات السابقة من أعلى الشاشة دون الرجوع إلى بداية الصفحة.",
+      "تبقى تسميات فترات الرسم واضحة ومنفصلة عند تكبير النص، مع تمرير داخلي عند الحاجة.",
+      "يوضح عرض الشهر عدد الأيام المنقضية مقارنة بطول الشهر الفعلي، وتظل النسب مستبعدة للأيام القادمة."
+    ],
+    "en": [
+      "The Progress title and Day, Week, Month and Year choices stay visible while you read your records.",
+      "Move between historical periods from the top of the screen without scrolling back to the beginning.",
+      "Chart period labels stay readable and separated with enlarged text, using internal scrolling when needed.",
+      "Month view explains elapsed days against the actual month length, while rates continue to exclude future days."
+    ]
+  },
+  {
     "release": "2026-10-14-3",
     "ar": [
       "قارن سجلات الصلوات في خمسة صفوف واضحة، واختر عرض أماكن الصلاة أو السنن الرواتب أو أذكار الصلاة كلًا على حدة.",

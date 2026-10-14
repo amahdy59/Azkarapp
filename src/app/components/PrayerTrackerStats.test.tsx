@@ -2,8 +2,31 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { PrayerTrackerStats } from "./PrayerTrackerStats";
+import { getCalendarMonthPeriod } from "../calendarPeriods";
 
 describe("compact prayer history", () => {
+  it.each(["gregorian", "hijri"] as const)(
+    "distinguishes elapsed days from the actual %s month length",
+    (calendarType) => {
+      const month = getCalendarMonthPeriod(new Date(2026, 5, 15, 12), calendarType, "en");
+      const props = {
+        records: [],
+        activeTab: "month" as const,
+        displayDate: month.referenceDate,
+        language: "en" as const,
+        calendarType,
+      };
+      const { rerender } = render(<PrayerTrackerStats {...props} now={month.dates[2]} />);
+      expect(screen.getByTestId("prayer-coverage-hint")).toHaveTextContent(`3 of ${month.dates.length} calendar days`);
+      expect(screen.getByText("0 of 15 recorded", { selector: "bdi.text-xl" })).toBeVisible();
+      for (const bar of screen.getAllByRole("img")) expect(bar).toHaveAccessibleName(/0 \/ 3/);
+      const afterMonth = new Date(month.endDate);
+      afterMonth.setDate(afterMonth.getDate() + 1);
+      rerender(<PrayerTrackerStats {...props} now={afterMonth} />);
+      expect(screen.getByTestId("prayer-coverage-hint")).toHaveTextContent(`${month.dates.length} elapsed days`);
+      expect(screen.getByText(`0 of ${month.dates.length * 5} recorded`, { selector: "bdi.text-xl" })).toBeVisible();
+    },
+  );
   it("compares five prayers and keeps location stacks independent from connected practices", async () => {
     const user = userEvent.setup();
     render(
