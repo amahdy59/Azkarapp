@@ -11,6 +11,7 @@
   "scripts": {
     "audit:prod": "pnpm audit --prod",
     "build:pages": "vite build --mode github-pages && node scripts/check-bundle-budget.mjs && node scripts/check-css-utilities.mjs",
+    "build:android": "vite build && cap sync android",
     "build": "vite build",
     "check": "node scripts/run-checks.mjs",
     "check:serial": "node scripts/run-checks.mjs --serial",
@@ -48,6 +49,9 @@
     "audit:english-audio": "node scripts/audit-english-audio.mjs"
   },
   "dependencies": {
+    "@capacitor/app": "8.1.0",
+    "@capacitor/core": "^8.5.2",
+    "@capacitor/local-notifications": "^8.3.1",
     "@fontsource-variable/noto-sans-arabic": "5.3.0",
     "@fontsource/amiri-quran": "^5.3.0",
     "@fontsource/ibm-plex-sans-arabic": "5.3.0",
@@ -77,6 +81,8 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.12.1",
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/cli": "^8.5.2",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.61.1",
     "@tailwindcss/vite": "4.1.12",

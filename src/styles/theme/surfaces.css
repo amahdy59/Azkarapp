@@ -55,8 +55,8 @@
   width: min(100vw, 390px);
   height: min(100dvh, 882px);
   border-radius: var(--ds-radius-device);
-  /* The bottom navigation and full-screen readers own their own safe-area
-     inset. Applying it to the shell as well leaves a second empty band on iOS. */
+  /* Reserve the system status-bar area once for the app shell. Individual
+     screens must not add a second top inset on top of this. */
   padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);
 }
 

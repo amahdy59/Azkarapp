@@ -19,7 +19,7 @@ The Home prayer header displays the next prayer and a live countdown. Settings â
 
 The five trackable prayers are Fajr, Dhuhr, Asr, Maghrib, and Isha. The same calculation also exposes Sunrise (Shrouk) as supporting Fajr-window context; it is never treated as a sixth prayer or given tracking controls.
 
-Prayer reminders are opt-in and use the same locally calculated times and adjustments shown on Home. While the PWA is open or backgrounded, one timer sleeps until the next due reminder and the app reconciles on focus/visibility; it does not poll continuously. The active service worker displays the notification where supported. Browser suspension means reliable delivery after the PWA is completely closed still requires a connected server Push API service, so Settings states this limitation rather than promising closed-app alarms.
+Prayer reminders are opt-in and use the same locally calculated times and adjustments shown on Home. The Android app pre-schedules a rolling 14-day window with native OS alarms, so delivery does not depend on JavaScript running and alarms are restored by the OS after reboot. Android notification permission is required; exact timing also depends on Android's exact-alarm access and device power-management policy. The app refreshes the window when it opens and when reminder settings, completion state, language, or location changes. The PWA keeps its browser timer/service-worker behavior; browser suspension means dependable delivery after the PWA is completely closed still requires a connected server Push API service.
 
 Home also uses the same calculated boundaries for its featured collection: Morning from Fajr to Asr, Evening from Asr to Isha, and Before Sleep from Isha to the following Fajr. The preferred Evening reading window is communicated as after Asr until Maghrib.
 
@@ -158,6 +158,7 @@ For a manual location verification:
 6. Compare the five times with a trusted local authority using the same calculation method.
 7. Disable the network, reload, and confirm the countdown is unchanged â€” it never depended on the network.
 8. Test a date on each side of a known DST transition through unit tests rather than changing the device clock.
-9. Enable prayer reminders, select 10 or 15 minutes, reload Settings, and confirm the choice persists.
+9. In the Android app, enable prayer reminders, select 10 or 15 minutes, reload Settings, and confirm the choice persists.
+10. On a physical Android device, schedule a near-term reminder, swipe Azkar away, and confirm it arrives; repeat after reboot. Do not use Force stop for this check because Android suppresses alarms for force-stopped apps until they are opened again.
 
 When local authorities differ by a few minutes, confirm the selected calculation method first, then use manual adjustments only when required.

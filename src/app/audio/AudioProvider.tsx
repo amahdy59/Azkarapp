@@ -17,6 +17,7 @@ import { resolveAudioAssetById } from "./resolveAudioAsset";
 import type { AudioPreferences, PlaybackEntry, PlaybackPlan, ResolvedAudioSegment } from "./audioTypes";
 import { getNextPlaybackPosition } from "./playbackProgression";
 import { getAudioVoiceName } from "./audioVoices";
+import { canUseNativeCachedAudio, getNativeCachedAudioUrl } from "./audioOfflineCache";
 
 type PlaybackMode = "play-once" | "repeat-prescribed-count";
 
@@ -104,6 +105,7 @@ export function AudioProvider({
   const stateRef = useRef(state);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const getPlaybackTime = useCallback(() => audioRef.current?.currentTime ?? 0, []);
+  const offlinePlaybackUrlRef = useRef<string | null>(null);
   const generationRef = useRef(0);
   const removeListenersRef = useRef<() => void>(() => undefined);
 
@@ -123,6 +125,12 @@ export function AudioProvider({
       audioRef.current.muted = preferencesRef.current.muted;
     }
     return audioRef.current;
+  }, []);
+
+  const releaseOfflinePlaybackUrl = useCallback(() => {
+    const url = offlinePlaybackUrlRef.current;
+    offlinePlaybackUrlRef.current = null;
+    if (url) URL.revokeObjectURL(url);
   }, []);
 
   useEffect(() => {
@@ -264,83 +272,101 @@ export function AudioProvider({
       audio.pause();
       audio.currentTime = 0;
       audio.playbackRate = preferencesRef.current.playbackRate;
+      releaseOfflinePlaybackUrl();
       dispatch({ type: "load", plan, entryIndex, segmentIndex, repetitionIndex, generation, voiceId });
 
-      const metadataTimer = window.setTimeout(() => {
-        dispatch({
-          type: "error",
-          generation,
-          error: {
-            code: "metadata-timeout",
-            message: "Audio metadata took too long to load.",
-            assetId: entry.audioAssetId,
-            variantId: segment.variantId,
-          },
-        });
-      }, 15_000);
-      const isCurrent = () =>
-        generationRef.current === generation && audio.src === new URL(segment.url, window.location.href).href;
-      const on = (event: keyof HTMLMediaElementEventMap, listener: () => void) =>
-        audio.addEventListener(event, listener as EventListener);
-      const off = (event: keyof HTMLMediaElementEventMap, listener: () => void) =>
-        audio.removeEventListener(event, listener as EventListener);
-      const handlers = {
-        loadstart: () => isCurrent() && dispatch({ type: "status", status: "loading", generation }),
-        loadedmetadata: () => {
-          if (!isCurrent()) return;
-          window.clearTimeout(metadataTimer);
-          dispatch({ type: "duration", duration: Number.isFinite(audio.duration) ? audio.duration : 0, generation });
-        },
-        canplay: () => {
-          if (!isCurrent()) return;
-          window.clearTimeout(metadataTimer);
-          if (stateRef.current.status !== "playing") dispatch({ type: "status", status: "ready", generation });
-        },
-        playing: () => isCurrent() && dispatch({ type: "status", status: "playing", generation }),
-        pause: () => {
-          if (isCurrent() && !audio.ended && stateRef.current.status !== "error") {
-            dispatch({ type: "status", status: "paused", generation });
-          }
-        },
-        waiting: () => isCurrent() && dispatch({ type: "status", status: "buffering", generation }),
-        stalled: () => isCurrent() && dispatch({ type: "status", status: "buffering", generation }),
-        timeupdate: () => isCurrent() && dispatch({ type: "time", currentTime: audio.currentTime, generation }),
-        ended: () => isCurrent() && advanceAfterEnded(plan, entryIndex, segmentIndex, repetitionIndex, voiceId),
-        error: () => {
-          if (!isCurrent()) return;
-          window.clearTimeout(metadataTimer);
+      const beginPlayback = (playbackUrl: string) => {
+        const metadataTimer = window.setTimeout(() => {
           dispatch({
             type: "error",
             generation,
-            error: { ...mapMediaError(audio), assetId: entry.audioAssetId, variantId: segment.variantId },
+            error: {
+              code: "metadata-timeout",
+              message: "Audio metadata took too long to load.",
+              assetId: entry.audioAssetId,
+              variantId: segment.variantId,
+            },
           });
-        },
-        durationchange: () =>
-          isCurrent() &&
-          dispatch({ type: "duration", duration: Number.isFinite(audio.duration) ? audio.duration : 0, generation }),
-      };
-      for (const [event, handler] of Object.entries(handlers)) on(event as keyof HTMLMediaElementEventMap, handler);
-      removeListenersRef.current = () => {
-        window.clearTimeout(metadataTimer);
-        for (const [event, handler] of Object.entries(handlers)) off(event as keyof HTMLMediaElementEventMap, handler);
+        }, 15_000);
+        const isCurrent = () =>
+          generationRef.current === generation && audio.src === new URL(playbackUrl, window.location.href).href;
+        const on = (event: keyof HTMLMediaElementEventMap, listener: () => void) =>
+          audio.addEventListener(event, listener as EventListener);
+        const off = (event: keyof HTMLMediaElementEventMap, listener: () => void) =>
+          audio.removeEventListener(event, listener as EventListener);
+        const handlers = {
+          loadstart: () => isCurrent() && dispatch({ type: "status", status: "loading", generation }),
+          loadedmetadata: () => {
+            if (!isCurrent()) return;
+            window.clearTimeout(metadataTimer);
+            dispatch({ type: "duration", duration: Number.isFinite(audio.duration) ? audio.duration : 0, generation });
+          },
+          canplay: () => {
+            if (!isCurrent()) return;
+            window.clearTimeout(metadataTimer);
+            if (stateRef.current.status !== "playing") dispatch({ type: "status", status: "ready", generation });
+          },
+          playing: () => isCurrent() && dispatch({ type: "status", status: "playing", generation }),
+          pause: () => {
+            if (isCurrent() && !audio.ended && stateRef.current.status !== "error") {
+              dispatch({ type: "status", status: "paused", generation });
+            }
+          },
+          waiting: () => isCurrent() && dispatch({ type: "status", status: "buffering", generation }),
+          stalled: () => isCurrent() && dispatch({ type: "status", status: "buffering", generation }),
+          timeupdate: () => isCurrent() && dispatch({ type: "time", currentTime: audio.currentTime, generation }),
+          ended: () => isCurrent() && advanceAfterEnded(plan, entryIndex, segmentIndex, repetitionIndex, voiceId),
+          error: () => {
+            if (!isCurrent()) return;
+            window.clearTimeout(metadataTimer);
+            dispatch({
+              type: "error",
+              generation,
+              error: { ...mapMediaError(audio), assetId: entry.audioAssetId, variantId: segment.variantId },
+            });
+          },
+          durationchange: () =>
+            isCurrent() &&
+            dispatch({ type: "duration", duration: Number.isFinite(audio.duration) ? audio.duration : 0, generation }),
+        };
+        for (const [event, handler] of Object.entries(handlers)) on(event as keyof HTMLMediaElementEventMap, handler);
+        removeListenersRef.current = () => {
+          window.clearTimeout(metadataTimer);
+          for (const [event, handler] of Object.entries(handlers))
+            off(event as keyof HTMLMediaElementEventMap, handler);
+        };
+
+        audio.src = playbackUrl;
+        audio.load();
+        if (autoPlay) {
+          try {
+            void audio.play().catch((error: unknown) => {
+              if (generationRef.current === generation)
+                dispatch({ type: "error", generation, error: mapPlayError(error) });
+            });
+          } catch (error) {
+            dispatch({ type: "error", generation, error: mapPlayError(error) });
+          }
+        } else if (stateRef.current.status === "loading") {
+          dispatch({ type: "status", status: "paused", generation });
+        }
       };
 
-      audio.src = segment.url;
-      audio.load();
-      if (autoPlay) {
-        try {
-          void audio.play().catch((error: unknown) => {
-            if (generationRef.current === generation)
-              dispatch({ type: "error", generation, error: mapPlayError(error) });
-          });
-        } catch (error) {
-          dispatch({ type: "error", generation, error: mapPlayError(error) });
-        }
-      } else if (stateRef.current.status === "loading") {
-        dispatch({ type: "status", status: "paused", generation });
+      if (!canUseNativeCachedAudio()) {
+        beginPlayback(segment.url);
+        return;
       }
+
+      void getNativeCachedAudioUrl(segment.url).then((cachedUrl) => {
+        if (generationRef.current !== generation) {
+          if (cachedUrl) URL.revokeObjectURL(cachedUrl);
+          return;
+        }
+        if (cachedUrl) offlinePlaybackUrlRef.current = cachedUrl;
+        beginPlayback(cachedUrl ?? segment.url);
+      });
     },
-    [advanceAfterEnded, chooseVoice, dispatch, getAudio],
+    [advanceAfterEnded, chooseVoice, dispatch, getAudio, releaseOfflinePlaybackUrl],
   );
   loadAtRef.current = loadAt;
 
@@ -411,8 +437,9 @@ export function AudioProvider({
       audio.removeAttribute("src");
       audio.currentTime = 0;
     }
+    releaseOfflinePlaybackUrl();
     dispatch({ type: "stop", playbackRate: preferencesRef.current.playbackRate });
-  }, [dispatch]);
+  }, [dispatch, releaseOfflinePlaybackUrl]);
 
   useEffect(() => stop, [stop]);
 

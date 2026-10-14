@@ -32,6 +32,8 @@ vi.mock("../share/shareDispatcher", () => ({
   canShareMultipleFiles: vi.fn().mockReturnValue(true),
   shareSingleFile: vi.fn().mockResolvedValue({ method: "shared", fileCount: 1 }),
   shareMultipleFiles: vi.fn().mockResolvedValue({ method: "shared", fileCount: 2 }),
+  shareNativeText: vi.fn().mockResolvedValue(false),
+  saveFile: vi.fn().mockResolvedValue(undefined),
   downloadFile: vi.fn(),
   downloadFilesSequentially: vi.fn().mockResolvedValue(undefined),
   canCopyImage: vi.fn().mockReturnValue(true),
@@ -489,9 +491,9 @@ describe("CollectionShareModal", () => {
     expect(await screen.findByText("Image copied to clipboard.")).toHaveClass("sr-only");
   });
   it("keeps explicit saving available when native image sharing is unsupported", async () => {
-    const { canShareMultipleFiles, downloadFile } = await import("../share/shareDispatcher");
+    const { canShareMultipleFiles, saveFile } = await import("../share/shareDispatcher");
     vi.mocked(canShareMultipleFiles).mockReturnValue(false);
-    vi.mocked(downloadFile).mockClear();
+    vi.mocked(saveFile).mockClear();
     try {
       render(
         <CollectionShareModal open onClose={vi.fn()} collectionTitle="Morning" items={SAMPLE_ITEMS} language="en" />,
@@ -502,7 +504,7 @@ describe("CollectionShareModal", () => {
         /Use Save or Copy/u,
       );
       fireEvent.click(screen.getByRole("button", { name: "Save", exact: true }));
-      expect(downloadFile).toHaveBeenCalledWith(expect.objectContaining({ name: "p1.png" }));
+      await waitFor(() => expect(saveFile).toHaveBeenCalledWith(expect.objectContaining({ name: "p1.png" })));
     } finally {
       vi.mocked(canShareMultipleFiles).mockReturnValue(true);
     }
@@ -511,8 +513,8 @@ describe("CollectionShareModal", () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
     const descriptor = Object.getOwnPropertyDescriptor(navigator, "clipboard");
     Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText } });
-    const { downloadFile } = await import("../share/shareDispatcher");
-    vi.mocked(downloadFile).mockClear();
+    const { saveFile } = await import("../share/shareDispatcher");
+    vi.mocked(saveFile).mockClear();
     try {
       render(
         <CollectionShareModal open onClose={vi.fn()} collectionTitle="Morning" items={SAMPLE_ITEMS} language="en" />,
@@ -524,8 +526,10 @@ describe("CollectionShareModal", () => {
       await waitFor(() => expect(screen.getByRole("button", { name: "Copy", exact: true })).toBeEnabled());
       fireEvent.click(screen.getByRole("button", { name: "Text", exact: true }));
       fireEvent.click(screen.getByRole("button", { name: "Save", exact: true }));
-      expect(downloadFile).toHaveBeenCalledWith(
-        expect.objectContaining({ name: "azkar.txt", type: "text/plain;charset=utf-8" }),
+      await waitFor(() =>
+        expect(saveFile).toHaveBeenCalledWith(
+          expect.objectContaining({ name: "azkar.txt", type: "text/plain;charset=utf-8" }),
+        ),
       );
     } finally {
       if (descriptor) Object.defineProperty(navigator, "clipboard", descriptor);

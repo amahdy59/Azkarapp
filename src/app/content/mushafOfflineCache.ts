@@ -1,4 +1,5 @@
 import { FONT_CACHE_NAME, getMushafPageUrl, getQcfFontUrl, MUSHAF_CACHE_NAME } from "./qcfMushaf";
+import { fetchNativeBinaryResource } from "./nativeMushafDownload";
 
 const PAGE_COUNT = 604;
 const CONCURRENCY_LIMIT = 8;
@@ -87,7 +88,7 @@ export async function downloadMushaf(
     if (!hasPage) {
       fetchTasks.push(
         (async () => {
-          const response = await fetch(pUrl, { signal: controller.signal });
+          const response = await fetchNativeBinaryResource(pUrl, controller.signal);
           if (!response.ok) throw new Error(`Mushaf page ${page} failed: ${response.status}`);
           await pageCache.put(pUrl, response);
         })(),
@@ -97,7 +98,7 @@ export async function downloadMushaf(
     if (!hasFont) {
       fetchTasks.push(
         (async () => {
-          const fontResponse = await fetch(fUrl, { signal: controller.signal });
+          const fontResponse = await fetchNativeBinaryResource(fUrl, controller.signal);
           if (!fontResponse.ok) throw new Error(`Mushaf font ${page} failed: ${fontResponse.status}`);
           await fontCache.put(fUrl, fontResponse);
         })(),

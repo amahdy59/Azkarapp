@@ -640,7 +640,7 @@ export function HomeScreen({
         onScroll={(event) => setHasScrolledHomeContent(event.currentTarget.scrollTop > 4)}
       >
         {/* Sticky Header Overlay */}
-        <div className="pointer-events-none sticky inset-x-0 top-0 z-50 h-0 overflow-visible">
+        <div className="pointer-events-none sticky inset-x-0 top-0 z-50 overflow-visible">
           <header
             data-testid="home-utility-header"
             data-scrolled={hasScrolledHomeContent || undefined}
