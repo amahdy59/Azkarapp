@@ -52,3 +52,23 @@ The owner asks for arrows beside the text rather than at the bottom, and a clear
 Final mobile Chromium regression run: 33 passed (1.8m), including all-prayer single-row scrolling, both language order, two-column phone cards, enlarged-text reflow and compact-prayer controls. Earlier diagnostic failures came from superseded row/font/header expectations and were repaired without dropping geometry/keyboard/axe assertions. Final bundle proof passed after moving Home-only variants to the lazy stylesheet; the fixed compressed ceiling remains intact. Final combined help/three-engine run and release hook pending.
 
 Final combined regression evidence: 31 passed across Chromium, Firefox and WebKit (5.5m), including one-row all-prayer reachability in RTL/LTR, two-by-two normal phone tiles, enlarged-text fallback, labelled combined benefits/palm route, independent appearance preferences, 1920px edge alignment and axe checks. Final 22 focused units passed (11.34s). Full pre-push and exact-commit CI remain required.
+
+## Image-free card density follow-up — 2026-10-15
+
+The owner supplies the current two-by-two phone cards and requests reduced top/bottom space. Scope the change to image-free captions: lower the 10rem reserved minimum to 7.5rem and block padding from 1rem to 0.75rem, retain 1rem inline padding, icon/text sizing, side arrows and equal grid alignment. Allow content to grow naturally for wrapped English/enlarged text. Preserve photo-card height and padding explicitly. Verify Arabic/English phone card bounds, no text overflow, keyboard/axe and photo preference independence; normal release gates apply.
+
+## Compact all-prayer disclosure follow-up
+
+The owner asks for a space-saving alternative to the full-width collapse button. Replace the extra action row with one 44px trailing control beside the prayer cards: List/All and ChevronUp/Less, localized visible short labels and unchanged full accessible names, title and aria-expanded/controls. Use a minmax(0,1fr) scrolling prayer column plus auto control column. Keep native keyboard/pointer access and 6rem focused/7rem full-row minimum widths, including enlarged text. No prayer-data changes.
+
+The owner explicitly confirmed the combined help entry in the asynchronous reply. The superseded full CI run 38643839973 was cancelled before deployment after the density/control requests arrived. No failed verification was bypassed. Card-density diagnostic run passed 21 cases; three English 320px cases exceeded the initially guessed 150px ceiling because complete text naturally needed 158px. Preserve natural growth: assert the actual 12px block padding/120px minimum and no overflow, with 160px normal-text bound. No fonts or text were shrunk to satisfy density. Subsequent final control verification remains required.
+
+## Equal situational shortcuts follow-up
+
+The owner requests equal small-card width/height and shorter long navigation labels. Add localized presentation labels that omit repeated Arabic “azkar” while retaining distinct category meaning; preserve canonical category names in full accessible labels/titles and unchanged routes. Use equal fractional grid rows/columns, a 4rem minimum height, consistent icon gap/padding and natural text wrapping. These are navigation labels, not reviewed devotional content. Update unit labels and existing all-six-target geometry/axe checks to require equal dimensions and no clipping. Preserve native modified-link behavior.
+
+## Final shortcut spacing follow-up
+
+The owner requests reduced top/bottom shortcut padding consistent with adjacent cards. Use 12px section block padding, 16px inline padding, 8px heading-to-grid gap and 48px minimum shortcut height, retaining equal rows, complete labels and 44px minimum accessibility targets. Keep one frosted parent and unblurred dark insets, avoiding extra layered blur or decorative effects. Large-text container fallback remains. Final reflow/browser recovery run passed all nine cases (1.3m); the earlier WebKit process closure reproduced no assertion failure and passed unchanged on rerun.
+
+Final shortcut spacing/material suite: 16 passed across Chromium, Firefox and WebKit (37.8s). Bundle budget passed. Final captures retained at output/playwright/home-short-wird-phone.png, home-compact-control-phone.png and home-equal-shortcuts-phone.png; latter two inspected. Source content, imagery and persistence unchanged. Full release hook and exact-commit CI follow.

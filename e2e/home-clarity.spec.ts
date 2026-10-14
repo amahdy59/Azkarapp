@@ -46,13 +46,25 @@ for (const language of ["ar", "en"] as const) {
       await expect(strip.locator('[data-density="summary"]')).toHaveCount(2);
       await expect(page.getByTestId("prayer-card-dhuhr")).toHaveAttribute("data-prayer-state", "current");
       await expect(page.getByTestId("prayer-card-asr")).toHaveAttribute("data-prayer-state", "next");
-      await strip.getByRole("button", { name: t(language, "settings.showAllPrayers") }).click();
+      const disclosure = strip.getByRole("button", { name: t(language, "settings.showAllPrayers") });
+      const disclosureBox = (await disclosure.boundingBox())!;
+      expect(disclosureBox.width).toBeGreaterThanOrEqual(44);
+      expect(disclosureBox.width).toBeLessThanOrEqual(48);
+      expect(disclosureBox.height).toBeGreaterThanOrEqual(44);
+      await disclosure.click();
       await expect(strip.locator('[data-density="summary"]')).toHaveCount(5);
       const allRow = page.getByTestId("home-all-prayers-row");
       const prayerTops = await allRow
         .locator("article")
         .evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect().top));
       expect(Math.max(...prayerTops) - Math.min(...prayerTops)).toBeLessThanOrEqual(1);
+      const collapse = strip.getByRole("button", { name: t(language, "settings.showFocusedPrayers") });
+      const collapseBox = (await collapse.boundingBox())!;
+      const firstPrayer = (await allRow.locator("article").first().boundingBox())!;
+      expect(collapseBox.width).toBeLessThanOrEqual(48);
+      expect(collapseBox.y).toBeGreaterThanOrEqual(firstPrayer.y - 1);
+      expect(collapseBox.y + collapseBox.height).toBeLessThanOrEqual(firstPrayer.y + firstPrayer.height + 1);
+
       await allRow.locator("article").last().scrollIntoViewIfNeeded();
       const lastReachable = await allRow.evaluate((row) => {
         const viewport = row.getBoundingClientRect();
@@ -79,6 +91,19 @@ for (const language of ["ar", "en"] as const) {
         expect(Math.abs(positions[0]! - positions[1]!)).toBeLessThanOrEqual(1);
         expect(Math.abs(positions[2]! - positions[3]!)).toBeLessThanOrEqual(1);
         expect(positions[2]!).toBeGreaterThan(positions[0]!);
+        const heights = await cards.evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect().height));
+        for (const height of heights) {
+          expect(height).toBeGreaterThanOrEqual(120);
+          expect(height).toBeLessThanOrEqual(160);
+        }
+        const spacing = await cards
+          .first()
+          .locator(".home-wird-caption")
+          .evaluate((node) => {
+            const style = getComputedStyle(node);
+            return { top: style.paddingTop, bottom: style.paddingBottom, minimum: style.minHeight };
+          });
+        expect(spacing).toEqual({ top: "12px", bottom: "12px", minimum: "120px" });
       }
       await expect(cards.locator("img")).toHaveCount(0);
       await expect(page.getByTestId("daily-evidence-hadith")).toBeVisible();
@@ -112,10 +137,24 @@ for (const language of ["ar", "en"] as const) {
       await images.click();
       await page.goto("/#/home");
       await expect(cards.locator("img")).toHaveCount(0);
-      if (width === 320)
+      if (width === 320) {
+        const shortcuts = page.getByTestId("situational-shortcuts");
+        await shortcuts.getByRole("button", { name: t(language, "reader.viewAll"), exact: true }).click();
         await page.locator("html").evaluate((node) => {
           node.style.fontSize = "32px";
         });
+        const links = shortcuts.getByRole("link");
+        await expect(links).toHaveCount(6);
+        expect(
+          await links.evaluateAll((nodes) =>
+            nodes.every(
+              (node) => node.scrollWidth <= node.clientWidth + 1 && node.scrollHeight <= node.clientHeight + 1,
+            ),
+          ),
+        ).toBe(true);
+        const tops = await links.evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect().top));
+        expect(new Set(tops).size).toBe(6);
+      }
       await expect
         .poll(() => page.evaluate(() => document.documentElement.scrollWidth - innerWidth))
         .toBeLessThanOrEqual(0);

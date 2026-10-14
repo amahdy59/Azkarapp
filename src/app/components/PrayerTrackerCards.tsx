@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Sunrise, Sun, CloudSun, Sunset, MoonStar, Check, ChevronNext } from "./icons";
+import { Sunrise, Sun, CloudSun, Sunset, MoonStar, Check, ChevronNext, List, ChevronUp } from "./icons";
 import { t } from "../i18n";
 import { PrayerVirtueModal } from "./PrayerVirtueModal";
 import type { AppLanguage, PrayerName, PrayerTrackingRecord } from "../types";
@@ -564,20 +564,20 @@ export function PrayerTrackerCards({
           onGlass={onGlass}
           elevation="raised"
           padding="sm"
-          className={`stagger-in grid gap-2 overflow-visible ${compactSummary ? (showAll ? "grid-cols-1" : "grid-cols-2 sm:grid-cols-3") : "grid-cols-2 sm:grid-cols-3 xl:grid-cols-5"}`}
+          className={`stagger-in grid gap-2 overflow-visible ${compactSummary ? "home-prayer-summary" : "grid-cols-2 sm:grid-cols-3 xl:grid-cols-5"}`}
           style={{ ["--prayer-columns" as string]: "5" }}
           id="home-prayer-overview"
         >
           <div
             data-testid={compactSummary && showAll ? "home-all-prayers-row" : undefined}
             className={
-              compactSummary && showAll
-                ? "home-all-prayers-row grid gap-2 overflow-x-auto rounded-xl p-1 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              compactSummary
+                ? `home-all-prayers-row ${showAll ? "" : "home-focused-prayers-row"} grid min-w-0 gap-2 overflow-x-auto rounded-xl p-1 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring`
                 : "contents"
             }
-            role={compactSummary && showAll ? "region" : undefined}
-            aria-label={compactSummary && showAll ? t(language, "prayerMoment.dayTitle") : undefined}
-            tabIndex={compactSummary && showAll ? 0 : undefined}
+            role={compactSummary ? "region" : undefined}
+            aria-label={compactSummary ? t(language, "prayerMoment.dayTitle") : undefined}
+            tabIndex={compactSummary ? 0 : undefined}
           >
             {visible.map((model) => {
               const record = byPrayer.get(model.prayer);
@@ -607,12 +607,15 @@ export function PrayerTrackerCards({
           {compactSummary && (
             <button
               type="button"
+              aria-label={t(language, showAll ? "settings.showFocusedPrayers" : "settings.showAllPrayers")}
+              title={t(language, showAll ? "settings.showFocusedPrayers" : "settings.showAllPrayers")}
               aria-expanded={showAll}
               aria-controls="home-prayer-overview"
               onClick={() => setShowAll((value) => !value)}
-              className={`${showAll ? "col-span-full" : "col-span-full sm:col-span-1"} flex min-h-11 items-center justify-center rounded-xl border px-3 py-2 text-sm font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${onGlass ? "border-white/20 home-glass-inset text-on-media" : "border-border bg-muted"}`}
+              className={`flex size-11 flex-col items-center justify-center gap-0.5 rounded-xl border text-xs font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${onGlass ? "border-white/20 home-glass-inset text-on-media" : "border-border bg-muted"}`}
             >
-              {t(language, showAll ? "settings.showFocusedPrayers" : "settings.showAllPrayers")}
+              {showAll ? <ChevronUp size={16} aria-hidden="true" /> : <List size={16} aria-hidden="true" />}
+              <span>{t(language, showAll ? "settings.fewerPrayersShort" : "settings.allPrayersShort")}</span>
             </button>
           )}
         </HomeCard>

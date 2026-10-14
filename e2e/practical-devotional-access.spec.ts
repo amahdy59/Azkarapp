@@ -103,6 +103,18 @@ for (const language of ["ar", "en"] as const) {
             }),
           );
           expect(targets).toHaveLength(6);
+          expect(
+            Math.max(...targets.map((item) => item.width)) - Math.min(...targets.map((item) => item.width)),
+          ).toBeLessThanOrEqual(1);
+          expect(
+            Math.max(...targets.map((item) => item.height)) - Math.min(...targets.map((item) => item.height)),
+          ).toBeLessThanOrEqual(1);
+          expect(
+            await card
+              .getByRole("link")
+              .evaluateAll((links) => links.every((link) => link.scrollHeight <= link.clientHeight + 1)),
+          ).toBe(true);
+
           for (const bounds of targets) {
             expect(bounds.width).toBeGreaterThanOrEqual(44);
             expect(bounds.height).toBeGreaterThanOrEqual(44);

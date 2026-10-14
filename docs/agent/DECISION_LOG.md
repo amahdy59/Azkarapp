@@ -4600,3 +4600,7 @@ The owner explicitly agrees to the recommended full-width header surface with al
 ## Mobile Home follow-up approved — 2026-10-15
 
 The owner requests all five prayers side by side in one mobile row, a two-by-two mobile daily-wird arrangement, and larger/bolder prayer times. A scrollable prayer row preserves readable card widths; a single-column wird fallback supports enlarged text. Include this in the pending full-width header/glass release; preserve existing quality ceilings and recording/content contracts.
+
+## Home card density and compact disclosure — 2026-10-15
+
+The owner explicitly selects the recommended combined benefits/palm help entry, then requests less vertical space in the image-free wird cards and a smaller mobile prayer disclosure alternative. Reduce block padding and reserved card height while preserving natural wrapped-text growth; retain photo-card geometry. Use one trailing 44px List/All or ChevronUp/Less control with visible localized short label and full accessible name. Preserve one-row native prayer scrolling and existing keyboard/data contracts. Supersede the full-width disclosure action. The prior workflow is cancelled as superseded by these follow-ups; verify the final commit with all normal release gates.

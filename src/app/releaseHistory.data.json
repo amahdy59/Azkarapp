@@ -1,5 +1,20 @@
 [
   {
+    "release": "2026-10-15-2",
+    "ar": [
+      "يمتد شريط الرئيسية على الحاسوب إلى الحواف، وتكشف البطاقات الزجاجية الخلفية مع الحفاظ على وضوح النص.",
+      "تظهر الصلوات الخمس في صف واحد يُمرَّر أفقيًا على الهاتف، مع أوقات أوضح وزر صغير لعرض الكل أو الاختصار.",
+      "بطاقات ورد اليوم أقصر وفي عمودين على الهاتف، مع أسهم بجانب النص ومدخل واحد لفوائد الورد وشرح النخلة.",
+      "أصبحت اختصارات مواقف يومك متساوية الحجم وذات عناوين أقصر وأسهل في التصفح."
+    ],
+    "en": [
+      "The desktop Home header spans the content area, with translucent cards that preserve readable text.",
+      "Prayer times are bolder, with one scrolling phone row and a compact All/Less control beside the cards.",
+      "Today’s wird cards are shorter and use two phone columns, side arrows, and one entry for benefits and palm help.",
+      "Everyday shortcuts now have equal card sizes and shorter, easier-to-scan labels."
+    ]
+  },
+  {
     "release": "2026-10-15",
     "ar": [
       "يمتد شريط الرئيسية على الحاسوب إلى الحواف، وتكشف البطاقات الزجاجية الخلفية مع الحفاظ على وضوح النص.",
