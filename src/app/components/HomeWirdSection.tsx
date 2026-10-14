@@ -5,6 +5,7 @@ import type { AppLanguage, CategoryId } from "../types";
 import type { GardenSummary } from "../progress";
 import type { QuranWirdTile } from "./ProgressViews";
 import "./home-wird.css";
+import { useId, useState } from "react";
 
 const ROUTINES = [
   { id: "morning", label: "progress.morningAzkar", Icon: Sunrise, image: "wird-morning.jpg" },
@@ -32,6 +33,8 @@ export function HomeWirdSection({
   recommendedCategoryId?: CategoryId;
   onGlass?: boolean;
 }) {
+  const [showPalmInfo, setShowPalmInfo] = useState(false);
+  const palmInfoId = useId();
   const items = [
     ...ROUTINES.map(({ id, label, Icon, image }) => ({
       id,
@@ -74,6 +77,16 @@ export function HomeWirdSection({
         >
           <Calendar size={22} aria-hidden="true" />
           {t(language, "progress.todayWird")}
+          <button
+            type="button"
+            aria-label={t(language, "garden.explanationLabel")}
+            aria-expanded={showPalmInfo}
+            aria-controls={palmInfoId}
+            onClick={() => setShowPalmInfo((value) => !value)}
+            className="flex size-11 shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          >
+            <Info size={18} aria-hidden="true" />
+          </button>
         </h2>
         {onOpenWirdBenefits && (
           <button
@@ -87,6 +100,15 @@ export function HomeWirdSection({
           </button>
         )}
       </div>
+      {showPalmInfo && (
+        <div
+          id={palmInfoId}
+          role="tooltip"
+          className="mb-3 rounded-xl border border-border bg-popover p-3 text-sm text-popover-foreground"
+        >
+          {t(language, "garden.explanationWithQuran")}
+        </div>
+      )}
       <div className="home-wird-grid">
         {items.map(({ id, name, Icon, image, complete, status, onPress }) => (
           <button

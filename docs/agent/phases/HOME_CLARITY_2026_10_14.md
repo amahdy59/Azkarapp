@@ -62,3 +62,9 @@ Human screen-reader/physical device validation cannot be inferred from automated
 ## Recommended next step
 
 The owner explicitly approved 12 MiB total output and publication of all changes. Run the final pre-push gates, then verify exact-commit Quality, Pages and production. All other limits and assertions remain intact.
+
+## Release verification and CI remediation
+
+The owner explicitly approved the 12 MiB total-output exception and publication. Commit 0a1a392f passed all local pre-push gates: frozen install, pnpm check (82.0s), 26 core browser cases (1.2m), Pages build and budgets. The first full CI run 38620334795 passed non-browser checks but reproduced outdated shortcut-count, single-row prayer geometry and old glass-tint expectations. The Home presentation also omitted existing palm-earning help; restored the labelled native disclosure and original translated explanation. Tests now disclose all six shortcuts before checking every target, compare prayer internal alignment across wrapped rows, and assert glass or solid material according to app/system preferences. Existing navigation, axe, focus, dimensions and opacity checks are retained. Two unrelated magnification/audio timing cases passed on retries and are recorded as flaky rather than hidden. No production deployment occurred for the failed run.
+
+Remediation evidence: 35 unaffected/repaired Chromium cases passed in the diagnostic run (six system-transparency assumptions then corrected); final cross-engine repair suite passed all 51 cases (3.1m), and Home render units passed all 13 cases (4.64s). Quiet-garden palm help, reduced-transparency opacity and Mushaf magnification passed the diagnostic run. Logs: output/home-ci-repairs.log, output/home-ci-cross-engine-repairs.log and output/home-palm-help-unit.log. Final hook and exact-commit CI remain required.

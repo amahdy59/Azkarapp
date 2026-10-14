@@ -22,9 +22,12 @@ for (const language of ["ar", "en"] as const) {
           cards.map((card) => {
             const icon = card.querySelector("[data-prayer-icon]")!.getBoundingClientRect();
             const heading = card.querySelector("h3")!.getBoundingClientRect();
-            return { icon: icon.y, heading: heading.y };
+            const bounds = card.getBoundingClientRect();
+            return { row: bounds.y, icon: icon.y - bounds.y, heading: heading.y - bounds.y };
           }),
         );
+        // Expanded prayers wrap into rows on narrow screens; every card keeps
+        // the same internal alignment, regardless of its row.
         expect(
           Math.max(...geometry.map((item) => item.icon)) - Math.min(...geometry.map((item) => item.icon)),
         ).toBeLessThanOrEqual(1);

@@ -99,7 +99,7 @@ test("a card over the hero photograph goes opaque, not merely unblurred", async 
     };
   });
   expect(material.backgroundColor, "the hero card should visibly reveal the photograph by default").toBe(
-    "rgba(255, 255, 255, 0.08)",
+    "rgba(15, 23, 42, 0.68)",
   );
   expect(material.backgroundImage).toContain("linear-gradient");
   expect(material.backdropFilter).toContain("blur(14px)");
