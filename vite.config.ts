@@ -322,7 +322,7 @@ export default defineConfig(({ mode }) => {
         "@azkar/native-mushaf-download": path.resolve(
           isGithubPages ? "src/app/content/nativeMushafDownload.browser.ts" : "src/app/content/nativeMushafDownload.ts",
         ),
-        "@azkar/native-sharing": path.resolve(
+        [path.resolve("src/app/share/nativeSharing.ts")]: path.resolve(
           isGithubPages ? "src/app/share/nativeSharing.browser.ts" : "src/app/share/nativeSharing.ts",
         ),
         "@azkar/native-reminders": path.resolve(

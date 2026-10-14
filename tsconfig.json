@@ -17,7 +17,6 @@
     "types": ["vite/client", "vite-plugin-pwa/client"],
     "paths": {
       "@azkar/native-mushaf-download": ["src/app/content/nativeMushafDownload.ts"],
-      "@azkar/native-sharing": ["src/app/share/nativeSharing.ts"],
       "@azkar/native-reminders": ["src/app/hooks/nativeReminderScheduling.ts"]
     }
   },

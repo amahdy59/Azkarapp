@@ -3,7 +3,7 @@
  * fallback downloading for desktop and older browsers.
  */
 
-import { isNativeAndroid, saveWithAndroid, shareWithAndroid } from "@azkar/native-sharing";
+import { isNativeAndroid, saveWithAndroid, shareWithAndroid } from "./nativeSharing";
 
 export type MultiShareMethod = "shared" | "downloaded" | "cancelled" | "error";
 

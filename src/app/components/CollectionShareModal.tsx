@@ -29,7 +29,7 @@ import {
   shareSingleFile,
 } from "../share/shareDispatcher";
 import { createShareArchive } from "../share/shareArchive";
-import { isNativeAndroid } from "@azkar/native-sharing";
+import { isNativeAndroid } from "../share/nativeSharing";
 import {
   getCuratedRoutinePack,
   resolveCuratedImageUrl,
