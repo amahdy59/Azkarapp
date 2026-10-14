@@ -108,6 +108,7 @@ test("each Home prayer expands its shared properties under an aligned notch", as
 
 test("the selected prayer card reflects selection in RTL visual order", async ({ page }) => {
   await openHomeAt(page, "2026-09-05T13:20:00", "ar");
+  await page.getByRole("button", { name: "عرض جميع الصلوات" }).click();
   const fajrCard = page.getByTestId("prayer-card-fajr");
   await fajrCard.getByRole("button").click();
   await expect(fajrCard).toHaveAttribute("data-selected", "true");

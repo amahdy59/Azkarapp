@@ -170,6 +170,7 @@ export function buildRemoteSettingsJson(state: AppStateSnapshot): RemoteSettings
     boldText: state.settings.boldText,
     reduceMotion: state.settings.reduceMotion,
     reduceTransparency: state.settings.reduceTransparency,
+    homeWirdImages: state.settings.homeWirdImages,
     hapticFeedback: state.settings.hapticFeedback,
     forceRtl: state.settings.forceRtl,
     colorBlindSupport: state.settings.colorBlindSupport,
@@ -393,6 +394,10 @@ export async function loadRemoteState(
           boldText: settings?.settings_json?.boldText ?? localState.settings.boldText,
           reduceMotion: settings?.settings_json?.reduceMotion ?? localState.settings.reduceMotion,
           reduceTransparency: settings?.settings_json?.reduceTransparency ?? localState.settings.reduceTransparency,
+          homeWirdImages:
+            typeof settings?.settings_json?.homeWirdImages === "boolean"
+              ? settings.settings_json.homeWirdImages
+              : localState.settings.homeWirdImages,
           hapticFeedback: settings?.settings_json?.hapticFeedback ?? localState.settings.hapticFeedback,
           forceRtl: settings?.settings_json?.forceRtl ?? localState.settings.forceRtl,
           colorBlindSupport: settings?.settings_json?.colorBlindSupport ?? localState.settings.colorBlindSupport,

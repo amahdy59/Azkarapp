@@ -20,6 +20,7 @@ async function openHome(page: Page) {
       }),
     );
   });
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
   await expect(page.getByRole("navigation").first()).toBeVisible({ timeout: 15000 });
 }

@@ -4584,3 +4584,11 @@ The owner approves the thorough review and plan: eliminate cards within cards wi
 ## Stationary Progress controls — 2026-10-14
 
 The owner explicitly requests keeping the Progress header and relevant filters visible while scrolling, based on the attached Day screenshot. Group the shared title, period tabs and date navigation in one opaque sticky owner with viewport-aware bounds and independently reachable short-screen controls. Preserve all recording/data contracts, DOM order and reviewed quotation text; supporting reflection may scroll outside the task chrome. Measured scroll padding and focus recovery must exclude portaled menus. Also complete the reproduced enlarged endpoint-label spacing repair without shrinking text or weakening geometry assertions. Follow normal intact release authority. See phases/PROGRESS_STATIONARY_CONTROLS_2026_10_14.md.
+
+## Home clarity and owner additions — 2026-10-14
+
+The owner approves the final Home image with current/next prayer summaries, all-prayer disclosure, default image-free daily wird, independent optional images/transparency, directly displayed reminder, retained mode selector, benefits information, header streak/palms, icon shortcuts and desktop-only Today’s path. Reuse the 900px expanded shell target. The owner also requests Mushaf lettering for the existing reliance quotation and an optional two-card supplied sleep sharing pack. Preserve reviewed text/counts and original raster bytes. No release-budget ceiling has been changed; the implementation exceeds the fixed total-output limit and release scope/contract requires owner decision.
+
+## Home release budget exception approved — 2026-10-14
+
+After requesting publication of all changes, the owner explicitly answered "yes" to increasing only the total-output limit from 11 MiB to 12 MiB. This supersedes the fixed total-output ceiling for this release and establishes the new 12 MiB backstop. The measured candidate was 11,941,511 bytes, including the original supplied sleep JPEGs and the offline page 207 font. Preserve every other budget, growth guard, content-integrity check and release gate. Publish the complete Home and follow-up changes after successful verification.

@@ -1,5 +1,20 @@
 [
   {
+    "release": "2026-10-14-5",
+    "ar": [
+      "تعرض الرئيسية الصلاة الحالية والقادمة مع خيار عرض الجميع، ويبقى مسار اليوم أعلى الشاشة مخصصًا للحاسوب.",
+      "أصبح ورد اليوم أوضح، ويمكنك إظهار صوره وضبط الشفافية بشكل مستقل من إعدادات المظهر.",
+      "يمكنك مشاركة أذكار النوم باستخدام بطاقتين جاهزتين مع معاينتهما وحفظهما معًا.",
+      "يظهر ذكر حسبي الله لا إله إلا هو بخط المصحف، مع الحفاظ على نصه وعدد تكراره وإتاحته دون اتصال."
+    ],
+    "en": [
+      "Home focuses on the current and next prayers with an option to show all, and keeps the top Today's path shortcut on desktop.",
+      "Today's wird is clearer, with independent image and transparency choices in Appearance settings.",
+      "Share before-sleep azkar using two supplied cards, with previews and one archive to save them together.",
+      "The Hasbi Allah reliance dhikr now uses Mushaf lettering offline while preserving its wording and repetition count."
+    ]
+  },
+  {
     "release": "2026-10-14-4",
     "ar": [
       "يبقى عنوان التقدم وخيارات اليوم والأسبوع والشهر والسنة ظاهرين أثناء قراءة السجلات.",

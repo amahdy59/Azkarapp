@@ -20,6 +20,17 @@ import { getProgressDayKey, shiftProgressDayKey } from "./progress";
 describe("app state persistence", () => {
   beforeEach(() => window.localStorage.clear());
 
+  it("normalizes, merges and reloads the independent Home image preference", () => {
+    expect(normalizeAppState({ settings: { homeWirdImages: "yes" } }).settings.homeWirdImages).toBe(false);
+    const state = normalizeAppState({ settings: { homeWirdImages: true, reduceTransparency: true } });
+    saveAppState(state);
+    expect(loadAppState().settings).toMatchObject({ homeWirdImages: true, reduceTransparency: true });
+    expect(mergeAppStates(state, { settings: { homeWirdImages: false } }).settings).toMatchObject({
+      homeWirdImages: false,
+      reduceTransparency: true,
+    });
+  });
+
   it("resets daily partial counts at rollover but retains situational progress", () => {
     expect(resetDailyPartialCounts({ "m-hm-77m": 1, "ap-tasbeeh-subhanallah": 30, "travel-progress": 12 })).toEqual({
       "travel-progress": 12,

@@ -82,18 +82,18 @@ test("the Home Wird keeps semantic order while mirroring Arabic placement and ex
   const mobileBoxes = await Promise.all([0, 1, 2].map((index) => ltrCards.nth(index).boundingBox()));
   expect(mobileBoxes.every(Boolean)).toBe(true);
   if (mobileBoxes[0] && mobileBoxes[1] && mobileBoxes[2]) {
-    expect(mobileBoxes[0].width).toBeGreaterThanOrEqual(180);
+    expect(mobileBoxes[0].width).toBeGreaterThanOrEqual(160);
     expect(mobileBoxes[0].height).toBeLessThanOrEqual(202);
   }
   const mobileCardPresentation = await ltrWirdCards.first().evaluate((card) => {
-    const [title, subtitle] = card.querySelectorAll("p");
+    const [title, subtitle] = card.querySelectorAll(".home-wird-caption > span");
     return {
       titleSize: title ? window.getComputedStyle(title).fontSize : "",
       subtitleSize: subtitle ? window.getComputedStyle(subtitle).fontSize : "",
       overflow: card.scrollHeight - card.clientHeight,
     };
   });
-  expect(mobileCardPresentation).toEqual({ titleSize: "18px", subtitleSize: "12px", overflow: 0 });
+  expect(mobileCardPresentation).toEqual({ titleSize: "16px", subtitleSize: "14px", overflow: 0 });
 
   const [mobileWirdBox, mobileCompanionBox, mobilePrimaryBox] = await Promise.all([
     page.getByTestId("home-wird-row").boundingBox(),
@@ -108,6 +108,7 @@ test("the Home Wird keeps semantic order while mirroring Arabic placement and ex
     expect(mobileCompanionBox.y + mobileCompanionBox.height).toBeLessThanOrEqual(mobileWirdBox.y);
   }
 
+  await page.getByRole("button", { name: "Show all prayers" }).click();
   const maghribLabel = page.locator("#prayer-card-heading-maghrib");
   await expect(maghribLabel).toHaveText("Maghrib");
   expect(
@@ -151,7 +152,7 @@ test("tablet and desktop Home keep prayer detail to the selected half while othe
   await expect(prayerDetail.locator(".hero-glass").first()).toBeVisible();
   await expect(primaryGlass).toBeVisible();
   await expect(companion.locator(".hero-glass").first()).toBeVisible();
-  await expect(prayerSummary.locator('article[data-density="summary"]')).toHaveCount(5);
+  await expect(prayerSummary.locator('article[data-density="summary"]')).toHaveCount(2);
   await expect(prayerSummary.getByRole("checkbox")).toHaveCount(0);
 
   await expect(async () => {
@@ -279,7 +280,7 @@ test("wide Home keeps navigation exposed, contains its scene, and uses glass for
       boxShadow: style.boxShadow,
     };
   });
-  expect(material.backgroundColor).toBe("rgba(255, 255, 255, 0.08)");
+  expect(material.backgroundColor).toBe("rgba(15, 23, 42, 0.68)");
   expect(material.backgroundImage).toContain("linear-gradient");
   expect(material.backdropFilter).toContain("blur(14px)");
   expect(material.boxShadow).not.toBe("none");
@@ -288,6 +289,7 @@ test("wide Home keeps navigation exposed, contains its scene, and uses glass for
 test("Home prayer strip keeps all five prayers legible without page overflow", async ({ page }) => {
   await openReturningGuest(page, "ar");
   const strip = page.getByTestId("prayer-tracker-cards");
+  await page.getByRole("button", { name: "عرض جميع الصلوات" }).click();
   const cards = strip.locator('article[data-density="summary"]');
   await expect(cards).toHaveCount(5);
   await expect(strip.locator('article[aria-current="step"]')).toHaveCount(1);

@@ -497,6 +497,7 @@ export function PrayerTrackerCards({
   onOpen,
   onGlass,
   summaryOnly,
+  compactSummary = false,
   selectedPrayer,
 }: {
   models: readonly PrayerCardModel[];
@@ -509,16 +510,24 @@ export function PrayerTrackerCards({
   onGlass?: boolean;
   /** Keep overview surfaces scannable; focused views retain full recording. */
   summaryOnly?: boolean;
+  compactSummary?: boolean;
   /** The Home summary whose shared detail panel is expanded below the strip. */
   selectedPrayer?: PrayerName | null;
 }) {
   const byPrayer = new Map(records.filter((record) => record.dayKey === dayKey).map((r) => [r.prayer, r]));
   const [virtuePrayer, setVirtuePrayer] = useState<PrayerName | null>(null);
+  const [showAll, setShowAll] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const ordered = PRAYER_ORDER.map((prayer) => models.find((model) => model.prayer === prayer)).filter(
     (model): model is PrayerCardModel => Boolean(model),
   );
+
+  const focused = [
+    ...ordered.filter((model) => model.state === "current"),
+    ...ordered.filter((model) => model.state === "next"),
+  ];
+  const visible = compactSummary && !showAll ? (focused.length ? focused : ordered.slice(-1)) : ordered;
 
   const focusIndex = Math.max(
     0,
@@ -527,7 +536,7 @@ export function PrayerTrackerCards({
 
   useEffect(() => {
     const container = scrollRef.current;
-    if (!container || focusIndex <= 0) return;
+    if (!container || focusIndex <= 0 || compactSummary) return;
     const card = container.children[focusIndex] as HTMLElement | undefined;
     if (card) {
       // Keep the focused card fully visible. We do a manual calculation
@@ -542,7 +551,7 @@ export function PrayerTrackerCards({
         container.scrollLeft = offset;
       }
     }
-  }, [focusIndex, direction]);
+  }, [focusIndex, direction, compactSummary]);
 
   return (
     <div className="flex flex-col gap-3">
@@ -555,10 +564,11 @@ export function PrayerTrackerCards({
           onGlass={onGlass}
           elevation="raised"
           padding="sm"
-          className="stagger-in grid grid-cols-[repeat(auto-fit,minmax(min(100%,3.5rem),1fr))] gap-1 overflow-visible sm:gap-2"
+          className={`stagger-in grid gap-2 overflow-visible ${compactSummary && !showAll ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-2 sm:grid-cols-3 xl:grid-cols-5"}`}
           style={{ ["--prayer-columns" as string]: "5" }}
+          id="home-prayer-overview"
         >
-          {ordered.map((model) => {
+          {visible.map((model) => {
             const record = byPrayer.get(model.prayer);
             return (
               <PrayerCard
@@ -582,6 +592,17 @@ export function PrayerTrackerCards({
               />
             );
           })}
+          {compactSummary && (
+            <button
+              type="button"
+              aria-expanded={showAll}
+              aria-controls="home-prayer-overview"
+              onClick={() => setShowAll((value) => !value)}
+              className={`${showAll ? "col-span-full" : "col-span-full sm:col-span-1"} flex min-h-11 items-center justify-center rounded-xl border px-3 py-2 text-sm font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${onGlass ? "hero-glass home-glass-surface" : "border-border bg-muted"}`}
+            >
+              {t(language, showAll ? "settings.showFocusedPrayers" : "settings.showAllPrayers")}
+            </button>
+          )}
         </HomeCard>
       ) : (
         <div

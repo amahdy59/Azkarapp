@@ -3,7 +3,7 @@ import { scheduleIdleAfterPaint } from "../startupMaintenance";
 import { ArrowNext, Compass, Sparkles, Zap } from "../components/icons";
 import { getQiblaBearing } from "../qibla";
 import { PalmTreeMark } from "../components/GardenMarks";
-import { TodayRoutineGarden } from "../components/RoutineGarden";
+import { HomeWirdSection } from "../components/HomeWirdSection";
 import { TranquilityCompletionCard } from "../components/TranquilityCompletionCard";
 import {
   getContextualEvidence,
@@ -29,7 +29,6 @@ import { ScreenContainer } from "../components/ScreenContainer";
 import { TimeOfDayBackground } from "../components/TimeOfDayBackground";
 import { getFirstIncompleteZikrIndex, getGardenSummary, getProgressDayKey } from "../progress";
 import { fridayKahfOpenedKey } from "../fridayProgress";
-import { VisitorCount } from "../components/VisitorCount";
 import { SituationalShortcuts } from "../components/SituationalShortcuts";
 import type {
   AppLanguage,
@@ -45,12 +44,6 @@ import type {
 
 const seenCompletions = new Set<string>();
 
-/**
- * The three time-of-day routines listed in Home's "وردك اليوم" card. After-prayer
- * azkar are deliberately absent: they get their own card. Progress still counts
- * all four main collections toward leaves and palms.
- */
-const HOME_WIRD_CATEGORY_IDS = ["morning", "evening", "before_sleep"] as const satisfies readonly CategoryId[];
 type HomeActionKind = "resume" | "start" | "again";
 
 export type HomeAction = {
@@ -251,6 +244,7 @@ export function HomeScreen({
   dailyCompletions,
   quietProgressEnabled,
   homeVisualEffects = true,
+  homeWirdImages = false,
   progressDayStartHour,
   language,
   direction,
@@ -291,6 +285,7 @@ export function HomeScreen({
   quietProgressEnabled: boolean;
   /** Photograph and translucent Home surfaces; false uses normal theme cards. */
   homeVisualEffects?: boolean;
+  homeWirdImages?: boolean;
   progressDayStartHour: number;
   calendarType?: "hijri" | "gregorian";
   hijriDateOffset?: number;
@@ -640,11 +635,11 @@ export function HomeScreen({
         onScroll={(event) => setHasScrolledHomeContent(event.currentTarget.scrollTop > 4)}
       >
         {/* Sticky Header Overlay */}
-        <div className="pointer-events-none sticky inset-x-0 top-0 z-50 h-0 overflow-visible">
+        <div className="pointer-events-none sticky inset-x-0 top-0 z-50 overflow-visible">
           <header
             data-testid="home-utility-header"
             data-scrolled={hasScrolledHomeContent || undefined}
-            className={`px-page mx-auto flex w-full max-w-7xl items-center justify-between gap-3 transition-[background-color,backdrop-filter,box-shadow,padding] duration-standard ${
+            className={`${homeVisualEffects ? "hero-glass home-glass-surface" : ""} px-page mx-auto flex w-full max-w-7xl items-center justify-between gap-3 transition-[background-color,backdrop-filter,box-shadow,padding] duration-standard ${
               hasScrolledHomeContent
                 ? "pt-[max(0.375rem,env(safe-area-inset-top))] pb-1"
                 : "pt-[max(0.5rem,env(safe-area-inset-top))] pb-1 sm:pt-3 sm:pb-2"
@@ -669,32 +664,40 @@ export function HomeScreen({
                 {formatDisplayDate(now, language, calendarType, hijriDateOffset)}
               </time>
             </div>
-            <button
-              type="button"
-              data-testid="home-header-routine-summary"
-              onClick={() => setPathSheetOpen(true)}
-              aria-label={t(language, "dailyPath.title")}
-              className={`pointer-events-auto flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center gap-2 rounded-full px-2.5 py-1 text-subtitle font-black transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:text-title3 ${
-                homeVisualEffects
-                  ? "text-on-media-accent drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)] hover:bg-on-media/10"
-                  : "text-primary hover:bg-muted"
-              }`}
+            <div
+              className={`flex shrink-0 items-center gap-2 ${homeVisualEffects ? "text-on-media-accent" : "text-primary"}`}
             >
-              {Boolean(gardenSummary.currentPalmRhythm && gardenSummary.currentPalmRhythm > 0) && (
-                <span className="flex items-center gap-1" title={t(language, "progress.lifetimePalmsSummary")}>
-                  <bdi>{formatNumerals(gardenSummary.currentPalmRhythm!, language)}</bdi>
-                  <PalmTreeMark size={18} className="text-inherit" />
-                </span>
-              )}
-              <span className="flex items-center gap-1" title={t(language, "progress.activeStreakSummary")}>
-                <bdi>{formatNumerals(gardenSummary.currentUsageStreak ?? 0, language)}</bdi>
-                <Zap className="size-5 sm:size-6" strokeWidth={2.5} aria-hidden="true" />
+              <span
+                className="flex items-center gap-1 text-sm font-bold"
+                role="img"
+                title={t(language, "progress.lifetimePalmsSummary")}
+                aria-label={`${t(language, "progress.lifetimePalmsSummary")}: ${formatNumerals(gardenSummary.currentPalmRhythm ?? 0, language)}`}
+              >
+                <PalmTreeMark size={18} />
+                <bdi>{formatNumerals(gardenSummary.currentPalmRhythm ?? 0, language)}</bdi>
               </span>
-            </button>
+              <span
+                className="flex items-center gap-1 text-sm font-bold"
+                role="img"
+                title={t(language, "progress.activeStreakSummary")}
+                aria-label={`${t(language, "progress.activeStreakSummary")}: ${formatNumerals(gardenSummary.currentUsageStreak ?? 0, language)}`}
+              >
+                <Zap size={18} aria-hidden="true" />
+                <bdi>{formatNumerals(gardenSummary.currentUsageStreak ?? 0, language)}</bdi>
+              </span>
+              <button
+                type="button"
+                data-testid="home-header-routine-summary"
+                onClick={() => setPathSheetOpen(true)}
+                className="pointer-events-auto hidden min-h-11 items-center gap-2 rounded-xl border border-current px-3 text-sm font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring min-[900px]:flex"
+              >
+                {t(language, "dailyPath.title")}
+              </button>
+            </div>
           </header>
         </div>
         <div data-testid="home-content-grid" className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-4 lg:gap-5">
-          <div data-testid="home-hero" className="relative isolate w-full pt-12 sm:pt-14">
+          <div data-testid="home-hero" className="relative isolate w-full">
             {showHeroContent && (
               <div className="relative z-10 mx-auto flex w-full flex-col items-stretch justify-end gap-4 px-page pb-5 pt-1 sm:pb-6 sm:pt-2 lg:gap-5 lg:pb-8 lg:pt-3">
                 <div
@@ -733,6 +736,7 @@ export function HomeScreen({
                         onOpen={handlePrayerOpen}
                         onGlass={homeVisualEffects}
                         summaryOnly
+                        compactSummary
                         selectedPrayer={expandedPrayer}
                       />
                     </div>
@@ -852,15 +856,10 @@ export function HomeScreen({
                       respond to their own available width, not the viewport. */}
                   {quietProgressEnabled && (
                     <div data-testid="home-wird-row" className="w-full min-w-0 justify-self-center md:col-span-2">
-                      <TodayRoutineGarden
+                      <HomeWirdSection
                         summary={gardenSummary}
                         language={language}
-                        hideTabs
-                        calendarType={calendarType}
-                        dailyCompletions={dailyCompletions}
                         onSelectCategory={onResume}
-                        visibleCategoryIds={HOME_WIRD_CATEGORY_IDS}
-                        recommendedCategoryId={isRoutineHero ? reminderInfo.categoryId : undefined}
                         onOpenWirdBenefits={onOpenWirdBenefits}
                         quranWird={{
                           progress: dailyPath.quran.progress,
@@ -871,7 +870,9 @@ export function HomeScreen({
                             ? (onContinueKhatmah ?? onOpenKhatmah ?? (() => undefined))
                             : (onOpenKhatmah ?? (() => undefined)),
                         }}
-                        onMedia={homeVisualEffects}
+                        onGlass={homeVisualEffects}
+                        showImages={homeWirdImages}
+                        recommendedCategoryId={isRoutineHero ? reminderInfo.categoryId : undefined}
                       />
                     </div>
                   )}
@@ -1004,10 +1005,6 @@ export function HomeScreen({
               </div>
             </div>
           )}
-
-          <div className="px-page mx-auto w-full">
-            <VisitorCount language={language} onMedia={homeVisualEffects} />
-          </div>
         </div>
       </div>
     </ScreenContainer>

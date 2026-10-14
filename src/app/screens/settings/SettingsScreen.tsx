@@ -47,6 +47,8 @@ export function SettingsScreen({
   boldText,
   reduceMotion,
   reduceTransparency,
+  homeWirdImages = false,
+  onHomeWirdImagesChange,
   hapticFeedback,
   forceRtl,
   colorBlindSupport,
@@ -267,6 +269,10 @@ export function SettingsScreen({
       case "appearance":
         return (
           <AppearancePanel
+            homeWirdImages={homeWirdImages}
+            onHomeWirdImagesChange={onHomeWirdImagesChange}
+            reduceTransparency={reduceTransparency}
+            onReduceTransparencyChange={onReduceTransparencyChange}
             language={language}
             direction={direction}
             themeMode={themeMode}

@@ -25,7 +25,8 @@ describe("curatedRoutineCards", () => {
     expect(evening?.cards).toHaveLength(2);
     expect(evening?.title.ar).toBe("أذكار المساء");
 
-    expect(getCuratedRoutinePack("before_sleep")).toBeNull();
+    expect(getCuratedRoutinePack("before_sleep")?.cards.map((card) => card.pageNumber)).toEqual([1, 2]);
+    expect(getCuratedRoutinePack("before_sleep")?.title.ar).toBe("أذكار النوم");
     expect(getCuratedRoutinePack(undefined)).toBeNull();
     expect(getCuratedRoutinePack("unknown")).toBeNull();
   });

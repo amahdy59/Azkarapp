@@ -102,10 +102,13 @@ test("Home utility status stays on one line without horizontal overflow", async 
       };
     });
     expect(geometry.header.y, `Home header top at ${viewport.width}px`).toBeLessThanOrEqual(25);
-    expect(geometry.hero.y, `Home hero starts flush at ${viewport.width}px`).toBeLessThanOrEqual(1);
-    expect(geometry.routineSummary.height, `Home routine summary stays visible at ${viewport.width}px`).toBeGreaterThan(
-      0,
+    expect(geometry.hero.y, `Home hero follows the unobscured header at ${viewport.width}px`).toBeGreaterThanOrEqual(
+      geometry.header.height,
     );
+    expect(geometry.routineSummary.height, `Today’s path is desktop-only at ${viewport.width}px`).toBe(
+      viewport.width >= 900 ? geometry.routineSummary.height : 0,
+    );
+    if (viewport.width >= 900) expect(geometry.routineSummary.height).toBeGreaterThan(0);
     expect(geometry.overflow, `horizontal overflow at ${viewport.width}px`).toBeLessThanOrEqual(0);
     await expect(page.getByTestId("today-garden-card").getByTestId("routine-garden-summary")).toHaveCount(0);
 

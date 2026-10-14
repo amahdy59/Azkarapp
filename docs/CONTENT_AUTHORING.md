@@ -147,3 +147,7 @@ timings are unchanged. Source comparison evidence is retained locally in
 ## Listening timestamp review
 
 Quran text and audio alignment have separate reviews. Do not invent or interpolate approved timestamps. Register only independently reviewed timings for the exact approved variant checksum, following [Quran timing authoring](audio/QURAN_TIMING_AUTHORING.md). `node scripts/validate-quran-timings.mjs` is part of `pnpm check` and checks recording identity, complete ordered verse coverage and shipped semantic word positions.
+
+## Reliance-dhikr display mapping — 2026-10-14
+
+The owner approved Mushaf lettering for the existing quran-009-129-excerpt identity (morning/evening reliance dhikr). The display quotation maps uniquely within page 207, ayah 9:129 using the existing strict quotation boundary. Uthmani إِلَـٰه and reviewed إِلَه normalize to the same word for display matching only. Semantic text, punctuation, seven repetitions, religious attribution and audio hashes are unchanged; no ayah prefix or verse marker is inserted. Unmatched/extra words still reject mapping and retain Unicode fallback. Bundled page font/data make this lettering available offline. Supplied sleep sharing images remain owner-provided raster assets and do not replace reviewed in-app devotional records.

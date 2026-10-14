@@ -359,6 +359,7 @@ function AppContent({
   const [highContrast, setHighContrast] = useState(initialState.settings.highContrast);
   const [boldText, setBoldText] = useState(initialState.settings.boldText);
   const [reduceTransparency, setReduceTransparency] = useState(initialState.settings.reduceTransparency);
+  const [homeWirdImages, setHomeWirdImages] = useState(initialState.settings.homeWirdImages);
   const [hapticFeedback, setHapticFeedback] = useState(initialState.settings.hapticFeedback);
   const [forceRtl, setForceRtl] = useState(initialState.settings.forceRtl);
   const [colorBlindSupport, setColorBlindSupport] = useState<ColorBlindSupport>(
@@ -737,6 +738,7 @@ function AppContent({
         boldText,
         reduceMotion,
         reduceTransparency,
+        homeWirdImages,
         hapticFeedback,
         forceRtl,
         colorBlindSupport,
@@ -790,6 +792,7 @@ function AppContent({
       hapticFeedback,
       highContrast,
       isGuest,
+      homeWirdImages,
       phone,
       avatarUrl,
       reduceMotion,
@@ -1131,6 +1134,7 @@ function AppContent({
     setBoldText(state.settings.boldText);
     setReduceMotion(state.settings.reduceMotion);
     setReduceTransparency(state.settings.reduceTransparency);
+    setHomeWirdImages(state.settings.homeWirdImages);
     setHapticFeedback(state.settings.hapticFeedback);
     setForceRtl(state.settings.forceRtl);
     setColorBlindSupport(state.settings.colorBlindSupport);
@@ -1808,6 +1812,7 @@ function AppContent({
                   dailyCompletions={dailyCompletions}
                   quietProgressEnabled={true}
                   homeVisualEffects={!reduceTransparency}
+                  homeWirdImages={homeWirdImages}
                   progressDayStartHour={progressDayStartHour}
                   locationSettings={locationSettings}
                   quranReadingPosition={quranReadingPosition}
@@ -2327,6 +2332,7 @@ function AppContent({
                   boldText={boldText}
                   reduceMotion={reduceMotion}
                   reduceTransparency={reduceTransparency}
+                  homeWirdImages={homeWirdImages}
                   hapticFeedback={hapticFeedback}
                   forceRtl={forceRtl}
                   colorBlindSupport={colorBlindSupport}
@@ -2349,6 +2355,7 @@ function AppContent({
                   onBoldTextChange={setBoldText}
                   onReduceMotionChange={setReduceMotion}
                   onReduceTransparencyChange={setReduceTransparency}
+                  onHomeWirdImagesChange={setHomeWirdImages}
                   onHapticFeedbackChange={setHapticFeedback}
                   onForceRtlChange={setForceRtl}
                   onColorBlindSupportChange={setColorBlindSupport}

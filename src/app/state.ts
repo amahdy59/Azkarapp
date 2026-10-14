@@ -134,6 +134,7 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
     boldText: false,
     reduceMotion: false,
     reduceTransparency: false,
+    homeWirdImages: false,
     hapticFeedback: true,
     forceRtl: false,
     colorBlindSupport: "none",
@@ -901,6 +902,10 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
       boldText: typeof settings?.boldText === "boolean" ? settings.boldText : DEFAULT_APP_STATE.settings.boldText,
       reduceMotion:
         typeof settings?.reduceMotion === "boolean" ? settings.reduceMotion : DEFAULT_APP_STATE.settings.reduceMotion,
+      homeWirdImages:
+        typeof settings?.homeWirdImages === "boolean"
+          ? settings.homeWirdImages
+          : DEFAULT_APP_STATE.settings.homeWirdImages,
       reduceTransparency:
         typeof settings?.reduceTransparency === "boolean"
           ? settings.reduceTransparency
@@ -1259,6 +1264,10 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
         typeof incoming.settings?.reduceMotion === "boolean"
           ? incoming.settings.reduceMotion
           : safeBase.settings.reduceMotion,
+      homeWirdImages:
+        typeof incoming.settings?.homeWirdImages === "boolean"
+          ? incoming.settings.homeWirdImages
+          : safeBase.settings.homeWirdImages,
       reduceTransparency:
         typeof incoming.settings?.reduceTransparency === "boolean"
           ? incoming.settings.reduceTransparency

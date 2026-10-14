@@ -24,6 +24,7 @@ async function openHome(page: Page, language: "ar" | "en") {
     );
   }, language);
   await page.goto("/#/home");
+  await page.getByRole("button", { name: language === "ar" ? "عرض جميع الصلوات" : "Show all prayers" }).click();
   await expect(page.getByTestId("prayer-card-fajr")).toBeVisible();
   await page.evaluate(() => document.fonts.ready);
 }
@@ -198,6 +199,7 @@ for (const language of ["ar", "en"] as const) {
         { themeMode, reduceTransparency },
       );
       await page.reload();
+      await page.getByRole("button", { name: language === "ar" ? "عرض جميع الصلوات" : "Show all prayers" }).click();
       await page.getByTestId("prayer-card-dhuhr").getByRole("button").click();
       await checkGeometry(page);
       expect(

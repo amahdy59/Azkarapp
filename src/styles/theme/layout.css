@@ -267,6 +267,19 @@
   color: var(--on-media);
 }
 
+/* Home materials share a dark tint so bright photography cannot wash out ink.
+   Image captions use this same material inside the photograph, not behind it. */
+.hero-glass.home-glass-surface {
+  background-color: rgb(15 23 42 / 0.68);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .hero-glass.home-glass-surface {
+    background: var(--on-media-surface);
+    backdrop-filter: none;
+  }
+}
+
 .home-photo-scrim {
   position: absolute;
   inset: 0;

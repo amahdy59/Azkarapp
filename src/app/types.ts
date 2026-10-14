@@ -273,6 +273,8 @@ export interface UserSettingsState {
   reduceMotion: boolean;
   /** Blurred materials go solid. See the .reduce-transparency rules. */
   reduceTransparency: boolean;
+  /** Optional Home daily-wird photography; independent of transparency. */
+  homeWirdImages: boolean;
   hapticFeedback: boolean;
   forceRtl: boolean;
   colorBlindSupport: ColorBlindSupport;

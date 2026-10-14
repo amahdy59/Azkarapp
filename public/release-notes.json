@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-14-4",
+  "release": "2026-10-14-5",
   "ar": [
-    "يبقى عنوان التقدم وخيارات اليوم والأسبوع والشهر والسنة ظاهرين أثناء قراءة السجلات.",
-    "يمكنك الانتقال بين الفترات السابقة من أعلى الشاشة دون الرجوع إلى بداية الصفحة.",
-    "تبقى تسميات فترات الرسم واضحة ومنفصلة عند تكبير النص، مع تمرير داخلي عند الحاجة.",
-    "يوضح عرض الشهر عدد الأيام المنقضية مقارنة بطول الشهر الفعلي، وتظل النسب مستبعدة للأيام القادمة."
+    "تعرض الرئيسية الصلاة الحالية والقادمة مع خيار عرض الجميع، ويبقى مسار اليوم أعلى الشاشة مخصصًا للحاسوب.",
+    "أصبح ورد اليوم أوضح، ويمكنك إظهار صوره وضبط الشفافية بشكل مستقل من إعدادات المظهر.",
+    "يمكنك مشاركة أذكار النوم باستخدام بطاقتين جاهزتين مع معاينتهما وحفظهما معًا.",
+    "يظهر ذكر حسبي الله لا إله إلا هو بخط المصحف، مع الحفاظ على نصه وعدد تكراره وإتاحته دون اتصال."
   ],
   "en": [
-    "The Progress title and Day, Week, Month and Year choices stay visible while you read your records.",
-    "Move between historical periods from the top of the screen without scrolling back to the beginning.",
-    "Chart period labels stay readable and separated with enlarged text, using internal scrolling when needed.",
-    "Month view explains elapsed days against the actual month length, while rates continue to exclude future days."
+    "Home focuses on the current and next prayers with an option to show all, and keeps the top Today's path shortcut on desktop.",
+    "Today's wird is clearer, with independent image and transparency choices in Appearance settings.",
+    "Share before-sleep azkar using two supplied cards, with previews and one archive to save them together.",
+    "The Hasbi Allah reliance dhikr now uses Mushaf lettering offline while preserving its wording and repetition count."
   ]
 }

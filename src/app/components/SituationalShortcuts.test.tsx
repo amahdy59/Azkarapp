@@ -13,6 +13,8 @@ describe("situational shortcuts", () => {
     onOpen.mockClear();
     fireEvent.click(travel, { ctrlKey: true });
     expect(onOpen).not.toHaveBeenCalled();
+    expect(screen.getAllByRole("link")).toHaveLength(3);
+    fireEvent.click(screen.getByRole("button", { name: "View all" }));
     expect(screen.getAllByRole("link")).toHaveLength(6);
   });
   it("labels shortcuts in Arabic without duplicating devotional text", () => {

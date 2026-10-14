@@ -161,3 +161,5 @@ For a manual location verification:
 9. Enable prayer reminders, select 10 or 15 minutes, reload Settings, and confirm the choice persists.
 
 When local authorities differ by a few minutes, confirm the selected calculation method first, then use manual adjustments only when required.
+
+Home clarity follow-up, 2026-10-14: the default overview presents current and next prayer only, with an explicit control for all five. Existing prayer calculations, sunrise bounds, next-day countdowns, future recording restrictions and recording models are unchanged.

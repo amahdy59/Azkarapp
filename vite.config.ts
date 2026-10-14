@@ -239,7 +239,8 @@ export default defineConfig(({ mode }) => {
             "**/*.{js,css,html,svg,png,webp,avif,woff2}",
             "**/release-history-*.bin",
             "assets/cards/routine-{morning,evening}-*.webp",
-            "data/mushaf/{42,49,75,76,603,604}.json",
+            "assets/cards/routine-before_sleep-*.jpg",
+            "data/mushaf/{42,49,75,76,207,603,604}.json",
           ],
           // Only real exclusions belong here. The rest of this list used to name
           // uncompressed masters, design sources and superseded imagery that no
