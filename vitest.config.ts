@@ -1,4 +1,5 @@
 import os from "node:os";
+import path from "node:path";
 import { defineConfig } from "vitest/config";
 
 const cpuCount = os.cpus().length || 4;
@@ -33,6 +34,12 @@ const shared = {
 };
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      "@azkar/native-mushaf-download": path.resolve("src/app/content/nativeMushafDownload.ts"),
+      "@azkar/native-reminders": path.resolve("src/app/hooks/nativeReminderScheduling.ts"),
+    },
+  },
   test: {
     projects: [
       {
