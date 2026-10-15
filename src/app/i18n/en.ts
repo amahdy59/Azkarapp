@@ -477,12 +477,26 @@ const en = {
     resultsSingular: '1 result for "{query}"',
     resultsPlural: '{count} results for "{query}"',
     resultAriaLabel: "{title}, in {category}",
+    loadMore: "Show {count} more results",
     emptyTitle: "No azkar found",
     emptyDescription: "Try another word in Arabic, English, or transliteration.",
     emptyAction: "Clear search",
     hint: "Try Arabic, English, or transliteration",
   },
+  widgets: {
+    prayers: "Prayer times",
+    azkar: "Daily azkar",
+    azkarBody: "Continue your daily reading",
+    quran: "Continue Quran",
+    page: "Page {page}",
+    counter: "Tasbih",
+    counterBody: "Open to continue counting",
+  },
   notifications: {
+    nativeAvailabilityBody:
+      "Android schedules the next seven days on this device. Open Azkar at least weekly and after a clock or timezone change to refresh them. Battery restrictions, approximate alarms and force-stop can delay or prevent delivery.",
+    nativeActiveNotice:
+      "Your reminder settings are saved. Android delivery depends on device notification permission and battery settings.",
     availabilityShort:
       "Keep Azkar open for reminders. Background delivery may be delayed; reminders do not run after you fully close the app.",
     invalidCoordinates: "Enter a latitude from -90 to 90 and longitude from -180 to 180.",
@@ -584,6 +598,7 @@ const en = {
     exportEmpty: "Download this group’s audio first to save files here.",
     saveFile: "Save audio file",
     preparingFile: "Preparing audio file…",
+    fileSavedOnDevice: "The file was saved to your chosen location.",
     fileHandedToBrowser: "Sent to your browser for saving. Check Downloads/Files.",
     exportError: "Could not verify this file. Refresh status and download missing audio.",
     offlineHelp: "How offline storage works",
@@ -805,6 +820,11 @@ const en = {
     qrSyncUnlinked: "This device has been unlinked.",
     qrSyncThisDevice: "This device",
     qrSyncStatusLinked: "Connected and syncing",
+    qrSyncRetry: "Retry sync",
+    qrSyncSaved: "Changes saved to paired devices",
+    qrSyncWaiting: "Device linked · waiting to sync",
+    qrSyncError: "Device sync needs attention. Your changes are saved locally. Reconnect or retry.",
+    qrSyncRequired: "Enter a pairing code first.",
     qrSyncStatusNotLinked: "Not connected to other devices",
     qrSyncUnlinkConfirm:
       "Are you sure you want to unlink this device? Your local reading progress will remain safely on this device.",
@@ -840,6 +860,7 @@ const en = {
     gardenQ: "How do leaves and palms work?",
     gardenA:
       "Each fully completed collection adds one leaf to its progress day. Completing Morning, Evening, and Before Sleep Azkar adds one palm. Repeats never add duplicate leaves, and the garden does not measure spiritual reward or rank.",
+    emailSupport: "Email support",
     stillNeedHelp: "Still need help?",
     reportIssue: "Report a problem",
     reportHint: "Open the project issue form to share steps and screenshots.",
@@ -850,17 +871,19 @@ const en = {
     privacyIntro: "Azkar is designed to work locally first and collect as little information as possible.",
     localTitle: "Data on this device",
     localBody:
-      "Preferences, progress, sessions, reminders, and saved items are stored in your browser for the app to function.",
+      "Preferences, progress, sessions, reminders, and saved items are stored on this device. Android also stores a small local widget projection and scheduled reminders. Coordinates stay local.",
     accountTitle: "Optional account data",
     accountBody:
-      "If sign-in is enabled and you choose it, your account identity and app data are processed by the configured Supabase service for sync.",
+      "Optional sign-in uses Supabase for identity and synchronization. Optional QR pairing separately stores a device credential hash and a sanitized progress snapshot with Cloudflare; coordinates and profile details are excluded from that snapshot.",
     permissionsTitle: "Browser permissions",
     permissionsBody:
       "Notifications are requested only after you choose to enable them. You can revoke permission in your browser or device settings.",
     trackingTitle: "Tracking and advertising",
-    trackingBody: "This version does not include advertising or third-party analytics trackers.",
+    trackingBody:
+      "There are no ads. While the app is visible, an anonymous presence heartbeat uses a random on-device identifier. Cloudflare stores a salted hash and first/last-seen times, and deletes inactive presence records after 24 hours. This aggregate counter is separate from optional account synchronization.",
     controlTitle: "Your controls",
-    controlBody: "Use Account & data to download your data, restore preferences, or erase local app data.",
+    controlBody:
+      "Use Account & data to export or erase local data. Account deletion removes Supabase account records. Unlinking a QR device removes that device; the Cloudflare account is removed when its last device is unlinked. Other linked devices retain their data.",
     termsTitle: "Terms summary",
     devotionalTitle: "Devotional tool",
     devotionalBody:

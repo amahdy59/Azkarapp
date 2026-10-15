@@ -22,6 +22,7 @@ import {
 // ─── Recent-search persistence ────────────────────────────────────────────────
 // Stored per-language so Arabic and English histories don't overwrite each other.
 const MAX_RECENTS = 5;
+const RESULT_BATCH_SIZE = 20;
 
 function recentsKey(language: AppLanguage): string {
   return `azkarapp_recent_searches_${language}`;
@@ -111,11 +112,13 @@ export function SearchScreen({
   useScreenFocus(t(language, "search.inputAriaLabel"));
   const searchInputId = useId();
   const [q, setQ] = useState(() => initialQuery.trim());
+  const [resultPage, setResultPage] = useState({ query: "", count: RESULT_BATCH_SIZE });
   const changeQuery = (query: string) => {
     setQ(query);
     onQueryChange?.(query);
   };
   const deferredQuery = useDeferredValue(q.trim());
+  const visibleCount = resultPage.query === deferredQuery ? resultPage.count : RESULT_BATCH_SIZE;
 
   // Load per-language history from localStorage; no hardcoded defaults.
   const [recents, setRecents] = useState<string[]>(() => loadRecents(language));
@@ -268,7 +271,7 @@ export function SearchScreen({
                 onAction={() => changeQuery("")}
               />
             ) : (
-              results.map((z) => {
+              results.slice(0, visibleCount).map((z) => {
                 const category = CATEGORIES.find((item) => item.id === z.category)!;
                 const sourceText = isArabic ? z.arabicText : z.translation;
                 const surahTitle = isArabic ? z.surahNameArabic : z.surahNameEnglish;
@@ -325,6 +328,20 @@ export function SearchScreen({
               })
             )}
           </div>
+        )}
+
+        {results.length > visibleCount && (
+          <button
+            type="button"
+            className="mt-3 min-h-11 w-full rounded-xl border border-border bg-card px-4 py-3 text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            onClick={() => setResultPage({ query: deferredQuery, count: visibleCount + RESULT_BATCH_SIZE })}
+          >
+            {t(language, "search.loadMore", {
+              count: Math.min(RESULT_BATCH_SIZE, results.length - visibleCount).toLocaleString(
+                language === "ar" ? "ar-EG" : "en-US",
+              ),
+            })}
+          </button>
         )}
 
         {/* Hint — shown when input is empty */}

@@ -5,6 +5,7 @@ export const CLOUDFLARE_DEVICE_SECRET_KEY = "azkarapp.cloudflare-device-secret.v
 export const CLOUDFLARE_DEVICE_EVENT = "azkarapp-cloudflare-device";
 const API_URL = import.meta.env.VITE_CLOUDFLARE_API_URL || "https://azkarapp-api.amahdy59.workers.dev";
 const VISITOR_KEY = "azkarapp.visitor-id.v1";
+export const DEVICE_REQUEST_TIMEOUT_MS = 15_000;
 
 export function getCloudflareDeviceSecret() {
   try {
@@ -34,16 +35,30 @@ async function requestJson<T extends Record<string, unknown>>(
   const headers = new Headers(init.headers);
   headers.set("content-type", "application/json");
   if (secret) headers.set("authorization", `Bearer ${secret}`);
-  const response = await fetch(`${API_URL}${path}`, {
-    ...init,
-    headers,
+  const controller = new AbortController();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const deadline = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => {
+      controller.abort();
+      reject(new Error("device_request_timeout"));
+    }, DEVICE_REQUEST_TIMEOUT_MS);
   });
-  if (options.acceptUnauthorizedDelete && init.method === "DELETE" && response.status === 401) return {} as T;
-  const data = (await response.json().catch(() => ({}))) as T & { error?: unknown };
-  if (!response.ok) {
-    throw new Error(typeof data.error === "string" ? data.error : `cloudflare_sync_${response.status}`);
+  try {
+    return await Promise.race([
+      (async () => {
+        const response = await fetch(`${API_URL}${path}`, { ...init, headers, signal: controller.signal });
+        if (options.acceptUnauthorizedDelete && init.method === "DELETE" && response.status === 401) return {} as T;
+        const data = (await response.json().catch(() => ({}))) as T & { error?: unknown };
+        if (!response.ok) {
+          throw new Error(typeof data.error === "string" ? data.error : `cloudflare_sync_${response.status}`);
+        }
+        return data;
+      })(),
+      deadline,
+    ]);
+  } finally {
+    clearTimeout(timer);
   }
-  return data;
 }
 
 export function hasCloudflareDevice() {

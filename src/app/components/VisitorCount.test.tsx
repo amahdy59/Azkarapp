@@ -1,5 +1,5 @@
 import { act, render, screen, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ActiveVisitorPresence, VisitorCount } from "./VisitorCount";
 
 function renderVisitorCount(language: "ar" | "en", onMedia = false) {
@@ -11,9 +11,42 @@ function renderVisitorCount(language: "ar" | "en", onMedia = false) {
 }
 
 describe("VisitorCount", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+  });
   beforeEach(() => {
     vi.restoreAllMocks();
     localStorage.clear();
+  });
+
+  it("never overlaps slow heartbeats and stops sending after unmount", async () => {
+    vi.useFakeTimers();
+    let complete!: (value: Response) => void;
+    const fetch = vi.fn(
+      () =>
+        new Promise<Response>((resolve) => {
+          complete = resolve;
+        }),
+    );
+    vi.stubGlobal("fetch", fetch);
+    let heartbeat: (() => void) | undefined;
+    vi.spyOn(window, "setInterval").mockImplementation((handler) => {
+      heartbeat = handler as () => void;
+      return 1;
+    });
+    const view = renderVisitorCount("en");
+    heartbeat?.();
+    heartbeat?.();
+    expect(fetch).toHaveBeenCalledTimes(1);
+    // The transport deadline ends the first request; its late response cannot update unmounted UI.
+    view.unmount();
+    await act(async () => {
+      complete(new Response(JSON.stringify({ active: 9 }), { status: 200 }));
+      await vi.advanceTimersByTimeAsync(60_000);
+    });
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(screen.queryByText("Visitors now: 9")).not.toBeInTheDocument();
   });
 
   it("shows the active visitor count after a successful heartbeat", async () => {

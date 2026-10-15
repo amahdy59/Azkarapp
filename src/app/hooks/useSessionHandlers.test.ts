@@ -112,6 +112,33 @@ beforeEach(() => {
 afterEach(() => vi.useRealTimers());
 
 describe("useSessionHandlers", () => {
+  it("preserves the previous completion set and reaches the summary after the first final count", () => {
+    const items = getAzkarForMode("morning", "complete");
+    const previous = new Set(items.slice(0, -1).map((item) => item.id));
+    const expected = [...previous];
+    const { result, pop } = renderSessionHarness({ completed: createCompleted({ morning: previous }) });
+    // The counter captures this callback before markComplete triggers a render.
+    const delayedAdvance = result.current.handlers.advanceAfterCompletion;
+    act(() => result.current.handlers.markComplete(items.length - 1));
+    expect([...previous]).toEqual(expected);
+    expect(result.current.completed.morning).toContain(items.at(-1)!.id);
+    act(() => delayedAdvance(items.length - 1));
+    expect(pop).not.toHaveBeenCalled();
+    expect(result.current.view).toBe("completion");
+    expect(result.current.sessions).toHaveLength(1);
+  });
+
+  it("never mutates a previous completion set when toggling or advancing", () => {
+    const items = getAzkarForMode("morning", "complete");
+    const previous = new Set([items[0]!.id]);
+    const { result } = renderSessionHarness({ completed: createCompleted({ morning: previous }) });
+    act(() => result.current.handlers.toggleZikrCompletion("morning", 0));
+    expect(previous).toEqual(new Set([items[0]!.id]));
+    const beforeAdvance = result.current.completed.morning;
+    act(() => result.current.handlers.advanceAfterCompletion(0));
+    expect(beforeAdvance.size).toBe(0);
+  });
+
   it("ignores a delayed advance from the previous shared routine", () => {
     const { result, rerender, pop } = renderSessionHarness({
       savedMorningMode: "core",

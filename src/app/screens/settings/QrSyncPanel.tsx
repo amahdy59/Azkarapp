@@ -1,15 +1,9 @@
-import { useEffect, useState } from "react";
 import { Button } from "../../components/ui/button";
 import type { AppLanguage } from "../../types";
-import {
-  claimCloudflarePairing,
-  CLOUDFLARE_DEVICE_EVENT,
-  createCloudflarePairing,
-  hasCloudflareDevice,
-  unlinkCloudflareDevice,
-} from "../../../lib/cloudflareSync";
+import { useDevicePairing } from "../../hooks/useDevicePairing";
 import { t } from "../../i18n";
 import { formatNumerals } from "../../formatting";
+import { retryDeviceSync, useDeviceSyncStatus } from "../../deviceSyncStatus";
 
 function formatMinutesSeconds(totalSeconds: number, language: AppLanguage) {
   const mins = Math.floor(totalSeconds / 60);
@@ -19,96 +13,21 @@ function formatMinutesSeconds(totalSeconds: number, language: AppLanguage) {
 }
 
 export function QrSyncPanel({ language }: { language: AppLanguage }) {
-  const [isLinked, setIsLinked] = useState<boolean>(hasCloudflareDevice);
-  const [confirmingUnlink, setConfirmingUnlink] = useState(false);
-  const [qr, setQr] = useState<string>();
-  const [expiresAt, setExpiresAt] = useState<number | null>(null);
-  const [secondsLeft, setSecondsLeft] = useState<number>(0);
-  const [pairingToken, setPairingToken] = useState("");
-  const [message, setMessage] = useState("");
-  const [pending, setPending] = useState(false);
-
-  useEffect(() => {
-    const handleDeviceChange = () => {
-      setIsLinked(hasCloudflareDevice());
-    };
-    window.addEventListener(CLOUDFLARE_DEVICE_EVENT, handleDeviceChange);
-    window.addEventListener("storage", handleDeviceChange);
-    return () => {
-      window.removeEventListener(CLOUDFLARE_DEVICE_EVENT, handleDeviceChange);
-      window.removeEventListener("storage", handleDeviceChange);
-    };
-  }, []);
-
-  useEffect(() => {
-    const token = new URLSearchParams(window.location.search).get("pair");
-    if (!token) return;
-    setPairingToken(token);
-    window.history.replaceState(window.history.state, "", `${window.location.pathname}${window.location.hash}`);
-  }, []);
-
-  useEffect(() => {
-    if (!expiresAt) {
-      setSecondsLeft(0);
-      return;
-    }
-    const update = () => {
-      const remaining = Math.max(0, Math.round((expiresAt - Date.now()) / 1000));
-      setSecondsLeft(remaining);
-    };
-    update();
-    const interval = window.setInterval(update, 1000);
-    return () => window.clearInterval(interval);
-  }, [expiresAt]);
-
-  const generate = async () => {
-    if (pending) return;
-    setPending(true);
-    try {
-      const pairing = await createCloudflarePairing();
-      setIsLinked(hasCloudflareDevice());
-      setPairingToken(pairing.token);
-      setQr(pairing.dataUrl);
-      setExpiresAt(pairing.expiresAt);
-      setMessage(t(language, "accountData.qrSyncCreated"));
-    } catch {
-      setMessage(t(language, "accountData.qrSyncCreateError"));
-    } finally {
-      setPending(false);
-    }
-  };
-
-  const claim = async () => {
-    if (pending || !pairingToken.trim()) return;
-    setPending(true);
-    try {
-      await claimCloudflarePairing(pairingToken.trim());
-      setIsLinked(true);
-      setMessage(t(language, "accountData.qrSyncLinked"));
-    } catch {
-      setMessage(t(language, "accountData.qrSyncExpired"));
-    } finally {
-      setPending(false);
-    }
-  };
-
-  const unlink = async () => {
-    if (pending) return;
-    setPending(true);
-    try {
-      await unlinkCloudflareDevice();
-      setIsLinked(false);
-      setConfirmingUnlink(false);
-      setQr(undefined);
-      setExpiresAt(null);
-      setPairingToken("");
-      setMessage(t(language, "accountData.qrSyncUnlinked"));
-    } catch {
-      setMessage(t(language, "accountData.qrSyncCreateError"));
-    } finally {
-      setPending(false);
-    }
-  };
+  const syncStatus = useDeviceSyncStatus();
+  const {
+    isLinked,
+    confirmingUnlink,
+    setConfirmingUnlink,
+    qr,
+    secondsLeft,
+    pairingToken,
+    setPairingToken,
+    message,
+    pending,
+    generate,
+    claim,
+    unlink,
+  } = useDevicePairing(language);
 
   return (
     <fieldset
@@ -125,10 +44,26 @@ export function QrSyncPanel({ language }: { language: AppLanguage }) {
             className={`size-2.5 rounded-full ${isLinked ? "bg-success" : "bg-muted-foreground"}`}
             aria-hidden="true"
           />
-          <span className="text-sm font-medium text-foreground">
-            {t(language, isLinked ? "accountData.qrSyncStatusLinked" : "accountData.qrSyncStatusNotLinked")}
+          <span role="status" className="text-sm font-medium text-foreground">
+            {t(
+              language,
+              !isLinked
+                ? "accountData.qrSyncStatusNotLinked"
+                : syncStatus === "syncing"
+                  ? "accountData.qrSyncStatusLinked"
+                  : syncStatus === "saved"
+                    ? "accountData.qrSyncSaved"
+                    : syncStatus === "error"
+                      ? "accountData.qrSyncError"
+                      : "accountData.qrSyncWaiting",
+            )}
           </span>
         </div>
+        {isLinked && syncStatus === "error" && (
+          <Button type="button" variant="outline" className="mt-3 w-full" onClick={retryDeviceSync}>
+            {t(language, "accountData.qrSyncRetry")}
+          </Button>
+        )}
 
         {isLinked && (
           <div className="mt-4 border-t border-border/60 pt-3">
