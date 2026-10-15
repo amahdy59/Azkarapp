@@ -8,15 +8,15 @@ importers:
 
   .:
     dependencies:
-      '@capacitor/app':
-        specifier: 8.1.0
-        version: 8.1.0(@capacitor/core@8.5.2)
+      '@capacitor/android':
+        specifier: 8.5.3
+        version: 8.5.3(@capacitor/core@8.5.3)
       '@capacitor/core':
-        specifier: ^8.5.2
-        version: 8.5.2
+        specifier: 8.5.3
+        version: 8.5.3
       '@capacitor/local-notifications':
-        specifier: ^8.3.1
-        version: 8.3.1(@capacitor/core@8.5.2)
+        specifier: 8.0.0
+        version: 8.0.0(@capacitor/core@8.5.3)
       '@fontsource-variable/noto-sans-arabic':
         specifier: 5.3.0
         version: 5.3.0
@@ -99,12 +99,9 @@ importers:
       '@axe-core/playwright':
         specifier: ^4.12.1
         version: 4.12.1(playwright-core@1.61.1)
-      '@capacitor/android':
-        specifier: ^8.5.2
-        version: 8.5.2(@capacitor/core@8.5.2)
       '@capacitor/cli':
-        specifier: ^8.5.2
-        version: 8.5.2(supports-color@7.2.0)
+        specifier: 8.5.3
+        version: 8.5.3(supports-color@7.2.0)
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.6.0(jiti@2.7.0)(supports-color@7.2.0))
@@ -730,26 +727,21 @@ packages:
     resolution: {integrity: sha512-ctxtJ/eA+t+6q2++vj5j7FYX3nRu311q1wfYH3xjlLOsczhlhxAg2FWNUXhpGvAw3BWo1xBcvOV6/YLc2r5FJw==}
     hasBin: true
 
-  '@capacitor/android@8.5.2':
-    resolution: {integrity: sha512-rtiaz78egCcS+vs29wkWCL3C+RhazKMSygXcjutwWP8NmO6r5UBxOvGf3Wjz5+ahobyQ723tn9gCePwRwcNDZQ==}
+  '@capacitor/android@8.5.3':
+    resolution: {integrity: sha512-ilH4gSSz3DrketMkzDVAvY9JsWJ//rCQnECLTdcFRO7xXDogwAbUvQAnIAbiqefwV/D1xfjEL4Gw1MJXEcaA9g==}
     peerDependencies:
       '@capacitor/core': ^8.5.0
 
-  '@capacitor/app@8.1.0':
-    resolution: {integrity: sha512-MlmttTOWHDedr/G4SrhNRxsXMqY+R75S4MM4eIgzsgCzOYhb/MpCkA5Q3nuOCfL1oHm26xjUzqZ5aupbOwdfYg==}
-    peerDependencies:
-      '@capacitor/core': '>=8.0.0'
-
-  '@capacitor/cli@8.5.2':
-    resolution: {integrity: sha512-O2kpA5ZPJUAmliDCcmpMf8xnJwMezxlFPUrlyOAjbL3U9MFNY3l4ZpPI/UXwvyPmR8ETcVF9pFr+VdWq61rqTQ==}
+  '@capacitor/cli@8.5.3':
+    resolution: {integrity: sha512-/G6xwna+p4GS3lthSdWN3OThCH2F85O0Ukdy8rv3oAXvgEMeyFgPEIA3PMAS++IkHwUuBYBAKOQJnZfcrh1n0w==}
     engines: {node: '>=22.0.0'}
     hasBin: true
 
-  '@capacitor/core@8.5.2':
-    resolution: {integrity: sha512-agnQbGdhGw/KZFuLf7H9SY2o+oE7upkr/WPQsYaokXP6f9chaE8iVmbKkfN6SVl4w3pmz7oZ3Ur1hbkmy1hx+w==}
+  '@capacitor/core@8.5.3':
+    resolution: {integrity: sha512-oBE1oGuYE4ZzYYrulC75OuHdSsD6zLUy7d5o1tFwDLG4govGoubY15cxpiI5l0+q87Lm5p0bhbehMdzJg4aFag==}
 
-  '@capacitor/local-notifications@8.3.1':
-    resolution: {integrity: sha512-F7zu/+p/mIR958YP4axOkeI5hBKRaXDyYjbNPrAil2wWfd7OxScPSTvP9t85NpQ0eULVRu0/sntoxOg6ck477A==}
+  '@capacitor/local-notifications@8.0.0':
+    resolution: {integrity: sha512-Jn2IJs13vhRyOUtYni7PIPdMDYMILb4uI/rRAi7PmGg2lnaKbM5aWBmHZWt0laTYyVApYIbCWmdgBqWx/IH4dQ==}
     peerDependencies:
       '@capacitor/core': '>=8.0.0'
 
@@ -4890,15 +4882,11 @@ snapshots:
     dependencies:
       css-tree: 3.2.1
 
-  '@capacitor/android@8.5.2(@capacitor/core@8.5.2)':
+  '@capacitor/android@8.5.3(@capacitor/core@8.5.3)':
     dependencies:
-      '@capacitor/core': 8.5.2
+      '@capacitor/core': 8.5.3
 
-  '@capacitor/app@8.1.0(@capacitor/core@8.5.2)':
-    dependencies:
-      '@capacitor/core': 8.5.2
-
-  '@capacitor/cli@8.5.2(supports-color@7.2.0)':
+  '@capacitor/cli@8.5.3(supports-color@7.2.0)':
     dependencies:
       '@ionic/cli-framework-output': 2.2.8(supports-color@7.2.0)
       '@ionic/utils-subprocess': 3.0.1(supports-color@7.2.0)
@@ -4921,13 +4909,13 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@capacitor/core@8.5.2':
+  '@capacitor/core@8.5.3':
     dependencies:
       tslib: 2.8.1
 
-  '@capacitor/local-notifications@8.3.1(@capacitor/core@8.5.2)':
+  '@capacitor/local-notifications@8.0.0(@capacitor/core@8.5.3)':
     dependencies:
-      '@capacitor/core': 8.5.2
+      '@capacitor/core': 8.5.3
 
   '@csstools/color-helpers@6.1.0': {}
 

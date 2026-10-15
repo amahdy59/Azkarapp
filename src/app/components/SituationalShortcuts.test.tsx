@@ -13,11 +13,15 @@ describe("situational shortcuts", () => {
     onOpen.mockClear();
     fireEvent.click(travel, { ctrlKey: true });
     expect(onOpen).not.toHaveBeenCalled();
+    expect(screen.getAllByRole("link")).toHaveLength(3);
+    fireEvent.click(screen.getByRole("button", { name: "View all" }));
     expect(screen.getAllByRole("link")).toHaveLength(6);
   });
   it("labels shortcuts in Arabic without duplicating devotional text", () => {
     render(<SituationalShortcuts language="ar" onOpen={vi.fn()} />);
     expect(screen.getByRole("heading", { name: "أذكار لمواقف يومك" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "أذكار الكرب والهم" })).toHaveTextContent("الكرب والهم");
+    expect(screen.getByRole("link", { name: "أذكار المنزل" })).toHaveTextContent("المنزل");
     expect(screen.getByRole("link", { name: "أذكار الكرب والهم" })).toHaveAttribute(
       "href",
       "#/azkar/distress-anxiety/1",

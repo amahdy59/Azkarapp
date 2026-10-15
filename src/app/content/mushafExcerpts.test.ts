@@ -12,6 +12,7 @@ import { WIRD_QURAN_EVIDENCE } from "./wirdBenefits";
 import { QURAN_PASSAGES } from "./quranPassages";
 import { QURAN_IMRAN_PASSAGE } from "./quranImranPassage";
 import { RELEVANT_NOW_VERSES } from "./relevantNowVerses";
+import { getAzkarByCategory } from "./azkar";
 import type { MushafWordToken } from "../components/MushafPageViewer";
 import type { MushafVerseData } from "./qcfMushaf";
 
@@ -25,6 +26,21 @@ const passages = [
   QURAN_IMRAN_PASSAGE,
 ];
 describe("canonical Mushaf excerpts", () => {
+  it("maps the reliance dhikr to only its unchanged quoted words in 9:129", () => {
+    const range = QURAN_EVIDENCE_EXCERPTS["quran-009-129-excerpt"]!;
+    const { lines } = readExcerptPages(range);
+    const selected = selectMushafExcerpt(lines, range.from, range.to);
+    for (const category of ["morning", "evening"] as const) {
+      const zikr = getAzkarByCategory(category).find((item) => item.id.endsWith("hm-83"))!;
+      const mapping = excerptWordMapping(selected, zikr.arabicText, true);
+      expect(mapping, JSON.stringify({ text: zikr.arabicText, key: zikr.canonicalKey })).not.toBeNull();
+      expect(mapping![0]!.word.position).toBeGreaterThan(1);
+      expect(mapping!.every((item) => item.word.verseKey === "9:129" && !item.word.isEnd)).toBe(true);
+      expect(mapping!.at(-1)!.endOffset).toBe(zikr.arabicText.length - 1);
+      expect(excerptWordMapping(selected, zikr.arabicText + " extra", true)).toBeNull();
+      expect(zikr.repetitionCount).toBe(7);
+    }
+  });
   it("maps existing evidence quotations only within their explicit cited verses", () => {
     for (const item of [...QURAN_DHIKR_EVIDENCE, ...WIRD_QURAN_EVIDENCE]) {
       const range = QURAN_EVIDENCE_EXCERPTS[item.id]!;

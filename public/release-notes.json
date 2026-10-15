@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-14-7",
+  "release": "2026-10-15-3",
   "ar": [
-    "يمكن للتطبيق جدولة تذكيرات الأذكار على أندرويد حتى بعد إغلاق التطبيق.",
-    "يمكن تنزيل ملفات المصحف والصوتيات وتشغيلها دون اتصال على أندرويد.",
-    "يمكن مشاركة الملفات وحفظها من أندرويد، ويعمل زر الرجوع مع تنقل التطبيق بسلاسة.",
-    "يظهر شريط الحالة وتبقى المسافات والعناوين متناسقة على شاشات أندرويد المختلفة."
+    "يفتح إكمال آخر ذكر ملخص الجلسة مباشرة، وتظل بياناتك قابلة للوصول عند تقييد تخزين المتصفح.",
+    "تعرض مزامنة الأجهزة حالة الحفظ الفعلية مع إعادة المحاولة عند تعذر الاتصال.",
+    "تُعرض نتائج البحث الطويلة على دفعات لتسهيل التصفح دون إخفاء بقية النتائج.",
+    "أصبحت معلومات الخصوصية والحذف أوضح بالعربية والإنجليزية، وصُحّح مصدر تسجيلات عبد الله محمد."
   ],
   "en": [
-    "Android can schedule Azkar reminders that remain available after the app is closed.",
-    "Download Mushaf files and audio recordings for offline use on Android.",
-    "Share and save files through Android, with the hardware Back button following app navigation.",
-    "The status bar stays visible and header spacing remains consistent across Android screens."
+    "Completing the final zikr now opens the session summary, and account data handles restricted browser storage.",
+    "Device sync shows its actual save status and offers retry when a connection fails.",
+    "Long search results load in batches, with more results available on request.",
+    "Privacy and deletion details are clearer in Arabic and English, and Abdullah Muhammad recording sources are corrected."
   ]
 }

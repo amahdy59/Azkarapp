@@ -1,0 +1,171 @@
+import { expect, test } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
+import { t } from "../src/app/i18n";
+
+for (const language of ["ar", "en"] as const) {
+  for (const width of [320, 390, 900, 1920]) {
+    test(`@cross-browser ${language} clear Home and independent appearance at ${width}px`, async ({
+      page,
+    }, testInfo) => {
+      await page.clock.setFixedTime(new Date("2026-10-14T14:00:00+03:00"));
+      await page.setViewportSize({ width, height: width === 320 ? 568 : 1000 });
+      await page.addInitScript((language) => {
+        if (localStorage.getItem("azkarapp.state.v1")) return;
+        localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+        localStorage.setItem(
+          "azkarapp.state.v1",
+          JSON.stringify({
+            settings: { language, themeMode: "midnight", reduceMotion: true },
+            profile: { isGuest: true },
+          }),
+        );
+      }, language);
+      await page.goto("/#/home");
+      const header = page.getByTestId("home-utility-header");
+      const frame = await header.evaluate((element) => {
+        const outer = element.getBoundingClientRect();
+        const canvas = element.closest('[role="region"]')!.getBoundingClientRect();
+        const inner = element.querySelector('[data-testid="home-header-content"]')!.getBoundingClientRect();
+        const grid = document.querySelector('[data-testid="home-content-grid"]')!.getBoundingClientRect();
+        return {
+          outerLeft: outer.left,
+          outerRight: outer.right,
+          canvasLeft: canvas.left,
+          canvasRight: canvas.right,
+          innerLeft: inner.left,
+          innerRight: inner.right,
+          gridLeft: grid.left,
+          gridRight: grid.right,
+        };
+      });
+      expect(Math.abs(frame.outerLeft - frame.canvasLeft)).toBeLessThanOrEqual(1);
+      expect(Math.abs(frame.outerRight - frame.canvasRight)).toBeLessThanOrEqual(1);
+      expect(Math.abs(frame.innerLeft - frame.gridLeft)).toBeLessThanOrEqual(1);
+      expect(Math.abs(frame.innerRight - frame.gridRight)).toBeLessThanOrEqual(1);
+      const strip = page.getByTestId("home-prayer-strip");
+      await expect(strip.locator('[data-density="summary"]')).toHaveCount(2);
+      await expect(page.getByTestId("prayer-card-dhuhr")).toHaveAttribute("data-prayer-state", "current");
+      await expect(page.getByTestId("prayer-card-asr")).toHaveAttribute("data-prayer-state", "next");
+      const disclosure = strip.getByRole("button", { name: t(language, "settings.showAllPrayers") });
+      const disclosureBox = (await disclosure.boundingBox())!;
+      expect(disclosureBox.width).toBeGreaterThanOrEqual(44);
+      expect(disclosureBox.width).toBeLessThanOrEqual(48);
+      expect(disclosureBox.height).toBeGreaterThanOrEqual(44);
+      await disclosure.click();
+      await expect(strip.locator('[data-density="summary"]')).toHaveCount(5);
+      const allRow = page.getByTestId("home-all-prayers-row");
+      const prayerTops = await allRow
+        .locator("article")
+        .evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect().top));
+      expect(Math.max(...prayerTops) - Math.min(...prayerTops)).toBeLessThanOrEqual(1);
+      const collapse = strip.getByRole("button", { name: t(language, "settings.showFocusedPrayers") });
+      const collapseBox = (await collapse.boundingBox())!;
+      const firstPrayer = (await allRow.locator("article").first().boundingBox())!;
+      expect(collapseBox.width).toBeLessThanOrEqual(48);
+      expect(collapseBox.y).toBeGreaterThanOrEqual(firstPrayer.y - 1);
+      expect(collapseBox.y + collapseBox.height).toBeLessThanOrEqual(firstPrayer.y + firstPrayer.height + 1);
+
+      await allRow.locator("article").last().scrollIntoViewIfNeeded();
+      const lastReachable = await allRow.evaluate((row) => {
+        const viewport = row.getBoundingClientRect();
+        const last = row.querySelector("article:last-child")!.getBoundingClientRect();
+        return last.left >= viewport.left - 1 && last.right <= viewport.right + 1;
+      });
+      expect(lastReachable).toBe(true);
+      const prayerTime = allRow.locator('[id^="prayer-summary-time-"]').first();
+      expect(await prayerTime.evaluate((node) => parseFloat(getComputedStyle(node).fontSize))).toBeGreaterThanOrEqual(
+        width < 640 ? 16 : 15,
+      );
+      expect(await prayerTime.evaluate((node) => Number(getComputedStyle(node).fontWeight))).toBeGreaterThanOrEqual(
+        800,
+      );
+      await strip.getByRole("button", { name: t(language, "settings.showFocusedPrayers") }).click();
+      await expect(strip.locator('[data-density="summary"]')).toHaveCount(2);
+      const path = page.getByTestId("home-header-routine-summary");
+      if (width >= 900) await expect(path).toBeVisible();
+      else await expect(path).toBeHidden();
+      const cards = page.getByTestId("wird-category-card");
+      await expect(cards).toHaveCount(4);
+      if (width < 640) {
+        const positions = await cards.evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect().top));
+        expect(Math.abs(positions[0]! - positions[1]!)).toBeLessThanOrEqual(1);
+        expect(Math.abs(positions[2]! - positions[3]!)).toBeLessThanOrEqual(1);
+        expect(positions[2]!).toBeGreaterThan(positions[0]!);
+        const heights = await cards.evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect().height));
+        for (const height of heights) {
+          expect(height).toBeGreaterThanOrEqual(120);
+          expect(height).toBeLessThanOrEqual(160);
+        }
+        const spacing = await cards
+          .first()
+          .locator(".home-wird-caption")
+          .evaluate((node) => {
+            const style = getComputedStyle(node);
+            return { top: style.paddingTop, bottom: style.paddingBottom, minimum: style.minHeight };
+          });
+        expect(spacing).toEqual({ top: "12px", bottom: "12px", minimum: "120px" });
+      }
+      await expect(cards.locator("img")).toHaveCount(0);
+      await expect(page.getByTestId("daily-evidence-hadith")).toBeVisible();
+      await expect(page.getByTestId("open-wird-benefits")).toBeVisible();
+      await expect(page.getByTestId("situational-shortcuts").locator("a svg")).toHaveCount(3);
+      await page.goto("/#/settings/appearance");
+      const images = page.getByRole("switch", { name: new RegExp(t(language, "settings.homeWirdImages")) });
+      const transparency = page.getByRole("switch", {
+        name: new RegExp("^" + t(language, "settings.homeTransparency")),
+      });
+      await expect(images).toHaveAttribute("aria-checked", "false");
+      await expect(transparency).toHaveAttribute("aria-checked", "true");
+      await images.click();
+      await expect(transparency).toHaveAttribute("aria-checked", "true");
+      await page.goto("/#/home");
+      await expect(cards.locator("img")).toHaveCount(4);
+      const caption = cards.first().locator(".home-wird-caption");
+      const material = await caption.evaluate((node) => ({
+        filter: getComputedStyle(node).backdropFilter,
+        reduced: matchMedia("(prefers-reduced-transparency: reduce)").matches,
+      }));
+      expect(material.filter).toEqual(material.reduced ? "none" : expect.stringContaining("blur"));
+      await page.goto("/#/settings/appearance");
+      await transparency.click();
+      await expect(images).toHaveAttribute("aria-checked", "true");
+      await page.goto("/#/home");
+      await page.reload();
+      await expect(cards.locator("img")).toHaveCount(4);
+      expect(await caption.evaluate((node) => getComputedStyle(node).backdropFilter)).toBe("none");
+      await page.goto("/#/settings/appearance");
+      await images.click();
+      await page.goto("/#/home");
+      await expect(cards.locator("img")).toHaveCount(0);
+      if (width === 320) {
+        const shortcuts = page.getByTestId("situational-shortcuts");
+        await shortcuts.getByRole("button", { name: t(language, "reader.viewAll"), exact: true }).click();
+        await page.locator("html").evaluate((node) => {
+          node.style.fontSize = "32px";
+        });
+        const links = shortcuts.getByRole("link");
+        await expect(links).toHaveCount(6);
+        expect(
+          await links.evaluateAll((nodes) =>
+            nodes.every(
+              (node) => node.scrollWidth <= node.clientWidth + 1 && node.scrollHeight <= node.clientHeight + 1,
+            ),
+          ),
+        ).toBe(true);
+        const tops = await links.evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect().top));
+        expect(new Set(tops).size).toBe(6);
+      }
+      await expect
+        .poll(() => page.evaluate(() => document.documentElement.scrollWidth - innerWidth))
+        .toBeLessThanOrEqual(0);
+      expect(await cards.evaluateAll((nodes) => nodes.every((node) => node.scrollWidth <= node.clientWidth + 1))).toBe(
+        true,
+      );
+      await cards.first().focus();
+      await expect(cards.first()).toBeFocused();
+      const results = await new AxeBuilder({ page }).analyze();
+      expect(results.violations).toEqual([]);
+      await page.screenshot({ path: testInfo.outputPath(`${language}-home-clear-${width}.png`) });
+    });
+  }
+}

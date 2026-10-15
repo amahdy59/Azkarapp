@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { isNativeAndroid } from "../native/platform";
 import { readNotificationPermission, showBrowserNotification } from "../notifications";
 import { getEstimatedPrayerTimes, PRAYER_NAMES, type PrayerTimes } from "../content/prayerTimes";
 import { t } from "../i18n";
@@ -13,13 +14,11 @@ import type {
   PrayerReminderLeadMinutes,
   ReminderSettings,
 } from "../types";
-import { isNativeAndroid, rescheduleNativeReminders } from "@azkar/native-reminders";
-
-export { getUpcomingNativeReminders } from "@azkar/native-reminders";
 
 const REMINDER_HISTORY_KEY = "azkarapp.foreground-reminders.v1";
 const REMINDER_WINDOW_MS = 5 * 60_000;
 const MAX_TIMEOUT_MS = 2_147_000_000;
+
 type RoutineReminderKind = "morning" | "evening" | "before_sleep" | "after_prayer";
 type ReminderHistoryKey = RoutineReminderKind | `prayer:${PrayerName}`;
 
@@ -226,13 +225,7 @@ export function useForegroundReminders({
   location?: LocationSettings;
 }) {
   useEffect(() => {
-    if (isNativeAndroid()) {
-      void rescheduleNativeReminders(reminders, dailyCompletions, language, location).catch(() => {
-        // Notification denial or OS scheduling failure must not interrupt app startup.
-      });
-      return;
-    }
-
+    if (isNativeAndroid()) return;
     let isDelivering = false;
     let cancelled = false;
     let timerId: number | undefined;

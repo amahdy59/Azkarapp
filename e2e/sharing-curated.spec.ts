@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 
-for (const category of ["morning", "evening"] as const) {
+for (const category of ["morning", "evening", "before_sleep"] as const) {
   test(`curated ${category} cards preview and save actual images @cross-browser`, async ({ page }, testInfo) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.addInitScript(() => {
@@ -12,22 +12,23 @@ for (const category of ["morning", "evening"] as const) {
         JSON.stringify({ settings: { language: "ar", reduceMotion: true }, profile: { isGuest: true } }),
       );
     });
-    await page.goto(`/#/azkar/${category}`);
+    await page.goto(`/#/azkar/${category === "before_sleep" ? "before-sleep" : category}`);
     await page.getByTestId("share-collection-button").click();
     const modal = page.getByTestId("collection-share-modal");
     await modal.getByRole("button", { name: "البطاقات المعتمدة", exact: true }).click();
-    const image = modal.locator(`img[src$="routine-${category}-1.webp"]`).first();
+    const extension = category === "before_sleep" ? "jpg" : "webp";
+    const image = modal.locator(`img[src$="routine-${category}-1.${extension}"]`).first();
     await expect(image).toBeVisible();
     await expect.poll(() => image.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBe(900);
     await modal.getByRole("button", { name: "البطاقة التالية" }).click();
-    await expect(modal.locator(`img[src$="routine-${category}-2.webp"]`).first()).toBeVisible();
+    await expect(modal.locator(`img[src$="routine-${category}-2.${extension}"]`).first()).toBeVisible();
     const download = page.waitForEvent("download");
     await modal.getByRole("button", { name: "حفظ", exact: true }).click();
     const saved = await download;
     const archive = await readFile((await saved.path())!);
     expect(archive.subarray(0, 2).toString()).toBe("PK");
     for (let i = 1; i <= (category === "morning" ? 3 : 2); i++) {
-      const original = await readFile(`public/assets/cards/routine-${category}-${i}.webp`);
+      const original = await readFile(`public/assets/cards/routine-${category}-${i}.${extension}`);
       expect(archive.includes(original)).toBe(true);
     }
     expect(
@@ -54,16 +55,26 @@ test("all supplied curated images are available on the first offline visit after
   await context.setOffline(true);
   try {
     const sizes = await page.evaluate(async () => {
-      const paths = ["morning-1", "morning-2", "morning-3", "evening-1", "evening-2"];
+      const paths = [
+        "morning-1",
+        "morning-2",
+        "morning-3",
+        "evening-1",
+        "evening-2",
+        "before_sleep-1",
+        "before_sleep-2",
+      ];
       return Promise.all(
         paths.map(async (path) => {
-          const response = await fetch(`assets/cards/routine-${path}.webp`);
+          const response = await fetch(
+            `assets/cards/routine-${path}.${path.startsWith("before_sleep") ? "jpg" : "webp"}`,
+          );
           if (!response.ok) throw new Error("Missing offline image");
           return (await response.blob()).size;
         }),
       );
     });
-    expect(sizes).toEqual([53622, 60654, 48974, 51324, 57152]);
+    expect(sizes).toEqual([53622, 60654, 48974, 51324, 57152, 139375, 150392]);
   } finally {
     await context.setOffline(false);
   }

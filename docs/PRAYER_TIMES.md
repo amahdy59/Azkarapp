@@ -162,3 +162,9 @@ For a manual location verification:
 10. On a physical Android device, schedule a near-term reminder, swipe Azkar away, and confirm it arrives; repeat after reboot. Do not use Force stop for this check because Android suppresses alarms for force-stopped apps until they are opened again.
 
 When local authorities differ by a few minutes, confirm the selected calculation method first, then use manual adjustments only when required.
+
+Home clarity follow-up, 2026-10-14: the default overview presents current and next prayer only, with an explicit control for all five. Existing prayer calculations, sunrise bounds, next-day countdowns, future recording restrictions and recording models are unchanged.
+
+## Packaged Android reminders — 2026-10-15
+
+The approved host uses a bounded seven-day native notification queue. Prayer wall times resolve against the selected location IANA timezone with date-specific DST; routine reminders retain the device-clock contract. Changes, completion and app resumption replace owned pending reminders. Expired reminders are not replayed on reboot. Approximate alarm delivery, OEM battery restrictions, force-stop and the need to reopen at least weekly are stated in settings. See [Android acceptance](ANDROID.md); actual device delivery is not proven by web tests. The PWA continues using its existing foreground/service-worker notification behavior.

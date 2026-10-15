@@ -60,6 +60,12 @@ export function HelpPanel({ language, onBack }: { language: AppLanguage; onBack:
           actionIcon={<ExternalLink size={16} aria-hidden="true" />}
           onAction={() => window.open(ISSUE_URL, "_blank", "noopener,noreferrer")}
         />
+        <a
+          href="mailto:amahdy59@yahoo.com"
+          className="flex min-h-11 items-center justify-center rounded-xl border border-border bg-card px-4 py-2 text-sm font-semibold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        >
+          {t(language, "help.emailSupport")}
+        </a>
       </div>
     </div>
   );

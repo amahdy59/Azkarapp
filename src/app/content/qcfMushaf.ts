@@ -38,11 +38,11 @@ const pendingFonts = new Map<number, Promise<boolean>>();
 
 export function getMushafPageUrl(page: number) {
   const base = import.meta.env.BASE_URL || "/";
-  return `${base.endsWith("/") ? base : `${base}/`}data/mushaf/${page}.json${[42, 49, 75, 76, 603, 604].includes(page) ? "" : "?v=3"}`;
+  return `${base.endsWith("/") ? base : `${base}/`}data/mushaf/${page}.json${[42, 49, 75, 76, 207, 603, 604].includes(page) ? "" : "?v=3"}`;
 }
 
 export function getQcfFontUrl(page: number) {
-  if ([42, 49, 75, 76, 603, 604].includes(page)) {
+  if ([42, 49, 75, 76, 207, 603, 604].includes(page)) {
     const base = import.meta.env.BASE_URL || "/";
     return `${base.endsWith("/") ? base : `${base}/`}fonts/qcf-v2/2026-10-11/p${page}.woff2`;
   }

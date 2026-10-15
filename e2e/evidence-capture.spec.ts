@@ -9,7 +9,7 @@
  * Ordinary runs write beneath Playwright's ignored output directory. Set
  * EVIDENCE_DIR only when intentionally refreshing committed phase evidence.
  *
- * Run with:  EVIDENCE_DIR=docs/agent/evidence/screenshots/current pnpm exec playwright test e2e/evidence-capture.spec.ts --project=desktop-chromium
+ * Run with:  EVIDENCE_DIR=docs/agent/evidence/screenshots/current pnpm test:e2e:evidence --project=desktop-chromium
  */
 import { expect, test, type Page } from "@playwright/test";
 import { mkdirSync } from "node:fs";

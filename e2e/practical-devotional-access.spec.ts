@@ -66,6 +66,9 @@ for (const language of ["ar", "en"] as const) {
           await page.setViewportSize({ width, height: 900 });
           const card = page.getByTestId("situational-shortcuts");
           await card.scrollIntoViewIfNeeded();
+          if ((await card.getByRole("link").count()) === 3) {
+            await card.getByRole("button", { name: t(language, "reader.viewAll"), exact: true }).click();
+          }
           const material = await card.evaluate((element) => {
             const style = getComputedStyle(element);
             const reference = getComputedStyle(document.querySelector('[data-testid="home-tool-qibla"]')!);
@@ -81,7 +84,10 @@ for (const language of ["ar", "en"] as const) {
           expect(material.background).toBe(material.referenceBackground);
           expect(material.blur).toBe(material.referenceBlur);
           expect(material.color).toBe(material.referenceColor);
-          if (reduceTransparency) expect(material.blur).toBe("none");
+          const systemReducesTransparency = await page.evaluate(
+            () => matchMedia("(prefers-reduced-transparency: reduce)").matches,
+          );
+          if (reduceTransparency || systemReducesTransparency) expect(material.blur).toBe("none");
           else expect(material.blur).toContain("blur(");
           const firstLink = card.getByRole("link").first();
           await firstLink.focus();
@@ -97,6 +103,18 @@ for (const language of ["ar", "en"] as const) {
             }),
           );
           expect(targets).toHaveLength(6);
+          expect(
+            Math.max(...targets.map((item) => item.width)) - Math.min(...targets.map((item) => item.width)),
+          ).toBeLessThanOrEqual(1);
+          expect(
+            Math.max(...targets.map((item) => item.height)) - Math.min(...targets.map((item) => item.height)),
+          ).toBeLessThanOrEqual(1);
+          expect(
+            await card
+              .getByRole("link")
+              .evaluateAll((links) => links.every((link) => link.scrollHeight <= link.clientHeight + 1)),
+          ).toBe(true);
+
           for (const bounds of targets) {
             expect(bounds.width).toBeGreaterThanOrEqual(44);
             expect(bounds.height).toBeGreaterThanOrEqual(44);
@@ -131,6 +149,8 @@ for (const language of ["ar", "en"] as const) {
       await page.goto("/#/home");
       const shortcuts = page.getByTestId("situational-shortcuts");
       await shortcuts.scrollIntoViewIfNeeded();
+      await expect(shortcuts.getByRole("link")).toHaveCount(3);
+      await shortcuts.getByRole("button", { name: t(language, "reader.viewAll"), exact: true }).click();
       await expect(shortcuts.getByRole("link")).toHaveCount(6);
       // These named visual captures are Chromium evidence. Other engines retain
       // every flow/axe assertion and failure traces without overwriting them.

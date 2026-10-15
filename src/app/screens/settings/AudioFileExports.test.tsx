@@ -5,7 +5,7 @@ vi.mock("../../audio/audioOfflineCache", () => ({
   getSavedAudioFiles: mocks.list,
   prepareSavedAudioFile: mocks.prepare,
 }));
-vi.mock("../../share/shareDispatcher", () => ({ downloadFile: mocks.download }));
+vi.mock("../../share/shareDispatcher", () => ({ saveFileToDevice: mocks.download }));
 import { AudioFileExports } from "./AudioFileExports";
 import { DEFAULT_AUDIO_PREFERENCES } from "../../audio/audioPreferences";
 const props = {

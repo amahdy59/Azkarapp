@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { act, render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { DEVICE_SYNC_RETRY_EVENT, publishDeviceSyncStatus } from "../../deviceSyncStatus";
 import { QrSyncPanel } from "./QrSyncPanel";
 import { CLOUDFLARE_DEVICE_SECRET_KEY } from "../../../lib/cloudflareSync";
 
@@ -7,6 +8,21 @@ describe("QrSyncPanel", () => {
   beforeEach(() => {
     localStorage.clear();
     vi.restoreAllMocks();
+    publishDeviceSyncStatus("idle");
+  });
+
+  it("announces sync failure and offers an explicit retry without claiming success", () => {
+    localStorage.setItem(CLOUDFLARE_DEVICE_SECRET_KEY, "test-secret");
+    const retry = vi.fn();
+    window.addEventListener(DEVICE_SYNC_RETRY_EVENT, retry);
+    const view = render(<QrSyncPanel language="en" />);
+    act(() => publishDeviceSyncStatus("error"));
+    expect(screen.getByRole("status")).toHaveTextContent("Your changes are saved locally");
+    fireEvent.click(screen.getByRole("button", { name: "Retry sync" }));
+    expect(retry).toHaveBeenCalledOnce();
+    view.unmount();
+    window.removeEventListener(DEVICE_SYNC_RETRY_EVENT, retry);
+    publishDeviceSyncStatus("idle");
   });
 
   it("renders initial unlinked state with This Device and Link Another Device cards", () => {
@@ -24,7 +40,7 @@ describe("QrSyncPanel", () => {
 
     render(<QrSyncPanel language="en" />);
 
-    expect(screen.getByText("Connected and syncing")).toBeInTheDocument();
+    expect(screen.getByText("Device linked · waiting to sync")).toBeInTheDocument();
     const unlinkBtn = screen.getByRole("button", { name: "Unlink this device" });
     expect(unlinkBtn).toBeInTheDocument();
 

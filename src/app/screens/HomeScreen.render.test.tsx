@@ -99,7 +99,7 @@ describe("HomeScreen quick access", () => {
     expect(screen.queryByTestId("home-benefits-card")).not.toBeInTheDocument();
   });
 
-  it("renders the five-prayer rail on Home", () => {
+  it("shows current and next prayers and reveals the complete rail on request", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date(2026, 7, 10, 15, 45));
     render(
@@ -115,6 +115,8 @@ describe("HomeScreen quick access", () => {
       />,
     );
 
+    expect(screen.queryByTestId("prayer-card-fajr")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Show all prayers" }));
     expect(screen.getByTestId("prayer-card-fajr")).toBeInTheDocument();
     expect(screen.getByText(/today.?s wird/i)).toBeInTheDocument();
 
@@ -140,7 +142,7 @@ describe("HomeScreen quick access", () => {
 
     fireEvent.scroll(screen.getByRole("region", { name: "Azkar" }), { target: { scrollTop: 12 } });
     expect(screen.getByTestId("home-utility-header")).toHaveAttribute("data-scrolled", "true");
-    expect(screen.getByTestId("home-utility-header")).toHaveClass("bg-on-media-surface/70", "backdrop-blur-xl");
+    expect(screen.getByTestId("home-utility-header")).toHaveClass("home-glass-header");
   });
 
   it("shows the completion card briefly, without actions, then returns to the normal hero", () => {

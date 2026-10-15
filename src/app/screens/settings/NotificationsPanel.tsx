@@ -1,6 +1,9 @@
+import { isNativeAndroid } from "../../native/platform";
+import { refreshNativeNotificationPermission } from "../../native/reminders";
 import { useEffect, useRef, useState } from "react";
 import {
   readNotificationPermission,
+  requestNotificationPermission,
   showBrowserNotification,
   type BrowserNotificationPermission,
 } from "../../notifications";
@@ -114,21 +117,29 @@ export function NotificationsPanel({
     mounted.current = true;
     const refreshPermission = () => {
       if (document.visibilityState !== "visible") return;
-      setPermission(readNotificationPermission());
+      if (isNativeAndroid())
+        void refreshNativeNotificationPermission()
+          .then(setPermission)
+          .catch(() => setHasRequestError(true));
+      else setPermission(readNotificationPermission());
       setPermissionAttemptBlocked(false);
       setHasRequestError(false);
     };
+    refreshPermission();
+    const nativePermissionChanged = () => setPermission(readNotificationPermission());
+    window.addEventListener("azkar-notification-permission", nativePermissionChanged);
     window.addEventListener("focus", refreshPermission);
     document.addEventListener("visibilitychange", refreshPermission);
     return () => {
       mounted.current = false;
+      window.removeEventListener("azkar-notification-permission", nativePermissionChanged);
       window.removeEventListener("focus", refreshPermission);
       document.removeEventListener("visibilitychange", refreshPermission);
     };
   }, []);
 
   const requestPermission = async () => {
-    if (!("Notification" in window)) {
+    if (!isNativeAndroid() && !("Notification" in window)) {
       setPermission("unsupported");
       return "unsupported" as const;
     }
@@ -137,7 +148,7 @@ export function NotificationsPanel({
       setHasRequestError(false);
       setPermissionAttemptBlocked(false);
       setIsRequesting(true);
-      const next = await Notification.requestPermission();
+      const next = await requestNotificationPermission();
       setPermission(next);
       setPermissionAttemptBlocked(next !== "granted");
       return next;
@@ -430,7 +441,7 @@ export function NotificationsPanel({
           </label>
           {anyReminderEnabled && permission === "granted" && (
             <p className="mt-3 rounded-xl bg-primary/10 px-4 py-3 text-label leading-5 text-foreground" role="status">
-              {t(language, "notifications.activeNotice")}
+              {t(language, isNativeAndroid() ? "notifications.nativeActiveNotice" : "notifications.activeNotice")}
             </p>
           )}
         </section>
@@ -439,7 +450,9 @@ export function NotificationsPanel({
             {t(language, "settings.moreDetails")}
             <ChevronDown size={16} aria-hidden="true" className="transition-transform group-open:rotate-180" />
           </summary>
-          <p className="text-sm text-muted-foreground">{t(language, "notifications.availabilityBody")}</p>
+          <p className="text-sm text-muted-foreground">
+            {t(language, isNativeAndroid() ? "notifications.nativeAvailabilityBody" : "notifications.availabilityBody")}
+          </p>
         </details>
       </div>
     </div>

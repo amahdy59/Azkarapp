@@ -14,3 +14,6 @@
 declare const __APP_RELEASE__: string | undefined;
 
 export const APP_RELEASE: string = typeof __APP_RELEASE__ === "string" ? __APP_RELEASE__ : "";
+
+declare const __APP_VERSION__: string | undefined;
+export const APP_VERSION = typeof __APP_VERSION__ === "string" ? __APP_VERSION__ : "";

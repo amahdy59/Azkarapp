@@ -5,7 +5,7 @@ import { URL } from "node:url";
 
 // Integrated application fonts only; owner confirmed an active QF account.
 const version = "2026-10-11";
-const pages = [42, 49, 75, 76, 603, 604];
+const pages = [42, 49, 75, 76, 207, 603, 604];
 const directory = new URL(`../public/fonts/qcf-v2/${version}/`, import.meta.url);
 const fonts = await Promise.all(
   pages.map(async (page) => {

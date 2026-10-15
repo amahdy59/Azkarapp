@@ -1,11 +1,11 @@
-import { Calendar, Globe, Moon } from "../../components/icons";
+import { Calendar, Globe, Moon, Eye, Droplets } from "../../components/icons";
 import { Button } from "../../components/ui/button";
 import { SegmentedControl } from "../../components/SegmentedControl";
 import { LANGUAGES_LIST } from "../../languageOptions";
 import { formatNumerals } from "../../formatting";
 import { t } from "../../i18n";
 import type { AppLanguage, ThemeMode } from "../../types";
-import { SettingsSection, SubHeader } from "./SettingsPrimitives";
+import { SettingsSection, SettingsToggleRow, SubHeader } from "./SettingsPrimitives";
 import { ThemeModeSelector } from "./ThemeModeSelector";
 const iconBackground = "color-mix(in srgb, var(--primary) 12%, transparent)";
 export interface AppearancePanelProps {
@@ -13,6 +13,10 @@ export interface AppearancePanelProps {
   direction: "ltr" | "rtl";
   themeMode: ThemeMode;
   highContrast: boolean;
+  homeWirdImages?: boolean;
+  onHomeWirdImagesChange?: (value: boolean) => void;
+  reduceTransparency?: boolean;
+  onReduceTransparencyChange?: (value: boolean) => void;
   onThemeModeChange: (value: ThemeMode) => void;
   onDisableHighContrast: () => void;
   onLanguageChange: (value: AppLanguage) => void;
@@ -27,6 +31,10 @@ export function AppearancePanel({
   direction,
   themeMode,
   highContrast,
+  homeWirdImages = false,
+  onHomeWirdImagesChange,
+  reduceTransparency = false,
+  onReduceTransparencyChange,
   onThemeModeChange,
   onDisableHighContrast,
   onLanguageChange,
@@ -64,6 +72,28 @@ export function AppearancePanel({
                 {t(language, "appearance.disableHighContrast")}
               </Button>
             </aside>
+          )}
+        </SettingsSection>
+        <SettingsSection label={t(language, "settings.homeCards")} className="mt-3">
+          {onHomeWirdImagesChange && (
+            <SettingsToggleRow
+              icon={<Eye size={20} />}
+              iconBg={iconBackground}
+              label={t(language, "settings.homeWirdImages")}
+              description={t(language, "settings.homeWirdImagesHint")}
+              checked={homeWirdImages}
+              onChange={() => onHomeWirdImagesChange(!homeWirdImages)}
+            />
+          )}
+          {onReduceTransparencyChange && (
+            <SettingsToggleRow
+              icon={<Droplets size={20} />}
+              iconBg={iconBackground}
+              label={t(language, "settings.homeTransparency")}
+              description={t(language, "settings.homeTransparencyHint")}
+              checked={!reduceTransparency}
+              onChange={() => onReduceTransparencyChange(!reduceTransparency)}
+            />
           )}
         </SettingsSection>
         <SettingsSection className="mt-3">

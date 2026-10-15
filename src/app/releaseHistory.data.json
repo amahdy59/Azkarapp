@@ -1,47 +1,88 @@
 [
   {
-    "release": "2026-10-14-7",
+    "release": "2026-10-15-3",
     "ar": [
-      "يمكن للتطبيق جدولة تذكيرات الأذكار على أندرويد حتى بعد إغلاق التطبيق.",
-      "يمكن تنزيل ملفات المصحف والصوتيات وتشغيلها دون اتصال على أندرويد.",
-      "يمكن مشاركة الملفات وحفظها من أندرويد، ويعمل زر الرجوع مع تنقل التطبيق بسلاسة.",
-      "يظهر شريط الحالة وتبقى المسافات والعناوين متناسقة على شاشات أندرويد المختلفة."
+      "يفتح إكمال آخر ذكر ملخص الجلسة مباشرة، وتظل بياناتك قابلة للوصول عند تقييد تخزين المتصفح.",
+      "تعرض مزامنة الأجهزة حالة الحفظ الفعلية مع إعادة المحاولة عند تعذر الاتصال.",
+      "تُعرض نتائج البحث الطويلة على دفعات لتسهيل التصفح دون إخفاء بقية النتائج.",
+      "أصبحت معلومات الخصوصية والحذف أوضح بالعربية والإنجليزية، وصُحّح مصدر تسجيلات عبد الله محمد."
     ],
     "en": [
-      "Android can schedule Azkar reminders that remain available after the app is closed.",
-      "Download Mushaf files and audio recordings for offline use on Android.",
-      "Share and save files through Android, with the hardware Back button following app navigation.",
-      "The status bar stays visible and header spacing remains consistent across Android screens."
+      "Completing the final zikr now opens the session summary, and account data handles restricted browser storage.",
+      "Device sync shows its actual save status and offers retry when a connection fails.",
+      "Long search results load in batches, with more results available on request.",
+      "Privacy and deletion details are clearer in Arabic and English, and Abdullah Muhammad recording sources are corrected."
+    ]
+  },
+  {
+    "release": "2026-10-15-2",
+    "ar": [
+      "يمتد شريط الرئيسية على الحاسوب إلى الحواف، وتكشف البطاقات الزجاجية الخلفية مع الحفاظ على وضوح النص.",
+      "تظهر الصلوات الخمس في صف واحد يُمرَّر أفقيًا على الهاتف، مع أوقات أوضح وزر صغير لعرض الكل أو الاختصار.",
+      "بطاقات ورد اليوم أقصر وفي عمودين على الهاتف، مع أسهم بجانب النص ومدخل واحد لفوائد الورد وشرح النخلة.",
+      "أصبحت اختصارات مواقف يومك متساوية الحجم وذات عناوين أقصر وأسهل في التصفح."
+    ],
+    "en": [
+      "The desktop Home header spans the content area, with translucent cards that preserve readable text.",
+      "Prayer times are bolder, with one scrolling phone row and a compact All/Less control beside the cards.",
+      "Today’s wird cards are shorter and use two phone columns, side arrows, and one entry for benefits and palm help.",
+      "Everyday shortcuts now have equal card sizes and shorter, easier-to-scan labels."
+    ]
+  },
+  {
+    "release": "2026-10-15",
+    "ar": [
+      "يمتد شريط الرئيسية على الحاسوب إلى الحواف، وتكشف البطاقات الزجاجية الخلفية مع الحفاظ على وضوح النص.",
+      "يمكن عرض الصلوات الخمس على الهاتف في صف واحد يُمرَّر أفقيًا، مع أوقات أكبر وأوضح.",
+      "تظهر بطاقات ورد اليوم في عمودين على الهاتف، مع أسهم بجانب النص ومدخل واحد واضح لفوائد الورد وشرح النخلة."
+    ],
+    "en": [
+      "The desktop Home header spans the content area, with translucent cards that preserve readable text.",
+      "Show all five prayers in one horizontally scrolling phone row, with larger, bolder prayer times.",
+      "Today’s wird uses two phone columns, arrows beside the text, and one clear entry for wird benefits and palm help."
+    ]
+  },
+  {
+    "release": "2026-10-14-7",
+    "ar": [
+      "يمتد شريط الرئيسية على الحاسوب إلى حواف مساحة المحتوى، مع بقاء عناصره مصطفّة مع البطاقات.",
+      "تُظهر البطاقات الزجاجية الخلفية بوضوح أكبر، مع سطح أقوى لقراءة التذكير وألوان نص أوضح.",
+      "تحافظ إعدادات تقليل الشفافية على أسطح ثابتة، وتبقى الأزرار داخل البطاقات أبسط وأوضح."
+    ],
+    "en": [
+      "The desktop Home header now spans the content area, with its contents aligned to the cards.",
+      "Frosted cards reveal more of the background, with stronger reading surfaces and clearer text colors.",
+      "Reduced-transparency settings keep solid surfaces, while controls inside cards use simpler layers."
     ]
   },
   {
     "release": "2026-10-14-6",
     "ar": [
-      "يمكن للتطبيق جدولة تذكيرات الأذكار على أندرويد حتى بعد إغلاق التطبيق.",
-      "يمكن تنزيل ملفات المصحف والصوتيات وتشغيلها دون اتصال على أندرويد.",
-      "يمكن مشاركة الملفات وحفظها من أندرويد، ويعمل زر الرجوع مع تنقل التطبيق بسلاسة.",
-      "يظهر شريط الحالة وتبقى المسافات والعناوين متناسقة على شاشات أندرويد المختلفة."
+      "تعرض الرئيسية الصلاة الحالية والقادمة مع خيار عرض الجميع، ويبقى مسار اليوم أعلى الشاشة مخصصًا للحاسوب.",
+      "أصبح ورد اليوم أوضح، مع شرح طريقة كسب النخلة وخيارات مستقلة لصور البطاقات والشفافية.",
+      "يمكنك مشاركة أذكار النوم باستخدام بطاقتين جاهزتين مع معاينتهما وحفظهما معًا.",
+      "يظهر ذكر حسبي الله لا إله إلا هو بخط المصحف، مع الحفاظ على نصه وعدد تكراره وإتاحته دون اتصال."
     ],
     "en": [
-      "Android can schedule Azkar reminders that remain available after the app is closed.",
-      "Download Mushaf files and audio recordings for offline use on Android.",
-      "Share and save files through Android, with the hardware Back button following app navigation.",
-      "The status bar stays visible and header spacing remains consistent across Android screens."
+      "Home focuses on the current and next prayers with an option to show all, and keeps the top Today's path shortcut on desktop.",
+      "Today's wird is clearer, with palm-earning help and independent choices for card images and transparency.",
+      "Share before-sleep azkar using two supplied cards, with previews and one archive to save them together.",
+      "The Hasbi Allah reliance dhikr now uses Mushaf lettering offline while preserving its wording and repetition count."
     ]
   },
   {
     "release": "2026-10-14-5",
     "ar": [
-      "يمكن للتطبيق جدولة تذكيرات الأذكار على أندرويد حتى بعد إغلاق التطبيق.",
-      "يمكن تنزيل ملفات المصحف والصوتيات وتشغيلها دون اتصال على أندرويد.",
-      "يمكن مشاركة الملفات وحفظها من أندرويد، ويعمل زر الرجوع مع تنقل التطبيق بسلاسة.",
-      "يظهر شريط الحالة وتبقى المسافات والعناوين متناسقة على شاشات أندرويد المختلفة."
+      "تعرض الرئيسية الصلاة الحالية والقادمة مع خيار عرض الجميع، ويبقى مسار اليوم أعلى الشاشة مخصصًا للحاسوب.",
+      "أصبح ورد اليوم أوضح، ويمكنك إظهار صوره وضبط الشفافية بشكل مستقل من إعدادات المظهر.",
+      "يمكنك مشاركة أذكار النوم باستخدام بطاقتين جاهزتين مع معاينتهما وحفظهما معًا.",
+      "يظهر ذكر حسبي الله لا إله إلا هو بخط المصحف، مع الحفاظ على نصه وعدد تكراره وإتاحته دون اتصال."
     ],
     "en": [
-      "Android can schedule Azkar reminders that remain available after the app is closed.",
-      "Download Mushaf files and audio recordings for offline use on Android.",
-      "Share and save files through Android, with the hardware Back button following app navigation.",
-      "The status bar stays visible and header spacing remains consistent across Android screens."
+      "Home focuses on the current and next prayers with an option to show all, and keeps the top Today's path shortcut on desktop.",
+      "Today's wird is clearer, with independent image and transparency choices in Appearance settings.",
+      "Share before-sleep azkar using two supplied cards, with previews and one archive to save them together.",
+      "The Hasbi Allah reliance dhikr now uses Mushaf lettering offline while preserving its wording and repetition count."
     ]
   },
   {

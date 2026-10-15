@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Sunrise, Sun, CloudSun, Sunset, MoonStar, Check, ChevronNext } from "./icons";
+import { Sunrise, Sun, CloudSun, Sunset, MoonStar, Check, ChevronNext, List, ChevronUp } from "./icons";
 import { t } from "../i18n";
 import { PrayerVirtueModal } from "./PrayerVirtueModal";
 import type { AppLanguage, PrayerName, PrayerTrackingRecord } from "../types";
@@ -228,7 +228,7 @@ function PrayerCard({
         className={`relative flex min-w-0 flex-col rounded-xl border text-center transition-colors duration-standard ease-standard ${
           isCurrent
             ? onGlass
-              ? "border-on-media-accent bg-on-media-accent/15 text-on-media"
+              ? "border-on-media-accent home-glass-inset text-on-media"
               : "border-primary bg-primary/15 text-foreground"
             : selected
               ? onGlass
@@ -285,7 +285,7 @@ function PrayerCard({
           <p
             id={`prayer-summary-time-${prayer}`}
             data-testid={state === "next" ? "next-prayer-time" : undefined}
-            className={`max-w-full whitespace-nowrap text-xs font-bold tabular-nums min-[360px]:text-sm sm:text-subtitle ${
+            className={`max-w-full whitespace-nowrap text-base font-extrabold tabular-nums sm:text-subtitle ${
               onGlass
                 ? isCurrent
                   ? "text-on-media-accent"
@@ -497,6 +497,7 @@ export function PrayerTrackerCards({
   onOpen,
   onGlass,
   summaryOnly,
+  compactSummary = false,
   selectedPrayer,
 }: {
   models: readonly PrayerCardModel[];
@@ -509,16 +510,24 @@ export function PrayerTrackerCards({
   onGlass?: boolean;
   /** Keep overview surfaces scannable; focused views retain full recording. */
   summaryOnly?: boolean;
+  compactSummary?: boolean;
   /** The Home summary whose shared detail panel is expanded below the strip. */
   selectedPrayer?: PrayerName | null;
 }) {
   const byPrayer = new Map(records.filter((record) => record.dayKey === dayKey).map((r) => [r.prayer, r]));
   const [virtuePrayer, setVirtuePrayer] = useState<PrayerName | null>(null);
+  const [showAll, setShowAll] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const ordered = PRAYER_ORDER.map((prayer) => models.find((model) => model.prayer === prayer)).filter(
     (model): model is PrayerCardModel => Boolean(model),
   );
+
+  const focused = [
+    ...ordered.filter((model) => model.state === "current"),
+    ...ordered.filter((model) => model.state === "next"),
+  ];
+  const visible = compactSummary && !showAll ? (focused.length ? focused : ordered.slice(-1)) : ordered;
 
   const focusIndex = Math.max(
     0,
@@ -527,7 +536,7 @@ export function PrayerTrackerCards({
 
   useEffect(() => {
     const container = scrollRef.current;
-    if (!container || focusIndex <= 0) return;
+    if (!container || focusIndex <= 0 || compactSummary) return;
     const card = container.children[focusIndex] as HTMLElement | undefined;
     if (card) {
       // Keep the focused card fully visible. We do a manual calculation
@@ -542,7 +551,7 @@ export function PrayerTrackerCards({
         container.scrollLeft = offset;
       }
     }
-  }, [focusIndex, direction]);
+  }, [focusIndex, direction, compactSummary]);
 
   return (
     <div className="flex flex-col gap-3">
@@ -555,33 +564,60 @@ export function PrayerTrackerCards({
           onGlass={onGlass}
           elevation="raised"
           padding="sm"
-          className="stagger-in grid grid-cols-[repeat(auto-fit,minmax(min(100%,3.5rem),1fr))] gap-1 overflow-visible sm:gap-2"
+          className={`stagger-in grid gap-2 overflow-visible ${compactSummary ? "home-prayer-summary" : "grid-cols-2 sm:grid-cols-3 xl:grid-cols-5"}`}
           style={{ ["--prayer-columns" as string]: "5" }}
+          id="home-prayer-overview"
         >
-          {ordered.map((model) => {
-            const record = byPrayer.get(model.prayer);
-            return (
-              <PrayerCard
-                key={model.prayer}
-                model={model}
-                language={language}
-                onGlass={onGlass}
-                tracking={{
-                  mosque: record?.mosque ?? false,
-                  adhkar: record?.adhkar ?? false,
-                  sunnah: record?.sunnah ?? false,
-                  location: trackedLocation(record),
-                }}
-                onToggle={(prayer, field, next) => {
-                  onToggle(prayer, field, next);
-                  if (field === "mosque" && next) setVirtuePrayer(prayer);
-                }}
-                onOpen={onOpen}
-                summaryOnly={summaryOnly}
-                selected={summaryOnly && model.prayer === selectedPrayer}
-              />
-            );
-          })}
+          <div
+            data-testid={compactSummary && showAll ? "home-all-prayers-row" : undefined}
+            className={
+              compactSummary
+                ? `home-all-prayers-row ${showAll ? "" : "home-focused-prayers-row"} grid min-w-0 gap-2 overflow-x-auto rounded-xl p-1 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring`
+                : "contents"
+            }
+            role={compactSummary ? "region" : undefined}
+            aria-label={compactSummary ? t(language, "prayerMoment.dayTitle") : undefined}
+            tabIndex={compactSummary ? 0 : undefined}
+          >
+            {visible.map((model) => {
+              const record = byPrayer.get(model.prayer);
+              return (
+                <PrayerCard
+                  key={model.prayer}
+                  model={model}
+                  language={language}
+                  onGlass={onGlass}
+                  tracking={{
+                    mosque: record?.mosque ?? false,
+                    adhkar: record?.adhkar ?? false,
+                    sunnah: record?.sunnah ?? false,
+                    location: trackedLocation(record),
+                  }}
+                  onToggle={(prayer, field, next) => {
+                    onToggle(prayer, field, next);
+                    if (field === "mosque" && next) setVirtuePrayer(prayer);
+                  }}
+                  onOpen={onOpen}
+                  summaryOnly={summaryOnly}
+                  selected={summaryOnly && model.prayer === selectedPrayer}
+                />
+              );
+            })}
+          </div>
+          {compactSummary && (
+            <button
+              type="button"
+              aria-label={t(language, showAll ? "settings.showFocusedPrayers" : "settings.showAllPrayers")}
+              title={t(language, showAll ? "settings.showFocusedPrayers" : "settings.showAllPrayers")}
+              aria-expanded={showAll}
+              aria-controls="home-prayer-overview"
+              onClick={() => setShowAll((value) => !value)}
+              className={`flex size-11 flex-col items-center justify-center gap-0.5 rounded-xl border text-xs font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${onGlass ? "border-white/20 home-glass-inset text-on-media" : "border-border bg-muted"}`}
+            >
+              {showAll ? <ChevronUp size={16} aria-hidden="true" /> : <List size={16} aria-hidden="true" />}
+              <span>{t(language, showAll ? "settings.fewerPrayersShort" : "settings.allPrayersShort")}</span>
+            </button>
+          )}
         </HomeCard>
       ) : (
         <div

@@ -17,7 +17,8 @@
     </style>
   </head>
   <body>
-    <h1>Delete an wa-zaker account</h1>
+    <p><a href="#deletion-ar" lang="ar">العربية</a></p>
+    <h1>Delete a wa-zaker account</h1>
     <ol>
       <li>Open wa-zaker and sign in to the account you want to delete.</li>
       <li>Open Settings → Account &amp; data.</li>
@@ -30,6 +31,13 @@
       The account and synchronized application data are permanently deleted. Device-only guest data can be removed
       separately from Settings.
     </p>
+    <h2>QR-linked devices</h2>
+    <p>
+      QR pairing uses a separate Cloudflare account. In Settings → Account &amp; data, unlink each linked device.
+      Unlinking the last device deletes that Cloudflare account and its progress snapshot. Supabase deletion and
+      clearing local storage do not delete a still-linked Cloudflare account. Contact support if you cannot access a
+      linked device.
+    </p>
     <h2>If you cannot sign in</h2>
     <p>
       Deletion from inside the app needs an account you can still reach. If you cannot sign in, email
@@ -37,5 +45,20 @@
       deleted. A reply should be expected within 30 days.
     </p>
     <p>Support: <a href="mailto:amahdy59@yahoo.com">amahdy59@yahoo.com</a></p>
+    <section lang="ar" dir="rtl" aria-labelledby="deletion-ar">
+      <h2 id="deletion-ar">حذف حساب وَذَكِّرْ</h2>
+      <p>
+        سجّل الدخول ثم افتح الإعدادات ← الحساب والبيانات ← تصدير الحساب وحذفه. راجع التأكيد؛ ينزّل التطبيق نسخة JSON قبل
+        طلب الحذف الموثّق. يُحذف حساب Supabase وبياناته المتزامنة نهائيًا. يمكن مسح البيانات المحلية بشكل منفصل.
+      </p>
+      <p>
+        حساب ربط QR لدى Cloudflare منفصل. افصل كل جهاز من الحساب والبيانات؛ يُحذف الحساب ونسخته عند فصل آخر جهاز. لا
+        يحذف مسح التخزين المحلي أو حساب Supabase حساب Cloudflare الذي ما زالت له أجهزة مرتبطة.
+      </p>
+      <p>
+        إذا تعذر الدخول أو الوصول لجهاز مرتبط، اطلب الحذف عبر
+        <a href="mailto:amahdy59@yahoo.com">amahdy59@yahoo.com</a> من عنوان الحساب. يُتوقع الرد خلال ٣٠ يومًا.
+      </p>
+    </section>
   </body>
 </html>

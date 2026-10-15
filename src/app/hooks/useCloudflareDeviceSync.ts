@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { AppStateSnapshot } from "../types";
 import { mergeAppStates } from "../state";
+import { DEVICE_SYNC_RETRY_EVENT, publishDeviceSyncStatus } from "../deviceSyncStatus";
 import {
   CLOUDFLARE_DEVICE_EVENT,
   CLOUDFLARE_DEVICE_SECRET_KEY,
@@ -23,10 +24,12 @@ export function useCloudflareDeviceSync(state: AppStateSnapshot, onRemoteState: 
     window.addEventListener(CLOUDFLARE_DEVICE_EVENT, refresh);
     window.addEventListener("storage", storage);
     window.addEventListener("online", refresh);
+    window.addEventListener(DEVICE_SYNC_RETRY_EVENT, refresh);
     return () => {
       window.removeEventListener(CLOUDFLARE_DEVICE_EVENT, refresh);
       window.removeEventListener("storage", storage);
       window.removeEventListener("online", refresh);
+      window.removeEventListener(DEVICE_SYNC_RETRY_EVENT, refresh);
     };
   }, []);
 
@@ -45,8 +48,13 @@ export function useCloudflareDeviceSync(state: AppStateSnapshot, onRemoteState: 
       if (active && !busy) timer = window.setTimeout(() => void flush(), 750);
     };
     const flush = async () => {
-      if (!active || busy || !hasCloudflareDevice() || !navigator.onLine) return;
+      if (!active || busy) return;
+      if (!hasCloudflareDevice() || !navigator.onLine) {
+        publishDeviceSyncStatus("idle");
+        return;
+      }
       busy = true;
+      publishDeviceSyncStatus("syncing");
       queued = false;
       try {
         if (!hydrated) {
@@ -64,12 +72,14 @@ export function useCloudflareDeviceSync(state: AppStateSnapshot, onRemoteState: 
         if (!active) return;
         revision = result.revision;
         failures = 0;
+        publishDeviceSyncStatus("saved");
       } catch {
         if (!active) return;
         // Re-read before retrying: a competing device may have advanced the revision.
         // Bound retries so an unavailable service cannot create a background loop.
         hydrated = false;
         failures += 1;
+        publishDeviceSyncStatus("error");
         queued = failures <= 2;
       } finally {
         busy = false;
@@ -80,6 +90,7 @@ export function useCloudflareDeviceSync(state: AppStateSnapshot, onRemoteState: 
     void flush();
     return () => {
       active = false;
+      publishDeviceSyncStatus("idle");
       window.clearTimeout(timer);
       scheduleRef.current = () => {};
     };

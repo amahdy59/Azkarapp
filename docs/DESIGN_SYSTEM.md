@@ -861,3 +861,23 @@ Month offers a wrapping two-choice display switch: Trend or Calendar and daily r
 All Progress period cards inherit the same 66rem screen measure. Week and Month do not introduce a narrower intermediate measure; prayer, chart and view-switch edges remain aligned at every breakpoint. Month uses short Trend/Calendar labels. Charts explain seven-day Month ranges or monthly Year points and omit the repeated decorative eyebrow. Period selection uses the shared ui/select components with localized direction, app popover/control tokens, selected checkmark, 44px options and Escape focus recovery. Exact chart data stays optional. No tracking, persistence or religious-content change.
 
 The centered Progress wrapper retains the shared opaque header's zero top-edge gap when scrolled. Day and Week primary titles remain on one readable line; descriptive Month and Year chart titles may use two complete lines at narrow widths rather than shrinking or clipping text. Surah listening preference buttons use the same centered icon/label spacing as paginated listening controls.
+
+## Approved Home clarity reference — 2026-10-14
+
+Home has two focused prayer summaries and an explicit all-prayer disclosure, one primary routine with its complete/abbreviated selector, one directly visible reviewed reminder, open daily-wird tiles, adjacent benefits access and icon-labelled situational shortcuts. Wird photography is an independent opt-in Appearance preference; photographic captions and image-free tiles use the same glass material when transparency is enabled. Reduced transparency renders stable solid surfaces. Streak/palm indicators remain compact; Today’s path is desktop-only at the shared 900px breakpoint. Narrow/enlarged tiles stack rather than shrinking their labels.
+
+## Home frosted surfaces and full-width chrome — 2026-10-14
+
+Owner-approved Home refinement: the sticky header surface spans the main canvas, excluding the sidebar; its inner controls retain the content grid measure. Shared standard glass uses 48% navy, reading/header 58%, 18px blur and a 6% maximum white highlight. Keep the page scrim and pale-gold on-media text to preserve contrast against bright scenery. Photo captions use 66% tint without the page scrim. Insets use one light darkening layer and no additional backdrop filter; primary actions stay solid. Application/system reduced-transparency preferences retain opaque materials. Header edges, inner alignment, OS/app fallbacks and conservative bright-photo contrast are covered by browser checks.
+
+### Mobile Home layout — owner follow-up 2026-10-15
+
+All-prayer disclosure uses one horizontally scrollable row, a 7rem minimum card width and a labelled focusable region. The collapse action remains separate. Phone prayer times use 16px extra-bold text. Daily wird uses two columns at ordinary phone text sizes, returning to one when its container is narrower than 15rem; wide desktop retains four columns. Preserve native scroll, logical RTL order and keyboard focus visibility. Home-only chrome/reading/inset variants load with the Home stylesheet to avoid increasing initial-route CSS.
+
+Wird navigation arrows sit at the logical trailing edge beside the title/status block and remain decorative within the full-card button. Home offers one labelled benefits action; the benefits screen includes the original palm-earning explanation as a separate section. Avoid adjacent duplicate info icons. Progress retains its existing help presentation.
+
+Image-free wird captions reserve 7.5rem minimum with 0.75rem block/1rem inline padding; content may grow for wrapped labels and enlarged text. Photo captions retain 1rem padding and their existing image/caption height. Compact prayer disclosure sits in a trailing auto-width column beside the scrollable cards, uses a 44px square target with List/All or ChevronUp/Less and preserves full accessible labels. It does not add a full-width action row.
+
+Situational shortcuts use equal fractional rows and columns with a 3rem minimum link height. Short localized display labels omit repeated Arabic “azkar”; full canonical category names remain accessible labels/titles. Preserve natural wrapping, icon alignment, native link semantics and existing destinations.
+
+Shortcut sections use 0.75rem block/1rem inline padding and 0.5rem heading-to-grid space, with 3rem minimum links that grow together when text wraps. This compact density matches image-free Home cards while retaining target size and readable text.

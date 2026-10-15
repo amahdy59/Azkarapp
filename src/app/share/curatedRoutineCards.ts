@@ -22,6 +22,26 @@ export interface CuratedRoutinePack {
 }
 
 export const CURATED_ROUTINE_PACKS: Readonly<Record<string, CuratedRoutinePack>> = {
+  before_sleep: {
+    categoryId: "before_sleep",
+    title: { ar: "أذكار النوم", en: "Sleep Remembrance" },
+    cards: [
+      {
+        id: "before-sleep-1",
+        imagePath: "assets/cards/routine-before_sleep-1.jpg",
+        pageNumber: 1,
+        totalPages: 2,
+        altText: { ar: "أذكار النوم — البطاقة ١ من ٢", en: "Sleep Remembrance — Card 1 of 2" },
+      },
+      {
+        id: "before-sleep-2",
+        imagePath: "assets/cards/routine-before_sleep-2.jpg",
+        pageNumber: 2,
+        totalPages: 2,
+        altText: { ar: "أذكار النوم — البطاقة ٢ من ٢", en: "Sleep Remembrance — Card 2 of 2" },
+      },
+    ],
+  },
   morning: {
     categoryId: "morning",
     title: { ar: "أذكار الصباح", en: "Morning Remembrance" },
@@ -106,7 +126,8 @@ export function getCuratedCardFilename(card: CuratedRoutineCard, packTitle: stri
           .replace(/^-|-$/g, "")
       : card.id;
   const withPage = safeBase.includes(String(card.pageNumber)) ? safeBase : `${safeBase}-${card.pageNumber}`;
-  return `${withPage}.webp`;
+  const extension = card.imagePath.toLowerCase().endsWith(".jpg") ? "jpg" : "webp";
+  return `${withPage}.${extension}`;
 }
 
 export async function fetchCuratedCardFile(

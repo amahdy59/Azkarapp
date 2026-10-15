@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_open">Open Azkar to set up your widgets</string>
+    <string name="widget_prayers">Prayer times</string>
+    <string name="widget_azkar">Daily azkar</string>
+    <string name="widget_quran">Continue Quran</string>
+    <string name="widget_tasbih">Tasbih</string>
+</resources>

@@ -28,6 +28,8 @@ import { gzipSync } from "node:zlib";
  * without the budget noticing (F24/F25). The owner explicitly approved an
  * 11 MiB total-output exception on 2026-10-10 for the complete English Quran
  * corpus. Keep existing Mushaf JSON URLs readable by installed older clients.
+ * On 2026-10-14 the owner explicitly approved 12 MiB for the supplied sleep
+ * sharing cards, offline page 207 font and Home refinement release.
  * All per-file, compressed, initial-route and baseline growth guards remain.
  */
 const limits = {
@@ -37,7 +39,7 @@ const limits = {
   javascriptGzip: 140 * 1024,
   cssGzip: 28 * 1024,
   initialGzip: 250 * 1024,
-  totalOutput: 11 * 1024 * 1024,
+  totalOutput: 12 * 1024 * 1024,
   largestFile: 2 * 1024 * 1024,
 };
 /**

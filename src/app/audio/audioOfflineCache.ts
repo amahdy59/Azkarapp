@@ -3,6 +3,7 @@ import type { Zikr } from "../types";
 import { AUDIO_CATALOG, AUDIO_MANIFEST_VERSION } from "./audioManifest";
 import type { AudioPreferences, AudioVariant } from "./audioTypes";
 import { getPreferredVoiceId, resolveAudioAsset } from "./resolveAudioAsset";
+import { isAudioSourceAllowed } from "./platformAudioPolicy";
 import { AudioDownloadError, transferAudio, type AudioDownloadPhase } from "./audioDownloadTransfer";
 
 export interface AudioDownloadProgress {
@@ -84,7 +85,10 @@ function getDownloadVariants(zikrs: readonly Zikr[], preferences: AudioPreferenc
       continue;
     for (const segment of resolution.asset.segments) {
       const variant = segment.variants.find(
-        (candidate) => candidate.voiceId === voiceId && candidate.reviewStatus === "approved",
+        (candidate) =>
+          candidate.voiceId === voiceId &&
+          candidate.reviewStatus === "approved" &&
+          isAudioSourceAllowed(candidate.sourceId),
       );
       const resolved = resolution.segmentsByVoice[voiceId]?.find((candidate) => candidate.id === segment.id);
       if (variant && resolved) {

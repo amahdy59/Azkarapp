@@ -11,13 +11,18 @@ function useActiveVisitorCount() {
 
   useEffect(() => {
     let active = true;
+    let pending = false;
     const sendHeartbeat = () => {
-      if (document.visibilityState === "hidden") return;
+      if (pending || !navigator.onLine || document.visibilityState === "hidden") return;
+      pending = true;
       void sendActiveVisitorHeartbeat()
         .then((nextCount) => {
           if (active && nextCount !== null) setCount(nextCount);
         })
-        .catch(() => undefined);
+        .catch(() => undefined)
+        .finally(() => {
+          pending = false;
+        });
     };
     const handleVisibilityChange = () => sendHeartbeat();
 

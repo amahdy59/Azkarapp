@@ -1,5 +1,13 @@
 # Decision Log
 
+## Android build tools and audio release policy — 2026-10-15
+
+The owner explicitly accepts Google Android SDK terms and authorizes JDK/SDK installation. The owner chooses to exclude uncertain Muhammad Al-Shara recordings from Android pending permission, then clarifies that only Al-Kahf and Al-Baqarah use محمد الشرع; the other recordings use Abdullah Muhammad or English narration. A complete AST inventory confirms 2 Muhammad Al-Shara variants and 23 Abdullah Muhammad variants incorrectly linked to the former generic source. Correct those 23 source links to the existing owner-authorized Abdullah Muhammad source; exclude only the 2 Muhammad Al-Shara variants at Android playback/download resolution. Preserve web availability, exact bytes/checksums, devotional text and attribution identity. Retain offline downloads and file export for eligible audio. No permission evidence is fabricated.
+
+## Coordinated audit remediation and Capacitor Android approved — 2026-10-15
+
+The owner requests applying all audit recommendations as one coordinated effort and explicitly approves “Capacitor Android (recommended)” with native widgets and reminder services while preserving React/PWA. Implement in bounded verified phases under phases/APP_AUDIT_REMEDIATION_2026_10_15.md. This supersedes the earlier widget deferral; it does not authorize invented recording permissions, deletion of user data, or claims of physical-device/Play acceptance without evidence. Existing autonomous release authority and intact gates apply.
+
 ## Historical Progress visualization — 2026-10-14
 
 The owner approves all screenshot-based Progress recommendations, welcomes multiple stacked bars where they make the data clearer, requests waiting for a concurrent session, then explicitly resumes this phase. Implement historical-only trends with correctly clipped ranges and synchronized selectors; monthly columns and an explained annual line; five-row prayer comparisons with mutually exclusive location stacks only; separate Rawatib/adhkar measures; optional exact records and accessible responsive controls. Preserve existing prayer-first ordering, today-inclusive recording denominators, reviewed Asr Rawatib applicability, independent Quran, offline state and merge boundaries. This supersedes future analytical placeholders and dense prayer metric cards. The existing autonomous main release authority applies after intact gates. See phases/PROGRESS_VISUAL_HISTORY_2026_10_14.md.
@@ -4584,3 +4592,23 @@ The owner approves the thorough review and plan: eliminate cards within cards wi
 ## Stationary Progress controls — 2026-10-14
 
 The owner explicitly requests keeping the Progress header and relevant filters visible while scrolling, based on the attached Day screenshot. Group the shared title, period tabs and date navigation in one opaque sticky owner with viewport-aware bounds and independently reachable short-screen controls. Preserve all recording/data contracts, DOM order and reviewed quotation text; supporting reflection may scroll outside the task chrome. Measured scroll padding and focus recovery must exclude portaled menus. Also complete the reproduced enlarged endpoint-label spacing repair without shrinking text or weakening geometry assertions. Follow normal intact release authority. See phases/PROGRESS_STATIONARY_CONTROLS_2026_10_14.md.
+
+## Home clarity and owner additions — 2026-10-14
+
+The owner approves the final Home image with current/next prayer summaries, all-prayer disclosure, default image-free daily wird, independent optional images/transparency, directly displayed reminder, retained mode selector, benefits information, header streak/palms, icon shortcuts and desktop-only Today’s path. Reuse the 900px expanded shell target. The owner also requests Mushaf lettering for the existing reliance quotation and an optional two-card supplied sleep sharing pack. Preserve reviewed text/counts and original raster bytes. No release-budget ceiling has been changed; the implementation exceeds the fixed total-output limit and release scope/contract requires owner decision.
+
+## Home release budget exception approved — 2026-10-14
+
+After requesting publication of all changes, the owner explicitly answered "yes" to increasing only the total-output limit from 11 MiB to 12 MiB. This supersedes the fixed total-output ceiling for this release and establishes the new 12 MiB backstop. The measured candidate was 11,941,511 bytes, including the original supplied sleep JPEGs and the offline page 207 font. Preserve every other budget, growth guard, content-integrity check and release gate. Publish the complete Home and follow-up changes after successful verification.
+
+## Home glass and edge-to-edge desktop header approved — 2026-10-14
+
+The owner explicitly agrees to the recommended full-width header surface with aligned inner content and visibly translucent Home cards. Replace excessive cumulative fills with shared standard/reading/header materials, preserve text contrast and user/system reduced-transparency fallbacks, and verify all scenes and responsive widths. Reuse existing components; no content, persistence, dependency or budget-limit changes. Normal autonomous release authority applies.
+
+## Mobile Home follow-up approved — 2026-10-15
+
+The owner requests all five prayers side by side in one mobile row, a two-by-two mobile daily-wird arrangement, and larger/bolder prayer times. A scrollable prayer row preserves readable card widths; a single-column wird fallback supports enlarged text. Include this in the pending full-width header/glass release; preserve existing quality ceilings and recording/content contracts.
+
+## Home card density and compact disclosure — 2026-10-15
+
+The owner explicitly selects the recommended combined benefits/palm help entry, then requests less vertical space in the image-free wird cards and a smaller mobile prayer disclosure alternative. Reduce block padding and reserved card height while preserving natural wrapped-text growth; retain photo-card geometry. Use one trailing 44px List/All or ChevronUp/Less control with visible localized short label and full accessible name. Preserve one-row native prayer scrolling and existing keyboard/data contracts. Supersede the full-width disclosure action. The prior workflow is cancelled as superseded by these follow-ups; verify the final commit with all normal release gates.

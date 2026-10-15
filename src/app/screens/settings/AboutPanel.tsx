@@ -1,4 +1,5 @@
 import React from "react";
+import { APP_VERSION, APP_RELEASE } from "../../releaseStamp";
 import {
   BookOpen,
   ExternalLink,
@@ -59,7 +60,7 @@ export function AboutPanel({
               {t(language, "about.subtitle")}
             </p>
             <p className="latin-ui text-xs text-muted-foreground opacity-60" lang="en" dir="ltr">
-              Version 2.0.1
+              {[APP_VERSION, APP_RELEASE].filter(Boolean).join(" � ")}
             </p>
           </div>
         </div>
@@ -118,7 +119,7 @@ export function AboutPanel({
             <SupportRow
               icon={<MessageChat size={18} className="text-background" />}
               label={t(language, "about.sendFeedback")}
-              onPress={() => openMailto("support@azkarapp.dev", "Azkar feedback")}
+              onPress={() => openMailto("amahdy59@yahoo.com", "Azkar feedback")}
             />
             <SupportRow
               icon={<HelpCircle size={18} className="text-background" />}

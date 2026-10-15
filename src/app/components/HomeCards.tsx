@@ -89,7 +89,7 @@ export function PrayerRoutineCard({
                 direction={direction}
                 aria-label={t(language, "home.routineMode")}
                 className={`flex items-center rounded-3xl border p-1 ${
-                  onGlass ? "border-white/20 bg-on-media-surface/60 backdrop-blur-md" : "border-border bg-muted"
+                  onGlass ? "border-white/20 home-glass-inset" : "border-border bg-muted"
                 }`}
                 itemClassName={(selected) =>
                   `flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
@@ -499,7 +499,7 @@ export function DailyEvidenceCard({
       aria-labelledby="home-evidence-heading"
       data-testid="home-daily-evidence"
       dir={direction}
-      className="flex min-h-0 flex-1 flex-col gap-3"
+      className="home-glass-reading flex min-h-0 flex-1 flex-col gap-3"
     >
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2">

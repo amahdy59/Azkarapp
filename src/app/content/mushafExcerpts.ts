@@ -14,6 +14,8 @@ export const MUSHAF_EXCERPTS: Readonly<Record<string, { page: number; endPage?: 
 
 /** Explicit existing evidence citations, located in the shipped QCF v2 page data. */
 export const QURAN_EVIDENCE_EXCERPTS: typeof MUSHAF_EXCERPTS = {
+  // Owner-approved display of the existing dhikr quotation, not the entire ayah.
+  "quran-009-129-excerpt": { page: 207, from: "9:129", to: "9:129" },
   "home-quran-Q01": { page: 95, from: "4:103", to: "4:103" },
   "home-quran-Q02": { page: 401, from: "29:45", to: "29:45" },
   "home-quran-Q03": { page: 290, from: "17:78", to: "17:78" },
@@ -73,6 +75,8 @@ const letters = (text: string) =>
     .replace(/ٱ/g, "ا")
     .replace(/ى/g, "ي")
     .replace(/^الليل$/, "اليل")
+    // Uthmani إِلَـٰه and the reviewed dhikr إِلَه share the same word.
+    .replace(/^الاه$/, "اله")
     .replace(/[^\p{L}\p{N}]/gu, "");
 export function excerptWordMapping(lines: MushafWordToken[][], transcript: string, allowQuotation = false) {
   const words = lines.flat().filter((word) => !word.isEnd);

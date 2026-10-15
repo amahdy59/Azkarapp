@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState, type ChangeEvent, type ReactNode } from "react";
+import { useRef, useState, type ChangeEvent, type ReactNode } from "react";
 import { Card } from "../../components/Card";
 import { Button } from "../../components/ui/button";
 import { Check, Database, Download, LogOut, RotateCcw, Upload, User, Wifi } from "../../components/icons";
 import { t } from "../../i18n";
 import type { AppLanguage } from "../../types";
-import { CLOUDFLARE_DEVICE_EVENT, CLOUDFLARE_DEVICE_SECRET_KEY } from "../../../lib/cloudflareSync";
+import { useDeviceLinkStatus } from "../../hooks/useDeviceLinkStatus";
 import { SectionLabel, SubHeader } from "./SettingsPrimitives";
 import { QrSyncPanel } from "./QrSyncPanel";
 
@@ -58,9 +58,7 @@ export function AccountDataPanel({
       }).format(new Date(lastSuccessfulSyncAt))
     : "";
 
-  const [hasCloudflareDevice, setHasCloudflareDevice] = useState(() =>
-    Boolean(typeof window !== "undefined" && window.localStorage?.getItem(CLOUDFLARE_DEVICE_SECRET_KEY)),
-  );
+  const hasCloudflareDevice = useDeviceLinkStatus();
   const restoreInputRef = useRef<HTMLInputElement>(null);
   const [restoreError, setRestoreError] = useState("");
 
@@ -75,18 +73,6 @@ export function AccountDataPanel({
       setRestoreError(error instanceof Error ? error.message : t(language, "accountData.restoreInvalid"));
     }
   };
-
-  useEffect(() => {
-    const handleDeviceChange = () => {
-      setHasCloudflareDevice(Boolean(window.localStorage?.getItem(CLOUDFLARE_DEVICE_SECRET_KEY)));
-    };
-    window.addEventListener(CLOUDFLARE_DEVICE_EVENT, handleDeviceChange);
-    window.addEventListener("storage", handleDeviceChange);
-    return () => {
-      window.removeEventListener(CLOUDFLARE_DEVICE_EVENT, handleDeviceChange);
-      window.removeEventListener("storage", handleDeviceChange);
-    };
-  }, []);
 
   return (
     <div className="slide-in-from-right flex h-full flex-col bg-background/50 backdrop-blur-md">
@@ -142,8 +128,14 @@ export function AccountDataPanel({
           <Card as="section" padding="lg">
             <p className="text-label leading-5 text-muted-foreground">{t(language, "accountData.dataSummary")}</p>
             <dl className="mt-4 grid grid-cols-2 gap-3">
-              <DataCount label={t(language, "accountData.sessions")} value={sessionCount} />
-              <DataCount label={t(language, "accountData.savedItems")} value={savedCount} />
+              <DataCount
+                label={t(language, "accountData.sessions")}
+                value={sessionCount.toLocaleString(language === "ar" ? "ar-EG" : "en-US")}
+              />
+              <DataCount
+                label={t(language, "accountData.savedItems")}
+                value={savedCount.toLocaleString(language === "ar" ? "ar-EG" : "en-US")}
+              />
             </dl>
           </Card>
         </div>
@@ -206,7 +198,7 @@ export function AccountDataPanel({
   );
 }
 
-function DataCount({ label, value }: { label: string; value: number }) {
+function DataCount({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-xl bg-muted/60 p-3 border border-border/50">
       <dt className="text-xs text-muted-foreground">{label}</dt>

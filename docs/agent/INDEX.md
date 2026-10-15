@@ -1,5 +1,7 @@
 # AI Improvement System Index
 
+Current coordinated effort: [Audit remediation and Android preparation](phases/APP_AUDIT_REMEDIATION_2026_10_15.md). The owner approved applying the audit recommendations and adding Capacitor Android/native widgets and reminders while retaining the PWA. Earlier entries below record historical phase authority; they are not additional simultaneously active briefs.
+
 [Combined refinements release](phases/COMBINED_RELEASE_2026_10_14.md) records the owner's superseding instruction to verify and push all completed local changes, integration repairs, supplied curated images and exact-commit release evidence.
 
 [Persistent devotional downloads and human-readable archives](phases/PERSISTENT_DOWNLOADS_AND_HUMAN_READABLE_ARCHIVES_2026_10_13.md) protects offline audio, Mushaf pages, fonts and timings from service worker update wipes, migrates valid recordings across manifest updates without re-downloading, auto-requests persistent storage, and organizes exported ZIP audio into bilingual category folders with numbered, human-understandable track titles and localized reciter names. Local implementation only per owner instruction.
@@ -323,3 +325,7 @@ The latest owner-approved continuation is [Canonical Surah magnification and rec
 [Historical Progress visualization](phases/PROGRESS_VISUAL_HISTORY_2026_10_14.md) is the active owner-approved Progress phase: compact prayer comparisons, valid location stacks, monthly columns, explained annual trends, historical-only chart options and accessible exact records. The owner resumed work after the concurrent session completed.
 
 [Stationary Progress controls](phases/PROGRESS_STATIONARY_CONTROLS_2026_10_14.md) is the active owner-requested screenshot follow-up: stationary title/period filters, actual-viewport bounds, safe focus recovery and separated enlarged chart labels. Historical visualization was deployed at a64b84c5; this follow-up has its own fresh release notes.
+
+[Home clarity and independent appearance](phases/HOME_CLARITY_2026_10_14.md) implements the owner-approved final concept and desktop-only Today’s path. [Supplied sleep cards and reliance lettering](phases/SLEEP_SHARING_AND_RELIANCE_LETTERING_2026_10_14.md) records the two subsequent owner requests. The owner explicitly approved a 12 MiB total-output exception and publication of all changes; intact release gates apply.
+
+[Home glass and desktop header](phases/HOME_GLASS_AND_HEADER_2026_10_14.md) is the active owner-approved refinement: full-width main-canvas header, visible photographic glass, stronger reading surfaces, simpler nested controls and intact accessibility preferences.

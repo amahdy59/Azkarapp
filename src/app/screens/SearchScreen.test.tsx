@@ -4,6 +4,22 @@ import { normalizeRecentSearches, SearchScreen } from "./SearchScreen";
 import { getAzkarByCategory } from "../content/azkar";
 
 describe("SearchScreen", () => {
+  it("batches a broad query and restarts the batch for another query", () => {
+    const { container } = render(
+      <SearchScreen
+        language="en"
+        direction="ltr"
+        initialQuery="الله"
+        onBack={() => undefined}
+        onZikr={() => undefined}
+      />,
+    );
+    expect(container.querySelectorAll('[data-testid="search-result"]')).toHaveLength(20);
+    fireEvent.click(screen.getByRole("button", { name: "Show 20 more results" }));
+    expect(container.querySelectorAll('[data-testid="search-result"]')).toHaveLength(40);
+    fireEvent.change(screen.getByRole("textbox"), { target: { value: "اللهم" } });
+    expect(container.querySelectorAll('[data-testid="search-result"]').length).toBeLessThanOrEqual(20);
+  });
   beforeEach(() => {
     localStorage.clear();
     document.documentElement.lang = "en";

@@ -61,6 +61,7 @@ export function buildRemoteSyncSnapshot(state: AppStateSnapshot): RemoteSyncSnap
     boldText: state.settings.boldText,
     reduceMotion: state.settings.reduceMotion,
     reduceTransparency: state.settings.reduceTransparency,
+    homeWirdImages: state.settings.homeWirdImages,
     hapticFeedback: state.settings.hapticFeedback,
     forceRtl: state.settings.forceRtl,
     colorBlindSupport: state.settings.colorBlindSupport,

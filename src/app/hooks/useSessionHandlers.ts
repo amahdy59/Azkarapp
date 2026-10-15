@@ -237,7 +237,7 @@ export function useSessionHandlers({
     if (!zikrId) {
       return;
     }
-    const effectiveCompleted = getEffectiveCompletedForSubcategory(completed, activeCat, activeSubCategory);
+    const effectiveCompleted = new Set(getEffectiveCompletedForSubcategory(completed, activeCat, activeSubCategory));
     const canonicalCollectionWasAlreadyComplete = azkar.every((zikr) => effectiveCompleted.has(zikr.id));
 
     if (isRepeatSession) {
@@ -329,7 +329,7 @@ export function useSessionHandlers({
     }));
 
     // Re-check completion using getEffectiveCompletedForSubcategory to see if the whole thing is done
-    const effectiveNow = getEffectiveCompletedForSubcategory(completed, catId, subCategory);
+    const effectiveNow = new Set(getEffectiveCompletedForSubcategory(completed, catId, subCategory));
     if (!wasCompleted) effectiveNow.add(zikrId);
     else effectiveNow.delete(zikrId);
 
@@ -359,7 +359,7 @@ export function useSessionHandlers({
       pop();
       return;
     }
-    const effectiveCompleted = getEffectiveCompletedForSubcategory(completed, activeCat, activeSubCategory);
+    const effectiveCompleted = new Set(getEffectiveCompletedForSubcategory(completed, activeCat, activeSubCategory));
     const canonicalCollectionWasAlreadyComplete = azkar.every((zikr) => effectiveCompleted.has(zikr.id));
     if (!isRepeatSession && canonicalCollectionWasAlreadyComplete) {
       pop();

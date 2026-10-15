@@ -18,7 +18,7 @@ afterEach(() => {
 
 describe("Mushaf page data", () => {
   it("serves daily passage fonts and page data from the same application origin", () => {
-    for (const page of [42, 49, 75, 76, 603, 604]) {
+    for (const page of [42, 49, 75, 76, 207, 603, 604]) {
       expect(getQcfFontUrl(page)).toMatch(new RegExp(`/fonts/qcf-v2/2026-10-11/p${page}\\.woff2$`));
       expect(getMushafPageUrl(page)).toMatch(new RegExp(`/data/mushaf/${page}\\.json$`));
     }

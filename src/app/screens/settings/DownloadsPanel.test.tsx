@@ -9,7 +9,7 @@ const audioMocks = vi.hoisted(() => ({
   export: vi.fn(),
 }));
 vi.mock("../../audio/audioArchive", () => ({ prepareAudioArchive: audioMocks.archive }));
-vi.mock("../../share/shareDispatcher", () => ({ downloadFile: audioMocks.export }));
+vi.mock("../../share/shareDispatcher", () => ({ saveFileToDevice: audioMocks.export }));
 
 vi.mock("../../audio/audioPreferences", () => ({ loadAudioPreferences: () => ({}) }));
 vi.mock("../../content/azkar", () => ({

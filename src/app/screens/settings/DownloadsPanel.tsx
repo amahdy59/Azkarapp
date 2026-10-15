@@ -1,3 +1,4 @@
+import { isNativeAndroid } from "../../native/platform";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Card } from "../../components/Card";
 import { Button } from "../../components/ui/button";
@@ -11,7 +12,7 @@ import { reportError } from "../../../lib/observability";
 import { SubHeader } from "./SettingsPrimitives";
 import { AudioFileExports } from "./AudioFileExports";
 import { DownloadProgress } from "../../components/DownloadProgress";
-import { downloadFile } from "../../share/shareDispatcher";
+import { saveFileToDevice } from "../../share/shareDispatcher";
 import { applyContentReview } from "../../content/contentReview";
 import { ALL_AZKAR, getAzkarForMode } from "../../content/azkar";
 import { loadAudioPreferences } from "../../audio/audioPreferences";
@@ -144,7 +145,7 @@ export function DownloadsPanel({
       setPersistence(storagePersistence);
       setCollections(resources);
       setStatus({
-        serviceWorkerReady: Boolean(registration?.active),
+        serviceWorkerReady: isNativeAndroid() || Boolean(registration?.active),
         cacheCount: cacheNames.length,
         usageBytes: storage.usage,
         quotaBytes: storage.quota,
@@ -518,7 +519,7 @@ export function DownloadsPanel({
                     },
                   );
                   controller.signal.throwIfAborted();
-                  if (mountedRef.current) downloadFile(file);
+                  if (mountedRef.current) await saveFileToDevice(file);
                 },
               );
             }}

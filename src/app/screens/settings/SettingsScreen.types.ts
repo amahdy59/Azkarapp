@@ -33,6 +33,8 @@ export interface SettingsScreenProps {
   boldText: boolean;
   reduceMotion: boolean;
   reduceTransparency: boolean;
+  homeWirdImages?: boolean;
+  onHomeWirdImagesChange?: (value: boolean) => void;
   hapticFeedback: boolean;
   forceRtl: boolean;
   colorBlindSupport: ColorBlindSupport;

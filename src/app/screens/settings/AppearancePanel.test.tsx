@@ -22,6 +22,31 @@ function renderPanel() {
 }
 
 describe("AppearancePanel", () => {
+  it("keeps images and transparency as independent appearance choices", () => {
+    const onImages = vi.fn();
+    const onTransparency = vi.fn();
+    render(
+      <AppearancePanel
+        language="en"
+        direction="ltr"
+        themeMode="midnight"
+        highContrast={false}
+        onThemeModeChange={vi.fn()}
+        onDisableHighContrast={vi.fn()}
+        onLanguageChange={vi.fn()}
+        onBack={vi.fn()}
+        homeWirdImages={false}
+        onHomeWirdImagesChange={onImages}
+        reduceTransparency={true}
+        onReduceTransparencyChange={onTransparency}
+      />,
+    );
+    fireEvent.click(screen.getByRole("switch", { name: /Daily-wird card images/ }));
+    expect(onImages).toHaveBeenCalledWith(true);
+    expect(onTransparency).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("switch", { name: /^Transparency/ }));
+    expect(onTransparency).toHaveBeenCalledWith(false);
+  });
   it("keeps theme, language, calendar and regional correction available in their own section", () => {
     const props = renderPanel();
     fireEvent.click(screen.getByTestId("theme-option-light"));
