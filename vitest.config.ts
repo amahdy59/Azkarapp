@@ -18,7 +18,6 @@ const nativeAliases = {
  * require isolation. Tooling runs separately in Node without React/jsdom setup.
  */
 const shared = {
-  resolve: { alias: nativeAliases },
   /**
    * 15s is ample for any single test here in isolation — the whole suite runs
    * in about 31s. The headroom is for `pnpm check`, where the suite shares the
@@ -44,9 +43,11 @@ export default defineConfig({
   test: {
     projects: [
       {
+        resolve: { alias: nativeAliases },
         test: { ...shared, name: "shared-registry", include: APP_SUITES, exclude: ISOLATED_SUITES, isolate: false },
       },
       {
+        resolve: { alias: nativeAliases },
         test: { ...shared, name: "isolated", include: ISOLATED_SUITES, isolate: true },
       },
       {
