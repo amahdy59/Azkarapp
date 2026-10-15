@@ -1,5 +1,5 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { useCallback, useEffect, useRef, type ReactNode } from "react";
+import { useCallback, useEffect, useId, useRef, type ReactNode, type MutableRefObject } from "react";
 import { Drawer, DrawerContent, DrawerTitle } from "./ui/drawer";
 import { useLayoutMode } from "../hooks/useLayoutMode";
 import { X } from "./icons";
@@ -14,17 +14,30 @@ import type { AppLanguage } from "../types";
  * Restore in the scope's close event, after the trap is released, including
  * conditionally unmounted roots. No guessed timeout or competing cleanup.
  */
-function useRestoreFocusOnClose() {
-  const previous = useRef<HTMLElement | null>(null);
+function useRestoreFocusOnClose(shared?: MutableRefObject<HTMLElement | null>, sharedScopeId?: string) {
+  const local = useRef<HTMLElement | null>(null);
+  const localScopeId = useId();
+  const scopeId = sharedScopeId ?? localScopeId;
+  const previous = shared ?? local;
   const onOpenAutoFocus = useCallback(() => {
-    previous.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-  }, []);
-  const onCloseAutoFocus = useCallback((event: Event) => {
-    if (!previous.current?.isConnected) return;
-    event.preventDefault();
-    previous.current.focus({ preventScroll: true });
-  }, []);
-  return { onOpenAutoFocus, onCloseAutoFocus };
+    const active = document.activeElement;
+    // A responsive branch switch opens a replacement scope while the old
+    // dialog still owns focus. Keep the original external opener across it.
+    if (
+      active instanceof HTMLElement &&
+      active.closest("[data-return-focus-scope]")?.getAttribute("data-return-focus-scope") !== scopeId
+    )
+      previous.current = active;
+  }, [previous, scopeId]);
+  const onCloseAutoFocus = useCallback(
+    (event: Event) => {
+      if (!previous.current?.isConnected) return;
+      event.preventDefault();
+      previous.current.focus({ preventScroll: true });
+    },
+    [previous],
+  );
+  return { onOpenAutoFocus, onCloseAutoFocus, "data-return-focus-scope": scopeId };
 }
 
 export interface SheetHeaderProps {
@@ -137,6 +150,8 @@ export function SheetHeader({
 }
 
 interface ModalProps {
+  returnFocusRef?: MutableRefObject<HTMLElement | null>;
+  returnFocusScopeId?: string;
   open: boolean;
   onClose: () => void;
   /** Required accessible name. Rendered visually hidden — content supplies its own visible heading. */
@@ -171,6 +186,8 @@ interface ModalProps {
  * that — see DEC-025.
  */
 export function Modal({
+  returnFocusRef,
+  returnFocusScopeId,
   open,
   onClose,
   title,
@@ -185,7 +202,7 @@ export function Modal({
   onGlass = false,
   showCloseButton = true,
 }: ModalProps) {
-  const focusScope = useRestoreFocusOnClose();
+  const focusScope = useRestoreFocusOnClose(returnFocusRef, returnFocusScopeId);
   const lang: AppLanguage = language ?? (direction === "rtl" ? "ar" : "en");
 
   return (
@@ -354,7 +371,9 @@ export function ResponsiveSheet({
   // Vaul's dialog behavior option enables its focus scope, rather than DOM input autofocus.
   const drawerFocusBehavior = { autoFocus: focusOnOpen };
   // Modal runs this itself; only the drawer branch needs it here.
-  const focusScope = useRestoreFocusOnClose();
+  const returnFocusRef = useRef<HTMLElement | null>(null);
+  const returnFocusScopeId = useId();
+  const focusScope = useRestoreFocusOnClose(returnFocusRef, returnFocusScopeId);
 
   useEffect(() => {
     if (!open) return;
@@ -371,6 +390,8 @@ export function ResponsiveSheet({
   if (!isCompact) {
     return (
       <Modal
+        returnFocusRef={returnFocusRef}
+        returnFocusScopeId={returnFocusScopeId}
         open={open}
         onClose={onClose}
         title={title}

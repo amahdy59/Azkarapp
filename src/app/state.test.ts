@@ -18,6 +18,59 @@ import {
 import { getProgressDayKey, shiftProgressDayKey } from "./progress";
 
 describe("app state persistence", () => {
+  it("migrates the combined Ruqyah bookmark and completion to all three surahs without changing history", () => {
+    const session = {
+      id: "before-ruqyah-split",
+      category: "illness_ruqyah",
+      completedAt: "2026-10-14T12:00:00.000Z",
+      completedCount: 8,
+      totalCount: 8,
+      durationSeconds: 120,
+      isComplete: true,
+    };
+    const old = {
+      savedZikrIds: ["ir-ref-5", "ir-ref-5a", "ir-ref-6"],
+      completed: { illness_ruqyah: ["ir-ref-5", "ir-ref-5b"] },
+      sessions: [session],
+    };
+    const state = normalizeAppState(old);
+    expect(state.savedZikrIds).toEqual(["ir-ref-5a", "ir-ref-5b", "ir-ref-5c", "ir-ref-6"]);
+    expect(state.completed.illness_ruqyah).toEqual(["ir-ref-5a", "ir-ref-5b", "ir-ref-5c"]);
+    expect(state.sessions).toEqual([session]);
+    expect(normalizeAppState(state)).toEqual(state);
+    expect(old.savedZikrIds).toContain("ir-ref-5");
+  });
+
+  it("migrates older synced Ruqyah identities through the same merge boundary", () => {
+    const incoming = {
+      ...DEFAULT_APP_STATE,
+      savedZikrIds: ["ir-ref-5"],
+      completed: { ...DEFAULT_APP_STATE.completed, illness_ruqyah: ["ir-ref-5"] },
+    };
+    const merged = mergeAppStates(DEFAULT_APP_STATE, incoming);
+    expect(merged.savedZikrIds).toEqual(["ir-ref-5a", "ir-ref-5b", "ir-ref-5c"]);
+    expect(merged.completed.illness_ruqyah).toEqual(["ir-ref-5a", "ir-ref-5b", "ir-ref-5c"]);
+    expect(mergeAppStates(merged, incoming)).toEqual(merged);
+  });
+
+  it("preserves legacy numeric Ruqyah completion identities after the split", () => {
+    const state = normalizeAppState({ completed: { illness_ruqyah: [4, 5, 7, 99] } });
+    expect(state.completed.illness_ruqyah).toEqual(["ir-baqarah", "ir-ref-5a", "ir-ref-5b", "ir-ref-5c", "ir-ref-6"]);
+  });
+
+  it("preserves partial Ruqyah repetitions and gives explicit new-surah counts precedence", () => {
+    const state = normalizeAppState({
+      partialZikrCounts: { "ir-ref-5": 1, "ir-ref-5a": 2, unrelated: 4 },
+    });
+    expect(state.partialZikrCounts).toEqual({
+      "ir-ref-5a": 2,
+      "ir-ref-5b": 1,
+      "ir-ref-5c": 1,
+      unrelated: 4,
+    });
+    expect(normalizeAppState(state)).toEqual(state);
+  });
+
   beforeEach(() => window.localStorage.clear());
 
   it("normalizes, merges and reloads the independent Home image preference", () => {

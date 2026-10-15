@@ -283,14 +283,24 @@ function normalizeSurahReadingPages(value: unknown): Record<string, number> {
   ) as Record<string, number>;
 }
 
+/** Owner-approved compatibility for the former combined Three Quls item. */
+const RUQYAH_SURAH_IDS = ["ir-ref-5a", "ir-ref-5b", "ir-ref-5c"] as const;
+const expandLegacyZikrId = (id: string): readonly string[] => (id === "ir-ref-5" ? RUQYAH_SURAH_IDS : [id]);
+
 /** Zikr id to in-progress partial tally, dropping anything that is not a positive integer. */
 function normalizePartialZikrCounts(value: unknown): Record<string, number> {
   if (!value || typeof value !== "object" || Array.isArray(value)) return {};
-  return Object.fromEntries(
+  const counts = Object.fromEntries(
     Object.entries(value).filter(
       ([zikrId, count]) => zikrId.length > 0 && Number.isInteger(count) && Number(count) >= 1 && Number(count) <= 10000,
     ),
   ) as Record<string, number>;
+  const legacy = counts["ir-ref-5"];
+  if (legacy !== undefined) {
+    delete counts["ir-ref-5"];
+    for (const id of RUQYAH_SURAH_IDS) counts[id] ??= legacy;
+  }
+  return counts;
 }
 
 /** Match completed-state rollover: situational collections remain resumable. */
@@ -555,6 +565,7 @@ function normalizeRoutineModes(value: unknown): AppStateSnapshot["settings"]["ro
 
 /** Pre-arrangement order used only to migrate legacy numeric completion indexes safely. */
 const LEGACY_ROUTINE_ORDER: Partial<Record<CategoryId, string[]>> = {
+  illness_ruqyah: ["ir-ref-1", "ir-ref-2", "ir-ref-3", "ir-ref-4", "ir-ref-5", "ir-ref-6", "ir-ref-7", "ir-baqarah"],
   morning: [
     "m-hm-75a",
     "m-hm-75",
@@ -744,6 +755,7 @@ function normalizeCompletedIds(values: unknown, category: CategoryId) {
               ? legacyZikrIds[Number(value)]
               : undefined,
         )
+        .flatMap((value) => (typeof value === "string" ? expandLegacyZikrId(value) : []))
         .filter(
           (value): value is string =>
             typeof value === "string" && (acceptsLazyIds ? isLazyZikrId(value) : validIds.has(value)),
@@ -759,10 +771,12 @@ function dedupeSavedZikrIds(values: unknown): string[] {
 
   return [
     ...new Set(
-      values.filter(
-        (value): value is string =>
-          typeof value === "string" && (ALL_STATIC_ZIKR_IDS.has(value) || isLazyZikrId(value)),
-      ),
+      values
+        .flatMap((value) => (typeof value === "string" ? expandLegacyZikrId(value) : []))
+        .filter(
+          (value): value is string =>
+            typeof value === "string" && (ALL_STATIC_ZIKR_IDS.has(value) || isLazyZikrId(value)),
+        ),
     ),
   ].sort();
 }

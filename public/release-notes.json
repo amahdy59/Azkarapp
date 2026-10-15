@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-15-7",
+  "release": "2026-10-15-8",
   "ar": [
-    "عرض سور الإخلاص والفلق والناس في أذكار الرقية ببطاقات قرآنية مستقلة بخط المصحف العثماني.",
-    "استخدام خط القراءة الواضح للكلمة المختارة في بطاقة معاني المفردات لتتناغم مع شرحها.",
-    "تفعيل تأثير الزجاج الشفاف المريح لبطاقات الشاشة الرئيسية على أجهزة الحاسوب المكتبية.",
-    "استمرار متابعة التلاوة تلقائياً عند فتح خيارات الصوت أو التنقل في عناصر التحكم."
+    "قراءة أهدأ للمصحف والترجمة، مع رقم الآية في زاويتها ومشغّل صوت عائم يمكنك إخفاؤه وإظهاره.",
+    "الوصول إلى ملفات الصوت المنزّلة وتصديرها بسهولة، مع توضيح استئناف الأذكار وإعادة ضبط الجلسة.",
+    "عرض سور الرقية الثلاث في بطاقات مستقلة مع الاحتفاظ بمحفوظاتك وتقدمك، وتحسين وضوح معاني الكلمات وزجاج بطاقات الرئيسية على الحاسوب.",
+    "تحسين عودة التركيز بعد المشاركة واستمرار متابعة التلاوة عند استخدام خيارات الصوت."
   ],
   "en": [
-    "Surahs Al-Ikhlas, Al-Falaq, and An-Nas in Ruqyah are now presented in dedicated Quranic cards with full Mushaf typography.",
-    "Word meanings now display the selected Quranic term in the clear reading font alongside its explanation.",
-    "Translucent frosted glass cards on the Home screen now render smoothly on desktop displays.",
-    "Recitation following now stays active seamlessly while opening audio options or navigating controls."
+    "Read a calmer Mushaf and translation, with corner ayah numbers and a floating audio player you can hide and restore.",
+    "Find and export downloaded audio more easily, with clearer guidance for resuming azkar and resetting a session.",
+    "Read the three Ruqyah surahs in separate cards while keeping saved items and progress, with clearer word meanings and translucent Home cards on desktop.",
+    "Return to your sharing control reliably and keep recitation following active while using audio options."
   ]
 }

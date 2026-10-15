@@ -71,6 +71,14 @@
   min-height: max(2.75rem, 5.2%);
   border-block-end: 0;
 }
+
+/* Match the reading region's inset plus its paragraph padding and border.
+   Scope this above the generic printed-page footer's zero inline padding. */
+.quran-page-meaning > .quran-meaning-header,
+.quran-page-meaning > .quran-meaning-footer {
+  padding: 0.375rem calc(1.5rem + 3px);
+}
+
 .quran-meaning-heading {
   display: flex;
   align-items: baseline;

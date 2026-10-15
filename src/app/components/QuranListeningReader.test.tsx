@@ -273,6 +273,23 @@ describe("read-only listening controls", () => {
 });
 
 describe("continuous surah listening", () => {
+  it("keeps following when focus moves to controls but pauses for manual reading", () => {
+    const { container } = render(
+      <div>
+        <button type="button">Audio options</button>
+        <div className="audio-expanded-text" tabIndex={-1}>
+          <ContinuousReader entry={entry} segment={null} currentTime={1} language="en" preferencesHost={null} />
+        </div>
+      </div>,
+    );
+    const viewport = container.querySelector<HTMLElement>(".audio-expanded-text")!;
+    viewport.focus();
+    screen.getByRole("button", { name: "Audio options" }).focus();
+    expect(screen.queryByRole("button", { name: "Return to current verse" })).toBeNull();
+    fireEvent.wheel(viewport);
+    expect(screen.getByRole("button", { name: "Return to current verse" })).toBeInTheDocument();
+  });
+
   it("honors End across late page fitting until the user browses elsewhere", () => {
     const callbacks: ResizeObserverCallback[] = [];
     vi.stubGlobal(

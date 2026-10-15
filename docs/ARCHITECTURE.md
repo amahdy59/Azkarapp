@@ -457,3 +457,7 @@ HomeWirdSection derives presentation only from existing routine/Quran progress. 
 ## Android local-service boundary — 2026-10-15
 
 The approved Capacitor host composes the same React application. `native/` owns platform detection, reminder-plan projection, queued native scheduling, widget projection and file export; `useNativeServices` connects normalized app state to those boundaries. Native plugins own RemoteViews and user-selected documents. Screens retain no direct storage/remote service orchestration for device pairing. See [Android](ANDROID.md) for contracts and acceptance limits. Synchronous application persistence remains authoritative; widget publication is a separate read-only projection.
+
+### Ruqyah identity compatibility — 2026-10-15
+
+The former combined Three Quls ID ir-ref-5 expands to ir-ref-5a, ir-ref-5b and ir-ref-5c when saved/completed data enters normalization or merging. Legacy numeric Ruqyah indexes resolve through the pre-split identity order. Partial repetitions expand to each surah, with explicit new-surah tallies taking precedence within a snapshot. Session history is unchanged; repeated normalization and older sync merges deduplicate the expanded identities.

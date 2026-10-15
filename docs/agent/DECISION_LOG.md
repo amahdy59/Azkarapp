@@ -4628,3 +4628,7 @@ The owner requests all five prayers side by side in one mobile row, a two-by-two
 ## Home card density and compact disclosure — 2026-10-15
 
 The owner explicitly selects the recommended combined benefits/palm help entry, then requests less vertical space in the image-free wird cards and a smaller mobile prayer disclosure alternative. Reduce block padding and reserved card height while preserving natural wrapped-text growth; retain photo-card geometry. Use one trailing 44px List/All or ChevronUp/Less control with visible localized short label and full accessible name. Preserve one-row native prayer scrolling and existing keyboard/data contracts. Supersede the full-width disclosure action. The prior workflow is cancelled as superseded by these follow-ups; verify the final commit with all normal release gates.
+
+## Ruqyah identity compatibility approved — 2026-10-15
+
+During the pre-push review, the owner explicitly approved migrating the former combined ir-ref-5 bookmark and completion to all three new surah IDs (ir-ref-5a/b/c). Apply the same compatibility at local-load, backup and sync-merge normalization boundaries. Preserve recorded session history, migrate partial repetitions without overwriting explicit new-surah tallies, retain legacy numeric completion identities, and make repeated normalization idempotent. Publication remains on hold for the requested review report.

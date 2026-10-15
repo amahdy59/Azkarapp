@@ -3,6 +3,26 @@ import { describe, expect, it, vi } from "vitest";
 import { Modal, SheetHeader } from "./ResponsiveSheet";
 
 describe("Modal accessibility", () => {
+  it("restores focus to an opener inside another dialog", async () => {
+    const outer = document.createElement("section");
+    outer.setAttribute("role", "dialog");
+    outer.setAttribute("data-return-focus-scope", "outer-dialog");
+    const opener = document.createElement("button");
+    opener.textContent = "Open nested sharing";
+    outer.append(opener);
+    document.body.append(outer);
+    opener.focus();
+    const view = render(
+      <Modal open onClose={vi.fn()} title="Nested sharing" direction="ltr">
+        <button type="button">Copy</button>
+      </Modal>,
+    );
+    await waitFor(() => expect(screen.getByTestId("modal-close-button")).toHaveFocus());
+    view.unmount();
+    await waitFor(() => expect(opener).toHaveFocus());
+    outer.remove();
+  });
+
   it("captures the opener before autofocus and restores it after a conditional unmount", async () => {
     const opener = document.createElement("button");
     opener.textContent = "Open sharing";
