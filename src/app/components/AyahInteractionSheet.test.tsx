@@ -1,9 +1,10 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AyahInteractionSheet } from "./AyahInteractionSheet";
 import { t } from "../i18n";
 import { __resetQuranTranslationsCacheForTesting } from "../content/quranTranslations";
+import { loadSurahWordMeanings } from "../content/quranWordMeanings";
 
 describe("AyahInteractionSheet", () => {
   beforeEach(() => {
@@ -90,7 +91,11 @@ describe("AyahInteractionSheet", () => {
       />,
     );
 
-    expect(await screen.findByTestId("ayah-meanings-container")).toBeInTheDocument();
+    // Await the actual shared data boundary instead of racing the default DOM polling deadline.
+    await act(async () => {
+      await loadSurahWordMeanings(2);
+    });
+    expect(screen.getByTestId("ayah-meanings-container")).toBeInTheDocument();
     expect(screen.getByText(t("ar", "reader.wordMeaningsTitle"))).toBeInTheDocument();
   });
 

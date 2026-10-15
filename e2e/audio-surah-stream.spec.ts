@@ -244,7 +244,30 @@ for (const item of listeningCases.filter((item) => item.id !== "ir-baqarah")) {
           await player.getByRole("button", { name: t(language, "audioPlayer.expand"), exact: true }).click();
         await expect
           .poll(() => player.evaluate((element) => element.scrollWidth - element.clientWidth))
-          .toBeLessThanOrEqual(1);
+          .toBeLessThanOrEqual(1)
+          .catch(async (error) => {
+            await testInfo.attach("expanded-player-overflow", {
+              contentType: "application/json",
+              body: JSON.stringify(
+                await player.evaluate((element) => {
+                  const box = element.getBoundingClientRect();
+                  return [...element.querySelectorAll<HTMLElement>("*")]
+                    .map((node) => ({
+                      tag: node.tagName,
+                      className: node.className,
+                      scrollWidth: node.scrollWidth,
+                      clientWidth: node.clientWidth,
+                      left: node.getBoundingClientRect().left - box.left,
+                      right: node.getBoundingClientRect().right - box.right,
+                    }))
+                    .filter((node) => node.right > 1 || node.left < -1 || node.scrollWidth > node.clientWidth + 1);
+                }),
+                null,
+                2,
+              ),
+            });
+            throw error;
+          });
         await expect(options).toBeVisible();
         await player.screenshot({
           path: testInfo.outputPath(`${item.id}-${language}-${size.width}.png`),

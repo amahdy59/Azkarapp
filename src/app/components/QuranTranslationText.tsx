@@ -1,4 +1,4 @@
-import { memo, useEffect, useLayoutEffect, useRef, type CSSProperties } from "react";
+import { memo, useEffect, useLayoutEffect, useRef } from "react";
 import type { TextSizeOption } from "../types";
 import type { QuranTranslationVerse } from "../content/quranTranslation";
 import "./quran-listening-translation.css";
@@ -69,13 +69,9 @@ export const QuranTranslationText = memo(function QuranTranslationText({
       aria-label={label}
       dir="ltr"
       lang="en"
+      data-translation-variant={variant}
       className={`quran-meaning-text ${className} focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring`}
-      style={
-        {
-          fontSize: FONT_SIZES[textSize],
-          "--quran-meaning-gutter": verses.some((verse) => verse.marker.length > 2) ? "2.5ch" : "2ch",
-        } as CSSProperties
-      }
+      style={{ fontSize: FONT_SIZES[textSize] }}
       onWheel={onManualBrowse}
       onTouchMove={onManualBrowse}
       onPointerDown={onManualBrowse}

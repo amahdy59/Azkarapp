@@ -32,6 +32,14 @@ html[data-mushaf-focus="true"] .floating-audio-player {
   margin-inline: auto;
 }
 
+.floating-audio-player[data-player-hidden="true"] {
+  container-type: normal;
+  inset-inline-start: auto;
+  width: fit-content;
+  max-width: calc(100% - 1rem);
+  border-radius: 999px;
+}
+
 .audio-compact-row {
   display: grid;
   grid-template-columns: 44px minmax(0, 1fr) 48px 44px;
@@ -693,9 +701,7 @@ html[data-mushaf-focus="true"] .floating-audio-player {
   padding-block-end: 4rem;
 }
 .audio-listening-stream [data-playback-verse] {
-  background: color-mix(in srgb, var(--primary) 12%, transparent);
-  text-decoration: underline;
-  text-underline-offset: 0.18em;
+  background-color: color-mix(in srgb, var(--primary) 9%, transparent);
 }
 .audio-listening-stream [data-playback-word="true"] {
   outline: 1px solid var(--primary);

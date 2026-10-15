@@ -1,8 +1,23 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { Modal, SheetHeader } from "./ResponsiveSheet";
 
 describe("Modal accessibility", () => {
+  it("captures the opener before autofocus and restores it after a conditional unmount", async () => {
+    const opener = document.createElement("button");
+    opener.textContent = "Open sharing";
+    document.body.append(opener);
+    opener.focus();
+    const view = render(
+      <Modal open onClose={vi.fn()} title="Sharing" direction="ltr">
+        <button type="button">Copy</button>
+      </Modal>,
+    );
+    await waitFor(() => expect(screen.getByTestId("modal-close-button")).toHaveFocus());
+    view.unmount();
+    await waitFor(() => expect(opener).toHaveFocus());
+    opener.remove();
+  });
   it("uses the title once without inventing a duplicate description", () => {
     render(
       <Modal open onClose={vi.fn()} title="Ayah actions" direction="ltr">

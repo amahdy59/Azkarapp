@@ -202,14 +202,6 @@ const MushafTextLine = memo(function MushafTextLine({
       data-mushaf-line=""
       className={`flex h-full w-full min-w-0 items-center justify-center ${readOnly ? "relative" : ""}`}
     >
-      {highlightedVerseKey && words.some((word) => word.verseKey === highlightedVerseKey) && (
-        <span
-          aria-hidden="true"
-          data-playback-line=""
-          className="absolute h-3.5 w-1 rounded-full bg-primary"
-          style={{ insetInlineStart: "-0.35rem" }}
-        />
-      )}
       {/* QCF glyph advances preserve printed spacing; the canvas never stretches word gaps. */}
       <div
         data-mushaf-line-content=""
@@ -229,6 +221,7 @@ const MushafTextLine = memo(function MushafTextLine({
               <span
                 key={key}
                 aria-hidden="true"
+                data-current-ayah-marker={highlightedVerseKey === w.verseKey ? "true" : undefined}
                 className={
                   highlightedVerseKey === w.verseKey && useQcfGlyphs && w.qcfCode
                     ? "text-primary transition-colors"
@@ -257,6 +250,7 @@ const MushafTextLine = memo(function MushafTextLine({
                   highlightedVerseKey === w.verseKey && useQcfGlyphs && w.qcfCode ? "text-primary" : ""
                 }`}
                 aria-current={highlightedVerseKey === w.verseKey ? "true" : undefined}
+                data-current-ayah-marker={highlightedVerseKey === w.verseKey ? "true" : undefined}
                 style={{ lineHeight: "inherit", verticalAlign: "baseline" }}
                 aria-label={t(language, "reader.openAyahActions", {
                   ayah: formatNumerals(w.verseKey.split(":")[1] || w.text, language),

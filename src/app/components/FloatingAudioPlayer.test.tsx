@@ -88,6 +88,27 @@ function createController(): AudioController {
 }
 
 describe("FloatingAudioPlayer", () => {
+  it("hides the Mushaf overlay without stopping playback or reserving page height", async () => {
+    const main = document.createElement("main");
+    main.id = "main-content";
+    document.body.append(main);
+    const controller = createController();
+    const view = render(
+      <FloatingAudioPlayer controller={controller} language="en" overReadingSurface preferCompactReading />,
+      { container: main },
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Hide player" }));
+    const show = screen.getByRole("button", { name: "Show player" });
+    await waitFor(() => expect(show).toHaveFocus());
+    expect(controller.stop).not.toHaveBeenCalled();
+    expect(controller.pause).not.toHaveBeenCalled();
+    expect(screen.queryByRole("slider")).not.toBeInTheDocument();
+    fireEvent.click(show);
+    await waitFor(() => expect(screen.getByRole("button", { name: "Hide player" })).toHaveFocus());
+    expect(screen.getByRole("slider", { name: "Seek audio" })).toBeVisible();
+    view.unmount();
+    main.remove();
+  });
   beforeEach(() => {
     document.documentElement.classList.add("reduce-motion");
   });

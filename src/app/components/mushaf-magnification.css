@@ -18,3 +18,20 @@
 .reader-swipe-surface:has(.mushaf-paper[data-magnified="true"]) {
   touch-action: pan-x pan-y;
 }
+/* Paint only: active ayahs retain the reference word and line rectangles. */
+.mushaf-page-canvas [data-playback-verse] {
+  background-color: color-mix(in srgb, var(--primary) 9%, transparent);
+}
+
+.mushaf-page-canvas [data-current-ayah-marker="true"] {
+  border-radius: 50%;
+  background-color: color-mix(in srgb, var(--primary) 16%, transparent);
+  outline: 1px solid var(--primary);
+  outline-offset: 1px;
+}
+
+@media (forced-colors: active) {
+  .mushaf-page-canvas [data-current-ayah-marker="true"] {
+    outline: 2px solid Highlight;
+  }
+}

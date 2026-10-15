@@ -180,6 +180,11 @@ export function FloatingAudioPlayer({
   const hasRoomBesideReading = useMediaQuery("(min-width: 768px)");
   const coversReading = overReadingSurface && (preferCompactReading || !hasRoomBesideReading);
   const [isMinimized, setIsMinimized] = useState(true);
+  const [readingDockHidden, setReadingDockHidden] = useState(false);
+  const showDockRef = useRef<HTMLButtonElement>(null);
+  const hideDockRef = useRef<HTMLButtonElement>(null);
+  const readingOverlay = preferCompactReading && overReadingSurface && !dockedInReader;
+  useEffect(() => setReadingDockHidden(false), [currentEntry?.entryId, readingOverlay]);
   const [audioOptionsHost, setAudioOptionsHost] = useState<HTMLDivElement | null>(null);
   const [listeningControlsHost, setListeningControlsHost] = useState<HTMLDivElement | null>(null);
   const [quranPreferencesHost, setQuranPreferencesHost] = useState<HTMLDivElement | null>(null);
@@ -206,7 +211,8 @@ export function FloatingAudioPlayer({
       );
       main.style.setProperty("--floating-audio-clearance", `${clearance}px`);
       if (preferCompactReading && window.innerWidth >= 768) {
-        main.style.setProperty("--mushaf-audio-clearance", `${clearance}px`);
+        // Overlay the reading canvas without refitting/shrinking its canonical pages.
+        main.style.setProperty("--mushaf-audio-clearance", "0px");
       } else {
         main.style.removeProperty("--mushaf-audio-clearance");
       }
@@ -234,7 +240,7 @@ export function FloatingAudioPlayer({
       // Keep the compact footprint while the expanded overlay covers the page.
       // Removing and restoring inherited calc() padding leaves stale layout in WebKit.
     };
-  }, [isMinimized, preferCompactReading, dockedInReader, currentEntry?.entryId]);
+  }, [isMinimized, readingDockHidden, preferCompactReading, dockedInReader, currentEntry?.entryId]);
   const collapseButtonRef = useRef<HTMLButtonElement>(null);
   const expandButtonRef = useRef<HTMLButtonElement>(null);
   const readingTextRef = useRef<HTMLDivElement>(null);
@@ -512,6 +518,9 @@ export function FloatingAudioPlayer({
       aria-describedby={compactDescriptionId}
       dir={direction}
       data-variant="compact"
+      data-reading-overlay={readingOverlay ? "true" : undefined}
+      data-player-hidden={readingOverlay && readingDockHidden ? "true" : undefined}
+      style={{ insetInlineStart: readingOverlay && readingDockHidden ? "auto" : undefined }}
       onClick={(event) => {
         event.stopPropagation();
       }}
@@ -527,108 +536,142 @@ export function FloatingAudioPlayer({
       <div className="sr-only" aria-live="polite" aria-atomic="true">
         {liveMessage}
       </div>
-      <div
-        className={`audio-compact-card relative w-full ${dockedInReader ? "max-w-2xl mx-auto rounded-2xl border border-border bg-card shadow-sm overflow-hidden" : ""}`}
-      >
-        <div className="audio-compact-row">
-          <button
-            type="button"
-            onClick={() => {
-              controller.stop();
-              onClose?.();
-            }}
-            aria-label={t(language, "audioPlayer.stop")}
-            className="flex size-11 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-          >
-            <X size={19} aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            onClick={() => setIsMinimized(false)}
-            aria-label={`${t(language, "audioPlayer.openFullPlayer")}: ${title}`}
-            className="audio-compact-context flex min-h-11 min-w-11 items-center gap-2 rounded-xl py-1 text-start hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-          >
-            <span className="audio-compact-context-icon shrink-0 items-center justify-center text-muted-foreground">
-              <Headphones size={20} aria-hidden="true" />
-            </span>
-            <motion.span
-              key={currentEntry.entryId}
-              initial={motionReduced ? false : { opacity: 0, y: 4 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={trackMetaTransition}
-              className="min-w-0 flex-1"
+      {readingOverlay && readingDockHidden ? (
+        <button
+          type="button"
+          ref={showDockRef}
+          className="flex min-h-11 items-center gap-2 rounded-full bg-card px-4 text-sm font-semibold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          aria-expanded={false}
+          aria-label={t(language, "audioPlayer.showPlayer")}
+          onClick={() => {
+            setReadingDockHidden(false);
+            requestAnimationFrame(() => hideDockRef.current?.focus());
+          }}
+        >
+          <Headphones size={18} aria-hidden="true" />
+          {t(language, "audioPlayer.showPlayer")}
+          <span className="text-muted-foreground">
+            {t(language, isPlaying ? "audioPlayer.playing" : "audioPlayer.paused")}
+          </span>
+        </button>
+      ) : (
+        <div
+          className={`audio-compact-card relative w-full ${dockedInReader ? "max-w-2xl mx-auto rounded-2xl border border-border bg-card shadow-sm overflow-hidden" : ""}`}
+        >
+          <div className="audio-compact-row">
+            <button
+              type="button"
+              onClick={() => {
+                controller.stop();
+                onClose?.();
+              }}
+              aria-label={t(language, "audioPlayer.stop")}
+              className="flex size-11 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
-              <span
-                data-testid="audio-compact-title"
-                title={title}
-                className="truncate block text-label font-bold text-foreground"
+              <X size={19} aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsMinimized(false)}
+              aria-label={`${t(language, "audioPlayer.openFullPlayer")}: ${title}`}
+              className="audio-compact-context flex min-h-11 min-w-11 items-center gap-2 rounded-xl py-1 text-start hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            >
+              <span className="audio-compact-context-icon shrink-0 items-center justify-center text-muted-foreground">
+                <Headphones size={20} aria-hidden="true" />
+              </span>
+              <motion.span
+                key={currentEntry.entryId}
+                initial={motionReduced ? false : { opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={trackMetaTransition}
+                className="min-w-0 flex-1"
               >
-                {title}
-              </span>
-              <span className="audio-compact-meta flex min-w-0 flex-wrap items-center gap-x-2 text-xs font-semibold text-muted-foreground">
-                <span className="audio-compact-voice truncate" title={reciterDisplayName}>
-                  {reciterDisplayName}
+                <span
+                  data-testid="audio-compact-title"
+                  title={title}
+                  className="truncate block text-label font-bold text-foreground"
+                >
+                  {title}
                 </span>
-                <span dir="ltr" className="shrink-0 tabular-nums">
-                  {formatTime(state.currentTime, language)}
+                <span className="audio-compact-meta flex min-w-0 flex-wrap items-center gap-x-2 text-xs font-semibold text-muted-foreground">
+                  <span className="audio-compact-voice truncate" title={reciterDisplayName}>
+                    {reciterDisplayName}
+                  </span>
+                  <span dir="ltr" className="shrink-0 tabular-nums">
+                    {formatTime(state.currentTime, language)}
+                  </span>
                 </span>
-              </span>
-            </motion.span>
-          </button>
-          <button
-            style={{ borderRadius: 9999 }}
-            type="button"
-            onClick={isPlaying ? controller.pause : controller.play}
-            aria-label={isPlaying ? t(language, "audioPlayer.pause") : t(language, "audioPlayer.play")}
-            className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm transition-transform duration-fast active:scale-95 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-          >
-            {isPlaying ? <Pause size={22} aria-hidden="true" /> : <Play size={22} aria-hidden="true" />}
-          </button>
-          <button
-            type="button"
-            ref={expandButtonRef}
-            onClick={() => setIsMinimized(false)}
-            aria-label={t(language, "audioPlayer.expand")}
-            aria-describedby={compactDescriptionId}
-            aria-expanded={false}
-            className="flex size-11 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-          >
-            <ChevronUp size={20} aria-hidden="true" />
-          </button>
-        </div>
-        <span id={compactDescriptionId} className="sr-only">
-          {title} · {reciterDisplayName} · {positionChip}
-        </span>
-        <div data-testid="audio-compact-progress" className="audio-compact-progress" dir={direction}>
-          <span dir="ltr" className="text-xs tabular-nums text-muted-foreground">
-            <span className="sr-only">{t(language, "audioPlayer.elapsed")}: </span>
-            {formatTime(state.currentTime, language)}
+              </motion.span>
+            </button>
+            <button
+              style={{ borderRadius: 9999 }}
+              type="button"
+              onClick={isPlaying ? controller.pause : controller.play}
+              aria-label={isPlaying ? t(language, "audioPlayer.pause") : t(language, "audioPlayer.play")}
+              className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm transition-transform duration-fast active:scale-95 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            >
+              {isPlaying ? <Pause size={22} aria-hidden="true" /> : <Play size={22} aria-hidden="true" />}
+            </button>
+            <button
+              type="button"
+              ref={expandButtonRef}
+              onClick={() => setIsMinimized(false)}
+              aria-label={t(language, "audioPlayer.expand")}
+              aria-describedby={compactDescriptionId}
+              aria-expanded={false}
+              className="flex size-11 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            >
+              <ChevronUp size={20} aria-hidden="true" />
+            </button>
+          </div>
+          <span id={compactDescriptionId} className="sr-only">
+            {title} · {reciterDisplayName} · {positionChip}
           </span>
-          <input
-            type="range"
-            min={0}
-            max={Math.max(0, state.duration)}
-            step="any"
-            value={Math.min(state.currentTime, state.duration || 0)}
-            disabled={state.duration <= 0}
-            onChange={(event) => controller.seek(Number(event.currentTarget.value))}
-            onKeyDown={handleTimelineKeyDown}
-            aria-label={t(language, "audioPlayer.seek")}
-            aria-keyshortcuts="PageUp PageDown Home End"
-            aria-valuetext={accessibleTime(state.currentTime, state.duration, language)}
-            style={
-              {
-                "--audio-range-fill": `linear-gradient(to ${direction === "rtl" ? "left" : "right"}, var(--primary) ${progressPercent}%, var(--muted-foreground) ${progressPercent}%)`,
-              } as CSSProperties
-            }
-            className="audio-timeline-range audio-compact-range min-w-0 flex-1 cursor-pointer appearance-none rounded-lg accent-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:cursor-default disabled:opacity-50"
-          />
-          <span dir="ltr" className="text-xs tabular-nums text-muted-foreground">
-            <span className="sr-only">{t(language, "audioPlayer.totalTime")}: </span>
-            {formatTime(state.duration, language)}
-          </span>
+          <div data-testid="audio-compact-progress" className="audio-compact-progress" dir={direction}>
+            {readingOverlay && (
+              <button
+                type="button"
+                ref={hideDockRef}
+                className="flex size-11 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                aria-label={t(language, "audioPlayer.hidePlayer")}
+                onClick={() => {
+                  setReadingDockHidden(true);
+                  requestAnimationFrame(() => showDockRef.current?.focus());
+                }}
+              >
+                <ChevronDown size={20} aria-hidden="true" />
+              </button>
+            )}
+            <span dir="ltr" className="text-xs tabular-nums text-muted-foreground">
+              <span className="sr-only">{t(language, "audioPlayer.elapsed")}: </span>
+              {formatTime(state.currentTime, language)}
+            </span>
+            <input
+              type="range"
+              min={0}
+              max={Math.max(0, state.duration)}
+              step="any"
+              value={Math.min(state.currentTime, state.duration || 0)}
+              disabled={state.duration <= 0}
+              onChange={(event) => controller.seek(Number(event.currentTarget.value))}
+              onKeyDown={handleTimelineKeyDown}
+              aria-label={t(language, "audioPlayer.seek")}
+              aria-keyshortcuts="PageUp PageDown Home End"
+              aria-valuetext={accessibleTime(state.currentTime, state.duration, language)}
+              style={
+                {
+                  "--audio-range-fill": `linear-gradient(to ${direction === "rtl" ? "left" : "right"}, var(--primary) ${progressPercent}%, var(--muted-foreground) ${progressPercent}%)`,
+                } as CSSProperties
+              }
+              className="audio-timeline-range audio-compact-range min-w-0 flex-1 cursor-pointer appearance-none rounded-lg accent-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:cursor-default disabled:opacity-50"
+            />
+            <span dir="ltr" className="text-xs tabular-nums text-muted-foreground">
+              <span className="sr-only">{t(language, "audioPlayer.totalTime")}: </span>
+              {formatTime(state.duration, language)}
+            </span>
+          </div>
         </div>
-      </div>
+      )}
     </motion.section>
   );
 
