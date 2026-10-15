@@ -54,6 +54,56 @@ const SAMPLE_ITEMS: Zikr[] = [
 ];
 
 describe("CollectionShareModal", () => {
+  it("localizes custom evidence and uses its source link for link sharing", async () => {
+    const { generateAllCollectionStoryPages } = await import("../share/collectionShareCard");
+    const byLanguage = {
+      ar: [
+        {
+          id: "evidence",
+          arabicText: "اقتباس عربي",
+          textDirection: "rtl" as const,
+          sourceReference: "المصدر",
+          language: "ar" as const,
+        },
+      ],
+      en: [
+        {
+          id: "evidence",
+          arabicText: "English quotation",
+          textDirection: "ltr" as const,
+          sourceReference: "Source",
+          language: "en" as const,
+        },
+      ],
+    };
+    render(
+      <CollectionShareModal
+        open
+        single
+        onClose={vi.fn()}
+        collectionTitle="Evidence"
+        items={[]}
+        shareItemsByLanguage={byLanguage}
+        shareUrl="https://example.com/source"
+        language="en"
+      />,
+    );
+    await screen.findByRole("img");
+    screen.getByText("Image settings").closest("details")!.open = true;
+    fireEvent.keyDown(screen.getByRole("combobox", { name: "Card language" }), { key: "Enter" });
+    fireEvent.click(await screen.findByRole("option", { name: "العربية" }));
+    await waitFor(() =>
+      expect(generateAllCollectionStoryPages).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          allItems: [expect.objectContaining({ arabicText: "اقتباس عربي", sourceReference: "المصدر" })],
+        }),
+      ),
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Text", exact: true }));
+    expect((screen.getByRole("textbox") as HTMLTextAreaElement).value).toContain("اقتباس عربي");
+    fireEvent.click(screen.getByRole("button", { name: "Link", exact: true }));
+    expect(screen.getByRole("textbox")).toHaveValue("https://example.com/source");
+  });
   it("can omit sources from image and text exports without changing the reviewed item", async () => {
     const { generateAllCollectionStoryPages } = await import("../share/collectionShareCard");
     const original = JSON.stringify(SAMPLE_ITEMS);

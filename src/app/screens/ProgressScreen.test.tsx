@@ -32,6 +32,7 @@ describe("ProgressScreen", () => {
     // Oasis Stage Card
     expect(screen.getByTestId("oasis-stage-card")).toBeInTheDocument();
     expect(screen.getByTestId("oasis-stage-card")).not.toHaveAttribute("open");
+    expect(screen.getByRole("heading", { name: "كيف تُضاف النخلة", hidden: true })).toBeInTheDocument();
     expect(screen.getByText("الواحة ومحطاتك السابقة")).toBeInTheDocument();
     expect(screen.getByText("تأمل لطيف فيما سجلته، وليس مقياساً للإيمان أو الأجر.")).toBeInTheDocument();
 

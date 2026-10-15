@@ -38,7 +38,7 @@ import {
 import {
   defaultShareAppearance,
   getShareText,
-  getShareRepetitionLabel,
+  getShareItemRepetitionLabel,
   shareDisplayDigits,
   getShareUrl,
   toShareItem,
@@ -65,6 +65,9 @@ export interface CollectionShareModalProps {
   language: AppLanguage;
   themeMode?: ThemeMode;
   shareItems?: ShareItem[];
+  shareItemsByLanguage?: Record<AppLanguage, ShareItem[]>;
+  shareUrl?: string;
+  dialogTitle?: string;
 }
 
 function supportsTextShare(data: ShareData): boolean {
@@ -92,13 +95,19 @@ export function CollectionShareModal({
   language,
   themeMode = "light",
   shareItems,
+  shareItemsByLanguage,
+  shareUrl,
+  dialogTitle,
 }: CollectionShareModalProps) {
   const direction = language === "ar" ? "rtl" : "ltr";
   const layoutMode = useLayoutMode();
   const wide = layoutMode === "expanded" || layoutMode === "large";
   const [appearance, setAppearance] = useState<ShareAppearance>(() => defaultShareAppearance(categoryId, themeMode));
   const [format, setFormat] = useState<ShareFormat>(() =>
-    single && (shareItems ?? items.map((item) => toShareItem(item, language))).every((item) => item.reminder)
+    single &&
+    (shareItemsByLanguage?.[language] ?? shareItems ?? items.map((item) => toShareItem(item, language))).every(
+      (item) => item.reminder,
+    )
       ? "portrait"
       : "story",
   );
@@ -141,13 +150,23 @@ export function CollectionShareModal({
   const formatId = useId();
   const languageId = useId();
   const presetId = useId();
-  const collectionUrl = categoryId
-    ? getShareUrl(categoryId, single ? readerIndex : undefined, undefined, { routineMode, prayer })
-    : undefined;
+  const collectionUrl =
+    shareUrl ??
+    (categoryId
+      ? getShareUrl(categoryId, single ? readerIndex : undefined, undefined, { routineMode, prayer })
+      : undefined);
   // Screen composition can recreate arrays on its minute/audio clock. Only changed
   // content should restart an expensive export, never a parent render alone.
-  const itemsJson = JSON.stringify({ items, shareItems });
-  const stableInput = useMemo(() => JSON.parse(itemsJson) as { items: Zikr[]; shareItems?: ShareItem[] }, [itemsJson]);
+  const itemsJson = JSON.stringify({ items, shareItems, shareItemsByLanguage });
+  const stableInput = useMemo(
+    () =>
+      JSON.parse(itemsJson) as {
+        items: Zikr[];
+        shareItems?: ShareItem[];
+        shareItemsByLanguage?: Record<AppLanguage, ShareItem[]>;
+      },
+    [itemsJson],
+  );
   const collectionName = (exportLanguage === "ar" ? collectionTitleArabic : collectionTitleEnglish) ?? collectionTitle;
   const title =
     single &&
@@ -170,9 +189,11 @@ export function CollectionShareModal({
   );
   const exportItems = useMemo<ShareItem[]>(
     () =>
-      (stableInput.shareItems ?? stableInput.items.map((z) => toShareItem(z, exportLanguage))).map((item) =>
-        single && !item.reminder && (categoryId || !item.title) ? { ...item, title } : item,
-      ),
+      (
+        stableInput.shareItemsByLanguage?.[exportLanguage] ??
+        stableInput.shareItems ??
+        stableInput.items.map((z) => toShareItem(z, exportLanguage))
+      ).map((item) => (single && !item.reminder && (categoryId || !item.title) ? { ...item, title } : item)),
     [stableInput, exportLanguage, single, title, categoryId],
   );
   const url = single && exportItems[0]?.reminder ? exportItems[0].readingUrl : collectionUrl;
@@ -429,7 +450,7 @@ export function CollectionShareModal({
     <Modal
       open={open}
       onClose={onClose}
-      title={t(language, single ? "shareStudio.singleTitle" : "shareStoryPack.modalTitle")}
+      title={dialogTitle ?? t(language, single ? "shareStudio.singleTitle" : "shareStoryPack.modalTitle")}
       direction={direction}
       language={language}
       describedById={descriptionId}
@@ -440,7 +461,7 @@ export function CollectionShareModal({
       <div data-testid="sharing-scroll" className="min-h-0 flex-1 overflow-y-auto scroll-py-4">
         <div className="shrink-0 border-b border-border px-[16px] py-[12px] pe-[96px]">
           <p className="text-lg font-bold" aria-hidden="true">
-            {t(language, single ? "shareStudio.singleTitle" : "shareStudio.collectionTitle")}
+            {dialogTitle ?? t(language, single ? "shareStudio.singleTitle" : "shareStudio.collectionTitle")}
           </p>
           <p className="text-sm text-muted-foreground break-words">{collectionTitle}</p>
         </div>
@@ -686,11 +707,11 @@ export function CollectionShareModal({
                             {fragment.item.title && (
                               <h3 className="font-semibold">{shareDisplayDigits(fragment.item.title)}</h3>
                             )}
-                            <p className="text-sm text-muted-foreground">
-                              {fragment.item.reminder
-                                ? t(exportLanguage, "shareStudio.reminder")
-                                : getShareRepetitionLabel(fragment.item.repetitionCount ?? 1, exportLanguage)}
-                            </p>
+                            {!fragment.item.hideRepetition && (
+                              <p className="text-sm text-muted-foreground">
+                                {getShareItemRepetitionLabel(fragment.item, exportLanguage)}
+                              </p>
+                            )}
                             {[...fragment.sections, ...(fragment.citation ? [fragment.citation] : [])].map(
                               (section, sectionIndex) => (
                                 <p
@@ -945,7 +966,10 @@ export function CollectionShareModal({
                             </SelectContent>
                           </Select>
                           <p id={languageHintId} className="text-xs text-muted-foreground">
-                            {t(language, "shareStudio.languageHint")}
+                            {t(
+                              language,
+                              shareItemsByLanguage ? "shareStudio.evidenceLanguageHint" : "shareStudio.languageHint",
+                            )}
                           </p>
                         </div>
                         <div className={selectClass}>

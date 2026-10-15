@@ -596,6 +596,14 @@ export function ProgressScreen({
                 />
               </summary>
               <div className="border-t border-border px-4 pb-4 pt-3 sm:px-5">
+                <section aria-labelledby="progress-palm-help-heading" className="mb-4">
+                  <h2 id="progress-palm-help-heading" className="text-base font-bold">
+                    {t(language, "garden.explanationLabel")}
+                  </h2>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    {t(language, "garden.explanationWithQuran")}
+                  </p>
+                </section>
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3.5">
                     <div>

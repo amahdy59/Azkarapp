@@ -52,6 +52,8 @@ export interface ShareItem {
   canonicalKey?: string;
   quranRendering?: { text: string; fontFamily: string };
   arabicText: string;
+  /** Custom evidence can use its reviewed English quotation as the primary text. */
+  textDirection?: "rtl" | "ltr";
   quranText?: boolean;
   title?: string;
   translation?: string;
@@ -60,6 +62,8 @@ export interface ShareItem {
   benefit?: string;
   sourceReference?: string;
   repetitionCount?: number;
+  /** Evidence quotations do not prescribe a devotional repetition count. */
+  hideRepetition?: boolean;
   reminder?: boolean;
   readingUrl?: string;
   language?: AppLanguage;
@@ -184,7 +188,7 @@ export function getShareSections(item: ShareItem, options: ShareContentOptions =
         {
           key: "arabic",
           text: item.arabicText,
-          direction: "rtl",
+          direction: item.textDirection ?? "rtl",
           ...(item.quranText ? { quranText: true, quranRendering: item.quranRendering } : {}),
         },
       ];
@@ -231,6 +235,14 @@ export function getShareRepetitionLabel(count: number, language: AppLanguage): s
       },
     ),
   );
+}
+
+export function getShareItemRepetitionLabel(item: ShareItem, language: AppLanguage): string {
+  return item.hideRepetition
+    ? ""
+    : item.reminder
+      ? t(language, "shareStudio.reminder")
+      : getShareRepetitionLabel(item.repetitionCount ?? 1, language);
 }
 
 /** Each raw run includes its whitespace; joining runs exactly reproduces the input.
@@ -395,13 +407,7 @@ export function layoutSharePages(
     let metadataHeight: number | undefined;
     if (!single) {
       ctx.font = `600 30px ${SHARE_ARABIC_FONT}`;
-      metadataWidth = Math.ceil(
-        ctx.measureText(
-          item.reminder
-            ? t(item.language ?? "ar", "shareStudio.reminder")
-            : getShareRepetitionLabel(item.repetitionCount ?? 1, item.language ?? "ar"),
-        ).width,
-      );
+      metadataWidth = Math.ceil(ctx.measureText(getShareItemRepetitionLabel(item, item.language ?? "ar")).width);
       const citationWidth = geometry.textWidth - metadataWidth - SHARE_COMPACT.metadataGap;
       measured = measured.map((section) =>
         section.key === "source" ? measureShareCitation(ctx, section, false, citationWidth) : section,
@@ -411,8 +417,9 @@ export function layoutSharePages(
     let source = measured.find((section) => section.key === "source");
     let citation = source;
     let sections = measured.filter((section) => section !== citation);
+    const textTop = item.hideRepetition ? SHARE_COMPACT.top : SHARE_PILL.textTop;
     let height = single
-      ? SHARE_PILL.textTop +
+      ? textTop +
         SHARE_PILL.bottom +
         (heading?.height ?? 0) +
         measured.reduce((sum, section) => sum + section.height, 0) +
@@ -439,7 +446,7 @@ export function layoutSharePages(
             ),
       );
       const compactHeight =
-        SHARE_PILL.textTop +
+        textTop +
         SHARE_PILL.bottom +
         (heading?.height ?? 0) +
         compactMeasured.reduce((sum, section) => sum + section.height, 0) +
@@ -493,9 +500,7 @@ export function getShareText(
     ...items.map((item) =>
       [
         item.title,
-        item.reminder
-          ? t(language, "shareStudio.reminder")
-          : getShareRepetitionLabel(item.repetitionCount ?? 1, language),
+        getShareItemRepetitionLabel(item, language),
         ...getShareSections(item, content).map((section) =>
           section.key === "arabic" ? section.text : `${t(language, `shareStudio.${section.key}`)}\n${section.text}`,
         ),

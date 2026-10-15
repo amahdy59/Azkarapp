@@ -191,6 +191,9 @@ test("three completed main collections stay concise and explain the palm on dema
   await expect(garden).not.toContainText(/points?|rank|leaderboard/i);
   await expect(garden.getByRole("button", { name: "How a palm is earned" })).toHaveCount(0);
   await garden.getByTestId("open-wird-benefits").click();
+  await expect(page.getByRole("heading", { name: "How a palm is earned" })).toHaveCount(0);
+  await page.goto("/#/progress");
+  await page.getByTestId("oasis-stage-card").locator("summary").click();
   const explanation = page.getByText(
     "A palm is planted in your oasis when you complete all of today's awrad (Morning, Evening, and Before Sleep azkar, and Qur'an wird).",
   );

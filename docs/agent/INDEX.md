@@ -1,5 +1,9 @@
 # AI Improvement System Index
 
+Current follow-up: [Cards, situational sessions and compact audio](phases/CARDS_AND_COMPACT_AUDIO_2026_10_15.md), approved by the owner after the audit. Preserve the coordinated Android/release acceptance work below.
+
+The owner also approves [Wird evidence sharing and the Progress explanation](phases/WIRD_EVIDENCE_SHARING_2026_10_15.md) as a bounded follow-up in the same verified release.
+
 Current coordinated effort: [Audit remediation and Android preparation](phases/APP_AUDIT_REMEDIATION_2026_10_15.md). The owner approved applying the audit recommendations and adding Capacitor Android/native widgets and reminders while retaining the PWA. Earlier entries below record historical phase authority; they are not additional simultaneously active briefs.
 
 [Combined refinements release](phases/COMBINED_RELEASE_2026_10_14.md) records the owner's superseding instruction to verify and push all completed local changes, integration repairs, supplied curated images and exact-commit release evidence.

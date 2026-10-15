@@ -18,7 +18,7 @@ import {
   SHARE_DIMENSIONS,
   defaultShareAppearance,
   layoutSharePages,
-  getShareRepetitionLabel,
+  getShareItemRepetitionLabel,
   shareGeometry,
   SHARE_PILL,
   SHARE_SECTION_GAP,
@@ -193,11 +193,9 @@ export function renderCollectionStoryPage(input: CollectionStoryPageInput): HTML
       );
     }
     const utilityY = y + (fragment.heading?.height ?? 0);
-    const repetition = fragment.item.reminder
-      ? t(language, "shareStudio.reminder")
-      : getShareRepetitionLabel(fragment.item.repetitionCount ?? 1, language);
+    const repetition = getShareItemRepetitionLabel(fragment.item, language);
     ctx.font = `600 30px ${SHARE_ARABIC_FONT}`;
-    if (input.single) {
+    if (input.single && repetition) {
       const pillWidth = ctx.measureText(repetition).width + 32;
       fillRoundedRect(
         ctx,
@@ -218,7 +216,7 @@ export function renderCollectionStoryPage(input: CollectionStoryPageInput): HTML
         centeredInkBaseline(ctx, repetition, utilityY + SHARE_PILL.top + SHARE_PILL.height / 2),
       );
     }
-    let sectionY = utilityY + (input.single ? SHARE_PILL.textTop : SHARE_COMPACT.top);
+    let sectionY = utilityY + (input.single && !fragment.item.hideRepetition ? SHARE_PILL.textTop : SHARE_COMPACT.top);
     const sections = [...fragment.sections, ...(input.single && fragment.citation ? [fragment.citation] : [])];
     sections.forEach((section, sectionIndex) => {
       if (sectionIndex > 0) sectionY += input.single ? SHARE_SECTION_GAP : SHARE_COMPACT.sectionGap;

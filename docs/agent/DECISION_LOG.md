@@ -1,5 +1,15 @@
 # Decision Log
 
+## Evidence sharing and palm explanation placement — 2026-10-15
+
+The owner requests that Share on the importance-of-Wird evidence page open the existing studio with image/text/link options and applicable existing customization, rather than a direct WhatsApp destination. Preserve all original evidence text, source URLs, translations and salaf attribution. Reuse CollectionShareModal with typed bilingual custom evidence and explicit source-link support; options without source data remain honestly unavailable. Move the existing palm explanation into the collapsed Progress reflection section. The owner also explicitly removes the floating Benefit pill during compact playback; normal reading controls return when audio closes. Existing immersive Mushaf reading help remains in its reading context. See phases/WIRD_EVIDENCE_SHARING_2026_10_15.md.
+
+## Cards, explicit situational sessions and usable compact seeking — 2026-10-15
+
+The owner approves the preceding recommendations: smaller shortcut/tool vertical padding, the Arabic food shortcut “أذكار الطعام”, a reserved completion badge at the top left in Arabic (mirrored in English) and an inset outline. Preserve completion text, contrast and touch targets. Home/travel/distress/mosque/food/illness collections retain unfinished progress across exits and midnight; completed collections offer Done and Start new session. Starting again clears only current collection counters, never session history; manual reset remains confirmed. Daily/Friday cycle behavior remains unchanged. The owner also requests compact-player click/drag seeking and separation of Close/Expand controls. Implement native range semantics, keyboard support, visible thumb/time labels and independent hit regions without dependencies. See phases/CARDS_AND_COMPACT_AUDIO_2026_10_15.md.
+
+The owner further clarifies that the two محمد الشرع recordings were supplied directly by their author for noncommercial listening/sharing, with no separate license document. Record this as owner-reported provenance, not an independently verified public license. The earlier Android exclusion remains pending traceable permission; web downloads remain available.
+
 ## Android build tools and audio release policy — 2026-10-15
 
 The owner explicitly accepts Google Android SDK terms and authorizes JDK/SDK installation. The owner chooses to exclude uncertain Muhammad Al-Shara recordings from Android pending permission, then clarifies that only Al-Kahf and Al-Baqarah use محمد الشرع; the other recordings use Abdullah Muhammad or English narration. A complete AST inventory confirms 2 Muhammad Al-Shara variants and 23 Abdullah Muhammad variants incorrectly linked to the former generic source. Correct those 23 source links to the existing owner-authorized Abdullah Muhammad source; exclude only the 2 Muhammad Al-Shara variants at Android playback/download resolution. Preserve web availability, exact bytes/checksums, devotional text and attribution identity. Retain offline downloads and file export for eligible audio. No permission evidence is fabricated.

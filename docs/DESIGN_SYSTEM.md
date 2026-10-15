@@ -1,5 +1,13 @@
 # Azkar design system
 
+## Home completion and compact playback — 2026-10-15
+
+Completed Home tiles retain their normal text contrast and localized status. A noninteractive 24px check badge sits at inline-end/top with reserved icon space, plus a 2px inset outline; focus remains a separate outer ring. Arabic places the badge at top left. Situational shortcut targets remain at least 44px high with natural text growth; tool cards use 12px block padding. The Arabic food shortcut is “أذكار الطعام”; collection/source content is unchanged.
+
+Compact playback uses a dedicated 44px-high native seek row, visible thumb, localized elapsed/total time and 8px gaps between independent header controls. Stop, context expansion, Play and Expand remain separate keyboard actions. Enlarged text, narrow layouts and RTL must preserve target separation and readable time values. Do not make a display-only progress strip resemble seeking.
+
+The floating Reader Benefit pill is absent during playback and returns with normal reading controls after Stop. The importance-of-Wird page shows evidence directly; its Share buttons open the shared studio, with image/text/link choices and source-backed optional additions. Its palm explanation lives in Progress's collapsed reflection section. Custom evidence can localize the original quotation and source together, while Quran remains Arabic and existing English meaning stays optional.
+
 ## Visual coherence — owner-approved, 2026-10-13
 
 Ordinary choice cards use ChoiceRadioItem: the shared control radius, passive control border, opaque card surface, selected primary tint/border and a non-color check indicator. Theme, reading, accessibility, weekly goal and onboarding pickers retain their existing layout/dimensions. Native Quran-plan and export-format radios use shared choice/native paint recipes. Ordinary radio arrows now focus and select immediately; Home/End and disabled-option skipping are supported. This explicitly supersedes DEC-022’s focus-only limitation; menus/selects retain focus-then-activation semantics.

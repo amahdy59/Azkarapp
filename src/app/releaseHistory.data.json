@@ -1,5 +1,20 @@
 [
   {
+    "release": "2026-10-15-4",
+    "ar": [
+      "بطاقات الرئيسية أكثر اختصارًا، وتظهر علامة الإكمال في زاوية مستقلة مع إطار داخلي واضح.",
+      "يمكن تقديم الصوت وتأخيره من المشغل المصغّر، مع أزرار متباعدة وإخفاء زر الفائدة أثناء الاستماع.",
+      "يفتح إكمال المجموعة ملخص الجلسة؛ ويمكن بدء جلسة جديدة لأذكار المواقف مع الاحتفاظ بسجل الجلسات.",
+      "يمكن مشاركة أدلة أهمية الورد كصور أو نصوص أو روابط؛ وتحسّنت مزامنة الأجهزة والبحث ووضوح الخصوصية."
+    ],
+    "en": [
+      "Home cards are more compact, with a separate corner checkmark and inset outline for completed routines.",
+      "Seek directly from the compact audio player, with better-spaced buttons and the Benefit action hidden while listening.",
+      "Finishing a collection opens its summary; start a new situational session while keeping your session history.",
+      "Share Wird evidence as images, text or links, alongside improved device sync, search and clearer privacy details."
+    ]
+  },
+  {
     "release": "2026-10-15-3",
     "ar": [
       "يفتح إكمال آخر ذكر ملخص الجلسة مباشرة، وتظل بياناتك قابلة للوصول عند تقييد تخزين المتصفح.",

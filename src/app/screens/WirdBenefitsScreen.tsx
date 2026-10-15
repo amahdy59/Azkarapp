@@ -3,7 +3,7 @@ import { QuranVerseText } from "../components/QuranVerseText";
 /* The scroll region is intentionally keyboard-focusable so Page Down/arrow
    scrolling works before a user reaches its first link. */
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
-import { useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { Header } from "../components/LayoutShells";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { TabList, tabPanelProps } from "../components/Tabs";
@@ -15,29 +15,51 @@ import {
   type WirdBenefitSection,
   type WirdEvidence,
 } from "../content/wirdBenefits";
-import { buildWhatsAppBenefitUrl } from "./BenefitsScreen";
+import { wirdEvidenceToShareItem } from "../share/wirdEvidenceSharing";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
 
 const WIRD_BATCH_SIZE = 15;
+const CollectionShareModal = lazy(() =>
+  import("../components/CollectionShareModal").then((module) => ({ default: module.CollectionShareModal })),
+);
 
-function ShareLink({ language, label, message }: { language: AppLanguage; label: string; message: string }) {
+function ShareEvidenceButton({
+  language,
+  label,
+  onShare,
+}: {
+  language: AppLanguage;
+  label: string;
+  onShare: () => void;
+}) {
   return (
-    <a
-      href={buildWhatsAppBenefitUrl(message)}
-      target="_blank"
-      rel="noreferrer"
+    <button
+      type="button"
+      onClick={(event) => {
+        event.currentTarget.focus({ preventScroll: true });
+        onShare();
+      }}
+      aria-haspopup="dialog"
       className="flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-      aria-label={t(language, "benefits.shareWhatsAppAria", { category: label })}
-      title={t(language, "benefits.shareWhatsApp")}
+      aria-label={t(language, "benefits.shareBenefitAria", { category: label })}
+      title={t(language, "benefits.shareBenefit")}
     >
       <Share2 size={17} aria-hidden="true" />
-    </a>
+    </button>
   );
 }
 
-function WirdEvidenceCard({ item, language }: { item: WirdEvidence; language: AppLanguage }) {
+function WirdEvidenceCard({
+  item,
+  language,
+  onShare,
+}: {
+  item: WirdEvidence;
+  language: AppLanguage;
+  onShare: () => void;
+}) {
   const title = localizeBenefitText(item.title, language);
   // Qur'an is always shown in Arabic; its English is a rendering of the meaning
   // beneath, never a replacement for the verse.
@@ -45,9 +67,6 @@ function WirdEvidenceCard({ item, language }: { item: WirdEvidence; language: Ap
   const meaning = item.kind === "quran" && language === "en" ? item.text.en : "";
   const source = localizeBenefitText(item.source, language);
   const attribution = item.attribution ? localizeBenefitText(item.attribution, language) : "";
-  const shareMessage = [t(language, "wirdBenefits.shareHeading"), title, text, meaning, attribution, source]
-    .filter(Boolean)
-    .join("\n\n");
 
   return (
     <article className="flex flex-col rounded-3xl border border-border bg-card p-5 text-start shadow-raised sm:p-6">
@@ -82,7 +101,7 @@ function WirdEvidenceCard({ item, language }: { item: WirdEvidence; language: Ap
         >
           {source}
         </a>
-        <ShareLink language={language} label={title} message={shareMessage} />
+        <ShareEvidenceButton language={language} label={title} onShare={onShare} />
       </footer>
     </article>
   );
@@ -99,6 +118,7 @@ export function WirdBenefitsScreen({
 }) {
   const [activeSection, setActiveSection] = useState<WirdBenefitSection>("quran");
   const [visibleCount, setVisibleCount] = useState(WIRD_BATCH_SIZE);
+  const [sharingEvidence, setSharingEvidence] = useState<WirdEvidence | null>(null);
 
   const evidenceItems = WIRD_EVIDENCE_BY_SECTION[activeSection];
   const total = evidenceItems.length;
@@ -158,14 +178,6 @@ export function WirdBenefitsScreen({
         className="page-content-center min-h-0 flex-1 overflow-y-auto px-5 pb-8 pt-1 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
         data-testid="wird-benefits-scroll-region"
       >
-        <section aria-labelledby="wird-palm-help-heading" className="mb-4 rounded-2xl border border-border bg-card p-4">
-          <h2 id="wird-palm-help-heading" className="text-base font-bold">
-            {t(language, "garden.explanationLabel")}
-          </h2>
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            {t(language, "garden.explanationWithQuran")}
-          </p>
-        </section>
         <section
           {...tabPanelProps("wird-benefits", activeSection)}
           className="rounded-xl outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
@@ -173,7 +185,12 @@ export function WirdBenefitsScreen({
         >
           <div className="grid gap-3.5 lg:grid-cols-2" data-testid="wird-benefits-list">
             {visibleEvidence.map((item) => (
-              <WirdEvidenceCard key={item.id} item={item} language={language} />
+              <WirdEvidenceCard
+                key={item.id}
+                item={item}
+                language={language}
+                onShare={() => setSharingEvidence(item)}
+              />
             ))}
           </div>
 
@@ -198,6 +215,33 @@ export function WirdBenefitsScreen({
           )}
         </section>
       </div>
+      {sharingEvidence && (
+        <Suspense
+          fallback={
+            <p role="status" className="sr-only">
+              {t(language, "common.loading")}
+            </p>
+          }
+        >
+          <CollectionShareModal
+            key={sharingEvidence.id}
+            open
+            single
+            dialogTitle={t(language, "wirdBenefits.shareEvidence")}
+            onClose={() => setSharingEvidence(null)}
+            collectionTitle={localizeBenefitText(sharingEvidence.title, language)}
+            collectionTitleArabic={sharingEvidence.title.ar}
+            collectionTitleEnglish={sharingEvidence.title.en}
+            items={[]}
+            shareItemsByLanguage={{
+              ar: [wirdEvidenceToShareItem(sharingEvidence, "ar")],
+              en: [wirdEvidenceToShareItem(sharingEvidence, "en")],
+            }}
+            shareUrl={sharingEvidence.sourceUrl}
+            language={language}
+          />
+        </Suspense>
+      )}
     </ScreenContainer>
   );
 }

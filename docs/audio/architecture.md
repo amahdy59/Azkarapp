@@ -1,5 +1,9 @@
 # Audio architecture
 
+## Interactive compact timeline — 2026-10-15
+
+The compact player's former display-only progress line is replaced by one native range input in its own 44px-high row, with a visible thumb and elapsed/total time. Click, drag and keyboard seek the same controller as the expanded timeline. Unknown duration disables seeking; RTL reverses the fill and horizontal arrow meaning. PageUp/PageDown seek 30 seconds, arrows 5 seconds and Home/End select boundaries. Header controls retain independent 44px or larger targets with 8px separation. The existing measured dock clearance adapts to the taller compact surface. Playback completion, cache, timing and media ownership are unchanged. This supersedes historical compact-strip descriptions below.
+
 ## Calm flowing Quran presentation — 2026-10-12
 
 The owner's request supersedes the earlier automatic 125% enlargement in continuous Al-Kahf, As-Sajdah and Al-Mulk listening. Flowing Quran uses shared 21.5/23/27px typography and 1.65 leading; explicit text scale/magnification remain. Basmalah is compact and page-fragment margins no longer add gaps between verses. Complete local words render immediately while page fonts load, with page-specific late-font recovery and cancellation guards. No recording, timing annotation, verse range, media ownership or completion contract changes.

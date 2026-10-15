@@ -1,5 +1,13 @@
 # Application architecture
 
+## Explicit situational sessions and evidence sharing — 2026-10-15
+
+Home/travel/distress/mosque/food/illness collections retain their tally across navigation and startup day cleanup until an explicit new session or confirmed reset. `useSessionHandlers.startNewSession` clears only that collection's current counts, preserving daily completion records and session history. Daily and Friday-cycle boundaries retain their existing ownership. Completed Reader/category surfaces and the summary expose the same new-session action.
+
+Wird evidence uses a pure typed share adapter and the existing lazily loaded CollectionShareModal. Optional bilingual custom payloads and an explicit source URL extend the shared boundary without creating fake Zikr records or inferring verse data. Text direction is explicit for English non-Quran quotations. Existing content, translation and attribution remain unchanged; generation/cancellation/export/focus recovery remain owned by the common studio. Palm mechanics are presented on Progress rather than before the evidence list.
+
+Evidence suppresses repetition metadata in all export modes and its accessible preview, without changing counts or badge layout for actual azkar. A context-specific dialog title identifies evidence sharing accurately.
+
 ## Combined release integration — 2026-10-14
 
 Audio migration retires an old cache only after its copy pass succeeds; quota/read/write failure retains the source for retry. Stale-worker recovery clears only application precache and route namespaces. Curated morning/evening artwork is supplied unchanged by the owner and explicitly precached for offline use. The interactive sharing studio remains the default; the supplied pack is an explicit alternate. Failed image fetches and non-image responses cannot become exported files, and failed pack loading returns to the generated studio without retaining obsolete files. Counter swipes suppress subsequent canvas clicks; Salawat totals accumulate actual completed counts rather than recalculating earlier rounds from a changed target. These additions do not change normalized persisted state or reviewed devotional source records.
