@@ -224,16 +224,19 @@ export default function QuranSurahListeningReader(props: QuranListeningReaderPro
     });
     if (root.current) resize.observe(root.current);
     if (viewport) resize.observe(viewport);
+    const blur = () => {
+      endTarget = null;
+    };
     viewport?.addEventListener("wheel", pause, { passive: true });
     viewport?.addEventListener("touchmove", pause, { passive: true });
     viewport?.addEventListener("pointerdown", pause, { passive: true });
-    viewport?.addEventListener("focusout", pause);
+    viewport?.addEventListener("focusout", blur);
     viewport?.addEventListener("keydown", key);
     return () => {
       viewport?.removeEventListener("wheel", pause);
       viewport?.removeEventListener("touchmove", pause);
       viewport?.removeEventListener("pointerdown", pause);
-      viewport?.removeEventListener("focusout", pause);
+      viewport?.removeEventListener("focusout", blur);
       viewport?.removeEventListener("keydown", key);
       resize.disconnect();
     };

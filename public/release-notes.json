@@ -1,13 +1,15 @@
 {
-  "release": "2026-10-15-6",
+  "release": "2026-10-15-7",
   "ar": [
     "عرض سور الإخلاص والفلق والناس في أذكار الرقية ببطاقات قرآنية مستقلة بخط المصحف العثماني.",
     "استخدام خط القراءة الواضح للكلمة المختارة في بطاقة معاني المفردات لتتناغم مع شرحها.",
-    "تفعيل تأثير الزجاج الشفاف المريح لبطاقات الشاشة الرئيسية على أجهزة الحاسوب المكتبية."
+    "تفعيل تأثير الزجاج الشفاف المريح لبطاقات الشاشة الرئيسية على أجهزة الحاسوب المكتبية.",
+    "استمرار متابعة التلاوة تلقائياً عند فتح خيارات الصوت أو التنقل في عناصر التحكم."
   ],
   "en": [
     "Surahs Al-Ikhlas, Al-Falaq, and An-Nas in Ruqyah are now presented in dedicated Quranic cards with full Mushaf typography.",
     "Word meanings now display the selected Quranic term in the clear reading font alongside its explanation.",
-    "Translucent frosted glass cards on the Home screen now render smoothly on desktop displays."
+    "Translucent frosted glass cards on the Home screen now render smoothly on desktop displays.",
+    "Recitation following now stays active seamlessly while opening audio options or navigating controls."
   ]
 }

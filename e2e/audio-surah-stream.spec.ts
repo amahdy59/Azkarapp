@@ -75,17 +75,16 @@ for (const item of listeningCases.filter((item) => item.id !== "ir-baqarah")) {
       const preferenceLayout = await preferences.getByRole("button").evaluateAll((buttons) =>
         buttons.map((button) => {
           const bounds = button.getBoundingClientRect();
-          const icon = button.querySelector("svg")!.getBoundingClientRect();
+          const icon = button.querySelector("svg")?.getBoundingClientRect();
           const label = button.querySelector("span")!.getBoundingClientRect();
           return {
             height: bounds.height,
-            centerGap: Math.abs(icon.top + icon.height / 2 - (bounds.top + bounds.height / 2)),
-            labelGap: Math.abs(label.top + label.height / 2 - (icon.top + icon.height / 2)),
+            centerGap: icon ? Math.abs(icon.top + icon.height / 2 - (bounds.top + bounds.height / 2)) : 0,
+            labelGap: icon ? Math.abs(label.top + label.height / 2 - (icon.top + icon.height / 2)) : 0,
             contained:
               label.left >= bounds.left &&
               label.right <= bounds.right &&
-              icon.left >= bounds.left &&
-              icon.right <= bounds.right,
+              (!icon || (icon.left >= bounds.left && icon.right <= bounds.right)),
           };
         }),
       );
