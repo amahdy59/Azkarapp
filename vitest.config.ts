@@ -8,11 +8,17 @@ import { ISOLATED_SUITES } from "./src/test/isolatedSuites";
 
 const APP_SUITES = ["src/**/*.test.{ts,tsx}"];
 
+const nativeAliases = {
+  "@azkar/native-mushaf-download": path.resolve("src/app/content/nativeMushafDownload.ts"),
+  "@azkar/native-reminders": path.resolve("src/app/hooks/nativeReminderScheduling.ts"),
+};
+
 /**
  * Application suites reuse a module registry unless mocks or first-use caches
  * require isolation. Tooling runs separately in Node without React/jsdom setup.
  */
 const shared = {
+  resolve: { alias: nativeAliases },
   /**
    * 15s is ample for any single test here in isolation — the whole suite runs
    * in about 31s. The headroom is for `pnpm check`, where the suite shares the
@@ -34,12 +40,7 @@ const shared = {
 };
 
 export default defineConfig({
-  resolve: {
-    alias: {
-      "@azkar/native-mushaf-download": path.resolve("src/app/content/nativeMushafDownload.ts"),
-      "@azkar/native-reminders": path.resolve("src/app/hooks/nativeReminderScheduling.ts"),
-    },
-  },
+  resolve: { alias: nativeAliases },
   test: {
     projects: [
       {
