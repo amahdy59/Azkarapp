@@ -590,13 +590,15 @@ const en = {
     prayerReminderBody: "{prayer} prayer is in {minutes} minutes.",
   },
   downloads: {
+    downloadedAudioTitle: "Downloaded audio",
     exportFiles: "Save audio files to device",
     archiveAll: "Download all audio as ZIP",
     archiveHelp:
       "Save all available audio for your selected voices in one ZIP. Missing recordings download first; the app keeps its offline copies.",
     archiveProgress: "Preparing ZIP: {completed} of {total} recordings",
-    exportHelp: "Save to Downloads/Files. The app keeps its offline copy.",
-    exportEmpty: "Download this group’s audio first to save files here.",
+    exportHelp:
+      "These verified recordings are ready offline. Listen from their collection, or save a separate copy to Downloads/Files. The app keeps its offline copy.",
+    exportEmpty: "No audio downloaded yet. Download a collection below; its recordings will appear here.",
     saveFile: "Save audio file",
     preparingFile: "Preparing audio file…",
     fileSavedOnDevice: "The file was saved to your chosen location.",
@@ -604,7 +606,7 @@ const en = {
     exportError: "Could not verify this file. Refresh status and download missing audio.",
     offlineHelp: "How offline storage works",
     localStorageHelp:
-      "Offline audio stays in this browser, not in the Files app. For a separate file, use Manage → Save audio files to device.",
+      "Offline audio stays in this app’s storage. Open Downloaded audio to save a separate copy to Downloads/Files. Clearing app or browser data removes the app’s copies.",
     receivingFile: "Receiving recording {file} of {total}…",
     verifyingFile: "Checking recording {file} of {total}…",
     fileSaved: "Recording verified and saved for offline playback.",
@@ -627,7 +629,7 @@ const en = {
     includedText: "Adhkar texts are available without downloading.",
     manage: "Manage",
     storageDetails: "Storage & details",
-    notDownloaded: "Not downloaded",
+    notDownloaded: "Online audio · not downloaded",
     downloaded: "Downloaded",
     partial: "Partly downloaded",
     downloading: "Downloading…",
@@ -1145,6 +1147,10 @@ const en = {
     translationUnavailable: "The English meaning for this page is unavailable.",
   },
   audioPlayer: {
+    hidePlayer: "Hide player",
+    showPlayer: "Show player",
+    playing: "Playing",
+    paused: "Paused",
     region: "Audio player",
     play: "Play audio",
     pause: "Pause audio",
@@ -1218,7 +1224,11 @@ const en = {
     startSession: "Start Session",
     resumeZikr: "Resume Zikr {index}",
     sessionComplete: "Session Complete",
-    resetConfirm: "Reset all progress for this collection? This cannot be undone.",
+    situationalResetHint:
+      "This session stays saved, including after midnight. Choose Start new session when you finish, or reset now to clear the current tally. Past activity is kept.",
+    sessionProgress: "Session progress",
+    resetConfirm:
+      "Clear the current tally for this collection? Past activity and preferences are kept. This tally cannot be restored.",
     resetConfirmTitle: "Reset Collection",
     readAgain: "Read again",
     dailyProgress: "Daily Progress",

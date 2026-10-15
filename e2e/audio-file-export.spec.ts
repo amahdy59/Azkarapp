@@ -39,9 +39,9 @@ for (const language of ["en", "ar"] as const) {
       },
       { bytes: [...bytes], url, version: AUDIO_MANIFEST_VERSION },
     );
-    const group = page.getByTestId("download-category-adhkar");
-    await group.locator("summary").first().click();
-    await group.getByText(t(language, "downloads.exportFiles"), { exact: true }).click();
+    const group = page.getByTestId("downloaded-audio-files");
+    // Downloaded recordings are discoverable without opening a collection's Manage disclosure.
+    await group.locator("summary").click();
     const save = group.getByRole("button", { name: new RegExp(`^${t(language, "downloads.saveFile")}`) });
     await expect(save).toHaveCount(1);
     await expect(save).toBeEnabled();

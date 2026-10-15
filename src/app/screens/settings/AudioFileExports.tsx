@@ -5,7 +5,7 @@ import type { AudioPreferences } from "../../audio/audioTypes";
 import { getSavedAudioFiles, prepareSavedAudioFile, type SavedAudioFile } from "../../audio/audioOfflineCache";
 import { saveFileToDevice } from "../../share/shareDispatcher";
 import { Button } from "../../components/ui/button";
-import { Download } from "../../components/icons";
+import { Check, ChevronDown, Download } from "../../components/icons";
 import { t } from "../../i18n";
 import { formatNumerals } from "../../formatting";
 
@@ -56,9 +56,14 @@ export function AudioFileExports({
     };
   }, [open, disabled, zikrs, preferences, revision, language]);
   return (
-    <details className="mt-3 border-t border-border/40 pt-2" onToggle={(event) => setOpen(event.currentTarget.open)}>
-      <summary className="flex min-h-11 cursor-pointer items-center rounded-lg text-sm font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
-        {t(language, "downloads.exportFiles")}
+    <details
+      className="group rounded-xl border border-border bg-card px-3"
+      data-testid="downloaded-audio-files"
+      onToggle={(event) => setOpen(event.currentTarget.open)}
+    >
+      <summary className="flex min-h-11 cursor-pointer items-center justify-between gap-2 rounded-lg py-3 text-sm font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+        {t(language, "downloads.downloadedAudioTitle")}
+        <ChevronDown size={18} aria-hidden="true" className="shrink-0 group-open:rotate-180" />
       </summary>
       {open && (
         <div className="space-y-3 py-2">
@@ -77,6 +82,10 @@ export function AudioFileExports({
               <div key={file.id} className="space-y-2 rounded-xl border border-border p-3">
                 <p className="break-words text-sm font-semibold">
                   {language === "ar" ? file.titleArabic : file.titleEnglish}
+                </p>
+                <p className="flex items-center gap-2 text-sm text-foreground">
+                  <Check size={16} aria-hidden="true" />
+                  {t(language, "downloads.resourceReady")}
                 </p>
                 <p className="text-sm text-muted-foreground">
                   {file.voiceName} ·{" "}

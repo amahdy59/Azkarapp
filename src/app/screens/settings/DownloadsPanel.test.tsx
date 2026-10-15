@@ -194,7 +194,7 @@ describe("DownloadsPanel", () => {
     fireEvent.click(button);
     await waitFor(() => expect(screen.getByTestId("download-persistence")).toHaveTextContent("Storage protected"));
     expect(screen.queryByRole("button", { name: "Keep downloads on this device" })).not.toBeInTheDocument();
-    expect(screen.getByText(/not in the Files app/)).toBeInTheDocument();
+    expect(screen.getByText(/Open Downloaded audio to save a separate copy/)).toBeInTheDocument();
   });
 
   it("keeps cancellation reachable when individual management is collapsed", async () => {

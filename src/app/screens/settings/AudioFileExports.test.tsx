@@ -16,7 +16,7 @@ const props = {
   revision: 1,
 };
 function open() {
-  const summary = screen.getByText("Save audio files to device");
+  const summary = screen.getByText("Downloaded audio");
   const details = summary.closest("details")!;
   details.open = true;
   fireEvent(details, new Event("toggle"));
@@ -51,7 +51,7 @@ describe("device audio exports", () => {
     mocks.list.mockResolvedValue([]);
     render(<AudioFileExports {...props} />);
     open();
-    expect(await screen.findByText(/Download this group’s audio first/)).toBeInTheDocument();
+    expect(await screen.findByText(/No audio downloaded yet/)).toBeInTheDocument();
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
   });
   it("does not trigger an export on verification failure", async () => {

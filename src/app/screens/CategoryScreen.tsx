@@ -150,7 +150,14 @@ export function CategoryScreen({
 
         <div className="shrink-0 border-b border-border px-5 py-4">
           <div className="mb-2 flex items-center justify-between">
-            <p className="text-label font-bold text-muted-foreground">{t(language, "category.dailyProgress")}</p>
+            <p className="text-label font-bold text-muted-foreground">
+              {t(
+                language,
+                SITUATIONAL_SESSION_CATEGORY_IDS.includes(catId)
+                  ? "category.sessionProgress"
+                  : "category.dailyProgress",
+              )}
+            </p>
             <p
               className="text-label font-bold text-muted-foreground"
               dir="auto"
@@ -169,8 +176,16 @@ export function CategoryScreen({
             trackColor="var(--card)"
             fillColor="var(--primary)"
             direction={direction}
-            aria-label={t(language, "category.dailyProgress")}
+            aria-label={t(
+              language,
+              SITUATIONAL_SESSION_CATEGORY_IDS.includes(catId) ? "category.sessionProgress" : "category.dailyProgress",
+            )}
           />
+          {SITUATIONAL_SESSION_CATEGORY_IDS.includes(catId) && (
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground" data-testid="session-reset-guidance">
+              {t(language, "category.situationalResetHint")}
+            </p>
+          )}
 
           {isMainRoutine && routineMode === "core" && completedItemCount === azkar.length && (
             <button
