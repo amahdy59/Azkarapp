@@ -2,6 +2,7 @@ import { isNativeAndroid } from "./platform";
 import type { NativeReminder } from "./reminderPlan";
 
 let permission: NotificationPermission = "default";
+const FIRST_LAUNCH_PERMISSION_KEY = "azkarapp.native-notification-permission-requested.v1";
 export const nativeNotificationPermission = () => permission;
 
 export async function refreshNativeNotificationPermission(request = false): Promise<NotificationPermission> {
@@ -46,5 +47,20 @@ export async function initializeNativeNotifications() {
     const route: unknown = notification.extra?.route;
     if (typeof route === "string" && /^#\/(azkar|settings|quran)(\/|$)/.test(route)) window.location.hash = route;
   });
+  let requestedOnFirstLaunch = false;
+  try {
+    requestedOnFirstLaunch = window.localStorage.getItem(FIRST_LAUNCH_PERMISSION_KEY) === "1";
+  } catch {
+    // Permission prompting should still work when storage is unavailable.
+  }
+  if (!requestedOnFirstLaunch) {
+    await refreshNativeNotificationPermission(true);
+    try {
+      window.localStorage.setItem(FIRST_LAUNCH_PERMISSION_KEY, "1");
+    } catch {
+      // A later launch will retry if storage is unavailable.
+    }
+    return;
+  }
   await refreshNativeNotificationPermission();
 }
