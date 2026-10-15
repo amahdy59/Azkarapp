@@ -1,5 +1,7 @@
 # AI Improvement System Index
 
+Current owner-approved continuation: [Final reading, offline clarity and release acceptance](phases/FINAL_READING_AND_OFFLINE_POLISH_2026_10_15.md). Actual local previews precede publication; canonical content/geometry and complete release gates remain intact.
+
 Current follow-up: [Cards, situational sessions and compact audio](phases/CARDS_AND_COMPACT_AUDIO_2026_10_15.md), approved by the owner after the audit. Preserve the coordinated Android/release acceptance work below.
 
 The owner also approves [Wird evidence sharing and the Progress explanation](phases/WIRD_EVIDENCE_SHARING_2026_10_15.md) as a bounded follow-up in the same verified release.

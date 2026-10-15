@@ -1,5 +1,9 @@
 # Audio architecture
 
+## Mushaf overlay and manual browse intent — 2026-10-15
+
+The main Mushaf's compact player overlays the page without refitting its height. Explicit Hide/Show changes presentation only, preserving plan, media clock and playback state; full expansion and Stop remain distinct. The hidden labeled 44px tab states Playing/Paused and restores keyboard focus to Hide. Ordinary screen clearance is unchanged. Manual continuous-surah keyboard browse cancels already-scheduled follow recovery synchronously; End tracks late-fitting content while the reading region stays focused, until another browse action. Canonical lines, reviewed timing and recordings remain unchanged.
+
 ## Interactive compact timeline — 2026-10-15
 
 The compact player's former display-only progress line is replaced by one native range input in its own 44px-high row, with a visible thumb and elapsed/total time. Click, drag and keyboard seek the same controller as the expanded timeline. Unknown duration disables seeking; RTL reverses the fill and horizontal arrow meaning. PageUp/PageDown seek 30 seconds, arrows 5 seconds and Home/End select boundaries. Header controls retain independent 44px or larger targets with 8px separation. The existing measured dock clearance adapts to the taller compact surface. Playback completion, cache, timing and media ownership are unchanged. This supersedes historical compact-strip descriptions below.

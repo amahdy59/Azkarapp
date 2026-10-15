@@ -1,5 +1,13 @@
 # Application architecture
 
+## Final interaction lifecycle refinement — 2026-10-15
+
+ResponsiveSheet's Modal, SidePanel and drawer capture their opener in the focus scope's open-autofocus event and restore in close-autofocus after trapping is released, including conditional unmount. Caller-specific SidePanel recovery still takes precedence. This replaces a passive mount capture that could observe an already-focused dialog.
+
+Continuous Quran listening records manual follow intent synchronously before scheduled geometry recovery. Home/End explicitly scroll the focused reading region; an explicit End remains at the endpoint through late page/font fitting until another browse action or focus exit. No playback timestamps or content change. Main Mushaf compact audio reserves zero page-height padding and uses transient Hide/Show UI; other screens retain overlap clearance.
+
+DownloadsPanel composes one top-level AudioFileExports from all existing selected-voice collections. It loads only when disclosed and uses the same checksum-verified saved-file service/export boundary; group Manage still owns removal/resumption. Situational progress guidance describes the existing explicit reset/history contract without changing normalized state.
+
 ## Explicit situational sessions and evidence sharing — 2026-10-15
 
 Home/travel/distress/mosque/food/illness collections retain their tally across navigation and startup day cleanup until an explicit new session or confirmed reset. `useSessionHandlers.startNewSession` clears only that collection's current counts, preserving daily completion records and session history. Daily and Friday-cycle boundaries retain their existing ownership. Completed Reader/category surfaces and the summary expose the same new-session action.

@@ -44,6 +44,8 @@ Native widget preferences and WebView state are excluded from cloud backup/devic
 
 These are acceptance requirements, not passed checks. No physical device was connected during initial implementation, and virtualization was unavailable on the audit machine. Code/build verification does not replace device, signing or Play Console evidence.
 
+Final-polish acceptance check (2026-10-15): platform-tools `adb devices -l` still lists no connected device. Physical Android Back, TalkBack, cutout/large-system-text, cold offline playback/export, reminder reboot/idle and placed/resized widget checks therefore remain pending. Browser keyboard/offline/RTL evidence and native CI compilation remain separate; no device pass has been inferred.
+
 ## Startup budget accounting
 
 The approved shared Capacitor platform bridge adds 7,844 gzip bytes to the measured initial graph (163,538 → 171,382, +4.8%). The bridge has its own manual chunk so it cannot pull deferred audio catalogs into startup. The measured increase is recorded in scripts/bundle-baseline.json; absolute bundle ceilings remain unchanged.

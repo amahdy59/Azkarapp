@@ -1,5 +1,11 @@
 # Decision Log
 
+## Final reading and offline polish — 2026-10-15
+
+Latest screenshot correction: the owner rejects the reserved right column, requests equal left/right paragraph padding and increases the old 12px left inset by 2px. Use equal calc(0.75rem + 2px) padding and absolute corner placement without a number-only row; a chip overlay is explicitly permitted. This supersedes the earlier no-overlap/inline-clearance recommendation.
+
+The owner approves all six final recommendations: calmer current-ayah emphasis, English reading clearance/chip, offline download discoverability, explicit reset guidance, shared interaction consistency, evidence-supported WebKit repairs and available Android acceptance. The subsequent screenshot correction explicitly supersedes the chip's own-row implementation: absolute bottom-right, bottom padding exactly 2px greater than top, remove English furniture rules. Overlay compact Mushaf playback without shrinking pages, with an explicit Hide/Show affordance and unchanged playback. Show actual images before pushing. Existing canonical text/fonts/line identity, progress history, permission restrictions and full release gates remain intact. Physical phone/TalkBack/store signing evidence cannot be substituted with browser tests. See phases/FINAL_READING_AND_OFFLINE_POLISH_2026_10_15.md.
+
 ## Evidence sharing and palm explanation placement — 2026-10-15
 
 The owner requests that Share on the importance-of-Wird evidence page open the existing studio with image/text/link options and applicable existing customization, rather than a direct WhatsApp destination. Preserve all original evidence text, source URLs, translations and salaf attribution. Reuse CollectionShareModal with typed bilingual custom evidence and explicit source-link support; options without source data remain honestly unavailable. Move the existing palm explanation into the collapsed Progress reflection section. The owner also explicitly removes the floating Benefit pill during compact playback; normal reading controls return when audio closes. Existing immersive Mushaf reading help remains in its reading context. See phases/WIRD_EVIDENCE_SHARING_2026_10_15.md.

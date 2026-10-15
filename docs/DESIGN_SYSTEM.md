@@ -1,5 +1,11 @@
 # Azkar design system
 
+## Final reading and download clarity — 2026-10-15
+
+Owner-approved follow-up supersedes the earlier English number gutter: paragraphs use a bottom-right absolutely positioned number chip, 0.5rem top padding and bottom padding 2px greater, with equal inline padding of calc(0.75rem + 2px), 14px at the default root size, and no number-only row or reserved right column. The owner explicitly permits the corner chip to overlay the paragraph. Native reading panes keep 12px minimum inline padding and stable scrollbar space. English header/footer furniture has no divider rules. Current Arabic ayahs use quiet word-background paint and an outlined existing end marker instead of repeated per-line strokes; exact word emphasis and canonical glyph/line geometry remain intact.
+
+Compact main-Mushaf playback overlays the canvas without reserving page height. A distinct 44px Hide player button leaves a labeled Show player tab with Playing/Paused state; it does not pause, stop or seek. Expand and Stop remain separate. Hide/Show returns focus and respects reduced motion. Ordinary pages retain their existing dock clearance. Downloaded audio is one top-level on-demand disclosure, listing verified saved files with voice, size, offline state and file export, while group download/cancel/remove controls remain shared OfflineResourceRow actions.
+
 ## Home completion and compact playback — 2026-10-15
 
 Completed Home tiles retain their normal text contrast and localized status. A noninteractive 24px check badge sits at inline-end/top with reserved icon space, plus a 2px inset outline; focus remains a separate outer ring. Arabic places the badge at top left. Situational shortcut targets remain at least 44px high with natural text growth; tool cards use 12px block padding. The Arabic food shortcut is “أذكار الطعام”; collection/source content is unchanged.

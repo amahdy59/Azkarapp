@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-15-4",
+  "release": "2026-10-15-5",
   "ar": [
-    "بطاقات الرئيسية أكثر اختصارًا، وتظهر علامة الإكمال في زاوية مستقلة مع إطار داخلي واضح.",
-    "يمكن تقديم الصوت وتأخيره من المشغل المصغّر، مع أزرار متباعدة وإخفاء زر الفائدة أثناء الاستماع.",
-    "يفتح إكمال المجموعة ملخص الجلسة؛ ويمكن بدء جلسة جديدة لأذكار المواقف مع الاحتفاظ بسجل الجلسات.",
-    "يمكن مشاركة أدلة أهمية الورد كصور أو نصوص أو روابط؛ وتحسّنت مزامنة الأجهزة والبحث ووضوح الخصوصية."
+    "تمييز أهدأ للآية الحالية، وترجمة إنجليزية بحواشٍ مريحة ورقم صغير في الزاوية دون سطر إضافي.",
+    "يمكن إخفاء مشغّل المصحف وإظهاره دون إيقاف الصوت أو تصغير مساحة الصفحة.",
+    "اعثر على الصوتيات المنزّلة في مكان واحد، واعرف حجمها وحالتها واحفظ نسخة على جهازك.",
+    "توضيح الاحتفاظ بجلسات أذكار المواقف وسجل النشاط، وتحسين استعادة التركيز والتنقل بالنص المكبّر."
   ],
   "en": [
-    "Home cards are more compact, with a separate corner checkmark and inset outline for completed routines.",
-    "Seek directly from the compact audio player, with better-spaced buttons and the Benefit action hidden while listening.",
-    "Finishing a collection opens its summary; start a new situational session while keeping your session history.",
-    "Share Wird evidence as images, text or links, alongside improved device sync, search and clearer privacy details."
+    "Calmer current-ayah highlighting and padded English verses with a small corner number, without an extra row.",
+    "Hide and show the Mushaf player without stopping audio or shrinking the page.",
+    "Find downloaded audio in one place, check its size and offline status, and save a copy to your device.",
+    "Clearer situational-session and history guidance, with improved focus return and enlarged-text navigation."
   ]
 }
