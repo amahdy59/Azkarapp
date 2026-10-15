@@ -703,7 +703,7 @@ export function HomeScreen({
           </header>
         </div>
         <div data-testid="home-content-grid" className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-4 lg:gap-5">
-          <div data-testid="home-hero" className="relative isolate w-full">
+          <div data-testid="home-hero" className="relative w-full">
             {showHeroContent && (
               <div className="relative z-10 mx-auto flex w-full flex-col items-stretch justify-end gap-4 px-page pb-5 pt-1 sm:pb-6 sm:pt-2 lg:gap-5 lg:pb-8 lg:pt-3">
                 <div

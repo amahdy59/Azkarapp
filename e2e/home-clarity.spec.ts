@@ -123,9 +123,8 @@ for (const language of ["ar", "en"] as const) {
       const caption = cards.first().locator(".home-wird-caption");
       const material = await caption.evaluate((node) => ({
         filter: getComputedStyle(node).backdropFilter,
-        reduced: matchMedia("(prefers-reduced-transparency: reduce)").matches,
       }));
-      expect(material.filter).toEqual(material.reduced ? "none" : expect.stringContaining("blur"));
+      expect(material.filter).toEqual(expect.stringContaining("blur"));
       await page.goto("/#/settings/appearance");
       await transparency.click();
       await expect(images).toHaveAttribute("aria-checked", "true");

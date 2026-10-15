@@ -1,4 +1,3 @@
-import { QURAN_TEXT_STYLE } from "../quranTypography";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ChevronUp } from "./icons";
 import { type QuranWordMeaning } from "../content/quranWordMeanings";
@@ -157,9 +156,7 @@ export function QuranWordPopover({
       <div className="grid min-w-0 gap-2.5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-stretch sm:gap-4">
         <div className="flex min-w-0 flex-col justify-center gap-1" lang="ar" dir="rtl">
           <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-1">
-            <span className="text-xl text-primary" style={QURAN_TEXT_STYLE}>
-              {primary.word}
-            </span>
+            <span className="font-ui-arabic text-lg font-bold text-primary">{primary.word}</span>
             <span className="font-ui-arabic text-micro font-bold text-primary/80">
               {t(language, "reader.wordMeaningLabel")}
             </span>

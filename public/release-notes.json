@@ -1,15 +1,13 @@
 {
-  "release": "2026-10-15-5",
+  "release": "2026-10-15-6",
   "ar": [
-    "تمييز أهدأ للآية الحالية، وترجمة إنجليزية بحواشٍ مريحة ورقم صغير في الزاوية دون سطر إضافي.",
-    "يمكن إخفاء مشغّل المصحف وإظهاره دون إيقاف الصوت أو تصغير مساحة الصفحة.",
-    "اعثر على الصوتيات المنزّلة في مكان واحد، واعرف حجمها وحالتها واحفظ نسخة على جهازك.",
-    "توضيح الاحتفاظ بجلسات أذكار المواقف وسجل النشاط، وتحسين استعادة التركيز والتنقل بالنص المكبّر."
+    "عرض سور الإخلاص والفلق والناس في أذكار الرقية ببطاقات قرآنية مستقلة بخط المصحف العثماني.",
+    "استخدام خط القراءة الواضح للكلمة المختارة في بطاقة معاني المفردات لتتناغم مع شرحها.",
+    "تفعيل تأثير الزجاج الشفاف المريح لبطاقات الشاشة الرئيسية على أجهزة الحاسوب المكتبية."
   ],
   "en": [
-    "Calmer current-ayah highlighting and padded English verses with a small corner number, without an extra row.",
-    "Hide and show the Mushaf player without stopping audio or shrinking the page.",
-    "Find downloaded audio in one place, check its size and offline status, and save a copy to your device.",
-    "Clearer situational-session and history guidance, with improved focus return and enlarged-text navigation."
+    "Surahs Al-Ikhlas, Al-Falaq, and An-Nas in Ruqyah are now presented in dedicated Quranic cards with full Mushaf typography.",
+    "Word meanings now display the selected Quranic term in the clear reading font alongside its explanation.",
+    "Translucent frosted glass cards on the Home screen now render smoothly on desktop displays."
   ]
 }

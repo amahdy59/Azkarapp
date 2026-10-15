@@ -229,7 +229,7 @@ describe("explicit audio content architecture", () => {
     const expectShared = (ids: string[]) =>
       expect(new Set(ids.map((id) => ALL_AZKAR.find((zikr) => zikr.id === id)?.canonicalKey)).size).toBe(1);
     expectShared(["m-hm-75", "e-hm-75", "s-hm-100", "ap-ref-9"]);
-    expectShared(["m-hm-76a", "e-hm-76a", "s-hm-99-ikhlas"]);
+    expectShared(["m-hm-76a", "e-hm-76a", "s-hm-99-ikhlas", "ir-ref-5a"]);
     expectShared(["m-hm-79", "e-hm-79", "misc-ref-8"]);
     expectShared(["s-hm-106-allahu-akbar", "ap-tasbeeh-allahuakbar"]);
   });

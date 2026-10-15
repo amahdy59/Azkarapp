@@ -1,4 +1,3 @@
-import { QURAN_TEXT_STYLE } from "../quranTypography";
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { ArrowLeft, ArrowRight, ExternalLink, Info, BookOpen } from "./icons";
 import {
@@ -69,8 +68,7 @@ function WordMeaningContent({
             >
               <div className="flex items-baseline justify-between gap-3 border-b border-border/50 bg-primary/10 px-4 py-3">
                 <p
-                  className="zikr-text min-w-0 text-xl font-extrabold leading-relaxed text-primary"
-                  style={QURAN_TEXT_STYLE}
+                  className="font-ui-arabic min-w-0 text-xl font-bold leading-relaxed text-primary"
                   lang="ar"
                   dir="rtl"
                 >

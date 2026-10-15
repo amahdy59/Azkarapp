@@ -25,6 +25,9 @@ const QURAN_CONTENT_BY_ID = {
   "s-hm-109a": QURAN_PASSAGES.alKafirun,
   "s-hm-110a": QURAN_PASSAGES.asSajdah,
   "s-hm-110b": QURAN_PASSAGES.alMulk,
+  "ir-ref-5a": QURAN_PASSAGES.alIkhlas,
+  "ir-ref-5b": QURAN_PASSAGES.alFalaq,
+  "ir-ref-5c": QURAN_PASSAGES.anNas,
 } as const;
 
 /** Repeated non-Qur'anic wording has one canonical source item. Context-specific benefits and counts stay local. */
@@ -79,6 +82,9 @@ const CANONICAL_KEY_BY_ID: Readonly<Record<string, string>> = {
   "s-hm-110b": "quran-067",
   "friday-kahf": "quran-018",
   "ir-baqarah": "quran-002",
+  "ir-ref-5a": "quran-112",
+  "ir-ref-5b": "quran-113",
+  "ir-ref-5c": "quran-114",
   "m-hm-75a": "zikr:collection-opening",
   "e-hm-75a": "zikr:collection-opening",
   "m-hm-79": "zikr:sayyid-al-istighfar",
