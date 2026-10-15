@@ -6,6 +6,8 @@ The owner approved Capacitor 8 on 2026-10-15, retaining the React/PWA applicatio
 
 Install Java 21 and Android SDK platform 36, platform-tools and build-tools. Set `JAVA_HOME` and `ANDROID_HOME` in your environment. Never commit `local.properties`, credentials, keystores or generated web assets.
 
+The web development watcher excludes the native Android tree, including Gradle intermediates. Native edits use the Android sync/build workflow rather than triggering web hot reloads for thousands of build outputs.
+
 ```sh
 pnpm install --frozen-lockfile
 pnpm android:sync

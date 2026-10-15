@@ -2,6 +2,7 @@
 export function ignoreGeneratedWatchPath(root: string) {
   const prefix = `${root.replaceAll("\\", "/").replace(/\/$/, "")}/`;
   const generated = new Set([
+    "android",
     "output",
     "coverage",
     "test-results",

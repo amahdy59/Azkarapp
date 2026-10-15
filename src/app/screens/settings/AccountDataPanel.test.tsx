@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { AccountDataPanel } from "./AccountDataPanel";
 
@@ -28,9 +28,11 @@ describe("AccountDataPanel", () => {
     const file = new File(["{}"], "azkar-backup.json", { type: "application/json" });
     Object.defineProperty(file, "text", { value: () => Promise.resolve('{"format":"azkarapp-backup"}') });
 
-    fireEvent.change(input!, { target: { files: [file] } });
+    await act(async () => {
+      fireEvent.change(input!, { target: { files: [file] } });
+    });
 
-    await waitFor(() => expect(onRestoreData).toHaveBeenCalledWith('{"format":"azkarapp-backup"}'));
+    expect(onRestoreData).toHaveBeenCalledWith('{"format":"azkarapp-backup"}');
     expect(screen.getByRole("button", { name: "Choose backup file" })).toBeInTheDocument();
   });
 });

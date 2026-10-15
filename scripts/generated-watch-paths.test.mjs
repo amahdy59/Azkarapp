@@ -6,6 +6,7 @@ test.each(["/workspace/Azkarapp", "C:/Users/Ahmed/My Project", "C:\\Users\\Ahmed
   (root) => {
     const ignored = ignoreGeneratedWatchPath(root);
     for (const folder of [
+      "android",
       "output",
       "coverage",
       "test-results",
@@ -25,6 +26,7 @@ test.each(["/workspace/Azkarapp", "C:/Users/Ahmed/My Project", "C:\\Users\\Ahmed
       "scripts/browser-partitions.mjs",
       "output-source.ts",
       "src/output/view.tsx",
+      "src/android/view.tsx",
       "README.md",
     ]) {
       expect(ignored(`${root}/${filename}`)).toBe(false);
