@@ -13,7 +13,7 @@ export const AUDIO_SOURCES: Readonly<Record<string, AudioSourceRecord>> = Object
     name: "Internal Upload",
     nameArabic: "تسجيل مرفوع داخلياً",
     attribution: "Recitation by Muhammad Al-Shara",
-    attributionArabic: "تلاوة محمد شرعي",
+    attributionArabic: "تلاوة محمد الشرع",
     licenseName: "Publicly distributed",
     licenseEvidence: "N/A",
   },

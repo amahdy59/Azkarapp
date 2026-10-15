@@ -1,3 +1,5 @@
+import { isNativeAndroid } from "../native/platform";
+import { nativeAudioSource } from "../native/cachedAudio";
 import {
   createContext,
   useCallback,
@@ -278,8 +280,10 @@ export function AudioProvider({
           },
         });
       }, 15_000);
+      let sourceUrl = segment.url;
+      let releaseSource = () => {};
       const isCurrent = () =>
-        generationRef.current === generation && audio.src === new URL(segment.url, window.location.href).href;
+        generationRef.current === generation && audio.src === new URL(sourceUrl, window.location.href).href;
       const on = (event: keyof HTMLMediaElementEventMap, listener: () => void) =>
         audio.addEventListener(event, listener as EventListener);
       const off = (event: keyof HTMLMediaElementEventMap, listener: () => void) =>
@@ -321,24 +325,38 @@ export function AudioProvider({
       };
       for (const [event, handler] of Object.entries(handlers)) on(event as keyof HTMLMediaElementEventMap, handler);
       removeListenersRef.current = () => {
+        releaseSource();
         window.clearTimeout(metadataTimer);
         for (const [event, handler] of Object.entries(handlers)) off(event as keyof HTMLMediaElementEventMap, handler);
       };
 
-      audio.src = segment.url;
-      audio.load();
-      if (autoPlay) {
-        try {
-          void audio.play().catch((error: unknown) => {
-            if (generationRef.current === generation)
-              dispatch({ type: "error", generation, error: mapPlayError(error) });
-          });
-        } catch (error) {
-          dispatch({ type: "error", generation, error: mapPlayError(error) });
+      const startSource = () => {
+        audio.src = sourceUrl;
+        audio.load();
+        if (autoPlay) {
+          try {
+            void audio.play().catch((error: unknown) => {
+              if (generationRef.current === generation)
+                dispatch({ type: "error", generation, error: mapPlayError(error) });
+            });
+          } catch (error) {
+            dispatch({ type: "error", generation, error: mapPlayError(error) });
+          }
+        } else if (stateRef.current.status === "loading") {
+          dispatch({ type: "status", status: "paused", generation });
         }
-      } else if (stateRef.current.status === "loading") {
-        dispatch({ type: "status", status: "paused", generation });
-      }
+      };
+      if (isNativeAndroid()) {
+        void nativeAudioSource(segment.url).then((source) => {
+          if (generationRef.current !== generation) {
+            source.release();
+            return;
+          }
+          sourceUrl = source.url;
+          releaseSource = source.release;
+          startSource();
+        });
+      } else startSource();
     },
     [advanceAfterEnded, chooseVoice, dispatch, getAudio],
   );

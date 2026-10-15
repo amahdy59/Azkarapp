@@ -1,5 +1,7 @@
 # AI Improvement System Index
 
+Current coordinated effort: [Audit remediation and Android preparation](phases/APP_AUDIT_REMEDIATION_2026_10_15.md). The owner approved applying the audit recommendations and adding Capacitor Android/native widgets and reminders while retaining the PWA. Earlier entries below record historical phase authority; they are not additional simultaneously active briefs.
+
 [Combined refinements release](phases/COMBINED_RELEASE_2026_10_14.md) records the owner's superseding instruction to verify and push all completed local changes, integration repairs, supplied curated images and exact-commit release evidence.
 
 [Persistent devotional downloads and human-readable archives](phases/PERSISTENT_DOWNLOADS_AND_HUMAN_READABLE_ARCHIVES_2026_10_13.md) protects offline audio, Mushaf pages, fonts and timings from service worker update wipes, migrates valid recordings across manifest updates without re-downloading, auto-requests persistent storage, and organizes exported ZIP audio into bilingual category folders with numbered, human-understandable track titles and localized reciter names. Local implementation only per owner instruction.

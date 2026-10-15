@@ -1,6 +1,7 @@
 import type { AppLanguage, Zikr } from "../types";
 import { AUDIO_CATALOG } from "./audioManifest";
 import { createArabicTextFingerprint } from "./arabicMatching";
+import { isAndroidRelease, isAudioSourceAllowed } from "./platformAudioPolicy";
 import type { AudioCatalog, AudioPreferences, AudioResolution, ResolvedAudioSegment } from "./audioTypes";
 
 export function getAudioBaseUrl(): string {
@@ -28,17 +29,23 @@ export function resolveAudioAssetById(
       segment.variants
         .filter(
           (variant) =>
-            variant.reviewStatus === "approved" && Boolean(catalog.sources[variant.sourceId]?.attribution.trim()),
+            variant.reviewStatus === "approved" &&
+            isAudioSourceAllowed(variant.sourceId) &&
+            Boolean(catalog.sources[variant.sourceId]?.attribution.trim()),
         )
         .map((variant) => variant.voiceId),
     ),
   );
   const availableVoiceIds = [...voices].filter((voiceId) =>
     asset.segments.every((segment) =>
-      segment.variants.some((variant) => variant.voiceId === voiceId && variant.reviewStatus === "approved"),
+      segment.variants.some(
+        (variant) =>
+          variant.voiceId === voiceId && variant.reviewStatus === "approved" && isAudioSourceAllowed(variant.sourceId),
+      ),
     ),
   );
-  if (!availableVoiceIds.includes(asset.defaultVoiceId)) return null;
+  if (!availableVoiceIds.length || (!availableVoiceIds.includes(asset.defaultVoiceId) && !isAndroidRelease()))
+    return null;
 
   const segmentsByVoice = Object.fromEntries(
     availableVoiceIds.map((voiceId) => [
@@ -51,6 +58,7 @@ export function resolveAudioAssetById(
             (candidate) =>
               candidate.voiceId === voiceId &&
               candidate.reviewStatus === "approved" &&
+              isAudioSourceAllowed(candidate.sourceId) &&
               Boolean(catalog.sources[candidate.sourceId]?.attribution.trim()),
           )!;
           const source = catalog.sources[variant.sourceId]!;
@@ -74,7 +82,10 @@ export function resolveAudioAssetById(
     ]),
   );
 
-  return { asset, segmentsByVoice, availableVoiceIds };
+  const resolvedAsset = availableVoiceIds.includes(asset.defaultVoiceId)
+    ? asset
+    : { ...asset, defaultVoiceId: availableVoiceIds[0]! };
+  return { asset: resolvedAsset, segmentsByVoice, availableVoiceIds };
 }
 
 export function resolveAudioAsset(

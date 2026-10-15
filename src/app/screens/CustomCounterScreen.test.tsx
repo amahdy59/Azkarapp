@@ -380,6 +380,9 @@ describe("CustomCounterScreen Component", () => {
   });
 
   it("opens share modal when share button is tapped", async () => {
+    // Module transfer is covered by browser tests. Await the real lazy module
+    // here so this interaction assertion does not race Vitest's transformer.
+    await import("../components/CollectionShareModal");
     const user = userEvent.setup();
     render(<CustomCounterScreen isArabic={true} direction="rtl" onBack={vi.fn()} />);
 

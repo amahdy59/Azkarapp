@@ -1,5 +1,13 @@
 # Decision Log
 
+## Android build tools and audio release policy — 2026-10-15
+
+The owner explicitly accepts Google Android SDK terms and authorizes JDK/SDK installation. The owner chooses to exclude uncertain Muhammad Al-Shara recordings from Android pending permission, then clarifies that only Al-Kahf and Al-Baqarah use محمد الشرع; the other recordings use Abdullah Muhammad or English narration. A complete AST inventory confirms 2 Muhammad Al-Shara variants and 23 Abdullah Muhammad variants incorrectly linked to the former generic source. Correct those 23 source links to the existing owner-authorized Abdullah Muhammad source; exclude only the 2 Muhammad Al-Shara variants at Android playback/download resolution. Preserve web availability, exact bytes/checksums, devotional text and attribution identity. Retain offline downloads and file export for eligible audio. No permission evidence is fabricated.
+
+## Coordinated audit remediation and Capacitor Android approved — 2026-10-15
+
+The owner requests applying all audit recommendations as one coordinated effort and explicitly approves “Capacitor Android (recommended)” with native widgets and reminder services while preserving React/PWA. Implement in bounded verified phases under phases/APP_AUDIT_REMEDIATION_2026_10_15.md. This supersedes the earlier widget deferral; it does not authorize invented recording permissions, deletion of user data, or claims of physical-device/Play acceptance without evidence. Existing autonomous release authority and intact gates apply.
+
 ## Historical Progress visualization — 2026-10-14
 
 The owner approves all screenshot-based Progress recommendations, welcomes multiple stacked bars where they make the data clearer, requests waiting for a concurrent session, then explicitly resumes this phase. Implement historical-only trends with correctly clipped ranges and synchronized selectors; monthly columns and an explained annual line; five-row prayer comparisons with mutually exclusive location stacks only; separate Rawatib/adhkar measures; optional exact records and accessible responsive controls. Preserve existing prayer-first ordering, today-inclusive recording denominators, reviewed Asr Rawatib applicability, independent Quran, offline state and merge boundaries. This supersedes future analytical placeholders and dense prayer metric cards. The existing autonomous main release authority applies after intact gates. See phases/PROGRESS_VISUAL_HISTORY_2026_10_14.md.

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_open">افتح التطبيق لإعداد الأدوات</string>
+    <string name="widget_prayers">مواقيت الصلاة</string>
+    <string name="widget_azkar">الأذكار اليومية</string>
+    <string name="widget_quran">تابع قراءة القرآن</string>
+    <string name="widget_tasbih">المسبحة</string>
+</resources>

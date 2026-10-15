@@ -1,3 +1,4 @@
+import { useNativeServices } from "./hooks/useNativeServices";
 import { lazy, Suspense, useState, useEffect, useRef, useCallback, useMemo } from "react";
 import {
   fromCompletedSets,
@@ -1258,6 +1259,7 @@ function AppContent({
   });
 
   useCloudflareDeviceSync(appStateSnapshot, applyStateSnapshot);
+  useNativeServices(appStateSnapshot);
 
   useForegroundReminders({
     reminders,

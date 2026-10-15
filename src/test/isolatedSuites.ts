@@ -11,6 +11,8 @@
  * fails until the suite is listed here.
  */
 export const ISOLATED_SUITES = [
+  "src/app/native/reminders.test.ts",
+  "src/app/native/saveFile.test.ts",
   "src/app/hooks/useForegroundReminders.lifecycle.test.ts",
   "src/app/screens/ProgressScreen.periodNavigation.test.tsx",
   "src/app/share/ayahMushafRendering.test.ts",

@@ -24,6 +24,10 @@ Settings displays the selected timezone, current UTC offset, and whether dayligh
 
 See [docs/PRAYER_TIMES.md](docs/PRAYER_TIMES.md) for formulas, caching, DST detection, failure behavior, and verification procedures.
 
+## Android preparation
+
+An owner-approved Capacitor Android host retains the web application and its offline reading/counting. See [Android build and acceptance requirements](docs/ANDROID.md) for builds, widgets, native reminders, offline audio/export and remaining signing/device/Play checks. A compiled test build alone does not establish Play readiness.
+
 ## Technology
 
 | Area          | Implementation                               |

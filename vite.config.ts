@@ -175,7 +175,11 @@ export default defineConfig(({ mode }) => {
 
   return {
     base: appBase,
-    define: { __APP_RELEASE__: JSON.stringify(currentRelease()) },
+    define: {
+      __ANDROID_BUILD__: JSON.stringify(mode === "android"),
+      __APP_RELEASE__: JSON.stringify(currentRelease()),
+      __APP_VERSION__: JSON.stringify(JSON.parse(readFileSync("package.json", "utf8")).version),
+    },
     plugins: [
       // Both plugins are load-bearing: the app is React, and Tailwind compiles
       // the entire design system. (This previously claimed Tailwind "is not
@@ -346,6 +350,10 @@ export default defineConfig(({ mode }) => {
           // manifest, the reducer) alongside them and keep genuinely shared
           // code out.
           manualChunks(id) {
+            // Platform detection is shared with startup. Do not let the lazy
+            // audio owner's manual chunk absorb it and pull audio into Home.
+            if (id.endsWith("/src/app/native/platform.ts") || id.includes("node_modules/@capacitor/core/"))
+              return "native-bridge";
             if (id.includes("node_modules/react-dom") || id.includes("node_modules/react/")) return "vendor";
             /*
              * The corpus is its own chunk because several lazy reading

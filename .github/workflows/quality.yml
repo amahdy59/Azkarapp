@@ -101,11 +101,42 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: ".nvmrc"
+          cache: "pnpm"
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+      - run: pnpm install --frozen-lockfile
+      - name: Build the packaged Android application
+        run: pnpm android:sync
+      - name: Compile, lint and test native boundaries
+        working-directory: android
+        run: bash gradlew assembleDebug lintDebug testDebugUnitTest bundleRelease --no-daemon
+      - name: Preserve Android verification artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: android-verification
+          path: |
+            android/app/build/outputs/apk/debug/*.apk
+            android/app/build/outputs/bundle/release/*.aab
+            android/app/build/reports/
+          if-no-files-found: error
+          retention-days: 7
+
   verify:
     # Preserve the release gate's identity. A missing/failed/cancelled shard
     # must fail this job even if its partial merged report looks successful.
     if: always() && !cancelled()
-    needs: [checks, browser]
+    needs: [checks, browser, android]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -144,9 +175,11 @@ jobs:
         env:
           CHECKS_RESULT: ${{ needs.checks.result }}
           BROWSER_RESULT: ${{ needs.browser.result }}
+          ANDROID_RESULT: ${{ needs.android.result }}
         run: |
           test "$CHECKS_RESULT" = success
           test "$BROWSER_RESULT" = success
+          test "$ANDROID_RESULT" = success
       - name: Preserve complete browser timings
         if: always()
         uses: actions/upload-artifact@v7

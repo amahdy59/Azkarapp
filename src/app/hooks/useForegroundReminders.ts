@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { isNativeAndroid } from "../native/platform";
 import { readNotificationPermission, showBrowserNotification } from "../notifications";
 import { getEstimatedPrayerTimes, PRAYER_NAMES, type PrayerTimes } from "../content/prayerTimes";
 import { t } from "../i18n";
@@ -224,6 +225,7 @@ export function useForegroundReminders({
   location?: LocationSettings;
 }) {
   useEffect(() => {
+    if (isNativeAndroid()) return;
     let isDelivering = false;
     let cancelled = false;
     let timerId: number | undefined;

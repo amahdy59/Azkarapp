@@ -1,3 +1,5 @@
+import { isNativeAndroid } from "./app/native/platform";
+import { initializeNativeNotifications } from "./app/native/reminders";
 import { lazy, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import { AppErrorBoundary } from "./app/components/AppErrorBoundary.tsx";
@@ -50,42 +52,46 @@ createRoot(document.getElementById("root")!).render(
 
 const UPDATE_CHECK_INTERVAL_MS = 60 * 60 * 1000;
 
-const updateServiceWorker = registerSW({
-  onNeedRefresh() {
-    window.dispatchEvent(new Event("azkar-update-available"));
-  },
-  /**
-   * Ask for the update ourselves.
-   *
-   * `registerType: "prompt"` means the new worker installs and then waits, which
-   * is what lets the reader choose the moment. But the browser only *looks* for
-   * a new worker on navigation, and an installed PWA is resumed rather than
-   * navigated — so on a phone the notice could go unseen for days while the
-   * mechanism behind it worked perfectly. Checking when the app becomes visible
-   * covers that case; the interval covers a session left open all day, and the
-   * online handler covers coming back from a tunnel or a flight.
-   *
-   * `registration.update()` is a conditional request: when nothing has shipped
-   * it costs one 304 and changes nothing.
-   */
-  onRegisteredSW(_swUrl, registration) {
-    if (!registration) return;
+if (isNativeAndroid()) void initializeNativeNotifications().catch((error) => reportError(error, "native-startup"));
 
-    const checkForUpdate = () => {
-      if (!navigator.onLine) return;
-      void registration.update().catch(() => {
-        // A failed check is not worth surfacing: the next one will retry.
-      });
-    };
+const updateServiceWorker = isNativeAndroid()
+  ? async () => {}
+  : registerSW({
+      onNeedRefresh() {
+        window.dispatchEvent(new Event("azkar-update-available"));
+      },
+      /**
+       * Ask for the update ourselves.
+       *
+       * `registerType: "prompt"` means the new worker installs and then waits, which
+       * is what lets the reader choose the moment. But the browser only *looks* for
+       * a new worker on navigation, and an installed PWA is resumed rather than
+       * navigated — so on a phone the notice could go unseen for days while the
+       * mechanism behind it worked perfectly. Checking when the app becomes visible
+       * covers that case; the interval covers a session left open all day, and the
+       * online handler covers coming back from a tunnel or a flight.
+       *
+       * `registration.update()` is a conditional request: when nothing has shipped
+       * it costs one 304 and changes nothing.
+       */
+      onRegisteredSW(_swUrl, registration) {
+        if (!registration) return;
 
-    document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "visible") checkForUpdate();
+        const checkForUpdate = () => {
+          if (!navigator.onLine) return;
+          void registration.update().catch(() => {
+            // A failed check is not worth surfacing: the next one will retry.
+          });
+        };
+
+        document.addEventListener("visibilitychange", () => {
+          if (document.visibilityState === "visible") checkForUpdate();
+        });
+        window.addEventListener("online", checkForUpdate);
+        window.setInterval(checkForUpdate, UPDATE_CHECK_INTERVAL_MS);
+        checkForUpdate();
+      },
     });
-    window.addEventListener("online", checkForUpdate);
-    window.setInterval(checkForUpdate, UPDATE_CHECK_INTERVAL_MS);
-    checkForUpdate();
-  },
-});
 
 window.addEventListener("azkar-apply-update", () => {
   let timeoutId = 0;

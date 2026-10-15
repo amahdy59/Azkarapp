@@ -3,7 +3,16 @@
  * fallback downloading for desktop and older browsers.
  */
 
+import { isNativeAndroid } from "../native/platform";
+
 export type MultiShareMethod = "shared" | "downloaded" | "cancelled" | "error";
+
+export async function saveFileToDevice(file: File): Promise<void> {
+  if (isNativeAndroid()) {
+    const { saveNativeFile } = await import("../native/saveFile");
+    await saveNativeFile(file);
+  } else downloadFile(file);
+}
 
 export interface MultiShareResult {
   method: MultiShareMethod;
@@ -89,7 +98,7 @@ export async function shareSingleFile(
   // Fallback to downloading
   if (options.downloadFallback === false) throw new Error("File sharing unavailable.");
   options.onStatus?.("downloading");
-  downloadFile(file);
+  await saveFileToDevice(file);
   options.onStatus?.("downloaded");
   return { method: "downloaded", fileCount: 1 };
 }
@@ -116,7 +125,7 @@ export async function downloadFilesSequentially(files: File[], delayMs = 180): P
   for (let i = 0; i < files.length; i += 1) {
     const file = files[i];
     if (!file) continue;
-    downloadFile(file);
+    await saveFileToDevice(file);
     if (i < files.length - 1 && delayMs > 0) {
       await new Promise((resolve) => setTimeout(resolve, delayMs));
     }

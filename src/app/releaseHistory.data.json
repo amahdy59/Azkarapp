@@ -1,5 +1,20 @@
 [
   {
+    "release": "2026-10-15-3",
+    "ar": [
+      "يفتح إكمال آخر ذكر ملخص الجلسة مباشرة، وتظل بياناتك قابلة للوصول عند تقييد تخزين المتصفح.",
+      "تعرض مزامنة الأجهزة حالة الحفظ الفعلية مع إعادة المحاولة عند تعذر الاتصال.",
+      "تُعرض نتائج البحث الطويلة على دفعات لتسهيل التصفح دون إخفاء بقية النتائج.",
+      "أصبحت معلومات الخصوصية والحذف أوضح بالعربية والإنجليزية، وصُحّح مصدر تسجيلات عبد الله محمد."
+    ],
+    "en": [
+      "Completing the final zikr now opens the session summary, and account data handles restricted browser storage.",
+      "Device sync shows its actual save status and offers retry when a connection fails.",
+      "Long search results load in batches, with more results available on request.",
+      "Privacy and deletion details are clearer in Arabic and English, and Abdullah Muhammad recording sources are corrected."
+    ]
+  },
+  {
     "release": "2026-10-15-2",
     "ar": [
       "يمتد شريط الرئيسية على الحاسوب إلى الحواف، وتكشف البطاقات الزجاجية الخلفية مع الحفاظ على وضوح النص.",

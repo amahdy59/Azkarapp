@@ -1,8 +1,9 @@
+import { isNativeAndroid } from "../../native/platform";
 import { useEffect, useRef, useState } from "react";
 import type { AppLanguage, Zikr } from "../../types";
 import type { AudioPreferences } from "../../audio/audioTypes";
 import { getSavedAudioFiles, prepareSavedAudioFile, type SavedAudioFile } from "../../audio/audioOfflineCache";
-import { downloadFile } from "../../share/shareDispatcher";
+import { saveFileToDevice } from "../../share/shareDispatcher";
 import { Button } from "../../components/ui/button";
 import { Download } from "../../components/icons";
 import { t } from "../../i18n";
@@ -93,9 +94,19 @@ export function AudioFileExports({
                     try {
                       const result = await prepareSavedAudioFile(zikrs, preferences, file.id);
                       if (!mounted.current) return;
-                      downloadFile(result);
-                      setMessage(t(language, "downloads.fileHandedToBrowser"));
-                    } catch {
+                      await saveFileToDevice(result);
+                      if (!mounted.current) return;
+                      setMessage(
+                        t(
+                          language,
+                          isNativeAndroid() ? "downloads.fileSavedOnDevice" : "downloads.fileHandedToBrowser",
+                        ),
+                      );
+                    } catch (error) {
+                      if (error instanceof DOMException && error.name === "AbortError") {
+                        if (mounted.current) setMessage("");
+                        return;
+                      }
                       if (mounted.current) {
                         setError(t(language, "downloads.exportError"));
                         setMessage("");
