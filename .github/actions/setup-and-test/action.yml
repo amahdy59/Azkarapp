@@ -60,13 +60,23 @@ runs:
       env:
         VITE_AUDIO_BASE_URL: ${{ inputs.vite-audio-base-url }}
 
+    - name: Resolve browser cache identity
+      if: inputs.scope != 'quality'
+      id: browser-runtime
+      shell: bash
+      env:
+        BROWSER_PROJECTS: ${{ inputs.browser-projects }}
+      run: |
+        engines="$(node scripts/browser-engines.mjs "$BROWSER_PROJECTS")"
+        echo "key=${engines// /-}" >> "$GITHUB_OUTPUT"
+
     - name: Cache Playwright browsers
       if: inputs.scope != 'quality'
       uses: actions/cache@v6
       id: playwright-cache
       with:
         path: ~/.cache/ms-playwright
-        key: playwright-browsers-v3-${{ runner.os }}-${{ env.ImageOS }}-${{ inputs.browser-projects || 'all' }}-${{ hashFiles('pnpm-lock.yaml') }}
+        key: playwright-browsers-v3-${{ runner.os }}-${{ env.ImageOS }}-${{ steps.browser-runtime.outputs.key }}-${{ hashFiles('pnpm-lock.yaml') }}
 
     - name: Install Playwright browsers
       # Validate executables even on a cache hit; Playwright reuses complete downloads.
