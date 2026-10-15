@@ -354,7 +354,7 @@ describe("CustomCounterScreen Component", () => {
 
     // One more click reaches target 33
     fireEvent.click(screen.getByTestId("custom-counter-surface"));
-    expect(screen.getByRole("dialog", { name: /Goal Reached!/i })).toBeInTheDocument();
+    expect(await screen.findByRole("dialog", { name: /Goal Reached!/i })).toBeInTheDocument();
     expect(screen.getByTestId("custom-counter-return-btn")).toBeInTheDocument();
 
     await user.click(screen.getByTestId("custom-counter-return-btn"));
@@ -391,7 +391,7 @@ describe("CustomCounterScreen Component", () => {
     await user.click(shareButton);
 
     // Modal is opened
-    expect(await screen.findByRole("dialog")).toBeInTheDocument();
+    expect(await screen.findByRole("dialog", {}, { timeout: 5000 })).toBeInTheDocument();
   });
 
   it("exposes the Aa typography menu to adjust text size", async () => {

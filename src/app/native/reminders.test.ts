@@ -7,17 +7,20 @@ const notifications = vi.hoisted(() => ({
   getPending: vi.fn(),
   cancel: vi.fn(),
   schedule: vi.fn(),
+  addListener: vi.fn(),
 }));
 vi.mock("@capacitor/local-notifications", () => ({ LocalNotifications: notifications }));
 vi.mock("./platform", () => ({ isNativeAndroid: () => true }));
 
 beforeEach(() => {
   vi.resetAllMocks();
+  window.localStorage.removeItem("azkarapp.native-notification-permission-requested.v1");
   notifications.checkPermissions.mockResolvedValue({ display: "granted" });
   notifications.requestPermissions.mockResolvedValue({ display: "denied" });
   notifications.getPending.mockResolvedValue({ notifications: [{ id: 9999 }, { id: 10_001 }] });
   notifications.cancel.mockResolvedValue(undefined);
   notifications.schedule.mockResolvedValue(undefined);
+  notifications.addListener.mockResolvedValue({ remove: vi.fn() });
 });
 
 describe("native reminder queue", () => {
@@ -26,6 +29,17 @@ describe("native reminder queue", () => {
     expect(notifications.requestPermissions).not.toHaveBeenCalled();
     expect(await refreshNativeNotificationPermission(true)).toBe("denied");
     expect(nativeNotificationPermission()).toBe("denied");
+  });
+
+  it("requests notification permission on the first native launch and only refreshes it later", async () => {
+    const { initializeNativeNotifications } = await import("./reminders");
+    await initializeNativeNotifications();
+    expect(notifications.requestPermissions).toHaveBeenCalledOnce();
+
+    notifications.requestPermissions.mockClear();
+    await initializeNativeNotifications();
+    expect(notifications.requestPermissions).not.toHaveBeenCalled();
+    expect(notifications.checkPermissions).toHaveBeenCalled();
   });
 
   it("replaces only owned pending alarms and retains internal click routes", async () => {

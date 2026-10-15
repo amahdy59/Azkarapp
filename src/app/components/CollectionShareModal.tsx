@@ -23,11 +23,13 @@ import {
   canCopyImage,
   canShareMultipleFiles,
   copyImageToClipboard,
-  downloadFile,
+  saveFile,
+  shareNativeText,
   shareMultipleFiles,
   shareSingleFile,
 } from "../share/shareDispatcher";
 import { createShareArchive } from "../share/shareArchive";
+import { isNativeAndroid } from "../share/nativeSharing";
 import {
   getCuratedRoutinePack,
   resolveCuratedImageUrl,
@@ -71,6 +73,7 @@ export interface CollectionShareModalProps {
 }
 
 function supportsTextShare(data: ShareData): boolean {
+  if (isNativeAndroid()) return true;
   if (typeof navigator.share !== "function") return false;
   try {
     return typeof navigator.canShare !== "function" || navigator.canShare(data);
@@ -384,6 +387,10 @@ export function CollectionShareModal({
     setStatus(t(language, "shareStudio.copied"));
   };
   const shareText = async (value: string, link = false) => {
+    if (await shareNativeText(link ? { title, url: value } : { title, text: value })) {
+      setStatus(t(language, "shareStudio.shared"));
+      return;
+    }
     if (!supportsTextShare(link ? { title, url: value } : { title, text: value })) {
       await copyText(value);
       return;
@@ -1238,7 +1245,7 @@ export function CollectionShareModal({
             aria-describedby={actionHint ? actionHintId : undefined}
             onClick={() =>
               void run(async () => {
-                downloadFile(
+                await saveFile(
                   mode !== "image"
                     ? new File([payload], "azkar.txt", { type: "text/plain;charset=utf-8" })
                     : isCuratedActive
