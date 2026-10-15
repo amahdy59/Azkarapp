@@ -66,10 +66,12 @@ describe("ReaderScreen audio identity", () => {
       audioPlayer: (onClose: () => void) => <button onClick={onClose}>Stop fixture</button>,
     };
     const { rerender } = render(<ReaderScreen {...props} audioModeActive />);
+    expect(screen.queryByTestId("reader-benefit-dock-button")).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Stop fixture" }));
     expect(screen.queryByTestId("counter-surface")).toBeNull();
     // The reading controls can commit arbitrarily later than the stop action.
     rerender(<ReaderScreen {...props} audioModeActive={false} />);
+    expect(screen.getByTestId("reader-benefit-dock-button")).toBeInTheDocument();
     act(() => frame?.(0));
     expect(screen.getByTestId("counter-surface")).toHaveFocus();
   });

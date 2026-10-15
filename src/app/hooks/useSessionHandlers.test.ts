@@ -112,6 +112,34 @@ beforeEach(() => {
 afterEach(() => vi.useRealTimers());
 
 describe("useSessionHandlers", () => {
+  it("starts a fresh situational session without clearing history or other collections", () => {
+    const items = getAzkarForMode("home", "complete");
+    const { result, onResetPartialCounts } = renderSessionHarness({
+      activeCat: "home",
+      initialView: "completion",
+      completed: createCompleted({ home: new Set(items.map((item) => item.id)), morning: new Set(["kept"]) }),
+    });
+    const history = result.current.sessions;
+    const records = result.current.dailyCompletions;
+    act(() => result.current.handlers.startNewSession("home"));
+    expect(result.current.completed.home.size).toBe(0);
+    expect([...result.current.completed.morning]).toEqual(["kept"]);
+    expect(result.current.sessions).toBe(history);
+    expect(result.current.dailyCompletions).toBe(records);
+    expect(result.current.view).toBe("reader");
+    expect(result.current.index).toBe(0);
+    expect(onResetPartialCounts).toHaveBeenCalledWith(items.map((item) => item.id));
+    for (const [index] of items.entries()) act(() => result.current.handlers.markComplete(index));
+    expect(result.current.sessions).toHaveLength(1);
+  });
+
+  it.each(["morning", "waking_up", "friday_kahf"] as const)("preserves the existing %s reset cycle", (category) => {
+    const { result, onResetPartialCounts } = renderSessionHarness({ activeCat: category });
+    const before = result.current.completed;
+    act(() => result.current.handlers.startNewSession(category));
+    expect(result.current.completed).toBe(before);
+    expect(onResetPartialCounts).not.toHaveBeenCalled();
+  });
   it("preserves the previous completion set and reaches the summary after the first final count", () => {
     const items = getAzkarForMode("morning", "complete");
     const previous = new Set(items.slice(0, -1).map((item) => item.id));

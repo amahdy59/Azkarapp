@@ -26,6 +26,40 @@
   gap: 0.5rem;
   padding: 0.75rem 1rem;
 }
+.home-wird-tile[data-complete="true"]::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 2px solid var(--primary);
+  border-radius: inherit;
+  pointer-events: none;
+}
+.home-wird-completed-badge {
+  position: absolute;
+  top: 12px;
+  inset-inline-end: 12px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  pointer-events: none;
+}
+.home-wird-tile[data-complete="true"] .home-wird-caption > svg {
+  margin-inline-end: 32px;
+}
+@media (forced-colors: active) {
+  .home-wird-completed-badge {
+    background: Highlight;
+    color: HighlightText;
+  }
+  .home-wird-tile[data-complete="true"]::after {
+    border-color: Highlight;
+  }
+}
 .home-wird-photo {
   min-height: 13rem;
   display: flex;

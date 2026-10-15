@@ -3,6 +3,15 @@ import { CATEGORY_IDS, type CategoryId, type DailyCollectionCompletion, type Sto
 
 export { CATEGORY_IDS } from "./types";
 export const MAIN_CATEGORY_IDS: CategoryId[] = ["morning", "evening", "before_sleep"];
+/** Event-based collections start again explicitly, independently of the daily/Friday clocks. */
+export const SITUATIONAL_SESSION_CATEGORY_IDS: readonly CategoryId[] = [
+  "home",
+  "travel",
+  "distress_anxiety",
+  "mosque",
+  "food_drink",
+  "illness_ruqyah",
+];
 /**
  * Collections whose reset is governed by their own cycle, not the day boundary.
  *
@@ -499,7 +508,7 @@ export function getGardenSummary(
   };
 }
 
-/** Clears only fully completed collections from an older progress day; partial reading progress remains resumable. */
+/** Clears stale full collections, except explicit-session and Friday-cycle progress; partial reading remains resumable. */
 export function resetStaleCompletedCollections(
   completed: Record<CategoryId, Set<string>>,
   records: DailyCollectionCompletion[],
@@ -510,8 +519,8 @@ export function resetStaleCompletedCollections(
 
   return Object.fromEntries(
     CATEGORY_IDS.map((category) => {
-      // Its own cycle owns it; the day boundary must not also clear it.
-      if (CYCLE_GOVERNED_CATEGORY_IDS.includes(category)) {
+      // Its own cycle or an explicit new-session action owns this progress.
+      if (CYCLE_GOVERNED_CATEGORY_IDS.includes(category) || SITUATIONAL_SESSION_CATEGORY_IDS.includes(category)) {
         return [category, new Set(completed[category] ?? [])];
       }
       const catDayKey = getProgressDayKey(now, boundaryHour, category);

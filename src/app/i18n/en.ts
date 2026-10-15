@@ -324,6 +324,7 @@ const en = {
     adhkarSummary: "After-Prayer Adhkar",
   },
   wirdBenefits: {
+    shareEvidence: "Share evidence",
     title: "Why a daily wird",
     subtitle: "The case for keeping a daily portion — with its evidence",
     quran: "Qur'an",
@@ -1098,6 +1099,8 @@ const en = {
     daysOfSeven: " of 7",
     sessionSummary: "Session summary",
     returnHome: "Home",
+    newSession: "Start new session",
+    done: "Done",
     share: "Share this completion",
     shareText: "I completed {category} — Masha’Allah!",
     shareSuccess: "Shared.",
@@ -2236,6 +2239,8 @@ const en = {
     alternativeHint: "You can also choose Text or Link above.",
     languageHint:
       "Card labels only. English translation is a separate addition. Word meanings are available in Arabic only.",
+    evidenceLanguageHint:
+      "Choose the quotation and source language. Quranic text stays Arabic; its English translation is an optional addition.",
     sizeHint: "Choose the shape that suits your destination.",
     sizeUnavailable: "Unavailable: complete text and additions do not fit.",
     storyHint: "Vertical image for a status or story",

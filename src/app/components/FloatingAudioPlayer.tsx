@@ -599,20 +599,34 @@ export function FloatingAudioPlayer({
         <span id={compactDescriptionId} className="sr-only">
           {title} · {reciterDisplayName} · {positionChip}
         </span>
-        <div
-          data-testid="audio-compact-progress"
-          className="audio-compact-progress"
-          dir={direction}
-          role="progressbar"
-          aria-label={t(language, "audioPlayer.sessionProgress")}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={Math.round(progressPercent)}
-          aria-valuetext={accessibleTime(state.currentTime, state.duration, language)}
-        >
-          <div data-testid="audio-compact-waveform" className="h-0.5 w-full overflow-hidden rounded-full bg-muted">
-            <div className="h-full bg-primary" style={{ width: `${progressPercent}%` }} />
-          </div>
+        <div data-testid="audio-compact-progress" className="audio-compact-progress" dir={direction}>
+          <span dir="ltr" className="text-xs tabular-nums text-muted-foreground">
+            <span className="sr-only">{t(language, "audioPlayer.elapsed")}: </span>
+            {formatTime(state.currentTime, language)}
+          </span>
+          <input
+            type="range"
+            min={0}
+            max={Math.max(0, state.duration)}
+            step="any"
+            value={Math.min(state.currentTime, state.duration || 0)}
+            disabled={state.duration <= 0}
+            onChange={(event) => controller.seek(Number(event.currentTarget.value))}
+            onKeyDown={handleTimelineKeyDown}
+            aria-label={t(language, "audioPlayer.seek")}
+            aria-keyshortcuts="PageUp PageDown Home End"
+            aria-valuetext={accessibleTime(state.currentTime, state.duration, language)}
+            style={
+              {
+                "--audio-range-fill": `linear-gradient(to ${direction === "rtl" ? "left" : "right"}, var(--primary) ${progressPercent}%, var(--muted-foreground) ${progressPercent}%)`,
+              } as CSSProperties
+            }
+            className="audio-timeline-range audio-compact-range min-w-0 flex-1 cursor-pointer appearance-none rounded-lg accent-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:cursor-default disabled:opacity-50"
+          />
+          <span dir="ltr" className="text-xs tabular-nums text-muted-foreground">
+            <span className="sr-only">{t(language, "audioPlayer.totalTime")}: </span>
+            {formatTime(state.duration, language)}
+          </span>
         </div>
       </div>
     </motion.section>

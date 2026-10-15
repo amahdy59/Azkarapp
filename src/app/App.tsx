@@ -84,6 +84,7 @@ import { usePwaLifecycle } from "./hooks/usePwaLifecycle";
 import { useAppStatePersistence } from "./hooks/useAppStatePersistence";
 import {
   getPalmStreakSummary,
+  SITUATIONAL_SESSION_CATEGORY_IDS,
   getFirstIncompleteZikrIndex,
   getNextIncompleteZikrIndex,
   millisecondsUntilNextProgressDay,
@@ -849,6 +850,7 @@ function AppContent({
     openReader,
     resumeCategory,
     repeatCategory,
+    startNewSession,
     leaveReader,
     viewAllAzkar,
     toggleSavedZikr,
@@ -2066,7 +2068,8 @@ function AppContent({
                       openReader(activeCat, 0);
                       return;
                     }
-                    repeatCategory(activeCat);
+                    if (SITUATIONAL_SESSION_CATEGORY_IDS.includes(activeCat)) startNewSession(activeCat);
+                    else repeatCategory(activeCat);
                   }}
                   onBack={pop}
                   onPlayAllAudio={
@@ -2133,14 +2136,7 @@ function AppContent({
                         true,
                       );
                     } else {
-                      showConfirm(
-                        t(selectedLang, "category.resetConfirmTitle"),
-                        t(selectedLang, "category.resetConfirm"),
-                        t(selectedLang, "common.reset"),
-                        t(selectedLang, "common.cancel"),
-                        () => handleResetCategory(activeCat, activeSubCategory),
-                        true,
-                      );
+                      handleResetCategory(activeCat, activeSubCategory);
                     }
                   }}
                   onRepeat={() => {
@@ -2149,7 +2145,8 @@ function AppContent({
                       openReader(activeCat, 0);
                       return;
                     }
-                    repeatCategory(activeCat);
+                    if (SITUATIONAL_SESSION_CATEGORY_IDS.includes(activeCat)) startNewSession(activeCat);
+                    else repeatCategory(activeCat);
                   }}
                   onUncomplete={(i) => {
                     if (fridayDuaFlow && activeCat === "comprehensive_duas") {
@@ -2295,6 +2292,9 @@ function AppContent({
                   quietProgressEnabled={quietProgressEnabled}
                   progressDayStartHour={progressDayStartHour}
                   onHome={goHome}
+                  onNewSession={
+                    SITUATIONAL_SESSION_CATEGORY_IDS.includes(activeCat) ? () => startNewSession(activeCat) : undefined
+                  }
                   language={selectedLang}
                   direction={layoutDirection}
                   completionLevel={activeRoutineMode}

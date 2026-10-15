@@ -36,8 +36,8 @@ html[data-mushaf-focus="true"] .floating-audio-player {
   display: grid;
   grid-template-columns: 44px minmax(0, 1fr) 48px 44px;
   align-items: center;
-  gap: 4px;
-  padding: 8px;
+  gap: 8px;
+  padding: 8px 12px 0;
 }
 
 .audio-compact-row > button:not(.audio-compact-context),
@@ -65,14 +65,18 @@ html[data-mushaf-focus="true"] .floating-audio-player {
   position: relative;
   display: flex;
   align-items: center;
-  height: 2px;
-  margin: 0 16px 8px;
+  gap: 8px;
+  min-height: 44px;
+  margin: 4px 16px 8px;
 }
-
-.audio-compact-progress .audio-seek-waveform > span,
-.audio-compact-progress .audio-seek-waveform-played > span {
-  width: 2px;
-  flex: 0 0 2px;
+.audio-compact-range {
+  height: 44px;
+  touch-action: pan-y;
+}
+@media (forced-colors: active) {
+  .audio-compact-range {
+    appearance: auto;
+  }
 }
 
 @container audio-dock (max-width: 24rem) {

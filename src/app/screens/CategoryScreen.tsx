@@ -29,6 +29,7 @@ import { ScreenContainer } from "../components/ScreenContainer";
 import { AzkarListLayout } from "../components/AzkarListLayout";
 import { AzkarListItem } from "../components/AzkarListItem";
 import { isPrayerName } from "../content/prayerTimes";
+import { SITUATIONAL_SESSION_CATEGORY_IDS } from "../progress";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -273,13 +274,27 @@ export function CategoryScreen({
                 >
                   {isArabic ? (
                     <>
-                      <span className="text-subtitle font-bold leading-none">{t(language, "category.readAgain")}</span>
+                      <span className="text-subtitle font-bold leading-none">
+                        {t(
+                          language,
+                          SITUATIONAL_SESSION_CATEGORY_IDS.includes(catId)
+                            ? "completion.newSession"
+                            : "category.readAgain",
+                        )}
+                      </span>
                       <RefreshCw size={18} className="shrink-0" aria-hidden="true" />
                     </>
                   ) : (
                     <>
                       <RefreshCw size={18} className="shrink-0" aria-hidden="true" />
-                      <span className="text-subtitle font-bold leading-none">{t(language, "category.readAgain")}</span>
+                      <span className="text-subtitle font-bold leading-none">
+                        {t(
+                          language,
+                          SITUATIONAL_SESSION_CATEGORY_IDS.includes(catId)
+                            ? "completion.newSession"
+                            : "category.readAgain",
+                        )}
+                      </span>
                     </>
                   )}
                 </button>

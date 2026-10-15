@@ -411,12 +411,12 @@ describe("AudioProvider integration", () => {
     expect(await screen.findByRole("region", { name: "Audio player" })).toBeInTheDocument();
 
     expect(screen.getByRole("button", { name: "Expand player" })).toBeInTheDocument();
-    expect(screen.getByRole("progressbar", { name: "Listening progress" })).toHaveAttribute("aria-valuenow", "0");
+    expect(screen.getByRole("slider", { name: "Seek audio" })).toHaveValue("0");
 
     // Playback starts compact so it does not obscure the screen.
     fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
     expect(screen.getByRole("button", { name: "Minimize player" })).toBeInTheDocument();
-    expect(screen.queryByRole("progressbar", { name: "Listening progress" })).not.toBeInTheDocument();
+    expect(screen.queryByTestId("audio-compact-progress")).not.toBeInTheDocument();
     expect(screen.getByRole("slider", { name: "Seek audio" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Forward 10 seconds" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Rewind 10 seconds" })).toBeInTheDocument();

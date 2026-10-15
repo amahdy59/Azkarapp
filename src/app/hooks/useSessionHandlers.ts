@@ -13,6 +13,7 @@ import { getAzkarForMode, getAzkarForPrayer, isRoutineCategory } from "../conten
 import { isPrayerName } from "../content/prayerTimes";
 import {
   getFirstIncompleteZikrIndex,
+  SITUATIONAL_SESSION_CATEGORY_IDS,
   getNextIncompleteIndex,
   getNextIncompleteZikrIndex,
   recordDailyCollectionCompletion,
@@ -189,6 +190,24 @@ export function useSessionHandlers({
       onResetSurahPages?.(surahIds);
     }
     openReader(catId, 0, undefined, subCat);
+  };
+
+  // A new situational session replaces its current tally, never its history.
+  const startNewSession = (catId: CategoryId) => {
+    if (!SITUATIONAL_SESSION_CATEGORY_IDS.includes(catId)) return;
+    const azkar = sessionAzkar(catId, "complete", undefined);
+    onResetPartialCounts?.(azkar.map((zikr) => prefixZikrId(catId, zikr.id)));
+    const surahIds = azkar.filter(isLongSurah).map((zikr) => zikr.id);
+    if (surahIds.length) onResetSurahPages?.(surahIds);
+    setCompleted((previous) => ({ ...previous, [catId]: new Set() }));
+    setIsRepeatSession(false);
+    setRepeatCompleted(new Set());
+    setActiveCat(catId);
+    setActiveSubCategory(undefined);
+    setActiveIdx(0);
+    setSessionStart(Date.now());
+    readerOpenedFromCategoryRef.current = false;
+    setView("reader");
   };
 
   const leaveReader = () => {
@@ -394,6 +413,7 @@ export function useSessionHandlers({
     openReader,
     resumeCategory,
     repeatCategory,
+    startNewSession,
     leaveReader,
     viewAllAzkar,
     toggleSavedZikr,

@@ -13,7 +13,7 @@ import {
 import "../../styles/animations/ZikrAnimations.css";
 import "./ReaderScreen.css";
 import { useZikrCounter } from "../hooks/useZikrCounter";
-import { prefixZikrId } from "../progress";
+import { prefixZikrId, SITUATIONAL_SESSION_CATEGORY_IDS } from "../progress";
 import { useCounterClickFeedback } from "../hooks/useCounterClickFeedback";
 import { useSwipeGestures } from "../hooks/useSwipeGestures";
 import { useMediaQuery } from "../hooks/useMediaQuery";
@@ -1024,7 +1024,12 @@ export function ReaderScreen({
                 className="interactive-elem flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-lg border border-primary/40 bg-primary/10 px-4 text-sm font-bold text-primary shadow-xs transition-colors hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
               >
                 <RefreshCw size={16} className="shrink-0" aria-hidden="true" />
-                <span>{t(language, "category.readAgain")}</span>
+                <span>
+                  {t(
+                    language,
+                    SITUATIONAL_SESSION_CATEGORY_IDS.includes(catId) ? "completion.newSession" : "category.readAgain",
+                  )}
+                </span>
               </button>
             ) : (
               <button
@@ -1250,12 +1255,7 @@ export function ReaderScreen({
           : isValidElement(audioPlayer) && typeof audioPlayer.type !== "string"
             ? cloneElement(audioPlayer as React.ReactElement<Record<string, unknown>>, { dockSlots: {}, onClose })
             : audioPlayer;
-      return (
-        <>
-          {!longSurah && <DevotionalFooter>{renderBenefitDockButton()}</DevotionalFooter>}
-          {player}
-        </>
-      );
+      return player;
     }
 
     if (audioModeActive) {

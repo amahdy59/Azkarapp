@@ -925,7 +925,7 @@ export function HomeScreen({
                     type="button"
                     onClick={onOpenQibla}
                     data-testid="home-tool-qibla"
-                    className={`group flex items-center justify-between gap-4 rounded-3xl p-4.5 text-start transition-[background-color,border-color,transform] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                    className={`group flex items-center justify-between gap-4 rounded-3xl px-4 py-3 text-start transition-[background-color,border-color,transform] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                       homeVisualEffects
                         ? "hero-glass home-glass-surface text-on-media hover:border-white/30"
                         : "border border-border bg-card text-foreground shadow-raised hover:bg-muted"
@@ -972,7 +972,7 @@ export function HomeScreen({
                     type="button"
                     onClick={onOpenMasbaha}
                     data-testid="home-tool-masbaha"
-                    className={`group flex items-center justify-between gap-4 rounded-3xl p-4.5 text-start transition-[background-color,border-color,transform] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                    className={`group flex items-center justify-between gap-4 rounded-3xl px-4 py-3 text-start transition-[background-color,border-color,transform] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                       homeVisualEffects
                         ? "hero-glass home-glass-surface text-on-media hover:border-white/30"
                         : "border border-border bg-card text-foreground shadow-raised hover:bg-muted"

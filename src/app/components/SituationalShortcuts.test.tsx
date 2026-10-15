@@ -22,6 +22,8 @@ describe("situational shortcuts", () => {
     expect(screen.getByRole("heading", { name: "أذكار لمواقف يومك" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "أذكار الكرب والهم" })).toHaveTextContent("الكرب والهم");
     expect(screen.getByRole("link", { name: "أذكار المنزل" })).toHaveTextContent("المنزل");
+    fireEvent.click(screen.getByRole("button", { name: "عرض الكل" }));
+    expect(screen.getByRole("link", { name: "أذكار الطعام" })).toHaveTextContent("أذكار الطعام");
     expect(screen.getByRole("link", { name: "أذكار الكرب والهم" })).toHaveAttribute(
       "href",
       "#/azkar/distress-anxiety/1",

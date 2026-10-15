@@ -40,6 +40,7 @@ export function CompletionScreen({
   direction,
   completionLevel = "complete",
   onContinueComplete,
+  onNewSession,
   reduceMotion = false,
   hapticFeedback = true,
 }: {
@@ -54,6 +55,7 @@ export function CompletionScreen({
   direction: "ltr" | "rtl";
   completionLevel?: RoutineMode;
   onContinueComplete?: () => void;
+  onNewSession?: () => void;
   reduceMotion?: boolean;
   hapticFeedback?: boolean;
 }) {
@@ -238,8 +240,18 @@ export function CompletionScreen({
               onClick={onHome}
               className="flex min-h-[48px] items-center justify-center gap-2 rounded-xl bg-primary px-4 font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
-              <Home size={18} /> {t(language, "completion.returnHome")}
+              <Home size={18} aria-hidden="true" />{" "}
+              {t(language, onNewSession ? "completion.done" : "completion.returnHome")}
             </button>
+            {onNewSession && (
+              <button
+                type="button"
+                onClick={onNewSession}
+                className="flex min-h-12 items-center justify-center rounded-xl border border-border-control bg-card px-4 font-bold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              >
+                {t(language, "completion.newSession")}
+              </button>
+            )}
             <button
               type="button"
               onClick={() => void share()}

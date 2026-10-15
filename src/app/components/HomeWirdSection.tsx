@@ -101,6 +101,7 @@ export function HomeWirdSection({
             data-recommended-now={id === recommendedCategoryId && !complete ? "true" : undefined}
             data-testid="wird-category-card"
             data-category={id}
+            data-complete={complete ? "true" : undefined}
             data-images={showImages ? "true" : "false"}
             className={`home-wird-tile focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 ${showImages ? "home-wird-photo" : onGlass ? "hero-glass home-glass-surface" : "border border-border bg-card text-foreground"}`}
           >
@@ -111,6 +112,11 @@ export function HomeWirdSection({
                 loading="lazy"
                 className="home-wird-photo-image"
               />
+            )}
+            {complete && (
+              <span className="home-wird-completed-badge" aria-hidden="true">
+                <Check size={16} strokeWidth={3} />
+              </span>
             )}
             <div
               className={`home-wird-caption ${showImages ? (onGlass ? "hero-glass home-glass-surface" : "home-wird-photo-solid") : ""}`}
@@ -126,7 +132,6 @@ export function HomeWirdSection({
                   <span className="text-sm text-muted-foreground">{status}</span>
                 </span>
                 <span className="flex shrink-0 items-center gap-2" aria-hidden="true">
-                  {complete && <Check size={18} />}
                   <ChevronNext size={18} data-rtl-flip />
                 </span>
               </span>

@@ -105,12 +105,10 @@ for (const scenario of [
       expect(compact.closeAtStart).toBe(!arabic);
       expect(compact.expandAtEnd).toBe(!arabic);
       expect(compact.overflow).toBeLessThanOrEqual(1);
-      await expect(player.getByTestId("audio-compact-waveform")).toBeVisible();
-      const stripVisible = await player.getByRole("progressbar").isVisible();
-      const seekVisible = await player
-        .getByRole("slider", { name: arabic ? "تقديم أو تأخير الصوت" : "Seek audio" })
-        .isVisible();
-      expect(Number(stripVisible) + Number(seekVisible)).toBe(1);
+      const seek = player.getByRole("slider", { name: arabic ? "تقديم أو تأخير الصوت" : "Seek audio" });
+      await expect(seek).toBeVisible();
+      await expect(player.getByRole("slider")).toHaveCount(1);
+      expect((await seek.boundingBox())!.height).toBeGreaterThanOrEqual(44);
     };
     await checkCompactContainment();
     if (scenario.width >= 1200) {
