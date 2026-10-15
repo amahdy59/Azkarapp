@@ -137,6 +137,10 @@ public class NativeSharingPlugin extends Plugin {
     }
 
     private void saveToDownloads(PluginCall call, String name, String mimeType, byte[] contents) throws Exception {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            call.reject("Direct Downloads export requires Android 10 or later.");
+            return;
+        }
         ContentValues values = new ContentValues();
         values.put(MediaStore.Downloads.DISPLAY_NAME, name);
         values.put(MediaStore.Downloads.MIME_TYPE, mimeType);

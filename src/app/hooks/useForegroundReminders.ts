@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { isNativeAndroid } from "../native/platform";
+import { isNativeAndroid, rescheduleNativeReminders } from "@azkar/native-reminders";
 import { readNotificationPermission, showBrowserNotification } from "../notifications";
 import { getEstimatedPrayerTimes, PRAYER_NAMES, type PrayerTimes } from "../content/prayerTimes";
 import { t } from "../i18n";
@@ -18,6 +18,8 @@ import type {
 const REMINDER_HISTORY_KEY = "azkarapp.foreground-reminders.v1";
 const REMINDER_WINDOW_MS = 5 * 60_000;
 const MAX_TIMEOUT_MS = 2_147_000_000;
+
+export { getUpcomingNativeReminders } from "@azkar/native-reminders";
 
 type RoutineReminderKind = "morning" | "evening" | "before_sleep" | "after_prayer";
 type ReminderHistoryKey = RoutineReminderKind | `prayer:${PrayerName}`;
@@ -225,7 +227,10 @@ export function useForegroundReminders({
   location?: LocationSettings;
 }) {
   useEffect(() => {
-    if (isNativeAndroid()) return;
+    if (isNativeAndroid()) {
+      void rescheduleNativeReminders(reminders, dailyCompletions, language, location);
+      return;
+    }
     let isDelivering = false;
     let cancelled = false;
     let timerId: number | undefined;
