@@ -1,3 +1,4 @@
+import { displayLocationName } from "../content/prayerLocations";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { scheduleIdleAfterPaint } from "../startupMaintenance";
 import { ArrowNext, Compass, Sparkles, Zap } from "../components/icons";
@@ -947,7 +948,7 @@ export function HomeScreen({
                         </span>
                         <span className="block text-micro font-semibold text-muted-foreground">
                           {locationSettings?.latitude != null && locationSettings?.longitude != null
-                            ? `${locationSettings.cityName || t(language, "qibla.currentLocation")} · ${formatNumerals(
+                            ? `${displayLocationName(locationSettings, language) || t(language, "qibla.currentLocation")} · ${formatNumerals(
                                 Math.round(getQiblaBearing(locationSettings.latitude, locationSettings.longitude)),
                                 language,
                               )}°`

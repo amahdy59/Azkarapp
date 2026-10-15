@@ -26,8 +26,9 @@
     </style>
   </head>
   <body>
+    <p><a href="#arabic" lang="ar">العربية</a></p>
     <h1>wa-zaker Privacy Policy</h1>
-    <p>Last updated: 22 September 2026</p>
+    <p>Last updated: 15 October 2026</p>
     <h2>Guest use</h2>
     <p>
       wa-zaker can be used without an account. Guest progress and preferences stay in browser storage on the device.
@@ -35,16 +36,24 @@
     </p>
     <h2>Privacy-safe visitor count</h2>
     <p>
-      The Home screen may show an aggregate visitor count. Cloudflare hashes a short-lived visitor fingerprint at the
-      edge using a private salt and stores only the resulting hash and first-seen time. Raw IP addresses and browser
-      identifiers are not stored, and this counter is not used for advertising or behavioural profiles. The estimate can
-      undercount shared networks and can be affected by automated traffic.
+      The Home screen may show the number of active visitors. While the app is visible, a heartbeat sends a random
+      identifier stored on this device. Cloudflare stores a privately salted hash with first- and last-seen times;
+      inactive presence records are deleted after 24 hours. The application does not store raw IP addresses for this
+      counter or use it for advertising. Hosting providers process network requests to operate their services.
     </p>
     <h2>QR device pairing</h2>
     <p>
-      If you choose QR pairing, Cloudflare stores a device credential hash and an encrypted-at-rest progress snapshot.
-      Pairing codes expire after five minutes and are single-use. The QR code does not contain your progress or a
-      password. You can clear the local device credential from browser storage or unlink the device through support.
+      If you choose QR pairing, Cloudflare stores a device credential hash and a sanitized progress snapshot, excluding
+      profile information and precise coordinates. Pairing codes expire after five minutes and are single-use. The QR
+      code does not contain your progress or a password. Use Settings → Account &amp; data to unlink this device.
+      Unlinking the last device deletes that Cloudflare account and its snapshot; other linked devices otherwise remain
+      linked.
+    </p>
+    <h2>Android widgets and reminders</h2>
+    <p>
+      Android stores a small local projection of prayer times, reading position and counter state for widgets, plus a
+      queue of scheduled reminders. These native services do not upload coordinates or account credentials. Notification
+      access is opt-in; device notification and battery settings affect delivery.
     </p>
     <h2>Optional accounts</h2>
     <p>
@@ -67,5 +76,33 @@
       account, can be sent to <a href="mailto:amahdy59@yahoo.com">amahdy59@yahoo.com</a>.
     </p>
     <p>This policy is governed by the laws of the Arab Republic of Egypt.</p>
+    <section id="arabic" lang="ar" dir="rtl" aria-labelledby="privacy-ar">
+      <h2 id="privacy-ar">سياسة خصوصية وَذَكِّرْ</h2>
+      <p>
+        آخر تحديث: ١٥ أكتوبر ٢٠٢٦. المسؤول عن البيانات: أحمد مهدي (Ahmed Mahdy). تخضع هذه السياسة لقوانين جمهورية مصر
+        العربية.
+      </p>
+      <h3>البيانات المحلية والحضور</h3>
+      <p>
+        يمكنك استخدام التطبيق دون حساب. تُحفظ التفضيلات والتقدم محليًا، وتبقى إحداثيات الصلاة على الجهاز دون مزامنتها.
+        أثناء ظهور التطبيق تُرسل إشارة حضور بمعرّف عشوائي محلي. تحفظ Cloudflare تجزئة مملّحة له وأوقات أول وآخر ظهور،
+        وتحذف سجلات الحضور غير النشطة بعد ٢٤ ساعة. لا يحفظ التطبيق عناوين IP الخام لهذا العداد ولا يستخدمه للإعلانات.
+        يعالج مزودو الاستضافة طلبات الشبكة لتشغيل خدماتهم.
+      </p>
+      <h3>الربط والحسابات الاختيارية</h3>
+      <p>
+        يحفظ ربط QR تجزئة اعتماد الجهاز ونسخة تقدم دون بيانات الملف الشخصي أو الإحداثيات. رمز الربط صالح لخمس دقائق
+        ولمرة واحدة. يمكنك فك ربط الجهاز من الحساب والبيانات؛ يُحذف حساب Cloudflare ونسخته عند فك آخر جهاز، وتظل الأجهزة
+        الأخرى مرتبطة خلاف ذلك. يستخدم تسجيل الدخول الاختياري Supabase لحفظ هوية الحساب والتقدم والعناصر المحفوظة
+        والجلسات والتفضيلات. يتولى مزود تسجيل الدخول بياناته وفق سياسته، ولا يتلقى التطبيق كلمة مروره.
+      </p>
+      <h3>أندرويد والحذف</h3>
+      <p>
+        يحفظ أندرويد نسخة محلية مختصرة للأدوات وتذكيرات مجدولة، ولا ترسل هذه الخدمات الإحداثيات أو بيانات اعتماد الحساب.
+        الإشعارات اختيارية وتعتمد على أذونات الجهاز وإعدادات البطارية. يمكنك تصدير البيانات وحذف الحساب من الإعدادات.
+        يحذف حذف الحساب مستخدم Supabase وسجلاته المرتبطة، ويظل حذف البيانات المحلية وفك ربط QR إجراءين منفصلين.
+      </p>
+      <p>للاستفسار أو طلب الحذف: <a href="mailto:amahdy59@yahoo.com">amahdy59@yahoo.com</a>.</p>
+    </section>
   </body>
 </html>

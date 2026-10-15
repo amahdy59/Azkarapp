@@ -333,53 +333,52 @@ test("time-of-day imagery has no decorative overlay layer", async ({ page }) => 
   expect(imageWidth).toBeGreaterThan(0);
 });
 
-test.skip("post-prayer cards hide what cannot be acted on and stay equal height", async ({ page }) => {
+test("post-prayer summaries disclose all prayers and preserve actionable tracking", async ({ page }) => {
+  await page.clock.setFixedTime(new Date("2026-09-05T13:40:00+03:00"));
   await seedAndOpen(page);
-
-  const tracker = page.getByTestId("after-prayer-trackers");
   const grid = page.getByTestId("prayer-tracker-cards");
-  const cards = grid.locator("article[data-prayer-state]");
-
-  await expect(tracker).toBeVisible();
-
-  /* Now that it's a carousel, we render all 5 cards on all viewports,
-     and rely on CSS snapping and JS scrolling to show the relevant ones.
-     The 'Show More' toggle has been removed. */
-  const collapsedStates = await cards.evaluateAll((nodes) =>
-    nodes.map((node) => (node as HTMLElement).dataset.prayerState),
-  );
-  expect(collapsedStates).toContain("next");
-  expect(collapsedStates.length).toBe(5);
-
-  const toggle = page.getByTestId("prayer-show-upcoming");
-  await expect(toggle).toHaveCount(0);
-
-  const metrics = await grid.evaluate((element) => {
-    const all = [...element.querySelectorAll("article[data-prayer-state]")];
-    const offsetsWithin = (card: Element) => {
+  const cards = grid.locator('article[data-density="summary"]');
+  await expect(cards).toHaveCount(2);
+  const toggle = page.getByRole("button", { name: "Show all prayers", exact: true });
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await toggle.click();
+  await expect(cards).toHaveCount(5);
+  const future = cards.filter({ has: page.locator("button:disabled") });
+  await expect(future).not.toHaveCount(0);
+  for (const card of await future.all()) {
+    await expect(card.locator('input[type="checkbox"]')).toHaveCount(0);
+    await expect(card.getByRole("button")).toBeDisabled();
+  }
+  const geometry = await cards.evaluateAll((nodes) =>
+    nodes.map((card) => {
       const top = card.getBoundingClientRect().top;
-      const at = (selector: string) => {
-        const node = card.querySelector(selector);
-        return node ? Math.round(node.getBoundingClientRect().top - top) : -1;
-      };
-      return [at("h3"), at('[data-testid^="prayer-status-"]'), at("hr"), at("fieldset")].join("|");
-    };
-    return {
-      heights: [...new Set(all.map((card) => Math.round(card.getBoundingClientRect().height)))],
-      layouts: [...new Set(all.map(offsetsWithin))],
-      checkboxCount: element.querySelectorAll('input[type="checkbox"]').length,
-      radioCount: element.querySelectorAll('input[type="radio"]').length,
-      fieldsets: element.querySelectorAll("fieldset").length,
-    };
-  });
-
-  // Two independent checkboxes per prayer, never radios, each in its own fieldset.
-  expect(metrics.checkboxCount).toBe(10);
-  expect(metrics.radioCount).toBe(0);
-  expect(metrics.fieldsets).toBe(5);
-  // Identical height and identical internal vertical positions whatever the state.
-  expect(metrics.heights).toHaveLength(1);
-  expect(metrics.layouts).toHaveLength(1);
+      const heading = card.querySelector("h3")!;
+      const time = card.querySelector('[id^="prayer-summary-time-"]')!;
+      const status = card.querySelector('[id^="prayer-summary-status-"]')!;
+      return [
+        card.getBoundingClientRect().height,
+        heading.getBoundingClientRect().top - top,
+        time.getBoundingClientRect().top - top,
+        status.getBoundingClientRect().top - top,
+      ]
+        .map(Math.round)
+        .join("|");
+    }),
+  );
+  expect(new Set(geometry).size).toBe(1);
+  // Tracking now belongs to the expanded actionable prayer, rather than five duplicated fieldsets.
+  const currentCard = grid.locator('article[data-prayer-state="current"]');
+  if (await currentCard.count()) {
+    const button = currentCard.getByRole("button");
+    if ((await button.getAttribute("aria-expanded")) !== "true") await button.click();
+  }
+  const panel = page.getByTestId("home-prayer-moment");
+  await expect(panel).toBeVisible();
+  const inputs = panel.locator('input[type="checkbox"]');
+  expect(await inputs.count()).toBeGreaterThanOrEqual(2);
+  await expect(panel.locator('input[type="radio"]')).toHaveCount(0);
+  await expect(page.getByTestId("prayer-open-adhkar")).toBeEnabled();
+  await expectNoHorizontalOverflow(page, "current prayer disclosure");
 });
 
 test("forced colors preserves focus and selected-state cues", async ({ page }) => {

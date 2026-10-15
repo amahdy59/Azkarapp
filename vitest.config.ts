@@ -74,16 +74,13 @@ export default defineConfig({
           lines: 70,
         },
         "src/lib/auth.ts": {
-          // auth.ts is 555 lines; unit tests cover only the exported
-          // OTP / OAuth / session / profile / settings surface. The large
-          // async sync, pagination, and merge functions (lines 200–555)
-          // require a live Supabase instance and are exercised by E2E
-          // smoke tests rather than unit tests. Threshold reflects the
-          // measured unit-test coverage for this file.
-          statements: 3,
-          branches: 0,
-          functions: 9,
-          lines: 3,
+          // Deterministic boundary tests cover hydration, owner scoping,
+          // keyset pagination, missing-table recovery and write failures.
+          // Live provider/RLS acceptance remains a separate release check.
+          statements: 65,
+          branches: 70,
+          functions: 55,
+          lines: 70,
         },
       },
     },

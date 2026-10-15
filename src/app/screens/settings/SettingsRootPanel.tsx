@@ -1,3 +1,4 @@
+import { displayLocationName } from "../../content/prayerLocations";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   Bell,
@@ -128,7 +129,7 @@ export function SettingsRootPanel({
       id: "location",
       icon: <MapPin size={20} className="text-primary" />,
       title: t(language, "settings.prayerTimesAndLocation"),
-      description: locationSettings?.cityName || t(language, "settings.locationNotSet"),
+      description: displayLocationName(locationSettings, language) || t(language, "settings.locationNotSet"),
       keywords: [
         "location",
         "city",
@@ -338,7 +339,7 @@ export function SettingsRootPanel({
       id: "prayer",
       title: t(language, "settings.prayerReminders"),
       icon: <Bell size={20} className="text-primary" />,
-      value: locationSettings?.cityName,
+      value: displayLocationName(locationSettings, language),
     },
     {
       id: "audio",

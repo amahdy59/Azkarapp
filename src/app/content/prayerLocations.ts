@@ -1,4 +1,18 @@
 import { matchesSearch, normalizeSearchText } from "./searchNormalization";
+import type { AppLanguage, LocationSettings } from "../types";
+
+/** Localize recognized presets without relabeling a custom location with the same city name. */
+export function displayLocationName(location: LocationSettings | undefined, language: AppLanguage): string | undefined {
+  if (!location?.cityName) return undefined;
+  const preset = PRAYER_LOCATION_PRESETS.find(
+    (entry) =>
+      [entry.nameEnglish, entry.nameArabic].includes(location.cityName!) &&
+      entry.latitude === location.latitude &&
+      entry.longitude === location.longitude &&
+      entry.timeZone === location.timeZone,
+  );
+  return preset ? (language === "ar" ? preset.nameArabic : preset.nameEnglish) : location.cityName;
+}
 
 export interface PrayerLocationPreset {
   id: string;

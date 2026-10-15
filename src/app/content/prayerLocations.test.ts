@@ -1,7 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { PRAYER_LOCATION_PRESETS, searchPrayerLocations } from "./prayerLocations";
+import { PRAYER_LOCATION_PRESETS, searchPrayerLocations, displayLocationName } from "./prayerLocations";
 
 describe("searchPrayerLocations", () => {
+  it("localizes known coordinates while preserving custom location names", () => {
+    const preset = PRAYER_LOCATION_PRESETS.find(({ id }) => id === "cairo")!;
+    const location = { ...preset, cityName: preset.nameEnglish, calculationMethod: 5, autoDetect: false };
+    expect(displayLocationName(location, "ar")).toBe(preset.nameArabic);
+    expect(displayLocationName({ ...location, latitude: 0 }, "ar")).toBe("Cairo");
+    expect(displayLocationName({ ...location, cityName: "My home" }, "ar")).toBe("My home");
+  });
   it("offers useful offline defaults when the query is empty", () => {
     expect(searchPrayerLocations("").map((location) => location.id)).toEqual([
       "makkah",

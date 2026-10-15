@@ -1,3 +1,4 @@
+import { displayLocationName } from "../../content/prayerLocations";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Header } from "../../components/LayoutShells";
@@ -291,7 +292,7 @@ export function SettingsScreen({
         return (
           <PrayerSettingsPanel
             language={language}
-            cityName={locationSettings?.cityName}
+            cityName={displayLocationName(locationSettings, language)}
             focusOnMount={
               returnFocusSub === "location" || returnFocusSub === "notifications" ? returnFocusSub : undefined
             }

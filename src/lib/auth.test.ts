@@ -11,10 +11,13 @@ import {
   signOutSupabase,
   subscribeToAuthChanges,
   verifyEmailOtp,
+  loadRemoteState,
+  syncRemoteState,
 } from "./auth";
 import { DEFAULT_APP_STATE } from "../app/state";
 
 const authMocks = vi.hoisted(() => ({
+  from: vi.fn(),
   getSession: vi.fn(),
   onAuthStateChange: vi.fn(),
   signInWithOAuth: vi.fn(),
@@ -25,7 +28,7 @@ const authMocks = vi.hoisted(() => ({
 
 vi.mock("./supabase", () => ({
   getAuthCallbackUrl: () => "https://example.com/?view=auth-callback",
-  getSupabaseClient: async () => ({ auth: authMocks }),
+  getSupabaseClient: async () => ({ auth: authMocks, from: authMocks.from }),
   isSupabaseConfigured: true,
 }));
 
@@ -188,5 +191,108 @@ describe("remote settings", () => {
 
   it("tags synced partial progress with the current midnight-based day", () => {
     expect(buildRemoteSettingsJson(DEFAULT_APP_STATE).lastActiveDayKey).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+});
+
+type QueryResult = { data: unknown; error: { code?: string; message: string } | null };
+function queryFor(result: QueryResult) {
+  return {
+    select: vi.fn().mockReturnThis(),
+    eq: vi.fn().mockReturnThis(),
+    order: vi.fn().mockReturnThis(),
+    limit: vi.fn().mockReturnThis(),
+    or: vi.fn().mockReturnThis(),
+    delete: vi.fn().mockReturnThis(),
+    maybeSingle: vi.fn().mockResolvedValue(result),
+    returns: vi.fn().mockResolvedValue(result),
+    upsert: vi.fn().mockResolvedValue(result),
+    in: vi.fn().mockResolvedValue(result),
+  };
+}
+function database(responses: Record<string, QueryResult[]> = {}) {
+  const calls: Array<{ table: string; query: ReturnType<typeof queryFor> }> = [];
+  authMocks.from.mockImplementation((table: string) => {
+    const response = responses[table]?.shift() ?? {
+      data: ["profiles", "user_settings", "user_progress"].includes(table) ? null : [],
+      error: null,
+    };
+    const query = queryFor(response);
+    calls.push({ table, query });
+    return query;
+  });
+  return calls;
+}
+const sessionFor = (id: string) => ({ user: { id, email: "reader@example.test" } }) as unknown as Session;
+
+describe("remote synchronization boundaries", () => {
+  it("keeps local coordinates and reading progress when remote rows are absent", async () => {
+    const calls = database();
+    const local = structuredClone(DEFAULT_APP_STATE);
+    local.khatmahPage = 123;
+    const loaded = await loadRemoteState(sessionFor("empty-remote"), local);
+    expect(loaded.settings.location).toEqual(local.settings.location);
+    expect(loaded.khatmahPage).toBe(123);
+    expect(loaded.profile.accountUserId).toBe("empty-remote");
+    for (const { table, query } of calls)
+      expect(query.eq).toHaveBeenCalledWith(table === "profiles" ? "id" : "user_id", "empty-remote");
+  });
+
+  it("continues keyset pagination past the first 500 daily completions", async () => {
+    const rows = Array.from({ length: 500 }, (_, index) => ({
+      day_key: new Date(Date.UTC(2024, 0, index + 1)).toISOString().slice(0, 10),
+      category: "morning",
+      time_zone: "Africa/Cairo",
+    }));
+    const calls = database({
+      daily_collection_completions: [
+        { data: rows, error: null },
+        { data: [{ day_key: "2025-06-01", category: "evening", time_zone: "Africa/Cairo" }], error: null },
+      ],
+    });
+    const loaded = await loadRemoteState(sessionFor("paginated-history"), DEFAULT_APP_STATE);
+    expect(loaded.dailyCompletions).toHaveLength(501);
+    expect(loaded.dailyCompletions).toContainEqual(
+      expect.objectContaining({ dayKey: "2025-06-01", category: "evening" }),
+    );
+    const pages = calls.filter(({ table }) => table === "daily_collection_completions");
+    expect(pages).toHaveLength(2);
+    expect(pages[1].query.or).toHaveBeenCalledWith(
+      `day_key.gt.${rows[499].day_key},and(day_key.eq.${rows[499].day_key},category.gt.morning)`,
+    );
+  });
+
+  it("uses the legacy settings fallback only for missing tables, and propagates other errors", async () => {
+    const missing = { code: "PGRST205", message: "missing table" };
+    const local = structuredClone(DEFAULT_APP_STATE);
+    local.savedZikrIds = ["m-hm-75"];
+    database({
+      saved_zikr: [{ data: null, error: missing }],
+      daily_collection_completions: [{ data: null, error: missing }],
+    });
+    expect((await loadRemoteState(sessionFor("legacy-tables"), local)).savedZikrIds).toEqual(local.savedZikrIds);
+    const error = { code: "42501", message: "access denied" };
+    database({ saved_zikr: [{ data: null, error }] });
+    await expect(loadRemoteState(sessionFor("denied-table"), local)).rejects.toBe(error);
+    expect(local.savedZikrIds).toEqual(["m-hm-75"]);
+  });
+
+  it("writes owner-scoped progress and omits coordinates from remote settings", async () => {
+    const calls = database();
+    await syncRemoteState(sessionFor("write-owner"), DEFAULT_APP_STATE, { currentStreak: 1, longestStreak: 2 });
+    const settings = calls.find(({ table }) => table === "user_settings")!.query.upsert.mock.calls[0][0];
+    expect(settings.user_id).toBe("write-owner");
+    expect(settings.settings_json).not.toHaveProperty("location");
+    expect(calls.find(({ table }) => table === "user_progress")!.query.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({ user_id: "write-owner", current_streak: 1 }),
+    );
+  });
+
+  it("stops after a failed profile write rather than claiming synchronized progress", async () => {
+    const error = { code: "42501", message: "profile denied" };
+    const calls = database({ profiles: [{ data: null, error }] });
+    await expect(
+      syncRemoteState(sessionFor("write-denied"), DEFAULT_APP_STATE, { currentStreak: 0, longestStreak: 0 }),
+    ).rejects.toBe(error);
+    expect(calls.map(({ table }) => table)).toEqual(["profiles"]);
   });
 });

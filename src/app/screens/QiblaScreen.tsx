@@ -1,3 +1,4 @@
+import { displayLocationName } from "../content/prayerLocations";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Check, ChevronDown, Compass, MapPin } from "../components/icons";
 import { Header } from "../components/LayoutShells";
@@ -197,7 +198,7 @@ export function QiblaScreen({
     [locationSettings],
   );
   const [coordinates, setCoordinates] = useState(savedCoordinates);
-  const [locationLabel, setLocationLabel] = useState(locationSettings?.cityName ?? null);
+  const [locationLabel, setLocationLabel] = useState(displayLocationName(locationSettings, language) ?? null);
   const [isLocating, setIsLocating] = useState(false);
   const [locationMessage, setLocationMessage] = useState<string | null>(null);
   const [compassEnabled, setCompassEnabled] = useState(false);
