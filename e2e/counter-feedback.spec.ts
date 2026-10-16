@@ -261,7 +261,7 @@ test("wide Home keeps navigation exposed, contains its scene, and uses glass for
   }
 
   const glassCards = [
-    page.getByTestId("prayer-tracker-cards"),
+    page.getByTestId("prayer-tracker-cards").locator('article[data-density="summary"]').first(),
     page.getByTestId("home-prayer-moment").locator(".hero-glass").first(),
     page.getByTestId("home-primary-card").locator(".hero-glass").first(),
     page.getByTestId("home-context-companion").locator(".hero-glass").first(),
