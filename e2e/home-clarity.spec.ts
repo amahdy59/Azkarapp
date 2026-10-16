@@ -230,7 +230,7 @@ for (const language of ["ar", "en"] as const) {
       await toggle.focus();
       await page.keyboard.press("Space");
       await expect(toggle).toHaveAttribute("aria-expanded", initiallyExpanded!);
-      // Capture the paired selection cues at ordinary text size after proving
+      // Capture the single joined outline at ordinary text size after proving
       // full-card activation and equal geometry at 200%.
       await page.locator("html").evaluate((node) => {
         node.style.fontSize = "";
@@ -240,34 +240,38 @@ for (const language of ["ar", "en"] as const) {
       await expect(panel).toHaveAttribute("data-prayer", (await current.getAttribute("data-prayer")) ?? "");
       await expect(row.locator('[data-selected="true"]')).toHaveCount(1);
       const connection = await current.evaluate((node) => {
-        const tip = getComputedStyle(node, "::before");
         const panel = document.querySelector('[data-testid="home-prayer-moment"]')!;
-        const receivingTip = getComputedStyle(panel, "::before");
+        const bridge = panel.querySelector(".home-prayer-bridge")!;
+        const leavingEdge = getComputedStyle(node, "::after");
+        const receivingEdge = getComputedStyle(panel, "::after");
         const row = node.closest('[data-testid="home-all-prayers-row"]')!;
         return {
-          tip: tip.content,
-          receivingTip: receivingTip.content,
-          decorative: tip.pointerEvents === "none" && receivingTip.pointerEvents === "none",
-          noNestedBlur: tip.backdropFilter === "none" && receivingTip.backdropFilter === "none",
+          joinedEdges: leavingEdge.content === '""' && receivingEdge.content === '""',
+          decorative:
+            leavingEdge.pointerEvents === "none" &&
+            receivingEdge.pointerEvents === "none" &&
+            getComputedStyle(bridge).pointerEvents === "none" &&
+            bridge.getAttribute("aria-hidden") === "true",
+          noNestedBlur: leavingEdge.backdropFilter === "none" && receivingEdge.backdropFilter === "none",
           fitsRow: node.getBoundingClientRect().bottom + 8 <= row.getBoundingClientRect().bottom,
         };
       });
-      expect(connection.tip).toBe('""');
-      expect(connection.receivingTip).toBe('""');
-      expect(connection.decorative && connection.noNestedBlur && connection.fitsRow).toBe(true);
+      expect(connection.joinedEdges && connection.decorative && connection.noNestedBlur && connection.fitsRow).toBe(
+        true,
+      );
       const notchOffset = () =>
         current.evaluate((node) => {
           const panel = document.querySelector('[data-testid="home-prayer-moment"]')!;
-          const center = (element: Element) => {
-            const tip = getComputedStyle(element, "::before");
-            return (
-              element.getBoundingClientRect().left +
-              element.clientLeft +
-              parseFloat(tip.left) +
-              parseFloat(tip.width) / 2
-            );
-          };
-          return Math.abs(center(node) - center(panel));
+          const bridge = panel.querySelector(".home-prayer-bridge")!.getBoundingClientRect();
+          const small = node.getBoundingClientRect();
+          const large = panel.getBoundingClientRect();
+          const anchor =
+            small.left + node.clientLeft + parseFloat(getComputedStyle(node).getPropertyValue("--prayer-notch-x"));
+          return Math.max(
+            Math.abs(anchor - (bridge.left + bridge.width / 2)),
+            Math.abs(bridge.top - small.bottom),
+            Math.abs(bridge.bottom - large.top),
+          );
         });
       await expect.poll(notchOffset).toBeLessThanOrEqual(1);
       await expect(current).toHaveCSS("--prayer-notch-opacity", "1");
@@ -282,7 +286,7 @@ for (const language of ["ar", "en"] as const) {
       await expect.poll(notchOffset).toBeLessThanOrEqual(1);
       await toggle.evaluate((node) => node.blur());
       await row.scrollIntoViewIfNeeded();
-      await page.screenshot({ path: testInfo.outputPath(`${language}-${width}-notch.png`), scale: "css" });
+      await page.screenshot({ path: testInfo.outputPath(`${language}-${width}-joined.png`), scale: "css" });
     });
   }
 }
