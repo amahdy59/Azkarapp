@@ -20,28 +20,41 @@ const status: DailyPathStatus = {
   achievedPillarCount: 0,
   streakQualified: false,
   palmEarned: false,
+  palmTier: "none",
 };
 
 describe("TodaysPathSheet", () => {
-  it("presents the reviewed practice order and keeps configuration secondary", () => {
-    render(
+  it("presents automatic progress and a read-only reward guide", () => {
+    render(<TodaysPathSheet open status={status} language="en" direction="ltr" onClose={vi.fn()} />);
+
+    const text = screen.getByTestId("todays-path-sheet").textContent ?? "";
+    expect(text.indexOf("Dhikr")).toBeLessThan(text.indexOf("Qur'an wird"));
+    expect(text.indexOf("Qur'an wird")).toBeLessThan(text.indexOf("Prayers in congregation"));
+    expect(screen.getByText("2 of 5 at the mosque")).toBeInTheDocument();
+    expect(screen.getByText(/does not measure faith or reward/i)).toBeInTheDocument();
+    expect(screen.queryByRole("radio")).not.toBeInTheDocument();
+    expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
+    expect(screen.getByText("Updates automatically from your recorded practice")).toBeInTheDocument();
+    expect(screen.getByText(/plus 3 prayers at the mosque/)).toBeInTheDocument();
+    expect(screen.getByText(/plus all 5 prayers at the mosque/)).toBeInTheDocument();
+  });
+
+  it.each(["palm", "golden", "oasis"] as const)("identifies the earned %s tier in text", (palmTier) => {
+    const { container } = render(
       <TodaysPathSheet
         open
-        status={status}
+        status={{ ...status, palmEarned: true, palmTier }}
         language="en"
         direction="ltr"
-        mosquePrayerGoal={3}
-        onMosquePrayerGoalChange={vi.fn()}
         onClose={vi.fn()}
       />,
     );
-
-    const text = screen.getByTestId("todays-path-sheet").textContent ?? "";
-    expect(text.indexOf("Prayer")).toBeLessThan(text.indexOf("Qur'an wird"));
-    expect(text.indexOf("Qur'an wird")).toBeLessThan(text.indexOf("Dhikr"));
-    expect(screen.getByText(/3 of 5 recorded .* 2 in congregation/)).toBeInTheDocument();
-    expect(screen.getByText(/does not measure faith or reward/i)).toBeInTheDocument();
-    expect(screen.getByText("Adjust congregation intention").closest("details")).not.toHaveAttribute("open");
+    const current = document.querySelector('[data-reward-tier][aria-current="step"]');
+    expect(current).toHaveAttribute("data-reward-tier", palmTier);
+    expect(current).toHaveTextContent(
+      palmTier === "palm" ? "Palm tree" : palmTier === "golden" ? "Golden palm" : "Palm with an oasis",
+    );
+    expect(container.querySelector("input")).toBeNull();
   });
 
   it("closes before opening full progress", () => {
@@ -53,7 +66,6 @@ describe("TodaysPathSheet", () => {
         status={status}
         language="en"
         direction="ltr"
-        onMosquePrayerGoalChange={vi.fn()}
         onClose={onClose}
         onViewProgress={onViewProgress}
       />,

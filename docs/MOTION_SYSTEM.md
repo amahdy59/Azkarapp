@@ -1,5 +1,9 @@
 # Azkarapp Motion System
 
+## Home prayer scroll handoff — 2026-10-16
+
+The owner-requested handoff fixes summary columns/header padding. Cards compact after 96px and restore at 8px. The current owner-approved follow-up replaces the earlier 220ms FLIP with bounded 260ms coordinated card/sticky-shell height interpolation and opacity-only arrival. This specific handoff is an exception to the general no-layout-animation preference; it prevents a height snap followed by a detached content slide. Text is not scaled and blur is not animated. Ordinary scroll does not restart motion. Reversals, unmount and OS/application reduced motion cancel active effects. Home disables compensating native scroll anchoring.
+
 ## Prayer surface emphasis — 2026-10-16
 
 Latest owner correction removes current's decorative emphasis entirely once next enters the last 30 minutes, rather than gradually retaining half its highlight. Next still increases on the existing minute clock. All reduced-motion/transparency and no-loop constraints remain.
@@ -164,3 +168,7 @@ Enabling reduced motion during an unfinished transition cancels the outgoing pre
 Interruption refinement (2026-10-05): when another selection arrives before the current transition settles, cancel that animation generation and show the latest entry immediately. Every further input remains immediate until 340ms (one exit/arrival interval) passes without a selection change. Do not queue intermediate entries or replay their counts. Ordinary navigation preserves 100ms exit/240ms arrival. Reduced motion retains one stable frame while entry-local reading controls reset by identity. Reset/restore cancels delayed completion advance; normal taps retain 15ms haptics and the final tap uses only the existing completion pattern.
 
 ReadingTextTransition shares a non-bouncing sheet-like transition between zikr entries in Reader and expanded audio. Exit translates 20px over 100ms with the existing exit curve; arrival translates 28px over 240ms with cubic-bezier(0.22, 1, 0.36, 1), easing to rest. Travel follows language direction and reverses for Previous. Only the reading text moves; controls and page geometry stay fixed. Initial content and reduced-motion users receive immediate stable text. It does not animate canonical Mushaf pages or add persistence.
+
+## Owner-requested coordinated prayer collapse — 2026-10-16
+
+Supersedes the earlier transform-only 220ms handoff: interpolate actual sticky-shell and five card heights together over 260ms with cubic-bezier(0.2, 0, 0, 1); arriving detail uses opacity only. This bounded layout interpolation explains the state change without text scaling, moving blur or an adjacent-content snap. Retain 96px/8px hysteresis, 1fr/auto footer alignment, cancellation on reversal/unmount/preferences, immediate OS/application reduced motion and no effect on ordinary scroll ticks. No extra clock, loop or permanent compositor hint. Local-only phase: `docs/agent/phases/AUTOMATIC_PATH_AND_HOME_POLISH_2026_10_16.md`.

@@ -49,6 +49,8 @@ export function SettingsScreen({
   reduceMotion,
   reduceTransparency,
   homeWirdImages = false,
+  homeMaterial = "system",
+  onHomeMaterialChange,
   onHomeWirdImagesChange,
   hapticFeedback,
   forceRtl,
@@ -270,6 +272,8 @@ export function SettingsScreen({
       case "appearance":
         return (
           <AppearancePanel
+            homeMaterial={homeMaterial}
+            onHomeMaterialChange={onHomeMaterialChange}
             homeWirdImages={homeWirdImages}
             onHomeWirdImagesChange={onHomeWirdImagesChange}
             reduceTransparency={reduceTransparency}

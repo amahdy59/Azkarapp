@@ -48,7 +48,9 @@ export type DayMomentContext = "friday" | "friday_after_asr" | "monday" | "thurs
  * `general` is the floor rather than a competitor — it is what remains when no
  * more specific pool has anything in it.
  */
-export type ReminderContext = CategoryId | PrayerMomentContext | DayMomentContext | "general";
+export type ReminderTopicContext =
+  "character" | "helping_others" | "general_dua" | "fasting_virtue" | "fasting_tomorrow";
+export type ReminderContext = CategoryId | PrayerMomentContext | DayMomentContext | ReminderTopicContext | "general";
 export type TextSizeOption = "small" | "medium" | "large";
 
 /**
@@ -273,6 +275,7 @@ export interface UserSettingsState {
   reduceMotion: boolean;
   /** Blurred materials go solid. See the .reduce-transparency rules. */
   reduceTransparency: boolean;
+  homeMaterial?: "system" | "glass" | "solid";
   /** Optional Home daily-wird photography; independent of transparency. */
   homeWirdImages: boolean;
   hapticFeedback: boolean;

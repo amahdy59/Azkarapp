@@ -6,15 +6,13 @@ import { getQiblaBearing } from "../qibla";
 import { PalmTreeMark } from "../components/GardenMarks";
 import { HomeWirdSection } from "../components/HomeWirdSection";
 import { TranquilityCompletionCard } from "../components/TranquilityCompletionCard";
-import {
-  getContextualEvidence,
-  getReminderContexts,
-  getReminderSlotKey,
-  selectLibraryEvidence,
-} from "../dailyEvidence";
+import { getContextualEvidence, getReminderContexts, selectLibraryEvidence } from "../dailyEvidence";
 import type { DayMomentContext, PrayerMomentContext, ReminderContext } from "../types";
 import { DailyEvidenceCard, FridayHomeCard, PrayerRoutineCard } from "../components/HomeCards";
 import { PrayerMomentPanel } from "../components/PrayerMomentPanel";
+import { VisitorCount } from "../components/VisitorCount";
+import { useHomePrayerScroll } from "../hooks/useHomePrayerScroll";
+import { getReminderPlan, reminderCivilTime } from "../reminderPlan";
 import { TodaysPathSheet } from "../components/TodaysPathSheet";
 import { getDailyPathStatus } from "../dailyPath";
 import { getLeadingPrayerMoment } from "../prayerMoment";
@@ -254,6 +252,8 @@ export function HomeScreen({
   quietProgressEnabled,
   homeVisualEffects: requestedHomeVisualEffects = true,
   homeWirdImages = false,
+  homeMaterial = "system",
+  reduceMotion = false,
   progressDayStartHour,
   language,
   direction,
@@ -264,7 +264,6 @@ export function HomeScreen({
   onOpenPrayerAdhkar,
   mosquePrayerGoal,
   dailyPathStartDayKey,
-  onMosquePrayerGoalChange,
   onOpenFridayMode,
   routineModes,
   onSetRoutineMode,
@@ -295,6 +294,8 @@ export function HomeScreen({
   /** Photograph and translucent Home surfaces; false uses normal theme cards. */
   homeVisualEffects?: boolean;
   homeWirdImages?: boolean;
+  homeMaterial?: "system" | "glass" | "solid";
+  reduceMotion?: boolean;
   progressDayStartHour: number;
   calendarType?: "hijri" | "gregorian";
   hijriDateOffset?: number;
@@ -324,7 +325,6 @@ export function HomeScreen({
   ) => void;
 }) {
   const [hasScrolledHomeContent, setHasScrolledHomeContent] = useState(false);
-  const [prayerCardsCondensed, setPrayerCardsCondensed] = useState(false);
   const [failedBackgroundCategory, setFailedBackgroundCategory] = useState<string | null>(null);
   const isArabic = language === "ar";
   const now = useNow();
@@ -431,7 +431,9 @@ export function HomeScreen({
        not derived: sunrise is computed inside the prayer maths and not
        reported, and guessing the forenoon from the leading prayer would be a
        second clock disagreeing with the first. */
-    const weekday = now.getDay();
+    const reminderNow = reminderCivilTime(now, locationSettings);
+    const timedReminder = getTimeOfDayZikr(reminderNow, language, locationSettings);
+    const weekday = reminderNow.getDay();
     const dayMoments: DayMomentContext[] = [];
     if (weekday === 5 && leadingPrayer?.prayer === "asr") dayMoments.push("friday_after_asr");
     if (weekday === 5) dayMoments.push("friday");
@@ -439,40 +441,42 @@ export function HomeScreen({
     if (weekday === 4) dayMoments.push("thursday");
 
     const prayerMoment: PrayerMomentContext | undefined =
-      reminderInfo.categoryId === "comprehensive_duas"
+      timedReminder.categoryId === "comprehensive_duas"
         ? "last_third"
         : leadingPrayer?.prayer === "fajr" && leadingPrayer.phase === "approaching"
           ? "before_fajr"
           : /* The forenoon only counts when no prayer is close enough to lead:
                a reader inside Dhuhr's approach is being called to Dhuhr, not to
                the Duha they could have prayed an hour ago. */
-            (leadingPrayer?.prayer ?? (isDhuhaWindow(now, locationSettings) ? "dhuha" : undefined));
+            (leadingPrayer?.prayer ?? (isDhuhaWindow(reminderNow, locationSettings) ? "dhuha" : undefined));
 
     return getReminderContexts({
       afterPrayer: leadingPrayer?.phase === "recorded" && !leadingPrayer.adhkarDone,
       activePrayer: leadingPrayer ? "after_prayer" : undefined,
-      timedCollection: reminderInfo.categoryId,
+      timedCollection: timedReminder.categoryId,
       prayerMoment,
       dayMoments,
     });
-  }, [leadingPrayer, locationSettings, now, reminderInfo.categoryId]);
+  }, [language, leadingPrayer, locationSettings, now]);
+  const reminderPlan = useMemo(
+    () =>
+      getReminderPlan({
+        now,
+        location: locationSettings,
+        contexts: currentReminderContexts,
+        hijriOffset: hijriDateOffset,
+      }),
+    [currentReminderContexts, hijriDateOffset, locationSettings, now],
+  );
   // Clock ticks can recreate the same contexts. Keep optional loading tied to
   // a meaningful context change rather than every new Date/array identity.
-  const reminderContextKey = currentReminderContexts.join("|");
+  const reminderContextKey = reminderPlan.contexts.join("|");
   const reminderContexts = useMemo(
     () => (reminderContextKey ? (reminderContextKey.split("|") as ReminderContext[]) : []),
     [reminderContextKey],
   );
 
-  const isExtendedDevotionalWindow =
-    reminderContexts.includes("dhuha") ||
-    reminderContexts.includes("before_fajr") ||
-    reminderContexts.includes("last_third");
-
-  const reminderSlotKey = useMemo(
-    () => getReminderSlotKey(todayKey, now, isExtendedDevotionalWindow),
-    [isExtendedDevotionalWindow, now, todayKey],
-  );
+  const reminderSlotKey = reminderPlan.key;
 
   const [manualEvidenceOffset, setManualEvidenceOffset] = useState(0);
 
@@ -495,14 +499,17 @@ export function HomeScreen({
     let cancelled = false;
     setLibraryEvidence(null);
     const load = async () => {
-      const [{ RELEVANT_NOW_LIBRARY }, { RELEVANT_NOW_VERSES }] = await Promise.all([
-        import("../content/relevantNowLibrary"),
-        import("../content/relevantNowVerses"),
-      ]);
+      const [{ RELEVANT_NOW_LIBRARY }, { RELEVANT_NOW_VERSES }, { AUTHENTICATED_REMINDER_LIBRARY }] = await Promise.all(
+        [
+          import("../content/relevantNowLibrary"),
+          import("../content/relevantNowVerses"),
+          import("../content/authenticatedReminders"),
+        ],
+      );
       if (cancelled) return;
       setLibraryEvidence(
         selectLibraryEvidence(
-          RELEVANT_NOW_LIBRARY,
+          [...RELEVANT_NOW_LIBRARY, ...AUTHENTICATED_REMINDER_LIBRARY],
           RELEVANT_NOW_VERSES,
           reminderSlotKey,
           language,
@@ -527,12 +534,13 @@ export function HomeScreen({
      actually in the window for. */
   const dailyEvidence = useMemo(() => {
     if (!libraryEvidence) return contextualEvidence?.evidence ?? null;
+    if (manualEvidenceOffset > 0) return libraryEvidence.evidence;
     if (!contextualEvidence) return libraryEvidence.evidence;
     const rank = (context: ReminderContext) => reminderContexts.indexOf(context);
     return rank(libraryEvidence.context) <= rank(contextualEvidence.context)
       ? libraryEvidence.evidence
       : contextualEvidence.evidence;
-  }, [contextualEvidence, libraryEvidence, reminderContexts]);
+  }, [contextualEvidence, libraryEvidence, manualEvidenceOffset, reminderContexts]);
   const isLastThirdDua = reminderInfo.categoryId === "comprehensive_duas";
   const doneSet = completed[reminderInfo.categoryId] ?? new Set<string>();
 
@@ -581,6 +589,12 @@ export function HomeScreen({
   );
   const homeScrollRef = useRef<HTMLDivElement>(null);
   const homeStickyRef = useRef<HTMLDivElement>(null);
+  const homeContentRef = useRef<HTMLDivElement>(null);
+  const { condensed: prayerCardsCondensed, updateScroll: updatePrayerScroll } = useHomePrayerScroll(
+    homeContentRef,
+    homeStickyRef,
+    reduceMotion,
+  );
 
   useEffect(() => {
     const scroll = homeScrollRef.current;
@@ -666,7 +680,7 @@ export function HomeScreen({
   return (
     <ScreenContainer
       dir={direction}
-      className={`home-photo-canvas relative isolate flex flex-col overflow-hidden px-0 pt-0 ${
+      className={`home-photo-canvas ${homeMaterial === "glass" ? "home-force-glass" : ""} relative isolate flex flex-col overflow-hidden px-0 pt-0 ${
         homeVisualEffects ? "!bg-on-media-surface" : "!bg-background"
       }`}
       style={{ paddingTop: 0 }}
@@ -684,11 +698,11 @@ export function HomeScreen({
         tabIndex={0}
         role="region"
         aria-label={t(language, "home.title")}
-        className="relative z-10 min-h-0 flex-1 overflow-y-auto overflow-x-hidden pb-24 pt-0 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
+        className="home-content-scroll relative z-10 min-h-0 flex-1 overflow-y-auto overflow-x-hidden pb-24 pt-0 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
         onScroll={(event) => {
           const top = event.currentTarget.scrollTop;
           setHasScrolledHomeContent(top > 4);
-          setPrayerCardsCondensed((condensed) => (condensed ? top > 8 : top > 96));
+          updatePrayerScroll(top);
         }}
       >
         {/* Sticky Header Overlay */}
@@ -697,17 +711,13 @@ export function HomeScreen({
           data-testid="home-sticky-prayers"
           data-prayer-cards-condensed={prayerCardsCondensed || undefined}
           className={`pointer-events-none sticky inset-x-0 top-0 z-50 overflow-visible ${
-            hasScrolledHomeContent ? (homeVisualEffects ? "bg-on-media-surface" : "bg-background") : ""
+            hasScrolledHomeContent ? (homeVisualEffects ? "home-prayer-scrolled" : "bg-background") : ""
           }`}
         >
           <header
             data-testid="home-utility-header"
             data-scrolled={hasScrolledHomeContent || undefined}
-            className={`${homeVisualEffects ? "hero-glass home-glass-surface home-glass-header" : ""} w-full transition-[background-color,backdrop-filter,box-shadow,padding] duration-standard ${
-              hasScrolledHomeContent
-                ? "pt-[max(0.375rem,env(safe-area-inset-top))] pb-1"
-                : "pt-[max(0.5rem,env(safe-area-inset-top))] pb-1 sm:pt-3 sm:pb-2"
-            } ${
+            className={`${homeVisualEffects ? "hero-glass home-glass-surface home-glass-header" : ""} w-full pt-[max(0.5rem,env(safe-area-inset-top))] pb-1 sm:pt-3 sm:pb-2 transition-[background-color,box-shadow] duration-standard ${
               homeVisualEffects
                 ? hasScrolledHomeContent
                   ? "shadow-none"
@@ -737,12 +747,12 @@ export function HomeScreen({
                   type="button"
                   data-testid="home-header-routine-summary-mobile"
                   onClick={() => setPathSheetOpen(true)}
-                  aria-label={`${t(language, "dailyPath.title")}: ${t(language, "progress.lifetimePalmsSummary")}: ${formatNumerals(gardenSummary.currentPalmRhythm ?? 0, language)}, ${t(language, "progress.activeStreakSummary")}: ${formatNumerals(gardenSummary.currentUsageStreak ?? 0, language)}`}
+                  aria-label={`${t(language, "dailyPath.title")}: ${t(language, "progress.lifetimePalmsSummary")}: ${formatNumerals(gardenSummary.lifetimePalms, language)}, ${t(language, "progress.activeStreakSummary")}: ${formatNumerals(gardenSummary.currentUsageStreak ?? 0, language)}`}
                   className="home-header-path-button pointer-events-auto flex min-h-11 items-center gap-1.5 rounded-xl px-2.5 text-sm font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring min-[600px]:hidden"
                 >
                   <span className="flex items-center gap-1" aria-hidden="true">
                     <PalmTreeMark size={20} strokeWidth={3} />
-                    <bdi>{formatNumerals(gardenSummary.currentPalmRhythm ?? 0, language)}</bdi>
+                    <bdi>{formatNumerals(gardenSummary.lifetimePalms, language)}</bdi>
                   </span>
                   <span className="home-header-path-divider" aria-hidden="true" />
                   <span className="flex items-center gap-1" aria-hidden="true">
@@ -754,7 +764,7 @@ export function HomeScreen({
                   type="button"
                   data-testid="home-header-routine-summary"
                   onClick={() => setPathSheetOpen(true)}
-                  aria-label={`${t(language, "dailyPath.title")}: ${t(language, "progress.lifetimePalmsSummary")}: ${formatNumerals(gardenSummary.currentPalmRhythm ?? 0, language)}, ${t(language, "progress.activeStreakSummary")}: ${formatNumerals(gardenSummary.currentUsageStreak ?? 0, language)}`}
+                  aria-label={`${t(language, "dailyPath.title")}: ${t(language, "progress.lifetimePalmsSummary")}: ${formatNumerals(gardenSummary.lifetimePalms, language)}, ${t(language, "progress.activeStreakSummary")}: ${formatNumerals(gardenSummary.currentUsageStreak ?? 0, language)}`}
                   className="home-header-path-button pointer-events-auto hidden min-h-11 items-center gap-2 rounded-xl px-3 text-sm font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring min-[600px]:flex"
                 >
                   <span className="hidden min-[900px]:inline" aria-hidden="true">
@@ -762,7 +772,7 @@ export function HomeScreen({
                   </span>
                   <span className="flex items-center gap-1" aria-hidden="true">
                     <PalmTreeMark size={20} strokeWidth={3} />
-                    <bdi>{formatNumerals(gardenSummary.currentPalmRhythm ?? 0, language)}</bdi>
+                    <bdi>{formatNumerals(gardenSummary.lifetimePalms, language)}</bdi>
                   </span>
                   <span className="home-header-path-divider" aria-hidden="true" />
                   <span className="flex items-center gap-1" aria-hidden="true">
@@ -794,7 +804,11 @@ export function HomeScreen({
             </div>
           )}
         </div>
-        <div data-testid="home-content-grid" className="mx-auto grid w-full max-w-[64rem] grid-cols-1 gap-4 lg:gap-5">
+        <div
+          ref={homeContentRef}
+          data-testid="home-content-grid"
+          className="mx-auto grid w-full max-w-[64rem] grid-cols-1 gap-4 lg:gap-5"
+        >
           <div data-testid="home-hero" className="relative w-full">
             {showHeroContent && (
               <div className="relative z-10 mx-auto flex w-full flex-col items-stretch justify-end gap-4 px-page pb-5 sm:pb-6 lg:gap-5 lg:pb-8">
@@ -935,12 +949,10 @@ export function HomeScreen({
           <TodaysPathSheet
             open={pathSheetOpen}
             status={dailyPath}
-            palmCount={gardenSummary.currentPalmRhythm ?? 0}
+            palmCount={gardenSummary.lifetimePalms}
             streakCount={gardenSummary.currentUsageStreak ?? 0}
             language={language}
             direction={direction}
-            mosquePrayerGoal={mosquePrayerGoal}
-            onMosquePrayerGoalChange={(goal) => onMosquePrayerGoalChange?.(goal)}
             onViewProgress={onOpenProgress}
             onClose={() => setPathSheetOpen(false)}
             onGlass={false}
@@ -966,7 +978,7 @@ export function HomeScreen({
           {/* Devotional Tools: Qiblah & Masbaha */}
           {(onOpenQibla || onOpenMasbaha) && (
             <div className="px-page mx-auto w-full">
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className={`grid grid-cols-1 gap-3 ${onOpenQibla && onOpenMasbaha ? "sm:grid-cols-2" : ""}`}>
                 {onOpenQibla && (
                   <button
                     type="button"
@@ -1058,6 +1070,9 @@ export function HomeScreen({
               </div>
             </div>
           )}
+          <footer className="px-page" data-testid="home-visitor-footer">
+            <VisitorCount language={language} onMedia={homeVisualEffects} />
+          </footer>
         </div>
       </div>
     </ScreenContainer>

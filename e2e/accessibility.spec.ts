@@ -329,6 +329,7 @@ test("custom counter has no automatically detectable WCAG A/AA violations", asyn
 });
 
 test("Light Home keeps Qibla and Masbaha copy on the on-media palette", async ({ page }) => {
+  await page.setViewportSize({ width: 834, height: 1112 });
   await enterEnglishGuestMode(page);
   await page.getByTestId("nav-settings").click();
   await page.getByTestId("settings-sub-appearance").click();

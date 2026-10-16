@@ -222,7 +222,7 @@ for (const width of [390, 1440]) {
       "home-daily-evidence",
       "home-friday-card",
       "situational-shortcuts",
-      "home-tool-qibla",
+      ...(width < 900 ? ["home-tool-qibla"] : []),
       "home-tool-masbaha",
     ]) {
       const card = page.getByTestId(testId).first();

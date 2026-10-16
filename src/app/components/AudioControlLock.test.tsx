@@ -1,0 +1,31 @@
+import { act, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, expect, it, vi } from "vitest";
+import { AudioControlLock } from "./AudioControlLock";
+afterEach(() => vi.useRealTimers());
+it("ignores taps, cancels incomplete holds and unlocks after a continuous two-second keyboard hold", () => {
+  vi.useFakeTimers();
+  const unlock = vi.fn();
+  render(<AudioControlLock language="en" onUnlock={unlock} />);
+  const button = screen.getByTestId("audio-unlock");
+  button.setPointerCapture = vi.fn();
+  fireEvent.click(button);
+  expect(unlock).not.toHaveBeenCalled();
+  fireEvent.pointerDown(button, { button: 0, pointerId: 1 });
+  act(() => vi.advanceTimersByTime(1000));
+  fireEvent.pointerUp(button);
+  act(() => vi.advanceTimersByTime(2000));
+  expect(unlock).not.toHaveBeenCalled();
+  fireEvent.keyDown(button, { key: " " });
+  act(() => vi.advanceTimersByTime(1999));
+  expect(unlock).not.toHaveBeenCalled();
+  act(() => vi.advanceTimersByTime(1));
+  expect(unlock).toHaveBeenCalledOnce();
+});
+it("does not dismiss on outside interaction and offers Escape recovery", () => {
+  const unlock = vi.fn();
+  render(<AudioControlLock language="en" onUnlock={unlock} />);
+  fireEvent.pointerDown(document.body);
+  expect(unlock).not.toHaveBeenCalled();
+  fireEvent.keyDown(screen.getByTestId("audio-unlock"), { key: "Escape" });
+  expect(unlock).toHaveBeenCalledOnce();
+});

@@ -261,9 +261,17 @@
   }
 }
 .home-prayer-summary-button {
+  /* Keep the natural name/time measure; compact detail spans both columns
+     below so it cannot widen the timing column or move the next badge. */
+  grid-template-columns: minmax(0, max-content) minmax(0, max-content);
   grid-template-rows: 1.75rem auto;
   align-items: baseline;
   padding: 0.875rem 0.875rem 0.75rem;
+}
+.home-content-scroll {
+  /* The compact strip owns its discrete layout change. Native anchoring must
+     not turn that change into a second scroll event across its thresholds. */
+  overflow-anchor: none;
 }
 @container (max-width: 10rem) {
   .home-prayer-summary-button {
@@ -301,7 +309,7 @@
   pointer-events: none;
 }
 .home-prayer-summary-card[data-selected="true"]::after {
-  bottom: 0;
+  bottom: -7px;
 }
 .home-prayer-connected-panel {
   position: relative;
@@ -411,7 +419,10 @@
 }
 [data-prayer-cards-condensed] [data-prayer-compact-countdown] {
   display: block;
+  grid-column: 1 / -1;
   grid-row: 3;
+  min-width: 0;
+  text-align: end;
 }
 
 .home-prayer-remaining {
@@ -436,4 +447,66 @@
 .home-prayer-remaining::-moz-progress-bar {
   border-radius: inherit;
   background: currentColor;
+}
+
+/* Explicit owner-selected Home glass overrides only reduced transparency.
+   High contrast, forced colors and unsupported blur retain their fallbacks. */
+@supports (backdrop-filter: blur(1px)) {
+  html:not(.high-contrast) .home-force-glass .hero-glass.home-glass-surface {
+    background-color: var(--home-glass-tint) !important;
+    background-image: linear-gradient(
+      135deg,
+      rgb(255 255 255 / var(--home-glass-sheen, 0.055)),
+      rgb(255 255 255 / 0.012) 55%,
+      rgb(2 6 23 / 0.04)
+    ) !important;
+    backdrop-filter: blur(16px) saturate(135%) !important;
+  }
+  @media (forced-colors: active) {
+    html:not(.high-contrast) .home-force-glass .hero-glass.home-glass-surface {
+      background: Canvas !important;
+      color: CanvasText;
+      backdrop-filter: none !important;
+    }
+  }
+}
+
+/* While content passes behind the sticky row, frost its shared ground once.
+   Child cards keep their own tint/edges without stacking another blur layer. */
+.home-prayer-scrolled {
+  background: rgb(15 23 42 / 0.5);
+  backdrop-filter: blur(16px) saturate(135%);
+}
+.home-prayer-scrolled .hero-glass.home-glass-surface,
+html:not(.high-contrast) .home-force-glass .home-prayer-scrolled .hero-glass.home-glass-surface {
+  backdrop-filter: none !important;
+}
+.reduce-transparency .home-prayer-scrolled,
+.high-contrast .home-prayer-scrolled {
+  background: var(--on-media-surface);
+  backdrop-filter: none;
+}
+@media (prefers-reduced-transparency: reduce) {
+  .home-prayer-scrolled {
+    background: var(--on-media-surface);
+    backdrop-filter: none;
+  }
+}
+@supports (backdrop-filter: blur(1px)) {
+  html:not(.high-contrast) .home-force-glass .home-prayer-scrolled {
+    background: rgb(15 23 42 / 0.5);
+    backdrop-filter: blur(16px) saturate(135%);
+  }
+}
+@supports not (backdrop-filter: blur(1px)) {
+  .home-prayer-scrolled {
+    background: var(--on-media-surface);
+  }
+}
+@media (forced-colors: active) {
+  .home-photo-canvas .home-prayer-scrolled,
+  html:not(.high-contrast) .home-force-glass .home-prayer-scrolled {
+    background: Canvas;
+    backdrop-filter: none;
+  }
 }

@@ -1,3 +1,5 @@
+import { AudioControlLock } from "./AudioControlLock";
+import { Lock } from "./icons";
 import { AudioOptionToggle } from "./AudioOptionToggle";
 import "./floating-audio-player.css";
 import { createPortal } from "react-dom";
@@ -179,6 +181,7 @@ export function FloatingAudioPlayer({
   const hasRoomBesideReading = useMediaQuery("(min-width: 768px)");
   const coversReading = overReadingSurface && (preferCompactReading || !hasRoomBesideReading);
   const [isMinimized, setIsMinimized] = useState(true);
+  const [controlsLocked, setControlsLocked] = useState(false);
   const [readingDockHidden, setReadingDockHidden] = useState(false);
   const showDockRef = useRef<HTMLButtonElement>(null);
   const hideDockRef = useRef<HTMLButtonElement>(null);
@@ -715,6 +718,7 @@ export function FloatingAudioPlayer({
           {liveMessage}
         </div>
 
+        {controlsLocked && <AudioControlLock language={language} onUnlock={() => setControlsLocked(false)} />}
         <motion.div
           initial={motionReduced ? false : { opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -1048,6 +1052,19 @@ export function FloatingAudioPlayer({
                   </TransportButton>
                 )}
               </div>
+              <button
+                type="button"
+                data-testid="audio-lock-controls"
+                aria-label={t(language, "audioPlayer.lockControls")}
+                title={t(language, "audioPlayer.lockControls")}
+                onClick={(event) => {
+                  event.currentTarget.focus();
+                  setControlsLocked(true);
+                }}
+                className="audio-lock-trigger inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full border border-border text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              >
+                <Lock size={18} aria-hidden="true" />
+              </button>
             </div>
 
             {audioOptionsHost &&

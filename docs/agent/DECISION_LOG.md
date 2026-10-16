@@ -1,5 +1,19 @@
 # Decision Log
 
+## Coordinated local verification hold — 2026-10-16
+
+The owner authorized coordination between the reminder and Home refinement chats. The latest direct instruction reported by the Home chat is “Coordinate; keep these changes local.” Complete the combined local implementation, source review and quality checks; do not commit, push or publish the shared snapshot. Earlier release authorizations do not override this current hold.
+
+## Owner-approved authenticated reminders and Home scrolling — 2026-10-16
+
+In this chat the owner first requested an editable content-review pack, then explicitly authorized inclusion of authenticated hadith/dua and successful implementation of both existing and expanded relevance plans. This supersedes the workbook approval gate. Use Sahih evidence plus specifically named Hasan grading, separate editorial suggestions, canonical existing dua text, deferred/precached offline data and selected-timezone scheduling. Preserve narrow devotional contexts, add daily-shifted topic rotation and a short Wednesday/Sunday advance fasting window with conservative calendar exclusions. Do not introduce counts, remote publication, bulk Dorar imports or notifications.
+
+The owner additionally requests stationary next-prayer copy, appropriate scroll transitions and restoration of the missing visitor estimate. Stabilize summary columns/header spacing, keep the original compact row, use finite cancelable transform/opacity motion honoring both reduced-motion preferences, and restore the existing VisitorCount/provider composition. See phases/HOME_PRAYER_SCROLL_AND_PRESENCE_2026_10_16.md and phases/HOME_RELEVANT_REMINDERS_2026_10_16.md. Earlier independently approved appearance/audio/Qibla changes remain subject to their intact verification before publication.
+
+## Qibla desktop shortcuts — 2026-10-16
+
+The owner requests hiding Qibla on desktop and explicitly says not to push changes yet. Use the established compact/medium versus expanded/large layout boundary at 900px: omit Qibla entry points on desktop layouts, including Home, the legacy More destination and the sidebar. Preserve existing Qibla deep links and an already-open screen across resize. Masbaha remains available and fills Home's remaining utility row. Width determines layout rather than device detection; wider tablets use their selected shell tier. This supersedes earlier all-tier shortcut guidance while preserving route compatibility. No publication is authorized.
+
 ## Friday content and Home follow-up — 2026-10-16
 
 The owner explicitly approved the sourced Friday approach: noon uses Jumu‘ah attendance, after-prayer adhkar and one Sunnah-after-Jumu‘ah action. Its information sheet explains four rak‘ahs (Muslim 881a) and two at home (Muslim 882a); the benefit uses Muslim 857a. This supersedes the earlier display-only Friday restriction. Product-owner approval is not an independent scholarly review. Keep the Dhuhr key, dates, times and existing stored fields; hide the weekday before-Sunnah action without deleting previous records.
@@ -4784,3 +4798,19 @@ The owner additionally requests visible Home card photos and compressed Cloudfla
 ### Owner correction: full-card artwork under reduced transparency
 
 The owner explicitly rejects the partial-photo/opaque-caption split. Supersede the 4rem visible-band decision above: the whole card remains photographic, shaded by a fixed readable gradient with no backdrop filter. Apply this in ordinary, device/app reduced-transparency and Home-glass-off modes. High contrast uses a stronger fixed gradient; forced colors retains native Canvas fallback. Keep decorative artwork independent of the background-glass preference.
+
+## Owner-approved desktop material and audio protection — 2026-10-16
+
+The owner selects persistent Home appearance choices: Glass / Follow device / Solid. Follow device is the legacy default; explicit Glass overrides device and app reduced transparency on Home, while high contrast and forced colors always remain opaque. Decorative card imagery remains independent. The owner selects audio controls lock only: playback continues under a modal cover, short taps cannot unlock, a two-second hold unlocks and Escape provides keyboard recovery. Do not change religious repetition counts or introduce child practice completion.
+
+The owner reports Arabic audio for اللهم اهدني وسددني speaking اللهم باعد بيني وبين خطاياي. Quarantine comprehensive-dua-39-abdullah-muhammad-v1, preserve the same bytes for the correctly matched friday-dua-25, remove the two mismatched owner-preview transcript annotations and rejected variant IDs, and retain approved English coverage. A reviewed replacement is required before restoring Arabic playback. Sacred text and exact assignments remain unchanged.
+
+The owner explicitly approves inclusion of verified concurrent Qibla shortcut edits in this release, superseding their separate chat's earlier no-push instruction.
+
+## Owner local-only automatic path and Home polish — 2026-10-16
+
+The owner requests a local-only follow-up and explicitly approves cross-chat coordination while keeping these edits local. This supersedes earlier release authority for the shared snapshot. From policy-activated days on 2026-10-16 onward, three main zikr groups plus a completed Quran wird earn a regular palm; three distinct mosque prayers upgrade it to filled gold and five add an oasis. Remove chosen mosque targets and checkbox-shaped status indicators from Today's path. Preserve prior award policies and records. The bar continues to mean remaining time, decreasing to zero at adhan with native RTL/LTR direction; move the selected edge 7px below the small card. The requested smoother scroll handoff supersedes the earlier transform-only implementation: use bounded 260ms card/sticky height interpolation without scale or blur, preserving enlarged footer alignment and all reduced-motion rules. Preserve the shared glass material; the scrolled strip owns one frosted translucent ground while child card/header filters are suppressed in that state. Keep all preference and contrast fallbacks. Mark three embedded recitations on the comprehensive-dua-42 Arabic recording; keep the separate 100-count assignment's prescribed count and safe playback fallback. Incompatible one-occurrence timing previews are quarantined, not invented. See phases/AUTOMATIC_PATH_AND_HOME_POLISH_2026_10_16.md.
+
+## Owner authorization to release all pending changes — 2026-10-16
+
+The owner now explicitly instructs “push all changes.” This supersedes the local-only hold for every current pending Home, automatic-path, sourced-reminder, audio-protection/timing, Qibla and accompanying documentation/test change. The coordinating release chat owns one combined verified release: preserve the frozen snapshot, refresh notes/history for changes since the last successful Pages deployment, run the intact tracked hook gates, commit/push main, monitor exact-commit Quality and Pages build/deploy, inspect any failed jobs, and verify the deployed commit plus browser smoke. No force push, hook bypass, relaxed assertions or religious-count/source shortcuts are authorized. Prior local-only reports remain historical evidence; this decision is current authority.

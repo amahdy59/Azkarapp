@@ -1,5 +1,9 @@
 # Azkar design system
 
+## Home reminder and scroll refinement — 2026-10-16
+
+The next-prayer badge retains fixed column bounds across compact/expanded cards, with stable header spacing and reduced-motion-aware transform/opacity feedback. The shared visitor estimate returns at the bottom of Home after a successful response. One reminder remains visible, with exact evidence, separate editorial takeaway, explicit excerpt/action attribution, visible grading and a 44px source/context link. Short Wednesday/Sunday preparation and varied general-topic rotation coexist with the existing moment plan; no new prescribed count, hidden tracking or notifications.
+
 ## Full-photo Wird and single liquid connector — 2026-10-16
 
 The owner replaces the separate top photograph/caption with full-card decorative imagery and one contrast gradient, retaining the existing tile sizes and responsive grid. Restore compact completion and fruit badges using the established five fruits per completed routine, twenty daily total. Opaque preference/high-contrast captions remain supported.
@@ -682,6 +686,8 @@ Home photography stays static. Progress fills translate inside clipped tracks, L
 
 ### Phase 59–60 utility refinements
 
+Owner follow-up (2026-10-16): Qibla shortcuts are offered below the shared 900px expanded-layout breakpoint only. Home and More omit Qibla on expanded/large layouts, and the large sidebar omits it. Home's remaining Masbaha card fills the utility row. Hidden shortcuts leave no keyboard or accessibility-tree target. Existing Qibla URLs and already-open screens remain functional across resize. This uses responsive layout width, so a wide tablet follows the expanded/large layout rule.
+
 Qiblah's primary surface is the always-visible locally calculated Kaaba direction,
 bearing, cardinal direction, and distance. Live sensor rotation enhances that same visual
 after an explicit action; calibration guidance is secondary. Neither opening the screen nor
@@ -984,3 +990,9 @@ At very short heights or enlarged text, restore ordinary scrolling only when the
 Owner follow-up: abbreviate these same cards away from the top, hiding all footers after 96px and restoring within 8px of the top. Keep next-prayer countdown beneath its time in the condensed row. Separate thresholds avoid scroll-height flicker; no animation or persisted preference is added.
 
 Owner correction: photo-enabled Wird cards retain full-card photography under reduced transparency as well. A fixed image gradient provides contrast without glass or a separate opaque caption; the earlier visible-band description is superseded. High contrast strengthens the gradient, while forced colors retains Canvas/CanvasText.
+
+Home material now persists as system, glass or solid. The default follows existing app/device transparency preferences; explicit glass restores supported Home blur even under reduced transparency. High contrast/forced colors take precedence. Full-card imagery is independent of that material selection.
+
+## Local Home path clarity follow-up — 2026-10-16
+
+Today's path presents current reward, compact recorded facts and a three-step palm/gold/oasis guide, without checkbox silhouettes or intention selection. Filled gold distinguishes the mosque upgrade from the regular green palm. The selected small prayer edge is 7px outside its bottom boundary. A native interval bar retains bright-remaining/dim-elapsed semantics, RTL/LTR direction and explanatory text. The scrolling prayer-strip ground uses a translucent 50% navy ground with one 16px/135% frost layer; child cards/header retain tint/edges with their filters suppressed in that state. This prevents readable content passing behind the strip from competing with prayer labels without stacking blur. At the top, individual cards own their established layer. All appearance/accessibility fallbacks remain. Details and verification: `docs/agent/phases/AUTOMATIC_PATH_AND_HOME_POLISH_2026_10_16.md`.

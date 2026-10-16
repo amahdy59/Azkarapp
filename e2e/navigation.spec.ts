@@ -88,7 +88,7 @@ test("@cross-browser navigation switches to wide utilities and opens Settings", 
   await expect(page.getByTestId("nav-quran")).toHaveAttribute("aria-current", "page");
   await expect(page).toHaveTitle("Quran Wird - wa-zaker");
   await expect(page.getByTestId("nav-more")).toHaveCount(0);
-  await expect(page.getByTestId("nav-qibla")).toBeVisible();
+  await expect(page.getByTestId("nav-qibla")).toHaveCount(0);
   await expect(page.getByTestId("nav-masbaha")).toBeVisible();
   await expect(page.getByTestId("nav-settings")).toBeVisible();
   await page.getByTestId("nav-settings").click();
@@ -101,6 +101,40 @@ test("@cross-browser navigation switches to wide utilities and opens Settings", 
     await expect(page.getByText("Turn clockwise to 136°.")).toBeVisible();
   }
 });
+
+for (const language of ["ar", "en"] as const) {
+  test(`@cross-browser Qibla shortcuts follow phone/tablet layouts in ${language}`, async ({ page }) => {
+    await page.addInitScript((language) => {
+      localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+      localStorage.setItem("azkarapp.state.v1", JSON.stringify({ settings: { language } }));
+    }, language);
+    await page.goto("/#/home");
+
+    for (const width of [834, 899, 900, 1199, 1200, 1440, 390]) {
+      await page.setViewportSize({ width, height: 1000 });
+      const qibla = page.getByTestId("home-tool-qibla");
+      if (width < 900) {
+        await expect(qibla).toBeVisible();
+      } else {
+        await expect(qibla).toHaveCount(0);
+      }
+      await expect(page.getByTestId("nav-qibla")).toHaveCount(0);
+      const masbaha = page.getByTestId("home-tool-masbaha");
+      await expect(masbaha).toBeVisible();
+      if (width >= 900) {
+        const bounds = await masbaha.evaluate((element) => ({
+          card: element.getBoundingClientRect().width,
+          row: element.parentElement!.getBoundingClientRect().width,
+        }));
+        expect(Math.abs(bounds.card - bounds.row)).toBeLessThanOrEqual(1);
+      }
+      if (language === "ar" && (width === 834 || width === 1440)) {
+        await masbaha.scrollIntoViewIfNeeded();
+        await page.screenshot({ path: `output/playwright/qibla-shortcuts-${width}.png` });
+      }
+    }
+  });
+}
 
 test("Qibla keeps the static bearing and explains Android sensor denial", async ({ page }) => {
   await page.addInitScript(() => {

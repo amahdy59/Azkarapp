@@ -14,6 +14,8 @@ export interface AppearancePanelProps {
   themeMode: ThemeMode;
   highContrast: boolean;
   homeWirdImages?: boolean;
+  homeMaterial?: "system" | "glass" | "solid";
+  onHomeMaterialChange?: (value: "system" | "glass" | "solid") => void;
   onHomeWirdImagesChange?: (value: boolean) => void;
   reduceTransparency?: boolean;
   onReduceTransparencyChange?: (value: boolean) => void;
@@ -32,6 +34,8 @@ export function AppearancePanel({
   themeMode,
   highContrast,
   homeWirdImages = false,
+  homeMaterial = "system",
+  onHomeMaterialChange,
   onHomeWirdImagesChange,
   reduceTransparency = false,
   onReduceTransparencyChange,
@@ -75,6 +79,26 @@ export function AppearancePanel({
           )}
         </SettingsSection>
         <SettingsSection label={t(language, "settings.homeCards")} className="mt-3">
+          {onHomeMaterialChange && (
+            <div className="space-y-3 p-4">
+              <h3 className="text-base font-semibold">{t(language, "settings.homeMaterial")}</h3>
+              <p className="text-sm text-muted-foreground">{t(language, "settings.homeMaterialHint")}</p>
+              <SegmentedControl
+                value={homeMaterial}
+                onChange={onHomeMaterialChange}
+                direction={direction}
+                aria-label={t(language, "settings.homeMaterial")}
+                className="flex flex-wrap gap-2"
+                itemClassName={(selected) =>
+                  `min-h-11 flex-1 rounded-xl border px-3 py-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${selected ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-foreground"}`
+                }
+                options={(["system", "glass", "solid"] as const).map((value) => ({
+                  value,
+                  label: t(language, `settings.homeMaterial_${value}`),
+                }))}
+              />
+            </div>
+          )}
           {onHomeWirdImagesChange && (
             <SettingsToggleRow
               icon={<Eye size={20} />}
@@ -85,7 +109,7 @@ export function AppearancePanel({
               onChange={() => onHomeWirdImagesChange(!homeWirdImages)}
             />
           )}
-          {onReduceTransparencyChange && (
+          {!onHomeMaterialChange && onReduceTransparencyChange && (
             <SettingsToggleRow
               icon={<Droplets size={20} />}
               iconBg={iconBackground}

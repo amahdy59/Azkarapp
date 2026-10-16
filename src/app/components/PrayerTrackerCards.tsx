@@ -346,6 +346,8 @@ function PrayerCard({
           {state === "next" && model.remainingPercent !== undefined && (
             <progress
               className="home-prayer-remaining mt-2.5"
+              dir={language === "ar" ? "rtl" : "ltr"}
+              title={t(language, "prayerTracking.remainingBarHint")}
               max={100}
               value={model.remainingPercent}
               aria-label={t(language, "prayerTracking.timeRemainingUntil", { prayer: name })}

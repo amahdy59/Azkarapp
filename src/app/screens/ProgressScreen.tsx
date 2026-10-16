@@ -5,7 +5,7 @@ import { Header, IconButton } from "../components/LayoutShells";
 import { TodayRoutineGarden } from "../components/RoutineGarden";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { t } from "../i18n";
-import { getDailyPathStatus, wasPrayedAtMosque } from "../dailyPath";
+import { getDailyPathStatus, wasPrayedAtMosque, type PalmTier } from "../dailyPath";
 import { getGardenSummary, getProgressDayKey } from "../progress";
 
 import { TabList, tabPanelProps } from "../components/Tabs";
@@ -29,7 +29,14 @@ import {
   type GardenLevel,
   type OasisHabits,
 } from "../oasis/oasisModel";
-import { DropletMark, SeedlingMark, BranchMark, PalmTreeMark, OasisMark } from "../components/GardenMarks";
+import {
+  DropletMark,
+  SeedlingMark,
+  BranchMark,
+  PalmTreeMark,
+  OasisMark,
+  PathRewardMark,
+} from "../components/GardenMarks";
 import { ChevronDown, Share2, Sparkles, Zap } from "../components/icons";
 import type {
   AppLanguage,
@@ -222,7 +229,10 @@ export function ProgressScreen({
     const dayHabits = (dailyHabits ?? []).filter((h) => h.dayKey === currentDayKey);
 
     const hasManualQuranHabit = dayHabits.some((h) => h.habit === "quran_wird");
-    const quranDone = quranWirdPlan?.kind !== "free" && (hasManualQuranHabit || pathStatus.quran.complete);
+    const quranDone =
+      pathStatus.policyVersion === 3
+        ? pathStatus.quran.complete
+        : quranWirdPlan?.kind !== "free" && (hasManualQuranHabit || pathStatus.quran.complete);
 
     const mosqueAttendanceCount = prayerTracking.filter(
       (r) => r.dayKey === currentDayKey && wasPrayedAtMosque(r),
@@ -246,7 +256,15 @@ export function ProgressScreen({
       active: activeHabit,
     };
 
-    const level = calculateOasisLevel(routines, habits);
+    const legacyLevel = calculateOasisLevel(routines, habits);
+    const level: GardenLevel =
+      pathStatus.policyVersion === 3
+        ? pathStatus.palmTier === "oasis"
+          ? 5
+          : pathStatus.palmEarned
+            ? 4
+            : (Math.min(legacyLevel, 3) as GardenLevel)
+        : legacyLevel;
     return {
       selectedDayPath: pathStatus,
       quranWirdDone: quranDone,
@@ -274,6 +292,7 @@ export function ProgressScreen({
       level: GardenLevel;
       dayLabel: string;
       isToday: boolean;
+      palmTier?: PalmTier;
     }> = [];
 
     const todayKey = getProgressDayKey(now, progressDayStartHour);
@@ -305,7 +324,10 @@ export function ProgressScreen({
         dailyPathStartDayKey,
       });
       const qDone =
-        quranWirdPlan?.kind !== "free" && (hRecords.some((h) => h.habit === "quran_wird") || dayPath.quran.complete);
+        dayPath.policyVersion === 3
+          ? dayPath.quran.complete
+          : quranWirdPlan?.kind !== "free" &&
+            (hRecords.some((h) => h.habit === "quran_wird") || dayPath.quran.complete);
       const mCount = prayerTracking.filter((r) => r.dayKey === dKey && wasPrayedAtMosque(r)).length;
       const mHab = hRecords.find((h) => h.habit.startsWith("mosque_"))?.habit as "mosque_3" | "mosque_5" | undefined;
       const mRes = mHab ?? (mCount >= 5 ? "mosque_5" : mCount >= 3 ? "mosque_3" : null);
@@ -323,7 +345,15 @@ export function ProgressScreen({
       days.push({
         date: d,
         dayKey: dKey,
-        level: lvl,
+        level:
+          dayPath.policyVersion === 3
+            ? dayPath.palmTier === "oasis"
+              ? 5
+              : dayPath.palmEarned
+                ? 4
+                : (Math.min(lvl, 3) as GardenLevel)
+            : lvl,
+        palmTier: dayPath.policyVersion === 3 ? dayPath.palmTier : undefined,
         dayLabel,
         isToday,
       });
@@ -581,7 +611,11 @@ export function ProgressScreen({
               <summary className="flex min-h-11 cursor-pointer select-none items-center justify-between px-4 py-3 text-start transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
                 <span className="flex min-w-0 items-center gap-3">
                   <span className="flex size-9 shrink-0 items-center justify-center" aria-hidden="true">
-                    {renderTierMark(oasisLevel, 28)}
+                    {selectedDayPath.policyVersion === 3 && selectedDayPath.palmEarned ? (
+                      <PathRewardMark tier={selectedDayPath.palmTier} size={28} />
+                    ) : (
+                      renderTierMark(oasisLevel, 28)
+                    )}
                   </span>
                   <span className="min-w-0 text-start">
                     <span className="block text-micro font-bold text-muted-foreground">
@@ -608,20 +642,44 @@ export function ProgressScreen({
                   <div className="flex items-center gap-3.5">
                     <div>
                       <h2 id="oasis-stage-heading" className="text-title font-black text-foreground leading-tight">
-                        {isArabic ? levelDetails.nameArabic : levelDetails.name}
+                        {selectedDayPath.policyVersion === 3 && selectedDayPath.palmEarned
+                          ? t(
+                              language,
+                              selectedDayPath.palmTier === "oasis"
+                                ? "dailyPath.oasisPalm"
+                                : selectedDayPath.palmTier === "golden"
+                                  ? "dailyPath.goldenPalm"
+                                  : "dailyPath.regularPalm",
+                            )
+                          : isArabic
+                            ? levelDetails.nameArabic
+                            : levelDetails.name}
                       </h2>
                     </div>
                   </div>
 
                   <div className="shrink-0 rounded-lg bg-primary/10 px-2.5 py-1 text-sm font-black text-primary">
                     <span>
-                      {t(language, "progress.oasisLevelBadge", { level: formatNumerals(oasisLevel, language) })}
+                      {selectedDayPath.policyVersion === 3
+                        ? t(language, "dailyPath.recordedToday")
+                        : t(language, "progress.oasisLevelBadge", { level: formatNumerals(oasisLevel, language) })}
                     </span>
                   </div>
                 </div>
 
                 <p className="mt-3 text-caption font-semibold leading-relaxed text-muted-foreground" dir="auto">
-                  {isArabic ? levelDetails.descriptionArabic : levelDetails.description}
+                  {selectedDayPath.policyVersion === 3
+                    ? t(
+                        language,
+                        selectedDayPath.palmTier === "oasis"
+                          ? "dailyPath.oasisRule"
+                          : selectedDayPath.palmTier === "golden"
+                            ? "dailyPath.goldenRule"
+                            : "dailyPath.palmRule",
+                      )
+                    : isArabic
+                      ? levelDetails.descriptionArabic
+                      : levelDetails.description}
                 </p>
 
                 <div className="mt-3 flex items-start gap-2 rounded-xl bg-primary/5 p-3 text-xs font-semibold text-foreground">
@@ -656,10 +714,25 @@ export function ProgressScreen({
                       >
                         <span className="text-micro font-bold text-muted-foreground">{day.dayLabel}</span>
                         <div className="my-1 flex size-8 sm:size-9 items-center justify-center">
-                          {renderTierMark(day.level, 24)}
+                          {day.palmTier && day.palmTier !== "none" ? (
+                            <PathRewardMark tier={day.palmTier} size={24} />
+                          ) : (
+                            renderTierMark(day.level, 24)
+                          )}
                         </div>
                         <span className="text-micro font-bold text-foreground truncate max-w-full">
-                          {day.level > 0 ? levelShortName : "—"}
+                          {day.palmTier && day.palmTier !== "none"
+                            ? t(
+                                language,
+                                day.palmTier === "oasis"
+                                  ? "dailyPath.oasisPalm"
+                                  : day.palmTier === "golden"
+                                    ? "dailyPath.goldenPalm"
+                                    : "dailyPath.regularPalm",
+                              )
+                            : day.level > 0
+                              ? levelShortName
+                              : "—"}
                         </span>
                       </div>
                     );

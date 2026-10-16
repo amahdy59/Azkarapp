@@ -150,6 +150,7 @@ export function SheetHeader({
 }
 
 interface ModalProps {
+  preventOutsideDismiss?: boolean;
   returnFocusRef?: MutableRefObject<HTMLElement | null>;
   returnFocusScopeId?: string;
   open: boolean;
@@ -201,6 +202,7 @@ export function Modal({
   overlayClassName,
   onGlass = false,
   showCloseButton = true,
+  preventOutsideDismiss = false,
 }: ModalProps) {
   const focusScope = useRestoreFocusOnClose(returnFocusRef, returnFocusScopeId);
   const lang: AppLanguage = language ?? (direction === "rtl" ? "ar" : "en");
@@ -222,6 +224,7 @@ export function Modal({
         />
         <DialogPrimitive.Content
           {...focusScope}
+          onInteractOutside={preventOutsideDismiss ? (event) => event.preventDefault() : undefined}
           data-testid={testId}
           data-prevent-count="true"
           aria-describedby={describedById}

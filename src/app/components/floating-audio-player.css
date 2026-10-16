@@ -362,6 +362,11 @@ html[data-mushaf-focus="true"] .floating-audio-player {
 .audio-expanded-actions > .audio-expanded-transport {
   grid-column: 2;
 }
+.audio-lock-trigger {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: start;
+}
 @container audio-controls (max-width: 36rem) {
   .audio-expanded-actions {
     grid-template-columns: minmax(0, 1fr);
@@ -377,6 +382,11 @@ html[data-mushaf-focus="true"] .floating-audio-player {
   }
   .audio-play-all-indicator:empty {
     display: none;
+  }
+  .audio-lock-trigger {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: end;
   }
 }
 

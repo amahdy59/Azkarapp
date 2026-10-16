@@ -295,6 +295,18 @@ for (const language of ["ar", "en"] as const) {
           await expect(page.getByTestId("home-prayer-moment")).toHaveAttribute("data-prayer", prayer);
           await tile.scrollIntoViewIfNeeded();
           await checkGeometry(page);
+          // Geometry below describes the full row. Browser scroll anchoring
+          // may condense its sticky cards after opening a longer detail panel.
+          await page
+            .getByTestId("home-sticky-prayers")
+            .locator("..")
+            .evaluate((node) => {
+              node.scrollTop = 0;
+            });
+          await expect(page.getByTestId("home-sticky-prayers")).not.toHaveAttribute(
+            "data-prayer-cards-condensed",
+            "true",
+          );
           const edges = await tile.evaluate((node) => ({
             small: getComputedStyle(node, "::after").backgroundColor,
             detail: getComputedStyle(document.querySelector('[data-testid="home-prayer-moment"]')!, "::before")
@@ -323,7 +335,10 @@ for (const language of ["ar", "en"] as const) {
           );
           expect(tiles.every((tile) => tile.width >= 44 && tile.height >= 44 && !tile.overflow)).toBe(true);
           expect(tiles.every((tile) => tile.gap === 4)).toBe(true);
-          expect(tiles.every((tile) => tile.statusGap >= 8 && Math.abs(tile.identity - tile.timing) > 20)).toBe(true);
+          expect(
+            tiles.every((tile) => tile.statusGap >= 8 && Math.abs(tile.identity - tile.timing) > 20),
+            JSON.stringify(tiles),
+          ).toBe(true);
           const timeStyles = await page.locator('[id^="prayer-summary-time-"]').evaluateAll((times) =>
             times.map((time) => ({
               size: getComputedStyle(time).fontSize,

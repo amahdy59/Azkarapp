@@ -295,6 +295,7 @@ function AppContent({
     setRoutineModes((previous) => ({ ...previous, [activeCat]: mode }));
   };
   const layoutMode = useLayoutMode();
+  const showQiblaShortcut = layoutMode === "compact" || layoutMode === "medium";
   useViewFocus(view);
   const previousAudioViewRef = useRef(view);
 
@@ -360,6 +361,7 @@ function AppContent({
   const [zikrFont, setZikrFont] = useState<ZikrFontOption>(initialState.settings.zikrFont ?? "humanist");
   const [highContrast, setHighContrast] = useState(initialState.settings.highContrast);
   const [boldText, setBoldText] = useState(initialState.settings.boldText);
+  const [homeMaterial, setHomeMaterial] = useState(initialState.settings.homeMaterial ?? "system");
   const [reduceTransparency, setReduceTransparency] = useState(initialState.settings.reduceTransparency);
   const [homeWirdImages, setHomeWirdImages] = useState(initialState.settings.homeWirdImages);
   const [hapticFeedback, setHapticFeedback] = useState(initialState.settings.hapticFeedback);
@@ -741,6 +743,7 @@ function AppContent({
         reduceMotion,
         reduceTransparency,
         homeWirdImages,
+        homeMaterial,
         hapticFeedback,
         forceRtl,
         colorBlindSupport,
@@ -795,6 +798,7 @@ function AppContent({
       highContrast,
       isGuest,
       homeWirdImages,
+      homeMaterial,
       phone,
       avatarUrl,
       reduceMotion,
@@ -1137,6 +1141,7 @@ function AppContent({
     setBoldText(state.settings.boldText);
     setReduceMotion(state.settings.reduceMotion);
     setReduceTransparency(state.settings.reduceTransparency);
+    setHomeMaterial(state.settings.homeMaterial ?? "system");
     setHomeWirdImages(state.settings.homeWirdImages);
     setHapticFeedback(state.settings.hapticFeedback);
     setForceRtl(state.settings.forceRtl);
@@ -1668,10 +1673,6 @@ function AppContent({
               setFridayDuaFlow(false);
               push("settings");
             }}
-            onOpenQibla={() => {
-              setFridayDuaFlow(false);
-              push("qibla");
-            }}
             isArabic={isArabic}
             themeMode={themeMode}
             onThemeModeChange={setThemeMode}
@@ -1815,7 +1816,9 @@ function AppContent({
                   completed={completed}
                   dailyCompletions={dailyCompletions}
                   quietProgressEnabled={true}
-                  homeVisualEffects={!reduceTransparency}
+                  homeVisualEffects={homeMaterial === "glass" || (homeMaterial === "system" && !reduceTransparency)}
+                  homeMaterial={homeMaterial}
+                  reduceMotion={reduceMotion}
                   homeWirdImages={homeWirdImages}
                   progressDayStartHour={progressDayStartHour}
                   locationSettings={locationSettings}
@@ -1854,7 +1857,7 @@ function AppContent({
                   onOpenWirdBenefits={() => push("wird_benefits")}
                   onOpenKhatmah={() => push("khatmah_overview")}
                   onOpenProgress={() => push("progress")}
-                  onOpenQibla={() => push("qibla")}
+                  onOpenQibla={showQiblaShortcut ? () => push("qibla") : undefined}
                   onOpenMasbaha={() => push("custom_counter")}
                   prayerTracking={prayerTracking}
                   onTogglePrayerTracking={handleTogglePrayerTracking}
@@ -1864,7 +1867,7 @@ function AppContent({
                 <MoreScreen
                   language={selectedLang}
                   direction={layoutDirection}
-                  onOpenQibla={() => push("qibla")}
+                  onOpenQibla={showQiblaShortcut ? () => push("qibla") : undefined}
                   onOpenMasbaha={() => push("custom_counter")}
                   onOpenSettings={() => push("settings")}
                 />
@@ -2337,6 +2340,8 @@ function AppContent({
                   reduceMotion={reduceMotion}
                   reduceTransparency={reduceTransparency}
                   homeWirdImages={homeWirdImages}
+                  homeMaterial={homeMaterial}
+                  onHomeMaterialChange={setHomeMaterial}
                   hapticFeedback={hapticFeedback}
                   forceRtl={forceRtl}
                   colorBlindSupport={colorBlindSupport}

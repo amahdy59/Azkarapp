@@ -2,6 +2,11 @@ import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { t } from "../src/app/i18n";
 
+test.beforeEach(async ({ page }) => {
+  const later = page.getByRole("button", { name: /^(Later|لاحقاً)$/ });
+  await page.addLocatorHandler(later, async () => later.click());
+});
+
 for (const language of ["ar", "en"] as const) {
   for (const width of [320, 390, 1440]) {
     test(`@cross-browser bounded prayer hierarchy ${language} at ${width}px`, async ({
@@ -130,7 +135,10 @@ for (const language of ["ar", "en"] as const) {
       await expect(next).toContainText(t(language, "prayerTracking.nextShort"));
       await expect(next.getByRole("progressbar")).toHaveCount(1);
       await expect(next.locator("[data-prayer-footer]").getByRole("progressbar")).toHaveCount(1);
-      await expect(next.getByRole("button")).not.toContainText(/باقي|left/);
+      // The condensed strip owns a hidden countdown inside its button. At the
+      // top only the separate footer countdown is visible.
+      await expect(next.locator("[data-prayer-compact-countdown]")).toBeHidden();
+      await expect(next.locator("[data-prayer-detail]")).toContainText(/باقي|left/);
       const countdownAlignment = await next.evaluate((card) => {
         const text = card.querySelector("[data-prayer-detail]")!;
         const range = document.createRange();
@@ -222,6 +230,16 @@ for (const language of ["ar", "en"] as const) {
       await expect(row).not.toContainText(/Viewing|معروضة/);
       const current = row.locator('[data-prayer-state="current"]');
       await current.scrollIntoViewIfNeeded();
+      // Horizontal focus recovery can scroll the Home region as well. Prove
+      // footer activation in the expanded state it belongs to, including 200% text.
+      await page
+        .getByTestId("home-sticky-prayers")
+        .locator("..")
+        .evaluate((node) => {
+          node.scrollTop = 0;
+        });
+      await expect(page.getByTestId("home-sticky-prayers")).not.toHaveAttribute("data-prayer-cards-condensed");
+      await expect(current.locator("[data-prayer-footer]")).toBeVisible();
       const toggle = current.getByRole("button");
       const initiallyExpanded = await toggle.getAttribute("aria-expanded");
       const footerHit = (await current.locator("[data-prayer-footer]").boundingBox())!;
@@ -254,17 +272,19 @@ for (const language of ["ar", "en"] as const) {
             detail.height === "2px"
           );
         });
-      expect(await matchingEdges()).toBe(true);
+      // WebKit can expose the start of even the reduced-motion transition
+      // for one frame. Wait for the exact shared accent, without relaxing it.
+      await expect.poll(matchingEdges).toBe(true);
       await expect(page.locator(".home-prayer-bridge")).toHaveCount(0);
       const oldScroll = await row.evaluate((node) => node.scrollLeft);
       await row.evaluate((node) => {
         node.scrollLeft += 16;
       });
-      expect(await matchingEdges()).toBe(true);
+      await expect.poll(matchingEdges).toBe(true);
       await row.evaluate((node, left) => {
         node.scrollLeft = left;
       }, oldScroll);
-      expect(await matchingEdges()).toBe(true);
+      await expect.poll(matchingEdges).toBe(true);
       await toggle.evaluate((node) => node.blur());
       await row.scrollIntoViewIfNeeded();
       await page.screenshot({ path: testInfo.outputPath(`${language}-${width}-joined.png`), scale: "css" });
@@ -425,9 +445,7 @@ for (const language of ["ar", "en"] as const) {
       await expect(page.getByTestId("situational-shortcuts").locator("a svg")).toHaveCount(3);
       await page.goto("/#/settings/appearance");
       const images = page.getByRole("switch", { name: new RegExp(t(language, "settings.homeWirdImages")) });
-      const transparency = page.getByRole("switch", {
-        name: new RegExp("^" + t(language, "settings.homeTransparency")),
-      });
+      const transparency = page.getByRole("radio", { name: t(language, "settings.homeMaterial_system"), exact: true });
       await expect(images).toHaveAttribute("aria-checked", "false");
       await expect(transparency).toHaveAttribute("aria-checked", "true");
       await images.click();
@@ -442,13 +460,13 @@ for (const language of ["ar", "en"] as const) {
       }));
       if (material.systemReduced) {
         expect(material.filter).toBe("none");
-        expect(material.color).toBe("rgb(2, 6, 23)");
+        expect(await caption.evaluate((node) => getComputedStyle(node).backgroundImage)).toContain("linear-gradient");
       } else {
         expect(material.filter).toBe("none");
         expect(await caption.evaluate((node) => getComputedStyle(node).backgroundImage)).toContain("linear-gradient");
       }
       await page.goto("/#/settings/appearance");
-      await transparency.click();
+      await page.getByRole("radio", { name: t(language, "settings.homeMaterial_solid"), exact: true }).click();
       await expect(images).toHaveAttribute("aria-checked", "true");
       await page.goto("/#/home");
       await page.reload();

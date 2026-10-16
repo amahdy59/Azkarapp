@@ -34,10 +34,10 @@ test("the indicators open today's path", async ({ page }) => {
   const sheet = page.getByTestId("todays-path-sheet");
   await expect(sheet).toBeVisible();
 
-  // The three summaries follow the reviewed order and expose their state in
+  // The three summaries expose recorded facts and their state in
   // text rather than colour.
-  await expect(sheet.getByText("Prayer", { exact: true })).toBeVisible();
-  await expect(sheet.getByText("0 of 5 recorded · 0 in congregation", { exact: true })).toBeVisible();
+  await expect(sheet.getByText("Prayers in congregation", { exact: true })).toBeVisible();
+  await expect(sheet.getByText("0 of 5 at the mosque", { exact: true })).toBeVisible();
   await expect(sheet.getByText("Qur'an wird", { exact: true })).toBeVisible();
   await expect(sheet.getByText("Dhikr", { exact: true })).toBeVisible();
   await expect(sheet.getByText("0 of 3 complete")).toBeVisible();
@@ -62,19 +62,21 @@ test("a phone keeps the full date and opens palm and streak counts in today's pa
   await expect(sheet).toContainText("Enduring Palms:");
 });
 
-test("the secondary congregation intention can be set from its disclosure", async ({ page }) => {
+test("the path automatically explains all reward tiers without configuration", async ({ page }, testInfo) => {
   await openHome(page);
   await page.getByTestId("home-header-routine-summary").click();
   const sheet = page.getByTestId("todays-path-sheet");
-
-  // The optional congregation intention is configured separately from the
-  // prayer record and stays out of the primary summary until requested.
-  await sheet.getByText("Adjust congregation intention", { exact: true }).click();
-
-  const three = sheet.getByTestId("mosque-goal-3");
-  await expect(three).toHaveAttribute("aria-checked", "false");
-  await three.click();
-  await expect(three).toHaveAttribute("aria-checked", "true");
+  await expect(sheet.getByRole("radio")).toHaveCount(0);
+  await expect(sheet.getByRole("checkbox")).toHaveCount(0);
+  await expect(sheet).toContainText("Updates automatically from your recorded practice");
+  await expect(sheet.locator("[data-reward-tier]")).toHaveCount(3);
+  await expect(sheet).toContainText("plus 3 prayers at the mosque");
+  await expect(sheet).toContainText("plus all 5 prayers at the mosque");
+  await page.screenshot({ path: testInfo.outputPath("automatic-path-desktop.png") });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(sheet).toBeVisible();
+  expect(await sheet.evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(true);
+  await page.screenshot({ path: testInfo.outputPath("automatic-path-phone.png") });
 });
 
 test("the day's record is explained without loss or faith-scoring language", async ({ page }) => {

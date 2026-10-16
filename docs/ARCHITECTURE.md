@@ -1,5 +1,9 @@
 # Application architecture
 
+## Home scroll and relevant reminders — 2026-10-16
+
+useHomePrayerScroll owns discrete, cancelable threshold feedback using Home's content/sticky refs and existing reduced-motion preference. Header spacing/summary columns stay fixed. Home restores VisitorCount through the existing global presence provider. reminderPlan combines dated selected-location prayer windows with shifted topic rotation and conservative fasting exclusions. The thirty-source authenticated extension stays in a deferred, precached JS module; four duas reuse COMPREHENSIVE_DUAS text/meaning. Existing routine/progress/count/sync ownership is unchanged. Manual refresh traverses eligible contextual sources without repeating the same evidence identity across contexts.
+
 ## Final interaction lifecycle refinement — 2026-10-15
 
 ResponsiveSheet's Modal, SidePanel and drawer capture their opener in the focus scope's open-autofocus event and restore in close-autofocus after trapping is released, including conditional unmount. Caller-specific SidePanel recovery still takes precedence. This replaces a passive mount capture that could observe an already-focused dialog.
@@ -149,7 +153,7 @@ The application uses a typed `View` state and browser history rather than a rout
 
 Onboarding and auth steps have no hash route on purpose: they are flow states gated by stored progress, not destinations, and `routeToHash` returns null so the URL is left untouched. The single exception is the OAuth return, which arrives as `?view=auth-callback` because `getAuthCallbackUrl` configures the provider redirect that way. Legacy `?view=` links still resolve, so older bookmarks keep working.
 
-A second, narrower `activeTab` state (`home | quran | azkar | progress | settings`) drives which top-level destination the navigation highlights. It is derived from `View` and kept in sync in `App.tsx`; `View` remains the source of truth for what renders. All layout tiers present the five primary destinations (`home`, `quran`, `azkar`, `progress`, and `settings`), while devotional utilities such as Qibla and Masbaha remain linkable at every tier.
+A second, narrower `activeTab` state (`home | quran | azkar | progress | settings`) drives which top-level destination the navigation highlights. It is derived from `View` and kept in sync in `App.tsx`; `View` remains the source of truth for what renders. All layout tiers present the five primary destinations (`home`, `quran`, `azkar`, `progress`, and `settings`). Qibla shortcuts appear only in compact/medium layouts (below 900px); expanded/large layouts omit them from Home, More and the sidebar. App owns this visibility through optional callbacks. Existing Qibla URLs remain usable at every tier, including after resizing an open Qibla screen. Masbaha remains available throughout.
 
 The shell is adaptive. `useLayoutMode` returns one of four width-only tiers — `compact` (≤599px), `medium` (600–899px), `expanded` (900–1199px), `large` (≥1200px) — and `App.tsx` mounts exactly one navigation component per tier: `BottomNav` for compact and medium, `NavRail` for expanded, `NavSidebar` for large. The corresponding grid areas live in `src/styles/theme/layout.css`; the JS boundaries and the CSS media queries must stay in agreement.
 
@@ -461,3 +465,7 @@ The approved Capacitor host composes the same React application. `native/` owns 
 ### Ruqyah identity compatibility — 2026-10-15
 
 The former combined Three Quls ID ir-ref-5 expands to ir-ref-5a, ir-ref-5b and ir-ref-5c when saved/completed data enters normalization or merging. Legacy numeric Ruqyah indexes resolve through the pre-split identity order. Partial repetitions expand to each surah, with explicit new-surah tallies taking precedence within a snapshot. Session history is unchanged; repeated normalization and older sync merges deduplicate the expanded identities.
+
+## Local automatic path and Home refinement — 2026-10-16
+
+See `docs/agent/phases/AUTOMATIC_PATH_AND_HOME_POLISH_2026_10_16.md`. Derived policy 3 applies from 2026-10-16 only to policy-activated days. All three timed groups plus a completed Quran wird earn a regular palm; three/five distinct mosque prayers upgrade it to gold/oasis. No configured mosque target, manual habit shortcut or after-prayer prerequisite. Earlier policies/awards and persisted record shapes are preserved. Home and Progress read the same tier; the sheet is read-only. Current changes remain local under explicit owner instruction.

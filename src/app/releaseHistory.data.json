@@ -1,5 +1,20 @@
 [
   {
+    "release": "2026-10-16.8",
+    "ar": [
+      "مسارك اليومي يتتبّع الأوراد تلقائيًا: نخلة للأذكار الثلاثة وورد القرآن، وذهبية مع ٣ صلوات في المسجد، وواحة مع الصلوات الخمس.",
+      "بطاقات صلاة أكثر سلاسة ووضوحًا أثناء التمرير، مع مظهر زجاجي أو حسب الجهاز أو مصمت، وصور ممتدة ومشاركة بطاقات الورد من الرئيسية.",
+      "تذكيرات أكثر مع مصادرها وسياقها، وتنبيه مسبق لصيام الاثنين والخميس يراعي أوقات الصلاة وأيام منع الصيام.",
+      "اقفل أزرار الصوت أثناء الاستماع، مع حفظ اختيار تشغيل الكل وتصحيح تكرار التسجيل الذي يتضمن الدعاء ثلاث مرات؛ أُوقف التسجيل العربي غير المطابق."
+    ],
+    "en": [
+      "Today’s path tracks your awrad automatically: a palm for the three zikr groups and Qur’an wird, gold with 3 mosque prayers, and an oasis with all 5.",
+      "Smoother, clearer prayer cards while scrolling, with Glass, Follow device or Solid appearances, full-card photos and routine-card sharing from Home.",
+      "More reminders with their sources and context, plus advance Monday and Thursday fasting reminders that respect prayer times and excluded fasting days.",
+      "Lock audio controls while listening, keep your Play all choice, and avoid extra loops when a recording already recites the dua three times; the mismatched Arabic recording is withdrawn."
+    ]
+  },
+  {
     "release": "2026-10-16.5",
     "ar": [
       "شارك بطاقات أذكار الصباح والمساء والنوم المعتمدة مباشرة من تذكير الرئيسية.",

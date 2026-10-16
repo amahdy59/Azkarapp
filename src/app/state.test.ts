@@ -821,3 +821,15 @@ describe("prayer tracking persistence", () => {
     expect(sameDayReset.items?.item1).toBeDefined();
   });
 });
+
+describe("explicit Home material", () => {
+  it("normalizes old/invalid preferences and preserves explicit choices through merges", () => {
+    expect(normalizeAppState({}).settings.homeMaterial).toBe("system");
+    expect(normalizeAppState({ settings: { homeMaterial: "invalid" } }).settings.homeMaterial).toBe("system");
+    for (const homeMaterial of ["system", "glass", "solid"] as const) {
+      const state = normalizeAppState({ settings: { homeMaterial } });
+      expect(state.settings.homeMaterial).toBe(homeMaterial);
+      expect(mergeAppStates(state, { settings: { homeMaterial } }).settings.homeMaterial).toBe(homeMaterial);
+    }
+  });
+});

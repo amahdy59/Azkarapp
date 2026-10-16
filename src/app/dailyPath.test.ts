@@ -336,3 +336,54 @@ describe("the garden judged by the daily path", () => {
     expect(legacy.lifetimePalms).toBe(3);
   });
 });
+
+describe("automatic palm tiers from 16 October", () => {
+  const dayKey = "2026-10-16";
+  const complete = {
+    dayKey,
+    dailyPathStartDayKey: BEFORE,
+    dailyCompletions: [
+      completion("morning", dayKey),
+      completion("evening", dayKey),
+      completion("before_sleep", dayKey),
+    ],
+    quranWirdPlan: { kind: "daily" as const, dailyPages: 2 },
+    wirdHistory: { [dayKey]: [1, 2] },
+    prayerTracking: [],
+  };
+  it.each([0, 1, 2, 3, 4, 5])("derives the correct tier for %i mosque prayers without a chosen target", (count) => {
+    const prayerTracking = (["fajr", "dhuhr", "asr", "maghrib", "isha"] as PrayerName[])
+      .slice(0, count)
+      .map((p) => prayed(p, "mosque", dayKey));
+    const result = getDailyPathStatus({ ...complete, prayerTracking });
+    expect(result.policyVersion).toBe(3);
+    expect(result.palmEarned).toBe(true);
+    expect(result.palmTier).toBe(count >= 5 ? "oasis" : count >= 3 ? "golden" : "palm");
+    expect(getDailyPathStatus({ ...complete, prayerTracking, mosquePrayerGoal: 1 }).palmTier).toBe(result.palmTier);
+  });
+  it("requires all four awrad and does not infer mosque attendance from home or duplicate records", () => {
+    expect(getDailyPathStatus({ ...complete, wirdHistory: {} }).palmTier).toBe("none");
+    expect(getDailyPathStatus({ ...complete, quranWirdPlan: undefined }).palmEarned).toBe(false);
+    expect(getDailyPathStatus({ ...complete, dailyCompletions: complete.dailyCompletions.slice(0, 2) }).palmTier).toBe(
+      "none",
+    );
+    const prayerTracking = [
+      prayed("fajr", "mosque", dayKey),
+      prayed("fajr", "mosque", dayKey),
+      prayed("asr", "home", dayKey),
+    ];
+    expect(getDailyPathStatus({ ...complete, prayerTracking }).palmTier).toBe("palm");
+  });
+  it("keeps the prior day's existing award rules", () => {
+    const dayKey = "2026-10-15";
+    const result = getDailyPathStatus({
+      ...complete,
+      dayKey,
+      dailyCompletions: complete.dailyCompletions.map((record) => ({ ...record, dayKey })),
+      wirdHistory: { [dayKey]: [1, 2] },
+      mosquePrayerGoal: 5,
+    });
+    expect(result.policyVersion).toBe(2);
+    expect(result.palmEarned).toBe(false);
+  });
+});

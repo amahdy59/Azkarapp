@@ -1,5 +1,11 @@
 # AI Improvement System Index
 
+Current coordinated snapshot is local only: the owner authorized chat coordination and subsequently instructed “Coordinate; keep these changes local” in the Home refinement chat. Finish local integration and verification; do not commit, push or publish this combined snapshot. This publication hold supersedes earlier release authority for the current pending changes.
+
+Latest owner-authorized combined work: [Authenticated reminders](phases/HOME_RELEVANT_REMINDERS_2026_10_16.md) and [Home scrolling/presence report](phases/HOME_PRAYER_SCROLL_AND_PRESENCE_2026_10_16.md). The owner explicitly supersedes the initial content-workbook approval gate for authenticated material and asks for both relevance plans to work together. Existing approved appearance/audio/Qibla work retains its separately documented release authority and verification requirements.
+
+Current bounded local follow-up: [Qibla shortcut visibility](phases/QIBLA_SHORTCUT_VISIBILITY_2026_10_16.md). The owner requests hiding desktop Qibla while retaining phone/tablet layouts and explicitly prohibits pushing changes.
+
 Latest owner-approved Home follow-up: Friday-specific deeds/evidence, full-photo Wird tiles and progress badges, versioned R2 backgrounds with opaque load-failure recovery, and a single symmetric liquid connector. See the active Home phase and decision log. Preserve normal glass values; inspect local responsive images before the authorized release.
 
 Latest release authorization, 2026-10-16: the owner reviewed the new Home image candidates and their real phone/desktop composites, selected the calmer Friday-morning scene, and requests applying the optimized backgrounds and pushing all pending Home refinements. This supersedes earlier local-preview holds. See the active Home phase, decision log, and the final Home release report.
@@ -349,3 +355,11 @@ The latest owner-approved continuation is [Canonical Surah magnification and rec
 [Home glass and desktop header](phases/HOME_GLASS_AND_HEADER_2026_10_14.md) is the active owner-approved refinement: full-width main-canvas header, visible photographic glass, stronger reading surfaces, simpler nested controls and intact accessibility preferences.
 
 Latest owner-approved combined follow-up: [Home sharing, selection and audio](phases/HOME_SHARING_AUDIO_2026_10_16.md) supersedes the hourglass connector with matching edges, adds direct approved-card sharing, persists the Play all choice, unifies audio option controls and fixes visible compressed photo delivery. Include the independently verified scrolling prayer summary as requested by the owner.
+
+[Desktop Home material and audio controls lock](phases/DESKTOP_GLASS_AUDIO_LOCK_2026_10_16.md) records the owner-approved Glass / Follow device / Solid choice, recording quarantine and touch-lock-only scope. The owner also approves including the verified concurrent Qibla edits, superseding their local publication hold.
+
+[Automatic path and Home polish](phases/AUTOMATIC_PATH_AND_HOME_POLISH_2026_10_16.md) is the current owner-requested local-only follow-up: prospective regular/golden/oasis palm tiers, read-only path clarity, embedded-three audio metadata, separated selection edge, coordinated prayer-card collapse and translucent scrolled ground. The owner approves coordination while withholding publication.
+
+## Combined release authorization — 2026-10-16
+
+The owner's subsequent “push all changes” instruction supersedes the current local-only holds. [Combined release report](phases/COMBINED_HOME_RELEASE_2026_10_16.md) records verification/publication for the frozen Home, automatic path, reminders, audio protection and Qibla work. One coordinating chat owns commit/push and exact-commit Quality/Pages/production verification.

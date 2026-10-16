@@ -542,6 +542,7 @@ export function DailyEvidenceCard({
       elevation="raised"
       aria-labelledby="home-evidence-heading"
       data-testid="home-daily-evidence"
+      data-evidence-id={evidence.evidenceId}
       dir={direction}
       className="home-glass-reading flex min-h-0 flex-1 flex-col gap-3"
     >
@@ -559,9 +560,9 @@ export function DailyEvidenceCard({
           </span>
           <h2
             id="home-evidence-heading"
-            className={`truncate text-subtitle font-bold ${onGlass ? "text-on-media" : "text-foreground"}`}
+            className={`min-w-0 text-subtitle font-bold ${onGlass ? "text-on-media" : "text-foreground"}`}
           >
-            {t(language, "home.dailyEvidence")}
+            {evidence.title ?? t(language, "home.dailyEvidence")}
           </h2>
         </div>
 
@@ -587,6 +588,11 @@ export function DailyEvidenceCard({
           `lang` and `dir` follow the text that is actually rendered, and the
           Arabic face is only applied when the text is Arabic. */}
 
+      {evidence.excerpt || evidence.reportedAction ? (
+        <p className={`text-xs font-semibold ${onGlass ? "text-on-media-muted" : "text-muted-foreground"}`}>
+          {t(language, evidence.reportedAction ? "home.reportedPropheticAction" : "home.hadithExcerpt")}
+        </p>
+      ) : null}
       <blockquote
         className={`font-medium ${
           evidence.isQuran ? "text-xl sm:text-2xl font-normal leading-relaxed tracking-wide" : "text-title leading-[2]"
@@ -623,6 +629,16 @@ export function DailyEvidenceCard({
           {evidence.authenticity}
         </span>
         {evidence.authenticityLevel === "weak" && <HadithWeakChainBadge language={language} />}
+        {evidence.sourceUrl && (
+          <a
+            href={evidence.sourceUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`ms-auto inline-flex min-h-11 items-center rounded-lg px-2 text-xs font-semibold underline underline-offset-4 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${onGlass ? "text-on-media-accent" : "text-primary"}`}
+          >
+            {t(language, "home.viewEvidenceSource")}
+          </a>
+        )}
         {evidence.sourceReference && (
           <span className={`text-xs ${onGlass ? "text-on-media-muted" : "text-muted-foreground"}`} dir="auto">
             {evidence.sourceReference}

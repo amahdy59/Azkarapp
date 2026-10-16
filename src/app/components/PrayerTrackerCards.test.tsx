@@ -50,6 +50,30 @@ function renderRow(current: PrayerName) {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("PrayerTrackerCards", () => {
+  it.each(["ar", "en"] as const)("exposes remaining-time semantics and native %s fill direction", (language) => {
+    render(
+      <PrayerTrackerCards
+        models={modelsWithCurrent("dhuhr").map((model) =>
+          model.state === "next" ? { ...model, remainingPercent: 25 } : model,
+        )}
+        language={language}
+        direction={language === "ar" ? "rtl" : "ltr"}
+        records={[]}
+        dayKey="2026-10-16"
+        onToggle={vi.fn()}
+        onOpen={vi.fn()}
+        summaryOnly
+        compactSummary
+      />,
+    );
+    const bar = screen.getByRole("progressbar");
+    expect(bar).toHaveAttribute("value", "25");
+    expect(bar).toHaveAttribute("max", "100");
+    expect(bar).toHaveAttribute("dir", language === "ar" ? "rtl" : "ltr");
+    expect(bar).toHaveAttribute("aria-valuetext", "01:00");
+    expect(bar).toHaveAccessibleName(language === "ar" ? "الوقت المتبقي حتى صلاة العصر" : "Time remaining until Asr");
+    expect(bar.closest("button")).toBeNull();
+  });
   it("uses concise saved-location and future-state footers without adding actions", () => {
     render(
       <PrayerTrackerCards

@@ -117,3 +117,11 @@ Owner correction replaces flowing Al-Kahf/As-Sajdah/Al-Mulk streams with continu
 ## Persistent automatic continuation — 2026-10-16
 
 Play all defaults on for new/legacy preference snapshots and single/full-session starts. An explicit manual choice is saved through the existing audio-preference boundary and retained across plans/reloads. A Reader listen still begins at the selected zikr in its existing language-filtered queue. This changes continuation only; prescribed repeats, exact recording identity, natural-ending-only completion and media ownership are unchanged. Binary audio options reuse AudioOptionToggle, and the expanded player omits the redundant visible title while retaining accessible/media identity. Desktop Play all feedback sits beside centered transport; narrow layouts move the label below at the left.
+
+## Recording quarantine and accidental-touch lock — 2026-10-16
+
+The owner-reported wrong comprehensive-dua-39 Arabic variant is rejected; misc-ref-1 shares that asset and likewise has no Arabic coverage. Approved English remains available. Identical bytes remain approved for the correctly matched friday-dua-25. Two mismatched transcript annotations are removed from the compressed owner-preview pack and all references to the rejected variant are stripped. No sacred text, prescribed count or progress rule changes. Restore coverage only through the existing independent recording review process.
+
+Expanded ordinary and Quran playback expose one 44px Lock controls action. Its shared modal blocks outside pointer interaction, traps focus and leaves media running. Hold the unlock action for two seconds with pointer, Space or Enter; release/cancel/blur resets the hold. Escape is an accessible recovery path; focus returns to the opener. This prevents accidental touches, not device navigation or OS interaction. It is temporary UI state, never a child practice or repetition mode.
+
+The owner-confirmed three recitations in the comprehensive-dua-42 Arabic recording require three-occurrence timing coverage. Its two one-occurrence preview candidates are quarantined; English timing remains. Arabic playback remains available without fabricated word highlighting until matching timing is reviewed. Existing prescribed counts remain unchanged.

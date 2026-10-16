@@ -5,6 +5,8 @@ import * as dailyEvidence from "../dailyEvidence";
 import * as maintenance from "../startupMaintenance";
 import { CATEGORY_IDS, type CategoryId } from "../types";
 import { HomeScreen } from "./HomeScreen";
+import { ActiveVisitorPresence } from "../components/VisitorCount";
+import * as cloudflare from "../../lib/cloudflareSync";
 
 function emptyProgress() {
   return Object.fromEntries(CATEGORY_IDS.map((id) => [id, new Set<string>()])) as Record<CategoryId, Set<string>>;
@@ -21,6 +23,29 @@ describe("HomeScreen quick access", () => {
   afterEach(() => {
     vi.restoreAllMocks();
     vi.useRealTimers();
+  });
+
+  it("renders the visitor count at the bottom of Home through the shared presence provider", async () => {
+    vi.spyOn(cloudflare, "sendActiveVisitorHeartbeat").mockResolvedValue(12);
+    render(
+      <ActiveVisitorPresence>
+        <HomeScreen
+          completed={emptyProgress()}
+          dailyCompletions={[]}
+          quietProgressEnabled={false}
+          progressDayStartHour={4}
+          language="en"
+          direction="ltr"
+          onResume={() => undefined}
+          routineModes={routineModes}
+        />
+      </ActiveVisitorPresence>,
+    );
+    expect(await screen.findByText("Visitors now: 12")).toBeInTheDocument();
+    const footer = screen.getByTestId("home-visitor-footer");
+    expect(footer).toContainElement(screen.getByText("Visitors now: 12"));
+    expect(screen.getByTestId("home-content-grid").lastElementChild).toBe(footer);
+    expect(screen.getByTestId("home-sticky-prayers")).not.toContainElement(footer);
   });
 
   it("does not reload optional reminder evidence on ordinary clock ticks and refreshes for a language change", () => {

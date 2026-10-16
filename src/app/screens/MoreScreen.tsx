@@ -50,7 +50,7 @@ export function MoreScreen({
 }: {
   language: AppLanguage;
   direction: "ltr" | "rtl";
-  onOpenQibla: () => void;
+  onOpenQibla?: () => void;
   onOpenMasbaha: () => void;
   onOpenSettings: () => void;
 }) {
@@ -64,13 +64,15 @@ export function MoreScreen({
           language={language}
         />
         <div className="grid w-full grid-cols-1 gap-3 px-page py-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
-          <ToolCard
-            title={t(language, "qibla.title")}
-            description={t(language, "more.qiblaDescription")}
-            Icon={Compass}
-            onClick={onOpenQibla}
-            featured
-          />
+          {onOpenQibla && (
+            <ToolCard
+              title={t(language, "qibla.title")}
+              description={t(language, "more.qiblaDescription")}
+              Icon={Compass}
+              onClick={onOpenQibla}
+              featured
+            />
+          )}
           <ToolCard
             title={t(language, "counter.tasbeehTitle")}
             description={t(language, "more.masbahaDescription")}
