@@ -1,3 +1,4 @@
+import { homeArtworkUrl } from "./azkar-backgrounds";
 import { BookOpen, Calendar, Check, ChevronNext, Info, MoonStar, Sunrise, Sunset } from "./icons";
 import { formatNumerals, formatRatio } from "../formatting";
 import { THIMAR_PER_ROUTINE, TOTAL_DAILY_THIMAR } from "../oasis/oasisModel";
@@ -128,16 +129,28 @@ export function HomeWirdSection({
             className={`home-wird-tile focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 ${showImages ? "home-wird-photo" : onGlass ? "hero-glass home-glass-surface" : "border border-border bg-card text-foreground"}`}
           >
             {showImages && (
-              <img
-                src={`${import.meta.env.BASE_URL}assets/cards/${image}`}
-                alt=""
-                loading="lazy"
-                decoding="async"
-                onError={(event) => {
-                  event.currentTarget.hidden = true;
-                }}
-                className="home-wird-photo-image"
-              />
+              <picture>
+                <source
+                  type="image/avif"
+                  srcSet={`${homeArtworkUrl(`assets/cards/${image.replace(".jpg", "-360.avif")}`)} 360w, ${homeArtworkUrl(`assets/cards/${image.replace(".jpg", "-720.avif")}`)} 720w`}
+                  sizes="(min-width: 1280px) 240px, 50vw"
+                />
+                <source
+                  type="image/webp"
+                  srcSet={`${homeArtworkUrl(`assets/cards/${image.replace(".jpg", "-360.webp")}`)} 360w, ${homeArtworkUrl(`assets/cards/${image.replace(".jpg", "-720.webp")}`)} 720w`}
+                  sizes="(min-width: 1280px) 240px, 50vw"
+                />
+                <img
+                  src={`${import.meta.env.BASE_URL}assets/cards/${image.replace(".jpg", "-720.webp")}`}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  onError={(event) => {
+                    event.currentTarget.hidden = true;
+                  }}
+                  className="home-wird-photo-image"
+                />
+              </picture>
             )}
             {complete && (
               <span className="home-wird-completed-badge" aria-hidden="true">

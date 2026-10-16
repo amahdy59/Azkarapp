@@ -1,5 +1,5 @@
 import { displayLocationName } from "../content/prayerLocations";
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { scheduleIdleAfterPaint } from "../startupMaintenance";
 import { ArrowNext, Compass, Sparkles, Zap } from "../components/icons";
 import { getQiblaBearing } from "../qibla";
@@ -24,7 +24,7 @@ import { getEstimatedPrayerTimes, timeToMinutes, type PrayerName } from "../cont
 import { PrayerTrackerCards, type PrayerTrackingWrite } from "../components/PrayerTrackerCards";
 import { buildPrayerCardModels } from "../prayerCardModels";
 import { useNow } from "../hooks/useNow";
-import { usePrayerNotchAlignment } from "../hooks/usePrayerNotchAlignment";
+import { useQuickRoutineShare } from "../hooks/useQuickRoutineShare";
 import { formatDisplayDate, formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { ScreenContainer } from "../components/ScreenContainer";
@@ -324,6 +324,7 @@ export function HomeScreen({
   ) => void;
 }) {
   const [hasScrolledHomeContent, setHasScrolledHomeContent] = useState(false);
+  const [prayerCardsCondensed, setPrayerCardsCondensed] = useState(false);
   const [failedBackgroundCategory, setFailedBackgroundCategory] = useState<string | null>(null);
   const isArabic = language === "ar";
   const now = useNow();
@@ -578,6 +579,33 @@ export function HomeScreen({
     () => buildPrayerCardModels(now, language, locationSettings),
     [now, language, locationSettings],
   );
+  const homeScrollRef = useRef<HTMLDivElement>(null);
+  const homeStickyRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const scroll = homeScrollRef.current;
+    const sticky = homeStickyRef.current;
+    if (!scroll || !sticky) return;
+    // Keep native focus/scroll-into-view recovery below the full sticky cards,
+    // including when text size, viewport width or safe-area insets change.
+    const measure = () => {
+      const height = sticky.getBoundingClientRect().height;
+      // A short landscape or enlarged-text viewport must still expose the
+      // content below the cards. Restore ordinary scrolling if it cannot.
+      const fits = height + 44 < scroll.clientHeight;
+      sticky.style.position = fits ? "" : "relative";
+      scroll.style.scrollPaddingTop = `${fits ? height + 8 : 8}px`;
+    };
+    const observer = new ResizeObserver(measure);
+    observer.observe(sticky);
+    observer.observe(scroll);
+    measure();
+    return () => {
+      observer.disconnect();
+      scroll.style.removeProperty("scroll-padding-top");
+      sticky.style.removeProperty("position");
+    };
+  }, []);
 
   const actionKind: "start" | "continue" | "again" = doneCount === 0 ? "start" : isComplete ? "again" : "continue";
 
@@ -616,7 +644,7 @@ export function HomeScreen({
   const autoPrayer = isPrayerHero ? (leadingPrayer?.prayer ?? null) : null;
   const expandedPrayer = selectedPrayer ?? (dismissedAutoPrayer === autoPrayer ? null : autoPrayer);
   const expandedPrayerModel = prayerCardModels.find((model) => model.prayer === expandedPrayer);
-  const { overviewRef, panelRef } = usePrayerNotchAlignment(expandedPrayer, direction);
+  const quickShare = useQuickRoutineShare(reminderInfo.categoryId, language);
   const hasQuranActivity =
     Boolean(quranWirdPlan?.startedDayKey) ||
     (quranReadingPosition?.page ?? 1) > 1 ||
@@ -651,15 +679,27 @@ export function HomeScreen({
 
       {/* Scrollable Content Area */}
       <div
+        ref={homeScrollRef}
         // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
         role="region"
         aria-label={t(language, "home.title")}
         className="relative z-10 min-h-0 flex-1 overflow-y-auto overflow-x-hidden pb-24 pt-0 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
-        onScroll={(event) => setHasScrolledHomeContent(event.currentTarget.scrollTop > 4)}
+        onScroll={(event) => {
+          const top = event.currentTarget.scrollTop;
+          setHasScrolledHomeContent(top > 4);
+          setPrayerCardsCondensed((condensed) => (condensed ? top > 8 : top > 96));
+        }}
       >
         {/* Sticky Header Overlay */}
-        <div className="pointer-events-none sticky inset-x-0 top-0 z-50 overflow-visible">
+        <div
+          ref={homeStickyRef}
+          data-testid="home-sticky-prayers"
+          data-prayer-cards-condensed={prayerCardsCondensed || undefined}
+          className={`pointer-events-none sticky inset-x-0 top-0 z-50 overflow-visible ${
+            hasScrolledHomeContent ? (homeVisualEffects ? "bg-on-media-surface" : "bg-background") : ""
+          }`}
+        >
           <header
             data-testid="home-utility-header"
             data-scrolled={hasScrolledHomeContent || undefined}
@@ -733,11 +773,31 @@ export function HomeScreen({
               </div>
             </div>
           </header>
+          {showHeroContent && (
+            <div className="pointer-events-auto mx-auto w-full max-w-[64rem] px-page pb-4 pt-1 sm:pt-2 lg:pb-5 lg:pt-3">
+              <div data-testid="home-prayer-strip" className="relative z-10 mx-auto w-full min-w-0 overflow-visible">
+                <h2 className="sr-only">{t(language, "prayerMoment.dayTitle")}</h2>
+                <PrayerTrackerCards
+                  models={prayerCardModels}
+                  language={language}
+                  direction={direction}
+                  records={prayerTracking}
+                  dayKey={todayKey}
+                  onToggle={onTogglePrayerTracking ?? (() => undefined)}
+                  onOpen={handlePrayerOpen}
+                  onGlass={homeVisualEffects}
+                  summaryOnly
+                  compactSummary
+                  selectedPrayer={expandedPrayer}
+                />
+              </div>
+            </div>
+          )}
         </div>
         <div data-testid="home-content-grid" className="mx-auto grid w-full max-w-[64rem] grid-cols-1 gap-4 lg:gap-5">
           <div data-testid="home-hero" className="relative w-full">
             {showHeroContent && (
-              <div className="relative z-10 mx-auto flex w-full flex-col items-stretch justify-end gap-4 px-page pb-5 pt-1 sm:pb-6 sm:pt-2 lg:gap-5 lg:pb-8 lg:pt-3">
+              <div className="relative z-10 mx-auto flex w-full flex-col items-stretch justify-end gap-4 px-page pb-5 sm:pb-6 lg:gap-5 lg:pb-8">
                 <div
                   data-testid="home-context-grid"
                   className={`grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:gap-5 ${
@@ -745,53 +805,15 @@ export function HomeScreen({
                   }`}
                   dir={direction}
                 >
-                  {/* Summary and full-width disclosure precede the fixed contextual pair. */}
-                  <div
-                    ref={overviewRef}
-                    data-testid="home-prayer-strip"
-                    className="relative z-10 mx-auto w-full min-w-0 overflow-visible md:col-span-2"
-                  >
-                    <h2 className="sr-only">{t(language, "prayerMoment.dayTitle")}</h2>
-                    <PrayerTrackerCards
-                      models={prayerCardModels}
-                      language={language}
-                      direction={direction}
-                      records={prayerTracking}
-                      dayKey={todayKey}
-                      onToggle={onTogglePrayerTracking ?? (() => undefined)}
-                      onOpen={handlePrayerOpen}
-                      onGlass={homeVisualEffects}
-                      summaryOnly
-                      compactSummary
-                      selectedPrayer={expandedPrayer}
-                    />
-                  </div>
                   <div data-testid="home-prayer-column" className="contents">
                     {expandedPrayer && (
                       <section
-                        ref={panelRef}
                         id="home-expanded-prayer"
                         data-testid="home-prayer-moment"
                         data-prayer={expandedPrayer}
                         aria-label={t(language, "prayerMoment.homeTitle")}
                         className="home-prayer-connected-panel mx-auto w-full min-w-0 justify-self-center md:col-span-2"
                       >
-                        <svg
-                          className="home-prayer-bridge"
-                          viewBox="0 0 72 100"
-                          preserveAspectRatio="none"
-                          aria-hidden="true"
-                          focusable="false"
-                        >
-                          <path
-                            stroke="none"
-                            d="M 8 0 C 8 18 23 28 23 50 C 23 72 8 82 8 100 L 64 100 C 64 82 49 72 49 50 C 49 28 64 18 64 0 Z"
-                          />
-                          <path
-                            fill="none"
-                            d="M 8 0 C 8 18 23 28 23 50 C 23 72 8 82 8 100 M 64 0 C 64 18 49 28 49 50 C 49 72 64 82 64 100"
-                          />
-                        </svg>
                         <PrayerMomentPanel
                           prayer={expandedPrayer}
                           language={language}
@@ -843,6 +865,7 @@ export function HomeScreen({
                                     : reminderCategory.name
                               }
                               description={reminderInfo.desc}
+                              quickShare={quickShare}
                               mode={reminderMode}
                               showModeSelector={!isLastThirdDua}
                               onModeChange={(mode) => {

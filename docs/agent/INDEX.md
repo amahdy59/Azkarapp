@@ -347,3 +347,5 @@ The latest owner-approved continuation is [Canonical Surah magnification and rec
 [Home clarity and independent appearance](phases/HOME_CLARITY_2026_10_14.md) implements the owner-approved final concept and desktop-only Today’s path. [Supplied sleep cards and reliance lettering](phases/SLEEP_SHARING_AND_RELIANCE_LETTERING_2026_10_14.md) records the two subsequent owner requests. The owner explicitly approved a 12 MiB total-output exception and publication of all changes; intact release gates apply.
 
 [Home glass and desktop header](phases/HOME_GLASS_AND_HEADER_2026_10_14.md) is the active owner-approved refinement: full-width main-canvas header, visible photographic glass, stronger reading surfaces, simpler nested controls and intact accessibility preferences.
+
+Latest owner-approved combined follow-up: [Home sharing, selection and audio](phases/HOME_SHARING_AUDIO_2026_10_16.md) supersedes the hourglass connector with matching edges, adds direct approved-card sharing, persists the Play all choice, unifies audio option controls and fixes visible compressed photo delivery. Include the independently verified scrolling prayer summary as requested by the owner.

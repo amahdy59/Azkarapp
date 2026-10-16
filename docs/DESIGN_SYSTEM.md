@@ -969,3 +969,18 @@ Keep the palm and streak counts visible in the Home header. Place the full selec
 ## Home photographic backgrounds and material — 2026-10-16
 
 The selected Home scenery uses calm, low-detail skies behind the content grid: ordinary dawn, subdued evening, night, a deep-blue Friday morning, and a warm later-Friday courtyard. Friday morning runs from Fajr until Dhuhr; the later Friday image runs until Maghrib under the existing Friday-daytime rule. This is a visual distinction only. Each scene has 768/1280/1600px AVIF sources, equivalent WebP fallbacks, and a tiny blurred placeholder. Keep the existing scrim and responsive source-loading behavior so readable surfaces do not depend on a single photograph or codec. Normal Home cards use 18% navy tint with 16px blur, 135% saturation, a restrained directional reflection and visible inset edge; long reading surfaces use 28% tint. Prayer cards keep their own quiet reflection and focus accents without reducing text opacity. System/app reduced transparency, forced colors, high contrast and unsupported backdrop filters continue to render stable opaque surfaces. These latest material numbers supersede earlier values above.
+
+## Home selection and photo accessibility — 2026-10-16
+
+Selected prayer and detail use matching 2px accent edges, without a connecting shape or screen-space alignment observer. Accent edges are decorative and pointer inert; native button expanded semantics remain. Opaque photo captions under reduced transparency/high contrast preserve a 4rem visible photographic band, rather than covering the complete card. Explicit images-off remains independent. Home photo delivery uses 360/720px AVIF/WebP in versioned R2 storage on hosted web builds; local/native builds retain packaged assets. Existing contrast and fallback rules remain.
+
+Audio binary options share AudioOptionToggle across ordinary, paginated Quran and continuous-surah listening. The expanded zikr title remains available to assistive technology and compact/media metadata, without duplication above the reading. Play all sits left of centered desktop transport and below it at the left in narrow containers, without taking a controller slot.
+
+### Sticky Home prayer cards — 2026-10-16
+
+The owner requests the original five Home prayer cards to remain pinned beneath the utility header while scrolling in either direction. Retain their full appearance, chronological DOM order, horizontal phone scrolling, native actions and countdown; do not replace them with a compact summary. The sticky block uses an opaque theme-aware backing once scrolled, and its measured height supplies native scroll-padding-top so focused content can clear it. This is a local-only refinement; see docs/agent/phases/STICKY_PRAYER_CARDS_2026_10_16.md.
+
+At very short heights or enlarged text, restore ordinary scrolling only when the full sticky block cannot leave a 44px action visible below it; keep all cards and their appearance unchanged.
+Owner follow-up: abbreviate these same cards away from the top, hiding all footers after 96px and restoring within 8px of the top. Keep next-prayer countdown beneath its time in the condensed row. Separate thresholds avoid scroll-height flicker; no animation or persisted preference is added.
+
+Owner correction: photo-enabled Wird cards retain full-card photography under reduced transparency as well. A fixed image gradient provides contrast without glass or a separate opaque caption; the earlier visible-band description is superseded. High contrast strengthens the gradient, while forced colors retains Canvas/CanvasText.

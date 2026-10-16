@@ -113,3 +113,7 @@ Expanded full-surah following observes reading/page geometry so text resizing ke
 ## Canonical continuous Surah listening — 2026-10-13
 
 Owner correction replaces flowing Al-Kahf/As-Sajdah/Al-Mulk streams with continuous canonical pages. Keep each source page's fifteen slots and original word lines; remove adjacent surah tokens/headings without compacting rows. Use MushafListeningPage with the selected surah filter and original semantic verse alternative. Enlarge both dimensions proportionally, retain normal fitting across zoom and allow horizontal panning. Reveal the selected opening rather than preceding blank slots. Reviewed timings, single native media ownership, exact word cues, manual-browse pause/resume, complete English translation and offline Unicode recovery remain unchanged.
+
+## Persistent automatic continuation — 2026-10-16
+
+Play all defaults on for new/legacy preference snapshots and single/full-session starts. An explicit manual choice is saved through the existing audio-preference boundary and retained across plans/reloads. A Reader listen still begins at the selected zikr in its existing language-filtered queue. This changes continuation only; prescribed repeats, exact recording identity, natural-ending-only completion and media ownership are unchanged. Binary audio options reuse AudioOptionToggle, and the expanded player omits the redundant visible title while retaining accessible/media identity. Desktop Play all feedback sits beside centered transport; narrow layouts move the label below at the left.

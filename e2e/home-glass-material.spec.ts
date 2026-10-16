@@ -291,40 +291,31 @@ test("photo-enabled Wird tiles fill the card behind a readable gradient", async 
   );
 });
 
-test("liquid selection bridge uses the shared glass palette at phone and desktop widths", async ({
-  page,
-}, testInfo) => {
+test("matching prayer accent edges preserve selection at phone and desktop widths", async ({ page }, testInfo) => {
   await page.clock.setFixedTime(new Date("2026-10-16T13:40:00+03:00"));
   await page.goto("/#/home");
   await page.getByTestId("prayer-card-dhuhr").getByRole("button").click();
-  const bridge = page.locator(".home-prayer-bridge");
-  await expect(bridge).toHaveAttribute("aria-hidden", "true");
-  await expect(bridge).toHaveCSS("pointer-events", "none");
   for (const width of [390, 1440]) {
     await page.setViewportSize({ width, height: 1000 });
     await page.getByTestId("home-prayer-strip").scrollIntoViewIfNeeded();
-    expect(await bridge.evaluate((node) => getComputedStyle(node).stroke)).toBe(
-      await page.getByTestId("prayer-card-dhuhr").evaluate((node) => {
-        const color = getComputedStyle(node).getPropertyValue("--prayer-join-stroke").trim();
-        const probe = document.createElement("span");
-        probe.style.color = color;
-        node.append(probe);
-        const resolved = getComputedStyle(probe).color;
-        probe.remove();
-        return resolved;
-      }),
-    );
-    await page.screenshot({ path: testInfo.outputPath(`liquid-bridge-${width}.png`), scale: "css" });
+    const edges = await page.getByTestId("prayer-card-dhuhr").evaluate((node) => {
+      const small = getComputedStyle(node, "::after"),
+        panel = getComputedStyle(document.querySelector('[data-testid="home-prayer-moment"]')!, "::before");
+      return {
+        small: small.backgroundColor,
+        panel: panel.backgroundColor,
+        height: small.height,
+        content: panel.content,
+        pointer: panel.pointerEvents,
+      };
+    });
+    expect(edges.small).toBe(edges.panel);
+    expect(edges.height).toBe("2px");
+    expect(edges.content).toBe('""');
+    expect(edges.pointer).toBe("none");
+    await expect(page.locator(".home-prayer-bridge")).toHaveCount(0);
+    await page.screenshot({ path: testInfo.outputPath(`matching-edges-${width}.png`), scale: "css" });
   }
-  const cdp = await page.context().newCDPSession(page);
-  await cdp.send("Emulation.setEmulatedMedia", {
-    features: [{ name: "prefers-reduced-transparency", value: "reduce" }],
-  });
-  await page.setViewportSize({ width: 390, height: 1000 });
-  await page.reload();
-  await page.getByTestId("prayer-card-dhuhr").getByRole("button").click();
-  await expect(page.getByTestId("home-prayer-moment").locator(".hero-glass")).toHaveCSS("backdrop-filter", "none");
-  await page.screenshot({ path: testInfo.outputPath("liquid-bridge-reduced-390.png"), scale: "css" });
 });
 
 for (const themeMode of ["light", "dark", "midnight"]) {

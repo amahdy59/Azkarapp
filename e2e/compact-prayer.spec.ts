@@ -249,7 +249,7 @@ for (const language of ["ar", "en"] as const) {
             expect(cardGaps.gaps.every((gap) => Math.abs(gap - 8) <= 1)).toBe(true);
             expect(cardGaps.selectedVisible).toBe(true);
             if (width === 390) expect(cardGaps.visibleCount).toBeGreaterThanOrEqual(2);
-            await expect(page.getByTestId(`prayer-card-${prayer}`)).toHaveCSS("--prayer-notch-opacity", "1");
+            await expect(page.getByTestId(`prayer-card-${prayer}`)).toHaveAttribute("data-selected", "true");
             await page.screenshot({
               path: testInfo.outputPath(`${language}-${width}-${prayer}-fixed-panel.png`),
               scale: "css",
@@ -295,25 +295,14 @@ for (const language of ["ar", "en"] as const) {
           await expect(page.getByTestId("home-prayer-moment")).toHaveAttribute("data-prayer", prayer);
           await tile.scrollIntoViewIfNeeded();
           await checkGeometry(page);
-          await expect
-            .poll(() =>
-              tile.evaluate((node) => {
-                const panel = document.querySelector('[data-testid="home-prayer-moment"]')!;
-                const bridge = panel.querySelector(".home-prayer-bridge")!;
-                const bounds = bridge.getBoundingClientRect();
-                const anchor =
-                  node.getBoundingClientRect().left +
-                  node.clientLeft +
-                  parseFloat(getComputedStyle(node).getPropertyValue("--prayer-notch-x"));
-                return Math.max(
-                  Math.abs(anchor - (bounds.left + bounds.width / 2)),
-                  Math.abs(bounds.top - node.getBoundingClientRect().bottom),
-                  Math.abs(bounds.bottom - panel.getBoundingClientRect().top),
-                );
-              }),
-            )
-            .toBeLessThanOrEqual(1);
-          await expect(tile).toHaveCSS("--prayer-notch-opacity", "1");
+          const edges = await tile.evaluate((node) => ({
+            small: getComputedStyle(node, "::after").backgroundColor,
+            detail: getComputedStyle(document.querySelector('[data-testid="home-prayer-moment"]')!, "::before")
+              .backgroundColor,
+          }));
+          expect(edges.small).toBe(edges.detail);
+          await expect(tile).toHaveAttribute("data-selected", "true");
+          await expect(page.locator(".home-prayer-bridge")).toHaveCount(0);
           const tiles = await page.locator('[data-density="summary"]').evaluateAll((tiles) =>
             tiles.map((tile) => {
               const button = tile.querySelector("button")!;

@@ -1,3 +1,4 @@
+import { AudioOptionToggle } from "./AudioOptionToggle";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import type { QuranListeningReaderProps } from "./QuranListeningReader";
@@ -11,7 +12,6 @@ import { QuranListeningTranslation } from "./QuranListeningTranslation";
 import { MushafBismillahArt } from "./MushafBismillahArt";
 import { BASMALAH_ARABIC } from "./QuranChrome";
 import { QURAN_TEXT_STYLE, getQuranReadingSize } from "../quranTypography";
-import { Check } from "./icons";
 import { t } from "../i18n";
 
 const actionClass =
@@ -249,21 +249,23 @@ export default function QuranSurahListeningReader(props: QuranListeningReaderPro
     >
       <p className="text-sm">{t(language, timing ? "quranListening.browseHint" : "quranListening.unavailable")}</p>
       {timing && (
-        <button type="button" className={actionClass} aria-pressed={follow} onClick={() => setFollow(!follow)}>
-          <span>{t(language, "quranListening.follow")}</span>
-          {follow && <Check size={16} className="shrink-0" aria-hidden="true" />}
-        </button>
+        <AudioOptionToggle
+          label={t(language, "quranListening.follow")}
+          checked={follow}
+          onChange={() => {
+            setFollow(!follow);
+          }}
+        />
       )}
       {timing?.verses.some((verse) => verse.words?.length) && (
-        <button type="button" className={actionClass} aria-pressed={words} onClick={() => setWords((value) => !value)}>
-          <span>
-            {t(
-              language,
-              timing.reviewStatus === "owner-preview" ? "quranListening.estimatedWords" : "quranListening.words",
-            )}
-          </span>
-          {words && <Check size={16} className="shrink-0" aria-hidden="true" />}
-        </button>
+        <AudioOptionToggle
+          label={t(
+            language,
+            timing?.reviewStatus === "owner-preview" ? "quranListening.estimatedWords" : "quranListening.words",
+          )}
+          checked={words}
+          onChange={() => setWords((value) => !value)}
+        />
       )}
     </div>
   );

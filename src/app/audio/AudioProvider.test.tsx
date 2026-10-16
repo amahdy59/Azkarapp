@@ -194,6 +194,33 @@ function QueueHarness({ queue }: { queue: PlaybackPlan }) {
 }
 
 describe("AudioProvider integration", () => {
+  it("defaults a single-entry start to Play all and retains manual choice across new plans and remount", () => {
+    vi.stubGlobal("Audio", FakeAudio);
+    let controller!: ReturnType<typeof useAudioController>;
+    function PreferencesHarness() {
+      controller = useAudioController();
+      return null;
+    }
+    const mounted = render(
+      <AudioProvider>
+        <PreferencesHarness />
+      </AudioProvider>,
+    );
+    act(() => controller.startPlan(plan));
+    expect(controller.autoAdvance).toBe(true);
+    act(() => controller.setAutoAdvance(false));
+    act(() => controller.startPlan({ ...plan, context: { ...plan.context, source: "full-session" } }));
+    expect(controller.autoAdvance).toBe(false);
+    mounted.unmount();
+    render(
+      <AudioProvider>
+        <PreferencesHarness />
+      </AudioProvider>,
+    );
+    expect(controller.autoAdvance).toBe(false);
+    act(() => controller.startPlan(plan));
+    expect(controller.autoAdvance).toBe(false);
+  });
   it("rejects an unavailable voice without changing playback or saved voice preferences", async () => {
     vi.stubGlobal("Audio", FakeAudio);
     let controller!: ReturnType<typeof useAudioController>;
@@ -289,6 +316,7 @@ describe("AudioProvider integration", () => {
       </AudioProvider>,
     );
     fireEvent.click(screen.getByText("Start queue"));
+    fireEvent.click(screen.getByText("Disable automatic continuation"));
     act(() => FakeAudio.latest!.dispatchEvent(new Event("ended")));
     expect(screen.getByTestId("queue-state")).toHaveTextContent("playing:0:1:0");
     expect(screen.getByTestId("queue-completions")).toHaveTextContent("0");

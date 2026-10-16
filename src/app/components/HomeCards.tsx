@@ -1,3 +1,4 @@
+import type { QuickRoutineShare } from "../hooks/useQuickRoutineShare";
 import { QuranVerseText } from "./QuranVerseText";
 import { QURAN_TEXT_STYLE } from "../quranTypography";
 import { progressFillStyle } from "./progressFillStyle";
@@ -8,7 +9,20 @@ import { formatNumerals } from "../formatting";
 import { HomeCard } from "./HomeCard";
 import { ProductImage } from "./ProductImage";
 import { SegmentedControl } from "./SegmentedControl";
-import { ArrowNext, Bookmark, BookOpen, Clock, Sparkles, Heart, Sun, MoonStar, Moon, RefreshCw, Mosque } from "./icons";
+import {
+  ArrowNext,
+  Bookmark,
+  BookOpen,
+  Clock,
+  Sparkles,
+  Heart,
+  Sun,
+  MoonStar,
+  Moon,
+  RefreshCw,
+  Mosque,
+  Share2,
+} from "./icons";
 import { HadithWeakChainBadge } from "./HadithWeakChainBadge";
 
 export type HomeSavedSource = "main" | "comprehensive" | "friday";
@@ -34,6 +48,7 @@ export function PrayerRoutineCard({
   estimatedMinutes,
   showEstimate = true,
   ctaLabel,
+  quickShare,
   onOpen,
   onGlass = true,
 }: {
@@ -50,6 +65,7 @@ export function PrayerRoutineCard({
   estimatedMinutes: number;
   showEstimate?: boolean;
   ctaLabel: string;
+  quickShare?: QuickRoutineShare;
   onOpen: () => void;
   onGlass?: boolean;
 }) {
@@ -176,18 +192,44 @@ export function PrayerRoutineCard({
           </div>
         )}
 
-        <button
-          type="button"
-          data-testid="home-primary-cta"
-          aria-describedby={progressId}
-          onClick={onOpen}
-          className="group mt-3 flex min-h-[52px] w-full items-center justify-center gap-2.5 rounded-2xl bg-primary px-4 text-title font-bold text-primary-foreground shadow-raised transition-transform hover:brightness-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
-        >
-          <span className="min-w-0 truncate" title={ctaLabel}>
-            {ctaLabel}
-          </span>
-          <ArrowNext size={20} className="shrink-0 transition-transform group-hover:scale-110" aria-hidden="true" />
-        </button>
+        <div className="mt-3 flex w-full items-center gap-3">
+          <button
+            type="button"
+            data-testid="home-primary-cta"
+            aria-describedby={progressId}
+            onClick={onOpen}
+            className="group flex min-h-[52px] w-full items-center justify-center gap-2.5 rounded-2xl bg-primary px-4 text-title font-bold text-primary-foreground shadow-raised transition-transform hover:brightness-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
+            <span className="min-w-0 truncate" title={ctaLabel}>
+              {ctaLabel}
+            </span>
+            <ArrowNext size={20} className="shrink-0 transition-transform group-hover:scale-110" aria-hidden="true" />
+          </button>
+          {quickShare?.available && (
+            <div className="flex shrink-0 items-center gap-2">
+              <button
+                type="button"
+                data-testid="home-quick-share"
+                disabled={quickShare.busy}
+                aria-busy={quickShare.busy || undefined}
+                aria-label={quickShare.label}
+                title={quickShare.label}
+                onPointerEnter={quickShare.prepare}
+                onPointerDown={quickShare.prepare}
+                onFocus={quickShare.prepare}
+                onClick={quickShare.share}
+                className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-xl border border-current/20 text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-50"
+              >
+                <Share2 size={20} aria-hidden="true" />
+              </button>
+            </div>
+          )}
+        </div>
+        {quickShare?.message && (
+          <p className="text-label" role={quickShare.error ? "alert" : "status"}>
+            {quickShare.message}
+          </p>
+        )}
       </HomeCard>
     </section>
   );

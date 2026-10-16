@@ -9,6 +9,7 @@ export const DEFAULT_AUDIO_PREFERENCES: AudioPreferences = {
   playbackRate: 1,
   volume: 1,
   muted: false,
+  autoAdvance: true,
   continueOnNavigation: true,
 };
 
@@ -28,6 +29,7 @@ export function loadAudioPreferences(): AudioPreferences {
         typeof value.playbackRate === "number" && value.playbackRate >= 0.5 && value.playbackRate <= 2
           ? value.playbackRate
           : 1,
+      autoAdvance: typeof value.autoAdvance === "boolean" ? value.autoAdvance : true,
       volume,
       muted: volume === 0 || value.muted === true,
       continueOnNavigation: typeof value.continueOnNavigation === "boolean" ? value.continueOnNavigation : true,

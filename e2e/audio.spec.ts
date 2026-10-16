@@ -1,11 +1,13 @@
 import { playEnglishTranslation } from "./reader-options";
 import { expect, test } from "@playwright/test";
 
-for (const language of ["ar", "en"] as const) {
-  test(`individual listening keeps manual navigation and waveform seeking independent of automatic continuation in ${language} @cross-browser`, async ({
+for (const { language, width } of (["ar", "en"] as const).flatMap((language) =>
+  [390, 1440].map((width) => ({ language, width })),
+)) {
+  test(`individual listening keeps manual navigation and waveform seeking independent of automatic continuation in ${language} at ${width}px @cross-browser`, async ({
     page,
-  }) => {
-    await page.setViewportSize({ width: 390, height: 844 });
+  }, testInfo) => {
+    await page.setViewportSize({ width, height: 844 });
     await page.addInitScript((language) => {
       localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
       localStorage.setItem(
@@ -97,10 +99,24 @@ for (const language of ["ar", "en"] as const) {
       name: language === "ar" ? "خيارات الصوت" : "Audio options",
       exact: true,
     });
+    if (width === 1440) {
+      const indicator = page.getByTestId("audio-play-all-indicator");
+      await expect(indicator).toContainText(language === "ar" ? "تشغيل الكل" : "Play all");
+      const layout = await indicator.evaluate((node) => ({
+        label: node.getBoundingClientRect().right,
+        controls: document.querySelector(".audio-expanded-transport")!.getBoundingClientRect().left,
+      }));
+      expect(layout.label).toBeLessThanOrEqual(layout.controls);
+      await page.screenshot({ path: testInfo.outputPath(`play-all-beside-transport-${language}.png`), scale: "css" });
+    }
     await options.click();
     const continuation = page.getByRole("switch", {
       name: language === "ar" ? "تشغيل الذكر التالي تلقائيًا" : "Play next zikr automatically",
     });
+    await expect(continuation).toHaveAttribute("aria-checked", "true");
+    await expect(page.locator(".audio-expanded-meta > .sr-only")).toHaveCount(0); // Reader already supplies context.
+    await page.screenshot({ path: testInfo.outputPath(`consistent-audio-options-${language}.png`), scale: "css" });
+    await continuation.click();
     await expect(continuation).toHaveAttribute("aria-checked", "false");
     await page.keyboard.press("Escape");
     const reader = page.getByTestId("reader-screen");

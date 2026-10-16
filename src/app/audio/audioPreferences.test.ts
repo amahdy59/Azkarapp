@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { DEFAULT_AUDIO_PREFERENCES, loadAudioPreferences } from "./audioPreferences";
+import { DEFAULT_AUDIO_PREFERENCES, loadAudioPreferences, saveAudioPreferences } from "./audioPreferences";
 
 describe("audio preferences", () => {
   afterEach(() => window.localStorage.clear());
@@ -17,6 +17,13 @@ describe("audio preferences", () => {
     expect(loadAudioPreferences().duaVoiceId).toBe("abdullah-muhammad");
   });
 
+  it("defaults continuation on for legacy snapshots and preserves an explicit manual choice", () => {
+    expect(loadAudioPreferences().autoAdvance).toBe(true);
+    window.localStorage.setItem("azkar.audio-preferences.v1", JSON.stringify({ autoAdvance: "false" }));
+    expect(loadAudioPreferences().autoAdvance).toBe(true);
+    saveAudioPreferences({ ...loadAudioPreferences(), autoAdvance: false });
+    expect(loadAudioPreferences().autoAdvance).toBe(false);
+  });
   it("keeps a known saved voice", () => {
     window.localStorage.setItem("azkar.audio-preferences.v1", JSON.stringify({ duaVoiceId: "muhammad-moataz" }));
     expect(loadAudioPreferences().duaVoiceId).toBe("muhammad-moataz");

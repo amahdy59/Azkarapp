@@ -147,6 +147,8 @@ export interface AudioPlaybackError {
 }
 
 export interface AudioPreferences {
+  /** Missing in older snapshots; defaults to true. */
+  autoAdvance?: boolean;
   quranReciterId: string;
   duaVoiceId: string;
   playbackRate: number;

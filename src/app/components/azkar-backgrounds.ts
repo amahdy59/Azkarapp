@@ -218,10 +218,24 @@ export function toSrcSet(items: readonly { src: string; width: number }[]): stri
 }
 
 export function backgroundAssetUrl(path: string): string {
-  if (import.meta.env.MODE === "github-pages") {
+  if (usesHostedHomeArtwork()) {
     return `https://pub-6e537fd865454e599c23a2bcfc22136e.r2.dev/visuals/home/2026-10-16${path}`;
   }
   const base = import.meta.env.BASE_URL || "/";
   const cleanBase = base.endsWith("/") ? base.slice(0, -1) : base;
   return `${cleanBase}${path}`;
+}
+
+/** Versioned Home artwork; native/local builds retain packaged offline assets. */
+export function homeArtworkUrl(path: string): string {
+  return usesHostedHomeArtwork()
+    ? `https://pub-6e537fd865454e599c23a2bcfc22136e.r2.dev/visuals/home/2026-10-16-cards/${path}`
+    : `${import.meta.env.BASE_URL}${path}`;
+}
+
+function usesHostedHomeArtwork(): boolean {
+  return (
+    import.meta.env.MODE === "github-pages" ||
+    (import.meta.env.MODE === "production" && typeof location !== "undefined" && location.protocol === "https:")
+  );
 }

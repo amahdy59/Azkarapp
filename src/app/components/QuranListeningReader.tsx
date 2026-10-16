@@ -1,3 +1,4 @@
+import { AudioOptionToggle } from "./AudioOptionToggle";
 import { QURAN_TEXT_STYLE } from "../quranTypography";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -12,7 +13,6 @@ import { formatNumerals } from "../formatting";
 import { splitMushafPages } from "../content/mushafPages";
 import { splitQuranTranslation } from "../content/quranTranslation";
 import { QuranListeningTranslation } from "./QuranListeningTranslation";
-import { Check } from "./icons";
 import QuranSurahListeningReader from "./QuranSurahListeningReader";
 
 const buttonClass =
@@ -261,28 +261,25 @@ export function PagedQuranListeningReader({
     >
       <p className="text-sm">{t(language, timing ? "quranListening.browseHint" : "quranListening.unavailable")}</p>
       {timing && (
-        <button
-          type="button"
-          className={buttonClass}
-          aria-pressed={follow && !error}
+        <AudioOptionToggle
+          label={t(language, "quranListening.follow")}
+          checked={follow && !error}
           disabled={error}
-          onClick={() => {
+          onChange={() => {
             setManualIndex(index);
             setFollow((value) => !value);
           }}
-        >
-          {t(language, "quranListening.follow")}
-          {follow ? <Check size={16} aria-hidden="true" /> : null}
-        </button>
+        />
       )}
       {hasWords && (
-        <button type="button" className={buttonClass} aria-pressed={words} onClick={() => setWords((value) => !value)}>
-          {t(
+        <AudioOptionToggle
+          label={t(
             language,
             timing?.reviewStatus === "owner-preview" ? "quranListening.estimatedWords" : "quranListening.words",
           )}
-          {words ? <Check size={16} aria-hidden="true" /> : null}
-        </button>
+          checked={words}
+          onChange={() => setWords((value) => !value)}
+        />
       )}
     </div>
   );

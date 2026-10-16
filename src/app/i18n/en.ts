@@ -91,6 +91,8 @@ const en = {
     retry: "Retry saving",
   },
   home: {
+    quickShareCards: "Share approved {name} cards",
+    quickShareError: "Could not share the cards. Try again, or open the collection for more sharing options.",
     shortcutHome: "Home",
     shortcutTravel: "Travel",
     shortcutDistress: "Distress",

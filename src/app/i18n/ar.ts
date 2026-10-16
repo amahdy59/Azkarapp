@@ -91,6 +91,8 @@ const ar = {
     retry: "إعادة محاولة الحفظ",
   },
   home: {
+    quickShareCards: "مشاركة بطاقات {name} المعتمدة",
+    quickShareError: "تعذّرت مشاركة البطاقات. حاول مجددًا، أو افتح المجموعة لمزيد من خيارات المشاركة.",
     shortcutHome: "المنزل",
     shortcutTravel: "السفر",
     shortcutDistress: "الكرب والهم",

@@ -1,3 +1,4 @@
+import { homeArtworkUrl } from "./azkar-backgrounds";
 /**
  * Decorative product illustration, served AVIF-first with a WebP fallback.
  *
@@ -22,7 +23,7 @@ export function ProductImage({
   /** The LCP hero should pass "eager"; everything else stays lazy. */
   loading?: "lazy" | "eager";
 }) {
-  const base = `${import.meta.env.BASE_URL}images/${name}`;
+  const base = homeArtworkUrl(`images/${name}`);
   return (
     <picture
       className="absolute inset-0 block bg-cover bg-center"

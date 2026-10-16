@@ -118,6 +118,9 @@ describe("HomeScreen quick access", () => {
     expect(screen.queryByRole("button", { name: "Show all prayers" })).not.toBeInTheDocument();
     expect(screen.getAllByTestId(/^prayer-card-/)).toHaveLength(5);
     expect(screen.getByTestId("prayer-card-fajr")).toBeInTheDocument();
+    expect(screen.getByTestId("home-sticky-prayers")).toContainElement(screen.getByTestId("home-prayer-strip"));
+    expect(screen.getByTestId("home-sticky-prayers")).toHaveClass("sticky", "top-0");
+    expect(screen.getByTestId("home-context-grid")).not.toContainElement(screen.getByTestId("home-prayer-strip"));
     expect(screen.getByText(/today.?s wird/i)).toBeInTheDocument();
 
     expect(screen.queryByRole("button", { name: "Masbaha" })).not.toBeInTheDocument();
@@ -143,6 +146,14 @@ describe("HomeScreen quick access", () => {
     fireEvent.scroll(screen.getByRole("region", { name: "Azkar" }), { target: { scrollTop: 12 } });
     expect(screen.getByTestId("home-utility-header")).toHaveAttribute("data-scrolled", "true");
     expect(screen.getByTestId("home-utility-header")).toHaveClass("home-glass-header");
+    const scroll = screen.getByRole("region", { name: "Azkar" });
+    const sticky = screen.getByTestId("home-sticky-prayers");
+    fireEvent.scroll(scroll, { target: { scrollTop: 150 } });
+    expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
+    fireEvent.scroll(scroll, { target: { scrollTop: 40 } });
+    expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
+    fireEvent.scroll(scroll, { target: { scrollTop: 0 } });
+    expect(sticky).not.toHaveAttribute("data-prayer-cards-condensed");
   });
 
   it("shows the completion card briefly, without actions, then returns to the normal hero", () => {

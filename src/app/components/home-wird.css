@@ -133,20 +133,19 @@
   color: var(--on-media);
   --muted-foreground: var(--on-media-muted);
 }
-.high-contrast .home-wird-photo-caption,
-.reduce-transparency .home-wird-photo-caption {
-  background: var(--on-media-surface);
+.high-contrast .home-wird-photo-caption {
+  background: linear-gradient(to bottom, rgb(2 6 23 / 0.25), rgb(2 6 23 / 0.8) 35%, rgb(2 6 23 / 0.98));
 }
-@media (prefers-reduced-transparency: reduce), (forced-colors: active) {
-  .home-wird-photo-caption {
-    background: var(--on-media-surface);
-  }
-}
+/* A fixed gradient shades the photograph itself. Reduced transparency removes
+   glass elsewhere; it must not replace independently enabled card artwork. */
 .home-wird-photo-solid {
-  background: var(--on-media-surface);
-  color: var(--on-media);
-  --muted-foreground: var(--on-media-muted);
   --primary: var(--on-media-accent);
+}
+@media (forced-colors: active) {
+  .home-wird-photo-caption {
+    background: Canvas;
+    color: CanvasText;
+  }
 }
 @container (max-width: 15rem) {
   .home-wird-grid,
@@ -290,76 +289,34 @@
   outline: 3px solid var(--ring);
   outline-offset: -4px;
 }
-.home-prayer-summary-card[data-selected="true"] {
-  --prayer-join-stroke: var(--primary);
-  border-color: var(--prayer-join-stroke);
-  border-bottom-color: transparent;
-}
-.home-prayer-summary-card.hero-glass[data-selected="true"] {
-  --prayer-join-stroke: var(--on-media-accent);
-}
-/* The two straight edges stop at the neck so the silhouette stays continuous. */
+/* Matching accent edges identify the pair without a decorative bridge. */
 .home-prayer-summary-card[data-selected="true"]::after,
-.home-prayer-connected-panel::after {
+.home-prayer-connected-panel::before {
   content: "";
   position: absolute;
-  left: 0.75rem;
-  right: 0.75rem;
-  height: 1px;
+  inset-inline: 20%;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--primary);
   pointer-events: none;
-  background: linear-gradient(
-    to right,
-    var(--prayer-join-stroke) 0,
-    var(--prayer-join-stroke) calc(var(--prayer-notch-x) - 1.75rem),
-    transparent calc(var(--prayer-notch-x) - 1.75rem),
-    transparent calc(var(--prayer-notch-x) + 1.75rem),
-    var(--prayer-join-stroke) calc(var(--prayer-notch-x) + 1.75rem),
-    var(--prayer-join-stroke) 100%
-  );
 }
 .home-prayer-summary-card[data-selected="true"]::after {
   bottom: 0;
 }
 .home-prayer-connected-panel {
   position: relative;
-  --prayer-join-stroke: var(--primary);
 }
-.home-prayer-connected-panel:has(.hero-glass) {
-  --prayer-join-stroke: var(--home-glass-accent);
-}
-.home-prayer-connected-panel > div > article {
-  border-top-color: transparent;
-}
-.home-prayer-connected-panel::after {
+.home-prayer-connected-panel::before {
   top: 0;
   z-index: 3;
 }
-.home-prayer-bridge {
-  position: absolute;
-  left: calc(var(--prayer-notch-x, 50%) - 2.25rem);
-  bottom: 100%;
-  width: 4.5rem;
-  height: var(--prayer-bridge-height, 0px);
-  opacity: var(--prayer-notch-opacity, 0);
-  pointer-events: none;
-  fill: var(--card);
-  stroke: var(--prayer-join-stroke);
-  stroke-width: 1px;
-  z-index: 2;
-}
-.home-prayer-bridge path {
-  vector-effect: non-scaling-stroke;
-}
-.home-prayer-connected-panel:has(.hero-glass) .home-prayer-bridge {
-  fill: rgb(15 23 42 / 0.18);
+.home-prayer-summary-card.hero-glass[data-selected="true"]::after,
+.home-prayer-connected-panel:has(.hero-glass)::before {
+  background: var(--home-glass-accent);
 }
 @media (forced-colors: active) {
-  .home-prayer-bridge {
-    fill: Canvas;
-    stroke: Highlight;
-  }
-  .home-prayer-connected-panel::after,
-  .home-prayer-summary-card[data-selected="true"]::after {
+  .home-prayer-summary-card[data-selected="true"]::after,
+  .home-prayer-connected-panel::before {
     background: Highlight;
   }
 }
@@ -445,6 +402,16 @@
 }
 .home-prayer-footer > * {
   flex-shrink: 0;
+}
+
+/* Shorten the original Home cards away from the top without replacing them.
+   Keep the next countdown in the timing column; the full footer returns at top. */
+[data-prayer-cards-condensed] .home-prayer-footer {
+  display: none;
+}
+[data-prayer-cards-condensed] [data-prayer-compact-countdown] {
+  display: block;
+  grid-row: 3;
 }
 
 .home-prayer-remaining {

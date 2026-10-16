@@ -1,3 +1,4 @@
+import { AudioOptionToggle } from "./AudioOptionToggle";
 import "./floating-audio-player.css";
 import { createPortal } from "react-dom";
 import { MushafMagnificationControl } from "./MushafMagnificationControl";
@@ -18,11 +19,9 @@ import {
 import {
   ChevronDown,
   ChevronUp,
-  Check,
   Headphones,
   Pause,
   Play,
-  Repeat,
   ClockRewind,
   ClockFastForward,
   SkipBack,
@@ -765,9 +764,7 @@ export function FloatingAudioPlayer({
           <div className="audio-expanded-reading relative flex min-h-0 flex-col overflow-hidden">
             <div className="flex min-h-0 flex-1 flex-col items-center">
               <div className="audio-expanded-meta w-full shrink-0 flex items-center px-3 text-center">
-                {!dockedInReader && !currentEntry.mushafPages?.length && (
-                  <span className="text-sm font-semibold">{title}</span>
-                )}
+                {!dockedInReader && !currentEntry.mushafPages?.length && <span className="sr-only">{title}</span>}
                 {isBusy && (
                   <p className="mt-1 text-xs font-semibold text-primary" role="status">
                     {state.status === "buffering"
@@ -977,10 +974,15 @@ export function FloatingAudioPlayer({
                 </span>
               )}
               {canRepeat && <span>{repeatLabel}</span>}
-              {totalTracks > 1 && controller.autoAdvance && <span>{t(language, "audioPlayer.playAllShort")}</span>}
             </div>
             <div className="audio-expanded-actions" dir={direction}>
-              {/* Primary Universal Audio Controller Row: Strict Symmetry Maintained */}
+              <span
+                className="audio-play-all-indicator text-xs text-muted-foreground"
+                data-testid="audio-play-all-indicator"
+              >
+                {totalTracks > 1 && controller.autoAdvance ? t(language, "audioPlayer.playAllShort") : null}
+              </span>
+              {/* Equal transport slots keep the play button centered. */}
               <div
                 className="audio-expanded-transport"
                 data-tracks={totalTracks > 1 ? "multiple" : "single"}
@@ -1250,100 +1252,45 @@ export function FloatingAudioPlayer({
 
                             {listeningTiming && (
                               <div data-listening-controls="" className="flex flex-col divide-y divide-border/40">
-                                <button
-                                  type="button"
-                                  aria-pressed={showListeningWords}
-                                  onClick={() => setShowListeningWords((value) => !value)}
-                                  className="audio-options-row flex min-h-11 items-center justify-between gap-3 px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted/70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-colors cursor-pointer"
-                                >
-                                  <span>
-                                    {t(
-                                      language,
-                                      listeningTiming.reviewStatus === "owner-preview"
-                                        ? "quranListening.estimatedWords"
-                                        : "quranListening.words",
-                                    )}
-                                  </span>
-                                  <span
-                                    aria-hidden="true"
-                                    className={`audio-option-check ${showListeningWords ? "audio-option-check--on" : ""}`}
-                                  >
-                                    {showListeningWords && <Check size={14} />}
-                                  </span>
-                                </button>
-                                <button
-                                  type="button"
-                                  aria-pressed={followListeningText}
-                                  onClick={() => setFollowListeningText((value) => !value)}
-                                  className="audio-options-row flex min-h-11 items-center justify-between gap-3 px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted/70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-colors cursor-pointer"
-                                >
-                                  <span>{t(language, "quranListening.followText")}</span>
-                                  <span
-                                    aria-hidden="true"
-                                    className={`audio-option-check ${followListeningText ? "audio-option-check--on" : ""}`}
-                                  >
-                                    {followListeningText && <Check size={14} />}
-                                  </span>
-                                </button>
+                                <AudioOptionToggle
+                                  label={t(
+                                    language,
+                                    listeningTiming.reviewStatus === "owner-preview"
+                                      ? "quranListening.estimatedWords"
+                                      : "quranListening.words",
+                                  )}
+                                  checked={showListeningWords}
+                                  onChange={() => setShowListeningWords((value) => !value)}
+                                />
+                                <AudioOptionToggle
+                                  label={t(language, "quranListening.followText")}
+                                  checked={followListeningText}
+                                  onChange={() => setFollowListeningText((value) => !value)}
+                                />
                               </div>
                             )}
                           </div>
                         )}
 
                         {canRepeat && (
-                          <button
-                            type="button"
-                            aria-pressed={repeatEnabled}
-                            onClick={() =>
+                          <AudioOptionToggle
+                            className="audio-repeat-option"
+                            label={repeatLabel}
+                            checked={repeatEnabled}
+                            onChange={() =>
                               controller.setPlaybackMode(repeatEnabled ? "play-once" : "repeat-prescribed-count")
                             }
-                            className={`audio-repeat-option flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-full border px-4 text-xs font-semibold hover:bg-muted transition-colors duration-fast focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                              repeatEnabled
-                                ? "border-primary/40 bg-primary/10 text-primary"
-                                : "border-border bg-card text-muted-foreground hover:text-foreground"
-                            }`}
-                            aria-label={repeatLabel}
-                            title={repeatLabel}
-                          >
-                            <Repeat
-                              size={15}
-                              className={repeatEnabled ? "text-primary" : "text-muted-foreground"}
-                              aria-hidden="true"
-                            />
-                            <span
-                              className={repeatEnabled ? "text-primary font-bold" : "text-foreground font-semibold"}
-                            >
-                              {repeatLabel}
-                            </span>
-                          </button>
+                          />
                         )}
-
                         {totalTracks > 1 && (
-                          <div className="rounded-xl border border-border/60 bg-muted/20">
-                            <button
-                              type="button"
-                              role="switch"
-                              aria-label={t(language, "audioPlayer.autoAdvance")}
-                              aria-checked={controller.autoAdvance}
-                              onClick={() => controller.setAutoAdvance(!controller.autoAdvance)}
-                              className="audio-options-row audio-auto-advance flex min-h-11 w-full items-center justify-between gap-3 px-3 py-2 text-sm font-medium text-foreground hover:bg-muted/70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-colors cursor-pointer"
-                            >
-                              <div className="flex flex-col items-start text-start">
-                                <span className="font-semibold text-foreground">
-                                  {t(language, "audioPlayer.playAllShort")}
-                                </span>
-                                <span className="text-micro text-muted-foreground">
-                                  {t(language, "audioPlayer.autoAdvance")}
-                                </span>
-                              </div>
-                              <span
-                                aria-hidden="true"
-                                className={`audio-switch-track ${controller.autoAdvance ? "audio-switch-track--on" : ""}`}
-                              >
-                                <span />
-                              </span>
-                            </button>
-                          </div>
+                          <AudioOptionToggle
+                            className="audio-auto-advance"
+                            switchRole
+                            label={t(language, "audioPlayer.playAllShort")}
+                            hint={t(language, "audioPlayer.autoAdvance")}
+                            checked={controller.autoAdvance}
+                            onChange={() => controller.setAutoAdvance(!controller.autoAdvance)}
+                          />
                         )}
 
                         <Popover.Close asChild>

@@ -239,51 +239,32 @@ for (const language of ["ar", "en"] as const) {
       const panel = page.getByTestId("home-prayer-moment");
       await expect(panel).toHaveAttribute("data-prayer", (await current.getAttribute("data-prayer")) ?? "");
       await expect(row.locator('[data-selected="true"]')).toHaveCount(1);
-      const connection = await current.evaluate((node) => {
-        const panel = document.querySelector('[data-testid="home-prayer-moment"]')!;
-        const bridge = panel.querySelector(".home-prayer-bridge")!;
-        const leavingEdge = getComputedStyle(node, "::after");
-        const receivingEdge = getComputedStyle(panel, "::after");
-        const row = node.closest('[data-testid="home-all-prayers-row"]')!;
-        return {
-          joinedEdges: leavingEdge.content === '""' && receivingEdge.content === '""',
-          decorative:
-            leavingEdge.pointerEvents === "none" &&
-            receivingEdge.pointerEvents === "none" &&
-            getComputedStyle(bridge).pointerEvents === "none" &&
-            bridge.getAttribute("aria-hidden") === "true",
-          noNestedBlur: leavingEdge.backdropFilter === "none" && receivingEdge.backdropFilter === "none",
-          fitsRow: node.getBoundingClientRect().bottom + 8 <= row.getBoundingClientRect().bottom,
-        };
-      });
-      expect(connection.joinedEdges && connection.decorative && connection.noNestedBlur && connection.fitsRow).toBe(
-        true,
-      );
-      const notchOffset = () =>
+      const matchingEdges = async () =>
         current.evaluate((node) => {
           const panel = document.querySelector('[data-testid="home-prayer-moment"]')!;
-          const bridge = panel.querySelector(".home-prayer-bridge")!.getBoundingClientRect();
-          const small = node.getBoundingClientRect();
-          const large = panel.getBoundingClientRect();
-          const anchor =
-            small.left + node.clientLeft + parseFloat(getComputedStyle(node).getPropertyValue("--prayer-notch-x"));
-          return Math.max(
-            Math.abs(anchor - (bridge.left + bridge.width / 2)),
-            Math.abs(bridge.top - small.bottom),
-            Math.abs(bridge.bottom - large.top),
+          const small = getComputedStyle(node, "::after");
+          const detail = getComputedStyle(panel, "::before");
+          return (
+            small.content === '""' &&
+            detail.content === '""' &&
+            small.backgroundColor === detail.backgroundColor &&
+            small.pointerEvents === "none" &&
+            detail.pointerEvents === "none" &&
+            small.height === "2px" &&
+            detail.height === "2px"
           );
         });
-      await expect.poll(notchOffset).toBeLessThanOrEqual(1);
-      await expect(current).toHaveCSS("--prayer-notch-opacity", "1");
+      expect(await matchingEdges()).toBe(true);
+      await expect(page.locator(".home-prayer-bridge")).toHaveCount(0);
       const oldScroll = await row.evaluate((node) => node.scrollLeft);
       await row.evaluate((node) => {
         node.scrollLeft += 16;
       });
-      await expect.poll(notchOffset).toBeLessThanOrEqual(1);
+      expect(await matchingEdges()).toBe(true);
       await row.evaluate((node, left) => {
         node.scrollLeft = left;
       }, oldScroll);
-      await expect.poll(notchOffset).toBeLessThanOrEqual(1);
+      expect(await matchingEdges()).toBe(true);
       await toggle.evaluate((node) => node.blur());
       await row.scrollIntoViewIfNeeded();
       await page.screenshot({ path: testInfo.outputPath(`${language}-${width}-joined.png`), scale: "css" });

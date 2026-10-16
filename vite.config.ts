@@ -121,6 +121,7 @@ function unwrapColorMixGuards(): Plugin {
  * be a permission granted for nothing.
  */
 function contentSecurityPolicy(audioBaseUrl?: string, cloudflareApiUrl?: string) {
+  const imageOrigin = "https://pub-6e537fd865454e599c23a2bcfc22136e.r2.dev";
   const audioOrigin = audioBaseUrl ? new URL(audioBaseUrl).origin : undefined;
   const cloudflareApiOrigin = cloudflareApiUrl
     ? new URL(cloudflareApiUrl).origin
@@ -135,7 +136,7 @@ function contentSecurityPolicy(audioBaseUrl?: string, cloudflareApiUrl?: string)
     // Tailwind 4 and the inline critical styles in index.html both need this.
     ["style-src", ["'self'", "'unsafe-inline'"]],
     // `blob:` covers the generated share card; `data:` the inlined icons.
-    ["img-src", ["'self'", "data:", "blob:"]],
+    ["img-src", ["'self'", "data:", "blob:", imageOrigin]],
     ["font-src", ["'self'", ...quranFonts]],
     [
       "connect-src",

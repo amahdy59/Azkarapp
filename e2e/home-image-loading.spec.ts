@@ -26,7 +26,7 @@ test("a stalled Home image falls back after 15 seconds and a new scene can recov
   await expect(page.getByTestId("time-of-day-scene-window")).toBeVisible();
   await page.clock.fastForward(15_001);
   await expect(page.getByTestId("time-of-day-scene-window")).toHaveCount(0);
-  await expect(page.locator(".home-wird-photo-caption").first()).toHaveCSS("background-image", "none");
+  await expect(page.locator(".home-wird-photo-caption").first()).toHaveCSS("background-image", /linear-gradient/);
   release();
   await page.clock.setFixedTime(new Date("2026-10-16T14:00:00+03:00"));
   await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));

@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-16.4",
+  "release": "2026-10-16.5",
   "ar": [
-    "أعمال صلاة الجمعة ومعلومات سنتها البعدية وفضلها أصبحت خاصة بالجمعة مع ذكر المصادر.",
-    "صور الورد تملأ البطاقات مع عودة ملخص الإنجاز والثمرات اليومية.",
-    "اتصال انسيابي متناظر يربط الصلاة المختارة بتفاصيلها دون تغيير تباعد البطاقات.",
-    "خلفيات محسّنة التحميل وصورة الجمعة تظهر بسرعة؛ وعند تعذّر تحميل صورة، تبقى البدائل واضحة دون تغيير تفضيلاتك."
+    "شارك بطاقات أذكار الصباح والمساء والنوم المعتمدة مباشرة من تذكير الرئيسية.",
+    "صور الورد تبقى ظاهرة مع تقليل الشفافية، مع صور محسّنة وأسرع تحميلًا من التخزين السحابي.",
+    "تمييز هادئ يربط الصلاة المختارة بتفاصيلها، وملخص للصلاة الحالية والقادمة أثناء التمرير.",
+    "تشغيل الكل مفعّل افتراضيًا ويحفظ اختيارك، مع خيارات صوت متناسقة ومساحة قراءة أوضح."
   ],
   "en": [
-    "Friday prayer now has its own deeds, after-prayer Sunnah guidance and benefit with sources.",
-    "Wird photos fill their cards, with daily completion and fruit totals restored.",
-    "A smooth, symmetrical connection links the selected prayer to its details without changing card spacing.",
-    "Optimized backgrounds load from dedicated storage, and Friday artwork appears promptly. If an image fails, readable fallbacks preserve your appearance preference."
+    "Share approved morning, evening and sleep cards directly from your Home reminder.",
+    "Wird photos stay visible with reduced transparency, with optimized images delivered from cloud storage.",
+    "Quiet matching accents identify the selected prayer and its details, with current and next prayer information while scrolling.",
+    "Play all starts enabled and remembers your choice, with consistent audio options and a clearer reading area."
   ]
 }

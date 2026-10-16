@@ -319,6 +319,16 @@ function PrayerCard({
                 timeLabel
               )}
             </p>
+            {state === "next" && countdown && (
+              <span
+                data-prayer-compact-countdown
+                aria-hidden="true"
+                dir="auto"
+                className="hidden text-xs font-semibold tabular-nums"
+              >
+                {countdown}
+              </span>
+            )}
           </div>
         </button>
         <div
