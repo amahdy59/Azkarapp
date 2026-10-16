@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { getAzkarForMode } from "../content/azkar";
+import { DEFAULT_LOCATION } from "../content/prayerCalculation";
 import * as dailyEvidence from "../dailyEvidence";
 import * as maintenance from "../startupMaintenance";
 import { CATEGORY_IDS, type CategoryId } from "../types";
@@ -247,7 +248,10 @@ describe("HomeScreen quick access", () => {
 });
 
 describe("HomeScreen document outline", () => {
-  afterEach(() => vi.useRealTimers());
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.useRealTimers();
+  });
 
   it("nests each card under the group it belongs to, and names every prayer card", () => {
     vi.useFakeTimers();
@@ -426,11 +430,27 @@ describe("HomeScreen document outline", () => {
     expect(afterClickCalls).toContain(1);
   });
 
-  it("rotates evidence slot key automatically when 30 minutes pass", () => {
+  it.each([
+    {
+      label: "regular 30-minute",
+      time: "2026-08-07T14:05:00+03:00",
+      minutes: 30,
+      initialSlot: "-s30-28",
+      nextSlot: "-s30-29",
+    },
+    {
+      label: "Duha 45-minute",
+      time: "2026-08-07T10:05:00+03:00",
+      minutes: 45,
+      initialSlot: "-s45-13",
+      nextSlot: "-s45-14",
+    },
+  ])("rotates the $label evidence slot in the selected timezone", ({ time, minutes, initialSlot, nextSlot }) => {
     vi.useFakeTimers();
-    vi.setSystemTime(new Date(2026, 7, 7, 9, 5));
+    // An offset-qualified instant keeps the intended Cairo window identical
+    // on UTC CI runners and on a developer's differently zoned device.
+    vi.setSystemTime(new Date(time));
     const spyContextual = vi.spyOn(dailyEvidence, "getContextualEvidence");
-
     render(
       <HomeScreen
         completed={emptyProgress()}
@@ -440,17 +460,16 @@ describe("HomeScreen document outline", () => {
         direction="rtl"
         dailyCompletions={[]}
         prayerTracking={[]}
+        locationSettings={DEFAULT_LOCATION}
       />,
     );
-
     const initialKey = spyContextual.mock.calls[0]?.[0];
-    expect(initialKey).toContain("-s30-");
-
+    expect(initialKey).toContain("2026-08-07" + initialSlot);
     act(() => {
-      vi.advanceTimersByTime(30 * 60 * 1000);
+      vi.advanceTimersByTime(minutes * 60 * 1000);
     });
-
     const latestKey = spyContextual.mock.calls.at(-1)?.[0];
+    expect(latestKey).toContain("2026-08-07" + nextSlot);
     expect(latestKey).not.toBe(initialKey);
   });
 });

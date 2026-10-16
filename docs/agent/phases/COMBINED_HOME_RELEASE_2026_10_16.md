@@ -55,3 +55,7 @@ The preceding Quality failure concerned prayer-card geometry and stale condensed
 ## Recommended next step
 
 Monitor the exact pushed commit through Quality/verify and Pages build/deploy, then verify public metadata and production UI. Preserve any failure evidence and apply only the smallest correct remediation if needed.
+
+## CI fixture remediation — 2026-10-16
+
+The first pushed commit 1e70b624 failed Quality/checks in the Home reminder rotation unit test; Android passed and the browser matrix correctly remained gated. Reproduced locally with TZ=UTC: the unqualified 09:05 host-local fixture selected Cairo's 45-minute Duha window rather than the intended 30-minute regular slot. The second describe also retained the previous test's getContextualEvidence spy history. The repair is test-only: restore spies after each test and use offset-qualified instants plus the selected Cairo location. Assert exact initial/next keys for both regular 30-minute and retained Duha 45-minute slots, and retain the changed-key assertion. No scheduler/product behavior, durations, assertions, coverage or budgets are relaxed. Focused Home/planner tests pass under UTC and America/Los_Angeles. The complete hook/CI is rerun for the remediation commit. Release notes remain .8 because this follow-up changes only tests and this report; the same application release is still awaiting successful CI/deployment.
