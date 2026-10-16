@@ -334,6 +334,10 @@ test("Light Home keeps Qibla and Masbaha copy on the on-media palette", async ({
   await page.getByTestId("nav-settings").click();
   await page.getByTestId("settings-sub-appearance").click();
   await page.getByTestId("theme-option-light").click();
+  await page
+    .getByRole("radiogroup", { name: "App appearance", exact: true })
+    .getByRole("radio", { name: "Glass", exact: true })
+    .click();
   await page.goto("/#/home");
 
   for (const testId of ["home-tool-qibla", "home-tool-masbaha"]) {

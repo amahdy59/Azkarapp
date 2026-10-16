@@ -1,5 +1,9 @@
 # Application architecture
 
+## Release QA backend isolation — 2026-10-16
+
+The browser preview build overrides the Cloudflare API origin with a loopback-only namespace through scripts/browser-test-environment.mjs. Test request fixtures retain the same API boundary without producing real presence/device writes. The preview override does not affect production or Pages builds; deliberate live health/smoke is separate. The 2026-10-16 investigation confirmed D1 write-quota exhaustion (API code 7500), so the visible counter can remain unavailable until the allowance resets even when its provider/UI is mounted correctly. No fake count, paid-plan change or persisted-data rewrite is used to hide this condition.
+
 ## Simple appearance and visible listening protection — 2026-10-16
 
 The owner supersedes the three/four-way selectors with Opaque/Glass. Applying either global choice explicitly sets Home to inherit, including reselecting the checked option. Optional Home customization is a native collapsed disclosure with a same-as-app switch and Opaque/Glass override; legacy system values remain normalized and display their effective value without a migration. A deferred AppSceneBackground shares the existing Home time helpers, responsive assets and cache across non-reading routes. It is stationary, decoration-only and uses a theme veil; Save-Data, failure, high contrast, forced colors and legacy reduced-system fallbacks do not require new photos. AudioControlLock retains Radix modality/focus restoration and transparent touch interception while playback/text remain visually unobscured; a fixed safe-area hold-to-unlock pill preserves pointer/keyboard cancellation and Escape recovery. No audio ownership, religious content or stored schema changes.

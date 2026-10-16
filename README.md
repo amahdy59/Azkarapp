@@ -1,5 +1,9 @@
 # Azkarapp
 
+## Isolated browser backend
+
+The browser test server forcibly builds with a loopback Cloudflare API namespace (`/__browser-test-api`) on its own preview port. General local/CI UI tests must never write visitor heartbeats, device registrations or snapshots to production. Feature specs supply deliberate route fixtures when a successful response is needed. Real production smoke is a separate, limited verification step. Production/Pages builds keep their normal API configuration.
+
 Azkarapp is an Arabic/English, offline-capable Progressive Web App for reading daily azkar, tracking quiet routine progress, and showing location-aware prayer times. The application is built with React, TypeScript, Vite, Tailwind CSS, and optional Supabase account synchronization.
 
 Production site: [amahdy59.github.io/Azkarapp](https://amahdy59.github.io/Azkarapp/)

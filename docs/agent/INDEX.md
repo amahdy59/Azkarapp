@@ -1,5 +1,7 @@
 # AI Improvement System Index
 
+Current bounded release repair: [QA backend isolation and presence diagnosis](phases/RELEASE_QA_ISOLATION_2026_10_16.md). Isolate browser builds from production API writes, explicitly select Glass in the on-media test and finish exact-commit release verification. Keep the current billing plan and report the confirmed D1 quota recovery limit honestly.
+
 Current owner-approved continuation: [Simple appearance and visible listening lock](phases/SIMPLE_APPEARANCE_VISIBLE_LOCK_2026_10_16.md). The subsequent owner request replaces the exposed three/four-way material controls with Opaque/Glass, shares the current Home photograph across Glass interface pages and keeps learning text/audio visible while locked. Earlier direct-main release authority remains; this chat owns the combined release and verification.
 
 Current owner-approved release continuation: [App-wide materials and remaining fixes](phases/APP_MATERIALS_AND_RELEASE_2026_10_16.md). Apply app-wide appearance with independent Home overrides, finish outstanding fixes, and push all changes through intact gates and production verification.

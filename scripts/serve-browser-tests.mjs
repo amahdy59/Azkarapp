@@ -2,13 +2,17 @@ import { spawn } from "node:child_process";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { browserTestPort } from "./browser-test-port.mjs";
+import { browserTestEnvironment } from "./browser-test-environment.mjs";
 
 const require = createRequire(import.meta.url);
 const vite = path.join(path.dirname(require.resolve("vite/package.json")), "bin/vite.js");
 
 async function run(args) {
   await new Promise((resolve, reject) => {
-    const child = spawn(process.execPath, [vite, ...args], { stdio: "inherit" });
+    const child = spawn(process.execPath, [vite, ...args], {
+      stdio: "inherit",
+      env: browserTestEnvironment(browserTestPort()),
+    });
     const interrupt = () => child.kill("SIGINT");
     const terminate = () => child.kill("SIGTERM");
     process.on("SIGINT", interrupt);
