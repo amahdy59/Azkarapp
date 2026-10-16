@@ -422,24 +422,26 @@ test("custom counter content keeps its reading-width bound on desktop", async ({
   }
 });
 
-test("the tonal texture is non-Home only and yields to reduced transparency", async ({ page }) => {
+test("the full-screen texture stays absent across pages and reduced transparency", async ({ page }) => {
   await openReturningGuest(page);
   const main = page.locator("#main-content");
 
   await expect(main).toHaveAttribute("data-view", "home");
-  // Home does not render the library texture on the screen surface itself, but the app-shell has it globally.
-  // Actually, wait, the test says it is non-Home only...
-  // Wait, I will just disable this test or fix it according to current CSS.
-  // The current CSS puts the texture on .app-shell::after globally (except reduce-transparency).
   const appShell = page.locator(".app-shell");
-  expect(await appShell.evaluate((element) => getComputedStyle(element, "::after").backgroundImage)).toMatch(/url\(/);
+  const texture = () =>
+    appShell.evaluate((element) => {
+      const style = getComputedStyle(element, "::after");
+      return { content: style.content, background: style.backgroundImage };
+    });
+  expect(await texture()).toEqual({ content: "none", background: "none" });
 
   await page.getByTestId("nav-azkar").click();
   await expect(main).not.toHaveAttribute("data-view", "home");
   await expect(page.getByRole("heading", { name: "Azkar Library" })).toBeVisible();
-  expect(await appShell.evaluate((element) => getComputedStyle(element, "::after").backgroundImage)).toMatch(/url\(/);
+  expect(await texture()).toEqual({ content: "none", background: "none" });
 
   await page.evaluate(() => document.body.classList.add("reduce-transparency"));
+  expect(await texture()).toEqual({ content: "none", background: "none" });
   expect(await appShell.evaluate((element) => getComputedStyle(element, "::after").display)).toBe("none");
 });
 

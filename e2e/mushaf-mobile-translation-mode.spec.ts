@@ -32,6 +32,10 @@ test("Compact mode retains Arabic recovery offline in every theme @cross-browser
     await page.getByTestId(`quick-theme-${theme}`).click();
     await page.keyboard.press("Escape");
     await expect(page.getByTestId("mushaf-quick-menu")).toBeHidden();
+    await expect(page.locator(".quran-pane-choice span").first()).toHaveCSS(
+      "color",
+      theme === "light" ? "rgb(23, 23, 23)" : "rgb(245, 240, 232)",
+    );
     expect(
       (await new AxeBuilder({ page }).include('[data-testid="mushaf-translation-toolbar"]').analyze()).violations,
     ).toEqual([]);

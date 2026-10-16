@@ -182,6 +182,7 @@
 }
 
 .quran-pane-choice span {
+  color: var(--foreground);
   display: flex;
   align-items: center;
   justify-content: center;

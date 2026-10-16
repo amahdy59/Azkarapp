@@ -1,5 +1,9 @@
 # Application architecture
 
+## Simple appearance and visible listening protection — 2026-10-16
+
+The owner supersedes the three/four-way selectors with Opaque/Glass. Applying either global choice explicitly sets Home to inherit, including reselecting the checked option. Optional Home customization is a native collapsed disclosure with a same-as-app switch and Opaque/Glass override; legacy system values remain normalized and display their effective value without a migration. A deferred AppSceneBackground shares the existing Home time helpers, responsive assets and cache across non-reading routes. It is stationary, decoration-only and uses a theme veil; Save-Data, failure, high contrast, forced colors and legacy reduced-system fallbacks do not require new photos. AudioControlLock retains Radix modality/focus restoration and transparent touch interception while playback/text remain visually unobscured; a fixed safe-area hold-to-unlock pill preserves pointer/keyboard cancellation and Escape recovery. No audio ownership, religious content or stored schema changes.
+
 ## App material and scroll responsiveness — 2026-10-16
 
 The owner-approved appMaterial preference uses existing normalized snapshot/partial-merge boundaries and initial appearance application. Home retains its explicit legacy system/glass/solid choice and can independently inherit the app choice. Root appearance resolves system transparency changes reactively; high contrast and forced colors retain priority. Shared non-reading interface surfaces use static translucency, with bounded blur on chrome only. The photographic Home and dense Quran/azkar/listening surfaces retain their own contrast contracts. No runtime dependency, AI request or additional server is added.

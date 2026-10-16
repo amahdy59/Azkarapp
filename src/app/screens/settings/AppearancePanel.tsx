@@ -7,6 +7,7 @@ import { t } from "../../i18n";
 import type { AppLanguage, ThemeMode } from "../../types";
 import { SettingsSection, SettingsToggleRow, SubHeader } from "./SettingsPrimitives";
 import { ThemeModeSelector } from "./ThemeModeSelector";
+import { useMediaQuery } from "../../hooks/useMediaQuery";
 const iconBackground = "color-mix(in srgb, var(--primary) 12%, transparent)";
 export interface AppearancePanelProps {
   language: AppLanguage;
@@ -38,7 +39,7 @@ export function AppearancePanel({
   homeWirdImages = false,
   appMaterial = "solid",
   onAppMaterialChange,
-  homeMaterial = "system",
+  homeMaterial = "inherit",
   onHomeMaterialChange,
   onHomeWirdImagesChange,
   reduceTransparency = false,
@@ -52,6 +53,13 @@ export function AppearancePanel({
   onHijriDateOffsetChange,
   onBack,
 }: AppearancePanelProps) {
+  const systemReduced = useMediaQuery("(prefers-reduced-transparency: reduce)");
+  const displayedMaterial = (value: "system" | "glass" | "solid") =>
+    value === "glass" || (value === "system" && !reduceTransparency && !systemReduced) ? "glass" : "solid";
+  const applyMaterial = (value: "glass" | "solid") => {
+    onAppMaterialChange?.(value);
+    onHomeMaterialChange?.("inherit");
+  };
   return (
     <div className="flex h-full min-h-0 flex-col">
       <SubHeader title={t(language, "settings.appearanceLanguage")} language={language} onBack={onBack} />
@@ -87,12 +95,13 @@ export function AppearancePanel({
             <div className="space-y-3 p-4">
               <p className="text-sm text-muted-foreground">{t(language, "settings.appMaterialHint")}</p>
               <SegmentedControl
-                value={appMaterial}
-                onChange={onAppMaterialChange}
+                value={displayedMaterial(appMaterial)}
+                onChange={applyMaterial}
+                onReselect={applyMaterial}
                 direction={direction}
                 aria-label={t(language, "settings.appMaterial")}
                 className="flex flex-wrap gap-2"
-                options={(["system", "glass", "solid"] as const).map((value) => ({
+                options={(["solid", "glass"] as const).map((value) => ({
                   value,
                   label: t(language, `settings.homeMaterial_${value}`),
                 }))}
@@ -102,24 +111,40 @@ export function AppearancePanel({
         )}
         <SettingsSection label={t(language, "settings.homeCards")} className="mt-3">
           {onHomeMaterialChange && (
-            <div className="space-y-3 p-4">
-              <h3 className="text-base font-semibold">{t(language, "settings.homeMaterial")}</h3>
-              <p className="text-sm text-muted-foreground">{t(language, "settings.homeMaterialHint")}</p>
-              <SegmentedControl
-                value={homeMaterial}
-                onChange={onHomeMaterialChange}
-                direction={direction}
-                aria-label={t(language, "settings.homeMaterial")}
-                className="flex flex-wrap gap-2"
-                itemClassName={(selected) =>
-                  `min-h-11 flex-1 rounded-xl border px-3 py-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${selected ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-foreground"}`
-                }
-                options={(["inherit", "system", "glass", "solid"] as const).map((value) => ({
-                  value,
-                  label: t(language, `settings.homeMaterial_${value}`),
-                }))}
-              />
-            </div>
+            <details className="p-4">
+              <summary className="min-h-11 cursor-pointer content-center rounded-lg font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+                {t(language, "settings.customizeHome")}
+              </summary>
+              <div className="space-y-3 pt-3">
+                <p className="text-sm text-muted-foreground">{t(language, "settings.homeMaterialHint")}</p>
+                <SettingsToggleRow
+                  icon={<Droplets size={20} />}
+                  iconBg={iconBackground}
+                  label={t(language, "settings.homeMaterial_inherit")}
+                  checked={homeMaterial === "inherit"}
+                  onChange={() =>
+                    onHomeMaterialChange(homeMaterial === "inherit" ? displayedMaterial(appMaterial) : "inherit")
+                  }
+                />
+                {homeMaterial !== "inherit" && (
+                  <SegmentedControl
+                    value={displayedMaterial(homeMaterial)}
+                    onChange={onHomeMaterialChange}
+                    onReselect={onHomeMaterialChange}
+                    direction={direction}
+                    aria-label={t(language, "settings.homeMaterial")}
+                    className="flex flex-wrap gap-2"
+                    itemClassName={(selected) =>
+                      `min-h-11 flex-1 rounded-xl border px-3 py-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${selected ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-foreground"}`
+                    }
+                    options={(["solid", "glass"] as const).map((value) => ({
+                      value,
+                      label: t(language, `settings.homeMaterial_${value}`),
+                    }))}
+                  />
+                )}
+              </div>
+            </details>
           )}
           {onHomeWirdImagesChange && (
             <SettingsToggleRow

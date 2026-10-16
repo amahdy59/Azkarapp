@@ -1,5 +1,7 @@
 # AI Improvement System Index
 
+Current owner-approved continuation: [Simple appearance and visible listening lock](phases/SIMPLE_APPEARANCE_VISIBLE_LOCK_2026_10_16.md). The subsequent owner request replaces the exposed three/four-way material controls with Opaque/Glass, shares the current Home photograph across Glass interface pages and keeps learning text/audio visible while locked. Earlier direct-main release authority remains; this chat owns the combined release and verification.
+
 Current owner-approved release continuation: [App-wide materials and remaining fixes](phases/APP_MATERIALS_AND_RELEASE_2026_10_16.md). Apply app-wide appearance with independent Home overrides, finish outstanding fixes, and push all changes through intact gates and production verification.
 
 Current coordinated snapshot is local only: the owner authorized chat coordination and subsequently instructed “Coordinate; keep these changes local” in the Home refinement chat. Finish local integration and verification; do not commit, push or publish this combined snapshot. This publication hold supersedes earlier release authority for the current pending changes.

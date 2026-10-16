@@ -1,5 +1,9 @@
 # Decision Log
 
+## 2026-10-16 — Owner simplifies appearance and requests visible locked learning
+
+The owner requests two visible appearance choices, Opaque/Glass for all, the current Home photograph on Glass pages, and unobscured text/audio while touch controls are locked. This supersedes the earlier visible Follow device and four-way Home selector: retain stored compatibility and place independent Home appearance behind optional customization. Global selection applies to Home too, even if reselected; Home can subsequently override. Keep solid reading, automatic contrast/device fallbacks and no extra animated blur. Retain the approved two-second hold, focus restoration and Escape recovery for the transparent touch shield. Full existing main release gates and production verification remain required.
+
 ## App-wide appearance, performance and complete release — 2026-10-16
 
 The owner accepts app-wide Follow device/Glass/Solid plus Home Same as app/independent override, then explicitly requests applying all remaining work and pushing all changes. This chat owns implementation and the release; the previous release chat acknowledges a source/build/commit freeze. The owner additionally requests efficient, accessible behavior on older devices/slow networks and removal of the sluggish scroll feel. Use static translucent interface cards, bounded shared-chrome blur, dense reading surfaces, a shorter 180ms Home handoff, threshold-only header state, paused hidden-screen clocks, immediate automatic reader positioning and Save-Data decorative fallback. Preserve explicit existing preferences, religious content/counts and offline data. Add desktop brand Home navigation and repair outstanding CI cases without loosening assertions or coverage. Verify both GitHub Pages and the separately Git-integrated Cloudflare custom domain after exact-commit CI succeeds.

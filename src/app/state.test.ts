@@ -823,6 +823,12 @@ describe("prayer tracking persistence", () => {
 });
 
 describe("explicit Home material", () => {
+  it("starts a new installation with one opaque app appearance while retaining legacy snapshots", () => {
+    localStorage.removeItem("azkarapp.state.v1");
+    expect(loadAppState().settings).toMatchObject({ appMaterial: "solid", homeMaterial: "inherit" });
+    expect(normalizeAppState({ settings: { homeMaterial: "glass" } }).settings.homeMaterial).toBe("glass");
+    expect(normalizeAppState({ settings: {} }).settings.homeMaterial).toBe("system");
+  });
   it("retains global and inherited Home choices across normalization and partial sync", () => {
     expect(normalizeAppState({}).settings.appMaterial).toBe("solid");
     for (const appMaterial of ["system", "glass", "solid"] as const) {

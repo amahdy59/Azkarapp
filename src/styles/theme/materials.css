@@ -1,9 +1,18 @@
 /* Interface materials are independent of colour theme and Home's photograph.
    Reading and playback surfaces retain their existing dense backgrounds. */
 html[data-app-material-resolved="glass"] [data-material-ui] {
-  background:
-    radial-gradient(ellipse at top right, color-mix(in srgb, var(--primary) 13%, transparent), transparent 65%),
-    var(--background);
+  position: relative;
+  isolation: isolate;
+  background: var(--background);
+}
+.app-scene {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+.high-contrast .app-scene {
+  display: none;
 }
 html[data-app-material-resolved="glass"] [data-material-ui] :is(.app-screen-surface, [data-testid="settings-screen"]) {
   background-color: transparent;
@@ -29,7 +38,6 @@ html[data-app-material-resolved="glass"]
   ),
 html[data-app-material-resolved="glass"] :is(.app-sidebar, .app-rail, .bottom-nav) {
   background-color: color-mix(in srgb, var(--card) 88%, transparent);
-  background-image: linear-gradient(135deg, color-mix(in srgb, var(--foreground) 3%, transparent), transparent);
   backdrop-filter: none !important;
 }
 /* Static card translucency needs no repeated GPU blur. Only sticky chrome
@@ -52,10 +60,18 @@ html[data-app-material="solid"] .app-shell :is(.app-sidebar, .app-rail, .bottom-
   }
 }
 @media (forced-colors: active) {
+  .app-scene {
+    display: none;
+  }
   html[data-app-material-resolved="glass"]
     .app-shell
     :is(.bg-card, .shared-screen-header, .app-sidebar, .app-rail, .bottom-nav) {
     background: Canvas;
     backdrop-filter: none !important;
   }
+}
+.audio-lock-shield {
+  background: transparent;
+  backdrop-filter: none;
+  touch-action: none;
 }

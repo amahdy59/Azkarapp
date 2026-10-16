@@ -110,6 +110,9 @@ const ReaderScreen = retryableScreen(() =>
 const FloatingAudioPlayer = lazy(() =>
   import("./components/FloatingAudioPlayer").then((module) => ({ default: module.FloatingAudioPlayer })),
 );
+const AppSceneBackground = lazy(() =>
+  import("./components/AppSceneBackground").then((module) => ({ default: module.AppSceneBackground })),
+);
 const PrayerMomentScreen = retryableScreen(() =>
   import("./screens/PrayerMomentScreen").then((module) => ({ default: module.PrayerMomentScreen })),
 );
@@ -362,7 +365,7 @@ function AppContent({
   const [highContrast, setHighContrast] = useState(initialState.settings.highContrast);
   const [boldText, setBoldText] = useState(initialState.settings.boldText);
   const [appMaterial, setAppMaterial] = useState(initialState.settings.appMaterial ?? "solid");
-  const [homeMaterial, setHomeMaterial] = useState(initialState.settings.homeMaterial ?? "system");
+  const [homeMaterial, setHomeMaterial] = useState(initialState.settings.homeMaterial ?? "inherit");
   const resolvedHomeMaterial = homeMaterial === "inherit" ? appMaterial : homeMaterial;
   const [reduceTransparency, setReduceTransparency] = useState(initialState.settings.reduceTransparency);
   const [homeWirdImages, setHomeWirdImages] = useState(initialState.settings.homeWirdImages);
@@ -1146,7 +1149,7 @@ function AppContent({
     setReduceMotion(state.settings.reduceMotion);
     setReduceTransparency(state.settings.reduceTransparency);
     setAppMaterial(state.settings.appMaterial ?? "solid");
-    setHomeMaterial(state.settings.homeMaterial ?? "system");
+    setHomeMaterial(state.settings.homeMaterial ?? "inherit");
     setHomeWirdImages(state.settings.homeWirdImages);
     setHapticFeedback(state.settings.hapticFeedback);
     setForceRtl(state.settings.forceRtl);
@@ -1704,6 +1707,21 @@ function AppContent({
             }
             className="app-main-view flex-1 overflow-hidden flex flex-col"
           >
+            {showBottomNav &&
+              appMaterial !== "solid" &&
+              !highContrast &&
+              view !== "home" &&
+              view !== "reader" &&
+              view !== "khatmah" &&
+              !readerInMushafMode && (
+                <Suspense fallback={null}>
+                  <AppSceneBackground
+                    location={locationSettings}
+                    material={appMaterial}
+                    reduceTransparency={reduceTransparency}
+                  />
+                </Suspense>
+              )}
             <Suspense fallback={<ScreenFallback language={selectedLang} />}>
               {/* Phase 2 — onboarding flow */}
               {view === "splash" && <SplashScreen language={selectedLang} onDone={handleSplashDone} />}

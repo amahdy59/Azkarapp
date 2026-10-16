@@ -48,6 +48,15 @@ for (const language of ["ar", "en"] as const) {
     await trigger.click();
     const dialog = page.getByTestId("audio-control-lock");
     await expect(dialog).toBeVisible();
+    await expect(page.locator(".audio-lock-shield")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+    await expect(page.locator(".audio-lock-shield")).toHaveCSS("backdrop-filter", "none");
+    const lockedSurface = await dialog.boundingBox();
+    expect(lockedSurface!.height).toBeLessThan(110);
+    expect(lockedSurface!.y).toBeLessThan(50);
+    expect(lockedSurface!.y).toBeGreaterThanOrEqual(0);
+    expect(lockedSurface!.x).toBeGreaterThanOrEqual(0);
+    expect(lockedSurface!.x + lockedSurface!.width).toBeLessThanOrEqual(390);
+    await expect(page.getByTestId("audio-player-zikr-text")).toBeVisible();
     expect(await page.evaluate(() => (window as unknown as { lockAudio: { paused: boolean } }).lockAudio.paused)).toBe(
       false,
     );
@@ -110,7 +119,9 @@ test("explicit Home glass overrides desktop device preference while solid and hi
   const card = page.getByTestId("prayer-card-dhuhr");
   await expect(card).toHaveCSS("backdrop-filter", "none");
   await page.goto("/#/settings/appearance");
-  await page.getByRole("radio", { name: "Glass", exact: true }).click();
+  const homeAppearance = page.getByRole("radiogroup", { name: "Home appearance", exact: true });
+  await page.getByText("Customize Home", { exact: true }).click();
+  await homeAppearance.getByRole("radio", { name: "Glass", exact: true }).click();
   await page.goto("/#/home");
   await expect(card).toHaveCSS("backdrop-filter", "blur(16px) saturate(1.35)");
   await page.reload();
@@ -124,11 +135,15 @@ test("explicit Home glass overrides desktop device preference while solid and hi
   await page.emulateMedia({ forcedColors: "none" });
   await expect(card).toHaveCSS("backdrop-filter", "blur(16px) saturate(1.35)");
   await page.goto("/#/settings/appearance");
-  await page.getByRole("radio", { name: "Solid", exact: true }).click();
+  await page.getByText("Customize Home", { exact: true }).click();
+  await homeAppearance.getByRole("radio", { name: "Opaque", exact: true }).click();
   await page.goto("/#/home");
   await expect(card).not.toHaveClass(/hero-glass/);
   await page.goto("/#/settings/appearance");
-  await page.getByRole("radio", { name: "Follow device", exact: true }).click();
+  await page
+    .getByRole("radiogroup", { name: "App appearance", exact: true })
+    .getByRole("radio", { name: "Opaque", exact: true })
+    .click();
   await page.goto("/#/home");
   await expect(card).toHaveCSS("backdrop-filter", "none");
 });

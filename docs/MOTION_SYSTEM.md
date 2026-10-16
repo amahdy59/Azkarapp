@@ -1,5 +1,9 @@
 # Azkarapp Motion System
 
+## Immediate reduced-motion Library cards — 2026-10-16
+
+Stagger entrances have no animation or initial opacity delay under OS or in-app reduced motion. Shared Glass photography is stationary and stays outside route content movement; no parallax, animated blur or scroll inertia is added. The listening-lock pill has no modal centering/zoom transform.
+
 ## Owner responsiveness correction — 2026-10-16
 
 The subsequent request to remove sluggish mobile/desktop scrolling shortens the Home state handoff to 180ms, superseding the earlier 260ms value below. Native wheel/touch scrolling has no synthetic inertia. Ordinary scroll does not trigger repeated React header updates or animations. Automatic Quran following and Reader collection positioning use immediate native positioning to avoid accumulating smooth-scroll work. All OS/app reduced-motion cancellation rules remain intact. Remove the full-shell turbulence/blend decoration and avoid per-card backdrop filters outside photographic Home.

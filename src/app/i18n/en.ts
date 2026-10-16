@@ -1186,7 +1186,7 @@ const en = {
     lockControls: "Lock controls",
     controlsLocked: "Audio controls locked",
     lockHint:
-      "Playback continues. Hold the button for 2 seconds to unlock. Keyboard: hold Space or Enter, or press Escape to exit.",
+      "Text and playback stay visible; screen controls are blocked. Hold for 2 seconds to unlock. Keyboard: hold Space or Enter, or press Escape to exit.",
     holdToUnlock: "Hold to unlock",
     keepHolding: "Keep holding…",
     hidePlayer: "Hide player",
@@ -2116,14 +2116,14 @@ const en = {
   settings: {
     appMaterial: "App appearance",
     appMaterialHint:
-      "Glass adds translucent interface surfaces. Reading stays solid. Follow device respects reduced transparency; high contrast always takes priority.",
+      "Choose Opaque or Glass for the whole app. Glass uses the current Home scene; reading stays opaque. High contrast and forced colours take priority.",
+    customizeHome: "Customize Home",
     homeMaterial_inherit: "Same as app",
     homeMaterial: "Home appearance",
-    homeMaterialHint:
-      "Choose a separate Home appearance or use the app setting. Glass explicitly enables translucent Home cards; high contrast and forced colors still take priority.",
+    homeMaterialHint: "Use the app appearance, or turn this off to choose Opaque or Glass just for Home.",
     homeMaterial_system: "Follow device",
     homeMaterial_glass: "Glass",
-    homeMaterial_solid: "Solid",
+    homeMaterial_solid: "Opaque",
     appearanceLanguage: "Appearance & language",
     prayerReminders: "Prayer & reminders",
     audioDownloads: "Audio & downloads",

@@ -29,6 +29,7 @@ const defaultItemClassName = (selected: boolean) =>
 export function SegmentedControl<T extends string>({
   value,
   onChange,
+  onReselect,
   options,
   direction,
   className = "",
@@ -39,6 +40,8 @@ export function SegmentedControl<T extends string>({
 }: {
   value: T;
   onChange: (value: T) => void;
+  /** Optional explicit application of an already-selected preference. */
+  onReselect?: (value: T) => void;
   options: ReadonlyArray<SegmentedControlOption<T>>;
   direction: "ltr" | "rtl";
   className?: string;
@@ -68,18 +71,24 @@ export function SegmentedControl<T extends string>({
           <RadioGroupPrimitive.Item
             key={option.value}
             value={option.value}
+            onClick={() => {
+              if (option.value === value) onReselect?.(option.value);
+            }}
             onKeyDownCapture={handleRadioNavigation}
             data-testid={option.testId}
             className={`relative isolate overflow-hidden ${resolveItemClass(value === option.value)}`}
           >
-            {value === option.value && (
-              <motion.span
-                layoutId={`${indicatorId}-active-pill`}
-                className={`absolute inset-0 z-0 rounded-[inherit] ${indicatorClassName}`}
-                transition={{ duration: motionReduced ? 0 : 0.18, ease: [0.22, 1, 0.36, 1] }}
-                aria-hidden="true"
-              />
-            )}
+            {value === option.value &&
+              (motionReduced ? (
+                <span className={`absolute inset-0 z-0 rounded-[inherit] ${indicatorClassName}`} aria-hidden="true" />
+              ) : (
+                <motion.span
+                  layoutId={`${indicatorId}-active-pill`}
+                  className={`absolute inset-0 z-0 rounded-[inherit] ${indicatorClassName}`}
+                  transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+                  aria-hidden="true"
+                />
+              ))}
             <span className="relative z-10 flex min-w-0 items-center justify-center gap-2 [&>svg]:block [&>svg]:shrink-0">
               {option.label}
             </span>

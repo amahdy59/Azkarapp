@@ -1,5 +1,9 @@
 # Audio architecture
 
+## Visible learning while controls are locked — 2026-10-16
+
+Owner supersedes the centered opaque lock panel: the same modal focus trap and outside-dismiss protection now use a transparent, non-blurred full-screen touch shield. Only a small fixed safe-area hold-to-unlock pill is visible. The underlying exact text, audio progress and playback continue unchanged; pointer/keyboard controls behind it cannot activate. Continuous two-second pointer/Space/Enter hold, cancellation, focus restoration and Escape recovery remain. No media/session/count/recording/timing changes.
+
 ## Mushaf overlay and manual browse intent — 2026-10-15
 
 The main Mushaf's compact player overlays the page without refitting its height. Explicit Hide/Show changes presentation only, preserving plan, media clock and playback state; full expansion and Stop remain distinct. The hidden labeled 44px tab states Playing/Paused and restores keyboard focus to Hide. Ordinary screen clearance is unchanged. Manual continuous-surah keyboard browse cancels already-scheduled follow recovery synchronously; End tracks late-fitting content while the reading region stays focused, until another browse action. Canonical lines, reviewed timing and recordings remain unchanged.

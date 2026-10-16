@@ -1,5 +1,9 @@
 # Azkar design system
 
+## Owner appearance simplification — 2026-10-16
+
+Primary appearance is two options: معتم / زجاجي (Opaque / Glass), applied throughout the app. Home-only customization is progressively disclosed, with a same-as-app switch and the same two choices. Existing values survive normalization; device/contrast fallbacks remain automatic. Glass interface pages reuse the current Home photograph behind a stable theme veil and translucent surfaces; reading remains opaque and navigation does not animate the scene. Listening protection leaves text, progress and playback visible behind a transparent interaction shield, with a small safe-area hold-to-unlock control. It is accidental-touch protection, not an OS or security lock.
+
 ## Independent app and Home material — 2026-10-16
 
 App appearance offers Follow device / Glass / Solid. Home adds Same as app while retaining its independent choices and decorative-photo switch. Preserve legacy explicit Home settings rather than resetting them. All colour themes share the material policy; high contrast and forced colors remain authoritative. Non-reading cards use static translucent washes and a quiet static themed ground, with no per-card GPU blur or animated background. Navigation/header chrome may use one bounded blur; reading text and dense overlays retain stable solid surfaces. The desktop brand is a native Home link with visible keyboard focus. Respect Save-Data for decorative hero photos.

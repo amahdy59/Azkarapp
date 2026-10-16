@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { AppearancePanel } from "./AppearancePanel";
 
@@ -22,6 +22,35 @@ function renderPanel() {
 }
 
 describe("AppearancePanel", () => {
+  it("offers two global choices and applies them to Home, with optional independent Home choices", () => {
+    const app = vi.fn();
+    const home = vi.fn();
+    const props = {
+      language: "en" as const,
+      direction: "ltr" as const,
+      themeMode: "midnight" as const,
+      highContrast: false,
+      onThemeModeChange: vi.fn(),
+      onDisableHighContrast: vi.fn(),
+      onLanguageChange: vi.fn(),
+      onBack: vi.fn(),
+      onAppMaterialChange: app,
+      onHomeMaterialChange: home,
+    };
+    const { rerender } = render(<AppearancePanel {...props} appMaterial="solid" homeMaterial="inherit" />);
+    const global = within(screen.getByRole("radiogroup", { name: "App appearance" }));
+    expect(global.getAllByRole("radio")).toHaveLength(2);
+    fireEvent.click(global.getByRole("radio", { name: "Glass" }));
+    expect(app).toHaveBeenCalledWith("glass");
+    expect(home).toHaveBeenCalledWith("inherit");
+    fireEvent.click(screen.getByText("Customize Home"));
+    fireEvent.click(screen.getByRole("switch", { name: "Same as app" }));
+    expect(home).toHaveBeenLastCalledWith("solid");
+    rerender(<AppearancePanel {...props} appMaterial="solid" homeMaterial="glass" />);
+    expect(within(screen.getByRole("radiogroup", { name: "Home appearance" })).getAllByRole("radio")).toHaveLength(2);
+    fireEvent.click(screen.getByRole("switch", { name: "Same as app" }));
+    expect(home).toHaveBeenLastCalledWith("inherit");
+  });
   it("keeps images and transparency as independent appearance choices", () => {
     const onImages = vi.fn();
     const onTransparency = vi.fn();

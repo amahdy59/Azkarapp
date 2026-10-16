@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-16.10",
+  "release": "2026-10-16.11",
   "ar": [
-    "مظهر زجاجي اختياري للتطبيق مع مظهر مستقل للرئيسية وصورها؛ تبقى الشاشات الأخرى مصمتة افتراضيًا، ويعيدك شعار سطح المكتب للرئيسية.",
-    "استجابة أخف للتمرير والقراءة، ومؤثرات أقل تراكبًا، وتوقّف تحديث الشاشة في الخلفية، واحترام توفير البيانات عند عرض الخلفيات.",
-    "أحاديث وأدعية موثّقة وسياق أنسب للتذكير بالصيام والأخلاق ومساعدة الآخرين، مع تتبّع تلقائي للنخلة والذهبية والواحة في مسارك اليومي.",
-    "حالات اختيار واضحة لورد القرآن حتى مع المظهر الزجاجي، وآيات ظاهرة عند تكبير النص، ومشاركة بطاقات الورد وقفل أزرار الصوت وحفظ تشغيل الكل وتصحيح التسجيلات."
+    "اختيار أبسط بين معتم وزجاجي للتطبيق كله، مع تخصيص اختياري للرئيسية وخلفيتها الحالية على صفحات المظهر الزجاجي، وبقاء القراءة معتمة.",
+    "تمرير أكثر مباشرة ومؤثرات أخف، وظهور فوري للبطاقات عند تقليل الحركة، واحترام توفير البيانات وتوقّف تحديث الشاشة في الخلفية.",
+    "أحاديث وأدعية موثّقة وتذكيرات مناسبة للصيام والأخلاق ومساعدة الآخرين، مع استعادة عدد الزوار وتتبع النخلة والذهبية والواحة في مسارك اليومي.",
+    "قفل يمنع لمس الأزرار ويبقي النص والصوت ظاهرين للتعلّم، مع فتح بالضغط المطوّل، وتحسين عرض الآيات ومشاركة الورد وحفظ تشغيل الكل وتصحيح التسجيلات."
   ],
   "en": [
-    "Opt into Glass across the app with separate Home appearance and photos; other screens remain Solid by default, and the desktop logo brings you Home.",
-    "More direct scrolling and reading, fewer overlapping effects, paused background screen updates, and data-saving background delivery.",
-    "Authenticated hadith and dua with contextual fasting, character and helping reminders, plus automatic palm, gold and oasis tracking in your daily path.",
-    "Clear selected Quran-plan choices even in Glass, visible verses with enlarged text, routine-card sharing, audio-control lock, remembered Play all and corrected recordings."
+    "Simpler Opaque or Glass appearance for the whole app, optional Home customization and the current Home scene across Glass pages, with opaque reading.",
+    "More direct scrolling, lighter effects, immediate cards with reduced motion, data-saving backgrounds and paused background screen updates.",
+    "Authenticated hadith and dua with relevant fasting, character and helping reminders, a restored visitor footer and automatic palm, gold and oasis tracking.",
+    "A touch lock keeps learning text and audio visible with hold-to-unlock, plus clearer Quran display, routine sharing, remembered Play all and corrected recordings."
   ]
 }

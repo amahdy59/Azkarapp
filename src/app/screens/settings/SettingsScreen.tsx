@@ -51,7 +51,7 @@ export function SettingsScreen({
   homeWirdImages = false,
   appMaterial = "solid",
   onAppMaterialChange,
-  homeMaterial = "system",
+  homeMaterial = "inherit",
   onHomeMaterialChange,
   onHomeWirdImagesChange,
   hapticFeedback,

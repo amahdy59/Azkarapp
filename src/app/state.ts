@@ -135,7 +135,7 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
     reduceMotion: false,
     reduceTransparency: false,
     appMaterial: "solid",
-    homeMaterial: "system",
+    homeMaterial: "inherit",
     homeWirdImages: false,
     hapticFeedback: true,
     forceRtl: false,
@@ -927,7 +927,9 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
       homeMaterial:
         settings?.homeMaterial === "inherit" || settings?.homeMaterial === "glass" || settings?.homeMaterial === "solid"
           ? settings.homeMaterial
-          : "system",
+          : value && typeof value === "object"
+            ? "system"
+            : DEFAULT_APP_STATE.settings.homeMaterial,
       reduceTransparency:
         typeof settings?.reduceTransparency === "boolean"
           ? settings.reduceTransparency

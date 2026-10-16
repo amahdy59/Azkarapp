@@ -79,3 +79,7 @@ The prior release had four failed browser cases and skipped GitHub Pages deploym
 ## Recommended next phase
 
 Physical low-end Android/iOS and assistive-technology sampling, informed by field INP/LCP/CLS observations. Keep future materials constrained to measured, readable surfaces and avoid automatic new remote content dependencies.
+
+## Complete-matrix test integration follow-up
+
+The complete matrix on 63f0688a exposed legacy Home radio selectors matching both new App and Home groups. The selectors are scoped to the existing named Home radiogroup, preserving every option, persistence and image-independence assertion. A former texture-presence test is updated to assert that the performance-removed full-screen overlay has neither generated content nor a background on Home and Library, including reduced transparency; its navigation and reduced-transparency checks remain. This follow-up changes tests/documentation only, so release notes remain 2026-10-16.10. All three engines run the complete affected Home cases locally before the new exact-commit CI matrix.

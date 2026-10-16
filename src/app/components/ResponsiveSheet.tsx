@@ -1,5 +1,13 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { useCallback, useEffect, useId, useRef, type ReactNode, type MutableRefObject } from "react";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  type ReactNode,
+  type MutableRefObject,
+  type CSSProperties,
+} from "react";
 import { Drawer, DrawerContent, DrawerTitle } from "./ui/drawer";
 import { useLayoutMode } from "../hooks/useLayoutMode";
 import { X } from "./icons";
@@ -165,6 +173,7 @@ interface ModalProps {
   /** Defaults to the DEC-004 reading measure. */
   maxWidthClassName?: string;
   className?: string;
+  style?: CSSProperties;
   /**
    * Overrides the scrim. A surface whose controls change what is behind it —
    * the Mushaf's reading settings — wants the page legible while it is open,
@@ -199,6 +208,7 @@ export function Modal({
   describedById,
   maxWidthClassName = "max-w-[var(--content-reading)]",
   className = "",
+  style,
   overlayClassName,
   onGlass = false,
   showCloseButton = true,
@@ -224,6 +234,7 @@ export function Modal({
         />
         <DialogPrimitive.Content
           {...focusScope}
+          style={style}
           onInteractOutside={preventOutsideDismiss ? (event) => event.preventDefault() : undefined}
           data-testid={testId}
           data-prevent-count="true"
