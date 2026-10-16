@@ -279,5 +279,26 @@ test("tracking uses rounded-square checkbox focus and mirrors in RTL", async ({ 
 
   const infoCenterX = infoCircleBox!.x + infoCircleBox!.width / 2;
   const indicatorCenterX = indicatorBox!.x + indicatorBox!.width / 2;
-  expect(Math.abs(infoCenterX - indicatorCenterX)).toBeLessThanOrEqual(1);
+  const actions = page.getByTestId("prayer-actions-card");
+  const headingBox = await actions.locator(":scope > div:first-child").boundingBox();
+  const listBox = await actions.locator(":scope > ol").boundingBox();
+  expect(headingBox).not.toBeNull();
+  expect(listBox).not.toBeNull();
+  // At desktop widths the approved disclosure places the heading/virtue and
+  // checkboxes in separate grid columns. Keep both controls in their own
+  // columns with a real gap instead of comparing their screen x coordinates.
+  expect(infoCenterX).toBeGreaterThan(headingBox!.x);
+  expect(infoCenterX).toBeLessThan(headingBox!.x + headingBox!.width);
+  expect(indicatorCenterX).toBeGreaterThan(listBox!.x);
+  expect(indicatorCenterX).toBeLessThan(listBox!.x + listBox!.width);
+  expect(headingBox!.x - (listBox!.x + listBox!.width)).toBeGreaterThanOrEqual(24);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  const phoneInfo = await infoCircle.boundingBox();
+  const phoneIndicator = await indicator.boundingBox();
+  expect(phoneInfo).not.toBeNull();
+  expect(phoneIndicator).not.toBeNull();
+  expect(
+    Math.abs(phoneInfo!.x + phoneInfo!.width / 2 - phoneIndicator!.x - phoneIndicator!.width / 2),
+  ).toBeLessThanOrEqual(1);
 });
