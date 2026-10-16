@@ -1,6 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { readFile } from "node:fs/promises";
+import { t } from "../src/app/i18n";
 
 for (const language of ["ar", "en"] as const) {
   test(`image-first sharing and milestone PNG ${language} @cross-browser`, async ({ page }, testInfo) => {
@@ -69,5 +70,55 @@ for (const language of ["ar", "en"] as const) {
       expect(await button.evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(true);
     }
     expect(await modal.evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(true);
+  });
+}
+
+for (const language of ["ar", "en"] as const) {
+  test(`completion opens the image studio without changing progress ${language} @cross-browser`, async ({
+    page,
+  }, testInfo) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.addInitScript((language) => {
+      localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+      localStorage.setItem(
+        "azkarapp.state.v1",
+        JSON.stringify({ settings: { language, reduceMotion: true }, profile: { isGuest: true } }),
+      );
+    }, language);
+    await page.goto("/#/completion");
+    const label = t(language, "completion.share");
+    const trigger = page.getByRole("button", { name: label, exact: true });
+    await expect(trigger).toBeVisible();
+    // Guest initialization persists its normalized category map asynchronously.
+    // Compare sharing against that settled map, not the incomplete seed object.
+    await expect
+      .poll(() =>
+        page.evaluate(() =>
+          Array.isArray(JSON.parse(localStorage.getItem("azkarapp.state.v1")!).completed?.after_prayer),
+        ),
+      )
+      .toBe(true);
+    const before = await page.evaluate(() => JSON.parse(localStorage.getItem("azkarapp.state.v1")!).completed);
+    await trigger.click();
+    const modal = page.getByTestId("collection-share-modal");
+    const image = modal.getByTestId("sharing-preview").getByRole("img");
+    await expect(image).toHaveAttribute("width", "1080");
+    await expect(image).toHaveAttribute("height", "1080");
+    const download = page.waitForEvent("download");
+    await modal
+      .getByTestId("sharing-actions")
+      .getByRole("button", { name: language === "ar" ? "حفظ" : "Save", exact: true })
+      .click();
+    const file = await download;
+    const bytes = await readFile((await file.path())!);
+    expect([...bytes.subarray(0, 8)]).toEqual([137, 80, 78, 71, 13, 10, 26, 10]);
+    await file.saveAs(testInfo.outputPath(`completion-${language}.png`));
+    expect(
+      (await new AxeBuilder({ page }).include('[data-testid="collection-share-modal"]').analyze()).violations,
+    ).toEqual([]);
+    await modal.getByRole("button", { name: language === "ar" ? "إغلاق" : "Close", exact: true }).click();
+    await expect(modal).toHaveCount(0);
+    await expect(trigger).toBeFocused();
+    expect(await page.evaluate(() => JSON.parse(localStorage.getItem("azkarapp.state.v1")!).completed)).toEqual(before);
   });
 }

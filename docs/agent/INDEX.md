@@ -1,5 +1,7 @@
 # AI Improvement System Index
 
+Final global-sharing audit: [Remaining image entry points](phases/IMAGE_SHARE_ENTRYPOINTS_2026_10_17.md) brings completion into the existing image studio and gives the ayah-image action priority over text. Preserve all completion and Quran contracts; finish the same release cycle.
+
 Current owner-authorized continuation: [Image-first sharing](phases/IMAGE_FIRST_SHARING_2026_10_17.md). Prioritize image previews/export globally in the shared studio, give Text/Link less visual weight, preserve approved art and content, and keep performance/fallback behavior explicit.
 
 Current exact-commit release correction: [Library theme contrast](phases/LIBRARY_THEME_CONTRAST_2026_10_16.md). Resolve nested progress phrases against the active semantic colour after WebKit exposed stale dark-theme inheritance; retain bidi text and unchanged axe checks. Existing direct-main release authority applies.

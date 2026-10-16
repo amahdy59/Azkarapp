@@ -287,23 +287,24 @@ export function AyahInteractionSheet({
                 </span>
               </button>
 
-              <button type="button" onClick={() => void handleShare()} className={actionClass} disabled={!text}>
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-foreground">
-                  <Share2 size={18} aria-hidden="true" />
-                </span>
-                <span className="font-semibold">{t(language, "reader.shareAyah")}</span>
-              </button>
               <button
                 ref={imageTrigger}
                 type="button"
                 onClick={() => setImageShare(true)}
                 className={actionClass}
+                style={{ backgroundColor: "var(--primary)", color: "var(--primary-foreground)" }}
                 disabled={!text}
               >
                 <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-foreground">
                   <Share2 size={18} aria-hidden="true" />
                 </span>
                 <span className="font-semibold">{t(language, "reader.shareAyahImage")}</span>
+              </button>
+              <button type="button" onClick={() => void handleShare()} className={actionClass} disabled={!text}>
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-foreground">
+                  <Share2 size={18} aria-hidden="true" />
+                </span>
+                <span className="font-semibold">{t(language, "reader.shareAyah")}</span>
               </button>
             </div>
 

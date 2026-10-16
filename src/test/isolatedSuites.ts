@@ -11,6 +11,7 @@
  * fails until the suite is listed here.
  */
 export const ISOLATED_SUITES = [
+  "src/app/screens/CompletionScreen.sharing.test.tsx",
   "src/app/components/AppSceneBackground.test.tsx",
   "src/app/share/quickRoutineShare.test.ts",
   "src/app/native/reminders.test.ts",

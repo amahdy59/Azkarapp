@@ -41,6 +41,7 @@ export function ShareableCardModal({ palms, golden, green, dateStr, language, on
       open
       single
       initialFormat="portrait"
+      contentAlignment="center"
       onClose={onClose}
       dialogTitle={t(language, "shareModal.dialogAria")}
       dialogDescription={t(language, "shareModal.completedSubtitle")}

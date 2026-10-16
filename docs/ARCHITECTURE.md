@@ -1,5 +1,9 @@
 # Application architecture
 
+## Completion and ayah share entry points — 2026-10-17
+
+Completion lazily composes the existing image studio only after an explicit Share action, with the original localized completion phrase and category link. Its Square preview has no devotional repetition metadata and does not add recorded metrics or alter session/progress state. The ayah action menu places the existing image-studio entry before its retained text action; canonical copy, bookmarks, glyph layout and native text sharing stay unchanged.
+
 ## Shared image-first export — 2026-10-17
 
 The existing collection studio also composes milestone export through localized ShareItem summaries with hideRepetition. It receives local count/date props; no progress data is fetched, persisted or shared without an explicit action. Portrait is a per-composition initial format; the same measured canvas renderer, semantic preview, PNG/ZIP dispatcher, cancellation and URL cleanup remain authoritative. Ready-made pack files load only on explicit selection. Image copy capability is checked for the actual selection and cannot silently substitute text. Supplied art and reviewed devotional payloads remain unchanged.

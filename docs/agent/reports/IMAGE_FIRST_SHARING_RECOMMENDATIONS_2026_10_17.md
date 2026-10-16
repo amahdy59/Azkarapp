@@ -29,7 +29,7 @@ Do not force an entire collection into one increasingly tall image. Keep each zi
 
 ## Consistency across the application
 
-Collections, single azkar and evidence use the shared studio. Milestones should export a real image through that same boundary, preserving the exact recorded counts/date and avoiding devotional repetition badges. Ayah sharing already prioritizes image export and keeps copyable text secondary; retain its dedicated Quran layout and source/word-meaning controls. Quick routine sharing already uses image files; preserve its direct path.
+Collections, single azkar and evidence use the shared studio. Milestones export a real image through that same boundary, preserving the exact recorded counts/date and avoiding devotional repetition badges. Session completion also opens an image preview using its original localized phrase and category link, without adding private metrics or changing recorded progress. The ayah menu puts its existing image action before text sharing; its studio retains the dedicated Quran layout and source/word-meaning controls. Quick routine sharing already uses image files; preserve its direct path.
 
 ## Reliability and accessibility
 

@@ -70,6 +70,7 @@ export interface CollectionShareModalProps {
   dialogTitle?: string;
   dialogDescription?: string;
   initialFormat?: ShareFormat;
+  contentAlignment?: "start" | "center";
 }
 
 function supportsTextShare(data: ShareData): boolean {
@@ -102,6 +103,7 @@ export function CollectionShareModal({
   dialogTitle,
   dialogDescription,
   initialFormat,
+  contentAlignment = "start",
 }: CollectionShareModalProps) {
   const direction = language === "ar" ? "rtl" : "ltr";
   const layoutMode = useLayoutMode();
@@ -311,6 +313,7 @@ export function CollectionShareModal({
         if (!formats.includes(format)) throw new ShareFitError("selection", format);
         return generateAllCollectionStoryPages({
           collectionTitle: title,
+          contentAlignment,
           collectionSubtitle: single ? collectionSubtitle : t(exportLanguage, `shareStudio.${subtitleKey}`),
           allItems: exportItems,
           appearance,
@@ -354,6 +357,7 @@ export function CollectionShareModal({
     open,
     exportItems,
     title,
+    contentAlignment,
     collectionSubtitle,
     exportLanguage,
     subtitleKey,

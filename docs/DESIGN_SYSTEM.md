@@ -2,6 +2,8 @@
 
 ## Image-first sharing — 2026-10-17
 
+User-owned completion and milestone summary images center their measured reading panel within the available body area, keeping brand/footer fixed. This is an explicit summary-only composition option: devotional and evidence exports retain their existing top alignment and 24px maximum extra gap, exact typography, content and sources. Completion starts Square, milestones Portrait. The ayah menu emphasizes its image entry before text while retaining its dedicated Quran studio.
+
 The owner gives image exports priority. Image is the larger, filled method choice; Text/Link stay directly reachable with quieter styling and explicit pressed state. The phone preview precedes artwork source/customization, and no redundant boxed frame surrounds the card. Existing 1080px formats, readable Arabic minima, reviewed artwork, pagination and exact text remain unchanged. Ready-made packs show their overview and actual pack count; generated palette/content controls are hidden when they cannot change the artwork. Share/Save retain priority over quiet Copy. Image mode never silently copies words when image copying is unsupported: explain Save or explicit Text recovery. Milestones compose the same studio with localized counts/date and no repetition badges. Ayah sharing retains its existing image-first/footer and secondary text disclosure.
 
 ## Owner appearance simplification — 2026-10-16

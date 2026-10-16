@@ -1,13 +1,13 @@
 {
-  "release": "2026-10-17.1",
+  "release": "2026-10-17.2",
   "ar": [
-    "مشاركة الصور أوضح ومعاينتها أكبر، مع خيارات نص ورابط أهدأ وإعدادات البطاقات بعد المعاينة.",
-    "يمكن الآن معاينة بطاقة التقدم وحفظها ومشاركتها كصورة، مع اختيار لغة البطاقة ومظهرها.",
-    "تُحمّل البطاقات الجاهزة عند اختيارها فقط، وتظهر إعدادات تخص التصميم المحدد، مع توضيح بدائل نسخ الصور."
+    "تفتح مشاركة إتمام الجلسة معاينة صورة قبل إرسالها بدل المشاركة النصية المباشرة.",
+    "توزيع متوازن للمحتوى على صور التقدم والإتمام، مع حفظ الصور وخيارات النص والرابط دون تغيير تقدمك المسجل.",
+    "تظهر مشاركة الآية كصورة قبل المشاركة النصية بتمييز أوضح، مع بقاء النسخ والإشارة المرجعية متاحين."
   ],
   "en": [
-    "Image sharing has a larger preview and clearer priority, with quieter Text and Link choices and card settings after the preview.",
-    "Preview, save and share your progress as an image, with card language and appearance choices.",
-    "Ready-made artwork loads only when selected, settings match the chosen design, and image-copy alternatives are explained."
+    "Sharing session completion now opens an image preview instead of immediately sending text.",
+    "Progress and completion images balance their content, with image saving and Text or Link choices that leave recorded progress unchanged.",
+    "The ayah menu puts image sharing before text with clearer emphasis, while Copy and Bookmark stay available."
   ]
 }

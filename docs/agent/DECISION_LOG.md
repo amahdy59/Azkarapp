@@ -1,5 +1,9 @@
 # Decision Log
 
+## 2026-10-17 — Complete global image-first entry points
+
+The owner's global sharing scope includes session completion and the ayah menu, discovered during the final entry-point audit. Bring completion into the existing lazy studio with its unchanged localized phrase/category link and no added private metrics. Give the existing ayah-image action visual and DOM priority over text while retaining text/copy/bookmark and focus recovery. This is a separate bounded follow-up to the shared-studio commit; preserve Quran rendering and full release gates.
+
 ## 2026-10-17 — Image sharing takes priority
 
 The owner requests global sharing/visual organization with image export weighted above Text/Link and authorizes thoughtful improvements. Keep the generated studio as the existing default and supplied artwork unchanged. Increase the image preview, move artwork controls below it on phones, quiet secondary methods/Copy, show only applicable settings, and fetch alternate packs only on selection. Explicit Image copying must not silently send words; Text remains available. Milestone sharing joins the existing image studio with unchanged localized metrics/date, no devotional repetition metadata and explicit-only export. Preserve source/content policy, native cancellation, offline files, accessibility and release gates.
