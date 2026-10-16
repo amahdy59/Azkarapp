@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-16.9",
+  "release": "2026-10-16.10",
   "ar": [
-    "اختر المظهر الزجاجي أو المصمت للتطبيق، مع مظهر مستقل للرئيسية وصور منفصلة؛ واضغط شعار سطح المكتب للعودة للرئيسية.",
-    "تمرير أخف واستجابة أسرع، مع تقليل المؤثرات المتراكبة وإيقاف تحديث الشاشات المخفية وتجنّب صور الخلفية عند تفعيل توفير البيانات.",
-    "تذكيرات موثّقة للأخلاق والدعاء ومساعدة الآخرين، وتذكير مسبق بصيام الاثنين والخميس؛ ومسار يومي يتتبّع النخلة والذهبية والواحة تلقائيًا.",
-    "قراءة أوضح للقرآن عند تكبير النص، ومشاركة بطاقات الورد من الرئيسية، وقفل أزرار الاستماع وحفظ تشغيل الكل وتصحيح تكرار التسجيلات وإيقاف التسجيل غير المطابق."
+    "مظهر زجاجي اختياري للتطبيق مع مظهر مستقل للرئيسية وصورها؛ تبقى الشاشات الأخرى مصمتة افتراضيًا، ويعيدك شعار سطح المكتب للرئيسية.",
+    "استجابة أخف للتمرير والقراءة، ومؤثرات أقل تراكبًا، وتوقّف تحديث الشاشة في الخلفية، واحترام توفير البيانات عند عرض الخلفيات.",
+    "أحاديث وأدعية موثّقة وسياق أنسب للتذكير بالصيام والأخلاق ومساعدة الآخرين، مع تتبّع تلقائي للنخلة والذهبية والواحة في مسارك اليومي.",
+    "حالات اختيار واضحة لورد القرآن حتى مع المظهر الزجاجي، وآيات ظاهرة عند تكبير النص، ومشاركة بطاقات الورد وقفل أزرار الصوت وحفظ تشغيل الكل وتصحيح التسجيلات."
   ],
   "en": [
-    "Choose Glass or Solid across the app, with a separate Home appearance and independent card images; click the desktop logo to return Home.",
-    "Lighter scrolling and quicker feedback, with fewer overlapping effects, paused hidden-screen updates, and no background photos when device data saving is enabled.",
-    "Sourced reminders for character, dua and helping others, plus advance Monday/Thursday fasting reminders and automatic palm, gold and oasis tracking.",
-    "Clearer Quran reading with enlarged text, Home routine-card sharing, listening-control lock, a remembered Play all choice and corrected recording repetitions; the mismatched recording is withdrawn."
+    "Opt into Glass across the app with separate Home appearance and photos; other screens remain Solid by default, and the desktop logo brings you Home.",
+    "More direct scrolling and reading, fewer overlapping effects, paused background screen updates, and data-saving background delivery.",
+    "Authenticated hadith and dua with contextual fasting, character and helping reminders, plus automatic palm, gold and oasis tracking in your daily path.",
+    "Clear selected Quran-plan choices even in Glass, visible verses with enlarged text, routine-card sharing, audio-control lock, remembered Play all and corrected recordings."
   ]
 }

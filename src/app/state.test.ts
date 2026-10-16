@@ -824,6 +824,7 @@ describe("prayer tracking persistence", () => {
 
 describe("explicit Home material", () => {
   it("retains global and inherited Home choices across normalization and partial sync", () => {
+    expect(normalizeAppState({}).settings.appMaterial).toBe("solid");
     for (const appMaterial of ["system", "glass", "solid"] as const) {
       const state = normalizeAppState({ settings: { appMaterial, homeMaterial: "inherit" } });
       expect(state.settings.appMaterial).toBe(appMaterial);
@@ -834,7 +835,7 @@ describe("explicit Home material", () => {
       });
     }
     expect(normalizeAppState({ settings: { appMaterial: "invalid", homeMaterial: "glass" } }).settings).toMatchObject({
-      appMaterial: "system",
+      appMaterial: "solid",
       homeMaterial: "glass",
     });
   });

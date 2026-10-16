@@ -190,6 +190,14 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
 
 test("offers clear RTL reading choices and free reading without progress tracking", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 700 });
+  // Glass must preserve the reading planner's selected/unselected control states.
+  await page.getByTestId("nav-settings").click();
+  await page.getByRole("button", { name: /المظهر واللغة/ }).click();
+  await page
+    .getByRole("radiogroup", { name: "مظهر التطبيق", exact: true })
+    .getByRole("radio", { name: "زجاجي", exact: true })
+    .click();
+  await page.getByTestId("nav-quran").click();
   await page.getByRole("button", { name: "تعديل" }).click();
 
   const radios = page.getByRole("radio");

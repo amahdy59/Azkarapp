@@ -27,7 +27,7 @@ export interface AppAppearancePreferences {
 /** Applies the complete root appearance contract atomically to prevent stale theme classes and startup flashes. */
 export function applyAppAppearance({
   themeMode,
-  appMaterial = "system",
+  appMaterial = "solid",
   language = "en",
   textSize = "medium",
   highContrast = false,

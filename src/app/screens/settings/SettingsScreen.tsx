@@ -49,7 +49,7 @@ export function SettingsScreen({
   reduceMotion,
   reduceTransparency,
   homeWirdImages = false,
-  appMaterial = "system",
+  appMaterial = "solid",
   onAppMaterialChange,
   homeMaterial = "system",
   onHomeMaterialChange,

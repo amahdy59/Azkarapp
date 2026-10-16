@@ -36,7 +36,7 @@ export function AppearancePanel({
   themeMode,
   highContrast,
   homeWirdImages = false,
-  appMaterial = "system",
+  appMaterial = "solid",
   onAppMaterialChange,
   homeMaterial = "system",
   onHomeMaterialChange,

@@ -40,6 +40,7 @@ for (const language of ["ar", "en"] as const) {
       await expect(page.locator(".home-photo-canvas")).toHaveClass(/home-force-glass/);
       await page.getByTestId("nav-azkar").click();
       await expect(page.getByTestId("category-card-morning")).toBeVisible();
+      await expect(page.getByTestId("category-card-morning")).toHaveCSS("background-color", /0\.88/);
       await page.screenshot({ path: testInfo.outputPath(`app-glass-${language}-${width}.png`) });
       expect((await new AxeBuilder({ page }).include(".app-main").analyze()).violations).toEqual([]);
       await page.getByTestId("category-card-morning").click();

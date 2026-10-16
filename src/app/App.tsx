@@ -361,7 +361,7 @@ function AppContent({
   const [zikrFont, setZikrFont] = useState<ZikrFontOption>(initialState.settings.zikrFont ?? "humanist");
   const [highContrast, setHighContrast] = useState(initialState.settings.highContrast);
   const [boldText, setBoldText] = useState(initialState.settings.boldText);
-  const [appMaterial, setAppMaterial] = useState(initialState.settings.appMaterial ?? "system");
+  const [appMaterial, setAppMaterial] = useState(initialState.settings.appMaterial ?? "solid");
   const [homeMaterial, setHomeMaterial] = useState(initialState.settings.homeMaterial ?? "system");
   const resolvedHomeMaterial = homeMaterial === "inherit" ? appMaterial : homeMaterial;
   const [reduceTransparency, setReduceTransparency] = useState(initialState.settings.reduceTransparency);
@@ -1145,7 +1145,7 @@ function AppContent({
     setBoldText(state.settings.boldText);
     setReduceMotion(state.settings.reduceMotion);
     setReduceTransparency(state.settings.reduceTransparency);
-    setAppMaterial(state.settings.appMaterial ?? "system");
+    setAppMaterial(state.settings.appMaterial ?? "solid");
     setHomeMaterial(state.settings.homeMaterial ?? "system");
     setHomeWirdImages(state.settings.homeWirdImages);
     setHapticFeedback(state.settings.hapticFeedback);
@@ -1699,6 +1699,9 @@ function AppContent({
             data-view={view}
             tabIndex={-1}
             data-app-page={view}
+            data-material-ui={
+              (view !== "home" && view !== "reader" && view !== "khatmah" && !readerInMushafMode) || undefined
+            }
             className="app-main-view flex-1 overflow-hidden flex flex-col"
           >
             <Suspense fallback={<ScreenFallback language={selectedLang} />}>

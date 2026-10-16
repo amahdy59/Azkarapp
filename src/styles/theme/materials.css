@@ -1,22 +1,32 @@
 /* Interface materials are independent of colour theme and Home's photograph.
    Reading and playback surfaces retain their existing dense backgrounds. */
-html[data-app-material-resolved="glass"]
-  .app-shell:not([data-material-reading])
-  .app-main-view:not([data-app-page="home"]) {
+html[data-app-material-resolved="glass"] [data-material-ui] {
   background:
     radial-gradient(ellipse at top right, color-mix(in srgb, var(--primary) 13%, transparent), transparent 65%),
     var(--background);
 }
-html[data-app-material-resolved="glass"]
-  .app-shell:not([data-material-reading])
-  .app-main-view:not([data-app-page="home"])
-  :is(.app-screen-surface, [data-testid="settings-screen"]) {
+html[data-app-material-resolved="glass"] [data-material-ui] :is(.app-screen-surface, [data-testid="settings-screen"]) {
   background-color: transparent;
 }
 html[data-app-material-resolved="glass"]
-  .app-shell:not([data-material-reading])
-  .app-main-view:not([data-app-page="home"])
-  :is(.bg-card, .shared-screen-header),
+  [data-material-ui]
+  :is(
+    .bg-card:not(
+      :is(
+        button,
+        input,
+        select,
+        textarea,
+        label,
+        [role="radio"],
+        [role="tab"],
+        [role="option"],
+        [aria-selected="true"],
+        [aria-checked="true"]
+      )
+    ),
+    .shared-screen-header
+  ),
 html[data-app-material-resolved="glass"] :is(.app-sidebar, .app-rail, .bottom-nav) {
   background-color: color-mix(in srgb, var(--card) 88%, transparent);
   background-image: linear-gradient(135deg, color-mix(in srgb, var(--foreground) 3%, transparent), transparent);
@@ -24,12 +34,12 @@ html[data-app-material-resolved="glass"] :is(.app-sidebar, .app-rail, .bottom-na
 }
 /* Static card translucency needs no repeated GPU blur. Only sticky chrome
    separates moving content with one small, bounded filter. */
-html[data-app-material-resolved="glass"] .app-shell:not([data-material-reading]) .shared-screen-header,
+html[data-app-material-resolved="glass"] [data-material-ui] .shared-screen-header,
 html[data-app-material-resolved="glass"] :is(.app-sidebar, .app-rail, .bottom-nav) {
   backdrop-filter: blur(12px) saturate(115%) !important;
 }
 /* Nested controls inherit the parent material rather than another blur layer. */
-html[data-app-material-resolved="glass"] .app-main-view:not([data-app-page="home"]) .bg-card .bg-card {
+html[data-app-material-resolved="glass"] [data-material-ui] .bg-card .bg-card {
   backdrop-filter: none !important;
 }
 html[data-app-material="solid"] .app-shell :is(.app-sidebar, .app-rail, .bottom-nav, .scroll-glass-header) {

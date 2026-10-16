@@ -4,6 +4,8 @@
 
 The owner-approved appMaterial preference uses existing normalized snapshot/partial-merge boundaries and initial appearance application. Home retains its explicit legacy system/glass/solid choice and can independently inherit the app choice. Root appearance resolves system transparency changes reactively; high contrast and forced colors retain priority. Shared non-reading interface surfaces use static translucency, with bounded blur on chrome only. The photographic Home and dense Quran/azkar/listening surfaces retain their own contrast contracts. No runtime dependency, AI request or additional server is added.
 
+Missing/invalid app-wide preferences normalize to Solid, preserving the pre-upgrade opaque interface and avoiding new rendering costs by default. Explicit System/Glass/Solid choices remain valid. Material washes exclude form controls and selected states so their own contrast and selection tokens retain authority.
+
 Minute-based screen clocks pause while hidden and resynchronize on visibility. Headers dispatch React state only at their scroll threshold. A full-shell turbulence/blend overlay is removed; native scrolling remains browser-owned. Automatic reader following uses immediate positioning instead of queuing smooth scrolls. Home's discrete silhouette handoff is shortened from 260ms to 180ms under the owner's subsequent responsiveness request; ordinary scroll ticks do not animate layout. Device Save-Data skips decorative hero pictures and retains an opaque fallback. Offline text and existing cache persistence remain unchanged.
 
 ## Home scroll and relevant reminders — 2026-10-16

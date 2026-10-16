@@ -1,5 +1,20 @@
 [
   {
+    "release": "2026-10-16.10",
+    "ar": [
+      "مظهر زجاجي اختياري للتطبيق مع مظهر مستقل للرئيسية وصورها؛ تبقى الشاشات الأخرى مصمتة افتراضيًا، ويعيدك شعار سطح المكتب للرئيسية.",
+      "استجابة أخف للتمرير والقراءة، ومؤثرات أقل تراكبًا، وتوقّف تحديث الشاشة في الخلفية، واحترام توفير البيانات عند عرض الخلفيات.",
+      "أحاديث وأدعية موثّقة وسياق أنسب للتذكير بالصيام والأخلاق ومساعدة الآخرين، مع تتبّع تلقائي للنخلة والذهبية والواحة في مسارك اليومي.",
+      "حالات اختيار واضحة لورد القرآن حتى مع المظهر الزجاجي، وآيات ظاهرة عند تكبير النص، ومشاركة بطاقات الورد وقفل أزرار الصوت وحفظ تشغيل الكل وتصحيح التسجيلات."
+    ],
+    "en": [
+      "Opt into Glass across the app with separate Home appearance and photos; other screens remain Solid by default, and the desktop logo brings you Home.",
+      "More direct scrolling and reading, fewer overlapping effects, paused background screen updates, and data-saving background delivery.",
+      "Authenticated hadith and dua with contextual fasting, character and helping reminders, plus automatic palm, gold and oasis tracking in your daily path.",
+      "Clear selected Quran-plan choices even in Glass, visible verses with enlarged text, routine-card sharing, audio-control lock, remembered Play all and corrected recordings."
+    ]
+  },
+  {
     "release": "2026-10-16.9",
     "ar": [
       "اختر المظهر الزجاجي أو المصمت للتطبيق، مع مظهر مستقل للرئيسية وصور منفصلة؛ واضغط شعار سطح المكتب للعودة للرئيسية.",

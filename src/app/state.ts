@@ -134,7 +134,7 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
     boldText: false,
     reduceMotion: false,
     reduceTransparency: false,
-    appMaterial: "system",
+    appMaterial: "solid",
     homeMaterial: "system",
     homeWirdImages: false,
     hapticFeedback: true,
@@ -923,7 +923,7 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
           ? settings.homeWirdImages
           : DEFAULT_APP_STATE.settings.homeWirdImages,
       appMaterial:
-        settings?.appMaterial === "glass" || settings?.appMaterial === "solid" ? settings.appMaterial : "system",
+        settings?.appMaterial === "glass" || settings?.appMaterial === "system" ? settings.appMaterial : "solid",
       homeMaterial:
         settings?.homeMaterial === "inherit" || settings?.homeMaterial === "glass" || settings?.homeMaterial === "solid"
           ? settings.homeMaterial

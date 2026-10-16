@@ -4,6 +4,8 @@
 
 App appearance offers Follow device / Glass / Solid. Home adds Same as app while retaining its independent choices and decorative-photo switch. Preserve legacy explicit Home settings rather than resetting them. All colour themes share the material policy; high contrast and forced colors remain authoritative. Non-reading cards use static translucent washes and a quiet static themed ground, with no per-card GPU blur or animated background. Navigation/header chrome may use one bounded blur; reading text and dense overlays retain stable solid surfaces. The desktop brand is a native Home link with visible keyboard focus. Respect Save-Data for decorative hero photos.
 
+Keep Solid as the initial app-wide appearance when an older snapshot has no explicit app preference. Glass is opt-in; Home retains its existing choice. Card material must not override label/button/input/select or radio/tab/option selection backgrounds. Selected controls keep their own semantic colors and borders.
+
 ## Home reminder and scroll refinement — 2026-10-16
 
 The next-prayer badge retains fixed column bounds across compact/expanded cards, with stable header spacing and reduced-motion-aware transform/opacity feedback. The shared visitor estimate returns at the bottom of Home after a successful response. One reminder remains visible, with exact evidence, separate editorial takeaway, explicit excerpt/action attribution, visible grading and a 44px source/context link. Short Wednesday/Sunday preparation and varied general-topic rotation coexist with the existing moment plan; no new prescribed count, hidden tracking or notifications.

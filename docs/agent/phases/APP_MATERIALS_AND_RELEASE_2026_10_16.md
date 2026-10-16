@@ -10,6 +10,10 @@ Use existing React/theme/i18n/segmented controls. Add no runtime dependency, AI 
 
 ## Scope completed
 
+CI integration correction: the responsive shard caught two issues in d584632f. Defaulting missing global preferences to System changed previously opaque screens, and the generic card wash overpainted reading-plan radio labels. Missing/invalid app appearance now defaults Solid, preserving existing screens; explicit System remains supported. Control/selection surfaces are excluded from the neutral material wash. The original opaque-header assertions remain unchanged. The existing RTL reading-choice test now explicitly enables Glass through Settings before checking distinct selected backgrounds/borders and accessibility.
+
+The targeted correction matrix passed 28/28 across desktop, phone and tablet Chromium plus Firefox/WebKit. The complete gate passed every stage except stylesheet growth after the longer state exclusion selector; scoping eligible interface roots through one data attribute reduced CSS to 166.49KB raw/28.62KB gzip and restored the unchanged budget checks. No ceiling, tolerance or baseline was raised. The final complete gate is rerun on the corrected snapshot before its corrective push.
+
 Added app-wide material preference and independent Home inheritance through the existing persistence/merge/theme boundaries. Preserved all prior explicit Home choices, existing photo control and protected reading/playback surfaces. Added desktop logo Home navigation. Applied the subsequent performance request: static card materials, limited chrome blur, no full-shell noise/blend layer, threshold-only header state updates, hidden-clock suspension, faster 180ms prayer handoff, immediate automatic reader following and Save-Data decorative fallback.
 
 Diagnosed the prior full-CI failures. Enlarged Quran listening left opening verses outside the visible reading region because heading visibility was insufficient and a second startup effect could override follow positioning; one geometry-aware effect now aligns the appropriate heading/ink. The magnification test sampled Unicode fallback before a late QCF swap, so it now establishes the same canonical rendering mode before comparing zoom/reset, preserving every original geometry/content assertion. Tablet utility navigation tests explicitly settle the compact sticky transition before clicking content it moves. No skips, coverage reduction, bundle increase or religious-text/count change.
@@ -58,7 +62,7 @@ Arabic/English 390px/1440px material captures and reading-layout evidence under 
 
 ## Documentation updated
 
-Architecture, design system, motion contract, decision log, phase index and this report. Release 2026-10-16.9 replaces the manifest with four bilingual outcomes covering all work since the last successful GitHub Pages deployment. The compressed release history is regenerated through the existing script.
+Architecture, design system, motion contract, decision log, phase index and this report. Release 2026-10-16.10 replaces the manifest with four bilingual outcomes covering all work since the last successful GitHub Pages deployment, including the CI material integration correction. The compressed release history is regenerated through the existing script.
 
 ## Decisions recorded
 
