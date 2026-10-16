@@ -1,5 +1,13 @@
 # AI Improvement System Index
 
+Latest release authorization, 2026-10-16: the owner reviewed the new Home image candidates and their real phone/desktop composites, selected the calmer Friday-morning scene, and requests applying the optimized backgrounds and pushing all pending Home refinements. This supersedes earlier local-preview holds. See the active Home phase, decision log, and the final Home release report.
+
+Latest Home material continuation, 2026-10-16: verify visible translucency for every Home card family across phone and desktop, including optional photo Wird captions, while preserving contrast and opaque device/application fallbacks. The local image-review-before-push hold remains. See the active Home phase and `docs/agent/HOME_GLASS_ALL_CARDS_2026_10_16_REPORT.md`.
+
+Latest Home continuation, 2026-10-16: the owner approves a full-width prayer disclosure below the summary row so Maghrib/Isha never swap contextual cards. Verify every expanded-card checkbox by pointer/keyboard and reload, and preview the recommended borderless utility header. The local screenshot review/publication hold remains. See the active Home phase and notch report.
+
+Latest owner follow-up, 2026-10-16: full-card prayer click targets, larger insets, no Viewing copy and next-only approaching emphasis require local image review before any further push. This supersedes the release authorization below for the new follow-up. The pushed `2c46d17f` failed one exact-geometry browser check (status badge alignment); Pages correctly skipped it. The local follow-up fixes the row alignment without relaxing that assertion. See the active Home phase and `docs/agent/HOME_PRAYER_CARD_TARGETS_2026_10_16_REPORT.md`.
+
 Release authorization, 2026-10-16: the owner approves all pending Home glass, Friday naming, contextual footer, countdown alignment and current-to-next focus changes and explicitly requests pushing all changes. This supersedes the local-only publication holds for the current continuation. Run the tracked hook, push verified `main`, require exact-commit Quality and Pages success, and verify the live application. Final release evidence is recorded in `output/home-refinements-release-2026-10-16/PHASE_REPORT.md`.
 
 Current owner-approved continuation: [Home glass clarity and material refinement](phases/HOME_GLASS_REFINEMENT_2026_10_15.md). Restore visible Home translucency and apply the owner-requested two-column, fit-or-scroll prayer overview; actual local previews precede publication and complete release gates remain intact. [Final reading, offline clarity and release acceptance](phases/FINAL_READING_AND_OFFLINE_POLISH_2026_10_15.md) is deployed at 2e93b36c.

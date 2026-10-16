@@ -80,7 +80,7 @@ export function getPrayerActions({
   const hasSunnahBeforeInChecklist = prayer === "fajr" || prayer === "dhuhr" || prayer === "asr";
   if (hasSunnahBeforeInChecklist) {
     const isChecked =
-      prayer === "dhuhr" ? (record?.sunnahBefore ?? false) : (record?.sunnahBefore ?? record?.sunnah ?? false);
+      prayer === "dhuhr" ? (record?.sunnahBefore ?? false) : record?.sunnahBefore === true || record?.sunnah === true;
 
     const labelKey =
       prayer === "fajr"
@@ -113,7 +113,7 @@ export function getPrayerActions({
   const hasSunnahAfterInChecklist = prayer === "dhuhr" || prayer === "maghrib" || prayer === "isha";
   if (hasSunnahAfterInChecklist) {
     const isChecked =
-      prayer === "dhuhr" ? (record?.sunnahAfter ?? false) : (record?.sunnahAfter ?? record?.sunnah ?? false);
+      prayer === "dhuhr" ? (record?.sunnahAfter ?? false) : record?.sunnahAfter === true || record?.sunnah === true;
 
     const labelKey =
       prayer === "dhuhr"

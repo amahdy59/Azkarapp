@@ -28,7 +28,7 @@ describe("dated prayer interval", () => {
     });
     expect(steps[0]).toEqual({ current: 1, next: 0.15 });
     expect(steps[1]).toEqual(steps[0]);
-    expect(steps[2].current).toBeCloseTo(0.75);
+    expect(steps[2].current).toBe(0);
     expect(steps[2].next).toBeCloseTo(0.575);
     expect(steps[3].next).toBeGreaterThan(steps[3].current);
     const atAdhan = buildPrayerCardModels(new Date(next.at), "en", DEFAULT_LOCATION);

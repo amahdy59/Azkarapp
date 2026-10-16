@@ -43,7 +43,7 @@ export function buildPrayerCardModels(
       state,
       isOpenable,
       isRecordable,
-      emphasis: state === "current" ? 1 - approach * 0.5 : isNext ? 0.15 + approach * 0.85 : 0,
+      emphasis: state === "current" ? (approach > 0 ? 0 : 1) : isNext ? 0.15 + approach * 0.85 : 0,
       ...(isNext
         ? {
             countdown: t(language, "prayerTracking.timeLeft", { time: countdown }),

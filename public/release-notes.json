@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-16.2",
+  "release": "2026-10-16.3",
   "ar": [
-    "زجاجية أوضح لبطاقات الرئيسية على الهاتف والتابلت والكمبيوتر، مع احترام إعدادات تقليل الشفافية.",
-    "تبرز الصلاة الحالية، ثم ينتقل التركيز تدريجيًا إلى القادمة خلال آخر نصف ساعة، مع بقاء النصوص واضحة.",
-    "عدّ تنازلي أكبر وشريط الوقت في تذييل القادمة، وتذييلات لباقي الصلوات تعرض التسجيل أو ترتيب الصلاة بدل ملخص الرواتب.",
-    "يظهر اسم صلاة الظهر «الجمعة» يوم الجمعة، مع الاحتفاظ بالمواقيت والتسجيلات الحالية."
+    "خلفيات أهدأ لأوقات اليوم مع مشهد خاص لصباح الجمعة، مع وضوح أعلى للبطاقات الزجاجية على جميع الشاشات.",
+    "اضغط أي موضع في بطاقة الصلاة لعرض تفاصيلها أسفل الصف، مع مؤشر يربط البطاقة بالتفاصيل دون إزاحة البطاقات الأخرى.",
+    "تنتقل إضاءة التركيز من الصلاة الحالية إلى القادمة عند اقتراب وقتها، ويظهر الوقت المتبقي في تذييل البطاقة القادمة.",
+    "يمكن تسجيل أعمال الصلاة من بطاقة التفاصيل؛ ويظهر اسم الظهر «الجمعة» يوم الجمعة."
   ],
   "en": [
-    "Clearer glass surfaces across Home on phones, tablets and desktop, while respecting reduced-transparency preferences.",
-    "The current prayer stands out, then emphasis gradually shifts to the next during the final half hour while all text stays readable.",
-    "A larger countdown and remaining-time bar sit in the next prayer's footer; other footers show recorded status or prayer order instead of Rawatib summaries.",
-    "The noon prayer is labelled Jumu‘ah on Fridays, keeping your existing times and records."
+    "Calmer time-of-day backgrounds, including a special Friday morning scene, make glass cards clearer across screens.",
+    "Tap anywhere on a prayer card to open its details below the row; a small marker connects them without shifting other cards.",
+    "Focus moves from the current prayer toward the next as its time approaches, with the countdown in the next card's footer.",
+    "Record prayer actions in the expanded card, and see the noon prayer labelled Jumu‘ah on Fridays."
   ]
 }

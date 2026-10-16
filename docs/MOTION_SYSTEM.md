@@ -2,6 +2,8 @@
 
 ## Prayer surface emphasis — 2026-10-16
 
+Latest owner correction removes current's decorative emphasis entirely once next enters the last 30 minutes, rather than gradually retaining half its highlight. Next still increases on the existing minute clock. All reduced-motion/transparency and no-loop constraints remain.
+
 Home summary emphasis is a stationary surface treatment updated by the existing minute clock. During the final 30 minutes before next adhan, current's decorative strength decreases while next's increases. No extra timer, moving gradient, pulsing, whole-card opacity change, layout animation or animated blur is introduced. The existing brief border-color transition respects application/system reduced motion; the sheen and restrained shadow update discretely. Reduced transparency/high contrast omit the glow and retain opaque materials. Prayer timing, text contrast and native progress semantics are unchanged.
 
 ## Shared switch feedback — 2026-10-13

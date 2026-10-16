@@ -218,6 +218,8 @@ function PrayerCard({
   const { prayer, time, state, countdown, isOpenable, isRecordable } = model;
   const Icon = PRAYER_ICON[prayer];
   const name = prayerDisplayName(prayer, language, dayKey);
+  const timeLabel = formatPrayerTimeLabel(time, language === "ar");
+  const periodStart = timeLabel.lastIndexOf(" ");
   // Future prayers show their controls so the card keeps its shape, but they
   // cannot be marked: nothing has happened yet to record.
   const disabled = !isRecordable;
@@ -266,7 +268,7 @@ function PrayerCard({
           aria-controls="home-expanded-prayer"
           aria-label={t(language, "prayerTracking.openPrayer", { prayer: name })}
           aria-describedby={`prayer-summary-time-${prayer} prayer-summary-status-${prayer} prayer-summary-detail-${prayer}`}
-          className="home-prayer-summary-button relative z-10 grid min-h-16 min-w-0 grid-cols-[minmax(0,max-content)_minmax(0,max-content)] justify-between gap-x-2.5 gap-y-1 rounded-xl outline-none transition-colors focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
+          className="home-prayer-summary-button no-press grid min-h-16 min-w-0 grid-cols-[minmax(0,max-content)_minmax(0,max-content)] justify-between gap-x-2.5 gap-y-1 rounded-xl outline-none transition-colors"
         >
           <div className="home-prayer-identity min-w-0 text-start" data-prayer-identity>
             <span
@@ -291,11 +293,6 @@ function PrayerCard({
             >
               {name}
             </h3>
-            {selected && (
-              <span className={`text-xs font-semibold ${onGlass ? "text-on-media-muted" : "text-muted-foreground"}`}>
-                {t(language, "prayerTracking.viewing")}
-              </span>
-            )}
           </div>
           <div className="home-prayer-timing min-w-0 text-end" data-prayer-timing>
             <span
@@ -313,7 +310,14 @@ function PrayerCard({
               className={`max-w-full text-base font-extrabold tabular-nums [overflow-wrap:anywhere] ${state === "next" ? (onGlass ? "text-on-media-accent" : "text-primary") : onGlass ? "text-on-media" : "text-foreground"}`}
               dir="auto"
             >
-              {formatPrayerTimeLabel(time, language === "ar")}
+              {periodStart > 0 ? (
+                <>
+                  {timeLabel.slice(0, periodStart)}{" "}
+                  <span className="text-xs font-semibold">{timeLabel.slice(periodStart + 1)}</span>
+                </>
+              ) : (
+                timeLabel
+              )}
             </p>
           </div>
         </button>
@@ -632,6 +636,24 @@ export function PrayerTrackerCards({
         : target.right - frame.right + 4;
     row.scrollLeft += delta;
   }, [compactSummary, direction, nextPrayer, summaryOverflows]);
+
+  // A selected summary is the disclosure's visual anchor. Keep it fully in
+  // view after selection without moving the vertical page or changing card gaps.
+  useEffect(() => {
+    const row = summaryRef.current;
+    if (!row || !compactSummary || !selectedPrayer) return;
+    const card = row.querySelector<HTMLElement>(`[data-prayer="${selectedPrayer}"]`);
+    if (!card) return;
+    const frame = row.getBoundingClientRect();
+    const bounds = card.getBoundingClientRect();
+    const offset =
+      bounds.left < frame.left + 4
+        ? bounds.left - frame.left - 4
+        : bounds.right > frame.right - 4
+          ? bounds.right - frame.right + 4
+          : 0;
+    if (offset) row.scrollLeft += offset;
+  }, [compactSummary, selectedPrayer]);
 
   return (
     <div className="flex flex-col gap-3">

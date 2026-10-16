@@ -10,6 +10,8 @@ export function TimeOfDayBackground({ categoryId = "morning" }: { categoryId?: s
     kind = "sleep";
   } else if (categoryId === "after_prayer") {
     kind = "prayer";
+  } else if (categoryId === "friday_morning") {
+    kind = "friday_morning";
   } else if (categoryId.includes("friday")) {
     kind = "friday";
   }

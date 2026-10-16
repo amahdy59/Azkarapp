@@ -191,7 +191,8 @@ describe("PrayerTrackerCards", () => {
     expect(screen.getByTestId("prayer-card-fajr")).not.toHaveAttribute("aria-current");
     expect(screen.getByTestId("prayer-card-asr")).toHaveAttribute("aria-current", "step");
     expect(screen.getByTestId("prayer-card-maghrib")).toHaveClass("border-primary", "bg-primary/15");
-    expect(screen.getByTestId("prayer-card-fajr")).toHaveTextContent("Viewing");
+    expect(screen.getByTestId("prayer-card-fajr")).not.toHaveTextContent("Viewing");
+    expect(screen.getByRole("button", { name: /Open Fajr/i })).toHaveAttribute("aria-expanded", "true");
     expect(screen.getByTestId("prayer-card-maghrib")).not.toHaveTextContent("Opens 30m before");
     expect(screen.getByRole("button", { name: "Open Maghrib" })).toBeDisabled();
     expect(screen.getByTestId("prayer-card-fajr")).not.toHaveClass("border-primary");

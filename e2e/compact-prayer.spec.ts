@@ -62,7 +62,7 @@ async function checkGeometry(page: Page) {
   expect(measures.contentWidth).toBeCloseTo(measures.headerWidth, 0);
   expect(Math.abs(measures.headerAlignment)).toBeLessThanOrEqual(1);
   expect(measures.stripWidth).toBeLessThanOrEqual(measures.contentWidth);
-  expect(measures.panelWidth).toBeLessThanOrEqual(40 * measures.rootSize);
+  expect(measures.panelWidth).toBeCloseTo(measures.stripWidth, 0);
   expect(Math.abs(measures.centerOffset)).toBeLessThanOrEqual(1);
   expect(measures.quoteFont).toBe(measures.headingFont);
   expect(measures.summaryOverflow).toBe(false);
@@ -108,6 +108,133 @@ async function checkGeometry(page: Page) {
 }
 
 for (const language of ["ar", "en"] as const) {
+  for (const width of [390, 1440]) {
+    // Keep pointer, keyboard and reload assertions within WebKit's ordinary
+    // deadline without skipping any prayer or increasing the global timeout.
+    for (const prayerGroup of [["fajr"], ["dhuhr"], ["asr"], ["maghrib", "isha"]] as const) {
+      test(`fixed prayer disclosure and every checkbox ${language} ${width} ${prayerGroup.join("/")} @cross-browser`, async ({
+        page,
+        browserName,
+      }, testInfo) => {
+        // Normal-glass captures complement the separate reduced-transparency checks.
+        if (browserName === "chromium") {
+          const cdp = await page.context().newCDPSession(page);
+          await cdp.send("Emulation.setEmulatedMedia", {
+            features: [{ name: "prefers-reduced-transparency", value: "no-preference" }],
+          });
+        }
+        await page.setViewportSize({ width, height: 1000 });
+        await openHome(page, language);
+        const panel = page.getByTestId("home-prayer-moment");
+        const strip = page.getByTestId("home-prayer-strip");
+        const primary = page.getByTestId("home-primary-card");
+        let fixedPosition: { x: number; width: number } | undefined;
+        const selectPrayer = async (prayer: (typeof prayers)[number]) => {
+          const time = getEstimatedPrayerTimes(new Date("2026-09-05T12:00:00+03:00"))[prayer];
+          const instant = new Date(`2026-09-05T${time}:00+03:00`);
+          instant.setMinutes(instant.getMinutes() + 2);
+          await page.clock.setFixedTime(instant);
+          await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
+          const tile = page.getByTestId(`prayer-card-${prayer}`);
+          await expect(tile).toHaveAttribute("data-prayer-state", "current");
+          const toggle = tile.getByRole("button");
+          if ((await toggle.getAttribute("aria-expanded")) !== "true") await toggle.click();
+          await expect(panel).toHaveAttribute("data-prayer", prayer);
+        };
+        for (const prayer of prayerGroup) {
+          await selectPrayer(prayer);
+          const [detail, summary, context] = await Promise.all([
+            panel.boundingBox(),
+            strip.boundingBox(),
+            primary.boundingBox(),
+          ]);
+          expect(detail!.x).toBeCloseTo(summary!.x, 0);
+          expect(detail!.width).toBeCloseTo(summary!.width, 0);
+          const homeMeasure = await page.evaluate(() => {
+            const rect = (selector: string) => document.querySelector(selector)!.getBoundingClientRect();
+            return {
+              heading: rect('[data-testid="home-header-content"]'),
+              gutter: parseFloat(
+                getComputedStyle(document.querySelector('[data-testid="home-header-content"]')!).paddingLeft,
+              ),
+              grid: rect('[data-testid="home-context-grid"]'),
+              wird: rect('[data-testid="home-wird-row"]'),
+              lower: rect('[data-testid="situational-shortcuts"]'),
+            };
+          });
+          for (const box of [homeMeasure.grid, homeMeasure.wird, homeMeasure.lower]) {
+            expect(box.x).toBeCloseTo(homeMeasure.heading.x + homeMeasure.gutter, 0);
+            expect(box.width).toBeCloseTo(homeMeasure.heading.width - 2 * homeMeasure.gutter, 0);
+          }
+          expect(homeMeasure.grid.x).toBeCloseTo(detail!.x, 0);
+          expect(homeMeasure.grid.width).toBeCloseTo(detail!.width, 0);
+          if (fixedPosition) {
+            expect(context!.x).toBeCloseTo(fixedPosition.x, 0);
+            expect(context!.width).toBeCloseTo(fixedPosition.width, 0);
+          } else fixedPosition = context!;
+          expect(context!.y).toBeGreaterThanOrEqual(detail!.y + detail!.height);
+          const checks = panel.getByRole("checkbox");
+          await expect(checks).toHaveCount(prayer === "dhuhr" ? 4 : 3);
+          for (const checkbox of await checks.all()) {
+            await expect(checkbox).toBeEnabled();
+            await expect(checkbox).not.toBeChecked();
+            // Real pointer activation in the text area of the full-width input.
+            await checkbox.click({ position: { x: 60, y: 20 } });
+            await expect(checkbox).toBeChecked();
+            await checkbox.focus();
+            await checkbox.press("Space");
+            await expect(checkbox).not.toBeChecked();
+            await checkbox.press("Space");
+            await expect(checkbox).toBeChecked();
+          }
+          if (prayer === "maghrib" || prayer === "isha") {
+            await checks.last().evaluate((node) => node.blur());
+            await strip.scrollIntoViewIfNeeded();
+            const cardGaps = await page.getByTestId("home-all-prayers-row").evaluate((row) => {
+              const cards = [...row.querySelectorAll<HTMLElement>("article")];
+              const gaps = cards.slice(1).map((card, index) => {
+                const previous = cards[index].getBoundingClientRect();
+                const current = card.getBoundingClientRect();
+                return Math.max(current.left - previous.right, previous.left - current.right);
+              });
+              const viewport = row.getBoundingClientRect();
+              const selected = row.querySelector<HTMLElement>('[data-selected="true"]')!.getBoundingClientRect();
+              const visible = cards.filter((card) => {
+                const bounds = card.getBoundingClientRect();
+                return Math.min(bounds.right, viewport.right) - Math.max(bounds.left, viewport.left) >= 44;
+              });
+              return {
+                gaps,
+                selectedVisible: selected.left >= viewport.left - 1 && selected.right <= viewport.right + 1,
+                visibleCount: visible.length,
+              };
+            });
+            expect(cardGaps.gaps.every((gap) => Math.abs(gap - 8) <= 1)).toBe(true);
+            expect(cardGaps.selectedVisible).toBe(true);
+            if (width === 390) expect(cardGaps.visibleCount).toBeGreaterThanOrEqual(2);
+            await expect(page.getByTestId(`prayer-card-${prayer}`)).toHaveCSS("--prayer-notch-opacity", "1");
+            await page.screenshot({
+              path: testInfo.outputPath(`${language}-${width}-${prayer}-fixed-panel.png`),
+              scale: "css",
+            });
+          }
+        }
+        // Revisit every prayer after a real reload: independent fields must persist.
+        await page.reload();
+        for (const prayer of prayerGroup) {
+          await selectPrayer(prayer);
+          for (const checkbox of await panel.getByRole("checkbox").all()) {
+            await expect(checkbox).toBeChecked();
+            await checkbox.press("Space");
+            await expect(checkbox).not.toBeChecked();
+          }
+        }
+        const header = page.getByTestId("home-utility-header");
+        await expect(header).toHaveCSS("border-top-width", "0px");
+        await expect(header).toHaveCSS("border-bottom-width", "0px");
+      });
+    }
+  }
   // Each viewport checks all five prayers within the normal per-test deadline,
   // including WebKit under concurrent local development workloads.
   for (const views of [[[320, 700]], [[390, 844]], [[643, 275]], [[820, 900]], [[1440, 900]], [[1885, 1000]]]) {
@@ -129,7 +256,26 @@ for (const language of ["ar", "en"] as const) {
             await tile.getByRole("button").click();
           }
           await expect(page.getByTestId("home-prayer-moment")).toHaveAttribute("data-prayer", prayer);
+          await tile.scrollIntoViewIfNeeded();
           await checkGeometry(page);
+          await expect
+            .poll(() =>
+              tile.evaluate((node) => {
+                const panel = document.querySelector('[data-testid="home-prayer-moment"]')!;
+                const center = (element: Element) => {
+                  const tip = getComputedStyle(element, "::before");
+                  return (
+                    element.getBoundingClientRect().left +
+                    element.clientLeft +
+                    parseFloat(tip.left) +
+                    parseFloat(tip.width) / 2
+                  );
+                };
+                return Math.abs(center(node) - center(panel));
+              }),
+            )
+            .toBeLessThanOrEqual(1);
+          await expect(tile).toHaveCSS("--prayer-notch-opacity", "1");
           const tiles = await page.locator('[data-density="summary"]').evaluateAll((tiles) =>
             tiles.map((tile) => {
               const button = tile.querySelector("button")!;

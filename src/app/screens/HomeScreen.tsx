@@ -24,6 +24,7 @@ import { getEstimatedPrayerTimes, timeToMinutes, type PrayerName } from "../cont
 import { PrayerTrackerCards, type PrayerTrackingWrite } from "../components/PrayerTrackerCards";
 import { buildPrayerCardModels } from "../prayerCardModels";
 import { useNow } from "../hooks/useNow";
+import { usePrayerNotchAlignment } from "../hooks/usePrayerNotchAlignment";
 import { formatDisplayDate, formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { ScreenContainer } from "../components/ScreenContainer";
@@ -167,6 +168,13 @@ export function isFridayDaytime(now: Date = new Date(), location?: LocationSetti
   const maghrib = timeToMinutes(prayerTimes.maghrib);
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
   return currentMinutes >= fajr && currentMinutes < maghrib;
+}
+
+/** The Friday morning photograph ends at the same day's calculated Dhuhr. */
+export function isFridayMorning(now: Date = new Date(), location?: LocationSettings): boolean {
+  if (!isFridayDaytime(now, location)) return false;
+  const dhuhr = timeToMinutes(getEstimatedPrayerTimes(now, location).dhuhr);
+  return now.getHours() * 60 + now.getMinutes() < dhuhr;
 }
 
 function hasStartedFridayKahf(): boolean {
@@ -584,7 +592,13 @@ export function HomeScreen({
           });
 
   const isFridayDay = isFridayDaytime(now, locationSettings);
-  const homeBackgroundCategoryId = isLastThirdDua ? "before_sleep" : isFridayDay ? "friday" : reminderInfo.categoryId;
+  const homeBackgroundCategoryId = isLastThirdDua
+    ? "before_sleep"
+    : isFridayDay
+      ? isFridayMorning(now, locationSettings)
+        ? "friday_morning"
+        : "friday"
+      : reminderInfo.categoryId;
   const fridayInWindow = isFridayFeatureWindow(now, locationSettings);
   const fridayKahfComplete = completed.friday_kahf?.has("friday-kahf") ?? false;
   const fridayStatus = fridayKahfComplete ? "review" : fridayKahfStarted ? "continue" : "start";
@@ -596,6 +610,7 @@ export function HomeScreen({
   const autoPrayer = isPrayerHero ? (leadingPrayer?.prayer ?? null) : null;
   const expandedPrayer = selectedPrayer ?? (dismissedAutoPrayer === autoPrayer ? null : autoPrayer);
   const expandedPrayerModel = prayerCardModels.find((model) => model.prayer === expandedPrayer);
+  const { overviewRef, panelRef } = usePrayerNotchAlignment(expandedPrayer, direction);
   const hasQuranActivity =
     Boolean(quranWirdPlan?.startedDayKey) ||
     (quranReadingPosition?.page ?? 1) > 1 ||
@@ -647,17 +662,17 @@ export function HomeScreen({
             } ${
               homeVisualEffects
                 ? hasScrolledHomeContent
-                  ? "border-b border-white/10 shadow-none"
+                  ? "shadow-none"
                   : ""
                 : hasScrolledHomeContent
-                  ? "border-b border-border bg-background/90 shadow-none"
-                  : "border-b border-border bg-background/95 shadow-sm"
+                  ? "bg-background/90 shadow-none"
+                  : "bg-background/95 shadow-none"
             }`}
             dir={direction}
           >
             <div
               data-testid="home-header-content"
-              className="px-page mx-auto flex w-full max-w-7xl items-center justify-between gap-3"
+              className="px-page mx-auto flex w-full max-w-[64rem] items-center justify-between gap-3"
             >
               <div
                 data-testid="hijri-date"
@@ -711,7 +726,7 @@ export function HomeScreen({
             </div>
           </header>
         </div>
-        <div data-testid="home-content-grid" className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-4 lg:gap-5">
+        <div data-testid="home-content-grid" className="mx-auto grid w-full max-w-[64rem] grid-cols-1 gap-4 lg:gap-5">
           <div data-testid="home-hero" className="relative w-full">
             {showHeroContent && (
               <div className="relative z-10 mx-auto flex w-full flex-col items-stretch justify-end gap-4 px-page pb-5 pt-1 sm:pb-6 sm:pt-2 lg:gap-5 lg:pb-8 lg:pt-3">
@@ -722,9 +737,9 @@ export function HomeScreen({
                   }`}
                   dir={direction}
                 >
-                  {/* Summary stays first in reading order; desktop pairs it with
-                    its expanded detail beside the contextual stack. */}
+                  {/* Summary and full-width disclosure precede the fixed contextual pair. */}
                   <div
+                    ref={overviewRef}
                     data-testid="home-prayer-strip"
                     className="relative z-10 mx-auto w-full min-w-0 overflow-visible md:col-span-2"
                   >
@@ -743,29 +758,15 @@ export function HomeScreen({
                       selectedPrayer={expandedPrayer}
                     />
                   </div>
-                  <div
-                    data-testid="home-prayer-column"
-                    className={`contents lg:w-full lg:min-w-0 ${
-                      hasContextStackContent && expandedPrayer
-                        ? direction === "rtl"
-                          ? "lg:flex lg:flex-col lg:gap-5 lg:justify-self-center lg:row-start-2 lg:col-start-1 lg:max-w-[40rem]"
-                          : "lg:flex lg:flex-col lg:gap-5 lg:justify-self-center lg:row-start-2 lg:col-start-2 lg:max-w-[40rem]"
-                        : "lg:col-span-2"
-                    }`}
-                  >
+                  <div data-testid="home-prayer-column" className="contents">
                     {expandedPrayer && (
                       <section
+                        ref={panelRef}
                         id="home-expanded-prayer"
                         data-testid="home-prayer-moment"
                         data-prayer={expandedPrayer}
                         aria-label={t(language, "prayerMoment.homeTitle")}
-                        className={`mx-auto w-full min-w-0 max-w-[40rem] justify-self-center ${
-                          hasContextStackContent
-                            ? direction === "rtl"
-                              ? "md:col-start-1 md:row-start-2"
-                              : "md:col-start-2 md:row-start-2"
-                            : "md:col-span-2 md:row-start-2"
-                        }`}
+                        className="home-prayer-connected-panel mx-auto w-full min-w-0 justify-self-center md:col-span-2"
                       >
                         <PrayerMomentPanel
                           prayer={expandedPrayer}
@@ -789,18 +790,7 @@ export function HomeScreen({
                   </div>
 
                   {hasContextStackContent && (
-                    <div
-                      data-testid="home-context-stack"
-                      className={
-                        expandedPrayer
-                          ? `contents md:flex md:min-w-0 md:flex-col md:gap-4 lg:gap-5 ${
-                              direction === "rtl"
-                                ? "md:col-start-2 md:row-start-2 lg:row-start-2"
-                                : "md:col-start-1 md:row-start-2 lg:row-start-2"
-                            }`
-                          : "contents"
-                      }
-                    >
+                    <div data-testid="home-context-stack" className="contents">
                       {/* Contextual Hero */}
                       {hasPrimaryContext && (
                         <div

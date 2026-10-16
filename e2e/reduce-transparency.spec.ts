@@ -107,8 +107,8 @@ test("a card over the hero photograph goes opaque, not merely unblurred", async 
 
   const standard = page.getByTestId("prayer-tracker-cards").locator("article").first();
   const reading = page.getByTestId("home-daily-evidence");
-  await expect(standard).toHaveCSS("background-color", "rgba(15, 23, 42, 0.2)");
-  await expect(reading).toHaveCSS("background-color", "rgba(15, 23, 42, 0.32)");
+  await expect(standard).toHaveCSS("background-color", "rgba(15, 23, 42, 0.18)");
+  await expect(reading).toHaveCSS("background-color", "rgba(15, 23, 42, 0.28)");
   const innerAction = standard.locator("button").first();
   await expect(innerAction).toHaveCSS("backdrop-filter", "none");
   // Bound contrast even if the brightest source photograph pixel is white.

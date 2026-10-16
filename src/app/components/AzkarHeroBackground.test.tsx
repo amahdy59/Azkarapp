@@ -44,8 +44,20 @@ describe("AzkarHeroBackground", () => {
     const { container } = render(<AzkarHeroBackground kind="sleep" />);
     const picture = container.querySelector("picture");
 
-    expect(picture?.style.getPropertyValue("--azkar-bg-position")).toBe("25% 74%");
-    expect(picture?.style.getPropertyValue("--azkar-bg-position-wide")).toBe("42% 72%");
+    expect(picture?.style.getPropertyValue("--azkar-bg-position")).toBe("50% 74%");
+    expect(picture?.style.getPropertyValue("--azkar-bg-position-wide")).toBe("50% 72%");
+  });
+
+  it("uses a separate responsive asset for Friday morning", () => {
+    const { container } = render(<TimeOfDayBackground categoryId="friday_morning" />);
+    expect(container.querySelector('source[type="image/avif"]')).toHaveAttribute(
+      "srcset",
+      expect.stringContaining("/assets/backgrounds/friday-morning/friday-morning-768.avif"),
+    );
+    expect(container.querySelector("img")).toHaveAttribute(
+      "src",
+      expect.stringContaining("/assets/backgrounds/friday-morning/friday-morning-1280.webp"),
+    );
   });
 
   it("keeps the time-of-day image unobstructed by overlay layers", () => {

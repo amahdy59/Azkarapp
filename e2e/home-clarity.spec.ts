@@ -75,22 +75,23 @@ for (const language of ["ar", "en"] as const) {
       expect(
         geometry.every(
           (card) =>
-            card.paddingTop >= 7.5 &&
-            card.paddingTop <= 8 &&
-            card.paddingLeft >= 7.5 &&
-            card.paddingLeft <= 8 &&
+            card.paddingTop >= 13.5 &&
+            card.paddingTop <= 14 &&
+            card.paddingLeft >= 13.5 &&
+            card.paddingLeft <= 14 &&
             card.paddingLeft === card.paddingRight &&
-            card.columnGap === 10 &&
-            Math.abs(card.visibleTopInset - 9) <= 1 &&
-            Math.abs(card.visibleIdentityInset - 9) <= 1 &&
-            Math.abs(card.visibleTimeInset - 9) <= 1 &&
+            card.columnGap === (card.width <= 162 ? 6 : 10) &&
+            Math.abs(card.visibleTopInset - 15) <= 1 &&
+            Math.abs(card.visibleIdentityInset - 15) <= 1 &&
+            Math.abs(card.visibleTimeInset - 15) <= 1 &&
             card.iconWidth >= 26,
         ),
       ).toBe(true);
       await expect(page.getByTestId("prayer-tracker-cards")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
       await expect(row.locator("[data-prayer-icon]").first()).toHaveCSS("border-top-width", "0px");
       if (width === 1440) {
-        expect(geometry.every((card) => card.actualColumnGap > 30)).toBe(true);
+        expect(geometry.every((card) => card.width <= 186)).toBe(true);
+        expect(geometry.every((card) => card.actualColumnGap >= 10)).toBe(true);
         const frames = await row.evaluate((node) => ({
           row: node.getBoundingClientRect().width,
           cards: [...node.querySelectorAll("article")].reduce(
@@ -152,8 +153,8 @@ for (const language of ["ar", "en"] as const) {
       expect(countdownAlignment.fontSize).toBe("14px");
       expect(countdownAlignment.alignment).toBe("end");
       expect(countdownAlignment.timeEdge).toBeLessThanOrEqual(1);
-      expect(countdownAlignment.barInsetLeft).toBeCloseTo(8, 0);
-      expect(countdownAlignment.barInsetRight).toBeCloseTo(8, 0);
+      expect(countdownAlignment.barInsetLeft).toBeCloseTo(14, 0);
+      expect(countdownAlignment.barInsetRight).toBeCloseTo(14, 0);
       expect(countdownAlignment.belowText).toBeGreaterThanOrEqual(4);
       await page.screenshot({ path: testInfo.outputPath(`${language}-${width}-home.png`), scale: "css" });
       await page
@@ -218,6 +219,70 @@ for (const language of ["ar", "en"] as const) {
         JSON.stringify(footerTextBounds),
       ).toBe(true);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      await expect(row).not.toContainText(/Viewing|معروضة/);
+      const current = row.locator('[data-prayer-state="current"]');
+      await current.scrollIntoViewIfNeeded();
+      const toggle = current.getByRole("button");
+      const initiallyExpanded = await toggle.getAttribute("aria-expanded");
+      const footerHit = (await current.locator("[data-prayer-footer]").boundingBox())!;
+      await page.mouse.click(footerHit.x + footerHit.width / 2, footerHit.y + footerHit.height / 2);
+      await expect(toggle).toHaveAttribute("aria-expanded", initiallyExpanded === "true" ? "false" : "true");
+      await toggle.focus();
+      await page.keyboard.press("Space");
+      await expect(toggle).toHaveAttribute("aria-expanded", initiallyExpanded!);
+      // Capture the paired selection cues at ordinary text size after proving
+      // full-card activation and equal geometry at 200%.
+      await page.locator("html").evaluate((node) => {
+        node.style.fontSize = "";
+      });
+      if ((await toggle.getAttribute("aria-expanded")) !== "true") await toggle.click();
+      const panel = page.getByTestId("home-prayer-moment");
+      await expect(panel).toHaveAttribute("data-prayer", (await current.getAttribute("data-prayer")) ?? "");
+      await expect(row.locator('[data-selected="true"]')).toHaveCount(1);
+      const connection = await current.evaluate((node) => {
+        const tip = getComputedStyle(node, "::before");
+        const panel = document.querySelector('[data-testid="home-prayer-moment"]')!;
+        const receivingTip = getComputedStyle(panel, "::before");
+        const row = node.closest('[data-testid="home-all-prayers-row"]')!;
+        return {
+          tip: tip.content,
+          receivingTip: receivingTip.content,
+          decorative: tip.pointerEvents === "none" && receivingTip.pointerEvents === "none",
+          noNestedBlur: tip.backdropFilter === "none" && receivingTip.backdropFilter === "none",
+          fitsRow: node.getBoundingClientRect().bottom + 8 <= row.getBoundingClientRect().bottom,
+        };
+      });
+      expect(connection.tip).toBe('""');
+      expect(connection.receivingTip).toBe('""');
+      expect(connection.decorative && connection.noNestedBlur && connection.fitsRow).toBe(true);
+      const notchOffset = () =>
+        current.evaluate((node) => {
+          const panel = document.querySelector('[data-testid="home-prayer-moment"]')!;
+          const center = (element: Element) => {
+            const tip = getComputedStyle(element, "::before");
+            return (
+              element.getBoundingClientRect().left +
+              element.clientLeft +
+              parseFloat(tip.left) +
+              parseFloat(tip.width) / 2
+            );
+          };
+          return Math.abs(center(node) - center(panel));
+        });
+      await expect.poll(notchOffset).toBeLessThanOrEqual(1);
+      await expect(current).toHaveCSS("--prayer-notch-opacity", "1");
+      const oldScroll = await row.evaluate((node) => node.scrollLeft);
+      await row.evaluate((node) => {
+        node.scrollLeft += 16;
+      });
+      await expect.poll(notchOffset).toBeLessThanOrEqual(1);
+      await row.evaluate((node, left) => {
+        node.scrollLeft = left;
+      }, oldScroll);
+      await expect.poll(notchOffset).toBeLessThanOrEqual(1);
+      await toggle.evaluate((node) => node.blur());
+      await row.scrollIntoViewIfNeeded();
+      await page.screenshot({ path: testInfo.outputPath(`${language}-${width}-notch.png`), scale: "css" });
     });
   }
 }
