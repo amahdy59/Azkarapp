@@ -5,6 +5,39 @@ import { DEFAULT_LOCATION } from "./content/prayerCalculation";
 import { buildPrayerCardModels } from "./prayerCardModels";
 
 describe("dated prayer interval", () => {
+  it.each([
+    new Date("2026-10-14T14:00:00+03:00"),
+    new Date("2026-10-14T23:59:00+03:00"),
+    new Date("2026-10-29T23:30:00+03:00"),
+  ])("transfers only decorative emphasis in the final thirty minutes after %s", (seed) => {
+    const { next } = getPrayerTimeline(seed, DEFAULT_LOCATION);
+    const steps = [45, 30, 15, 1].map((minutes) => {
+      const models = buildPrayerCardModels(new Date(next.at - minutes * 60_000), "en", DEFAULT_LOCATION);
+      const current = models.find((model) => model.state === "current")!;
+      const coming = models.find((model) => model.state === "next")!;
+      expect(coming.prayer).toBe(next.prayer);
+      expect(coming.time).toBe(next.time);
+      expect(coming.isRecordable).toBe(false);
+      expect(current.isRecordable).toBe(true);
+      expect(
+        models
+          .filter((model) => model.state === "past" || model.state === "upcoming")
+          .every((model) => model.emphasis === 0),
+      ).toBe(true);
+      return { current: current.emphasis!, next: coming.emphasis! };
+    });
+    expect(steps[0]).toEqual({ current: 1, next: 0.15 });
+    expect(steps[1]).toEqual(steps[0]);
+    expect(steps[2].current).toBeCloseTo(0.75);
+    expect(steps[2].next).toBeCloseTo(0.575);
+    expect(steps[3].next).toBeGreaterThan(steps[3].current);
+    const atAdhan = buildPrayerCardModels(new Date(next.at), "en", DEFAULT_LOCATION);
+    expect(atAdhan.find((model) => model.prayer === next.prayer)).toMatchObject({
+      state: "current",
+      emphasis: 1,
+      isRecordable: true,
+    });
+  });
   it("counts down monotonically between prayer boundaries and switches exactly at the adhan", () => {
     const now = new Date("2026-10-14T14:00:00+03:00");
     const first = getPrayerTimeline(now, DEFAULT_LOCATION);

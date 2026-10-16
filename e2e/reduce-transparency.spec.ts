@@ -102,8 +102,8 @@ test("a card over the hero photograph goes opaque, not merely unblurred", async 
     "rgba(15, 23, 42, 0.28)",
   );
   expect(material.backgroundImage).toContain("linear-gradient");
-  expect(material.backdropFilter).toContain("blur(12px)");
-  expect(material.backdropFilter).toContain("saturate(1.15)");
+  expect(material.backdropFilter).toContain("blur(16px)");
+  expect(material.backdropFilter).toContain("saturate(1.35)");
 
   const standard = page.getByTestId("prayer-tracker-cards").locator("article").first();
   const reading = page.getByTestId("home-daily-evidence");

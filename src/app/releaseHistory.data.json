@@ -1,5 +1,20 @@
 [
   {
+    "release": "2026-10-16.2",
+    "ar": [
+      "زجاجية أوضح لبطاقات الرئيسية على الهاتف والتابلت والكمبيوتر، مع احترام إعدادات تقليل الشفافية.",
+      "تبرز الصلاة الحالية، ثم ينتقل التركيز تدريجيًا إلى القادمة خلال آخر نصف ساعة، مع بقاء النصوص واضحة.",
+      "عدّ تنازلي أكبر وشريط الوقت في تذييل القادمة، وتذييلات لباقي الصلوات تعرض التسجيل أو ترتيب الصلاة بدل ملخص الرواتب.",
+      "يظهر اسم صلاة الظهر «الجمعة» يوم الجمعة، مع الاحتفاظ بالمواقيت والتسجيلات الحالية."
+    ],
+    "en": [
+      "Clearer glass surfaces across Home on phones, tablets and desktop, while respecting reduced-transparency preferences.",
+      "The current prayer stands out, then emphasis gradually shifts to the next during the final half hour while all text stays readable.",
+      "A larger countdown and remaining-time bar sit in the next prayer's footer; other footers show recorded status or prayer order instead of Rawatib summaries.",
+      "The noon prayer is labelled Jumu‘ah on Fridays, keeping your existing times and records."
+    ]
+  },
+  {
     "release": "2026-10-16",
     "ar": [
       "بطاقات الرئيسية الزجاجية أوضح فوق خلفية الوقت، مع عرض التاريخ والنخيل وأيام المواظبة في شريط علوي متوازن.",

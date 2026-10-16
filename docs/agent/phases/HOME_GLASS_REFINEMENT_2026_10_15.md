@@ -1,5 +1,23 @@
 # Home glass clarity and material refinement
 
+## Owner approves complete release — 2026-10-16
+
+The owner accepts the previews and explicitly requests applying and pushing all pending changes. This supersedes the local-preview publication holds below for the completed Home glass, Friday naming, contextual footers, countdown alignment and current-to-next focus work. Release plan: inspect the combined diff/current deployment; replace and archive the bilingual notes since deployed commit `6b9a515a`; run the intact pre-push gates; commit and push to `origin/main`; monitor the complete exact-commit Quality matrix and Pages build/deploy/production verification; inspect and repair any failure without reducing assertions; confirm the deployed SHA and production browser behavior. Final report: `output/home-refinements-release-2026-10-16/PHASE_REPORT.md`.
+
+## Owner current-to-next focus continuation — 2026-10-16
+
+The owner approves quieter previous/later cards and a gradual emphasis handoff from current to next. Plan: derive bounded decorative strengths from the existing dated timeline during the final 30 minutes; change only reflections, boundaries and a stationary shallow glow; retain text contrast, card opacity, glass/solid accessibility fallbacks, equal geometry, reading content, selection and recording. Verify early/approach/adhan, midnight/DST, scenes, responsive geometry and supported engines; capture actual phone/desktop previews and run intact quality. Current starts at 100%, next at 15%; by adhan current decoration reaches 50% and next reaches 100%, then normal temporal state rollover applies. This supersedes prior next-only strong-surface priority. Local image review precedes publication. Results: `docs/agent/HOME_PRAYER_FOCUS_2026_10_16_REPORT.md`.
+
+## Owner next-prayer/footer continuation — 2026-10-16
+
+The owner subsequently approves the proposed alignment refinement. Apply 14px tabular countdown text aligned with the time column and keep the native progress bar full-width beneath it on all cards, with matching 8px insets. Existing icon/status and name/time rows already provide the approved shared alignment; retain them and equal card dimensions. Verify actual countdown text edges in Arabic/English, full-width bar insets, responsive wrapping and 200% text. Keep local previews before publication.
+
+The owner requests Friday's noon label الجمعة, removal of Rawatib summaries from small cards, more prominence for next prayer and remaining time in its footer. Plan: inspect existing presentation/date/record contracts; replace summary-only footers with contextual countdown, saved-location/adhkar/unrecorded or prayer-sequence text; keep next uniquely accented; derive Friday display naming from the supplied dayKey while preserving `dhuhr` identity; update unit/browser assertions, responsive/enlargement evidence and documentation; run intact local quality. This supersedes all earlier small-card Sunnah/footer and progress-placement requirements below. Reviewed expanded details, calculations and persisted state remain. Local screenshot review still precedes publication. See `docs/agent/HOME_PRAYER_PRIORITY_2026_10_16_REPORT.md`.
+
+## 2026-10-16 material visibility continuation
+
+The owner's latest request strengthens all Home cards across desktop/mobile views. Plan: compare actual normal-preference phone/desktop captures, refine the shared Home material without layout/content changes, verify every card category across scenes/themes/languages/responsive sizes, retain contrast and opaque accessibility fallbacks, and provide local previews before publication. The implemented material uses 16px blur/135% saturation, 5.5% maximum directional sheen, 26% ordinary/24% prayer edges and a brighter inset reflection with a shallower shadow. Earlier numerical material values below are superseded; tint hierarchy and photo scrim remain. Evidence and exact command results: `docs/agent/HOME_GLASS_VISIBILITY_2026_10_16_REPORT.md`.
+
 The owner requests visibly translucent Home surfaces on mobile and desktop, preserving the approved layout and drawing on Apple's materials guidance. Improve the existing implementation rather than add a new visual system or platform dependency.
 
 ## Approved scope and plan

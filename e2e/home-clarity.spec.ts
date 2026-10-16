@@ -116,18 +116,45 @@ for (const language of ["ar", "en"] as const) {
         t(language, "prayerTracking.notRecorded"),
       );
       await expect(row.locator('[data-prayer="dhuhr"] [data-prayer-footer]')).toContainText(
-        language === "ar" ? "رواتب: ٤ قبلها" : "Rawatib: 4 before",
+        t(language, "prayerTracking.notRecorded"),
       );
       await expect(row.locator('[data-prayer="maghrib"] [data-prayer-footer]')).toContainText(
-        language === "ar" ? "رواتب: ٢ بعدها" : "Rawatib: 2 after",
+        t(language, "prayerTracking.afterPrayer", { prayer: t(language, "notifications.asr") }),
       );
+      await expect(row).not.toContainText(/Rawatib|Optional|رواتب|مستحبة/);
       await expect(row).not.toContainText(/Opens 30m before|تفتح قبلها/);
       expect(geometry.find((card) => card.state === "next")!.visible).toBe(true);
       if (width >= 390) expect(geometry.find((card) => card.state === "current")!.visible).toBe(true);
       const next = row.locator('[data-prayer-state="next"]');
       await expect(next).toContainText(t(language, "prayerTracking.nextShort"));
       await expect(next.getByRole("progressbar")).toHaveCount(1);
-      await expect(next.locator("[data-prayer-footer]").getByRole("progressbar")).toHaveCount(0);
+      await expect(next.locator("[data-prayer-footer]").getByRole("progressbar")).toHaveCount(1);
+      await expect(next.getByRole("button")).not.toContainText(/باقي|left/);
+      const countdownAlignment = await next.evaluate((card) => {
+        const text = card.querySelector("[data-prayer-detail]")!;
+        const range = document.createRange();
+        range.selectNodeContents(text);
+        const ink = range.getBoundingClientRect();
+        const time = card.querySelector('[id^="prayer-summary-time-"]')!.getBoundingClientRect();
+        const bar = card.querySelector("progress")!.getBoundingClientRect();
+        const footer = card.querySelector("[data-prayer-footer]")!;
+        const footerBox = footer.getBoundingClientRect();
+        const rtl = getComputedStyle(card).direction === "rtl";
+        return {
+          fontSize: getComputedStyle(text).fontSize,
+          alignment: getComputedStyle(text).textAlign,
+          timeEdge: rtl ? Math.abs(ink.left - time.left) : Math.abs(ink.right - time.right),
+          barInsetLeft: bar.left - footerBox.left,
+          barInsetRight: footerBox.right - bar.right,
+          belowText: bar.top - ink.bottom,
+        };
+      });
+      expect(countdownAlignment.fontSize).toBe("14px");
+      expect(countdownAlignment.alignment).toBe("end");
+      expect(countdownAlignment.timeEdge).toBeLessThanOrEqual(1);
+      expect(countdownAlignment.barInsetLeft).toBeCloseTo(8, 0);
+      expect(countdownAlignment.barInsetRight).toBeCloseTo(8, 0);
+      expect(countdownAlignment.belowText).toBeGreaterThanOrEqual(4);
       await page.screenshot({ path: testInfo.outputPath(`${language}-${width}-home.png`), scale: "css" });
       await page
         .getByTestId("home-prayer-strip")

@@ -299,6 +299,9 @@ const en = {
     ishaAfterDesc: "Two rak'ahs after Isha prayer from the confirmed rawātib",
   },
   prayerTracking: {
+    jumuah: "Jumu‘ah",
+    afterPrayer: "After {prayer}",
+    adhkarRecorded: "Adhkar completed",
     mosque: "Prayed at the mosque",
     adhkar: "Completed the azkar",
     sunnah: "Rawatib prayer",

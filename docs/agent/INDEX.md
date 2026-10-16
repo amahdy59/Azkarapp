@@ -1,5 +1,7 @@
 # AI Improvement System Index
 
+Release authorization, 2026-10-16: the owner approves all pending Home glass, Friday naming, contextual footer, countdown alignment and current-to-next focus changes and explicitly requests pushing all changes. This supersedes the local-only publication holds for the current continuation. Run the tracked hook, push verified `main`, require exact-commit Quality and Pages success, and verify the live application. Final release evidence is recorded in `output/home-refinements-release-2026-10-16/PHASE_REPORT.md`.
+
 Current owner-approved continuation: [Home glass clarity and material refinement](phases/HOME_GLASS_REFINEMENT_2026_10_15.md). Restore visible Home translucency and apply the owner-requested two-column, fit-or-scroll prayer overview; actual local previews precede publication and complete release gates remain intact. [Final reading, offline clarity and release acceptance](phases/FINAL_READING_AND_OFFLINE_POLISH_2026_10_15.md) is deployed at 2e93b36c.
 
 Current follow-up: [Cards, situational sessions and compact audio](phases/CARDS_AND_COMPACT_AUDIO_2026_10_15.md), approved by the owner after the audit. Preserve the coordinated Android/release acceptance work below.

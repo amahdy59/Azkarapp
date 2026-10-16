@@ -1,5 +1,25 @@
 # Azkar design system
 
+## Current-to-next prayer emphasis — 2026-10-16
+
+The owner approves a gentle transfer of surface emphasis rather than fading whole cards. Outside the last 30 minutes, current has full decorative strength and next has 15%; in that interval current falls linearly to 50% while next rises to 100%. The new current takes full emphasis at adhan. Past/later surfaces have quiet 14% white edges and 1.5% sheen. Current/next use the same bounded 1.5–5.5% sheen, a strength-weighted accent boundary, inset reflection and small stationary glow; normal glass tint/blur stay unchanged. Solid mode uses an opaque theme-card/accent mix with the same border hierarchy. Reduced transparency/high contrast omit the glow, and existing opaque fallbacks remain.
+
+The value derives from dated instants in the existing timeline/minute clock, with no animation loop, new timer or layout/blur animation. Whole-card opacity, text colors/contrast, footer count/progress, dimensions, selection, keyboard focus and recording rules remain unchanged. This supersedes the earlier next-only strong-surface priority; explicit Now/Next labels and the readable next countdown remain. The 30-minute decorative handoff is not a religious prayer-window boundary.
+
+## Home next-prayer priority and contextual footers — 2026-10-16
+
+Owner-approved alignment follow-up: the next countdown uses the existing 14px `text-sm` step and tabular numerals, aligned to the logical trailing edge matching the time column (left in Arabic, right in English). The native bar stays below it at full inner width, sharing the header's 8px inline insets. Other footer text remains secondary. Preserve name/time baselines, the shared top icon/status row, equal footer geometry at enlargement and next-only strong accent.
+
+The owner supersedes the uniform Sunnah footers in the small Home overview. Remove all Rawatib/Optional summaries from these cards. Next alone has the accent boundary, accented name/time and a tinted Next label; its localized remaining time and real interval progress now sit together inside the footer, outside the open button, without live announcements. Other footers show saved mosque/home location, independently completed adhkar when location is absent, or Not recorded for current/past prayers. Later prayers show After {previous prayer}. No unchecked observation is presented as a missed prayer or an inferred location. Existing record normalization, controls and reviewed details remain.
+
+On Friday's supplied civil record day, the noon overview label is الجمعة/Jumu‘ah; other days retain الظهر/Dhuhr. Its internal `dhuhr` key, timing, navigation and record ownership stay unchanged. This is an interface label, not a change to reviewed Dhuhr/Sunnah evidence in the expanded educational view. Equal card/footer dimensions, natural enlarged text, 8px header insets, next-only progress and shared glass/fallbacks remain. Header bottom padding returns to 8px because progress no longer occupies that area.
+
+## Home glass visibility follow-up — 2026-10-16
+
+The owner requests clearer translucent Home cards at every responsive tier. The shared Home material now uses 16px blur/135% saturation, a directional white sheen capped at 5.5%, a 26% edge (24% for prayer summaries), a brighter inset top reflection and a shallower outer shadow. This supersedes the earlier 12px/115%/3.5% material values and 18% prayer edge below. Preserve standard/reading/header tint hierarchy, the continuous photo scrim, solid primary actions and one backdrop filter per surface. All Home card categories share this material; no dimensions, reading content or tracking behavior change.
+
+System/application reduced transparency, high contrast and unsupported backdrop filters still produce opaque surfaces. A solid card in that state is intentional and must not be reported as evidence of normal glass. Chromium checks explicitly emulate normal glass separately from the live solid fallback, cover 320/390/834/1440px in Arabic/English and every theme, and retain the conservative 4.5:1 white-source compositing check. Real device and screen-reader acceptance remain separate.
+
 ## Final reading and download clarity — 2026-10-15
 
 Owner-approved follow-up supersedes the earlier English number gutter: paragraphs use a bottom-right absolutely positioned number chip, 0.5rem top padding and bottom padding 2px greater, with equal inline padding of calc(0.75rem + 2px), 14px at the default root size, and no number-only row or reserved right column. The owner explicitly permits the corner chip to overlay the paragraph. Native reading panes keep 12px minimum inline padding and stable scrollbar space. English header/footer furniture has no divider rules. Current Arabic ayahs use quiet word-background paint and an outlined existing end marker instead of repeated per-line strokes; exact word emphasis and canonical glyph/line geometry remain intact.

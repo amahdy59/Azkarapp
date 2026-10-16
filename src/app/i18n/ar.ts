@@ -298,6 +298,9 @@ const ar = {
     ishaAfterDesc: "ركعتان بعد صلاة العشاء من السنن الرواتب",
   },
   prayerTracking: {
+    jumuah: "الجمعة",
+    afterPrayer: "بعد {prayer}",
+    adhkarRecorded: "الأذكار مكتملة",
     mosque: "صليت في المسجد",
     adhkar: "أتممت أذكار الصلاة",
     sunnah: "صلاة الرواتب",

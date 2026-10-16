@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Sunrise, Sun, CloudSun, Sunset, MoonStar, Check, ChevronNext } from "./icons";
 import { t } from "../i18n";
 import { PrayerVirtueModal } from "./PrayerVirtueModal";
@@ -6,8 +6,7 @@ import type { AppLanguage, PrayerName, PrayerTrackingRecord } from "../types";
 import type { PrayerTimes } from "../content/prayerTimes";
 import { formatPrayerTimeLabel } from "../content/prayerTimes";
 import { trackedLocation } from "../prayerMoment";
-import { getPrayerSunnah } from "../content/prayerSunnah";
-import { formatNumerals } from "../formatting";
+import { prayerDisplayName } from "../prayerPresentation";
 
 /**
  * The five after-prayer cards.
@@ -51,6 +50,8 @@ export interface PrayerCardModel {
   /** Only present on the next prayer. */
   countdown?: string;
   remainingPercent?: number;
+  /** Decorative surface emphasis, independent of recording and prayer validity. */
+  emphasis?: number;
 }
 
 /** The independent fields a prayer card or actions card tracks. */
@@ -202,6 +203,7 @@ function PrayerCard({
   onGlass,
   summaryOnly,
   selected,
+  dayKey,
 }: {
   model: PrayerCardModel;
   language: AppLanguage;
@@ -211,27 +213,28 @@ function PrayerCard({
   onOpen?: (prayer: PrayerName | null) => void;
   summaryOnly?: boolean;
   selected?: boolean;
+  dayKey: string;
 }) {
   const { prayer, time, state, countdown, isOpenable, isRecordable } = model;
   const Icon = PRAYER_ICON[prayer];
-  const name = t(language, `notifications.${prayer}`);
+  const name = prayerDisplayName(prayer, language, dayKey);
   // Future prayers show their controls so the card keeps its shape, but they
   // cannot be marked: nothing has happened yet to record.
   const disabled = !isRecordable;
   const isCurrent = state === "current";
-  const sunnahBefore = getPrayerSunnah(prayer, "before");
-  const sunnahAfter = getPrayerSunnah(prayer, "after");
-  const footerSunnah =
-    sunnahBefore?.rank === "confirmed"
-      ? sunnahBefore
-      : sunnahAfter?.rank === "confirmed"
-        ? sunnahAfter
-        : (sunnahBefore ?? sunnahAfter);
-  const sunnahSummary = footerSunnah
-    ? t(language, footerSunnah.before ? "prayerTracking.sunnahBeforeShort" : "prayerTracking.sunnahAfterShort", {
-        count: formatNumerals(footerSunnah.before || footerSunnah.after, language),
-      })
-    : "";
+  const previousPrayer = PRAYER_ORDER[(PRAYER_ORDER.indexOf(prayer) + PRAYER_ORDER.length - 1) % PRAYER_ORDER.length]!;
+  const footerText =
+    state === "next"
+      ? (countdown ?? t(language, "prayerTracking.next"))
+      : state === "upcoming"
+        ? t(language, "prayerTracking.afterPrayer", { prayer: prayerDisplayName(previousPrayer, language, dayKey) })
+        : tracking.location === "mosque"
+          ? t(language, "prayerTracking.atMosque")
+          : tracking.location === "home"
+            ? t(language, "prayerTracking.atHome")
+            : tracking.adhkar
+              ? t(language, "prayerTracking.adhkarRecorded")
+              : t(language, "prayerTracking.notRecorded");
 
   if (summaryOnly) {
     return (
@@ -243,6 +246,7 @@ function PrayerCard({
         data-density="summary"
         aria-current={isCurrent ? "step" : undefined}
         data-selected={selected ? "true" : undefined}
+        style={{ "--prayer-focus": model.emphasis ?? (isCurrent ? 1 : state === "next" ? 0.15 : 0) } as CSSProperties}
         className={`home-prayer-summary-card relative grid min-w-0 rounded-xl border text-center transition-colors duration-standard ease-standard ${
           onGlass
             ? "hero-glass home-glass-surface text-on-media"
@@ -282,7 +286,7 @@ function PrayerCard({
             </span>
             <h3
               id={`prayer-card-heading-${prayer}`}
-              className={`min-w-0 max-w-full text-sm font-bold leading-tight [overflow-wrap:anywhere] ${onGlass ? "text-on-media" : "text-foreground"}`}
+              className={`min-w-0 max-w-full text-sm font-bold leading-tight [overflow-wrap:anywhere] ${state === "next" ? (onGlass ? "text-on-media-accent" : "text-primary") : onGlass ? "text-on-media" : "text-foreground"}`}
               dir="auto"
             >
               {name}
@@ -298,7 +302,7 @@ function PrayerCard({
               id={`prayer-summary-status-${prayer}`}
               data-prayer-state-label
               data-testid={countdown && state === "next" ? "next-prayer" : undefined}
-              className={`max-w-full text-xs font-semibold ${isCurrent || state === "next" ? (onGlass ? "text-on-media-accent" : "text-primary") : onGlass ? "text-on-media-muted" : "text-muted-foreground"}`}
+              className={`max-w-full text-xs font-semibold ${state === "next" ? "home-prayer-next-label" : ""} ${isCurrent || state === "next" ? (onGlass ? "text-on-media-accent" : "text-primary") : onGlass ? "text-on-media-muted" : "text-muted-foreground"}`}
               dir="auto"
             >
               {state === "next" ? t(language, "prayerTracking.nextShort") : statusLabel(language, state)}
@@ -306,60 +310,34 @@ function PrayerCard({
             <p
               id={`prayer-summary-time-${prayer}`}
               data-testid={state === "next" ? "next-prayer-time" : undefined}
-              className={`max-w-full text-base font-extrabold tabular-nums [overflow-wrap:anywhere] ${onGlass ? "text-on-media" : "text-foreground"}`}
+              className={`max-w-full text-base font-extrabold tabular-nums [overflow-wrap:anywhere] ${state === "next" ? (onGlass ? "text-on-media-accent" : "text-primary") : onGlass ? "text-on-media" : "text-foreground"}`}
               dir="auto"
             >
               {formatPrayerTimeLabel(time, language === "ar")}
             </p>
-            <span
-              id={`prayer-summary-detail-${prayer}`}
-              data-prayer-detail
-              className={`min-h-4 max-w-full text-xs font-semibold [overflow-wrap:anywhere] ${
-                state === "next"
-                  ? onGlass
-                    ? "text-on-media-accent"
-                    : "text-primary"
-                  : onGlass
-                    ? "text-on-media-muted"
-                    : "text-muted-foreground"
-              }`}
-              dir="auto"
-            >
-              {state === "next"
-                ? countdown
-                : state === "current" || state === "past"
-                  ? tracking.location === "mosque"
-                    ? t(language, "prayerTracking.atMosque")
-                    : tracking.location === "home"
-                      ? t(language, "prayerTracking.atHome")
-                      : t(language, "prayerTracking.notRecorded")
-                  : null}
-            </span>
           </div>
         </button>
-        {state === "next" && model.remainingPercent !== undefined && (
-          <progress
-            className="home-prayer-remaining home-prayer-interval"
-            style={{ color: onGlass ? "var(--on-media-accent)" : "var(--primary)" }}
-            max={100}
-            value={model.remainingPercent}
-            aria-label={t(language, "prayerTracking.timeRemainingUntil", { prayer: name })}
-            aria-valuetext={countdown}
-          />
-        )}
         <div
           data-prayer-footer
-          className={`home-prayer-footer w-full border-t px-2 py-1.5 text-center text-xs font-semibold ${onGlass ? "border-white/10 text-on-media-muted" : "border-border text-muted-foreground"}`}
+          className={`home-prayer-footer w-full border-t px-2 py-1.5 text-center text-xs font-semibold ${state === "next" ? (onGlass ? "border-white/20 text-on-media-accent" : "border-primary/30 text-primary") : onGlass ? "border-white/10 text-on-media-muted" : "border-border text-muted-foreground"}`}
         >
-          <span dir="auto" className="min-w-0 [overflow-wrap:anywhere]">
-            {t(
-              language,
-              footerSunnah?.rank === "confirmed"
-                ? "prayerTracking.rawatibSummaryShort"
-                : "prayerTracking.optionalSummaryShort",
-              { summary: sunnahSummary },
-            )}
+          <span
+            id={`prayer-summary-detail-${prayer}`}
+            data-prayer-detail
+            dir="auto"
+            className={`min-w-0 [overflow-wrap:anywhere] ${state === "next" ? "text-end text-sm tabular-nums" : ""}`}
+          >
+            {footerText}
           </span>
+          {state === "next" && model.remainingPercent !== undefined && (
+            <progress
+              className="home-prayer-remaining mt-2.5"
+              max={100}
+              value={model.remainingPercent}
+              aria-label={t(language, "prayerTracking.timeRemainingUntil", { prayer: name })}
+              aria-valuetext={countdown}
+            />
+          )}
         </div>
       </article>
     );
@@ -684,6 +662,7 @@ export function PrayerTrackerCards({
                 <PrayerCard
                   key={model.prayer}
                   model={model}
+                  dayKey={dayKey}
                   language={language}
                   onGlass={onGlass}
                   tracking={{
@@ -718,6 +697,7 @@ export function PrayerTrackerCards({
               <PrayerCard
                 key={model.prayer}
                 model={model}
+                dayKey={dayKey}
                 language={language}
                 onGlass={onGlass}
                 tracking={{

@@ -21,6 +21,9 @@ export function buildPrayerCardModels(
   const timeline = getPrayerTimeline(now, location);
   const times = timeline.prayerTimes;
   const activeIndex = PRAYER_NAMES.indexOf(timeline.current.prayer as PrayerName);
+  // Thirty calm minute-clock steps; use dated instants, including midnight/DST.
+  // This is decoration only and does not define a religious prayer window.
+  const approach = Math.max(0, Math.min(1, 1 - (timeline.next.at - now.getTime()) / (30 * 60_000)));
   const countdown = formatNumerals(
     `${Math.floor(timeline.remainingMinutes / 60)
       .toString()
@@ -40,6 +43,7 @@ export function buildPrayerCardModels(
       state,
       isOpenable,
       isRecordable,
+      emphasis: state === "current" ? 1 - approach * 0.5 : isNext ? 0.15 + approach * 0.85 : 0,
       ...(isNext
         ? {
             countdown: t(language, "prayerTracking.timeLeft", { time: countdown }),

@@ -1,5 +1,9 @@
 # Azkarapp Motion System
 
+## Prayer surface emphasis — 2026-10-16
+
+Home summary emphasis is a stationary surface treatment updated by the existing minute clock. During the final 30 minutes before next adhan, current's decorative strength decreases while next's increases. No extra timer, moving gradient, pulsing, whole-card opacity change, layout animation or animated blur is introduced. The existing brief border-color transition respects application/system reduced motion; the sheen and restrained shadow update discretely. Reduced transparency/high contrast omit the glow and retain opaque materials. Prayer timing, text contrast and native progress semantics are unchanged.
+
 ## Shared switch feedback — 2026-10-13
 
 Settings and reminder switches reuse ToggleTrack. Its thumb uses a 150ms token-based transform, mirrored by actual CSS direction, instead of animating inset layout. OS reduced motion and the app preference make the position change immediate. Logical start stays fixed; switch semantics, focus and at least 44px targets remain with each action owner.

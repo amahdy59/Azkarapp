@@ -75,16 +75,70 @@ describe("PrayerTrackerCards", () => {
     expect(screen.getByTestId("prayer-card-dhuhr").querySelector("[data-prayer-detail]")).toHaveTextContent(
       "At the mosque",
     );
-    expect(footer("fajr")).toHaveTextContent("Rawatib: 2 before");
-    expect(footer("dhuhr")).toHaveTextContent("Rawatib: 4 before");
-    expect(footer("maghrib")).not.toHaveTextContent("Optional: 2 before");
-    expect(footer("maghrib")).toHaveTextContent("Rawatib: 2 after");
-    expect(footer("isha")).toHaveTextContent("Rawatib: 2 after");
-    expect(footer("asr")).toHaveTextContent("Optional: 4 before");
-    expect(footer("asr")?.querySelector("progress")).toBeNull();
+    expect(footer("fajr")).toHaveTextContent("At home");
+    expect(footer("dhuhr")).toHaveTextContent("At the mosque");
+    expect(footer("maghrib")).toHaveTextContent("After Asr");
+    expect(footer("isha")).toHaveTextContent("After Maghrib");
+    expect(footer("asr")).toHaveTextContent("01:00");
+    expect(footer("asr")?.querySelector("progress")).not.toBeNull();
+    expect(screen.getByTestId("prayer-tracker-cards")).not.toHaveTextContent(/Rawatib|Optional/);
     expect(screen.getByTestId("prayer-card-asr").querySelector("progress")).not.toBeNull();
     expect(screen.getAllByRole("button")).toHaveLength(5);
     expect(footer("fajr")?.querySelector("button")).toBeNull();
+  });
+  it.each([
+    ["ar", "2026-10-16", "الجمعة"],
+    ["en", "2026-10-16", "Jumu‘ah"],
+    ["ar", "2026-10-15", "الظهر"],
+    ["en", "2026-10-17", "Dhuhr"],
+    ["en", "invalid", "Dhuhr"],
+  ] as const)("names noon prayer in %s for the supplied record day %s", (language, dayKey, name) => {
+    const onOpen = vi.fn();
+    const onToggle = vi.fn();
+    render(
+      <PrayerTrackerCards
+        models={modelsWithCurrent("dhuhr")}
+        language={language}
+        direction={language === "ar" ? "rtl" : "ltr"}
+        records={[]}
+        dayKey={dayKey}
+        onToggle={onToggle}
+        onOpen={onOpen}
+        summaryOnly
+      />,
+    );
+    const card = screen.getByTestId("prayer-card-dhuhr");
+    expect(card.querySelector("h3")).toHaveTextContent(name);
+    fireEvent.click(card.querySelector("button")!);
+    expect(onOpen).toHaveBeenCalledWith("dhuhr");
+    expect(onToggle).not.toHaveBeenCalled();
+    expect(card).toHaveTextContent(language === "ar" ? "١٢:٥٩ م" : "12:59 PM");
+    expect(card.querySelector("[data-prayer-footer]")).toHaveTextContent(
+      language === "ar" ? "غير مسجّلة" : "Not recorded",
+    );
+  });
+
+  it("does not infer a prayed location from adhkar alone or from future records", () => {
+    render(
+      <PrayerTrackerCards
+        models={modelsWithCurrent("dhuhr")}
+        language="en"
+        direction="ltr"
+        records={[
+          { dayKey: "2026-10-16", prayer: "fajr", mosque: false, adhkar: true },
+          { dayKey: "2026-10-16", prayer: "isha", mosque: true, adhkar: true },
+        ]}
+        dayKey="2026-10-16"
+        onToggle={vi.fn()}
+        summaryOnly
+      />,
+    );
+    expect(screen.getByTestId("prayer-card-fajr").querySelector("[data-prayer-footer]")).toHaveTextContent(
+      "Adhkar completed",
+    );
+    expect(screen.getByTestId("prayer-card-isha").querySelector("[data-prayer-footer]")).toHaveTextContent(
+      "After Maghrib",
+    );
   });
   it("shows all five prayers in order with a labelled countdown and today's recordable state", () => {
     const models = modelsWithCurrent("isha").map((model): PrayerCardModel =>

@@ -138,7 +138,7 @@ for (const language of ["ar", "en"] as const) {
                 height: button.getBoundingClientRect().height,
                 gap: parseFloat(getComputedStyle(button).rowGap),
                 statusGap:
-                  tile.querySelector("[data-prayer-detail]")!.getBoundingClientRect().top -
+                  tile.querySelector("[data-prayer-footer]")!.getBoundingClientRect().top -
                   tile.querySelector("p")!.getBoundingClientRect().bottom,
                 identity: tile.querySelector("[data-prayer-identity] h3")!.getBoundingClientRect().x,
                 timing: tile.querySelector("[data-prayer-timing] p")!.getBoundingClientRect().x,
@@ -150,11 +150,7 @@ for (const language of ["ar", "en"] as const) {
           );
           expect(tiles.every((tile) => tile.width >= 44 && tile.height >= 44 && !tile.overflow)).toBe(true);
           expect(tiles.every((tile) => tile.gap === 4)).toBe(true);
-          expect(
-            tiles.every(
-              (tile) => tile.statusGap >= 0 && tile.statusGap <= 8 && Math.abs(tile.identity - tile.timing) > 20,
-            ),
-          ).toBe(true);
+          expect(tiles.every((tile) => tile.statusGap >= 8 && Math.abs(tile.identity - tile.timing) > 20)).toBe(true);
           const timeStyles = await page.locator('[id^="prayer-summary-time-"]').evaluateAll((times) =>
             times.map((time) => ({
               size: getComputedStyle(time).fontSize,
