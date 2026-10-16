@@ -275,7 +275,8 @@ export interface UserSettingsState {
   reduceMotion: boolean;
   /** Blurred materials go solid. See the .reduce-transparency rules. */
   reduceTransparency: boolean;
-  homeMaterial?: "system" | "glass" | "solid";
+  appMaterial?: "system" | "glass" | "solid";
+  homeMaterial?: "inherit" | "system" | "glass" | "solid";
   /** Optional Home daily-wird photography; independent of transparency. */
   homeWirdImages: boolean;
   hapticFeedback: boolean;

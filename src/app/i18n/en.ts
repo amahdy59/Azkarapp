@@ -2114,9 +2114,13 @@ const en = {
     skip: "Skip",
   },
   settings: {
+    appMaterial: "App appearance",
+    appMaterialHint:
+      "Glass adds translucent interface surfaces. Reading stays solid. Follow device respects reduced transparency; high contrast always takes priority.",
+    homeMaterial_inherit: "Same as app",
     homeMaterial: "Home appearance",
     homeMaterialHint:
-      "Follow device respects reduced transparency. Glass explicitly enables translucent Home cards; high contrast and forced colors still take priority.",
+      "Choose a separate Home appearance or use the app setting. Glass explicitly enables translucent Home cards; high contrast and forced colors still take priority.",
     homeMaterial_system: "Follow device",
     homeMaterial_glass: "Glass",
     homeMaterial_solid: "Solid",

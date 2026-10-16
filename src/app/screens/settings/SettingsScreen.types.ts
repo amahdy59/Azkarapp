@@ -34,8 +34,10 @@ export interface SettingsScreenProps {
   reduceMotion: boolean;
   reduceTransparency: boolean;
   homeWirdImages?: boolean;
-  homeMaterial?: "system" | "glass" | "solid";
-  onHomeMaterialChange?: (value: "system" | "glass" | "solid") => void;
+  appMaterial?: "system" | "glass" | "solid";
+  onAppMaterialChange?: (value: "system" | "glass" | "solid") => void;
+  homeMaterial?: "inherit" | "system" | "glass" | "solid";
+  onHomeMaterialChange?: (value: "inherit" | "system" | "glass" | "solid") => void;
   onHomeWirdImagesChange?: (value: boolean) => void;
   hapticFeedback: boolean;
   forceRtl: boolean;

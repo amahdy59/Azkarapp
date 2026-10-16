@@ -1,5 +1,9 @@
 # Azkarapp Motion System
 
+## Owner responsiveness correction — 2026-10-16
+
+The subsequent request to remove sluggish mobile/desktop scrolling shortens the Home state handoff to 180ms, superseding the earlier 260ms value below. Native wheel/touch scrolling has no synthetic inertia. Ordinary scroll does not trigger repeated React header updates or animations. Automatic Quran following and Reader collection positioning use immediate native positioning to avoid accumulating smooth-scroll work. All OS/app reduced-motion cancellation rules remain intact. Remove the full-shell turbulence/blend decoration and avoid per-card backdrop filters outside photographic Home.
+
 ## Home prayer scroll handoff — 2026-10-16
 
 The owner-requested handoff fixes summary columns/header padding. Cards compact after 96px and restore at 8px. The current owner-approved follow-up replaces the earlier 220ms FLIP with bounded 260ms coordinated card/sticky-shell height interpolation and opacity-only arrival. This specific handoff is an exception to the general no-layout-animation preference; it prevents a height snap followed by a detached content slide. Text is not scaled and blur is not animated. Ordinary scroll does not restart motion. Reversals, unmount and OS/application reduced motion cancel active effects. Home disables compensating native scroll anchoring.

@@ -12,6 +12,7 @@ const THEME_BACKGROUND: Record<ThemeMode, string> = {
 
 export interface AppAppearancePreferences {
   themeMode: ThemeMode;
+  appMaterial?: "system" | "glass" | "solid";
   language?: AppLanguage;
   textSize?: TextSizeOption;
   highContrast?: boolean;
@@ -26,6 +27,7 @@ export interface AppAppearancePreferences {
 /** Applies the complete root appearance contract atomically to prevent stale theme classes and startup flashes. */
 export function applyAppAppearance({
   themeMode,
+  appMaterial = "system",
   language = "en",
   textSize = "medium",
   highContrast = false,
@@ -57,6 +59,14 @@ export function applyAppAppearance({
   if (reduceTransparency) root.classList.add("reduce-transparency");
 
   const fontSizes: Record<TextSizeOption, string> = { small: "14px", medium: "16px", large: "18px" };
+  root.dataset.appMaterial = appMaterial;
+  root.dataset.appMaterialResolved =
+    !highContrast &&
+    appMaterial !== "solid" &&
+    (appMaterial === "glass" ||
+      (!reduceTransparency && !window.matchMedia?.("(prefers-reduced-transparency: reduce)").matches))
+      ? "glass"
+      : "solid";
   root.lang = language;
   root.dir = language === "ar" || forceRtl ? "rtl" : "ltr";
   root.style.setProperty("--font-size", fontSizes[textSize]);

@@ -48,7 +48,7 @@ describe("Home prayer scroll transition", () => {
     expect(animate).toHaveBeenCalledTimes(3);
     expect(animate.mock.calls[0]).toEqual([
       [{ height: "200px" }, { height: "172px" }],
-      { duration: 260, easing: "cubic-bezier(0.2, 0, 0, 1)" },
+      { duration: 180, easing: "cubic-bezier(0.2, 0, 0, 1)" },
     ]);
     scroll(40);
     expect(animate).toHaveBeenCalledTimes(3);

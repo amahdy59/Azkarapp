@@ -1,0 +1,51 @@
+/* Interface materials are independent of colour theme and Home's photograph.
+   Reading and playback surfaces retain their existing dense backgrounds. */
+html[data-app-material-resolved="glass"]
+  .app-shell:not([data-material-reading])
+  .app-main-view:not([data-app-page="home"]) {
+  background:
+    radial-gradient(ellipse at top right, color-mix(in srgb, var(--primary) 13%, transparent), transparent 65%),
+    var(--background);
+}
+html[data-app-material-resolved="glass"]
+  .app-shell:not([data-material-reading])
+  .app-main-view:not([data-app-page="home"])
+  :is(.app-screen-surface, [data-testid="settings-screen"]) {
+  background-color: transparent;
+}
+html[data-app-material-resolved="glass"]
+  .app-shell:not([data-material-reading])
+  .app-main-view:not([data-app-page="home"])
+  :is(.bg-card, .shared-screen-header),
+html[data-app-material-resolved="glass"] :is(.app-sidebar, .app-rail, .bottom-nav) {
+  background-color: color-mix(in srgb, var(--card) 88%, transparent);
+  background-image: linear-gradient(135deg, color-mix(in srgb, var(--foreground) 3%, transparent), transparent);
+  backdrop-filter: none !important;
+}
+/* Static card translucency needs no repeated GPU blur. Only sticky chrome
+   separates moving content with one small, bounded filter. */
+html[data-app-material-resolved="glass"] .app-shell:not([data-material-reading]) .shared-screen-header,
+html[data-app-material-resolved="glass"] :is(.app-sidebar, .app-rail, .bottom-nav) {
+  backdrop-filter: blur(12px) saturate(115%) !important;
+}
+/* Nested controls inherit the parent material rather than another blur layer. */
+html[data-app-material-resolved="glass"] .app-main-view:not([data-app-page="home"]) .bg-card .bg-card {
+  backdrop-filter: none !important;
+}
+html[data-app-material="solid"] .app-shell :is(.app-sidebar, .app-rail, .bottom-nav, .scroll-glass-header) {
+  background-color: var(--background);
+  backdrop-filter: none !important;
+}
+@supports not (backdrop-filter: blur(1px)) {
+  html[data-app-material-resolved="glass"] .app-shell .bg-card {
+    background-color: var(--card);
+  }
+}
+@media (forced-colors: active) {
+  html[data-app-material-resolved="glass"]
+    .app-shell
+    :is(.bg-card, .shared-screen-header, .app-sidebar, .app-rail, .bottom-nav) {
+    background: Canvas;
+    backdrop-filter: none !important;
+  }
+}

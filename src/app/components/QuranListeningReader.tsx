@@ -18,7 +18,7 @@ import QuranSurahListeningReader from "./QuranSurahListeningReader";
 const buttonClass =
   "inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-lg px-3 text-sm hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-50";
 
-function revealListeningTarget(root: HTMLElement | null, target: HTMLElement | null) {
+function revealListeningTarget(root: HTMLElement | null, target: HTMLElement | null, alignOpening = false) {
   const enlarged = target?.closest<HTMLElement>(
     '.audio-listening-body[data-listening-magnified="true"] > .audio-listening-arabic',
   );
@@ -28,7 +28,7 @@ function revealListeningTarget(root: HTMLElement | null, target: HTMLElement | n
   const bounds = target.getBoundingClientRect();
   const controls = root?.closest(".floating-audio-player--expanded")?.querySelector("[data-listening-controls]");
   const visibleTop = enlarged ? view.top : Math.max(view.top, controls?.getBoundingClientRect().bottom ?? view.top);
-  if (bounds.top < visibleTop || bounds.bottom > view.bottom) {
+  if (alignOpening || bounds.top < visibleTop || bounds.bottom > view.bottom) {
     viewport.scrollTo?.({
       top: Math.max(0, viewport.scrollTop + bounds.top - visibleTop - 8),
       behavior: "instant",
@@ -71,12 +71,10 @@ export function PagedQuranListeningReader({
   const timing = useReviewedQuranTiming(segment);
   const cue = useQuranPlaybackCue(timing, currentTime, playing, readTime);
   const root = useRef<HTMLElement>(null);
-  const positionedAtStart = useRef(false);
   const positionedZoom = useRef("");
   useEffect(() => {
     setFollow(true);
     setManualIndex(0);
-    positionedAtStart.current = false;
   }, [entry.entryId, segment?.variantId]);
   const ayah = Number(cue.verseKey?.split(":")[1]);
   const playingIndex =
@@ -121,7 +119,11 @@ export function PagedQuranListeningReader({
         heading && firstWord && viewport
           ? firstWord.getBoundingClientRect().bottom - heading.getBoundingClientRect().top <= viewport.clientHeight - 16
           : true;
-      revealListeningTarget(root.current, cueTarget ?? (openingFits ? (heading ?? firstWord) : firstWord) ?? null);
+      revealListeningTarget(
+        root.current,
+        cueTarget ?? (openingFits ? (heading ?? firstWord) : firstWord) ?? null,
+        !cueTarget,
+      );
     };
     reveal();
     // Text resizing and page fitting can move a stationary playback cue.
@@ -192,18 +194,6 @@ export function PagedQuranListeningReader({
       observer.disconnect();
     };
   }, [magnification, result, follow, page.page, entry.quranRange?.surah]);
-  useEffect(() => {
-    if (!result || positionedAtStart.current) return;
-    positionedAtStart.current = true;
-    if (index !== 0 || !entry.quranRange) return;
-    const heading =
-      root.current?.querySelector<HTMLElement>(`[data-mushaf-surah-number="${entry.quranRange.surah}"]`) ??
-      root.current?.querySelector<HTMLElement>(
-        `[data-listening-verse="${entry.quranRange.surah}:${entry.quranRange.ayahStart}"]`,
-      );
-    // This uses the printed surah boundary, never an inferred playback timestamp.
-    revealListeningTarget(root.current, heading ?? null);
-  }, [result, index, entry.quranRange]);
   useEffect(() => {
     const viewport = root.current?.closest<HTMLElement>(".audio-expanded-text") ?? root.current;
     const pauseFollowing = () => {

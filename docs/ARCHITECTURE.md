@@ -1,5 +1,11 @@
 # Application architecture
 
+## App material and scroll responsiveness — 2026-10-16
+
+The owner-approved appMaterial preference uses existing normalized snapshot/partial-merge boundaries and initial appearance application. Home retains its explicit legacy system/glass/solid choice and can independently inherit the app choice. Root appearance resolves system transparency changes reactively; high contrast and forced colors retain priority. Shared non-reading interface surfaces use static translucency, with bounded blur on chrome only. The photographic Home and dense Quran/azkar/listening surfaces retain their own contrast contracts. No runtime dependency, AI request or additional server is added.
+
+Minute-based screen clocks pause while hidden and resynchronize on visibility. Headers dispatch React state only at their scroll threshold. A full-shell turbulence/blend overlay is removed; native scrolling remains browser-owned. Automatic reader following uses immediate positioning instead of queuing smooth scrolls. Home's discrete silhouette handoff is shortened from 260ms to 180ms under the owner's subsequent responsiveness request; ordinary scroll ticks do not animate layout. Device Save-Data skips decorative hero pictures and retains an opaque fallback. Offline text and existing cache persistence remain unchanged.
+
 ## Home scroll and relevant reminders — 2026-10-16
 
 useHomePrayerScroll owns discrete, cancelable threshold feedback using Home's content/sticky refs and existing reduced-motion preference. Header spacing/summary columns stay fixed. Home restores VisitorCount through the existing global presence provider. reminderPlan combines dated selected-location prayer windows with shifted topic rotation and conservative fasting exclusions. The thirty-source authenticated extension stays in a deferred, precached JS module; four duas reuse COMPREHENSIVE_DUAS text/meaning. Existing routine/progress/count/sync ownership is unchanged. Manual refresh traverses eligible contextual sources without repeating the same evidence identity across contexts.

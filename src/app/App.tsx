@@ -361,7 +361,9 @@ function AppContent({
   const [zikrFont, setZikrFont] = useState<ZikrFontOption>(initialState.settings.zikrFont ?? "humanist");
   const [highContrast, setHighContrast] = useState(initialState.settings.highContrast);
   const [boldText, setBoldText] = useState(initialState.settings.boldText);
+  const [appMaterial, setAppMaterial] = useState(initialState.settings.appMaterial ?? "system");
   const [homeMaterial, setHomeMaterial] = useState(initialState.settings.homeMaterial ?? "system");
+  const resolvedHomeMaterial = homeMaterial === "inherit" ? appMaterial : homeMaterial;
   const [reduceTransparency, setReduceTransparency] = useState(initialState.settings.reduceTransparency);
   const [homeWirdImages, setHomeWirdImages] = useState(initialState.settings.homeWirdImages);
   const [hapticFeedback, setHapticFeedback] = useState(initialState.settings.hapticFeedback);
@@ -743,6 +745,7 @@ function AppContent({
         reduceMotion,
         reduceTransparency,
         homeWirdImages,
+        appMaterial,
         homeMaterial,
         hapticFeedback,
         forceRtl,
@@ -798,6 +801,7 @@ function AppContent({
       highContrast,
       isGuest,
       homeWirdImages,
+      appMaterial,
       homeMaterial,
       phone,
       avatarUrl,
@@ -1141,6 +1145,7 @@ function AppContent({
     setBoldText(state.settings.boldText);
     setReduceMotion(state.settings.reduceMotion);
     setReduceTransparency(state.settings.reduceTransparency);
+    setAppMaterial(state.settings.appMaterial ?? "system");
     setHomeMaterial(state.settings.homeMaterial ?? "system");
     setHomeWirdImages(state.settings.homeWirdImages);
     setHapticFeedback(state.settings.hapticFeedback);
@@ -1324,18 +1329,24 @@ function AppContent({
   }, [progressDayStartHour, reconcileDailyProgress]);
 
   useEffect(() => {
-    applyAppAppearance({
-      themeMode,
-      language: selectedLang,
-      textSize,
-      zikrFont,
-      highContrast,
-      boldText,
-      reduceMotion,
-      reduceTransparency,
-      forceRtl,
-      colorBlindSupport,
-    });
+    const apply = () =>
+      applyAppAppearance({
+        themeMode,
+        language: selectedLang,
+        textSize,
+        zikrFont,
+        highContrast,
+        boldText,
+        reduceMotion,
+        reduceTransparency,
+        appMaterial,
+        forceRtl,
+        colorBlindSupport,
+      });
+    apply();
+    const media = window.matchMedia("(prefers-reduced-transparency: reduce)");
+    media.addEventListener("change", apply);
+    return () => media.removeEventListener("change", apply);
   }, [
     boldText,
     colorBlindSupport,
@@ -1344,6 +1355,7 @@ function AppContent({
     highContrast,
     reduceMotion,
     reduceTransparency,
+    appMaterial,
     selectedLang,
     textSize,
     zikrFont,
@@ -1620,6 +1632,7 @@ function AppContent({
         // No elevation utility here: theme.css sets `box-shadow: none` on
         // .app-shell both at <=599px and at >=600px, so the shadow-2xl that used
         // to sit here never rendered at any viewport width (DEC-067 / F11).
+        data-material-reading={view === "reader" || view === "khatmah" || readerInMushafMode ? "true" : undefined}
         className={`app-shell relative overflow-hidden bg-background ${showBottomNav ? "" : "app-shell--navigation-hidden"}`}
       >
         {/* Both banners share one grid area, so they stack across the full shell
@@ -1685,6 +1698,7 @@ function AppContent({
             id="main-content"
             data-view={view}
             tabIndex={-1}
+            data-app-page={view}
             className="app-main-view flex-1 overflow-hidden flex flex-col"
           >
             <Suspense fallback={<ScreenFallback language={selectedLang} />}>
@@ -1816,8 +1830,10 @@ function AppContent({
                   completed={completed}
                   dailyCompletions={dailyCompletions}
                   quietProgressEnabled={true}
-                  homeVisualEffects={homeMaterial === "glass" || (homeMaterial === "system" && !reduceTransparency)}
-                  homeMaterial={homeMaterial}
+                  homeVisualEffects={
+                    resolvedHomeMaterial === "glass" || (resolvedHomeMaterial === "system" && !reduceTransparency)
+                  }
+                  homeMaterial={resolvedHomeMaterial}
                   reduceMotion={reduceMotion}
                   homeWirdImages={homeWirdImages}
                   progressDayStartHour={progressDayStartHour}
@@ -2341,6 +2357,8 @@ function AppContent({
                   reduceTransparency={reduceTransparency}
                   homeWirdImages={homeWirdImages}
                   homeMaterial={homeMaterial}
+                  appMaterial={appMaterial}
+                  onAppMaterialChange={setAppMaterial}
                   onHomeMaterialChange={setHomeMaterial}
                   hapticFeedback={hapticFeedback}
                   forceRtl={forceRtl}

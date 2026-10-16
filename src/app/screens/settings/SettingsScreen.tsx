@@ -49,6 +49,8 @@ export function SettingsScreen({
   reduceMotion,
   reduceTransparency,
   homeWirdImages = false,
+  appMaterial = "system",
+  onAppMaterialChange,
   homeMaterial = "system",
   onHomeMaterialChange,
   onHomeWirdImagesChange,
@@ -170,6 +172,7 @@ export function SettingsScreen({
 
   return (
     <div
+      data-testid="settings-screen"
       className="relative mx-auto flex h-full w-full max-w-[80rem] flex-col overflow-hidden bg-background"
       dir={direction}
     >
@@ -272,6 +275,8 @@ export function SettingsScreen({
       case "appearance":
         return (
           <AppearancePanel
+            appMaterial={appMaterial}
+            onAppMaterialChange={onAppMaterialChange}
             homeMaterial={homeMaterial}
             onHomeMaterialChange={onHomeMaterialChange}
             homeWirdImages={homeWirdImages}

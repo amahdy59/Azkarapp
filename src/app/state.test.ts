@@ -823,6 +823,21 @@ describe("prayer tracking persistence", () => {
 });
 
 describe("explicit Home material", () => {
+  it("retains global and inherited Home choices across normalization and partial sync", () => {
+    for (const appMaterial of ["system", "glass", "solid"] as const) {
+      const state = normalizeAppState({ settings: { appMaterial, homeMaterial: "inherit" } });
+      expect(state.settings.appMaterial).toBe(appMaterial);
+      expect(state.settings.homeMaterial).toBe("inherit");
+      expect(mergeAppStates(state, { settings: { showTranslation: true } }).settings).toMatchObject({
+        appMaterial,
+        homeMaterial: "inherit",
+      });
+    }
+    expect(normalizeAppState({ settings: { appMaterial: "invalid", homeMaterial: "glass" } }).settings).toMatchObject({
+      appMaterial: "system",
+      homeMaterial: "glass",
+    });
+  });
   it("normalizes old/invalid preferences and preserves explicit choices through merges", () => {
     expect(normalizeAppState({}).settings.homeMaterial).toBe("system");
     expect(normalizeAppState({ settings: { homeMaterial: "invalid" } }).settings.homeMaterial).toBe("system");

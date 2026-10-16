@@ -134,6 +134,7 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
     boldText: false,
     reduceMotion: false,
     reduceTransparency: false,
+    appMaterial: "system",
     homeMaterial: "system",
     homeWirdImages: false,
     hapticFeedback: true,
@@ -921,8 +922,12 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
         typeof settings?.homeWirdImages === "boolean"
           ? settings.homeWirdImages
           : DEFAULT_APP_STATE.settings.homeWirdImages,
+      appMaterial:
+        settings?.appMaterial === "glass" || settings?.appMaterial === "solid" ? settings.appMaterial : "system",
       homeMaterial:
-        settings?.homeMaterial === "glass" || settings?.homeMaterial === "solid" ? settings.homeMaterial : "system",
+        settings?.homeMaterial === "inherit" || settings?.homeMaterial === "glass" || settings?.homeMaterial === "solid"
+          ? settings.homeMaterial
+          : "system",
       reduceTransparency:
         typeof settings?.reduceTransparency === "boolean"
           ? settings.reduceTransparency
@@ -1285,7 +1290,14 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
         typeof incoming.settings?.homeWirdImages === "boolean"
           ? incoming.settings.homeWirdImages
           : safeBase.settings.homeWirdImages,
+      appMaterial:
+        incoming.settings?.appMaterial === "glass" ||
+        incoming.settings?.appMaterial === "solid" ||
+        incoming.settings?.appMaterial === "system"
+          ? incoming.settings.appMaterial
+          : safeBase.settings.appMaterial,
       homeMaterial:
+        incoming.settings?.homeMaterial === "inherit" ||
         incoming.settings?.homeMaterial === "glass" ||
         incoming.settings?.homeMaterial === "solid" ||
         incoming.settings?.homeMaterial === "system"

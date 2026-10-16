@@ -1,5 +1,9 @@
 # Decision Log
 
+## App-wide appearance, performance and complete release — 2026-10-16
+
+The owner accepts app-wide Follow device/Glass/Solid plus Home Same as app/independent override, then explicitly requests applying all remaining work and pushing all changes. This chat owns implementation and the release; the previous release chat acknowledges a source/build/commit freeze. The owner additionally requests efficient, accessible behavior on older devices/slow networks and removal of the sluggish scroll feel. Use static translucent interface cards, bounded shared-chrome blur, dense reading surfaces, a shorter 180ms Home handoff, threshold-only header state, paused hidden-screen clocks, immediate automatic reader positioning and Save-Data decorative fallback. Preserve explicit existing preferences, religious content/counts and offline data. Add desktop brand Home navigation and repair outstanding CI cases without loosening assertions or coverage. Verify both GitHub Pages and the separately Git-integrated Cloudflare custom domain after exact-commit CI succeeds.
+
 ## Coordinated local verification hold — 2026-10-16
 
 The owner authorized coordination between the reminder and Home refinement chats. The latest direct instruction reported by the Home chat is “Coordinate; keep these changes local.” Complete the combined local implementation, source review and quality checks; do not commit, push or publish the shared snapshot. Earlier release authorizations do not override this current hold.

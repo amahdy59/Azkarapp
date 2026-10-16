@@ -379,7 +379,7 @@ export function KhatmahReaderScreen({
     if (targetBounds.top < paperBounds.top + topMargin || targetBounds.bottom > paperBounds.bottom - bottomMargin) {
       paper.scrollTo({
         top: Math.max(0, paper.scrollTop + targetBounds.top - paperBounds.top - topMargin),
-        behavior: "smooth",
+        behavior: "instant",
       });
     }
   }, [playback.follow, playback.cue.verseKey, playback.cue.word?.position, pageMagnification]);

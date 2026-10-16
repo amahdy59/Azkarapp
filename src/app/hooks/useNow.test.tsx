@@ -13,6 +13,20 @@ beforeEach(() => vi.useFakeTimers());
 afterEach(() => vi.useRealTimers());
 
 describe("useNow", () => {
+  it("stops background screen work and resumes on the current minute", () => {
+    vi.setSystemTime(new Date("2026-08-19T10:30:20Z"));
+    const visibility = vi.spyOn(document, "visibilityState", "get").mockReturnValue("visible");
+    render(<Clock />);
+    visibility.mockReturnValue("hidden");
+    act(() => document.dispatchEvent(new Event("visibilitychange")));
+    act(() => vi.advanceTimersByTime(300_000));
+    expect(reading()).toBe("2026-08-19T10:30:20.000Z");
+    expect(vi.getTimerCount()).toBe(0);
+    visibility.mockReturnValue("visible");
+    act(() => document.dispatchEvent(new Event("visibilitychange")));
+    expect(reading()).toBe("2026-08-19T10:35:20.000Z");
+    visibility.mockRestore();
+  });
   it("moves the reading forward on the wall-clock minute", () => {
     vi.setSystemTime(new Date("2026-08-19T10:30:20Z"));
     render(<Clock />);

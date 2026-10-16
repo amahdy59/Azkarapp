@@ -14,8 +14,10 @@ export interface AppearancePanelProps {
   themeMode: ThemeMode;
   highContrast: boolean;
   homeWirdImages?: boolean;
-  homeMaterial?: "system" | "glass" | "solid";
-  onHomeMaterialChange?: (value: "system" | "glass" | "solid") => void;
+  appMaterial?: "system" | "glass" | "solid";
+  onAppMaterialChange?: (value: "system" | "glass" | "solid") => void;
+  homeMaterial?: "inherit" | "system" | "glass" | "solid";
+  onHomeMaterialChange?: (value: "inherit" | "system" | "glass" | "solid") => void;
   onHomeWirdImagesChange?: (value: boolean) => void;
   reduceTransparency?: boolean;
   onReduceTransparencyChange?: (value: boolean) => void;
@@ -34,6 +36,8 @@ export function AppearancePanel({
   themeMode,
   highContrast,
   homeWirdImages = false,
+  appMaterial = "system",
+  onAppMaterialChange,
   homeMaterial = "system",
   onHomeMaterialChange,
   onHomeWirdImagesChange,
@@ -78,6 +82,24 @@ export function AppearancePanel({
             </aside>
           )}
         </SettingsSection>
+        {onAppMaterialChange && (
+          <SettingsSection label={t(language, "settings.appMaterial")} className="mt-3">
+            <div className="space-y-3 p-4">
+              <p className="text-sm text-muted-foreground">{t(language, "settings.appMaterialHint")}</p>
+              <SegmentedControl
+                value={appMaterial}
+                onChange={onAppMaterialChange}
+                direction={direction}
+                aria-label={t(language, "settings.appMaterial")}
+                className="flex flex-wrap gap-2"
+                options={(["system", "glass", "solid"] as const).map((value) => ({
+                  value,
+                  label: t(language, `settings.homeMaterial_${value}`),
+                }))}
+              />
+            </div>
+          </SettingsSection>
+        )}
         <SettingsSection label={t(language, "settings.homeCards")} className="mt-3">
           {onHomeMaterialChange && (
             <div className="space-y-3 p-4">
@@ -92,7 +114,7 @@ export function AppearancePanel({
                 itemClassName={(selected) =>
                   `min-h-11 flex-1 rounded-xl border px-3 py-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${selected ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-foreground"}`
                 }
-                options={(["system", "glass", "solid"] as const).map((value) => ({
+                options={(["inherit", "system", "glass", "solid"] as const).map((value) => ({
                   value,
                   label: t(language, `settings.homeMaterial_${value}`),
                 }))}

@@ -112,6 +112,7 @@ export function Header({
 }) {
   const headerRef = useRef<HTMLDivElement>(null);
   const [hasScrolledContent, setHasScrolledContent] = useState(false);
+  const scrolledRef = useRef(false);
 
   useEffect(() => {
     if (!elevateOnScroll) return;
@@ -125,7 +126,10 @@ export function Header({
       // An inner devotional text reader scrolls within its own card and never
       // passes content underneath the header, so it should not trigger elevation.
       if (target.classList.contains("reader-text-scroll") || target.closest(".reader-text-scroll")) return;
-      setHasScrolledContent(target.scrollTop > 4);
+      const next = target.scrollTop > 4;
+      if (next === scrolledRef.current) return;
+      scrolledRef.current = next;
+      setHasScrolledContent(next);
     };
 
     // Scroll does not bubble, but it can be observed in the capture phase.
@@ -205,7 +209,7 @@ export function BottomNav({ active, onChange, isArabic = false }: NavProps) {
   return (
     <nav
       aria-label={t(language, "common.bottomNavigation")}
-      className="flex h-[calc(4.5rem+env(safe-area-inset-bottom))] shrink-0 bg-card pb-[env(safe-area-inset-bottom)] shadow-sm"
+      className="bottom-nav flex h-[calc(4.5rem+env(safe-area-inset-bottom))] shrink-0 bg-card pb-[env(safe-area-inset-bottom)] shadow-sm"
     >
       <div className="flex min-h-0 flex-1 items-center justify-between px-1 min-[360px]:px-2 min-[390px]:px-4">
         {tabs.map(({ id, label, Icon }) => {
@@ -345,7 +349,13 @@ export function NavSidebar({
     >
       <div className="flex flex-col gap-1">
         {/* App brand / identity */}
-        <div className="nav-sidebar-brand flex items-center gap-3 px-3 py-4 mb-2 border-b border-border/40">
+        <a
+          href={NAV_HREF.home}
+          data-testid="desktop-brand-home"
+          onClick={(event) => followInAppLink(event, () => onChange("home"))}
+          aria-label={t(language, "common.home")}
+          className="nav-sidebar-brand flex min-h-11 items-center gap-3 px-3 py-4 mb-2 border-b border-border/40 rounded-xl focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        >
           <PalmTreeMark size={32} className="text-primary shrink-0" />
           <div className="flex flex-col leading-tight">
             <span className="text-lg font-extrabold text-foreground font-sans">{t(language, "common.appName")}</span>
@@ -353,7 +363,7 @@ export function NavSidebar({
               {t(language, "common.appTagline")}
             </span>
           </div>
-        </div>
+        </a>
 
         {/* Primary nav items */}
         {tabs.map(({ id, label, Icon }) => {

@@ -61,7 +61,7 @@ function Passage({
       const atOpening = !verseKey && page === props.entry.mushafPages?.[0]?.page;
       // A verse can straddle printed pages; without a word cue use its declared page.
       if (!atOpening && !word && pageRange && (ayah < pageRange.startAyah || ayah > pageRange.endAyah)) return;
-      const target = atOpening
+      let target = atOpening
         ? root.current?.querySelector<HTMLElement>(`[data-mushaf-surah-number="${range.surah}"]`)
         : word
           ? root.current?.querySelector<HTMLElement>('[data-playback-word="true"]')
@@ -69,6 +69,13 @@ function Passage({
       if (!target) return;
       const region = root.current?.closest<HTMLElement>(".audio-listening-arabic");
       const viewport = region && region.scrollHeight > region.clientHeight + 1 ? region : outerViewport;
+      // Enlarged text can place all opening verses below a tall surah heading.
+      // Reveal actual reading ink while retaining the heading above for scrolling.
+      if (atOpening) {
+        const firstVerse = root.current?.querySelector<HTMLElement>("[data-listening-verse]");
+        if (firstVerse && firstVerse.getBoundingClientRect().top >= viewport.getBoundingClientRect().bottom - 8)
+          target = firstVerse;
+      }
       if (!atOpening && region && region.scrollWidth > region.clientWidth) {
         const view = region.getBoundingClientRect();
         const wordBounds = target.getBoundingClientRect();

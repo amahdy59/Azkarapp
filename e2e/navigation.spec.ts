@@ -45,7 +45,20 @@ for (const viewport of [
     await expect(page.getByTestId("home-tool-qibla")).toBeVisible();
     await expect(page.getByTestId("home-tool-masbaha")).toBeVisible();
 
-    await page.getByTestId("home-tool-qibla").click();
+    const qibla = page.getByTestId("home-tool-qibla");
+    await qibla.scrollIntoViewIfNeeded();
+    await expect(page.getByTestId("home-sticky-prayers")).toHaveAttribute("data-prayer-cards-condensed", "true");
+    // The scroll compacts the sticky row. Wait for that finite handoff before
+    // testing a pointer click on the content it moves, including Firefox.
+    await page.getByTestId("home-sticky-prayers").evaluate(async (node) => {
+      await Promise.all(
+        node
+          .getAnimations({ subtree: true })
+          .filter((a) => a.playState === "running")
+          .map((a) => a.finished.catch(() => undefined)),
+      );
+    });
+    await qibla.click();
     await expect(page).toHaveURL(/#\/qibla$/);
     await expect(page.getByRole("heading", { name: "Qibla", exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: /Qibla is 136° from north/ })).toBeVisible();
@@ -73,6 +86,16 @@ for (const viewport of [
     }
 
     await page.getByTestId("nav-home").click();
+    await page.getByTestId("home-tool-masbaha").scrollIntoViewIfNeeded();
+    await expect(page.getByTestId("home-sticky-prayers")).toHaveAttribute("data-prayer-cards-condensed", "true");
+    await page.getByTestId("home-sticky-prayers").evaluate(async (node) => {
+      await Promise.all(
+        node
+          .getAnimations({ subtree: true })
+          .filter((a) => a.playState === "running")
+          .map((a) => a.finished.catch(() => undefined)),
+      );
+    });
     await page.getByTestId("home-tool-masbaha").click();
     await expect(page).toHaveURL(/#\/counter$/);
     await expect(page.getByRole("heading", { name: "Masbaha", exact: true })).toBeVisible();

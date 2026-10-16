@@ -294,7 +294,7 @@ export function HomeScreen({
   /** Photograph and translucent Home surfaces; false uses normal theme cards. */
   homeVisualEffects?: boolean;
   homeWirdImages?: boolean;
-  homeMaterial?: "system" | "glass" | "solid";
+  homeMaterial?: "inherit" | "system" | "glass" | "solid";
   reduceMotion?: boolean;
   progressDayStartHour: number;
   calendarType?: "hijri" | "gregorian";
@@ -325,6 +325,7 @@ export function HomeScreen({
   ) => void;
 }) {
   const [hasScrolledHomeContent, setHasScrolledHomeContent] = useState(false);
+  const scrolledHomeRef = useRef(false);
   const [failedBackgroundCategory, setFailedBackgroundCategory] = useState<string | null>(null);
   const isArabic = language === "ar";
   const now = useNow();
@@ -701,7 +702,11 @@ export function HomeScreen({
         className="home-content-scroll relative z-10 min-h-0 flex-1 overflow-y-auto overflow-x-hidden pb-24 pt-0 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
         onScroll={(event) => {
           const top = event.currentTarget.scrollTop;
-          setHasScrolledHomeContent(top > 4);
+          const scrolled = top > 4;
+          if (scrolledHomeRef.current !== scrolled) {
+            scrolledHomeRef.current = scrolled;
+            setHasScrolledHomeContent(scrolled);
+          }
           updatePrayerScroll(top);
         }}
       >

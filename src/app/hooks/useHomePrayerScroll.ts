@@ -38,7 +38,7 @@ export function useHomePrayerScroll(
 
     const animations: Animation[] = [];
     const animate = (element: HTMLElement, frames: Keyframe[]) => {
-      const animation = element.animate(frames, { duration: 260, easing: "cubic-bezier(0.2, 0, 0, 1)" });
+      const animation = element.animate(frames, { duration: 180, easing: "cubic-bezier(0.2, 0, 0, 1)" });
       // Canceled animations reject finished. Rapid reversals must not leave an
       // unhandled rejection or queue a stale intermediate layout.
       void animation.finished.catch(() => undefined);

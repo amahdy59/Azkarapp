@@ -585,7 +585,7 @@ export function ReaderScreen({
   useEffect(() => {
     const activeItem = activeNavigatorItemRef.current;
     if (!activeItem || !(canDockCollection ? isSidebarOpen : isCollectionDrawerOpen)) return;
-    activeItem.scrollIntoView?.({ block: "nearest", behavior: reducedMotion ? "auto" : "smooth" });
+    activeItem.scrollIntoView?.({ block: "nearest", behavior: "auto" });
   }, [idx, reducedMotion, canDockCollection, isSidebarOpen, isCollectionDrawerOpen]);
 
   const handleToggleSaved = useCallback(() => {

@@ -1,5 +1,7 @@
 # AI Improvement System Index
 
+Current owner-approved release continuation: [App-wide materials and remaining fixes](phases/APP_MATERIALS_AND_RELEASE_2026_10_16.md). Apply app-wide appearance with independent Home overrides, finish outstanding fixes, and push all changes through intact gates and production verification.
+
 Current coordinated snapshot is local only: the owner authorized chat coordination and subsequently instructed “Coordinate; keep these changes local” in the Home refinement chat. Finish local integration and verification; do not commit, push or publish this combined snapshot. This publication hold supersedes earlier release authority for the current pending changes.
 
 Latest owner-authorized combined work: [Authenticated reminders](phases/HOME_RELEVANT_REMINDERS_2026_10_16.md) and [Home scrolling/presence report](phases/HOME_PRAYER_SCROLL_AND_PRESENCE_2026_10_16.md). The owner explicitly supersedes the initial content-workbook approval gate for authenticated material and asks for both relevance plans to work together. Existing approved appearance/audio/Qibla work retains its separately documented release authority and verification requirements.
