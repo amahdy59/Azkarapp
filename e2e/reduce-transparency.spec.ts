@@ -99,17 +99,17 @@ test("a card over the hero photograph goes opaque, not merely unblurred", async 
     };
   });
   expect(material.backgroundColor, "the hero card should visibly reveal the photograph by default").toBe(
-    "rgba(15, 23, 42, 0.58)",
+    "rgba(15, 23, 42, 0.28)",
   );
   expect(material.backgroundImage).toContain("linear-gradient");
-  expect(material.backdropFilter).toContain("blur(18px)");
-  expect(material.backdropFilter).toContain("saturate(1.2)");
+  expect(material.backdropFilter).toContain("blur(12px)");
+  expect(material.backdropFilter).toContain("saturate(1.15)");
 
-  const standard = page.getByTestId("prayer-tracker-cards");
+  const standard = page.getByTestId("prayer-tracker-cards").locator("article").first();
   const reading = page.getByTestId("home-daily-evidence");
-  await expect(standard).toHaveCSS("background-color", "rgba(15, 23, 42, 0.48)");
-  await expect(reading).toHaveCSS("background-color", "rgba(15, 23, 42, 0.58)");
-  const innerAction = standard.getByRole("button", { name: "Show all prayers", exact: true });
+  await expect(standard).toHaveCSS("background-color", "rgba(15, 23, 42, 0.2)");
+  await expect(reading).toHaveCSS("background-color", "rgba(15, 23, 42, 0.32)");
+  const innerAction = standard.locator("button").first();
   await expect(innerAction).toHaveCSS("backdrop-filter", "none");
   // Bound contrast even if the brightest source photograph pixel is white.
   // Read actual compositing colors rather than treating blur as a guarantee.
@@ -167,6 +167,9 @@ test("the saved setting removes Home photography and uses theme cards", async ({
   await expect(prayerStrip).not.toHaveClass(/hero-glass/);
   await expect(page.getByTestId("home-saved-section")).toHaveCount(0);
   await expect(page.getByTestId("home-benefits-card")).toHaveCount(0);
-  const surface = await prayerStrip.evaluate((element) => getComputedStyle(element).backgroundColor);
+  const surface = await prayerStrip
+    .locator("article")
+    .first()
+    .evaluate((element) => getComputedStyle(element).backgroundColor);
   expect(surface).not.toMatch(/rgba\(.*0?\.\d+\)/);
 });

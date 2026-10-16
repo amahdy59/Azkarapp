@@ -617,7 +617,7 @@ export function HomeScreen({
   return (
     <ScreenContainer
       dir={direction}
-      className={`relative isolate flex flex-col overflow-hidden px-0 pt-0 ${
+      className={`home-photo-canvas relative isolate flex flex-col overflow-hidden px-0 pt-0 ${
         homeVisualEffects ? "!bg-on-media-surface" : "!bg-background"
       }`}
       style={{ paddingTop: 0 }}
@@ -653,7 +653,7 @@ export function HomeScreen({
                   ? "border-b border-border bg-background/90 shadow-none"
                   : "border-b border-border bg-background/95 shadow-sm"
             }`}
-            dir="ltr"
+            dir={direction}
           >
             <div
               data-testid="home-header-content"
@@ -661,42 +661,51 @@ export function HomeScreen({
             >
               <div
                 data-testid="hijri-date"
-                className={`min-w-0 flex-1 truncate text-label font-bold sm:text-subtitle ${
+                className={`min-w-0 flex-1 text-start text-label font-bold leading-tight sm:text-subtitle ${
                   homeVisualEffects ? "text-on-media-accent drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)]" : "text-primary"
                 }`}
               >
-                <time className="truncate" dateTime={now.toISOString()}>
+                <time className="block" dateTime={now.toISOString()} dir="auto">
                   {formatDisplayDate(now, language, calendarType, hijriDateOffset)}
                 </time>
               </div>
-              <div
-                className={`flex shrink-0 items-center gap-2 ${homeVisualEffects ? "text-on-media-accent" : "text-primary"}`}
-              >
-                <span
-                  className="flex items-center gap-1 text-sm font-bold"
-                  role="img"
-                  title={t(language, "progress.lifetimePalmsSummary")}
-                  aria-label={`${t(language, "progress.lifetimePalmsSummary")}: ${formatNumerals(gardenSummary.currentPalmRhythm ?? 0, language)}`}
+              <div className={`shrink-0 ${homeVisualEffects ? "text-on-media-accent" : "text-primary"}`}>
+                <button
+                  type="button"
+                  data-testid="home-header-routine-summary-mobile"
+                  onClick={() => setPathSheetOpen(true)}
+                  aria-label={`${t(language, "dailyPath.title")}: ${t(language, "progress.lifetimePalmsSummary")}: ${formatNumerals(gardenSummary.currentPalmRhythm ?? 0, language)}, ${t(language, "progress.activeStreakSummary")}: ${formatNumerals(gardenSummary.currentUsageStreak ?? 0, language)}`}
+                  className="home-header-path-button pointer-events-auto flex min-h-11 items-center gap-1.5 rounded-xl px-2.5 text-sm font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring min-[600px]:hidden"
                 >
-                  <PalmTreeMark size={18} />
-                  <bdi>{formatNumerals(gardenSummary.currentPalmRhythm ?? 0, language)}</bdi>
-                </span>
-                <span
-                  className="flex items-center gap-1 text-sm font-bold"
-                  role="img"
-                  title={t(language, "progress.activeStreakSummary")}
-                  aria-label={`${t(language, "progress.activeStreakSummary")}: ${formatNumerals(gardenSummary.currentUsageStreak ?? 0, language)}`}
-                >
-                  <Zap size={18} aria-hidden="true" />
-                  <bdi>{formatNumerals(gardenSummary.currentUsageStreak ?? 0, language)}</bdi>
-                </span>
+                  <span className="flex items-center gap-1" aria-hidden="true">
+                    <PalmTreeMark size={20} strokeWidth={3} />
+                    <bdi>{formatNumerals(gardenSummary.currentPalmRhythm ?? 0, language)}</bdi>
+                  </span>
+                  <span className="home-header-path-divider" aria-hidden="true" />
+                  <span className="flex items-center gap-1" aria-hidden="true">
+                    <Zap size={18} />
+                    <bdi>{formatNumerals(gardenSummary.currentUsageStreak ?? 0, language)}</bdi>
+                  </span>
+                </button>
                 <button
                   type="button"
                   data-testid="home-header-routine-summary"
                   onClick={() => setPathSheetOpen(true)}
-                  className="pointer-events-auto hidden min-h-11 items-center gap-2 rounded-xl border border-current px-3 text-sm font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring min-[900px]:flex"
+                  aria-label={`${t(language, "dailyPath.title")}: ${t(language, "progress.lifetimePalmsSummary")}: ${formatNumerals(gardenSummary.currentPalmRhythm ?? 0, language)}, ${t(language, "progress.activeStreakSummary")}: ${formatNumerals(gardenSummary.currentUsageStreak ?? 0, language)}`}
+                  className="home-header-path-button pointer-events-auto hidden min-h-11 items-center gap-2 rounded-xl px-3 text-sm font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring min-[600px]:flex"
                 >
-                  {t(language, "dailyPath.title")}
+                  <span className="hidden min-[900px]:inline" aria-hidden="true">
+                    {t(language, "dailyPath.title")}
+                  </span>
+                  <span className="flex items-center gap-1" aria-hidden="true">
+                    <PalmTreeMark size={20} strokeWidth={3} />
+                    <bdi>{formatNumerals(gardenSummary.currentPalmRhythm ?? 0, language)}</bdi>
+                  </span>
+                  <span className="home-header-path-divider" aria-hidden="true" />
+                  <span className="flex items-center gap-1" aria-hidden="true">
+                    <Zap size={18} />
+                    <bdi>{formatNumerals(gardenSummary.currentUsageStreak ?? 0, language)}</bdi>
+                  </span>
                 </button>
               </div>
             </div>
@@ -713,40 +722,37 @@ export function HomeScreen({
                   }`}
                   dir={direction}
                 >
+                  {/* Summary stays first in reading order; desktop pairs it with
+                    its expanded detail beside the contextual stack. */}
+                  <div
+                    data-testid="home-prayer-strip"
+                    className="relative z-10 mx-auto w-full min-w-0 overflow-visible md:col-span-2"
+                  >
+                    <h2 className="sr-only">{t(language, "prayerMoment.dayTitle")}</h2>
+                    <PrayerTrackerCards
+                      models={prayerCardModels}
+                      language={language}
+                      direction={direction}
+                      records={prayerTracking}
+                      dayKey={todayKey}
+                      onToggle={onTogglePrayerTracking ?? (() => undefined)}
+                      onOpen={handlePrayerOpen}
+                      onGlass={homeVisualEffects}
+                      summaryOnly
+                      compactSummary
+                      selectedPrayer={expandedPrayer}
+                    />
+                  </div>
                   <div
                     data-testid="home-prayer-column"
                     className={`contents lg:w-full lg:min-w-0 ${
                       hasContextStackContent && expandedPrayer
                         ? direction === "rtl"
-                          ? "lg:flex lg:flex-col lg:gap-5 lg:justify-self-center lg:row-start-1 lg:col-start-1 lg:max-w-[40rem]"
-                          : "lg:flex lg:flex-col lg:gap-5 lg:justify-self-center lg:row-start-1 lg:col-start-2 lg:max-w-[40rem]"
+                          ? "lg:flex lg:flex-col lg:gap-5 lg:justify-self-center lg:row-start-2 lg:col-start-1 lg:max-w-[40rem]"
+                          : "lg:flex lg:flex-col lg:gap-5 lg:justify-self-center lg:row-start-2 lg:col-start-2 lg:max-w-[40rem]"
                         : "lg:col-span-2"
                     }`}
                   >
-                    {/* Summary stays first in reading order; desktop pairs it with
-                    its expanded detail beside the contextual stack. */}
-                    <div
-                      data-testid="home-prayer-strip"
-                      className={`relative z-10 mx-auto w-full overflow-visible md:col-span-2 ${
-                        expandedPrayer ? "max-w-[40rem]" : ""
-                      }`}
-                    >
-                      <h2 className="sr-only">{t(language, "prayerMoment.dayTitle")}</h2>
-                      <PrayerTrackerCards
-                        models={prayerCardModels}
-                        language={language}
-                        direction={direction}
-                        records={prayerTracking}
-                        dayKey={todayKey}
-                        onToggle={onTogglePrayerTracking ?? (() => undefined)}
-                        onOpen={handlePrayerOpen}
-                        onGlass={homeVisualEffects}
-                        summaryOnly
-                        compactSummary
-                        selectedPrayer={expandedPrayer}
-                      />
-                    </div>
-
                     {expandedPrayer && (
                       <section
                         id="home-expanded-prayer"
@@ -767,6 +773,8 @@ export function HomeScreen({
                           direction={direction}
                           records={prayerTracking}
                           dayKey={todayKey}
+                          calendarType={calendarType}
+                          hijriDateOffset={hijriDateOffset}
                           locationSettings={locationSettings}
                           now={now}
                           onToggle={onTogglePrayerTracking ?? (() => undefined)}
@@ -787,8 +795,8 @@ export function HomeScreen({
                         expandedPrayer
                           ? `contents md:flex md:min-w-0 md:flex-col md:gap-4 lg:gap-5 ${
                               direction === "rtl"
-                                ? "md:col-start-2 md:row-start-2 lg:row-start-1"
-                                : "md:col-start-1 md:row-start-2 lg:row-start-1"
+                                ? "md:col-start-2 md:row-start-2 lg:row-start-2"
+                                : "md:col-start-1 md:row-start-2 lg:row-start-2"
                             }`
                           : "contents"
                       }
@@ -890,6 +898,8 @@ export function HomeScreen({
           <TodaysPathSheet
             open={pathSheetOpen}
             status={dailyPath}
+            palmCount={gardenSummary.currentPalmRhythm ?? 0}
+            streakCount={gardenSummary.currentUsageStreak ?? 0}
             language={language}
             direction={direction}
             mosquePrayerGoal={mosquePrayerGoal}

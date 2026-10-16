@@ -2274,6 +2274,8 @@ function AppContent({
                   direction={layoutDirection}
                   records={prayerTracking}
                   dayKey={getProgressDayKey(new Date(), progressDayStartHour)}
+                  calendarType={calendarType}
+                  hijriDateOffset={hijriDateOffset}
                   locationSettings={locationSettings}
                   onBack={pop}
                   onToggle={(prayer, field, value) =>

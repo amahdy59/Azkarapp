@@ -46,7 +46,7 @@ function Pillar({
     >
       {/* State is carried by the mark, the text and the accessible name — never
           by colour alone. */}
-      <TrackingCheckMark checked={complete} onGlass={onGlass} />
+      <TrackingCheckMark checked={complete} onGlass={onGlass} statusOnly />
       <div className="min-w-0 flex-1">
         <p className={`text-subtitle font-black ${onGlass ? "text-white" : "text-foreground"}`}>{title}</p>
         <p className={`mt-0.5 text-label font-semibold ${onGlass ? "text-white/80" : "text-muted-foreground"}`}>
@@ -60,6 +60,8 @@ function Pillar({
 export function TodaysPathSheet({
   open,
   status,
+  palmCount = 0,
+  streakCount = 0,
   language,
   direction,
   mosquePrayerGoal,
@@ -70,6 +72,8 @@ export function TodaysPathSheet({
 }: {
   open: boolean;
   status: DailyPathStatus;
+  palmCount?: number;
+  streakCount?: number;
   language: AppLanguage;
   direction: "ltr" | "rtl";
   mosquePrayerGoal?: number;
@@ -102,7 +106,7 @@ export function TodaysPathSheet({
             <Zap className="size-5 text-primary shrink-0" aria-hidden="true" />
             <div className="min-w-0">
               <p className={`text-sm font-black leading-tight ${onGlass ? "text-white" : "text-foreground"}`}>
-                {t(language, "progress.activeStreakSummary")}
+                {t(language, "progress.activeStreakSummary")}: <bdi>{count(streakCount)}</bdi>
               </p>
               <p className={`mt-0.5 text-xs font-semibold ${onGlass ? "text-white/80" : "text-muted-foreground"}`}>
                 {t(language, status.streakQualified ? "dailyPath.streakSecured" : "dailyPath.streakPending")}
@@ -120,12 +124,15 @@ export function TodaysPathSheet({
               className={status.palmEarned ? "text-primary" : "text-muted-foreground/50"}
             />
             <span>
-              {status.palmEarned
-                ? t(language, "dailyPath.palmEarned")
-                : t(language, "dailyPath.palmProgress", {
-                    done: count(status.achievedPillarCount),
-                    total: count(status.activePillarCount),
-                  })}
+              {t(language, "progress.lifetimePalmsSummary")}: <bdi>{count(palmCount)}</bdi>
+              <span className="block font-semibold">
+                {status.palmEarned
+                  ? t(language, "dailyPath.palmEarned")
+                  : t(language, "dailyPath.palmProgress", {
+                      done: count(status.achievedPillarCount),
+                      total: count(status.activePillarCount),
+                    })}
+              </span>
             </span>
           </div>
         </div>

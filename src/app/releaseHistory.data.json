@@ -1,5 +1,20 @@
 [
   {
+    "release": "2026-10-16",
+    "ar": [
+      "بطاقات الرئيسية الزجاجية أوضح فوق خلفية الوقت، مع عرض التاريخ والنخيل وأيام المواظبة في شريط علوي متوازن.",
+      "عرض الصلوات الخمس في بطاقات متساوية، مع وقت الصلاة القادمة والعدّ التنازلي وشريط الوقت المتبقي.",
+      "تُظهر بطاقات الصلاة ملخصًا موجزًا للرواتب أو السنة المستحبة، وتبقى تفاصيلها الكاملة متاحة عند فتح الصلاة.",
+      "تاريخ سجل الصلاة يتبع التقويم الهجري أو الميلادي المختار، مع خيارات مستقلة لتسجيل الجماعة والسنن والأذكار."
+    ],
+    "en": [
+      "Clearer glass cards on Home show the time-of-day scenery, with the date, palms and practice streak balanced in the header.",
+      "See all five prayers in equal-sized cards, with the next prayer's time, countdown and remaining-time bar.",
+      "Prayer cards show a short Rawatib or optional Sunnah summary, with full details when you open a prayer.",
+      "Prayer record dates follow your chosen Hijri or Gregorian calendar, with independent options for congregation, Sunnah and adhkar."
+    ]
+  },
+  {
     "release": "2026-10-15-8",
     "ar": [
       "قراءة أهدأ للمصحف والترجمة، مع رقم الآية في زاويتها ومشغّل صوت عائم يمكنك إخفاؤه وإظهاره.",

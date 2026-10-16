@@ -410,7 +410,8 @@ describe("PrayerActionsCard", () => {
     expect(row).toHaveClass("-mx-2");
     expect(row).toHaveClass("text-white");
     expect(row.querySelector(":scope > div svg")).toBeNull();
-    expect(row.querySelector(".tracking-check")).toHaveClass("size-5");
+    expect(row.querySelector(".tracking-check")).toHaveClass("size-5", "rounded-md");
+    expect(row.querySelector(".tracking-check")).not.toHaveClass("rounded-full");
     expect(row.querySelector("input")).toHaveAccessibleName("صليت الظهر جماعة");
 
     const heading = screen.getByRole("heading", { level: 3 });

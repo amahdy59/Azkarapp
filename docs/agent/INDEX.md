@@ -1,6 +1,6 @@
 # AI Improvement System Index
 
-Current owner-approved continuation: [Final reading, offline clarity and release acceptance](phases/FINAL_READING_AND_OFFLINE_POLISH_2026_10_15.md). Actual local previews precede publication; canonical content/geometry and complete release gates remain intact.
+Current owner-approved continuation: [Home glass clarity and material refinement](phases/HOME_GLASS_REFINEMENT_2026_10_15.md). Restore visible Home translucency and apply the owner-requested two-column, fit-or-scroll prayer overview; actual local previews precede publication and complete release gates remain intact. [Final reading, offline clarity and release acceptance](phases/FINAL_READING_AND_OFFLINE_POLISH_2026_10_15.md) is deployed at 2e93b36c.
 
 Current follow-up: [Cards, situational sessions and compact audio](phases/CARDS_AND_COMPACT_AUDIO_2026_10_15.md), approved by the owner after the audit. Preserve the coordinated Android/release acceptance work below.
 

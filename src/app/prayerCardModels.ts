@@ -1,4 +1,7 @@
-import { getCurrentPrayerPeriod, getNextPrayerCountdown, PRAYER_NAMES } from "./content/prayerTimes";
+import { PRAYER_NAMES } from "./content/prayerTimes";
+import { getPrayerTimeline } from "./prayerTimeline";
+import { formatNumerals } from "./formatting";
+import { t } from "./i18n";
 import type { PrayerCardModel } from "./components/PrayerTrackerCards";
 import type { AppLanguage, LocationSettings, PrayerName } from "./types";
 
@@ -15,23 +18,34 @@ export function buildPrayerCardModels(
   language: AppLanguage,
   location: LocationSettings | undefined,
 ): PrayerCardModel[] {
-  const period = getCurrentPrayerPeriod(now, location);
-  const next = getNextPrayerCountdown(now, language, location);
-  const activeIndex = PRAYER_NAMES.indexOf(period.currentPrayer as PrayerName);
+  const timeline = getPrayerTimeline(now, location);
+  const times = timeline.prayerTimes;
+  const activeIndex = PRAYER_NAMES.indexOf(timeline.current.prayer as PrayerName);
+  const countdown = formatNumerals(
+    `${Math.floor(timeline.remainingMinutes / 60)
+      .toString()
+      .padStart(2, "0")}:${(timeline.remainingMinutes % 60).toString().padStart(2, "0")}`,
+    language,
+  );
 
   return PRAYER_NAMES.map((prayer, index) => {
-    const isNext = prayer === next.name;
+    const isNext = prayer === timeline.next.prayer;
     const state = index === activeIndex ? "current" : isNext ? "next" : index < activeIndex ? "past" : "upcoming";
-    const isOpenable = state === "past" || state === "current" || (isNext && next.remainingMinutes <= 30);
+    const isOpenable = state === "past" || state === "current" || (isNext && timeline.remainingMinutes <= 30);
     const isRecordable = state === "past" || state === "current";
     return {
       prayer,
-      time: period.prayerTimes[prayer],
-      ...(prayer === "fajr" && period.prayerTimes.shrouk ? { shroukTime: period.prayerTimes.shrouk } : {}),
+      time: (isNext ? timeline.next : state === "current" ? timeline.current : null)?.time ?? times[prayer],
+      ...(prayer === "fajr" && times.shrouk ? { shroukTime: times.shrouk } : {}),
       state,
       isOpenable,
       isRecordable,
-      ...(isNext ? { countdown: next.formattedCountdown } : {}),
+      ...(isNext
+        ? {
+            countdown: t(language, "prayerTracking.timeLeft", { time: countdown }),
+            remainingPercent: timeline.remainingPercent,
+          }
+        : {}),
     };
   });
 }

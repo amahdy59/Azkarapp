@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-15-8",
+  "release": "2026-10-16",
   "ar": [
-    "قراءة أهدأ للمصحف والترجمة، مع رقم الآية في زاويتها ومشغّل صوت عائم يمكنك إخفاؤه وإظهاره.",
-    "الوصول إلى ملفات الصوت المنزّلة وتصديرها بسهولة، مع توضيح استئناف الأذكار وإعادة ضبط الجلسة.",
-    "عرض سور الرقية الثلاث في بطاقات مستقلة مع الاحتفاظ بمحفوظاتك وتقدمك، وتحسين وضوح معاني الكلمات وزجاج بطاقات الرئيسية على الحاسوب.",
-    "تحسين عودة التركيز بعد المشاركة واستمرار متابعة التلاوة عند استخدام خيارات الصوت."
+    "بطاقات الرئيسية الزجاجية أوضح فوق خلفية الوقت، مع عرض التاريخ والنخيل وأيام المواظبة في شريط علوي متوازن.",
+    "عرض الصلوات الخمس في بطاقات متساوية، مع وقت الصلاة القادمة والعدّ التنازلي وشريط الوقت المتبقي.",
+    "تُظهر بطاقات الصلاة ملخصًا موجزًا للرواتب أو السنة المستحبة، وتبقى تفاصيلها الكاملة متاحة عند فتح الصلاة.",
+    "تاريخ سجل الصلاة يتبع التقويم الهجري أو الميلادي المختار، مع خيارات مستقلة لتسجيل الجماعة والسنن والأذكار."
   ],
   "en": [
-    "Read a calmer Mushaf and translation, with corner ayah numbers and a floating audio player you can hide and restore.",
-    "Find and export downloaded audio more easily, with clearer guidance for resuming azkar and resetting a session.",
-    "Read the three Ruqyah surahs in separate cards while keeping saved items and progress, with clearer word meanings and translucent Home cards on desktop.",
-    "Return to your sharing control reliably and keep recitation following active while using audio options."
+    "Clearer glass cards on Home show the time-of-day scenery, with the date, palms and practice streak balanced in the header.",
+    "See all five prayers in equal-sized cards, with the next prayer's time, countdown and remaining-time bar.",
+    "Prayer cards show a short Rawatib or optional Sunnah summary, with full details when you open a prayer.",
+    "Prayer record dates follow your chosen Hijri or Gregorian calendar, with independent options for congregation, Sunnah and adhkar."
   ]
 }

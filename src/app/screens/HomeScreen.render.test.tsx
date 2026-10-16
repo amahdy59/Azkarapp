@@ -99,7 +99,7 @@ describe("HomeScreen quick access", () => {
     expect(screen.queryByTestId("home-benefits-card")).not.toBeInTheDocument();
   });
 
-  it("shows current and next prayers and reveals the complete rail on request", () => {
+  it("shows all five prayer summaries without a disclosure", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date(2026, 7, 10, 15, 45));
     render(
@@ -115,8 +115,8 @@ describe("HomeScreen quick access", () => {
       />,
     );
 
-    expect(screen.queryByTestId("prayer-card-fajr")).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Show all prayers" }));
+    expect(screen.queryByRole("button", { name: "Show all prayers" })).not.toBeInTheDocument();
+    expect(screen.getAllByTestId(/^prayer-card-/)).toHaveLength(5);
     expect(screen.getByTestId("prayer-card-fajr")).toBeInTheDocument();
     expect(screen.getByText(/today.?s wird/i)).toBeInTheDocument();
 

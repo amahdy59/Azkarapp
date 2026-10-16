@@ -4,6 +4,8 @@ import { PrayerMomentScreen } from "./PrayerMomentScreen";
 import { PrayerMomentPanel } from "../components/PrayerMomentPanel";
 import { getEstimatedPrayerTimes } from "../content/prayerTimes";
 import type { PrayerName, PrayerTrackingRecord } from "../types";
+import { formatDisplayDate } from "../formatting";
+import { dateFromProgressDayKey } from "../progress";
 
 afterEach(cleanup);
 
@@ -48,6 +50,54 @@ function renderScreen({
 }
 
 describe("the prayer as one surface", () => {
+  it("names the record date across midnight without repeating the timetable countdown or completion tally", () => {
+    render(
+      <PrayerMomentPanel
+        prayer="isha"
+        language="en"
+        direction="ltr"
+        records={[]}
+        dayKey="2026-09-04"
+        calendarType="gregorian"
+        now={new Date(2026, 8, 5, 1)}
+        onToggle={vi.fn()}
+        onOpenAdhkar={vi.fn()}
+      />,
+    );
+    expect(screen.getByTestId("prayer-record-date")).toHaveAttribute("datetime", "2026-09-04");
+    expect(screen.getByTestId("prayer-record-date")).toHaveTextContent("Record for Friday, September 4, 2026 AD");
+    expect(screen.queryByText("Not yet due")).toBeNull();
+    expect(screen.queryByText(/In \d+ min/)).toBeNull();
+    expect(screen.queryByTestId("prayer-actions-progress")).toBeNull();
+    expect(screen.getByTestId("prayer-moment-virtue")).toBeInTheDocument();
+  });
+  it.each(["ar", "en"] as const)(
+    "follows calendar and Hijri adjustment changes in %s without moving the record day",
+    (language) => {
+      const props = {
+        prayer: "isha" as const,
+        language,
+        direction: language === "ar" ? ("rtl" as const) : ("ltr" as const),
+        records: [],
+        dayKey: DAY,
+        now: new Date(2026, 8, 5, 1),
+        onBack: vi.fn(),
+        onToggle: vi.fn(),
+        onOpenAdhkar: vi.fn(),
+        onSelectPrayer: vi.fn(),
+      };
+      const { rerender } = render(<PrayerMomentScreen {...props} calendarType="hijri" hijriDateOffset={1} />);
+      const date = screen.getByTestId("prayer-record-date");
+      expect(date).toHaveTextContent(formatDisplayDate(dateFromProgressDayKey(DAY), language, "hijri", 1));
+      rerender(<PrayerMomentScreen {...props} calendarType="hijri" hijriDateOffset={-1} />);
+      expect(date).toHaveTextContent(formatDisplayDate(dateFromProgressDayKey(DAY), language, "hijri", -1));
+      rerender(<PrayerMomentScreen {...props} calendarType="gregorian" hijriDateOffset={1} />);
+      expect(date).toHaveTextContent(formatDisplayDate(dateFromProgressDayKey(DAY), language, "gregorian"));
+      expect(date).toHaveAttribute("datetime", DAY);
+      fireEvent.click(screen.getByTestId("prayer-action-location").querySelector("input")!);
+      expect(props.onToggle).toHaveBeenCalledWith("isha", "location", "mosque");
+    },
+  );
   it("allows an approaching prayer preview without allowing an early record", () => {
     const onToggle = vi.fn();
     render(

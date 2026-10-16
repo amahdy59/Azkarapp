@@ -24,7 +24,6 @@ async function openHome(page: Page, language: "ar" | "en") {
     );
   }, language);
   await page.goto("/#/home");
-  await page.getByRole("button", { name: language === "ar" ? "عرض جميع الصلوات" : "Show all prayers" }).click();
   await expect(page.getByTestId("prayer-card-fajr")).toBeVisible();
   await page.evaluate(() => document.fonts.ready);
 }
@@ -48,9 +47,7 @@ async function checkGeometry(page: Page) {
       headerAlignment: content.x - header.x,
       stripWidth: strip.width,
       panelWidth: panel.width,
-      centerOffset:
-        strip.x + strip.width / 2 - (innerWidth >= 1024 ? panel.x + panel.width / 2 : content.x + content.width / 2),
-      columnWidthDifference: innerWidth >= 1024 ? strip.width - panel.width : 0,
+      centerOffset: strip.x + strip.width / 2 - (content.x + content.width / 2),
       quoteFont: getComputedStyle(quote).fontFamily,
       headingFont: getComputedStyle(heading).fontFamily,
       summaryOverflow: [
@@ -64,10 +61,9 @@ async function checkGeometry(page: Page) {
   expect(measures.contentWidth).toBeLessThanOrEqual(80 * measures.rootSize);
   expect(measures.contentWidth).toBeCloseTo(measures.headerWidth, 0);
   expect(Math.abs(measures.headerAlignment)).toBeLessThanOrEqual(1);
-  expect(measures.stripWidth).toBeLessThanOrEqual(40 * measures.rootSize);
+  expect(measures.stripWidth).toBeLessThanOrEqual(measures.contentWidth);
   expect(measures.panelWidth).toBeLessThanOrEqual(40 * measures.rootSize);
   expect(Math.abs(measures.centerOffset)).toBeLessThanOrEqual(1);
-  expect(Math.abs(measures.columnWidthDifference)).toBeLessThanOrEqual(1);
   expect(measures.quoteFont).toBe(measures.headingFont);
   expect(measures.summaryOverflow).toBe(false);
   const overflow = await panel.evaluate((panel) => {
@@ -142,11 +138,10 @@ for (const language of ["ar", "en"] as const) {
                 height: button.getBoundingClientRect().height,
                 gap: parseFloat(getComputedStyle(button).rowGap),
                 statusGap:
-                  tile.querySelector('[id^="prayer-summary-status-"]')!.getBoundingClientRect().top -
+                  tile.querySelector("[data-prayer-detail]")!.getBoundingClientRect().top -
                   tile.querySelector("p")!.getBoundingClientRect().bottom,
-                wrapping: [...tile.querySelectorAll('h3, p, [id^="prayer-summary-status-"]')].some(
-                  (el) => getComputedStyle(el).whiteSpace !== "nowrap",
-                ),
+                identity: tile.querySelector("[data-prayer-identity] h3")!.getBoundingClientRect().x,
+                timing: tile.querySelector("[data-prayer-timing] p")!.getBoundingClientRect().x,
                 overflow: [...tile.querySelectorAll('h3, p, [id^="prayer-summary-status-"]')].some(
                   (el) => el.scrollWidth > el.clientWidth + 1,
                 ),
@@ -154,17 +149,19 @@ for (const language of ["ar", "en"] as const) {
             }),
           );
           expect(tiles.every((tile) => tile.width >= 44 && tile.height >= 44 && !tile.overflow)).toBe(true);
-          expect(tiles.every((tile) => tile.gap === 6)).toBe(true);
-          expect(tiles.every((tile) => !tile.wrapping && Math.abs(tile.statusGap - 6) < 0.01)).toBe(true);
+          expect(tiles.every((tile) => tile.gap === 4)).toBe(true);
+          expect(
+            tiles.every(
+              (tile) => tile.statusGap >= 0 && tile.statusGap <= 8 && Math.abs(tile.identity - tile.timing) > 20,
+            ),
+          ).toBe(true);
           const timeStyles = await page.locator('[id^="prayer-summary-time-"]').evaluateAll((times) =>
             times.map((time) => ({
               size: getComputedStyle(time).fontSize,
               weight: getComputedStyle(time).fontWeight,
             })),
           );
-          expect(
-            timeStyles.every((time) => time.size === `${width < 640 ? 16 : 15}px` && Number(time.weight) >= 800),
-          ).toBe(true);
+          expect(timeStyles.every((time) => time.size === "16px" && Number(time.weight) >= 800)).toBe(true);
           if ((width === 390 && prayer === "fajr") || (width === 1440 && prayer === "dhuhr")) {
             await page.getByTestId("home-prayer-strip").scrollIntoViewIfNeeded();
             await page.screenshot({
@@ -197,7 +194,6 @@ for (const language of ["ar", "en"] as const) {
         { themeMode, reduceTransparency },
       );
       await page.reload();
-      await page.getByRole("button", { name: language === "ar" ? "عرض جميع الصلوات" : "Show all prayers" }).click();
       await page.getByTestId("prayer-card-dhuhr").getByRole("button").click();
       await checkGeometry(page);
       expect(
@@ -224,7 +220,10 @@ for (const language of ["ar", "en"] as const) {
     await input.focus();
     await page.keyboard.press("Space");
     await expect(input).toBeChecked();
-    await expect(page.getByTestId("prayer-actions-progress")).toContainText(language === "ar" ? "١ من ٤" : "1 of 4");
+    await expect(page.getByTestId("prayer-actions-progress")).toHaveCount(0);
+    await expect(page.getByTestId("prayer-card-dhuhr").locator("[data-prayer-detail]")).toContainText(
+      language === "ar" ? "في المسجد" : "At the mosque",
+    );
     await page.keyboard.press("Space");
     await expect(input).not.toBeChecked();
     await page.getByTestId("prayer-actions-more-info").click();

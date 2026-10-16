@@ -281,7 +281,7 @@
 .home-photo-scrim {
   position: absolute;
   inset: 0;
-  background-image: linear-gradient(to bottom, rgb(2 6 23 / 0.5), rgb(2 6 23 / 0.35), rgb(2 6 23 / 0.75));
+  background-image: linear-gradient(to bottom, rgb(2 6 23 / 0.56), rgb(2 6 23 / 0.54), rgb(2 6 23 / 0.64));
 }
 
 @keyframes stagger-enter {

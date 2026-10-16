@@ -43,6 +43,25 @@ test("the indicators open today's path", async ({ page }) => {
   await expect(sheet.getByText("0 of 3 complete")).toBeVisible();
 });
 
+test("a phone keeps the full date and opens palm and streak counts in today's path @cross-browser", async ({
+  page,
+}) => {
+  await openHome(page);
+  await page.setViewportSize({ width: 320, height: 740 });
+  const date = page.getByTestId("hijri-date");
+  await expect(date.locator("time")).toBeVisible();
+  expect(await date.evaluate((node) => node.querySelector("time")!.scrollWidth <= node.clientWidth + 1)).toBe(true);
+  const path = page.getByTestId("home-header-routine-summary-mobile");
+  await expect(path).toBeVisible();
+  await expect(path).toHaveAttribute("aria-label", /Today's path.*Enduring Palms.*Consecutive practice days/);
+  await expect(path.locator("svg")).toHaveCount(2);
+  await path.click();
+  const sheet = page.getByTestId("todays-path-sheet");
+  await expect(sheet).toBeVisible();
+  await expect(sheet).toContainText("Consecutive practice days:");
+  await expect(sheet).toContainText("Enduring Palms:");
+});
+
 test("the secondary congregation intention can be set from its disclosure", async ({ page }) => {
   await openHome(page);
   await page.getByTestId("home-header-routine-summary").click();

@@ -110,7 +110,6 @@ test("the Home Wird keeps semantic order while mirroring Arabic placement and ex
     expect(mobileCompanionBox.y + mobileCompanionBox.height).toBeLessThanOrEqual(mobileWirdBox.y);
   }
 
-  await page.getByRole("button", { name: "Show all prayers" }).click();
   const maghribLabel = page.locator("#prayer-card-heading-maghrib");
   await expect(maghribLabel).toHaveText("Maghrib");
   expect(
@@ -154,7 +153,7 @@ test("tablet and desktop Home keep prayer detail to the selected half while othe
   await expect(prayerDetail.locator(".hero-glass").first()).toBeVisible();
   await expect(primaryGlass).toBeVisible();
   await expect(companion.locator(".hero-glass").first()).toBeVisible();
-  await expect(prayerSummary.locator('article[data-density="summary"]')).toHaveCount(2);
+  await expect(prayerSummary.locator('article[data-density="summary"]')).toHaveCount(5);
   await expect(prayerSummary.getByRole("checkbox")).toHaveCount(0);
 
   await expect(async () => {
@@ -171,10 +170,9 @@ test("tablet and desktop Home keep prayer detail to the selected half while othe
       const rootSize = await page.locator("html").evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
       expect(Math.abs(prayerDetailBox.width - (gridBox.width - 1.25 * rootSize) / 2)).toBeLessThanOrEqual(2);
       expect(prayerDetailBox.x + prayerDetailBox.width).toBeCloseTo(gridBox.x + gridBox.width, 0);
-      expect(prayerSummaryBox.width).toBeLessThanOrEqual(40 * rootSize);
-      expect(prayerSummaryBox.width).toBeCloseTo(prayerDetailBox.width, 0);
-      expect(prayerSummaryBox.x).toBeCloseTo(prayerDetailBox.x, 0);
-      expect(Math.abs(prayerSummaryBox.y - contextStackBox.y)).toBeLessThanOrEqual(2);
+      expect(prayerSummaryBox.width).toBeCloseTo(gridBox.width, 0);
+      expect(prayerSummaryBox.x).toBeCloseTo(gridBox.x, 0);
+      expect(contextStackBox.y).toBeCloseTo(prayerSummaryBox.y + prayerSummaryBox.height + 1.25 * rootSize, 0);
       expect(prayerDetailBox.y).toBeCloseTo(prayerSummaryBox.y + prayerSummaryBox.height + 1.25 * rootSize, 0);
       expect(Math.abs(prayerDetailBox.width - contextStackBox.width)).toBeLessThanOrEqual(2);
       expect(primaryBox.width).toBeCloseTo(contextStackBox.width, 0);
@@ -201,7 +199,7 @@ test("tablet and desktop Home keep prayer detail to the selected half while othe
       const rootSize = await page.locator("html").evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
       expect(Math.abs(tabletPrayerBox.width - (tabletGridBox.width - rootSize) / 2)).toBeLessThanOrEqual(2);
       expect(tabletPrayerBox.x + tabletPrayerBox.width).toBeCloseTo(tabletGridBox.x + tabletGridBox.width, 0);
-      expect(tabletSummaryBox.width).toBeLessThanOrEqual(40 * rootSize);
+      expect(tabletSummaryBox.width).toBeCloseTo(tabletGridBox.width, 0);
       expect(Math.abs(tabletPrayerBox.y - tabletStackBox.y)).toBeLessThanOrEqual(2);
       expect(Math.abs(tabletPrayerBox.width - tabletStackBox.width)).toBeLessThanOrEqual(2);
     }
@@ -282,16 +280,15 @@ test("wide Home keeps navigation exposed, contains its scene, and uses glass for
       boxShadow: style.boxShadow,
     };
   });
-  expect(material.backgroundColor).toBe("rgba(15, 23, 42, 0.48)");
+  expect(material.backgroundColor).toBe("rgba(15, 23, 42, 0.2)");
   expect(material.backgroundImage).toContain("linear-gradient");
-  expect(material.backdropFilter).toContain("blur(18px)");
+  expect(material.backdropFilter).toContain("blur(12px)");
   expect(material.boxShadow).not.toBe("none");
 });
 
 test("Home prayer strip keeps all five prayers legible without page overflow", async ({ page }) => {
   await openReturningGuest(page, "ar");
   const strip = page.getByTestId("prayer-tracker-cards");
-  await page.getByRole("button", { name: "عرض جميع الصلوات" }).click();
   const cards = strip.locator('article[data-density="summary"]');
   await expect(cards).toHaveCount(5);
   await expect(strip.locator('article[aria-current="step"]')).toHaveCount(1);

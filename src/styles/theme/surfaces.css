@@ -182,7 +182,7 @@
 }
 
 /* Tracking rows use a transparent native checkbox over the whole 44px+ row.
-   Keep that generous hit area, but place keyboard focus on the visible round
+   Keep that generous hit area, but place keyboard focus on the visible checkbox
    indicator instead of drawing a rectangular outline around invisible input. */
 .tracking-choice:focus,
 .tracking-choice:focus-visible {

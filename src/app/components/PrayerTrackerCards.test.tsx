@@ -3,30 +3,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { PrayerTrackerCards, type PrayerCardModel } from "./PrayerTrackerCards";
 import type { PrayerName, PrayerTrackingRecord } from "../types";
 
-/**
- * The row shows a window onto the five prayers, not the first two of them.
- *
- * The window used to look right only in the morning: it opens on whatever is
- * current, and the screens that render it sampled `new Date()` once per mount,
- * so a page left open kept framing Fajr and Dhuhr into the evening. The clock
- * is fixed in `useNow`; what these tests hold is the other half — that given a
- * correct clock, the window lands on the prayers you can still act on.
- */
-
-/** jsdom has no matchMedia, and the tier the row picks is read from it. */
-function stubViewport(matchingQueries: string[]) {
-  vi.stubGlobal(
-    "matchMedia",
-    (query: string) =>
-      ({
-        matches: matchingQueries.includes(query),
-        media: query,
-        addEventListener: () => undefined,
-        removeEventListener: () => undefined,
-      }) as unknown as MediaQueryList,
-  );
-}
-
 const TIMES: Record<PrayerName, string> = {
   fajr: "04:52",
   dhuhr: "12:59",
@@ -74,6 +50,75 @@ function renderRow(current: PrayerName) {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("PrayerTrackerCards", () => {
+  it("uses concise saved-location and future-state footers without adding actions", () => {
+    render(
+      <PrayerTrackerCards
+        models={modelsWithCurrent("dhuhr").map((model) =>
+          model.state === "next" ? { ...model, remainingPercent: 60 } : model,
+        )}
+        language="en"
+        direction="ltr"
+        records={[
+          { dayKey: "2026-10-16", prayer: "fajr", mosque: false, adhkar: false, location: "home" },
+          { dayKey: "2026-10-16", prayer: "dhuhr", mosque: true, adhkar: false },
+        ]}
+        dayKey="2026-10-16"
+        onToggle={vi.fn()}
+        onOpen={vi.fn()}
+        summaryOnly
+        compactSummary
+      />,
+    );
+    const footer = (prayer: PrayerName) =>
+      screen.getByTestId(`prayer-card-${prayer}`).querySelector("[data-prayer-footer]");
+    expect(screen.getByTestId("prayer-card-fajr").querySelector("[data-prayer-detail]")).toHaveTextContent("At home");
+    expect(screen.getByTestId("prayer-card-dhuhr").querySelector("[data-prayer-detail]")).toHaveTextContent(
+      "At the mosque",
+    );
+    expect(footer("fajr")).toHaveTextContent("Rawatib: 2 before");
+    expect(footer("dhuhr")).toHaveTextContent("Rawatib: 4 before");
+    expect(footer("maghrib")).not.toHaveTextContent("Optional: 2 before");
+    expect(footer("maghrib")).toHaveTextContent("Rawatib: 2 after");
+    expect(footer("isha")).toHaveTextContent("Rawatib: 2 after");
+    expect(footer("asr")).toHaveTextContent("Optional: 4 before");
+    expect(footer("asr")?.querySelector("progress")).toBeNull();
+    expect(screen.getByTestId("prayer-card-asr").querySelector("progress")).not.toBeNull();
+    expect(screen.getAllByRole("button")).toHaveLength(5);
+    expect(footer("fajr")?.querySelector("button")).toBeNull();
+  });
+  it("shows all five prayers in order with a labelled countdown and today's recordable state", () => {
+    const models = modelsWithCurrent("isha").map((model): PrayerCardModel =>
+      model.prayer === "fajr" ? { ...model, state: "next", countdown: "06:00 left", remainingPercent: 60 } : model,
+    );
+    render(
+      <PrayerTrackerCards
+        models={models}
+        language="en"
+        direction="ltr"
+        records={[]}
+        dayKey="2026-10-15"
+        onToggle={vi.fn()}
+        onOpen={vi.fn()}
+        summaryOnly
+        compactSummary
+      />,
+    );
+    expect(screen.getAllByTestId(/^prayer-card-/).map((card) => card.dataset.prayer)).toEqual([
+      "fajr",
+      "dhuhr",
+      "asr",
+      "maghrib",
+      "isha",
+    ]);
+    const progress = screen.getByRole("progressbar", { name: "Time remaining until Fajr" });
+    expect(progress).toHaveAttribute("value", "60");
+    expect(progress).toHaveAttribute("aria-valuetext", "06:00 left");
+    expect(screen.queryByRole("button", { name: "Show all prayers" })).toBeNull();
+    expect(screen.getByRole("button", { name: "Open Dhuhr" })).toBeEnabled();
+    expect(screen.getByTestId("prayer-card-dhuhr")).toHaveTextContent("12:59 PM");
+    expect(progress.closest("button")).toBeNull();
+  });
+
   it("keeps the viewed prayer distinct from the current prayer and describes its time", () => {
     render(
       <PrayerTrackerCards
@@ -91,19 +136,20 @@ describe("PrayerTrackerCards", () => {
     expect(screen.getByTestId("prayer-card-fajr")).toHaveAttribute("data-selected", "true");
     expect(screen.getByTestId("prayer-card-fajr")).not.toHaveAttribute("aria-current");
     expect(screen.getByTestId("prayer-card-asr")).toHaveAttribute("aria-current", "step");
-    expect(screen.getByTestId("prayer-card-asr")).toHaveClass("border-primary", "bg-primary/15");
+    expect(screen.getByTestId("prayer-card-maghrib")).toHaveClass("border-primary", "bg-primary/15");
+    expect(screen.getByTestId("prayer-card-fajr")).toHaveTextContent("Viewing");
+    expect(screen.getByTestId("prayer-card-maghrib")).not.toHaveTextContent("Opens 30m before");
+    expect(screen.getByRole("button", { name: "Open Maghrib" })).toBeDisabled();
     expect(screen.getByTestId("prayer-card-fajr")).not.toHaveClass("border-primary");
     expect(screen.getByRole("button", { name: /Open Fajr/i })).toHaveAccessibleDescription(/4:52 AM/);
     expect(screen.getByTestId("prayer-card-asr")).toHaveTextContent("Now");
     expect(screen.getByTestId("prayer-card-maghrib")).toHaveTextContent("Next");
   });
   it("renders all five cards unconditionally", () => {
-    stubViewport([]);
     expect(renderRow("fajr")).toEqual(["fajr", "dhuhr", "asr", "maghrib", "isha"]);
   });
 
   it("shows sunrise as Fajr context without creating a sixth prayer card", () => {
-    stubViewport(["(min-width: 1024px)"]);
     renderRow("fajr");
 
     expect(screen.getByTestId("prayer-card-fajr")).toHaveTextContent("Sunrise: 6:18 AM");
@@ -112,7 +158,6 @@ describe("PrayerTrackerCards", () => {
   });
 
   it("keeps a summary row navigable without duplicating tracking controls", () => {
-    stubViewport(["(min-width: 1024px)"]);
     const onOpen = vi.fn();
     render(
       <PrayerTrackerCards
@@ -135,7 +180,6 @@ describe("PrayerTrackerCards", () => {
   });
 
   it("keeps long English prayer names visible instead of ellipsizing them", () => {
-    stubViewport([]);
     renderRow("asr");
 
     const heading = screen.getByRole("heading", { name: "Maghrib" });
@@ -153,7 +197,6 @@ describe("the card as a way into the prayer", () => {
   afterEach(() => vi.unstubAllGlobals());
 
   function renderRow(records: PrayerTrackingRecord[], onOpen = vi.fn()) {
-    stubViewport(["(min-width: 1024px)"]);
     render(
       <PrayerTrackerCards
         models={modelsWithCurrent("fajr")}

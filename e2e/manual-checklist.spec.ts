@@ -333,15 +333,11 @@ test("time-of-day imagery has no decorative overlay layer", async ({ page }) => 
   expect(imageWidth).toBeGreaterThan(0);
 });
 
-test("post-prayer summaries disclose all prayers and preserve actionable tracking", async ({ page }) => {
+test("post-prayer summaries show all prayers and preserve actionable tracking", async ({ page }) => {
   await page.clock.setFixedTime(new Date("2026-09-05T13:40:00+03:00"));
   await seedAndOpen(page);
   const grid = page.getByTestId("prayer-tracker-cards");
   const cards = grid.locator('article[data-density="summary"]');
-  await expect(cards).toHaveCount(2);
-  const toggle = page.getByRole("button", { name: "Show all prayers", exact: true });
-  await expect(toggle).toHaveAttribute("aria-expanded", "false");
-  await toggle.click();
   await expect(cards).toHaveCount(5);
   const future = cards.filter({ has: page.locator("button:disabled") });
   await expect(future).not.toHaveCount(0);

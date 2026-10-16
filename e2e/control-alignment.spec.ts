@@ -13,7 +13,6 @@ for (const language of ["ar", "en"] as const) {
     for (const width of [390, 820, 1440]) {
       await page.setViewportSize({ width, height: 900 });
       await page.goto("/#/home");
-      await page.getByRole("button", { name: t(language, "settings.showAllPrayers") }).click();
       const cards = page.locator('[data-density="summary"]');
       await expect(cards).toHaveCount(5);
       await page.evaluate(() => document.fonts.ready);
