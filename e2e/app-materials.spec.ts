@@ -58,6 +58,19 @@ for (const language of ["ar", "en"] as const) {
             root.classList.add(`theme-${theme}`);
             root.classList.toggle("dark", theme !== "light");
           }, theme);
+          const mutedColor = await page.evaluate(() => {
+            const probe = document.createElement("span");
+            probe.style.color = "var(--muted-foreground)";
+            document.body.append(probe);
+            const color = getComputedStyle(probe).color;
+            probe.remove();
+            return color;
+          });
+          const progressPhrases = page.getByTestId("category-card-morning").locator("bdi");
+          await expect(progressPhrases).toHaveCount(2);
+          for (const phrase of await progressPhrases.all()) {
+            await expect(phrase).toHaveCSS("color", mutedColor);
+          }
           expect((await new AxeBuilder({ page }).include(".app-main").analyze()).violations).toEqual([]);
           await page.screenshot({ path: testInfo.outputPath(`app-glass-${theme}-${language}.png`) });
         }

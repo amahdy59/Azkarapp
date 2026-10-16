@@ -1,5 +1,18 @@
 [
   {
+    "release": "2026-10-16.12",
+    "ar": [
+      "يبقى تقدّم مجموعات الأذكار واضحًا عند التبديل بين المظهر الفاتح والداكن.",
+      "تحتفظ ملخّصات المجموعات بتباين مقروء في بطاقات المكتبة الزجاجية.",
+      "تتبع أعداد الأذكار المكتملة المظهر النشط بالعربية والإنجليزية مع الحفاظ على اتجاه النص."
+    ],
+    "en": [
+      "Collection progress stays readable when switching between Light and dark themes.",
+      "Collection summaries retain readable contrast on Glass library cards.",
+      "Completed-item counts follow the active theme in Arabic and English while preserving text direction."
+    ]
+  },
+  {
     "release": "2026-10-16.11",
     "ar": [
       "اختيار أبسط بين معتم وزجاجي للتطبيق كله، مع تخصيص اختياري للرئيسية وخلفيتها الحالية على صفحات المظهر الزجاجي، وبقاء القراءة معتمة.",

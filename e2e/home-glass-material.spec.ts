@@ -334,11 +334,21 @@ for (const themeMode of ["light", "dark", "midnight"]) {
       for (const width of [320, 390, 834, 1440]) {
         await page.setViewportSize({ width, height: 1000 });
         const surfaces = page.locator(".home-photo-canvas .hero-glass.home-glass-surface");
-        await expect.poll(() => surfaces.count()).toBeGreaterThan(10);
-        for (const surface of await surfaces.all()) {
-          await expect(surface).toHaveCSS("backdrop-filter", "blur(16px) saturate(1.35)");
-          expect(await surface.evaluate((node) => getComputedStyle(node).backgroundColor)).toMatch(/^rgba\(/);
-        }
+        // A breakpoint can replace the prayer summary while it is sampled.
+        // Check every currently mounted surface in one DOM snapshot rather
+        // than retaining nth-locators into a changing list.
+        await expect
+          .poll(() =>
+            surfaces.evaluateAll((nodes) => {
+              const styles = nodes.map((node) => getComputedStyle(node));
+              return {
+                countAboveTen: nodes.length > 10,
+                filters: [...new Set(styles.map((style) => style.backdropFilter))],
+                translucent: styles.every((style) => /^rgba\(/.test(style.backgroundColor)),
+              };
+            }),
+          )
+          .toEqual({ countAboveTen: true, filters: ["blur(16px) saturate(1.35)"], translucent: true });
         expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBe(0);
       }
     });
