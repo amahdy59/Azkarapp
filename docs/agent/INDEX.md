@@ -1,5 +1,7 @@
 # AI Improvement System Index
 
+Current owner-authorized continuation: [Image-first sharing](phases/IMAGE_FIRST_SHARING_2026_10_17.md). Prioritize image previews/export globally in the shared studio, give Text/Link less visual weight, preserve approved art and content, and keep performance/fallback behavior explicit.
+
 Current exact-commit release correction: [Library theme contrast](phases/LIBRARY_THEME_CONTRAST_2026_10_16.md). Resolve nested progress phrases against the active semantic colour after WebKit exposed stale dark-theme inheritance; retain bidi text and unchanged axe checks. Existing direct-main release authority applies.
 
 Current bounded release repair: [QA backend isolation and presence diagnosis](phases/RELEASE_QA_ISOLATION_2026_10_16.md). Isolate browser builds from production API writes, explicitly select Glass in the on-media test and finish exact-commit release verification. Keep the current billing plan and report the confirmed D1 quota recovery limit honestly.

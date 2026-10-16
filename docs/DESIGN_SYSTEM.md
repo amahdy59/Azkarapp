@@ -1,5 +1,9 @@
 # Azkar design system
 
+## Image-first sharing — 2026-10-17
+
+The owner gives image exports priority. Image is the larger, filled method choice; Text/Link stay directly reachable with quieter styling and explicit pressed state. The phone preview precedes artwork source/customization, and no redundant boxed frame surrounds the card. Existing 1080px formats, readable Arabic minima, reviewed artwork, pagination and exact text remain unchanged. Ready-made packs show their overview and actual pack count; generated palette/content controls are hidden when they cannot change the artwork. Share/Save retain priority over quiet Copy. Image mode never silently copies words when image copying is unsupported: explain Save or explicit Text recovery. Milestones compose the same studio with localized counts/date and no repetition badges. Ayah sharing retains its existing image-first/footer and secondary text disclosure.
+
 ## Owner appearance simplification — 2026-10-16
 
 Primary appearance is two options: معتم / زجاجي (Opaque / Glass), applied throughout the app. Home-only customization is progressively disclosed, with a same-as-app switch and the same two choices. Existing values survive normalization; device/contrast fallbacks remain automatic. Glass interface pages reuse the current Home photograph behind a stable theme veil and translucent surfaces; reading remains opaque and navigation does not animate the scene. Listening protection leaves text, progress and playback visible behind a transparent interaction shield, with a small safe-area hold-to-unlock control. It is accidental-touch protection, not an OS or security lock.

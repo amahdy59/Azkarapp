@@ -1,5 +1,9 @@
 # Application architecture
 
+## Shared image-first export — 2026-10-17
+
+The existing collection studio also composes milestone export through localized ShareItem summaries with hideRepetition. It receives local count/date props; no progress data is fetched, persisted or shared without an explicit action. Portrait is a per-composition initial format; the same measured canvas renderer, semantic preview, PNG/ZIP dispatcher, cancellation and URL cleanup remain authoritative. Ready-made pack files load only on explicit selection. Image copy capability is checked for the actual selection and cannot silently substitute text. Supplied art and reviewed devotional payloads remain unchanged.
+
 ## Release QA backend isolation — 2026-10-16
 
 The browser preview build overrides the Cloudflare API origin with a loopback-only namespace through scripts/browser-test-environment.mjs. Test request fixtures retain the same API boundary without producing real presence/device writes. The preview override does not affect production or Pages builds; deliberate live health/smoke is separate. The 2026-10-16 investigation confirmed D1 write-quota exhaustion (API code 7500), so the visible counter can remain unavailable until the allowance resets even when its provider/UI is mounted correctly. No fake count, paid-plan change or persisted-data rewrite is used to hide this condition.

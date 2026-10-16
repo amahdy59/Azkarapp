@@ -210,7 +210,8 @@ describe("CollectionShareModal", () => {
     expect(screen.getByText("1 card to share")).toBeVisible();
     const image = screen.getByRole("button", { name: "Image", exact: true });
     const current = screen.getByRole("button", { name: "This card", exact: true });
-    expect(image).toHaveClass("border-primary", "bg-muted");
+    expect(image).toHaveClass("bg-primary", "text-primary-foreground");
+    expect(image).toHaveAttribute("aria-pressed", "true");
     expect(current).toHaveClass("border-primary", "bg-muted");
     fireEvent.click(screen.getByRole("button", { name: "Selected cards", exact: true }));
     expect(screen.getByText("No cards selected to share")).toBeVisible();
@@ -557,7 +558,7 @@ describe("CollectionShareModal", () => {
       vi.mocked(canShareMultipleFiles).mockReturnValue(true);
     }
   });
-  it("copies the selected text for multiple images and saves text without native sharing", async () => {
+  it("keeps multi-image copying explicit and copies words only in Text mode", async () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
     const descriptor = Object.getOwnPropertyDescriptor(navigator, "clipboard");
     Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText } });
@@ -569,10 +570,13 @@ describe("CollectionShareModal", () => {
       );
       await screen.findByRole("img");
       fireEvent.click(screen.getByRole("button", { name: "Entire collection", exact: true }));
+      expect(screen.getByRole("button", { name: "Copy", exact: true })).toBeDisabled();
+      expect(screen.getByRole("button", { name: "Copy", exact: true })).toHaveAccessibleDescription(/choose Text/);
+      expect(writeText).not.toHaveBeenCalled();
+      fireEvent.click(screen.getByRole("button", { name: "Text", exact: true }));
       fireEvent.click(screen.getByRole("button", { name: "Copy", exact: true }));
       await waitFor(() => expect(writeText).toHaveBeenCalledWith(expect.stringContaining(SAMPLE_ITEMS[0]!.arabicText)));
       await waitFor(() => expect(screen.getByRole("button", { name: "Copy", exact: true })).toBeEnabled());
-      fireEvent.click(screen.getByRole("button", { name: "Text", exact: true }));
       fireEvent.click(screen.getByRole("button", { name: "Save", exact: true }));
       expect(downloadFile).toHaveBeenCalledWith(
         expect.objectContaining({ name: "azkar.txt", type: "text/plain;charset=utf-8" }),
@@ -602,9 +606,12 @@ describe("CollectionShareModal", () => {
       />,
     );
 
+    await screen.findByAltText("أذكار الصباح - صفحة 1 من 5");
+    expect(fetch).not.toHaveBeenCalled();
     fireEvent.click(await screen.findByRole("button", { name: "البطاقات المعتمدة" }));
     expect(await screen.findByAltText(/أذكار الصباح - البطاقة الأولى/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "البطاقات المعتمدة" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.queryByText("إعدادات الصورة", { exact: true })).not.toBeInTheDocument();
 
     const nextBtn = screen.getByRole("button", { name: "البطاقة التالية" });
     fireEvent.click(nextBtn);
@@ -634,6 +641,7 @@ describe("CollectionShareModal", () => {
           language="ar"
         />,
       );
+      fireEvent.click(await screen.findByRole("button", { name: "البطاقات المعتمدة" }));
       expect(await screen.findByAltText("أذكار الصباح - صفحة 1 من 5")).toBeInTheDocument();
       expect(screen.queryByRole("button", { name: "البطاقات المعتمدة" })).not.toBeInTheDocument();
     } finally {

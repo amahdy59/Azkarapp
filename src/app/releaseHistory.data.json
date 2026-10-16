@@ -1,5 +1,18 @@
 [
   {
+    "release": "2026-10-17.1",
+    "ar": [
+      "مشاركة الصور أوضح ومعاينتها أكبر، مع خيارات نص ورابط أهدأ وإعدادات البطاقات بعد المعاينة.",
+      "يمكن الآن معاينة بطاقة التقدم وحفظها ومشاركتها كصورة، مع اختيار لغة البطاقة ومظهرها.",
+      "تُحمّل البطاقات الجاهزة عند اختيارها فقط، وتظهر إعدادات تخص التصميم المحدد، مع توضيح بدائل نسخ الصور."
+    ],
+    "en": [
+      "Image sharing has a larger preview and clearer priority, with quieter Text and Link choices and card settings after the preview.",
+      "Preview, save and share your progress as an image, with card language and appearance choices.",
+      "Ready-made artwork loads only when selected, settings match the chosen design, and image-copy alternatives are explained."
+    ]
+  },
+  {
     "release": "2026-10-16.12",
     "ar": [
       "يبقى تقدّم مجموعات الأذكار واضحًا عند التبديل بين المظهر الفاتح والداكن.",

@@ -1,5 +1,9 @@
 # Decision Log
 
+## 2026-10-17 — Image sharing takes priority
+
+The owner requests global sharing/visual organization with image export weighted above Text/Link and authorizes thoughtful improvements. Keep the generated studio as the existing default and supplied artwork unchanged. Increase the image preview, move artwork controls below it on phones, quiet secondary methods/Copy, show only applicable settings, and fetch alternate packs only on selection. Explicit Image copying must not silently send words; Text remains available. Milestone sharing joins the existing image studio with unchanged localized metrics/date, no devotional repetition metadata and explicit-only export. Preserve source/content policy, native cancellation, offline files, accessibility and release gates.
+
 ## 2026-10-16 — Owner simplifies appearance and requests visible locked learning
 
 The owner requests two visible appearance choices, Opaque/Glass for all, the current Home photograph on Glass pages, and unobscured text/audio while touch controls are locked. This supersedes the earlier visible Follow device and four-way Home selector: retain stored compatibility and place independent Home appearance behind optional customization. Global selection applies to Home too, even if reselected; Home can subsequently override. Keep solid reading, automatic contrast/device fallbacks and no extra animated blur. Retain the approved two-second hold, focus restoration and Escape recovery for the transparent touch shield. Full existing main release gates and production verification remain required.

@@ -1,11 +1,8 @@
-import { useRef, useState } from "react";
-import { CheckCircle2, Leaf, Share2, X } from "../components/icons";
 import type { AppLanguage } from "../types";
+import type { ShareItem } from "../share/shareLayout";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
-import { PalmTreeMark } from "./RoutineGarden";
-import { Modal } from "./ResponsiveSheet";
-import { reportError } from "../../lib/observability";
+import { CollectionShareModal } from "./CollectionShareModal";
 
 interface ShareableCardModalProps {
   palms: number;
@@ -16,152 +13,44 @@ interface ShareableCardModalProps {
   onClose: () => void;
 }
 
+/** Milestones use the same image/export boundary as the rest of sharing. */
 export function ShareableCardModal({ palms, golden, green, dateStr, language, onClose }: ShareableCardModalProps) {
-  const isArabic = language === "ar";
-  const direction = isArabic ? "rtl" : "ltr";
-  const cardRef = useRef<HTMLDivElement | null>(null);
-  const [isSharing, setIsSharing] = useState(false);
-  const [shareStatus, setShareStatus] = useState<{ message: string; error: boolean } | null>(null);
-
-  const handleShare = async () => {
-    if (isSharing) return;
-    try {
-      setIsSharing(true);
-      setShareStatus({ message: t(language, "shareModal.sharing"), error: false });
-      const text = t(language, "shareModal.text", {
-        palms: formatNumerals(palms, language),
-        golden: formatNumerals(golden, language),
-        green: formatNumerals(green, language),
-      });
-      const url = new URL(import.meta.env.BASE_URL, window.location.origin).href;
-      if (navigator.share) {
-        await navigator.share({
-          title: t(language, "shareModal.title"),
-          text,
-          url,
-        });
-        setShareStatus({ message: t(language, "shareModal.shared"), error: false });
-      } else {
-        await navigator.clipboard.writeText(`${text}\n${url}`);
-        setShareStatus({ message: t(language, "shareModal.copied"), error: false });
-      }
-    } catch (error) {
-      if (error instanceof DOMException && error.name === "AbortError") {
-        setShareStatus({ message: t(language, "shareModal.cancelled"), error: false });
-      } else {
-        reportError(error, "progress-share");
-        setShareStatus({ message: t(language, "shareModal.error"), error: true });
-      }
-    } finally {
-      setIsSharing(false);
-    }
-  };
+  const shareItemsByLanguage = Object.fromEntries(
+    (["ar", "en"] as const).map((exportLanguage) => [
+      exportLanguage,
+      [
+        {
+          id: "recorded-practice",
+          title: t(exportLanguage, "shareModal.title"),
+          arabicText: [
+            `${t(exportLanguage, "shareModal.palmDays")}: ${formatNumerals(palms, exportLanguage)}`,
+            `${t(exportLanguage, "shareModal.dailyRoutines")}: ${formatNumerals(golden, exportLanguage)}`,
+            `${t(exportLanguage, "shareModal.additionalPractice")}: ${formatNumerals(green, exportLanguage)}`,
+            dateStr,
+          ].join("\n"),
+          textDirection: exportLanguage === "ar" ? "rtl" : "ltr",
+          language: exportLanguage,
+          hideRepetition: true,
+        } satisfies ShareItem,
+      ],
+    ]),
+  ) as Record<AppLanguage, ShareItem[]>;
 
   return (
-    <Modal
+    <CollectionShareModal
       open
+      single
+      initialFormat="portrait"
       onClose={onClose}
-      title={t(language, "shareModal.dialogAria")}
-      direction={direction}
-      maxWidthClassName="max-w-sm"
-      className="border-border bg-card p-5 text-foreground sm:p-6"
-    >
-      <div className="relative">
-        {/* Close Button — dynamically positioned based on direction */}
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label={t(language, "common.cancel")}
-          className="absolute end-3 top-3 z-10 flex size-11 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-sm transition-[color,background-color,border-color,transform] hover:bg-muted hover:text-foreground active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:end-4 sm:top-4"
-        >
-          <X size={18} />
-        </button>
-
-        {/* Shareable Card Content */}
-        <div
-          ref={cardRef}
-          className="flex flex-col items-center rounded-2xl border border-border bg-card p-6 text-center shadow-sm"
-          dir={direction}
-        >
-          {/* Logo Badge */}
-          <div className="flex items-center gap-2 text-sm font-black tracking-wider text-primary">
-            <PalmTreeMark
-              size={20}
-              filled={palms > 0}
-              className={palms > 0 ? "text-primary" : "text-muted-foreground opacity-40"}
-              aria-hidden="true"
-            />
-            <span>{t(language, "common.azkar")}</span>
-          </div>
-
-          <p className="mt-4 text-lg font-black leading-snug text-foreground">
-            {t(language, "shareModal.mayAllahAccept")}
-          </p>
-
-          <p className="mt-1.5 text-label font-semibold text-muted-foreground">
-            {t(language, "shareModal.completedSubtitle")}
-          </p>
-
-          {/* Stats Badge Pill Row */}
-          <dl
-            className="my-5 flex w-full overflow-hidden rounded-2xl border border-border bg-muted/40 shadow-sm"
-            aria-label={t(language, "progress.dailyStreak")}
-          >
-            <div className="flex min-w-0 flex-1 flex-col items-center gap-1 border-e border-border p-3">
-              <PalmTreeMark
-                size={24}
-                filled={palms > 0}
-                className={palms > 0 ? "text-primary" : "text-muted-foreground/40"}
-                aria-hidden="true"
-              />
-              <dd className={`text-subtitle font-black ${palms > 0 ? "text-primary" : "text-muted-foreground/60"}`}>
-                {formatNumerals(palms, language)}
-              </dd>
-              <dt className="text-micro font-bold text-muted-foreground">{t(language, "shareModal.palmDays")}</dt>
-            </div>
-            <div className="flex min-w-0 flex-1 flex-col items-center gap-1 border-e border-border p-3">
-              <CheckCircle2 size={24} className="text-success" aria-hidden="true" />
-              <dd className="text-subtitle font-black text-success">{formatNumerals(golden, language)}</dd>
-              <dt className="text-micro font-bold text-muted-foreground">{t(language, "shareModal.dailyRoutines")}</dt>
-            </div>
-            <div className="flex min-w-0 flex-1 flex-col items-center gap-1 p-3">
-              <Leaf size={24} className="text-info" aria-hidden="true" />
-              <dd className="text-subtitle font-black text-info">{formatNumerals(green, language)}</dd>
-              <dt className="text-micro font-bold text-muted-foreground">
-                {t(language, "shareModal.additionalPractice")}
-              </dt>
-            </div>
-          </dl>
-
-          {/* Date Label */}
-          <span className="text-xs font-extrabold text-muted-foreground" dir={direction}>
-            {dateStr}
-          </span>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="mt-5 flex gap-3">
-          <button
-            type="button"
-            onClick={() => void handleShare()}
-            disabled={isSharing}
-            aria-busy={isSharing || undefined}
-            className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-2xl bg-primary py-3 text-subtitle font-black text-primary-foreground shadow-md transition-[color,background-color,border-color,box-shadow,opacity,transform] hover:bg-primary active:scale-95 disabled:cursor-wait disabled:opacity-60"
-          >
-            <Share2 size={18} />
-            <span>{t(language, "shareModal.shareMilestone")}</span>
-          </button>
-        </div>
-        {shareStatus && (
-          <p
-            className={`mt-3 text-center text-label font-semibold ${shareStatus.error ? "text-destructive" : "text-primary"}`}
-            role={shareStatus.error ? "alert" : "status"}
-            aria-live={shareStatus.error ? undefined : "polite"}
-          >
-            {shareStatus.message}
-          </p>
-        )}
-      </div>
-    </Modal>
+      dialogTitle={t(language, "shareModal.dialogAria")}
+      dialogDescription={t(language, "shareModal.completedSubtitle")}
+      collectionTitle={t(language, "shareModal.mayAllahAccept")}
+      collectionTitleArabic={t("ar", "shareModal.mayAllahAccept")}
+      collectionTitleEnglish={t("en", "shareModal.mayAllahAccept")}
+      items={[]}
+      shareItemsByLanguage={shareItemsByLanguage}
+      shareUrl={new URL(import.meta.env.BASE_URL, window.location.origin).href}
+      language={language}
+    />
   );
 }

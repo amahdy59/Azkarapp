@@ -2347,6 +2347,8 @@ const en = {
     saveChosen: "Save images · ZIP",
     method: "Sharing method",
     image: "Image",
+    imageCopyUnavailable:
+      "Image copying is unavailable for this selection. Save the images, or choose Text to copy words.",
     curatedTab: "Curated cards",
     curatedHint: "Designed cards containing the full routine in high resolution",
     generatedTab: "Interactive studio",
