@@ -1,5 +1,9 @@
 # Content authoring guide
 
+## Friday prayer guidance, owner approval — 2026-10-16
+
+The owner approved the Jumu‘ah checklist and evidence approach explicitly in this conversation. Source module: src/app/content/fridayPrayer.ts. Four after Jumu‘ah: https://sunnah.com/muslim:881a. Two at home, reported from Ibn ‘Umar about the Prophet ﷺ: https://sunnah.com/muslim:882a. The complete Friday benefit: https://sunnah.com/muslim:857a. Arabic evidence retains the source wording; English is a faithful meaning rendered for the app. The information sheet identifies the alternatives rather than adding the counts. This records product approval, not independent scholarly review. Weekday Dhuhr evidence and the twelve-rawatib explanation remain unchanged and are not presented as Friday guidance.
+
 ## After-salat learning arrangement — 2026-10-12
 
 The after-prayer collection uses a stable learning sequence: opening forgiveness/peace, tawhid/giving, 33/33/33 tasbih with its concluding tawhid, supplication, then Quran recitation. Numbered editorial stages are explicitly described as a learning aid, not a prescribed complete order. Related entries share group metadata and a presentation surface; original IDs, reviewed wording, sources, repetition counts and prayer-specific filtering remain unchanged. Do not replace independent records with concatenated text or remove their counters as a visual shortcut. See [the local phase](agent/phases/AFTER_PRAYER_LEARNING_ORDER_2026_10_12.md).

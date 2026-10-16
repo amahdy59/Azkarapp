@@ -459,7 +459,8 @@ for (const language of ["ar", "en"] as const) {
         expect(material.filter).toBe("none");
         expect(material.color).toBe("rgb(2, 6, 23)");
       } else {
-        expect(material.filter).toEqual(expect.stringContaining("blur"));
+        expect(material.filter).toBe("none");
+        expect(await caption.evaluate((node) => getComputedStyle(node).backgroundImage)).toContain("linear-gradient");
       }
       await page.goto("/#/settings/appearance");
       await transparency.click();

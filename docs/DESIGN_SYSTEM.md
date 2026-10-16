@@ -1,5 +1,13 @@
 # Azkar design system
 
+## Full-photo Wird and single liquid connector — 2026-10-16
+
+The owner replaces the separate top photograph/caption with full-card decorative imagery and one contrast gradient, retaining the existing tile sizes and responsive grid. Restore compact completion and fruit badges using the established five fruits per completed routine, twenty daily total. Opaque preference/high-contrast captions remain supported.
+
+Replace paired prayer notches with one 72px-wide mirrored SVG neck spanning the measured gap. The selected-card bottom and expanded-card top borders each stop at the neck; its two exterior curves carry the same glass accent token, so the outline reads as one shape. It is aria-hidden, pointer-inert and stationary; selection semantics and all existing spacing remain unchanged. Hide the connection when its selected anchor scrolls out of view.
+
+Normal Home translucency stays at the existing values. Failed or stalled background loads switch Home to opaque theme surfaces for that scene without mutating preferences; new scenes may retry. Versioned R2 delivery keeps responsive AVIF/WebP and immutable caching, while local/native builds retain packaged files. The product illustrations use sub-1KiB WebP previews beneath their AVIF/WebP pictures; Friday requests its full artwork eagerly and retains a decorative icon if its requests fail, preventing a blank benefit card during decode.
+
 ## Home glass across card families — 2026-10-16
 
 The latest owner request strengthens the shared normal-transparency Home material across prayer summaries, the expanded prayer panel, routine and evidence cards, image-free Wird tiles, situational shortcuts, Friday content and utility cards at phone and desktop sizes. Standard card tint is 18% navy over the existing contrast-bounded photograph, with 16px blur/135% saturation, a 5.5% default directional sheen, a 30% light edge and a brighter inset reflection. The prayer focus may raise the sheen to 7% while keeping ordinary cards visually quiet. Long devotional reading remains denser at 28% navy; photo-enabled Wird tiles retain full-opacity artwork with one frosted caption. No card gains a nested backdrop filter. The existing 4.5:1 conservative bright-photo contrast check, opaque reduced-transparency/high-contrast fallbacks, content, grid and interactions remain authoritative. This supersedes the earlier 20% standard / 32% reading tint and weaker edge values below. Local screenshots are required before publication.

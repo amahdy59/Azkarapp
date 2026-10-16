@@ -1,5 +1,6 @@
 import { BookOpen, Calendar, Check, ChevronNext, Info, MoonStar, Sunrise, Sunset } from "./icons";
-import { formatNumerals } from "../formatting";
+import { formatNumerals, formatRatio } from "../formatting";
+import { THIMAR_PER_ROUTINE, TOTAL_DAILY_THIMAR } from "../oasis/oasisModel";
 import { t } from "../i18n";
 import type { AppLanguage, CategoryId } from "../types";
 import type { GardenSummary } from "../progress";
@@ -60,6 +61,7 @@ export function HomeWirdSection({
       onPress: quranWird.onPress,
     },
   ];
+  const completedCount = items.filter((item) => item.complete).length;
   return (
     <section
       data-testid="today-garden-card"
@@ -87,6 +89,26 @@ export function HomeWirdSection({
           </button>
         )}
       </div>
+      <div className="mb-3 flex flex-wrap items-center gap-2 text-label font-semibold" data-testid="home-wird-summary">
+        <span className="rounded-full border border-current/20 px-3 py-1.5">
+          <span className="sr-only">
+            {t(language, "prayerActions.completedCount", {
+              count: formatNumerals(completedCount, language),
+              total: formatNumerals(items.length, language),
+            })}
+          </span>
+          <bdi aria-hidden="true">{formatRatio(completedCount, items.length, language)}</bdi>
+        </span>
+        <span className="rounded-full border border-current/20 px-3 py-1.5" data-testid="thimar-progress-badge">
+          <span aria-hidden="true">🌱 </span>
+          <bdi>
+            {t(language, "progress.todayThimarProgress", {
+              earned: formatNumerals(completedCount * THIMAR_PER_ROUTINE, language),
+              total: formatNumerals(TOTAL_DAILY_THIMAR, language),
+            })}
+          </bdi>
+        </span>
+      </div>
       <div className="home-wird-grid">
         {items.map(({ id, name, Icon, image, complete, status, onPress }) => (
           <button
@@ -110,6 +132,10 @@ export function HomeWirdSection({
                 src={`${import.meta.env.BASE_URL}assets/cards/${image}`}
                 alt=""
                 loading="lazy"
+                decoding="async"
+                onError={(event) => {
+                  event.currentTarget.hidden = true;
+                }}
                 className="home-wird-photo-image"
               />
             )}
@@ -119,7 +145,7 @@ export function HomeWirdSection({
               </span>
             )}
             <div
-              className={`home-wird-caption ${showImages ? (onGlass ? "hero-glass home-glass-surface" : "home-wird-photo-solid") : ""}`}
+              className={`home-wird-caption ${showImages ? `home-wird-photo-caption ${onGlass ? "" : "home-wird-photo-solid"}` : ""}`}
             >
               <Icon
                 size={28}

@@ -24,7 +24,10 @@ export function ProductImage({
 }) {
   const base = `${import.meta.env.BASE_URL}images/${name}`;
   return (
-    <picture>
+    <picture
+      className="absolute inset-0 block bg-cover bg-center"
+      style={{ backgroundImage: `url(${base}-placeholder.webp)` }}
+    >
       <source srcSet={`${base}.avif`} type="image/avif" />
       <source srcSet={`${base}.webp`} type="image/webp" />
       <img
@@ -34,6 +37,9 @@ export function ProductImage({
         height={1254}
         loading={loading}
         decoding="async"
+        onError={(event) => {
+          event.currentTarget.hidden = true;
+        }}
         className={className}
       />
     </picture>

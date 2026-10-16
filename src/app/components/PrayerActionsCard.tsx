@@ -61,9 +61,12 @@ export function PrayerActionsCard({
     [dayKey, prayer, records],
   );
 
-  const actions = useMemo(() => getPrayerActions({ prayer, language, record }), [prayer, language, record]);
+  const actions = useMemo(
+    () => getPrayerActions({ prayer, language, record, dayKey }),
+    [prayer, language, record, dayKey],
+  );
 
-  const infoData = useMemo(() => getPrayerInfoData(prayer, language), [prayer, language]);
+  const infoData = useMemo(() => getPrayerInfoData(prayer, language, dayKey), [prayer, language, dayKey]);
 
   const titleColor = onGlass ? "text-on-media" : "text-foreground";
   const Heading = headingLevel === 2 ? "h2" : "h3";

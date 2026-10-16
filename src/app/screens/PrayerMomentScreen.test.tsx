@@ -173,11 +173,11 @@ describe("the prayer as one surface", () => {
 
   it("renders the prayer actions card with prayer-specific deeds", () => {
     renderScreen({ prayer: "dhuhr" });
-    expect(screen.getByRole("heading", { level: 2, name: /أعمال صلاة الظهر/ })).toBeInTheDocument();
-    expect(screen.getByTestId("prayer-action-location")).toHaveTextContent("صليت الظهر جماعة");
-    expect(screen.getByTestId("prayer-action-dhuhr-sunnah-before")).toHaveTextContent("أربع ركعات قبل الظهر");
+    expect(screen.getByRole("heading", { level: 2, name: /أعمال صلاة الجمعة/ })).toBeInTheDocument();
+    expect(screen.getByTestId("prayer-action-location")).toHaveTextContent("صليت الجمعة جماعة");
+    expect(screen.queryByTestId("prayer-action-dhuhr-sunnah-before")).toBeNull();
     expect(screen.getByTestId("prayer-action-dhuhr-adhkar")).toHaveTextContent("أذكار بعد الصلاة");
-    expect(screen.getByTestId("prayer-action-dhuhr-sunnah-after")).toHaveTextContent("ركعتان بعد الظهر");
+    expect(screen.getByTestId("prayer-action-dhuhr-sunnah-after")).toHaveTextContent("سنة بعد الجمعة");
   });
 
   it("names an encouraged sunnah in More Info, not as one of the twelve", () => {

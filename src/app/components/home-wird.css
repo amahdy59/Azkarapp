@@ -121,14 +121,26 @@
 }
 .home-wird-photo .home-wird-caption {
   width: 100%;
-  height: auto;
-  min-height: 9rem;
+  height: 100%;
+  min-height: 13rem;
   padding: 1rem;
-  margin-top: 4rem;
+  padding-top: 4rem;
+  justify-content: flex-end;
   border-radius: 0;
 }
-.home-wird-photo .hero-glass.home-glass-surface {
-  --home-glass-tint: rgb(2 6 23 / 0.66);
+.home-wird-photo-caption {
+  background: linear-gradient(to bottom, rgb(2 6 23 / 0.08), rgb(2 6 23 / 0.62) 35%, rgb(2 6 23 / 0.92));
+  color: var(--on-media);
+  --muted-foreground: var(--on-media-muted);
+}
+.high-contrast .home-wird-photo-caption,
+.reduce-transparency .home-wird-photo-caption {
+  background: var(--on-media-surface);
+}
+@media (prefers-reduced-transparency: reduce), (forced-colors: active) {
+  .home-wird-photo-caption {
+    background: var(--on-media-surface);
+  }
 }
 .home-wird-photo-solid {
   background: var(--on-media-surface);
@@ -279,36 +291,77 @@
   outline-offset: -4px;
 }
 .home-prayer-summary-card[data-selected="true"] {
-  outline: 1px solid currentColor;
-  outline-offset: -4px;
+  --prayer-join-stroke: var(--primary);
+  border-color: var(--prayer-join-stroke);
+  border-bottom-color: transparent;
 }
-/* Paired stationary tips suggest joined droplets without drawing across the
-   adjacent column or placing another frosted layer over the photograph. */
-.home-prayer-summary-card[data-selected="true"]::before,
-.home-prayer-connected-panel::before {
+.home-prayer-summary-card.hero-glass[data-selected="true"] {
+  --prayer-join-stroke: var(--on-media-accent);
+}
+/* The two straight edges stop at the neck so the silhouette stays continuous. */
+.home-prayer-summary-card[data-selected="true"]::after,
+.home-prayer-connected-panel::after {
   content: "";
   position: absolute;
-  width: 1.5rem;
-  height: 0.5rem;
-  left: calc(var(--prayer-notch-x, 50%) - 0.75rem);
-  opacity: var(--prayer-notch-opacity, 0);
+  left: 0.75rem;
+  right: 0.75rem;
+  height: 1px;
   pointer-events: none;
-  background: var(--card);
-  border: 1px solid var(--primary);
-  z-index: 1;
+  background: linear-gradient(
+    to right,
+    var(--prayer-join-stroke) 0,
+    var(--prayer-join-stroke) calc(var(--prayer-notch-x) - 1.75rem),
+    transparent calc(var(--prayer-notch-x) - 1.75rem),
+    transparent calc(var(--prayer-notch-x) + 1.75rem),
+    var(--prayer-join-stroke) calc(var(--prayer-notch-x) + 1.75rem),
+    var(--prayer-join-stroke) 100%
+  );
 }
-.home-prayer-summary-card[data-selected="true"]::before {
-  bottom: -0.4375rem;
-  border-top: 0;
-  border-radius: 0 0 0.75rem 0.75rem;
-}
-.home-prayer-summary-card.hero-glass[data-selected="true"]::before,
-.home-prayer-connected-panel:has(.hero-glass)::before {
-  background: var(--on-media-surface);
-  border-color: var(--on-media-accent);
+.home-prayer-summary-card[data-selected="true"]::after {
+  bottom: 0;
 }
 .home-prayer-connected-panel {
   position: relative;
+  --prayer-join-stroke: var(--primary);
+}
+.home-prayer-connected-panel:has(.hero-glass) {
+  --prayer-join-stroke: var(--home-glass-accent);
+}
+.home-prayer-connected-panel > div > article {
+  border-top-color: transparent;
+}
+.home-prayer-connected-panel::after {
+  top: 0;
+  z-index: 3;
+}
+.home-prayer-bridge {
+  position: absolute;
+  left: calc(var(--prayer-notch-x, 50%) - 2.25rem);
+  bottom: 100%;
+  width: 4.5rem;
+  height: var(--prayer-bridge-height, 0px);
+  opacity: var(--prayer-notch-opacity, 0);
+  pointer-events: none;
+  fill: var(--card);
+  stroke: var(--prayer-join-stroke);
+  stroke-width: 1px;
+  z-index: 2;
+}
+.home-prayer-bridge path {
+  vector-effect: non-scaling-stroke;
+}
+.home-prayer-connected-panel:has(.hero-glass) .home-prayer-bridge {
+  fill: rgb(15 23 42 / 0.18);
+}
+@media (forced-colors: active) {
+  .home-prayer-bridge {
+    fill: Canvas;
+    stroke: Highlight;
+  }
+  .home-prayer-connected-panel::after,
+  .home-prayer-summary-card[data-selected="true"]::after {
+    background: Highlight;
+  }
 }
 @media (min-width: 768px) {
   .home-prayer-connected-panel [data-testid="prayer-actions-card"] {
@@ -338,18 +391,6 @@
     grid-column: 2;
     grid-row: 4;
     align-self: end;
-  }
-}
-.home-prayer-connected-panel::before {
-  top: -0.4375rem;
-  border-bottom: 0;
-  border-radius: 0.75rem 0.75rem 0 0;
-}
-@media (forced-colors: active) {
-  .home-prayer-summary-card[data-selected="true"]::before,
-  .home-prayer-connected-panel::before {
-    background: Canvas;
-    border-color: Highlight;
   }
 }
 .home-prayer-icon {

@@ -71,4 +71,59 @@ test("the retired PNG illustrations are no longer served", async ({ page }) => {
       expect(encoded.headers()["content-type"] ?? "").toContain(`image/${extension}`);
     }
   }
+  for (const name of ["mosque_prophet", "benefits_zikr"]) {
+    const preview = await page.request.get(`/images/${name}-placeholder.webp`);
+    expect(preview.status()).toBe(200);
+    expect(preview.headers()["content-type"]).toContain("image/webp");
+  }
+});
+
+test("Friday artwork fills its frame at phone and desktop sizes and has a visible failure fallback", async ({
+  page,
+  browser,
+}, testInfo) => {
+  await page.clock.setFixedTime(new Date("2026-10-16T13:40:00+03:00"));
+  await openHome(page);
+  for (const width of [390, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    const card = page.getByTestId("home-friday-card");
+    await card.scrollIntoViewIfNeeded();
+    const image = card.locator("img");
+    await expect(card.locator("picture")).toHaveCSS("background-image", /mosque_prophet-placeholder\.webp/);
+    await image.evaluate((node: HTMLImageElement) => node.decode());
+    const geometry = await image.evaluate((node) => {
+      const photo = node.getBoundingClientRect();
+      const frame = node.closest("picture")!.parentElement!.getBoundingClientRect();
+      return {
+        photo: { width: photo.width, height: photo.height },
+        frame: { width: frame.width, height: frame.height },
+        width: node.naturalWidth,
+        loading: node.loading,
+      };
+    });
+    expect(geometry.width).toBeGreaterThan(0);
+    expect(geometry.loading).toBe("eager");
+    expect(Math.abs(geometry.photo.width - geometry.frame.width)).toBeLessThanOrEqual(2);
+    expect(Math.abs(geometry.photo.height - geometry.frame.height)).toBeLessThanOrEqual(2);
+    await page.screenshot({ path: testInfo.outputPath(`friday-artwork-${width}.png`), scale: "css" });
+  }
+  const isolated = await browser.newContext({ serviceWorkers: "block", timezoneId: "Africa/Cairo" });
+  const failedPage = await isolated.newPage();
+  await failedPage.clock.setFixedTime(new Date("2026-10-16T13:40:00+03:00"));
+  await failedPage.addInitScript(() => {
+    localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+    localStorage.setItem(
+      "azkarapp.state.v1",
+      JSON.stringify({
+        settings: { language: "en", themeMode: "midnight" },
+        profile: { isGuest: true },
+      }),
+    );
+  });
+  await failedPage.route("**/images/mosque_prophet*", (route) => route.abort());
+  await failedPage.goto(`${new URL(page.url()).origin}/#/home`);
+  const image = failedPage.getByTestId("home-friday-card").locator("img");
+  await expect(image).toBeHidden();
+  await expect(failedPage.getByTestId("home-friday-card").locator("svg").first()).toBeVisible();
+  await isolated.close();
 });

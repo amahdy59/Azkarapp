@@ -28,6 +28,43 @@ async function openHome(page: Page, language: "ar" | "en") {
   await page.evaluate(() => document.fonts.ready);
 }
 
+for (const language of ["ar", "en"] as const) {
+  test(`Friday deeds and sourced alternatives ${language} @cross-browser`, async ({ page }, testInfo) => {
+    await page.setViewportSize({ width: language === "ar" ? 390 : 1440, height: 900 });
+    await openHome(page, language);
+    await page.clock.setFixedTime(new Date("2026-10-16T13:40:00+03:00"));
+    await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
+    const tile = page.getByTestId("prayer-card-dhuhr");
+    await tile.getByRole("button").click();
+    const panel = page.getByTestId("home-prayer-moment");
+    await expect(panel).toHaveAttribute("data-prayer", "dhuhr");
+    await expect(panel.locator("h2")).toContainText(language === "ar" ? "الجمعة" : "Jumu");
+    await expect(panel.getByRole("checkbox")).toHaveCount(3);
+    await expect(panel.getByTestId("prayer-moment-virtue")).toContainText(language === "ar" ? "٨٥٧" : "857a");
+    for (const check of await panel.getByRole("checkbox").all()) {
+      await check.check();
+      await expect(check).toBeChecked();
+      await check.press("Space");
+      await expect(check).not.toBeChecked();
+      await check.press("Space");
+    }
+    await tile.scrollIntoViewIfNeeded();
+    await page.screenshot({ path: testInfo.outputPath(`friday-${language}.png`), scale: "css" });
+    await panel.getByTestId("prayer-actions-more-info").click();
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).toContainText(language === "ar" ? "٨٨١" : "881a");
+    await expect(dialog).toContainText(language === "ar" ? "٨٨٢" : "882a");
+    await page.screenshot({ path: testInfo.outputPath(`friday-info-${language}.png`), scale: "css" });
+    await page.keyboard.press("Escape");
+    await page.reload();
+    await page.getByTestId("prayer-card-dhuhr").getByRole("button").click();
+    for (const check of await panel.getByRole("checkbox").all()) await expect(check).toBeChecked();
+    expect((await new AxeBuilder({ page }).include('[data-testid="home-prayer-moment"]').analyze()).violations).toEqual(
+      [],
+    );
+  });
+}
+
 async function checkGeometry(page: Page) {
   const panel = page.getByTestId("home-prayer-moment");
   await expect(panel.getByTestId("prayer-moment-virtue")).toBeVisible();
@@ -262,16 +299,17 @@ for (const language of ["ar", "en"] as const) {
             .poll(() =>
               tile.evaluate((node) => {
                 const panel = document.querySelector('[data-testid="home-prayer-moment"]')!;
-                const center = (element: Element) => {
-                  const tip = getComputedStyle(element, "::before");
-                  return (
-                    element.getBoundingClientRect().left +
-                    element.clientLeft +
-                    parseFloat(tip.left) +
-                    parseFloat(tip.width) / 2
-                  );
-                };
-                return Math.abs(center(node) - center(panel));
+                const bridge = panel.querySelector(".home-prayer-bridge")!;
+                const bounds = bridge.getBoundingClientRect();
+                const anchor =
+                  node.getBoundingClientRect().left +
+                  node.clientLeft +
+                  parseFloat(getComputedStyle(node).getPropertyValue("--prayer-notch-x"));
+                return Math.max(
+                  Math.abs(anchor - (bounds.left + bounds.width / 2)),
+                  Math.abs(bounds.top - node.getBoundingClientRect().bottom),
+                  Math.abs(bounds.bottom - panel.getBoundingClientRect().top),
+                );
               }),
             )
             .toBeLessThanOrEqual(1);

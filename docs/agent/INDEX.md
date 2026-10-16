@@ -1,5 +1,7 @@
 # AI Improvement System Index
 
+Latest owner-approved Home follow-up: Friday-specific deeds/evidence, full-photo Wird tiles and progress badges, versioned R2 backgrounds with opaque load-failure recovery, and a single symmetric liquid connector. See the active Home phase and decision log. Preserve normal glass values; inspect local responsive images before the authorized release.
+
 Latest release authorization, 2026-10-16: the owner reviewed the new Home image candidates and their real phone/desktop composites, selected the calmer Friday-morning scene, and requests applying the optimized backgrounds and pushing all pending Home refinements. This supersedes earlier local-preview holds. See the active Home phase, decision log, and the final Home release report.
 
 Latest Home material continuation, 2026-10-16: verify visible translucency for every Home card family across phone and desktop, including optional photo Wird captions, while preserving contrast and opaque device/application fallbacks. The local image-review-before-push hold remains. See the active Home phase and `docs/agent/HOME_GLASS_ALL_CARDS_2026_10_16_REPORT.md`.

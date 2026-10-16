@@ -252,7 +252,7 @@ export function HomeScreen({
   completed,
   dailyCompletions,
   quietProgressEnabled,
-  homeVisualEffects = true,
+  homeVisualEffects: requestedHomeVisualEffects = true,
   homeWirdImages = false,
   progressDayStartHour,
   language,
@@ -324,6 +324,7 @@ export function HomeScreen({
   ) => void;
 }) {
   const [hasScrolledHomeContent, setHasScrolledHomeContent] = useState(false);
+  const [failedBackgroundCategory, setFailedBackgroundCategory] = useState<string | null>(null);
   const isArabic = language === "ar";
   const now = useNow();
   const [fridayKahfStarted] = useState(hasStartedFridayKahf);
@@ -600,6 +601,11 @@ export function HomeScreen({
         : "friday"
       : reminderInfo.categoryId;
   const fridayInWindow = isFridayFeatureWindow(now, locationSettings);
+  const homeVisualEffects = requestedHomeVisualEffects && failedBackgroundCategory !== homeBackgroundCategoryId;
+  const handleBackgroundFailure = useCallback(
+    () => setFailedBackgroundCategory(homeBackgroundCategoryId),
+    [homeBackgroundCategoryId],
+  );
   const fridayKahfComplete = completed.friday_kahf?.has("friday-kahf") ?? false;
   const fridayStatus = fridayKahfComplete ? "review" : fridayKahfStarted ? "continue" : "start";
   const isPrayerHero = Boolean(
@@ -638,7 +644,9 @@ export function HomeScreen({
       style={{ paddingTop: 0 }}
       screenName={t(language, "home.title")}
     >
-      {homeVisualEffects && <TimeOfDayBackground categoryId={homeBackgroundCategoryId} />}
+      {homeVisualEffects && (
+        <TimeOfDayBackground categoryId={homeBackgroundCategoryId} onFailure={handleBackgroundFailure} />
+      )}
       <h1 className="sr-only">{t(language, "home.title")}</h1>
 
       {/* Scrollable Content Area */}
@@ -768,6 +776,22 @@ export function HomeScreen({
                         aria-label={t(language, "prayerMoment.homeTitle")}
                         className="home-prayer-connected-panel mx-auto w-full min-w-0 justify-self-center md:col-span-2"
                       >
+                        <svg
+                          className="home-prayer-bridge"
+                          viewBox="0 0 72 100"
+                          preserveAspectRatio="none"
+                          aria-hidden="true"
+                          focusable="false"
+                        >
+                          <path
+                            stroke="none"
+                            d="M 8 0 C 8 18 23 28 23 50 C 23 72 8 82 8 100 L 64 100 C 64 82 49 72 49 50 C 49 28 64 18 64 0 Z"
+                          />
+                          <path
+                            fill="none"
+                            d="M 8 0 C 8 18 23 28 23 50 C 23 72 8 82 8 100 M 64 0 C 64 18 49 28 49 50 C 49 72 64 82 64 100"
+                          />
+                        </svg>
                         <PrayerMomentPanel
                           prayer={expandedPrayer}
                           language={language}

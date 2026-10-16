@@ -1,6 +1,40 @@
 import { describe, expect, it } from "vitest";
-import { getPrayerActions } from "./prayerActions";
+import { getPrayerActions, getPrayerInfoData } from "./prayerActions";
+import { JUMUAH_VIRTUE } from "./fridayPrayer";
 import type { PrayerTrackingRecord } from "../types";
+
+describe("owner-approved Friday guidance", () => {
+  it.each(["ar", "en"] as const)("uses the record date for %s Friday actions and evidence", (language) => {
+    const record: PrayerTrackingRecord = {
+      prayer: "dhuhr",
+      dayKey: "2026-10-16",
+      mosque: true,
+      adhkar: true,
+      sunnahBefore: true,
+      sunnahAfter: true,
+    };
+    const actions = getPrayerActions({ prayer: "dhuhr", language, record });
+    expect(actions.map((action) => action.field)).toEqual(["location", "adhkar", "sunnahAfter"]);
+    expect(actions.every((action) => action.checked)).toBe(true);
+    expect(actions[2].label).toBe(language === "ar" ? "سنة بعد الجمعة" : "Sunnah after Jumu‘ah");
+    const info = getPrayerInfoData("dhuhr", language, record.dayKey);
+    expect(info.rawatibVirtue).toBeUndefined();
+    expect(info.sunnahItems.map((item) => [item.position, item.rakahs])).toEqual([
+      ["after", 4],
+      ["after", 2],
+    ]);
+    expect(info.sunnahItems.map((item) => item.sunnah.evidence.referenceEnglish)).toEqual([
+      "Sahih Muslim 881a",
+      "Sahih Muslim 882a — reported from Ibn ‘Umar",
+    ]);
+    expect(JUMUAH_VIRTUE.referenceEnglish).toBe("Sahih Muslim 857a");
+    expect(record.sunnahBefore).toBe(true);
+    expect(
+      getPrayerActions({ prayer: "dhuhr", language, record, dayKey: "2026-10-15" }).map((item) => item.field),
+    ).toEqual(["location", "sunnahBefore", "adhkar", "sunnahAfter"]);
+    expect(getPrayerInfoData("dhuhr", language, "2026-10-15").rawatibVirtue).toBeDefined();
+  });
+});
 
 describe("prayer action saved-state presentation", () => {
   it.each(["fajr", "asr", "maghrib", "isha"] as const)(

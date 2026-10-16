@@ -1,5 +1,9 @@
 # Prayer times, location, timezone, and DST
 
+## Friday deed presentation — 2026-10-16
+
+For a Friday record date, the noon action card uses the owner-approved Jumu‘ah name, three-action checklist and Friday evidence. It retains the internal dhuhr prayer ID, calculated noon time, record ownership, location/adhkar/sunnahAfter fields and all prior stored data. No prayer calculation or notification boundary changes. Before-Sunnah is not offered in Friday's checklist; existing values are retained. The approved sources and review status are recorded in CONTENT_AUTHORING.md.
+
 Reminder reliability, 2026-10-13: permission changes are rechecked after returning from browser settings. Delivery uses an already active service-worker registration, avoiding an indefinite ready wait when none exists; supported desktop browsers may use their Notification constructor. Mobile rejection is reported as failure, with existing scheduled retry. Settings shows a pending test state and accurate background/closed-app limits. Prayer formulas and reminder times are unchanged.
 
 This document is the source of truth for Azkarapp's prayer-time pipeline. It explains how times are calculated on the device, how daylight saving is applied, and how maintainers can verify or extend the feature safely.

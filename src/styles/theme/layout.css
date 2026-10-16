@@ -259,6 +259,9 @@
    surface tokens opt into this companion class when they sit on that canvas,
    keeping their existing anatomy while moving copy and nested controls onto
    the measured on-media palette. */
+.home-photo-canvas {
+  --home-glass-accent: #fff0bd;
+}
 .home-glass-surface {
   --foreground: var(--on-media);
   --muted-foreground: var(--on-media-muted);
@@ -271,7 +274,7 @@
    long reading and sticky chrome use a stronger tint without stacking fills. */
 .hero-glass.home-glass-surface {
   /* Pale gold preserves small citation/control contrast on bright scenery. */
-  --on-media-accent: #fff0bd;
+  --on-media-accent: var(--home-glass-accent);
   --home-glass-tint: rgb(15 23 42 / 0.48);
   background-color: var(--home-glass-tint);
   background-image: linear-gradient(135deg, rgb(255 255 255 / 0.06), rgb(255 255 255 / 0.01) 60%);

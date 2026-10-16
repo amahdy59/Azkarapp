@@ -3,6 +3,8 @@ import type { PrayerTrackingWrite } from "./PrayerTrackerCards";
 import { CloudSun, MoonStar, Sun, Sunrise, Sunset } from "./icons";
 import { t } from "../i18n";
 import { formatPrayerTimeLabel, getEstimatedPrayerTimes } from "../content/prayerTimes";
+import { isJumuahPrayer, prayerDisplayName } from "../prayerPresentation";
+import { JUMUAH_VIRTUE } from "../content/fridayPrayer";
 import { getPrayerVirtues } from "../content/prayerVirtues";
 import type { AppLanguage, LocationSettings, PrayerName, PrayerTrackingRecord } from "../types";
 import { HomeCard } from "./HomeCard";
@@ -54,8 +56,8 @@ export function PrayerMomentPanel({
   const times = useMemo(() => getEstimatedPrayerTimes(now, locationSettings), [now, locationSettings]);
 
   const isArabic = language === "ar";
-  const name = t(language, `notifications.${prayer}`);
-  const virtue = getPrayerVirtues(prayer)[0];
+  const name = prayerDisplayName(prayer, language, dayKey);
+  const virtue = isJumuahPrayer(prayer, dayKey) ? JUMUAH_VIRTUE : getPrayerVirtues(prayer)[0];
 
   const titleText = onGlass ? "text-on-media" : "text-foreground";
   const bodyText = onGlass ? "text-on-media-muted" : "text-muted-foreground";

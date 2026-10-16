@@ -8,7 +8,7 @@ import { formatNumerals } from "../formatting";
 import { HomeCard } from "./HomeCard";
 import { ProductImage } from "./ProductImage";
 import { SegmentedControl } from "./SegmentedControl";
-import { ArrowNext, Bookmark, BookOpen, Clock, Sparkles, Heart, Sun, MoonStar, Moon, RefreshCw } from "./icons";
+import { ArrowNext, Bookmark, BookOpen, Clock, Sparkles, Heart, Sun, MoonStar, Moon, RefreshCw, Mosque } from "./icons";
 import { HadithWeakChainBadge } from "./HadithWeakChainBadge";
 
 export type HomeSavedSource = "main" | "comprehensive" | "friday";
@@ -359,8 +359,9 @@ export function FridayHomeCard({
         padding="md"
         className="flex flex-col gap-4 sm:flex-row sm:items-center"
       >
-        <span className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-primary/20 bg-primary/10 text-primary">
-          <ProductImage name="mosque_prophet" className="h-full w-full object-cover" />
+        <span className="relative flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-primary/20 bg-primary/10 text-primary">
+          <Mosque size={28} aria-hidden="true" />
+          <ProductImage name="mosque_prophet" loading="eager" className="h-full w-full object-cover" />
         </span>
         <div className="min-w-0 flex-1 text-start">
           <h3
@@ -404,7 +405,8 @@ export function FridayHomeCard({
     >
       <div className="grid gap-5 p-5 sm:p-6 xl:grid-cols-[14rem_minmax(0,1fr)_19rem] xl:items-center">
         <div className="relative flex h-44 w-full items-center justify-center self-center overflow-hidden rounded-2xl border border-primary/20 bg-primary/10 text-primary sm:h-52 xl:h-48">
-          <ProductImage name="mosque_prophet" className="absolute inset-0 h-full w-full object-cover" />
+          <Mosque size={52} aria-hidden="true" />
+          <ProductImage name="mosque_prophet" loading="eager" className="h-full w-full object-cover" />
         </div>
 
         <div className="min-w-0 text-start">

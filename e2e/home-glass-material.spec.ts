@@ -250,7 +250,7 @@ for (const width of [390, 1440]) {
   });
 }
 
-test("photo-enabled Wird tiles keep a single glass caption over their own image", async ({ page }) => {
+test("photo-enabled Wird tiles fill the card behind a readable gradient", async ({ page }, testInfo) => {
   await page.addInitScript(() => {
     localStorage.setItem(
       "azkarapp.state.v1",
@@ -265,10 +265,66 @@ test("photo-enabled Wird tiles keep a single glass caption over their own image"
   for (const card of await page.getByTestId("wird-category-card").all()) {
     await expect(card).toHaveAttribute("data-images", "true");
     await expect(card.locator(".home-wird-photo-image")).toHaveCount(1);
-    await expect(card.locator(".home-wird-caption")).toHaveClass(/hero-glass/);
-    await expect(card.locator(".home-wird-caption")).toHaveCSS("backdrop-filter", "blur(16px) saturate(1.35)");
+    await card.locator(".home-wird-photo-image").evaluate((node: HTMLImageElement) => node.decode());
+    await expect(card.locator(".home-wird-caption")).toHaveCSS("backdrop-filter", "none");
+    const geometry = await card.evaluate((node) => {
+      const outer = node.getBoundingClientRect();
+      const photo = node.querySelector("img")!.getBoundingClientRect();
+      const caption = node.querySelector(".home-wird-caption")!.getBoundingClientRect();
+      return { height: outer.height, photoHeight: photo.height, captionHeight: caption.height };
+    });
+    expect(Math.abs(geometry.height - geometry.photoHeight)).toBeLessThanOrEqual(2);
+    expect(Math.abs(geometry.height - geometry.captionHeight)).toBeLessThanOrEqual(2);
     await expect(card.locator(".hero-glass .hero-glass")).toHaveCount(0);
   }
+  await expect(page.getByTestId("thimar-progress-badge")).toContainText("٢٠");
+  for (const width of [390, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.getByTestId("today-garden-card").evaluate((node) => {
+      (node as HTMLElement).style.scrollMarginTop = "80px";
+      node.scrollIntoView({ block: "start" });
+    });
+    await page.screenshot({ path: testInfo.outputPath(`full-photo-wird-${width}.png`) });
+  }
+  expect((await new AxeBuilder({ page }).include('[data-testid="today-garden-card"]').analyze()).violations).toEqual(
+    [],
+  );
+});
+
+test("liquid selection bridge uses the shared glass palette at phone and desktop widths", async ({
+  page,
+}, testInfo) => {
+  await page.clock.setFixedTime(new Date("2026-10-16T13:40:00+03:00"));
+  await page.goto("/#/home");
+  await page.getByTestId("prayer-card-dhuhr").getByRole("button").click();
+  const bridge = page.locator(".home-prayer-bridge");
+  await expect(bridge).toHaveAttribute("aria-hidden", "true");
+  await expect(bridge).toHaveCSS("pointer-events", "none");
+  for (const width of [390, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.getByTestId("home-prayer-strip").scrollIntoViewIfNeeded();
+    expect(await bridge.evaluate((node) => getComputedStyle(node).stroke)).toBe(
+      await page.getByTestId("prayer-card-dhuhr").evaluate((node) => {
+        const color = getComputedStyle(node).getPropertyValue("--prayer-join-stroke").trim();
+        const probe = document.createElement("span");
+        probe.style.color = color;
+        node.append(probe);
+        const resolved = getComputedStyle(probe).color;
+        probe.remove();
+        return resolved;
+      }),
+    );
+    await page.screenshot({ path: testInfo.outputPath(`liquid-bridge-${width}.png`), scale: "css" });
+  }
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send("Emulation.setEmulatedMedia", {
+    features: [{ name: "prefers-reduced-transparency", value: "reduce" }],
+  });
+  await page.setViewportSize({ width: 390, height: 1000 });
+  await page.reload();
+  await page.getByTestId("prayer-card-dhuhr").getByRole("button").click();
+  await expect(page.getByTestId("home-prayer-moment").locator(".hero-glass")).toHaveCSS("backdrop-filter", "none");
+  await page.screenshot({ path: testInfo.outputPath("liquid-bridge-reduced-390.png"), scale: "css" });
 });
 
 for (const themeMode of ["light", "dark", "midnight"]) {

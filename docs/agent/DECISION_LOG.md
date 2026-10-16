@@ -1,5 +1,11 @@
 # Decision Log
 
+## Friday content and Home follow-up — 2026-10-16
+
+The owner explicitly approved the sourced Friday approach: noon uses Jumu‘ah attendance, after-prayer adhkar and one Sunnah-after-Jumu‘ah action. Its information sheet explains four rak‘ahs (Muslim 881a) and two at home (Muslim 882a); the benefit uses Muslim 857a. This supersedes the earlier display-only Friday restriction. Product-owner approval is not an independent scholarly review. Keep the Dhuhr key, dates, times and existing stored fields; hide the weekday before-Sunnah action without deleting previous records.
+
+The owner requests full-card Wird photos at the current grid sizes, restored completion/fruit badges, authorized upload of the optimized backgrounds to R2, and an opaque themed fallback on failed background loading without changing normal glass. The latest connector request supersedes paired notches: one symmetric Bézier neck with the joining segments of both card borders removed, a shared theme accent, stationary layout and no motion or hit target. The owner then approved the fused-silhouette revision. The Friday illustration is requested eagerly with an icon fallback after a blank lazy-loading capture. Inspect local images before the authorized release.
+
 ## Home background selection and release — 2026-10-16
 
 The owner approved the generated Home background set after seeing phone and desktop composites, including the calmer blue Friday-morning choice, and authorized implementation and push. Use ordinary dawn, subdued evening, night, Friday morning, and later-Friday courtyard scenes. Friday morning is visual only and runs from Fajr until Dhuhr; existing Friday daytime content continues through Maghrib. Keep the established photo scrim and opaque reduced-transparency fallbacks. Serve each scene as responsive AVIF with WebP fallback and a small blurred placeholder. Verify in-app screenshots, accessibility, exact-commit CI and deployed production before reporting release completion.

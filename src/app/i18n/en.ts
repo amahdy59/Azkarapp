@@ -280,6 +280,11 @@ const en = {
     sunnahAfter: "{prayer} Sunnah after",
     fajrBeforeAction: "2 rak'ahs before Fajr",
     dhuhrBeforeAction: "4 rak'ahs before Dhuhr",
+    jumuahAfterAction: "Sunnah after Jumu‘ah",
+    jumuahFourDesc:
+      "Four rak‘ahs after Jumu‘ah are reported in Sahih Muslim 881. The single Sunnah checkbox records the after-prayer Sunnah; do not add together the two counts shown here.",
+    jumuahTwoDesc:
+      "Two rak‘ahs at home are also reported from the Prophet ﷺ in Sahih Muslim 882. This is another narrated practice, not an additional two required alongside the four.",
     dhuhrAfterAction: "2 rak'ahs after Dhuhr",
     asrBeforeAction: "4 rak'ahs before Asr",
     maghribAfterAction: "2 rak'ahs after Maghrib",

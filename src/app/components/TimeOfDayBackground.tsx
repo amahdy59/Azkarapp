@@ -1,7 +1,13 @@
 import { AzkarHeroBackground } from "./AzkarHeroBackground";
 import type { AzkarBackgroundKey } from "./azkar-backgrounds";
 
-export function TimeOfDayBackground({ categoryId = "morning" }: { categoryId?: string }) {
+export function TimeOfDayBackground({
+  categoryId = "morning",
+  onFailure,
+}: {
+  categoryId?: string;
+  onFailure?: () => void;
+}) {
   let kind: AzkarBackgroundKey = "morning";
 
   if (categoryId === "evening") {
@@ -25,6 +31,7 @@ export function TimeOfDayBackground({ categoryId = "morning" }: { categoryId?: s
       <AzkarHeroBackground
         kind={kind}
         priority={true}
+        onFailure={onFailure}
         className="w-full h-full absolute inset-0 transition-opacity duration-entrance ease-out"
       />
       <div className="home-photo-scrim" aria-hidden="true" />

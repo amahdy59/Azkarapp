@@ -1,4 +1,6 @@
 import { Mosque, PrayerBeads, PrayerRug } from "../components/icons";
+import { isJumuahPrayer, prayerDisplayName } from "../prayerPresentation";
+import { JUMUAH_SUNNAH } from "./fridayPrayer";
 import { t } from "../i18n";
 import type { AppLanguage, PrayerName, PrayerTrackingRecord } from "../types";
 import {
@@ -58,12 +60,15 @@ export function getPrayerActions({
   prayer,
   language,
   record,
+  dayKey = record?.dayKey,
 }: {
   prayer: PrayerName;
   language: AppLanguage;
   record?: PrayerTrackingRecord;
+  dayKey?: string;
 }): PrayerActionItem[] {
-  const name = t(language, `notifications.${prayer}`);
+  const name = prayerDisplayName(prayer, language, dayKey);
+  const friday = isJumuahPrayer(prayer, dayKey);
   const actions: PrayerActionItem[] = [];
 
   // 1. Obligatory prayer in congregation (All 5 prayers)
@@ -77,7 +82,7 @@ export function getPrayerActions({
   });
 
   // 2. Sunnah before (Fajr, Dhuhr, Asr)
-  const hasSunnahBeforeInChecklist = prayer === "fajr" || prayer === "dhuhr" || prayer === "asr";
+  const hasSunnahBeforeInChecklist = prayer === "fajr" || (prayer === "dhuhr" && !friday) || prayer === "asr";
   if (hasSunnahBeforeInChecklist) {
     const isChecked =
       prayer === "dhuhr" ? (record?.sunnahBefore ?? false) : record?.sunnahBefore === true || record?.sunnah === true;
@@ -117,7 +122,9 @@ export function getPrayerActions({
 
     const labelKey =
       prayer === "dhuhr"
-        ? "prayerActions.dhuhrAfterAction"
+        ? friday
+          ? "prayerActions.jumuahAfterAction"
+          : "prayerActions.dhuhrAfterAction"
         : prayer === "maghrib"
           ? "prayerActions.maghribAfterAction"
           : "prayerActions.ishaAfterAction";
@@ -138,10 +145,27 @@ export function getPrayerActions({
 /**
  * Returns structured educational information about the Sunnah prayers of the selected prayer.
  */
-export function getPrayerInfoData(prayer: PrayerName, language: AppLanguage): PrayerInfoData {
-  const prayerName = t(language, `notifications.${prayer}`);
+export function getPrayerInfoData(prayer: PrayerName, language: AppLanguage, dayKey?: string): PrayerInfoData {
+  const prayerName = prayerDisplayName(prayer, language, dayKey);
   const modalTitle = t(language, "prayerActions.infoTitle", { prayer: prayerName });
 
+  if (isJumuahPrayer(prayer, dayKey)) {
+    return {
+      prayer,
+      prayerName,
+      modalTitle,
+      sunnahItems: JUMUAH_SUNNAH.map((sunnah) => ({
+        position: "after",
+        title: t(language, "prayerActions.afterPrayer"),
+        rakahs: sunnah.after,
+        rakahsLabel: t(language, sunnah.after === 4 ? "prayerActions.rakahsFour" : "prayerActions.rakahsTwo"),
+        rank: sunnah.rank,
+        rankLabel: t(language, "prayerActions.optionalRank"),
+        description: t(language, sunnah.after === 4 ? "prayerActions.jumuahFourDesc" : "prayerActions.jumuahTwoDesc"),
+        sunnah,
+      })),
+    };
+  }
   const sunnahBefore = getPrayerSunnah(prayer, "before");
   const sunnahAfter = getPrayerSunnah(prayer, "after");
 

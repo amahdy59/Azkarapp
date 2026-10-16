@@ -19,6 +19,7 @@ export function usePrayerNotchAlignment(prayer: PrayerName | null, direction: "l
       const start = Math.max(small.left + 20, large.left + 24, viewport.left + 20);
       const end = Math.min(small.right - 20, large.right - 24, viewport.right - 20);
       const x = Math.max(start, Math.min(end, small.left + small.width / 2));
+      panel.style.setProperty("--prayer-bridge-height", `${Math.max(0, large.top - small.bottom)}px`);
       for (const [element, left] of [
         [card, small.left],
         [panel, large.left],
@@ -45,6 +46,7 @@ export function usePrayerNotchAlignment(prayer: PrayerName | null, direction: "l
         element.style.removeProperty("--prayer-notch-x");
         element.style.removeProperty("--prayer-notch-opacity");
       }
+      panel.style.removeProperty("--prayer-bridge-height");
     };
   }, [prayer, direction]);
   return { overviewRef, panelRef };

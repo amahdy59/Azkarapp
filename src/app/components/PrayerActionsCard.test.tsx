@@ -5,7 +5,8 @@ import type { PrayerTrackingRecord } from "../types";
 
 afterEach(cleanup);
 
-const DAY = "2026-09-18";
+// Weekday fixture keeps the ordinary Dhuhr rawatib expectations distinct from Friday guidance.
+const DAY = "2026-09-17";
 
 describe("PrayerActionsCard", () => {
   it("returns information-sheet focus to its pointer trigger rather than the previous checkbox", async () => {
