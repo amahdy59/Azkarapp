@@ -1,5 +1,18 @@
 # Azkar design system
 
+## Frostness benchmark and glassmorphic reference — 2026-10-17
+
+The owner provides an authoritative visual reference for "frostness" (frosted glass / glassmorphic devotional style) as preserved in `docs/agent/evidence/design-references/frostness-reference.png`.
+
+Key characteristics defining this visual standard:
+
+1. **Translucent dark wash & blur:** Deep slate/navy wash (~18%–35% opacity) over an atmospheric or photographic background, paired with heavy, smooth backdrop blur (`backdrop-filter: blur(16px - 24px) saturate(130% - 150%)`). The underlying background diffuses softly through the card.
+2. **Beveled hairline edges & rim highlight:** Ultra-fine 1px borders with directional lighting: a crisp, semi-transparent top rim highlight (`rgba(255, 255, 255, 0.20 - 0.30)` or warm golden tint) simulating light catching the top edge, tapering to a subtler bottom border (`rgba(255, 255, 255, 0.08)`), combined with an inner highlight (`box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.20)`).
+3. **Layered squircle sub-elements:** Nested controls and icon tiles possess their own dedicated frosted squircle containers (`rounded-xl` / `rounded-2xl`, subtle dark translucent fill `bg-white/5` or `bg-slate-900/30`, hairline border), establishing tactile physical depth without stacking multiple active GPU blur filters.
+4. **Soft ambient focus & warmth:** A gentle, diffused golden/amber aura or backlighting behind active/next devotional focal points (e.g. dawn/active prayer).
+5. **High-contrast devotional typography:** Crisp, calm warm off-white and pure white typography (`#f8fafc` / `#fff0bd`) with prominent bold Arabic-Indic numerals, generous padding, and organic rounded card geometry (`rounded-2xl` to `rounded-3xl`).
+6. **Legibility & fallbacks:** High contrast, forced colors, and reduced-transparency environments must gracefully fall back to solid theme surfaces without breaking semantic hierarchy or contrast.
+
 ## Image-first sharing — 2026-10-17
 
 User-owned completion and milestone summary images center their measured reading panel within the available body area, keeping brand/footer fixed. This is an explicit summary-only composition option: devotional and evidence exports retain their existing top alignment and 24px maximum extra gap, exact typography, content and sources. Completion starts Square, milestones Portrait. The ayah menu emphasizes its image entry before text while retaining its dedicated Quran studio.
@@ -1032,3 +1045,13 @@ The owner supplies a blue/gold prayer-row reference and approves comfortable hor
 The owner's screenshot review supersedes the icon divider, bright blue/white summary outlines, next-prayer interval bar and 28% overlay tint. Prayer summaries use quieter boundaries and a text countdown, without vertical dividers or a progress bar. Keep current/next initial visibility, native free scrolling, recorded-state descriptions, full-card targets and stable name/time geometry through collapse. Expanded actions precede supporting evidence on phone; desktop retains separate evidence and tracking columns. Reviewed sources and tracking/calculation behavior are unchanged.
 
 Text-over-text overlays require a denser material than cards: dialogs, menus, listboxes and expanded audio use 80% navy with stationary 28px/135% frost. Ordinary cards and reading tint retain their existing values. Expanded AudioPlayerSurface visually hides its covered main-canvas siblings using a reversible attribute, in addition to inert/aria-hidden, and restores them on collapse. The shared shell scene remains visible; transparent backgrounds cannot reveal duplicate Reader text. Native focus, Escape, touch lock, Solid/high-contrast/forced-color recovery and offline state remain. See docs/agent/phases/CALM_PRAYER_AND_OVERLAY_SEPARATION_2026_10_17.md.
+
+## Frost clarity and compact headers — 2026-10-17
+
+The owner's eight-screenshot review supersedes the earlier 18% ordinary/28% reading material. Shared ordinary cards now use 36% navy and long reading surfaces 48%, with stationary 22px/135% frost; overlays retain 80%/28px. Sticky page headers and the whole Progress tab/date group use lighter 42% slate/36px frost with directional sheen to soften passing text. Nested controls borrow outer frost; no blur animation is added. App/Home choices and opaque/high-contrast/forced-color fallbacks remain independent.
+
+Glass palettes set light success ink with matching dark foreground for filled status marks, rather than inheriting light-theme dark green. Home sharing uses explicit on-media ink and a stable button ground. Shared headers omit decorative border/shadow; Settings rows omit separators by default. Reader and standalone-counter desktop titles share their control row (96px Reader hero versus127px before); compact headers retain56px and may grow for wrapped/enlarged text. Remove standalone bottom instruction banners while preserving phone introductory guidance and header keyboard help. Religious text/counts, state and audio ownership remain unchanged. See agent/phases/FROST_CLARITY_COMPACT_HEADERS_2026_10_17.md.
+
+Owner screenshot selection: retain the open scene-backed Masbaha/Salawat canvas without an extra dark reading panel. Frost remains on their controls/menus; compact shared titles and removed bottom banners remain. This specifically supersedes applying long-reading tint to the standalone counter canvas.
+
+Owner frost correction: replace the near-opaque navy header shade with a lighter slate glass (42% tint), soft white sheen and stationary36px/135% frost. Extend Progress's sticky material across the page gutters, add16px lower breathing room and rounded lower corners. This supersedes98% header shade; maintain44px controls, focus scroll clearance, opaque accessibility recovery and the owner-selected open counter canvas. Test foreground contrast and moving-content separation against actual screenshots.

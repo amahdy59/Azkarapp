@@ -32,7 +32,7 @@ for (const language of ["ar", "en"] as const) {
       const bounds = (await header.boundingBox())!;
       // Compact padding/border and wide toolbar/title/progress geometry.
       // Preserve the fractional CSS height rather than its rounded screenshot value.
-      expect(bounds.height).toBeCloseTo(width < 768 ? 57 : 127, 0);
+      expect(bounds.height).toBeCloseTo(width < 768 ? 56 : 96, 0);
       // The owner's sidebar controls share their separate card anatomy in
       // both open and closed states; the remaining header actions are round.
       const buttons = header.getByRole("button");

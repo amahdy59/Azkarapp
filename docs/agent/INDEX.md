@@ -1,5 +1,7 @@
 # AI Improvement System Index
 
+Design system benchmark: [Frostness visual reference](evidence/design-references/frostness-reference.png) establishes the owner's canonical benchmark for frosted glass / glassmorphic devotional surfaces (translucency, blur, beveled borders, layered squircle sub-elements, warm glow, and high-contrast typography; see `docs/DESIGN_SYSTEM.md` and `docs/agent/DECISION_LOG.md`).
+
 Final global-sharing audit: [Remaining image entry points](phases/IMAGE_SHARE_ENTRYPOINTS_2026_10_17.md) brings completion into the existing image studio and gives the ayah-image action priority over text. Preserve all completion and Quran contracts; finish the same release cycle.
 
 Current owner-authorized continuation: [Image-first sharing](phases/IMAGE_FIRST_SHARING_2026_10_17.md). Prioritize image previews/export globally in the shared studio, give Text/Link less visual weight, preserve approved art and content, and keep performance/fallback behavior explicit.
@@ -383,3 +385,5 @@ The owner's subsequent “push all changes” instruction supersedes the current
 [Frosted prayer hierarchy](phases/PRAYER_GLASS_HIERARCHY_2026_10_17.md) follows the separately committed global material phase: reference-inspired icon/time/status anatomy and comfortable free horizontal scrolling with initial current/next visibility.
 
 [Calm prayer and overlay separation](phases/CALM_PRAYER_AND_OVERLAY_SEPARATION_2026_10_17.md) is the active owner-requested follow-up: quieter summaries, no next-prayer bar/dividers, clearer expanded actions, denser overlays and reversible covered-reader visibility.
+
+Latest owner continuation: [Frost clarity and compact consistent headers](phases/FROST_CLARITY_COMPACT_HEADERS_2026_10_17.md) supersedes the lighter material after screenshot review; stronger frost, protected scrolling headers, accessible status colors and compact shared zikr chrome. Standing main-branch release authority applies.

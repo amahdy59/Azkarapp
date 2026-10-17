@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Card } from "../../components/Card";
 import { IconButton } from "../../components/LayoutShells";
 import { ArrowPrevious } from "../../components/icons";
@@ -34,6 +34,10 @@ export function SubHeader({
   const layoutMode = useLayoutMode();
   const isTwoPane = layoutMode === "expanded" || layoutMode === "large";
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const [hasScrolled, setHasScrolled] = useState(false);
+  const scrolledRef = useRef(false);
+
   useEffect(() => {
     // Panels may mount after the outgoing animation has finished. Focus the
     // heading owned by the mounted panel, rather than querying the old panel.
@@ -41,9 +45,51 @@ export function SubHeader({
     return () => cancelAnimationFrame(frame);
   }, [isTwoPane]);
 
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+
+    const screenRoot =
+      el.closest<HTMLElement>(".settings-detail-pane") ||
+      el.closest<HTMLElement>("[data-testid='settings-screen']") ||
+      document.body;
+
+    const updateFromScroll = (event: Event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement || target === document || target === window)) return;
+      let scrollTop = 0;
+      if (target === document || target === window) {
+        scrollTop = window.scrollY || document.documentElement.scrollTop;
+      } else if (target instanceof HTMLElement) {
+        if (screenRoot.contains(target) || target.contains(el)) {
+          scrollTop = target.scrollTop;
+        } else {
+          return;
+        }
+      }
+      const next = scrollTop > 4;
+      if (next === scrolledRef.current) return;
+      scrolledRef.current = next;
+      setHasScrolled(next);
+    };
+
+    screenRoot.addEventListener("scroll", updateFromScroll, true);
+    window.addEventListener("scroll", updateFromScroll, { capture: true, passive: true });
+    return () => {
+      screenRoot.removeEventListener("scroll", updateFromScroll, true);
+      window.removeEventListener("scroll", updateFromScroll, { capture: true });
+    };
+  }, []);
+
   if (isTwoPane) {
     return (
-      <div className="flex items-center justify-between px-page pt-2 pb-1 shrink-0" style={{ minHeight: 56 }}>
+      <div
+        ref={headerRef}
+        data-testid="shared-screen-header"
+        data-scrolled={hasScrolled || undefined}
+        className="shared-screen-header sticky top-0 z-40 flex items-center justify-between bg-background px-page pt-2 pb-1 shrink-0 transition-colors duration-standard"
+        style={{ minHeight: 56 }}
+      >
         <h2
           ref={headingRef}
           data-settings-subheading
@@ -63,7 +109,13 @@ export function SubHeader({
   }
 
   return (
-    <div className="flex items-center justify-between px-4 shrink-0" style={{ minHeight: 56 }}>
+    <div
+      ref={headerRef}
+      data-testid="shared-screen-header"
+      data-scrolled={hasScrolled || undefined}
+      className="shared-screen-header sticky top-0 z-40 flex items-center justify-between gap-2 bg-background px-4 pt-2 pb-1 shrink-0 transition-colors duration-standard"
+      style={{ minHeight: 56 }}
+    >
       <IconButton onClick={onBack} label={t(language, "common.back")}>
         <ArrowPrevious size={20} className="text-foreground" />
       </IconButton>
@@ -71,7 +123,7 @@ export function SubHeader({
         ref={headingRef}
         data-settings-subheading
         tabIndex={-1}
-        className="block min-w-0 flex-1 break-words text-center font-sans text-xl font-extrabold leading-tight text-foreground outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:text-2xl"
+        className="block min-w-0 flex-1 break-words text-start font-sans text-xl font-extrabold leading-tight text-foreground outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:text-2xl"
       >
         {title}
       </h1>

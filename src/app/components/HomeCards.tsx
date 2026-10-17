@@ -218,7 +218,7 @@ export function PrayerRoutineCard({
                 onPointerDown={quickShare.prepare}
                 onFocus={quickShare.prepare}
                 onClick={quickShare.share}
-                className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-xl border border-current/20 text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-50"
+                className={`inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-xl border border-current/30 ${onGlass ? "bg-on-media-surface/40 text-on-media-accent" : "bg-card text-foreground"} focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-50`}
               >
                 <Share2 size={20} aria-hidden="true" />
               </button>

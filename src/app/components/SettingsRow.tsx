@@ -23,7 +23,7 @@ export function SettingsRowItem({
   labelColor = "text-foreground",
   right,
   onPress,
-  hasDivider = true,
+  hasDivider = false,
   current = false,
   testId,
 }: SettingsRowProps) {
@@ -86,7 +86,7 @@ export function SettingsSelectRow({
   onChange,
   direction,
   testId,
-  hasDivider = true,
+  hasDivider = false,
 }: {
   icon: React.ReactNode;
   iconBg?: string;
@@ -218,7 +218,7 @@ export function SettingsToggleRow({
   description,
   checked,
   onChange,
-  hasDivider = true,
+  hasDivider = false,
 }: {
   icon: React.ReactNode;
   iconBg?: string;
@@ -233,6 +233,7 @@ export function SettingsToggleRow({
       <button
         type="button"
         role="switch"
+        aria-label={label}
         aria-checked={checked}
         onClick={onChange}
         className="flex min-h-16 w-full items-center gap-3 bg-card px-4 py-3 text-start transition-opacity active:opacity-70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"

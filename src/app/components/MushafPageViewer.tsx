@@ -257,7 +257,18 @@ const MushafTextLine = memo(function MushafTextLine({
                 })}
                 onClick={(event) => {
                   event.currentTarget.focus();
-                  onAyahAction?.(w.verseKey);
+                  // Pointer/mouse/touch clicks are ignored to prevent unintentional opening
+                  // while scrolling or reading. Readers can hold-press (long press) any word
+                  // or the marker to open actions. Keyboard Enter/Space (detail === 0) is preserved.
+                  if (event.detail === 0) {
+                    onAyahAction?.(w.verseKey);
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    onAyahAction?.(w.verseKey);
+                  }
                 }}
                 onContextMenu={(e) => {
                   e.preventDefault();

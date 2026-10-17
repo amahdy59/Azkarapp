@@ -1,5 +1,26 @@
 # Decision Log
 
+## 2026-10-17 — Header scroll occlusion and glassmorphic clarity
+
+The owner requested that headers completely occlude scrolling text across all pages (specifically Progress, Settings root and subpanels, and Azkar Library) so that content gliding beneath headers does not show or bleed through. In Settings, the search input was pinned directly to the sticky header container so settings items glide under both the header and search input seamlessly.
+
+- Scrolled headers across Progress (`.progress-screen-controls[data-scrolled="true"]`), Settings root and subpanels (`.settings-subpanel-header[data-scrolled="true"]`), and Azkar Library receive an opaque `#0a1228` visor with subtle ambient gradient and elevation shadow, eliminating text bleed-through while preserving ambient warmth.
+- SubHeader in `SettingsPrimitives.tsx` tracks scroll state via capture scroll listener, ensuring all 15 settings subpanels elevate consistently.
+- Search input in `SettingsRootPanel.tsx` is pinned to the header block for unified gliding.
+- AppearancePanel bilingual strings were localized cleanly via `t(language, ...)` in `src/app/i18n/ar.ts` and `src/app/i18n/en.ts`.
+- High contrast, prefers-reduced-motion, and WCAG 2.2 AA accessibility baselines are fully preserved.
+
+## 2026-10-17 — Frostness visual benchmark
+
+The owner supplied the canonical visual reference for "frostness" (frosted glass / glassmorphic devotional style), captured in `docs/agent/evidence/design-references/frostness-reference.png`. All future sessions and UI tasks referring to "frostness" or glass surfaces follow this specification:
+
+- Deep translucent navy/slate wash (~18%–35%) with rich backdrop blur (`blur(16px - 24px) saturate(130% - 150%)`).
+- Fine 1px beveled border with directional top-edge highlight and inner top rim reflection (`box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.20)`).
+- Nested squircle sub-elements (e.g. icon tiles) with their own frosted container (`rounded-xl` / `rounded-2xl`, subtle dark wash, hairline border) for tactile glass layering without extra active GPU filter layers.
+- Soft ambient warm glow behind active focal points (such as current/next prayer).
+- High-contrast, calm devotional typography (`#f8fafc` / `#fff0bd`) with prominent Arabic-Indic numerals.
+- Graceful solid theme fallback under high-contrast, forced-colors, and reduced-transparency modes.
+
 ## 2026-10-17 — Complete global image-first entry points
 
 The owner's global sharing scope includes session completion and the ayah menu, discovered during the final entry-point audit. Bring completion into the existing lazy studio with its unchanged localized phrase/category link and no added private metrics. Give the existing ayah-image action visual and DOM priority over text while retaining text/copy/bookmark and focus recovery. This is a separate bounded follow-up to the shared-studio commit; preserve Quran rendering and full release gates.
@@ -4848,3 +4869,13 @@ The owner supplies a blue/gold prayer-row reference and approves comfortable hor
 The owner's screenshot review supersedes the icon divider, bright blue/white summary outlines, next-prayer interval bar and 28% overlay tint. Prayer summaries use quieter boundaries and a text countdown, without vertical dividers or a progress bar. Keep current/next initial visibility, native free scrolling, recorded-state descriptions, full-card targets and stable name/time geometry through collapse. Expanded actions precede supporting evidence on phone; desktop retains separate evidence and tracking columns. Reviewed sources and tracking/calculation behavior are unchanged.
 
 Text-over-text overlays require a denser material than cards: dialogs, menus, listboxes and expanded audio use 80% navy with stationary 28px/135% frost. Ordinary cards and reading tint retain their existing values. Expanded AudioPlayerSurface visually hides its covered main-canvas siblings using a reversible attribute, in addition to inert/aria-hidden, and restores them on collapse. The shared shell scene remains visible; transparent backgrounds cannot reveal duplicate Reader text. Native focus, Escape, touch lock, Solid/high-contrast/forced-color recovery and offline state remain. See docs/agent/phases/CALM_PRAYER_AND_OVERLAY_SEPARATION_2026_10_17.md.
+
+## Frost clarity and compact headers — 2026-10-17
+
+The owner's eight-screenshot review supersedes the earlier 18% ordinary/28% reading material. Shared ordinary cards now use 36% navy and long reading surfaces 48%, with stationary 22px/135% frost; overlays retain 80%/28px. Sticky page headers and the whole Progress tab/date group use 98% navy/28px to obscure passing text. Nested controls borrow outer frost; no blur animation is added. App/Home choices and opaque/high-contrast/forced-color fallbacks remain independent.
+
+Glass palettes set light success ink with matching dark foreground for filled status marks, rather than inheriting light-theme dark green. Home sharing uses explicit on-media ink and a stable button ground. Shared headers omit decorative border/shadow; Settings rows omit separators by default. Reader and standalone-counter desktop titles share their control row (96px Reader hero versus127px before); compact headers retain56px and may grow for wrapped/enlarged text. Remove standalone bottom instruction banners while preserving phone introductory guidance and header keyboard help. Religious text/counts, state and audio ownership remain unchanged. See agent/phases/FROST_CLARITY_COMPACT_HEADERS_2026_10_17.md.
+
+Owner screenshot selection: retain the open scene-backed Masbaha/Salawat canvas without an extra dark reading panel. Frost remains on their controls/menus; compact shared titles and removed bottom banners remain. This specifically supersedes applying long-reading tint to the standalone counter canvas.
+
+Owner frost correction: replace the near-opaque navy header shade with a lighter slate glass (42% tint), soft white sheen and stationary36px/135% frost. Extend Progress's sticky material across the page gutters, add16px lower breathing room and rounded lower corners. This supersedes98% header shade; maintain44px controls, focus scroll clearance, opaque accessibility recovery and the owner-selected open counter canvas. Test foreground contrast and moving-content separation against actual screenshots.

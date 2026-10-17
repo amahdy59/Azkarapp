@@ -355,9 +355,8 @@ export function CounterShortcutHints({
         lang={language}
         className="mx-auto mt-4 hidden w-fit max-w-full flex-wrap items-center justify-center gap-3 rounded-full border border-border/40 bg-muted/60 px-4 py-1.5 text-xs font-medium text-muted-foreground md:flex"
       >
-        {shortcuts.map((shortcut, index) => (
+        {shortcuts.map((shortcut) => (
           <React.Fragment key={shortcut.label}>
-            {index > 0 && <span className="h-3 w-px bg-border/60" aria-hidden="true" />}
             <span className="flex items-center gap-1" dir={direction}>
               {shortcut.keys.map((key) => (
                 <kbd

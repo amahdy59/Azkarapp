@@ -57,7 +57,7 @@ const ONBOARDING_COMPLETE_KEY = "azkarapp.onboarding-complete.v1";
 
 import { useAppRouting, isLazyRouteCategory } from "./hooks/useAppRouting";
 
-import { BottomNav, NavRail, NavSidebar } from "./components/LayoutShells";
+import { BottomNav, NavRail, NavSidebar, type NavTab } from "./components/LayoutShells";
 import { useLayoutMode } from "./hooks/useLayoutMode";
 import { useViewFocus } from "./hooks/useScreenFocus";
 
@@ -1630,6 +1630,17 @@ function AppContent({
   const showRail = showBottomNav && layoutMode === "expanded";
   const showSidebar = showBottomNav && layoutMode === "large";
 
+  const handleNavigationTab = (tab: NavTab) => {
+    setFridayDuaFlow(false);
+    if (tab === "home" && view === "home") {
+      const scrollRegion = document.querySelector(".home-content-scroll");
+      if (scrollRegion && scrollRegion.scrollTop > 0) {
+        scrollRegion.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+      }
+    }
+    handleNavTab(tab);
+  };
+
   return (
     <div className="app-viewport flex items-center justify-center">
       <div
@@ -1639,15 +1650,28 @@ function AppContent({
         data-material-reading={view === "reader" || view === "khatmah" || readerInMushafMode ? "true" : undefined}
         className={`app-shell relative isolate overflow-hidden bg-background ${showBottomNav ? "" : "app-shell--navigation-hidden"}`}
       >
-        {hasCompletedOnboarding && view !== "home" && appMaterial !== "solid" && !highContrast && (
-          <Suspense fallback={null}>
-            <AppSceneBackground
-              location={locationSettings}
-              material={appMaterial}
-              reduceTransparency={reduceTransparency}
-            />
-          </Suspense>
-        )}
+        {view !== "home" &&
+          ![
+            "splash",
+            "onboard1",
+            "ar_onboard1",
+            "language",
+            "login",
+            "email",
+            "otp",
+            "auth-callback",
+            "profile-completion",
+          ].includes(view) &&
+          appMaterial !== "solid" &&
+          !highContrast && (
+            <Suspense fallback={null}>
+              <AppSceneBackground
+                location={locationSettings}
+                material={appMaterial}
+                reduceTransparency={reduceTransparency}
+              />
+            </Suspense>
+          )}
         {/* Both banners share one grid area, so they stack across the full shell
             width instead of being auto-placed into an implicit row — which put
             them underneath the rail on the expanded and large tiers. */}
@@ -1669,24 +1693,12 @@ function AppContent({
         </div>
 
         {/* Adaptive navigation — only one renders at a time */}
-        {showRail && (
-          <NavRail
-            active={activeTab}
-            onChange={(tab) => {
-              setFridayDuaFlow(false);
-              handleNavTab(tab);
-            }}
-            isArabic={isArabic}
-          />
-        )}
+        {showRail && <NavRail active={activeTab} onChange={handleNavigationTab} isArabic={isArabic} />}
         {showSidebar && (
           <NavSidebar
             active={activeTab}
             activeUtility={view === "custom_counter" ? "masbaha" : view === "qibla" ? "qibla" : undefined}
-            onChange={(tab) => {
-              setFridayDuaFlow(false);
-              handleNavTab(tab);
-            }}
+            onChange={handleNavigationTab}
             onOpenQuran={() => {
               setFridayDuaFlow(false);
               push("khatmah_overview");
@@ -2630,14 +2642,7 @@ function AppContent({
         {/* Bottom nav — compact and medium only, shown in its own grid area */}
         {showBottomNavArea && (
           <div className="app-bottom-nav">
-            <BottomNav
-              active={activeTab}
-              onChange={(tab) => {
-                setFridayDuaFlow(false);
-                handleNavTab(tab);
-              }}
-              isArabic={isArabic}
-            />
+            <BottomNav active={activeTab} onChange={handleNavigationTab} isArabic={isArabic} />
           </div>
         )}
       </div>

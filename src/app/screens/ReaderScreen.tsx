@@ -1526,7 +1526,7 @@ export function ReaderScreen({
               >
                 <ReaderSceneArt category={catId} />
                 <div
-                  className="relative z-10 flex w-full items-center justify-between gap-3"
+                  className="reading-hero-toolbar relative z-10 grid w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3"
                   data-testid="reader-header-toolbar"
                 >
                   <IconButton
@@ -1536,6 +1536,13 @@ export function ReaderScreen({
                   >
                     <ArrowPrevious size={20} />
                   </IconButton>
+
+                  <h1
+                    className="min-w-0 break-words text-lg md:text-xl font-extrabold leading-tight text-on-media-accent"
+                    dir="auto"
+                  >
+                    {displayCategoryName}
+                  </h1>
 
                   {/* Hero actions: appearance and contextual actions. */}
                   <div className="flex flex-wrap items-center justify-end gap-2" data-testid="reader-hero-actions">
@@ -1598,13 +1605,6 @@ export function ReaderScreen({
                     </button>
                   </div>
                 </div>
-
-                <h1
-                  className="relative z-10 w-full break-words text-lg md:text-xl font-extrabold leading-tight text-on-media-accent drop-shadow-sm"
-                  dir="auto"
-                >
-                  {displayCategoryName}
-                </h1>
 
                 <div className="relative z-10 flex w-full max-w-[42rem] flex-col items-center gap-1">
                   <div className="flex w-full items-center justify-between px-1 leading-none" aria-hidden="true">

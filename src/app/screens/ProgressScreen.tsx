@@ -134,6 +134,39 @@ export function ProgressScreen({
   const [offset, setOffset] = useState(0);
   const controlsRef = useRef<HTMLDivElement>(null);
   const pointerFocus = useRef(false);
+  const [hasScrolledControls, setHasScrolledControls] = useState(false);
+  const scrolledControlsRef = useRef(false);
+
+  useEffect(() => {
+    const controls = controlsRef.current;
+    const scrollport = controls?.closest<HTMLElement>(".app-screen-surface") || document.body;
+    const onScroll = (e: Event) => {
+      const target = e.target;
+      if (!(target instanceof HTMLElement || target === document || target === window)) return;
+      let top = 0;
+      if (target === document || target === window) {
+        top = window.scrollY || document.documentElement.scrollTop;
+      } else if (target instanceof HTMLElement) {
+        if (scrollport.contains(target) || (controls && controls.contains(target))) {
+          top = target.scrollTop;
+        } else {
+          return;
+        }
+      }
+      const next = top > 4;
+      if (next !== scrolledControlsRef.current) {
+        scrolledControlsRef.current = next;
+        setHasScrolledControls(next);
+      }
+    };
+    scrollport.addEventListener("scroll", onScroll, { capture: true, passive: true });
+    window.addEventListener("scroll", onScroll, { capture: true, passive: true });
+    return () => {
+      scrollport.removeEventListener("scroll", onScroll, true);
+      window.removeEventListener("scroll", onScroll, true);
+    };
+  }, []);
+
   useEffect(() => {
     const controls = controlsRef.current;
     const scrollport = controls?.closest<HTMLElement>(".app-screen-surface");
@@ -409,7 +442,12 @@ export function ProgressScreen({
       screenName={t(language, "common.progress")}
     >
       <div className="progress-screen-content relative z-10 mx-auto flex min-h-screen w-full shrink-0 max-w-7xl flex-col items-center px-page pb-8">
-        <div ref={controlsRef} className="progress-screen-controls w-full" data-testid="progress-sticky-controls">
+        <div
+          ref={controlsRef}
+          data-scrolled={hasScrolledControls || undefined}
+          className="progress-screen-controls w-full"
+          data-testid="progress-sticky-controls"
+        >
           <Header
             title={t(language, "common.progress")}
             language={language}

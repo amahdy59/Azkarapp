@@ -12,10 +12,24 @@
   flex-shrink: 0;
   margin-block-end: 1.5rem;
   padding-block-start: env(safe-area-inset-top);
-  background: var(--background);
   max-block-size: var(--progress-controls-max-height, 60dvh);
   overflow-y: auto;
   overscroll-behavior: contain;
+  transition:
+    background-color 150ms ease,
+    box-shadow 150ms ease,
+    border-color 150ms ease;
+}
+
+html:not([data-app-material-resolved="glass"]) .progress-screen-controls,
+html.high-contrast .progress-screen-controls {
+  background: var(--background);
+}
+
+html:not([data-app-material-resolved="glass"]) .progress-screen-controls[data-scrolled="true"],
+html.high-contrast .progress-screen-controls[data-scrolled="true"] {
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 4px 20px rgb(0 0 0 / 0.1);
 }
 
 .progress-screen-controls .shared-screen-header {

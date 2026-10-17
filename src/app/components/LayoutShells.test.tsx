@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { Header, BottomNav } from "./LayoutShells";
+import { Header, BottomNav, NavRail, NavSidebar } from "./LayoutShells";
 
 describe("Header", () => {
   it("keeps artwork out of the compact title and action surface", () => {
@@ -8,7 +8,7 @@ describe("Header", () => {
     expect(screen.queryByTestId("header-art")).not.toBeInTheDocument();
     expect(screen.getByTestId("shared-screen-header")).toHaveAttribute("data-header-contrast", "solid");
   });
-  it("keeps an opaque surface and adds a divider after nested content scrolls", () => {
+  it("keeps a stable header surface without decorative dividers after nested content scrolls", () => {
     render(
       <div className="app-screen-surface">
         <Header title="Progress" />
@@ -25,7 +25,8 @@ describe("Header", () => {
 
     fireEvent.scroll(region, { target: { scrollTop: 12 } });
     expect(header).toHaveAttribute("data-scrolled", "true");
-    expect(header).toHaveClass("bg-background", "border-border", "shadow-sm");
+    expect(header).toHaveClass("bg-background");
+    expect(header).not.toHaveClass("border-b", "border-border", "shadow-sm");
 
     fireEvent.scroll(region, { target: { scrollTop: 0 } });
     expect(header).not.toHaveAttribute("data-scrolled");
@@ -45,11 +46,11 @@ describe("Header", () => {
     const header = screen.getByTestId("shared-screen-header");
     const region = screen.getByTestId("scroll-region");
     expect(header).not.toHaveAttribute("data-scrolled");
-    expect(header).toHaveClass("border-transparent");
+    expect(header).not.toHaveClass("border-b", "shadow-sm");
 
     fireEvent.scroll(region, { target: { scrollTop: 20 } });
     expect(header).not.toHaveAttribute("data-scrolled");
-    expect(header).toHaveClass("border-transparent");
+    expect(header).not.toHaveClass("border-b", "shadow-sm");
     expect(header).not.toHaveClass("border-border");
   });
 
@@ -66,11 +67,11 @@ describe("Header", () => {
     const header = screen.getByTestId("shared-screen-header");
     const readerRegion = screen.getByTestId("reader-scroll-region");
     expect(header).not.toHaveAttribute("data-scrolled");
-    expect(header).toHaveClass("border-transparent");
+    expect(header).not.toHaveClass("border-b", "shadow-sm");
 
     fireEvent.scroll(readerRegion, { target: { scrollTop: 50 } });
     expect(header).not.toHaveAttribute("data-scrolled");
-    expect(header).toHaveClass("border-transparent");
+    expect(header).not.toHaveClass("border-b", "shadow-sm");
     expect(header).not.toHaveClass("border-border");
   });
 });
@@ -95,5 +96,31 @@ describe("BottomNav", () => {
 
     fireEvent.click(screen.getByTestId("nav-progress"), { ctrlKey: true });
     expect(handleChange).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("Desktop Brand Navigation", () => {
+  it("navigates to Home when clicking the rail brand mark", () => {
+    const handleChange = vi.fn();
+    render(<NavRail active="azkar" onChange={handleChange} isArabic={true} />);
+
+    const brandLink = screen.getByTestId("desktop-rail-brand-home");
+    expect(brandLink).toHaveAttribute("href", "#/home");
+    expect(brandLink).toHaveAccessibleName("الرئيسية");
+
+    fireEvent.click(brandLink);
+    expect(handleChange).toHaveBeenCalledWith("home");
+  });
+
+  it("navigates to Home when clicking the sidebar brand mark", () => {
+    const handleChange = vi.fn();
+    render(<NavSidebar active="azkar" onChange={handleChange} isArabic={true} />);
+
+    const brandLink = screen.getByTestId("desktop-brand-home");
+    expect(brandLink).toHaveAttribute("href", "#/home");
+    expect(brandLink).toHaveAccessibleName("الرئيسية");
+
+    fireEvent.click(brandLink);
+    expect(handleChange).toHaveBeenCalledWith("home");
   });
 });

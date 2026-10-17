@@ -435,7 +435,7 @@ export function CategoryScreen({
                   className="celebration-pop mt-3 flex items-center gap-3 rounded-2xl border border-success/30 bg-success/10 p-3 text-start"
                   data-testid="sleep-preparation-complete"
                 >
-                  <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-success text-white dark:bg-success dark:text-primary-foreground">
+                  <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-success text-success-foreground">
                     <Check size={19} strokeWidth={3} aria-hidden="true" />
                   </span>
                   <span>

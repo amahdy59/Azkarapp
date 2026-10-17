@@ -11,13 +11,18 @@
     rgb(255 255 255 / 0.012) 55%,
     rgb(2 6 23 / 0.04)
   );
-  border-color: rgb(255 255 255 / 0.3);
+  border-color: rgb(255 255 255 / 0.22) rgb(255 255 255 / 0.16) rgb(255 255 255 / 0.1) rgb(255 255 255 / 0.16);
   backdrop-filter: var(--glass-frost);
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.36),
+    inset 0 1px 0 rgb(255 255 255 / 0.22),
     inset 1px 0 0 rgb(255 255 255 / 0.09),
     inset 0 -1px 0 rgb(255 255 255 / 0.05),
     0 8px 24px rgb(2 6 23 / 0.14);
+}
+@media (hover: hover) and (pointer: fine) {
+  .home-photo-canvas .hero-glass.home-glass-surface:hover {
+    border-color: rgb(255 255 255 / 0.28) rgb(255 255 255 / 0.22) rgb(255 255 255 / 0.14) rgb(255 255 255 / 0.22);
+  }
 }
 
 /* Preserve the material's legible ground without relying on blur support. */
@@ -511,7 +516,11 @@
    Child cards keep their own tint/edges without stacking another blur layer. */
 .home-prayer-scrolled {
   background: rgb(15 23 42 / 0.5);
-  backdrop-filter: blur(16px) saturate(135%);
+  backdrop-filter: var(--glass-frost);
+  box-shadow: 0 4px 20px rgb(2 6 23 / 0.25);
+  transition:
+    background-color var(--motion-duration-fast) ease,
+    box-shadow var(--motion-duration-fast) ease;
 }
 .home-prayer-scrolled .hero-glass.home-glass-surface,
 html:not(.high-contrast) .home-force-glass .home-prayer-scrolled .hero-glass.home-glass-surface {
@@ -521,22 +530,26 @@ html:not(.high-contrast) .home-force-glass .home-prayer-scrolled .hero-glass.hom
 .high-contrast .home-prayer-scrolled {
   background: var(--on-media-surface);
   backdrop-filter: none;
+  box-shadow: none;
 }
 @media (prefers-reduced-transparency: reduce) {
   .home-prayer-scrolled {
     background: var(--on-media-surface);
     backdrop-filter: none;
+    box-shadow: none;
   }
 }
 @supports (backdrop-filter: blur(1px)) {
   html:not(.high-contrast) .home-force-glass .home-prayer-scrolled {
     background: rgb(15 23 42 / 0.5);
-    backdrop-filter: blur(16px) saturate(135%);
+    backdrop-filter: var(--glass-frost);
+    box-shadow: 0 4px 20px rgb(2 6 23 / 0.25);
   }
 }
 @supports not (backdrop-filter: blur(1px)) {
   .home-prayer-scrolled {
     background: var(--on-media-surface);
+    box-shadow: none;
   }
 }
 @media (forced-colors: active) {
@@ -544,5 +557,11 @@ html:not(.high-contrast) .home-force-glass .home-prayer-scrolled .hero-glass.hom
   html:not(.high-contrast) .home-force-glass .home-prayer-scrolled {
     background: Canvas;
     backdrop-filter: none;
+    box-shadow: none;
   }
+}
+/* On-media actions must not inherit a light theme's dark success ink. */
+html:not(.high-contrast) .home-photo-canvas {
+  --success: #8aefb7;
+  --success-foreground: #062e16;
 }

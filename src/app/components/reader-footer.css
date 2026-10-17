@@ -14,7 +14,6 @@
   max-width: 42rem;
   margin-inline: auto;
   padding-top: 10px;
-  border-top: 1px solid var(--border);
 }
 .reader-tools-actions {
   grid-column: 1 / 4;
@@ -27,8 +26,14 @@
 }
 .reader-tools-disclosure button {
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
   padding-inline: 12px;
   white-space: nowrap;
+  overflow: hidden;
+}
+.reader-tools-disclosure .reader-tools-chevron {
+  flex-shrink: 0;
 }
 .reader-tools-toggle:not([data-focus-active])[aria-expanded="false"] {
   border-style: dashed;
@@ -94,11 +99,11 @@
     display: flex;
   }
   [data-testid="reader-support-actions"] .devotional-secondary-action:has(.reader-tool-label),
-  .reader-tools-disclosure button:has(.reader-tool-short-label) {
+  .reader-tools-disclosure button:has(.reader-tool-label) {
     gap: 2px;
   }
   [data-testid="reader-support-actions"] .devotional-secondary-action > .reader-tool-label,
-  .reader-tools-disclosure button > .reader-tool-short-label {
+  .reader-tools-disclosure button > .reader-tool-label {
     display: block;
     max-width: 100%;
     white-space: normal;

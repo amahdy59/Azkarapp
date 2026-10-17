@@ -458,12 +458,6 @@ export function FridaySalawatScreen({
                       />
                     }
                   />
-                  <CounterGuidance
-                    language={language}
-                    direction={direction}
-                    hasStarted={progress.count > 0}
-                    placement="below"
-                  />
                 </div>
               </footer>
             </div>

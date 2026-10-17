@@ -17,6 +17,7 @@
         [data-material-ui],
         [data-material-surface],
         [data-material-ui] [class*="theme-"],
+        [data-material-ui] [data-reader-category],
         .app-sidebar,
         .app-rail,
         .bottom-nav,
@@ -39,6 +40,12 @@
       --input: var(--border-control);
       --primary: #d4a020;
       --primary-foreground: #0a1228;
+      --success: #8aefb7;
+      --success-foreground: #062e16;
+      --warning: #ffe08a;
+      --warning-foreground: #271900;
+      --destructive: #ffb4b4;
+      --destructive-foreground: #3b0808;
       color: var(--foreground);
     }
     html[data-app-material-resolved="glass"]:not(.high-contrast)
@@ -50,22 +57,31 @@
         .bottom-nav,
         [role="dialog"],
         [role="menu"],
-        [role="listbox"]
-      ):not(:where(input, select, textarea, label)) {
+        [role="listbox"],
+        [data-material-ui] [class*="CHOICE_SURFACE"],
+        [data-material-ui] label.has-\[\:checked\]
+      ):not(:where(input, select, textarea, label:not([class*="border"]):not([class*="rounded"]))) {
       background-color: var(--glass-card-tint);
       background-image: linear-gradient(
         135deg,
-        rgb(255 255 255 / 0.055),
-        rgb(255 255 255 / 0.012) 55%,
+        rgb(255 255 255 / 0.07),
+        rgb(255 255 255 / 0.015) 55%,
         rgb(2 6 23 / 0.04)
       );
-      border-color: rgb(255 255 255 / 0.3);
+      border-color: rgb(255 255 255 / 0.22) rgb(255 255 255 / 0.16) rgb(255 255 255 / 0.1) rgb(255 255 255 / 0.16);
       backdrop-filter: var(--glass-frost);
       box-shadow:
-        inset 0 1px 0 rgb(255 255 255 / 0.36),
+        inset 0 1px 0 rgb(255 255 255 / 0.22),
         inset 1px 0 0 rgb(255 255 255 / 0.09),
         inset 0 -1px 0 rgb(255 255 255 / 0.05),
         0 8px 24px rgb(2 6 23 / 0.14);
+    }
+    @media (hover: hover) and (pointer: fine) {
+      html[data-app-material-resolved="glass"]:not(.high-contrast)
+        [data-material-ui]
+        :is([class*="bg-card"], .glass-reading):hover {
+        border-color: rgb(255 255 255 / 0.28) rgb(255 255 255 / 0.22) rgb(255 255 255 / 0.14) rgb(255 255 255 / 0.22);
+      }
     }
     /* Home's stronger reading tint also supports Quran pages and overlays.
        Glyphs, page geometry and reading interactions remain unchanged. */
@@ -94,8 +110,16 @@
       :is([role="dialog"], [role="menu"], [role="listbox"], .audio-options-menu, .audio-player-surface):not(
         .audio-lock-shield
       ) {
-      background-color: rgb(15 23 42 / 0.8);
+      background-color: rgb(15 23 42 / 0.85);
+      background-image: linear-gradient(
+        135deg,
+        rgb(255 255 255 / 0.08),
+        rgb(255 255 255 / 0.015) 55%,
+        rgb(2 6 23 / 0.05)
+      );
       backdrop-filter: blur(28px) saturate(135%);
+      border: 1px solid rgb(255 255 255 / 0.18);
+      box-shadow: 0 20px 48px rgb(2 6 23 / 0.45);
     }
     /* Nested surfaces use their parent's frost, avoiding stacked GPU layers. */
     html[data-app-material-resolved="glass"]:not(.high-contrast)
@@ -106,9 +130,68 @@
     html[data-app-material-resolved="glass"]:not(.high-contrast)
       [data-material-ui]
       :is([class*="bg-card"], .bg-popover, header)
-      :is([class*="bg-card"], .bg-popover, header) {
+      :is([class*="bg-card"], .bg-popover, .field-shell, button:not([role="tab"])) {
       backdrop-filter: none;
       background-image: none;
+    }
+    /* Unscrolled headers and sticky controls blend into the top of the scene */
+    html[data-app-material-resolved="glass"]:not(.high-contrast)
+      :is(
+        [data-material-ui] header:not([data-scrolled="true"]),
+        [data-material-ui] .shared-screen-header:not([data-scrolled="true"]),
+        [data-material-ui] .settings-search-sticky:not([data-scrolled="true"]),
+        [data-material-ui] .progress-screen-controls:not([data-scrolled="true"])
+      ) {
+      background-color: transparent !important;
+      background-image: none !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      border-bottom-color: transparent !important;
+      box-shadow: none !important;
+    }
+    /* Scrolled sticky headers and controls protect text readability without letting content bleed through */
+    html[data-app-material-resolved="glass"]:not(.high-contrast)
+      :is(
+        [data-material-ui] header[data-scrolled="true"],
+        [data-material-ui] .shared-screen-header[data-scrolled="true"],
+        [data-material-ui] .settings-search-sticky[data-scrolled="true"],
+        [data-material-ui] .progress-screen-controls[data-scrolled="true"]
+      ) {
+      background-color: #0a1228 !important;
+      background-image: linear-gradient(
+        135deg,
+        rgb(255 255 255 / 0.08),
+        rgb(255 255 255 / 0.015) 55%,
+        rgb(2 6 23 / 0.05)
+      ) !important;
+      backdrop-filter: blur(28px) saturate(140%) !important;
+      -webkit-backdrop-filter: blur(28px) saturate(140%) !important;
+      border-bottom: 1px solid rgb(255 255 255 / 0.12) !important;
+      box-shadow: 0 4px 20px rgb(2 6 23 / 0.35) !important;
+    }
+    /* In the settings root panel, the header sits directly above the sticky search bar, so only the search bar needs the bottom border/shadow */
+    html[data-app-material-resolved="glass"]:not(.high-contrast)
+      :is(
+        [data-testid="settings-screen"] > div > .shared-screen-header[data-scrolled="true"],
+        .settings-nav-pane > .shared-screen-header[data-scrolled="true"]
+      ) {
+      border-bottom: 0 !important;
+      box-shadow: none !important;
+    }
+    /* Progress controls act as the unified sticky visor for header, tabs, and date navigation together */
+    html[data-app-material-resolved="glass"]:not(.high-contrast) .progress-screen-controls {
+      inline-size: calc(100% + 2 * var(--spacing-page));
+      margin-inline: calc(-1 * var(--spacing-page));
+      padding-inline: var(--spacing-page);
+      padding-block-end: 1rem;
+      border-radius: 0 0 1.5rem 1.5rem;
+    }
+    html[data-app-material-resolved="glass"]:not(.high-contrast) .progress-screen-controls .shared-screen-header {
+      background: transparent !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      border: 0 !important;
+      box-shadow: none !important;
     }
   }
 }

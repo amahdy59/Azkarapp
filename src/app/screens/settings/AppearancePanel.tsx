@@ -1,4 +1,4 @@
-import { Calendar, Globe, Moon, Eye, Droplets } from "../../components/icons";
+import { Calendar, Globe, Moon, Eye, Droplets, SwitchHorizontal, Smartphone } from "../../components/icons";
 import { Button } from "../../components/ui/button";
 import { SegmentedControl } from "../../components/SegmentedControl";
 import { LANGUAGES_LIST } from "../../languageOptions";
@@ -89,48 +89,37 @@ export function AppearancePanel({
             </aside>
           )}
         </SettingsSection>
-        {onAppMaterialChange && (
+        {(onAppMaterialChange || onHomeMaterialChange || onHomeWirdImagesChange) && (
           <SettingsSection label={t(language, "settings.appMaterial")} className="mt-3">
-            <div className="space-y-3 p-4">
-              <p className="text-sm text-muted-foreground">{t(language, "settings.appMaterialHint")}</p>
-              <SegmentedControl
-                value={displayedMaterial(appMaterial)}
-                onChange={applyMaterial}
-                onReselect={applyMaterial}
-                direction={direction}
-                aria-label={t(language, "settings.appMaterial")}
-                className="flex flex-wrap gap-2"
-                options={(["solid", "glass"] as const).map((value) => ({
-                  value,
-                  label: t(language, `settings.homeMaterial_${value}`),
-                }))}
-              />
-            </div>
-          </SettingsSection>
-        )}
-        <SettingsSection label={t(language, "settings.homeCards")} className="mt-3">
-          {onHomeMaterialChange && (
-            <div className="p-4">
-              <div className="space-y-3">
-                <p className="text-sm text-muted-foreground">{t(language, "settings.homeMaterialHint")}</p>
-                <SettingsToggleRow
-                  icon={<Droplets size={20} />}
-                  iconBg={iconBackground}
-                  label={t(language, "settings.homeMaterial_inherit")}
-                  checked={homeMaterial === "inherit"}
-                  onChange={() =>
-                    onHomeMaterialChange(homeMaterial === "inherit" ? displayedMaterial(appMaterial) : "inherit")
-                  }
-                />
+            {/* 1. Entire app appearance */}
+            {onAppMaterialChange && (
+              <div className="p-4">
+                <div className="mb-2 flex items-center gap-2.5">
+                  <span
+                    className="flex size-7 shrink-0 items-center justify-center rounded-lg text-primary"
+                    style={{ background: iconBackground }}
+                    aria-hidden="true"
+                  >
+                    <Smartphone size={16} />
+                  </span>
+                  <p className="text-sm font-bold text-foreground">{t(language, "settings.entireAppAppearance")}</p>
+                </div>
+                <p className="mb-3 text-xs leading-5 text-muted-foreground">
+                  {t(language, "settings.appMaterialHint")}
+                </p>
                 <SegmentedControl
-                  value={displayedMaterial(homeMaterial === "inherit" ? appMaterial : homeMaterial)}
-                  onChange={onHomeMaterialChange}
-                  onReselect={onHomeMaterialChange}
+                  value={displayedMaterial(appMaterial)}
+                  onChange={applyMaterial}
+                  onReselect={applyMaterial}
                   direction={direction}
-                  aria-label={t(language, "settings.homeMaterial")}
-                  className="flex flex-wrap gap-2"
+                  aria-label={t(language, "settings.appMaterial")}
+                  className="flex bg-muted/80 p-1 rounded-xl"
                   itemClassName={(selected) =>
-                    `min-h-11 flex-1 rounded-xl border px-3 py-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${selected ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-foreground"}`
+                    `min-h-11 flex-1 rounded-lg py-2.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                      selected
+                        ? "bg-primary text-primary-foreground font-bold"
+                        : "text-muted-foreground hover:text-foreground font-semibold"
+                    }`
                   }
                   options={(["solid", "glass"] as const).map((value) => ({
                     value,
@@ -138,29 +127,87 @@ export function AppearancePanel({
                   }))}
                 />
               </div>
-            </div>
-          )}
-          {onHomeWirdImagesChange && (
-            <SettingsToggleRow
-              icon={<Eye size={20} />}
-              iconBg={iconBackground}
-              label={t(language, "settings.homeWirdImages")}
-              description={t(language, "settings.homeWirdImagesHint")}
-              checked={homeWirdImages}
-              onChange={() => onHomeWirdImagesChange(!homeWirdImages)}
-            />
-          )}
-          {!onHomeMaterialChange && onReduceTransparencyChange && (
-            <SettingsToggleRow
-              icon={<Droplets size={20} />}
-              iconBg={iconBackground}
-              label={t(language, "settings.homeTransparency")}
-              description={t(language, "settings.homeTransparencyHint")}
-              checked={!reduceTransparency}
-              onChange={() => onReduceTransparencyChange(!reduceTransparency)}
-            />
-          )}
-        </SettingsSection>
+            )}
+
+            {onAppMaterialChange && onHomeMaterialChange && <div className="h-px bg-border/40 mx-4" />}
+
+            {/* 2. Home page cards appearance */}
+            {onHomeMaterialChange && (
+              <>
+                <SettingsToggleRow
+                  icon={<SwitchHorizontal size={20} className="text-primary" />}
+                  iconBg={iconBackground}
+                  label={t(language, "settings.homeMaterial_inherit")}
+                  description={
+                    homeMaterial === "inherit"
+                      ? `${t(language, "settings.homeMaterialFollowsApp")} (${t(language, `settings.homeMaterial_${displayedMaterial(appMaterial)}`)})`
+                      : t(language, "settings.homeMaterialCustomDesc")
+                  }
+                  checked={homeMaterial === "inherit"}
+                  onChange={() =>
+                    onHomeMaterialChange(homeMaterial === "inherit" ? displayedMaterial(appMaterial) : "inherit")
+                  }
+                />
+                <div className="px-4 pb-3 pt-1">
+                  <div className="rounded-2xl bg-muted/40 p-3 border border-border/40">
+                    <div className="mb-2 flex items-center justify-between text-xs font-semibold text-muted-foreground">
+                      <span>{t(language, "settings.homeMaterial")}</span>
+                      <span className="text-micro font-medium">
+                        {homeMaterial === "inherit"
+                          ? t(language, "settings.autoTag")
+                          : t(language, "settings.customTag")}
+                      </span>
+                    </div>
+                    <SegmentedControl
+                      value={displayedMaterial(homeMaterial === "inherit" ? appMaterial : homeMaterial)}
+                      onChange={onHomeMaterialChange}
+                      onReselect={onHomeMaterialChange}
+                      direction={direction}
+                      aria-label={t(language, "settings.homeMaterial")}
+                      className="flex bg-card/80 p-1 rounded-xl border border-border/40"
+                      itemClassName={(selected) =>
+                        `min-h-11 flex-1 rounded-lg py-2.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                          selected
+                            ? "bg-primary text-primary-foreground font-bold"
+                            : "text-muted-foreground hover:text-foreground font-semibold"
+                        }`
+                      }
+                      options={(["solid", "glass"] as const).map((value) => ({
+                        value,
+                        label: t(language, `settings.homeMaterial_${value}`),
+                      }))}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+
+            {(onHomeMaterialChange || onAppMaterialChange) &&
+              (onHomeWirdImagesChange || onReduceTransparencyChange) && <div className="h-px bg-border/40 mx-4" />}
+
+            {/* 3. Daily-wird card look / images */}
+            {onHomeWirdImagesChange && (
+              <SettingsToggleRow
+                icon={<Eye size={20} className="text-primary" />}
+                iconBg={iconBackground}
+                label={t(language, "settings.homeWirdImages")}
+                description={t(language, "settings.homeWirdImagesHint")}
+                checked={homeWirdImages}
+                onChange={() => onHomeWirdImagesChange(!homeWirdImages)}
+              />
+            )}
+            {!onHomeMaterialChange && onReduceTransparencyChange && (
+              <SettingsToggleRow
+                icon={<Droplets size={20} className="text-primary" />}
+                iconBg={iconBackground}
+                label={t(language, "settings.homeTransparency")}
+                description={t(language, "settings.homeTransparencyHint")}
+                checked={!reduceTransparency}
+                onChange={() => onReduceTransparencyChange(!reduceTransparency)}
+              />
+            )}
+          </SettingsSection>
+        )}
         <SettingsSection className="mt-3">
           <div className="p-4 border-b border-border/50">
             <div className="mb-3 flex items-center gap-3">

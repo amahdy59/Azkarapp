@@ -1,5 +1,31 @@
 [
   {
+    "release": "2026-10-17.10",
+    "ar": [
+      "تثبيت شريط البحث في الإعدادات مع حماية تامة من تداخل النصوص أثناء التمرير في شاشات التقدم والإعدادات.",
+      "تحسين شريط أدوات القارئ ليظهر زر التركيز بحجم متناسق ودقيق على مختلف أحجام الشاشات.",
+      "خلفية المشهد الهادئة تتكامل بسلاسة مع نمط الزجاج الضبابي في جميع شاشات التطبيق."
+    ],
+    "en": [
+      "Pinned Settings search with complete protection against text overlap when scrolling through Progress and Settings.",
+      "Refined reader tools with a clean focus action tailored for compact and mobile screens.",
+      "Peaceful scene background now integrates seamlessly across all application views in glass mode."
+    ]
+  },
+  {
+    "release": "2026-10-17.9",
+    "ar": [
+      "زجاج أكثر ضبابية وبطاقات أوضح مع ألوان مقروءة لحالات الإكمال وأزرار المشاركة.",
+      "رؤوس صفحات بزجاج ضبابي أفتح ومساحة أوسع تفصل المحتوى أثناء التمرير، مع فواصل زخرفية أقل.",
+      "عنوان الأذكار بمحاذاة أدواته في رأس أقصر، مع نفس الترتيب للمسبحة والصلاة على النبي وإزالة شريط التعليمات السفلي."
+    ],
+    "en": [
+      "Stronger frost makes cards clearer, with readable completion colors and share buttons.",
+      "Headers use lighter frost and more space to separate scrolling content, with fewer decorative separators.",
+      "Zikr titles align with their controls in shorter headers, shared by Masbaha and Salawat, without the bottom instruction banner."
+    ]
+  },
+  {
     "release": "2026-10-17.8",
     "ar": [
       "زر معلومات الصلاة بمحاذاة مربعات التسجيل على الهاتف.",

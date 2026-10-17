@@ -73,10 +73,17 @@ export function ReadingScreenChrome({
       >
         <ReaderSceneArt category={artCategory} />
 
-        <div className="relative z-10 flex w-full items-center justify-between gap-3">
+        <div className="reading-hero-toolbar relative z-10 grid w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3">
           <IconButton onClick={onBack} label={t(language, "common.back")} className={HERO_ACTION_CLASS}>
             <ArrowPrevious size={20} />
           </IconButton>
+
+          <h1
+            className="min-w-0 break-words text-lg md:text-xl font-extrabold leading-tight text-on-media-accent"
+            dir="auto"
+          >
+            {title}
+          </h1>
 
           <div className="flex items-center gap-2" data-testid={`${testId}-hero-actions`}>
             {onKeyboardHelp && (
@@ -105,13 +112,6 @@ export function ReadingScreenChrome({
             {actions("wide")}
           </div>
         </div>
-
-        <h1
-          className="relative z-10 w-full break-words text-lg md:text-xl font-extrabold leading-tight text-on-media-accent drop-shadow-sm"
-          dir="auto"
-        >
-          {title}
-        </h1>
 
         {(progress || subRow) && (
           <div className="relative z-10 flex w-full max-w-[42rem] flex-col items-center gap-2">

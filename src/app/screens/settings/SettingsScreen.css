@@ -16,7 +16,10 @@
 
   .settings-nav-pane {
     border-inline-end: 1px solid var(--border-subtle);
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 100%;
   }
 
   .settings-detail-pane {

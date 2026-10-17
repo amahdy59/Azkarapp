@@ -210,10 +210,19 @@ export function AzkarLibraryScreen({
     checkScrollAffordance();
   }, [selectedGroupId, checkScrollAffordance]);
 
+  const [hasScrolledHeader, setHasScrolledHeader] = useState(false);
+  const handleListScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const next = e.currentTarget.scrollTop > 4;
+    if (next !== hasScrolledHeader) setHasScrolledHeader(next);
+  };
+
   return (
     <ScreenContainer dir={direction} className="relative" screenName={t(language, "library.title")}>
       <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col min-h-screen">
-        <header className="shrink-0 border-b border-border-control/25 bg-background px-page pb-3 pt-2 sm:pb-4">
+        <header
+          data-scrolled={hasScrolledHeader || undefined}
+          className="shrink-0 border-b border-border-control/25 bg-background px-page pb-3 pt-2 sm:pb-4 transition-colors duration-standard"
+        >
           <div className="flex min-h-11 min-w-0 items-center justify-between gap-3">
             <div className="min-w-0">
               <h1 className="block max-w-full truncate whitespace-nowrap text-xl font-extrabold text-foreground sm:text-2xl">
@@ -415,6 +424,7 @@ export function AzkarLibraryScreen({
         </header>
 
         <div
+          onScroll={handleListScroll}
           className="min-h-0 flex-1 overflow-y-auto px-page pb-5 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
           {...tabPanelProps("library-sections", section)}
         >

@@ -117,16 +117,38 @@ export function Header({
   useEffect(() => {
     if (!elevateOnScroll) return;
     const header = headerRef.current;
-    const screen = header?.closest<HTMLElement>(".app-screen-surface");
-    if (!screen) return;
+    if (!header) return;
+
+    const screenRoot =
+      header.closest<HTMLElement>(".app-screen-surface") ||
+      header.closest<HTMLElement>("[data-testid='settings-screen']") ||
+      header.closest<HTMLElement>(".app-main-view") ||
+      document.body;
 
     const updateFromScroll = (event: Event) => {
       const target = event.target;
-      if (!(target instanceof HTMLElement)) return;
+      if (!(target instanceof HTMLElement || target === document || target === window)) return;
       // An inner devotional text reader scrolls within its own card and never
       // passes content underneath the header, so it should not trigger elevation.
-      if (target.classList.contains("reader-text-scroll") || target.closest(".reader-text-scroll")) return;
-      const next = target.scrollTop > 4;
+      if (
+        target instanceof HTMLElement &&
+        (target.classList.contains("reader-text-scroll") || target.closest(".reader-text-scroll"))
+      ) {
+        return;
+      }
+
+      let scrollTop = 0;
+      if (target === document || target === window) {
+        scrollTop = window.scrollY || document.documentElement.scrollTop;
+      } else if (target instanceof HTMLElement) {
+        if (screenRoot.contains(target) || target.contains(header)) {
+          scrollTop = target.scrollTop;
+        } else {
+          return;
+        }
+      }
+
+      const next = scrollTop > 4;
       if (next === scrolledRef.current) return;
       scrolledRef.current = next;
       setHasScrolledContent(next);
@@ -135,8 +157,12 @@ export function Header({
     // Scroll does not bubble, but it can be observed in the capture phase.
     // This keeps Header independent from each screen's choice of scroll owner:
     // some screens scroll the surface itself, while others use a nested region.
-    screen.addEventListener("scroll", updateFromScroll, true);
-    return () => screen.removeEventListener("scroll", updateFromScroll, true);
+    screenRoot.addEventListener("scroll", updateFromScroll, true);
+    window.addEventListener("scroll", updateFromScroll, { capture: true, passive: true });
+    return () => {
+      screenRoot.removeEventListener("scroll", updateFromScroll, true);
+      window.removeEventListener("scroll", updateFromScroll, { capture: true });
+    };
   }, [elevateOnScroll]);
 
   const isScrolled = Boolean(elevateOnScroll && hasScrolledContent);
@@ -147,9 +173,7 @@ export function Header({
       data-testid="shared-screen-header"
       data-scrolled={isScrolled || undefined}
       data-header-contrast="solid"
-      className={`shared-screen-header ${decoration ? "isolate" : ""} sticky top-0 z-40 flex w-full shrink-0 items-center gap-2 border-b border-transparent bg-background ${pageGutters ? "px-page" : "px-4"} pt-2 pb-1 shadow-xs transition-colors duration-standard ${
-        isScrolled ? "border-border shadow-sm" : "border-transparent"
-      }`}
+      className={`shared-screen-header ${decoration ? "isolate" : ""} sticky top-0 z-40 flex w-full shrink-0 items-center gap-2 bg-background ${pageGutters ? "px-page" : "px-4"} pt-2 pb-1 transition-colors duration-standard`}
       style={{ minHeight: 56, ...style }}
     >
       {/* Reading headers use one opaque surface; scene artwork belongs below
@@ -266,9 +290,15 @@ export function NavRail({ active, onChange, isArabic = false }: NavProps) {
       className="app-rail flex flex-col items-center gap-2 py-4 px-1"
     >
       {/* Brand icon */}
-      <div className="flex items-center justify-center p-2 mb-2" aria-hidden="true">
+      <a
+        href={NAV_HREF.home}
+        data-testid="desktop-rail-brand-home"
+        onClick={(event) => followInAppLink(event, () => onChange("home"))}
+        aria-label={t(language, "common.home")}
+        className="flex min-h-11 min-w-11 items-center justify-center p-2 mb-2 rounded-xl focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring hover:bg-white/10 transition-colors"
+      >
         <PalmTreeMark size={28} className="text-primary" />
-      </div>
+      </a>
 
       {tabs.map(({ id, label, Icon }) => {
         const on = active === id;

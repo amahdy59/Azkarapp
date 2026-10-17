@@ -605,7 +605,6 @@ export function CustomCounterScreen({
                       />
                     }
                   />
-                  <CounterGuidance language={language} direction={direction} hasStarted={count > 0} placement="below" />
                 </div>
               </footer>
             </div>

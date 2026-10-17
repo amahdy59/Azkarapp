@@ -1,13 +1,13 @@
 {
-  "release": "2026-10-17.8",
+  "release": "2026-10-17.10",
   "ar": [
-    "زر معلومات الصلاة بمحاذاة مربعات التسجيل على الهاتف.",
-    "المحاذاة متناسقة عند التبديل بين العربية والإنجليزية.",
-    "زر المعلومات يبقى داخل حافة البطاقة مع مساحة لمس مريحة."
+    "تثبيت شريط البحث في الإعدادات مع حماية تامة من تداخل النصوص أثناء التمرير في شاشات التقدم والإعدادات.",
+    "تحسين شريط أدوات القارئ ليظهر زر التركيز بحجم متناسق ودقيق على مختلف أحجام الشاشات.",
+    "خلفية المشهد الهادئة تتكامل بسلاسة مع نمط الزجاج الضبابي في جميع شاشات التطبيق."
   ],
   "en": [
-    "Prayer information buttons line up with the tracking checkboxes on phones.",
-    "Alignment stays consistent when switching between Arabic and English.",
-    "The information button sits inside the card edge with a comfortable touch target."
+    "Pinned Settings search with complete protection against text overlap when scrolling through Progress and Settings.",
+    "Refined reader tools with a clean focus action tailored for compact and mobile screens.",
+    "Peaceful scene background now integrates seamlessly across all application views in glass mode."
   ]
 }

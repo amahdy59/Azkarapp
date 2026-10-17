@@ -51,21 +51,13 @@ export function ReaderFooterTools({
                 event.stopPropagation();
                 onToggleFocus?.();
               }}
-              className="reader-tools-toggle min-w-11 text-label font-semibold"
+              className="reader-tools-toggle min-w-0 max-w-full overflow-hidden text-label font-semibold"
             >
               <span className="reader-tools-chevron flex shrink-0 items-center justify-center" aria-hidden="true">
                 {focusMode ? <Minimize size={20} /> : <Maximize size={20} />}
               </span>
-              <span className="reader-tool-short-label" aria-hidden="true">
+              <span className="reader-tool-label min-w-0 truncate text-label font-semibold">
                 {t(language, focusMode ? "reader.exitFocusShort" : "reader.focusShort")}
-              </span>
-              <span className="inline-grid">
-                <span className="col-start-1 row-start-1">
-                  {t(language, focusMode ? "reader.exitFocus" : "reader.enterFocus")}
-                </span>
-                <span aria-hidden="true" className="invisible col-start-1 row-start-1">
-                  {t(language, focusMode ? "reader.enterFocus" : "reader.exitFocus")}
-                </span>
               </span>
             </DevotionalAction>
           ) : (

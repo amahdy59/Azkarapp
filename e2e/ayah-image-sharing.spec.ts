@@ -19,7 +19,7 @@ async function openStudio(page: Page, language: "ar" | "en") {
     name: language === "ar" ? "فتح إجراءات الآية ٢٥٥" : "Open actions for ayah 255",
   });
   await expect(trigger).toBeVisible();
-  await trigger.click();
+  await trigger.click({ button: "right" });
   const imageAction = page.getByRole("button", { name: t(language, "reader.shareAyahImage"), exact: true });
   await imageAction.click();
   const studio = page.getByTestId("ayah-share-studio");

@@ -601,7 +601,7 @@ export function HomeScreen({
           data-testid="home-sticky-prayers"
           data-prayer-cards-condensed={prayerCardsCondensed || undefined}
           className={`pointer-events-none sticky inset-x-0 top-0 z-50 overflow-visible ${
-            hasScrolledHomeContent ? (homeVisualEffects ? "home-prayer-scrolled" : "bg-background") : ""
+            prayerCardsCondensed ? (homeVisualEffects ? "home-prayer-scrolled" : "bg-background") : ""
           }`}
         >
           <header

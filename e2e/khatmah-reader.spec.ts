@@ -135,7 +135,7 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
 
   // QCF draws private-use glyphs, so ayah actions must expose the canonical
   // Unicode text rather than relying on selection-copy from the paper.
-  await page.getByRole("button", { name: "فتح إجراءات الآية ٢٥٥" }).click();
+  await page.getByRole("button", { name: "فتح إجراءات الآية ٢٥٥" }).click({ button: "right" });
   const ayahSheet = page.getByTestId("ayah-interaction-sheet");
   await expect(ayahSheet).toBeVisible();
   if ((await page.viewportSize())!.width < 768) {

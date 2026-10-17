@@ -87,6 +87,51 @@ describe("MushafPageViewer", () => {
     expect(screen.getByRole("button", { name: "فتح إجراءات الآية ٦" })).toBeInTheDocument();
   });
 
+  it("ignores unintentional pointer clicks on ayah number but opens actions on hold-press or keyboard", () => {
+    const onAyahAction = vi.fn();
+    render(
+      <MushafPageViewer
+        lines={sampleLines}
+        language="ar"
+        pageNumber={3}
+        surahName="سورة البقرة"
+        juzNumber={1}
+        direction="rtl"
+        onAyahAction={onAyahAction}
+      />,
+    );
+
+    const marker = screen.getByRole("button", { name: "فتح إجراءات الآية ٦" });
+
+    // Pointer click (mouse or tap with detail >= 1) should be ignored
+    fireEvent.click(marker, { detail: 1 });
+    expect(onAyahAction).not.toHaveBeenCalled();
+
+    // Context menu / hold-press on marker should trigger ayah actions
+    fireEvent.contextMenu(marker);
+    expect(onAyahAction).toHaveBeenCalledWith("2:6", 3);
+    onAyahAction.mockClear();
+
+    // Context menu / hold-press on a word of the ayah should trigger ayah actions
+    const word = screen.getByText("إِنَّ");
+    fireEvent.contextMenu(word);
+    expect(onAyahAction).toHaveBeenCalledWith("2:6", 3);
+    onAyahAction.mockClear();
+
+    // Keyboard activation (Enter / Space) on marker should trigger ayah actions for accessibility
+    fireEvent.keyDown(marker, { key: "Enter" });
+    expect(onAyahAction).toHaveBeenCalledWith("2:6", 3);
+    onAyahAction.mockClear();
+
+    fireEvent.keyDown(marker, { key: " " });
+    expect(onAyahAction).toHaveBeenCalledWith("2:6", 3);
+    onAyahAction.mockClear();
+
+    // Synthetic click from keyboard (detail === 0) should trigger ayah actions
+    fireEvent.click(marker, { detail: 0 });
+    expect(onAyahAction).toHaveBeenCalledWith("2:6", 3);
+  });
+
   it("exposes reviewed difficult words only when the reader turns meanings on", () => {
     render(
       <MushafPageViewer

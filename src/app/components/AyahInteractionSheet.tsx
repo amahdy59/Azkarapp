@@ -1,6 +1,6 @@
 import { QURAN_TEXT_STYLE } from "../quranTypography";
 import { lazy, Suspense, useCallback, useEffect, useId, useRef, useState } from "react";
-import { Bookmark, BookOpen, Check, Copy, Share2 } from "./icons";
+import { Bookmark, BookOpen, Check, Copy, Share2, Translate } from "./icons";
 import { ResponsiveSheet, SheetHeader } from "./ResponsiveSheet";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
@@ -133,7 +133,7 @@ export function AyahInteractionSheet({
   }
 
   const actionClass =
-    "flex min-h-14 w-full min-w-0 items-center justify-start gap-3 rounded-2xl px-5 py-3 text-start transition-colors hover:bg-secondary/60 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:cursor-wait disabled:opacity-55";
+    "flex min-h-14 w-full min-w-0 items-center justify-start gap-3 rounded-2xl px-5 py-3 text-start transition-colors hover:bg-muted/70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:cursor-wait disabled:opacity-55";
 
   return (
     <ResponsiveSheet
@@ -200,12 +200,12 @@ export function AyahInteractionSheet({
           </Suspense>
         ) : (
           <>
-            <div className="pt-3" />
+            <div className="pt-2" />
 
-            <div className="mx-5 mb-3 rounded-xl bg-muted/55 px-4 py-3">
+            <div className="mx-5 mb-3 rounded-2xl border border-border/60 bg-card p-5 shadow-xs">
               {text ? (
                 <p
-                  className="zikr-text text-center text-xl leading-9"
+                  className="zikr-text text-center text-xl sm:text-2xl leading-loose font-normal text-foreground"
                   lang="ar"
                   dir="rtl"
                   data-testid="ayah-sheet-text"
@@ -214,7 +214,7 @@ export function AyahInteractionSheet({
                   <AyahMushafText text={text} verseKey={verseKey!} pageNumber={pageNumber} language={language} />
                 </p>
               ) : (
-                <p className="text-sm font-semibold text-muted-foreground" role="status">
+                <p className="text-center text-sm font-semibold text-muted-foreground" role="status">
                   {t(language, "reader.loadingAyah")}
                 </p>
               )}
@@ -222,30 +222,37 @@ export function AyahInteractionSheet({
 
             {translation && (
               <div
-                className="mx-5 mb-3 rounded-xl border border-border bg-card/60 px-4 py-3 text-start"
+                className="mx-5 mb-3 rounded-2xl border border-border/60 bg-muted/30 p-4 text-start"
                 dir="ltr"
                 lang="en"
                 data-testid="ayah-sheet-translation-container"
               >
-                <h4
-                  className="mb-1 text-sm font-semibold text-muted-foreground"
+                <div
+                  className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-muted-foreground"
                   lang={language}
                   dir={language === "ar" ? "rtl" : "ltr"}
                 >
-                  {t(language, "quranListening.translation")} · Saheeh International
-                </h4>
-                <p className="text-base leading-[1.65] text-foreground" data-testid="ayah-sheet-translation">
+                  <Translate size={14} className="text-primary shrink-0" aria-hidden="true" />
+                  <span>{t(language, "quranListening.translation")} · Saheeh International</span>
+                </div>
+                <p
+                  className="text-sm sm:text-base leading-relaxed text-foreground"
+                  data-testid="ayah-sheet-translation"
+                >
                   {translation}
                 </p>
               </div>
             )}
             {meanings.length > 0 && (
               <div
-                className="mx-5 mb-3 rounded-xl border border-primary/20 bg-primary/5 p-3"
+                className="mx-5 mb-3 rounded-2xl border border-border/60 bg-muted/30 p-4"
                 data-testid="ayah-meanings-container"
               >
-                <h4 className="mb-2 text-xs font-bold text-primary">{t(language, "reader.wordMeaningsTitle")}</h4>
-                <div className="space-y-1.5 pe-1" lang="ar" dir="rtl">
+                <div className="mb-2.5 flex items-center gap-1.5 text-xs font-bold text-primary">
+                  <BookOpen size={14} className="shrink-0" aria-hidden="true" />
+                  <h4>{t(language, "reader.wordMeaningsTitle")}</h4>
+                </div>
+                <div className="space-y-2 pe-1" lang="ar" dir="rtl">
                   {meanings.map((m) => (
                     <div key={m.id} className="text-sm leading-relaxed flex items-baseline gap-2">
                       <span className="font-bold text-foreground shrink-0">{m.word}:</span>
@@ -256,16 +263,26 @@ export function AyahInteractionSheet({
               </div>
             )}
 
-            <div className="flex flex-col gap-1 px-3">
-              <button type="button" onClick={() => void handleCopy()} className={actionClass} disabled={!text}>
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-foreground">
-                  {copied ? (
-                    <Check size={18} className="text-primary" aria-hidden="true" />
-                  ) : (
-                    <Copy size={18} aria-hidden="true" />
-                  )}
+            <div className="flex flex-col gap-2 px-5">
+              <button
+                ref={imageTrigger}
+                type="button"
+                onClick={() => setImageShare(true)}
+                className={`${actionClass} shadow-xs hover:opacity-95 active:scale-[0.99]`}
+                style={{ backgroundColor: "var(--primary)", color: "var(--primary-foreground)" }}
+                disabled={!text}
+              >
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary-foreground/15 text-primary-foreground">
+                  <Share2 size={18} aria-hidden="true" />
                 </span>
-                <span className="font-semibold">{t(language, "reader.copyAyah")}</span>
+                <span className="font-semibold">{t(language, "reader.shareAyahImage")}</span>
+              </button>
+
+              <button type="button" onClick={() => void handleShare()} className={actionClass} disabled={!text}>
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-muted text-foreground">
+                  <Share2 size={18} aria-hidden="true" />
+                </span>
+                <span className="font-semibold">{t(language, "reader.shareAyah")}</span>
               </button>
 
               <button
@@ -279,7 +296,7 @@ export function AyahInteractionSheet({
                 }}
                 className={actionClass}
               >
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-foreground">
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-muted text-foreground">
                   <Bookmark size={18} className={isBookmarked ? "fill-primary text-primary" : ""} aria-hidden="true" />
                 </span>
                 <span className="font-semibold">
@@ -287,30 +304,25 @@ export function AyahInteractionSheet({
                 </span>
               </button>
 
-              <button
-                ref={imageTrigger}
-                type="button"
-                onClick={() => setImageShare(true)}
-                className={actionClass}
-                style={{ backgroundColor: "var(--primary)", color: "var(--primary-foreground)" }}
-                disabled={!text}
-              >
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-foreground">
-                  <Share2 size={18} aria-hidden="true" />
+              <button type="button" onClick={() => void handleCopy()} className={actionClass} disabled={!text}>
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-muted text-foreground">
+                  {copied ? (
+                    <Check size={18} className="text-primary" aria-hidden="true" />
+                  ) : (
+                    <Copy size={18} aria-hidden="true" />
+                  )}
                 </span>
-                <span className="font-semibold">{t(language, "reader.shareAyahImage")}</span>
-              </button>
-              <button type="button" onClick={() => void handleShare()} className={actionClass} disabled={!text}>
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-foreground">
-                  <Share2 size={18} aria-hidden="true" />
-                </span>
-                <span className="font-semibold">{t(language, "reader.shareAyah")}</span>
+                <span className="font-semibold">{t(language, "reader.copyAyah")}</span>
               </button>
             </div>
 
             {feedback && (
               <p
-                className={`mx-5 mt-3 text-sm font-semibold ${feedback.error ? "text-destructive" : "text-primary"}`}
+                className={`mx-5 mt-3 rounded-xl p-3 text-center text-sm font-semibold border ${
+                  feedback.error
+                    ? "bg-destructive/10 text-destructive border-destructive/20"
+                    : "bg-primary/10 text-primary border-primary/20"
+                }`}
                 role={feedback.error ? "alert" : "status"}
               >
                 {feedback.message}
