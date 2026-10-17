@@ -1,13 +1,13 @@
 {
-  "release": "2026-10-17.10",
+  "release": "2026-10-17.11",
   "ar": [
-    "تثبيت شريط البحث في الإعدادات مع حماية تامة من تداخل النصوص أثناء التمرير في شاشات التقدم والإعدادات.",
-    "تحسين شريط أدوات القارئ ليظهر زر التركيز بحجم متناسق ودقيق على مختلف أحجام الشاشات.",
-    "خلفية المشهد الهادئة تتكامل بسلاسة مع نمط الزجاج الضبابي في جميع شاشات التطبيق."
+    "تثبيت شريط البحث في الإعدادات مع حماية تامة من تداخل النصوص أثناء التمرير في شاشات التقدم والإعدادات ومكتبة الأذكار.",
+    "تحسين محاذاة خيارات القراءة وخطة الختمة لضمان سهولة الاختيار والاستجابة في الوضع الزجاجي.",
+    "تنسيق متناسق وهوامش موحدة عبر شاشات التطبيق والقارئ لراحة العين والتركيز على الذكر."
   ],
   "en": [
-    "Pinned Settings search with complete protection against text overlap when scrolling through Progress and Settings.",
-    "Refined reader tools with a clean focus action tailored for compact and mobile screens.",
-    "Peaceful scene background now integrates seamlessly across all application views in glass mode."
+    "Pinned Settings search with complete protection against text overlap when scrolling through Progress, Settings, and Azkar Library.",
+    "Refined reading plan options and selection highlights for seamless responsiveness in glass mode.",
+    "Consistent margins and balanced heading alignment across Reader and settings panels for calm devotional focus."
   ]
 }
