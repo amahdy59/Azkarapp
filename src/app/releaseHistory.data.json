@@ -1,5 +1,18 @@
 [
   {
+    "release": "2026-10-17.8",
+    "ar": [
+      "زر معلومات الصلاة بمحاذاة مربعات التسجيل على الهاتف.",
+      "المحاذاة متناسقة عند التبديل بين العربية والإنجليزية.",
+      "زر المعلومات يبقى داخل حافة البطاقة مع مساحة لمس مريحة."
+    ],
+    "en": [
+      "Prayer information buttons line up with the tracking checkboxes on phones.",
+      "Alignment stays consistent when switching between Arabic and English.",
+      "The information button sits inside the card edge with a comfortable touch target."
+    ]
+  },
+  {
     "release": "2026-10-17.7",
     "ar": [
       "بطاقات الصلاة أهدأ بحواف أخف ومحاذاة موحدة وعدّ تنازلي واضح دون شريط أو فواصل زائدة.",

@@ -1,13 +1,13 @@
 {
-  "release": "2026-10-17.7",
+  "release": "2026-10-17.8",
   "ar": [
-    "بطاقات الصلاة أهدأ بحواف أخف ومحاذاة موحدة وعدّ تنازلي واضح دون شريط أو فواصل زائدة.",
-    "تفاصيل الصلاة أوضح: خطوات التسجيل والإجراء الرئيسي أولاً، ثم النصوص الداعمة، مع ترتيب مناسب للهاتف والحاسوب.",
-    "النوافذ وخيارات الصوت أكثر ضبابية ووضوحًا، ويُخفى نص القراءة خلف المشغل الموسّع لمنع تداخل النصوص."
+    "زر معلومات الصلاة بمحاذاة مربعات التسجيل على الهاتف.",
+    "المحاذاة متناسقة عند التبديل بين العربية والإنجليزية.",
+    "زر المعلومات يبقى داخل حافة البطاقة مع مساحة لمس مريحة."
   ],
   "en": [
-    "Prayer cards have softer edges, consistent alignment and a clear countdown without extra dividers or a progress bar.",
-    "Expanded prayer details put tracking and the main action first, followed by supporting text, with organized phone and desktop layouts.",
-    "Dialogs and audio options have denser frost, and expanded playback hides the covered reading text to prevent overlapping layers."
+    "Prayer information buttons line up with the tracking checkboxes on phones.",
+    "Alignment stays consistent when switching between Arabic and English.",
+    "The information button sits inside the card edge with a comfortable touch target."
   ]
 }

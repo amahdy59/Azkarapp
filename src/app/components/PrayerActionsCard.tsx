@@ -102,7 +102,7 @@ export function PrayerActionsCard({
           data-testid="prayer-actions-more-info"
           aria-haspopup="dialog"
           aria-label={t(language, "prayerActions.moreInfoAria", { prayer: infoData.prayerName })}
-          className={`flex size-11 -me-3 shrink-0 items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+          className={`flex size-11 shrink-0 items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
             onGlass ? "text-on-media hover:bg-white/10" : "text-muted-foreground hover:bg-muted hover:text-foreground"
           }`}
         >

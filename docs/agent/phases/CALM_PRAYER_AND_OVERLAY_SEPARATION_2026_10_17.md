@@ -39,3 +39,5 @@ This owner review supersedes the earlier bright outlines, dividers, native next-
 Physical older-device compositing and assistive-technology acceptance remain manual; automated browser/axe checks do not certify complete accessibility. Do not add decorative blur animation or extra nested material layers. Complete exact-commit CI and both public-site smoke tests, then assess on representative physical phones.
 
 Owner spacing correction: 8px section gaps, no checklist row gaps, 44px minimum rows and normal Arabic line height. The previous roomy 16px/48px treatment is superseded. Covered reader content uses non-inherited parent opacity with existing inert/aria-hidden, avoiding stale inherited visibility in browser focus recovery. No test tolerance or focus assertion is relaxed.
+
+Release remediation: exact-commit CI39020640853 found one 12px mobile information/checkbox-center mismatch. Removed the information button's obsolete negative inline margin; retained 44px targets, 8px gaps and the unchanged 1px browser assertion. Release .8 announces only this alignment correction; .7 is retained verbatim in offline history. Final results follow in the output report.
