@@ -5,7 +5,7 @@ import { getHomeBackgroundCategory } from "../homeTime";
 import type { LocationSettings } from "../types";
 import { TimeOfDayBackground } from "./TimeOfDayBackground";
 
-/** One stationary, cached scene behind interface pages, never the reading canvas. */
+/** One stationary, cached Home scene shared by Glass layouts and navigation. */
 export function AppSceneBackground({
   location,
   material,
@@ -26,10 +26,6 @@ export function AppSceneBackground({
   return (
     <div className="app-scene" data-testid="app-scene" aria-hidden="true" data-failed={failed || undefined}>
       {!failed && <TimeOfDayBackground categoryId={category} onFailure={fail} />}
-      <div
-        className="absolute inset-0"
-        style={{ background: "color-mix(in srgb, var(--background) 78%, transparent)" }}
-      />
     </div>
   );
 }

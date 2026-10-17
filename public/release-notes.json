@@ -1,15 +1,13 @@
 {
-  "release": "2026-10-17.4",
+  "release": "2026-10-17.5",
   "ar": [
-    "اختر المظهر الزجاجي أو المعتم للتطبيق والرئيسية بشكل مستقل؛ تغيير أحدهما لا يلغي اختيارك للآخر.",
-    "خيارات مظهر الرئيسية ظاهرة مباشرة في إعدادات المظهر، دون فتح قائمة إضافية.",
-    "يمكنك إبقاء الرئيسية تابعة لمظهر التطبيق أو تخصيصها، مع توضيح استخدام خلفية الرئيسية المشتركة وحماية وضوح القراءة.",
-    "تحسين وضوح النصوص الصغيرة فوق الخلفية الزجاجية، بما في ذلك بطاقة الصلاة النشطة."
+    "المظهر الزجاجي يطابق الرئيسية الآن في البطاقات والعناوين والتنقل عبر شاشات التطبيق.",
+    "تظهر خلفية الرئيسية نفسها بوضوح خلف الواجهات، مع انعكاس وحواف زجاجية موحدة.",
+    "تمتد الأسطح الزجاجية إلى القراءة والنوافذ وعناصر الصوت، مع تظليل أقوى للنصوص الطويلة وخيارات التباين المعتادة."
   ],
   "en": [
-    "Choose Glass or Opaque independently for the app and Home; changing one keeps your choice for the other.",
-    "Home appearance controls are directly visible in Appearance settings without opening another section.",
-    "Let Home follow the app or give it its own appearance, with clearer guidance about the shared background and protected reading surfaces.",
-    "Small text stays clearer over the Glass background, including the active prayer card."
+    "Glass now matches Home across cards, headers and navigation throughout the app.",
+    "The same Home scenery shows clearly behind interface layouts with consistent reflections and glass edges.",
+    "Reading, dialogs and audio surfaces share Glass styling, with stronger tint for long text and the existing contrast options."
   ]
 }

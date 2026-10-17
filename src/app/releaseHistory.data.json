@@ -1,5 +1,18 @@
 [
   {
+    "release": "2026-10-17.5",
+    "ar": [
+      "المظهر الزجاجي يطابق الرئيسية الآن في البطاقات والعناوين والتنقل عبر شاشات التطبيق.",
+      "تظهر خلفية الرئيسية نفسها بوضوح خلف الواجهات، مع انعكاس وحواف زجاجية موحدة.",
+      "تمتد الأسطح الزجاجية إلى القراءة والنوافذ وعناصر الصوت، مع تظليل أقوى للنصوص الطويلة وخيارات التباين المعتادة."
+    ],
+    "en": [
+      "Glass now matches Home across cards, headers and navigation throughout the app.",
+      "The same Home scenery shows clearly behind interface layouts with consistent reflections and glass edges.",
+      "Reading, dialogs and audio surfaces share Glass styling, with stronger tint for long text and the existing contrast options."
+    ]
+  },
+  {
     "release": "2026-10-17.4",
     "ar": [
       "اختر المظهر الزجاجي أو المعتم للتطبيق والرئيسية بشكل مستقل؛ تغيير أحدهما لا يلغي اختيارك للآخر.",

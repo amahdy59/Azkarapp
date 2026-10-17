@@ -1421,7 +1421,7 @@ export function MushafPageViewer({
 
   return (
     <article
-      className={`relative flex h-full min-h-0 w-full overflow-hidden transition-colors duration-200 ${useRail ? (railSide === "left" ? "flex-row-reverse" : "") : "flex-col"} ${themeClasses} ${theme === "oled" ? "theme-oled" : `theme-${theme}`}`}
+      className={`glass-reading relative flex h-full min-h-0 w-full overflow-hidden transition-colors duration-200 ${useRail ? (railSide === "left" ? "flex-row-reverse" : "") : "flex-col"} ${themeClasses} ${theme === "oled" ? "theme-oled" : `theme-${theme}`}`}
       data-mushaf-chrome-mode={useRail ? "rail" : headerContent ? "bars" : "clean"}
       data-theme={theme === "oled" ? undefined : theme}
       dir="rtl"
@@ -1886,7 +1886,7 @@ export function MushafListeningPage({
           } as CSSProperties
         }
         aria-hidden="true"
-        className={`audio-listening-page theme-${theme} relative isolate flex w-full flex-col rounded-lg bg-background text-foreground`}
+        className={`glass-reading audio-listening-page theme-${theme} relative isolate flex w-full flex-col rounded-lg bg-background text-foreground`}
         dir="rtl"
         lang="ar"
       >

@@ -8,6 +8,9 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
+  --glass-card-tint: rgb(15 23 42 / 0.18);
+  --glass-reading-tint: rgb(15 23 42 / 0.28);
+  --glass-frost: blur(16px) saturate(135%);
   --motion-duration-press: 90ms;
   --motion-duration-fast: 150ms;
   --motion-duration-standard: 220ms;

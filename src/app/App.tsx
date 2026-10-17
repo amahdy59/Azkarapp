@@ -1,4 +1,5 @@
 import { useNativeServices } from "./hooks/useNativeServices";
+import "../styles/theme/materials.css";
 import { lazy, Suspense, useState, useEffect, useRef, useCallback, useMemo } from "react";
 import {
   fromCompletedSets,
@@ -1636,8 +1637,17 @@ function AppContent({
         // .app-shell both at <=599px and at >=600px, so the shadow-2xl that used
         // to sit here never rendered at any viewport width (DEC-067 / F11).
         data-material-reading={view === "reader" || view === "khatmah" || readerInMushafMode ? "true" : undefined}
-        className={`app-shell relative overflow-hidden bg-background ${showBottomNav ? "" : "app-shell--navigation-hidden"}`}
+        className={`app-shell relative isolate overflow-hidden bg-background ${showBottomNav ? "" : "app-shell--navigation-hidden"}`}
       >
+        {hasCompletedOnboarding && view !== "home" && appMaterial !== "solid" && !highContrast && (
+          <Suspense fallback={null}>
+            <AppSceneBackground
+              location={locationSettings}
+              material={appMaterial}
+              reduceTransparency={reduceTransparency}
+            />
+          </Suspense>
+        )}
         {/* Both banners share one grid area, so they stack across the full shell
             width instead of being auto-placed into an implicit row — which put
             them underneath the rail on the expanded and large tiers. */}
@@ -1702,26 +1712,9 @@ function AppContent({
             data-view={view}
             tabIndex={-1}
             data-app-page={view}
-            data-material-ui={
-              (view !== "home" && view !== "reader" && view !== "khatmah" && !readerInMushafMode) || undefined
-            }
+            data-material-ui={view !== "home" || undefined}
             className="app-main-view flex-1 overflow-hidden flex flex-col"
           >
-            {showBottomNav &&
-              appMaterial !== "solid" &&
-              !highContrast &&
-              view !== "home" &&
-              view !== "reader" &&
-              view !== "khatmah" &&
-              !readerInMushafMode && (
-                <Suspense fallback={null}>
-                  <AppSceneBackground
-                    location={locationSettings}
-                    material={appMaterial}
-                    reduceTransparency={reduceTransparency}
-                  />
-                </Suspense>
-              )}
             <Suspense fallback={<ScreenFallback language={selectedLang} />}>
               {/* Phase 2 — onboarding flow */}
               {view === "splash" && <SplashScreen language={selectedLang} onDone={handleSplashDone} />}

@@ -1,73 +1,99 @@
-/* Interface materials are independent of colour theme and Home's photograph.
-   Reading and playback surfaces retain their existing dense backgrounds. */
-html[data-app-material-resolved="glass"] [data-material-ui] {
-  position: relative;
-  isolation: isolate;
-  background: var(--background);
-}
+/* Glass shares Home's stationary scene, palette and material. */
 .app-scene {
   position: absolute;
   inset: 0;
   z-index: -1;
-  pointer-events: none;
 }
-.high-contrast .app-scene {
-  display: none;
-}
-html[data-app-material-resolved="glass"] [data-material-ui] :is(.app-screen-surface, [data-testid="settings-screen"]) {
-  background-color: transparent;
-}
-html[data-app-material-resolved="glass"]
-  [data-material-ui]
-  :is(
-    .bg-card:not(
+
+@supports (backdrop-filter: blur(1px)) {
+  @media not (forced-colors: active) {
+    /* The on-media ink always has a dark ground, also before scene decoding,
+       when offline, and beneath the decorative negative-z scene layer. */
+    html[data-app-material-resolved="glass"]:not(.high-contrast) .app-shell {
+      background-color: var(--on-media-surface);
+    }
+    html[data-app-material-resolved="glass"]:not(.high-contrast)
       :is(
-        button,
-        input,
-        select,
-        textarea,
-        label,
-        [role="radio"],
-        [role="tab"],
-        [role="option"],
-        [aria-selected="true"],
-        [aria-checked="true"]
-      )
-    ),
-    .shared-screen-header
-  ),
-html[data-app-material-resolved="glass"] :is(.app-sidebar, .app-rail, .bottom-nav) {
-  background-color: color-mix(in srgb, var(--card) 88%, transparent);
-  backdrop-filter: none !important;
-}
-/* Static card translucency needs no repeated GPU blur. Only sticky chrome
-   separates moving content with one small, bounded filter. */
-html[data-app-material-resolved="glass"] [data-material-ui] .shared-screen-header,
-html[data-app-material-resolved="glass"] :is(.app-sidebar, .app-rail, .bottom-nav) {
-  backdrop-filter: blur(12px) saturate(115%) !important;
-}
-/* Nested controls inherit the parent material rather than another blur layer. */
-html[data-app-material-resolved="glass"] [data-material-ui] .bg-card .bg-card {
-  backdrop-filter: none !important;
-}
-html[data-app-material="solid"] .app-shell :is(.app-sidebar, .app-rail, .bottom-nav, .scroll-glass-header) {
-  background-color: var(--background);
-  backdrop-filter: none !important;
-}
-@supports not (backdrop-filter: blur(1px)) {
-  html[data-app-material-resolved="glass"] .app-shell .bg-card {
-    background-color: var(--card);
-  }
-}
-@media (forced-colors: active) {
-  .app-scene {
-    display: none;
-  }
-  html[data-app-material-resolved="glass"]
-    .app-shell
-    :is(.bg-card, .shared-screen-header, .app-sidebar, .app-rail, .bottom-nav) {
-    background: Canvas;
-    backdrop-filter: none !important;
+        [data-material-ui],
+        [data-material-surface],
+        [data-material-ui] [class*="theme-"],
+        .app-sidebar,
+        .app-rail,
+        .bottom-nav,
+        [role="dialog"],
+        [role="menu"]
+      ) {
+      --background: transparent;
+      --card: var(--glass-card-tint);
+      --popover: var(--glass-reading-tint);
+      --foreground: #fff;
+      --card-foreground: #fff;
+      --popover-foreground: #fff;
+      --muted-foreground: rgb(255 255 255 / 0.9);
+      --muted: rgb(255 255 255 / 0.12);
+      --accent: rgb(255 255 255 / 0.12);
+      --accent-foreground: #fff;
+      --border: rgb(255 255 255 / 0.3);
+      --border-control: rgb(255 255 255 / 0.5);
+      --input: var(--border-control);
+      --primary: #d4a020;
+      --primary-foreground: #0a1228;
+      color: var(--foreground);
+    }
+    html[data-app-material-resolved="glass"]:not(.high-contrast)
+      :is(
+        [data-material-ui] :is([class*="bg-card"], .bg-popover, header, .shared-screen-header, .glass-reading),
+        .app-sidebar,
+        [data-material-surface],
+        .app-rail,
+        .bottom-nav,
+        [role="dialog"],
+        [role="menu"]
+      ):not(:where(button, input, select, textarea, label)) {
+      background-color: var(--glass-card-tint);
+      background-image: linear-gradient(
+        135deg,
+        rgb(255 255 255 / 0.055),
+        rgb(255 255 255 / 0.012) 55%,
+        rgb(2 6 23 / 0.04)
+      );
+      border-color: rgb(255 255 255 / 0.3);
+      backdrop-filter: var(--glass-frost);
+      box-shadow:
+        inset 0 1px 0 rgb(255 255 255 / 0.36),
+        inset 1px 0 0 rgb(255 255 255 / 0.09),
+        inset 0 -1px 0 rgb(255 255 255 / 0.05),
+        0 8px 24px rgb(2 6 23 / 0.14);
+    }
+    /* Home's stronger reading tint also supports Quran pages and overlays.
+       Glyphs, page geometry and reading interactions remain unchanged. */
+    html[data-app-material-resolved="glass"]:not(.high-contrast)
+      :is(
+        [data-material-ui] .glass-reading,
+        [data-material-surface="reading"],
+        [role="dialog"],
+        [role="menu"],
+        .app-sidebar,
+        .app-rail,
+        .bottom-nav,
+        [data-material-ui] header,
+        [data-material-ui] .shared-screen-header
+      ) {
+      background-color: var(--glass-reading-tint);
+    }
+    /* A denser regular material separates moving content from navigation. */
+    html[data-app-material-resolved="glass"]:not(.high-contrast)
+      :is(.app-sidebar, .app-rail, .bottom-nav, [data-material-ui] header, [data-material-ui] .shared-screen-header) {
+      backdrop-filter: blur(22px) saturate(135%);
+    }
+    /* Nested surfaces use their parent's frost, avoiding stacked GPU layers. */
+    html[data-app-material-resolved="glass"]:not(.high-contrast)
+      [data-material-ui]
+      :is([class*="bg-card"], .bg-popover, header)
+      :is([class*="bg-card"], .bg-popover, header) {
+      backdrop-filter: none;
+      background-image: none;
+    }
   }
 }
 .audio-lock-shield {

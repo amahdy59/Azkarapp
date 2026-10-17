@@ -1,7 +1,7 @@
 /* The lighter material is limited to Home's contrast-bounded photograph.
    Other media/dialog surfaces keep their existing denser material. */
 .home-photo-canvas .hero-glass.home-glass-surface {
-  --home-glass-tint: rgb(15 23 42 / 0.18);
+  --home-glass-tint: var(--glass-card-tint);
   background-color: var(--home-glass-tint);
   /* A directional sheen makes the material visible even over the dark sky.
      Keep the brightest stop bounded by the white-source contrast test. */
@@ -12,7 +12,7 @@
     rgb(2 6 23 / 0.04)
   );
   border-color: rgb(255 255 255 / 0.3);
-  backdrop-filter: blur(16px) saturate(135%);
+  backdrop-filter: var(--glass-frost);
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.36),
     inset 1px 0 0 rgb(255 255 255 / 0.09),
@@ -175,10 +175,10 @@
 
 /* Home-only chrome and inset variants load with the Home screen. */
 .home-photo-canvas .hero-glass.home-glass-reading {
-  --home-glass-tint: rgb(15 23 42 / 0.28);
+  --home-glass-tint: var(--glass-reading-tint);
 }
 .home-photo-canvas .hero-glass.home-glass-header {
-  --home-glass-tint: rgb(15 23 42 / 0.28);
+  --home-glass-tint: var(--glass-reading-tint);
 }
 .hero-glass.home-glass-header {
   border-width: 0;
@@ -460,7 +460,7 @@
       rgb(255 255 255 / 0.012) 55%,
       rgb(2 6 23 / 0.04)
     ) !important;
-    backdrop-filter: blur(16px) saturate(135%) !important;
+    backdrop-filter: var(--glass-frost) !important;
   }
   @media (forced-colors: active) {
     html:not(.high-contrast) .home-force-glass .hero-glass.home-glass-surface {

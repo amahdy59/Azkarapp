@@ -520,6 +520,7 @@ export function FloatingAudioPlayer({
       aria-describedby={compactDescriptionId}
       dir={direction}
       data-variant="compact"
+      data-material-surface={dockedInReader ? undefined : ""}
       data-reading-overlay={readingOverlay ? "true" : undefined}
       data-player-hidden={readingOverlay && readingDockHidden ? "true" : undefined}
       style={{ insetInlineStart: readingOverlay && readingDockHidden ? "auto" : undefined }}

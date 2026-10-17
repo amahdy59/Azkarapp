@@ -497,3 +497,7 @@ See `docs/agent/phases/AUTOMATIC_PATH_AND_HOME_POLISH_2026_10_16.md`. Derived po
 ## Independent App and Home appearance — 2026-10-17
 
 The owner now requires genuine App/Home independence: choosing or reselecting App appearance must not write Home's preference. Both Glass/Opaque groups are directly visible in Settings → Appearance. Same as app remains optional; inherited Home resolves to App while explicit Home overrides survive every App change. Glass interface pages reuse the existing current Home scene; reading and playback protection, legacy values, contrast fallbacks and chrome-only blur remain unchanged. See docs/agent/phases/INDEPENDENT_GLASS_CONTROLS_2026_10_17.md.
+
+## Home glass across all layouts — 2026-10-17
+
+The owner rejects the dense Library/interface material shown beside Home and explicitly requests Home's translucency and glassmorphism for all Glass-mode screens, cards and layouts. This supersedes the 88% interface fill, extra 78% scene veil, chrome-only blur and exclusion of reading layouts. Share Home's scene/scrim, 18% ordinary tint, 28% long-reading tint and 16px/135% frost with directional sheen and inset edges; avoid nested blur. Preserve printed Mushaf glyphs/geometry, semantic contrast, independent App/Home choices, Solid/high-contrast/forced-color/unsupported-filter and failed-photo fallbacks. See docs/agent/phases/UNIFIED_HOME_GLASS_2026_10_17.md.

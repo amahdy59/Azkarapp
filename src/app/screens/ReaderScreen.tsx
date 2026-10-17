@@ -1634,7 +1634,7 @@ export function ReaderScreen({
                 and keyboard guidance. Page-level actions stay in the hero. */}
               <div className="reader-canvas-wrap relative mx-3 my-2 md:mx-4 md:my-2 flex min-h-0 flex-1 overflow-hidden bg-transparent">
                 <div
-                  className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden cursor-pointer"
+                  className="glass-reading relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden cursor-pointer"
                   data-testid="reader-card"
                   {...surfaceProps}
                 >
@@ -1824,7 +1824,7 @@ export function ReaderScreen({
             {/* Main Layout Area */}
             <div
               ref={readerMainRef}
-              className="flex-1 flex flex-col min-h-0 justify-between select-none relative reader-column cursor-pointer"
+              className="glass-reading flex-1 flex flex-col min-h-0 justify-between select-none relative reader-column cursor-pointer"
               data-testid="reader-card"
               {...surfaceProps}
             >

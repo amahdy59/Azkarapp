@@ -47,7 +47,8 @@ for (const language of ["ar", "en"] as const) {
       await expect(page.getByTestId("category-card-morning")).toHaveCSS("animation-name", "none");
       await expect(page.getByTestId("app-scene").locator("img")).toHaveCount(1);
       await expect(page.getByTestId("app-scene").locator("img")).toHaveAttribute("src", homeScene!);
-      await expect(page.getByTestId("category-card-morning")).toHaveCSS("background-color", /0\.88/);
+      await expect(page.getByTestId("category-card-morning")).toHaveCSS("background-color", "rgba(15, 23, 42, 0.18)");
+      await expect(page.getByTestId("category-card-morning")).toHaveCSS("backdrop-filter", "blur(16px) saturate(1.35)");
       await page.screenshot({ path: testInfo.outputPath(`app-glass-${language}-${width}.png`) });
       expect((await new AxeBuilder({ page }).include(".app-main").analyze()).violations).toEqual([]);
       if (width === 390) {
@@ -60,7 +61,7 @@ for (const language of ["ar", "en"] as const) {
           const mutedColor = await page.evaluate(() => {
             const probe = document.createElement("span");
             probe.style.color = "var(--muted-foreground)";
-            document.body.append(probe);
+            document.querySelector('[data-testid="category-card-morning"]')!.append(probe);
             const color = getComputedStyle(probe).color;
             probe.remove();
             return color;
@@ -76,7 +77,7 @@ for (const language of ["ar", "en"] as const) {
       }
       await page.getByTestId("category-card-morning").click();
       await expect(page.locator(".app-shell")).toHaveAttribute("data-material-reading", "true");
-      await expect(page.getByTestId("app-scene")).toHaveCount(0);
+      await expect(page.getByTestId("app-scene").locator("img")).toHaveCount(1);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     });
   }
