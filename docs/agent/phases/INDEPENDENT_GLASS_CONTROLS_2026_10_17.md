@@ -69,3 +69,7 @@ No religious content, repetition, prayer timing, normalized state shape or histo
 ### Recommended next step
 
 Review the mix-and-match controls and captures, then retain the standard exact-commit Quality/Pages and both production-domain smoke verification for the release.
+
+### CI contrast remediation
+
+Exact-commit CI exposed the pre-existing active-first-prayer sheen contrast edge: muted text measured 4.268:1 over a hypothetical white photograph, below the unchanged 4.5:1 requirement. Local reproduction matched. Raise the Home scrim minimum alpha from 0.54 to 0.58 (top 0.60), preserving card tints, blur, assets and fallback behavior. The regression now fixes time to the active Fajr card and asserts its maximum focus, preventing time-of-day from hiding the defect. The composited worst-case muted/accent ratios exceed 4.73:1. This is a narrow readability repair within the appearance release. Release 2026-10-17.4 adds the outcome to the pending bilingual notes. Final exact-commit results remain in the output report.

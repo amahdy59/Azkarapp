@@ -63,6 +63,9 @@ test("the setting makes blurred materials solid", async ({ page, browserName }) 
 
 test("a card over the hero photograph goes opaque, not merely unblurred", async ({ page, browserName }) => {
   test.skip(browserName !== "chromium", "Emulation.setEmulatedMedia is Chromium-only");
+  // Fajr is active: the first card uses its brightest reflection. A daytime
+  // inactive card has a quieter sheen and used to hide the contrast defect.
+  await page.clock.setFixedTime(new Date("2026-10-17T06:00:00+03:00"));
 
   /* Removing the blur is only half of it. `.hero-glass` declares its
      translucent wash in a different file at the same specificity, and later in
@@ -110,6 +113,7 @@ test("a card over the hero photograph goes opaque, not merely unblurred", async 
   await expect(standard).toHaveCSS("background-color", "rgba(15, 23, 42, 0.18)");
   await expect(reading).toHaveCSS("background-color", "rgba(15, 23, 42, 0.28)");
   const innerAction = standard.locator("button").first();
+  await expect(standard).toHaveCSS("--prayer-focus", "1");
   await expect(innerAction).toHaveCSS("backdrop-filter", "none");
   // Bound contrast even if the brightest source photograph pixel is white.
   // Read actual compositing colors rather than treating blur as a guarantee.

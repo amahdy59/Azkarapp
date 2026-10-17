@@ -284,7 +284,8 @@
 .home-photo-scrim {
   position: absolute;
   inset: 0;
-  background-image: linear-gradient(to bottom, rgb(2 6 23 / 0.56), rgb(2 6 23 / 0.54), rgb(2 6 23 / 0.64));
+  /* Bound small-text contrast even beneath the active prayer's brightest sheen. */
+  background-image: linear-gradient(to bottom, rgb(2 6 23 / 0.6), rgb(2 6 23 / 0.58), rgb(2 6 23 / 0.64));
 }
 
 @keyframes stagger-enter {
