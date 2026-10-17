@@ -331,6 +331,7 @@ const en = {
     virtueTitle: "The virtue of {prayer} prayer",
     legend: "{prayer} prayer tracking",
     now: "Now",
+    nowPill: "Now",
     next: "Next prayer",
     nextShort: "Next",
     viewing: "Viewing",

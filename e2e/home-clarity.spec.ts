@@ -44,7 +44,6 @@ for (const language of ["ar", "en"] as const) {
           const style = getComputedStyle(card);
           const padding = getComputedStyle(card.querySelector("button")!);
           const identity = card.querySelector("[data-prayer-identity] h3")!.getBoundingClientRect();
-          const isRtl = getComputedStyle(card).direction === "rtl";
           const footer = card.querySelector("[data-prayer-footer]")!.getBoundingClientRect();
           return {
             state: card.getAttribute("data-prayer-state"),
@@ -53,8 +52,8 @@ for (const language of ["ar", "en"] as const) {
             iconTop: icon.top,
             bottomGap: bounds.bottom - card.querySelector("button")!.getBoundingClientRect().bottom,
             visible: bounds.left >= frame.left && bounds.right <= frame.right,
-            aligned: Math.abs(name.bottom - time.bottom) <= 4,
-            iconAbove: icon.bottom <= name.top,
+            aligned: Math.abs(name.right - time.right) <= 1 && name.bottom <= time.top,
+            iconAbove: icon.right < name.left && icon.bottom >= name.bottom,
             bounded: parseFloat(style.borderTopWidth) >= 1 && style.borderTopColor !== "rgba(0, 0, 0, 0)",
             height: bounds.height,
             paddingTop: parseFloat(padding.paddingTop),
@@ -63,9 +62,9 @@ for (const language of ["ar", "en"] as const) {
             iconWidth: icon.width,
             columnGap: parseFloat(padding.columnGap),
             visibleTopInset: icon.top - bounds.top,
-            visibleIdentityInset: isRtl ? bounds.right - identity.right : identity.left - bounds.left,
-            visibleTimeInset: isRtl ? time.left - bounds.left : bounds.right - time.right,
-            actualColumnGap: isRtl ? identity.left - time.right : time.left - identity.right,
+            visibleIdentityInset: bounds.right - identity.right,
+            visibleTimeInset: bounds.right - time.right,
+            actualColumnGap: time.left - icon.right,
             width: bounds.width,
             footerTop: footer.top,
             footerHeight: footer.height,
@@ -82,18 +81,20 @@ for (const language of ["ar", "en"] as const) {
           (card) =>
             card.paddingTop >= 13.5 &&
             card.paddingTop <= 14 &&
-            card.paddingLeft >= 13.5 &&
-            card.paddingLeft <= 14 &&
+            card.paddingLeft >= 11.5 &&
+            card.paddingLeft <= 12 &&
             card.paddingLeft === card.paddingRight &&
             card.columnGap === (card.width <= 162 ? 6 : 10) &&
-            Math.abs(card.visibleTopInset - 15) <= 1 &&
-            Math.abs(card.visibleIdentityInset - 15) <= 1 &&
-            Math.abs(card.visibleTimeInset - 15) <= 1 &&
+            card.visibleTopInset >= 14 &&
+            card.visibleTopInset <= 19 &&
+            Math.abs(card.visibleIdentityInset - 13) <= 1 &&
+            Math.abs(card.visibleTimeInset - 13) <= 1 &&
             card.iconWidth >= 26,
         ),
+        JSON.stringify(geometry),
       ).toBe(true);
       await expect(page.getByTestId("prayer-tracker-cards")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-      await expect(row.locator("[data-prayer-icon]").first()).toHaveCSS("border-top-width", "0px");
+      await expect(row.locator("[data-prayer-icon]").first()).toHaveCSS("border-top-width", "1px");
       if (width === 1440) {
         expect(geometry.every((card) => card.width <= 186)).toBe(true);
         expect(geometry.every((card) => card.actualColumnGap >= 10)).toBe(true);
@@ -116,10 +117,10 @@ for (const language of ["ar", "en"] as const) {
         const positions = geometry.map((card) => card[key]);
         expect(Math.max(...positions) - Math.min(...positions)).toBeLessThanOrEqual(1);
       }
-      expect(geometry.every((card) => card.footerHeight >= 48 && card.footerHeight <= 49)).toBe(true);
+      expect(geometry.every((card) => card.footerHeight >= 68 && card.footerHeight <= 69)).toBe(true);
       await expect(row.locator("[data-prayer-footer]")).toHaveCount(5);
       await expect(row.locator('[data-prayer-state="current"] [data-prayer-detail]')).toHaveText(
-        t(language, "prayerTracking.notRecorded"),
+        t(language, "prayerTracking.nowPill"),
       );
       await expect(row.locator('[data-prayer="dhuhr"] [data-prayer-footer]')).toContainText(
         t(language, "prayerTracking.notRecorded"),
@@ -151,7 +152,7 @@ for (const language of ["ar", "en"] as const) {
         const rtl = getComputedStyle(card).direction === "rtl";
         return {
           fontSize: getComputedStyle(text).fontSize,
-          alignment: getComputedStyle(text).textAlign,
+          alignment: getComputedStyle(text).justifyContent,
           timeEdge: rtl ? Math.abs(ink.left - time.left) : Math.abs(ink.right - time.right),
           barInsetLeft: bar.left - footerBox.left,
           barInsetRight: footerBox.right - bar.right,
@@ -159,10 +160,9 @@ for (const language of ["ar", "en"] as const) {
         };
       });
       expect(countdownAlignment.fontSize).toBe("14px");
-      expect(countdownAlignment.alignment).toBe("end");
-      expect(countdownAlignment.timeEdge).toBeLessThanOrEqual(1);
-      expect(countdownAlignment.barInsetLeft).toBeCloseTo(14, 0);
-      expect(countdownAlignment.barInsetRight).toBeCloseTo(14, 0);
+      expect(countdownAlignment.alignment).toBe("center");
+      expect(countdownAlignment.barInsetLeft).toBeCloseTo(12, 0);
+      expect(countdownAlignment.barInsetRight).toBeCloseTo(12, 0);
       expect(countdownAlignment.belowText).toBeGreaterThanOrEqual(4);
       await page.screenshot({ path: testInfo.outputPath(`${language}-${width}-home.png`), scale: "css" });
       await page
@@ -182,6 +182,16 @@ for (const language of ["ar", "en"] as const) {
       await page.locator("html").evaluate((node) => {
         node.style.fontSize = "32px";
       });
+      // Firefox delivers the footer's ResizeObserver after the font-size
+      // mutation. Assert the settled shared geometry, not its intervening frame.
+      await expect
+        .poll(() =>
+          row.locator("[data-prayer-footer]").evaluateAll((nodes) => {
+            const tops = nodes.map((node) => node.getBoundingClientRect().top);
+            return Math.max(...tops) - Math.min(...tops);
+          }),
+        )
+        .toBeLessThanOrEqual(1);
       const enlarged = await row.locator("article").evaluateAll((nodes) =>
         nodes.map((node) => ({
           width: node.clientWidth,
@@ -198,22 +208,24 @@ for (const language of ["ar", "en"] as const) {
         const positions = enlarged.map((card) => card[key]);
         expect(Math.max(...positions) - Math.min(...positions)).toBeLessThanOrEqual(1);
       }
-      const footerTextBounds = await row.locator("[data-prayer-footer] > span").evaluateAll((nodes) =>
-        nodes.map((node) => {
-          const text = node.getBoundingClientRect();
-          const footer = node.parentElement!.getBoundingClientRect();
-          const style = getComputedStyle(node);
-          return {
-            text: node.textContent,
-            left: text.left - footer.left,
-            right: footer.right - text.right,
-            top: text.top - footer.top,
-            bottom: footer.bottom - text.bottom,
-            ellipsis: style.textOverflow === "ellipsis",
-            overflow: node.scrollWidth - node.clientWidth,
-          };
-        }),
-      );
+      const footerTextBounds = await row
+        .locator("[data-prayer-footer] > .home-prayer-status-pill")
+        .evaluateAll((nodes) =>
+          nodes.map((node) => {
+            const text = node.getBoundingClientRect();
+            const footer = node.parentElement!.getBoundingClientRect();
+            const style = getComputedStyle(node);
+            return {
+              text: node.textContent,
+              left: text.left - footer.left,
+              right: footer.right - text.right,
+              top: text.top - footer.top,
+              bottom: footer.bottom - text.bottom,
+              ellipsis: style.textOverflow === "ellipsis",
+              overflow: node.scrollWidth - node.clientWidth,
+            };
+          }),
+        );
       expect(
         footerTextBounds.every(
           (item) =>
@@ -343,7 +355,7 @@ for (const language of ["ar", "en"] as const) {
         .evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect().top));
       expect(Math.max(...prayerTops) - Math.min(...prayerTops)).toBeLessThanOrEqual(1);
       const overflowing = await allRow.evaluate((row) => row.scrollWidth > row.clientWidth + 1);
-      expect(overflowing).toBe(width < 1200);
+      expect(overflowing).toBe(width < 600);
       await expect(strip.locator("#home-prayer-scroll-hint")).toHaveCount(0);
       if (overflowing) {
         // Start at the first prayer: initially revealing Asr may already reach
@@ -363,7 +375,7 @@ for (const language of ["ar", "en"] as const) {
           const timing = card.querySelector("[data-prayer-timing] p")!.getBoundingClientRect();
           const bounds = card.getBoundingClientRect();
           return {
-            separated: identity.right + 4 <= timing.left || timing.right + 4 <= identity.left,
+            separated: identity.bottom <= timing.top && Math.abs(identity.right - timing.right) <= 1,
             width: bounds.width,
             height: bounds.height,
           };
@@ -374,7 +386,7 @@ for (const language of ["ar", "en"] as const) {
         anatomy.every(
           (card) =>
             card.separated &&
-            card.width >= 152 &&
+            card.width >= 130 &&
             card.width <= Math.max(240, availableRowWidth / 5) &&
             card.height >= 64,
         ),

@@ -49,7 +49,7 @@
         .bottom-nav,
         [role="dialog"],
         [role="menu"]
-      ):not(:where(button, input, select, textarea, label)) {
+      ):not(:where(input, select, textarea, label)) {
       background-color: var(--glass-card-tint);
       background-image: linear-gradient(
         135deg,
@@ -87,6 +87,11 @@
       backdrop-filter: blur(22px) saturate(135%);
     }
     /* Nested surfaces use their parent's frost, avoiding stacked GPU layers. */
+    html[data-app-material-resolved="glass"]:not(.high-contrast)
+      :is([data-material-ui], [data-material-surface], [role="dialog"], [role="menu"])
+      .text-primary {
+      color: #fff0bd;
+    }
     html[data-app-material-resolved="glass"]:not(.high-contrast)
       [data-material-ui]
       :is([class*="bg-card"], .bg-popover, header)

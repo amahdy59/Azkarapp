@@ -88,9 +88,7 @@ async function checkGeometry(page: Page) {
       quoteFont: getComputedStyle(quote).fontFamily,
       headingFont: getComputedStyle(heading).fontFamily,
       summaryOverflow: [
-        ...document.querySelectorAll(
-          '[data-density="summary"] h3, [data-density="summary"] p, [id^="prayer-summary-status-"]',
-        ),
+        ...document.querySelectorAll('[data-density="summary"] h3, [data-density="summary"] p, [data-prayer-detail]'),
       ].some((el) => el.scrollWidth > el.clientWidth + 1),
     };
   });
@@ -325,9 +323,9 @@ for (const language of ["ar", "en"] as const) {
                 statusGap:
                   tile.querySelector("[data-prayer-footer]")!.getBoundingClientRect().top -
                   tile.querySelector("p")!.getBoundingClientRect().bottom,
-                identity: tile.querySelector("[data-prayer-identity] h3")!.getBoundingClientRect().x,
-                timing: tile.querySelector("[data-prayer-timing] p")!.getBoundingClientRect().x,
-                overflow: [...tile.querySelectorAll('h3, p, [id^="prayer-summary-status-"]')].some(
+                identity: tile.querySelector("[data-prayer-identity] h3")!.getBoundingClientRect().right,
+                timing: tile.querySelector("[data-prayer-timing] p")!.getBoundingClientRect().right,
+                overflow: [...tile.querySelectorAll("h3, p, [data-prayer-detail]")].some(
                   (el) => el.scrollWidth > el.clientWidth + 1,
                 ),
               };
@@ -336,7 +334,7 @@ for (const language of ["ar", "en"] as const) {
           expect(tiles.every((tile) => tile.width >= 44 && tile.height >= 44 && !tile.overflow)).toBe(true);
           expect(tiles.every((tile) => tile.gap === 4)).toBe(true);
           expect(
-            tiles.every((tile) => tile.statusGap >= 8 && Math.abs(tile.identity - tile.timing) > 20),
+            tiles.every((tile) => tile.statusGap >= 8 && Math.abs(tile.identity - tile.timing) <= 1),
             JSON.stringify(tiles),
           ).toBe(true);
           const timeStyles = await page.locator('[id^="prayer-summary-time-"]').evaluateAll((times) =>
@@ -345,7 +343,11 @@ for (const language of ["ar", "en"] as const) {
               weight: getComputedStyle(time).fontWeight,
             })),
           );
-          expect(timeStyles.every((time) => time.size === "16px" && Number(time.weight) >= 800)).toBe(true);
+          expect(
+            timeStyles.every(
+              (time) => parseFloat(time.size) >= 16 && parseFloat(time.size) <= 28 && Number(time.weight) >= 800,
+            ),
+          ).toBe(true);
           if ((width === 390 && prayer === "fajr") || (width === 1440 && prayer === "dhuhr")) {
             await page.getByTestId("home-prayer-strip").scrollIntoViewIfNeeded();
             await page.screenshot({
@@ -354,8 +356,11 @@ for (const language of ["ar", "en"] as const) {
             });
           }
         }
-        const first = (await page.getByTestId("prayer-card-fajr").boundingBox())!;
-        const last = (await page.getByTestId("prayer-card-isha").boundingBox())!;
+        const row = page.getByTestId("home-all-prayers-row");
+        const overflowing = await row.evaluate((node) => node.scrollWidth > node.clientWidth + 1);
+        await expect(row.locator("article").first()).toHaveAttribute("data-prayer", overflowing ? "isha" : "fajr");
+        const first = (await row.locator("article").first().boundingBox())!;
+        const last = (await row.locator("article").last().boundingBox())!;
         expect(first.y < last.y || (language === "ar" ? first.x > last.x : first.x < last.x)).toBe(true);
       }
     });
@@ -405,8 +410,8 @@ for (const language of ["ar", "en"] as const) {
     await page.keyboard.press("Space");
     await expect(input).toBeChecked();
     await expect(page.getByTestId("prayer-actions-progress")).toHaveCount(0);
-    await expect(page.getByTestId("prayer-card-dhuhr").locator("[data-prayer-detail]")).toContainText(
-      language === "ar" ? "في المسجد" : "At the mosque",
+    await expect(page.getByTestId("prayer-card-dhuhr").getByRole("button")).toHaveAccessibleDescription(
+      language === "ar" ? /في المسجد/ : /At the mosque/,
     );
     await page.keyboard.press("Space");
     await expect(input).not.toBeChecked();

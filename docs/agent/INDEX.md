@@ -379,3 +379,5 @@ The owner's subsequent “push all changes” instruction supersedes the current
 [Independent App and Home Glass](phases/INDEPENDENT_GLASS_CONTROLS_2026_10_17.md) is the owner-approved implementation phase: directly visible controls, four mix-and-match combinations, persistent Home overrides, shared existing background and protected reading surfaces. This supersedes the earlier reset-Home-on-App-selection rule.
 
 [Home glass across all layouts](phases/UNIFIED_HOME_GLASS_2026_10_17.md) is the active owner-requested appearance correction: material parity with Home across screens, cards, navigation, reading layouts and overlays.
+
+[Frosted prayer hierarchy](phases/PRAYER_GLASS_HIERARCHY_2026_10_17.md) follows the separately committed global material phase: reference-inspired icon/time/status anatomy and comfortable free horizontal scrolling with initial current/next visibility.

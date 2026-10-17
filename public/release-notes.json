@@ -1,13 +1,15 @@
 {
-  "release": "2026-10-17.5",
+  "release": "2026-10-17.6",
   "ar": [
     "المظهر الزجاجي يطابق الرئيسية الآن في البطاقات والعناوين والتنقل عبر شاشات التطبيق.",
     "تظهر خلفية الرئيسية نفسها بوضوح خلف الواجهات، مع انعكاس وحواف زجاجية موحدة.",
-    "تمتد الأسطح الزجاجية إلى القراءة والنوافذ وعناصر الصوت، مع تظليل أقوى للنصوص الطويلة وخيارات التباين المعتادة."
+    "تمتد الأسطح الزجاجية إلى القراءة والنوافذ وعناصر الصوت، مع تظليل أقوى للنصوص الطويلة وخيارات التباين المعتادة.",
+    "بطاقات الصلاة أوضح بأوقات أكبر وأيقونات مميزة وحالات ذهبية، مع تمرير مريح وإظهار الصلاة الحالية والتالية معًا في البداية."
   ],
   "en": [
     "Glass now matches Home across cards, headers and navigation throughout the app.",
     "The same Home scenery shows clearly behind interface layouts with consistent reflections and glass edges.",
-    "Reading, dialogs and audio surfaces share Glass styling, with stronger tint for long text and the existing contrast options."
+    "Reading, dialogs and audio surfaces share Glass styling, with stronger tint for long text and the existing contrast options.",
+    "Prayer cards have larger times, distinct icon tiles and gold status pills, with comfortable scrolling that initially shows current and next together."
   ]
 }

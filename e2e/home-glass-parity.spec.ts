@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 
 for (const language of ["ar", "en"] as const) {
   for (const width of [390, 1440]) {
-    for (const flow of ["screens", "reading"] as const) {
+    for (const flow of ["screens", "utilities", "reading"] as const) {
       test(`Home glass material ${flow} ${language} ${width} @cross-browser`, async ({ page }, testInfo) => {
         await page.setViewportSize({ width, height: 1000 });
         await page.clock.setFixedTime(new Date("2026-10-17T08:00:00+03:00"));
@@ -46,17 +46,19 @@ for (const language of ["ar", "en"] as const) {
         await expect(page.getByTestId("app-scene").locator("img")).toHaveAttribute("src", scene!);
         if (width === 1440)
           await expect(page.locator(".app-sidebar")).toHaveCSS("backdrop-filter", "blur(22px) saturate(1.35)");
-        if (flow === "screens") {
-          for (const route of [
-            "azkar",
-            "progress",
-            "settings/appearance",
-            "quran-wird",
-            "qibla",
-            "counter",
-            "more",
-            "benefits",
-          ]) {
+        if (flow === "utilities") {
+          await page.getByRole("textbox").fill(language === "ar" ? "اغفر" : "forgive");
+          const result = page.getByTestId("matching-zikr-card").first();
+          await expect(result).toHaveCSS("backdrop-filter", filter);
+          await expect(result).toHaveCSS("background-color", tint);
+          await page.screenshot({ path: testInfo.outputPath("search-card.png"), scale: "css" });
+        }
+        if (flow !== "reading") {
+          const routes =
+            flow === "screens"
+              ? ["azkar", "progress", "settings/appearance", "quran-wird"]
+              : ["qibla", "counter", "more", "benefits"];
+          for (const route of routes) {
             await page.goto("/#/" + route);
             await expect(page.getByTestId("app-scene").locator("img")).toHaveAttribute("src", scene!);
             await expect

@@ -330,6 +330,7 @@ const ar = {
     virtueTitle: "من فضل صلاة {prayer}",
     legend: "متابعة صلاة {prayer}",
     now: "حان وقتها",
+    nowPill: "الآن",
     next: "الصلاة القادمة",
     nextShort: "القادمة",
     viewing: "معروضة",

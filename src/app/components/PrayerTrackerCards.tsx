@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { Sunrise, Sun, CloudSun, Sunset, MoonStar, Check, ChevronNext } from "./icons";
+import { Sunrise, Sun, CloudSun, Sunset, MoonStar, Check, ChevronNext, Clock } from "./icons";
 import { t } from "../i18n";
 import { PrayerVirtueModal } from "./PrayerVirtueModal";
 import type { AppLanguage, PrayerName, PrayerTrackingRecord } from "../types";
@@ -267,9 +267,10 @@ function PrayerCard({
           aria-expanded={selected}
           aria-controls="home-expanded-prayer"
           aria-label={t(language, "prayerTracking.openPrayer", { prayer: name })}
-          aria-describedby={`prayer-summary-time-${prayer} prayer-summary-status-${prayer} prayer-summary-detail-${prayer}`}
+          aria-describedby={`prayer-summary-time-${prayer} prayer-summary-status-${prayer} prayer-summary-detail-${prayer}${state !== "next" ? ` prayer-summary-record-${prayer}` : ""}`}
           className="home-prayer-summary-button no-press grid min-h-16 min-w-0 grid-cols-[minmax(0,max-content)_minmax(0,max-content)] justify-between gap-x-2.5 gap-y-1 rounded-xl outline-none transition-colors"
         >
+          <span className="home-prayer-divider" aria-hidden="true" />
           <div className="home-prayer-identity min-w-0 text-start" data-prayer-identity>
             <span
               aria-hidden="true"
@@ -299,7 +300,7 @@ function PrayerCard({
               id={`prayer-summary-status-${prayer}`}
               data-prayer-state-label
               data-testid={countdown && state === "next" ? "next-prayer" : undefined}
-              className={`max-w-full text-xs font-semibold ${state === "next" ? "home-prayer-next-label" : ""} ${isCurrent || state === "next" ? (onGlass ? "text-on-media-accent" : "text-primary") : onGlass ? "text-on-media-muted" : "text-muted-foreground"}`}
+              className="sr-only"
               dir="auto"
             >
               {state === "next" ? t(language, "prayerTracking.nextShort") : statusLabel(language, state)}
@@ -339,10 +340,24 @@ function PrayerCard({
             id={`prayer-summary-detail-${prayer}`}
             data-prayer-detail
             dir="auto"
-            className={`min-w-0 [overflow-wrap:anywhere] ${state === "next" ? "text-end text-sm tabular-nums" : ""}`}
+            className="home-prayer-status-pill min-w-0 text-sm tabular-nums [overflow-wrap:anywhere]"
           >
-            {footerText}
+            {isCurrent ? (
+              <span className="home-prayer-now-dot" aria-hidden="true" />
+            ) : (
+              <Clock size={17} aria-hidden="true" />
+            )}
+            {state === "next"
+              ? footerText
+              : isCurrent
+                ? t(language, "prayerTracking.nowPill")
+                : statusLabel(language, state)}
           </span>
+          {state !== "next" && (
+            <span id={`prayer-summary-record-${prayer}`} className="sr-only">
+              {footerText}
+            </span>
+          )}
           {state === "next" && model.remainingPercent !== undefined && (
             <progress
               className="home-prayer-remaining mt-2.5"
@@ -558,9 +573,17 @@ export function PrayerTrackerCards({
   const summaryRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const ordered = PRAYER_ORDER.map((prayer) => models.find((model) => model.prayer === prayer)).filter(
+  const chronological = PRAYER_ORDER.map((prayer) => models.find((model) => model.prayer === prayer)).filter(
     (model): model is PrayerCardModel => Boolean(model),
   );
+  // At night the adjacent pair crosses midnight. Rotate the narrow strip's
+  // cyclic order so Isha and the following Fajr can appear together.
+  const nightPair =
+    compactSummary &&
+    summaryOverflows &&
+    chronological.some((model) => model.prayer === "isha" && model.state === "current") &&
+    chronological.some((model) => model.prayer === "fajr" && model.state === "next");
+  const ordered = nightPair ? [...chronological.slice(-1), ...chronological.slice(0, -1)] : chronological;
 
   const focusIndex = Math.max(
     0,

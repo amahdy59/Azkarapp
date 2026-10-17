@@ -95,10 +95,9 @@ describe("PrayerTrackerCards", () => {
     );
     const footer = (prayer: PrayerName) =>
       screen.getByTestId(`prayer-card-${prayer}`).querySelector("[data-prayer-footer]");
-    expect(screen.getByTestId("prayer-card-fajr").querySelector("[data-prayer-detail]")).toHaveTextContent("At home");
-    expect(screen.getByTestId("prayer-card-dhuhr").querySelector("[data-prayer-detail]")).toHaveTextContent(
-      "At the mosque",
-    );
+    expect(screen.getByTestId("prayer-card-fajr").querySelector("[data-prayer-detail]")).toHaveTextContent("Passed");
+    expect(screen.getByTestId("prayer-card-dhuhr").querySelector("[data-prayer-detail]")).toHaveTextContent("Now");
+    expect(screen.getByTestId("prayer-card-fajr").querySelector("button")).toHaveAccessibleDescription(/At home/);
     expect(footer("fajr")).toHaveTextContent("At home");
     expect(footer("dhuhr")).toHaveTextContent("At the mosque");
     expect(footer("maghrib")).toHaveTextContent("After Asr");
