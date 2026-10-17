@@ -1,4 +1,5 @@
-.settings-root-panel {
+.settings-root-panel,
+.settings-search-sticky {
   --settings-gutter: var(--spacing-page);
 }
 
@@ -10,7 +11,8 @@
     overflow: hidden;
   }
 
-  .settings-root-panel {
+  .settings-root-panel,
+  .settings-search-sticky {
     --settings-gutter: 1rem;
   }
 
