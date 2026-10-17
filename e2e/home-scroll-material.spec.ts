@@ -24,7 +24,7 @@ test("scrolled Home frosts one shared ground and preserves appearance fallbacks"
     node.scrollTop = 150;
   });
   await expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
-  await expect(sticky).toHaveCSS("backdrop-filter", "blur(22px) saturate(1.35)");
+  await expect(sticky).toHaveCSS("backdrop-filter", "blur(16px) saturate(1.35)");
   for (const card of await sticky.locator(".hero-glass.home-glass-surface").all())
     await expect(card).toHaveCSS("backdrop-filter", "none");
   await page.screenshot({ path: testInfo.outputPath("scrolled-single-frost.png"), scale: "css" });
@@ -36,7 +36,7 @@ test("scrolled Home frosts one shared ground and preserves appearance fallbacks"
   });
   await expect(sticky).toHaveCSS("backdrop-filter", "none");
   await page.evaluate(() => document.querySelector(".home-photo-canvas")?.classList.add("home-force-glass"));
-  await expect(sticky).toHaveCSS("backdrop-filter", "blur(22px) saturate(1.35)");
+  await expect(sticky).toHaveCSS("backdrop-filter", "blur(16px) saturate(1.35)");
   for (const card of await sticky.locator(".hero-glass.home-glass-surface").all())
     await expect(card).toHaveCSS("backdrop-filter", "none");
   await page.evaluate(() => document.documentElement.classList.add("high-contrast"));

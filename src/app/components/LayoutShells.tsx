@@ -173,7 +173,7 @@ export function Header({
       data-testid="shared-screen-header"
       data-scrolled={isScrolled || undefined}
       data-header-contrast="solid"
-      className={`shared-screen-header ${decoration ? "isolate" : ""} sticky top-0 z-40 flex w-full shrink-0 items-center gap-2 bg-background ${pageGutters ? "px-page" : "px-4"} pt-2 pb-1 transition-colors duration-standard`}
+      className={`shared-screen-header ${decoration ? "isolate" : ""} sticky top-0 z-40 flex w-full shrink-0 items-center gap-2 border-transparent bg-background ${pageGutters ? "px-page" : "px-4"} pt-2 pb-1 transition-colors duration-standard`}
       style={{ minHeight: 56, ...style }}
     >
       {/* Reading headers use one opaque surface; scene artwork belongs below

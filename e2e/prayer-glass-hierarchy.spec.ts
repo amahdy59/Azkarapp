@@ -27,7 +27,7 @@ for (const language of ["ar", "en"] as const) {
       const current = row.locator('[data-prayer-state="current"]');
       const next = row.locator('[data-prayer-state="next"]');
       for (const card of [current, next]) {
-        await expect(card).toHaveCSS("backdrop-filter", "blur(22px) saturate(1.35)");
+        await expect(card).toHaveCSS("backdrop-filter", "blur(16px) saturate(1.35)");
         await expect
           .poll(() =>
             card.evaluate((n) => {
