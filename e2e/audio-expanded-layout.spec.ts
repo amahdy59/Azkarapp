@@ -24,7 +24,7 @@ for (const scenario of [
       localStorage.setItem(
         "azkarapp.state.v1",
         JSON.stringify({
-          settings: { language, themeMode: theme, reduceMotion: true },
+          settings: { language, themeMode: theme, appMaterial: "glass", reduceMotion: true },
           profile: { displayName: "Guest", isGuest: true },
         }),
       );
@@ -127,6 +127,9 @@ for (const scenario of [
     await expand.focus();
     await page.keyboard.press("Enter");
     await expect(player).toHaveAttribute("data-variant", "expanded");
+    await expect(page.locator("[data-audio-covered]").first()).toHaveCSS("opacity", "0");
+    await expect(page.locator(".audio-player-surface")).toHaveCSS("background-color", "rgba(15, 23, 42, 0.8)");
+    await expect(page.locator(".audio-player-surface")).toHaveCSS("backdrop-filter", "blur(28px) saturate(1.35)");
     await expect(player.getByTestId("audio-queue-position")).toHaveCount(0);
     await expect(player.getByTestId("audio-expanded-identity")).not.toContainText(arabic ? "المقطع" : "Track");
     const waveformContrast = await player.getByTestId("audio-seek-waveform").evaluate((element) => {
@@ -209,6 +212,9 @@ for (const scenario of [
     await expect(audioOptions.getByRole("switch")).toHaveCount(1);
     expect((await new AxeBuilder({ page }).include('[role="dialog"]').analyze()).violations).toEqual([]);
     await expect(audioOptions.getByTestId("audio-reciter-select")).toBeVisible();
+    await expect(audioOptions).toHaveCSS("background-color", "rgba(15, 23, 42, 0.8)");
+    await expect(audioOptions).toHaveCSS("backdrop-filter", "blur(28px) saturate(1.35)");
+    await page.screenshot({ path: testInfo.outputPath(`frosted-options-${scenario.name}.png`) });
     const speedAlignment = await audioOptions.locator(".audio-speed-select").evaluate((element) => {
       const value = element.querySelector('[data-slot="select-value"]')!.getBoundingClientRect();
       const icon = element.querySelector("svg")!.getBoundingClientRect();
@@ -355,5 +361,6 @@ for (const scenario of [
       player.getByRole("button", { name: arabic ? "توسيع المشغل" : "Expand player", exact: true }),
     ).toBeFocused();
     await expect(canvas.locator("[inert]")).toHaveCount(0);
+    await expect(page.locator("[data-audio-covered]")).toHaveCount(0);
   });
 }

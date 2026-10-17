@@ -270,7 +270,6 @@ function PrayerCard({
           aria-describedby={`prayer-summary-time-${prayer} prayer-summary-status-${prayer} prayer-summary-detail-${prayer}${state !== "next" ? ` prayer-summary-record-${prayer}` : ""}`}
           className="home-prayer-summary-button no-press grid min-h-16 min-w-0 grid-cols-[minmax(0,max-content)_minmax(0,max-content)] justify-between gap-x-2.5 gap-y-1 rounded-xl outline-none transition-colors"
         >
-          <span className="home-prayer-divider" aria-hidden="true" />
           <div className="home-prayer-identity min-w-0 text-start" data-prayer-identity>
             <span
               aria-hidden="true"
@@ -357,17 +356,6 @@ function PrayerCard({
             <span id={`prayer-summary-record-${prayer}`} className="sr-only">
               {footerText}
             </span>
-          )}
-          {state === "next" && model.remainingPercent !== undefined && (
-            <progress
-              className="home-prayer-remaining mt-2.5"
-              dir={language === "ar" ? "rtl" : "ltr"}
-              title={t(language, "prayerTracking.remainingBarHint")}
-              max={100}
-              value={model.remainingPercent}
-              aria-label={t(language, "prayerTracking.timeRemainingUntil", { prayer: name })}
-              aria-valuetext={countdown}
-            />
           )}
         </div>
       </article>

@@ -381,3 +381,5 @@ The owner's subsequent “push all changes” instruction supersedes the current
 [Home glass across all layouts](phases/UNIFIED_HOME_GLASS_2026_10_17.md) is the active owner-requested appearance correction: material parity with Home across screens, cards, navigation, reading layouts and overlays.
 
 [Frosted prayer hierarchy](phases/PRAYER_GLASS_HIERARCHY_2026_10_17.md) follows the separately committed global material phase: reference-inspired icon/time/status anatomy and comfortable free horizontal scrolling with initial current/next visibility.
+
+[Calm prayer and overlay separation](phases/CALM_PRAYER_AND_OVERLAY_SEPARATION_2026_10_17.md) is the active owner-requested follow-up: quieter summaries, no next-prayer bar/dividers, clearer expanded actions, denser overlays and reversible covered-reader visibility.

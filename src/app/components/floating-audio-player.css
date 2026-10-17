@@ -93,6 +93,10 @@ html[data-mushaf-focus="true"] .floating-audio-player {
   }
 }
 
+[data-audio-covered] {
+  opacity: 0 !important;
+}
+
 .audio-player-surface {
   container: audio-surface / inline-size;
   position: absolute;
@@ -100,7 +104,7 @@ html[data-mushaf-focus="true"] .floating-audio-player {
   /* Above the sticky session header (40), below portalled options (50). */
   z-index: 45;
   overflow: hidden;
-  background: var(--background);
+  background: var(--card);
   cursor: auto;
 }
 

@@ -28,21 +28,13 @@ test("next-prayer remaining time updates without live announcements or phone ove
   await page.goto("/#/home");
   const strip = page.getByTestId("home-prayer-strip");
   await expect(strip.locator('[data-density="summary"]')).toHaveCount(5);
-  const progress = strip.getByRole("progressbar");
-  await expect(progress).toHaveCount(1);
-  await expect(progress).toHaveAttribute("aria-label", "الوقت المتبقي حتى صلاة العصر");
-  expect(await progress.evaluate((node) => getComputedStyle(node).color)).toBe(
-    await strip
-      .locator('[data-prayer-state="next"] [data-prayer-detail]')
-      .evaluate((node) => getComputedStyle(node).color),
-  );
-  const first = await progress.evaluate((node) => (node as HTMLProgressElement).value);
-  const countdown = await progress.getAttribute("aria-valuetext");
+  await expect(strip.getByRole("progressbar")).toHaveCount(0);
+  const countdown = strip.locator('[data-prayer-state="next"] [data-prayer-detail]');
+  const first = await countdown.textContent();
   await page.clock.fastForward(60_000);
-  await expect.poll(() => progress.getAttribute("aria-valuetext")).not.toBe(countdown);
-  expect(await progress.evaluate((node) => (node as HTMLProgressElement).value)).toBeLessThan(first);
+  await expect.poll(() => countdown.textContent()).not.toBe(first);
   expect(
-    await progress.evaluate((node) => Boolean(node.closest('[aria-live="polite"], [aria-live="assertive"]'))),
+    await countdown.evaluate((node) => Boolean(node.closest('[aria-live="polite"], [aria-live="assertive"]'))),
   ).toBe(false);
   await page.setViewportSize({ width: 320, height: 740 });
   await expect(strip.locator('[data-density="summary"]')).toHaveCount(5);
@@ -54,20 +46,6 @@ test("next-prayer remaining time updates without live announcements or phone ove
   const manualPosition = await row.evaluate((node) => node.scrollLeft);
   await page.clock.fastForward(60_000);
   expect(await row.evaluate((node) => node.scrollLeft)).toBe(manualPosition);
-  const bounds = await progress.evaluate((node) => {
-    const bar = node.getBoundingClientRect();
-    const card = node.closest("article")!;
-    const footer = card.querySelector("[data-prayer-footer]")!.getBoundingClientRect();
-    const text = card.querySelector("[data-prayer-detail]")!.getBoundingClientRect();
-    return {
-      outsideButton: !node.closest("button"),
-      insideFooter: bar.top >= footer.top && bar.bottom <= footer.bottom,
-      gapBelowText: bar.top - text.bottom,
-    };
-  });
-  expect(bounds.outsideButton).toBe(true);
-  expect(bounds.insideFooter).toBe(true);
-  expect(bounds.gapBelowText).toBeGreaterThanOrEqual(2);
 });
 
 for (const width of [390, 1440]) {
@@ -111,7 +89,7 @@ for (const width of [390, 1440]) {
     await expect.poll(() => strength(next)).toBe(1);
     await expect(page.getByTestId("prayer-card-maghrib")).toHaveAttribute("data-prayer-state", "next");
     await expect(next.getByRole("progressbar")).toHaveCount(0);
-    await expect(page.getByTestId("home-prayer-strip").getByRole("progressbar")).toHaveCount(1);
+    await expect(page.getByTestId("home-prayer-strip").getByRole("progressbar")).toHaveCount(0);
   });
 }
 

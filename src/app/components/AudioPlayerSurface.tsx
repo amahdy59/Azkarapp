@@ -37,6 +37,7 @@ export function AudioPlayerSurface({
       child,
       inert: child.hasAttribute("inert"),
       hidden: child.getAttribute("aria-hidden"),
+      covered: child.hasAttribute("data-audio-covered"),
     }));
     (
       surface.querySelector<HTMLButtonElement>("[data-audio-initial-focus]") ??
@@ -45,6 +46,7 @@ export function AudioPlayerSurface({
     for (const { child } of previous) {
       child.setAttribute("inert", "");
       child.setAttribute("aria-hidden", "true");
+      child.setAttribute("data-audio-covered", "");
     }
 
     const onKeyDown = (event: KeyboardEvent) => {
@@ -60,10 +62,11 @@ export function AudioPlayerSurface({
       const restoreStoppedFocus = surface.contains(document.activeElement);
       window.removeEventListener("keydown", onKeyDown, true);
       window.removeEventListener("hashchange", onNavigate);
-      for (const { child, inert, hidden } of previous) {
+      for (const { child, inert, hidden, covered } of previous) {
         if (!inert) child.removeAttribute("inert");
         if (hidden === null) child.removeAttribute("aria-hidden");
         else child.setAttribute("aria-hidden", hidden);
+        if (!covered) child.removeAttribute("data-audio-covered");
       }
       if (restoreStoppedFocus && dockedInReader) {
         requestAnimationFrame(() => {

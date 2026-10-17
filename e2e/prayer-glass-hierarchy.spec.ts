@@ -39,7 +39,7 @@ for (const language of ["ar", "en"] as const) {
           .toBe(true);
       }
       await expect(current.locator(".home-prayer-status-pill")).toContainText(language === "ar" ? "الآن" : "Now");
-      await expect(next.getByRole("progressbar")).toHaveCount(1);
+      await expect(next.getByRole("progressbar")).toHaveCount(0);
       const sizes = await row.locator("article").evaluateAll((nodes) =>
         nodes.map((n) => {
           const box = n.getBoundingClientRect();
@@ -76,6 +76,18 @@ for (const language of ["ar", "en"] as const) {
       await next.scrollIntoViewIfNeeded();
       expect(await next.evaluate((n) => n.scrollWidth <= n.clientWidth + 1)).toBe(true);
       await page.screenshot({ path: testInfo.outputPath("prayer-hierarchy-enlarged.png"), scale: "css" });
+      await page.locator("html").evaluate((n) => {
+        n.style.fontSize = "";
+      });
+      await current.getByRole("button").click();
+      const panel = page.getByTestId("home-prayer-moment");
+      await expect(panel.getByTestId("prayer-open-adhkar")).toBeVisible();
+      if (width < 600) {
+        const action = (await panel.getByTestId("prayer-open-adhkar").boundingBox())!;
+        const evidence = (await panel.getByTestId("prayer-moment-virtue").boundingBox())!;
+        expect(action.y + action.height).toBeLessThanOrEqual(evidence.y);
+      }
+      await panel.screenshot({ path: testInfo.outputPath("expanded-prayer.png"), scale: "css" });
     });
   }
 }

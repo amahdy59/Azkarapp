@@ -682,10 +682,12 @@ describe("FloatingAudioPlayer", () => {
     );
     fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
     expect(screen.getByTestId("reading-content").closest('[data-testid="reader-card"]')).toHaveAttribute("inert");
+    expect(screen.getByTestId("reader-card")).toHaveAttribute("data-audio-covered");
     expect(screen.queryByRole("button", { name: "Reading action" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Reader header" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Minimize player" })).toHaveFocus();
     fireEvent.keyDown(window, { key: "Escape" });
+    expect(screen.getByTestId("reader-card")).not.toHaveAttribute("data-audio-covered");
     expect(screen.getByTestId("reading-content")).not.toHaveAttribute("inert");
     expect(screen.getByRole("button", { name: "Reading action" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Expand player" })).toHaveFocus();

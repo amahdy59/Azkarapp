@@ -82,8 +82,8 @@ for (const language of ["ar", "en"] as const) {
           await expect(page.getByTestId("reader-card").first()).toHaveCSS("backdrop-filter", filter);
           await page.screenshot({ path: testInfo.outputPath("reader.png"), scale: "css" });
           await page.getByRole("button", { name: language === "ar" ? "الفائدة" : "Benefit", exact: true }).click();
-          await expect(page.getByRole("dialog")).toHaveCSS("background-color", "rgba(15, 23, 42, 0.28)");
-          await expect(page.getByRole("dialog")).toHaveCSS("backdrop-filter", filter);
+          await expect(page.getByRole("dialog")).toHaveCSS("background-color", "rgba(15, 23, 42, 0.8)");
+          await expect(page.getByRole("dialog")).toHaveCSS("backdrop-filter", "blur(28px) saturate(1.35)");
           expect((await new AxeBuilder({ page }).include('[role="dialog"]').analyze()).violations).toEqual([]);
           await page.screenshot({ path: testInfo.outputPath("benefit-dialog.png"), scale: "css" });
           await page.keyboard.press("Escape");

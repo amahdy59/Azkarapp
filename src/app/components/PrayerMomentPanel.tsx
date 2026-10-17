@@ -88,7 +88,7 @@ export function PrayerMomentPanel({
           status={
             <div
               data-testid="prayer-moment-status"
-              className={`flex flex-wrap gap-x-3 gap-y-1 text-label leading-relaxed ${bodyText}`}
+              className={`flex flex-wrap gap-x-3 text-label leading-normal ${bodyText}`}
             >
               <time dateTime={dayKey} data-testid="prayer-record-date" dir="auto">
                 {t(language, "prayerMoment.recordDate", { date: dateLabel })}
@@ -103,7 +103,7 @@ export function PrayerMomentPanel({
         >
           {virtue && (
             <section
-              className={`min-w-0 border-y py-3 text-start ${hairline}`}
+              className={`min-w-0 border-t pt-4 text-start ${hairline}`}
               data-testid="prayer-moment-virtue"
               aria-labelledby={`prayer-virtue-heading-${prayer}`}
             >

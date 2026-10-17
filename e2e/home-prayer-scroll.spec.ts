@@ -34,7 +34,7 @@ for (const language of ["ar", "en"] as const) {
           return [...elements].flatMap((element) => element.getAnimations()).length;
         });
       const next = page.locator('[data-density="summary"][data-prayer-state="next"]');
-      const label = next.locator("[data-prayer-state-label]");
+      const label = next.locator("h3");
       await expect(label).toBeVisible();
       await page.evaluate(() => document.fonts.ready);
       await expect
@@ -67,7 +67,7 @@ for (const language of ["ar", "en"] as const) {
       await expect.poll(activeHandoffAnimations).toBe(0);
       await scroll.evaluate((element) => (element.scrollTop = 0));
       await expect(sticky).not.toHaveAttribute("data-prayer-cards-condensed");
-      await expect(next.locator("progress")).toBeVisible();
+      await expect(next.locator("progress")).toHaveCount(0);
       await expect(next.locator("[data-prayer-compact-countdown]")).not.toBeVisible();
       const footer = page.getByTestId("home-visitor-footer");
       await footer.scrollIntoViewIfNeeded();

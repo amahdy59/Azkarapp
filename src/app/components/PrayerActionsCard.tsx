@@ -77,14 +77,14 @@ export function PrayerActionsCard({
       data-prayer={prayer}
       aria-labelledby={`prayer-actions-heading-${prayer}`}
       dir={direction}
-      className={`flex min-w-0 flex-col gap-3 p-4 sm:p-5 ${className}`}
+      className={`flex min-w-0 flex-col gap-2 p-4 sm:p-5 ${className}`}
     >
       {/* One heading and a quiet information action. */}
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0 flex-1">
           <Heading
             id={`prayer-actions-heading-${prayer}`}
-            className={`text-title font-bold leading-relaxed ${titleColor}`}
+            className={`text-title font-bold leading-normal ${titleColor}`}
             dir="auto"
           >
             {t(language, "prayerActions.heading", { prayer: infoData.prayerName })}
@@ -131,7 +131,6 @@ export function PrayerActionsCard({
           )}
         </div>
       )}
-      {children}
 
       {/* Plain rows grow naturally with wrapped labels, retaining 44px targets. */}
       <ol className="flex flex-col">
@@ -143,7 +142,7 @@ export function PrayerActionsCard({
             <li
               key={action.id}
               data-testid={action.testId}
-              className={`group/item relative -mx-2 flex min-h-11 items-center justify-between gap-3 rounded-xl px-2 py-1 transition-colors duration-fast ${
+              className={`group/item relative flex min-h-11 items-center justify-between gap-3 rounded-xl px-3 py-1 transition-colors duration-fast ${
                 onGlass
                   ? "text-white hover:bg-white/10 active:bg-white/15"
                   : "text-foreground hover:bg-muted/50 active:bg-muted/70"
@@ -171,7 +170,7 @@ export function PrayerActionsCard({
               <div className="min-w-0 flex-1">
                 <span
                   id={labelId}
-                  className={`block break-words text-base font-semibold leading-relaxed ${onGlass ? "text-on-media" : titleColor}`}
+                  className={`block break-words text-base font-semibold leading-normal ${onGlass ? "text-on-media" : titleColor}`}
                   dir="auto"
                 >
                   {action.label}
@@ -195,6 +194,8 @@ export function PrayerActionsCard({
         <BookOpen size={20} className="shrink-0" aria-hidden="true" />
         <span>{t(language, "prayerActions.startAdhkar")}</span>
       </button>
+
+      {children}
 
       {/* Educational More Info Modal */}
       {infoOpen && (

@@ -407,8 +407,8 @@ describe("PrayerActionsCard", () => {
     expect(row).not.toHaveClass("backdrop-blur-md");
     expect(row).not.toHaveClass("bg-on-media-surface/60");
     expect(row).not.toHaveClass("border");
-    expect(row).toHaveClass("px-2");
-    expect(row).toHaveClass("-mx-2");
+    expect(row).toHaveClass("px-3");
+    expect(row).toHaveClass("min-h-11");
     expect(row).toHaveClass("text-white");
     expect(row.querySelector(":scope > div svg")).toBeNull();
     expect(row.querySelector(".tracking-check")).toHaveClass("size-5", "rounded-md");

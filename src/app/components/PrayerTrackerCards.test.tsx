@@ -50,7 +50,7 @@ function renderRow(current: PrayerName) {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("PrayerTrackerCards", () => {
-  it.each(["ar", "en"] as const)("exposes remaining-time semantics and native %s fill direction", (language) => {
+  it.each(["ar", "en"] as const)("exposes a text countdown without a redundant %s progress bar", (language) => {
     render(
       <PrayerTrackerCards
         models={modelsWithCurrent("dhuhr").map((model) =>
@@ -66,13 +66,8 @@ describe("PrayerTrackerCards", () => {
         compactSummary
       />,
     );
-    const bar = screen.getByRole("progressbar");
-    expect(bar).toHaveAttribute("value", "25");
-    expect(bar).toHaveAttribute("max", "100");
-    expect(bar).toHaveAttribute("dir", language === "ar" ? "rtl" : "ltr");
-    expect(bar).toHaveAttribute("aria-valuetext", "01:00");
-    expect(bar).toHaveAccessibleName(language === "ar" ? "الوقت المتبقي حتى صلاة العصر" : "Time remaining until Asr");
-    expect(bar.closest("button")).toBeNull();
+    expect(screen.queryByRole("progressbar")).toBeNull();
+    expect(screen.getByTestId("prayer-card-asr").querySelector("[data-prayer-detail]")).toHaveTextContent("01:00");
   });
   it("uses concise saved-location and future-state footers without adding actions", () => {
     render(
@@ -103,9 +98,9 @@ describe("PrayerTrackerCards", () => {
     expect(footer("maghrib")).toHaveTextContent("After Asr");
     expect(footer("isha")).toHaveTextContent("After Maghrib");
     expect(footer("asr")).toHaveTextContent("01:00");
-    expect(footer("asr")?.querySelector("progress")).not.toBeNull();
+    expect(footer("asr")?.querySelector("progress")).toBeNull();
     expect(screen.getByTestId("prayer-tracker-cards")).not.toHaveTextContent(/Rawatib|Optional/);
-    expect(screen.getByTestId("prayer-card-asr").querySelector("progress")).not.toBeNull();
+    expect(screen.getByTestId("prayer-card-asr").querySelector("progress")).toBeNull();
     expect(screen.getAllByRole("button")).toHaveLength(5);
     expect(footer("fajr")?.querySelector("button")).toBeNull();
   });
@@ -187,13 +182,11 @@ describe("PrayerTrackerCards", () => {
       "maghrib",
       "isha",
     ]);
-    const progress = screen.getByRole("progressbar", { name: "Time remaining until Fajr" });
-    expect(progress).toHaveAttribute("value", "60");
-    expect(progress).toHaveAttribute("aria-valuetext", "06:00 left");
+    expect(screen.queryByRole("progressbar")).toBeNull();
+    expect(screen.getByTestId("prayer-card-fajr")).toHaveTextContent("06:00 left");
     expect(screen.queryByRole("button", { name: "Show all prayers" })).toBeNull();
     expect(screen.getByRole("button", { name: "Open Dhuhr" })).toBeEnabled();
     expect(screen.getByTestId("prayer-card-dhuhr")).toHaveTextContent("12:59 PM");
-    expect(progress.closest("button")).toBeNull();
   });
 
   it("keeps the viewed prayer distinct from the current prayer and describes its time", () => {
