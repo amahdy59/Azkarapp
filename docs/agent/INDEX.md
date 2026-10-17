@@ -375,3 +375,5 @@ Latest owner-approved combined follow-up: [Home sharing, selection and audio](ph
 ## Combined release authorization — 2026-10-16
 
 The owner's subsequent “push all changes” instruction supersedes the current local-only holds. [Combined release report](phases/COMBINED_HOME_RELEASE_2026_10_16.md) records verification/publication for the frozen Home, automatic path, reminders, audio protection and Qibla work. One coordinating chat owns commit/push and exact-commit Quality/Pages/production verification.
+
+[Independent App and Home Glass](phases/INDEPENDENT_GLASS_CONTROLS_2026_10_17.md) is the owner-approved implementation phase: directly visible controls, four mix-and-match combinations, persistent Home overrides, shared existing background and protected reading surfaces. This supersedes the earlier reset-Home-on-App-selection rule.

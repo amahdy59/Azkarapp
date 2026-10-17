@@ -22,7 +22,7 @@ function renderPanel() {
 }
 
 describe("AppearancePanel", () => {
-  it("offers two global choices and applies them to Home, with optional independent Home choices", () => {
+  it("exposes independent app and Home choices without resetting Home on app selection", () => {
     const app = vi.fn();
     const home = vi.fn();
     const props = {
@@ -42,8 +42,8 @@ describe("AppearancePanel", () => {
     expect(global.getAllByRole("radio")).toHaveLength(2);
     fireEvent.click(global.getByRole("radio", { name: "Glass" }));
     expect(app).toHaveBeenCalledWith("glass");
-    expect(home).toHaveBeenCalledWith("inherit");
-    fireEvent.click(screen.getByText("Customize Home"));
+    expect(home).not.toHaveBeenCalled();
+    expect(screen.getByRole("radiogroup", { name: "Home appearance" })).toBeVisible();
     fireEvent.click(screen.getByRole("switch", { name: "Same as app" }));
     expect(home).toHaveBeenLastCalledWith("solid");
     rerender(<AppearancePanel {...props} appMaterial="solid" homeMaterial="glass" />);
@@ -51,6 +51,43 @@ describe("AppearancePanel", () => {
     fireEvent.click(screen.getByRole("switch", { name: "Same as app" }));
     expect(home).toHaveBeenLastCalledWith("inherit");
   });
+  it.each(["solid", "glass"] as const)(
+    "preserves a %s Home override when changing or reselecting the app",
+    (homeMaterial) => {
+      const app = vi.fn();
+      const home = vi.fn();
+      const props = {
+        language: "en" as const,
+        direction: "ltr" as const,
+        themeMode: "midnight" as const,
+        highContrast: false,
+        onThemeModeChange: vi.fn(),
+        onDisableHighContrast: vi.fn(),
+        onLanguageChange: vi.fn(),
+        onBack: vi.fn(),
+        onAppMaterialChange: app,
+        onHomeMaterialChange: home,
+        homeMaterial,
+      };
+      const view = render(<AppearancePanel {...props} appMaterial="solid" />);
+      fireEvent.click(
+        within(screen.getByRole("radiogroup", { name: "App appearance" })).getByRole("radio", { name: "Glass" }),
+      );
+      expect(app).toHaveBeenLastCalledWith("glass");
+      expect(home).not.toHaveBeenCalled();
+      view.rerender(<AppearancePanel {...props} appMaterial="glass" />);
+      fireEvent.click(
+        within(screen.getByRole("radiogroup", { name: "App appearance" })).getByRole("radio", { name: "Glass" }),
+      );
+      expect(app).toHaveBeenCalledTimes(2);
+      expect(home).not.toHaveBeenCalled();
+      fireEvent.click(
+        within(screen.getByRole("radiogroup", { name: "Home appearance" })).getByRole("radio", { name: "Opaque" }),
+      );
+      expect(home).toHaveBeenLastCalledWith("solid");
+      expect(app).toHaveBeenCalledTimes(2);
+    },
+  );
   it("keeps images and transparency as independent appearance choices", () => {
     const onImages = vi.fn();
     const onTransparency = vi.fn();

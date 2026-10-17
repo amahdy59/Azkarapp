@@ -4830,3 +4830,7 @@ The owner requests a local-only follow-up and explicitly approves cross-chat coo
 ## Owner authorization to release all pending changes — 2026-10-16
 
 The owner now explicitly instructs “push all changes.” This supersedes the local-only hold for every current pending Home, automatic-path, sourced-reminder, audio-protection/timing, Qibla and accompanying documentation/test change. The coordinating release chat owns one combined verified release: preserve the frozen snapshot, refresh notes/history for changes since the last successful Pages deployment, run the intact tracked hook gates, commit/push main, monitor exact-commit Quality and Pages build/deploy, inspect any failed jobs, and verify the deployed commit plus browser smoke. No force push, hook bypass, relaxed assertions or religious-count/source shortcuts are authorized. Prior local-only reports remain historical evidence; this decision is current authority.
+
+## Independent App and Home appearance — 2026-10-17
+
+The owner now requires genuine App/Home independence: choosing or reselecting App appearance must not write Home's preference. Both Glass/Opaque groups are directly visible in Settings → Appearance. Same as app remains optional; inherited Home resolves to App while explicit Home overrides survive every App change. Glass interface pages reuse the existing current Home scene; reading and playback protection, legacy values, contrast fallbacks and chrome-only blur remain unchanged. See docs/agent/phases/INDEPENDENT_GLASS_CONTROLS_2026_10_17.md.

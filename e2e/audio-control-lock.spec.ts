@@ -120,7 +120,6 @@ test("explicit Home glass overrides desktop device preference while solid and hi
   await expect(card).toHaveCSS("backdrop-filter", "none");
   await page.goto("/#/settings/appearance");
   const homeAppearance = page.getByRole("radiogroup", { name: "Home appearance", exact: true });
-  await page.getByText("Customize Home", { exact: true }).click();
   await homeAppearance.getByRole("radio", { name: "Glass", exact: true }).click();
   await page.goto("/#/home");
   await expect(card).toHaveCSS("backdrop-filter", "blur(16px) saturate(1.35)");
@@ -135,7 +134,6 @@ test("explicit Home glass overrides desktop device preference while solid and hi
   await page.emulateMedia({ forcedColors: "none" });
   await expect(card).toHaveCSS("backdrop-filter", "blur(16px) saturate(1.35)");
   await page.goto("/#/settings/appearance");
-  await page.getByText("Customize Home", { exact: true }).click();
   await homeAppearance.getByRole("radio", { name: "Opaque", exact: true }).click();
   await page.goto("/#/home");
   await expect(card).not.toHaveClass(/hero-glass/);

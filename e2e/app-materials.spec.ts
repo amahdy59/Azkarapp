@@ -31,10 +31,9 @@ for (const language of ["ar", "en"] as const) {
       await expect(app.locator('[aria-checked="true"] > [aria-hidden="true"]')).toHaveCSS("transform", "none");
       await app.scrollIntoViewIfNeeded();
       await page.screenshot({ path: testInfo.outputPath(`simple-appearance-${language}-${width}.png`) });
-      await page.getByText(language === "ar" ? "تخصيص الرئيسية" : "Customize Home", { exact: true }).click();
       await expect(
         page.getByRole("switch", { name: language === "ar" ? "مثل التطبيق" : "Same as app", exact: true }),
-      ).toHaveAttribute("aria-checked", "true");
+      ).toHaveAttribute("aria-checked", "false");
       await expect(page.locator("html")).toHaveAttribute("data-app-material-resolved", "glass");
       expect((await new AxeBuilder({ page }).include(".app-main").analyze()).violations).toEqual([]);
       await page.reload();

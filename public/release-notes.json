@@ -1,13 +1,13 @@
 {
-  "release": "2026-10-17.2",
+  "release": "2026-10-17.3",
   "ar": [
-    "تفتح مشاركة إتمام الجلسة معاينة صورة قبل إرسالها بدل المشاركة النصية المباشرة.",
-    "توزيع متوازن للمحتوى على صور التقدم والإتمام، مع حفظ الصور وخيارات النص والرابط دون تغيير تقدمك المسجل.",
-    "تظهر مشاركة الآية كصورة قبل المشاركة النصية بتمييز أوضح، مع بقاء النسخ والإشارة المرجعية متاحين."
+    "اختر المظهر الزجاجي أو المعتم للتطبيق والرئيسية بشكل مستقل؛ تغيير أحدهما لا يلغي اختيارك للآخر.",
+    "خيارات مظهر الرئيسية ظاهرة مباشرة في إعدادات المظهر، دون فتح قائمة إضافية.",
+    "يمكنك إبقاء الرئيسية تابعة لمظهر التطبيق أو تخصيصها، مع توضيح استخدام خلفية الرئيسية المشتركة وحماية وضوح القراءة."
   ],
   "en": [
-    "Sharing session completion now opens an image preview instead of immediately sending text.",
-    "Progress and completion images balance their content, with image saving and Text or Link choices that leave recorded progress unchanged.",
-    "The ayah menu puts image sharing before text with clearer emphasis, while Copy and Bookmark stay available."
+    "Choose Glass or Opaque independently for the app and Home; changing one keeps your choice for the other.",
+    "Home appearance controls are directly visible in Appearance settings without opening another section.",
+    "Let Home follow the app or give it its own appearance, with clearer guidance about the shared background and protected reading surfaces."
   ]
 }

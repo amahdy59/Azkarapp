@@ -1,5 +1,18 @@
 [
   {
+    "release": "2026-10-17.3",
+    "ar": [
+      "اختر المظهر الزجاجي أو المعتم للتطبيق والرئيسية بشكل مستقل؛ تغيير أحدهما لا يلغي اختيارك للآخر.",
+      "خيارات مظهر الرئيسية ظاهرة مباشرة في إعدادات المظهر، دون فتح قائمة إضافية.",
+      "يمكنك إبقاء الرئيسية تابعة لمظهر التطبيق أو تخصيصها، مع توضيح استخدام خلفية الرئيسية المشتركة وحماية وضوح القراءة."
+    ],
+    "en": [
+      "Choose Glass or Opaque independently for the app and Home; changing one keeps your choice for the other.",
+      "Home appearance controls are directly visible in Appearance settings without opening another section.",
+      "Let Home follow the app or give it its own appearance, with clearer guidance about the shared background and protected reading surfaces."
+    ]
+  },
+  {
     "release": "2026-10-17.2",
     "ar": [
       "تفتح مشاركة إتمام الجلسة معاينة صورة قبل إرسالها بدل المشاركة النصية المباشرة.",

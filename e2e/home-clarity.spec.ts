@@ -445,7 +445,6 @@ for (const language of ["ar", "en"] as const) {
       await expect(page.getByTestId("situational-shortcuts").locator("a svg")).toHaveCount(3);
       await page.goto("/#/settings/appearance");
       const images = page.getByRole("switch", { name: new RegExp(t(language, "settings.homeWirdImages")) });
-      await page.getByText(t(language, "settings.customizeHome"), { exact: true }).click();
       const homeAppearance = page.getByRole("radiogroup", { name: t(language, "settings.homeMaterial"), exact: true });
       const transparency = homeAppearance.getByRole("radio", {
         name: t(language, "settings.homeMaterial_solid"),
@@ -472,7 +471,6 @@ for (const language of ["ar", "en"] as const) {
         expect(await caption.evaluate((node) => getComputedStyle(node).backgroundImage)).toContain("linear-gradient");
       }
       await page.goto("/#/settings/appearance");
-      await page.getByText(t(language, "settings.customizeHome"), { exact: true }).click();
       await homeAppearance
         .getByRole("radio", { name: t(language, "settings.homeMaterial_solid"), exact: true })
         .click();

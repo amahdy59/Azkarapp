@@ -2116,11 +2116,12 @@ const en = {
   settings: {
     appMaterial: "App appearance",
     appMaterialHint:
-      "Choose Opaque or Glass for the whole app. Glass uses the current Home scene; reading stays opaque. High contrast and forced colours take priority.",
+      "Choose Glass or Opaque for screens outside Home. Glass uses the current Home background; reading text keeps a stronger surface.",
     customizeHome: "Customize Home",
     homeMaterial_inherit: "Same as app",
     homeMaterial: "Home appearance",
-    homeMaterialHint: "Use the app appearance, or turn this off to choose Opaque or Glass just for Home.",
+    homeMaterialHint:
+      "Choose Home independently, or let it follow the app. Changing app appearance keeps your Home choice.",
     homeMaterial_system: "Follow device",
     homeMaterial_glass: "Glass",
     homeMaterial_solid: "Opaque",

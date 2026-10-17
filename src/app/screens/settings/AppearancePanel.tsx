@@ -58,7 +58,6 @@ export function AppearancePanel({
     value === "glass" || (value === "system" && !reduceTransparency && !systemReduced) ? "glass" : "solid";
   const applyMaterial = (value: "glass" | "solid") => {
     onAppMaterialChange?.(value);
-    onHomeMaterialChange?.("inherit");
   };
   return (
     <div className="flex h-full min-h-0 flex-col">
@@ -111,11 +110,8 @@ export function AppearancePanel({
         )}
         <SettingsSection label={t(language, "settings.homeCards")} className="mt-3">
           {onHomeMaterialChange && (
-            <details className="p-4">
-              <summary className="min-h-11 cursor-pointer content-center rounded-lg font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
-                {t(language, "settings.customizeHome")}
-              </summary>
-              <div className="space-y-3 pt-3">
+            <div className="p-4">
+              <div className="space-y-3">
                 <p className="text-sm text-muted-foreground">{t(language, "settings.homeMaterialHint")}</p>
                 <SettingsToggleRow
                   icon={<Droplets size={20} />}
@@ -126,25 +122,23 @@ export function AppearancePanel({
                     onHomeMaterialChange(homeMaterial === "inherit" ? displayedMaterial(appMaterial) : "inherit")
                   }
                 />
-                {homeMaterial !== "inherit" && (
-                  <SegmentedControl
-                    value={displayedMaterial(homeMaterial)}
-                    onChange={onHomeMaterialChange}
-                    onReselect={onHomeMaterialChange}
-                    direction={direction}
-                    aria-label={t(language, "settings.homeMaterial")}
-                    className="flex flex-wrap gap-2"
-                    itemClassName={(selected) =>
-                      `min-h-11 flex-1 rounded-xl border px-3 py-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${selected ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-foreground"}`
-                    }
-                    options={(["solid", "glass"] as const).map((value) => ({
-                      value,
-                      label: t(language, `settings.homeMaterial_${value}`),
-                    }))}
-                  />
-                )}
+                <SegmentedControl
+                  value={displayedMaterial(homeMaterial === "inherit" ? appMaterial : homeMaterial)}
+                  onChange={onHomeMaterialChange}
+                  onReselect={onHomeMaterialChange}
+                  direction={direction}
+                  aria-label={t(language, "settings.homeMaterial")}
+                  className="flex flex-wrap gap-2"
+                  itemClassName={(selected) =>
+                    `min-h-11 flex-1 rounded-xl border px-3 py-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${selected ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-foreground"}`
+                  }
+                  options={(["solid", "glass"] as const).map((value) => ({
+                    value,
+                    label: t(language, `settings.homeMaterial_${value}`),
+                  }))}
+                />
               </div>
-            </details>
+            </div>
           )}
           {onHomeWirdImagesChange && (
             <SettingsToggleRow
