@@ -88,6 +88,13 @@ for (const language of ["ar", "en"] as const) {
         "aria-checked",
         "true",
       );
+      // Material changes update inherited ink as well as checked state. Wait for
+      // the selected label itself before axe snapshots the newly applied theme.
+      for (const group of [app, home]) {
+        const selected = group.getByRole("radio", { name: label("glass"), exact: true });
+        await expect(selected).toHaveCSS("color", "rgb(10, 18, 40)");
+        await expect(selected.locator("span.relative.z-10")).toHaveCSS("color", "rgb(10, 18, 40)");
+      }
       expect((await new AxeBuilder({ page }).include(".app-main").analyze()).violations).toEqual([]);
     });
   }
