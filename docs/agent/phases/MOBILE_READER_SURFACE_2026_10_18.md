@@ -68,3 +68,9 @@ Prior release CI failures require the pending focused fixes and exact-commit ver
 ## Recommended next step
 
 Verify Quality / verify, Pages build/deploy and production behavior for the pushed commit, then review on the original physical device.
+
+## Exact-commit CI footer assertion remediation
+
+Quality run 39144257848 exposed a stale four-control centering assertion in standalone-counter-footer.spec.ts after the pending restoration of desktop keyboard help added a fifth tool. The actual row remains centered. Replace the fixed fourth-index edge with the real last control; retain the exact one-pixel tolerance, focus/count recovery, viewport bounds and axe checks. No application or content change is required, so this tests/documentation-only remediation does not require new release notes.
+
+Inspected failed Chromium-3 and Firefox-2 logs: all reported failures point to that same assertion (four cases per engine). Logs are retained in output/mobile-reader-ci-chromium3.log and output/mobile-reader-ci-firefox2.log. Targeted 1440px standalone-footer verification passed all 12 cases across Chromium, Firefox and WebKit, exit 0, 1.4m; output/mobile-reader-footer-ci-repair.log/.json. Remaining first-run CI results and final exact-commit publication results are preserved in output/MOBILE_READER_RELEASE_REPORT.md. The intact push hook still requires a fresh exact-tree pass for this tracked test change; no receipt reuse is fabricated.

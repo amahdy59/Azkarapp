@@ -36,7 +36,7 @@ for (const route of ["/counter", "/friday/salawat"]) {
           const grid = [...cells, { x: disclosure.x, right: disclosure.x + disclosure.width }].sort(
             (a, b) => a.x - b.x,
           );
-          expect(Math.abs(before.x + before.width / 2 - (grid[0].x + grid[3].right) / 2)).toBeLessThanOrEqual(1);
+          expect(Math.abs(before.x + before.width / 2 - (grid[0].x + grid.at(-1)!.right) / 2)).toBeLessThanOrEqual(1);
         }
         await counter.click();
         const count = await counter.getAttribute("aria-label");
