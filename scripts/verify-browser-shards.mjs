@@ -1,9 +1,10 @@
-import { mkdir, readFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { BROWSER_PARTITIONS } from "./browser-partitions.mjs";
+import { scheduleBrowserTests } from "./schedule-browser-tests.mjs";
 
 export function browserInventory(report) {
   if (!Array.isArray(report.suites)) throw new Error("Expected Playwright inventory JSON.");
@@ -47,11 +48,16 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
       const directory = "output/browser-inventory";
       await mkdir(directory, { recursive: true });
       const filenames = [];
+      await mkdir("output/browser-schedule", { recursive: true });
+      let schedule;
       for (let shard = 0; shard <= BROWSER_PARTITIONS.length; shard += 1) {
         const filename = path.resolve(directory, `${shard}.json`);
         const partition = BROWSER_PARTITIONS[shard - 1];
         const selection = partition
-          ? [`--shard=${partition.shard}`, ...partition.projects.split(",").map((project) => `--project=${project}`)]
+          ? [
+              `--test-list=output/browser-schedule/${partition.name}.txt`,
+              ...partition.projects.split(",").map((project) => `--project=${project}`),
+            ]
           : [];
         const args = [cli, "test", "--list", "--reporter=json", ...selection];
         const result = spawnSync(process.execPath, args, {
@@ -63,6 +69,14 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
           throw new Error(`Inventory collection failed for shard ${shard}: ${result.error?.message ?? result.stderr}`);
         }
         filenames.push(filename);
+        if (shard === 0) {
+          const baseline = JSON.parse(await readFile("scripts/browser-timing-baseline.json", "utf8"));
+          schedule = scheduleBrowserTests(JSON.parse(await readFile(filename, "utf8")), baseline);
+          for (const entry of schedule) {
+            await writeFile(`output/browser-schedule/${entry.name}.txt`, entry.files.join("\n") + "\n");
+          }
+          await writeFile("output/browser-schedule/summary.json", JSON.stringify(schedule, null, 2) + "\n");
+        }
       }
       [fullPath, ...shardPaths] = filenames;
     }

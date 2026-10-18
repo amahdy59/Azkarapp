@@ -39,7 +39,9 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: browser-inventory
-          path: output/browser-inventory/0.json
+          path: |
+            output/browser-inventory/0.json
+            output/browser-schedule/
           if-no-files-found: error
           retention-days: 7
       - name: Publish the verified browser schedule
@@ -65,11 +67,16 @@ jobs:
       matrix: ${{ fromJSON(needs.checks.outputs.browser_matrix) }}
     steps:
       - uses: actions/checkout@v7
+      - name: Download the verified duration-balanced schedule
+        uses: actions/download-artifact@v8
+        with:
+          name: browser-inventory
+          path: output
       - name: Setup and test complete browser shard
         uses: ./.github/actions/setup-and-test
         with:
           scope: browser
-          browser-shard: ${{ matrix.shard }}
+          browser-test-list: output/browser-schedule/${{ matrix.name }}.txt
           browser-projects: ${{ matrix.projects }}
           vite-audio-base-url: ${{ vars.VITE_AUDIO_BASE_URL }}
 
@@ -169,7 +176,7 @@ jobs:
       - name: Report browser timings and failures
         run: pnpm test:timings
       - name: Require the merged results to cover every test exactly once
-        run: node scripts/verify-browser-shards.mjs browser-inventory/0.json output/e2e-results.json
+        run: node scripts/verify-browser-shards.mjs browser-inventory/browser-inventory/0.json output/e2e-results.json
       - name: Require all quality and browser jobs to succeed
         if: always()
         env:
