@@ -61,3 +61,5 @@ Ibn Majah 299 does not contain pur-ref-2's dua; the matching Nasai route and cha
 ## Recommended next step
 
 Resolve the eight concrete content mismatches through the content-review process, retaining supported attributed scholarly views; inspect the repaired gloss on a physical phone in Glass mode.
+
+Final Firefox inspection also found competing verse shapes through the Mushaf quick/full settings panels. These two named reading overlays share the opaque navy text-protection ground with the gloss, retaining the existing sheen/frost; other application overlays retain the approved 80% tint. Both panels now have explicit cross-engine background assertions.

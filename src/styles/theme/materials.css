@@ -135,7 +135,7 @@
        tint when nested backdrop roots cannot sample the whole reading layer.
        Keep the frost, with enough fill to protect the gloss independently. */
     html[data-app-material-resolved="glass"]:not(.high-contrast)
-      .quran-word-popover:is([role="tooltip"], [role="dialog"]) {
+      :is(.quran-word-popover:is([role="tooltip"], [role="dialog"]), .mushaf-protected-overlay[role="dialog"]) {
       background-color: rgb(15 23 42);
     }
     html:not(.high-contrast) [role="dialog"].hero-glass,

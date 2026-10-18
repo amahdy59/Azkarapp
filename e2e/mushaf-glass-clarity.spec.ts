@@ -44,6 +44,7 @@ for (const language of ["ar", "en"] as const) {
     await page.keyboard.press("Escape");
     await expect(gloss).toBeHidden();
     await page.getByTestId("mushaf-more-actions").click();
+    await expect(page.getByTestId("mushaf-quick-menu")).toHaveCSS("background-color", "rgb(15, 23, 42)");
     const hint = page.getByTestId("mushaf-material-hint");
     await expect(hint).toBeVisible();
     await expect(hint).toContainText(t(language, "mushaf.glassActive"));
@@ -51,6 +52,7 @@ for (const language of ["ar", "en"] as const) {
     await expect(hint).toBeVisible();
     await expect(page.getByTestId("quick-theme-light")).toHaveAttribute("aria-checked", "true");
     await page.getByTestId("mushaf-quick-settings").click();
+    await expect(page.getByTestId("mushaf-settings-sheet")).toHaveCSS("background-color", "rgb(15, 23, 42)");
     await expect(page.getByTestId("mushaf-settings-sheet").getByTestId("mushaf-material-hint")).toBeVisible();
     await page.screenshot({ path: info.outputPath(`mushaf-glass-colors-${language}.png`) });
     expect((await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag22aa"]).analyze()).violations).toEqual(

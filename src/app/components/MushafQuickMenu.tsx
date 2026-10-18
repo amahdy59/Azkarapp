@@ -232,9 +232,10 @@ export function MushafQuickMenu({
       title={t(language, "mushaf.readingViewOptions")}
       direction={direction}
       testId="mushaf-quick-menu"
+      dialogClassName="mushaf-protected-overlay"
       maxWidthClassName="max-w-sm"
       showCloseButton={false}
-      drawerClassName="pb-safe"
+      drawerClassName="mushaf-protected-overlay pb-safe"
     >
       <div className="flex flex-col h-full overflow-hidden text-start" dir={direction}>
         <SheetHeader

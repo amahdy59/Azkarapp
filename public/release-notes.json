@@ -1,13 +1,13 @@
 {
-  "release": "2026-10-18.7",
+  "release": "2026-10-18.8",
   "ar": [
     "اقرأ معاني كلمات القرآن فوق خلفية زجاجية أوضح تحجب تداخل النص خلف الشرح.",
     "اعرف أن المظهر الزجاجي مفعّل عند اختيار لون صفحة المصحف، مع توضيح مكان تغيير المظهر.",
-    "افتح شروح الكلمات داخل حدود الشاشة في المتصفحات المختلفة، دون تداخلها مع نص الآيات."
+    "اقرأ خيارات المصحف وإعدادات المظهر بوضوح فوق الآيات، بخلفيات تحجب تداخل النص في المتصفحات المختلفة."
   ],
   "en": [
     "Read Quran word explanations on a clearer frosted surface that keeps underlying text from competing with the meaning.",
     "See when Glass mode is active while choosing a Mushaf page color, with guidance on where to change the surface.",
-    "Open word explanations within the screen edges across browsers, without competing verse text behind them."
+    "Read Mushaf options and appearance settings clearly over the verses, with protected backgrounds across browsers."
   ]
 }

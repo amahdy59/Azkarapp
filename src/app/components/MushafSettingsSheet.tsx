@@ -314,7 +314,7 @@ export function MushafSettingsSheet({
         testId="mushaf-settings-sheet"
         side={toolbarSide}
         inset={panelInset}
-        className={sheetSurfaceClass}
+        className={`mushaf-protected-overlay ${sheetSurfaceClass}`}
       >
         {body}
       </SidePanel>
@@ -331,7 +331,7 @@ export function MushafSettingsSheet({
       testId="mushaf-settings-sheet"
       maxWidthClassName="max-w-md"
       overlayClassName="bg-black/50"
-      className={sheetSurfaceClass}
+      className={`mushaf-protected-overlay ${sheetSurfaceClass}`}
       showCloseButton={false}
     >
       {body}
