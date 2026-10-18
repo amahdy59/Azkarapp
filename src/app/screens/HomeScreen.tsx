@@ -621,7 +621,7 @@ export function HomeScreen({
           >
             <div
               data-testid="home-header-content"
-              className="home-layout-frame px-page mx-auto flex w-full max-w-[64rem] items-center justify-between gap-3"
+              className="home-layout-frame px-page mx-auto flex w-full max-w-7xl items-center justify-between gap-3"
             >
               <div
                 data-testid="hijri-date"
@@ -675,7 +675,7 @@ export function HomeScreen({
             </div>
           </header>
           {showHeroContent && (
-            <div className="home-layout-frame home-prayer-sticky-row pointer-events-auto mx-auto w-full max-w-[64rem] px-page">
+            <div className="home-layout-frame home-prayer-sticky-row pointer-events-auto mx-auto w-full max-w-7xl px-page">
               <div data-testid="home-prayer-strip" className="relative z-10 mx-auto w-full min-w-0 overflow-visible">
                 <h2 className="sr-only">{t(language, "prayerMoment.dayTitle")}</h2>
                 <PrayerTrackerCards
@@ -697,7 +697,7 @@ export function HomeScreen({
         </div>
         <div
           data-testid="home-content-grid"
-          className="home-layout-frame home-aligned-content mx-auto grid w-full max-w-[64rem] grid-cols-1 gap-4 lg:gap-5"
+          className="home-layout-frame mx-auto grid w-full max-w-7xl grid-cols-1 gap-4 lg:gap-5"
         >
           <div data-testid="home-hero" className="relative w-full">
             {showHeroContent && (

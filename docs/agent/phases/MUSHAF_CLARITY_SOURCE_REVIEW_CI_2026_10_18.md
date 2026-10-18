@@ -63,3 +63,9 @@ Ibn Majah 299 does not contain pur-ref-2's dua; the matching Nasai route and cha
 Resolve the eight concrete content mismatches through the content-review process, retaining supported attributed scholarly views; inspect the repaired gloss on a physical phone in Glass mode.
 
 Final Firefox inspection also found competing verse shapes through the Mushaf quick/full settings panels. These two named reading overlays share the opaque navy text-protection ground with the gloss, retaining the existing sheen/frost; other application overlays retain the approved 80% tint. Both panels now have explicit cross-engine background assertions.
+
+## Owner follow-up: Home width parity
+
+Expand Home to Library's max-w-7xl frame and px-page gutters, removing the narrower 52rem cap and secondary 4px horizontal inset. Existing contextual columns, prayer disclosure, compact/mobile browsing and container-driven lower grids remain. HomeScreen and home-wird.css are modified; existing Home alignment, prayer disclosure and browse gutter tests gain direct Library geometry coverage. No new component or content/state change. Quality run 39157862563 was cancelled because this newly requested change supersedes cd1d612d. Targeted results and final release gates are recorded in output/MUSHAF_CLARITY_RELEASE_REPORT.md.
+
+The widened companion exposed an existing intrinsic-width shrink on DailyEvidenceCard; add w-full to that card so it fills its grid column. Existing Home alignment tests assert its rendered width as well as outer frame parity. Library geometry comparisons cover Arabic/English at 390, 600, 820, 1024, 1440 and 1920 CSS pixels across Chromium, Firefox and WebKit without adding or removing browser inventory identities. Existing compact-prayer tests retain all disclosure/tracking assertions with the new zero additional horizontal inset.

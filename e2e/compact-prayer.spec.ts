@@ -193,7 +193,7 @@ for (const language of ["ar", "en"] as const) {
             strip.boundingBox(),
             primary.boundingBox(),
           ]);
-          const focusInset = width >= 600 ? 4 : 0;
+          const focusInset = 0;
           expect(detail!.x).toBeCloseTo(summary!.x + focusInset, 0);
           expect(detail!.width).toBeCloseTo(summary!.width - 2 * focusInset, 0);
           const homeMeasure = await page.evaluate(() => {

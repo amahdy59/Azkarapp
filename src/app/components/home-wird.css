@@ -185,20 +185,15 @@
   }
 }
 
+/* Use Library's page gutters without adding a second horizontal focus inset. */
 @media (min-width: 600px) {
-  .home-layout-frame {
-    max-width: calc(52rem + 2 * var(--spacing-page));
-  }
-
-  /* Match the summary row's 4px focus inset, including every lower section. */
-  .home-aligned-content {
-    padding-inline: 4px;
+  .home-all-prayers-row {
+    padding-inline: 0;
   }
 }
 
 .home-prayer-overview {
   width: 100%;
-  max-width: 52rem;
   margin-inline: auto;
 }
 .home-all-prayers-row {

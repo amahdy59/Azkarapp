@@ -55,6 +55,11 @@ for (const language of ["ar", "en"] as const) {
           expect(box?.height).toBe(44);
         }
       }
+      await page.goto("/#/home");
+      const home = await page.getByTestId("home-context-grid").boundingBox();
+      expect(home).not.toBeNull();
+      expect(home!.x).toBeCloseTo(library!.x, 0);
+      expect(home!.width).toBeCloseTo(library!.width, 0);
       await page.goto("/#/settings");
       const settings = await page
         .getByRole("searchbox", { name: t(language, "settings.searchPlaceholder") })

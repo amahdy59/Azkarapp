@@ -53,7 +53,21 @@ for (const language of ["ar", "en"] as const) {
         expect(Math.abs(section.left), JSON.stringify(alignment)).toBeLessThanOrEqual(1);
         expect(Math.abs(section.right), JSON.stringify(alignment)).toBeLessThanOrEqual(1);
       }
+      const homeGrid = (await page.getByTestId("home-context-grid").boundingBox())!;
+      const homeColumns = await page
+        .getByTestId("home-context-grid")
+        .evaluate((node) => getComputedStyle(node).gridTemplateColumns.split(" ").length);
+      expect(homeColumns).toBe(width >= 768 ? 2 : 1);
+      const companion = page.getByTestId("home-context-companion");
+      const companionBox = (await companion.boundingBox())!;
+      const reminderBox = (await companion.locator("section").boundingBox())!;
+      expect(reminderBox.width).toBeCloseTo(companionBox.width, 0);
       await page.screenshot({ path: testInfo.outputPath(`aligned-${language}-${width}.png`), scale: "css" });
+      await page.goto("/#/azkar");
+      const library = (await page.locator(".field-shell").boundingBox())!;
+      expect(homeGrid.x).toBeCloseTo(library.x, 0);
+      expect(homeGrid.width).toBeCloseTo(library.width, 0);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     });
   }
 }
