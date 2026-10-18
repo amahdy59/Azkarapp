@@ -431,3 +431,5 @@ Local follow-up: [Concise, actionable Progress](phases/PROGRESS_REFINEMENTS_2026
 [Combined release .4](phases/COMBINED_RELEASE_2026_10_18_4.md) records the owner-authorized R2 verification, all-pending-change integration and full release cycle, superseding prior local-only holds.
 
 [Mobile Reader surface and release](phases/MOBILE_READER_SURFACE_2026_10_18.md) records the owner-requested mobile progress seam repair, related compact-counter inspection and authorized all-pending-change release.
+
+[Mushaf clarity, source comparison and timed CI](phases/MUSHAF_CLARITY_SOURCE_REVIEW_CI_2026_10_18.md) is the active owner request. All 20 pending comparisons include the owner-requested Dorar follow-up: 12 source-attributed entries supported and eight specific content mismatches documented; grading disagreement alone causes no blanket hold. Protect Mushaf tooltip/status overlays, identify active Glass material separately from page color, and schedule the unchanged browser inventory using recorded durations. Standing main release authority applies.

@@ -1159,3 +1159,7 @@ Keep the pictured Azkar Library header appearance unchanged while browsing: reta
 ## Compact Reader surface continuity — 2026-10-18
 
 The compact Reader owns one protected reading material on its screen surface, including the stationary title, collection progress and text. Its body does not add another tinted card or shadow at the progress boundary. Desktop reading cards and printed Mushaf keep their existing ownership. Compact Reader, Masbaha and Salawat progress tracks use the muted token so the empty portion remains visible in Glass and opaque themes. Preserve progress semantics, focus mode, RTL/LTR and text enlargement.
+
+## Mushaf overlay and material clarity — 2026-10-18
+
+The anchored Quran word tooltip and floating theme-shortcut feedback use protected overlay material (28px blur, 135% saturation), explicitly selected by class so tooltip/status semantics do not lose protection. The dense word gloss uses a opaque navy fill after visual inspection showed that the ordinary 80% overlay tint still exposed competing verse shapes under nested backdrop compositing. Shortcut feedback retains the shared 80% tint. Solid, high-contrast and unsupported-filter fallbacks remain. Quick/full Mushaf appearance controls label Page color separately and explicitly show active Glass material with Settings → Appearance guidance. The status uses the resolved page-material selector, not a new stored preference; shortcut feedback also identifies Glass. No Quran text, page geometry or global color/material schema changes.

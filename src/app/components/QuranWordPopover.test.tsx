@@ -12,6 +12,26 @@ describe("QuranWordPopover and QuranWordMeaningSheet", () => {
     explanationArabic: "الذي يُلْقِي في النفس حديثًا خفيًا",
   };
 
+  it("keeps the fixed gloss outside the reading canvas while preserving its page theme", () => {
+    const canvas = document.createElement("div");
+    canvas.className = "theme-light mushaf-page-canvas";
+    const anchor = document.createElement("button");
+    canvas.append(anchor);
+    document.body.append(canvas);
+    const { unmount } = render(
+      <QuranWordPopover meanings={[sampleMeaning]} anchorEl={anchor} language="en" direction="ltr" onClose={vi.fn()} />,
+    );
+    try {
+      const gloss = screen.getByRole("tooltip");
+      expect(gloss.parentElement).toBe(document.body);
+      expect(gloss).toHaveClass("theme-light");
+      expect(canvas).not.toContainElement(gloss);
+    } finally {
+      unmount();
+      canvas.remove();
+    }
+  });
+
   it("consumes Escape before it can leave the surrounding reader", () => {
     const anchorEl = document.createElement("button");
     document.body.appendChild(anchorEl);

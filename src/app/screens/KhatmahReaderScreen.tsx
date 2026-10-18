@@ -1373,7 +1373,7 @@ export function KhatmahReaderScreen({
           data-testid="mushaf-theme-hud"
           className="pointer-events-none absolute inset-x-0 top-16 z-30 flex justify-center px-4"
         >
-          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-popover px-4 py-2 text-xs font-bold text-popover-foreground shadow-overlay">
+          <div className="mushaf-theme-hud-surface inline-flex max-w-full flex-wrap items-center justify-center gap-2 rounded-2xl border border-border px-4 py-2 text-xs font-bold text-popover-foreground shadow-overlay">
             <span
               className="size-3 rounded-full border border-border"
               style={{
@@ -1381,6 +1381,7 @@ export function KhatmahReaderScreen({
               }}
               aria-hidden="true"
             />
+            <span className="mushaf-material-hint hidden">{t(language, "mushaf.glassActive")}</span>
             <span>
               {themeHud === "light"
                 ? t(language, "mushaf.themeLight")

@@ -28,7 +28,8 @@
         .bottom-nav,
         [role="dialog"],
         [role="menu"],
-        [role="listbox"]
+        [role="listbox"],
+        .quran-word-popover
       ) {
       --background: transparent;
       --card: var(--glass-card-tint);
@@ -112,9 +113,15 @@
     /* Overlaid text needs a denser material than scenery-backed cards. */
     html:not(.high-contrast) [role="dialog"].hero-glass,
     html[data-app-material-resolved="glass"]:not(.high-contrast)
-      :is([role="dialog"], [role="menu"], [role="listbox"], .audio-options-menu, .audio-player-surface):not(
-        .audio-lock-shield
-      ) {
+      :is(
+        [role="dialog"],
+        [role="menu"],
+        [role="listbox"],
+        .audio-options-menu,
+        .audio-player-surface,
+        .quran-word-popover,
+        .mushaf-theme-hud-surface
+      ):not(.audio-lock-shield) {
       background-color: rgb(15 23 42 / 0.8);
       background-image: linear-gradient(
         135deg,
@@ -124,9 +131,16 @@
       );
       backdrop-filter: blur(28px) saturate(135%);
     }
+    /* Dense Quran lettering remains distracting through the ordinary overlay
+       tint when nested backdrop roots cannot sample the whole reading layer.
+       Keep the frost, with enough fill to protect the gloss independently. */
+    html[data-app-material-resolved="glass"]:not(.high-contrast)
+      .quran-word-popover:is([role="tooltip"], [role="dialog"]) {
+      background-color: rgb(15 23 42);
+    }
     html:not(.high-contrast) [role="dialog"].hero-glass,
     html[data-app-material-resolved="glass"]:not(.high-contrast)
-      :is([role="dialog"], [role="menu"], [role="listbox"], .audio-options-menu):not(
+      :is([role="dialog"], [role="menu"], [role="listbox"], .audio-options-menu, .quran-word-popover):not(
         .audio-player-surface,
         .audio-lock-shield
       ) {
@@ -232,4 +246,9 @@
   background: transparent;
   backdrop-filter: none;
   touch-action: none;
+}
+
+/* Match the resolved page material, including system and high-contrast fallback. */
+html[data-app-material-resolved="glass"]:not(.high-contrast) .mushaf-material-hint {
+  display: block;
 }

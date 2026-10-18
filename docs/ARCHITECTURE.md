@@ -575,3 +575,7 @@ The owner supersedes scroll-elevated frost for the pictured Azkar Library. Its t
 ## Compact Reader material boundary — 2026-10-18
 
 ReaderScreen applies the existing glass-reading presentation once to the compact non-Mushaf screen instead of only its reading body. Header, progress and text therefore share a continuous protected ground. Desktop cards retain their material; Mushaf retains its edge-to-edge surface. Shared compact progress chrome uses the muted track token. No content, counting, persistence, audio or service boundaries change.
+
+## Anchored Quran word overlays — 2026-10-18
+
+QuranWordPopover renders through a body portal, retaining the nearest page theme. A single layout measurement places it in viewport coordinates and clamps/flips within the viewport; scrolling dismisses rather than continually repositioning it. This avoids transformed/size-contained Mushaf canvases changing fixed-coordinate behavior across engines. The gloss has an opaque navy ground plus the shared Glass sheen/frost when Glass is resolved, so underlying verse shapes cannot compete even when blur compositing differs. Quick/full Mushaf settings and gesture feedback describe active Glass separately from page color, using the root resolved-material selector with no new persistence state.

@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { ChevronUp } from "./icons";
 import { type QuranWordMeaning } from "../content/quranWordMeanings";
 import { formatNumerals } from "../formatting";
@@ -14,12 +15,9 @@ import type { AppLanguage } from "../types";
  *
  * Exactly one popover exists for the whole passage — Al-Kahf highlights 258
  * words, and rendering a positioned element per word would cost 258 layout
- * boxes to show one. The tapped word takes `data-word-active`, CSS gives that
- * element the anchor name, and this element positions against it.
+ * boxes to show one. The tapped word stays highlighted, and one viewport
+ * measurement places the explanation against it.
  */
-const ANCHOR_SUPPORTED =
-  typeof CSS !== "undefined" && typeof CSS.supports === "function" && CSS.supports("anchor-name", "--a");
-
 export function QuranWordPopover({
   meanings,
   anchorEl,
@@ -43,37 +41,19 @@ export function QuranWordPopover({
      while it moves is both a jank source and the wrong behaviour; this closes
      instead.
      
-     Both paths measure, for different reasons. Without anchor positioning this
-     computes the placement. With it, the browser has already placed the box —
-     including flipping it above the word near the viewport edge — but CSS
-     gives no selector for "the fallback position won", so the caret would keep
-     pointing up while sitting below the word. Reading the resolved box back is
-     the only way to know which side it landed on. */
+     A body portal and viewport coordinates avoid differing CSS-anchor
+     containment across engines and keep blur outside the reading canvas. */
   useLayoutEffect(() => {
     if (!open || !anchorEl || !ref.current) return;
     const word = anchorEl.getBoundingClientRect();
     const box = ref.current.getBoundingClientRect();
     const margin = 8;
 
-    if (ANCHOR_SUPPORTED) {
-      /* The caret is measured even here. The browser centres the box on the
-         word, but on a narrow screen it also clamps it to the viewport, and a
-         caret pinned to the box's middle then points at empty space beside the
-         word — worst on phones, where the clamp always happens. */
-      setFallback({
-        top: 0,
-        left: 0,
-        caret: word.left + word.width / 2 - box.left,
-        above: box.bottom <= word.top + 2,
-      });
-      return;
-    }
-
     const above = word.bottom + margin + box.height > window.innerHeight;
     const wordCenter = word.left + word.width / 2;
     const left = Math.min(Math.max(wordCenter - box.width / 2, margin), window.innerWidth - box.width - margin);
     setFallback({
-      top: above ? word.top - box.height - margin : word.bottom + margin,
+      top: Math.max(margin, above ? word.top - box.height - margin : word.bottom + margin),
       left,
       caret: wordCenter - left,
       above,
@@ -135,7 +115,10 @@ export function QuranWordPopover({
   const primary = meanings[0]!;
   const extra = meanings.length - 1;
 
-  return (
+  // Keep the fixed overlay outside transformed/size-contained reading canvases.
+  // Otherwise some engines position it relative to the page rather than the
+  // viewport and nested backdrop roots cannot frost the underlying verses.
+  return createPortal(
     <div
       ref={ref}
       role={onShowAll ? "dialog" : "tooltip"}
@@ -143,11 +126,18 @@ export function QuranWordPopover({
       dir={direction}
       data-testid="quran-word-popover"
       data-above={fallback?.above ? "true" : undefined}
-      className="quran-word-popover"
+      className={`quran-word-popover ${
+        anchorEl
+          ?.closest(".theme-light, .theme-midnight, .theme-dark, .theme-oled")
+          ?.className.split(/\s+/)
+          .filter((name) => /^theme-(light|midnight|dark|oled)$/.test(name))
+          .join(" ") ?? ""
+      }`}
       style={
         fallback
           ? ({
-              ...(ANCHOR_SUPPORTED ? null : { top: `${fallback.top}px`, left: `${fallback.left}px` }),
+              top: `${fallback.top}px`,
+              left: `${fallback.left}px`,
               "--caret-x": `${fallback.caret}px`,
             } as React.CSSProperties)
           : undefined
@@ -187,6 +177,7 @@ export function QuranWordPopover({
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

@@ -1,3 +1,4 @@
+import { MushafMaterialHint } from "./MushafMaterialHint";
 import { MushafMagnificationControl } from "./MushafMagnificationControl";
 import { Modal, SheetHeader, SidePanel } from "./ResponsiveSheet";
 import { formatNumerals } from "../formatting";
@@ -146,8 +147,9 @@ export function MushafSettingsSheet({
         {/* Section: Themes (Clean Swatches + App Theme Badge) */}
         <section aria-labelledby="mushaf-theme-heading" className="flex flex-col gap-2.5">
           <h3 id="mushaf-theme-heading" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            {t(language, "mushaf.themeTitle")}
+            {t(language, "mushaf.pageColor")}
           </h3>
+          <MushafMaterialHint language={language} />
           <div
             role="radiogroup"
             aria-labelledby="mushaf-theme-heading"

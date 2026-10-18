@@ -4991,3 +4991,9 @@ The owner explicitly authorizes verifying all pending hadith/rotating reminder c
 ## Mobile Reader surface repair and combined release — 2026-10-18
 
 The owner requests fixing the marked mobile progress area, checking similar issues and pushing all changes. Apply one compact Reader material across title/progress/body and visible muted progress tracks in the shared compact counters. Preserve pending approved changes and complete the intact release cycle. Reuse valid prior checks, run only necessary affected regressions and required release gates. This publication instruction supersedes pending local-only holds. See phases/MOBILE_READER_SURFACE_2026_10_18.md.
+
+## Mushaf clarity, remaining source comparison and timed CI — 2026-10-18
+
+Owner requests a fresh review of the remaining 20 original collection identities before expansion, timing-based CI shard balancing preserving all 2,098 existing cases/projects, protected Mushaf glosses and explicit Glass-mode identification in appearance controls. Plan: three bounded scopes with separate commits; no new planning gate. Complete source comparison and document unresolved scholarly decisions without changing reviewed religious content. Separate page color from material, reuse the approved dense overlay treatment and retain all release gates. Standing direct-main release authority applies. See phases/MUSHAF_CLARITY_SOURCE_REVIEW_CI_2026_10_18.md and BROWSER_SCHEDULING.md.
+
+Owner clarification: check grading disagreements against Dorar and retain the resource already shown within the card. Treat a documented named scholarly view as attributed evidence, not a blanket blocker merely because another scholar differs. Separate concrete wording/citation/narrator mismatches from grading disagreement. All 20 entries receive a Dorar follow-up; reviewed devotional wording remains unchanged in this release.

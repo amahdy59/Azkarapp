@@ -1,3 +1,4 @@
+import { MushafMaterialHint } from "./MushafMaterialHint";
 import { type ReactNode } from "react";
 import { ResponsiveSheet, SheetHeader } from "./ResponsiveSheet";
 import { formatNumerals } from "../formatting";
@@ -436,8 +437,9 @@ export function MushafQuickMenu({
                 id="quick-appearance-heading"
                 className="text-xs font-bold uppercase tracking-wider text-muted-foreground"
               >
-                {t(language, "mushaf.appearanceTitle")}
+                {t(language, "mushaf.pageColor")}
               </h3>
+              <MushafMaterialHint language={language} />
               <div role="radiogroup" aria-labelledby="quick-appearance-heading" className="grid grid-cols-4 gap-2">
                 {THEME_OPTIONS.map((opt) => {
                   const isSelected = theme === opt.id || (theme === "follow-app" && opt.id === appTheme);
