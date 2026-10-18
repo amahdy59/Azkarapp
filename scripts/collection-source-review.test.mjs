@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
+import { URL } from "node:url";
 import { expect, test } from "vitest";
 
 const read = (file) => JSON.parse(readFileSync(new URL(file, import.meta.url), "utf8"));
