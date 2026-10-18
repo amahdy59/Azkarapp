@@ -82,7 +82,7 @@ export function PrayerProgressSummary({
                   {t(language, "dailyPath.prayer")}
                 </th>
                 <th scope="col" className="p-2 text-start font-semibold">
-                  {t(language, "prayerTracking.prayed")}
+                  {t(language, "prayerTracking.prayerRecord")}
                 </th>
                 {practices.map((practice) => (
                   <th key={practice.field} scope="col" className="p-2 text-center font-semibold">

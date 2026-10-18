@@ -762,6 +762,7 @@ test("shared reader links preserve content across recipient routine preferences"
     // recipient identity/completion checks at the project's supplied width,
     // then expose that sidebar for the explicit preference-change assertion.
     await destination.setViewportSize({ width: 1440, height: 900 });
+    await destination.getByTestId("reader-sidebar-toggle").click();
     await destination.getByTestId("routine-mode-filter").click();
     await destination.getByRole("menuitemradio", { name: /^Core/u }).click();
     await expect(destination.getByTestId("reader-screen")).toBeVisible();

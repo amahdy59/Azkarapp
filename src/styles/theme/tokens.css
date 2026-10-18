@@ -11,6 +11,7 @@
   --glass-card-tint: rgb(15 23 42 / 0.24);
   --glass-reading-tint: rgb(15 23 42 / 0.36);
   --glass-frost: blur(22px) saturate(135%);
+  --glass-chrome-frost: blur(32px) saturate(135%);
   --glass-scroll-frost: blur(32px) saturate(135%);
   --glass-sheen-strength: 0.055;
   --glass-sheen-midpoint: rgb(255 255 255 / 0.012);

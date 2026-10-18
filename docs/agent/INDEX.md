@@ -409,3 +409,5 @@ Latest owner continuation: [Frost clarity and compact consistent headers](phases
 [Compact devotional title rows](phases/COMPACT_DEVOTIONAL_TITLE_ROWS_2026_10_18.md) records the owner-requested local-only title/control alignment, raised progress and shorter shared Reader/Masbaha/Salawat heroes.
 
 [Combined release](phases/COMBINED_RELEASE_2026_10_18.md) records the owner-authorized publication of all pending refinements, superseding their earlier local-only holds.
+
+[Shared chrome frost and mosque wording](phases/CHROME_PARITY_MOSQUE_LABEL_2026_10_18.md) records the owner's material-parity/accurate recording follow-up and responsive CI remediation.

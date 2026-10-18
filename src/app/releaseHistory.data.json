@@ -1,5 +1,20 @@
 [
   {
+    "release": "2026-10-18.3",
+    "ar": [
+      "صفحة تقدم أبسط تعرض إحصاءات للقراءة فقط وتفاصيل اختيارية لكل صلاة، دون حقول تسجيل.",
+      "خلفيات زجاجية متناسقة للقائمة الجانبية والعناوين، مع صياغة أوضح لتسجيل الصلاة في المسجد.",
+      "بطاقات صلاة أكثر إحكاماً ومحاذاة أفضل لبطاقات الرئيسية وأزرار القراءة والمشاركة.",
+      "عناوين قراءة أقصر ولوحة قائمة أذكار تبدأ مطوية لتوفير مساحة أكبر للنص."
+    ],
+    "en": [
+      "Simpler Progress statistics with optional per-prayer details and no recording fields.",
+      "Consistent frosted navigation and headers, with clearer wording for recording prayer at the mosque.",
+      "More compact prayer cards and better alignment for Home cards, reading and sharing actions.",
+      "Shorter reading headers and an initially collapsed collection panel leave more room for the text."
+    ]
+  },
+  {
     "release": "2026-10-18.2",
     "ar": [
       "أصبحت صفحة التقدم أبسط: إحصاءات للقراءة فقط وتفاصيل اختيارية لكل صلاة، دون حقول تسجيل.",

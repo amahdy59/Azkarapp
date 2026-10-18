@@ -289,12 +289,11 @@ describe("the card as a way into the prayer", () => {
     expect(onOpen).toHaveBeenCalledWith("fajr");
   });
 
-  it("counts a prayer recorded at home as prayed", () => {
-    // The row only knew `mosque`, so a prayer recorded at home on the prayer
-    // screen showed here as an empty box — which reads as "not recorded".
+  it("does not count a home prayer as mosque attendance", () => {
+    // Keep the saved home fact visible without checking the mosque action.
     renderRow([{ dayKey: "2026-09-05", prayer: "fajr", mosque: false, adhkar: false, location: "home" }]);
     const prayed = screen.getAllByRole("checkbox", { name: /Prayed/i })[0]!;
-    expect(prayed).toBeChecked();
+    expect(prayed).not.toBeChecked();
     expect(screen.getByText("At home")).toBeInTheDocument();
   });
 

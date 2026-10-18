@@ -1650,22 +1650,22 @@ function AppContent({
         data-material-reading={view === "reader" || view === "khatmah" || readerInMushafMode ? "true" : undefined}
         className={`app-shell relative isolate overflow-hidden bg-background ${showBottomNav ? "" : "app-shell--navigation-hidden"}`}
       >
-        {view !== "home" &&
-          ![
-            "splash",
-            "onboard1",
-            "ar_onboard1",
-            "language",
-            "login",
-            "email",
-            "otp",
-            "auth-callback",
-            "profile-completion",
-          ].includes(view) &&
+        {![
+          "splash",
+          "onboard1",
+          "ar_onboard1",
+          "language",
+          "login",
+          "email",
+          "otp",
+          "auth-callback",
+          "profile-completion",
+        ].includes(view) &&
           appMaterial !== "solid" &&
           !highContrast && (
             <Suspense fallback={null}>
               <AppSceneBackground
+                navigationOnly={view === "home"}
                 location={locationSettings}
                 material={appMaterial}
                 reduceTransparency={reduceTransparency}

@@ -84,6 +84,7 @@ async function checkGeometry(page: Page) {
       headerAlignment: content.x - header.x,
       stripWidth: strip.width,
       panelWidth: panel.width,
+      alignedInset: window.innerWidth >= 600 ? 8 : 0,
       centerOffset: strip.x + strip.width / 2 - (content.x + content.width / 2),
       quoteFont: getComputedStyle(quote).fontFamily,
       headingFont: getComputedStyle(heading).fontFamily,
@@ -97,7 +98,7 @@ async function checkGeometry(page: Page) {
   expect(measures.contentWidth).toBeCloseTo(measures.headerWidth, 0);
   expect(Math.abs(measures.headerAlignment)).toBeLessThanOrEqual(1);
   expect(measures.stripWidth).toBeLessThanOrEqual(measures.contentWidth);
-  expect(measures.panelWidth).toBeCloseTo(measures.stripWidth, 0);
+  expect(measures.panelWidth).toBeCloseTo(measures.stripWidth - measures.alignedInset, 0);
   expect(Math.abs(measures.centerOffset)).toBeLessThanOrEqual(1);
   expect(measures.quoteFont).toBe(measures.headingFont);
   expect(measures.summaryOverflow).toBe(false);
@@ -183,8 +184,9 @@ for (const language of ["ar", "en"] as const) {
             strip.boundingBox(),
             primary.boundingBox(),
           ]);
-          expect(detail!.x).toBeCloseTo(summary!.x, 0);
-          expect(detail!.width).toBeCloseTo(summary!.width, 0);
+          const focusInset = width >= 600 ? 4 : 0;
+          expect(detail!.x).toBeCloseTo(summary!.x + focusInset, 0);
+          expect(detail!.width).toBeCloseTo(summary!.width - 2 * focusInset, 0);
           const homeMeasure = await page.evaluate(() => {
             const rect = (selector: string) => document.querySelector(selector)!.getBoundingClientRect();
             return {
@@ -198,8 +200,8 @@ for (const language of ["ar", "en"] as const) {
             };
           });
           for (const box of [homeMeasure.grid, homeMeasure.wird, homeMeasure.lower]) {
-            expect(box.x).toBeCloseTo(homeMeasure.heading.x + homeMeasure.gutter, 0);
-            expect(box.width).toBeCloseTo(homeMeasure.heading.width - 2 * homeMeasure.gutter, 0);
+            expect(box.x).toBeCloseTo(homeMeasure.heading.x + homeMeasure.gutter + focusInset, 0);
+            expect(box.width).toBeCloseTo(homeMeasure.heading.width - 2 * homeMeasure.gutter - 2 * focusInset, 0);
           }
           expect(homeMeasure.grid.x).toBeCloseTo(detail!.x, 0);
           expect(homeMeasure.grid.width).toBeCloseTo(detail!.width, 0);

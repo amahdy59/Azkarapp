@@ -110,18 +110,16 @@ for (const language of ["en", "ar"] as const) {
       expect(box).not.toBeNull();
       expect(box!.width).toBeGreaterThan(800);
     }).toPass();
-    // Three: after-prayer adhkar are tracked per prayer in their own section.
-    const routineCards = garden.getByRole("button", { name: / - (Completed|Not completed|مكتملة|غير مكتملة)$/ });
-    await expect(routineCards).toHaveCount(3);
-    await expect(async () => {
-      const routineCardTops = await routineCards.evaluateAll((cards) =>
-        cards.map((card) => Math.round(card.getBoundingClientRect().top)),
-      );
-      // The approved photograph-free Day layout uses two columns, preserving
-      // source/keyboard order with the third routine on the next row.
-      expect(routineCardTops[0]).toBe(routineCardTops[1]);
-      expect(routineCardTops[2]).toBeGreaterThan(routineCardTops[1]);
-    }).toPass();
+    const records = garden.locator("dl > div");
+    for (const label of language === "ar"
+      ? ["أذكار الصباح", "أذكار المساء", "أذكار النوم"]
+      : ["Morning Azkar", "Evening Azkar", "Sleep Azkar"]) {
+      await expect(records.filter({ hasText: label })).toHaveCount(1);
+    }
+    await expect(garden.locator("input, select, button")).toHaveCount(0);
+    const rowTops = await records.evaluateAll((rows) => rows.map((row) => row.getBoundingClientRect().top));
+    expect(rowTops[1]).toBeGreaterThan(rowTops[0]);
+    expect(rowTops[2]).toBeGreaterThan(rowTops[1]);
     await expect(page.locator("html")).toHaveAttribute("dir", language === "ar" ? "rtl" : "ltr");
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(1280);
   });
@@ -252,9 +250,10 @@ test("both Home and Progress keep prayer tracking outside the wird card", async 
   // disclosure rather than adding a fourth tile to the wird.
   const prayerGroup = page.getByTestId("progress-prayer-group");
   await expect(prayerGroup).toBeVisible();
-  await prayerGroup.getByText("Review prayer and connected practices", { exact: true }).click();
-  await expect(prayerGroup.locator("article[data-prayer-state]").first()).toBeVisible();
-  await expect(prayerGroup.locator('input[type="checkbox"]').first()).toBeAttached();
+  await prayerGroup.getByText("Per-prayer breakdown", { exact: true }).click();
+  await expect(prayerGroup.getByRole("table")).toBeVisible();
+  await expect(prayerGroup.getByRole("row")).toHaveCount(6);
+  await expect(prayerGroup.locator("input, select, button")).toHaveCount(0);
   expect(
     await page.evaluate(() => {
       // Compared inside the page: Node.DOCUMENT_POSITION_* only exists there.

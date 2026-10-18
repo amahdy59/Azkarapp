@@ -115,7 +115,7 @@ for (const [language, width] of [
               : page.getByTestId("shared-screen-header").first();
       await expect(header).not.toHaveAttribute("data-scrolled");
       await expect(header).toHaveCSS("background-color", "rgba(15, 23, 42, 0.36)");
-      await expect(header).toHaveCSS("backdrop-filter", "blur(22px) saturate(1.35)");
+      await expect(header).toHaveCSS("backdrop-filter", "blur(32px) saturate(1.35)");
       await expect(page.locator(".app-main-view")).toHaveCSS("view-transition-name", "none");
       const material = () =>
         header.evaluate((node) => {
@@ -172,7 +172,7 @@ for (const [language, width] of [
         if (elevated) await expect(header).toHaveAttribute("data-scrolled", "true");
         else await expect(header).not.toHaveAttribute("data-scrolled");
         expect(await material()).toEqual(restingMaterial);
-        await expect(header).toHaveCSS("backdrop-filter", `blur(${elevated ? 32 : 22}px) saturate(1.35)`);
+        await expect(header).toHaveCSS("backdrop-filter", "blur(32px) saturate(1.35)");
       }
       // The stationary Glass treatment must not leak into opaque modes.
       await page.locator("html").evaluate((root) => root.classList.add("high-contrast"));

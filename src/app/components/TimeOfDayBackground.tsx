@@ -4,9 +4,11 @@ import type { AzkarBackgroundKey } from "./azkar-backgrounds";
 export function TimeOfDayBackground({
   categoryId = "morning",
   onFailure,
+  testId = "time-of-day-scene-window",
 }: {
   categoryId?: string;
   onFailure?: () => void;
+  testId?: string;
 }) {
   let kind: AzkarBackgroundKey = "morning";
 
@@ -24,7 +26,7 @@ export function TimeOfDayBackground({
 
   return (
     <div
-      data-testid="time-of-day-scene-window"
+      data-testid={testId}
       className="pointer-events-none absolute inset-0 z-0 overflow-hidden bg-on-media-surface"
       aria-hidden="true"
     >

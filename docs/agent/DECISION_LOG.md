@@ -4927,3 +4927,7 @@ The owner supersedes the initial input-panel interpretation: Progress must show 
 ## Combined release authority — 2026-10-18
 
 The owner explicitly requests continuing and pushing all changes. This supersedes local-only publication holds for the pending Home, glass/scroll, prayer, Reader/header/sidebar and read-only Progress work. Preserve intact local hooks, full exact-commit Quality, Pages build/deploy and production smoke verification.
+
+## Shared chrome and explicit mosque recording — 2026-10-18
+
+Owner requests the same sidebar/header look and frost and replaces ambiguous Prayed wording with صليتها في المسجد. Reuse one fixed 32px chrome frost and header tint/sheen, render the scene behind Home navigation, keep mosque-only checks distinct from home records and retain general read-only statistics. Supersedes variable-strength header frost only; no persisted-data or content change. Existing release authority continues.

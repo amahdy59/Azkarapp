@@ -10,10 +10,12 @@ export function AppSceneBackground({
   location,
   material,
   reduceTransparency,
+  navigationOnly = false,
 }: {
   location: LocationSettings;
   material: "system" | "glass";
   reduceTransparency: boolean;
+  navigationOnly?: boolean;
 }) {
   const now = useNow();
   const category = getHomeBackgroundCategory(now, location);
@@ -25,7 +27,13 @@ export function AppSceneBackground({
   const failed = failedCategory === category;
   return (
     <div className="app-scene" data-testid="app-scene" aria-hidden="true" data-failed={failed || undefined}>
-      {!failed && <TimeOfDayBackground categoryId={category} onFailure={fail} />}
+      {!failed && (
+        <TimeOfDayBackground
+          categoryId={category}
+          onFailure={fail}
+          testId={navigationOnly ? "navigation-scene-window" : "time-of-day-scene-window"}
+        />
+      )}
     </div>
   );
 }

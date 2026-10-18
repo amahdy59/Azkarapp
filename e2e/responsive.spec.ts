@@ -568,7 +568,7 @@ test("shared screen headers stay opaque after scrolling without changing Home", 
   await expect(page.getByTestId("shared-screen-header")).toHaveCount(0);
 
   await page.getByTestId("nav-progress").click();
-  const header = page.getByTestId("shared-screen-header");
+  const header = page.getByTestId("progress-sticky-controls");
   await expect(header).toBeVisible();
   await expect(header).not.toHaveAttribute("data-scrolled");
 
@@ -577,7 +577,7 @@ test("shared screen headers stay opaque after scrolling without changing Home", 
     surface.dispatchEvent(new Event("scroll"));
   });
   await expect(header).toHaveAttribute("data-scrolled", "true");
-  await expect(header).toHaveClass(/bg-background/);
+  await expect(header.getByTestId("shared-screen-header")).toHaveClass(/bg-background/);
   await expect(header).toHaveCSS(
     "background-color",
     await page.locator(".app-screen-surface").evaluate((surface) => getComputedStyle(surface).backgroundColor),

@@ -161,6 +161,9 @@
        panel or interpolated blur appearing during native scrolling. */
     html[data-app-material-resolved="glass"]:not(.high-contrast)
       :is(
+        .app-sidebar,
+        .app-rail,
+        .bottom-nav,
         [data-material-ui] header,
         [data-material-ui] .shared-screen-header,
         [data-material-ui] .settings-search-sticky,
@@ -173,7 +176,7 @@
         rgb(255 255 255 / 0.012) 55%,
         transparent
       ) !important;
-      backdrop-filter: var(--glass-frost) !important;
+      backdrop-filter: var(--glass-chrome-frost) !important;
       border-bottom: 1px solid transparent;
       box-shadow: none;
       transition-property: border-color, box-shadow !important;
@@ -185,7 +188,7 @@
         [data-material-ui] .settings-search-sticky[data-scrolled="true"],
         [data-material-ui] .progress-screen-controls[data-scrolled="true"]
       ) {
-      backdrop-filter: var(--glass-scroll-frost) !important;
+      backdrop-filter: var(--glass-chrome-frost) !important;
       border-bottom-color: rgb(255 255 255 / 0.07);
       box-shadow: 0 3px 12px rgb(2 6 23 / 0.12);
     }

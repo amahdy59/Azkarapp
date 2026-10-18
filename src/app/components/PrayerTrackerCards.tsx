@@ -478,14 +478,7 @@ function PrayerCard({
           otherwise repeats the same two labels with no context. */}
       <fieldset className="mt-1.5 flex flex-col border-0 p-0">
         <legend className="sr-only">{t(language, "prayerTracking.legend", { prayer: name })}</legend>
-        {/* "Prayed", not "prayed at the mosque".
-            The prayer screen records where — mosque or home — while this row
-            only knew the mosque, so a prayer recorded at home showed here as an
-            empty box: the two surfaces disagreed about the same fact, and the
-            empty box read as "not recorded", which is the ambiguity the place
-            model exists to end. This ticks for either answer and names the
-            place beside it; ticking it here still means the mosque, because
-            that is the only answer a single box can give. */}
+        {/* Mosque attendance is independent of a saved prayer at home. */}
         <TrackingCheckbox
           id={`prayer-${prayer}-mosque`}
           label={t(language, "prayerTracking.prayed")}
@@ -494,7 +487,7 @@ function PrayerCard({
               ? t(language, tracking.location === "mosque" ? "prayerTracking.atMosque" : "prayerTracking.atHome")
               : undefined
           }
-          checked={tracking.location !== null}
+          checked={tracking.location === "mosque"}
           disabled={disabled}
           onChange={(next) => onToggle(prayer, "mosque", next)}
           onGlass={onGlass}

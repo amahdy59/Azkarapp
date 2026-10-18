@@ -174,7 +174,7 @@ describe("the prayer as one surface", () => {
   it("renders the prayer actions card with prayer-specific deeds", () => {
     renderScreen({ prayer: "dhuhr" });
     expect(screen.getByRole("heading", { level: 2, name: /أعمال صلاة الجمعة/ })).toBeInTheDocument();
-    expect(screen.getByTestId("prayer-action-location")).toHaveTextContent("صليت الجمعة جماعة");
+    expect(screen.getByTestId("prayer-action-location")).toHaveTextContent("صليتها في المسجد");
     expect(screen.queryByTestId("prayer-action-dhuhr-sunnah-before")).toBeNull();
     expect(screen.getByTestId("prayer-action-dhuhr-adhkar")).toHaveTextContent("أذكار بعد الصلاة");
     expect(screen.getByTestId("prayer-action-dhuhr-sunnah-after")).toHaveTextContent("سنة بعد الجمعة");

@@ -115,7 +115,7 @@ test("Home utility status stays on one line without horizontal overflow", async 
 
     await page.evaluate(() => {
       const scroller = document.querySelector<HTMLElement>('[role="region"][aria-label]');
-      if (scroller) scroller.scrollTop = 8;
+      if (scroller) scroller.scrollTop = 12;
     });
     await expect(page.getByTestId("home-utility-header")).toHaveAttribute("data-scrolled", "true");
   }
