@@ -1,5 +1,20 @@
 [
   {
+    "release": "2026-10-19.2",
+    "ar": [
+      "تصفّح الصفحة الرئيسية ببطاقات صلاة أكثر ثباتًا، مع بقاء العد التنازلي للصلاة التالية ظاهرًا عند التمرير.",
+      "اقرأ أسماء الصلوات وأوقاتها بوضوح مع تباعد مريح حتى عند تكبير النص.",
+      "اقرأ الروايات الكاملة للأحاديث في صفحة فوائد الذكر بالعربية والإنجليزية، وشارك نصها مع مصادرها.",
+      "احتفظ باختيارك للمظهر الزجاجي أو المعتم للصفحة الرئيسية أثناء التمرير، بشكل مستقل عن مظهر بقية التطبيق."
+    ],
+    "en": [
+      "Browse Home with steadier prayer cards and keep the next-prayer countdown visible while scrolling.",
+      "Read prayer names and times clearly with comfortable spacing, including enlarged text.",
+      "Read complete hadith narrations in Benefits in Arabic and English, and share their text with sources.",
+      "Keep your chosen Glass or Opaque Home appearance while scrolling, independently of the rest of the app."
+    ]
+  },
+  {
     "release": "2026-10-19",
     "ar": [
       "تصفّح الصفحة الرئيسية ببطاقات صلاة أكثر ثباتًا، مع بقاء العد التنازلي للصلاة التالية ظاهرًا عند التمرير.",

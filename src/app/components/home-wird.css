@@ -626,7 +626,11 @@ html:not(.high-contrast) .home-photo-canvas {
   background: var(--background);
 }
 @supports (backdrop-filter: blur(1px)) {
-  html:not(.high-contrast) .home-photo-canvas .home-prayer-sticky[data-scrolled] {
+  /* Only an active Glass header opts the shared strip into photographic frost.
+     Opaque Home and failed-photo recovery keep the ordinary theme ground. */
+  html:not(.high-contrast)
+    .home-photo-canvas
+    .home-prayer-sticky[data-scrolled]:where(:has(> .hero-glass.home-glass-header)) {
     background: color-mix(in srgb, var(--on-media-surface) 88%, transparent);
     backdrop-filter: var(--glass-chrome-frost);
   }
@@ -637,7 +641,9 @@ html:not(.high-contrast) .home-photo-canvas {
     /* Match the existing explicit Home Glass override on individual surfaces.
        The global reduced-transparency rule otherwise removes this new parent
        filter while its children correctly suppress their nested filters. */
-    html:not(.high-contrast) .home-force-glass .home-prayer-sticky[data-scrolled] {
+    html:not(.high-contrast)
+      .home-force-glass
+      .home-prayer-sticky[data-scrolled]:where(:has(> .hero-glass.home-glass-header)) {
       backdrop-filter: var(--glass-chrome-frost) !important;
     }
   }

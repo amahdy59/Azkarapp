@@ -10,6 +10,7 @@ test("scrolled Home protects gaps with one continuous ground and preserves fallb
   });
   await page.addInitScript(() => {
     localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+    if (localStorage.getItem("azkarapp.state.v1")) return;
     localStorage.setItem(
       "azkarapp.state.v1",
       JSON.stringify({
@@ -53,4 +54,29 @@ test("scrolled Home protects gaps with one continuous ground and preserves fallb
   await page.evaluate(() => document.documentElement.classList.remove("high-contrast"));
   await page.emulateMedia({ forcedColors: "active" });
   await expect(sticky).toHaveCSS("backdrop-filter", "none");
+  await page.emulateMedia({ forcedColors: "none" });
+  await cdp.send("Emulation.setEmulatedMedia", {
+    features: [{ name: "prefers-reduced-transparency", value: "no-preference" }],
+  });
+  await page.evaluate(() => {
+    const state = JSON.parse(localStorage.getItem("azkarapp.state.v1")!);
+    state.settings.homeMaterial = "solid";
+    state.settings.appMaterial = "glass";
+    localStorage.setItem("azkarapp.state.v1", JSON.stringify(state));
+  });
+  await page.reload();
+  await sticky.locator("..").evaluate((node) => (node.scrollTop = 150));
+  await expect(sticky).toHaveAttribute("data-scrolled", "true");
+  await expect(page.getByTestId("home-utility-header")).not.toHaveClass(/hero-glass/);
+  await expect(sticky).toHaveCSS("backdrop-filter", "none");
+  expect(
+    await sticky.evaluate((node) => {
+      const probe = document.createElement("div");
+      probe.style.background = "var(--background)";
+      node.append(probe);
+      const expected = getComputedStyle(probe).backgroundColor;
+      probe.remove();
+      return getComputedStyle(node).backgroundColor === expected;
+    }),
+  ).toBe(true);
 });
