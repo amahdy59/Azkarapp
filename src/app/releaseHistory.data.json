@@ -1,5 +1,20 @@
 [
   {
+    "release": "2026-10-18.1",
+    "ar": [
+      "أصبحت صفحة التقدم أبسط: إحصاءات للقراءة فقط وتفاصيل اختيارية لكل صلاة، دون حقول تسجيل.",
+      "بطاقات صلاة أكثر إحكاماً وحركة تمرير أهدأ، مع وضوح الصلاة المحددة وتفاصيلها.",
+      "تحسين الزجاجية ومحاذاة بطاقات الرئيسية وأزرار القراءة والمشاركة عبر أحجام الشاشات.",
+      "عناوين قراءة أقصر وأكثر اتساقاً، ولوحة قائمة الأذكار تبدأ مطوية لتوفير مساحة للنص."
+    ],
+    "en": [
+      "Progress is simpler, with read-only statistics and optional per-prayer details instead of recording fields.",
+      "More compact prayer cards and calmer scrolling make the selected prayer and its details clearer.",
+      "Refined glass surfaces and aligned Home cards, reading and sharing actions across screen sizes.",
+      "Shorter, consistent reading headers and an initially collapsed collection panel leave more room for the text."
+    ]
+  },
+  {
     "release": "2026-10-17.13",
     "ar": [
       "تثبيت شريط البحث في الإعدادات مع حماية تامة من تداخل النصوص أثناء التمرير في شاشات التقدم والإعدادات ومكتبة الأذكار.",
