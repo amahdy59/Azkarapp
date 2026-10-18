@@ -78,8 +78,11 @@ for (const language of ["ar", "en"] as const) {
           await card.click();
           await expect(page.getByTestId("app-scene").locator("img")).toHaveCount(1);
           await expect(page.locator("[data-material-ui]")).toBeVisible();
-          await expect(page.getByTestId("reader-card").first()).toHaveCSS("background-color", "rgba(15, 23, 42, 0.36)");
-          await expect(page.getByTestId("reader-card").first()).toHaveCSS("backdrop-filter", filter);
+          const readingSurface = page.getByTestId(width < 768 ? "reader-screen" : "reader-card").first();
+          await expect(readingSurface).toHaveCSS("background-color", "rgba(15, 23, 42, 0.36)");
+          await expect(readingSurface).toHaveCSS("backdrop-filter", filter);
+          if (width < 768)
+            await expect(page.getByTestId("reader-card")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
           await page.screenshot({ path: testInfo.outputPath("reader.png"), scale: "css" });
           await page.getByRole("button", { name: language === "ar" ? "الفائدة" : "Benefit", exact: true }).click();
           await expect(page.getByRole("dialog")).toHaveCSS("background-color", "rgba(15, 23, 42, 0.8)");

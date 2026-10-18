@@ -1,5 +1,20 @@
 [
   {
+    "release": "2026-10-18.6",
+    "ar": [
+      "اقرأ الأذكار على الجوال بخلفية متصلة وشريط تقدم أوضح، دون الفاصل الداكن أسفل العنوان.",
+      "افتح أذكار ما بعد الصلاة من زر قراءة أخف، مع بقاء التسميات واضحة عند تكبير النص وضيق الشاشة.",
+      "استعد تعليمات لوحة المفاتيح في المسبحة والصلاة على النبي، وتحكم في اختصارات الحروف.",
+      "اقرأ التذكيرات كاملة مع معانٍ موجزة ومراجع أدق، واحفظ البطاقات المعتمدة مع رابط الموقع."
+    ],
+    "en": [
+      "Read adhkar on mobile with one continuous background and a clearer progress track, without the dark break below the title.",
+      "Open after-prayer adhkar from a lighter Read action, with readable labels on narrow screens and enlarged text.",
+      "Reach keyboard help in Masbaha and Salawat again and choose whether letter shortcuts are enabled.",
+      "Read complete reminders with concise meanings and clearer references, and save approved cards with the website link."
+    ]
+  },
+  {
     "release": "2026-10-18.4",
     "ar": [
       "اقرأ النص الكامل للتذكيرات المتجددة وافتح معناها المختصر ومصادرها بشكل مستقل، مع حفظها بعد التحميل للقراءة دون اتصال.",

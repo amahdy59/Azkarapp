@@ -571,3 +571,7 @@ ReaderFooterTools owns one wrapping-free support row shared by Reader and Standa
 ## Stationary Library image header — 2026-10-18, local only
 
 The owner supersedes scroll-elevated frost for the pictured Azkar Library. Its title/search/filter header is outside a bounded native collection-list viewport, so moving cards never pass behind it. Glass remains transparent over the existing stationary scene with no elevation listener. Controls have an independent 65% maximum-height scroll recovery for short windows and enlarged text. Other screens retain their existing scroll ownership. No content, persistence or release changes.
+
+## Compact Reader material boundary — 2026-10-18
+
+ReaderScreen applies the existing glass-reading presentation once to the compact non-Mushaf screen instead of only its reading body. Header, progress and text therefore share a continuous protected ground. Desktop cards retain their material; Mushaf retains its edge-to-edge surface. Shared compact progress chrome uses the muted track token. No content, counting, persistence, audio or service boundaries change.

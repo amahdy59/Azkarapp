@@ -379,7 +379,14 @@ test("the custom counter stays bounded on a short phone and isolates focused-con
   const counterBox = await counter.boundingBox();
   expect(counterBox).not.toBeNull();
   if (counterBox) {
-    expect(counterBox.width).toBeGreaterThanOrEqual(200);
+    // The approved shared footer sizes actions to complete content, rather
+    // than the old fixed-width pill. Keep the target and its text measurable.
+    expect(counterBox.width).toBeGreaterThanOrEqual(44);
+    const fits = await page
+      .getByTestId("custom-counter-surface")
+      .locator(".adaptive-counter-content")
+      .evaluate((node) => node.scrollWidth <= node.clientWidth + 1 && node.scrollHeight <= node.clientHeight + 1);
+    expect(fits).toBe(true);
     expect(counterBox.width).toBeLessThanOrEqual(320);
     expect(Math.round(counterBox.height)).toBe(48);
     expect(counterBox.x).toBeGreaterThanOrEqual(0);
@@ -413,6 +420,7 @@ test("custom counter content keeps its reading-width bound on desktop", async ({
   await page.setViewportSize({ width: 1440, height: 900 });
   await openReturningGuest(page);
   await page.getByTestId("nav-masbaha").click();
+  await page.evaluate(() => document.fonts.ready);
 
   const contentBox = await page.getByTestId("custom-counter-content").boundingBox();
   expect(contentBox).not.toBeNull();
@@ -421,7 +429,17 @@ test("custom counter content keeps its reading-width bound on desktop", async ({
   const counterBox = await page.getByTestId("custom-counter-surface").boundingBox();
   expect(counterBox).not.toBeNull();
   if (counterBox) {
-    expect(counterBox.width).toBeGreaterThanOrEqual(200);
+    expect(counterBox.width).toBeGreaterThanOrEqual(44);
+    // Measure the visible tally: the clipped, transparent ready halo can
+    // enlarge the button's scroll bounds after its transform has finished.
+    await expect
+      .poll(() =>
+        page
+          .getByTestId("custom-counter-surface")
+          .locator(".adaptive-counter-content")
+          .evaluate((node) => Math.max(node.scrollWidth - node.clientWidth, node.scrollHeight - node.clientHeight)),
+      )
+      .toBeLessThanOrEqual(1);
     expect(Math.round(counterBox.height)).toBe(48);
   }
 });

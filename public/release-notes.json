@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-18.4",
+  "release": "2026-10-18.6",
   "ar": [
-    "اقرأ النص الكامل للتذكيرات المتجددة وافتح معناها المختصر ومصادرها بشكل مستقل، مع حفظها بعد التحميل للقراءة دون اتصال.",
-    "استكشف اتجاهات الصلاة والأذكار خلال الفترات المختلفة، مع تفاصيل أوضح وسجل الأذكار المسجلة من الآن فصاعداً.",
-    "يبقى عنوان صفحة الأذكار فوق الصورة بينما تتحرك المجموعات أسفله، مع أدوات قراءة وتسبيح أكثر اتساقاً وملاءمة للشاشات.",
-    "تتضمن بطاقات المشاركة عنوان الموقع داخل الصورة، وتتيح بطاقات الصلاة فتح أذكار ما بعد الصلاة بجوار تسجيلها."
+    "اقرأ الأذكار على الجوال بخلفية متصلة وشريط تقدم أوضح، دون الفاصل الداكن أسفل العنوان.",
+    "افتح أذكار ما بعد الصلاة من زر قراءة أخف، مع بقاء التسميات واضحة عند تكبير النص وضيق الشاشة.",
+    "استعد تعليمات لوحة المفاتيح في المسبحة والصلاة على النبي، وتحكم في اختصارات الحروف.",
+    "اقرأ التذكيرات كاملة مع معانٍ موجزة ومراجع أدق، واحفظ البطاقات المعتمدة مع رابط الموقع."
   ],
   "en": [
-    "Read complete rotating reminders and open their brief meanings and sources independently, with offline access after loading.",
-    "Explore prayer and routine trends across periods, with clearer details and individual zikr history recorded from now on.",
-    "The Azkar header stays over its photograph while collections scroll below, with more consistent reading and counter controls across screen sizes.",
-    "Shared cards include the website inside the image, and prayer cards place after-prayer reading beside its completion control."
+    "Read adhkar on mobile with one continuous background and a clearer progress track, without the dark break below the title.",
+    "Open after-prayer adhkar from a lighter Read action, with readable labels on narrow screens and enlarged text.",
+    "Reach keyboard help in Masbaha and Salawat again and choose whether letter shortcuts are enabled.",
+    "Read complete reminders with concise meanings and clearer references, and save approved cards with the website link."
   ]
 }

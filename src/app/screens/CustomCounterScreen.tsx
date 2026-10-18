@@ -533,6 +533,7 @@ export function CustomCounterScreen({
                 <div data-testid="reader-counter-stack">
                   <StandaloneCounterFooter
                     language={language}
+                    direction={direction}
                     focusMode={focusMode}
                     onToggleFocus={() => setFocusMode((value) => !value)}
                     focusToggleRef={focusToggleRef}

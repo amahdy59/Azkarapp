@@ -1414,7 +1414,7 @@ export function ReaderScreen({
          which pushed the page down and left a strip of shell above a surface
          that is supposed to be the page itself. */
       edgeToEdge={showMushaf}
-      className={`reader-swipe-surface relative !pb-0 sm:!pt-0 ${showMushaf ? "overflow-hidden" : ""}`}
+      className={`reader-swipe-surface relative !pb-0 sm:!pt-0 ${showMushaf ? "overflow-hidden" : !isDesktopReader ? "glass-reading" : ""}`}
       data-testid="reader-screen"
       data-zikr-index={idx}
       data-zikr-id={z.id}
@@ -1801,7 +1801,7 @@ export function ReaderScreen({
                 value={readingProgressValue}
                 max={azkar.length}
                 height={8}
-                trackColor="var(--card)"
+                trackColor="var(--muted)"
                 fillColor="var(--primary)"
                 direction={direction}
                 aria-label={t(language, "reader.groupProgress")}
@@ -1811,7 +1811,7 @@ export function ReaderScreen({
             {/* Main Layout Area */}
             <div
               ref={readerMainRef}
-              className="glass-reading flex-1 flex flex-col min-h-0 justify-between select-none relative reader-column cursor-pointer"
+              className="flex-1 flex flex-col min-h-0 justify-between select-none relative reader-column cursor-pointer"
               data-testid="reader-card"
               {...surfaceProps}
             >

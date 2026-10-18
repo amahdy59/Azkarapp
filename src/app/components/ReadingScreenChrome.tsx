@@ -182,7 +182,7 @@ export function ReadingScreenChrome({
                   value={progress.value}
                   max={progress.max}
                   height={8}
-                  trackColor="var(--card)"
+                  trackColor="var(--muted)"
                   fillColor="var(--primary)"
                   direction={direction}
                   aria-label={progress.ariaLabel}

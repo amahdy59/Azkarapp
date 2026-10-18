@@ -4987,3 +4987,7 @@ The owner requests implementing the remaining session-review gaps and explicitly
 ## 2026-10-18 — Combined release .4 authorization
 
 The owner explicitly authorizes verifying all pending hadith/rotating reminder content on Cloudflare R2, pushing all changes and completing deployment with intact quality gates. This supersedes earlier local-only holds. The header chat owns integration, release notes, commit/push, exact-commit CI/Pages and production verification; other sessions freeze edits. See phases/COMBINED_RELEASE_2026_10_18_4.md.
+
+## Mobile Reader surface repair and combined release — 2026-10-18
+
+The owner requests fixing the marked mobile progress area, checking similar issues and pushing all changes. Apply one compact Reader material across title/progress/body and visible muted progress tracks in the shared compact counters. Preserve pending approved changes and complete the intact release cycle. Reuse valid prior checks, run only necessary affected regressions and required release gates. This publication instruction supersedes pending local-only holds. See phases/MOBILE_READER_SURFACE_2026_10_18.md.

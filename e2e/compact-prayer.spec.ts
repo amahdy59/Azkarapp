@@ -1,16 +1,16 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { getEstimatedPrayerTimes } from "../src/app/content/prayerTimes";
+import { fixtureReminderCatalogue } from "./fixtures/reminderCatalogue";
+
+// Prayer geometry reloads themes; worker update lifecycle has its own specs.
+// A waiting-worker dialog must not replace the information sheet under test.
+test.use({ serviceWorkers: "block" });
+test.beforeEach(async ({ page }) => fixtureReminderCatalogue(page));
 
 const prayers = ["fajr", "dhuhr", "asr", "maghrib", "isha"] as const;
 
 async function openHome(page: Page, language: "ar" | "en") {
-  // Repeated theme reloads can surface a waiting-worker notice in Firefox.
-  // Defer through the real control so it cannot obstruct the prayer flow.
-  const later = page.getByRole("button", { name: language === "ar" ? "لاحقاً" : "Later", exact: true });
-  await page.addLocatorHandler(later, async () => {
-    await later.click();
-  });
   await page.clock.setFixedTime(new Date("2026-09-05T13:40:00+03:00"));
   await page.addInitScript((language) => {
     localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
@@ -26,6 +26,7 @@ async function openHome(page: Page, language: "ar" | "en") {
   await page.goto("/#/home");
   await expect(page.getByTestId("prayer-card-fajr")).toBeVisible();
   await page.evaluate(() => document.fonts.ready);
+  await expect(page.getByTestId("home-daily-evidence")).toBeVisible();
 }
 
 for (const language of ["ar", "en"] as const) {
@@ -108,7 +109,13 @@ async function checkGeometry(page: Page) {
         (element) =>
           element.scrollWidth > element.clientWidth + 1 || getComputedStyle(element).textOverflow === "ellipsis",
       )
-      .map((element) => element.textContent);
+      .map((element) => ({
+        text: element.textContent,
+        width: element.clientWidth,
+        scrollWidth: element.scrollWidth,
+        font: getComputedStyle(element).fontSize,
+        parentWidth: element.parentElement?.clientWidth,
+      }));
   });
   expect(overflow).toEqual([]);
   const checklist = await panel.locator("ol").evaluate((list) => ({

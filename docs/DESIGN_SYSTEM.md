@@ -1155,3 +1155,7 @@ The owner's latest correction removes counting-instruction strips and hand/reope
 ## Stationary Library image header — 2026-10-18, local only
 
 Keep the pictured Azkar Library header appearance unchanged while browsing: retain the scene through transparent Glass chrome and scroll only the list below it. No scroll-triggered frost, tint, shadow or dividing edge. Preserve existing opaque/high-contrast fallbacks and independent scrolling of controls when short windows or enlarged text require it. This supersedes the Library part of the resting/scrolled material policy.
+
+## Compact Reader surface continuity — 2026-10-18
+
+The compact Reader owns one protected reading material on its screen surface, including the stationary title, collection progress and text. Its body does not add another tinted card or shadow at the progress boundary. Desktop reading cards and printed Mushaf keep their existing ownership. Compact Reader, Masbaha and Salawat progress tracks use the muted token so the empty portion remains visible in Glass and opaque themes. Preserve progress semantics, focus mode, RTL/LTR and text enlargement.

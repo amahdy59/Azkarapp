@@ -429,3 +429,5 @@ Local follow-up: [Concise, actionable Progress](phases/PROGRESS_REFINEMENTS_2026
 [Session gap closure](phases/SESSION_GAP_CLOSURE_2026_10_18.md) records owner-approved image attribution, precise collection citations, concise hadith meanings and reconciled verification, with physical/human acceptance tracked separately. Local application only.
 
 [Combined release .4](phases/COMBINED_RELEASE_2026_10_18_4.md) records the owner-authorized R2 verification, all-pending-change integration and full release cycle, superseding prior local-only holds.
+
+[Mobile Reader surface and release](phases/MOBILE_READER_SURFACE_2026_10_18.md) records the owner-requested mobile progress seam repair, related compact-counter inspection and authorized all-pending-change release.

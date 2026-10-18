@@ -2,6 +2,13 @@
   max-height: min(82dvh, 720px);
 }
 
+/* Compact reading owns one continuous protected surface, including its chrome.
+   A second material on the body creates a visible seam below the progress row. */
+.reader-swipe-surface.glass-reading {
+  border: 0;
+  box-shadow: none !important;
+}
+
 /* Allow the first/last Quran diacritics to clear the native reading viewport. */
 .reader-text-scroll [data-quran-passage] {
   padding-block: 0.5em;

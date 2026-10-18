@@ -444,6 +444,6 @@ describe("PrayerActionsCard", () => {
     expect(heading).toHaveClass("text-on-media");
 
     const cta = screen.getByTestId("prayer-open-adhkar");
-    expect(cta).toHaveClass("bg-primary");
+    expect(cta).toHaveClass("bg-transparent", "text-on-media-accent");
   });
 });

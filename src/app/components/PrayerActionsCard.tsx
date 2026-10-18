@@ -156,10 +156,10 @@ export function PrayerActionsCard({
             <li
               key={action.id}
               data-testid={action.testId}
-              className="group/item flex min-h-11 min-w-0 items-center gap-2"
+              className="group/item flex min-h-11 min-w-0 flex-wrap items-center gap-2"
             >
               <label
-                className={`relative flex min-h-11 min-w-0 ${action.id === "adhkar" ? "flex-initial" : "flex-1"} cursor-pointer items-center gap-3 rounded-xl px-3 py-1 transition-colors duration-fast ${
+                className={`relative flex min-h-11 ${action.id === "adhkar" ? "min-w-[min(100%,10rem)] flex-initial" : "min-w-0 flex-1"} cursor-pointer items-center gap-3 rounded-xl px-3 py-1 transition-colors duration-fast ${
                   onGlass
                     ? "text-on-media hover:bg-white/10 active:bg-white/15"
                     : "text-foreground hover:bg-muted/50 active:bg-muted/70"
@@ -201,7 +201,7 @@ export function PrayerActionsCard({
                   onClick={() => onOpenAdhkar(prayer)}
                   data-testid="prayer-open-adhkar"
                   aria-label={t(language, "prayerActions.readAdhkarAria")}
-                  className="inline-flex min-h-11 min-w-28 shrink-0 items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-bold text-primary-foreground transition-colors duration-fast hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                  className={`inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-transparent px-1.5 py-1 text-sm font-semibold underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${onGlass ? "text-on-media-accent" : "text-primary"}`}
                 >
                   <BookOpen size={18} className="shrink-0" aria-hidden="true" />
                   <span>{t(language, "prayerActions.readAdhkar")}</span>

@@ -159,8 +159,18 @@ for (const width of [390, 1440]) {
       const before = await region.evaluate((node) => node.scrollTop);
       await page.mouse.wheel(0, 180);
       await expect.poll(() => region.evaluate((node) => node.scrollTop)).toBeGreaterThan(before + 50);
+      const firstWheelTop = await region.evaluate((node) => node.scrollTop);
       await page.mouse.wheel(0, 180);
-      await expect.poll(() => region.evaluate((node) => node.scrollTop)).toBeGreaterThan(before + 100);
+      // Short records can reach their native end on the first wheel. Require
+      // another 50px only where that much scroll range actually remains.
+      await expect
+        .poll(() =>
+          region.evaluate((node, firstTop) => {
+            const end = node.scrollHeight - node.clientHeight;
+            return node.scrollTop - Math.min(firstTop + 50, end);
+          }, firstWheelTop),
+        )
+        .toBeGreaterThanOrEqual(0);
       const wheelTop = await region.evaluate((node) => node.scrollTop);
       await page.mouse.wheel(0, -180);
       await expect.poll(() => region.evaluate((node) => node.scrollTop)).toBeLessThan(wheelTop);

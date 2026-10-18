@@ -47,22 +47,31 @@ for (const material of ["glass", "solid"] as const) {
             language === "ar" ? titleBox.x + titleBox.width : titleBox.x,
             0,
           );
-          // Firefox reports a 112px CSS width as111.999992; discard only floating-point noise.
-          expect(Number((await read.boundingBox())!.width.toFixed(3))).toBeGreaterThanOrEqual(112);
+          await expect(read).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+          await expect(read).toHaveCSS("background-image", "none");
+          expect((await read.boundingBox())!.width).toBeLessThan(112);
           const controls = await row.locator("input, button").evaluateAll((nodes) =>
             nodes.map((node) => {
               const r = node.getBoundingClientRect();
-              return { x: r.x, right: r.right, width: r.width, height: r.height };
+              return { x: r.x, right: r.right, y: r.y, bottom: r.bottom, width: r.width, height: r.height };
             }),
           );
           for (const box of controls) {
             expect(box.width).toBeGreaterThanOrEqual(44);
             expect(box.height).toBeGreaterThanOrEqual(44);
           }
-          expect(controls[0]!.right <= controls[1]!.x || controls[1]!.right <= controls[0]!.x).toBe(true);
+          expect(
+            controls[0]!.right <= controls[1]!.x ||
+              controls[1]!.right <= controls[0]!.x ||
+              controls[0]!.bottom <= controls[1]!.y ||
+              controls[1]!.bottom <= controls[0]!.y,
+          ).toBe(true);
           const labelBox = (await row.locator("label").boundingBox())!;
           const readBox = (await read.boundingBox())!;
-          const gap = Math.max(readBox.x - (labelBox.x + labelBox.width), labelBox.x - (readBox.x + readBox.width));
+          const wrapped = readBox.y >= labelBox.y + labelBox.height;
+          const gap = wrapped
+            ? readBox.y - (labelBox.y + labelBox.height)
+            : Math.max(readBox.x - (labelBox.x + labelBox.width), labelBox.x - (readBox.x + readBox.width));
           expect(gap).toBeCloseTo(8, 0);
           if (width === 1440) {
             const evidenceBox = (await panel.getByTestId("prayer-moment-virtue").boundingBox())!;

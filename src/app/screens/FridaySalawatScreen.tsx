@@ -413,6 +413,7 @@ export function FridaySalawatScreen({
                   )}
                   <StandaloneCounterFooter
                     language={language}
+                    direction={direction}
                     focusMode={focusMode}
                     onToggleFocus={() => setFocusMode((value) => !value)}
                     focusToggleRef={focusToggleRef}
