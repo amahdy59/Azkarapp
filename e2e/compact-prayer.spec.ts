@@ -265,6 +265,26 @@ for (const language of ["ar", "en"] as const) {
             });
           }
         }
+        // Prayer settings intentionally coalesce writes. Prove every field
+        // reached storage before testing its independent restoration; an
+        // automation reload can bypass the browser's normal unload flush.
+        await expect
+          .poll(() => page.evaluate(() => JSON.parse(localStorage.getItem("azkarapp.state.v1")!).prayerTracking))
+          .toEqual(
+            expect.arrayContaining(
+              prayerGroup.map((prayer) =>
+                expect.objectContaining({
+                  dayKey: "2026-09-05",
+                  prayer,
+                  mosque: true,
+                  location: "mosque",
+                  adhkar: true,
+                  sunnah: true,
+                  ...(prayer === "dhuhr" ? { sunnahBefore: true, sunnahAfter: true } : {}),
+                }),
+              ),
+            ),
+          );
         // Revisit every prayer after a real reload: independent fields must persist.
         await page.reload();
         for (const prayer of prayerGroup) {
