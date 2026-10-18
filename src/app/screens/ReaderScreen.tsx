@@ -59,7 +59,6 @@ import type { AudioController } from "../audio/AudioProvider";
 import type { AppLanguage, CategoryId, RoutineMode, MushafTextScale, TextSizeOption, ThemeMode, Zikr } from "../types";
 import { isPrayerName } from "../content/prayerTimes";
 import { ProgressBar } from "../components/ProgressBar";
-import { CounterGuidance } from "../components/CounterGuidance";
 import { CounterKeyboardHelp } from "../components/CounterKeyboardHelp";
 import { ReaderFooterTools } from "../components/ReaderFooterTools";
 import { DevotionalAction, DevotionalFooter } from "../components/DevotionalControls";
@@ -746,7 +745,7 @@ export function ReaderScreen({
 
   const renderReadingContent = () => (
     <article
-      className={`w-full px-4 flex flex-col items-center justify-center text-center bg-transparent ${longSurah ? "" : "cursor-pointer touch-manipulation transition-colors hover:bg-muted/10 active:bg-muted/20"}`}
+      className={`w-full px-4 flex flex-col items-center justify-center text-center bg-transparent ${longSurah ? "" : "cursor-pointer touch-manipulation"}`}
     >
       {longSurah ? (
         <div
@@ -1701,16 +1700,6 @@ export function ReaderScreen({
                       {longSurah && renderSideNavigation()}
                     </div>
 
-                    {!longSurah && !audioModeActive && (
-                      <CounterGuidance
-                        language={language}
-                        direction={direction}
-                        reader
-                        hasStarted={count > 0}
-                        placement="above"
-                        showKeyboardHelp={false}
-                      />
-                    )}
                     {<footer className={`shrink-0 pt-1.5 ${audioModeActive ? "pb-0" : "pb-2"}`}>{renderDock()}</footer>}
                     {!audioModeActive && typeof audioPlayer !== "function" && audioPlayer}
                   </div>
@@ -1894,16 +1883,6 @@ export function ReaderScreen({
                 </div>
               </div>
 
-              {!longSurah && !audioModeActive && (
-                <CounterGuidance
-                  language={language}
-                  direction={direction}
-                  reader
-                  hasStarted={count > 0}
-                  placement="above"
-                  showKeyboardHelp={false}
-                />
-              )}
               {/* The screen sets !pb-0 and the tab bar is hidden here, so the
                 counter itself owns the bottom inset — otherwise it would sit
                 flush against the home indicator. */}

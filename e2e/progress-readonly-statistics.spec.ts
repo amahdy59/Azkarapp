@@ -42,12 +42,13 @@ for (const language of ["ar", "en"] as const) {
         const state = JSON.parse(localStorage.getItem("azkarapp.state.v1")!);
         return { prayers: state.prayerTracking, completions: state.dailyCompletions, habits: state.dailyHabits };
       });
-      await expect(summary.getByText(ar ? "١ مسجّل" : "1 recorded", { exact: true })).toHaveCount(2);
+      await expect(summary.getByRole("listitem")).toHaveCount(5);
+      await expect(summary.getByText(ar ? "في المنزل" : "At home", { exact: true })).toBeVisible();
       await expect(
         page.locator(".progress-screen input, .progress-screen select, .progress-screen textarea"),
       ).toHaveCount(0);
       await expect(page.getByRole("button", { name: ar ? "فتح الفجر" : "Open Fajr", exact: true })).toHaveCount(0);
-      await expect(summary.locator("details")).not.toHaveAttribute("open");
+      await expect(summary.locator("details, table")).toHaveCount(0);
       if (width === 320)
         await page.evaluate(() => {
           document.documentElement.style.fontSize = "200%";
@@ -55,26 +56,17 @@ for (const language of ["ar", "en"] as const) {
       const directory = `output/playwright/progress-statistics/${testInfo.project.name}`;
       await mkdir(directory, { recursive: true });
       await page.screenshot({ path: `${directory}/${language}-${width}-overview.png` });
-      if (width === 1440)
-        expect((await page.getByTestId("progress-prayer-group").boundingBox())!.height).toBeLessThan(300);
-      const disclosure = summary.locator("summary");
-      await disclosure.focus();
-      await page.keyboard.press("Enter");
-      await expect(summary.getByRole("table")).toBeVisible();
-      await expect(summary.getByRole("row")).toHaveCount(6);
-      await expect(summary.getByText(ar ? "في المنزل" : "At home", { exact: true })).toBeVisible();
-      const region = summary.getByRole("region");
-      await region.focus();
-      await expect(region).toBeFocused();
-      expect(await region.evaluate((node) => node.clientWidth <= node.parentElement!.clientWidth)).toBe(true);
+      await expect(summary.getByRole("listitem")).toHaveCount(5);
       expect(
         await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
       ).toBe(true);
-      await page.screenshot({ path: `${directory}/${language}-${width}-breakdown.png` });
+      await page.screenshot({ path: `${directory}/${language}-${width}-statuses.png` });
       const axe = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
       expect(axe.violations).toEqual([]);
       await page.getByRole("button", { name: ar ? "الفترة السابقة" : "Previous period", exact: true }).click();
-      await expect(summary.getByText(ar ? "٠ مسجّل" : "0 recorded", { exact: true })).toHaveCount(2);
+      await expect(summary.getByRole("listitem").first()).not.toContainText(
+        ar ? "أتممت أذكار الصلاة" : "Completed the azkar",
+      );
       await expect(summary.getByText(ar ? "في المسجد" : "At the mosque", { exact: true })).toBeVisible();
       await expect(
         page.locator(".progress-screen input, .progress-screen select, .progress-screen textarea"),

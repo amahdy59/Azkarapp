@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 for (const language of ["ar", "en"] as const) {
-  test(`combined Reader guidance preserves text and focus in ${language} @cross-browser`, async ({ page }) => {
+  test(`Reader without tap guidance preserves text and focus in ${language} @cross-browser`, async ({ page }) => {
     await page.addInitScript((language) => {
       localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
       localStorage.setItem(
@@ -19,12 +19,12 @@ for (const language of ["ar", "en"] as const) {
     for (const width of [390, 820, 1200, 1440]) {
       await page.setViewportSize({ width, height: 900 });
       await expect(page.getByTestId("counter-surface")).toBeVisible();
-      await expect(hint).toBeVisible();
+      await expect(hint).toHaveCount(0);
+      await expect(page.getByTestId("counter-guidance-reopen")).toHaveCount(0);
       await expect(page.getByTestId("reader-keyboard-shortcuts")).toHaveCount(0);
       await expect(page.getByTestId("reader-side-navigation")).toHaveCount(0);
       if (width >= 768) {
         await expect(help).toBeVisible();
-        await expect(hint).toContainText(language === "ar" ? "المسافة" : "Space");
         await help.click();
         const dialog = page.getByRole("dialog");
         await expect(dialog).toBeVisible();

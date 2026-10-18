@@ -4,6 +4,9 @@ import { CollectionShareModal } from "./CollectionShareModal";
 import type { Zikr } from "../types";
 
 // Mock canvas and share functions
+vi.mock("../share/attributedCard", () => ({
+  attributeCardImage: vi.fn(async (blob: Blob) => blob),
+}));
 vi.mock("../share/collectionShareCard", async (importOriginal) => ({
   ...(await importOriginal<typeof import("../share/collectionShareCard")>()),
   releaseSharePages: vi.fn(),

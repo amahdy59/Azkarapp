@@ -1,4 +1,7 @@
+import { fixtureReminderCatalogue } from "./fixtures/reminderCatalogue";
 import { expect, test } from "@playwright/test";
+
+test.beforeEach(async ({ page }) => fixtureReminderCatalogue(page));
 import AxeBuilder from "@axe-core/playwright";
 import { t } from "../src/app/i18n";
 

@@ -383,28 +383,27 @@ export function HomeScreen({
     [language, manualEvidenceOffset, reminderContexts, reminderSlotKey],
   );
 
-  /* The reviewed source library is fetched after first paint and never before.
-     It is 41 sources of Arabic and English, and a static import would put them
-     in the chunk that paints this screen — the growth DEC-153 had to
-     re-baseline. Until it resolves the card shows the corpus-derived reminder,
-     so nothing is blocked and nothing is empty. */
+  /* Complete readings load after first paint from the verified R2/offline package,
+     including the unchanged schedule and Quran records. Do not briefly show
+     unverified legacy excerpts while this catalogue is being unpacked. */
   const [libraryEvidence, setLibraryEvidence] = useState<ReturnType<typeof getContextualEvidence>>(null);
+  const [readingCatalogue, setReadingCatalogue] = useState<Awaited<
+    ReturnType<typeof import("../content/reminderReadings").loadReminderReadings>
+  > | null>(null);
   useEffect(() => {
     let cancelled = false;
-    setLibraryEvidence(null);
+    // Keep the current verified card until its replacement is ready. Clearing
+    // it here briefly rotates through a contextual fallback on every refresh.
     const load = async () => {
-      const [{ RELEVANT_NOW_LIBRARY }, { RELEVANT_NOW_VERSES }, { AUTHENTICATED_REMINDER_LIBRARY }] = await Promise.all(
-        [
-          import("../content/relevantNowLibrary"),
-          import("../content/relevantNowVerses"),
-          import("../content/authenticatedReminders"),
-        ],
-      );
+      const catalogue = await import("../content/reminderReadings");
       if (cancelled) return;
+      const readings = await catalogue.loadReminderReadings();
+      if (cancelled) return;
+      setReadingCatalogue(readings);
       setLibraryEvidence(
         selectLibraryEvidence(
-          [...RELEVANT_NOW_LIBRARY, ...AUTHENTICATED_REMINDER_LIBRARY],
-          RELEVANT_NOW_VERSES,
+          readings.library,
+          readings.verses,
           reminderSlotKey,
           language,
           reminderContexts,
@@ -427,14 +426,19 @@ export function HomeScreen({
      found. Otherwise a Friday source would displace the Asr one the reader is
      actually in the window for. */
   const dailyEvidence = useMemo(() => {
-    if (!libraryEvidence) return contextualEvidence?.evidence ?? null;
-    if (manualEvidenceOffset > 0) return libraryEvidence.evidence;
-    if (!contextualEvidence) return libraryEvidence.evidence;
-    const rank = (context: ReminderContext) => reminderContexts.indexOf(context);
-    return rank(libraryEvidence.context) <= rank(contextualEvidence.context)
-      ? libraryEvidence.evidence
-      : contextualEvidence.evidence;
-  }, [contextualEvidence, libraryEvidence, manualEvidenceOffset, reminderContexts]);
+    let evidence = contextualEvidence?.evidence ?? null;
+    if (libraryEvidence) {
+      const rank = (context: ReminderContext) => reminderContexts.indexOf(context);
+      if (
+        manualEvidenceOffset > 0 ||
+        !contextualEvidence ||
+        rank(libraryEvidence.context) <= rank(contextualEvidence.context)
+      ) {
+        evidence = libraryEvidence.evidence;
+      }
+    }
+    return evidence && readingCatalogue ? readingCatalogue.withReminderReading(evidence, language) : null;
+  }, [contextualEvidence, language, libraryEvidence, manualEvidenceOffset, readingCatalogue, reminderContexts]);
   const isLastThirdDua = reminderInfo.categoryId === "comprehensive_duas";
   const doneSet = completed[reminderInfo.categoryId] ?? new Set<string>();
 
@@ -610,8 +614,8 @@ export function HomeScreen({
                   ? "shadow-none"
                   : ""
                 : hasScrolledHomeContent
-                  ? "bg-background/90 shadow-none"
-                  : "bg-background/95 shadow-none"
+                  ? "bg-background shadow-none"
+                  : "bg-background shadow-none"
             }`}
             dir={direction}
           >

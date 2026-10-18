@@ -9,6 +9,30 @@ afterEach(cleanup);
 const DAY = "2026-09-17";
 
 describe("PrayerActionsCard", () => {
+  it("keeps reading independent from completion, including a completed future preview", () => {
+    const onToggle = vi.fn();
+    const onOpenAdhkar = vi.fn();
+    render(
+      <PrayerActionsCard
+        prayer="fajr"
+        language="en"
+        direction="ltr"
+        records={[{ dayKey: DAY, prayer: "fajr", mosque: false, adhkar: true }]}
+        dayKey={DAY}
+        canRecord={false}
+        onToggle={onToggle}
+        onOpenAdhkar={onOpenAdhkar}
+      />,
+    );
+    const button = screen.getByRole("button", { name: "Read after-prayer adhkar" });
+    const checkbox = screen.getByRole("checkbox", { name: "Azkar after prayer" });
+    expect(checkbox).toBeChecked();
+    expect(checkbox).toBeDisabled();
+    expect(button.closest("label")).toBeNull();
+    fireEvent.click(button);
+    expect(onOpenAdhkar).toHaveBeenCalledExactlyOnceWith("fajr");
+    expect(onToggle).not.toHaveBeenCalled();
+  });
   it("returns information-sheet focus to its pointer trigger rather than the previous checkbox", async () => {
     render(
       <PrayerActionsCard
@@ -345,7 +369,7 @@ describe("PrayerActionsCard", () => {
     expect(modal).toHaveTextContent("رَحِمَ اللَّهُ امْرَأً صَلَّى قَبْلَ الْعَصْرِ أَرْبَعًا");
   });
 
-  it("triggers onOpenAdhkar when bottom primary CTA is clicked", () => {
+  it("triggers onOpenAdhkar when inline reading action is clicked", () => {
     const onOpenAdhkar = vi.fn();
     render(
       <PrayerActionsCard
@@ -360,7 +384,8 @@ describe("PrayerActionsCard", () => {
     );
 
     const button = screen.getByTestId("prayer-open-adhkar");
-    expect(button).toHaveTextContent("ابدأ أذكار بعد الصلاة");
+    expect(button).toHaveTextContent("قراءة");
+    expect(button.closest("li")).toBe(screen.getByTestId("prayer-action-maghrib-adhkar"));
     fireEvent.click(button);
     expect(onOpenAdhkar).toHaveBeenCalledWith("maghrib");
   });
@@ -383,7 +408,7 @@ describe("PrayerActionsCard", () => {
     expect(screen.getByTestId("prayer-action-dhuhr-sunnah-before")).toHaveTextContent("4 rak'ahs before Dhuhr");
     expect(screen.getByTestId("prayer-action-dhuhr-adhkar")).toHaveTextContent("Azkar after prayer");
     expect(screen.getByTestId("prayer-action-dhuhr-sunnah-after")).toHaveTextContent("2 rak'ahs after Dhuhr");
-    expect(screen.getByTestId("prayer-open-adhkar")).toHaveTextContent("Start after-prayer adhkar");
+    expect(screen.getByTestId("prayer-open-adhkar")).toHaveTextContent("Read");
   });
 
   it("renders with clean aligned rows without fill/stroke when onGlass is true", () => {
@@ -407,9 +432,9 @@ describe("PrayerActionsCard", () => {
     expect(row).not.toHaveClass("backdrop-blur-md");
     expect(row).not.toHaveClass("bg-on-media-surface/60");
     expect(row).not.toHaveClass("border");
-    expect(row).toHaveClass("px-3");
+    expect(row.querySelector("label")).toHaveClass("px-3");
     expect(row).toHaveClass("min-h-11");
-    expect(row).toHaveClass("text-white");
+    expect(row.querySelector("label")).toHaveClass("text-on-media");
     expect(row.querySelector(":scope > div svg")).toBeNull();
     expect(row.querySelector(".tracking-check")).toHaveClass("size-5", "rounded-md");
     expect(row.querySelector(".tracking-check")).not.toHaveClass("rounded-full");

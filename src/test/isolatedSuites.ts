@@ -11,6 +11,10 @@
  * fails until the suite is listed here.
  */
 export const ISOLATED_SUITES = [
+  "src/app/share/curatedRoutineCards.test.ts",
+  "src/app/content/reminderReadings.test.ts",
+  "src/app/components/PrayerTrackerStats.test.tsx",
+  "src/app/components/RoutineInsights.test.tsx",
   "src/app/screens/CompletionScreen.sharing.test.tsx",
   "src/app/components/AppSceneBackground.test.tsx",
   "src/app/share/quickRoutineShare.test.ts",

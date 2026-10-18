@@ -1,70 +1,11 @@
-import React, { useId, useState } from "react";
+import React, { useState } from "react";
 import { progressFillStyle } from "./progressFillStyle";
 import "./ZikrComponents.css";
-import { Check, HandTap } from "./icons";
+import { Check } from "./icons";
 import { counterNumeralFontFamily, formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { shouldReduceMotion } from "../motionPreferences";
 import type { AppLanguage } from "../types";
-
-/** Quiet counting guidance follows the shared responsive footer hierarchy. */
-export function CounterTapHint({
-  text,
-  desktopText,
-  keyboardHelp,
-  expanded = true,
-  onToggle,
-  toggleLabel,
-}: {
-  text: string;
-  desktopText?: string;
-  keyboardHelp?: React.ReactNode;
-  expanded?: boolean;
-  onToggle?: () => void;
-  toggleLabel?: string;
-}) {
-  const explanationId = useId();
-  return (
-    <div className="devotional-guidance mx-auto w-full max-w-[25rem] shrink-0 px-3 pt-2">
-      <div
-        data-testid="counter-tap-hint"
-        data-expanded={expanded}
-        className="counter-tap-hint flex min-h-11 items-center gap-2 px-3 text-center text-label font-medium"
-        style={expanded ? undefined : { background: "transparent" }}
-      >
-        {onToggle ? (
-          <button
-            type="button"
-            data-testid="counter-guidance-reopen"
-            className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border bg-card text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-            aria-label={toggleLabel}
-            title={toggleLabel}
-            aria-expanded={expanded}
-            aria-controls={explanationId}
-            onClick={(event) => {
-              event.stopPropagation();
-              onToggle();
-            }}
-          >
-            <HandTap size={24} aria-hidden="true" />
-          </button>
-        ) : (
-          <HandTap size={24} className="shrink-0 text-muted-foreground" aria-hidden="true" />
-        )}
-        {keyboardHelp && <div className="hidden shrink-0 md:block">{keyboardHelp}</div>}
-        <span
-          id={explanationId}
-          aria-hidden={!expanded}
-          style={{ display: "block", visibility: expanded ? "visible" : "hidden" }}
-          className="min-w-0 flex-1"
-        >
-          <span className={desktopText ? "md:hidden" : undefined}>{text}</span>
-          {desktopText && <span className="hidden md:inline">{desktopText}</span>}
-        </span>
-      </div>
-    </div>
-  );
-}
 
 export function RepBadge({ label, done, language }: { label: string; done: boolean; language: AppLanguage }) {
   return (

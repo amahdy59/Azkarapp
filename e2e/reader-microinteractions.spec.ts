@@ -410,18 +410,16 @@ test("desktop and tablet keep navigation below reading text and one reachable ke
     await expect(counter).toHaveAccessibleName(/Click the dhikr or press Space 0 \/ 1/);
 
     const zikrText = card.getByTestId("zikr-text").first();
-    const [textBox, navigationBox, counterBox, guideBox] = await Promise.all([
+    const [textBox, navigationBox, counterBox] = await Promise.all([
       zikrText.boundingBox(),
       navigation.boundingBox(),
       counter.boundingBox(),
-      shortcutGuide.boundingBox(),
     ]);
     expect(textBox).not.toBeNull();
     expect(navigationBox).not.toBeNull();
     expect(counterBox).not.toBeNull();
-    expect(guideBox).not.toBeNull();
+    await expect(shortcutGuide).toHaveCount(0);
     if (textBox && navigationBox) expect(textBox.y + textBox.height).toBeLessThanOrEqual(navigationBox.y);
-    if (counterBox && guideBox) expect(guideBox.y + guideBox.height).toBeLessThanOrEqual(counterBox.y);
   }
 
   await expect(desktopHero).toBeVisible();

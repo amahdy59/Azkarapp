@@ -404,7 +404,9 @@ test("compact sources are optional and never exceed two image lines @cross-brows
     ),
   );
   expect(sourceLines.length).toBeGreaterThan(0);
-  expect(sourceLines.some((line) => line.text.includes("٢٠٨٨"))).toBe(true);
+  // Verified bilingual citations now identify the narration, rather than the
+  // legacy collection's volume/page locator.
+  expect(sourceLines.some((line) => line.text.includes("٢٧٢٣") && line.text.includes("مسلم"))).toBe(true);
   expect(sourceLines[0]!.text).not.toContain("حصن المسلم");
   for (const id of new Set(sourceLines.map((line) => line.panelId)))
     expect(sourceLines.filter((line) => line.panelId === id).length).toBeLessThanOrEqual(2);
@@ -432,7 +434,7 @@ test("compact sources are optional and never exceed two image lines @cross-brows
   await modal.getByRole("button", { name: "نص", exact: true }).click();
   await expect(modal.getByRole("textbox")).not.toHaveValue(/مسلم|حصن المسلم/u);
   await checkbox.check();
-  await expect(modal.getByRole("textbox")).toHaveValue(/حصن المسلم/u);
+  await expect(modal.getByRole("textbox")).toHaveValue(/صحيح مسلم ٢٧٢٣ب/u);
 });
 
 test("sharing works offline with English meaning and exact text/link alternatives @cross-browser", async ({ page }) => {

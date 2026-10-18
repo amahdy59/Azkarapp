@@ -1,8 +1,24 @@
+## Actionable Progress patterns — 2026-10-18, local only
+
+## Supplied-card attribution — 2026-10-18
+
+Owner-approved gap closure supersedes the caption-only supplied-card export rule. Append a dark, high-contrast website footer below the entire supplied artwork, proportional to image width. Never crop, cover, rescale or rewrite devotional content to make room. Native shares retain their caption too; Save, Copy and prepared-image previews use the attributed layout. Brief hadith meanings explain the narration directly; implementation and methodological cautions belong in source documentation.
+
+The owner replaces numeric tables, annual fractions and large dropdowns with useful visual interpretation. This supersedes the historical Progress matrix/calendar, metric dropdown and exact-table presentation, plus the closed daily prayer table. Keep period tabs and previous/next navigation. Daily prayer facts use five read-only status rows. Historical prayer charts use three visible native pressed controls for obligatory prayer, Rawatib and after-prayer azkar; optional practices never imply prayer attendance, and Asr has no Rawatib comparison.
+
+Lead comparisons with most consistently recorded and needs-attention summaries, preserving ties and neutral empty/equal/small-sample states. Percent bars share a fixed zero baseline and explicit recorded-day measure. Longer periods translate rates to approximate days per week rather than prominent annual fractions; exact values remain in accessible names and explicit JSON downloads. Three labelled small-multiple lines share the same 0–100% scale, with chronological left-to-right time, explained daily/seven-day/monthly points and exact descriptions. They do not combine different practices into a worship score. Use ordinary shared material, semantic tokens, full wrapping, visible focus, 44px controls and no new runtime dependency.
+
+Only complete days enter historical analysis; prayer records retain civil dates and routines retain the configured devotional-day rollover. Today remains in the daily view. All complete days in the selected calendar period count, including those without records. No record is not evidence of missed worship. Available history identifies completed routines (including abbreviated completions), not individual zikr repetition history; the interface states that limitation. Quran and configured weekly intentions remain separate. See [the local phase](agent/phases/PROGRESS_ACTIONABLE_INSIGHTS_2026_10_18.md).
+
 ## Compact devotional title rows — 2026-10-18
 
 Owner-approved local correction: Reader collection heroes and the shared Masbaha/Salawat hero place the h1 in the same row as Back and the utility controls. ReadingHeroToolbar uses three equal, shrinkable grid tracks so unequal action counts cannot displace the title from the hero center. Titles wrap without truncation; action groups wrap rather than overlap enlarged text. Progress follows immediately beneath that row. Keep the existing mobile Header, 44px controls, semantic focus order, artwork, reading surfaces and content. Standalone selector rows remain below their progress, with a consistent 4px internal gap. No fixed hero height or negative title positioning.
 
 # Azkar design system
+
+## Seamless resting page headers — 2026-10-18, local only
+
+The owner now requests page headers matching the surrounding canvas at rest. Glass page headers, Settings search and the owning Progress control group are transparent until their existing scroll elevation threshold activates the shared protected chrome. Home follows this policy independently of App appearance. Stationary navigation, opaque/high-contrast/forced-color recovery and fixed control geometry remain. Remove Reader text-area hover/press background fills so devotional text has no rectangular pointer highlight; counting behavior stays intact. This supersedes the previous always-visible resting chrome material.
 
 ## Home card edge alignment — 2026-10-18, local only
 
@@ -1103,3 +1119,39 @@ The owner clarifies that Progress is for statistics, never prayer or routine ent
 ## Shared chrome frost and mosque wording — 2026-10-18
 
 The owner supersedes variable-strength header frost with common sidebar/rail/navigation/header material: 36% navy tint, the existing restrained header sheen and fixed 32px/135% frost in App Glass. The shared cached scene also renders behind navigation on Home. Independent Home/App settings and opaque/accessibility fallbacks remain. Mosque checkbox labels explicitly read صليتها في المسجد / Prayed at the mosque; a saved home prayer remains visible without ticking mosque attendance. Statistics use a separate general record heading. See agent/phases/CHROME_PARITY_MOSQUE_LABEL_2026_10_18.md.
+
+## Adjacent after-prayer reading action — 2026-10-18, local only
+
+The owner approves the mobile/desktop card concept while requiring existing mode colors, Glass material and responsive contracts. PrayerActionsCard groups each native checkbox with its label at logical start, and places a separate compact Read / قراءة button as a sibling in the after-prayer adhkar row. Reading never toggles completion and remains available for completed records and non-recordable previews. Retain the subsequently approved mosque wording صليتها في المسجد. Remove the standalone full-width CTA.
+
+PrayerMomentPanel retains HomeCard and shared theme/on-media tokens without a new tint, frost or palette. After the owner rejected unused desktop space, the title and checklist use the first logical column; record context fills the upper second column and complete evidence aligns with the checklist below it. This removes a dedicated full-width metadata row and shortens the panel. Record date remains explicit and sunrise gets its own line. A card-width container query at 40rem enables this composition. The reading button immediately follows its intrinsic-width checkbox/label group with an 8px gap instead of being pushed across the column. Below that available measure, evidence is a keyboard-operated disclosure following the checklist. Enlarged text can return to one column. This supersedes the former viewport-768px two-column arrangement and always-visible narrow evidence, preserving source wording, dates, tracking fields, future restrictions, offline behavior and shared fallbacks. Scoped checkbox styling removes decorative glow while retaining visible keyboard focus. No publication is authorized.
+
+Owner alignment follow-up: Fajr sunrise moves directly beneath the prayer title in the same text column, with identical logical text edges in RTL/LTR. The record date remains over the evidence column at wide card widths. Read has a 112px minimum width with the same 44px minimum height and 8px label gap; labels wrap naturally on narrow/enlarged layouts. Existing modes, material and tracking remain.
+
+## Prayer evidence alignment and secondary record context — 2026-10-18, local only
+
+The owner requests removing the visible record line, aligning virtue with the title and keeping its citation inline. Move the same explicit time/dayKey/date label into the existing information sheet; no date assignment or calculation change. On wide cards, align the evidence heading at the prayer title top edge and span its column alongside the title/checklist. Fajr sunrise remains directly beneath its title. Append the unchanged source as a smaller inline span after the complete quotation; allow natural wrapping when the final line has insufficient room, never truncate or alter devotional text. Keep the established narrow disclosure, reading button, semantic colors, Glass/fallbacks and keyboard targets. This supersedes the earlier upper evidence-column record line. No push.
+
+Owner typography/alignment follow-up — 2026-10-18: prayer and virtue headings share the existing 17px title step and normal line height. The attribution increases from 12px to 13px and uses the same line metrics and 4px heading gap as Fajr sunrise. Both columns therefore align their heading and secondary text rows with matching logical edges in RTL/LTR. The source remains inline; no religious wording, theme, glass or responsive breakpoint changes. Local only.
+
+## Prominent Progress time series — 2026-10-18, local only
+
+The owner requires temporal charts alongside useful comparisons. Historical remembrance and prayer sections therefore lead with one large line chart, a fixed 0–100% scale, direct overall/individual series buttons and a dated readout explored through a labelled 44px native range control. Preserve chronological left-to-right order in either language with an explicit explanation. Use short axis dates, full readout ranges and described SVG values; no hover-only information. Week points are complete days, Month points span up to seven days, Year points follow actual calendar months. Mark partial buckets and show honest single-point/empty states. Retain strongest/attention summaries, categorical comparison bars, reminder links, period controls and JSON exports. The selectable chart consolidates the previous three miniature routine lines without removing their histories; prayer gains its own temporal chart. Use independent, explicitly described measures rather than a combined worship score. See agent/phases/PROGRESS_TIME_SERIES_2026_10_18.md.
+
+## Concise, actionable Progress — 2026-10-18, local only
+
+The owner approves the remaining chart recommendations. Historical lines retain direct series selection and native date ranges, with tap-to-select nearest date and Arrow/Home/End equivalents; Enter on the chart focuses the range. Concise labels precede the plot, while measurement/chronology detail uses native disclosures. Previous-period comparisons use equal elapsed complete-day windows, labelled by overall routine or prayer practice; unequal-sized adjacent buckets do not generate a change claim. New individual-zikr history uses observed routine days, actual mode scope and explicit completion only. No historical totals are expanded into per-item records. ZikrInsights shows bounded highest/lowest rates, explicit ties and links to complete reviewed text. See agent/phases/PROGRESS_REFINEMENTS_2026_10_18.md.
+
+## Home reminder Reading flow — 2026-10-18, local only
+
+The owner selects Reading flow. Devotional text leads within the shared Home reading material and natural card height. Hadith taller than four rendered lines uses native CSS ellipsis and an explicit 44px expand/collapse button; detect actual font/width overflow, not character count. Meaning uses an independent native disclosure, initially closed. Quran stays unclamped, with its English rendering separated from explanation and editorial guidance. Keep visible source/grading, keyboard focus and RTL/LTR. Hold the displayed source while either disclosure is open or focus is within the card; explicit Next clears the hold. Narrowing and enlarged text must preserve the full semantic quotation.
+
+## Shared devotional footer text fit — 2026-10-18, local only
+
+Reader, Masbaha and Salawat use one centered row of support tools above the centered primary counter/navigation row. Wide tool pills hug complete localized labels, with 20px icons, 44px minimum targets, 8px gaps and an 18px primary-row gap. At actual Reader container widths of 37.5rem or below, all four tools use consistent 44px icon buttons with localized accessible names and native titles. No ellipsis, multi-row tools or orphan fourth button. The container query also handles enlarged text by using compact tools. Tools precede Focus in DOM and visual order. Screen-specific actions and primary counting/navigation retain their existing contracts.
+
+The owner's latest correction removes counting-instruction strips and hand/reopen affordances globally, including first visits and returning readers. Remove their component and device-marker hook; leave old marker values harmlessly unused. Counting, counter accessible names and the independent header keyboard-help dialog remain. This supersedes earlier progressive counting guidance and the initial two-column experiment in this phase.
+
+## Stationary Library image header — 2026-10-18, local only
+
+Keep the pictured Azkar Library header appearance unchanged while browsing: retain the scene through transparent Glass chrome and scroll only the list below it. No scroll-triggered frost, tint, shadow or dividing edge. Preserve existing opaque/high-contrast fallbacks and independent scrolling of controls when short windows or enlarged text require it. This supersedes the Library part of the resting/scrolled material policy.

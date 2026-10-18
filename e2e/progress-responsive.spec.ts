@@ -58,17 +58,18 @@ for (const tab of ["يوم", "أسبوع", "شهر", "سنة"]) {
   });
 }
 
-test("longer Progress periods compare five prayers and disclose exact records", async ({ page }) => {
+test("longer Progress periods compare five prayers with exact data available as a file", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await openProgress(page);
 
   await expect(page.getByText(/أَحَبُّ الأَعْمَالِ/)).toBeHidden();
   await page.getByRole("tab", { name: "أسبوع", exact: true }).click();
 
-  await expect(page.getByTestId("prayer-comparison").getByRole("img")).toHaveCount(5);
-  const disclosure = page.locator("details").filter({ hasText: "عرض سجلات الصلاة بالتفصيل" });
-  await expect(disclosure).not.toHaveAttribute("open", "");
-  await disclosure.locator("summary").click();
-  await expect(disclosure).toHaveAttribute("open", "");
-  await expect(disclosure.getByText("الفجر", { exact: true })).toBeVisible();
+  await expect(page.getByTestId("prayer-comparison").getByRole("list").getByRole("img")).toHaveCount(5);
+  await expect(page.getByRole("table")).toHaveCount(0);
+  await expect(page.getByRole("combobox")).toHaveCount(0);
+  const download = page.getByTestId("prayer-comparison").getByRole("button", { name: "تنزيل بيانات الصلاة (JSON)" });
+  await download.focus();
+  await expect(download).toBeFocused();
+  await expect(page.getByTestId("prayer-comparison").getByTestId("insight-fajr")).toBeVisible();
 });

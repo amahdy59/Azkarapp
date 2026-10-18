@@ -1,4 +1,6 @@
 import type { AppStateSnapshot, UserSettingsState } from "../app/types";
+import { recentDayKeys } from "../app/syncMerge";
+import { normalizeZikrHistory } from "../app/zikrHistory";
 
 export type RemoteSyncSnapshot = Omit<AppStateSnapshot, "settings" | "profile"> & {
   settings: Omit<UserSettingsState, "location">;
@@ -92,6 +94,7 @@ export function buildRemoteSyncSnapshot(state: AppStateSnapshot): RemoteSyncSnap
     completed: state.completed,
     sessions: sortedSessions,
     dailyCompletions: state.dailyCompletions,
+    zikrHistory: recentZikrHistory(state.zikrHistory),
     prayerTracking: state.prayerTracking,
     dailyHabits: state.dailyHabits,
     savedZikrIds: state.savedZikrIds,
@@ -116,4 +119,10 @@ export function buildRemoteSyncSnapshot(state: AppStateSnapshot): RemoteSyncSnap
 
   assertNoForbiddenSyncFields(snapshot);
   return snapshot;
+}
+
+function recentZikrHistory(value: AppStateSnapshot["zikrHistory"]) {
+  const records = normalizeZikrHistory(value);
+  const days = new Set(recentDayKeys([...new Set(records.map((row) => row.dayKey))]));
+  return records.filter((row) => days.has(row.dayKey));
 }

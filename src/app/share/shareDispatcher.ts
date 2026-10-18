@@ -5,6 +5,15 @@
 
 import { isNativeAndroid } from "../native/platform";
 
+export const SHARED_APP_URL = "https://wa-zaker.com/";
+
+/** Share targets commonly use text as the caption accompanying image files. */
+export function imageShareText(files: readonly File[], text?: string): string | undefined {
+  if (!files.some((file) => file.type.startsWith("image/"))) return text;
+  if (text?.includes("https://wa-zaker.com")) return text;
+  return [text?.trim(), SHARED_APP_URL].filter(Boolean).join("\n\n");
+}
+
 export type MultiShareMethod = "shared" | "downloaded" | "cancelled" | "error";
 
 export async function saveFileToDevice(file: File): Promise<void> {
@@ -82,7 +91,7 @@ export async function shareSingleFile(
       await navigator.share({
         files: [file],
         title: options.title,
-        text: options.text,
+        text: imageShareText([file], options.text),
       });
       options.onStatus?.("shared");
       return { method: "shared", fileCount: 1 };
@@ -155,7 +164,7 @@ export async function shareMultipleFiles(
       await navigator.share({
         files,
         title: options.title,
-        text: options.text,
+        text: imageShareText(files, options.text),
       });
       options.onStatus?.("shared");
       return { method: "shared", fileCount: files.length };

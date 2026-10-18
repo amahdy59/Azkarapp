@@ -126,10 +126,12 @@ async function checkGeometry(page: Page) {
   // Read all targets in one browser call: serial geometry round trips can
   // exhaust WebKit's deadline without a geometry assertion failing.
   const controlBounds = await panel.locator("input[type=checkbox], button").evaluateAll((controls) =>
-    controls.map((control) => {
-      const { width, height } = control.getBoundingClientRect();
-      return { width, height };
-    }),
+    controls
+      .filter((control) => control.getClientRects().length > 0)
+      .map((control) => {
+        const { width, height } = control.getBoundingClientRect();
+        return { width, height };
+      }),
   );
   for (const bounds of controlBounds) {
     // Firefox rect subtraction can return 43.999969 for a 44px CSS target.

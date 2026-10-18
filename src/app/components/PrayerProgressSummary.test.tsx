@@ -1,47 +1,39 @@
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { PrayerProgressSummary } from "./PrayerProgressSummary";
-
 const dayKey = "2026-10-18";
-describe("PrayerProgressSummary", () => {
-  it("shows independent practice totals without any recording controls", () => {
+describe("daily prayer diagram", () => {
+  it("shows five native read-only statuses with independent practices and no table", () => {
     const { container } = render(
       <PrayerProgressSummary
+        dayKey={dayKey}
+        language="en"
         records={[
-          { dayKey, prayer: "fajr", mosque: false, location: "home", adhkar: true, sunnah: true },
+          { dayKey, prayer: "fajr", mosque: false, location: "home", adhkar: true, sunnahBefore: true },
           { dayKey, prayer: "dhuhr", mosque: false, adhkar: true },
+          { dayKey: "2026-10-17", prayer: "isha", mosque: true, adhkar: true },
         ]}
-        dayKey={dayKey}
-        language="en"
       />,
     );
-    expect(screen.getByText("1 recorded")).toBeInTheDocument();
-    expect(screen.getByText("2 recorded")).toBeInTheDocument();
-    expect(container.querySelector("input, select, textarea, button, a")).toBeNull();
-    expect(container.querySelector("details")).not.toHaveAttribute("open");
-    const table = within(screen.getByRole("table", { hidden: true }));
-    expect(table.getByText("At home")).toBeInTheDocument();
-    expect(table.getAllByRole("row", { hidden: true })).toHaveLength(6);
-    expect(screen.getByText(/does not mean a missed prayer/)).toBeInTheDocument();
+    expect(screen.getAllByRole("listitem")).toHaveLength(5);
+    const fajr = within(screen.getByText("Fajr").closest("li")!);
+    expect(fajr.getByText("At home")).toBeVisible();
+    expect(fajr.getByText("Sunan Rawātib")).toBeVisible();
+    expect(screen.getAllByText("Completed the azkar")).toHaveLength(2);
+    expect(container.querySelector("input, select, textarea, button, a, table, details")).toBeNull();
+    expect(screen.getByText(/does not mean a missed prayer/)).toBeVisible();
   });
-  it("reads legacy attendance and excludes records from other days", () => {
-    render(
+  it("reads legacy mosque facts and localizes empty Arabic statuses", () => {
+    const { rerender } = render(
       <PrayerProgressSummary
-        records={[
-          { dayKey, prayer: "fajr", mosque: true, adhkar: false },
-          { dayKey: "2026-10-17", prayer: "dhuhr", mosque: true, adhkar: true, sunnah: true },
-        ]}
+        records={[{ dayKey, prayer: "fajr", mosque: true, adhkar: false }]}
         dayKey={dayKey}
         language="en"
       />,
     );
-    expect(screen.getAllByText("0 recorded")).toHaveLength(2);
-    expect(within(screen.getByRole("table", { hidden: true })).getByText("At the mosque")).toBeInTheDocument();
-  });
-  it("renders empty Arabic records without implying missed worship", () => {
-    const { container } = render(<PrayerProgressSummary records={[]} dayKey={dayKey} language="ar" />);
-    expect(screen.getAllByText("٠ مسجّل")).toHaveLength(2);
-    expect(screen.getByText("تفاصيل الصلوات")).toBeInTheDocument();
-    expect(container.querySelector("input, select, textarea, button, a")).toBeNull();
+    expect(screen.getByText("At the mosque")).toBeVisible();
+    rerender(<PrayerProgressSummary records={[]} dayKey={dayKey} language="ar" />);
+    expect(screen.getAllByRole("listitem")).toHaveLength(5);
+    expect(screen.getByText("الفجر")).toBeVisible();
   });
 });

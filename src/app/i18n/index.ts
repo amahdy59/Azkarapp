@@ -37,6 +37,15 @@ export function t(
   replacements?: Record<string, string | number>,
 ) {
   const dictionary = getDictionary(language) as unknown as Record<string, unknown>;
+  return translateDictionary(dictionary, key, replacements);
+}
+
+/** Shared interpolation for feature dictionaries loaded with deferred screens. */
+export function translateDictionary(
+  dictionary: Record<string, unknown>,
+  key: string,
+  replacements?: Record<string, string | number>,
+) {
   let template = resolveKey(dictionary, key);
 
   if (!replacements) {

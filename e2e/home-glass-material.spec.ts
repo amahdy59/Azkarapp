@@ -1,4 +1,7 @@
+import { fixtureReminderCatalogue } from "./fixtures/reminderCatalogue";
 import { expect, test } from "@playwright/test";
+
+test.beforeEach(async ({ page }) => fixtureReminderCatalogue(page));
 import AxeBuilder from "@axe-core/playwright";
 import { getPrayerTimeline } from "../src/app/prayerTimeline";
 import { DEFAULT_LOCATION } from "../src/app/content/prayerCalculation";
@@ -132,6 +135,12 @@ for (const width of [390, 834, 1440]) {
       const surfaces = page.locator(".home-photo-canvas .hero-glass.home-glass-surface");
       expect(await surfaces.count()).toBeGreaterThan(10);
       for (const surface of await surfaces.all()) {
+        if ((await surface.getAttribute("data-testid")) === "home-utility-header") {
+          await expect(surface).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+          await expect(surface).toHaveCSS("background-image", "none");
+          await expect(surface).toHaveCSS("backdrop-filter", "none");
+          continue;
+        }
         await expect(surface).toHaveCSS("backdrop-filter", "blur(22px) saturate(1.35)");
         const material = await surface.evaluate((node) => {
           const style = getComputedStyle(node);
@@ -145,7 +154,8 @@ for (const width of [390, 834, 1440]) {
       await expect(page.locator(".hero-glass .hero-glass")).toHaveCount(0);
       await expect(page.getByTestId("home-daily-evidence")).toHaveCSS("background-color", "rgba(15, 23, 42, 0.36)");
       const header = page.getByTestId("home-utility-header");
-      await expect(header).toHaveCSS("background-color", "rgba(15, 23, 42, 0.36)");
+      await expect(header).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+      await expect(header).toHaveCSS("backdrop-filter", "none");
       await expect(header).toHaveCSS("border-top-width", "0px");
       await expect(header).toHaveCSS("border-bottom-width", "0px");
       await page.screenshot({ path: testInfo.outputPath(`${scene}-${width}.png`), scale: "css" });
@@ -318,15 +328,26 @@ for (const themeMode of ["light", "dark", "midnight"]) {
         await expect
           .poll(() =>
             surfaces.evaluateAll((nodes) => {
-              const styles = nodes.map((node) => getComputedStyle(node));
+              const styles = nodes.filter((node) => node.tagName !== "HEADER").map((node) => getComputedStyle(node));
+              const headers = nodes.filter((node) => node.tagName === "HEADER").map((node) => getComputedStyle(node));
               return {
                 countAboveTen: nodes.length > 10,
                 filters: [...new Set(styles.map((style) => style.backdropFilter))],
                 translucent: styles.every((style) => /^rgba\(/.test(style.backgroundColor)),
+                restingHeader:
+                  headers.length === 1 &&
+                  headers.every(
+                    (style) => style.backgroundColor === "rgba(0, 0, 0, 0)" && style.backdropFilter === "none",
+                  ),
               };
             }),
           )
-          .toEqual({ countAboveTen: true, filters: ["blur(22px) saturate(1.35)"], translucent: true });
+          .toEqual({
+            countAboveTen: true,
+            filters: ["blur(22px) saturate(1.35)"],
+            translucent: true,
+            restingHeader: true,
+          });
         expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBe(0);
       }
     });

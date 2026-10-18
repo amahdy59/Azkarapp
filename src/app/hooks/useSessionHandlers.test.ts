@@ -37,6 +37,7 @@ function renderSessionHarness({
   const replace = vi.fn<(view: View) => void>();
   const onResetPartialCounts = vi.fn();
   const onResetSurahPages = vi.fn();
+  const onRecordZikrDay = vi.fn();
   const showConfirm = vi.fn((_: string, __: string, ___: string, ____: string, onConfirm: () => void) => onConfirm());
 
   const hook = renderHook(
@@ -83,6 +84,7 @@ function renderSessionHarness({
         showConfirm,
         onResetPartialCounts,
         onResetSurahPages,
+        onRecordZikrDay,
       });
       return {
         activeTab,
@@ -101,7 +103,7 @@ function renderSessionHarness({
     { initialProps: { readingMode: activeRoutineMode } },
   );
 
-  return { ...hook, pop, push, replace, showConfirm, onResetPartialCounts, onResetSurahPages };
+  return { ...hook, pop, push, replace, showConfirm, onResetPartialCounts, onResetSurahPages, onRecordZikrDay };
 }
 
 beforeEach(() => {
@@ -112,6 +114,21 @@ beforeEach(() => {
 afterEach(() => vi.useRealTimers());
 
 describe("useSessionHandlers", () => {
+  it("records the actual routine scope and completed items without changing earlier records on reset", () => {
+    const items = getAzkarForMode("morning", "core");
+    const { result, onRecordZikrDay } = renderSessionHarness({ activeRoutineMode: "core" });
+    act(() => result.current.handlers.openReader("morning", 0));
+    const offered = items.filter((item) => !item.isCollectionIntroduction).map((item) => item.id);
+    expect(onRecordZikrDay).toHaveBeenLastCalledWith("morning", offered, []);
+    const index = items.findIndex((item) => !item.isCollectionIntroduction);
+    act(() => result.current.handlers.markComplete(index));
+    expect(onRecordZikrDay).toHaveBeenLastCalledWith("morning", offered, [items[index]!.id]);
+    const calls = onRecordZikrDay.mock.calls.length;
+    act(() => result.current.handlers.handleResetCategory("morning"));
+    expect(onRecordZikrDay).toHaveBeenCalledTimes(calls);
+    act(() => result.current.handlers.toggleZikrCompletion("morning", index));
+    expect(onRecordZikrDay).toHaveBeenLastCalledWith("morning", offered, [items[index]!.id]);
+  });
   it("starts a fresh situational session without clearing history or other collections", () => {
     const items = getAzkarForMode("home", "complete");
     const { result, onResetPartialCounts } = renderSessionHarness({

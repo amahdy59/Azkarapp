@@ -7,6 +7,7 @@ vi.mock("./shareDispatcher", () => ({
   canShareMultipleFiles: vi.fn(),
   downloadFile: vi.fn(),
   shareMultipleFiles: vi.fn(),
+  SHARED_APP_URL: "https://wa-zaker.com/",
 }));
 vi.mock("./shareArchive", () => ({ createFileArchive: vi.fn() }));
 vi.mock("./curatedRoutineCards", () => ({
@@ -39,7 +40,11 @@ describe("quick approved routine sharing", () => {
     const zip = new File(["zip"], "cards.zip");
     vi.mocked(createFileArchive).mockResolvedValue(zip);
     expect(await shareQuickRoutinePack(pack)).toBe("downloaded");
-    expect(createFileArchive).toHaveBeenCalledWith(pack.files, "azkar-cards.zip");
+    const entries = vi.mocked(createFileArchive).mock.calls[0]![0] as File[];
+    expect(entries.slice(0, 2)).toEqual(pack.files);
+    expect(entries[2]!.name).toBe("wa-zaker.txt");
+    expect(await entries[2]!.text()).toBe("Evening\n\nhttps://wa-zaker.com/\n");
+    expect(vi.mocked(createFileArchive).mock.calls[0]![1]).toBe("azkar-cards.zip");
     expect(downloadFile).toHaveBeenCalledOnce();
     expect(shareMultipleFiles).not.toHaveBeenCalled();
   });

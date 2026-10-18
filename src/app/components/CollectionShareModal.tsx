@@ -132,6 +132,7 @@ export function CollectionShareModal({
   const [imageSource, setImageSource] = useState<"curated" | "generated">("generated");
   const [curatedIndex, setCuratedIndex] = useState(0);
   const [curatedFiles, setCuratedFiles] = useState<File[]>([]);
+  const [curatedPreviewUrls, setCuratedPreviewUrls] = useState<string[]>([]);
   const [curatedLoading, setCuratedLoading] = useState(false);
   const [curatedUnavailable, setCuratedUnavailable] = useState(false);
   const [inspect, setInspect] = useState(false);
@@ -250,6 +251,12 @@ export function CollectionShareModal({
   const payloadReady = mode === "link" ? Boolean(url) : scope !== "selected" || selected.length > 0;
   const copyAsImage =
     mode === "image" && (isCuratedActive ? canCopyImage() : scopedPages.length === 1 && canCopyImage());
+
+  useEffect(() => {
+    const urls = curatedFiles.map((file) => URL.createObjectURL(file));
+    setCuratedPreviewUrls(urls);
+    return () => urls.forEach((url) => URL.revokeObjectURL(url));
+  }, [curatedFiles]);
 
   useEffect(() => {
     setImageSource("generated");
@@ -571,7 +578,9 @@ export function CollectionShareModal({
                           style={{ height: inspect ? "min(75dvh,800px)" : "clamp(240px,calc(100dvh - 260px),720px)" }}
                         >
                           <img
-                            src={resolveCuratedImageUrl(currentCuratedCard.imagePath)}
+                            src={
+                              curatedPreviewUrls[curatedIndex] ?? resolveCuratedImageUrl(currentCuratedCard.imagePath)
+                            }
                             alt={language === "ar" ? currentCuratedCard.altText.ar : currentCuratedCard.altText.en}
                             className="h-full max-w-full w-auto object-contain rounded-xl shadow-raised"
                           />
@@ -847,7 +856,7 @@ export function CollectionShareModal({
                         }`}
                       >
                         <img
-                          src={resolveCuratedImageUrl(card.imagePath)}
+                          src={curatedPreviewUrls[idx] ?? resolveCuratedImageUrl(card.imagePath)}
                           alt=""
                           className="mx-auto h-20 w-full object-contain rounded-lg"
                         />

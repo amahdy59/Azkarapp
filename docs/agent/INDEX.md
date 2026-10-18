@@ -1,4 +1,8 @@
+[Prominent Progress time series](phases/PROGRESS_TIME_SERIES_2026_10_18.md) responds to the owner's chart correction: large inspectable remembrance and prayer lines precede retained comparisons and actionable insights. This supersedes the miniature-trend presentation in [Actionable Progress insights](phases/PROGRESS_ACTIONABLE_INSIGHTS_2026_10_18.md), preserving complete-day analysis, JSON exports and honest individual-zikr history limits. Local only; preserve pending work and do not publish.
+
 # AI Improvement System Index
+
+[Complete Home reminder readings](phases/HOME_REMINDER_FULL_READING_2026_10_18.md) applies the approved Reading flow, independent four-line text/meaning disclosure, all 71 curated sources and the review of 185 fallback identities. Owner-authorized immutable R2 content upload, checksum-verified offline caching and source-fidelity/browser evidence; application changes remain local.
 
 [Home card alignment](phases/HOME_CARD_ALIGNMENT_2026_10_18.md) aligns tablet/desktop Home sections with the outer prayer-card edges through one shared frame. Local only; preserve pending changes.
 
@@ -411,3 +415,17 @@ Latest owner continuation: [Frost clarity and compact consistent headers](phases
 [Combined release](phases/COMBINED_RELEASE_2026_10_18.md) records the owner-authorized publication of all pending refinements, superseding their earlier local-only holds.
 
 [Shared chrome frost and mosque wording](phases/CHROME_PARITY_MOSQUE_LABEL_2026_10_18.md) records the owner's material-parity/accurate recording follow-up and responsive CI remediation.
+
+[Adjacent after-prayer reading action](phases/PRAYER_ACTIONS_ADJACENT_READING_2026_10_18.md) is the owner-approved local-only card implementation: independent inline Read/completion controls, adjacent checkbox labels, card-width responsive evidence and unchanged mode colors/Glass. Do not push.
+
+Local follow-up: [Concise, actionable Progress](phases/PROGRESS_REFINEMENTS_2026_10_18.md) applies all remaining owner-approved recommendations: concise disclosures, tap/keyboard points, matched elapsed-period comparisons and new observed individual-zikr history. Preserve unrelated pending work; no publication.
+
+[Consistent devotional footer and text fit](phases/DEVOTIONAL_FOOTER_TEXT_FIT_2026_10_18.md) records the owner's local-only shared Reader/Masbaha/Salawat footer, complete labels and responsive content-sized controls.
+
+[Seamless headers and shared-card links](phases/SEAMLESS_HEADERS_AND_CARD_LINKS_2026_10_18.md) records the owner's local-only text-highlight removal, verified independent Home Glass, scroll-only header material and app links accompanying shared images. No push.
+
+[Stationary Library image header](phases/STATIONARY_LIBRARY_IMAGE_HEADER_2026_10_18.md) records the owner-requested local-only image-backed Library header and independently scrolling list. No push.
+
+[Session gap closure](phases/SESSION_GAP_CLOSURE_2026_10_18.md) records owner-approved image attribution, precise collection citations, concise hadith meanings and reconciled verification, with physical/human acceptance tracked separately. Local application only.
+
+[Combined release .4](phases/COMBINED_RELEASE_2026_10_18_4.md) records the owner-authorized R2 verification, all-pending-change integration and full release cycle, superseding prior local-only holds.

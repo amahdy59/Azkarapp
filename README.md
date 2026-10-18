@@ -16,6 +16,7 @@ Production site: [amahdy59.github.io/Azkarapp](https://amahdy59.github.io/Azkara
 - Private on-device astronomical prayer timings with selectable calculation methods and manual minute adjustments
 - Automatic geolocation, device IANA timezone detection, and DST handling without sending coordinates to a third party
 - Local progress, saved zikr, sessions, configurable prayer/routine reminders, accessibility preferences, and theme persistence
+- Prayer, routine and newly recorded individual-zikr patterns with interactive charts, matched-period comparisons and JSON downloads
 - Optional Supabase Google, email OTP, and feature-flagged Apple authentication with cross-device synchronization
 - Installable PWA, offline app shell, update prompts, and quick actions
 - Responsive RTL/LTR layouts with WCAG-oriented automated checks

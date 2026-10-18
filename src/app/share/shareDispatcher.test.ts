@@ -5,6 +5,7 @@ import {
   copyImageToClipboard,
   shareMultipleFiles,
   shareSingleFile,
+  imageShareText,
 } from "./shareDispatcher";
 
 afterEach(() => {
@@ -15,6 +16,12 @@ afterEach(() => {
 describe("shareDispatcher", () => {
   const dummyFile1 = new File(["dummy1"], "card-1.png", { type: "image/png" });
   const dummyFile2 = new File(["dummy2"], "card-2.png", { type: "image/png" });
+
+  it("retains captions and adds one app link only to image payloads", () => {
+    expect(imageShareText([dummyFile1], "Evening cards")).toBe("Evening cards\n\nhttps://wa-zaker.com/");
+    expect(imageShareText([dummyFile1], "Read https://wa-zaker.com/#/home")).toBe("Read https://wa-zaker.com/#/home");
+    expect(imageShareText([new File(["zip"], "cards.zip", { type: "application/zip" })], "Archive")).toBe("Archive");
+  });
 
   it("returns false for canShareMultipleFiles when navigator.canShare is missing", () => {
     vi.stubGlobal("navigator", {});
@@ -51,7 +58,7 @@ describe("shareDispatcher", () => {
     expect(share).toHaveBeenCalledWith({
       files: [dummyFile1, dummyFile2],
       title: "أذكار الصباح",
-      text: undefined,
+      text: "https://wa-zaker.com/",
     });
     expect(statusUpdates).toEqual(["sharing", "shared"]);
   });
@@ -111,7 +118,7 @@ describe("shareDispatcher", () => {
     expect(share).toHaveBeenCalledWith({
       files: [dummyFile1],
       title: "بطاقة ذكر",
-      text: undefined,
+      text: "https://wa-zaker.com/",
     });
     expect(statusUpdates).toEqual(["sharing", "shared"]);
   });

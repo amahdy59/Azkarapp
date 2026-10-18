@@ -4,6 +4,7 @@ import { getAzkarForMode } from "../content/azkar";
 import { DEFAULT_LOCATION } from "../content/prayerCalculation";
 import * as dailyEvidence from "../dailyEvidence";
 import * as maintenance from "../startupMaintenance";
+import * as reminderReadings from "../content/reminderReadings";
 import { CATEGORY_IDS, type CategoryId } from "../types";
 import { HomeScreen } from "./HomeScreen";
 import { ActiveVisitorPresence } from "../components/VisitorCount";
@@ -403,6 +404,13 @@ describe("HomeScreen document outline", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date(2026, 7, 7, 9, 5));
     const spyContextual = vi.spyOn(dailyEvidence, "getContextualEvidence");
+    vi.spyOn(reminderReadings, "loadReminderReadings").mockResolvedValue(
+      reminderReadings.createReminderReadingCatalogue({ readings: {}, fallbacks: {} }),
+    );
+    vi.spyOn(maintenance, "scheduleIdleAfterPaint").mockImplementation((callback) => {
+      callback();
+      return () => undefined;
+    });
 
     render(
       <HomeScreen
@@ -416,6 +424,9 @@ describe("HomeScreen document outline", () => {
       />,
     );
 
+    await act(async () => {
+      await vi.dynamicImportSettled();
+    });
     const refreshBtn = screen.getByTestId("daily-evidence-refresh");
     expect(refreshBtn).toBeInTheDocument();
 

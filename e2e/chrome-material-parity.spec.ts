@@ -16,11 +16,6 @@ for (const language of ["ar", "en"] as const) {
       );
     }, language);
     const sidebar = page.locator(".app-sidebar");
-    const material = () =>
-      sidebar.evaluate((node) => {
-        const style = getComputedStyle(node);
-        return [style.backgroundColor, style.backgroundImage, style.backdropFilter];
-      });
     for (const route of ["home", "azkar", "progress", "quran-wird"]) {
       await page.goto("/#/" + route);
       const header =
@@ -30,17 +25,11 @@ for (const language of ["ar", "en"] as const) {
             ? page.getByTestId("progress-sticky-controls")
             : route === "azkar"
               ? page.locator("[data-material-ui] header").first()
-              : page.getByTestId("shared-screen-header").first();
+              : page.locator(".app-main .shared-screen-header").first();
       await expect(header).toBeVisible();
       await expect(page.getByTestId("app-scene").locator("img")).toBeVisible();
-      await expect
-        .poll(() =>
-          header.evaluate((node) => {
-            const style = getComputedStyle(node);
-            return [style.backgroundColor, style.backgroundImage, style.backdropFilter];
-          }),
-        )
-        .toEqual(await material());
+      await expect(header).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+      await expect(header).toHaveCSS("backdrop-filter", "none");
       await expect(sidebar).toHaveCSS("backdrop-filter", "blur(32px) saturate(1.35)");
       if (route === "home") {
         await expect(page.getByTestId("navigation-scene-window")).toBeVisible();

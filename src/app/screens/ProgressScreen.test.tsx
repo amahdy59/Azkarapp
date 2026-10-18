@@ -127,7 +127,8 @@ describe("ProgressScreen", () => {
     expect(weekTab).toHaveAttribute("aria-selected", "true");
     // Oasis stage card is exclusive to Day view
     expect(screen.queryByTestId("oasis-stage-card")).not.toBeInTheDocument();
-    expect(await screen.findByRole("table")).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "إيقاع أذكارك" })).toBeInTheDocument();
+    expect(screen.queryByRole("table")).not.toBeInTheDocument();
     expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
 
     // Switch to Month tab
@@ -161,7 +162,8 @@ describe("ProgressScreen", () => {
       />,
     );
     const summary = screen.getByTestId("prayer-progress-summary");
-    expect(summary.querySelector("details")).not.toHaveAttribute("open");
+    expect(summary.querySelector("details, table")).toBeNull();
+    expect(summary.querySelectorAll("li")).toHaveLength(5);
     expect(screen.queryByRole("button", { name: "Open Fajr" })).not.toBeInTheDocument();
     expect(container.querySelector("input, select, textarea")).toBeNull();
     expect(onPrayerResume).not.toHaveBeenCalled();

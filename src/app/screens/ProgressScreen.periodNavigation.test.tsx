@@ -1,11 +1,8 @@
 import { useState } from "react";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { ProgressScreen } from "./ProgressScreen";
-
 vi.mock("../hooks/useNow", () => ({ useNow: () => new Date(2026, 9, 12, 12) }));
-
 function RoutedProgress() {
   const [period, setPeriod] = useState<"day" | "week" | "month" | "year">("year");
   return (
@@ -24,23 +21,18 @@ function RoutedProgress() {
     </>
   );
 }
-
-describe("Progress month exploration and routing", () => {
-  it("preserves the selected historical month when routing echoes the new period and restores keyboard context", async () => {
-    const user = userEvent.setup();
+describe("Progress period navigation", () => {
+  it("preserves historical ranges and synchronizes externally restored periods without a long selector", () => {
     render(<RoutedProgress />);
-    await screen.findByRole("combobox", { name: "Select month" });
     fireEvent.click(screen.getByRole("button", { name: "Previous period" }));
-    await waitFor(() => expect(screen.getByTestId("garden-view-date")).toHaveTextContent("2025"));
-    await user.click(screen.getByRole("combobox", { name: "Select month" }));
-    await user.click(screen.getByRole("option", { name: "February" }));
-    fireEvent.click(screen.getByRole("button", { name: "Explore this month" }));
-    await screen.findByTestId("month-weekly-chart");
-    expect(screen.getByTestId("garden-view-date")).toHaveTextContent("February");
     expect(screen.getByTestId("garden-view-date")).toHaveTextContent("2025");
-    expect(screen.getByRole("tab", { name: "Month", exact: true })).toHaveFocus();
+    expect(screen.getByTestId("routine-trends")).toBeVisible();
+    expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("tab", { name: "Month", exact: true }));
+    expect(screen.getByTestId("garden-view-date")).toHaveTextContent("October");
+    fireEvent.click(screen.getByRole("button", { name: "Previous period" }));
+    expect(screen.getByTestId("garden-view-date")).toHaveTextContent("September");
     fireEvent.click(screen.getByRole("button", { name: "History back to year" }));
-    await screen.findByTestId("year-monthly-chart");
     expect(screen.getByRole("tab", { name: "Year", exact: true })).toHaveAttribute("aria-selected", "true");
     expect(screen.getByTestId("garden-view-date")).toHaveTextContent("2026");
   });

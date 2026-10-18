@@ -394,9 +394,3 @@
 .adaptive-counter-surface--action {
   min-height: 48px;
 }
-
-.counter-tap-hint {
-  border-radius: 20px;
-  background: color-mix(in srgb, var(--primary) 4%, var(--card));
-  color: var(--foreground);
-}

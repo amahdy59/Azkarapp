@@ -1,4 +1,7 @@
+import { fixtureReminderCatalogue } from "./fixtures/reminderCatalogue";
 import { expect, test, type Page } from "@playwright/test";
+
+test.beforeEach(async ({ page }) => fixtureReminderCatalogue(page));
 
 /**
  * The reminder follows the moment, not the date.

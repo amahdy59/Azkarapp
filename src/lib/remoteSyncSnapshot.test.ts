@@ -4,6 +4,18 @@ import type { AppStateSnapshot, StoredSession } from "../app/types";
 import { assertNoForbiddenSyncFields, buildRemoteSyncSnapshot, FORBIDDEN_SYNC_KEYS } from "./remoteSyncSnapshot";
 
 describe("remoteSyncSnapshot privacy boundary", () => {
+  it("bounds item history uploads without trimming on-device records", () => {
+    const zikrHistory = Array.from({ length: 125 }, (_, index) => ({
+      dayKey: new Date(2026, 0, index + 1, 12).toISOString().slice(0, 10),
+      category: "morning" as const,
+      offeredIds: ["m-hm-77m"],
+      completedIds: [],
+    }));
+    const result = buildRemoteSyncSnapshot({ ...DEFAULT_APP_STATE, zikrHistory });
+    expect(result.zikrHistory).toHaveLength(120);
+    expect(zikrHistory).toHaveLength(125);
+    expect(result.zikrHistory?.[0]?.dayKey).toBe(zikrHistory[5]?.dayKey);
+  });
   it("preserves prayer attendance without allowing device coordinates", () => {
     const snapshot = buildRemoteSyncSnapshot({
       ...DEFAULT_APP_STATE,

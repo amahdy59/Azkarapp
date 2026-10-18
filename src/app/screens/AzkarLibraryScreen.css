@@ -1,3 +1,10 @@
+/* Keep the photograph visible through stationary chrome. Only the list below
+   it scrolls; short windows/large text can independently scroll the controls. */
+.library-stationary-header {
+  max-block-size: 65%;
+  overflow-y: auto;
+}
+
 /* Load this mobile-only presentation with the Library, outside the app shell CSS. */
 @media (width < 40rem) {
   .library-section-tabs {

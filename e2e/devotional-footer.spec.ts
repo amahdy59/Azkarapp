@@ -24,7 +24,7 @@ for (const language of ["ar", "en"] as const) {
       const tools = page.getByTestId("reader-support-actions");
       const counter = page.getByTestId("counter-surface");
       await expect(tools).toBeVisible();
-      const toolBounds = (await tools.boundingBox())!;
+      const toolBounds = (await page.locator(".reader-tools-row").boundingBox())!;
       const primaryBounds = (await page.getByTestId("counter-panel").boundingBox())!;
       expect(primaryBounds.y - toolBounds.y - toolBounds.height).toBeGreaterThanOrEqual(16);
       for (const button of await tools.getByRole("button").all()) {
@@ -45,19 +45,15 @@ for (const language of ["ar", "en"] as const) {
       if (width === 1440) {
         await page.getByTestId("reader-sidebar-close").click();
         const row = await page.locator(".reader-footer-composition").evaluate((el) => {
-          const actions = el.querySelector(".reader-tools-actions")!.getBoundingClientRect();
+          const actions = el.querySelector(".reader-tools-row")!.getBoundingClientRect();
           const primary = el.querySelector(".reader-primary-actions")!.getBoundingClientRect();
-          const toggle = el.querySelector(".reader-tools-disclosure")!.getBoundingClientRect();
+          const toggle = el.querySelector(".reader-tools-toggle")!.getBoundingClientRect();
           const centers = [actions, toggle].map((box) => box.y + box.height / 2);
           const composition = el.getBoundingClientRect();
           const toolCells = Array.from(el.querySelectorAll('[data-testid="reader-support-actions"] button')).map(
             (button) => button.getBoundingClientRect(),
           );
-          const previous = el.querySelector(".adaptive-counter-row > div:first-child button")!.getBoundingClientRect();
-          const next = el.querySelector(".adaptive-counter-row > div:last-child button")!.getBoundingClientRect();
-          const counter = el.querySelector('[data-testid="counter-surface"]')!.getBoundingClientRect();
           const edges = [...toolCells, toggle].sort((a, b) => a.x - b.x);
-          const navigation = [previous, next].sort((a, b) => a.x - b.x);
           return {
             alignment: Math.max(...centers) - Math.min(...centers),
             twoRows: primary.top >= actions.bottom,
@@ -65,21 +61,14 @@ for (const language of ["ar", "en"] as const) {
               (label) => label.scrollWidth <= label.clientWidth + 1,
             ),
             symmetry: Math.abs(primary.x + primary.width / 2 - (composition.x + composition.width / 2)),
-            gridEdges: Math.max(
-              Math.abs(navigation[0].x - edges[0].x),
-              Math.abs(navigation[0].right - edges[0].right),
-              Math.abs(counter.x - edges[1].x),
-              Math.abs(counter.right - edges[2].right),
-              Math.abs(navigation[1].x - edges[3].x),
-              Math.abs(navigation[1].right - edges[3].right),
-            ),
+            toolsSymmetry: Math.abs((edges[0].x + edges[3].right) / 2 - (composition.x + composition.width / 2)),
           };
         });
         expect(row.alignment).toBeLessThanOrEqual(2);
         expect(row.symmetry).toBeLessThanOrEqual(1);
         expect(row.twoRows).toBe(true);
         expect(row.labelsFit).toBe(true);
-        expect(row.gridEdges).toBeLessThanOrEqual(1);
+        expect(row.toolsSymmetry).toBeLessThanOrEqual(1);
       }
 
       const reading = page.locator(".reader-text-scroll");
@@ -310,30 +299,15 @@ for (const language of ["ar", "en"] as const) {
       await page.setViewportSize({ width, height: 900 });
       await expect(actions).toBeVisible();
       await expect(actions.getByRole("button")).toHaveCount(3);
-      await expect(hint).toBeVisible();
-      await expect(hint.locator("svg:visible")).toHaveCount(1);
-      await expect(
-        hint.getByRole("button", { name: language === "ar" ? "إخفاء إرشادات العد" : "Hide counting guidance" }),
-      ).toHaveAttribute("aria-expanded", "true");
+      await expect(hint).toHaveCount(0);
+      await expect(page.getByTestId("counter-guidance-reopen")).toHaveCount(0);
       await expect(async () => {
-        const hintBox = (await hint.boundingBox())!;
-        const supportBox = (await actions.boundingBox())!;
+        const supportBox = (await page.locator(".reader-tools-row").boundingBox())!;
         const panelBox = (await page.getByTestId("counter-panel").boundingBox())!;
-        expect(hintBox.y + hintBox.height).toBeLessThanOrEqual(Math.max(supportBox.y, panelBox.y) + 1);
-        // The tool group uses the space beside the primary on wide canvases.
+        // Tools and primary controls stay inside the same centered dock.
         const dockBox = (await page.getByTestId("reader-dock").boundingBox())!;
         expect(supportBox.x).toBeGreaterThanOrEqual(dockBox.x);
         expect(panelBox.x + panelBox.width).toBeLessThanOrEqual(dockBox.x + dockBox.width + 1);
-        const lines = await hint.locator("span[aria-hidden]").evaluate((element) => {
-          const visible = Array.from(element.querySelectorAll("span")).find(
-            (child) => getComputedStyle(child).display !== "none",
-          )!;
-          const range = document.createRange();
-          range.selectNodeContents(visible);
-          return range.getClientRects().length;
-        });
-        expect(lines).toBe(1);
-        expect(await hint.evaluate((element) => element.closest('[data-testid="reader-dock"]') === null)).toBe(true);
         for (const button of await actions.getByRole("button").all()) {
           const box = await button.boundingBox();
           expect(box).not.toBeNull();
@@ -377,7 +351,7 @@ for (const language of ["ar", "en"] as const) {
             }
           }
           expect(new Set(navigationWidths).size).toBe(1);
-          const supportBox = (await actions.boundingBox())!;
+          const supportBox = (await page.locator(".reader-tools-row").boundingBox())!;
           expect(box!.y).toBeGreaterThanOrEqual(supportBox.y + supportBox.height);
         } else {
           for (const button of await page.getByTestId("reader-side-navigation").getByRole("button").all()) {
@@ -400,7 +374,7 @@ for (const language of ["ar", "en"] as const) {
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       await page.screenshot({ path: `output/playwright/footer-redesign/reader-${language}-${width}.png` });
       if (width === 1440) {
-        await hint.click();
+        await counter.click();
         await expect(counter).toHaveAttribute("aria-label", language === "en" ? /1 \/ 100$/ : /١ \/ ١٠٠$/);
         await expect(hint).toHaveCount(0);
         await expect(page.getByTestId("counter-guidance-reopen")).toHaveCount(0);
@@ -421,10 +395,8 @@ for (const language of ["ar", "en"] as const) {
           await page.goto(`/#/${route}`);
           const surface = page.getByTestId(testId);
           await expect(surface).toBeVisible();
-          await expect(page.getByTestId("counter-tap-hint")).toBeVisible();
-          const hintBox = (await page.getByTestId("counter-tap-hint").boundingBox())!;
-          const dockBox = (await page.getByTestId("reader-dock").boundingBox())!;
-          expect(dockBox.y + dockBox.height).toBeLessThanOrEqual(hintBox.y);
+          await expect(page.getByTestId("counter-tap-hint")).toHaveCount(0);
+          await expect(page.getByTestId("counter-guidance-reopen")).toHaveCount(0);
           expect(Math.round((await surface.boundingBox())!.height)).toBe(48);
           await page.screenshot({ path: `output/playwright/footer-redesign/${testId}-${language}.png` });
         }
@@ -453,7 +425,6 @@ for (const themeMode of ["light", "dark", "midnight"] as const) {
     await counter.click();
     const scan = await new AxeBuilder({ page })
       .include('[data-testid="reader-dock"]')
-      .include('[data-testid="counter-tap-hint"]')
       .withTags(["wcag2a", "wcag2aa", "wcag22aa"])
       .analyze();
     expect(scan.violations).toEqual([]);

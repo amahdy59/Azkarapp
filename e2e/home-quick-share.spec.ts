@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 for (const language of ["ar", "en"] as const) {
   for (const outcome of ["shared", "cancelled", "error", "download"] as const) {
-    test(`Home approved cards quick share ${language}/${outcome}`, async ({ page }) => {
+    test(`Home approved cards quick share ${language}/${outcome} @cross-browser`, async ({ page }, testInfo) => {
       await page.clock.setFixedTime(new Date("2026-10-14T17:00:00+03:00"));
       await page.addInitScript(
         ({ language, outcome }) => {
@@ -16,6 +16,8 @@ for (const language of ["ar", "en"] as const) {
             configurable: true,
             value: async (data: ShareData) => {
               Object.assign(window, {
+                __sharedText: data.text,
+                __sharedFirstFile: data.files?.[0],
                 __sharedFiles: data.files?.map((file) => ({ name: file.name, type: file.type, size: file.size })),
               });
               if (outcome === "cancelled") throw new DOMException("Cancelled", "AbortError");
@@ -42,10 +44,43 @@ for (const language of ["ar", "en"] as const) {
           .poll(() => page.evaluate(() => (window as unknown as { __sharedFiles?: unknown[] }).__sharedFiles?.length))
           .toBe(2);
         expect(downloads).toEqual([]);
+        expect(await page.evaluate(() => (window as unknown as { __sharedText: string }).__sharedText)).toContain(
+          "https://wa-zaker.com/",
+        );
         const files = await page.evaluate(
           () => (window as unknown as { __sharedFiles: { size: number; name: string }[] }).__sharedFiles,
         );
         expect(files.every((file) => file.size > 0 && file.name.endsWith(".webp"))).toBe(true);
+        if (outcome === "shared") {
+          const image = await page.evaluate(async () => {
+            const file = (window as unknown as { __sharedFirstFile: File }).__sharedFirstFile;
+            const url = URL.createObjectURL(file);
+            try {
+              const img = new Image();
+              img.src = url;
+              await img.decode();
+              const canvas = document.createElement("canvas");
+              canvas.width = img.naturalWidth;
+              canvas.height = img.naturalHeight;
+              const ctx = canvas.getContext("2d")!;
+              ctx.drawImage(img, 0, 0);
+              // Count the printed light glyphs on the dark footer, independent of the caption.
+              const footer = Math.round(canvas.width * 0.085);
+              const pixels = ctx.getImageData(0, canvas.height - footer, canvas.width, footer).data;
+              let light = 0;
+              for (let i = 0; i < pixels.length; i += 4)
+                if (pixels[i]! > 210 && pixels[i + 1]! > 210 && pixels[i + 2]! > 210) light++;
+              return { light, dataUrl: canvas.toDataURL("image/png") };
+            } finally {
+              URL.revokeObjectURL(url);
+            }
+          });
+          expect(image.light).toBeGreaterThan(100);
+          await testInfo.attach(`shared-card-${language}.png`, {
+            body: Buffer.from(image.dataUrl.split(",")[1]!, "base64"),
+            contentType: "image/png",
+          });
+        }
         if (outcome === "error") await expect(page.getByRole("alert")).toBeVisible();
       }
       expect(

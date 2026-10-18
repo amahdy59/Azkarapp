@@ -1,4 +1,5 @@
 import type { AppLanguage, ThemeMode } from "../types";
+import { imageShareText, SHARED_APP_URL } from "./shareDispatcher";
 import { DAYLIGHT_BOTANICAL_PALETTE, MIDNIGHT_BOTANICAL_PALETTE, drawCardCornerBotanicals } from "./canvasBotanicals";
 
 export const ZIKR_SHARE_CARD_WIDTH = 1080;
@@ -953,7 +954,7 @@ export function renderZikrShareCard(input: ZikrShareCardInput) {
   });
 
   // Footer: Clean website link below the card (replacing tagline as requested)
-  const rawUrl = input.appUrl?.trim() || "wazaker.app";
+  const rawUrl = input.appUrl?.trim() || SHARED_APP_URL;
   const displayUrl = rawUrl.replace(/^https?:\/\//i, "").replace(/\/$/, "");
 
   const footerUrlY = format === "square" ? 1014 : format === "story" ? 1836 : 2780;
@@ -1070,7 +1071,7 @@ export async function shareZikrCard(input: ZikrShareCardInput, options: ShareZik
       try {
         await navigator.share({
           title: resolvedLabels(input).brandName,
-          text: input.categoryLabel?.trim() || undefined,
+          text: imageShareText([generated.file], input.categoryLabel?.trim() || undefined),
           files: [generated.file],
         });
         notify?.("shared");

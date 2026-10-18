@@ -4,13 +4,14 @@ import "./progress-screen.css";
 import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { Header, IconButton } from "../components/LayoutShells";
 import { TodayRoutineGarden } from "../components/RoutineGarden";
+import { RoutineInsights } from "../components/RoutineInsights";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { t } from "../i18n";
 import { getDailyPathStatus, wasPrayedAtMosque, type PalmTier } from "../dailyPath";
 import { getGardenSummary, getProgressDayKey } from "../progress";
 
 import { TabList, tabPanelProps } from "../components/Tabs";
-import { getCalendarMonthPeriod, shiftCalendarDate } from "../calendarPeriods";
+import { shiftCalendarDate } from "../calendarPeriods";
 import { ProgressPeriodNavigation } from "../components/ProgressPeriodNavigation";
 import { getProgressPeriodHeading } from "../components/gardenDateLabel";
 
@@ -50,6 +51,7 @@ import type {
   PrayerName,
   PrayerTrackingRecord,
   QuranWirdPlan,
+  ZikrDayRecord,
 } from "../types";
 
 /** The wird is the three time-of-day routines. After-prayer adhkar are tracked
@@ -96,6 +98,7 @@ export function ProgressScreen({
   weeklyGoalDays,
   initialPeriod = "day",
   onPeriodChange,
+  zikrHistory = [],
 }: {
   dailyCompletions: DailyCollectionCompletion[];
   progressDayStartHour: number;
@@ -121,6 +124,7 @@ export function ProgressScreen({
   onOpenKhatmah?: () => void;
   initialPeriod?: "day" | "week" | "month" | "year";
   onPeriodChange?: (period: "day" | "week" | "month" | "year") => void;
+  zikrHistory?: readonly ZikrDayRecord[];
 }) {
   const now = useNow();
 
@@ -193,6 +197,13 @@ export function ProgressScreen({
   );
 
   const fridaySummary = getFridaySummary(getFridayCycleKey(displayDate));
+
+  const isQuranDoneForDay = (dayKey: string) => {
+    const manual = dailyHabits.some((habit) => habit.dayKey === dayKey && habit.habit === "quran_wird");
+    const read = new Set(wirdHistory?.[dayKey] ?? []).size;
+    const goal = quranWirdDailyGoals?.[dayKey] ?? (quranWirdPlan?.kind === "daily" ? quranWirdPlan.dailyPages : 0);
+    return manual || (goal > 0 && read >= goal);
+  };
 
   const activeGardenSummary = useMemo(
     () =>
@@ -507,6 +518,7 @@ export function ProgressScreen({
             ) : (
               <div className="border-t border-border py-4">
                 <PrayerTrackerStats
+                  key={`${activeTab}-${offset}`}
                   records={prayerTracking}
                   activeTab={activeTab}
                   now={now}
@@ -520,68 +532,49 @@ export function ProgressScreen({
 
           {/* The selected period's wird answer (Azkar + Quran) follows prayer. */}
           <div className="mb-5 w-full">
-            <TodayRoutineGarden
-              readOnly
-              now={now}
-              progressDayStartHour={progressDayStartHour}
-              onSelectMonth={(date) => {
-                const target = getCalendarMonthPeriod(date, calendarType, language).startDate.getTime();
-                let monthOffset = Math.round((date.getTime() - now.getTime()) / (29.5 * 86400000));
-                let candidate = getCalendarMonthPeriod(
-                  shiftCalendarDate(now, "month", monthOffset, calendarType),
-                  calendarType,
-                  language,
-                ).startDate.getTime();
-                while (candidate !== target) {
-                  monthOffset += candidate < target ? 1 : -1;
-                  candidate = getCalendarMonthPeriod(
-                    shiftCalendarDate(now, "month", monthOffset, calendarType),
-                    calendarType,
-                    language,
-                  ).startDate.getTime();
+            {activeTab !== "day" ? (
+              <RoutineInsights
+                zikrHistory={zikrHistory}
+                key={`${activeTab}-${offset}`}
+                records={dailyCompletions}
+                period={activeTab}
+                displayDate={displayDate}
+                now={now}
+                language={language}
+                calendarType={calendarType}
+                progressDayStartHour={progressDayStartHour}
+                weeklyGoalDays={weeklyGoalDays}
+                isQuranDoneForDay={isQuranDoneForDay}
+              />
+            ) : (
+              <TodayRoutineGarden
+                readOnly
+                now={now}
+                progressDayStartHour={progressDayStartHour}
+                summary={activeGardenSummary}
+                language={language}
+                hideTabs={true}
+                calendarType={calendarType}
+                dailyCompletions={dailyCompletions}
+                onOpenShareModal={onOpenShareModal}
+                visibleCategoryIds={WIRD_CATEGORY_IDS}
+                quranWird={
+                  quranWirdPlan?.kind !== "free"
+                    ? {
+                        progress: selectedDayPath.quran.progress,
+                        goal: selectedDayPath.quran.goal,
+                        complete: quranWirdDone,
+                        active: selectedDayPath.quran.active,
+                      }
+                    : undefined
                 }
-                activePeriodRef.current = "month";
-                setActiveTab("month");
-                onPeriodChange?.("month");
-                setOffset(monthOffset);
-                document.getElementById("global-progress-tab-month")?.focus();
-              }}
-              summary={activeGardenSummary}
-              language={language}
-              hideTabs={true}
-              calendarType={calendarType}
-              dailyCompletions={dailyCompletions}
-              onOpenShareModal={onOpenShareModal}
-              visibleCategoryIds={WIRD_CATEGORY_IDS}
-              quranWird={
-                quranWirdPlan?.kind !== "free"
-                  ? {
-                      progress: selectedDayPath.quran.progress,
-                      goal: selectedDayPath.quran.goal,
-                      complete: quranWirdDone,
-                      active: selectedDayPath.quran.active,
-                    }
-                  : undefined
-              }
-              isQuranDoneForDay={(dayKey) => {
-                const habitsForDay = (dailyHabits ?? []).filter((h) => h.dayKey === dayKey);
-                const manual = habitsForDay.some((h) => h.habit === "quran_wird");
-                const dayPages = (wirdHistory ?? {})[dayKey] ?? [];
-                const read = new Set(dayPages).size;
-                const recordedGoal = (quranWirdDailyGoals ?? {})[dayKey];
-                const goal =
-                  typeof recordedGoal === "number"
-                    ? recordedGoal
-                    : quranWirdPlan?.kind === "daily"
-                      ? quranWirdPlan.dailyPages
-                      : 0;
-                return manual || (goal > 0 && read >= goal);
-              }}
-              onMedia={false}
-              activeTab={activeTab}
-              displayDate={displayDate}
-              weeklyGoalDays={weeklyGoalDays}
-            />
+                isQuranDoneForDay={isQuranDoneForDay}
+                onMedia={false}
+                activeTab={activeTab}
+                displayDate={displayDate}
+                weeklyGoalDays={weeklyGoalDays}
+              />
+            )}
           </div>
 
           {/* The garden is reflective context, so it follows the day's answer and

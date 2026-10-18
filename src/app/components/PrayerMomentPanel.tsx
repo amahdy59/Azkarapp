@@ -1,6 +1,6 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { PrayerTrackingWrite } from "./PrayerTrackerCards";
-import { CloudSun, MoonStar, Sun, Sunrise, Sunset } from "./icons";
+import { ChevronDown, CloudSun, MoonStar, Sun, Sunrise, Sunset } from "./icons";
 import { t } from "../i18n";
 import { formatPrayerTimeLabel, getEstimatedPrayerTimes } from "../content/prayerTimes";
 import { isJumuahPrayer, prayerDisplayName } from "../prayerPresentation";
@@ -53,6 +53,7 @@ export function PrayerMomentPanel({
   canRecord?: boolean;
   onOpenAdhkar: (prayer: PrayerName) => void;
 }) {
+  const [evidenceExpanded, setEvidenceExpanded] = useState(false);
   const times = useMemo(() => getEstimatedPrayerTimes(now, locationSettings), [now, locationSettings]);
 
   const isArabic = language === "ar";
@@ -72,7 +73,7 @@ export function PrayerMomentPanel({
     : formatDisplayDate(recordDate, language, calendarType, hijriDateOffset);
 
   return (
-    <HomeCard as="article" onGlass={onGlass} padding="none" className="min-w-0 overflow-hidden">
+    <HomeCard as="article" onGlass={onGlass} padding="none" className="prayer-moment-panel min-w-0 overflow-hidden">
       <div data-testid="prayer-journey">
         <PrayerActionsCard
           prayer={prayer}
@@ -85,44 +86,77 @@ export function PrayerMomentPanel({
           onOpenAdhkar={onOpenAdhkar}
           onGlass={onGlass}
           headingLevel={2}
-          status={
+          subtitle={
+            prayer === "fajr" && times.shrouk ? (
+              <p data-testid="prayer-sunrise-context" dir="auto">
+                {t(language, "notifications.shrouk")}: {formatPrayerTimeLabel(times.shrouk, isArabic)}
+              </p>
+            ) : undefined
+          }
+          infoContext={
             <div
               data-testid="prayer-moment-status"
-              className={`flex flex-wrap gap-x-3 text-label leading-normal ${bodyText}`}
+              className={`flex min-w-0 flex-col gap-1 text-label leading-normal ${bodyText}`}
             >
               <time dateTime={dayKey} data-testid="prayer-record-date" dir="auto">
                 {t(language, "prayerMoment.recordDate", { date: dateLabel })}
               </time>
-              {prayer === "fajr" && times.shrouk && (
-                <p dir="auto">
-                  {t(language, "notifications.shrouk")}: {formatPrayerTimeLabel(times.shrouk, isArabic)}
-                </p>
-              )}
             </div>
           }
         >
           {virtue && (
             <section
-              className={`min-w-0 border-t pt-4 text-start ${hairline}`}
+              className={`prayer-actions-evidence min-w-0 border-t pt-2 text-start ${hairline}`}
+              data-expanded={evidenceExpanded}
               data-testid="prayer-moment-virtue"
               aria-labelledby={`prayer-virtue-heading-${prayer}`}
             >
-              <h3 id={`prayer-virtue-heading-${prayer}`} className={`text-sm font-semibold ${accentText}`} dir="auto">
-                {t(language, "prayerMoment.virtueTitle", { prayer: name })}
-              </h3>
-              <p className={`mt-1 text-xs font-medium ${bodyText}`} dir="auto">
-                {t(language, "prayerMoment.virtueAttribution")}
-              </p>
-              <p
-                className={`mt-1 text-base font-semibold leading-loose ${titleText}`}
-                dir={isArabic || !virtue.textEnglish ? "rtl" : "ltr"}
-                lang={isArabic || !virtue.textEnglish ? "ar" : "en"}
+              <h3
+                id={`prayer-virtue-heading-${prayer}`}
+                className={`text-title font-semibold leading-normal ${accentText}`}
+                dir="auto"
               >
-                {isArabic ? virtue.textArabic : (virtue.textEnglish ?? virtue.textArabic)}
-              </p>
-              <p className={`mt-1 text-xs font-medium ${bodyText}`} dir="auto">
-                {isArabic ? virtue.referenceArabic : virtue.referenceEnglish}
-              </p>
+                <span className="prayer-evidence-desktop-title leading-normal">
+                  {t(language, "prayerMoment.virtueTitle", { prayer: name })}
+                </span>
+                <button
+                  type="button"
+                  className="prayer-evidence-toggle flex min-h-11 w-full items-center justify-between gap-2 rounded-xl text-start focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                  aria-expanded={evidenceExpanded}
+                  aria-controls={`prayer-evidence-body-${prayer}`}
+                  onClick={() => setEvidenceExpanded((expanded) => !expanded)}
+                >
+                  <span>{t(language, "prayerMoment.virtueTitle", { prayer: name })}</span>
+                  <ChevronDown
+                    size={18}
+                    aria-hidden="true"
+                    className={evidenceExpanded ? "rotate-180 shrink-0" : "shrink-0"}
+                  />
+                </button>
+              </h3>
+              <div id={`prayer-evidence-body-${prayer}`} className="prayer-evidence-body">
+                <p
+                  className={`mt-1 text-label font-medium leading-normal ${bodyText}`}
+                  dir="auto"
+                  data-testid="prayer-virtue-attribution"
+                >
+                  {t(language, "prayerMoment.virtueAttribution")}
+                </p>
+                <p
+                  className={`mt-1 text-base font-semibold leading-loose ${titleText}`}
+                  dir={isArabic || !virtue.textEnglish ? "rtl" : "ltr"}
+                  lang={isArabic || !virtue.textEnglish ? "ar" : "en"}
+                >
+                  {isArabic ? virtue.textArabic : (virtue.textEnglish ?? virtue.textArabic)}{" "}
+                  <span
+                    className={`inline text-xs font-medium ${bodyText}`}
+                    dir="auto"
+                    data-testid="prayer-virtue-source"
+                  >
+                    {isArabic ? virtue.referenceArabic : virtue.referenceEnglish}
+                  </span>
+                </p>
+              </div>
             </section>
           )}
         </PrayerActionsCard>

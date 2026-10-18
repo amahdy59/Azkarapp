@@ -1,8 +1,22 @@
 # Application architecture
 
+## Supplied-card attribution and collection citation follow-up — 2026-10-18
+
+Supplied routine cards append an export-only website footer through `share/attributedCard.ts`. The original image remains complete; prepared files feed Share, Save and studio previews, while Copy encodes the same layout as PNG. Decode/encoding failures retain explicit recovery and never export unbranded originals. `contentReview.ts` applies precise bilingual citation metadata to 165 verified original identities from the dated source audit; 20 Home alternatives are excluded. Counts, wording and stored identities are unchanged.
+
+## Actionable Progress insights — 2026-10-18, local only
+
+Historical Progress derives prayer comparisons and three daily-routine patterns from existing normalized records. `progressInsights.ts` resolves the selected calendar range, excludes the current unfinished progress day, deduplicates collection/day pairs and groups daily, seven-day or calendar-month trend points. No stored schema, tracking-start inference, synchronization or devotional text changes. Prayer analysis retains civil dates, while routine analysis uses the configured devotional-day rollover. Historical denominators include every complete day in the period, including days without records; this supersedes earlier through-today denominators for Progress only.
+
+`RecordingInsights` handles ties, no records and fewer than three complete days without inventing a winner. Chart labels state the measure and approximate weekly averages; exact counts remain in accessible descriptions and explicit JSON downloads through the existing device-file boundary. `RoutineInsights` replaces historical matrices/calendar/dropdowns with routine comparisons and separately labelled trend lines. Quran and configured weekly intentions remain independent. `PrayerTrackerStats` exposes three visible practice controls, counts home/mosque equally for obligatory recording and excludes Asr from Rawatib comparisons. Daily prayer facts use a native read-only list. Home entry behavior and persistence remain unchanged.
+
 ## Local prayer selection light — 2026-10-18
 
 usePrayerSelectionAnchor owns decorative geometry only. Home supplies existing sticky-strip and detail refs plus the expanded prayer and direction. A layout effect, passive horizontal-scroll listener and ResizeObserver align bounded CSS light variables to the selected summary; no React scroll state, timer, persisted field or forced scroll is added. The hook accounts for changing strip padding to retain 20px separation, fades the receiving light when its summary leaves view and disconnects/removes styles on closure. Prayer/record ownership remains unchanged. This owner-approved local follow-up supersedes the earlier no-measurement/full-width-edge presentation rule.
+
+## Seamless resting headers and image captions — 2026-10-18, local only
+
+The owner's latest screenshot request supersedes always-frosted resting page headers. Existing threshold-only scroll ownership now selects transparent resting chrome and the existing protected tint/sheen/frost while content passes below. Home retains independent material resolution; navigation retains its stationary material. Opaque and accessibility fallbacks remain. Reader text has no hover/press fill. Native image dispatch appends https://wa-zaker.com/ to the caption while preserving existing text and approved image bytes; quick-pack ZIPs include a plain-text app link. Receiving apps may discard captions; generated images retain existing printed branding. No persistence, content or release change.
 
 ## Stationary interface headers — owner correction, 2026-10-18
 
@@ -531,3 +545,29 @@ Glass palettes set light success ink with matching dark foreground for filled st
 ## Compact Progress records — 2026-10-18
 
 ProgressScreen composes PrayerProgressSummary from saved records filtered by the selected progress day. trackedLocation retains the legacy mosque fallback. The component has no mutation callback, prayer clock, route or service access. TodayRoutineGarden passes an opt-in readOnly flag to ProgressDayView: Progress renders native description lists while Home retains its existing interactive view. FridayProgressCard similarly supports read-only rows; its cycle is resolved from the selected date, not today. The optional prayer breakdown uses one native table in a named keyboard-scrollable region. Calendar, storage, sync, normalization and historical analytics remain unchanged.
+
+## Local prayer card composition — 2026-10-18
+
+PrayerActionsCard keeps independent onToggle and onOpenAdhkar callbacks, with a native checkbox/label and separate sibling reading button in the adhkar list item. PrayerMomentPanel owns only transient evidence disclosure state; CSS container queries handle card-width reflow without adding a viewport observer. Existing HomeCard owns material and theme behavior; persistence, calculation, normalization and sync ownership remain unchanged. See docs/agent/phases/PRAYER_ACTIONS_ADJACENT_READING_2026_10_18.md.
+
+## Progress timeline composition — 2026-10-18, local only
+
+progressInsights owns shared calendar-aware complete-day buckets; routine analysis preserves devotional rollover while prayer uses civil dates and existing getPrayerPeriodStats normalization. RecordingTimeline is a reusable visual component receiving prepared series, with transient selected-series/date state only and no persistence/services. RoutineInsights and PrayerTrackerStats compose prominent timelines before retained RecordingInsights comparisons. Overall routine rates weight three daily routines equally; prayer practice rates remain separate, with four Rawatib-applicable prayers excluding Asr. Adjacent bucket rate changes use percentage points only when both buckets contain at least three complete days; partial buckets remain explicit. JSON includes bucket boundaries and counts. No history/schema/sync or reviewed-content change. See agent/phases/PROGRESS_TIME_SERIES_2026_10_18.md.
+
+## Observed individual-zikr history and matched comparisons — 2026-10-18
+
+Owner-approved local Progress refinements add optional zikrHistory to AppStateSnapshot: day/category records with valid offeredIds/completedIds, normalized and deterministically unioned by zikrHistory.ts. useSessionHandlers records actual timed-routine scope on reader entry and explicit completion, excluding editorial introductions; App owns serialization/application. Core-only scope never generates opportunities for complete-only items. Each day/item counts once; tally resets retain the recorded-at-least-once fact. Old totals are never backfilled. Backups, guest migration/private clearing and Cloudflare/Supabase payloads preserve a 120-observed-day window and merge on load; Supabase uses existing settings_json. No schema/RLS migration. ZikrInsights requires three observed days per item, preserves ties and links to reviewed text. The earlier no-item-history limitation applies to older records only.
+
+getMatchedInsightPeriods provides equal elapsed complete-day windows for adjacent Week/Month/Year periods in the selected calendar and correct prayer/devotional day boundary. PeriodComparison describes those exact windows independently of chart bucket length. RecordingTimeline owns only transient point/series state and exposes pointer/keyboard exploration; explanations use native disclosures. See agent/phases/PROGRESS_REFINEMENTS_2026_10_18.md.
+
+## Home complete-reading package — 2026-10-18, R2 delivery
+
+Home defers `content/reminderReadings.ts` after paint. Its owner-authorized immutable R2 package contains 186 deduplicated reading/meaning records, all 185 fallback mappings, the unchanged 71-source schedule and the original 18 Quran records. The build-time packer reads authoritative source modules and omits duplicate obsolete hadith excerpts from delivery; authoring modules remain unchanged. Only the tiny URL/size/SHA-256 manifest enters the application bundle; the binary stays out of site output. The loader verifies compressed bytes before decoding and before storing them in its dedicated CacheStorage cache, and verifies cached reads again. The matching Workbox NetworkOnly route prevents the broad R2/audio cache from owning unverified catalogue bytes. The package is independent of core service-worker installation, so R2 failure cannot block core offline setup/update. Previously loaded reminders work offline; a first uncached reminder load requires connectivity. Cache denial is recoverable for online reading. The screen owns loading and selection; the shared visual reading component has no storage or network access. Do not display legacy excerpts before the reviewed catalogue is ready. Late cancelled loads cannot overwrite current selection. Reading/focus holds are visit-local and never persisted.
+
+## Devotional footer and retired counting guidance — 2026-10-18, local only
+
+ReaderFooterTools owns one wrapping-free support row shared by Reader and StandaloneCounterFooter. Intrinsic labelled controls become 44px named icons according to the actual footer container width; screens retain action and counting ownership. The owner removes CounterGuidance, CounterTapHint and useCounterGuidance, including every Reader/Masbaha/Salawat mount. The old device-only guidance marker is harmlessly unused; no stored snapshot is rewritten. Native counter accessible instructions and independently owned header keyboard-help dialogs remain. This supersedes the earlier first-use/reopen guidance contract.
+
+## Stationary Library image header — 2026-10-18, local only
+
+The owner supersedes scroll-elevated frost for the pictured Azkar Library. Its title/search/filter header is outside a bounded native collection-list viewport, so moving cards never pass behind it. Glass remains transparent over the existing stationary scene with no elevation listener. Controls have an independent 65% maximum-height scroll recovery for short windows and enlarged text. Other screens retain their existing scroll ownership. No content, persistence or release changes.

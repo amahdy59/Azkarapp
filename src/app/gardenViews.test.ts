@@ -29,6 +29,29 @@ const records: DailyCollectionCompletion[] = [
 ];
 
 describe("garden view selectors", () => {
+  it("keeps today's unrecorded bedtime routine and Quran partial until the day ends", () => {
+    const todayKey = "2026-10-14";
+    const index = createDailyCompletionIndex([
+      { dayKey: todayKey, category: "morning", timeZone: "Africa/Cairo" },
+      { dayKey: todayKey, category: "evening", timeZone: "Africa/Cairo" },
+    ]);
+    const current = getWeekGardenStats(index, new Date(2026, 9, 14, 12), "en", () => false, todayKey);
+    expect(current.days.find((day) => day.dayKey === todayKey)).toMatchObject({
+      isToday: true,
+      morningStatus: "complete",
+      eveningStatus: "complete",
+      sleepStatus: "partial",
+      quranStatus: "partial",
+      completedCount: 2,
+      isPalm: false,
+    });
+    const followingDay = getWeekGardenStats(index, new Date(2026, 9, 15, 12), "en", () => false, "2026-10-15");
+    expect(followingDay.days.find((day) => day.dayKey === todayKey)).toMatchObject({
+      isToday: false,
+      sleepStatus: "missed",
+      quranStatus: "missed",
+    });
+  });
   it("uses three canonical routines and elapsed days in current month/year rates", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date(2026, 0, 2, 12));

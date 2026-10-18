@@ -1,5 +1,20 @@
 [
   {
+    "release": "2026-10-18.4",
+    "ar": [
+      "اقرأ النص الكامل للتذكيرات المتجددة وافتح معناها المختصر ومصادرها بشكل مستقل، مع حفظها بعد التحميل للقراءة دون اتصال.",
+      "استكشف اتجاهات الصلاة والأذكار خلال الفترات المختلفة، مع تفاصيل أوضح وسجل الأذكار المسجلة من الآن فصاعداً.",
+      "يبقى عنوان صفحة الأذكار فوق الصورة بينما تتحرك المجموعات أسفله، مع أدوات قراءة وتسبيح أكثر اتساقاً وملاءمة للشاشات.",
+      "تتضمن بطاقات المشاركة عنوان الموقع داخل الصورة، وتتيح بطاقات الصلاة فتح أذكار ما بعد الصلاة بجوار تسجيلها."
+    ],
+    "en": [
+      "Read complete rotating reminders and open their brief meanings and sources independently, with offline access after loading.",
+      "Explore prayer and routine trends across periods, with clearer details and individual zikr history recorded from now on.",
+      "The Azkar header stays over its photograph while collections scroll below, with more consistent reading and counter controls across screen sizes.",
+      "Shared cards include the website inside the image, and prayer cards place after-prayer reading beside its completion control."
+    ]
+  },
+  {
     "release": "2026-10-18.3",
     "ar": [
       "صفحة تقدم أبسط تعرض إحصاءات للقراءة فقط وتفاصيل اختيارية لكل صلاة، دون حقول تسجيل.",

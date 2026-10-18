@@ -1,4 +1,7 @@
+import { fixtureReminderCatalogue } from "./fixtures/reminderCatalogue";
 import { expect, test } from "@playwright/test";
+
+test.beforeEach(async ({ page }) => fixtureReminderCatalogue(page));
 
 /**
  * Reduced transparency: blurred materials go solid and the decorative grain
@@ -90,7 +93,9 @@ test("a card over the hero photograph goes opaque, not merely unblurred", async 
   await page.goto("/");
   await page.getByRole("navigation").first().waitFor();
 
-  const glass = page.locator(".hero-glass").first();
+  // Resting chrome is intentionally transparent; exercise the reading card's
+  // protective material rather than depending on its order among Glass nodes.
+  const glass = page.getByTestId("home-daily-evidence");
   await glass.waitFor();
 
   const material = await glass.evaluate((element) => {

@@ -1,4 +1,4 @@
-import { canShareMultipleFiles, downloadFile, shareMultipleFiles } from "./shareDispatcher";
+import { canShareMultipleFiles, downloadFile, shareMultipleFiles, SHARED_APP_URL } from "./shareDispatcher";
 import { fetchAllCuratedCardFiles, getCuratedRoutinePack } from "./curatedRoutineCards";
 import { createFileArchive } from "./shareArchive";
 import type { AppLanguage } from "../types";
@@ -14,7 +14,13 @@ export async function shareQuickRoutinePack(pack: Awaited<ReturnType<typeof prep
   if (canShareMultipleFiles(pack.files)) {
     return (await shareMultipleFiles(pack.files, { title: pack.title, downloadFallback: false })).method;
   }
-  const archive = await createFileArchive(pack.files, "azkar-cards.zip");
+  const archive = await createFileArchive(
+    [
+      ...pack.files,
+      new File([`${pack.title}\n\n${SHARED_APP_URL}\n`], "wa-zaker.txt", { type: "text/plain;charset=utf-8" }),
+    ],
+    "azkar-cards.zip",
+  );
   downloadFile(archive);
   return "downloaded" as const;
 }

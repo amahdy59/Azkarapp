@@ -1,3 +1,7 @@
+## 2026-10-18 — Actionable Progress charts, local only
+
+The owner asks for relevant patterns and actions instead of numerical tables, unclear aggregate bars and large dropdowns. Apply locally; no commit, push or deployment. Supersede the earlier daily-table and historical chart/selector presentation with read-only daily statuses, strongest/needs-attention comparisons, explicit chart units, approximate weekly rhythm and separate routine trend lines. Exact data belongs in explicit JSON downloads. Preserve prayer, Quran, reviewed content and normalized persistence contracts. Exclude the unfinished progress day from historical rankings and state the denominator; missing records never establish missed worship. Explain that individual zikr history is unavailable rather than deriving false per-zikr rankings from collection completions. Preserve all other pending work.
+
 ## 2026-10-18 — Home card alignment, local only
 
 The owner requests matching all Home cards to the top prayer-card alignment on desktop and tablet. Use the existing 52rem prayer measure plus responsive gutters for the shared frame, accounting for the prayer row's 4px inset in content. This supersedes the older 64rem outer Home measure at 600px and wider. Preserve phone layout, material, reviewed content, prayer calculations and persistence. No commit, push or deployment.
@@ -4931,3 +4935,55 @@ The owner explicitly requests continuing and pushing all changes. This supersede
 ## Shared chrome and explicit mosque recording — 2026-10-18
 
 Owner requests the same sidebar/header look and frost and replaces ambiguous Prayed wording with صليتها في المسجد. Reuse one fixed 32px chrome frost and header tint/sheen, render the scene behind Home navigation, keep mosque-only checks distinct from home records and retain general read-only statistics. Supersedes variable-strength header frost only; no persisted-data or content change. Existing release authority continues.
+
+## Adjacent after-prayer reading action — 2026-10-18, local only
+
+The owner approves the mobile/desktop card concept while requiring existing mode colors, Glass material and responsive contracts. PrayerActionsCard groups each native checkbox with its label at logical start, and places a separate compact Read / قراءة button as a sibling in the after-prayer adhkar row. Reading never toggles completion and remains available for completed records and non-recordable previews. Retain the subsequently approved mosque wording صليتها في المسجد. Remove the standalone full-width CTA.
+
+PrayerMomentPanel retains HomeCard and shared theme/on-media tokens without a new tint, frost or palette. After the owner rejected unused desktop space, the title and checklist use the first logical column; record context fills the upper second column and complete evidence aligns with the checklist below it. This removes a dedicated full-width metadata row and shortens the panel. Record date remains explicit and sunrise gets its own line. A card-width container query at 40rem enables this composition. The reading button immediately follows its intrinsic-width checkbox/label group with an 8px gap instead of being pushed across the column. Below that available measure, evidence is a keyboard-operated disclosure following the checklist. Enlarged text can return to one column. This supersedes the former viewport-768px two-column arrangement and always-visible narrow evidence, preserving source wording, dates, tracking fields, future restrictions, offline behavior and shared fallbacks. Scoped checkbox styling removes decorative glow while retaining visible keyboard focus. No publication is authorized.
+
+Owner alignment follow-up: Fajr sunrise moves directly beneath the prayer title in the same text column, with identical logical text edges in RTL/LTR. The record date remains over the evidence column at wide card widths. Read has a 112px minimum width with the same 44px minimum height and 8px label gap; labels wrap naturally on narrow/enlarged layouts. Existing modes, material and tracking remain.
+
+## Prayer evidence alignment and secondary record context — 2026-10-18, local only
+
+The owner requests removing the visible record line, aligning virtue with the title and keeping its citation inline. Move the same explicit time/dayKey/date label into the existing information sheet; no date assignment or calculation change. On wide cards, align the evidence heading at the prayer title top edge and span its column alongside the title/checklist. Fajr sunrise remains directly beneath its title. Append the unchanged source as a smaller inline span after the complete quotation; allow natural wrapping when the final line has insufficient room, never truncate or alter devotional text. Keep the established narrow disclosure, reading button, semantic colors, Glass/fallbacks and keyboard targets. This supersedes the earlier upper evidence-column record line. No push.
+
+Owner typography/alignment follow-up — 2026-10-18: prayer and virtue headings share the existing 17px title step and normal line height. The attribution increases from 12px to 13px and uses the same line metrics and 4px heading gap as Fajr sunrise. Both columns therefore align their heading and secondary text rows with matching logical edges in RTL/LTR. The source remains inline; no religious wording, theme, glass or responsive breakpoint changes. Local only.
+
+## 2026-10-18 — Preserve prominent temporal charts in Progress
+
+Owner correction: line charts are relevant for change over time and must remain prominent; add charting where useful while retaining meaningful comparisons. Apply locally. A large selectable remembrance line replaces the repeated miniature routine plots, preserving every routine series; add a prayer line for each independent practice and selectable prayer. Keep categorical bars and strongest/attention summaries because they answer which practice needs attention. Explain axes, denominators, complete days and partial buckets; show dated values without large dropdowns or in-page numeric tables. No persistence/content changes or publication. See phases/PROGRESS_TIME_SERIES_2026_10_18.md.
+
+## 2026-10-18 — Apply all remaining Progress recommendations, locally
+
+Owner approves concise mobile writing, direct chart interaction, fair elapsed-period comparisons and new individual-zikr tracking. Preserve prominent line charts and useful categorical comparisons. Use native disclosures for detail, tap/keyboard date exploration, equal complete-day comparison windows, and additive observed-day item history with deterministic normalization/merge and private-data ownership. No legacy backfill, religious-content interpretation or publication. See phases/PROGRESS_REFINEMENTS_2026_10_18.md.
+
+## 2026-10-18 — Full Home reminder readings, authorized R2 content upload
+
+The owner selects Reading flow and requests full authentic text for all rotating content, with ellipsis/expansion beyond four rendered lines and an independently expandable brief meaning. The owner explicitly asks to review and make all 185 older fallback entries usable. Source comparison yields 165 verified-reading mappings and 20 authenticated alternatives where old routes, promises or attribution cannot safely be retained. Preserve canonical collection text, counts, IDs and persistence. Record alternatives and their reasons; clear the old benefit/target on an alternative Home card. Keep meanings, Quran translations, editorial guidance and Companion attribution distinct. Preserve local reviewable sources.
+
+The owner's subsequent instruction, “we can upload content to R2. you can do that to avoide hitting the ceiling,” explicitly authorizes publishing the immutable content package. Upload to the existing Azkar bucket, pin its URL/size/checksum in a small manifest and retain verified bytes for offline Home reading. The binary is excluded from site output. Preserve core service-worker installation independently of R2 availability. Existing wa-zaker.com/Pages CORS origins are retained; add only the local verification origin 4897. The bucket currently has no attached custom domain; use its existing public endpoint without DNS changes. Application changes remain local; no commit, push or application deployment in this phase.
+
+## 2026-10-18 — Consistent devotional footer and complete labels, local only
+
+The owner requests footer consistency across all azkar including Masbaha and Salawat, with text-hugging desktop/mobile layouts. Reuse shared footer/action components; replace equal-width clipped tool cells with content-sized controls and balanced compact reflow. Preserve screen-specific actions, sacred content, counts, persistence and focus recovery. Keep all changes local; no commit, push or deployment. See phases/DEVOTIONAL_FOOTER_TEXT_FIT_2026_10_18.md.
+
+### Owner correction — single tool row and no counting guidance
+
+The owner explicitly requires tools to stay on one row and the tap-to-count information to be removed globally. Use content-sized labels on wide footers and consistent named icon controls on compact footers. Remove first-use instructions and hand/reopen controls from Reader, Masbaha and Salawat, including their unused component/hook. Preserve header keyboard help and counting behavior. This supersedes the initial wrapped/two-column implementation. Local only.
+
+## 2026-10-18 — Seamless headers, unhighlighted text and app discovery
+
+The owner explicitly requests local application only and prohibits pushing. Remove the Reader text-area pointer highlight; verify Home Glass across independent App/Home choices. Resting page headers blend into their content canvas; existing scroll thresholds enable protected shared frost only when content passes underneath. This supersedes always-frosted resting page headers while preserving stationary navigation and accessibility fallbacks. Include https://wa-zaker.com/ in native image captions and quick-pack download text while preserving approved artwork and reviewed devotional wording. See phases/SEAMLESS_HEADERS_AND_CARD_LINKS_2026_10_18.md. No commit, push or deployment.
+
+## 2026-10-18 — Stationary Library photograph
+
+Owner requests local application of an unchanged image-backed header with content scrolling below it and no frost. Apply to the pictured Azkar Library first: bounded list viewport, stationary transparent header, native short-height control recovery. Other headers retain existing contracts. No commit, push or deployment; preserve unrelated pending work.
+
+## 2026-10-18 — Session gaps and direct hadith meanings, local only
+
+The owner requests implementing the remaining session-review gaps and explicitly rejects distracting app/methodological caveats inside brief meanings. Add a visible website footer outside supplied card artwork, precise bilingual citation metadata for verified originals, and move editorial cautions to reference evidence. Preserve original narration, counts, timing and identities. Do not turn a Home alternative into evidence for its original collection item. Keep physical-device, human assistive-technology and independent source acceptance distinct from automated results. Application publication remains withheld; the revised immutable reminder content uses the existing authorized R2 workflow.
+
+## 2026-10-18 — Combined release .4 authorization
+
+The owner explicitly authorizes verifying all pending hadith/rotating reminder content on Cloudflare R2, pushing all changes and completing deployment with intact quality gates. This supersedes earlier local-only holds. The header chat owns integration, release notes, commit/push, exact-commit CI/Pages and production verification; other sessions freeze edits. See phases/COMBINED_RELEASE_2026_10_18_4.md.

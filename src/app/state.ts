@@ -28,6 +28,7 @@ import {
   isProgressDayKey,
 } from "./progress";
 import { ALL_STATIC_ZIKR_IDS, CATEGORY_ZIKR_IDS } from "./content/azkarIds";
+import { normalizeZikrHistory, mergeZikrHistory } from "./zikrHistory";
 import { CALCULATION_METHODS, DEFAULT_LOCATION } from "./content/prayerCalculation";
 
 export type { AppLanguage, AppStateSnapshot, CategoryId, StoredSession } from "./types";
@@ -175,6 +176,7 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
   },
   completed: Object.fromEntries(CATEGORY_IDS.map((id) => [id, []])) as unknown as Record<CategoryId, string[]>,
   sessions: [],
+  zikrHistory: [],
   dailyCompletions: [],
   prayerTracking: [],
   dailyHabits: [],
@@ -995,6 +997,7 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
     },
     completed,
     sessions,
+    zikrHistory: normalizeZikrHistory(parsed.zikrHistory),
     dailyCompletions,
     prayerTracking,
     dailyHabits: normalizeDailyHabits(parsed.dailyHabits),
@@ -1363,6 +1366,7 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
     },
     completed,
     sessions: newestSessions([...sessions.values()]),
+    zikrHistory: mergeZikrHistory(safeBase.zikrHistory, incoming.zikrHistory),
     dailyCompletions: mergeDailyCompletions(
       safeBase.dailyCompletions,
       Array.isArray(incoming.dailyCompletions)
@@ -1442,6 +1446,7 @@ export function clearPrivateAppData(state: AppStateSnapshot): AppStateSnapshot {
     profile: { ...DEFAULT_APP_STATE.profile },
     completed: Object.fromEntries(CATEGORY_IDS.map((id) => [id, []])) as unknown as Record<CategoryId, string[]>,
     sessions: [],
+    zikrHistory: [],
     dailyCompletions: [],
     prayerTracking: [],
     dailyHabits: [],

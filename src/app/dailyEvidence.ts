@@ -53,6 +53,16 @@ export interface DailyEvidence {
   excerpt?: boolean;
   reportedAction?: boolean;
   evidenceId?: string;
+  narrator?: string;
+  meaning?: string;
+  meaningSourceUrl?: string;
+  meaningSourceName?: "hadeethenc" | "dorar" | "source";
+  companionReport?: boolean;
+  /** A Quran rendering stays separate from editorial guidance. */
+  translation?: string;
+  takeaway?: string;
+  /** Original reference for exact source matching, independent of UI language. */
+  sourceReferenceEnglish?: string;
 }
 
 /**
@@ -118,6 +128,12 @@ function shapeEvidence(zikr: Zikr, language: AppLanguage): DailyEvidence {
     authenticityLevel: zikr.authenticityLevel,
     categoryId: zikr.category,
     sourceUrl: zikr.sourceUrl,
+    sourceReferenceEnglish: zikr.sourceReference,
+    meaning: (language === "ar" ? zikr.benefitArabic || toArabicBenefit(zikr.benefit) : zikr.benefit)!,
+    meaningSourceUrl: zikr.sourceUrl,
+    // Supporting corpus fields include selected quotations and descriptions.
+    // Completeness is asserted only by the separately verified reading catalogue.
+    excerpt: true,
   };
 }
 
@@ -287,7 +303,10 @@ function shapeLibrarySource(
       authenticity: isArabic
         ? `${verse.referenceArabic} — ${verse.surahArabic}`
         : `${verse.reference} — ${verse.surahEnglish}`,
-      benefit: isArabic ? benefit : `${verse.english} — ${benefit}`,
+      benefit,
+      takeaway: benefit,
+      translation: isArabic ? undefined : verse.english,
+      evidenceId: source.id,
       sourceUrl: `https://quran.com/${verse.reference.replace("Qur'an ", "").replace(":", "/")}`,
     };
   }
@@ -298,7 +317,7 @@ function shapeLibrarySource(
     const zikr =
       POOL.find((entry) => entry.id === source.zikrId) ?? ALL_AZKAR.find((entry) => entry.id === source.zikrId);
     if (!zikr) return null;
-    return { ...shapeEvidence(zikr, language), benefit };
+    return { ...shapeEvidence(zikr, language), benefit, takeaway: benefit, evidenceId: source.id };
   }
 
   const inArabic = isArabic || !source.english;
@@ -313,6 +332,7 @@ function shapeLibrarySource(
       .filter(Boolean)
       .join(" — "),
     benefit,
+    takeaway: benefit,
     sourceUrl: source.sourceUrl,
     title: isArabic ? source.title : undefined,
     excerpt: source.excerpt,

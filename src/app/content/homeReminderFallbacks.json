@@ -1,0 +1,742 @@
+{
+  "m-hm-75a": {
+    "reading": "L:abudawud:3667",
+    "replacement": false
+  },
+  "m-hm-75": {
+    "reading": "L:muslim:810",
+    "replacement": true
+  },
+  "m-hm-76a": {
+    "reading": "L:abudawud:5082",
+    "replacement": false
+  },
+  "m-hm-76b": {
+    "reading": "L:abudawud:5082",
+    "replacement": false
+  },
+  "m-hm-76c": {
+    "reading": "L:abudawud:5082",
+    "replacement": false
+  },
+  "m-hm-77m": {
+    "reading": "L:muslim:2723b",
+    "replacement": false
+  },
+  "m-hm-78m": {
+    "reading": "L:abudawud:5068",
+    "replacement": false
+  },
+  "m-hm-79": {
+    "reading": "H08",
+    "replacement": false
+  },
+  "m-hm-80m": {
+    "reading": "H08",
+    "replacement": true
+  },
+  "m-hm-81m": {
+    "reading": "L:muslim:2734",
+    "replacement": true
+  },
+  "m-hm-82": {
+    "reading": "L:abudawud:5090",
+    "replacement": false
+  },
+  "m-hm-84": {
+    "reading": "L:abudawud:5074",
+    "replacement": false
+  },
+  "m-hm-85": {
+    "reading": "L:tirmidhi:3392",
+    "replacement": false
+  },
+  "m-hm-86": {
+    "reading": "L:abudawud:5088",
+    "replacement": false
+  },
+  "m-hm-87": {
+    "reading": "L:muslim:386",
+    "replacement": true
+  },
+  "m-hm-88": {
+    "reading": "L:nasai-kubra:10330",
+    "replacement": false
+  },
+  "m-hm-89m": {
+    "reading": "L:muslim:2723b",
+    "replacement": true
+  },
+  "m-hm-91": {
+    "reading": "L:bukhari:6405",
+    "replacement": false
+  },
+  "m-hm-93": {
+    "reading": "L:bukhari:3293",
+    "replacement": false
+  },
+  "m-hm-94": {
+    "reading": "L:muslim:2726a",
+    "replacement": false
+  },
+  "m-hm-95": {
+    "reading": "L:ibnmajah:925",
+    "replacement": false
+  },
+  "m-hm-96": {
+    "reading": "L:abudawud:1516",
+    "replacement": false
+  },
+  "m-hm-97": {
+    "reading": "L:muslim:2709a",
+    "replacement": false
+  },
+  "e-hm-75a": {
+    "reading": "L:abudawud:3667",
+    "replacement": false
+  },
+  "e-hm-75": {
+    "reading": "L:muslim:810",
+    "replacement": true
+  },
+  "e-hm-76a": {
+    "reading": "L:abudawud:5082",
+    "replacement": false
+  },
+  "e-hm-76b": {
+    "reading": "L:abudawud:5082",
+    "replacement": false
+  },
+  "e-hm-76c": {
+    "reading": "L:abudawud:5082",
+    "replacement": false
+  },
+  "e-hm-77e": {
+    "reading": "L:muslim:2723b",
+    "replacement": false
+  },
+  "e-hm-78e": {
+    "reading": "L:abudawud:5068",
+    "replacement": false
+  },
+  "e-hm-79": {
+    "reading": "H08",
+    "replacement": false
+  },
+  "e-hm-80e": {
+    "reading": "H08",
+    "replacement": true
+  },
+  "e-hm-81e": {
+    "reading": "L:muslim:2734",
+    "replacement": true
+  },
+  "e-hm-82": {
+    "reading": "L:abudawud:5090",
+    "replacement": false
+  },
+  "e-hm-84": {
+    "reading": "L:abudawud:5074",
+    "replacement": false
+  },
+  "e-hm-85": {
+    "reading": "L:tirmidhi:3392",
+    "replacement": false
+  },
+  "e-hm-86": {
+    "reading": "L:abudawud:5088",
+    "replacement": false
+  },
+  "e-hm-87": {
+    "reading": "L:muslim:386",
+    "replacement": true
+  },
+  "e-hm-88": {
+    "reading": "L:nasai-kubra:10330",
+    "replacement": false
+  },
+  "e-hm-89e": {
+    "reading": "L:muslim:2723b",
+    "replacement": true
+  },
+  "e-hm-91": {
+    "reading": "L:bukhari:6405",
+    "replacement": false
+  },
+  "e-hm-92": {
+    "reading": "L:bukhari:3293",
+    "replacement": false
+  },
+  "e-hm-96": {
+    "reading": "L:abudawud:1516",
+    "replacement": false
+  },
+  "e-hm-97": {
+    "reading": "L:muslim:2709a",
+    "replacement": false
+  },
+  "s-hm-99-ikhlas": {
+    "reading": "L:bukhari:5017",
+    "replacement": false
+  },
+  "s-hm-99-falaq": {
+    "reading": "L:bukhari:5017",
+    "replacement": false
+  },
+  "s-hm-99-nas": {
+    "reading": "L:bukhari:5017",
+    "replacement": false
+  },
+  "s-hm-100": {
+    "reading": "H16",
+    "replacement": false
+  },
+  "s-hm-101": {
+    "reading": "H17",
+    "replacement": false
+  },
+  "s-hm-109a": {
+    "reading": "L:abudawud:5055",
+    "replacement": false
+  },
+  "s-hm-110a": {
+    "reading": "L:bukhari:5017",
+    "replacement": true
+  },
+  "s-hm-110b": {
+    "reading": "L:tirmidhi:2891",
+    "replacement": false
+  },
+  "s-hm-106-subhanallah": {
+    "reading": "L:bukhari:3113",
+    "replacement": false
+  },
+  "s-hm-106-alhamdulillah": {
+    "reading": "L:bukhari:3113",
+    "replacement": false
+  },
+  "s-hm-106-allahu-akbar": {
+    "reading": "L:bukhari:3113",
+    "replacement": false
+  },
+  "s-hm-102": {
+    "reading": "L:bukhari:6320",
+    "replacement": false
+  },
+  "s-hm-105": {
+    "reading": "L:bukhari:6312",
+    "replacement": false
+  },
+  "s-hm-104": {
+    "reading": "L:tirmidhi:3399",
+    "replacement": false
+  },
+  "s-hm-108": {
+    "reading": "L:muslim:2715",
+    "replacement": false
+  },
+  "s-hm-107": {
+    "reading": "L:muslim:2713a",
+    "replacement": false
+  },
+  "s-hm-109": {
+    "reading": "L:abudawud:5067",
+    "replacement": false
+  },
+  "s-hm-111": {
+    "reading": "L:bukhari:247",
+    "replacement": false
+  },
+  "wu-hm-1": {
+    "reading": "L:bukhari:6312",
+    "replacement": false
+  },
+  "wu-hm-2": {
+    "reading": "L:bukhari:1154",
+    "replacement": false
+  },
+  "wu-hm-3": {
+    "reading": "L:tirmidhi:3401",
+    "replacement": false
+  },
+  "wu-hm-4": {
+    "reading": "L:muslim:763b",
+    "replacement": false
+  },
+  "home-hm-15": {
+    "reading": "L:abudawud:5095",
+    "replacement": false
+  },
+  "home-hm-17": {
+    "reading": "L:muslim:2018",
+    "replacement": false
+  },
+  "home-hm-18": {
+    "reading": "L:abudawud:5094",
+    "replacement": false
+  },
+  "msq-hm-20": {
+    "reading": "L:abudawud:466",
+    "replacement": false
+  },
+  "msq-hm-21": {
+    "reading": "L:muslim:713a",
+    "replacement": false
+  },
+  "msq-hm-22": {
+    "reading": "L:muslim:763",
+    "replacement": false
+  },
+  "msq-hm-23": {
+    "reading": "L:bukhari:444",
+    "replacement": false
+  },
+  "ap-ref-1": {
+    "reading": "L:muslim:591",
+    "replacement": false
+  },
+  "ap-ref-2": {
+    "reading": "L:muslim:591",
+    "replacement": false
+  },
+  "ap-ref-9": {
+    "reading": "L:nasai-kubra:9848",
+    "replacement": false
+  },
+  "ap-ref-3": {
+    "reading": "L:bukhari:844",
+    "replacement": false
+  },
+  "ap-ref-4": {
+    "reading": "L:bukhari:844",
+    "replacement": false
+  },
+  "ap-tasbeeh-subhanallah": {
+    "reading": "H15",
+    "replacement": false
+  },
+  "ap-tasbeeh-alhamdulillah": {
+    "reading": "H15",
+    "replacement": false
+  },
+  "ap-tasbeeh-allahuakbar": {
+    "reading": "H15",
+    "replacement": false
+  },
+  "ap-tasbeeh-tawhid": {
+    "reading": "H15",
+    "replacement": false
+  },
+  "ap-ref-6": {
+    "reading": "L:abudawud:1522",
+    "replacement": false
+  },
+  "ap-ref-7": {
+    "reading": "L:tirmidhi:3474",
+    "replacement": false
+  },
+  "ap-ref-8": {
+    "reading": "L:tirmidhi:3233",
+    "replacement": false
+  },
+  "ap-ref-10": {
+    "reading": "L:ibnmajah:925",
+    "replacement": false
+  },
+  "ap-ref-12a": {
+    "reading": "L:abudawud:1523",
+    "replacement": false
+  },
+  "ap-ref-12b": {
+    "reading": "L:abudawud:1523",
+    "replacement": false
+  },
+  "ap-ref-12c": {
+    "reading": "L:abudawud:1523",
+    "replacement": false
+  },
+  "in-prayer-opening-praise": {
+    "reading": "L:abudawud:775",
+    "replacement": false
+  },
+  "in-prayer-ruku-submission": {
+    "reading": "L:muslim:771",
+    "replacement": false
+  },
+  "in-prayer-ruku-sujud-holy": {
+    "reading": "L:abudawud:872",
+    "replacement": false
+  },
+  "in-prayer-ruku-sujud-majesty": {
+    "reading": "L:abudawud:873",
+    "replacement": false
+  },
+  "in-prayer-sujud-submission": {
+    "reading": "L:muslim:771",
+    "replacement": false
+  },
+  "in-prayer-sujud-tilawah": {
+    "reading": "L:abudawud:1414",
+    "replacement": false
+  },
+  "in-prayer-between-prostrations": {
+    "reading": "L:abudawud:850",
+    "replacement": false
+  },
+  "in-prayer-between-prostrations-brief": {
+    "reading": "L:abudawud:874",
+    "replacement": false
+  },
+  "in-prayer-before-salam-comprehensive": {
+    "reading": "L:nasai:1305",
+    "replacement": false
+  },
+  "in-prayer-before-salam-forgiveness": {
+    "reading": "L:muslim:771",
+    "replacement": false
+  },
+  "in-prayer-witr-qunut": {
+    "reading": "L:abudawud:1425",
+    "replacement": false
+  },
+  "fasting-iftar-supplication": {
+    "reading": "L:abudawud:2357",
+    "replacement": false
+  },
+  "fasting-affront-response": {
+    "reading": "L:bukhari:1894",
+    "replacement": false
+  },
+  "fasting-laylat-al-qadr": {
+    "reading": "L:tirmidhi:3513",
+    "replacement": false
+  },
+  "fasting-witr-completion": {
+    "reading": "L:nasai:1699",
+    "replacement": false
+  },
+  "fasting-iftar-host": {
+    "reading": "L:abudawud:3854",
+    "replacement": false
+  },
+  "pur-ref-1": {
+    "reading": "L:abudawud:101",
+    "replacement": false
+  },
+  "pur-ref-2": {
+    "reading": "L:muslim:234a",
+    "replacement": true
+  },
+  "pur-ref-3": {
+    "reading": "L:bukhari:142",
+    "replacement": false
+  },
+  "pur-ref-4": {
+    "reading": "L:abudawud:30",
+    "replacement": false
+  },
+  "pur-ref-5": {
+    "reading": "L:muslim:234a",
+    "replacement": false
+  },
+  "pur-ref-6": {
+    "reading": "L:muslim:234a",
+    "replacement": true
+  },
+  "fd-ref-1": {
+    "reading": "L:abudawud:3767",
+    "replacement": false
+  },
+  "fd-ref-2": {
+    "reading": "L:abudawud:3767",
+    "replacement": false
+  },
+  "fd-ref-3": {
+    "reading": "L:bukhari:5458",
+    "replacement": true
+  },
+  "fd-ref-4": {
+    "reading": "L:bukhari:5458",
+    "replacement": false
+  },
+  "fd-ref-5": {
+    "reading": "L:abudawud:3730",
+    "replacement": true
+  },
+  "fd-ref-6": {
+    "reading": "L:muslim:2055",
+    "replacement": false
+  },
+  "fd-ref-7": {
+    "reading": "L:abudawud:3854",
+    "replacement": false
+  },
+  "fd-ref-8": {
+    "reading": "L:abudawud:3730",
+    "replacement": false
+  },
+  "fd-ref-9": {
+    "reading": "L:tirmidhi:3458",
+    "replacement": false
+  },
+  "clo-ref-1": {
+    "reading": "L:abudawud:4020",
+    "replacement": true
+  },
+  "clo-ref-2": {
+    "reading": "L:abudawud:4020",
+    "replacement": false
+  },
+  "clo-ref-3": {
+    "reading": "L:abudawud:4020",
+    "replacement": false
+  },
+  "clo-ref-4": {
+    "reading": "L:abudawud:4020",
+    "replacement": true
+  },
+  "tr-ref-1": {
+    "reading": "L:muslim:1342",
+    "replacement": false
+  },
+  "tr-ref-2": {
+    "reading": "L:bukhari:2993",
+    "replacement": false
+  },
+  "tr-ref-3": {
+    "reading": "L:ibnmajah:2825",
+    "replacement": false
+  },
+  "tr-ref-5": {
+    "reading": "L:abudawud:2600",
+    "replacement": false
+  },
+  "tr-ref-6": {
+    "reading": "L:ibnkhuzaymah:2565",
+    "replacement": false
+  },
+  "tr-ref-7": {
+    "reading": "L:muslim:2708",
+    "replacement": false
+  },
+  "tr-ref-8": {
+    "reading": "L:muslim:2718",
+    "replacement": false
+  },
+  "tr-ref-4": {
+    "reading": "L:muslim:1342",
+    "replacement": false
+  },
+  "tr-ref-9": {
+    "reading": "L:bukhari:1797",
+    "replacement": false
+  },
+  "da-ref-1": {
+    "reading": "L:bukhari:6363",
+    "replacement": false
+  },
+  "da-ref-2": {
+    "reading": "L:tirmidhi:3505",
+    "replacement": false
+  },
+  "da-ref-3": {
+    "reading": "L:abudawud:1525",
+    "replacement": false
+  },
+  "da-ref-4": {
+    "reading": "L:abudawud:5090",
+    "replacement": false
+  },
+  "da-ref-6": {
+    "reading": "L:ahmad:3712",
+    "replacement": false
+  },
+  "da-ref-7": {
+    "reading": "L:tirmidhi:3563",
+    "replacement": false
+  },
+  "da-ref-8": {
+    "reading": "L:bukhari:6346",
+    "replacement": false
+  },
+  "ir-ref-1": {
+    "reading": "L:muslim:2202",
+    "replacement": false
+  },
+  "ir-ref-2": {
+    "reading": "L:muslim:2191",
+    "replacement": false
+  },
+  "ir-ref-3": {
+    "reading": "L:muslim:2185",
+    "replacement": false
+  },
+  "ir-ref-4": {
+    "reading": "L:abudawud:3106",
+    "replacement": false
+  },
+  "ir-ref-5a": {
+    "reading": "L:bukhari:5017",
+    "replacement": false
+  },
+  "ir-ref-5b": {
+    "reading": "L:bukhari:5017",
+    "replacement": false
+  },
+  "ir-ref-5c": {
+    "reading": "L:bukhari:5017",
+    "replacement": false
+  },
+  "ir-ref-6": {
+    "reading": "L:muslim:2186",
+    "replacement": false
+  },
+  "ir-ref-7": {
+    "reading": "L:muslim:916a",
+    "replacement": false
+  },
+  "ir-baqarah": {
+    "reading": "L:muslim:780",
+    "replacement": false
+  },
+  "sc-ref-1": {
+    "reading": "L:abudawud:5195",
+    "replacement": false
+  },
+  "sc-ref-2": {
+    "reading": "L:bukhari:3217",
+    "replacement": false
+  },
+  "sc-ref-3": {
+    "reading": "L:bukhari:6224",
+    "replacement": false
+  },
+  "sc-ref-4": {
+    "reading": "L:bukhari:6224",
+    "replacement": false
+  },
+  "sc-ref-5": {
+    "reading": "L:tirmidhi:2035",
+    "replacement": false
+  },
+  "sc-ref-6": {
+    "reading": "L:nasai-kubra:10062",
+    "replacement": false
+  },
+  "sc-ref-7": {
+    "reading": "L:abudawud:2130",
+    "replacement": false
+  },
+  "sc-ref-8": {
+    "reading": "L:muslim:918",
+    "replacement": false
+  },
+  "sc-ref-9": {
+    "reading": "L:muslim:920",
+    "replacement": false
+  },
+  "sc-ref-10": {
+    "reading": "L:tirmidhi:3433",
+    "replacement": false
+  },
+  "sc-ref-11": {
+    "reading": "L:bukhari:6388",
+    "replacement": false
+  },
+  "sc-ref-12": {
+    "reading": "L:bukhari:3371",
+    "replacement": false
+  },
+  "sc-ref-13": {
+    "reading": "N28",
+    "replacement": true
+  },
+  "sc-ref-14": {
+    "reading": "L:ibnmajah:3509",
+    "replacement": false
+  },
+  "ne-ref-1": {
+    "reading": "L:muslim:899b",
+    "replacement": false
+  },
+  "ne-ref-2": {
+    "reading": "L:bukhari:1032",
+    "replacement": false
+  },
+  "ne-ref-3": {
+    "reading": "L:bukhari:846",
+    "replacement": false
+  },
+  "ne-ref-4": {
+    "reading": "L:adab:723",
+    "replacement": false
+  },
+  "ne-ref-5": {
+    "reading": "N24",
+    "replacement": true
+  },
+  "ne-ref-6": {
+    "reading": "L:abudawud:1191",
+    "replacement": false
+  },
+  "ne-ref-7": {
+    "reading": "L:bukhari:1014",
+    "replacement": false
+  },
+  "misc-ref-1": {
+    "reading": "N25",
+    "replacement": false
+  },
+  "misc-ref-2": {
+    "reading": "L:bukhari:3293",
+    "replacement": false
+  },
+  "misc-ref-3": {
+    "reading": "L:bukhari:6405",
+    "replacement": false
+  },
+  "misc-ref-4": {
+    "reading": "L:bukhari:7563",
+    "replacement": false
+  },
+  "misc-ref-5": {
+    "reading": "L:abudawud:5074",
+    "replacement": false
+  },
+  "misc-ref-6": {
+    "reading": "L:bukhari:6384",
+    "replacement": false
+  },
+  "misc-ref-7": {
+    "reading": "L:muslim:2697a",
+    "replacement": false
+  },
+  "misc-ref-8": {
+    "reading": "H08",
+    "replacement": false
+  },
+  "misc-ref-9": {
+    "reading": "L:abudawud:5088",
+    "replacement": false
+  },
+  "misc-ref-10": {
+    "reading": "L:bukhari:1166",
+    "replacement": false
+  },
+  "misc-ref-11": {
+    "reading": "L:bukhari:6405",
+    "replacement": true
+  },
+  "misc-ref-12": {
+    "reading": "L:adab:716",
+    "replacement": false
+  },
+  "misc-ref-13": {
+    "reading": "L:abudawud:1516",
+    "replacement": false
+  },
+  "misc-ref-14": {
+    "reading": "L:bukhari:6115",
+    "replacement": false
+  }
+}

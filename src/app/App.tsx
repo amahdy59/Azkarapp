@@ -81,6 +81,7 @@ import { getLocationBasedReminders, useForegroundReminders } from "./hooks/useFo
 import { useAuthHandlers, type ConfirmDialogOptions, type GuestMigrationDecision } from "./hooks/useAuthHandlers";
 import { useSettingsHandlers } from "./hooks/useSettingsHandlers";
 import { useSessionHandlers } from "./hooks/useSessionHandlers";
+import { mergeZikrHistory } from "./zikrHistory";
 import { usePwaLifecycle } from "./hooks/usePwaLifecycle";
 import { useAppStatePersistence } from "./hooks/useAppStatePersistence";
 import {
@@ -396,6 +397,7 @@ function AppContent({
   const [hijriDateOffset, setHijriDateOffset] = useState<number>(initialState.settings.hijriDateOffset ?? 0);
   const [masbahaState, setMasbahaState] = useState(initialState.masbahaState);
   const [dailyCompletions, setDailyCompletions] = useState(initialState.dailyCompletions);
+  const [zikrHistory, setZikrHistory] = useState(initialState.zikrHistory ?? []);
   const [prayerTracking, setPrayerTracking] = useState(initialState.prayerTracking);
   const [dailyHabits, setDailyHabits] = useState(initialState.dailyHabits ?? []);
   const [khatmahPage, setKhatmahPage] = useState(() => quranPage ?? initialState.khatmahPage ?? 1);
@@ -769,6 +771,7 @@ function AppContent({
       completed: fromCompletedSets(completed),
       sessions,
       dailyCompletions,
+      zikrHistory,
       prayerTracking,
       dailyHabits,
       savedZikrIds: [...savedZikrIds].sort(),
@@ -822,6 +825,7 @@ function AppContent({
       selectedLang,
       sessions,
       dailyCompletions,
+      zikrHistory,
       prayerTracking,
       dailyHabits,
       savedZikrIds,
@@ -871,6 +875,10 @@ function AppContent({
     advanceAfterCompletion,
     goHome,
   } = useSessionHandlers({
+    onRecordZikrDay: (category, offeredIds, completedIds) => {
+      const dayKey = getProgressDayKey(new Date(), progressDayStartHour);
+      setZikrHistory((previous) => mergeZikrHistory(previous, [{ dayKey, category, offeredIds, completedIds }]));
+    },
     activeCat,
     activeRoutineMode,
     setActiveCat,
@@ -1172,6 +1180,7 @@ function AppContent({
     setIsGuest(state.profile.isGuest);
     setAccountUserId(state.profile.accountUserId);
     setDailyCompletions(state.dailyCompletions);
+    setZikrHistory(state.zikrHistory ?? []);
     // Any snapshot written before this field existed — which is every stored
     // or synced state from an earlier version — has no prayerTracking. The
     // type says otherwise, but restore data does not obey the type.
@@ -1954,6 +1963,7 @@ function AppContent({
               )}
               {view === "progress" && (
                 <ProgressScreen
+                  zikrHistory={zikrHistory}
                   dailyCompletions={dailyCompletions}
                   progressDayStartHour={progressDayStartHour}
                   calendarType={calendarType}

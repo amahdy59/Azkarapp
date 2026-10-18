@@ -234,6 +234,14 @@ export interface Zikr {
 export type ZikrDraft = Omit<Zikr, "canonicalKey" | "audioBehavior"> &
   Partial<Pick<Zikr, "canonicalKey" | "audioBehavior">>;
 
+/** Explicit daily item history; no reconstruction from collection totals. */
+export interface ZikrDayRecord {
+  dayKey: string;
+  category: "morning" | "evening" | "before_sleep";
+  offeredIds: string[];
+  completedIds: string[];
+}
+
 export interface StoredSession {
   id: string;
   category: CategoryId;
@@ -439,6 +447,7 @@ export interface AppStateSnapshot {
   completed: Record<CategoryId, string[]>;
   sessions: StoredSession[];
   dailyCompletions: DailyCollectionCompletion[];
+  zikrHistory?: ZikrDayRecord[];
   /** Per-prayer mosque/adhkar tracking, by day and stable prayer id. */
   prayerTracking: PrayerTrackingRecord[];
   /** Companion daily spiritual habits (Quran wird, mosque prayers) recorded per day. */

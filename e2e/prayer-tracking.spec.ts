@@ -83,10 +83,13 @@ test.describe("after-prayer tracking", () => {
     await page.goto("/#/progress");
     const group = page.getByTestId("progress-prayer-group");
     await expect(group.locator("input, select, button")).toHaveCount(0);
-    await group.getByText("تفاصيل الصلوات", { exact: true }).click();
-    await expect(group.getByRole("row")).toHaveCount(6);
+    const records = group.getByTestId("prayer-progress-summary").getByRole("listitem");
+    await expect(records).toHaveCount(5);
+    for (const name of ["الفجر", "الظهر", "العصر", "المغرب", "العشاء"])
+      await expect(records.filter({ hasText: name })).toHaveCount(1);
     await page.setViewportSize({ width: 375, height: 812 });
-    await expect(group.getByRole("row")).toHaveCount(6);
-    await expect(group.getByRole("region")).toBeVisible();
+    await expect(records).toHaveCount(5);
+    await expect(group.locator("input, select, button, table")).toHaveCount(0);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   });
 });

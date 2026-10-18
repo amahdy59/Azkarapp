@@ -2,6 +2,7 @@ import type { Zikr, ZikrAudioBehavior, ZikrDraft } from "../types";
 import { APPROVED_AUDIO_ASSIGNMENTS } from "../audio/audioAssignments";
 import { QURAN_PASSAGES } from "./quranPassages";
 import { QURAN_IMRAN_PASSAGE } from "./quranImranPassage";
+import reviewedCitations from "./reviewedCollectionCitations.json" with { type: "json" };
 
 const QURAN_CONTENT_BY_ID = {
   "wu-hm-4": QURAN_IMRAN_PASSAGE,
@@ -333,6 +334,18 @@ export function applyContentReview(items: ZikrDraft[]): Zikr[] {
   return items
     .filter((item) => item.id !== "ap-ref-11")
     .map((item) => {
+      const citation = reviewedCitations[item.id as keyof typeof reviewedCitations];
+      if (citation) {
+        item.sourceUrl = citation.url;
+        if (!item.sourceReferenceArabic?.includes(citation.referenceArabic)) {
+          item.sourceReferenceArabic = [citation.referenceArabic, item.sourceReferenceArabic]
+            .filter(Boolean)
+            .join("؛ ");
+        }
+        if (!item.sourceReference.includes(citation.reference)) {
+          item.sourceReference = `${citation.reference}; ${item.sourceReference}`;
+        }
+      }
       const audioAssetId = APPROVED_AUDIO_ASSIGNMENTS[item.id];
       return Object.assign(item, {
         canonicalKey:

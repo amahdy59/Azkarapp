@@ -1,0 +1,1195 @@
+{
+  "scope": "Citation metadata only; original wording, benefits, counts, timing and attribution remain unchanged.",
+  "updated": [
+    {
+      "id": "m-hm-75a",
+      "originalReference": "Abu Dawud no. 3667; Hisn al-Muslim 75a.",
+      "preciseReference": "Sunan Abi Dawud 3667",
+      "sourceUrl": "https://sunnah.com/abudawud:3667"
+    },
+    {
+      "id": "m-hm-76a",
+      "originalReference": "Abu Dawud 4/322; At-Tirmidhi 5/567; Hisn al-Muslim 76.",
+      "preciseReference": "Sunan Abi Dawud 5082",
+      "sourceUrl": "https://sunnah.com/abudawud:5082"
+    },
+    {
+      "id": "m-hm-76b",
+      "originalReference": "Abu Dawud 4/322; At-Tirmidhi 5/567; Hisn al-Muslim 76.",
+      "preciseReference": "Sunan Abi Dawud 5082",
+      "sourceUrl": "https://sunnah.com/abudawud:5082"
+    },
+    {
+      "id": "m-hm-76c",
+      "originalReference": "Abu Dawud 4/322; At-Tirmidhi 5/567; Hisn al-Muslim 76.",
+      "preciseReference": "Sunan Abi Dawud 5082",
+      "sourceUrl": "https://sunnah.com/abudawud:5082"
+    },
+    {
+      "id": "m-hm-77m",
+      "originalReference": "Muslim 4/2088; Hisn al-Muslim 77.",
+      "preciseReference": "Sahih Muslim 2723b",
+      "sourceUrl": "https://sunnah.com/muslim:2723b"
+    },
+    {
+      "id": "m-hm-78m",
+      "originalReference": "At-Tirmidhi 5/466; Abu Dawud 4/317; Ibn Majah; Hisn al-Muslim 78.",
+      "preciseReference": "Sunan Abi Dawud 5068",
+      "sourceUrl": "https://sunnah.com/abudawud:5068"
+    },
+    {
+      "id": "m-hm-79",
+      "originalReference": "Al-Bukhari 7/150; Hisn al-Muslim 79.",
+      "preciseReference": "Sahih al-Bukhari 6306",
+      "sourceUrl": "https://sunnah.com/bukhari:6306"
+    },
+    {
+      "id": "m-hm-82",
+      "originalReference": "Abu Dawud 4/324; Ahmad 5/42; An-Nasa’i; Ibn as-Sunni; Al-Adab al-Mufrad; Hisn al-Muslim 82.",
+      "preciseReference": "Sunan Abi Dawud 5090",
+      "sourceUrl": "https://sunnah.com/abudawud:5090"
+    },
+    {
+      "id": "m-hm-84",
+      "originalReference": "Abu Dawud; Ibn Majah; Ahmad; An-Nasa’i; Hisn al-Muslim 84.",
+      "preciseReference": "Sunan Abi Dawud 5074",
+      "sourceUrl": "https://sunnah.com/abudawud:5074"
+    },
+    {
+      "id": "m-hm-85",
+      "originalReference": "At-Tirmidhi; Abu Dawud 4/317; Hisn al-Muslim 85/109.",
+      "preciseReference": "Jami al-Tirmidhi 3392",
+      "sourceUrl": "https://sunnah.com/tirmidhi:3392"
+    },
+    {
+      "id": "m-hm-86",
+      "originalReference": "Abu Dawud 4/323; At-Tirmidhi 5/465; Ibn Majah; Ahmad; Hisn al-Muslim 86.",
+      "preciseReference": "Sunan Abi Dawud 5088",
+      "sourceUrl": "https://sunnah.com/abudawud:5088"
+    },
+    {
+      "id": "m-hm-88",
+      "originalReference": "Al-Hakim; Al-Albani, Sahih al-Jamiʿ; Hisn al-Muslim 88.",
+      "preciseReference": "al-Nasai, al-Sunan al-Kubra 10330",
+      "sourceUrl": "https://dorar.net/hadith/sharh/209179"
+    },
+    {
+      "id": "m-hm-91",
+      "originalReference": "Al-Bukhari 4/2071; Hisn al-Muslim 91.",
+      "preciseReference": "Sahih al-Bukhari 6405",
+      "sourceUrl": "https://sunnah.com/bukhari:6405"
+    },
+    {
+      "id": "m-hm-93",
+      "originalReference": "Al-Bukhari 4/95; Muslim 4/2071; Hisn al-Muslim 93.",
+      "preciseReference": "Sahih al-Bukhari 3293",
+      "sourceUrl": "https://sunnah.com/bukhari:3293"
+    },
+    {
+      "id": "m-hm-94",
+      "originalReference": "Muslim 4/2090; Hisn al-Muslim 94.",
+      "preciseReference": "Sahih Muslim 2726a",
+      "sourceUrl": "https://sunnah.com/muslim:2726a"
+    },
+    {
+      "id": "m-hm-95",
+      "originalReference": "Ibn as-Sunni no. 54; Ibn Majah no. 925; Hisn al-Muslim 95.",
+      "preciseReference": "Sunan Ibn Majah 925",
+      "sourceUrl": "https://sunnah.com/ibnmajah:925"
+    },
+    {
+      "id": "m-hm-96",
+      "originalReference": "Al-Bukhari; Muslim 4/2075; Hisn al-Muslim 96.",
+      "preciseReference": "Sunan Abi Dawud 1516",
+      "sourceUrl": "https://sunnah.com/abudawud:1516"
+    },
+    {
+      "id": "m-hm-97",
+      "originalReference": "Ahmad 2/290; An-Nasa’i; At-Tirmidhi 3/187; Ibn as-Sunni; Hisn al-Muslim 97.",
+      "preciseReference": "Sahih Muslim 2709a",
+      "sourceUrl": "https://sunnah.com/muslim:2709a"
+    },
+    {
+      "id": "e-hm-75a",
+      "originalReference": "Abu Dawud no. 3667; Hisn al-Muslim 75a.",
+      "preciseReference": "Sunan Abi Dawud 3667",
+      "sourceUrl": "https://sunnah.com/abudawud:3667"
+    },
+    {
+      "id": "e-hm-76a",
+      "originalReference": "Abu Dawud 4/322; At-Tirmidhi 5/567; Hisn al-Muslim 76.",
+      "preciseReference": "Sunan Abi Dawud 5082",
+      "sourceUrl": "https://sunnah.com/abudawud:5082"
+    },
+    {
+      "id": "e-hm-76b",
+      "originalReference": "Abu Dawud 4/322; At-Tirmidhi 5/567; Hisn al-Muslim 76.",
+      "preciseReference": "Sunan Abi Dawud 5082",
+      "sourceUrl": "https://sunnah.com/abudawud:5082"
+    },
+    {
+      "id": "e-hm-76c",
+      "originalReference": "Abu Dawud 4/322; At-Tirmidhi 5/567; Hisn al-Muslim 76.",
+      "preciseReference": "Sunan Abi Dawud 5082",
+      "sourceUrl": "https://sunnah.com/abudawud:5082"
+    },
+    {
+      "id": "e-hm-77e",
+      "originalReference": "Muslim 4/2088; Hisn al-Muslim 77.",
+      "preciseReference": "Sahih Muslim 2723b",
+      "sourceUrl": "https://sunnah.com/muslim:2723b"
+    },
+    {
+      "id": "e-hm-78e",
+      "originalReference": "At-Tirmidhi 5/466; Abu Dawud 4/317; Ibn Majah; Hisn al-Muslim 78.",
+      "preciseReference": "Sunan Abi Dawud 5068",
+      "sourceUrl": "https://sunnah.com/abudawud:5068"
+    },
+    {
+      "id": "e-hm-79",
+      "originalReference": "Al-Bukhari 7/150; Hisn al-Muslim 79.",
+      "preciseReference": "Sahih al-Bukhari 6306",
+      "sourceUrl": "https://sunnah.com/bukhari:6306"
+    },
+    {
+      "id": "e-hm-82",
+      "originalReference": "Abu Dawud 4/324; Ahmad 5/42; An-Nasa’i; Ibn as-Sunni; Al-Adab al-Mufrad; Hisn al-Muslim 82.",
+      "preciseReference": "Sunan Abi Dawud 5090",
+      "sourceUrl": "https://sunnah.com/abudawud:5090"
+    },
+    {
+      "id": "e-hm-84",
+      "originalReference": "Abu Dawud; Ibn Majah; Ahmad; An-Nasa’i; Hisn al-Muslim 84.",
+      "preciseReference": "Sunan Abi Dawud 5074",
+      "sourceUrl": "https://sunnah.com/abudawud:5074"
+    },
+    {
+      "id": "e-hm-85",
+      "originalReference": "At-Tirmidhi; Abu Dawud 4/317; Hisn al-Muslim 85/109.",
+      "preciseReference": "Jami al-Tirmidhi 3392",
+      "sourceUrl": "https://sunnah.com/tirmidhi:3392"
+    },
+    {
+      "id": "e-hm-86",
+      "originalReference": "Abu Dawud 4/323; At-Tirmidhi 5/465; Ibn Majah; Ahmad; Hisn al-Muslim 86.",
+      "preciseReference": "Sunan Abi Dawud 5088",
+      "sourceUrl": "https://sunnah.com/abudawud:5088"
+    },
+    {
+      "id": "e-hm-88",
+      "originalReference": "Al-Hakim; Al-Albani, Sahih al-Jamiʿ; Hisn al-Muslim 88.",
+      "preciseReference": "al-Nasai, al-Sunan al-Kubra 10330",
+      "sourceUrl": "https://dorar.net/hadith/sharh/209179"
+    },
+    {
+      "id": "e-hm-91",
+      "originalReference": "Al-Bukhari 4/2071; Hisn al-Muslim 91.",
+      "preciseReference": "Sahih al-Bukhari 6405",
+      "sourceUrl": "https://sunnah.com/bukhari:6405"
+    },
+    {
+      "id": "e-hm-92",
+      "originalReference": "Al-Bukhari 3293; Muslim 2691; Hisn al-Muslim 92–93.",
+      "preciseReference": "Sahih al-Bukhari 3293",
+      "sourceUrl": "https://sunnah.com/bukhari:3293"
+    },
+    {
+      "id": "e-hm-96",
+      "originalReference": "Al-Bukhari; Muslim 4/2075; Hisn al-Muslim 96.",
+      "preciseReference": "Sunan Abi Dawud 1516",
+      "sourceUrl": "https://sunnah.com/abudawud:1516"
+    },
+    {
+      "id": "e-hm-97",
+      "originalReference": "Ahmad 2/290; An-Nasa’i; At-Tirmidhi 3/187; Ibn as-Sunni; Hisn al-Muslim 97.",
+      "preciseReference": "Sahih Muslim 2709a",
+      "sourceUrl": "https://sunnah.com/muslim:2709a"
+    },
+    {
+      "id": "s-hm-99-ikhlas",
+      "originalReference": "Sahih al-Bukhari 5017; Sahih Muslim 2192; Hisn al-Muslim 99.",
+      "preciseReference": "Sahih al-Bukhari 5017",
+      "sourceUrl": "https://sunnah.com/bukhari:5017"
+    },
+    {
+      "id": "s-hm-99-falaq",
+      "originalReference": "Sahih al-Bukhari 5017; Sahih Muslim 2192; Hisn al-Muslim 99.",
+      "preciseReference": "Sahih al-Bukhari 5017",
+      "sourceUrl": "https://sunnah.com/bukhari:5017"
+    },
+    {
+      "id": "s-hm-99-nas",
+      "originalReference": "Sahih al-Bukhari 5017; Sahih Muslim 2192; Hisn al-Muslim 99.",
+      "preciseReference": "Sahih al-Bukhari 5017",
+      "sourceUrl": "https://sunnah.com/bukhari:5017"
+    },
+    {
+      "id": "s-hm-100",
+      "originalReference": "Sahih al-Bukhari 2311; Hisn al-Muslim 100.",
+      "preciseReference": "Sahih al-Bukhari 2311",
+      "sourceUrl": "https://sunnah.com/bukhari:2311"
+    },
+    {
+      "id": "s-hm-101",
+      "originalReference": "Sahih al-Bukhari 5009; Sahih Muslim 807; Hisn al-Muslim 101.",
+      "preciseReference": "Sahih al-Bukhari 5009",
+      "sourceUrl": "https://sunnah.com/bukhari:5009"
+    },
+    {
+      "id": "s-hm-109a",
+      "originalReference": "Sunan Abu Dawud 5055; Jami' at-Tirmidhi 3403.",
+      "preciseReference": "Sunan Abi Dawud 5055",
+      "sourceUrl": "https://sunnah.com/abudawud:5055"
+    },
+    {
+      "id": "s-hm-110b",
+      "originalReference": "Jami' at-Tirmidhi 2891 (Hasan).",
+      "preciseReference": "Jami al-Tirmidhi 2891",
+      "sourceUrl": "https://sunnah.com/tirmidhi:2891"
+    },
+    {
+      "id": "s-hm-106-subhanallah",
+      "originalReference": "Sahih al-Bukhari 3113; Sahih Muslim 2727; Hisn al-Muslim 106.",
+      "preciseReference": "Sahih al-Bukhari 3113",
+      "sourceUrl": "https://sunnah.com/bukhari:3113"
+    },
+    {
+      "id": "s-hm-106-alhamdulillah",
+      "originalReference": "Sahih al-Bukhari 3113; Sahih Muslim 2727; Hisn al-Muslim 106.",
+      "preciseReference": "Sahih al-Bukhari 3113",
+      "sourceUrl": "https://sunnah.com/bukhari:3113"
+    },
+    {
+      "id": "s-hm-106-allahu-akbar",
+      "originalReference": "Sahih al-Bukhari 3113; Sahih Muslim 2727; Hisn al-Muslim 106.",
+      "preciseReference": "Sahih al-Bukhari 3113",
+      "sourceUrl": "https://sunnah.com/bukhari:3113"
+    },
+    {
+      "id": "s-hm-102",
+      "originalReference": "Sahih al-Bukhari 6320; Sahih Muslim 2714; Hisn al-Muslim 102.",
+      "preciseReference": "Sahih al-Bukhari 6320",
+      "sourceUrl": "https://sunnah.com/bukhari:6320"
+    },
+    {
+      "id": "s-hm-105",
+      "originalReference": "Sahih al-Bukhari 6312; Sahih Muslim 2711; Hisn al-Muslim 105.",
+      "preciseReference": "Sahih al-Bukhari 6312",
+      "sourceUrl": "https://sunnah.com/bukhari:6312"
+    },
+    {
+      "id": "s-hm-104",
+      "originalReference": "Sunan Abu Dawud 5045; Jami' at-Tirmidhi 3398; Hisn al-Muslim 104.",
+      "preciseReference": "Jami al-Tirmidhi 3399",
+      "sourceUrl": "https://sunnah.com/tirmidhi:3399"
+    },
+    {
+      "id": "s-hm-108",
+      "originalReference": "Sahih Muslim 2715; Hisn al-Muslim 108.",
+      "preciseReference": "Sahih Muslim 2715",
+      "sourceUrl": "https://sunnah.com/muslim:2715"
+    },
+    {
+      "id": "s-hm-107",
+      "originalReference": "Sahih Muslim 2713; Hisn al-Muslim 107.",
+      "preciseReference": "Sahih Muslim 2713a",
+      "sourceUrl": "https://sunnah.com/muslim:2713a"
+    },
+    {
+      "id": "s-hm-109",
+      "originalReference": "Sunan Abu Dawud 5067; Jami' at-Tirmidhi 3392; Hisn al-Muslim 109.",
+      "preciseReference": "Sunan Abi Dawud 5067",
+      "sourceUrl": "https://sunnah.com/abudawud:5067"
+    },
+    {
+      "id": "s-hm-111",
+      "originalReference": "Sahih al-Bukhari 247; Sahih Muslim 2710; Hisn al-Muslim 111.",
+      "preciseReference": "Sahih al-Bukhari 247",
+      "sourceUrl": "https://sunnah.com/bukhari:247"
+    },
+    {
+      "id": "wu-hm-1",
+      "originalReference": "Al-Bukhari 11/113; Muslim 4/2083; Hisn al-Muslim 1.",
+      "preciseReference": "Sahih al-Bukhari 6312",
+      "sourceUrl": "https://sunnah.com/bukhari:6312"
+    },
+    {
+      "id": "wu-hm-2",
+      "originalReference": "Al-Bukhari 3/39; Hisn al-Muslim 2.",
+      "preciseReference": "Sahih al-Bukhari 1154",
+      "sourceUrl": "https://sunnah.com/bukhari:1154"
+    },
+    {
+      "id": "wu-hm-3",
+      "originalReference": "Jami` at-Tirmidhi 3401 (Hasan).",
+      "preciseReference": "Jami al-Tirmidhi 3401",
+      "sourceUrl": "https://sunnah.com/tirmidhi:3401"
+    },
+    {
+      "id": "wu-hm-4",
+      "originalReference": "Sahih al-Bukhari 4569; Sahih Muslim 763; Hisn al-Muslim 4.",
+      "preciseReference": "Sahih Muslim 763b",
+      "sourceUrl": "https://sunnah.com/muslim:763b"
+    },
+    {
+      "id": "home-hm-15",
+      "originalReference": "Abu Dawud 4/325; At-Tirmidhi 5/490; Hisn al-Muslim 15.",
+      "preciseReference": "Sunan Abi Dawud 5095",
+      "sourceUrl": "https://sunnah.com/abudawud:5095"
+    },
+    {
+      "id": "home-hm-17",
+      "originalReference": "Sahih Muslim 2018.",
+      "preciseReference": "Sahih Muslim 2018",
+      "sourceUrl": "https://sunnah.com/muslim:2018"
+    },
+    {
+      "id": "home-hm-18",
+      "originalReference": "Sunan Abi Dawud 5094; Jami` at-Tirmidhi 3427 (Sahih).",
+      "preciseReference": "Sunan Abi Dawud 5094",
+      "sourceUrl": "https://sunnah.com/abudawud:5094"
+    },
+    {
+      "id": "msq-hm-20",
+      "originalReference": "Abu Dawud; Muslim 1/494; Hisn al-Muslim 20.",
+      "preciseReference": "Sunan Abi Dawud 466",
+      "sourceUrl": "https://sunnah.com/abudawud:466"
+    },
+    {
+      "id": "msq-hm-21",
+      "originalReference": "Muslim 1/494; Ibn Majah; Hisn al-Muslim 21.",
+      "preciseReference": "Sahih Muslim 713a",
+      "sourceUrl": "https://sunnah.com/muslim:713a"
+    },
+    {
+      "id": "msq-hm-22",
+      "originalReference": "Sahih Muslim 763; Sahih al-Bukhari 6316; Hisn al-Muslim 19.",
+      "preciseReference": "Sahih Muslim 763",
+      "sourceUrl": "https://sunnah.com/muslim:763"
+    },
+    {
+      "id": "msq-hm-23",
+      "originalReference": "Sahih al-Bukhari 1163; Sahih Muslim 714.",
+      "preciseReference": "Sahih al-Bukhari 444",
+      "sourceUrl": "https://sunnah.com/bukhari:444"
+    },
+    {
+      "id": "ap-ref-1",
+      "originalReference": "Sahih Muslim 591; Hisn al-Muslim 66.",
+      "preciseReference": "Sahih Muslim 591",
+      "sourceUrl": "https://sunnah.com/muslim:591"
+    },
+    {
+      "id": "ap-ref-2",
+      "originalReference": "Sahih Muslim 592; Hisn al-Muslim 66.",
+      "preciseReference": "Sahih Muslim 591",
+      "sourceUrl": "https://sunnah.com/muslim:591"
+    },
+    {
+      "id": "ap-ref-9",
+      "originalReference": "Sunan an-Nasa'i 9928; Ibn Hibban 2004; Hisn al-Muslim 31.",
+      "preciseReference": "al-Nasai, al-Sunan al-Kubra 9848",
+      "sourceUrl": "https://dorar.net/h/cNxKfqOR?osoul=1"
+    },
+    {
+      "id": "ap-ref-3",
+      "originalReference": "Sahih al-Bukhari 6329; Sahih Muslim 595; Hisn al-Muslim 25.",
+      "preciseReference": "Sahih al-Bukhari 844",
+      "sourceUrl": "https://sunnah.com/bukhari:844"
+    },
+    {
+      "id": "ap-ref-4",
+      "originalReference": "Sahih al-Bukhari 844; Sahih Muslim 593; Hisn al-Muslim 26.",
+      "preciseReference": "Sahih al-Bukhari 844",
+      "sourceUrl": "https://sunnah.com/bukhari:844"
+    },
+    {
+      "id": "ap-tasbeeh-subhanallah",
+      "originalReference": "Sahih Muslim 597; Hisn al-Muslim 27.",
+      "preciseReference": "Sahih Muslim 597a",
+      "sourceUrl": "https://sunnah.com/muslim:597a"
+    },
+    {
+      "id": "ap-tasbeeh-alhamdulillah",
+      "originalReference": "Sahih Muslim 597; Hisn al-Muslim 27.",
+      "preciseReference": "Sahih Muslim 597a",
+      "sourceUrl": "https://sunnah.com/muslim:597a"
+    },
+    {
+      "id": "ap-tasbeeh-allahuakbar",
+      "originalReference": "Sahih Muslim 597; Hisn al-Muslim 27.",
+      "preciseReference": "Sahih Muslim 597a",
+      "sourceUrl": "https://sunnah.com/muslim:597a"
+    },
+    {
+      "id": "ap-tasbeeh-tawhid",
+      "originalReference": "Sahih Muslim 597; Hisn al-Muslim 27.",
+      "preciseReference": "Sahih Muslim 597a",
+      "sourceUrl": "https://sunnah.com/muslim:597a"
+    },
+    {
+      "id": "ap-ref-6",
+      "originalReference": "Sunan Abi Dawud 1522 (Sahih); Hisn al-Muslim 28.",
+      "preciseReference": "Sunan Abi Dawud 1522",
+      "sourceUrl": "https://sunnah.com/abudawud:1522"
+    },
+    {
+      "id": "ap-ref-7",
+      "originalReference": "Jami' at-Tirmidhi 3474; Sunan an-Nasa'i 10234; Hisn al-Muslim 29.",
+      "preciseReference": "Jami al-Tirmidhi 3474",
+      "sourceUrl": "https://sunnah.com/tirmidhi:3474"
+    },
+    {
+      "id": "ap-ref-8",
+      "originalReference": "Jami' at-Tirmidhi 3233 (Hasan).",
+      "preciseReference": "Jami al-Tirmidhi 3233",
+      "sourceUrl": "https://sunnah.com/tirmidhi:3233"
+    },
+    {
+      "id": "ap-ref-10",
+      "originalReference": "Sunan Ibn Majah 925; Hisn al-Muslim 32.",
+      "preciseReference": "Sunan Ibn Majah 925",
+      "sourceUrl": "https://sunnah.com/ibnmajah:925"
+    },
+    {
+      "id": "ap-ref-12a",
+      "originalReference": "Sunan Abi Dawud 1523 (Sahih).",
+      "preciseReference": "Sunan Abi Dawud 1523",
+      "sourceUrl": "https://sunnah.com/abudawud:1523"
+    },
+    {
+      "id": "ap-ref-12b",
+      "originalReference": "Sunan Abi Dawud 1523 (Sahih).",
+      "preciseReference": "Sunan Abi Dawud 1523",
+      "sourceUrl": "https://sunnah.com/abudawud:1523"
+    },
+    {
+      "id": "ap-ref-12c",
+      "originalReference": "Sunan Abi Dawud 1523 (Sahih).",
+      "preciseReference": "Sunan Abi Dawud 1523",
+      "sourceUrl": "https://sunnah.com/abudawud:1523"
+    },
+    {
+      "id": "in-prayer-opening-praise",
+      "originalReference": "Sunan Abi Dawud 775 (Sahih, al-Albani).",
+      "preciseReference": "Sunan Abi Dawud 775",
+      "sourceUrl": "https://sunnah.com/abudawud:775"
+    },
+    {
+      "id": "in-prayer-ruku-submission",
+      "originalReference": "Sahih Muslim 771.",
+      "preciseReference": "Sahih Muslim 771",
+      "sourceUrl": "https://sunnah.com/muslim:771"
+    },
+    {
+      "id": "in-prayer-ruku-sujud-holy",
+      "originalReference": "Sunan Abi Dawud 872 (Sahih, al-Albani); also reported by Muslim.",
+      "preciseReference": "Sunan Abi Dawud 872",
+      "sourceUrl": "https://sunnah.com/abudawud:872"
+    },
+    {
+      "id": "in-prayer-ruku-sujud-majesty",
+      "originalReference": "Sunan Abi Dawud 873; Sunan an-Nasa'i 1049.",
+      "preciseReference": "Sunan Abi Dawud 873",
+      "sourceUrl": "https://sunnah.com/abudawud:873"
+    },
+    {
+      "id": "in-prayer-sujud-submission",
+      "originalReference": "Sahih Muslim 771.",
+      "preciseReference": "Sahih Muslim 771",
+      "sourceUrl": "https://sunnah.com/muslim:771"
+    },
+    {
+      "id": "in-prayer-sujud-tilawah",
+      "originalReference": "Sunan Abi Dawud 1414; Jami' at-Tirmidhi 580.",
+      "preciseReference": "Sunan Abi Dawud 1414",
+      "sourceUrl": "https://sunnah.com/abudawud:1414"
+    },
+    {
+      "id": "in-prayer-between-prostrations",
+      "originalReference": "Sunan Abi Dawud 850 (Hasan, al-Albani).",
+      "preciseReference": "Sunan Abi Dawud 850",
+      "sourceUrl": "https://sunnah.com/abudawud:850"
+    },
+    {
+      "id": "in-prayer-between-prostrations-brief",
+      "originalReference": "Sunan Abi Dawud 874 (Sahih, al-Albani).",
+      "preciseReference": "Sunan Abi Dawud 874",
+      "sourceUrl": "https://sunnah.com/abudawud:874"
+    },
+    {
+      "id": "in-prayer-before-salam-comprehensive",
+      "originalReference": "Sunan an-Nasa'i 1305; Musnad Ahmad 4/264.",
+      "preciseReference": "Sunan al-Nasai 1305",
+      "sourceUrl": "https://sunnah.com/nasai:1305"
+    },
+    {
+      "id": "in-prayer-before-salam-forgiveness",
+      "originalReference": "Sahih Muslim 771.",
+      "preciseReference": "Sahih Muslim 771",
+      "sourceUrl": "https://sunnah.com/muslim:771"
+    },
+    {
+      "id": "in-prayer-witr-qunut",
+      "originalReference": "Sunan Abi Dawud 1425 (Sahih, al-Albani).",
+      "preciseReference": "Sunan Abi Dawud 1425",
+      "sourceUrl": "https://sunnah.com/abudawud:1425"
+    },
+    {
+      "id": "fasting-iftar-supplication",
+      "originalReference": "Sunan Abi Dawud 2357 (Hasan, al-Albani).",
+      "preciseReference": "Sunan Abi Dawud 2357",
+      "sourceUrl": "https://sunnah.com/abudawud:2357"
+    },
+    {
+      "id": "fasting-affront-response",
+      "originalReference": "Sahih al-Bukhari 1894; Sahih Muslim 1151.",
+      "preciseReference": "Sahih al-Bukhari 1894",
+      "sourceUrl": "https://sunnah.com/bukhari:1894"
+    },
+    {
+      "id": "fasting-laylat-al-qadr",
+      "originalReference": "Jami` at-Tirmidhi 3513 (Hasan Sahih).",
+      "preciseReference": "Jami al-Tirmidhi 3513",
+      "sourceUrl": "https://sunnah.com/tirmidhi:3513"
+    },
+    {
+      "id": "fasting-witr-completion",
+      "originalReference": "Sunan an-Nasa'i 1699, 1732 (Sahih, al-Albani).",
+      "preciseReference": "Sunan al-Nasai 1699",
+      "sourceUrl": "https://sunnah.com/nasai:1699"
+    },
+    {
+      "id": "fasting-iftar-host",
+      "originalReference": "Sunan Abi Dawud 3854 (Sahih, al-Albani).",
+      "preciseReference": "Sunan Abi Dawud 3854",
+      "sourceUrl": "https://sunnah.com/abudawud:3854"
+    },
+    {
+      "id": "pur-ref-1",
+      "originalReference": "Sunan Abu Dawud 101; Sunan Ibn Majah 399; Hisn al-Muslim 8.",
+      "preciseReference": "Sunan Abi Dawud 101",
+      "sourceUrl": "https://sunnah.com/abudawud:101"
+    },
+    {
+      "id": "pur-ref-3",
+      "originalReference": "Sahih al-Bukhari 142; Sahih Muslim 375; Hisn al-Muslim 6.",
+      "preciseReference": "Sahih al-Bukhari 142",
+      "sourceUrl": "https://sunnah.com/bukhari:142"
+    },
+    {
+      "id": "pur-ref-4",
+      "originalReference": "Sunan Abu Dawud 30; Jami' at-Tirmidhi 7; Hisn al-Muslim 7.",
+      "preciseReference": "Sunan Abi Dawud 30",
+      "sourceUrl": "https://sunnah.com/abudawud:30"
+    },
+    {
+      "id": "pur-ref-5",
+      "originalReference": "Sahih Muslim 234; Jami` at-Tirmidhi 55; Hisn al-Muslim 9.",
+      "preciseReference": "Sahih Muslim 234a",
+      "sourceUrl": "https://sunnah.com/muslim:234a"
+    },
+    {
+      "id": "fd-ref-1",
+      "originalReference": "Sunan Abu Dawud 3/347; Jami' at-Tirmidhi 4/288; Hisn al-Muslim 178.",
+      "preciseReference": "Sunan Abi Dawud 3767",
+      "sourceUrl": "https://sunnah.com/abudawud:3767"
+    },
+    {
+      "id": "fd-ref-2",
+      "originalReference": "Sunan Abu Dawud 3767; Jami' at-Tirmidhi 1858; Hisn al-Muslim 178.",
+      "preciseReference": "Sunan Abi Dawud 3767",
+      "sourceUrl": "https://sunnah.com/abudawud:3767"
+    },
+    {
+      "id": "fd-ref-4",
+      "originalReference": "Sahih al-Bukhari 7/84; Hisn al-Muslim 180.",
+      "preciseReference": "Sahih al-Bukhari 5458",
+      "sourceUrl": "https://sunnah.com/bukhari:5458"
+    },
+    {
+      "id": "fd-ref-6",
+      "originalReference": "Sahih Muslim 2055; Hisn al-Muslim 182.",
+      "preciseReference": "Sahih Muslim 2055",
+      "sourceUrl": "https://sunnah.com/muslim:2055"
+    },
+    {
+      "id": "fd-ref-7",
+      "originalReference": "Sunan Abu Dawud 3854; Sunan Ibn Majah 1747; Hisn al-Muslim 183.",
+      "preciseReference": "Sunan Abi Dawud 3854",
+      "sourceUrl": "https://sunnah.com/abudawud:3854"
+    },
+    {
+      "id": "fd-ref-8",
+      "originalReference": "Sunan Abu Dawud 3730; Jami' at-Tirmidhi 3455; Hisn al-Muslim 181.",
+      "preciseReference": "Sunan Abi Dawud 3730",
+      "sourceUrl": "https://sunnah.com/abudawud:3730"
+    },
+    {
+      "id": "fd-ref-9",
+      "originalReference": "Sunan Abu Dawud 4023; Jami' at-Tirmidhi 3458; Hisn al-Muslim 179.",
+      "preciseReference": "Jami al-Tirmidhi 3458",
+      "sourceUrl": "https://sunnah.com/tirmidhi:3458"
+    },
+    {
+      "id": "clo-ref-2",
+      "originalReference": "Sunan Abu Dawud 4020; Jami' at-Tirmidhi 1767; Hisn al-Muslim 3.",
+      "preciseReference": "Sunan Abi Dawud 4020",
+      "sourceUrl": "https://sunnah.com/abudawud:4020"
+    },
+    {
+      "id": "clo-ref-3",
+      "originalReference": "Sunan Abu Dawud 4020; Hisn al-Muslim 4.",
+      "preciseReference": "Sunan Abi Dawud 4020",
+      "sourceUrl": "https://sunnah.com/abudawud:4020"
+    },
+    {
+      "id": "tr-ref-1",
+      "originalReference": "Sahih Muslim 1342; Sunan Abu Dawud 2599; Hisn al-Muslim 75–76.",
+      "preciseReference": "Sahih Muslim 1342",
+      "sourceUrl": "https://sunnah.com/muslim:1342"
+    },
+    {
+      "id": "tr-ref-2",
+      "originalReference": "Sahih al-Bukhari 2993; Hisn al-Muslim 79.",
+      "preciseReference": "Sahih al-Bukhari 2993",
+      "sourceUrl": "https://sunnah.com/bukhari:2993"
+    },
+    {
+      "id": "tr-ref-3",
+      "originalReference": "Sunan Ibn Majah 2825; Musnad Ahmad 8690; Hisn al-Muslim 78.",
+      "preciseReference": "Sunan Ibn Majah 2825",
+      "sourceUrl": "https://sunnah.com/ibnmajah:2825"
+    },
+    {
+      "id": "tr-ref-5",
+      "originalReference": "Sunan Abu Dawud 2600; Jami' at-Tirmidhi 3443; Hisn al-Muslim 77.",
+      "preciseReference": "Sunan Abi Dawud 2600",
+      "sourceUrl": "https://sunnah.com/abudawud:2600"
+    },
+    {
+      "id": "tr-ref-6",
+      "originalReference": "Sahih Ibn Hibban 2697; Al-Hakim 1/442; Hisn al-Muslim 80.",
+      "preciseReference": "Sahih Ibn Khuzaymah 2565",
+      "sourceUrl": "https://dorar.net/h/L2Px7h0l?osoul=1"
+    },
+    {
+      "id": "tr-ref-7",
+      "originalReference": "Sahih Muslim 2708; Hisn al-Muslim 81.",
+      "preciseReference": "Sahih Muslim 2708",
+      "sourceUrl": "https://sunnah.com/muslim:2708"
+    },
+    {
+      "id": "tr-ref-8",
+      "originalReference": "Sahih Muslim 2718; Hisn al-Muslim 82.",
+      "preciseReference": "Sahih Muslim 2718",
+      "sourceUrl": "https://sunnah.com/muslim:2718"
+    },
+    {
+      "id": "tr-ref-4",
+      "originalReference": "Sahih Muslim 1342; Hisn al-Muslim 76.",
+      "preciseReference": "Sahih Muslim 1342",
+      "sourceUrl": "https://sunnah.com/muslim:1342"
+    },
+    {
+      "id": "tr-ref-9",
+      "originalReference": "Sahih al-Bukhari 1797, 3084; Sahih Muslim 1344; Hisn al-Muslim 77–78.",
+      "preciseReference": "Sahih al-Bukhari 1797",
+      "sourceUrl": "https://sunnah.com/bukhari:1797"
+    },
+    {
+      "id": "da-ref-1",
+      "originalReference": "Sahih al-Bukhari 6363; Sunan Abu Dawud 1555; Hisn al-Muslim 120.",
+      "preciseReference": "Sahih al-Bukhari 6363",
+      "sourceUrl": "https://sunnah.com/bukhari:6363"
+    },
+    {
+      "id": "da-ref-2",
+      "originalReference": "Jami' at-Tirmidhi 3505; Quran 21:87; Hisn al-Muslim 121.",
+      "preciseReference": "Jami al-Tirmidhi 3505",
+      "sourceUrl": "https://sunnah.com/tirmidhi:3505"
+    },
+    {
+      "id": "da-ref-3",
+      "originalReference": "Sunan Abu Dawud 1525; Hisn al-Muslim 122.",
+      "preciseReference": "Sunan Abi Dawud 1525",
+      "sourceUrl": "https://sunnah.com/abudawud:1525"
+    },
+    {
+      "id": "da-ref-4",
+      "originalReference": "Sunan Abu Dawud 5090; Hisn al-Muslim 123.",
+      "preciseReference": "Sunan Abi Dawud 5090",
+      "sourceUrl": "https://sunnah.com/abudawud:5090"
+    },
+    {
+      "id": "da-ref-6",
+      "originalReference": "Musnad Ahmad 3712; Hisn al-Muslim 120.",
+      "preciseReference": "Musnad Ahmad 3712",
+      "sourceUrl": "https://dorar.net/hadith/sharh/120832"
+    },
+    {
+      "id": "da-ref-7",
+      "originalReference": "Jami` at-Tirmidhi 3563; Hisn al-Muslim 136.",
+      "preciseReference": "Jami al-Tirmidhi 3563",
+      "sourceUrl": "https://sunnah.com/tirmidhi:3563"
+    },
+    {
+      "id": "da-ref-8",
+      "originalReference": "Sahih al-Bukhari 6346; Sahih Muslim 2730; Hisn al-Muslim 121.",
+      "preciseReference": "Sahih al-Bukhari 6346",
+      "sourceUrl": "https://sunnah.com/bukhari:6346"
+    },
+    {
+      "id": "ir-ref-1",
+      "originalReference": "Sahih Muslim 2202; Hisn al-Muslim 131.",
+      "preciseReference": "Sahih Muslim 2202",
+      "sourceUrl": "https://sunnah.com/muslim:2202"
+    },
+    {
+      "id": "ir-ref-2",
+      "originalReference": "Sahih al-Bukhari 7/131; Sahih Muslim 2191; Hisn al-Muslim 129.",
+      "preciseReference": "Sahih Muslim 2191",
+      "sourceUrl": "https://sunnah.com/muslim:2191"
+    },
+    {
+      "id": "ir-ref-3",
+      "originalReference": "Sahih Muslim 2186; Hisn al-Muslim 130.",
+      "preciseReference": "Sahih Muslim 2185",
+      "sourceUrl": "https://sunnah.com/muslim:2185"
+    },
+    {
+      "id": "ir-ref-4",
+      "originalReference": "Sunan Abu Dawud 3106; Jami' at-Tirmidhi 2083; Hisn al-Muslim 128.",
+      "preciseReference": "Sunan Abi Dawud 3106",
+      "sourceUrl": "https://sunnah.com/abudawud:3106"
+    },
+    {
+      "id": "ir-ref-5a",
+      "originalReference": "Sahih al-Bukhari 5017; Sahih Muslim 2192; Hisn al-Muslim 132.",
+      "preciseReference": "Sahih al-Bukhari 5017",
+      "sourceUrl": "https://sunnah.com/bukhari:5017"
+    },
+    {
+      "id": "ir-ref-5b",
+      "originalReference": "Sahih al-Bukhari 5017; Sahih Muslim 2192; Hisn al-Muslim 132.",
+      "preciseReference": "Sahih al-Bukhari 5017",
+      "sourceUrl": "https://sunnah.com/bukhari:5017"
+    },
+    {
+      "id": "ir-ref-5c",
+      "originalReference": "Sahih al-Bukhari 5017; Sahih Muslim 2192; Hisn al-Muslim 132.",
+      "preciseReference": "Sahih al-Bukhari 5017",
+      "sourceUrl": "https://sunnah.com/bukhari:5017"
+    },
+    {
+      "id": "ir-ref-6",
+      "originalReference": "Sahih Muslim 2186; Hisn al-Muslim 133.",
+      "preciseReference": "Sahih Muslim 2186",
+      "sourceUrl": "https://sunnah.com/muslim:2186"
+    },
+    {
+      "id": "ir-ref-7",
+      "originalReference": "Sahih Muslim 916, 917; Sunan Abi Dawud 3116; Hisn al-Muslim 138.",
+      "preciseReference": "Sahih Muslim 916a",
+      "sourceUrl": "https://sunnah.com/muslim:916a"
+    },
+    {
+      "id": "ir-baqarah",
+      "originalReference": "Sahih Muslim 804, 780.",
+      "preciseReference": "Sahih Muslim 780",
+      "sourceUrl": "https://sunnah.com/muslim:780"
+    },
+    {
+      "id": "sc-ref-1",
+      "originalReference": "Sunan Abu Dawud 5195; Hisn al-Muslim 72.",
+      "preciseReference": "Sunan Abi Dawud 5195",
+      "sourceUrl": "https://sunnah.com/abudawud:5195"
+    },
+    {
+      "id": "sc-ref-2",
+      "originalReference": "Sunan Abu Dawud 5195; Hisn al-Muslim 72.",
+      "preciseReference": "Sahih al-Bukhari 3217",
+      "sourceUrl": "https://sunnah.com/bukhari:3217"
+    },
+    {
+      "id": "sc-ref-3",
+      "originalReference": "Sahih al-Bukhari 7/125; Hisn al-Muslim 188.",
+      "preciseReference": "Sahih al-Bukhari 6224",
+      "sourceUrl": "https://sunnah.com/bukhari:6224"
+    },
+    {
+      "id": "sc-ref-4",
+      "originalReference": "Sahih al-Bukhari 7/125; Hisn al-Muslim 188.",
+      "preciseReference": "Sahih al-Bukhari 6224",
+      "sourceUrl": "https://sunnah.com/bukhari:6224"
+    },
+    {
+      "id": "sc-ref-5",
+      "originalReference": "Jami' at-Tirmidhi 2035.",
+      "preciseReference": "Jami al-Tirmidhi 2035",
+      "sourceUrl": "https://sunnah.com/tirmidhi:2035"
+    },
+    {
+      "id": "sc-ref-6",
+      "originalReference": "Various Sahih narrations.",
+      "preciseReference": "al-Nasai, al-Sunan al-Kubra 10062",
+      "sourceUrl": "https://dorar.net/h/moDLH4GW"
+    },
+    {
+      "id": "sc-ref-7",
+      "originalReference": "Sunan Abu Dawud 2130; Jami' at-Tirmidhi 1091; Hisn al-Muslim 98.",
+      "preciseReference": "Sunan Abi Dawud 2130",
+      "sourceUrl": "https://sunnah.com/abudawud:2130"
+    },
+    {
+      "id": "sc-ref-8",
+      "originalReference": "Sahih Muslim 918; Hisn al-Muslim 134.",
+      "preciseReference": "Sahih Muslim 918",
+      "sourceUrl": "https://sunnah.com/muslim:918"
+    },
+    {
+      "id": "sc-ref-9",
+      "originalReference": "Sahih Muslim 920; Hisn al-Muslim 135.",
+      "preciseReference": "Sahih Muslim 920",
+      "sourceUrl": "https://sunnah.com/muslim:920"
+    },
+    {
+      "id": "sc-ref-10",
+      "originalReference": "Jami` at-Tirmidhi 3433; Sunan Abi Dawud 4859; Hisn al-Muslim 196.",
+      "preciseReference": "Jami al-Tirmidhi 3433",
+      "sourceUrl": "https://sunnah.com/tirmidhi:3433"
+    },
+    {
+      "id": "sc-ref-11",
+      "originalReference": "Sahih al-Bukhari 6388; Sahih Muslim 1434; Hisn al-Muslim 190.",
+      "preciseReference": "Sahih al-Bukhari 6388",
+      "sourceUrl": "https://sunnah.com/bukhari:6388"
+    },
+    {
+      "id": "sc-ref-12",
+      "originalReference": "Sahih al-Bukhari 3371; Hisn al-Muslim 146.",
+      "preciseReference": "Sahih al-Bukhari 3371",
+      "sourceUrl": "https://sunnah.com/bukhari:3371"
+    },
+    {
+      "id": "sc-ref-14",
+      "originalReference": "Muwatta Malik 1746; Musnad Ahmad 15700.",
+      "preciseReference": "Sunan Ibn Majah 3509",
+      "sourceUrl": "https://sunnah.com/ibnmajah:3509"
+    },
+    {
+      "id": "ne-ref-1",
+      "originalReference": "Sahih Muslim 899; Hisn al-Muslim 170.",
+      "preciseReference": "Sahih Muslim 899b",
+      "sourceUrl": "https://sunnah.com/muslim:899b"
+    },
+    {
+      "id": "ne-ref-2",
+      "originalReference": "Sahih al-Bukhari 2/518; Hisn al-Muslim 171.",
+      "preciseReference": "Sahih al-Bukhari 1032",
+      "sourceUrl": "https://sunnah.com/bukhari:1032"
+    },
+    {
+      "id": "ne-ref-3",
+      "originalReference": "Sahih al-Bukhari 846; Sahih Muslim 71; Hisn al-Muslim 172.",
+      "preciseReference": "Sahih al-Bukhari 846",
+      "sourceUrl": "https://sunnah.com/bukhari:846"
+    },
+    {
+      "id": "ne-ref-4",
+      "originalReference": "Muwatta Imam Malik 2/992; Hisn al-Muslim 173.",
+      "preciseReference": "al-Adab al-Mufrad 723",
+      "sourceUrl": "https://dorar.net/h/55RjSOSD"
+    },
+    {
+      "id": "ne-ref-6",
+      "originalReference": "Sunan Abu Dawud 1191; Sahih al-Bukhari 1044; Sahih Muslim 901.",
+      "preciseReference": "Sunan Abi Dawud 1191",
+      "sourceUrl": "https://sunnah.com/abudawud:1191"
+    },
+    {
+      "id": "ne-ref-7",
+      "originalReference": "Sahih al-Bukhari 1014; Sahih Muslim 897; Hisn al-Muslim 175.",
+      "preciseReference": "Sahih al-Bukhari 1014",
+      "sourceUrl": "https://sunnah.com/bukhari:1014"
+    },
+    {
+      "id": "misc-ref-1",
+      "originalReference": "Sahih Muslim 2725; Hisn al-Muslim 127.",
+      "preciseReference": "Sahih Muslim 2725a",
+      "sourceUrl": "https://sunnah.com/muslim:2725a"
+    },
+    {
+      "id": "misc-ref-2",
+      "originalReference": "Sahih al-Bukhari 3293; Sahih Muslim 2691; Hisn al-Muslim 152.",
+      "preciseReference": "Sahih al-Bukhari 3293",
+      "sourceUrl": "https://sunnah.com/bukhari:3293"
+    },
+    {
+      "id": "misc-ref-3",
+      "originalReference": "Sahih al-Bukhari 6042; Sahih Muslim 2691; Hisn al-Muslim 153.",
+      "preciseReference": "Sahih al-Bukhari 6405",
+      "sourceUrl": "https://sunnah.com/bukhari:6405"
+    },
+    {
+      "id": "misc-ref-4",
+      "originalReference": "Sahih al-Bukhari 7563; Sahih Muslim 2694; Hisn al-Muslim 154.",
+      "preciseReference": "Sahih al-Bukhari 7563",
+      "sourceUrl": "https://sunnah.com/bukhari:7563"
+    },
+    {
+      "id": "misc-ref-5",
+      "originalReference": "Sunan Ibn Majah 3871; Hisn al-Muslim 126.",
+      "preciseReference": "Sunan Abi Dawud 5074",
+      "sourceUrl": "https://sunnah.com/abudawud:5074"
+    },
+    {
+      "id": "misc-ref-6",
+      "originalReference": "Sahih al-Bukhari 4409; Sahih Muslim 2704; Hisn al-Muslim 155.",
+      "preciseReference": "Sahih al-Bukhari 6384",
+      "sourceUrl": "https://sunnah.com/bukhari:6384"
+    },
+    {
+      "id": "misc-ref-7",
+      "originalReference": "Sahih Muslim 2696; Hisn al-Muslim 156.",
+      "preciseReference": "Sahih Muslim 2697a",
+      "sourceUrl": "https://sunnah.com/muslim:2697a"
+    },
+    {
+      "id": "misc-ref-8",
+      "originalReference": "Sahih al-Bukhari 6306; Hisn al-Muslim 69.",
+      "preciseReference": "Sahih al-Bukhari 6306",
+      "sourceUrl": "https://sunnah.com/bukhari:6306"
+    },
+    {
+      "id": "misc-ref-9",
+      "originalReference": "Sunan Abu Dawud 5088; Jami' at-Tirmidhi 3388; Hisn al-Muslim 70.",
+      "preciseReference": "Sunan Abi Dawud 5088",
+      "sourceUrl": "https://sunnah.com/abudawud:5088"
+    },
+    {
+      "id": "misc-ref-10",
+      "originalReference": "Sahih al-Bukhari 1162; Hisn al-Muslim 93.",
+      "preciseReference": "Sahih al-Bukhari 1166",
+      "sourceUrl": "https://sunnah.com/bukhari:1166"
+    },
+    {
+      "id": "misc-ref-12",
+      "originalReference": "Al-Adab Al-Mufrad 716; Musnad Ahmad 19606; Hisn al-Muslim 203.",
+      "preciseReference": "al-Adab al-Mufrad 716",
+      "sourceUrl": "https://sunnah.com/adab:716"
+    },
+    {
+      "id": "misc-ref-13",
+      "originalReference": "Sunan Abu Dawud 1516; Jami' at-Tirmidhi 3434; Hisn al-Muslim 208.",
+      "preciseReference": "Sunan Abi Dawud 1516",
+      "sourceUrl": "https://sunnah.com/abudawud:1516"
+    },
+    {
+      "id": "misc-ref-14",
+      "originalReference": "Sahih al-Bukhari 6115; Sahih Muslim 2610; Hisn al-Muslim 201.",
+      "preciseReference": "Sahih al-Bukhari 6115",
+      "sourceUrl": "https://sunnah.com/bukhari:6115"
+    }
+  ],
+  "pending": [
+    {
+      "id": "m-hm-75",
+      "source": "muslim:810",
+      "status": "replacement",
+      "originalReference": "Qur’an 2:255; Al-Hakim 1/562; Hisn al-Muslim 75.",
+      "reviewedCandidate": "hisn:75",
+      "reason": "Morning/evening protection addition is disputed; use the authenticated merit of Ayat al-Kursi without assigning that timing.",
+      "reviewUrl": "https://dorar.net/h/UA2ZPwXk",
+      "disposition": "Independent review of original wording, benefit, timing and count required. Do not substitute the Home alternative into this collection."
+    },
+    {
+      "id": "m-hm-80m",
+      "source": "bukhari:6306",
+      "status": "replacement",
+      "originalReference": "Abu Dawud 4/317; Al-Bukhari in Al-Adab al-Mufrad; An-Nasa’i; Ibn as-Sunni; Hisn al-Muslim 80.",
+      "reviewedCandidate": "abudawud:5069",
+      "reason": "Linked route is weak according to al-Albani; use the authenticated master supplication for forgiveness.",
+      "reviewUrl": "https://sunnah.com/abudawud:5069",
+      "disposition": "Independent review of original wording, benefit, timing and count required. Do not substitute the Home alternative into this collection."
+    },
+    {
+      "id": "m-hm-81m",
+      "source": "muslim:2734",
+      "status": "replacement",
+      "originalReference": "Abu Dawud 4/318; An-Nasa’i Amal al-Yawm wa al-Laylah no. 7; Ibn as-Sunni no. 41; Ibn Hibban no. 2361; Hisn al-Muslim 81.",
+      "reviewedCandidate": "abudawud:5073",
+      "reason": "Linked route is weak according to al-Albani; use authenticated gratitude for food and drink.",
+      "reviewUrl": "https://sunnah.com/abudawud:5073",
+      "disposition": "Independent review of original wording, benefit, timing and count required. Do not substitute the Home alternative into this collection."
+    },
+    {
+      "id": "m-hm-87",
+      "source": "muslim:386",
+      "status": "replacement",
+      "originalReference": "Ahmad 4/337; An-Nasa’i; Ibn as-Sunni; At-Tirmidhi 5/465; Hisn al-Muslim 87.",
+      "reviewedCandidate": "tirmidhi:3389",
+      "reason": "Older claim adds three repetitions and morning timing absent from this route; use the authenticated satisfaction declaration with its explicit adhan context.",
+      "reviewUrl": "https://sunnah.com/tirmidhi:3389",
+      "disposition": "Independent review of original wording, benefit, timing and count required. Do not substitute the Home alternative into this collection."
+    },
+    {
+      "id": "m-hm-89m",
+      "source": "muslim:2723b",
+      "status": "replacement",
+      "originalReference": "Abu Dawud 4/322; Hisn al-Muslim 89.",
+      "reviewedCandidate": "abudawud:5084",
+      "reason": "Linked route is weak according to al-Albani; use the authenticated morning/evening report.",
+      "reviewUrl": "https://sunnah.com/abudawud:5084",
+      "disposition": "Independent review of original wording, benefit, timing and count required. Do not substitute the Home alternative into this collection."
+    },
+    {
+      "id": "e-hm-75",
+      "source": "muslim:810",
+      "status": "replacement",
+      "originalReference": "Qur’an 2:255; Al-Hakim 1/562; Hisn al-Muslim 75.",
+      "reviewedCandidate": "hisn:75",
+      "reason": "Morning/evening protection addition is disputed; use the authenticated merit of Ayat al-Kursi without assigning that timing.",
+      "reviewUrl": "https://dorar.net/h/UA2ZPwXk",
+      "disposition": "Independent review of original wording, benefit, timing and count required. Do not substitute the Home alternative into this collection."
+    },
+    {
+      "id": "e-hm-80e",
+      "source": "bukhari:6306",
+      "status": "replacement",
+      "originalReference": "Abu Dawud 4/317; Al-Bukhari in Al-Adab al-Mufrad; An-Nasa’i; Ibn as-Sunni; Hisn al-Muslim 80.",
+      "reviewedCandidate": "abudawud:5069",
+      "reason": "Linked route is weak according to al-Albani; use the authenticated master supplication for forgiveness.",
+      "reviewUrl": "https://sunnah.com/abudawud:5069",
+      "disposition": "Independent review of original wording, benefit, timing and count required. Do not substitute the Home alternative into this collection."
+    },
+    {
+      "id": "e-hm-81e",
+      "source": "muslim:2734",
+      "status": "replacement",
+      "originalReference": "Abu Dawud 4/318; An-Nasa’i Amal al-Yawm wa al-Laylah no. 7; Ibn as-Sunni no. 41; Ibn Hibban no. 2361; Hisn al-Muslim 81.",
+      "reviewedCandidate": "abudawud:5073",
+      "reason": "Linked route is weak according to al-Albani; use authenticated gratitude for food and drink.",
+      "reviewUrl": "https://sunnah.com/abudawud:5073",
+      "disposition": "Independent review of original wording, benefit, timing and count required. Do not substitute the Home alternative into this collection."
+    },
+    {
+      "id": "e-hm-87",
+      "source": "muslim:386",
+      "status": "replacement",
+      "originalReference": "Ahmad 4/337; An-Nasa’i; Ibn as-Sunni; At-Tirmidhi 5/465; Hisn al-Muslim 87.",
+      "reviewedCandidate": "tirmidhi:3389",
+      "reason": "Older claim adds three repetitions and morning timing absent from this route; use the authenticated satisfaction declaration with its explicit adhan context.",
+      "reviewUrl": "https://sunnah.com/tirmidhi:3389",
+      "disposition": "Independent review of original wording, benefit, timing and count required. Do not substitute the Home alternative into this collection."
+    },
+    {
+      "id": "e-hm-89e",
+      "source": "muslim:2723b",
+      "status": "replacement",
+      "originalReference": "Abu Dawud 4/322; Hisn al-Muslim 89.",
+      "reviewedCandidate": "abudawud:5084",
+      "reason": "Linked route is weak according to al-Albani; use the authenticated morning/evening report.",
+      "reviewUrl": "https://sunnah.com/abudawud:5084",
+      "disposition": "Independent review of original wording, benefit, timing and count required. Do not substitute the Home alternative into this collection."
+    },
+    {
+      "id": "s-hm-110a",
+      "source": "bukhari:5017",
+      "status": "replacement",
+      "originalReference": "Jami' at-Tirmidhi 2892; Sunan an-Nasa'i 10043.",
+      "reviewedCandidate": "tirmidhi:2892",
+      "reason": "Darussalam grades the linked route weak; use the authenticated bedtime recitation report.",
+      "reviewUrl": "https://sunnah.com/tirmidhi:2892",
+      "disposition": "Independent review of original wording, benefit, timing and count required. Do not substitute the Home alternative into this collection."
+    },
+    {
+      "id": "pur-ref-2",
+      "source": "muslim:234a",
+      "status": "replacement",
+      "originalReference": "Sunan Ibn Majah 299.",
+      "reviewedCandidate": "nasai-kubra:9828",
+      "reason": "Scholarly grading disagreement; use an undisputed Sahih Muslim purification report.",
+      "reviewUrl": "https://dorar.net/index.php/azkar/mukhtasar/227",
+      "disposition": "Independent review of original wording, benefit, timing and count required. Do not substitute the Home alternative into this collection."
+    },
+    {
+      "id": "pur-ref-6",
+      "source": "muslim:234a",
+      "status": "replacement",
+      "originalReference": "Jami' at-Tirmidhi 3/153; Sunan an-Nasa'i; Hisn al-Muslim 10.",
+      "reviewedCandidate": "nasai-kubra:9909",
+      "reason": "Attribution as prophetic or companion is disputed; use Sahih Muslim purification evidence.",
+      "reviewUrl": "https://dorar.net/index.php/azkar/mukhtasar/227",
+      "disposition": "Independent review of original wording, benefit, timing and count required. Do not substitute the Home alternative into this collection."
+    },
+    {
+      "id": "fd-ref-3",
+      "source": "bukhari:5458",
+      "status": "replacement",
+      "originalReference": "Sunan Abu Dawud 3850; Jami' at-Tirmidhi 3457; Hisn al-Muslim 180.",
+      "reviewedCandidate": "abudawud:3850",
+      "reason": "Linked route is weak according to al-Albani; use authenticated praise after eating.",
+      "reviewUrl": "https://sunnah.com/abudawud:3850",
+      "disposition": "Independent review of original wording, benefit, timing and count required. Do not substitute the Home alternative into this collection."
+    },
+    {
+      "id": "fd-ref-5",
+      "source": "abudawud:3730",
+      "status": "replacement",
+      "originalReference": "Jami' at-Tirmidhi 5/506; Hisn al-Muslim 181.",
+      "reviewedCandidate": "tirmidhi:3455",
+      "reason": "Darussalam grades this route weak; use the linked Abu Dawud route graded Hasan by al-Albani.",
+      "reviewUrl": "https://sunnah.com/tirmidhi:3455",
+      "disposition": "Independent review of original wording, benefit, timing and count required. Do not substitute the Home alternative into this collection."
+    },
+    {
+      "id": "clo-ref-1",
+      "source": "abudawud:4020",
+      "status": "verified",
+      "originalReference": "Sunan Abu Dawud 4023; Jami' at-Tirmidhi 3458; Hisn al-Muslim 2.",
+      "reviewedCandidate": "abudawud:4020",
+      "disposition": "Independent review of original wording, benefit, timing and count required. Do not substitute the Home alternative into this collection."
+    },
+    {
+      "id": "clo-ref-4",
+      "source": "abudawud:4020",
+      "status": "replacement",
+      "originalReference": "Sunan Ibn Majah 297; Jami' at-Tirmidhi; Hisn al-Muslim 5.",
+      "reviewedCandidate": "ibnmajah:297",
+      "reason": "Darussalam grades this route weak; use authenticated supplication on receiving new clothing.",
+      "reviewUrl": "https://sunnah.com/ibnmajah:297",
+      "disposition": "Independent review of original wording, benefit, timing and count required. Do not substitute the Home alternative into this collection."
+    },
+    {
+      "id": "sc-ref-13",
+      "source": "bukhari:6412",
+      "status": "replacement",
+      "originalReference": "Jami` at-Tirmidhi 3431; Hisn al-Muslim 198.",
+      "reviewedCandidate": "tirmidhi:3431",
+      "reason": "Darussalam grades this route weak; use authenticated reflection on health and free time, without promising immunity from illness.",
+      "reviewUrl": "https://sunnah.com/tirmidhi:3431",
+      "disposition": "Independent review of original wording, benefit, timing and count required. Do not substitute the Home alternative into this collection."
+    },
+    {
+      "id": "ne-ref-5",
+      "source": "muslim:2721a",
+      "status": "replacement",
+      "originalReference": "Jami' at-Tirmidhi 3451; Hisn al-Muslim 168.",
+      "reviewedCandidate": "tirmidhi:3451",
+      "reason": "Darussalam grades this route weak; use an authenticated general supplication without claiming crescent-specific timing.",
+      "reviewUrl": "https://sunnah.com/tirmidhi:3451",
+      "disposition": "Independent review of original wording, benefit, timing and count required. Do not substitute the Home alternative into this collection."
+    },
+    {
+      "id": "misc-ref-11",
+      "source": "bukhari:6405",
+      "status": "replacement",
+      "originalReference": "Jami` at-Tirmidhi 3428; Hisn al-Muslim 200.",
+      "reviewedCandidate": "tirmidhi:3428",
+      "reason": "Darussalam grades this route weak; use authenticated general remembrance without the market-specific million-fold promise.",
+      "reviewUrl": "https://sunnah.com/tirmidhi:3428",
+      "disposition": "Independent review of original wording, benefit, timing and count required. Do not substitute the Home alternative into this collection."
+    }
+  ]
+}

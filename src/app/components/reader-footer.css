@@ -1,4 +1,4 @@
-/* Two centered action rows retain their geometry when tools are hidden. */
+/* Shared content-sized tools above the centered primary counting row. */
 [data-testid="reader-counter-stack"] {
   container: reader-footer / inline-size;
 }
@@ -7,63 +7,53 @@
 }
 .reader-footer-composition {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  align-items: center;
-  gap: 12px;
-  row-gap: 18px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px;
   max-width: 42rem;
   margin-inline: auto;
   padding-top: 10px;
 }
-.reader-tools-actions {
-  grid-column: 1 / 4;
-  grid-row: 1;
-}
-.reader-tools-disclosure {
-  grid-column: 4;
-  grid-row: 1;
-  padding-block: 0;
-}
-.reader-tools-disclosure button {
-  width: 100%;
+.reader-tools-row {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   min-width: 0;
-  max-width: 100%;
-  padding-inline: 12px;
-  white-space: nowrap;
-  overflow: hidden;
 }
-.reader-tools-disclosure .reader-tools-chevron {
+/* Flatten presentation wrappers so all four tools share one row in DOM order. */
+.reader-tools-actions,
+[data-testid="reader-support-actions"],
+.reader-tools-disclosure {
+  display: contents;
+}
+.reader-tools-row .devotional-secondary-action {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 44px;
+  max-width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  gap: 6px;
+  background: transparent;
+}
+.reader-tools-row .devotional-secondary-action > span {
+  white-space: normal;
+  overflow: visible;
+  overflow-wrap: anywhere;
+  text-overflow: clip;
+}
+.reader-tools-row .reader-tools-chevron {
   flex-shrink: 0;
 }
 .reader-tools-toggle:not([data-focus-active])[aria-expanded="false"] {
   border-style: dashed;
   background: var(--card);
 }
-.reader-footer-composition[data-focus-mode="true"] {
-  border-top-color: transparent;
-}
 .reader-primary-actions {
-  grid-column: 1 / -1;
-  grid-row: 2;
+  min-width: 0;
   width: min(100%, 35rem);
   justify-self: center;
-}
-[data-testid="reader-support-actions"] {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(0, 1fr);
-  gap: 12px;
-}
-[data-testid="reader-support-actions"] .devotional-secondary-action,
-.reader-tools-disclosure .devotional-secondary-action {
-  width: 100%;
-  min-width: 0;
-  padding-inline: 12px;
-  background: transparent;
-}
-[data-testid="reader-support-actions"] .devotional-secondary-action > span {
-  white-space: nowrap;
-  overflow-wrap: normal;
 }
 .reader-text-scroll .reading-measure > div {
   min-height: 100%;
@@ -73,43 +63,17 @@
 }
 
 @container reader-footer (max-width: 37.5rem) {
-  .reader-footer-composition {
-    grid-template-columns: repeat(4, minmax(44px, 1fr));
-    gap: 8px;
-    row-gap: 18px;
+  .reader-tools-row .devotional-secondary-action {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    gap: 0;
   }
-  [data-testid="reader-support-actions"] {
-    gap: 8px;
-  }
-  [data-testid="reader-support-actions"] .devotional-secondary-action {
-    padding-inline: 0;
-  }
-  [data-testid="reader-support-actions"] .devotional-secondary-action > span {
+  .reader-tools-row .devotional-secondary-action > span {
     display: none;
   }
-  .reader-tools-disclosure button {
-    font-size: 0.875rem;
-    padding-inline: 8px;
-    gap: 4px;
-  }
-  .reader-tools-disclosure button > span {
-    display: none;
-  }
-  .reader-tools-disclosure .reader-tools-chevron {
+  .reader-tools-row .devotional-secondary-action > .reader-tools-chevron {
     display: flex;
-  }
-  [data-testid="reader-support-actions"] .devotional-secondary-action:has(.reader-tool-label),
-  .reader-tools-disclosure button:has(.reader-tool-label) {
-    gap: 2px;
-  }
-  [data-testid="reader-support-actions"] .devotional-secondary-action > .reader-tool-label,
-  .reader-tools-disclosure button > .reader-tool-label {
-    display: block;
-    max-width: 100%;
-    white-space: normal;
-    overflow-wrap: anywhere;
-    font-size: var(--text-micro);
-    line-height: 1.25;
   }
 }
 

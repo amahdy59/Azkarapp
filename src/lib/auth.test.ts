@@ -170,6 +170,17 @@ describe("remote history bounds", () => {
 });
 
 describe("remote settings", () => {
+  it("sends bounded, normalized item history while preserving full local history", () => {
+    const records = Array.from({ length: 125 }, (_, index) => ({
+      dayKey: new Date(2026, 0, index + 1, 12).toISOString().slice(0, 10),
+      category: "morning" as const,
+      offeredIds: ["m-hm-77m"],
+      completedIds: ["m-hm-77m"],
+    }));
+    const state = { ...DEFAULT_APP_STATE, zikrHistory: records };
+    expect(buildRemoteSettingsJson(state).zikrHistory).toHaveLength(120);
+    expect(state.zikrHistory).toHaveLength(125);
+  });
   it("keeps precise prayer location and calculation preferences device-local", () => {
     const location = {
       latitude: 21.4225,
@@ -225,6 +236,24 @@ function database(responses: Record<string, QueryResult[]> = {}) {
 const sessionFor = (id: string) => ({ user: { id, email: "reader@example.test" } }) as unknown as Session;
 
 describe("remote synchronization boundaries", () => {
+  it("merges item history from account settings without overwriting local days", async () => {
+    const row = {
+      dayKey: "2026-10-01",
+      category: "morning" as const,
+      offeredIds: ["m-hm-77m", "m-hm-78m"],
+      completedIds: ["m-hm-77m"],
+    };
+    database({
+      user_settings: [
+        {
+          data: { dark_mode: true, settings_json: { zikrHistory: [{ ...row, completedIds: ["m-hm-78m"] }] } },
+          error: null,
+        },
+      ],
+    });
+    const loaded = await loadRemoteState(sessionFor("zikr-history"), { ...DEFAULT_APP_STATE, zikrHistory: [row] });
+    expect(loaded.zikrHistory).toEqual([{ ...row, completedIds: row.offeredIds }]);
+  });
   it("keeps local coordinates and reading progress when remote rows are absent", async () => {
     const calls = database();
     const local = structuredClone(DEFAULT_APP_STATE);

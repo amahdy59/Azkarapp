@@ -40,6 +40,23 @@ it("renders tools and primary counter without a disclosure toggle when onToggle 
   expect(screen.queryByTestId("reader-tools-toggle")).not.toBeInTheDocument();
 });
 
+it("keeps tool, focus and counter keyboard order aligned with the visible rows", () => {
+  render(
+    <ReaderFooterTools language="en" onToggleFocus={() => {}} primary={<button>Count</button>}>
+      <button>Benefit</button>
+      <button>Listen</button>
+      <button>Share</button>
+    </ReaderFooterTools>,
+  );
+  expect(screen.getAllByRole("button").map((button) => button.textContent)).toEqual([
+    "Benefit",
+    "Listen",
+    "Share",
+    "Focus",
+    "Count",
+  ]);
+});
+
 it.each(["en", "ar"] as const)("toggles focus mode with onToggleFocus in %s", async (language) => {
   function FocusExample() {
     const [focusMode, setFocusMode] = useState(false);

@@ -199,3 +199,15 @@ Text-over-text overlays require a denser material than cards: dialogs, menus, li
 ## Progress-only tracking panel — 2026-10-18
 
 The owner clarifies Progress as a read-only statistics surface. Daily summaries derive saved counts; a collapsed native table exposes prayer locations and independent Rawatib/azkar facts. No timing decoration, recording controls or prayer-entry routes are shown. Missing records are explicitly distinguished from missed worship. Home continues owning prayer times, guidance and recording under the unchanged eligibility rules. No calculation, religious content, reminder, timezone, normalization or persistence change. Local phase: docs/agent/phases/PROGRESS_COMPACT_TRACKING_2026_10_18.md.
+
+## Progress recording patterns — 2026-10-18, local only
+
+The owner supersedes numeric tables and metric dropdowns with daily read-only status rows and historical comparisons for obligatory prayer, Rawatib and prayer azkar. Obligatory recording counts explicit home and mosque locations equally; optional practices remain independent and Asr remains excluded from Rawatib. Historical prayer comparisons include complete civil days only, independently of the devotional-day rollover, with absence explicitly distinguished from missed worship. Home recording, prayer times, religious source material and persistence are unchanged. Exact selected-period counts and location totals are available through an explicit JSON download. See docs/agent/phases/PROGRESS_ACTIONABLE_INSIGHTS_2026_10_18.md.
+
+## Local adjacent adhkar reading action — 2026-10-18
+
+The owner-approved card refinement moves the reading route into a separate button beside the after-prayer completion checkbox. The checkbox alone writes the existing record; the reading button never writes completion. Existing mosque labels, record day, Fajr sunrise, calculations, future eligibility and offline behavior remain. The complete unchanged virtue/source moves into a disclosure on narrow cards and remains visible beside actions when the card has 40rem available. Theme colors and shared Glass/fallback rules remain authoritative. See docs/agent/phases/PRAYER_ACTIONS_ADJACENT_READING_2026_10_18.md. Local only; no push.
+
+## Prayer evidence alignment and secondary record context — 2026-10-18, local only
+
+The owner requests removing the visible record line, aligning virtue with the title and keeping its citation inline. Move the same explicit time/dayKey/date label into the existing information sheet; no date assignment or calculation change. On wide cards, align the evidence heading at the prayer title top edge and span its column alongside the title/checklist. Fajr sunrise remains directly beneath its title. Append the unchanged source as a smaller inline span after the complete quotation; allow natural wrapping when the final line has insufficient room, never truncate or alter devotional text. Keep the established narrow disclosure, reading button, semantic colors, Glass/fallbacks and keyboard targets. This supersedes the earlier upper evidence-column record line. No push.

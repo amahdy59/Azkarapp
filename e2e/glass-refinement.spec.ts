@@ -114,8 +114,8 @@ for (const [language, width] of [
               ? page.locator(".settings-detail-pane .shared-screen-header")
               : page.getByTestId("shared-screen-header").first();
       await expect(header).not.toHaveAttribute("data-scrolled");
-      await expect(header).toHaveCSS("background-color", "rgba(15, 23, 42, 0.36)");
-      await expect(header).toHaveCSS("backdrop-filter", "blur(32px) saturate(1.35)");
+      await expect(header).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+      await expect(header).toHaveCSS("backdrop-filter", "none");
       await expect(page.locator(".app-main-view")).toHaveCSS("view-transition-name", "none");
       const material = () =>
         header.evaluate((node) => {
@@ -130,11 +130,38 @@ for (const [language, width] of [
         });
       await page.evaluate(() => document.fonts.ready);
       await capture("rest");
+      if (route === "azkar") {
+        await expect(viewport).toHaveAttribute("data-testid", "library-content-scroll");
+        const headerBounds = await header.boundingBox();
+        const listBounds = await viewport.boundingBox();
+        expect(listBounds!.y).toBeGreaterThanOrEqual(headerBounds!.y + headerBounds!.height - 1);
+        await viewport.evaluate((node) => {
+          node.scrollTop = 120;
+        });
+        await expect.poll(() => viewport.evaluate((node) => node.scrollTop)).toBe(120);
+        expect(await header.boundingBox()).toEqual(headerBounds);
+        expect(await material()).toEqual(restingMaterial);
+        await expect(header).toHaveCSS("backdrop-filter", "none");
+        await expect(header).not.toHaveAttribute("data-scrolled");
+        await viewport.focus();
+        await page.keyboard.press("End");
+        await expect
+          .poll(() => viewport.evaluate((node) => Math.abs(node.scrollHeight - node.clientHeight - node.scrollTop)))
+          .toBeLessThan(2);
+        expect(await header.boundingBox()).toEqual(headerBounds);
+        await capture("scrolled");
+        expect((await new AxeBuilder({ page }).include(".app-main").analyze()).violations).toEqual([]);
+        await page.locator("html").evaluate((root) => root.classList.add("high-contrast"));
+        await expect(header).toHaveCSS("backdrop-filter", "none");
+        await expect(header).toHaveCSS("background-color", /^rgb\(/);
+        return;
+      }
       await viewport.evaluate((node) => {
         node.scrollTop = 120;
       });
       await expect(header).toHaveAttribute("data-scrolled", "true");
-      expect(await material()).toEqual(restingMaterial);
+      await expect(header).toHaveCSS("background-color", "rgba(15, 23, 42, 0.36)");
+      expect(await material()).not.toEqual(restingMaterial);
       await expect(header).toHaveCSS("backdrop-filter", "blur(32px) saturate(1.35)");
       if (route === "progress") {
         await expect(header.locator(".shared-screen-header")).toHaveCSS("backdrop-filter", "none");
@@ -171,8 +198,9 @@ for (const [language, width] of [
         }, top);
         if (elevated) await expect(header).toHaveAttribute("data-scrolled", "true");
         else await expect(header).not.toHaveAttribute("data-scrolled");
-        expect(await material()).toEqual(restingMaterial);
-        await expect(header).toHaveCSS("backdrop-filter", "blur(32px) saturate(1.35)");
+        if (elevated) expect(await material()).not.toEqual(restingMaterial);
+        else expect(await material()).toEqual(restingMaterial);
+        await expect(header).toHaveCSS("backdrop-filter", elevated ? "blur(32px) saturate(1.35)" : "none");
       }
       // The stationary Glass treatment must not leak into opaque modes.
       await page.locator("html").evaluate((root) => root.classList.add("high-contrast"));

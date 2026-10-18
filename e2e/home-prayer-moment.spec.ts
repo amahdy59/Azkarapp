@@ -46,6 +46,7 @@ for (const language of ["ar", "en"] as const) {
     test(`prayer record respects ${calendar} calendar in ${language} @cross-browser`, async ({ page }, testInfo) => {
       await page.setViewportSize({ width: 390, height: 844 });
       await openHomeAt(page, "2026-09-05T13:20:00", language, calendar, 1);
+      await page.getByTestId("prayer-actions-more-info").click();
       const record = page.getByTestId("prayer-record-date");
       await expect(record).toHaveAttribute("datetime", "2026-09-05");
       // The header and checklist name the same civil day using one preference.
@@ -69,7 +70,7 @@ test("the prayer card is on Home inside the window, and gone outside it", async 
   await expect(card).toHaveAttribute("data-prayer", "dhuhr");
 
   // Its parts are the prayer screen's, not a second copy of them.
-  await expect(card.getByTestId("prayer-moment-status")).toBeVisible();
+  await expect(card.getByTestId("prayer-moment-status")).toHaveCount(0);
   await expect(card.getByTestId("prayer-action-location")).toBeVisible();
 
   const strip = page.getByTestId("home-prayer-strip");
@@ -139,7 +140,7 @@ test("each Home prayer expands its shared properties under an aligned notch", as
   await expect(page).toHaveURL(/\/?$/);
   const expanded = page.getByTestId("home-prayer-moment");
   await expect(expanded).toHaveAttribute("data-prayer", "dhuhr");
-  await expect(expanded.getByTestId("prayer-moment-status")).toBeVisible();
+  await expect(expanded.getByTestId("prayer-moment-status")).toHaveCount(0);
   await expect(expanded.getByTestId("prayer-action-location")).toBeVisible();
 
   const selected = page.getByTestId("prayer-card-dhuhr");
@@ -172,7 +173,9 @@ test("each control on the card owns its own centre", async ({ page }) => {
   await expect(card).toBeVisible();
 
   const obscured = await card.evaluate((root) => {
-    const controls = [...root.querySelectorAll<HTMLElement>("input, button, [role='radio']")];
+    const controls = [...root.querySelectorAll<HTMLElement>("input, button, [role='radio']")].filter(
+      (element) => element.getClientRects().length > 0,
+    );
     return controls
       .map((element) => {
         // elementFromPoint reads viewport coordinates, so a control still below
@@ -266,7 +269,7 @@ test("tracking uses rounded-square checkbox focus and mirrors in RTL", async ({ 
   const copyBox = await copy.boundingBox();
   expect(indicatorBox).not.toBeNull();
   expect(copyBox).not.toBeNull();
-  expect(indicatorBox!.x).toBeLessThan(copyBox!.x);
+  expect(indicatorBox!.x).toBeGreaterThan(copyBox!.x + copyBox!.width);
 
   const infoButton = page.getByTestId("prayer-actions-more-info");
   const infoCircle = infoButton.locator("span[aria-hidden='true']");
@@ -291,14 +294,17 @@ test("tracking uses rounded-square checkbox focus and mirrors in RTL", async ({ 
   expect(infoCenterX).toBeLessThan(headingBox!.x + headingBox!.width);
   expect(indicatorCenterX).toBeGreaterThan(listBox!.x);
   expect(indicatorCenterX).toBeLessThan(listBox!.x + listBox!.width);
-  expect(headingBox!.x - (listBox!.x + listBox!.width)).toBeGreaterThanOrEqual(24);
+  // Identity and checklist share one logical column beside the evidence.
+  expect(headingBox!.x).toBeCloseTo(listBox!.x, 0);
+  expect(headingBox!.width).toBeCloseTo(listBox!.width, 0);
 
   await page.setViewportSize({ width: 390, height: 844 });
   const phoneInfo = await infoCircle.boundingBox();
   const phoneIndicator = await indicator.boundingBox();
   expect(phoneInfo).not.toBeNull();
   expect(phoneIndicator).not.toBeNull();
-  expect(
-    Math.abs(phoneInfo!.x + phoneInfo!.width / 2 - phoneIndicator!.x - phoneIndicator!.width / 2),
-  ).toBeLessThanOrEqual(1);
+  const phoneCopy = (await copy.boundingBox())!;
+  expect(phoneIndicator!.x).toBeGreaterThan(phoneCopy.x + phoneCopy.width);
+  expect(phoneIndicator!.x - (phoneCopy.x + phoneCopy.width)).toBeCloseTo(12, 0);
+  expect(phoneInfo!.x + phoneInfo!.width).toBeLessThan(phoneIndicator!.x);
 });

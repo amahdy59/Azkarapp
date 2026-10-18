@@ -1,6 +1,7 @@
+import { reminderText } from "../i18n/reminderReadings";
 import type { QuickRoutineShare } from "../hooks/useQuickRoutineShare";
-import { QuranVerseText } from "./QuranVerseText";
-import { QURAN_TEXT_STYLE } from "../quranTypography";
+import { useState, type ComponentProps } from "react";
+import { ReminderReading } from "./ReminderReading";
 import { progressFillStyle } from "./progressFillStyle";
 import { t } from "../i18n";
 import type { DailyEvidence } from "../dailyEvidence";
@@ -512,10 +513,10 @@ export function FridayHomeCard({
  * the only place in the app making a claim it could not support, so
  * {@link getDailyEvidence} will not return an entry that lacks one.
  */
-export function DailyEvidenceCard({
+function DailyEvidenceCardContent({
   language,
   direction,
-  evidence,
+  evidence: incomingEvidence,
   onRefresh,
   onGlass = false,
 }: {
@@ -535,6 +536,9 @@ export function DailyEvidenceCard({
    */
   onGlass?: boolean;
 }) {
+  const [readingEvidence, setReadingEvidence] = useState<DailyEvidence | null>(null);
+  const [focusedEvidence, setFocusedEvidence] = useState<DailyEvidence | null>(null);
+  const evidence = readingEvidence ?? focusedEvidence ?? incomingEvidence;
   return (
     <HomeCard
       as="section"
@@ -544,7 +548,11 @@ export function DailyEvidenceCard({
       data-testid="home-daily-evidence"
       data-evidence-id={evidence.evidenceId}
       dir={direction}
-      className="home-glass-reading flex min-h-0 flex-1 flex-col gap-3"
+      className="home-glass-reading flex min-h-0 flex-col gap-3"
+      onFocusCapture={() => setFocusedEvidence(evidence)}
+      onBlurCapture={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setFocusedEvidence(null);
+      }}
     >
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2">
@@ -562,16 +570,20 @@ export function DailyEvidenceCard({
             id="home-evidence-heading"
             className={`min-w-0 text-subtitle font-bold ${onGlass ? "text-on-media" : "text-foreground"}`}
           >
-            {evidence.title ?? t(language, "home.dailyEvidence")}
+            {evidence.title ?? reminderText(language, "home.dailyEvidence")}
           </h2>
         </div>
 
         {onRefresh && (
           <button
             type="button"
-            onClick={onRefresh}
-            aria-label={t(language, "home.nextDailyEvidence")}
-            title={t(language, "home.nextDailyEvidence")}
+            onClick={() => {
+              setReadingEvidence(null);
+              setFocusedEvidence(null);
+              onRefresh();
+            }}
+            aria-label={reminderText(language, "home.nextDailyEvidence")}
+            title={reminderText(language, "home.nextDailyEvidence")}
             data-testid="daily-evidence-refresh"
             className={`-my-1.5 -me-1.5 flex size-11 shrink-0 items-center justify-center rounded-full transition-transform hover:opacity-80 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring motion-reduce:transition-none ${
               onGlass ? "text-on-media-muted hover:text-on-media" : "text-muted-foreground hover:text-foreground"
@@ -588,36 +600,28 @@ export function DailyEvidenceCard({
           `lang` and `dir` follow the text that is actually rendered, and the
           Arabic face is only applied when the text is Arabic. */}
 
-      {evidence.excerpt || evidence.reportedAction ? (
+      {evidence.excerpt || evidence.reportedAction || evidence.companionReport ? (
         <p className={`text-xs font-semibold ${onGlass ? "text-on-media-muted" : "text-muted-foreground"}`}>
-          {t(language, evidence.reportedAction ? "home.reportedPropheticAction" : "home.hadithExcerpt")}
+          {reminderText(
+            language,
+            evidence.companionReport
+              ? "home.companionReport"
+              : evidence.reportedAction
+                ? "home.reportedPropheticAction"
+                : "home.hadithExcerpt",
+          )}
         </p>
       ) : null}
-      <blockquote
-        className={`font-medium ${
-          evidence.isQuran ? "text-xl sm:text-2xl font-normal leading-relaxed tracking-wide" : "text-title leading-[2]"
-        } ${onGlass ? "text-on-media" : "text-foreground"} ${evidence.hadithInArabic ? "zikr-text" : ""}`}
-        style={evidence.isQuran ? QURAN_TEXT_STYLE : undefined}
-        dir={evidence.hadithInArabic ? "rtl" : "ltr"}
-        lang={evidence.hadithInArabic ? "ar" : "en"}
-        data-testid="daily-evidence-hadith"
-      >
-        {evidence.isQuran ? (
-          <QuranVerseText text={evidence.hadith} language={language} canonicalKey={evidence.canonicalKey} />
-        ) : (
-          evidence.hadith
-        )}
-      </blockquote>
-
-      <p
-        className={`text-label leading-relaxed ${onGlass ? "text-on-media-muted" : "text-muted-foreground"}`}
-        dir="auto"
-      >
-        {evidence.benefit}
-      </p>
+      <ReminderReading
+        key={`${evidence.evidenceId ?? evidence.zikrId ?? evidence.canonicalKey ?? evidence.hadith}|${language}`}
+        evidence={evidence}
+        language={language}
+        onGlass={onGlass}
+        onReadingChange={(reading) => setReadingEvidence(reading ? evidence : null)}
+      />
 
       <footer
-        className={`mt-auto flex flex-wrap items-center gap-x-2 gap-y-1 border-t pt-3 ${
+        className={`flex flex-wrap items-center gap-x-2 gap-y-1 border-t pt-3 ${
           onGlass ? "border-white/20" : "border-border/40"
         }`}
       >
@@ -631,12 +635,13 @@ export function DailyEvidenceCard({
         {evidence.authenticityLevel === "weak" && <HadithWeakChainBadge language={language} />}
         {evidence.sourceUrl && (
           <a
+            data-testid="daily-evidence-source"
             href={evidence.sourceUrl}
             target="_blank"
             rel="noopener noreferrer"
             className={`ms-auto inline-flex min-h-11 items-center rounded-lg px-2 text-xs font-semibold underline underline-offset-4 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${onGlass ? "text-on-media-accent" : "text-primary"}`}
           >
-            {t(language, "home.viewEvidenceSource")}
+            {reminderText(language, "home.viewEvidenceSource")}
           </a>
         )}
         {evidence.sourceReference && (
@@ -647,4 +652,8 @@ export function DailyEvidenceCard({
       </footer>
     </HomeCard>
   );
+}
+
+export function DailyEvidenceCard(props: ComponentProps<typeof DailyEvidenceCardContent>) {
+  return <DailyEvidenceCardContent key={props.language} {...props} />;
 }

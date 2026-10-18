@@ -55,6 +55,7 @@ export function getSafeAuthErrorMessage(error: unknown, language: AppLanguage, f
 export function hasPrivateProgress(state: AppStateSnapshot) {
   return (
     state.sessions.length > 0 ||
+    (state.zikrHistory?.length ?? 0) > 0 ||
     state.dailyCompletions.length > 0 ||
     state.savedZikrIds.length > 0 ||
     Object.values(state.completed).some((items) => items.length > 0)

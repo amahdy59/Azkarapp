@@ -1,5 +1,6 @@
 import type { AppLanguage } from "../types";
 import { canCopyImage, copyImageToClipboard } from "./shareDispatcher";
+import { attributeCardImage } from "./attributedCard";
 
 export interface CuratedRoutineCard {
   id: string;
@@ -143,7 +144,9 @@ export async function fetchCuratedCardFile(
   const blob = await res.blob();
   if (!blob.size || !["image/jpeg", "image/png", "image/webp"].includes(blob.type))
     throw new Error("Unavailable card image");
-  return new File([blob], filename, { type: blob.type });
+  const attributed = await attributeCardImage(blob);
+  const extension = attributed.type === "image/webp" ? "webp" : "png";
+  return new File([attributed], filename.replace(/\.[^.]+$/, `.${extension}`), { type: attributed.type });
 }
 
 export async function fetchAllCuratedCardFiles(pack: CuratedRoutinePack, language: AppLanguage): Promise<File[]> {
@@ -159,30 +162,8 @@ export async function copyCuratedCardImage(card: CuratedRoutineCard): Promise<bo
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const blob = await res.blob();
 
-    if (blob.type === "image/png") {
-      return await copyImageToClipboard(blob);
-    }
-
-    if (typeof createImageBitmap === "function" && typeof document !== "undefined") {
-      try {
-        const bitmap = await createImageBitmap(blob);
-        const canvas = document.createElement("canvas");
-        canvas.width = bitmap.width;
-        canvas.height = bitmap.height;
-        const ctx = canvas.getContext("2d");
-        if (ctx) {
-          ctx.drawImage(bitmap, 0, 0);
-          const pngBlob = await new Promise<Blob | null>((resolve) => canvas.toBlob((b) => resolve(b), "image/png"));
-          if (pngBlob) {
-            return await copyImageToClipboard(pngBlob);
-          }
-        }
-      } catch {
-        // Fallback to copying fetched blob directly
-      }
-    }
-
-    return await copyImageToClipboard(blob);
+    if (!blob.size || !["image/jpeg", "image/png", "image/webp"].includes(blob.type)) return false;
+    return await copyImageToClipboard(await attributeCardImage(blob, "image/png"));
   } catch {
     return false;
   }

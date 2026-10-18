@@ -26,7 +26,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
-import { CounterGuidance } from "../components/CounterGuidance";
 import { ZikrCounterSurface } from "../components/ZikrComponents";
 import { isCounterShortcutBlocked } from "../keyboardShortcuts";
 import { useCounterClickFeedback } from "../hooks/useCounterClickFeedback";
@@ -402,12 +401,6 @@ export function FridaySalawatScreen({
                 </div>
               </div>
 
-              <CounterGuidance
-                language={language}
-                direction={direction}
-                hasStarted={progress.count > 0}
-                placement="above"
-              />
               <footer className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
                 <div data-testid="reader-counter-stack">
                   {rounds > 0 && (
@@ -457,12 +450,6 @@ export function FridaySalawatScreen({
                         reduceMotion={reduceMotion}
                       />
                     }
-                  />
-                  <CounterGuidance
-                    language={language}
-                    direction={direction}
-                    hasStarted={progress.count > 0}
-                    placement="below"
                   />
                 </div>
               </footer>

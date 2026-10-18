@@ -192,6 +192,20 @@
       border-bottom-color: rgb(255 255 255 / 0.07);
       box-shadow: 0 3px 12px rgb(2 6 23 / 0.12);
     }
+    /* At the top, chrome belongs to the same canvas as its content. Only
+       passing content needs a separate frosted surface. Keep navigation fixed. */
+    html[data-app-material-resolved="glass"]:not(.high-contrast)
+      :is(
+        [data-material-ui] header,
+        [data-material-ui] .shared-screen-header,
+        [data-material-ui] .settings-search-sticky,
+        [data-material-ui] .progress-screen-controls
+      ):not([data-scrolled="true"]) {
+      background: transparent !important;
+      backdrop-filter: none !important;
+      border-bottom-color: transparent;
+      box-shadow: none;
+    }
     /* In the settings root panel, the header sits directly above the sticky search bar, so only the search bar needs the bottom border/shadow */
     html[data-app-material-resolved="glass"]:not(.high-contrast)
       :is([data-testid="settings-screen"] > div > .shared-screen-header, .settings-nav-pane > .shared-screen-header) {

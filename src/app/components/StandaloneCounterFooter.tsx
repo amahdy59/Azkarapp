@@ -73,7 +73,7 @@ export function StandaloneCounterFooter({
               data-testid="counter-share-button"
             >
               <Share2 size={20} aria-hidden="true" />
-              <span className="min-w-0 truncate text-label font-semibold">{t(language, "reader.shareAction")}</span>
+              <span className="reader-tool-label text-label font-semibold">{t(language, "reader.shareAction")}</span>
             </DevotionalAction>
           )}
           <DevotionalAction
@@ -86,7 +86,7 @@ export function StandaloneCounterFooter({
             }}
           >
             {soundEnabled ? <Volume2 size={20} aria-hidden="true" /> : <VolumeX size={20} aria-hidden="true" />}
-            <span className="min-w-0 truncate text-label font-semibold">{t(language, "counter.sound")}</span>
+            <span className="reader-tool-label text-label font-semibold">{t(language, "counter.sound")}</span>
           </DevotionalAction>
           {!onShare && (
             <DevotionalAction
@@ -100,7 +100,7 @@ export function StandaloneCounterFooter({
               }}
             >
               <RotateCcw size={20} aria-hidden="true" />
-              <span className="min-w-0 truncate text-label font-semibold">{t(language, "counter.reset")}</span>
+              <span className="reader-tool-label text-label font-semibold">{t(language, "counter.reset")}</span>
             </DevotionalAction>
           )}
         </div>
