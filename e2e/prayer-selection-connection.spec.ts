@@ -118,12 +118,20 @@ test("selection follows keyboard activation and fades during free browsing @cros
   if (testInfo.project.name === "desktop-chromium")
     await page.screenshot({ path: "output/playwright/prayer-connection/selected-isha-phone.png", scale: "css" });
   await page.locator(".home-content-scroll").evaluate((n) => (n.scrollTop = 130));
-  await expect(page.getByTestId("home-sticky-prayers")).toHaveAttribute("data-prayer-cards-condensed", "true");
+  // An open prayer holds its geometry while the selection connection is active.
+  await expect(page.getByTestId("home-sticky-prayers")).not.toHaveAttribute("data-prayer-cards-condensed");
   await expectAligned(page);
   await page.locator(".home-content-scroll").evaluate((n) => (n.scrollTop = 0));
   await expectAligned(page);
   await isha.getByRole("button").click();
   await expect(panel).toHaveCount(0);
+  // Touch WebKit can retain the earlier keyboard-focused Maghrib button after
+  // an Isha tap. Leave the whole prayer row before expecting scroll collapse.
+  await page.locator(".home-content-scroll").focus();
+  await page.locator(".home-content-scroll").evaluate((n) => (n.scrollTop = 130));
+  await expect(page.getByTestId("home-sticky-prayers")).toHaveAttribute("data-prayer-cards-condensed", "true");
+  await page.locator(".home-content-scroll").evaluate((n) => (n.scrollTop = 0));
+  await expect(page.getByTestId("home-sticky-prayers")).not.toHaveAttribute("data-prayer-cards-condensed");
 });
 
 test("opaque and forced-color connection retains native disclosure @cross-browser", async ({ page }) => {

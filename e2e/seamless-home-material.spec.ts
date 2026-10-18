@@ -29,14 +29,23 @@ for (const [language, width] of [
       await expect(routine).toHaveCSS("background-color", "rgba(15, 23, 42, 0.24)");
       await expect(routine).toHaveCSS("backdrop-filter", "blur(22px) saturate(1.35)");
       const header = page.getByTestId("home-utility-header");
+      const sticky = page.getByTestId("home-sticky-prayers");
       await expect(header).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
       await expect(header).toHaveCSS("backdrop-filter", "none");
+      await expect(sticky).toHaveCSS("backdrop-filter", "none");
       await page.screenshot({ path: testInfo.outputPath(`home-${language}-${appMaterial}-rest.png`) });
       await page.locator(".home-content-scroll").evaluate((node) => {
         node.scrollTop = 220;
       });
       await expect(header).toHaveAttribute("data-scrolled", "true");
-      await expect(header).not.toHaveCSS("backdrop-filter", "none");
+      // One shared strip owns the scrolled frost, including header and gutters.
+      // Independent Home Glass must keep that frost even with App Solid and
+      // reduced transparency, without stacking filters on its children.
+      await expect(sticky).toHaveCSS("backdrop-filter", "blur(32px) saturate(1.35)");
+      await expect(header).toHaveCSS("backdrop-filter", "none");
+      const prayerCards = sticky.locator("article.hero-glass.home-glass-surface");
+      await expect(prayerCards).toHaveCount(5);
+      for (const card of await prayerCards.all()) await expect(card).toHaveCSS("backdrop-filter", "none");
       await expect(header).not.toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
       await page.screenshot({ path: testInfo.outputPath(`home-${language}-${appMaterial}-scroll.png`) });
       await page.locator(".home-content-scroll").evaluate((node) => {
@@ -44,6 +53,9 @@ for (const [language, width] of [
       });
       await expect(header).not.toHaveAttribute("data-scrolled");
       await expect(header).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+      await expect(sticky).toHaveCSS("backdrop-filter", "none");
+      for (const card of await prayerCards.all())
+        await expect(card).toHaveCSS("backdrop-filter", "blur(22px) saturate(1.35)");
       expect(
         (await new AxeBuilder({ page }).include('[data-testid="home-routine-card"]').analyze()).violations,
       ).toEqual([]);

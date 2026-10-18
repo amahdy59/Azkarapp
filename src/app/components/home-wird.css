@@ -633,6 +633,14 @@ html:not(.high-contrast) .home-photo-canvas {
   html:not(.high-contrast) .home-photo-canvas .home-prayer-sticky[data-scrolled] .hero-glass.home-glass-surface {
     backdrop-filter: none !important;
   }
+  @media not (forced-colors: active) {
+    /* Match the existing explicit Home Glass override on individual surfaces.
+       The global reduced-transparency rule otherwise removes this new parent
+       filter while its children correctly suppress their nested filters. */
+    html:not(.high-contrast) .home-force-glass .home-prayer-sticky[data-scrolled] {
+      backdrop-filter: var(--glass-chrome-frost) !important;
+    }
+  }
 }
 html.reduce-transparency .home-photo-canvas:not(.home-force-glass) .home-prayer-sticky[data-scrolled],
 .high-contrast .home-photo-canvas .home-prayer-sticky[data-scrolled] {
