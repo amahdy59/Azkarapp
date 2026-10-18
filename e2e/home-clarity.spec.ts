@@ -161,7 +161,6 @@ for (const language of ["ar", "en"] as const) {
       await expect(page.getByTestId("prayer-tracker-cards")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
       await expect(row.locator("[data-prayer-icon]").first()).toHaveCSS("border-top-width", "1px");
       if (width === 1440) {
-        expect(geometry.every((card) => card.width <= 186)).toBe(true);
         expect(geometry.every((card) => card.actualColumnGap >= 10)).toBe(true);
         const frames = await row.evaluate((node) => ({
           row: node.getBoundingClientRect().width,
@@ -172,6 +171,8 @@ for (const language of ["ar", "en"] as const) {
           padding: parseFloat(getComputedStyle(node).paddingLeft) + parseFloat(getComputedStyle(node).paddingRight),
           gaps: parseFloat(getComputedStyle(node).columnGap) * 4,
         }));
+        const expectedCardWidth = (frames.row - frames.padding - frames.gaps) / 5;
+        expect(geometry.every((card) => Math.abs(card.width - expectedCardWidth) <= 1)).toBe(true);
         expect(Math.abs(frames.row - frames.cards - frames.padding - frames.gaps)).toBeLessThanOrEqual(1);
       }
       for (const key of ["nameTop", "timeTop", "iconTop"] as const) {

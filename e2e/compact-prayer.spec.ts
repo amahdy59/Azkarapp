@@ -85,7 +85,6 @@ async function checkGeometry(page: Page) {
       headerAlignment: content.x - header.x,
       stripWidth: strip.width,
       panelWidth: panel.width,
-      alignedInset: window.innerWidth >= 600 ? 8 : 0,
       centerOffset: strip.x + strip.width / 2 - (content.x + content.width / 2),
       quoteFont: getComputedStyle(quote).fontFamily,
       headingFont: getComputedStyle(heading).fontFamily,
@@ -99,7 +98,7 @@ async function checkGeometry(page: Page) {
   expect(measures.contentWidth).toBeCloseTo(measures.headerWidth, 0);
   expect(Math.abs(measures.headerAlignment)).toBeLessThanOrEqual(1);
   expect(measures.stripWidth).toBeLessThanOrEqual(measures.contentWidth);
-  expect(measures.panelWidth).toBeCloseTo(measures.stripWidth - measures.alignedInset, 0);
+  expect(measures.panelWidth).toBeCloseTo(measures.stripWidth, 0);
   expect(Math.abs(measures.centerOffset)).toBeLessThanOrEqual(1);
   expect(measures.quoteFont).toBe(measures.headingFont);
   expect(measures.summaryOverflow).toBe(false);

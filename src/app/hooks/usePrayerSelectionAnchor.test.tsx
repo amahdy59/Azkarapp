@@ -33,6 +33,13 @@ function fixture() {
 }
 
 describe("prayer selection light", () => {
+  it("keeps a flush card fully lit despite subpixel edge rounding", () => {
+    const f = fixture();
+    f.bounds.cardX = 500.000001;
+    renderHook(() => usePrayerSelectionAnchor(f.stripRef, f.panelRef, "fajr", "rtl"));
+    expect(f.panel.style.getPropertyValue("--prayer-anchor-opacity")).toBe("1");
+  });
+
   it("aligns to physical card geometry in either direction and retains a 20px clear gap", () => {
     const f = fixture();
     const hook = renderHook(

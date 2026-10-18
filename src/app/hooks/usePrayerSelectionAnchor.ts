@@ -22,8 +22,9 @@ export function usePrayerSelectionAnchor(
       // Keep the receiving light clear of the panel's rounded corners.
       const width = Math.min(144, selected.width * 0.65, 2 * (Math.min(center, detail.width - center) - 24));
       const visible = Math.max(0, Math.min(selected.right, frame.right) - Math.max(selected.left, frame.left));
-      const opacity =
-        width > 0 && selected.width > 0 ? Math.max(0, Math.min(1, (visible / selected.width - 0.6) / 0.4)) : 0;
+      // Firefox can place a flush card edge a fraction of a pixel outside the row.
+      const visibleRatio = selected.width - visible < 0.01 ? 1 : visible / selected.width;
+      const opacity = width > 0 && selected.width > 0 ? Math.max(0, Math.min(1, (visibleRatio - 0.6) / 0.4)) : 0;
       const clearance = stripRef.current!.getBoundingClientRect().bottom - selected.bottom;
       panel.style.setProperty("--prayer-panel-offset", `${20 - clearance}px`);
       panel.style.setProperty("--prayer-anchor-x", `${center}px`);

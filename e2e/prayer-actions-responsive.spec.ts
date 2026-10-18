@@ -28,6 +28,7 @@ for (const material of ["glass", "solid"] as const) {
         await page.setViewportSize({ width: 1440, height: 1000 });
         await page.goto("/#/home");
         await page.getByTestId("prayer-card-fajr").getByRole("button").click();
+        await page.evaluate(() => document.fonts.ready);
         const panel = page.getByTestId("home-prayer-moment");
         const row = panel.getByTestId("prayer-action-fajr-adhkar");
         const read = row.getByTestId("prayer-open-adhkar");

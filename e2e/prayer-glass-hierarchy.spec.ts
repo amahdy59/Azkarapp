@@ -67,7 +67,10 @@ for (const language of ["ar", "en"] as const) {
       const nowBadge = (await current.locator(".home-prayer-status-pill").boundingBox())!;
       expect(nowBadge.width).toBeGreaterThan((await current.boundingBox())!.width * 0.7);
       if (width === 1440) {
-        expect((await row.boundingBox())!.width).toBeLessThanOrEqual(832);
+        const grid = (await page.getByTestId("home-context-grid").boundingBox())!;
+        const summary = (await row.boundingBox())!;
+        expect(summary.width).toBeCloseTo(grid.width, 0);
+        expect(summary.x).toBeCloseTo(grid.x, 0);
         const icon = current.locator("[data-prayer-icon]");
         await expect(icon).toHaveCSS("width", "44px");
       }

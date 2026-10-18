@@ -162,7 +162,7 @@ test("tablet and desktop Home keep full-width prayer detail above the fixed cont
       const rootSize = await page.locator("html").evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
       expect(prayerDetailBox.width).toBeCloseTo(gridBox.width, 0);
       expect(prayerDetailBox.x).toBeCloseTo(gridBox.x, 0);
-      expect(prayerSummaryBox.width).toBeCloseTo(Math.min(gridBox.width + 8, 52 * rootSize), 0);
+      expect(prayerSummaryBox.width).toBeCloseTo(gridBox.width, 0);
       expect(prayerSummaryBox.x + prayerSummaryBox.width / 2).toBeCloseTo(gridBox.x + gridBox.width / 2, 0);
       const cardBottom = await prayerSummary
         .locator("article")
@@ -197,7 +197,7 @@ test("tablet and desktop Home keep full-width prayer detail above the fixed cont
       const rootSize = await page.locator("html").evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
       expect(tabletPrayerBox.width).toBeCloseTo(tabletGridBox.width, 0);
       expect(tabletPrayerBox.x).toBeCloseTo(tabletGridBox.x, 0);
-      expect(tabletSummaryBox.width).toBeCloseTo(tabletGridBox.width + 8, 0);
+      expect(tabletSummaryBox.width).toBeCloseTo(tabletGridBox.width, 0);
       expect(tabletPrimaryBox.y).toBeCloseTo(tabletPrayerBox.y + tabletPrayerBox.height + rootSize, 0);
       expect(tabletCompanionBox.y).toBeCloseTo(tabletPrimaryBox.y, 0);
       expect(tabletPrimaryBox.width).toBeCloseTo((tabletGridBox.width - rootSize) / 2, 0);
