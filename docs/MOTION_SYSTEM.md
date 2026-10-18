@@ -1,5 +1,17 @@
 # Azkarapp Motion System
 
+## Stationary header surface — owner correction, 2026-10-18
+
+Library, Progress and Settings keep the same header tint/sheen while scrolling. The owner requests stronger passing-content frost: switch 22px to 32px only at the existing scroll-elevation threshold; do not interpolate blur or add per-frame JS. Edge/shadow retains brief elevation feedback and reduced-motion suppression. Glass disables the named app-content capture boundary so actual content is sampled beneath its sticky chrome; Opaque keeps the named route transition. Preserve native Progress scrolling/focus recovery and accepted Home card motion. This supersedes historical opaque-header coverage and the interim separately clipped records viewport.
+
+## Coordinated Home expansion — owner live-preview correction, 2026-10-18
+
+Replace shell-only height animation with one registered/inherited CSS number, --home-prayer-expansion, transitioning 1 to 0 over 280ms. Footer height/opacity, icon dimensions, card padding and row clearance resolve from that number; all card shapes change continuously together, without display:none swaps, text scaling, animated blur, frame-by-frame React state, or JavaScript animation objects. Native CSS retargets reversals from the current value and removes effects on unmount. OS/app reduced motion disables the transition. This bounded layout handoff remains an explicit exception to the general layout-animation restriction; older engines without typed custom-property interpolation recover immediately. Keep 96px/8px hysteresis. Remove the prayer row's opacity entrance so individual frost remains effective against passing content. No compact countdown or visible horizontal scrollbar; native swipe/keyboard access remains.
+
+## Single-shell Home handoff — 2026-10-18, local refinement
+
+The owner-approved scrolling review replaces coordinated per-card height interpolation with one 180ms outer sticky-shell height transition plus detail opacity. This remains the bounded Home exception to layout-animation rules; card text takes its natural compact layout without scaling. Keep 96px-collapse/8px-restore hysteresis, cancellation on reversals/unmount/OS or application reduced motion, and no native anchoring compensation. Ordinary scrolling does not restart the handoff. Header coverage is immediate rather than a transparent-background fade, so passing text stays occluded. Native wheel/touch scrolling and stationary frost remain; loaded-photo Glass frame diagnostics complement the existing constrained Solid checks.
+
 ## Immediate reduced-motion Library cards — 2026-10-16
 
 Stagger entrances have no animation or initial opacity delay under OS or in-app reduced motion. Shared Glass photography is stationary and stays outside route content movement; no parallax, animated blur or scroll inertia is added. The listening-lock pill has no modal centering/zoom transform.

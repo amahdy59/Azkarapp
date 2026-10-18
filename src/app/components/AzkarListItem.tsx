@@ -151,6 +151,7 @@ export function AzkarListItem({
   return (
     <div
       id={`zikr-card-${index}`}
+      data-material-card={!isActive || undefined}
       ref={isActive ? activeRef : undefined}
       aria-current={isActive ? "step" : undefined}
       className={`group relative flex w-full flex-col ${grouped ? "" : "rounded-2xl border"} transition-[background-color,border-color,box-shadow,opacity] duration-200 ${

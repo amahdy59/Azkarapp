@@ -8,6 +8,54 @@ test.beforeEach(async ({ page }) => {
 });
 
 for (const language of ["ar", "en"] as const) {
+  for (const width of [600, 820, 1024, 1440, 1920]) {
+    test(`@cross-browser aligned Home card edges ${language} at ${width}px`, async ({ page }, testInfo) => {
+      await page.setViewportSize({ width, height: 1100 });
+      await page.clock.setFixedTime(new Date("2026-10-14T14:00:00+03:00"));
+      await page.addInitScript((language) => {
+        localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+        localStorage.setItem(
+          "azkarapp.state.v1",
+          JSON.stringify({
+            settings: { language, themeMode: "midnight", homeMaterial: "glass", reduceMotion: true },
+            profile: { isGuest: true },
+          }),
+        );
+      }, language);
+      await page.goto("/#/home");
+      await page.getByTestId("prayer-card-dhuhr").getByRole("button").click();
+      await expect(page.getByTestId("home-prayer-moment")).toBeVisible();
+      const alignment = await page.getByTestId("home-context-grid").evaluate((grid) => {
+        const row = document.querySelector('[data-testid="home-all-prayers-row"]')!;
+        const frame = row.getBoundingClientRect();
+        const inset = getComputedStyle(row);
+        // Narrow tablets retain native browsing; align to its visible aperture.
+        const left = frame.left + parseFloat(inset.paddingLeft);
+        const right = frame.right - parseFloat(inset.paddingRight);
+        const sections = [
+          grid,
+          document.querySelector('[data-testid="home-prayer-moment"]')!,
+          ...document.querySelectorAll('[data-testid="home-content-grid"] > .px-page'),
+        ];
+        return sections.map((section) => {
+          const bounds = section.getBoundingClientRect();
+          const style = getComputedStyle(section);
+          return {
+            left: bounds.left + parseFloat(style.paddingLeft) - left,
+            right: bounds.right - parseFloat(style.paddingRight) - right,
+          };
+        });
+      });
+      for (const section of alignment) {
+        expect(Math.abs(section.left), JSON.stringify(alignment)).toBeLessThanOrEqual(1);
+        expect(Math.abs(section.right), JSON.stringify(alignment)).toBeLessThanOrEqual(1);
+      }
+      await page.screenshot({ path: testInfo.outputPath(`aligned-${language}-${width}.png`), scale: "css" });
+    });
+  }
+}
+
+for (const language of ["ar", "en"] as const) {
   for (const width of [320, 390, 1440]) {
     test(`@cross-browser bounded prayer hierarchy ${language} at ${width}px`, async ({
       page,
@@ -79,14 +127,14 @@ for (const language of ["ar", "en"] as const) {
       expect(
         geometry.every(
           (card) =>
-            card.paddingTop >= 13.5 &&
-            card.paddingTop <= 14 &&
+            card.paddingTop >= 9.5 &&
+            card.paddingTop <= 10 &&
             card.paddingLeft >= 11.5 &&
             card.paddingLeft <= 12 &&
             card.paddingLeft === card.paddingRight &&
-            card.columnGap === (card.width <= 162 ? 6 : 10) &&
-            card.visibleTopInset >= 14 &&
-            card.visibleTopInset <= 19 &&
+            card.columnGap === (card.width <= 144 ? 6 : 10) &&
+            card.visibleTopInset >= 10 &&
+            card.visibleTopInset <= 15 &&
             Math.abs(card.visibleIdentityInset - 13) <= 1 &&
             Math.abs(card.visibleTimeInset - 13) <= 1 &&
             card.iconWidth >= 26,
@@ -117,7 +165,7 @@ for (const language of ["ar", "en"] as const) {
         const positions = geometry.map((card) => card[key]);
         expect(Math.max(...positions) - Math.min(...positions)).toBeLessThanOrEqual(1);
       }
-      expect(geometry.every((card) => card.footerHeight >= 68 && card.footerHeight <= 69)).toBe(true);
+      expect(geometry.every((card) => card.footerHeight >= 52 && card.footerHeight <= 53)).toBe(true);
       await expect(row.locator("[data-prayer-footer]")).toHaveCount(5);
       await expect(row.locator('[data-prayer-state="current"] [data-prayer-detail]')).toHaveText(
         t(language, "prayerTracking.nowPill"),
@@ -238,7 +286,7 @@ for (const language of ["ar", "en"] as const) {
       await toggle.focus();
       await page.keyboard.press("Space");
       await expect(toggle).toHaveAttribute("aria-expanded", initiallyExpanded!);
-      // Capture the single joined outline at ordinary text size after proving
+      // Capture the localized receiving edge at ordinary text size after proving
       // full-card activation and equal geometry at 200%.
       await page.locator("html").evaluate((node) => {
         node.style.fontSize = "";
@@ -255,15 +303,14 @@ for (const language of ["ar", "en"] as const) {
           return (
             small.content === '""' &&
             detail.content === '""' &&
-            small.backgroundColor === detail.backgroundColor &&
+            detail.backgroundImage.includes(small.backgroundColor) &&
             small.pointerEvents === "none" &&
             detail.pointerEvents === "none" &&
             small.height === "2px" &&
             detail.height === "2px"
           );
         });
-      // WebKit can expose the start of even the reduced-motion transition
-      // for one frame. Wait for the exact shared accent, without relaxing it.
+      // Wait for the receiving gradient to resolve the exact selected accent.
       await expect.poll(matchingEdges).toBe(true);
       await expect(page.locator(".home-prayer-bridge")).toHaveCount(0);
       const oldScroll = await row.evaluate((node) => node.scrollLeft);

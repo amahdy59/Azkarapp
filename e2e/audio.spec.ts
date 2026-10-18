@@ -607,6 +607,7 @@ test("synchronizes Reader navigation with audio tracks, shows proper track title
 
   // 2. Moving to another zikr in the Reader updates the active audio track
   // In desktop reader collection navigator, select Surah Al-Ikhlas (index 2 / s-hm-99-ikhlas)
+  await page.getByTestId("reader-sidebar-toggle").click();
   await page.locator("#zikr-card-2 button[data-zikr-select]").click();
   await expect(reader).toHaveAttribute("data-zikr-id", "s-hm-99-ikhlas");
   await expect(player).toContainText("سورة الْإِخْلَاص");

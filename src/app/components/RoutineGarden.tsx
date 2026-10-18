@@ -58,6 +58,7 @@ export function TodayRoutineGarden({
   onOpenWirdBenefits,
   quranWird,
   onMedia = true,
+  readOnly = false,
   activeTab = "day",
   displayDate = new Date(),
   weeklyGoalDays,
@@ -71,6 +72,7 @@ export function TodayRoutineGarden({
   hideTabs?: boolean;
   /** See ProgressDayView: media surfaces get overlays and a reserved height. */
   onMedia?: boolean;
+  readOnly?: boolean;
   /** Passed through to the day view; see ProgressDayView for the contract. */
   visibleCategoryIds?: readonly CategoryId[];
   /** The routine the surrounding screen is already offering to start. */
@@ -174,6 +176,7 @@ export function TodayRoutineGarden({
             subsection of whichever routine the hero happened to recommend. */}
         {activeTab === "day" && (
           <ProgressDayView
+            readOnly={readOnly}
             onMedia={onMedia}
             summary={summary}
             language={language}
@@ -368,7 +371,13 @@ export function GrowthEventStatus({ event, language }: { event: GrowthEvent; lan
     : "flex size-9 shrink-0 items-center justify-center rounded-xl bg-muted text-muted-foreground";
 
   return (
-    <div className={containerClass} role="status" aria-live="polite" data-testid="garden-growth-event">
+    <div
+      data-material-card={!isCore || undefined}
+      className={containerClass}
+      role="status"
+      aria-live="polite"
+      data-testid="garden-growth-event"
+    >
       <span className={iconClass} aria-hidden="true">
         {event.kind === "palm" ? (
           <PalmTreeMark size={isCore ? 28 : 22} />

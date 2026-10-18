@@ -31,6 +31,8 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(
   return (
     <Component
       ref={ref}
+      data-material-card
+      data-material-elevation={elevation}
       className={`${elevation === "overlay" ? "rounded-3xl" : "rounded-2xl"} border border-border/40 bg-card ${PADDING_CLASS[padding]} ${ELEVATION_CLASS[elevation]} ${className}`.trim()}
       {...rest}
     >

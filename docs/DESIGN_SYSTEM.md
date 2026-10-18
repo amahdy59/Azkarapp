@@ -1,4 +1,44 @@
+## Compact devotional title rows — 2026-10-18
+
+Owner-approved local correction: Reader collection heroes and the shared Masbaha/Salawat hero place the h1 in the same row as Back and the utility controls. ReadingHeroToolbar uses three equal, shrinkable grid tracks so unequal action counts cannot displace the title from the hero center. Titles wrap without truncation; action groups wrap rather than overlap enlarged text. Progress follows immediately beneath that row. Keep the existing mobile Header, 44px controls, semantic focus order, artwork, reading surfaces and content. Standalone selector rows remain below their progress, with a consistent 4px internal gap. No fixed hero height or negative title positioning.
+
 # Azkar design system
+
+## Home card edge alignment — 2026-10-18, local only
+
+At 600px and wider, Home's header, prayer strip and content share a centered frame capped at the 52rem prayer measure plus two responsive page gutters. Content adds the prayer row's 4px focus inset on both sides, so the disclosure, contextual pair, Wird and lower sections align with the outer prayer-card edges. Phone geometry remains unchanged. This supersedes the older 64rem Home frame for tablet/desktop only; materials, reading order and prayer behavior remain unchanged.
+
+## Reader surface and initial collection visibility — 2026-10-18, local only
+
+The owner requests softening the highlighted desktop reading panel and starting with its sidebar collapsed. Tablet/desktop Reader cards use the shared 16px rounded corners, clipping their stationary reading material and inset rim to that outline. Keep the existing 8px hero clearance, reading measure, typography and material/accessibility fallbacks. Each newly mounted Reader starts with the collection navigator closed; the existing labelled toolbar control opens it. Explicit opening, resizing, width restoration, focus transfer and phone/tablet drawers retain their existing behavior. This supersedes earlier initially open desktop navigation; no persistent preference, content or progress change. See [local phase](agent/phases/READER_SURFACE_AND_COLLAPSED_SIDEBAR_2026_10_18.md).
+
+## Routine-card material reference — 2026-10-18, local only
+
+The owner selects the supplied Home routine-card frost as the ordinary Glass card benchmark. Keep 24% navy tint and 22px/135% stationary frost; interface cards now share its 5.5%/1.2% directional white reflection instead of the brighter 7%/1.5% sheen. Shared tokens own reflection stops, ordinary/hover edges and the existing shallow shadow. Preserve selected prayer emphasis, flat elevation, 36% reading surfaces, scrolled headers, 80% overlays and nested single-filter/fallback rules. Equal material does not require equal geometry or removal of semantic selected states. See [local phase](agent/phases/CARD_FROST_REFERENCE_2026_10_18.md).
+
+## Local prayer selection connection — 2026-10-18
+
+Owner-approved local follow-up: keep 20px clear space between summary cards and their detail surface. The selected summary has a short 28px underline and restrained glow. The detail panel retains its neutral outline and normal surface shadow, with a local 2px receiving highlight (65% of summary width, capped at 144px) and a faint 32px-deep inner wash directly below selection. Fade toward ordinary edges before neighboring cards; no broad external gold shadow, physical bridge or full-width accent line. Measured physical alignment follows RTL/LTR selection, resize and horizontal browsing, fading away when the selected summary leaves view without changing selection or scrolling. Reduced motion removes the fade; forced colors omit decorative panel light and retain native disclosure/focus cues. Preserve existing compact summaries, glass/fallback surfaces, reviewed text and tracking behavior. This supersedes the earlier matching full-width-edge/no-observer rule for this composition only. No publication is authorized.
+
+## Stationary header material — owner correction, 2026-10-18
+
+The owner rejects the solid background switch illustrated in Library, Progress and Settings, then requests stronger frost as content passes beneath the headers like Home prayer cards. Keep the 36% navy tint and quiet sheen identical before/after scroll. Use 22px/135% frost at rest and 32px/135% when scrolled, changing only filter strength and a faint edge/shadow; no blur animation or scrolling colour swap. Glass disables the named route-capture boundary that blocked actual descendant backdrop sampling. Progress retains one outer filter, transparent nested header and native content flowing beneath its controls, without the rounded visor silhouette. Opaque/accessibility fallbacks remain authoritative. This supersedes both the opaque-slate/complete-text-occlusion treatment and the interim separate records viewport.
+
+## Compact prayer summaries — 2026-10-18
+
+Next-prayer footer correction: keep the footer transparent over the card's continuous material. The countdown pill retains its inset fill, but no separate rectangular footer tint may spill beyond the rounded card corners. Preserve selection/focus geometry and gold status emphasis.
+
+The owner's follow-up screenshot explicitly retains the earlier icon tiles, full-width temporal pills, gold current treatment and rounded glass anatomy. Tighten spacing rather than replacing that design: cap the summary row at 52rem, reduce expanded header top/bottom padding, and reduce footer minimum height from 68px to 52px. Keep 44px expanded icon tiles where width permits and the existing smaller narrow-card fallback. Enlarged text can grow all footers equally. Preserve time hierarchy, status/copy, material, current/next visibility, horizontal browsing, native 44px actions, disclosure and coordinated sticky transition. See [phase](agent/phases/COMPACT_PRAYER_CARDS_2026_10_18.md).
+
+## Balanced glass local refinement — 2026-10-18
+
+Live-preview Home correction: the compact prayer row has no shared background or filter. Its header and individual cards retain actual frost; omit the retained opacity entrance on the row so descendant filters can sample passing content. Hide the scrollbar while preserving native horizontal swipe/keyboard access. Compact cards show name/time without a second countdown; the expanded footer keeps its original status/countdown. Coordinate footer height/opacity, icon size and surrounding spacing through one inherited 280ms expansion value, with immediate OS/app reduced-motion recovery. Retain 44px native actions and natural enlarged text. This supersedes the shell-only animation and shared scrolling ground described in historical notes below.
+
+The owner selected the balanced phone preview: shared cards use 24% navy, long-reading surfaces 36%, and stationary 22px/135% frost. Overlays retain 80% navy and 28px frost. This supersedes the previous competing card values for this local phase. A shared shallow shadow and inset rim define ordinary glass; flat cards omit outer elevation. Current/next prayer emphasis retains its existing specific treatment.
+
+The later decision-log requirement for complete header text occlusion takes precedence over the older translucent-header note below. Scrolled interface headers use an opaque slate ground (#142137), quiet directional sheen and lower shadow. Coverage applies immediately without a transparent-to-opaque fade; no backdrop filter is rendered through that opaque ground. Progress retains its full-width rounded control group. Headers enter elevation above 8px and leave at 2px, tracking only their actual vertical scroll owner. Home keeps its 96px/8px prayer collapse thresholds and independent material/fallback contracts. Shared cards declare material ownership; exact bg-card is retained as the legacy contract, while opacity/hover class-name substrings no longer implicitly create glass. Nested controls reuse outer frost. No blur animation, new dependency or devotional-content change.
+
+This is an unpublished local preview. See [phase plan](agent/phases/GLASS_SCROLL_REFINEMENT_2026_10_18.md) for image evidence and verification.
 
 ## Frostness benchmark and glassmorphic reference — 2026-10-17
 
@@ -1055,3 +1095,7 @@ Glass palettes set light success ink with matching dark foreground for filled st
 Owner screenshot selection: retain the open scene-backed Masbaha/Salawat canvas without an extra dark reading panel. Frost remains on their controls/menus; compact shared titles and removed bottom banners remain. This specifically supersedes applying long-reading tint to the standalone counter canvas.
 
 Owner frost correction: replace the near-opaque navy header shade with a lighter slate glass (42% tint), soft white sheen and stationary36px/135% frost. Extend Progress's sticky material across the page gutters, add16px lower breathing room and rounded lower corners. This supersedes98% header shade; maintain44px controls, focus scroll clearance, opaque accessibility recovery and the owner-selected open counter canvas. Test foreground contrast and moving-content separation against actual screenshots.
+
+## Compact Progress prayer records — 2026-10-18
+
+The owner clarifies that Progress is for statistics, never prayer or routine entry. This supersedes the initial compact-input experiment. Daily prayer records show the existing recorded-prayer/location summary and two concise independent Rawatib/azkar totals. A closed-by-default Per-prayer breakdown reveals a native read-only five-row table; no time, icon badges, countdowns, entry links or recording fields appear. Missing records use a dash with a shared explanation that absence is not missed worship. A labelled, focusable scroll region preserves complete enlarged table text on narrow screens without document overflow. Daily wird uses plain completion records rather than actionable cards, and Friday rows are read-only. Preserve Home reading/recording, historical charts, period controls, calendar boundaries, theme fallbacks and stored data. Local only.

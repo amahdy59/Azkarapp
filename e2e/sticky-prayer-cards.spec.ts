@@ -32,7 +32,7 @@ for (const language of ["ar", "en"] as const) {
         await expect(strip).toBeInViewport();
         await expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
         await expect(strip.locator("[data-prayer-footer]").first()).toBeHidden();
-        await expect(strip.locator("[data-prayer-compact-countdown]")).toBeVisible();
+        await expect(strip.locator("[data-prayer-compact-countdown]")).toHaveCount(0);
         await expect(strip).toHaveText(originalCards!);
         const geometry = await strip.evaluate((node) => {
           const box = node.getBoundingClientRect();

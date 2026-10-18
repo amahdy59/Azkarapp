@@ -45,7 +45,10 @@ export function ReferenceCard({
   const lang = isArabicText ? "ar" : language;
 
   return (
-    <article className={`rounded-2xl border border-border/70 bg-card/80 p-4 text-start ${className}`.trim()}>
+    <article
+      data-material-card
+      className={`rounded-2xl border border-border/70 bg-card/80 p-4 text-start ${className}`.trim()}
+    >
       {title ? (
         <>
           <div className="flex items-start justify-between gap-2 mb-2">

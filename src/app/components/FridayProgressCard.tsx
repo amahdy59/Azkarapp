@@ -15,15 +15,18 @@ export function FridayProgressCard({
   language,
   direction,
   onOpen,
+  readOnly = false,
 }: {
   summary: FridaySummary;
   language: AppLanguage;
   direction: "ltr" | "rtl";
   onOpen?: () => void;
+  readOnly?: boolean;
 }) {
   const locale = language === "ar" ? "ar-EG" : "en-US";
   const num = (value: number) => value.toLocaleString(locale);
   const salawatReached = summary.salawatCount >= summary.salawatTarget;
+  const Row = readOnly ? "div" : "button";
 
   const rows = [
     {
@@ -63,11 +66,11 @@ export function FridayProgressCard({
 
       <div className="stagger-in grid gap-2.5 p-3 sm:p-4 sm:grid-cols-3">
         {rows.map((row) => (
-          <button
+          <Row
             key={row.id}
-            type="button"
-            onClick={onOpen}
-            disabled={!onOpen}
+            type={readOnly ? undefined : "button"}
+            onClick={readOnly ? undefined : onOpen}
+            disabled={readOnly ? undefined : !onOpen}
             data-testid={`progress-friday-${row.id}`}
             className={`stagger-content group flex min-h-[4.25rem] w-full items-center gap-3 rounded-xl p-3 text-start transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-default ${
               row.done ? "bg-primary/10 enabled:hover:bg-primary/15" : "bg-muted/40 enabled:hover:bg-muted/70"
@@ -81,13 +84,13 @@ export function FridayProgressCard({
               {row.icon}
             </span>
             <span className="flex min-w-0 flex-col">
-              <span dir="auto" className="truncate text-sm font-black leading-snug text-foreground">
+              <span dir="auto" className="text-sm font-black leading-snug text-foreground">
                 {row.label}
               </span>
               {/* Isolated so a Latin "3 / 7" cannot reorder against Arabic around it. */}
               <bdi className="mt-0.5 text-xs font-semibold text-muted-foreground">{row.value}</bdi>
             </span>
-          </button>
+          </Row>
         ))}
       </div>
     </section>

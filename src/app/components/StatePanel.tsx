@@ -78,6 +78,8 @@ export function StatePanel({
 
   return (
     <section
+      data-material-card
+      data-material-elevation="flat"
       className="flex flex-col items-center rounded-2xl border border-dashed border-border bg-card px-5 py-10 text-center"
       role={liveMode === "assertive" ? "alert" : liveMode === "polite" ? "status" : undefined}
       aria-live={liveMode === "polite" ? "polite" : undefined}

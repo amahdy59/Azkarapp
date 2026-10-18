@@ -308,9 +308,9 @@ for (const language of ["ar", "en"] as const) {
           const edges = await tile.evaluate((node) => ({
             small: getComputedStyle(node, "::after").backgroundColor,
             detail: getComputedStyle(document.querySelector('[data-testid="home-prayer-moment"]')!, "::before")
-              .backgroundColor,
+              .backgroundImage,
           }));
-          expect(edges.small).toBe(edges.detail);
+          expect(edges.detail).toContain(edges.small);
           await expect(tile).toHaveAttribute("data-selected", "true");
           await expect(page.locator(".home-prayer-bridge")).toHaveCount(0);
           const tiles = await page.locator('[data-density="summary"]').evaluateAll((tiles) =>

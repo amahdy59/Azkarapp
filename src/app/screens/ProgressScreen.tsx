@@ -1,3 +1,4 @@
+import { useScrollElevation } from "../hooks/useScrollElevation";
 import { PEER_TAB_SELECTED } from "../components/ui/controlStyles";
 import "./progress-screen.css";
 import { useState, useCallback, useEffect, useMemo, useRef } from "react";
@@ -13,14 +14,15 @@ import { getCalendarMonthPeriod, shiftCalendarDate } from "../calendarPeriods";
 import { ProgressPeriodNavigation } from "../components/ProgressPeriodNavigation";
 import { getProgressPeriodHeading } from "../components/gardenDateLabel";
 
-import { PrayerTrackerCards, type PrayerTrackingField } from "../components/PrayerTrackerCards";
+import { PrayerProgressSummary } from "../components/PrayerProgressSummary";
+import type { PrayerTrackingField } from "../components/PrayerTrackerCards";
 import { useNow } from "../hooks/useNow";
-import { buildPrayerCardModels } from "../prayerCardModels";
 import { FridayProgressCard } from "../components/FridayProgressCard";
 import { PrayerTrackerStats } from "../components/PrayerTrackerStats";
 import { FridayProgressStats } from "../components/FridayProgressStats";
 
 import { getFridaySummary } from "../fridaySummary";
+import { getFridayCycleKey } from "../fridayProgress";
 import { formatNumerals } from "../formatting";
 import {
   calculateOasisLevel,
@@ -84,8 +86,6 @@ export function ProgressScreen({
   language,
   direction,
   onOpenShareModal,
-  onSelectCategory,
-  locationSettings,
   prayerTracking = [],
   dailyHabits = [],
   wirdHistory,
@@ -94,12 +94,6 @@ export function ProgressScreen({
   mosquePrayerGoal,
   dailyPathStartDayKey,
   weeklyGoalDays,
-  onTogglePrayerTracking,
-  onToggleDailyHabit,
-  onCycleMosqueHabit: _onCycleMosqueHabit,
-  onPrayerResume,
-  onOpenFriday,
-  onOpenKhatmah,
   initialPeriod = "day",
   onPeriodChange,
 }: {
@@ -134,38 +128,7 @@ export function ProgressScreen({
   const [offset, setOffset] = useState(0);
   const controlsRef = useRef<HTMLDivElement>(null);
   const pointerFocus = useRef(false);
-  const [hasScrolledControls, setHasScrolledControls] = useState(false);
-  const scrolledControlsRef = useRef(false);
-
-  useEffect(() => {
-    const controls = controlsRef.current;
-    const scrollport = controls?.closest<HTMLElement>(".app-screen-surface") || document.body;
-    const onScroll = (e: Event) => {
-      const target = e.target;
-      if (!(target instanceof HTMLElement || target === document || target === window)) return;
-      let top = 0;
-      if (target === document || target === window) {
-        top = window.scrollY || document.documentElement.scrollTop;
-      } else if (target instanceof HTMLElement) {
-        if (scrollport.contains(target) || (controls && controls.contains(target))) {
-          top = target.scrollTop;
-        } else {
-          return;
-        }
-      }
-      const next = top > 4;
-      if (next !== scrolledControlsRef.current) {
-        scrolledControlsRef.current = next;
-        setHasScrolledControls(next);
-      }
-    };
-    scrollport.addEventListener("scroll", onScroll, { capture: true, passive: true });
-    window.addEventListener("scroll", onScroll, { capture: true, passive: true });
-    return () => {
-      scrollport.removeEventListener("scroll", onScroll, true);
-      window.removeEventListener("scroll", onScroll, true);
-    };
-  }, []);
+  const hasScrolledControls = useScrollElevation(controlsRef);
 
   useEffect(() => {
     const controls = controlsRef.current;
@@ -204,8 +167,6 @@ export function ProgressScreen({
     onPeriodChange?.(tab);
   };
 
-  const prayerCardModels = buildPrayerCardModels(now, language, locationSettings);
-
   const judgeDay = useCallback(
     (dayKey: string) => {
       const status = getDailyPathStatus({
@@ -231,7 +192,7 @@ export function ProgressScreen({
     ],
   );
 
-  const fridaySummary = getFridaySummary();
+  const fridaySummary = getFridaySummary(getFridayCycleKey(displayDate));
 
   const activeGardenSummary = useMemo(
     () =>
@@ -450,6 +411,7 @@ export function ProgressScreen({
         >
           <Header
             title={t(language, "common.progress")}
+            elevateOnScroll={false}
             language={language}
             style={{ paddingInline: 0, marginBottom: "0.75rem" }}
             right={
@@ -514,9 +476,7 @@ export function ProgressScreen({
           {...tabPanelProps("global-progress", activeTab)}
           className="w-full outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
-          {/* Prayer is the canonical first practice group in every period. The
-            day keeps its fifteen recording controls behind one disclosure; a
-            reader who only needs the summary does not have to traverse them. */}
+          {/* Prayer records lead; Home owns timing and devotional guidance. */}
           <section
             data-testid="progress-prayer-group"
             dir={direction}
@@ -528,7 +488,12 @@ export function ProgressScreen({
                   {t(language, "dailyPath.prayer")}
                 </h2>
                 {activeTab === "day" && (
-                  <p className="mt-1 text-xs font-semibold text-muted-foreground" dir="auto">
+                  <p
+                    role="status"
+                    aria-atomic="true"
+                    className="mt-1 text-xs font-semibold text-muted-foreground"
+                    dir="auto"
+                  >
                     {t(language, "dailyPath.prayerSummary", {
                       recorded: formatNumerals(selectedDayPath.salah.recordedCount, language),
                       congregation: formatNumerals(selectedDayPath.salah.mosqueCount, language),
@@ -538,24 +503,7 @@ export function ProgressScreen({
               </div>
             </div>
             {activeTab === "day" ? (
-              <details className="border-t border-border">
-                <summary className="min-h-11 cursor-pointer px-4 py-3 text-label font-black focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:px-5">
-                  {t(language, "progress.reviewPrayerDetails")}
-                </summary>
-                <div className="border-t border-border py-4">
-                  <PrayerTrackerCards
-                    models={prayerCardModels}
-                    language={language}
-                    direction={direction}
-                    records={prayerTracking}
-                    dayKey={currentDayKey}
-                    onToggle={onTogglePrayerTracking ?? (() => undefined)}
-                    onOpen={(prayer) => {
-                      if (prayer) onPrayerResume?.(prayer);
-                    }}
-                  />
-                </div>
-              </details>
+              <PrayerProgressSummary language={language} records={prayerTracking} dayKey={currentDayKey} />
             ) : (
               <div className="border-t border-border py-4">
                 <PrayerTrackerStats
@@ -573,6 +521,7 @@ export function ProgressScreen({
           {/* The selected period's wird answer (Azkar + Quran) follows prayer. */}
           <div className="mb-5 w-full">
             <TodayRoutineGarden
+              readOnly
               now={now}
               progressDayStartHour={progressDayStartHour}
               onSelectMonth={(date) => {
@@ -603,7 +552,6 @@ export function ProgressScreen({
               calendarType={calendarType}
               dailyCompletions={dailyCompletions}
               onOpenShareModal={onOpenShareModal}
-              onSelectCategory={onSelectCategory}
               visibleCategoryIds={WIRD_CATEGORY_IDS}
               quranWird={
                 quranWirdPlan?.kind !== "free"
@@ -612,8 +560,6 @@ export function ProgressScreen({
                       goal: selectedDayPath.quran.goal,
                       complete: quranWirdDone,
                       active: selectedDayPath.quran.active,
-                      onPress: onOpenKhatmah ?? (() => onToggleDailyHabit?.(currentDayKey, "quran_wird")),
-                      onToggleComplete: () => onToggleDailyHabit?.(currentDayKey, "quran_wird"),
                     }
                   : undefined
               }
@@ -827,12 +773,7 @@ export function ProgressScreen({
 
           {/* Friday Card / Stats */}
           {activeTab === "day" ? (
-            <FridayProgressCard
-              summary={fridaySummary}
-              language={language}
-              direction={direction}
-              onOpen={onOpenFriday}
-            />
+            <FridayProgressCard readOnly summary={fridaySummary} language={language} direction={direction} />
           ) : (
             <FridayProgressStats
               activeTab={activeTab}

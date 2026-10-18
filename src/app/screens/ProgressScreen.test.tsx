@@ -56,7 +56,7 @@ describe("ProgressScreen", () => {
 
     // Qur'an and remembrance follow the primary prayer group.
     expect(screen.getByTestId("today-garden-card")).toBeInTheDocument();
-    expect(screen.getByText("وردك اليوم")).toBeInTheDocument();
+    expect(screen.getByText("الورد اليومي")).toBeInTheDocument();
 
     expect(screen.getByTestId("progress-prayer-group")).toBeInTheDocument();
 
@@ -82,14 +82,13 @@ describe("ProgressScreen", () => {
     expect(screen.getByText("Garden and past milestones")).toBeInTheDocument();
     expect(screen.getByText("7-Day Rhythm")).toBeInTheDocument();
     expect(screen.getByTestId("today-garden-card")).toBeInTheDocument();
-    expect(screen.getByText("Today's Wird")).toBeInTheDocument();
+    expect(screen.getByText("Daily wird records")).toBeInTheDocument();
   });
 
-  it("records the Quran from its focused group without duplicating mosque tracking", () => {
+  it("shows read-only daily statistics without Quran or prayer recording actions", () => {
     const onToggleDailyHabit = vi.fn();
-    const onCycleMosqueHabit = vi.fn();
-
-    render(
+    const onTogglePrayerTracking = vi.fn();
+    const { container } = render(
       <ProgressScreen
         dailyCompletions={mockCompletions}
         dailyHabits={mockDailyHabits}
@@ -99,18 +98,14 @@ describe("ProgressScreen", () => {
         direction="rtl"
         onOpenShareModal={vi.fn()}
         onToggleDailyHabit={onToggleDailyHabit}
-        onCycleMosqueHabit={onCycleMosqueHabit}
+        onTogglePrayerTracking={onTogglePrayerTracking}
       />,
     );
-
-    // Toggle Quran Wird
-    const quranButton = screen.getByRole("button", { name: /ورد القرآن/ });
-    fireEvent.click(quranButton);
-    expect(onToggleDailyHabit).toHaveBeenCalledTimes(1);
-    expect(onToggleDailyHabit).toHaveBeenCalledWith(expect.any(String), "quran_wird");
-
-    expect(screen.queryByRole("button", { name: /صلوات المسجد/ })).not.toBeInTheDocument();
-    expect(onCycleMosqueHabit).not.toHaveBeenCalled();
+    expect(container.querySelector("input, select, textarea")).toBeNull();
+    expect(screen.queryByRole("button", { name: /ورد القرآن/ })).not.toBeInTheDocument();
+    expect(screen.getByTestId("prayer-progress-summary")).toBeInTheDocument();
+    expect(onToggleDailyHabit).not.toHaveBeenCalled();
+    expect(onTogglePrayerTracking).not.toHaveBeenCalled();
   });
 
   it("switches tabs between Day, Week, Month, and Year", async () => {
@@ -152,11 +147,11 @@ describe("ProgressScreen", () => {
     expect(screen.getByTestId("oasis-stage-card")).toBeInTheDocument();
   });
 
-  it("opens the focused prayer route from the disclosed prayer cards", () => {
+  it("keeps per-prayer detail optional without prayer-entry links", () => {
     const onPrayerResume = vi.fn();
-    render(
+    const { container } = render(
       <ProgressScreen
-        dailyCompletions={mockCompletions}
+        dailyCompletions={[]}
         progressDayStartHour={3}
         calendarType="gregorian"
         language="en"
@@ -165,10 +160,11 @@ describe("ProgressScreen", () => {
         onPrayerResume={onPrayerResume}
       />,
     );
-
-    fireEvent.click(screen.getByText("Review prayer and connected practices"));
-    fireEvent.click(screen.getByRole("button", { name: "Open Fajr" }));
-    expect(onPrayerResume).toHaveBeenCalledWith("fajr");
+    const summary = screen.getByTestId("prayer-progress-summary");
+    expect(summary.querySelector("details")).not.toHaveAttribute("open");
+    expect(screen.queryByRole("button", { name: "Open Fajr" })).not.toBeInTheDocument();
+    expect(container.querySelector("input, select, textarea")).toBeNull();
+    expect(onPrayerResume).not.toHaveBeenCalled();
   });
 
   it("shows the configured weekly intention on the Week view", async () => {
@@ -186,5 +182,26 @@ describe("ProgressScreen", () => {
 
     fireEvent.click(screen.getByRole("tab", { name: "Week" }));
     expect(await screen.findByText("Your seven-day intention")).toBeInTheDocument();
+  });
+
+  it("keeps both today and past-day statistics read-only", () => {
+    const onTogglePrayerTracking = vi.fn();
+    const { container } = render(
+      <ProgressScreen
+        dailyCompletions={[]}
+        progressDayStartHour={3}
+        calendarType="gregorian"
+        language="en"
+        direction="ltr"
+        onOpenShareModal={vi.fn()}
+        onTogglePrayerTracking={onTogglePrayerTracking}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Previous period" }));
+    expect(container.querySelector("input, select, textarea")).toBeNull();
+    expect(screen.getByTestId("prayer-progress-summary")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Next period" }));
+    expect(container.querySelector("input, select, textarea")).toBeNull();
+    expect(onTogglePrayerTracking).not.toHaveBeenCalled();
   });
 });

@@ -47,8 +47,8 @@ for (const language of ["ar", "en"] as const) {
       await expect(page.getByTestId("category-card-morning")).toHaveCSS("animation-name", "none");
       await expect(page.getByTestId("app-scene").locator("img")).toHaveCount(1);
       await expect(page.getByTestId("app-scene").locator("img")).toHaveAttribute("src", homeScene!);
-      await expect(page.getByTestId("category-card-morning")).toHaveCSS("background-color", "rgba(15, 23, 42, 0.18)");
-      await expect(page.getByTestId("category-card-morning")).toHaveCSS("backdrop-filter", "blur(16px) saturate(1.35)");
+      await expect(page.getByTestId("category-card-morning")).toHaveCSS("background-color", "rgba(15, 23, 42, 0.24)");
+      await expect(page.getByTestId("category-card-morning")).toHaveCSS("backdrop-filter", "blur(22px) saturate(1.35)");
       await page.screenshot({ path: testInfo.outputPath(`app-glass-${language}-${width}.png`) });
       expect((await new AxeBuilder({ page }).include(".app-main").analyze()).violations).toEqual([]);
       if (width === 390) {

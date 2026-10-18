@@ -1,5 +1,19 @@
 # Application architecture
 
+## Local prayer selection light — 2026-10-18
+
+usePrayerSelectionAnchor owns decorative geometry only. Home supplies existing sticky-strip and detail refs plus the expanded prayer and direction. A layout effect, passive horizontal-scroll listener and ResizeObserver align bounded CSS light variables to the selected summary; no React scroll state, timer, persisted field or forced scroll is added. The hook accounts for changing strip padding to retain 20px separation, fades the receiving light when its summary leaves view and disconnects/removes styles on closure. Prayer/record ownership remains unchanged. This owner-approved local follow-up supersedes the earlier no-measurement/full-width-edge presentation rule.
+
+## Stationary interface headers — owner correction, 2026-10-18
+
+Glass header tint/sheen stay unchanged on scroll; frost increases from 22px to 32px at the existing 8px/2px threshold, without frame-driven React work or blur interpolation. The named app-content route-capture boundary prevented descendants from sampling passing content; Glass disables that name while retaining the existing root animation suppression. Opaque mode keeps the named route transition. Progress retains its native scrolling records beneath one sticky controls group, ResizeObserver scroll-padding and keyboard focus recovery. This supersedes the briefly tested separate records-viewport approach after the owner specifically requested content frosting beneath headers like Home. Solid/high-contrast/reduced-transparency/forced-color and the accepted Home card material remain authoritative.
+
+## Header scroll ownership — 2026-10-18, local refinement
+
+Live-preview Home correction: useHomePrayerScroll now owns only the 96px/8px hysteresis state. A registered CSS expansion number owns the coordinated 280ms footer/icon/spacing handoff; native CSS handles reversal, unmount and reduced-motion cancellation. Prayer footer measurement observes natural content/width changes rather than animation height frames, preventing feedback into its own layout. No shared prayer-row backing or opacity entrance, no compact countdown; retain individual card/header frost and native horizontal browsing with a hidden scrollbar.
+
+useScrollElevation binds one passive listener to the header's vertical viewport, initializing from restored scroll position and rebinding at responsive resize. Explicit data-header-scroll-owner identifies fixed-header list viewports; sticky headers resolve their ancestor viewport. Progress, shared Header, Settings subheaders/root search and Library share 8px-enter/2px-exit hysteresis. Nested reading, chart or horizontal scrolling cannot reset elevation. Home retains its independently owned native viewport and 96px/8px collapse handoff, using the coordinated CSS handoff described above. No persistent state, route, data boundary or deployment change.
+
 ## Completion and ayah share entry points — 2026-10-17
 
 Completion lazily composes the existing image studio only after an explicit Share action, with the original localized completion phrase and category link. Its Square preview has no devotional repetition metadata and does not add recorded metrics or alter session/progress state. The ayah action menu places the existing image-studio entry before its retained text action; canonical copy, bookmarks, glyph layout and native text sharing stay unchanged.
@@ -513,3 +527,7 @@ Text-over-text overlays require a denser material than cards: dialogs, menus, li
 The owner's eight-screenshot review supersedes the earlier 18% ordinary/28% reading material. Shared ordinary cards now use 36% navy and long reading surfaces 48%, with stationary 22px/135% frost; overlays retain 80%/28px. Sticky page headers and the whole Progress tab/date group use lighter 42% slate/36px frost with directional sheen to soften passing text. Nested controls borrow outer frost; no blur animation is added. App/Home choices and opaque/high-contrast/forced-color fallbacks remain independent.
 
 Glass palettes set light success ink with matching dark foreground for filled status marks, rather than inheriting light-theme dark green. Home sharing uses explicit on-media ink and a stable button ground. Shared headers omit decorative border/shadow; Settings rows omit separators by default. Reader and standalone-counter desktop titles share their control row (96px Reader hero versus127px before); compact headers retain56px and may grow for wrapped/enlarged text. Remove standalone bottom instruction banners while preserving phone introductory guidance and header keyboard help. Religious text/counts, state and audio ownership remain unchanged. See agent/phases/FROST_CLARITY_COMPACT_HEADERS_2026_10_17.md.
+
+## Compact Progress records — 2026-10-18
+
+ProgressScreen composes PrayerProgressSummary from saved records filtered by the selected progress day. trackedLocation retains the legacy mosque fallback. The component has no mutation callback, prayer clock, route or service access. TodayRoutineGarden passes an opt-in readOnly flag to ProgressDayView: Progress renders native description lists while Home retains its existing interactive view. FridayProgressCard similarly supports read-only rows; its cycle is resolved from the selected date, not today. The optional prayer breakdown uses one native table in a named keyboard-scrollable region. Calendar, storage, sync, normalization and historical analytics remain unchanged.

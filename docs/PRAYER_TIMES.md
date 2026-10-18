@@ -1,5 +1,9 @@
 # Prayer times, location, timezone, and DST
 
+## Compact overview presentation — 2026-10-18
+
+The owner's follow-up retains the previous icons and full-width temporal pills, requesting only tighter highlighted gaps and modest polish. The row is capped at 52rem with tighter header/footer padding and a 52px footer minimum. Existing visible temporal statuses, next countdown and accessible saved-state descriptions remain unchanged, as do openability, recording, chronology, Friday naming, calculation, reminders and stored data. Horizontal browsing and coordinated sticky collapse are preserved.
+
 ## Friday deed presentation — 2026-10-16
 
 For a Friday record date, the noon action card uses the owner-approved Jumu‘ah name, three-action checklist and Friday evidence. It retains the internal dhuhr prayer ID, calculated noon time, record ownership, location/adhkar/sunnahAfter fields and all prior stored data. No prayer calculation or notification boundary changes. Before-Sunnah is not offered in Friday's checklist; existing values are retained. The approved sources and review status are recorded in CONTENT_AUTHORING.md.
@@ -191,3 +195,7 @@ The owner supplies a blue/gold prayer-row reference and approves comfortable hor
 The owner's screenshot review supersedes the icon divider, bright blue/white summary outlines, next-prayer interval bar and 28% overlay tint. Prayer summaries use quieter boundaries and a text countdown, without vertical dividers or a progress bar. Keep current/next initial visibility, native free scrolling, recorded-state descriptions, full-card targets and stable name/time geometry through collapse. Expanded actions precede supporting evidence on phone; desktop retains separate evidence and tracking columns. Reviewed sources and tracking/calculation behavior are unchanged.
 
 Text-over-text overlays require a denser material than cards: dialogs, menus, listboxes and expanded audio use 80% navy with stationary 28px/135% frost. Ordinary cards and reading tint retain their existing values. Expanded AudioPlayerSurface visually hides its covered main-canvas siblings using a reversible attribute, in addition to inert/aria-hidden, and restores them on collapse. The shared shell scene remains visible; transparent backgrounds cannot reveal duplicate Reader text. Native focus, Escape, touch lock, Solid/high-contrast/forced-color recovery and offline state remain. See docs/agent/phases/CALM_PRAYER_AND_OVERLAY_SEPARATION_2026_10_17.md.
+
+## Progress-only tracking panel — 2026-10-18
+
+The owner clarifies Progress as a read-only statistics surface. Daily summaries derive saved counts; a collapsed native table exposes prayer locations and independent Rawatib/azkar facts. No timing decoration, recording controls or prayer-entry routes are shown. Missing records are explicitly distinguished from missed worship. Home continues owning prayer times, guidance and recording under the unchanged eligibility rules. No calculation, religious content, reminder, timezone, normalization or persistence change. Local phase: docs/agent/phases/PROGRESS_COMPACT_TRACKING_2026_10_18.md.

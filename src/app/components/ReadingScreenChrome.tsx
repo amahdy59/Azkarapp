@@ -3,6 +3,7 @@ import { ArrowPrevious, Keyboard } from "./icons";
 import { Header, IconButton } from "./LayoutShells";
 import { ProgressBar } from "./ProgressBar";
 import { ReaderSceneArt } from "./ReaderSceneArt";
+import { ReadingHeroToolbar } from "./ReadingHeroToolbar";
 import { AppearanceMenu } from "./AppearanceMenu";
 import { useMediaQuery } from "../hooks/useMediaQuery";
 import { t } from "../i18n";
@@ -73,12 +74,16 @@ export function ReadingScreenChrome({
       >
         <ReaderSceneArt category={artCategory} />
 
-        <div className="relative z-10 flex w-full items-center justify-between gap-3">
-          <IconButton onClick={onBack} label={t(language, "common.back")} className={HERO_ACTION_CLASS}>
-            <ArrowPrevious size={20} />
-          </IconButton>
-
-          <div className="flex items-center gap-2" data-testid={`${testId}-hero-actions`}>
+        <ReadingHeroToolbar
+          title={title}
+          testId={`${testId}-header-toolbar`}
+          back={
+            <IconButton onClick={onBack} label={t(language, "common.back")} className={HERO_ACTION_CLASS}>
+              <ArrowPrevious size={20} />
+            </IconButton>
+          }
+        >
+          <div className="flex min-w-0 flex-wrap items-center justify-end gap-2" data-testid={`${testId}-hero-actions`}>
             {onKeyboardHelp && (
               <button
                 type="button"
@@ -104,17 +109,10 @@ export function ReadingScreenChrome({
             )}
             {actions("wide")}
           </div>
-        </div>
-
-        <h1
-          className="relative z-10 w-full break-words text-lg md:text-xl font-extrabold leading-tight text-on-media-accent drop-shadow-sm"
-          dir="auto"
-        >
-          {title}
-        </h1>
+        </ReadingHeroToolbar>
 
         {(progress || subRow) && (
-          <div className="relative z-10 flex w-full max-w-[42rem] flex-col items-center gap-2">
+          <div className="relative z-10 flex w-full max-w-[42rem] flex-col items-center gap-1">
             {progress && (
               <>
                 <div className="flex w-full items-center justify-between px-1" aria-hidden="true">

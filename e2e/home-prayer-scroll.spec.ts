@@ -52,9 +52,13 @@ for (const language of ["ar", "en"] as const) {
       await expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
       await expect.poll(activeHandoffAnimations).toBe(0);
       const compact = (await label.boundingBox())!;
-      for (const key of ["x", "y", "width", "height"] as const) expect(compact[key]).toBeCloseTo(original[key], 0);
+      // The owner now explicitly wants smaller icon/padding geometry. Keep
+      // the title's reading edge and type stable through that deliberate shift.
+      expect(compact.x + compact.width).toBeCloseTo(original.x + original.width, 0);
+      expect(compact.height).toBeCloseTo(original.height, 0);
+      await expect(label).toHaveCSS("font-size", "14px");
       expect((await next.boundingBox())!.height).toBeLessThan(expandedHeight);
-      await expect(next.locator("[data-prayer-compact-countdown]")).toBeVisible();
+      await expect(next.locator("[data-prayer-compact-countdown]")).toHaveCount(0);
       await expect(next.locator("progress")).not.toBeVisible();
       await expect.poll(activeHandoffAnimations).toBe(0);
       await page.screenshot({ path: testInfo.outputPath(`compact-${language}-${width}.png`), scale: "css" });

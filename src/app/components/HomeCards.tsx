@@ -192,13 +192,13 @@ export function PrayerRoutineCard({
           </div>
         )}
 
-        <div className="mt-3 flex w-full items-center gap-3">
+        <div className="mt-3 flex w-full items-stretch gap-3">
           <button
             type="button"
             data-testid="home-primary-cta"
             aria-describedby={progressId}
             onClick={onOpen}
-            className="group flex min-h-[52px] w-full items-center justify-center gap-2.5 rounded-2xl bg-primary px-4 text-title font-bold text-primary-foreground shadow-raised transition-transform hover:brightness-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="group flex min-h-[52px] min-w-0 flex-1 items-center justify-center gap-2.5 rounded-2xl bg-primary px-4 text-title font-bold text-primary-foreground shadow-raised transition-transform hover:brightness-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             <span className="min-w-0 truncate" title={ctaLabel}>
               {ctaLabel}
@@ -206,7 +206,7 @@ export function PrayerRoutineCard({
             <ArrowNext size={20} className="shrink-0 transition-transform group-hover:scale-110" aria-hidden="true" />
           </button>
           {quickShare?.available && (
-            <div className="flex shrink-0 items-center gap-2">
+            <div className="flex shrink-0 items-stretch gap-2">
               <button
                 type="button"
                 data-testid="home-quick-share"
@@ -218,7 +218,7 @@ export function PrayerRoutineCard({
                 onPointerDown={quickShare.prepare}
                 onFocus={quickShare.prepare}
                 onClick={quickShare.share}
-                className={`inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-xl border border-current/30 ${onGlass ? "bg-on-media-surface/40 text-on-media-accent" : "bg-card text-foreground"} focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-50`}
+                className={`inline-flex min-h-[52px] w-[52px] shrink-0 items-center justify-center rounded-2xl border border-current/30 ${onGlass ? "bg-on-media-surface/40 text-on-media-accent hover:bg-on-media-surface/60" : "bg-card text-foreground hover:bg-muted"} focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50`}
               >
                 <Share2 size={20} aria-hidden="true" />
               </button>

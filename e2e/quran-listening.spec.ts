@@ -423,7 +423,7 @@ for (const item of listeningCases.filter((item) => item.id === "ir-baqarah")) {
       await player.getByRole("button", { name: t(language, "audioPlayer.collapse"), exact: true }).click();
       await expect(player).toHaveAttribute("data-variant", "compact");
       await page.setViewportSize({ width: 1440, height: 1100 });
-      await page.getByTestId("reader-sidebar-close").click();
+      await expect(page.getByTestId("reader-sidebar-toggle")).toHaveAttribute("aria-expanded", "false");
       await player.getByRole("button", { name: t(language, "audioPlayer.expand"), exact: true }).click();
       await expect
         .poll(() => player.locator(".audio-listening-page").evaluate((el) => el.clientHeight))

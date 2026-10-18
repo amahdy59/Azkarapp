@@ -1,5 +1,21 @@
 # AI Improvement System Index
 
+[Home card alignment](phases/HOME_CARD_ALIGNMENT_2026_10_18.md) aligns tablet/desktop Home sections with the outer prayer-card edges through one shared frame. Local only; preserve pending changes.
+
+[Reader surface and collapsed sidebar](phases/READER_SURFACE_AND_COLLAPSED_SIDEBAR_2026_10_18.md) records the owner-requested softened reading-panel outline and initially collapsed collection navigation. Preserve pending work; local only, no push.
+
+[Home routine action bounds](phases/HOME_ROUTINE_ACTION_BOUNDS_2026_10_18.md) keeps the continuation and share buttons inside the card with a flexible, truncating primary action. The owner follow-up matches their heights, corners and focus treatment, with a 52px-wide share target and all-theme review. Local only; preserve pending material/prayer work.
+
+[Routine-card frost reference](phases/CARD_FROST_REFERENCE_2026_10_18.md) applies the owner's supplied morning-card benchmark to ordinary Glass cards through shared reflection/edge tokens. Preserve reading/overlay contrast, selected prayer treatments and all pending local work. No commit, push or deployment.
+
+[Local prayer selection connection](phases/PRAYER_SELECTION_CONNECTION_2026_10_18.md) is the owner's approved localized receiving light and 20px separation refinement. Preserve pending compact/glass work, show screenshots during development, and do not commit, push or deploy.
+
+Latest local preview correction: [Glass and scrolling](phases/GLASS_SCROLL_REFINEMENT_2026_10_18.md) keeps header tint/sheen unchanged while increasing scrolling frost from 22px to 32px. The owner rejects the solid visor and requests passing-content frost like Home, superseding earlier complete-header-occlusion and interim clipped-records notes. Glass removes the named route backdrop boundary so the effect actually samples content. Preserve all local-only authority and fallback behavior.
+
+[Compact prayer cards](phases/COMPACT_PRAYER_CARDS_2026_10_18.md) records the owner's local-only spacing refinement: retain the earlier icons/status pills, tighten horizontal and vertical gaps, preserve browsing/sticky motion, and repair the separately approved Progress scroll ownership failure.
+
+Current local-only refinement: [Glass and scrolling](phases/GLASS_SCROLL_REFINEMENT_2026_10_18.md). The owner approves balanced 24% card/36% reading tint and 22px frost, explicit surface ownership, quieter depth, actual scroll-owner elevation and a coordinated Home card/footer/icon handoff. The live-preview correction removes the shared prayer-row backing, compact countdown and visible scrollbar, preserving actual individual frost. Share actual screenshots during development; do not commit, push or deploy. Preserve complete scrolled-header text occlusion.
+
 Design system benchmark: [Frostness visual reference](evidence/design-references/frostness-reference.png) establishes the owner's canonical benchmark for frosted glass / glassmorphic devotional surfaces (translucency, blur, beveled borders, layered squircle sub-elements, warm glow, and high-contrast typography; see `docs/DESIGN_SYSTEM.md` and `docs/agent/DECISION_LOG.md`).
 
 Final global-sharing audit: [Remaining image entry points](phases/IMAGE_SHARE_ENTRYPOINTS_2026_10_17.md) brings completion into the existing image studio and gives the ayah-image action priority over text. Preserve all completion and Quran contracts; finish the same release cycle.
@@ -387,3 +403,9 @@ The owner's subsequent “push all changes” instruction supersedes the current
 [Calm prayer and overlay separation](phases/CALM_PRAYER_AND_OVERLAY_SEPARATION_2026_10_17.md) is the active owner-requested follow-up: quieter summaries, no next-prayer bar/dividers, clearer expanded actions, denser overlays and reversible covered-reader visibility.
 
 Latest owner continuation: [Frost clarity and compact consistent headers](phases/FROST_CLARITY_COMPACT_HEADERS_2026_10_17.md) supersedes the lighter material after screenshot review; stronger frost, protected scrolling headers, accessible status colors and compact shared zikr chrome. Standing main-branch release authority applies.
+
+[Read-only Progress statistics](phases/PROGRESS_COMPACT_TRACKING_2026_10_18.md) records the owner's clarified statistics-only purpose: concise daily totals, optional read-only prayer breakdown and plain wird records. Local only; Home and historical charts are preserved.
+
+[Compact devotional title rows](phases/COMPACT_DEVOTIONAL_TITLE_ROWS_2026_10_18.md) records the owner-requested local-only title/control alignment, raised progress and shorter shared Reader/Masbaha/Salawat heroes.
+
+[Combined release](phases/COMBINED_RELEASE_2026_10_18.md) records the owner-authorized publication of all pending refinements, superseding their earlier local-only holds.

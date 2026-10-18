@@ -78,7 +78,7 @@ for (const language of ["ar", "en"] as const) {
           await card.click();
           await expect(page.getByTestId("app-scene").locator("img")).toHaveCount(1);
           await expect(page.locator("[data-material-ui]")).toBeVisible();
-          await expect(page.getByTestId("reader-card").first()).toHaveCSS("background-color", "rgba(15, 23, 42, 0.28)");
+          await expect(page.getByTestId("reader-card").first()).toHaveCSS("background-color", "rgba(15, 23, 42, 0.36)");
           await expect(page.getByTestId("reader-card").first()).toHaveCSS("backdrop-filter", filter);
           await page.screenshot({ path: testInfo.outputPath("reader.png"), scale: "css" });
           await page.getByRole("button", { name: language === "ar" ? "الفائدة" : "Benefit", exact: true }).click();
@@ -93,7 +93,7 @@ for (const language of ["ar", "en"] as const) {
             .click();
           const mushaf = page.locator("[data-mushaf-chrome-mode]");
           await expect(mushaf).toBeVisible();
-          await expect(mushaf).toHaveCSS("background-color", "rgba(15, 23, 42, 0.28)");
+          await expect(mushaf).toHaveCSS("background-color", "rgba(15, 23, 42, 0.36)");
           await expect(mushaf).toHaveCSS("backdrop-filter", filter);
           expect((await new AxeBuilder({ page }).include(".app-main").analyze()).violations).toEqual([]);
           await page.screenshot({ path: testInfo.outputPath("mushaf.png"), scale: "css" });

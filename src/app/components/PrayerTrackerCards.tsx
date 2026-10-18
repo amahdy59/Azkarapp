@@ -319,44 +319,36 @@ function PrayerCard({
                 timeLabel
               )}
             </p>
-            {state === "next" && countdown && (
-              <span
-                data-prayer-compact-countdown
-                aria-hidden="true"
-                dir="auto"
-                className="hidden text-xs font-semibold tabular-nums"
-              >
-                {countdown}
-              </span>
-            )}
           </div>
         </button>
         <div
           data-prayer-footer
           className={`home-prayer-footer w-full border-t px-2 py-1.5 text-center text-xs font-semibold ${state === "next" ? (onGlass ? "border-white/20 text-on-media-accent" : "border-primary/30 text-primary") : onGlass ? "border-white/10 text-on-media-muted" : "border-border text-muted-foreground"}`}
         >
-          <span
-            id={`prayer-summary-detail-${prayer}`}
-            data-prayer-detail
-            dir="auto"
-            className="home-prayer-status-pill min-w-0 text-sm tabular-nums [overflow-wrap:anywhere]"
-          >
-            {isCurrent ? (
-              <span className="home-prayer-now-dot" aria-hidden="true" />
-            ) : (
-              <Clock size={17} aria-hidden="true" />
-            )}
-            {state === "next"
-              ? footerText
-              : isCurrent
-                ? t(language, "prayerTracking.nowPill")
-                : statusLabel(language, state)}
-          </span>
-          {state !== "next" && (
-            <span id={`prayer-summary-record-${prayer}`} className="sr-only">
-              {footerText}
+          <div className="home-prayer-footer-content">
+            <span
+              id={`prayer-summary-detail-${prayer}`}
+              data-prayer-detail
+              dir="auto"
+              className="home-prayer-status-pill min-w-0 text-sm tabular-nums [overflow-wrap:anywhere]"
+            >
+              {isCurrent ? (
+                <span className="home-prayer-now-dot" aria-hidden="true" />
+              ) : (
+                <Clock size={17} aria-hidden="true" />
+              )}
+              {state === "next"
+                ? footerText
+                : isCurrent
+                  ? t(language, "prayerTracking.nowPill")
+                  : statusLabel(language, state)}
             </span>
-          )}
+            {state !== "next" && (
+              <span id={`prayer-summary-record-${prayer}`} className="sr-only">
+                {footerText}
+              </span>
+            )}
+          </div>
         </div>
       </article>
     );
@@ -628,9 +620,17 @@ export function PrayerTrackerCards({
         row.style.setProperty("--prayer-footer-height", height);
     };
     measure();
-    const observer = new ResizeObserver(measure);
+    let previousWidth = row.clientWidth;
+    const observer = new ResizeObserver((entries) => {
+      const width = row.clientWidth;
+      // The handoff changes row height every frame. Remeasure only width or
+      // natural footer content, never feed animation geometry back into sizing.
+      if (width !== previousWidth || entries.some((entry) => entry.target.matches("[data-prayer-footer] > *"))) {
+        previousWidth = width;
+        measure();
+      }
+    });
     observer.observe(row);
-    for (const child of row.children) observer.observe(child);
     for (const content of row.querySelectorAll("[data-prayer-footer] > *")) observer.observe(content);
     return () => observer.disconnect();
   }, [compactSummary]);
@@ -685,7 +685,7 @@ export function PrayerTrackerCards({
           ref={scrollRef}
           dir={direction}
           data-testid="prayer-tracker-cards"
-          className={`stagger-in grid gap-1 overflow-visible ${compactSummary ? "home-prayer-overview grid-cols-1" : "grid-cols-2 sm:grid-cols-3 xl:grid-cols-5"}`}
+          className={`grid gap-1 overflow-visible ${compactSummary ? "home-prayer-overview grid-cols-1" : "stagger-in grid-cols-2 sm:grid-cols-3 xl:grid-cols-5"}`}
           style={{ ["--prayer-columns" as string]: "5" }}
           id="home-prayer-overview"
         >

@@ -110,6 +110,7 @@ for (const scenario of [
       await expect(player.getByRole("slider")).toHaveCount(1);
       expect((await seek.boundingBox())!.height).toBeGreaterThanOrEqual(44);
     };
+    if (scenario.width >= 1200) await page.getByTestId("reader-sidebar-toggle").click();
     await checkCompactContainment();
     if (scenario.width >= 1200) {
       await page.getByTestId("reader-sidebar-close").click();

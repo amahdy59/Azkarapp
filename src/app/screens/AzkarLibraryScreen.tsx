@@ -1,3 +1,4 @@
+import { useScrollElevation } from "../hooks/useScrollElevation";
 import { PEER_TAB_SELECTED } from "../components/ui/controlStyles";
 import { QURAN_TEXT_STYLE, isQuranPassage } from "../quranTypography";
 import { QuranVerseText } from "../components/QuranVerseText";
@@ -210,11 +211,8 @@ export function AzkarLibraryScreen({
     checkScrollAffordance();
   }, [selectedGroupId, checkScrollAffordance]);
 
-  const [hasScrolledHeader, setHasScrolledHeader] = useState(false);
-  const handleListScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const next = e.currentTarget.scrollTop > 4;
-    if (next !== hasScrolledHeader) setHasScrolledHeader(next);
-  };
+  const listScrollRef = useRef<HTMLDivElement>(null);
+  const hasScrolledHeader = useScrollElevation(listScrollRef);
 
   return (
     <ScreenContainer dir={direction} className="relative" screenName={t(language, "library.title")}>
@@ -424,7 +422,8 @@ export function AzkarLibraryScreen({
         </header>
 
         <div
-          onScroll={handleListScroll}
+          ref={listScrollRef}
+          data-header-scroll-owner
           className="min-h-0 flex-1 overflow-y-auto px-page pb-5 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
           {...tabPanelProps("library-sections", section)}
         >
@@ -444,7 +443,10 @@ export function AzkarLibraryScreen({
                   </div>
                 ) : (
                   <>
-                    <div className="mb-4 flex items-center justify-between gap-3 rounded-2xl border border-border/40 bg-card/60 px-4 py-2.5 backdrop-blur-sm">
+                    <div
+                      data-material-card
+                      className="mb-4 flex items-center justify-between gap-3 rounded-2xl border border-border/40 bg-card/60 px-4 py-2.5 backdrop-blur-sm"
+                    >
                       <p className="text-sm font-semibold text-muted-foreground">
                         {t(language, "library.searchResultsFor", { query: deferredQuery })}
                       </p>

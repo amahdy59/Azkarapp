@@ -37,9 +37,8 @@ describe("ProgressScreen Quran wird completion consistency", () => {
       />,
     );
 
-    const wirdButton = screen.getByRole("button", { name: /Qur'an Wird|Quran Wird/i });
-    expect(wirdButton).not.toHaveAttribute("aria-pressed");
-    expect(wirdButton).toHaveAccessibleName(/ - \d+ \/ \d+ pages$/);
+    const wirdButton = screen.getByText("Quran Wird", { exact: true }).closest("div")!;
+    expect(wirdButton.querySelector("button, input, select")).toBeNull();
     expect(within(wirdButton).getByText("0 / 4 pages")).toBeInTheDocument();
   });
 
@@ -58,9 +57,8 @@ describe("ProgressScreen Quran wird completion consistency", () => {
       />,
     );
 
-    const wirdButton = screen.getByRole("button", { name: /Qur'an Wird|Quran Wird/i });
-    expect(wirdButton).not.toHaveAttribute("aria-pressed");
-    expect(wirdButton).toHaveAccessibleName(/ - \d+ \/ \d+ pages$/);
+    const wirdButton = screen.getByText("Quran Wird", { exact: true }).closest("div")!;
+    expect(wirdButton.querySelector("button, input, select")).toBeNull();
     expect(within(wirdButton).getByText("1 / 4 pages")).toBeInTheDocument();
   });
 
@@ -79,9 +77,8 @@ describe("ProgressScreen Quran wird completion consistency", () => {
       />,
     );
 
-    const wirdButton = screen.getByRole("button", { name: /Qur'an Wird|Quran Wird/i });
-    expect(wirdButton).not.toHaveAttribute("aria-pressed");
-    expect(wirdButton).toHaveAccessibleName(/ - Completed$/);
+    const wirdButton = screen.getByText("Quran Wird", { exact: true }).closest("div")!;
+    expect(wirdButton.querySelector("button, input, select")).toBeNull();
     expect(within(wirdButton).getByText("Completed")).toBeInTheDocument();
   });
 
@@ -119,9 +116,8 @@ describe("ProgressScreen Quran wird completion consistency", () => {
       />,
     );
 
-    const wirdButton = screen.getByRole("button", { name: /Qur'an Wird|Quran Wird/i });
-    expect(wirdButton).not.toHaveAttribute("aria-pressed");
-    expect(wirdButton).toHaveAccessibleName(/ - Completed$/);
+    const wirdButton = screen.getByText("Quran Wird", { exact: true }).closest("div")!;
+    expect(wirdButton.querySelector("button, input, select")).toBeNull();
     expect(within(wirdButton).getByText("Completed")).toBeInTheDocument();
   });
 
@@ -150,9 +146,8 @@ describe("ProgressScreen Quran wird completion consistency", () => {
       />,
     );
 
-    const wirdButton = screen.getByRole("button", { name: /Qur'an Wird|Quran Wird/i });
-    expect(wirdButton).not.toHaveAttribute("aria-pressed");
-    expect(wirdButton).toHaveAccessibleName(/ - \d+ \/ \d+ pages$/);
+    const wirdButton = screen.getByText("Quran Wird", { exact: true }).closest("div")!;
+    expect(wirdButton.querySelector("button, input, select")).toBeNull();
     expect(within(wirdButton).getByText("3 / 20 pages")).toBeInTheDocument();
 
     const fullRange = Array.from({ length: 20 }, (_, i) => i + 1);
@@ -170,8 +165,7 @@ describe("ProgressScreen Quran wird completion consistency", () => {
       />,
     );
 
-    expect(wirdButton).not.toHaveAttribute("aria-pressed");
-    expect(wirdButton).toHaveAccessibleName(/ - Completed$/);
+    expect(wirdButton.querySelector("button, input, select")).toBeNull();
     expect(within(wirdButton).getByText("Completed")).toBeInTheDocument();
   });
 });

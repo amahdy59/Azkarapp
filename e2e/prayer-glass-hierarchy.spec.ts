@@ -27,7 +27,7 @@ for (const language of ["ar", "en"] as const) {
       const current = row.locator('[data-prayer-state="current"]');
       const next = row.locator('[data-prayer-state="next"]');
       for (const card of [current, next]) {
-        await expect(card).toHaveCSS("backdrop-filter", "blur(16px) saturate(1.35)");
+        await expect(card).toHaveCSS("backdrop-filter", "blur(22px) saturate(1.35)");
         await expect
           .poll(() =>
             card.evaluate((n) => {
@@ -40,6 +40,11 @@ for (const language of ["ar", "en"] as const) {
       }
       await expect(current.locator(".home-prayer-status-pill")).toContainText(language === "ar" ? "الآن" : "Now");
       await expect(next.getByRole("progressbar")).toHaveCount(0);
+      // One continuous card material: no rectangular next-footer tint may
+      // spill beyond the rounded card or compete with the countdown pill.
+      await expect(next.locator("[data-prayer-footer]")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+      await expect(next.locator("[data-prayer-footer]")).toHaveCSS("background-image", "none");
+      await page.evaluate(() => document.fonts.ready);
       const sizes = await row.locator("article").evaluateAll((nodes) =>
         nodes.map((n) => {
           const box = n.getBoundingClientRect();
@@ -58,8 +63,20 @@ for (const language of ["ar", "en"] as const) {
         JSON.stringify(sizes),
       ).toBe(true);
       expect(Math.max(...sizes.map((s) => s.height)) - Math.min(...sizes.map((s) => s.height))).toBeLessThanOrEqual(1);
+      expect(Math.max(...sizes.map((s) => s.height))).toBeLessThanOrEqual(140);
+      const nowBadge = (await current.locator(".home-prayer-status-pill").boundingBox())!;
+      expect(nowBadge.width).toBeGreaterThan((await current.boundingBox())!.width * 0.7);
+      if (width === 1440) {
+        expect((await row.boundingBox())!.width).toBeLessThanOrEqual(832);
+        const icon = current.locator("[data-prayer-icon]");
+        await expect(icon).toHaveCSS("width", "44px");
+      }
       if (width === 480) expect(sizes[0]!.width * 3 + 16).toBeLessThanOrEqual(await row.evaluate((n) => n.clientWidth));
       await page.screenshot({ path: testInfo.outputPath("prayer-hierarchy.png"), scale: "css" });
+      await row.screenshot({
+        path: `output/playwright/compact-prayer-cards/${testInfo.project.name}-${language}-${width}.png`,
+        scale: "css",
+      });
       expect(
         (await new AxeBuilder({ page }).include('[data-testid="home-prayer-strip"]').analyze()).violations,
       ).toEqual([]);

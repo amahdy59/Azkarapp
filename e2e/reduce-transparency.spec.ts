@@ -102,16 +102,16 @@ test("a card over the hero photograph goes opaque, not merely unblurred", async 
     };
   });
   expect(material.backgroundColor, "the hero card should visibly reveal the photograph by default").toBe(
-    "rgba(15, 23, 42, 0.28)",
+    "rgba(15, 23, 42, 0.36)",
   );
   expect(material.backgroundImage).toContain("linear-gradient");
-  expect(material.backdropFilter).toContain("blur(16px)");
+  expect(material.backdropFilter).toContain("blur(22px)");
   expect(material.backdropFilter).toContain("saturate(1.35)");
 
   const standard = page.getByTestId("prayer-tracker-cards").locator("article").first();
   const reading = page.getByTestId("home-daily-evidence");
-  await expect(standard).toHaveCSS("background-color", "rgba(15, 23, 42, 0.18)");
-  await expect(reading).toHaveCSS("background-color", "rgba(15, 23, 42, 0.28)");
+  await expect(standard).toHaveCSS("background-color", "rgba(15, 23, 42, 0.24)");
+  await expect(reading).toHaveCSS("background-color", "rgba(15, 23, 42, 0.36)");
   const innerAction = standard.locator("button").first();
   await expect(standard).toHaveCSS("--prayer-focus", "1");
   await expect(innerAction).toHaveCSS("backdrop-filter", "none");

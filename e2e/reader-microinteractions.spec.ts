@@ -323,6 +323,8 @@ test("wide Reader keeps a bounded RTL collection navigator and supports direct j
 
   const navigator = page.getByTestId("reader-collection-navigator");
   const readerCard = page.getByTestId("reader-card");
+  await expect(navigator).toBeHidden();
+  await page.getByTestId("reader-sidebar-toggle").click();
   await expect(navigator).toBeVisible();
   await expect(navigator).toHaveAccessibleName("عرض جميع الأذكار");
 
@@ -1000,6 +1002,8 @@ test("the reader header keeps options and wide collection navigation together", 
   const collectionToggle = actions.getByTestId("reader-sidebar-toggle");
   if (width >= 1200) {
     const collectionPanel = page.getByTestId("reader-collection-navigator");
+    await expect(collectionPanel).toBeHidden();
+    await collectionToggle.click();
     await expect(collectionPanel).toBeVisible();
     await expect(collectionToggle).toBeHidden();
     await expect(actions.locator("button:visible")).toHaveCount(3);

@@ -158,6 +158,12 @@ describe("ReaderScreen audio identity", () => {
     );
 
     const navigator = screen.getByTestId("reader-collection-navigator");
+    const toggleBtn = screen.getByTestId("reader-sidebar-toggle");
+    expect(navigator).toHaveAttribute("hidden");
+    expect(toggleBtn).toBeVisible();
+    expect(toggleBtn).toHaveAttribute("aria-expanded", "false");
+    expect(screen.queryByRole("separator")).not.toBeInTheDocument();
+    fireEvent.click(toggleBtn);
     expect(navigator).toHaveAccessibleName("عرض جميع الأذكار");
     expect(screen.getByRole("button", { name: /ذكر .*, اكتمل/ })).toHaveAttribute("aria-current", "step");
 
@@ -165,7 +171,6 @@ describe("ReaderScreen audio identity", () => {
     expect(onSelectZikr).toHaveBeenCalledWith(1);
 
     // Only the panel's collapse button is available while docked and open.
-    const toggleBtn = screen.getByTestId("reader-sidebar-toggle");
     expect(toggleBtn).not.toBeVisible();
     fireEvent.click(screen.getByTestId("reader-sidebar-close"));
     expect(navigator).toHaveAttribute("hidden");
@@ -308,6 +313,7 @@ describe("ReaderScreen audio identity", () => {
     fireEvent.pointerDown(screen.getByRole("button", { name: "Reader options" }), { button: 0, ctrlKey: false });
     expect(screen.queryByRole("menuitem", { name: "Listen to all azkar" })).not.toBeInTheDocument();
     await userEvent.setup().keyboard("{Escape}");
+    fireEvent.click(screen.getByTestId("reader-sidebar-toggle"));
     fireEvent.click(screen.getByRole("button", { name: "Play All Audio" }));
     expect(onPlayAllAudio).toHaveBeenCalledOnce();
   });
@@ -790,6 +796,8 @@ describe("ReaderScreen audio identity", () => {
 
     const closeBtn = screen.getByTestId("reader-sidebar-close");
     const toggleBtn = screen.getByTestId("reader-sidebar-toggle");
+
+    fireEvent.click(toggleBtn);
 
     // Both use the same prominent card border and rounded-xl classes
     expect(closeBtn.className).toContain("rounded-xl");

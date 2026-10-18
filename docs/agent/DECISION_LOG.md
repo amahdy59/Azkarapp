@@ -1,4 +1,44 @@
+## 2026-10-18 — Home card alignment, local only
+
+The owner requests matching all Home cards to the top prayer-card alignment on desktop and tablet. Use the existing 52rem prayer measure plus responsive gutters for the shared frame, accounting for the prayer row's 4px inset in content. This supersedes the older 64rem outer Home measure at 600px and wider. Preserve phone layout, material, reviewed content, prayer calculations and persistence. No commit, push or deployment.
+
+## 2026-10-18 — Titles aligned with devotional toolbar controls, local only
+
+The owner again highlights the separate collection-title row and requests titles level with the top controls, raised progress and shorter heroes globally, including Masbaha and Salawat. Supersede the still-separate h1 row with a shared centered toolbar implementation across Reader and ReadingScreenChrome. Retain responsive wrapping, control sizes, mobile chrome and reviewed content. This is explicitly local; do not commit, push or deploy. Preserve all pending workspace changes.
+
 # Decision Log
+
+## 2026-10-18 — Rounded Reader surface and collapsed collection panel, local only
+
+The owner highlights the abrupt rectangular desktop reading surface and requests a local repair plus a sidebar collapsed by default. Apply shared 16px card corners while retaining its reading material, gap and content geometry. Initialize the visit-local collection panel closed; preserve explicit open/close, resizing, focus recovery and responsive drawer behavior. This supersedes the earlier initially expanded desktop panel. Preserve unrelated pending changes. No push or deployment is authorized.
+
+## 2026-10-18 — Routine-card frost benchmark, local only
+
+The owner requests using the supplied morning-routine card as the reference for cards throughout Glass mode and applying the result locally without pushing. Share its 24% navy/22px/135% material and 5.5%/1.2% reflection through semantic tokens, replacing the brighter ordinary interface sheen. Preserve stronger reading/overlay contrast, header scroll frost, selected prayer emphasis, flat elevation, nested filter suppression and independent Home/App fallbacks. No commit, push or deployment; preserve all pending local refinements.
+
+## 2026-10-18 — Localized prayer selection connection, local only
+
+The owner approves the recommendation to replace the full-width glowing detail edge with a short selected-card underline, a slightly wider fading receiving highlight aligned beneath that card, contained inner warmth and 16–20px breathing room. The receiving light follows the visible selection through resizing/horizontal scrolling and fades when its card leaves view. This explicitly supersedes the earlier matching full-width edges/no-geometry-observer constraint. Preserve current compact cards, glass, reviewed content and state behavior. Provide actual image evidence during development; do not commit, push or deploy.
+
+## 2026-10-18 — Compact prayer cards, local only
+
+The owner initially requests compact mobile/desktop cards, then explicitly prefers the previous design after reviewing the preview. The follow-up screenshot supersedes the small-badge/context-line experiment: restore the earlier full-width status pills, icon tiles, copy and rounded glass anatomy. Tighten highlighted space through a 52rem row cap, smaller header insets and 52px footer minimum; preserve shared material, current/next visibility, accessible saved context, free scrolling, tracking/calculation boundaries and coordinated sticky handoff. The owner separately authorizes repairing the existing Progress scroll-elevation failure. Preserve other pending changes. No commit, push or deployment. See phases/COMPACT_PRAYER_CARDS_2026_10_18.md.
+
+## 2026-10-18 — Consistent interface header material, owner correction
+
+The owner rejects the solid scrolling backgrounds in Library, Progress and Settings, then explicitly requests stronger frost when content flows behind headers, imitating Home prayer cards. Keep 36% navy tint/sheen unchanged; use 22px/135% frost at rest and 32px/135% while scrolled with a quiet separating edge/shadow. No blur interpolation or frame-driven state. Disable the named app-content route capture in Glass because actual browser evidence shows it blocks descendant backdrop sampling; Opaque retains that transition. Progress retains content beneath its sticky controls, native scrolling and existing focus recovery; this supersedes the interim clipped records viewport. Solid, high contrast, reduced transparency and forced colors remain authoritative. Preserve accepted Home cards and local-only scope. No publication.
+
+## 2026-10-18 — Owner live-preview Home motion correction
+
+The owner approves the smaller scrolling cards but rejects the abrupt shell-only transition and the shared backing behind the prayer row. Use one inherited 280ms CSS expansion value to coordinate natural footer height/opacity, icon size, card spacing and row clearance. Do not scale devotional text or synthesize scroll inertia. Restore/retarget from the currently interpolated state; OS/app reduced motion applies the final state immediately. Home's 96px/8px hysteresis remains.
+
+The owner subsequently removes the compact next-prayer countdown and requests visible frost on the scrolled header/cards with no horizontal scrollbar. The full expanded footer retains its countdown and accessible description; compact cards show prayer identity/time only. Keep native swipe/keyboard access and individual card/header frost, with no full-row background/filter. Remove the prayer row's retained opacity entrance, which isolated descendant backdrop sampling from moving content in the browser evidence. This supersedes the shared Home scrolling ground and shell-only handoff; other screens retain their approved protected headers. Preserve all local-only authority and accessibility fallbacks.
+
+## 2026-10-18 — Balanced glass and scrolling, local preview only
+
+The owner asks to apply all code-review recommendations locally with image evidence throughout, and selects “Keep this balanced frost” after the first phone preview. Use shared 24% navy card tint, 36% reading tint and stationary 22px/135% frost. Quiet secondary elevation and explicit shared-card ownership replace class-substring glass matching. Overlays retain 80%/28px. Preserve the later complete-text-occlusion header decision: use an opaque slate ground with subtle sheen, immediate coverage and no invisible backdrop-filter work. This supersedes the older translucent 42%/36px header note and the 36%/48% card proposal for this bounded preview.
+
+Headers observe their actual vertical viewport, initialize restored position and use 8px-enter/2px-exit hysteresis. Nested horizontal/reading scrolls do not alter elevation. Home retains its 96px-collapse/8px-restore contract, with one 180ms outer-shell height transition and detail opacity rather than per-card layout effects. OS/app reduced-motion cancellation remains. Do not commit, push or deploy this phase. Physical-device performance and human assistive technology remain separate acceptance.
 
 ## 2026-10-17 — Header scroll occlusion and glassmorphic clarity
 
@@ -4879,3 +4919,11 @@ Glass palettes set light success ink with matching dark foreground for filled st
 Owner screenshot selection: retain the open scene-backed Masbaha/Salawat canvas without an extra dark reading panel. Frost remains on their controls/menus; compact shared titles and removed bottom banners remain. This specifically supersedes applying long-reading tint to the standalone counter canvas.
 
 Owner frost correction: replace the near-opaque navy header shade with a lighter slate glass (42% tint), soft white sheen and stationary36px/135% frost. Extend Progress's sticky material across the page gutters, add16px lower breathing room and rounded lower corners. This supersedes98% header shade; maintain44px controls, focus scroll clearance, opaque accessibility recovery and the owner-selected open counter canvas. Test foreground contrast and moving-content separation against actual screenshots.
+
+## Compact Progress prayer tracking — 2026-10-18
+
+The owner supersedes the initial input-panel interpretation: Progress must show statistics rather than let users record. Implement concise read-only daily prayer/practice totals, an optional per-prayer breakdown and plain daily-wird records. Remove prayer-entry links and mutation controls from every daily statistics group; retain meaningful period/chart controls. Friday statistics read the cycle associated with the selected date. Preserve Home, normalized persistence, calendar rules, optional-practice independence and historical analytics. See phases/PROGRESS_COMPACT_TRACKING_2026_10_18.md. No commit, push or deployment.
+
+## Combined release authority — 2026-10-18
+
+The owner explicitly requests continuing and pushing all changes. This supersedes local-only publication holds for the pending Home, glass/scroll, prayer, Reader/header/sidebar and read-only Progress work. Preserve intact local hooks, full exact-commit Quality, Pages build/deploy and production smoke verification.

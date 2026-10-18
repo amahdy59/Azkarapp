@@ -1,3 +1,4 @@
+import { useScrollElevation } from "../../hooks/useScrollElevation";
 import { displayLocationName } from "../../content/prayerLocations";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
@@ -399,11 +400,7 @@ export function SettingsRootPanel({
       )
     : [];
 
-  const [hasScrolled, setHasScrolled] = useState(false);
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const next = e.currentTarget.scrollTop > 4;
-    if (next !== hasScrolled) setHasScrolled(next);
-  };
+  const hasScrolled = useScrollElevation(panelRef);
 
   return (
     <div className="flex flex-1 flex-col min-h-0 overflow-hidden" dir={direction}>
@@ -450,7 +447,7 @@ export function SettingsRootPanel({
       </div>
 
       {/* ── Scrollable Settings Rows ── */}
-      <div ref={panelRef} onScroll={handleScroll} className="settings-root-panel flex-1 overflow-y-auto pb-8 pt-3">
+      <div ref={panelRef} data-header-scroll-owner className="settings-root-panel flex-1 overflow-y-auto pb-8 pt-3">
         {trimmedQuery ? (
           /* ── Search Results ── */
           <div className="mt-3">

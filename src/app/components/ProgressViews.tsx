@@ -17,7 +17,7 @@ export interface QuranWirdTile {
   goal: number;
   complete: boolean;
   active: boolean;
-  onPress: () => void;
+  onPress?: () => void;
   onToggleComplete?: () => void;
 }
 
@@ -316,8 +316,10 @@ export function ProgressDayView({
   onOpenWirdBenefits,
   quranWird,
   onMedia = true,
+  readOnly = false,
 }: {
   summary: GardenSummary;
+  readOnly?: boolean;
   language: AppLanguage;
   dynamicSubtitle: string;
   onSelectCategory?: (categoryId: CategoryId) => void;
@@ -388,6 +390,44 @@ export function ProgressDayView({
     categories.filter((category) => completedToday.includes(category.id)).length + (quranWird?.complete ? 1 : 0);
   const totalCount = categories.length + (quranWird ? 1 : 0);
   const [isWirdInfoOpen, setIsWirdInfoOpen] = useState(false);
+
+  if (readOnly) {
+    const rows: { id: string; name: string; value: string }[] = displayCategories.map((category) => ({
+      id: category.id,
+      name: category.name,
+      value: t(language, completedToday.includes(category.id) ? "progress.completed" : "prayerTracking.notRecorded"),
+    }));
+    if (quranWird)
+      rows.push({
+        id: "quran",
+        name: t(language, "progress.quranWird"),
+        value: quranWird.complete
+          ? t(language, "progress.completed")
+          : quranWird.active
+            ? `${formatRatio(quranWird.progress, quranWird.goal, language)} ${isArabic ? "صفحة" : "pages"}`
+            : t(language, "prayerTracking.notRecorded"),
+      });
+    return (
+      <HomeCard onGlass={false} className="flex-col">
+        <Heading data-testid="progress-primary-heading" className="text-lg font-bold text-foreground">
+          {t(language, "progress.dailyWirdRecords")}
+        </Heading>
+        <dl className="mt-3 divide-y divide-border">
+          {rows.map((row) => (
+            <div
+              key={row.id}
+              className="flex min-h-11 flex-wrap items-center justify-between gap-x-4 gap-y-1 py-2 text-sm"
+            >
+              <dt className="font-semibold text-foreground">{row.name}</dt>
+              <dd className="text-muted-foreground">
+                <bdi>{row.value}</bdi>
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </HomeCard>
+    );
+  }
 
   return (
     // h-full/flex-1 let Home stretch this card to the hero's height. On the

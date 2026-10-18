@@ -107,6 +107,7 @@ export function CategoryCard({
     };
     return (
       <a
+        data-material-card
         href={href}
         data-testid={`category-card-${id}`}
         dir={direction}
@@ -122,6 +123,7 @@ export function CategoryCard({
 
   return (
     <button
+      data-material-card
       type="button"
       data-testid={`category-card-${id}`}
       dir={direction}

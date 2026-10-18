@@ -21,6 +21,7 @@ import { DailyEvidenceCard, FridayHomeCard, PrayerRoutineCard } from "../compone
 import { PrayerMomentPanel } from "../components/PrayerMomentPanel";
 import { VisitorCount } from "../components/VisitorCount";
 import { useHomePrayerScroll } from "../hooks/useHomePrayerScroll";
+import { usePrayerSelectionAnchor } from "../hooks/usePrayerSelectionAnchor";
 import { getReminderPlan, reminderCivilTime } from "../reminderPlan";
 import { TodaysPathSheet } from "../components/TodaysPathSheet";
 import { getDailyPathStatus } from "../dailyPath";
@@ -482,12 +483,8 @@ export function HomeScreen({
   );
   const homeScrollRef = useRef<HTMLDivElement>(null);
   const homeStickyRef = useRef<HTMLDivElement>(null);
-  const homeContentRef = useRef<HTMLDivElement>(null);
-  const { condensed: prayerCardsCondensed, updateScroll: updatePrayerScroll } = useHomePrayerScroll(
-    homeContentRef,
-    homeStickyRef,
-    reduceMotion,
-  );
+  const prayerPanelRef = useRef<HTMLElement>(null);
+  const { condensed: prayerCardsCondensed, updateScroll: updatePrayerScroll } = useHomePrayerScroll();
 
   useEffect(() => {
     const scroll = homeScrollRef.current;
@@ -544,6 +541,7 @@ export function HomeScreen({
   const autoPrayer = isPrayerHero ? (leadingPrayer?.prayer ?? null) : null;
   const expandedPrayer = selectedPrayer ?? (dismissedAutoPrayer === autoPrayer ? null : autoPrayer);
   const expandedPrayerModel = prayerCardModels.find((model) => model.prayer === expandedPrayer);
+  usePrayerSelectionAnchor(homeStickyRef, prayerPanelRef, showHeroContent ? expandedPrayer : null, direction);
   const quickShare = useQuickRoutineShare(reminderInfo.categoryId, language);
   const hasQuranActivity =
     Boolean(quranWirdPlan?.startedDayKey) ||
@@ -587,7 +585,7 @@ export function HomeScreen({
         className="home-content-scroll relative z-10 min-h-0 flex-1 overflow-y-auto overflow-x-hidden pb-24 pt-0 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
         onScroll={(event) => {
           const top = event.currentTarget.scrollTop;
-          const scrolled = top > 4;
+          const scrolled = top > (scrolledHomeRef.current ? 2 : 8);
           if (scrolledHomeRef.current !== scrolled) {
             scrolledHomeRef.current = scrolled;
             setHasScrolledHomeContent(scrolled);
@@ -600,9 +598,8 @@ export function HomeScreen({
           ref={homeStickyRef}
           data-testid="home-sticky-prayers"
           data-prayer-cards-condensed={prayerCardsCondensed || undefined}
-          className={`pointer-events-none sticky inset-x-0 top-0 z-50 overflow-visible ${
-            prayerCardsCondensed ? (homeVisualEffects ? "home-prayer-scrolled" : "bg-background") : ""
-          }`}
+          data-home-motion={reduceMotion ? "reduced" : undefined}
+          className="home-prayer-sticky pointer-events-none sticky inset-x-0 top-0 z-50 overflow-visible"
         >
           <header
             data-testid="home-utility-header"
@@ -620,7 +617,7 @@ export function HomeScreen({
           >
             <div
               data-testid="home-header-content"
-              className="px-page mx-auto flex w-full max-w-[64rem] items-center justify-between gap-3"
+              className="home-layout-frame px-page mx-auto flex w-full max-w-[64rem] items-center justify-between gap-3"
             >
               <div
                 data-testid="hijri-date"
@@ -674,7 +671,7 @@ export function HomeScreen({
             </div>
           </header>
           {showHeroContent && (
-            <div className="pointer-events-auto mx-auto w-full max-w-[64rem] px-page pb-4 pt-1 sm:pt-2 lg:pb-5 lg:pt-3">
+            <div className="home-layout-frame home-prayer-sticky-row pointer-events-auto mx-auto w-full max-w-[64rem] px-page">
               <div data-testid="home-prayer-strip" className="relative z-10 mx-auto w-full min-w-0 overflow-visible">
                 <h2 className="sr-only">{t(language, "prayerMoment.dayTitle")}</h2>
                 <PrayerTrackerCards
@@ -695,9 +692,8 @@ export function HomeScreen({
           )}
         </div>
         <div
-          ref={homeContentRef}
           data-testid="home-content-grid"
-          className="mx-auto grid w-full max-w-[64rem] grid-cols-1 gap-4 lg:gap-5"
+          className="home-layout-frame home-aligned-content mx-auto grid w-full max-w-[64rem] grid-cols-1 gap-4 lg:gap-5"
         >
           <div data-testid="home-hero" className="relative w-full">
             {showHeroContent && (
@@ -712,6 +708,7 @@ export function HomeScreen({
                   <div data-testid="home-prayer-column" className="contents">
                     {expandedPrayer && (
                       <section
+                        ref={prayerPanelRef}
                         id="home-expanded-prayer"
                         data-testid="home-prayer-moment"
                         data-prayer={expandedPrayer}

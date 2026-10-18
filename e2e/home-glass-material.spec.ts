@@ -77,7 +77,7 @@ for (const width of [390, 1440]) {
       for (const card of await page.locator('[data-density="summary"]').all()) {
         await expect(card).toHaveCSS("opacity", "1");
         await expect(card).toHaveCSS("filter", "none");
-        await expect(card).toHaveCSS("backdrop-filter", "blur(16px) saturate(1.35)");
+        await expect(card).toHaveCSS("backdrop-filter", "blur(22px) saturate(1.35)");
       }
       const a11y = await new AxeBuilder({ page }).include('[data-testid="home-prayer-strip"]').analyze();
       expect(a11y.violations).toEqual([]);
@@ -122,8 +122,8 @@ for (const width of [390, 834, 1440]) {
         .getByTestId("prayer-tracker-cards")
         .locator('article[data-prayer-state="past"], article[data-prayer-state="upcoming"]')
         .first();
-      await expect(standard).toHaveCSS("background-color", "rgba(15, 23, 42, 0.18)");
-      await expect(standard).toHaveCSS("backdrop-filter", "blur(16px) saturate(1.35)");
+      await expect(standard).toHaveCSS("background-color", "rgba(15, 23, 42, 0.24)");
+      await expect(standard).toHaveCSS("backdrop-filter", "blur(22px) saturate(1.35)");
       await expect(standard).toHaveCSS("--prayer-focus", "0");
       const quietBorder = await standard.evaluate((node) => getComputedStyle(node).borderTopColor);
       expect(quietBorder).not.toBe("rgba(0, 0, 0, 0)");
@@ -132,7 +132,7 @@ for (const width of [390, 834, 1440]) {
       const surfaces = page.locator(".home-photo-canvas .hero-glass.home-glass-surface");
       expect(await surfaces.count()).toBeGreaterThan(10);
       for (const surface of await surfaces.all()) {
-        await expect(surface).toHaveCSS("backdrop-filter", "blur(16px) saturate(1.35)");
+        await expect(surface).toHaveCSS("backdrop-filter", "blur(22px) saturate(1.35)");
         const material = await surface.evaluate((node) => {
           const style = getComputedStyle(node);
           return { fill: style.backgroundColor, sheen: style.backgroundImage };
@@ -143,9 +143,9 @@ for (const width of [390, 834, 1440]) {
         expect(peak).toBeLessThanOrEqual(0.07);
       }
       await expect(page.locator(".hero-glass .hero-glass")).toHaveCount(0);
-      await expect(page.getByTestId("home-daily-evidence")).toHaveCSS("background-color", "rgba(15, 23, 42, 0.28)");
+      await expect(page.getByTestId("home-daily-evidence")).toHaveCSS("background-color", "rgba(15, 23, 42, 0.36)");
       const header = page.getByTestId("home-utility-header");
-      await expect(header).toHaveCSS("background-color", "rgba(15, 23, 42, 0.28)");
+      await expect(header).toHaveCSS("background-color", "rgba(15, 23, 42, 0.36)");
       await expect(header).toHaveCSS("border-top-width", "0px");
       await expect(header).toHaveCSS("border-bottom-width", "0px");
       await page.screenshot({ path: testInfo.outputPath(`${scene}-${width}.png`), scale: "css" });
@@ -172,7 +172,7 @@ test("Home glass respects live system preference and high contrast without chang
 }) => {
   await page.goto("/#/home");
   const card = page.getByTestId("prayer-tracker-cards").locator('article[data-prayer-state="current"]');
-  await expect(card).toHaveCSS("background-color", "rgba(15, 23, 42, 0.18)");
+  await expect(card).toHaveCSS("background-color", "rgba(15, 23, 42, 0.24)");
   const cdp = await page.context().newCDPSession(page);
   await cdp.send("Emulation.setEmulatedMedia", {
     features: [{ name: "prefers-reduced-transparency", value: "reduce" }],
@@ -183,7 +183,7 @@ test("Home glass respects live system preference and high contrast without chang
   await cdp.send("Emulation.setEmulatedMedia", {
     features: [{ name: "prefers-reduced-transparency", value: "no-preference" }],
   });
-  await expect(card).toHaveCSS("background-color", "rgba(15, 23, 42, 0.18)");
+  await expect(card).toHaveCSS("background-color", "rgba(15, 23, 42, 0.24)");
   await page.locator("html").evaluate((node) => node.classList.add("high-contrast"));
   await expect(card).toHaveCSS("background-color", "rgb(2, 6, 23)");
   await expect(card).toHaveCSS("backdrop-filter", "none");
@@ -217,11 +217,11 @@ for (const width of [390, 1440]) {
     await expect(page.getByTestId("wird-category-card")).toHaveCount(4);
     for (const card of await page.getByTestId("wird-category-card").all()) {
       await expect(card).toHaveClass(/hero-glass/);
-      await expect(card).toHaveCSS("background-color", "rgba(15, 23, 42, 0.18)");
+      await expect(card).toHaveCSS("background-color", "rgba(15, 23, 42, 0.24)");
     }
     for (const prayer of await page.getByTestId("prayer-tracker-cards").locator("article").all()) {
       await expect(prayer).toHaveClass(/hero-glass/);
-      await expect(prayer).toHaveCSS("background-color", "rgba(15, 23, 42, 0.18)");
+      await expect(prayer).toHaveCSS("background-color", "rgba(15, 23, 42, 0.24)");
     }
     await page.getByTestId("prayer-card-fajr").getByRole("button").click();
     await expect(page.getByTestId("home-prayer-moment").locator(".hero-glass.home-glass-surface")).toHaveCount(1);
@@ -269,7 +269,7 @@ test("photo-enabled Wird tiles fill the card behind a readable gradient", async 
   );
 });
 
-test("matching prayer accent edges preserve selection at phone and desktop widths", async ({ page }, testInfo) => {
+test("localized prayer accent edges preserve selection at phone and desktop widths", async ({ page }, testInfo) => {
   await page.clock.setFixedTime(new Date("2026-10-16T13:40:00+03:00"));
   await page.goto("/#/home");
   await page.getByTestId("prayer-card-dhuhr").getByRole("button").click();
@@ -281,13 +281,13 @@ test("matching prayer accent edges preserve selection at phone and desktop width
         panel = getComputedStyle(document.querySelector('[data-testid="home-prayer-moment"]')!, "::before");
       return {
         small: small.backgroundColor,
-        panel: panel.backgroundColor,
+        panel: panel.backgroundImage,
         height: small.height,
         content: panel.content,
         pointer: panel.pointerEvents,
       };
     });
-    expect(edges.small).toBe(edges.panel);
+    expect(edges.panel).toContain(edges.small);
     expect(edges.height).toBe("2px");
     expect(edges.content).toBe('""');
     expect(edges.pointer).toBe("none");
@@ -326,7 +326,7 @@ for (const themeMode of ["light", "dark", "midnight"]) {
               };
             }),
           )
-          .toEqual({ countAboveTen: true, filters: ["blur(16px) saturate(1.35)"], translucent: true });
+          .toEqual({ countAboveTen: true, filters: ["blur(22px) saturate(1.35)"], translucent: true });
         expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBe(0);
       }
     });

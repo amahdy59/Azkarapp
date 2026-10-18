@@ -12,7 +12,7 @@ describe("Header", () => {
     render(
       <div className="app-screen-surface">
         <Header title="Progress" />
-        <div data-testid="scroll-region">
+        <div data-testid="scroll-region" style={{ overflowY: "auto" }}>
           <div>Content</div>
         </div>
       </div>,
@@ -58,7 +58,7 @@ describe("Header", () => {
     render(
       <div className="app-screen-surface">
         <Header title="Reader" />
-        <div className="reader-text-scroll" data-testid="reader-scroll-region">
+        <div className="reader-text-scroll" data-testid="reader-scroll-region" style={{ overflowY: "auto" }}>
           <div>Devotional reading text</div>
         </div>
       </div>,

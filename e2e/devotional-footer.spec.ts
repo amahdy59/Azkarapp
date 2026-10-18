@@ -20,6 +20,7 @@ for (const language of ["ar", "en"] as const) {
         );
       }, language);
       await page.goto("/#/azkar/morning/1");
+      if (width === 1440) await page.getByTestId("reader-sidebar-toggle").click();
       const tools = page.getByTestId("reader-support-actions");
       const counter = page.getByTestId("counter-surface");
       await expect(tools).toBeVisible();

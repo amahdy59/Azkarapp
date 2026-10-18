@@ -72,6 +72,7 @@ import { useCountingSurface } from "../components/countingSurface";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { Header } from "../components/LayoutShells";
 import { ReaderSceneArt } from "../components/ReaderSceneArt";
+import { ReadingHeroToolbar } from "../components/ReadingHeroToolbar";
 import { AppearanceMenu } from "../components/AppearanceMenu";
 import { QuranPrelude, QuranSurahHeader } from "../components/QuranChrome";
 import { QuranWordText } from "../components/QuranWordText";
@@ -306,7 +307,7 @@ export function ReaderScreen({
     });
     return () => cancelAnimationFrame(frame);
   }, [audioModeActive]);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const sidebarToggleRef = useRef<HTMLButtonElement>(null);
   const readerMenuRef = useRef<HTMLButtonElement>(null);
   const collectionMenuRequested = useRef(false);
@@ -1525,20 +1526,24 @@ export function ReaderScreen({
                 }}
               >
                 <ReaderSceneArt category={catId} />
-                <div
-                  className="relative z-10 flex w-full items-center justify-between gap-3"
-                  data-testid="reader-header-toolbar"
+                <ReadingHeroToolbar
+                  title={displayCategoryName}
+                  testId="reader-header-toolbar"
+                  back={
+                    <IconButton
+                      onClick={onBack}
+                      label={t(language, "common.back")}
+                      className={READER_WIDE_HEADER_ACTION_CLASS}
+                    >
+                      <ArrowPrevious size={20} />
+                    </IconButton>
+                  }
                 >
-                  <IconButton
-                    onClick={onBack}
-                    label={t(language, "common.back")}
-                    className={READER_WIDE_HEADER_ACTION_CLASS}
-                  >
-                    <ArrowPrevious size={20} />
-                  </IconButton>
-
                   {/* Hero actions: appearance and contextual actions. */}
-                  <div className="flex flex-wrap items-center justify-end gap-2" data-testid="reader-hero-actions">
+                  <div
+                    className="flex min-w-0 flex-wrap items-center justify-end gap-2"
+                    data-testid="reader-hero-actions"
+                  >
                     <button
                       type="button"
                       data-testid="reader-help-trigger"
@@ -1597,14 +1602,7 @@ export function ReaderScreen({
                       />
                     </button>
                   </div>
-                </div>
-
-                <h1
-                  className="relative z-10 w-full break-words text-lg md:text-xl font-extrabold leading-tight text-on-media-accent drop-shadow-sm"
-                  dir="auto"
-                >
-                  {displayCategoryName}
-                </h1>
+                </ReadingHeroToolbar>
 
                 <div className="relative z-10 flex w-full max-w-[42rem] flex-col items-center gap-1">
                   <div className="flex w-full items-center justify-between px-1 leading-none" aria-hidden="true">
@@ -1634,7 +1632,7 @@ export function ReaderScreen({
                 and keyboard guidance. Page-level actions stay in the hero. */}
               <div className="reader-canvas-wrap relative mx-3 my-2 md:mx-4 md:my-2 flex min-h-0 flex-1 overflow-hidden bg-transparent">
                 <div
-                  className="glass-reading relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden cursor-pointer"
+                  className="glass-reading relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-2xl cursor-pointer"
                   data-testid="reader-card"
                   {...surfaceProps}
                 >

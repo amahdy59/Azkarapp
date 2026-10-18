@@ -10,8 +10,7 @@ test("Main Mushaf follows audio beside readable English and yields to manual bro
 }, testInfo) => {
   const player = await openListeningPage(page, listeningCases[0], "en");
   await page.setViewportSize({ width: 1440, height: 900 });
-  if (await page.getByTestId("reader-sidebar-close").isVisible())
-    await page.getByTestId("reader-sidebar-close").click();
+  await expect(page.getByTestId("reader-sidebar-toggle")).toHaveAttribute("aria-expanded", "false");
   const annotation = listeningTiming(listeningCases[0]);
   const playVerse = async (key: string) => {
     const verse = annotation.verses.find((verse) => verse.verseKey === key)!;
@@ -127,7 +126,7 @@ for (const item of listeningCases) {
       player.locator(`[${continuous ? "data-listening-passage" : "data-mushaf-page"}="${pageNumber}"]`);
     await expect(passage(item.first)).toBeVisible();
     await page.setViewportSize({ width: 1440, height: 1100 });
-    await page.getByTestId("reader-sidebar-close").click();
+    await expect(page.getByTestId("reader-sidebar-toggle")).toHaveAttribute("aria-expanded", "false");
     if ((await player.getAttribute("data-variant")) === "compact") {
       await player.getByRole("button", { name: t("en", "audioPlayer.expand"), exact: true }).click();
     }
@@ -228,7 +227,7 @@ test("Enlarged paired Mushaf stays inside a keyboard-scrollable Arabic pane @cro
   const player = await openListeningPage(page, listeningCases[0], "en");
   await expect(player.locator('[data-mushaf-page="2"]')).toBeVisible();
   await page.setViewportSize({ width: 1440, height: 1100 });
-  await page.getByTestId("reader-sidebar-close").click();
+  await expect(page.getByTestId("reader-sidebar-toggle")).toHaveAttribute("aria-expanded", "false");
   if ((await player.getAttribute("data-variant")) === "compact") {
     await player.getByRole("button", { name: t("en", "audioPlayer.expand"), exact: true }).click();
   }

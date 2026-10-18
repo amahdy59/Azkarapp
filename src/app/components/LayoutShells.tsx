@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
+import { useScrollElevation } from "../hooks/useScrollElevation";
 import {
   ArrowPrevious,
   BarChart3,
@@ -111,61 +112,7 @@ export function Header({
   pageGutters?: boolean;
 }) {
   const headerRef = useRef<HTMLDivElement>(null);
-  const [hasScrolledContent, setHasScrolledContent] = useState(false);
-  const scrolledRef = useRef(false);
-
-  useEffect(() => {
-    if (!elevateOnScroll) return;
-    const header = headerRef.current;
-    if (!header) return;
-
-    const screenRoot =
-      header.closest<HTMLElement>(".app-screen-surface") ||
-      header.closest<HTMLElement>("[data-testid='settings-screen']") ||
-      header.closest<HTMLElement>(".app-main-view") ||
-      document.body;
-
-    const updateFromScroll = (event: Event) => {
-      const target = event.target;
-      if (!(target instanceof HTMLElement || target === document || target === window)) return;
-      // An inner devotional text reader scrolls within its own card and never
-      // passes content underneath the header, so it should not trigger elevation.
-      if (
-        target instanceof HTMLElement &&
-        (target.classList.contains("reader-text-scroll") || target.closest(".reader-text-scroll"))
-      ) {
-        return;
-      }
-
-      let scrollTop = 0;
-      if (target === document || target === window) {
-        scrollTop = window.scrollY || document.documentElement.scrollTop;
-      } else if (target instanceof HTMLElement) {
-        if (screenRoot.contains(target) || target.contains(header)) {
-          scrollTop = target.scrollTop;
-        } else {
-          return;
-        }
-      }
-
-      const next = scrollTop > 4;
-      if (next === scrolledRef.current) return;
-      scrolledRef.current = next;
-      setHasScrolledContent(next);
-    };
-
-    // Scroll does not bubble, but it can be observed in the capture phase.
-    // This keeps Header independent from each screen's choice of scroll owner:
-    // some screens scroll the surface itself, while others use a nested region.
-    screenRoot.addEventListener("scroll", updateFromScroll, true);
-    window.addEventListener("scroll", updateFromScroll, { capture: true, passive: true });
-    return () => {
-      screenRoot.removeEventListener("scroll", updateFromScroll, true);
-      window.removeEventListener("scroll", updateFromScroll, { capture: true });
-    };
-  }, [elevateOnScroll]);
-
-  const isScrolled = Boolean(elevateOnScroll && hasScrolledContent);
+  const isScrolled = useScrollElevation(headerRef, elevateOnScroll);
 
   return (
     <div
