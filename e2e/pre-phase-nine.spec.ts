@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { readFile } from "node:fs/promises";
+import benefitsHadithReadings from "../src/app/content/benefitsHadithReadings.json" with { type: "json" };
 
 test("onboarding offers a visible skip action for pointer and keyboard users", async ({ page }) => {
   await page.goto("/");
@@ -139,6 +140,19 @@ test("Library Benefits entry shares complete evidence and attribution through th
   await expect(page.getByTestId("benefits-list").locator("article")).toHaveCount(21);
   await expect(page.locator("details")).toHaveCount(0);
 
+  const fatimah = page
+    .getByRole("article")
+    .filter({ has: page.getByRole("heading", { name: "Tasbih Fatimah at bedtime: 33, 33, 34", exact: true }) });
+  await expect(fatimah.locator("p")).toHaveText(benefitsHadithReadings["h-fatima"].en);
+  await expect(
+    page
+      .getByRole("article")
+      .filter({ has: page.getByRole("heading", { name: "Ayat al-Kursi at bedtime", exact: true }) })
+      .locator("p"),
+  ).toHaveText(benefitsHadithReadings["h-kursi"].en);
+  await fatimah.scrollIntoViewIfNeeded();
+  await page.screenshot({ path: "output/playwright/benefits-full-hadith-en.png" });
+
   const evidence = page.getByTestId("benefits-list").locator("article").first();
   const body = await evidence.locator("p").first().innerText();
   const source = await evidence.getByRole("link").innerText();
@@ -155,6 +169,29 @@ test("Library Benefits entry shares complete evidence and attribution through th
   const saved = await download;
   expect(saved.suggestedFilename()).toBe("azkar.txt");
   expect(await readFile((await saved.path())!, "utf8")).toBe(payload);
+});
+
+test("complete Arabic hadith remains readable at 320px and shares its complete story @cross-browser", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 740 });
+  await openReturningGuest(page, [], [], "ar");
+  await page.goto("/#/benefits");
+  await page.getByRole("tab").nth(1).click();
+  await page.getByTestId("benefits-load-more").click();
+  const fatimah = page
+    .getByRole("article")
+    .filter({ has: page.getByRole("heading", { name: "تسبيح فاطمة عند النوم: ٣٣، ٣٣، ٣٤", exact: true }) });
+  await expect(fatimah.locator("p")).toHaveText(benefitsHadithReadings["h-fatima"].ar);
+  await fatimah.scrollIntoViewIfNeeded();
+  expect(await fatimah.evaluate((element) => element.scrollWidth - element.clientWidth)).toBeLessThanOrEqual(1);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(1);
+  await page.screenshot({ path: "output/playwright/benefits-full-hadith-ar-320.png" });
+  await fatimah.getByRole("button").click();
+  const studio = page.getByTestId("collection-share-modal");
+  await expect(studio).toBeVisible();
+  await studio.getByRole("button", { name: "نص", exact: true }).click();
+  expect(await studio.getByRole("textbox").inputValue()).toContain(benefitsHadithReadings["h-fatima"].ar);
 });
 
 test("the Library exposes the full Saved state", async ({ page }) => {

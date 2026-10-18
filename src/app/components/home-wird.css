@@ -7,10 +7,12 @@
 }
 .home-prayer-sticky {
   --home-prayer-expansion: 1;
-  transition: --home-prayer-expansion 280ms cubic-bezier(0.2, 0, 0, 1);
+  transition: --home-prayer-expansion 160ms cubic-bezier(0.2, 0, 0, 1);
+  margin-block-end: var(--home-prayer-reserved-space, 0px);
 }
 .home-prayer-sticky[data-prayer-cards-condensed] {
   --home-prayer-expansion: 0;
+  transition-delay: 60ms;
 }
 .home-prayer-sticky-row {
   padding-block-start: calc(0.125rem + 0.375rem * var(--home-prayer-expansion));
@@ -297,12 +299,12 @@
   }
 }
 .home-prayer-summary-button {
-  grid-template-columns: calc(1.75rem + 1rem * var(--home-prayer-expansion, 1)) minmax(0, 1fr);
+  grid-template-columns: 2.75rem minmax(0, 1fr);
   grid-template-rows: auto auto;
   align-items: center;
   align-content: start;
   min-height: 4rem;
-  padding: calc(0.375rem + 0.25rem * var(--home-prayer-expansion, 1)) 0.75rem 0.5rem;
+  padding: calc(0.5rem + 0.25rem * var(--home-prayer-expansion, 1)) 0.75rem 0.5rem;
   row-gap: calc(0.125rem + 0.125rem * var(--home-prayer-expansion, 1));
   direction: ltr;
 }
@@ -312,8 +314,12 @@
   overflow-anchor: none;
 }
 @container (max-width: 9rem) {
+  .home-prayer-icon {
+    width: calc(1.75rem + 0.25rem * var(--home-prayer-expansion, 1));
+    height: calc(1.75rem + 0.25rem * var(--home-prayer-expansion, 1));
+  }
   .home-prayer-summary-button {
-    grid-template-columns: calc(1.75rem + 0.25rem * var(--home-prayer-expansion, 1)) minmax(0, 1fr);
+    grid-template-columns: 2rem minmax(0, 1fr);
     column-gap: 0.375rem;
   }
 }
@@ -433,8 +439,9 @@
 }
 .home-prayer-icon {
   position: relative;
-  width: 100%;
-  height: calc(1.75rem + 1rem * var(--home-prayer-expansion, 1));
+  width: min(100%, calc(1.75rem + 1rem * var(--home-prayer-expansion, 1)));
+  height: auto;
+  aspect-ratio: 1;
   border-radius: 0.875rem;
   border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
   background: linear-gradient(145deg, rgb(255 255 255 / 0.12), rgb(2 6 23 / 0.18));
@@ -479,7 +486,7 @@
 }
 .home-prayer-timing > p {
   grid-row: 2;
-  font-size: clamp(1rem, 12cqi, calc(1.25rem + 0.5rem * var(--home-prayer-expansion, 1)));
+  font-size: clamp(1rem, 12cqi, 1.75rem);
   line-height: 1.2;
   white-space: nowrap;
   text-align: right;
@@ -493,7 +500,8 @@
   height: calc(var(--home-prayer-expansion, 1) * max(3.25rem, var(--prayer-footer-height, 0px)));
   min-height: 0;
   overflow: clip;
-  opacity: var(--home-prayer-expansion, 1);
+  opacity: 1;
+  transition: opacity 60ms linear 160ms;
   padding: 0;
   border-top: 0;
 }
@@ -502,7 +510,7 @@
   min-height: 3.25rem;
   flex-direction: column;
   justify-content: center;
-  padding: 0.375rem 0.75rem;
+  padding: 0.5rem 0.75rem;
 }
 .home-prayer-status-pill {
   display: flex;
@@ -609,5 +617,70 @@ html:not(.high-contrast) .home-photo-canvas {
       border-color: transparent;
       box-shadow: none;
     }
+  }
+}
+
+/* The scrolled strip protects its full width, including gaps and page gutters.
+   Material changes are discrete; native scrolling never interpolates frost. */
+.home-prayer-sticky[data-scrolled] {
+  background: var(--background);
+}
+@supports (backdrop-filter: blur(1px)) {
+  html:not(.high-contrast) .home-photo-canvas .home-prayer-sticky[data-scrolled] {
+    background: color-mix(in srgb, var(--on-media-surface) 88%, transparent);
+    backdrop-filter: var(--glass-chrome-frost);
+  }
+  html:not(.high-contrast) .home-photo-canvas .home-prayer-sticky[data-scrolled] .hero-glass.home-glass-surface {
+    backdrop-filter: none !important;
+  }
+}
+html.reduce-transparency .home-photo-canvas:not(.home-force-glass) .home-prayer-sticky[data-scrolled],
+.high-contrast .home-photo-canvas .home-prayer-sticky[data-scrolled] {
+  background: var(--background);
+  backdrop-filter: none;
+}
+@media (prefers-reduced-transparency: reduce) {
+  html:not(.high-contrast) .home-photo-canvas:not(.home-force-glass) .home-prayer-sticky[data-scrolled] {
+    background: var(--background);
+    backdrop-filter: none;
+  }
+}
+@media (forced-colors: active) {
+  .home-prayer-sticky[data-scrolled] {
+    background: Canvas !important;
+    backdrop-filter: none !important;
+  }
+}
+.home-prayer-sticky[data-prayer-cards-condensed] .home-prayer-footer {
+  opacity: 0;
+  transition-delay: 0ms;
+}
+/* The compact countdown uses the same text/accessible description as the footer.
+   Reveal it after the footer fades, without announcing duplicate information. */
+.home-prayer-compact-countdown {
+  position: absolute;
+  inset-inline: 0.75rem;
+  bottom: 0.5rem;
+  text-align: right;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  opacity: 0;
+  transition: opacity 60ms linear;
+}
+.home-prayer-sticky[data-prayer-cards-condensed] .home-prayer-compact-countdown {
+  opacity: 1;
+  transition-delay: 160ms;
+}
+.home-prayer-summary-card[data-prayer-state="next"] .home-prayer-summary-button {
+  padding-bottom: calc(0.5rem + 1.125rem * (1 - var(--home-prayer-expansion, 1)));
+}
+.reduce-motion :is(.home-prayer-footer, .home-prayer-compact-countdown),
+.home-prayer-sticky[data-home-motion="reduced"] :is(.home-prayer-footer, .home-prayer-compact-countdown) {
+  transition: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-prayer-footer,
+  .home-prayer-compact-countdown {
+    transition: none;
   }
 }

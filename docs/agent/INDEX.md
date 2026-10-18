@@ -433,3 +433,9 @@ Local follow-up: [Concise, actionable Progress](phases/PROGRESS_REFINEMENTS_2026
 [Mobile Reader surface and release](phases/MOBILE_READER_SURFACE_2026_10_18.md) records the owner-requested mobile progress seam repair, related compact-counter inspection and authorized all-pending-change release.
 
 [Mushaf clarity, source comparison and timed CI](phases/MUSHAF_CLARITY_SOURCE_REVIEW_CI_2026_10_18.md) is the active owner request. All 20 pending comparisons include the owner-requested Dorar follow-up: 12 source-attributed entries supported and eight specific content mismatches documented; grading disagreement alone causes no blanket hold. Protect Mushaf tooltip/status overlays, identify active Glass material separately from page color, and schedule the unchanged browser inventory using recorded durations. Standing main release authority applies.
+
+[Complete Benefits hadith narrations](phases/BENEFITS_FULL_HADITH_2026_10_18.md) records the owner-requested local-only replacement of 21 abbreviated summaries with complete sourced bilingual narrations. Coordinate with the active release; no publication.
+
+[Stable prayer cards and scrolling](phases/STABLE_PRAYER_CARD_SCROLL_2026_10_18.md) records the approved local-only protected strip, stable typography/scroll geometry, retained next countdown and enlarged-text spacing. [Final pending-change review](phases/FINAL_PENDING_REVIEW_2026_10_18.md) records integration checks and reconciles the domain guides before publication.
+
+[Final pending release](phases/FINAL_PENDING_RELEASE_2026_10_18.md) records the owner's subsequent authorization to publish all pending changes with fresh release notes, complete required testing and exact-commit deployment verification. This supersedes the two pending local-only holds.

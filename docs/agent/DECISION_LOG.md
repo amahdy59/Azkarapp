@@ -5001,3 +5001,11 @@ Owner clarification: check grading disagreements against Dorar and retain the re
 ## Home width parity — 2026-10-18
 
 Owner requests expanding Home to match Azkar's responsive grid width, margins and padding. Reuse max-w-7xl and px-page across Home's three aligned frames, remove its narrower CSS cap and redundant desktop inset, preserve card breakpoints and mobile scrolling. Extend existing alignment cases with actual Library geometry; retain every existing browser case. Include this follow-up in the authorized release and supersede the running older-commit CI.
+
+## Complete Benefits hadith narrations — 2026-10-18
+
+Owner explicitly requests full hadith text in the pictured Benefits cards, applied locally and coordinated with other sessions. Replace all 21 reward summaries with complete selected matn and bilingual meaning, preserving citations, derived benefits and stable IDs. Prepare externally during release freeze and integrate after coordination; no commit, push or publication. See phases/BENEFITS_FULL_HADITH_2026_10_18.md.
+
+## Final refinements and combined release — 2026-10-18
+
+The owner explicitly instructs: apply recommendations, push all changes, and ensure proper testing and deployment. This supersedes the pending Benefits and stable prayer-scroll publication holds. Include the final documentation reconciliation, fresh bilingual release notes/history and all pending approved application/test/content evidence. Use the intact local hook and exact-commit Quality/Pages gates, then production smoke. The separate eight original collection corrections remain subject to content review; this release does not reinterpret reviewed sacred content. See phases/FINAL_PENDING_RELEASE_2026_10_18.md.

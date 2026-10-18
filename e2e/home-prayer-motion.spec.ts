@@ -75,7 +75,7 @@ for (const [language, width] of [
     await sticky.evaluate((node) => {
       for (const animation of node.getAnimations())
         if (animation instanceof CSSTransition && animation.transitionProperty === "--home-prayer-expansion")
-          animation.currentTime = 140;
+          animation.currentTime = 100;
     });
     const middle = (await card.boundingBox())!.height;
     expect(middle).toBeLessThan(expanded - 2);
@@ -86,17 +86,17 @@ for (const [language, width] of [
     await expect(sticky).toHaveCSS("--home-prayer-expansion", "0");
     const compact = (await card.boundingBox())!.height;
     expect(middle).toBeGreaterThan(compact + 2);
-    expect(compact).toBeLessThan(expanded * 0.65);
-    expect((await sticky.boundingBox())!.height).toBeLessThan(expandedSticky - 60);
-    await expect(sticky).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-    await expect(sticky).toHaveCSS("backdrop-filter", "none");
-    await expect(card).toHaveCSS("backdrop-filter", "blur(22px) saturate(1.35)");
+    expect(compact).toBeLessThan(expanded - 20);
+    expect((await sticky.boundingBox())!.height).toBeLessThan(expandedSticky - 35);
+    expect(await sticky.evaluate((node) => getComputedStyle(node).backgroundColor)).not.toBe("rgba(0, 0, 0, 0)");
+    await expect(sticky).toHaveCSS("backdrop-filter", "blur(32px) saturate(1.35)");
+    await expect(card).toHaveCSS("backdrop-filter", "none");
     await expect(page.getByTestId("home-all-prayers-row")).toHaveCSS("scrollbar-width", "none");
-    await expect(sticky.locator("[data-prayer-compact-countdown]")).toHaveCount(0);
+    await expect(sticky.locator("[data-prayer-compact-countdown]")).toHaveCSS("opacity", "1");
     // An ancestor opacity entrance creates a backdrop root and prevents each
     // card from frosting the moving content outside the prayer strip.
     await expect(page.getByTestId("home-all-prayers-row")).toHaveCSS("animation-name", "none");
-    await expect(page.getByTestId("home-utility-header")).toHaveCSS("backdrop-filter", "blur(32px) saturate(1.35)");
+    await expect(page.getByTestId("home-utility-header")).toHaveCSS("backdrop-filter", "none");
     for (const button of await sticky.locator("[data-density='summary'] button").all()) {
       const bounds = (await button.boundingBox())!;
       expect(bounds.height).toBeGreaterThanOrEqual(44);

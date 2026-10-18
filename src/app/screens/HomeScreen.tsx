@@ -496,8 +496,14 @@ export function HomeScreen({
     if (!scroll || !sticky) return;
     // Keep native focus/scroll-into-view recovery below the full sticky cards,
     // including when text size, viewport width or safe-area insets change.
+    let expandedHeight = sticky.getBoundingClientRect().height;
     const measure = () => {
       const height = sticky.getBoundingClientRect().height;
+      const expansion = Number(getComputedStyle(sticky).getPropertyValue("--home-prayer-expansion"));
+      if (expansion === 1) expandedHeight = height;
+      // Keep the same content coordinates while the sticky footprint contracts.
+      // This reserved flow space scrolls away normally, without scrollTop writes.
+      sticky.style.setProperty("--home-prayer-reserved-space", `${Math.max(0, expandedHeight - height)}px`);
       // A short landscape or enlarged-text viewport must still expose the
       // content below the cards. Restore ordinary scrolling if it cannot.
       const fits = height + 44 < scroll.clientHeight;
@@ -512,6 +518,7 @@ export function HomeScreen({
       observer.disconnect();
       scroll.style.removeProperty("scroll-padding-top");
       sticky.style.removeProperty("position");
+      sticky.style.removeProperty("--home-prayer-reserved-space");
     };
   }, []);
 
@@ -594,13 +601,21 @@ export function HomeScreen({
             scrolledHomeRef.current = scrolled;
             setHasScrolledHomeContent(scrolled);
           }
-          updatePrayerScroll(top);
+          updatePrayerScroll(
+            top,
+            expandedPrayer !== null || !!homeStickyRef.current?.querySelector(".home-prayer-sticky-row:focus-within"),
+          );
         }}
       >
         {/* Sticky Header Overlay */}
         <div
           ref={homeStickyRef}
+          onBlurCapture={(event) => {
+            if (!expandedPrayer && !event.currentTarget.contains(event.relatedTarget as Node | null))
+              updatePrayerScroll(homeScrollRef.current?.scrollTop ?? 0);
+          }}
           data-testid="home-sticky-prayers"
+          data-scrolled={hasScrolledHomeContent || undefined}
           data-prayer-cards-condensed={prayerCardsCondensed || undefined}
           data-home-motion={reduceMotion ? "reduced" : undefined}
           className="home-prayer-sticky pointer-events-none sticky inset-x-0 top-0 z-50 overflow-visible"

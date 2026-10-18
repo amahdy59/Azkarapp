@@ -1,8 +1,26 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { BenefitsScreen, buildWhatsAppBenefitUrl } from "./BenefitsScreen";
+import { BenefitsScreen, benefitEvidenceToShareItem, buildWhatsAppBenefitUrl } from "./BenefitsScreen";
+import { HADITH_DHIKR_EVIDENCE } from "../content/zikrBenefits";
 
 describe("BenefitsScreen", () => {
+  it.each(["ar", "en"] as const)("renders and shares complete hadith evidence in %s", (language) => {
+    render(
+      <BenefitsScreen language={language} direction={language === "ar" ? "rtl" : "ltr"} onBack={() => undefined} />,
+    );
+    fireEvent.click(screen.getAllByRole("tab")[1]!);
+    fireEvent.click(screen.getByTestId("benefits-load-more"));
+    for (const item of HADITH_DHIKR_EVIDENCE) {
+      const article = screen
+        .getAllByRole("article")
+        .find((node) => node.querySelector("h2")?.textContent === item.title[language]);
+      expect(article?.querySelector("p")?.textContent, item.id).toBe(item.text[language]);
+      const shared = benefitEvidenceToShareItem(item, language);
+      expect(shared.arabicText).toBe(item.text[language]);
+      expect(shared.sourceReference).toBe(item.source[language]);
+      expect(shared.readingUrl).toBe(item.sourceUrl);
+    }
+  });
   it("presents Qur'an and hadith as two side-by-side evidence filters", () => {
     render(<BenefitsScreen language="en" direction="ltr" onBack={() => undefined} />);
 

@@ -66,6 +66,13 @@ describe("PrayerTrackerCards", () => {
         compactSummary
       />,
     );
+    expect(screen.getByTestId("prayer-card-asr").querySelector("[data-prayer-compact-countdown]")).toHaveTextContent(
+      "01:00",
+    );
+    expect(screen.getByTestId("prayer-card-asr").querySelector("[data-prayer-compact-countdown]")).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
     expect(screen.queryByRole("progressbar")).toBeNull();
     expect(screen.getByTestId("prayer-card-asr").querySelector("[data-prayer-detail]")).toHaveTextContent("01:00");
   });

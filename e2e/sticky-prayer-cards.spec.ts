@@ -32,7 +32,7 @@ for (const language of ["ar", "en"] as const) {
         await expect(strip).toBeInViewport();
         await expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
         await expect(strip.locator("[data-prayer-footer]").first()).toBeHidden();
-        await expect(strip.locator("[data-prayer-compact-countdown]")).toHaveCount(0);
+        await expect(strip.locator("[data-prayer-compact-countdown]")).toHaveCSS("opacity", "1");
         await expect(strip).toHaveText(originalCards!);
         const geometry = await strip.evaluate((node) => {
           const box = node.getBoundingClientRect();
@@ -85,6 +85,16 @@ for (const language of ["ar", "en"] as const) {
       });
       await expect(strip).toBeInViewport();
       await expect(strip.locator("article")).toHaveCount(5);
+      // The open prayer remains stable during interaction, including at the top.
+      await expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
+      await current.click();
+      await current.evaluate((node) => (node as HTMLElement).blur());
+      await scroll.evaluate((node) => {
+        node.scrollTop = 12;
+      });
+      await scroll.evaluate((node) => {
+        node.scrollTop = 0;
+      });
       await expect(sticky).not.toHaveAttribute("data-prayer-cards-condensed", "true");
       await expect(strip.locator("[data-prayer-footer]").first()).toBeVisible();
       // Very short windows must allow the full cards to scroll away rather

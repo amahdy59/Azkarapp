@@ -320,6 +320,11 @@ function PrayerCard({
               )}
             </p>
           </div>
+          {state === "next" && countdown && (
+            <span data-prayer-compact-countdown className="home-prayer-compact-countdown" aria-hidden="true" dir="auto">
+              {footerText}
+            </span>
+          )}
         </button>
         <div
           data-prayer-footer

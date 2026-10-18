@@ -144,8 +144,8 @@ for (const language of ["ar", "en"] as const) {
       expect(
         geometry.every(
           (card) =>
-            card.paddingTop >= 9.5 &&
-            card.paddingTop <= 10 &&
+            card.paddingTop >= 11.5 &&
+            card.paddingTop <= 12 &&
             card.paddingLeft >= 11.5 &&
             card.paddingLeft <= 12 &&
             card.paddingLeft === card.paddingRight &&
@@ -204,7 +204,7 @@ for (const language of ["ar", "en"] as const) {
       await expect(next.locator("[data-prayer-footer]").getByRole("progressbar")).toHaveCount(0);
       // The condensed strip owns a hidden countdown inside its button. At the
       // top only the separate footer countdown is visible.
-      await expect(next.locator("[data-prayer-compact-countdown]")).toBeHidden();
+      await expect(next.locator("[data-prayer-compact-countdown]")).toHaveCSS("opacity", "0");
       await expect(next.locator("[data-prayer-detail]")).toContainText(/باقي|left/);
       await expect(next.locator("[data-prayer-detail]")).toHaveCSS("justify-content", "center");
       await expect(next.locator(".home-prayer-divider")).toHaveCount(0);
@@ -252,24 +252,23 @@ for (const language of ["ar", "en"] as const) {
         const positions = enlarged.map((card) => card[key]);
         expect(Math.max(...positions) - Math.min(...positions)).toBeLessThanOrEqual(1);
       }
-      const footerTextBounds = await row
-        .locator("[data-prayer-footer] > .home-prayer-status-pill")
-        .evaluateAll((nodes) =>
-          nodes.map((node) => {
-            const text = node.getBoundingClientRect();
-            const footer = node.parentElement!.getBoundingClientRect();
-            const style = getComputedStyle(node);
-            return {
-              text: node.textContent,
-              left: text.left - footer.left,
-              right: footer.right - text.right,
-              top: text.top - footer.top,
-              bottom: footer.bottom - text.bottom,
-              ellipsis: style.textOverflow === "ellipsis",
-              overflow: node.scrollWidth - node.clientWidth,
-            };
-          }),
-        );
+      const footerTextBounds = await row.locator("[data-prayer-footer] .home-prayer-status-pill").evaluateAll((nodes) =>
+        nodes.map((node) => {
+          const text = node.getBoundingClientRect();
+          const footer = node.closest("[data-prayer-footer]")!.getBoundingClientRect();
+          const style = getComputedStyle(node);
+          return {
+            text: node.textContent,
+            left: text.left - footer.left,
+            right: footer.right - text.right,
+            top: text.top - footer.top,
+            bottom: footer.bottom - text.bottom,
+            ellipsis: style.textOverflow === "ellipsis",
+            overflow: node.scrollWidth - node.clientWidth,
+          };
+        }),
+      );
+      expect(footerTextBounds).toHaveLength(5);
       expect(
         footerTextBounds.every(
           (item) =>
