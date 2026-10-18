@@ -45,7 +45,7 @@ for (const language of ["ar", "en"] as const) {
         await expect(card).toHaveCSS("background-image", /linear-gradient/);
         await expect(page.getByTestId("app-scene").locator("img")).toHaveAttribute("src", scene!);
         if (width === 1440)
-          await expect(page.locator(".app-sidebar")).toHaveCSS("backdrop-filter", "blur(22px) saturate(1.35)");
+          await expect(page.locator(".app-sidebar")).toHaveCSS("backdrop-filter", "blur(32px) saturate(1.35)");
         if (flow === "utilities") {
           await page.getByRole("textbox").fill(language === "ar" ? "اغفر" : "forgive");
           const result = page.getByTestId("matching-zikr-card").first();

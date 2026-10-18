@@ -83,10 +83,12 @@ test("the collection share modal has no automatically detectable WCAG A/AA viola
   await seed(page, "/#/azkar");
   await page.getByTestId("category-card-morning").click();
   await expect(page.getByTestId("reader-screen")).toBeVisible();
-  await page.getByRole("button", { name: /خيارات القارئ|Reader options/ }).click();
-  const sidebar = page.getByRole("menuitem", { name: /عرض القائمة الجانبية|Show sidebar/ });
-  if (await sidebar.count()) await sidebar.click();
-  else await page.keyboard.press("Escape");
+  const sidebarToggle = page.getByTestId("reader-sidebar-toggle");
+  if (await sidebarToggle.isVisible()) await sidebarToggle.click();
+  else {
+    await page.getByRole("button", { name: /خيارات القارئ|Reader options/ }).click();
+    await page.getByRole("menuitem", { name: /عرض القائمة الجانبية|Show sidebar/ }).click();
+  }
   const shareBtn = page.getByRole("button", {
     name: /Share collection azkar as story cards for social status|مشاركة أذكار المجموعة/,
   });

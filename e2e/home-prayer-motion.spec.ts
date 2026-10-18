@@ -96,7 +96,7 @@ for (const [language, width] of [
     // An ancestor opacity entrance creates a backdrop root and prevents each
     // card from frosting the moving content outside the prayer strip.
     await expect(page.getByTestId("home-all-prayers-row")).toHaveCSS("animation-name", "none");
-    await expect(page.getByTestId("home-utility-header")).toHaveCSS("backdrop-filter", "blur(22px) saturate(1.35)");
+    await expect(page.getByTestId("home-utility-header")).toHaveCSS("backdrop-filter", "blur(32px) saturate(1.35)");
     for (const button of await sticky.locator("[data-density='summary'] button").all()) {
       const bounds = (await button.boundingBox())!;
       expect(bounds.height).toBeGreaterThanOrEqual(44);
