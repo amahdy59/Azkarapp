@@ -39,7 +39,7 @@ for (const language of ["ar", "en"] as const) {
     await modal
       .getByText(language === "ar" ? "قراءة نص هذه البطاقة" : "Read the text on this card", { exact: true })
       .click();
-    const cardText = modal.getByText(language === "ar" ? "أيام النخيل: ٠" : "Palm days: ٠", { exact: false }).first();
+    const cardText = modal.getByText(language === "ar" ? "أيام النخيل: ٠" : "Palm days: 0", { exact: false }).first();
     await expect(cardText).toBeVisible();
     const download = page.waitForEvent("download");
     await modal

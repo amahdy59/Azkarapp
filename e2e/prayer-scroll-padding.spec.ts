@@ -3,6 +3,7 @@ import { expect, test } from "@playwright/test";
 for (const language of ["ar", "en"] as const) {
   test(`prayer card padding at enlarged text ${language} @cross-browser`, async ({ page }, testInfo) => {
     await page.setViewportSize({ width: 320, height: 900 });
+    await page.clock.setFixedTime(new Date("2026-10-18T08:00:00+03:00"));
     await page.addInitScript((language) => {
       localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
       localStorage.setItem(

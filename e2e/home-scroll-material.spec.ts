@@ -3,6 +3,7 @@ import { expect, test } from "@playwright/test";
 
 test("scrolled Home protects gaps with one continuous ground and preserves fallbacks", async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 390, height: 900 });
+  await page.clock.setFixedTime(new Date("2026-10-18T08:00:00+03:00"));
   await page.emulateMedia({ reducedMotion: "reduce" });
   const cdp = await page.context().newCDPSession(page);
   await cdp.send("Emulation.setEmulatedMedia", {

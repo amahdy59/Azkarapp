@@ -5,6 +5,7 @@ for (const language of ["ar", "en"] as const) {
   for (const width of [390, 1440]) {
     test(`independent app and Home materials ${language} ${width} @cross-browser`, async ({ page }, testInfo) => {
       await page.setViewportSize({ width, height: 1000 });
+      await page.clock.setFixedTime(new Date("2026-10-18T08:00:00+03:00"));
       await page.addInitScript((language) => {
         if (localStorage.getItem("azkarapp.onboarding-complete.v1")) return;
         localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
