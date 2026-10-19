@@ -9,6 +9,7 @@ async function enterAsEnglishGuest(page: Page) {
 }
 
 async function enterAsReturningEnglishGuest(page: Page) {
+  await page.clock.setFixedTime(new Date("2026-10-18T08:00:00+03:00"));
   await page.addInitScript(() => {
     localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
     localStorage.setItem("azkarapp.state.v1", JSON.stringify({ settings: { language: "en" } }));
