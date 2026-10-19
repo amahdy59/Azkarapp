@@ -1,5 +1,9 @@
 # Azkarapp Motion System
 
+## Synchronized Home prayer transition — 2026-10-19
+
+The owner requests smoother, accurate Home motion. Supersede the 60ms hold plus 160ms contraction with one immediate 220ms expansion-value transition using the shared standard duration/easing. Footer details fade out over the first 60ms; the compact next countdown arrives over the final 60ms. Expansion hides the countdown immediately and reveals footer details over the final 60ms. Both directions finish together, without a stationary pause or early countdown against moving geometry. Preserve CSS interruption/reversal, stable typography, reserved page-flow space, interaction holds, 96px/8px hysteresis and instant OS/app reduced-motion cancellation. Native scrolling and the single stationary frost layer remain browser-owned.
+
 ## Stationary header surface — owner correction, 2026-10-18
 
 Library, Progress and Settings keep the same header tint/sheen while scrolling. The owner requests stronger passing-content frost: switch 22px to 32px only at the existing scroll-elevation threshold; do not interpolate blur or add per-frame JS. Edge/shadow retains brief elevation feedback and reduced-motion suppression. Glass disables the named app-content capture boundary so actual content is sampled beneath its sticky chrome; Opaque keeps the named route transition. Preserve native Progress scrolling/focus recovery and accepted Home card motion. This supersedes historical opaque-header coverage and the interim separately clipped records viewport.

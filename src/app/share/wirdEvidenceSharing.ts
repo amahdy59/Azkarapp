@@ -8,6 +8,7 @@ export function wirdEvidenceToShareItem(item: WirdEvidence, language: AppLanguag
   const isQuran = item.kind === "quran";
   return {
     id: item.id,
+    canonicalKey: isQuran ? item.id : undefined,
     arabicText: isQuran ? item.text.ar : localizeBenefitText(item.text, language),
     textDirection: isQuran || language === "ar" ? "rtl" : "ltr",
     quranText: isQuran,

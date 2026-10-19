@@ -103,7 +103,8 @@ describe("AyahShareStudio", () => {
     });
     await user.click(screen.getByRole("checkbox", { name: "Include English translation" }));
     await user.click(screen.getByRole("checkbox", { name: "Include Arabic word explanations" }));
-    await user.click(screen.getByRole("radio", { name: /Square/ }));
+    await user.click(screen.getByRole("combobox", { name: "Image size" }));
+    await user.click(screen.getByRole("option", { name: "Square · 1:1", exact: true }));
     await waitFor(() =>
       expect(generateAyahCards.mock.lastCall![0]).toMatchObject({
         format: "square",
@@ -191,7 +192,8 @@ describe("AyahShareStudio", () => {
           finish = resolve;
         }),
     );
-    await user.click(screen.getByRole("radio", { name: /Square/ }));
+    await user.click(screen.getByRole("combobox", { name: "Image size" }));
+    await user.click(screen.getByRole("option", { name: "Square · 1:1", exact: true }));
     expect(oldSignal.aborted).toBe(true);
     expect(screen.getByRole("img")).toHaveAttribute("src", "blob:preview");
     expect(screen.getByRole("button", { name: "Save this card" })).toBeDisabled();

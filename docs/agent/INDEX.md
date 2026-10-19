@@ -2,6 +2,10 @@
 
 # AI Improvement System Index
 
+[Complete sharing and Home attribution](phases/SHARING_CONTINUATIONS_HOME_2026_10_19.md) records the owner's local-only continuation cards, full Benefits exports, shared four-size selector with platform tags, QCF evidence lettering and Home Share matching Reload. No push or deployment.
+
+[Verified sharing phase report](reports/SHARING_CONTINUATIONS_HOME_2026_10_19_REPORT.md) records complete quality/Pages builds, 30 selected cross-engine cases covered by passing results, exact diagnostics and local export evidence.
+
 [Complete Home reminder readings](phases/HOME_REMINDER_FULL_READING_2026_10_18.md) applies the approved Reading flow, independent four-line text/meaning disclosure, all 71 curated sources and the review of 185 fallback identities. Owner-authorized immutable R2 content upload, checksum-verified offline caching and source-fidelity/browser evidence; application changes remain local.
 
 [Home card alignment](phases/HOME_CARD_ALIGNMENT_2026_10_18.md) aligns tablet/desktop Home sections with the outer prayer-card edges through one shared frame. Local only; preserve pending changes.
@@ -439,3 +443,5 @@ Local follow-up: [Concise, actionable Progress](phases/PROGRESS_REFINEMENTS_2026
 [Stable prayer cards and scrolling](phases/STABLE_PRAYER_CARD_SCROLL_2026_10_18.md) records the approved local-only protected strip, stable typography/scroll geometry, retained next countdown and enlarged-text spacing. [Final pending-change review](phases/FINAL_PENDING_REVIEW_2026_10_18.md) records integration checks and reconciles the domain guides before publication.
 
 [Final pending release](phases/FINAL_PENDING_RELEASE_2026_10_18.md) records the owner's subsequent authorization to publish all pending changes with fresh release notes, complete required testing and exact-commit deployment verification. This supersedes the two pending local-only holds.
+
+[Home frost, motion and Android handoff](phases/FROST_MOTION_ANDROID_HANDOFF_2026_10_19.md) is the active owner-requested follow-up: one softer scrolled Home material, synchronized 220ms prayer geometry/details and verified Android build/developer handoff. Persistent native-file downloads and device/Play acceptance remain explicit Android follow-up work. The owner's latest instruction withholds push/deployment until returning for review.

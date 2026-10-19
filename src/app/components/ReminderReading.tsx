@@ -5,6 +5,7 @@ import { reminderText } from "../i18n/reminderReadings";
 import { QURAN_TEXT_STYLE } from "../quranTypography";
 import { QuranVerseText } from "./QuranVerseText";
 import { ChevronDown } from "./icons";
+import { reminderAttribution } from "../share/reminderSharing";
 
 /** Reading state belongs to one evidence identity; the parent keys this component. */
 export function ReminderReading({
@@ -59,6 +60,15 @@ export function ReminderReading({
     <>
       <div>
         {evidence.narrator && <p className={`mb-2 text-label leading-relaxed ${secondary}`}>{evidence.narrator}</p>}
+        {reminderAttribution(evidence) && (
+          <p
+            className={`mb-2 text-label font-semibold ${secondary}`}
+            dir={evidence.hadithInArabic ? "rtl" : "ltr"}
+            lang={evidence.hadithInArabic ? "ar" : "en"}
+          >
+            {reminderAttribution(evidence)}
+          </p>
+        )}
         <blockquote
           ref={quotation}
           id={textId}

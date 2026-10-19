@@ -1,5 +1,19 @@
 # Application architecture
 
+## Complete sharing and common sizes — 2026-10-19, local only
+
+`shareLayout` continues oversized quotations and selected additions across measured, numbered fragments at existing reading sizes. Each part repeats its heading and selected citation; original items stay intact for Text/ZIP, with duplicate identities removed from selected-card archive text. Benefits supplies the entire section independently of its screen batch, explicit bilingual payloads, no repetition metadata and all-card scope by default. Short individual evidence uses centered Square cards.
+
+`shareContinuation` finds locale-aware exact sentence offsets. Collection continuations end at the last complete sentence that fits and move a following sentence to a fresh card first. An individually oversized sentence prefers existing clause/pause punctuation; unpunctuated text retains a word-boundary recovery with explicit continuation cues. No punctuation is inserted into reviewed text. Both image renderers label previous/next continuation; ayah translation/meaning rows keep fitting sentences together. Quran drawing reserves 8px extra inline ink clearance for QCF overhang.
+
+`ShareFormatSelect` owns the common Story/Square/Portrait/Tall choices, dimensions and two localized destination tags in both image studios. Ayah layouts consume `SHARE_DIMENSIONS`, preserving complete text, QCF drawing and cancellation. General Quran drawing also resolves existing Benefits/Home/Wird excerpt identities; glyph-to-Unicode offsets preserve exact semantic slices across continuations. Existing readable font recovery and long-surah Mushaf reminders remain.
+
+Home's lazy studio captures and holds the displayed source until close. `reminderSharing` supplies missing prophetic attribution as presentation text without editing reviewed quotations, excluding Quran, Companion reports and reported actions. Reading and sharing use the same attribution helper. Persistence, R2 delivery and prayer behavior are unchanged. No publication is authorized.
+
+## Home frost/motion and Android handoff — 2026-10-19
+
+The owner supersedes the 88% scrolled Home ground and stacked header tint with one translucent 60% on-media material and the existing stationary chrome frost. The existing registered CSS expansion value now uses the shared 220ms standard duration without a contraction delay; footer/countdown fades finish with geometry. No scroll hook, prayer, persistence or remote boundary changes. The [Android handoff](ANDROID_DEVELOPER_HANDOFF.md) maps the existing packaged host/adapters and identifies persistent app-private download files as follow-up: current native playback still consumes WebView Cache Storage, while native document export is a separate service.
+
 ## Supplied-card attribution and collection citation follow-up — 2026-10-18
 
 Supplied routine cards append an export-only website footer through `share/attributedCard.ts`. The original image remains complete; prepared files feed Share, Save and studio previews, while Copy encodes the same layout as PNG. Decode/encoding failures retain explicit recovery and never export unbranded originals. `contentReview.ts` applies precise bilingual citation metadata to 165 verified original identities from the dated source audit; 20 Home alternatives are excluded. Counts, wording and stored identities are unchanged.
@@ -226,7 +240,7 @@ Rules:
 
 The owner's source-option follow-up overrides the prior mandatory sharing-source policy: `ShareContentOptions.source` defaults to included and can explicitly omit sources. Image measurement retains the original source in `text`, adds its first-reference summary in `displayText`, and bounds visible lines to two. Long names abbreviate visibly with retained reference numbers; the renderer and semantic image alternative use those same measured lines. Source-enabled Text/ZIP retain the complete reviewed citation. Canonical content, glossary attribution and reminder QR/reading URLs are unaffected.
 
-Combined-share geometry and digit presentation are owned by `shareLayout.ts`: sources wrap within the measured space left by the inline repetition label, and section/panel geometry is shared with the canvas renderer. Display-only Arabic-Indic digit mapping participates in width measurement without rewriting raw reviewed strings; readable HTML mirrors that presentation while Text/ZIP retain exact source payloads and URLs. Collection subtitles are transient opt-in export content; no persistence or synchronization changes. Plain website text replaces the exported footer badge.
+Combined-share geometry and digit presentation are owned by `shareLayout.ts`: sources wrap within the measured space left by the inline repetition label, and section/panel geometry is shared with the canvas renderer. Display-only language-aware digit mapping participates in width measurement without rewriting raw reviewed strings; readable HTML mirrors that presentation while Text/ZIP retain exact source payloads and URLs. Collection subtitles are transient opt-in export content; no persistence or synchronization changes. Plain website text replaces the exported footer badge.
 
 Share items now carry optional reviewed Arabic word explanations separately from the English translation. The sharing boundary obtains only entries anchored to the shared excerpt through the existing Quran glossary helpers, includes their source, and excludes them from English exports and long-surah reminders. Both image and text/ZIP outputs use the same section policy. Content presets and language changes remain transient; contextual single-zikr titles never change collection routes or item identity.
 

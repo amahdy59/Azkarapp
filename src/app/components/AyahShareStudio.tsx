@@ -1,4 +1,4 @@
-import { NATIVE_RADIO } from "./ui/controlStyles";
+import { ShareFormatSelect } from "./ShareFormatSelect";
 import { QURAN_TEXT_STYLE } from "../quranTypography";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { AppLanguage } from "../types";
@@ -123,6 +123,7 @@ export default function AyahShareStudio({
   const input = useMemo<AyahCardInput>(
     () => ({
       verseKey,
+      language,
       pageNumber,
       text,
       title,
@@ -325,25 +326,12 @@ export default function AyahShareStudio({
           )}
         </div>
         <div className="space-y-4 min-w-0">
-          <fieldset className="space-y-2">
-            <legend className="text-sm font-semibold">{t(language, "reader.ayahCardFormat")}</legend>
-            <div className="flex flex-wrap gap-2">
-              {(["portrait", "square"] as const).map((value) => (
-                <label key={value} className="ayah-share-option">
-                  <input
-                    type="radio"
-                    className={NATIVE_RADIO}
-                    name="ayah-card-format"
-                    value={value}
-                    checked={format === value}
-                    onChange={() => update({ format: value })}
-                    disabled={busy}
-                  />
-                  {t(language, value === "portrait" ? "reader.ayahCardPortrait" : "reader.ayahCardSquare")}
-                </label>
-              ))}
-            </div>
-          </fieldset>
+          <ShareFormatSelect
+            value={format}
+            onChange={(format) => update({ format })}
+            language={language}
+            disabled={busy}
+          />
           <fieldset className="space-y-2">
             <legend className="text-sm font-semibold">{t(language, "reader.ayahCardContent")}</legend>
             <label className="ayah-share-option">

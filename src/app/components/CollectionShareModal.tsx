@@ -8,6 +8,7 @@ import { t } from "../i18n";
 import { FIELD_LABEL_CLASS } from "./FormField";
 import { QURAN_TEXT_STYLE } from "../quranTypography";
 import { QuranVerseText } from "./QuranVerseText";
+import { ShareFormatSelect } from "./ShareFormatSelect";
 import { SharingDisclosure } from "./SharingDisclosure";
 import { SharingChoiceLabel, SHARING_SELECTED_CLASS } from "./SharingChoiceLabel";
 import { useLayoutMode } from "../hooks/useLayoutMode";
@@ -70,6 +71,7 @@ export interface CollectionShareModalProps {
   dialogTitle?: string;
   dialogDescription?: string;
   initialFormat?: ShareFormat;
+  initialScope?: "current" | "selected" | "all";
   contentAlignment?: "start" | "center";
 }
 
@@ -103,6 +105,7 @@ export function CollectionShareModal({
   dialogTitle,
   dialogDescription,
   initialFormat,
+  initialScope = "current",
   contentAlignment = "start",
 }: CollectionShareModalProps) {
   const direction = language === "ar" ? "rtl" : "ltr";
@@ -146,17 +149,15 @@ export function CollectionShareModal({
   const [error, setError] = useState(false);
   const [compatibleFormats, setCompatibleFormats] = useState<ShareFormat[] | null>(null);
   const [fitFailed, setFitFailed] = useState(false);
-  const [scope, setScope] = useState<"current" | "selected" | "all">("current");
+  const [scope, setScope] = useState<"current" | "selected" | "all">(initialScope);
   const [selected, setSelected] = useState<number[]>([]);
   const activeItemRef = useRef<string | undefined>(undefined);
   const operationLock = useRef(false);
   const descriptionId = useId();
-  const formatHintId = useId();
   const languageHintId = useId();
   const actionHintId = useId();
   const copyHintId = useId();
   const shareHintId = useId();
-  const formatId = useId();
   const languageId = useId();
   const presetId = useId();
   const collectionUrl =
@@ -207,6 +208,7 @@ export function CollectionShareModal({
   );
   const url = single && exportItems[0]?.reminder ? exportItems[0].readingUrl : collectionUrl;
   const text = getShareText(exportItems, exportLanguage, content, title, url);
+  const uniqueItems = (items: ShareItem[]) => [...new Map(items.map((item) => [item.id, item])).values()];
   const current = pages[active];
   const total = current?.totalPages ?? pages.length;
   const ready = Boolean(current);
@@ -231,7 +233,7 @@ export function CollectionShareModal({
   const scopedText =
     scope === "current"
       ? getShareText(
-          current?.layout?.fragments.map((fragment) => fragment.item) ?? exportItems,
+          uniqueItems(current?.layout?.fragments.map((fragment) => fragment.item) ?? exportItems),
           exportLanguage,
           content,
           title,
@@ -239,7 +241,7 @@ export function CollectionShareModal({
         )
       : scope === "selected"
         ? getShareText(
-            scopedPages.flatMap((page) => page.layout?.fragments.map((fragment) => fragment.item) ?? []),
+            uniqueItems(scopedPages.flatMap((page) => page.layout?.fragments.map((fragment) => fragment.item) ?? [])),
             exportLanguage,
             content,
             title,
@@ -442,8 +444,6 @@ export function CollectionShareModal({
   ]
     .filter(Boolean)
     .join(" · ");
-  const formats = ["story", "square", "portrait", "tall"] as const;
-  const unavailable = compatibleFormats !== null && compatibleFormats.length < formats.length;
   const actionHint =
     mode !== "image"
       ? ""
@@ -638,7 +638,15 @@ export function CollectionShareModal({
                         aria-label={t(language, inspect ? "shareStudio.closeInspect" : "shareStudio.inspect")}
                         aria-pressed={inspect}
                         className="flex w-full items-center justify-center rounded-2xl p-2 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                        style={{ height: inspect ? "min(75dvh,800px)" : "clamp(240px,calc(100dvh - 260px),720px)" }}
+                        style={{
+                          height: inspect
+                            ? "min(75dvh,800px)"
+                            : wide
+                              ? "clamp(240px,calc(100dvh - 260px),720px)"
+                              : undefined,
+                          aspectRatio: !inspect && !wide ? `${current.width} / ${current.height}` : undefined,
+                          maxHeight: !inspect && !wide ? "65dvh" : undefined,
+                        }}
                       >
                         <img
                           src={current.dataUrl}
@@ -693,12 +701,19 @@ export function CollectionShareModal({
                       <div className="pb-3 space-y-4">
                         {current.layout.fragments.map((fragment, index) => (
                           <div key={`${fragment.item.id}-${index}`}>
-                            {fragment.item.title && (
-                              <h3 className="font-semibold">{shareDisplayDigits(fragment.item.title)}</h3>
+                            {(fragment.heading?.text ?? fragment.item.title) && (
+                              <h3 className="whitespace-pre-wrap font-semibold">
+                                {shareDisplayDigits(fragment.heading?.text ?? fragment.item.title!, exportLanguage)}
+                              </h3>
                             )}
                             {!fragment.item.hideRepetition && (
                               <p className="text-sm text-muted-foreground">
                                 {getShareItemRepetitionLabel(fragment.item, exportLanguage)}
+                              </p>
+                            )}
+                            {fragment.part > 1 && (
+                              <p className="text-sm font-semibold text-primary">
+                                {t(exportLanguage, "shareStudio.continuedBefore")}
                               </p>
                             )}
                             {[...fragment.sections, ...(fragment.citation ? [fragment.citation] : [])].map(
@@ -722,10 +737,18 @@ export function CollectionShareModal({
                                       canonicalKey={fragment.item.canonicalKey}
                                     />
                                   ) : (
-                                    shareDisplayDigits(section.displayText ?? section.text)
+                                    shareDisplayDigits(
+                                      section.displayText ?? section.text,
+                                      section.direction === "rtl" ? "ar" : "en",
+                                    )
                                   )}
                                 </p>
                               ),
+                            )}
+                            {fragment.part < fragment.parts && (
+                              <p className="text-sm font-semibold text-primary">
+                                {t(exportLanguage, "shareStudio.continuedAfter")}
+                              </p>
                             )}
                           </div>
                         ))}
@@ -994,83 +1017,14 @@ export function CollectionShareModal({
                             )}
                           </p>
                         </div>
-                        <div className={selectClass}>
-                          <label className={FIELD_LABEL_CLASS} id={formatId} htmlFor={`${formatId}-control`}>
-                            {t(language, "shareStudio.format")}
-                          </label>
-                          <Select
-                            value={format}
-                            onValueChange={(value) => setFormat(value as ShareFormat)}
-                            disabled={busy}
-                            dir={direction}
-                          >
-                            <SelectTrigger
-                              id={`${formatId}-control`}
-                              aria-labelledby={formatId}
-                              aria-describedby={formatHintId}
-                            >
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent className="z-[110]">
-                              {formats.map((value) => (
-                                <SelectItem
-                                  key={value}
-                                  value={value}
-                                  description={
-                                    <span className="text-xs text-muted-foreground whitespace-normal">
-                                      {t(language, `shareStudio.${value}Hint`)}
-                                      {compatibleFormats !== null && !compatibleFormats.includes(value) && (
-                                        <span className="block">{t(language, "shareStudio.sizeUnavailable")}</span>
-                                      )}
-                                    </span>
-                                  }
-                                  textValue={t(language, `shareStudio.${value}`)}
-                                  aria-label={t(language, `shareStudio.${value}`)}
-                                  disabled={compatibleFormats !== null && !compatibleFormats.includes(value)}
-                                >
-                                  <span className="flex items-center gap-2">
-                                    <span
-                                      aria-hidden="true"
-                                      className="inline-block shrink-0 rounded border border-current h-6"
-                                      style={{
-                                        aspectRatio:
-                                          value === "square"
-                                            ? "1"
-                                            : value === "portrait"
-                                              ? "4 / 5"
-                                              : value === "story"
-                                                ? "9 / 16"
-                                                : "1080 / 2920",
-                                      }}
-                                    />
-                                    <span dir="auto">
-                                      {t(language, `shareStudio.${value}`).split(" · ")[0]}
-                                      {value !== "tall" && (
-                                        <>
-                                          {" "}
-                                          ·{" "}
-                                          <bdi dir="ltr">
-                                            {formatNumerals(
-                                              value === "story" ? "9:16" : value === "square" ? "1:1" : "4:5",
-                                              language,
-                                            )}
-                                          </bdi>
-                                        </>
-                                      )}
-                                    </span>
-                                  </span>
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
+                        <ShareFormatSelect
+                          value={format}
+                          onChange={setFormat}
+                          language={language}
+                          disabled={busy}
+                          compatibleFormats={compatibleFormats}
+                        />
                       </div>
-                      <p
-                        id={formatHintId}
-                        className={`text-sm ${unavailable ? "text-foreground font-semibold" : "text-muted-foreground"}`}
-                      >
-                        {t(language, unavailable ? "shareStudio.compatibilityHint" : "shareStudio.sizeHint")}
-                      </p>
                     </>
                   )}
                 </SharingDisclosure>

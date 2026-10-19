@@ -45,51 +45,54 @@ describe("complete ayah image cards", () => {
       "36px",
     );
   });
-  it.each(["portrait", "square"] as const)("continues long %s content without truncating or shrinking it", (format) => {
-    const input: AyahCardInput = {
-      verseKey: "2:282",
-      title: "Al-Baqarah · Ayah 282",
-      format,
-      continuation: "Part",
-      text: "رَبِّ ٱلْعَٰلَمِينَ ۚ ".repeat(70),
-      translation: { text: "Complete English wording. ".repeat(60), label: "English · Pickthall" },
-      meanings: { text: "كلمة: شرح المعنى\n".repeat(40), label: "معاني الكلمات · مصدر عربي طويل ".repeat(4) },
-    };
-    const ctx = context();
-    const pages = layoutAyahCards(ctx, input);
-    expect(pages.length).toBeGreaterThan(1);
-    const rows = pages.flatMap((page) => page.rows);
-    expect(
-      rows
-        .filter((row) => !row.label && row.font.includes(AYAH_MUSHAF_FONT))
-        .map((row) => row.text)
-        .join(""),
-    ).toBe(input.text);
-    expect(
-      rows
-        .filter((row) => !row.label && row.direction === "ltr")
-        .map((row) => row.text)
-        .join(""),
-    ).toBe(input.translation!.text);
-    expect(
-      rows
-        .filter((row) => !row.label && row.font.includes("34px"))
-        .map((row) => row.text)
-        .join(""),
-    ).toBe(input.meanings!.text);
-    for (const page of pages) {
-      expect(page.width).toBe(1080);
-      expect(page.height).toBe(format === "portrait" ? 1350 : 1080);
-      expect(page.rows.reduce((sum, row) => sum + row.height, 0)).toBeLessThanOrEqual(page.height - 360);
-      expect(page.rows.at(-1)?.label).not.toBe(true);
-      for (const row of page.rows) {
-        ctx.font = row.font;
-        expect(ctx.measureText(row.text.trim()).width).toBeLessThanOrEqual(848);
-        if (row.font.includes(AYAH_MUSHAF_FONT)) expect(row.font).toContain("64px");
-        if (row.direction === "ltr" && !row.label) expect(row.font).toContain("46px");
+  it.each(["story", "portrait", "square", "tall"] as const)(
+    "continues long %s content without truncating or shrinking it",
+    (format) => {
+      const input: AyahCardInput = {
+        verseKey: "2:282",
+        title: "Al-Baqarah · Ayah 282",
+        format,
+        continuation: "Part",
+        text: "رَبِّ ٱلْعَٰلَمِينَ ۚ ".repeat(70),
+        translation: { text: "Complete English wording. ".repeat(60), label: "English · Pickthall" },
+        meanings: { text: "كلمة: شرح المعنى\n".repeat(40), label: "معاني الكلمات · مصدر عربي طويل ".repeat(4) },
+      };
+      const ctx = context();
+      const pages = layoutAyahCards(ctx, input);
+      expect(pages.length).toBeGreaterThan(1);
+      const rows = pages.flatMap((page) => page.rows);
+      expect(
+        rows
+          .filter((row) => !row.label && row.font.includes(AYAH_MUSHAF_FONT))
+          .map((row) => row.text)
+          .join(""),
+      ).toBe(input.text);
+      expect(
+        rows
+          .filter((row) => !row.label && row.direction === "ltr")
+          .map((row) => row.text)
+          .join(""),
+      ).toBe(input.translation!.text);
+      expect(
+        rows
+          .filter((row) => !row.label && row.font.includes("34px"))
+          .map((row) => row.text)
+          .join(""),
+      ).toBe(input.meanings!.text);
+      for (const page of pages) {
+        expect(page.width).toBe(1080);
+        expect(page.height).toBe({ story: 1920, portrait: 1350, square: 1080, tall: 2920 }[format]);
+        expect(page.rows.reduce((sum, row) => sum + row.height, 0)).toBeLessThanOrEqual(page.height - 360);
+        expect(page.rows.at(-1)?.label).not.toBe(true);
+        for (const row of page.rows) {
+          ctx.font = row.font;
+          expect(ctx.measureText(row.text.trim()).width).toBeLessThanOrEqual(848);
+          if (row.font.includes(AYAH_MUSHAF_FONT)) expect(row.font).toContain("64px");
+          if (row.direction === "ltr" && !row.label) expect(row.font).toContain("46px");
+        }
       }
-    }
-  });
+    },
+  );
   it("uses asynchronous PNG encoding and stops obsolete work without leaking URLs", async () => {
     const input: AyahCardInput = {
       text: "قُلْ هُوَ ٱللَّهُ أَحَدٌ ".repeat(50),

@@ -92,16 +92,17 @@ for (const language of ["ar", "en"] as const) {
     expect(semanticArabic).toContain("ٱللَّهُ لَآ إِلَـٰهَ إِلَّا هُوَ");
     expect(await studio.locator(".ayah-share-header").boundingBox()).toEqual(headerBefore);
     await expect(studio.locator(".ayah-share-footer")).toBeInViewport();
-    for (const format of ["portrait", "square"] as const) {
-      await studio
-        .getByRole("radio", {
-          name: t(language, format === "portrait" ? "reader.ayahCardPortrait" : "reader.ayahCardSquare"),
-          exact: true,
-        })
-        .check();
+    for (const format of ["story", "square", "portrait", "tall"] as const) {
+      await studio.getByRole("combobox", { name: t(language, "shareStudio.format"), exact: true }).click();
+      const option = page.getByRole("option", { name: t(language, `shareStudio.${format}`), exact: true });
+      await expect(option.getByTestId("share-format-platforms").locator(":scope > span")).toHaveCount(2);
+      await option.click();
       const save = studio.getByRole("button", { name: t(language, "reader.ayahCardDownload"), exact: true });
       await expect(save).toBeEnabled();
-      await expect(preview).toHaveAttribute("height", format === "portrait" ? "1350" : "1080");
+      await expect(preview).toHaveAttribute(
+        "height",
+        String({ story: 1920, portrait: 1350, square: 1080, tall: 2920 }[format]),
+      );
       const previous = studio.getByRole("button", { name: t(language, "common.previous"), exact: true });
       while (await previous.isEnabled()) await previous.click();
       const downloadPromise = page.waitForEvent("download");
@@ -167,9 +168,9 @@ for (const language of ["ar", "en"] as const) {
       await page.evaluate(() => {
         document.documentElement.style.fontSize = "200%";
       });
-      await studio.getByRole("radio", { name: t(language, "reader.ayahCardPortrait"), exact: true }).focus();
+      await studio.getByRole("combobox", { name: t(language, "shareStudio.format"), exact: true }).focus();
       await expect(
-        studio.getByRole("radio", { name: t(language, "reader.ayahCardPortrait"), exact: true }),
+        studio.getByRole("combobox", { name: t(language, "shareStudio.format"), exact: true }),
       ).toBeInViewport();
       const enlargedSave = studio.getByRole("button", { name: t(language, "reader.ayahCardDownload"), exact: true });
       await enlargedSave.focus();

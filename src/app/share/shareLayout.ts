@@ -4,6 +4,8 @@ import { isLongSurah } from "../content/mushafPages";
 import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content/localizedZikr";
 import { buildQuranTextSegments, getQuranWordMeanings, QURAN_WORD_MEANING_SOURCE } from "../content/quranWordMeanings";
 import { isQuranPassage } from "../quranTypography";
+import type { QuranGlyphRendering } from "./quranGlyphs";
+import { shareSentenceEnds, shareContinuationEnd, SHARE_CONTINUATION_HEIGHT } from "./shareContinuation";
 
 export type ShareFormat = "story" | "square" | "portrait" | "tall";
 export type ShareAppearance = "olive" | "gold" | "lavender";
@@ -30,14 +32,16 @@ export const SHARE_COMPACT = {
 } as const;
 
 /** Display glyphs only: reviewed payloads, URLs and filenames stay byte-preserving. */
-export function shareDisplayDigits(text: string): string {
-  return text.replace(/[0-9۰-۹]/gu, (digit) =>
-    String.fromCharCode(0x660 + (digit.charCodeAt(0) >= 0x6f0 ? digit.charCodeAt(0) - 0x6f0 : Number(digit))),
-  );
+export function shareDisplayDigits(text: string, language: AppLanguage = "ar"): string {
+  return text.replace(/[0-9٠-٩۰-۹]/gu, (digit) => {
+    const code = digit.charCodeAt(0);
+    const value = code >= 0x6f0 ? code - 0x6f0 : code >= 0x660 ? code - 0x660 : Number(digit);
+    return language === "en" ? String(value) : String.fromCharCode(0x660 + value);
+  });
 }
 
-export function formatShareNumber(value: number): string {
-  return new Intl.NumberFormat("ar-EG-u-nu-arab").format(value);
+export function formatShareNumber(value: number, language: AppLanguage = "ar"): string {
+  return new Intl.NumberFormat(language === "en" ? "en-US-u-nu-latn" : "ar-EG-u-nu-arab").format(value);
 }
 
 export interface ShareSection {
@@ -45,12 +49,12 @@ export interface ShareSection {
   text: string;
   direction: "rtl" | "ltr";
   quranText?: boolean;
-  quranRendering?: { text: string; fontFamily: string };
+  quranRendering?: QuranGlyphRendering;
 }
 export interface ShareItem {
   id: string;
   canonicalKey?: string;
-  quranRendering?: { text: string; fontFamily: string };
+  quranRendering?: QuranGlyphRendering;
   arabicText: string;
   /** Custom evidence can use its reviewed English quotation as the primary text. */
   textDirection?: "rtl" | "ltr";
@@ -231,9 +235,10 @@ export function getShareRepetitionLabel(count: number, language: AppLanguage): s
             ? "shareStudio.repeatMany"
             : "shareStudio.repetitions",
       {
-        count: formatShareNumber(count),
+        count: formatShareNumber(count, language),
       },
     ),
+    language,
   );
 }
 
@@ -289,8 +294,8 @@ export function measureShareSection(
   ctx.textBaseline = "alphabetic";
   const lines = wrapShareText(
     section.quranRendering?.text ?? section.text,
-    (value) => ctx.measureText(shareDisplayDigits(value)).width,
-    width,
+    (value) => ctx.measureText(shareDisplayDigits(value, section.direction === "rtl" ? "ar" : "en")).width,
+    section.quranText ? width - 16 : width,
   );
   // Keep the final reference together when it fits on the next line. The
   // joined reviewed payload stays identical, including its whitespace.
@@ -298,7 +303,10 @@ export function measureShareSection(
     const previous = lines.at(-2)!;
     const boundary = Math.max(previous.lastIndexOf(";"), previous.lastIndexOf("؛")) + 1;
     const reference = previous.slice(boundary) + lines.at(-1)!;
-    if (boundary > 0 && ctx.measureText(shareDisplayDigits(reference.trim())).width <= width) {
+    if (
+      boundary > 0 &&
+      ctx.measureText(shareDisplayDigits(reference.trim(), section.direction === "rtl" ? "ar" : "en")).width <= width
+    ) {
       lines[lines.length - 2] = previous.slice(0, boundary);
       lines[lines.length - 1] = reference;
     }
@@ -308,7 +316,7 @@ export function measureShareSection(
   // beyond nominal leading; reserve their real height before the next row.
   const inkHeight = Math.max(
     ...lines.map((line) => {
-      const bounds = ctx.measureText(shareDisplayDigits(line.trim()));
+      const bounds = ctx.measureText(shareDisplayDigits(line.trim(), section.direction === "rtl" ? "ar" : "en"));
       return (bounds.actualBoundingBoxAscent ?? fontSize * 0.8) + (bounds.actualBoundingBoxDescent ?? fontSize * 0.2);
     }),
   );
@@ -359,7 +367,11 @@ export function measureShareCitation(
       new Intl.Segmenter("ar", { granularity: "grapheme" }).segment(visible[1]!.trimEnd()),
       ({ segment }) => segment,
     );
-    while (graphemes.length && ctx.measureText(shareDisplayDigits(graphemes.join("") + "…")).width > width)
+    while (
+      graphemes.length &&
+      ctx.measureText(shareDisplayDigits(graphemes.join("") + "…", section.direction === "rtl" ? "ar" : "en")).width >
+        width
+    )
       graphemes.pop();
     visible[1] = graphemes.join("").trimEnd() + "…";
     measured.lines = visible;
@@ -368,7 +380,7 @@ export function measureShareCitation(
   return { ...measured, text: section.text, displayText: measured.lines.join("") };
 }
 
-/** Complete items are indivisible. Reject incompatible sizes before encoding any image. */
+/** Preserve complete content, continuing oversized readings across measured cards. */
 export function layoutSharePages(
   ctx: CanvasRenderingContext2D,
   items: readonly ShareItem[],
@@ -387,7 +399,7 @@ export function layoutSharePages(
       ctx.font = `600 40px ${direction === "rtl" ? SHARE_ARABIC_FONT : SHARE_UI_FONT}`;
       const lines = wrapShareText(
         item.title,
-        (value) => ctx.measureText(shareDisplayDigits(value)).width,
+        (value) => ctx.measureText(shareDisplayDigits(value, item.language ?? "ar")).width,
         geometry.textWidth,
       );
       heading = { text: item.title, direction, lines, fontSize: 40, lineHeight: 66, height: lines.length * 66 + 16 };
@@ -459,7 +471,111 @@ export function layoutSharePages(
         height = compactHeight;
       }
     }
-    if (height > itemCapacity) throw new ShareFitError(item.id, format);
+    if (height > itemCapacity) {
+      const partLabelHeight = 66;
+      const overhead = single
+        ? textTop +
+          SHARE_PILL.bottom +
+          (heading?.height ?? 0) +
+          partLabelHeight +
+          (citation ? citation.height + sectionGap : 0)
+        : SHARE_COMPACT.top +
+          SHARE_COMPACT.bottom +
+          (heading?.height ?? 0) +
+          partLabelHeight +
+          sectionGap +
+          metadataHeight!;
+      const continuedOverhead = overhead + SHARE_CONTINUATION_HEIGHT * 2;
+      const available = itemCapacity - continuedOverhead;
+      const chunks: MeasuredSection[][] = [];
+      let chunk: MeasuredSection[] = [];
+      let used = 0;
+      for (const section of sections) {
+        const label = section.key === "arabic" ? 0 : 44;
+        let offset = 0;
+        const drawing = section.quranRendering?.text ?? section.text;
+        const offsets = section.quranRendering?.sourceOffsets;
+        const sentenceEnds = shareSentenceEnds(section.text, section.direction === "rtl" ? "ar" : "en");
+        ctx.font = getShareSectionFont(section, section.fontSize);
+        while (offset < drawing.length) {
+          const remaining = wrapShareText(
+            drawing.slice(offset),
+            (value) => ctx.measureText(shareDisplayDigits(value, section.direction === "rtl" ? "ar" : "en")).width,
+            geometry.textWidth - (section.quranText ? 16 : 0),
+          );
+          const gap = chunk.length ? sectionGap : 0;
+          const count = Math.min(remaining.length, Math.floor((available - used - gap - label) / section.lineHeight));
+          if (count < 1) {
+            if (!chunk.length) throw new ShareFitError(item.id, format);
+            chunks.push(chunk);
+            chunk = [];
+            used = 0;
+            continue;
+          }
+          const limit = offset + remaining.slice(0, count).join("").length;
+          const startSource = offsets?.[offset] ?? offset;
+          const endSource = shareContinuationEnd(
+            section.text,
+            startSource,
+            offsets?.[limit] ?? limit,
+            sentenceEnds,
+            !chunk.length,
+          );
+          if (endSource === startSource) {
+            chunks.push(chunk);
+            chunk = [];
+            used = 0;
+            continue;
+          }
+          let end = endSource;
+          if (offsets) {
+            end = limit;
+            while (end > offset && offsets[end]! > endSource) end--;
+            if (end === offset) end = limit;
+          }
+          const lines = wrapShareText(
+            drawing.slice(offset, end),
+            (value) => ctx.measureText(shareDisplayDigits(value, section.direction === "rtl" ? "ar" : "en")).width,
+            geometry.textWidth - (section.quranText ? 16 : 0),
+          );
+          const text = section.text.slice(offsets?.[offset] ?? offset, offsets?.[end] ?? end);
+          const piece = { ...section, text, lines, height: lines.length * section.lineHeight + label };
+          chunk.push(piece);
+          used += gap + piece.height;
+          offset = end;
+        }
+      }
+      if (chunk.length) chunks.push(chunk);
+      chunks.forEach((sections, index) => {
+        const label = t(item.language ?? "ar", "shareStudio.continuation", {
+          current: formatShareNumber(index + 1, item.language),
+          total: formatShareNumber(chunks.length, item.language),
+        });
+        const continuedHeading = {
+          text: [heading?.text, label].filter(Boolean).join("\n"),
+          direction: (item.language === "en" ? "ltr" : "rtl") as "ltr" | "rtl",
+          lines: [...(heading?.lines ?? []), label],
+          fontSize: 40,
+          lineHeight: 66,
+          height: (heading?.height ?? 0) + partLabelHeight,
+        };
+        fragments.push({
+          item,
+          sections,
+          part: index + 1,
+          parts: chunks.length,
+          height:
+            continuedOverhead +
+            sections.reduce((sum, section) => sum + section.height, 0) +
+            Math.max(0, sections.length - 1) * sectionGap,
+          citation,
+          heading: continuedHeading,
+          metadataWidth,
+          metadataHeight,
+        });
+      });
+      continue;
+    }
     fragments.push({ item, sections, part: 1, parts: 1, height, citation, heading, metadataWidth, metadataHeight });
   }
   const groups: ShareFragment[][] = [];
@@ -472,6 +588,8 @@ export function layoutSharePages(
     if (
       group.length &&
       (single ||
+        fragment.parts > 1 ||
+        group.some((part) => part.parts > 1) ||
         fragment.item.reminder ||
         group.some((part) => part.item.reminder) ||
         group.length >= maxItems ||

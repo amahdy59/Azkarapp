@@ -4,6 +4,8 @@ import { translateDictionary } from "./index";
 const en = {
   home: {
     dailyEvidence: "Relevant now",
+    shareEvidence: "Share this reminder",
+    prophetSaid: "The Messenger of Allah ﷺ said:",
     nextDailyEvidence: "Show another reminder",
     hadithExcerpt: "Hadith excerpt; see the source for its full context",
     reportedPropheticAction: "From the Prophet’s ﷺ practice, reported by Aisha",
@@ -22,6 +24,8 @@ const en = {
 const ar: typeof en = {
   home: {
     dailyEvidence: "تذكير لك الآن",
+    shareEvidence: "مشاركة هذا التذكير",
+    prophetSaid: "قال رسول الله صلى الله عليه وسلم:",
     nextDailyEvidence: "عرض تذكير آخر",
     hadithExcerpt: "جزء من حديث؛ النص الكامل في المصدر",
     reportedPropheticAction: "من هدي النبي ﷺ؛ رواية عن عائشة رضي الله عنها",

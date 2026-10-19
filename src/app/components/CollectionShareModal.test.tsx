@@ -238,7 +238,9 @@ describe("CollectionShareModal", () => {
     const settings = screen.getByText("Image settings").closest("details")!;
     settings.open = true;
     const size = screen.getByRole("combobox", { name: "Image size" });
-    expect(size).toHaveAccessibleDescription("Choose the shape that suits your destination.");
+    expect(size).toHaveAccessibleDescription(
+      "Long readings continue across numbered cards, with their source on every part.",
+    );
     expect(screen.getByRole("combobox", { name: "Card language" })).toHaveAccessibleDescription(
       "Card labels only. English translation is a separate addition. Word meanings are available in Arabic only.",
     );
@@ -288,7 +290,7 @@ describe("CollectionShareModal", () => {
     expect((screen.getByRole("textbox") as HTMLTextAreaElement).value).toContain(SAMPLE_ITEMS[0]!.arabicText);
     expect(screen.getByRole("button", { name: "Copy", exact: true })).toBeEnabled();
   });
-  it("offers compatible sizes and text instead of splitting an oversized item", async () => {
+  it("offers another layout and complete text when a layout cannot be prepared", async () => {
     const { getCompatibleShareFormats, generateAllCollectionStoryPages } = await import("../share/collectionShareCard");
     vi.mocked(getCompatibleShareFormats).mockResolvedValueOnce(["tall"]);
     vi.mocked(generateAllCollectionStoryPages).mockClear();

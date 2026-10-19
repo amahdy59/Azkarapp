@@ -12,6 +12,16 @@ The owner again highlights the separate collection-title row and requests titles
 
 # Decision Log
 
+## 2026-10-19 — Complete sharing, common sizes and Home attribution, local only
+
+The owner requests complete Benefits sharing through multiple images, approved Mushaf lettering for Quran sharing, a Home share action beside Reload and explicit prophetic attribution where omitted. This supersedes the old indivisible-single-image restriction. Continue complete readings and selected additions at existing readable sizes; repeat title/source and preserve original semantic text, item order and long-surah Mushaf reminders. Share the full Benefits section independently of its visible batch. Reuse QCF evidence mappings; add attribution as presentation text without editing reviewed narrations, retaining Companion/action distinctions.
+
+Follow-ups require identical size options across dialogs with one or two platform tags, and Share styled like Reload with slight emphasis. Use a shared Story/Square/Portrait/Tall selector, common dimensions and two localized destination suggestions each. Match Home's borderless circular target/icon/focus anatomy with accent ink. Preserve unrelated pending work. No commit, push, R2 upload or application deployment this session.
+
+The owner's numeral correction supersedes the earlier Arabic-Indic-in-both-languages export rule: English card/page/part/repetition labels use Western digits, while Arabic uses Arabic-Indic digits. Reading/source display follows its own language and canonical religious text, URLs and filenames remain byte-preserving. Both image studios and readable previews follow this policy.
+
+The owner rejects a continuation ending mid-sentence in the Ayat al-Kursi narration. Prefer complete sentence boundaries, move a sentence to a fresh card before splitting it, and explicitly label previous/next continuation in both languages. Oversized sentences prefer existing clause/pause punctuation; no new punctuation or religious wording is authored. Keep the selected image dimensions and readable type. Preserve the complete ayah-fit contract and provide matching cues for ayah sharing.
+
 ## 2026-10-18 — Rounded Reader surface and collapsed collection panel, local only
 
 The owner highlights the abrupt rectangular desktop reading surface and requests a local repair plus a sidebar collapsed by default. Apply shared 16px card corners while retaining its reading material, gap and content geometry. Initialize the visit-local collection panel closed; preserve explicit open/close, resizing, focus recovery and responsive drawer behavior. This supersedes the earlier initially expanded desktop panel. Preserve unrelated pending changes. No push or deployment is authorized.
@@ -5009,3 +5019,9 @@ Owner explicitly requests full hadith text in the pictured Benefits cards, appli
 ## Final refinements and combined release — 2026-10-18
 
 The owner explicitly instructs: apply recommendations, push all changes, and ensure proper testing and deployment. This supersedes the pending Benefits and stable prayer-scroll publication holds. Include the final documentation reconciliation, fresh bilingual release notes/history and all pending approved application/test/content evidence. Use the intact local hook and exact-commit Quality/Pages gates, then production smoke. The separate eight original collection corrections remain subject to content review; this release does not reinterpret reviewed sacred content. See phases/FINAL_PENDING_RELEASE_2026_10_18.md.
+
+## Home frost/motion and Android developer preparation — 2026-10-19
+
+The owner rejects the dark backing behind Home header/prayer cards while scrolling and requests smooth, accurate motion. Supersede the 88% shared ground/stacked header tint with one 60% on-media surface, existing stationary 32px frost and restrained sheen. Synchronize the expansion value to the shared 220ms standard transition with no initial hold, coordinating footer/countdown fades within the same duration. Preserve independent appearance, opacity fallbacks, stable text/flow, interaction holds and reduced motion. Also inspect/rebuild the existing Capacitor Android host and prepare a developer handoff: shared screens/domain logic, current native permissions/reminders/widgets/export and the explicit remaining persistent native-file storage/device/signing/Play work. No destructive storage migration or religious-content interpretation. See phases/FROST_MOTION_ANDROID_HANDOFF_2026_10_19.md.
+
+Owner follow-up: website caching must remain; recommend separate native-file storage through a platform adapter for the Android developer. The owner's latest explicit instruction is to complete local work and return before pushing. This supersedes standing release authority for this phase: no push or deployment pending owner review.

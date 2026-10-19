@@ -101,7 +101,7 @@ describe("collectionShareCard", () => {
     expect(vi.mocked(context.fillText).mock.calls.find((call) => call[0] === "wa-zaker.com")).toEqual(normalFooter);
   });
   for (const language of ["ar", "en"] as const) {
-    it(`renders plain website text, compact sources and Arabic-Indic footer digits in ${language}`, () => {
+    it(`renders plain website text, compact sources and localized footer digits in ${language}`, () => {
       const { canvas, context } = createMockCanvas();
       const originalCreateElement = document.createElement.bind(document);
       vi.spyOn(document, "createElement").mockImplementation(((tagName: string) =>
@@ -112,9 +112,10 @@ describe("collectionShareCard", () => {
       const original = JSON.stringify(items);
       renderCollectionStoryPage({ ...SAMPLE_PAGE, language, totalPages: 13, items });
       const text = vi.mocked(context.fillText).mock.calls.map((call) => call[0]);
-      expect(text).toContain(language === "ar" ? "بطاقة ١ من ١٣" : "Card ١ of ١٣");
+      expect(text).toContain(language === "ar" ? "بطاقة ١ من ١٣" : "Card 1 of 13");
       expect(text.some((line) => line.includes("٢٠٨٨/٤"))).toBe(true);
-      expect(text.every((line) => !/[0-9۰-۹]/u.test(line))).toBe(true);
+      const labels = text.filter((line) => /^(?:Card |بطاقة |Repeat |[٠-٩]+ مرة)/u.test(line));
+      expect(labels.every((line) => !(language === "ar" ? /[0-9۰-۹]/u : /[٠-٩۰-۹]/u).test(line))).toBe(true);
       expect(text).not.toContain("المصدر");
       expect(text).not.toContain("Source");
       expect(text).not.toContain(SAMPLE_PAGE.collectionSubtitle);

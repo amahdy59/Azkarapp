@@ -1,16 +1,20 @@
 import { drawInkTop, drawShareBrand, drawWebsiteText } from "./shareCardBrand";
 import { fillRoundedRect, strokeRoundedRect, drawOrnateFlourish } from "./canvasBotanicals";
-import { wrapShareText, SHARE_UI_FONT } from "./shareLayout";
+import { wrapShareText, SHARE_UI_FONT, SHARE_DIMENSIONS, shareDisplayDigits, type ShareFormat } from "./shareLayout";
+import type { AppLanguage } from "../types";
+import { t } from "../i18n";
+import { shareSentenceEnds } from "./shareContinuation";
 import { prepareAyahMushafRendering } from "./ayahMushafRendering";
 
 export const AYAH_MUSHAF_FONT = '"Amiri Quran", serif';
 export interface AyahCardInput {
   verseKey: string;
+  language?: AppLanguage;
   pageNumber?: number;
   arabicDrawing?: { text: string; fontFamily: string };
   text: string;
   title: string;
-  format: "portrait" | "square";
+  format: ShareFormat;
   textScale?: number;
   fitAyah?: boolean;
   translation?: { text: string; label: string };
@@ -32,7 +36,7 @@ export interface AyahCardPage {
 
 /** Fixed readable type, complete ordered text, measured marks and continued cards. */
 export function layoutAyahCards(ctx: CanvasRenderingContext2D, input: AyahCardInput): AyahCardPage[] {
-  const height = input.format === "portrait" ? 1350 : 1080;
+  const height = SHARE_DIMENSIONS[input.format].height;
   const capacity = height - 372;
   const arabicText = input.arabicDrawing?.text ?? input.text;
   const arabicFamily = input.arabicDrawing?.fontFamily ?? AYAH_MUSHAF_FONT;
@@ -123,13 +127,27 @@ export function layoutAyahCards(ctx: CanvasRenderingContext2D, input: AyahCardIn
       if (used + labelHeight + measure(lines[0]!) > capacity) push();
       labelRows.forEach(add);
     }
-    for (const line of lines) {
-      const row = { text: line, font: section.font, direction: section.direction, height: measure(line) };
-      if (used + row.height > capacity && labelRows.length) {
+    let sentenceStart = 0;
+    for (const sentenceEnd of shareSentenceEnds(section.text, section.direction === "rtl" ? "ar" : "en")) {
+      const sentenceLines = wrapShareText(
+        section.text.slice(sentenceStart, sentenceEnd),
+        (value) => ctx.measureText(value).width,
+        848,
+      );
+      const sentenceHeight = sentenceLines.reduce((sum, line) => sum + measure(line), 0);
+      if (sentenceHeight + labelHeight <= capacity && used + sentenceHeight > capacity) {
         push();
         labelRows.forEach(add);
       }
-      add(row);
+      for (const line of sentenceLines) {
+        const row = { text: line, font: section.font, direction: section.direction, height: measure(line) };
+        if (used + row.height > capacity && labelRows.length) {
+          push();
+          labelRows.forEach(add);
+        }
+        add(row);
+      }
+      sentenceStart = sentenceEnd;
     }
     const gap = Math.min(28, capacity - used);
     if (rows.length) rows[rows.length - 1]!.height += gap;
@@ -154,9 +172,19 @@ export function renderAyahCard(input: AyahCardInput, page: AyahCardPage, index: 
   ctx.textAlign = "center";
   ctx.direction = /[\u0600-\u06ff]/u.test(input.title) ? "rtl" : "ltr";
   drawInkTop(ctx, input.title, 540, 148);
-  drawOrnateFlourish(ctx, 540, 220, 240, "#9b773a");
+  if (total === 1) drawOrnateFlourish(ctx, 540, 220, 240, "#9b773a");
   const contentHeight = page.rows.reduce((sum, row) => sum + row.height, 0);
   let top = 252 + Math.min(96, Math.max(0, (page.height - 372 - contentHeight) / 2));
+  const continuationCue = (key: "continuedBefore" | "continuedAfter", x: number) => {
+    ctx.font = `500 28px ${SHARE_UI_FONT}`;
+    ctx.direction = input.language === "ar" ? "rtl" : "ltr";
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#735425";
+    drawInkTop(ctx, t(input.language ?? "en", `shareStudio.${key}`), x, 202);
+  };
+  const middle = index > 0 && index < total - 1;
+  if (index > 0) continuationCue("continuedBefore", middle ? 300 : 540);
+  if (index < total - 1) continuationCue("continuedAfter", middle ? 780 : 540);
   for (const row of page.rows) {
     ctx.font = row.font;
     ctx.direction = row.direction;
@@ -171,7 +199,7 @@ export function renderAyahCard(input: AyahCardInput, page: AyahCardPage, index: 
   ctx.fillStyle = "#526055";
   if (total > 1) {
     // Canvas engines differ on bidi isolates: paint label and numbers as separate runs.
-    const numbers = `${index + 1} / ${total} · ${input.verseKey}`;
+    const numbers = shareDisplayDigits(`${index + 1} / ${total} · ${input.verseKey}`, input.language ?? "en");
     const labelWidth = ctx.measureText(input.continuation).width;
     const numberWidth = ctx.measureText(numbers).width;
     const left = 540 - (labelWidth + numberWidth + 16) / 2;
@@ -182,7 +210,7 @@ export function renderAyahCard(input: AyahCardInput, page: AyahCardPage, index: 
     ctx.direction = rtl ? "rtl" : "ltr";
     ctx.textAlign = rtl ? "right" : "left";
     drawInkTop(ctx, input.continuation, rtl ? left + numberWidth + 16 + labelWidth : left, page.height - 118);
-  } else drawInkTop(ctx, input.verseKey, 540, page.height - 118);
+  } else drawInkTop(ctx, shareDisplayDigits(input.verseKey, input.language ?? "en"), 540, page.height - 118);
   ctx.direction = "ltr";
   ctx.textAlign = "center";
   drawWebsiteText(ctx, 540, page.height - 72, "#526055");

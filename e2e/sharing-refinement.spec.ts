@@ -260,9 +260,8 @@ test("sharing layout mirrors wide previews and keeps mobile recovery and focus r
   expect(previewBox.x + previewBox.width).toBeLessThanOrEqual(settingsBox.x);
   await revealImageSettings(modal, "ar");
   await modal.getByRole("combobox", { name: "مقاس الصورة" }).click();
-  const unavailable = page.getByRole("option", { name: "مربع · ١:١", exact: true });
-  await expect(unavailable).toBeDisabled();
-  await expect(unavailable).toContainText("غير متاح: لا يتسع للنص الكامل والإضافات.");
+  const square = page.getByRole("option", { name: "مربع · ١:١", exact: true });
+  await expect(square).toBeEnabled();
   await page.keyboard.press("Escape");
   await expect(modal).toBeVisible();
   await expect(modal.getByRole("combobox", { name: "مقاس الصورة" })).toBeFocused();
@@ -352,8 +351,8 @@ test("sharing preview supports readable Arabic, sources and accessible controls 
   for (const line of ink) {
     expect(line.text).not.toMatch(/[0-9۰-۹]/u);
     expect(line.text).not.toBe("المصدر");
-    expect(line.left).toBeGreaterThanOrEqual(110);
-    expect(line.right).toBeLessThanOrEqual(975);
+    expect(line.left, line.text).toBeGreaterThanOrEqual(110);
+    expect(line.right, line.text).toBeLessThanOrEqual(975);
     expect(line.top).toBeGreaterThanOrEqual(line.panelTop + 23);
     expect(line.bottom).toBeLessThanOrEqual(line.panelBottom - 23);
   }
@@ -448,7 +447,7 @@ test("sharing works offline with English meaning and exact text/link alternative
   await modal.getByRole("button", { name: "Image", exact: true }).click();
   await revealImageSettings(modal);
   await modal.getByRole("combobox", { name: "Image size" }).click();
-  await expect(page.getByRole("option", { name: "Square · 1:1", exact: true })).toBeDisabled();
+  await expect(page.getByRole("option", { name: "Square · 1:1", exact: true })).toBeEnabled();
   await page.getByRole("option", { name: "Tall reading image", exact: true }).click();
   await expect(modal.getByRole("img").first()).toHaveAttribute("height", "2920");
   await expect(modal.getByText("Preparing the remaining cards…")).toHaveCount(0);
@@ -546,19 +545,9 @@ test("complete cards, compatible formats and ZIP saving are usable on a narrow s
     ["حالة · ٩:١٦", 1920],
   ] as const) {
     await modal.getByRole("combobox", { name: "مقاس الصورة" }).click();
-    await expect(page.getByRole("option", { name: "مربع · ١:١", exact: true })).toBeDisabled();
+    await expect(page.getByRole("option", { name: "مربع · ١:١", exact: true })).toBeEnabled();
     const choice = page.getByRole("option", { name: option, exact: true });
-    if (await choice.isDisabled()) {
-      await expect(choice).toBeDisabled();
-      await page.keyboard.press("Escape");
-      await expect(modal.getByRole("img").first()).toHaveAttribute("height", "2920");
-      await expect(
-        modal.getByText("المقاسات غير المتاحة لا تتسع للمحتوى كاملًا. اختر الصورة الطويلة أو النص أو الرابط.", {
-          exact: true,
-        }),
-      ).toBeVisible();
-      continue;
-    }
+    await expect(choice).toBeEnabled();
     await choice.click();
     await expect(modal.getByRole("img").first()).toHaveAttribute("height", String(height));
     await expect(modal.getByText("جارٍ تجهيز بقية البطاقات…")).toHaveCount(0);

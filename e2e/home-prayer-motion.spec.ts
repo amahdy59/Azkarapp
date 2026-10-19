@@ -70,6 +70,8 @@ for (const [language, width] of [
     );
     expect(paused).toBe(true);
     await expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
+    await expect(sticky).toHaveCSS("transition-duration", "0.22s");
+    await expect(sticky).toHaveCSS("transition-delay", "0s");
     // At time zero the actual card shape is still expanded: no hidden-footer snap.
     expect((await card.boundingBox())!.height).toBeCloseTo(expanded, 0);
     await sticky.evaluate((node) => {
@@ -80,6 +82,10 @@ for (const [language, width] of [
     const middle = (await card.boundingBox())!.height;
     expect(middle).toBeLessThan(expanded - 2);
     await capture("middle");
+    // The new countdown arrives during the final 60ms, finishing with the
+    // geometry rather than appearing while a delayed contraction is running.
+    await expect(sticky.locator("[data-prayer-compact-countdown]")).toHaveCSS("transition-delay", "0.16s");
+    await expect(sticky.locator("[data-prayer-footer]").first()).toHaveCSS("transition-delay", "0s");
     await sticky.evaluate((node) => {
       for (const animation of node.getAnimations()) animation.finish();
     });

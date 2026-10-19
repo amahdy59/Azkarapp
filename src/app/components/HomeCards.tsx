@@ -1,6 +1,7 @@
 import { reminderText } from "../i18n/reminderReadings";
 import type { QuickRoutineShare } from "../hooks/useQuickRoutineShare";
-import { useState, type ComponentProps } from "react";
+import { lazy, Suspense, useState, type ComponentProps } from "react";
+import { reminderToShareItem } from "../share/reminderSharing";
 import { ReminderReading } from "./ReminderReading";
 import { progressFillStyle } from "./progressFillStyle";
 import { t } from "../i18n";
@@ -25,6 +26,10 @@ import {
   Share2,
 } from "./icons";
 import { HadithWeakChainBadge } from "./HadithWeakChainBadge";
+
+const ReminderShareModal = lazy(() =>
+  import("./CollectionShareModal").then((module) => ({ default: module.CollectionShareModal })),
+);
 
 export type HomeSavedSource = "main" | "comprehensive" | "friday";
 
@@ -538,7 +543,8 @@ function DailyEvidenceCardContent({
 }) {
   const [readingEvidence, setReadingEvidence] = useState<DailyEvidence | null>(null);
   const [focusedEvidence, setFocusedEvidence] = useState<DailyEvidence | null>(null);
-  const evidence = readingEvidence ?? focusedEvidence ?? incomingEvidence;
+  const [sharingEvidence, setSharingEvidence] = useState<DailyEvidence | null>(null);
+  const evidence = sharingEvidence ?? readingEvidence ?? focusedEvidence ?? incomingEvidence;
   return (
     <HomeCard
       as="section"
@@ -574,24 +580,39 @@ function DailyEvidenceCardContent({
           </h2>
         </div>
 
-        {onRefresh && (
+        <div className="flex shrink-0 items-center gap-1">
           <button
             type="button"
-            onClick={() => {
-              setReadingEvidence(null);
-              setFocusedEvidence(null);
-              onRefresh();
+            onClick={(event) => {
+              event.currentTarget.focus({ preventScroll: true });
+              setSharingEvidence(evidence);
             }}
-            aria-label={reminderText(language, "home.nextDailyEvidence")}
-            title={reminderText(language, "home.nextDailyEvidence")}
-            data-testid="daily-evidence-refresh"
-            className={`-my-1.5 -me-1.5 flex size-11 shrink-0 items-center justify-center rounded-full transition-transform hover:opacity-80 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring motion-reduce:transition-none ${
-              onGlass ? "text-on-media-muted hover:text-on-media" : "text-muted-foreground hover:text-foreground"
-            }`}
+            aria-label={reminderText(language, "home.shareEvidence")}
+            title={reminderText(language, "home.shareEvidence")}
+            data-testid="daily-evidence-share"
+            className={`-my-1.5 flex size-11 shrink-0 items-center justify-center rounded-full transition-colors hover:opacity-80 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring motion-reduce:transition-none ${onGlass ? "text-on-media-accent hover:text-on-media" : "text-primary hover:text-foreground"}`}
           >
-            <RefreshCw size={16} aria-hidden="true" />
+            <Share2 size={16} aria-hidden="true" />
           </button>
-        )}
+          {onRefresh && (
+            <button
+              type="button"
+              onClick={() => {
+                setReadingEvidence(null);
+                setFocusedEvidence(null);
+                onRefresh();
+              }}
+              aria-label={reminderText(language, "home.nextDailyEvidence")}
+              title={reminderText(language, "home.nextDailyEvidence")}
+              data-testid="daily-evidence-refresh"
+              className={`-my-1.5 -me-1.5 flex size-11 shrink-0 items-center justify-center rounded-full transition-transform hover:opacity-80 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring motion-reduce:transition-none ${
+                onGlass ? "text-on-media-muted hover:text-on-media" : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <RefreshCw size={16} aria-hidden="true" />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* The narration leads, in the reader's language where one was reviewed.
@@ -650,6 +671,28 @@ function DailyEvidenceCardContent({
           </span>
         )}
       </footer>
+      {sharingEvidence && (
+        <Suspense
+          fallback={
+            <p role="status" className="sr-only">
+              {t(language, "common.loading")}
+            </p>
+          }
+        >
+          <ReminderShareModal
+            open
+            onClose={() => setSharingEvidence(null)}
+            items={[]}
+            single
+            language={language}
+            collectionTitle={sharingEvidence.title ?? reminderText(language, "home.dailyEvidence")}
+            dialogTitle={reminderText(language, "home.shareEvidence")}
+            shareItems={[reminderToShareItem(sharingEvidence, language)]}
+            shareUrl={sharingEvidence.sourceUrl}
+            initialFormat="portrait"
+          />
+        </Suspense>
+      )}
     </HomeCard>
   );
 }
