@@ -445,3 +445,5 @@ Local follow-up: [Concise, actionable Progress](phases/PROGRESS_REFINEMENTS_2026
 [Final pending release](phases/FINAL_PENDING_RELEASE_2026_10_18.md) records the owner's subsequent authorization to publish all pending changes with fresh release notes, complete required testing and exact-commit deployment verification. This supersedes the two pending local-only holds.
 
 [Home frost, motion and Android handoff](phases/FROST_MOTION_ANDROID_HANDOFF_2026_10_19.md) is the active owner-requested follow-up: one softer scrolled Home material, synchronized 220ms prayer geometry/details and verified Android build/developer handoff. Persistent native-file downloads and device/Play acceptance remain explicit Android follow-up work. The owner's latest instruction withholds push/deployment until returning for review.
+
+[Sharing steps and truthful availability](phases/SHARING_STEPS_AND_AVAILABILITY_2026_10_19.md) is the active owner-requested sharing phase: Content/Design/Share, retained live preview, explicit dropdown menus, existing reviewed English content, honest presets/capabilities and responsive/accessibility verification.

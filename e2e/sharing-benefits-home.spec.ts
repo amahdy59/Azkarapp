@@ -1,3 +1,4 @@
+import { sharingStep } from "./helpers/sharing";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { readFile } from "node:fs/promises";
@@ -39,6 +40,7 @@ for (const language of ["ar", "en"] as const) {
     const opener = page.getByTestId("share-benefits-collection-button");
     await opener.click();
     const modal = page.getByTestId("collection-share-modal");
+    await sharingStep(modal, "share");
     const save = modal.getByRole("button", { name: t(language, "shareStudio.save"), exact: true });
     await expect(save).toBeEnabled({ timeout: 60000 });
     await expect(modal.getByRole("alert")).toHaveCount(0);
@@ -87,6 +89,7 @@ for (const language of ["ar", "en"] as const) {
     const opener = page.getByRole("article").nth(1).getByRole("button");
     await opener.click();
     const modal = page.getByTestId("collection-share-modal");
+    await sharingStep(modal, "share");
     await expect(modal.getByRole("button", { name: t(language, "shareStudio.save"), exact: true })).toBeEnabled({
       timeout: 60000,
     });
@@ -128,6 +131,7 @@ for (const language of ["ar", "en"] as const) {
     await opener.focus();
     await page.keyboard.press("Enter");
     const modal = page.getByTestId("collection-share-modal");
+    await sharingStep(modal, "share");
     await expect(modal.getByRole("img").first()).toBeVisible();
     await modal.getByRole("button", { name: t(language, "shareStudio.text"), exact: true }).click();
     const clean = (text: string) =>

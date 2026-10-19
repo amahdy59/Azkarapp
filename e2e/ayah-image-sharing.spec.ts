@@ -1,3 +1,4 @@
+import { sharingStep } from "./helpers/sharing";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { t } from "../src/app/i18n";
@@ -31,23 +32,37 @@ for (const language of ["ar", "en"] as const) {
     page,
   }, testInfo) => {
     const { trigger, imageAction, studio } = await openStudio(page, language);
-    await expect(studio.getByRole("heading")).toBeFocused();
+    await expect(studio.getByRole("heading", { name: t(language, "reader.ayahCardTitle"), exact: true })).toBeFocused();
     const preview = studio.getByRole("img");
     await expect(preview).toBeVisible();
     await expect(preview).toBeInViewport();
     await expect(studio.locator(".ayah-share-footer")).toBeInViewport();
     const initialSave = studio.getByRole("button", { name: t(language, "reader.ayahCardDownload"), exact: true });
+    await sharingStep(studio, "share");
     await expect(initialSave).toBeEnabled();
     await expect(studio.getByRole("button", { name: t(language, "common.next"), exact: true })).toHaveCount(0);
     const size = studio.getByRole("slider", { name: new RegExp(t(language, "reader.ayahCardTextSize")) });
+    await sharingStep(studio, "design");
+    if (!(await studio.locator(".sharing-typography").evaluate((node) => (node as HTMLDetailsElement).open)))
+      await studio.locator(".sharing-typography > summary").click();
     await size.focus();
     await page.keyboard.press("Home");
     await expect(size).toHaveValue("0.75");
+    await sharingStep(studio, "share");
     await expect(initialSave).toBeEnabled();
+    await sharingStep(studio, "design");
+    if (!(await studio.locator(".sharing-typography").evaluate((node) => (node as HTMLDetailsElement).open)))
+      await studio.locator(".sharing-typography > summary").click();
+    await size.focus();
     await page.keyboard.press("End");
     await expect(size).toHaveValue("1.125");
+    await sharingStep(studio, "share");
     await expect(initialSave).toBeEnabled();
     await expect(studio.getByRole("button", { name: t(language, "common.next"), exact: true })).toHaveCount(0);
+    await sharingStep(studio, "design");
+    if (!(await studio.locator(".sharing-typography").evaluate((node) => (node as HTMLDetailsElement).open)))
+      await studio.locator(".sharing-typography > summary").click();
+    await size.focus();
     await page.keyboard.press("Home");
     // WebKit and Chromium use different native horizontal keys for an RTL range.
     await page.keyboard.press("ArrowRight");
@@ -55,6 +70,7 @@ for (const language of ["ar", "en"] as const) {
     if (increase === "ArrowLeft") await page.keyboard.press(increase);
     await page.keyboard.press(increase);
     await expect(size).toHaveValue("1");
+    await sharingStep(studio, "share");
     await expect(initialSave).toBeEnabled();
     await page.screenshot({ path: testInfo.outputPath(`studio-${language}-mobile-sizing.png`), scale: "css" });
     if (language === "en") {
@@ -67,15 +83,18 @@ for (const language of ["ar", "en"] as const) {
     });
     await page.screenshot({ path: testInfo.outputPath(`studio-${language}-mobile-preview.png`), scale: "css" });
     const headerBefore = await studio.locator(".ayah-share-header").boundingBox();
+    await sharingStep(studio, "content");
     await expect(
       studio.getByRole("checkbox", { name: t(language, "reader.ayahCardTranslation"), exact: true }),
     ).toBeEnabled();
     await studio.getByRole("checkbox", { name: t(language, "reader.ayahCardTranslation"), exact: true }).check();
     await studio.getByRole("checkbox", { name: t(language, "reader.ayahCardMeanings"), exact: true }).check();
+    await sharingStep(studio, "share");
     await expect(
       studio.getByRole("button", { name: t(language, "reader.ayahCardDownload"), exact: true }),
     ).toBeEnabled();
     await page.screenshot({ path: testInfo.outputPath(`studio-${language}-mobile-options.png`), scale: "css" });
+    await sharingStep(studio, "share");
     await studio.locator("summary").click();
     await expect(studio.locator("[data-quran-glyph]").first()).toBeVisible();
     await studio.locator('p[lang="ar"]').first().scrollIntoViewIfNeeded();
@@ -93,10 +112,14 @@ for (const language of ["ar", "en"] as const) {
     expect(await studio.locator(".ayah-share-header").boundingBox()).toEqual(headerBefore);
     await expect(studio.locator(".ayah-share-footer")).toBeInViewport();
     for (const format of ["story", "square", "portrait", "tall"] as const) {
+      await sharingStep(studio, "design");
+      if (!(await studio.locator(".sharing-typography").evaluate((node) => (node as HTMLDetailsElement).open)))
+        await studio.locator(".sharing-typography > summary").click();
       await studio.getByRole("combobox", { name: t(language, "shareStudio.format"), exact: true }).click();
       const option = page.getByRole("option", { name: t(language, `shareStudio.${format}`), exact: true });
       await expect(option.getByTestId("share-format-platforms").locator(":scope > span")).toHaveCount(2);
       await option.click();
+      await sharingStep(studio, "share");
       const save = studio.getByRole("button", { name: t(language, "reader.ayahCardDownload"), exact: true });
       await expect(save).toBeEnabled();
       await expect(preview).toHaveAttribute(
@@ -153,7 +176,9 @@ for (const language of ["ar", "en"] as const) {
     ).toBeEnabled();
     await studio.getByRole("checkbox", { name: t(language, "reader.ayahCardTranslation"), exact: true }).check();
     await studio.getByRole("checkbox", { name: t(language, "reader.ayahCardMeanings"), exact: true }).check();
+    await sharingStep(studio, "share");
     await studio.locator("summary").click();
+    await sharingStep(studio, "share");
     await expect(
       studio.getByRole("button", { name: t(language, "reader.ayahCardDownload"), exact: true }),
     ).toBeEnabled();
@@ -168,10 +193,14 @@ for (const language of ["ar", "en"] as const) {
       await page.evaluate(() => {
         document.documentElement.style.fontSize = "200%";
       });
+      await sharingStep(studio, "design");
+      if (!(await studio.locator(".sharing-typography").evaluate((node) => (node as HTMLDetailsElement).open)))
+        await studio.locator(".sharing-typography > summary").click();
       await studio.getByRole("combobox", { name: t(language, "shareStudio.format"), exact: true }).focus();
       await expect(
         studio.getByRole("combobox", { name: t(language, "shareStudio.format"), exact: true }),
       ).toBeInViewport();
+      await sharingStep(studio, "share");
       const enlargedSave = studio.getByRole("button", { name: t(language, "reader.ayahCardDownload"), exact: true });
       await enlargedSave.focus();
       await expect(enlargedSave).toBeInViewport();
@@ -190,10 +219,13 @@ for (const language of ["ar", "en"] as const) {
           })),
       }));
       expect(geometry.fits, JSON.stringify(geometry)).toBe(true);
+      await sharingStep(studio, "content");
+      await expect(studio.locator(".ayah-share-option")).toHaveCount(2);
       for (const target of await studio.locator(".ayah-share-option").all()) {
         const bounds = await target.boundingBox();
         expect(bounds!.height).toBeGreaterThanOrEqual(44);
       }
+      await sharingStep(studio, "share");
       expect(
         (await new AxeBuilder({ page }).include('[data-testid="ayah-interaction-sheet"]').analyze()).violations,
       ).toEqual([]);
@@ -206,6 +238,7 @@ for (const language of ["ar", "en"] as const) {
       document.documentElement.style.fontSize = "";
     });
     await page.setViewportSize({ width: 1024, height: 768 });
+    await sharingStep(studio, "share");
     await expect(
       studio.getByRole("button", { name: t(language, "reader.ayahCardDownload"), exact: true }),
     ).toBeEnabled();

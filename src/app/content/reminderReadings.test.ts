@@ -29,6 +29,17 @@ const evidence: DailyEvidence = {
 
 describe("complete local Home readings", () => {
   afterEach(() => vi.unstubAllGlobals());
+  it("provides reviewed English sharing text without changing Arabic reading presentation", () => {
+    for (const [id, record] of Object.entries(readings)) {
+      if (!("english" in record) || !record.english) continue;
+      const arabic = catalogue.withReminderReading({ ...evidence, evidenceId: id }, "ar");
+      const english = catalogue.withReminderReading({ ...evidence, evidenceId: id }, "en");
+      expect(arabic.translationForSharing, id).toBe(record.english);
+      expect(arabic.translation).toBeUndefined();
+      expect(english.translationForSharing).toBeUndefined();
+      expect(english.hadith).toBe(record.english);
+    }
+  });
 
   it("covers all 71 curated sources and all 185 original fallback identities explicitly", () => {
     expect(Object.keys(readings).filter((k) => !k.startsWith("L:"))).toHaveLength(71);

@@ -1,3 +1,4 @@
+import { sharingStep } from "./helpers/sharing";
 import { expect, test } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
@@ -34,6 +35,7 @@ for (const category of ["morning", "evening", "before_sleep"] as const) {
     await page.getByTestId("share-collection-button").click();
     const modal = page.getByTestId("collection-share-modal");
     await modal.getByRole("button", { name: "البطاقات المعتمدة", exact: true }).click();
+    await sharingStep(modal, "share");
     const extension = category === "before_sleep" ? "jpg" : "webp";
     const image = modal.getByRole("img").first();
     await expect(image).toBeVisible();

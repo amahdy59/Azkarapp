@@ -17,6 +17,7 @@ for (const section of WIRD_SECTION_ORDER) {
       if (item.kind === "quran")
         expect(getShareText([shared], language, {}, "Evidence")).not.toContain(t(language, "shareStudio.repeatOnce"));
       const sections = getShareSections(shared, { meaning: true });
+      expect(shared.translation).toBe(item.kind === "quran" || language === "ar" ? item.text.en : undefined);
       expect(sections[0].direction).toBe(item.kind === "quran" || language === "ar" ? "rtl" : "ltr");
       if (item.kind === "quran") {
         expect(shared.quranText).toBe(true);

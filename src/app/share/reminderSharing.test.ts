@@ -11,6 +11,14 @@ const evidence: DailyEvidence = {
   sourceUrl: "https://sunnah.com/bukhari:6014",
 };
 
+it("exposes the existing reviewed English narration as an optional addition to an Arabic share", () => {
+  const translated = { ...evidence, translationForSharing: "Gabriel kept advising me about the neighbor." };
+  const shared = reminderToShareItem(translated, "ar");
+  expect(shared.arabicText).toContain(evidence.hadith);
+  expect(shared.translation).toBe(translated.translationForSharing);
+  expect(translated.translation).toBeUndefined();
+});
+
 it("attributes bare prophetic quotations in the displayed language and shared payload without altering them", () => {
   expect(reminderAttribution(evidence)).toBe("قال رسول الله صلى الله عليه وسلم:");
   const shared = reminderToShareItem(evidence, "ar");

@@ -1,0 +1,261 @@
+.sharing-steps ol {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sharing-steps button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--ds-radius-control);
+  color: var(--muted-foreground);
+  overflow-wrap: anywhere;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+.sharing-steps button[aria-current="step"] {
+  background: var(--muted);
+  border-color: var(--primary);
+  color: var(--foreground);
+  font-weight: 700;
+}
+.sharing-steps button:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+}
+.sharing-steps button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.sharing-step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+}
+/* At enlarged text sizes, keep the words readable instead of giving a
+   decorative number more width than the step label. em follows text size. */
+@container (max-width: 20em) {
+  .sharing-step-number {
+    display: none;
+  }
+  .sharing-steps button {
+    padding: 6px 4px;
+    gap: 0;
+    line-height: 1.25;
+  }
+}
+.sharing-step-navigation {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+.sharing-step-navigation button {
+  min-height: 44px;
+  height: auto;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.sharing-step-navigation button:last-child:not(:first-child) {
+  margin-inline-start: auto;
+}
+.sharing-choice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--ds-radius-control);
+  cursor: pointer;
+}
+.sharing-select-trigger[data-slot="select-trigger"] {
+  min-height: 48px;
+  height: auto;
+  border-radius: var(--ds-radius-control);
+  border: 1px solid var(--border-control);
+  background: var(--background);
+  padding: 8px 12px;
+  text-align: start;
+  white-space: normal;
+}
+.sharing-select-trigger [data-slot="select-value"] {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  text-align: start;
+  overflow-wrap: anywhere;
+  -webkit-line-clamp: unset;
+}
+.sharing-select-trigger > svg:last-child {
+  width: 20px;
+  height: 20px;
+  opacity: 1;
+  color: var(--foreground);
+}
+.sharing-select-trigger[data-state="open"] {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary);
+}
+.sharing-select-trigger[data-state="open"] > svg:last-child {
+  transform: rotate(180deg);
+}
+.sharing-layout {
+  align-items: start;
+  gap: 0.75rem;
+}
+.sharing-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.sharing-settings > * {
+  margin-block: 0 !important;
+}
+.sharing-content-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr));
+  gap: 0.75rem;
+}
+.sharing-additions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  gap: 0.5rem;
+}
+.sharing-size-guide > summary:focus-visible,
+.sharing-typography > summary:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: var(--ds-radius-control);
+}
+.sharing-export-actions button {
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.sharing-actions {
+  container-type: inline-size;
+  font-size: 1rem;
+}
+/* Text enlargement should add a row instead of compressing Arabic action labels. */
+@container (max-width: 14em) {
+  .sharing-export-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  .sharing-export-actions button {
+    gap: 4px;
+    padding-inline: 4px;
+  }
+}
+.sharing-preview {
+  align-self: start;
+}
+.sharing-card-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0.5rem auto 0;
+}
+.sharing-card-navigation > span,
+.sharing-card-navigation > div {
+  min-width: 0;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.sharing-card-navigation button {
+  flex-shrink: 1;
+  min-width: 44px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+@media (min-height: 38rem) {
+  .sharing-layout:not([data-inspect]):not([data-step="share"]) > .sharing-preview {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--card);
+    border-radius: var(--ds-radius-control);
+    padding: 0.25rem;
+  }
+}
+.sharing-surface {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+.sharing-surface [data-sharing-body] {
+  min-height: 180px;
+}
+.sharing-surface[data-scroll-whole] {
+  overflow-y: auto;
+}
+.sharing-surface[data-scroll-whole] [data-testid="sharing-scroll"] {
+  flex: 0 0 auto;
+  overflow: visible;
+}
+@media (max-width: 767px) {
+  .sharing-layout:not([data-inspect]) .sharing-preview > [role="group"]:has(> button):has(> div) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .sharing-layout:not([data-inspect]) .sharing-preview > [role="group"] > button {
+    height: min(12dvh, 112px) !important;
+    max-height: min(12dvh, 112px) !important;
+    aspect-ratio: auto !important;
+  }
+  .sharing-layout:not([data-inspect]) .sharing-preview > [role="group"] > div {
+    margin-top: 0;
+  }
+}
+@media (max-width: 767px) and (min-height: 38rem) {
+  .sharing-surface:not([data-scroll-whole]) [data-sharing-body] {
+    scroll-padding-block-start: min(32dvh, 16rem);
+  }
+}
+@media (max-height: 28rem) {
+  .sharing-surface {
+    overflow-y: auto;
+  }
+  .sharing-surface [data-testid="sharing-scroll"] {
+    flex: 0 0 auto;
+    overflow: visible;
+  }
+}
+.sharing-choice:has(:checked) {
+  border-color: var(--primary);
+  background: var(--muted);
+}
+.sharing-choice:has(:focus-visible) {
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+}
+@media (forced-colors: active) {
+  .sharing-steps button[aria-current="step"],
+  .sharing-choice:has(:checked) {
+    outline: 2px solid Highlight;
+  }
+}
+.sharing-steps {
+  container-type: inline-size;
+}

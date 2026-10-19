@@ -1,3 +1,4 @@
+import { sharingStep } from "./helpers/sharing";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { readFile } from "node:fs/promises";
@@ -32,6 +33,7 @@ for (const language of ["ar", "en"] as const) {
       [image, text].map((button) => button.evaluate((node) => node.getBoundingClientRect().width)),
     );
     expect(widths[0]).toBeGreaterThan(widths[1]! * 1.5);
+    await sharingStep(modal, "share");
     const preview = modal.getByTestId("sharing-preview").getByRole("img");
     await expect(preview).toBeVisible();
     await expect(preview).toHaveAttribute("width", "1080");
@@ -101,6 +103,7 @@ for (const language of ["ar", "en"] as const) {
     const before = await page.evaluate(() => JSON.parse(localStorage.getItem("azkarapp.state.v1")!).completed);
     await trigger.click();
     const modal = page.getByTestId("collection-share-modal");
+    await sharingStep(modal, "share");
     const image = modal.getByTestId("sharing-preview").getByRole("img");
     await expect(image).toHaveAttribute("width", "1080");
     await expect(image).toHaveAttribute("height", "1080");

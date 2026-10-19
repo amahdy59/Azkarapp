@@ -1,3 +1,4 @@
+import { sharingStep } from "./helpers/sharing";
 import { expect, test, type Page } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 import benefitsHadithReadings from "../src/app/content/benefitsHadithReadings.json" with { type: "json" };
@@ -164,6 +165,7 @@ test("Library Benefits entry shares complete evidence and attribution through th
   expect(payload).toContain(body);
   expect(payload).toContain(source);
   expect(payload).toContain("\n");
+  await sharingStep(studio, "share");
   const download = page.waitForEvent("download");
   await studio.getByRole("button", { name: "Save", exact: true }).click();
   const saved = await download;

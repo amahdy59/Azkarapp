@@ -141,3 +141,14 @@ Export rows reserve the measured alphabetic ascent and descent of their actual d
 ### Android release acceptance
 
 Follow [docs/ANDROID.md](ANDROID.md). Require Android compilation, lint and native unit tasks in Quality in addition to the unchanged web matrix. Preserve signed-build, physical-device/TalkBack, offline audio/external export, widgets, permission/reboot/timezone and Play Console evidence separately from automated web checks. Verify that only the two permission-pending Muhammad Al-Shara recordings are excluded from Android and that Abdullah Muhammad/English downloads and exports remain available.
+
+## Sharing steps and option integrity — 2026-10-19
+
+- Test Content/Design/Share and the shorter Text/Link/supplied-artwork paths; Previous/Next and direct step navigation preserve selections and announce context by heading focus.
+- Verify absent/whitespace/reminder/wrong-language additions, partial coverage descriptions and exact image/text/ZIP content. Canonical zikr/dua English coverage is a corpus regression; Quran Benefits and Home use existing reviewed meanings.
+- Every dropdown has a visible label/value, clear chevron, rectangular field boundary, keyboard selection, expanded state, Escape recovery and focus return.
+- Check current/selected/all continuation cards, including a multi-card single reading; keep stale generations out of exports and release blob URLs.
+- Exercise phone/desktop, 320px, 200% text, short landscape, RTL/LTR, themes, reduced motion, focus containment/return and visible Save/manual-copy recovery. Sticky preview must never intercept settings or selection.
+- Retain physical native sharing/clipboard/OS download and human assistive-technology acceptance separately from automated checks.
+
+Sharing arrow acceptance checks the actual rendered SVG tip direction and button positions in both languages, generated and approved artwork. Require complete visible 44px controls, nearby card/counter grouping, correct boundary disabling, pointer Previous/Next and keyboard ArrowLeft/ArrowRight/Home/End on the active collection.

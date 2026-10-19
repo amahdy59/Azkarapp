@@ -20,7 +20,7 @@ export function reminderToShareItem(evidence: DailyEvidence, language: AppLangua
     quranText: evidence.isQuran,
     hideRepetition: true,
     title: evidence.title,
-    translation: evidence.translation,
+    translation: evidence.translationForSharing ?? evidence.translation,
     benefit: evidence.meaning ?? evidence.benefit,
     sourceReference:
       evidence.sourceReference && !evidence.authenticity.includes(evidence.sourceReference)

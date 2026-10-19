@@ -82,6 +82,9 @@ export function createReminderReadingCatalogue(data: ReminderReadingData) {
         hadith: record.arabic ? (isArabic ? record.arabic : record.english!) : evidence.hadith,
         hadithInArabic: record.arabic ? isArabic : evidence.hadithInArabic,
         meaning,
+        translationForSharing: isArabic
+          ? (record.english ?? data.verses?.find((verse) => verse.id === evidence.evidenceId)?.english)
+          : undefined,
         meaningSourceUrl:
           record.meaningSourceUrl ??
           (record.commentaryId

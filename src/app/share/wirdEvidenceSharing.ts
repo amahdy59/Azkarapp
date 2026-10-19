@@ -14,7 +14,7 @@ export function wirdEvidenceToShareItem(item: WirdEvidence, language: AppLanguag
     quranText: isQuran,
     hideRepetition: true,
     title: localizeBenefitText(item.title, language),
-    translation: isQuran ? item.text.en : undefined,
+    translation: isQuran || language === "ar" ? item.text.en : undefined,
     sourceReference: [
       item.attribution ? localizeBenefitText(item.attribution, language) : "",
       localizeBenefitText(item.source, language),

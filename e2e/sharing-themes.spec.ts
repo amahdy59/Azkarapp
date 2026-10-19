@@ -1,3 +1,4 @@
+import { sharingStep } from "./helpers/sharing";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
@@ -15,9 +16,7 @@ for (const themeMode of ["light", "midnight", "dark"] as const) {
     const modal = page.getByTestId("collection-share-modal");
     await expect(modal.getByRole("img").first()).toBeVisible();
     await expect(modal.getByText("جارٍ تجهيز بقية البطاقات…")).toHaveCount(0);
-    const settings = modal.getByText("إعدادات الصورة", { exact: true }).locator("xpath=ancestor::details[1]");
-    if (!(await settings.evaluate((element) => (element as HTMLDetailsElement).open)))
-      await settings.locator("summary").click();
+    await sharingStep(modal, "design");
     const selected = modal.getByRole("button", { name: "زيتوني · نهاري", exact: true });
     await expect(selected).toHaveAttribute("aria-pressed", "true");
     await expect(selected.locator('svg[aria-hidden="true"]')).toHaveCount(1);

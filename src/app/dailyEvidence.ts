@@ -60,6 +60,8 @@ export interface DailyEvidence {
   companionReport?: boolean;
   /** A Quran rendering stays separate from editorial guidance. */
   translation?: string;
+  /** Existing reviewed English quotation, available on demand in the sharing studio. */
+  translationForSharing?: string;
   takeaway?: string;
   /** Original reference for exact source matching, independent of UI language. */
   sourceReferenceEnglish?: string;

@@ -3,6 +3,7 @@ import type { AppLanguage } from "../types";
 import { t } from "../i18n";
 import { formatNumerals } from "../formatting";
 import { SHARE_DIMENSIONS, type ShareFormat } from "../share/shareLayout";
+import { ChevronDown } from "./icons";
 import { FIELD_LABEL_CLASS } from "./FormField";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 
@@ -56,7 +57,13 @@ export function ShareFormatSelect({
         disabled={disabled}
         dir={language === "ar" ? "rtl" : "ltr"}
       >
-        <SelectTrigger id={id} aria-labelledby={`${id}-label`} aria-describedby={hintId}>
+        <SelectTrigger
+          className="sharing-select-trigger"
+          aria-haspopup="listbox"
+          id={id}
+          aria-labelledby={`${id}-label`}
+          aria-describedby={hintId}
+        >
           <SelectValue />
         </SelectTrigger>
         <SelectContent className="z-[110]">
@@ -86,13 +93,19 @@ export function ShareFormatSelect({
           ))}
         </SelectContent>
       </Select>
-      <div className="text-xs text-muted-foreground">
-        {dimensions(value)}
-        <PlatformTags format={value} language={language} />
-      </div>
-      <p id={hintId} className={`text-sm ${unavailable ? "font-semibold text-foreground" : "text-muted-foreground"}`}>
-        {t(language, unavailable ? "shareStudio.compatibilityHint" : "shareStudio.sizeHint")}
-      </p>
+      <details className="sharing-size-guide">
+        <summary className="flex min-h-11 cursor-pointer items-center justify-between gap-2 text-sm text-muted-foreground">
+          {t(language, "shareStudio.sizeGuide")}
+          <ChevronDown className="size-4 shrink-0" aria-hidden="true" />
+        </summary>
+        <div className="text-xs text-muted-foreground">
+          {dimensions(value)}
+          <PlatformTags format={value} language={language} />
+        </div>
+        <p id={hintId} className={`text-sm ${unavailable ? "font-semibold text-foreground" : "text-muted-foreground"}`}>
+          {t(language, unavailable ? "shareStudio.compatibilityHint" : "shareStudio.sizeHint")}
+        </p>
+      </details>
     </div>
   );
 }

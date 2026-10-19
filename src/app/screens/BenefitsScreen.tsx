@@ -55,7 +55,7 @@ export function benefitEvidenceToShareItem(item: BenefitEvidence, language: AppL
   const isQuran = item.kind === "quran";
   const title = localizeBenefitText(item.title, language);
   const text = isQuran ? item.text.ar : localizeBenefitText(item.text, language);
-  const meaning = isQuran && language === "en" ? item.text.en : undefined;
+  const meaning = isQuran || language === "ar" ? item.text.en : undefined;
   const source = isQuran ? quranCitation(item, language) : localizeBenefitText(item.source, language);
 
   return {

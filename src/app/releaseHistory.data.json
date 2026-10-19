@@ -1,5 +1,18 @@
 [
   {
+    "release": "2026-10-19.4",
+    "ar": [
+      "جهّز بطاقات المشاركة عبر خطوات المحتوى والتصميم والمشاركة، مع معاينة مباشرة وحفظ اختياراتك بين الخطوات.",
+      "أضف الترجمات الإنجليزية المتاحة إلى مشاركات نصوص الرئيسية والفضائل والورد، مع خيارات تطابق المحتوى.",
+      "استخدم قوائم أوضح وتمريرًا أقل على الهاتف، وتنقّل بين البطاقات بأسهم قريبة وواضحة الاتجاه."
+    ],
+    "en": [
+      "Prepare shared cards in clear Content, Design and Share steps, with a live preview and choices kept between steps.",
+      "Include available English meanings in Home, Benefits and Wird shares, with accurate options for each reading.",
+      "Use clearer dropdowns with less phone scrolling, and move between cards using nearby arrows that point the right way."
+    ]
+  },
+  {
     "release": "2026-10-19.3",
     "ar": [
       "استمتع بزجاج ضبابي أخف يُظهر ألوان خلفية الصفحة الرئيسية أثناء التمرير.",

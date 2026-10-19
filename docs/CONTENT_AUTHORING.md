@@ -187,3 +187,9 @@ The fresh [20-entry comparison](agent/evidence/collection-independent-review-202
 ## Complete Benefits hadith cards — 2026-10-18
 
 The owner requests full Benefits narrations locally. benefitsHadithReadings.json supplies all 21 complete selected matn versions in Arabic and English, replacing reward-only summaries. Keep story context, conditions and conclusions; exclude preceding transmission chains and subsequent compiler notes. Twelve readings reuse existing source-compared Home texts; nine additional comparisons and source URLs are recorded in agent/evidence/benefits-full-hadith-2026-10-18.json. English is the app rendering of meaning. Preserve the existing Dorar links and named grading, Quran excerpts, derived benefits and stable IDs. No runtime source request or R2 update is needed. See agent/phases/BENEFITS_FULL_HADITH_2026_10_18.md. This is source comparison, not independent scholarly approval.
+
+## Sharing translation coverage and availability — 2026-10-19
+
+The canonical zikr/dua coverage regression verifies nonempty existing English meanings across the eager corpus and lazy comprehensive duas, and checks ordinary Arabic sharing exposes those exact translations. No new religious wording, translation, transliteration, grading or source interpretation was authored in this UI phase.
+
+Arabic Benefits and Wird sharing now receive the existing English meaning that their adapters previously omitted; Quran meaning remains available in both interface languages. The verified Home reading catalogue exposes its already source-compared English narration as optional sharing data (translationForSharing); this does not turn it into an automatically displayed Arabic-screen translation or change R2 bytes. Partial glossary/translation/pronunciation coverage is described honestly. Presets must never select an unavailable section. New or missing authored material still follows the source-review process above.
