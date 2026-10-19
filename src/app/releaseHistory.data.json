@@ -1,5 +1,18 @@
 [
   {
+    "release": "2026-10-19.5",
+    "ar": [
+      "تظل معاينة البطاقة الحالية ظاهرة أثناء تغيير تصميمها، حتى عند اختيار بطاقات متأخرة.",
+      "يبقى رقم البطاقة ظاهرًا ومتسقًا أثناء تجهيز البطاقات الجديدة، حتى عندما يقل عددها.",
+      "تبقى أزرار السابق والتالي في مكانها، مع تعطيلها بوضوح إلى أن تصبح البطاقة الجديدة جاهزة."
+    ],
+    "en": [
+      "Keep the current preview visible while changing its design, including when viewing later cards.",
+      "Keep a consistent card number while new cards are prepared, even when there are fewer cards.",
+      "Previous and Next stay in place and are clearly disabled until the updated card is ready."
+    ]
+  },
+  {
     "release": "2026-10-19.4",
     "ar": [
       "جهّز بطاقات المشاركة عبر خطوات المحتوى والتصميم والمشاركة، مع معاينة مباشرة وحفظ اختياراتك بين الخطوات.",

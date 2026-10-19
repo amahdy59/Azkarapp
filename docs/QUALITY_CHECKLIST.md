@@ -152,3 +152,5 @@ Follow [docs/ANDROID.md](ANDROID.md). Require Android compilation, lint and nati
 - Retain physical native sharing/clipboard/OS download and human assistive-technology acceptance separately from automated checks.
 
 Sharing arrow acceptance checks the actual rendered SVG tip direction and button positions in both languages, generated and approved artwork. Require complete visible 44px controls, nearby card/counter grouping, correct boundary disabling, pointer Previous/Next and keyboard ArrowLeft/ArrowRight/Home/End on the active collection.
+
+Regenerate while viewing a later card: publish only the first replacement page, assert the prior selected image and count remain visible, and verify navigation/Save stay disabled. Resolve a shorter replacement sequence and verify the new first card becomes available.

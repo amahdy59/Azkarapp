@@ -146,6 +146,7 @@ export function CollectionShareModal({
   const [scrollWhole, setScrollWhole] = useState(false);
   const stepHeading = useRef<HTMLHeadingElement>(null);
   const [pages, setPages] = useState<GeneratedCollectionStoryCard[]>([]);
+  const [completedPreview, setCompletedPreview] = useState<GeneratedCollectionStoryCard[]>([]);
   const completedPages = useRef<GeneratedCollectionStoryCard[]>([]);
   const [renderedKey, setRenderedKey] = useState("");
   const [active, setActive] = useState(0);
@@ -277,7 +278,10 @@ export function CollectionShareModal({
     retry,
   });
   const current = pages[active];
-  const total = current?.totalPages ?? pages.length;
+  // Rendering may retain a later card while its replacement has not streamed yet.
+  // Export readiness and payloads continue to use only the current request's pages.
+  const previewPage = current ?? (generating ? completedPreview[active] : undefined);
+  const total = current?.totalPages ?? previewPage?.totalPages ?? pages.length;
   const ready = Boolean(current) && renderedKey === generationKey;
   const allReady = ready && !generating;
   const scopedPages =
@@ -418,6 +422,7 @@ export function CollectionShareModal({
         }
         releaseSharePages(completedPages.current);
         completedPages.current = result;
+        setCompletedPreview(result);
         setPages(result);
         setRenderedKey(generationKey);
         const remembered = result.findIndex((page) =>
@@ -499,6 +504,7 @@ export function CollectionShareModal({
     if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
     event.preventDefault();
     event.stopPropagation();
+    if (!isCuratedActive && !ready) return;
     const count = isCuratedActive ? totalCurated : pages.length;
     const update = isCuratedActive ? setCuratedIndex : setActive;
     if (!count) return;
@@ -638,7 +644,7 @@ export function CollectionShareModal({
                       </p>
                     )}
                   </div>
-                  {mode === "image" && (isCuratedActive ? Boolean(currentCuratedCard) : ready) && (
+                  {mode === "image" && (isCuratedActive ? Boolean(currentCuratedCard) : Boolean(previewPage)) && (
                     <Button
                       variant="ghost"
                       size="sm"
@@ -759,7 +765,7 @@ export function CollectionShareModal({
                             </div>
                           )}
                         </div>
-                      ) : current ? (
+                      ) : previewPage ? (
                         <button
                           type="button"
                           onKeyDown={onPreviewKeyDown}
@@ -773,15 +779,15 @@ export function CollectionShareModal({
                               : wide
                                 ? "clamp(160px,calc(100dvh - 480px),440px)"
                                 : undefined,
-                            aspectRatio: !inspect && !wide ? `${current.width} / ${current.height}` : undefined,
+                            aspectRatio: !inspect && !wide ? `${previewPage.width} / ${previewPage.height}` : undefined,
                             maxHeight: !inspect && !wide ? (currentStep === "share" ? "45dvh" : "28dvh") : undefined,
                           }}
                         >
                           <img
-                            src={current.dataUrl}
-                            alt={current.altText}
-                            width={current.width}
-                            height={current.height}
+                            src={previewPage.dataUrl}
+                            alt={previewPage.altText}
+                            width={previewPage.width}
+                            height={previewPage.height}
                             className="h-full max-w-full w-auto object-contain rounded-xl shadow-raised"
                           />
                         </button>
@@ -790,12 +796,12 @@ export function CollectionShareModal({
                           {t(language, "shareStoryPack.generating")}
                         </p>
                       )}
-                      {!isCuratedActive && ready && total > 1 && (
+                      {!isCuratedActive && previewPage && total > 1 && (
                         <div className="sharing-card-navigation">
                           <Button
                             variant="outline"
                             size="icon"
-                            disabled={active <= 0 || busy}
+                            disabled={!ready || active <= 0 || busy}
                             aria-label={t(language, "shareStoryPack.previousPage")}
                             onKeyDown={onPreviewKeyDown}
                             onClick={() => setActive((value) => value - 1)}
@@ -809,7 +815,7 @@ export function CollectionShareModal({
                           <Button
                             variant="outline"
                             size="icon"
-                            disabled={active >= pages.length - 1 || busy}
+                            disabled={!ready || active >= pages.length - 1 || busy}
                             aria-label={t(language, "shareStoryPack.nextPage")}
                             onKeyDown={onPreviewKeyDown}
                             onClick={() => setActive((value) => value + 1)}

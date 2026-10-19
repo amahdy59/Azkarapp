@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
+import { act, render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import { CollectionShareModal } from "./CollectionShareModal";
 import type { Zikr } from "../types";
 
@@ -63,18 +63,21 @@ function goStep(step: "content" | "design" | "share") {
 }
 
 describe("CollectionShareModal", () => {
-  it("keeps the last preview while preventing exports of stale choices", async () => {
+  it("keeps a later-card preview through streamed replacements while blocking stale exports", async () => {
     const { generateAllCollectionStoryPages } = await import("../share/collectionShareCard");
     render(
       <CollectionShareModal open onClose={vi.fn()} collectionTitle="Morning" items={SAMPLE_ITEMS} language="en" />,
     );
     const preview = await screen.findByRole("img");
+    fireEvent.click(screen.getByRole("button", { name: "Next card", exact: true }));
     const previous = preview.getAttribute("src");
     let finish!: (value: Awaited<ReturnType<typeof generateAllCollectionStoryPages>>) => void;
+    let publish!: NonNullable<Parameters<typeof generateAllCollectionStoryPages>[0]["onPage"]>;
     vi.mocked(generateAllCollectionStoryPages).mockImplementationOnce(
-      () =>
+      (options) =>
         new Promise((resolve) => {
           finish = resolve;
+          publish = options.onPage!;
         }),
     );
     goStep("design");
@@ -83,16 +86,23 @@ describe("CollectionShareModal", () => {
     expect(screen.getByRole("img")).toHaveAttribute("src", previous);
     goStep("share");
     expect(screen.getByRole("button", { name: "Save", exact: true })).toBeDisabled();
-    finish([
-      {
-        pageNumber: 1,
-        totalPages: 1,
-        file: new File(["new"], "new.png"),
-        blob: new Blob(["new"]),
-        dataUrl: "data:image/png;base64,new",
-        altText: "New selected design",
-      },
-    ]);
+    const replacement = {
+      pageNumber: 1,
+      totalPages: 1,
+      file: new File(["new"], "new.png"),
+      blob: new Blob(["new"]),
+      dataUrl: "data:image/png;base64,new",
+      altText: "New selected design",
+    };
+    act(() => publish(replacement));
+    expect(screen.getByRole("img")).toHaveAttribute("src", previous);
+    expect(screen.getByText("Card 2 of 5")).toBeVisible();
+    expect(screen.getByRole("button", { name: "Previous card", exact: true })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Next card", exact: true })).toBeDisabled();
+    fireEvent.keyDown(screen.getByRole("img").closest("button")!, { key: "Home" });
+    expect(screen.getByRole("img")).toHaveAttribute("src", previous);
+    expect(screen.getByRole("button", { name: "Save", exact: true })).toBeDisabled();
+    finish([replacement]);
     await waitFor(() => expect(screen.getByRole("button", { name: "Save", exact: true })).toBeEnabled());
     expect(screen.getByRole("img")).toHaveAttribute("src", "data:image/png;base64,new");
   });
