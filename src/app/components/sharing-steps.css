@@ -189,7 +189,7 @@
   border-radius: var(--ds-radius-control);
 }
 .sharing-export-actions {
-  grid-template-columns: 44px repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 .sharing-export-actions button {
   width: 100%;
@@ -225,14 +225,19 @@
   white-space: normal;
   overflow-wrap: anywhere;
 }
+/* A sticky thumbnail only makes sense beside, never above, the form. */
+.sharing-layout > .sharing-preview {
+  position: static;
+}
 @media (min-height: 38rem) {
-  .sharing-layout:not([data-inspect]) > .sharing-preview:not(:has(details[open])) {
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    background: var(--card);
-    border-radius: var(--ds-radius-control);
-    padding: 0.25rem 0;
+  @container sharing (min-width: 44rem) {
+    .sharing-layout:not([data-inspect]) > .sharing-preview:not(:has(details[open])) {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: var(--card);
+      border-radius: var(--ds-radius-control);
+    }
   }
 }
 .sharing-surface {
@@ -296,11 +301,6 @@
     margin-top: 0;
   }
 }
-@media (max-width: 767px) and (min-height: 38rem) {
-  .sharing-surface:not([data-scroll-whole]) [data-sharing-body] {
-    scroll-padding-block-start: min(32dvh, 16rem);
-  }
-}
 @media (max-height: 28rem) {
   .sharing-surface {
     overflow-y: auto;
@@ -346,7 +346,7 @@
 }
 
 .sharing-export-actions > button:last-child {
-  grid-column: 2 / -1;
+  grid-column: 1 / -1;
 }
 .sharing-export-actions button {
   flex-wrap: nowrap;
@@ -511,7 +511,7 @@
 }
 @container sharing (min-width: 30em) {
   .sharing-export-actions {
-    grid-template-columns: 44px repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
   .sharing-export-actions > button:last-child {
     grid-column: auto;
@@ -530,4 +530,20 @@
     white-space: normal;
     overflow-wrap: anywhere;
   }
+}
+
+.sharing-export-actions button,
+.sharing-step-navigation button,
+.sharing-final-actions button {
+  min-height: 48px;
+  border: 1px solid var(--border-control);
+  padding: 10px 12px;
+}
+.sharing-export-actions button {
+  flex-direction: row;
+}
+.sharing-final-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: 8px;
 }

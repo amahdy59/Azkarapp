@@ -590,7 +590,7 @@ function DailyEvidenceCardContent({
             aria-label={reminderText(language, "home.shareEvidence")}
             title={reminderText(language, "home.shareEvidence")}
             data-testid="daily-evidence-share"
-            className={`-my-1.5 flex size-11 shrink-0 items-center justify-center rounded-full transition-colors hover:opacity-80 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring motion-reduce:transition-none ${onGlass ? "text-on-media-accent hover:text-on-media" : "text-primary hover:text-foreground"}`}
+            className={`ui-icon-button -my-1.5 flex size-11 shrink-0 items-center justify-center rounded-full transition-colors hover:opacity-80 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring motion-reduce:transition-none ${onGlass ? "text-on-media-accent hover:text-on-media" : "text-primary hover:text-foreground"}`}
           >
             <Share2 size={16} aria-hidden="true" />
           </button>

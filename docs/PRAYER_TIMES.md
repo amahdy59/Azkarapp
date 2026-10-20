@@ -1,5 +1,13 @@
 # Prayer times, location, timezone, and DST
 
+## Next-prayer seconds and interval ring — 2026-10-20, local only
+
+The owner's subsequent approved WebKit restoration repair distinguishes native horizontal-list focus from an active prayer button. Closing details reconciles current scroll without moving focus; real keyboard focus on a prayer button still holds card geometry until it leaves. Horizontal browsing alone cannot leave closed cards stuck condensed at the top. Existing 96px/8px hysteresis, accessible region focusability and native horizontal scrolling remain.
+
+The owner approves a small elapsed-interval ring replacing the clock outline, with localized HH:MM:SS. Mobile, narrow cards and the condensed summary omit the localized remaining-time word; the passive accessible description retains complete meaning. The ring is redundant with text and is hidden from assistive technology; no live region announces each second. This supersedes the summary's earlier no-progress-indicator rule for this small ring only.
+
+The existing model passes current/next dated instants to one visibility-aware clock owned by the next summary card. It computes remaining time from the absolute deadline on each aligned second and resynchronizes after document visibility or horizontal-scroll visibility returns. Hidden/offscreen/expired/unmounted cards do no timer work. Home's minute clock still owns prayer rollover, availability, tracking and other derived state; no prayer calculation runs each second. Both summary copies share that clock. Midnight/DST, calculations, sunrise rules, saved records and reminders remain unchanged. OS/app reduced motion suppresses the brief seconds fade and arc interpolation while preserving accurate immediate numeric updates.
+
 ## Compact overview presentation — 2026-10-18
 
 The owner's follow-up retains the previous icons and full-width temporal pills, requesting only tighter highlighted gaps and modest polish. The row is capped at 52rem with tighter header/footer padding and a 52px footer minimum. Existing visible temporal statuses, next countdown and accessible saved-state descriptions remain unchanged, as do openability, recording, chronology, Friday naming, calculation, reminders and stored data. Horizontal browsing and coordinated sticky collapse are preserved.

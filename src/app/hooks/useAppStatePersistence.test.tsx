@@ -7,6 +7,7 @@ import { useAppStatePersistence } from "./useAppStatePersistence";
 vi.mock("../state", async (original) => ({
   ...(await original<typeof import("../state")>()),
   saveAppState: vi.fn(() => true),
+  createAppStateWriter: () => (snapshot: typeof DEFAULT_APP_STATE) => saveAppState(snapshot),
 }));
 
 describe("debounced application persistence", () => {

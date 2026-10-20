@@ -94,6 +94,30 @@ export interface DailyPathInput {
   dailyPathStartDayKey?: string;
 }
 
+/** Revision-owned index; callers replace it when records or policy inputs change.
+ * Keep all judging in getDailyPathStatus so indexed and individual views agree. */
+export function createDailyPathIndex(input: Omit<DailyPathInput, "dayKey">) {
+  const completions = new Map<string, DailyCollectionCompletion[]>();
+  const prayers = new Map<string, PrayerTrackingRecord[]>();
+  for (const record of input.dailyCompletions) {
+    const day = completions.get(record.dayKey) ?? [];
+    day.push(record);
+    completions.set(record.dayKey, day);
+  }
+  for (const record of input.prayerTracking) {
+    const day = prayers.get(record.dayKey) ?? [];
+    day.push(record);
+    prayers.set(record.dayKey, day);
+  }
+  return (dayKey: string) =>
+    getDailyPathStatus({
+      ...input,
+      dayKey,
+      dailyCompletions: completions.get(dayKey) ?? [],
+      prayerTracking: prayers.get(dayKey) ?? [],
+    });
+}
+
 /**
  * Whether a prayer was prayed in congregation.
  *

@@ -58,3 +58,10 @@ describe("app appearance", () => {
     expect(document.documentElement.style.getPropertyValue("--font-size")).toBe("18px");
   });
 });
+
+it("applies and restores the footer label presentation", () => {
+  applyAppAppearance({ themeMode: "midnight", readerToolLabels: false });
+  expect(document.documentElement.dataset.readerToolLabels).toBe("false");
+  applyAppAppearance({ themeMode: "midnight" });
+  expect(document.documentElement.dataset.readerToolLabels).toBe("true");
+});

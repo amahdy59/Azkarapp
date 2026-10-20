@@ -81,6 +81,7 @@ test.describe("after-prayer tracking", () => {
   test("all five prayer records stay available without bringing recording controls into Progress", async ({ page }) => {
     await openHome(page);
     await page.goto("/#/progress");
+    await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
     const group = page.getByTestId("progress-prayer-group");
     await expect(group.locator("input, select, button")).toHaveCount(0);
     const records = group.getByTestId("prayer-progress-summary").getByRole("listitem");

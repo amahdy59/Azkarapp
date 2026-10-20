@@ -6,6 +6,7 @@ import { VitePWA } from "vite-plugin-pwa";
 import { readFileSync } from "node:fs";
 import { AUDIO_MANIFEST_VERSION } from "./src/app/audio/audioManifest";
 import { ignoreGeneratedWatchPath } from "./scripts/generated-watch-paths";
+import { compactBuildManifest } from "./scripts/compact-build-manifest";
 import reminderManifest from "./src/app/content/homeReminderManifest.json";
 
 /**
@@ -197,6 +198,7 @@ export default defineConfig(({ mode }) => {
       react(),
       tailwindcss(),
       unwrapColorMixGuards(),
+      compactBuildManifest(),
       contentSecurityPolicy(audioBaseUrl, cloudflareApiUrl),
       VitePWA({
         registerType: "prompt",

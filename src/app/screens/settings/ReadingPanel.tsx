@@ -1,5 +1,6 @@
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { Translate, TypeIcon } from "../../components/icons";
+import { ReaderFooterPreview } from "../../components/ReaderFooterPreview";
 import { ChoiceRadioItem } from "../../components/ChoiceRadioItem";
 import { t } from "../../i18n";
 import type { AppLanguage, TextSizeOption, ZikrFontOption } from "../../types";
@@ -20,6 +21,8 @@ export function ReadingPanel({
   zikrFont = "humanist",
   showTranslation,
   showTransliteration,
+  readerToolLabels = true,
+  onReaderToolLabelsChange,
   onTextSizeChange,
   onZikrFontChange,
   onShowTranslationChange,
@@ -32,6 +35,8 @@ export function ReadingPanel({
   zikrFont?: ZikrFontOption;
   showTranslation: boolean;
   showTransliteration: boolean;
+  readerToolLabels?: boolean;
+  onReaderToolLabelsChange?: (value: boolean) => void;
   onTextSizeChange: (value: TextSizeOption) => void;
   onZikrFontChange: (value: ZikrFontOption) => void;
   onShowTranslationChange: (value: boolean) => void;
@@ -130,6 +135,31 @@ export function ReadingPanel({
             {ZIKR_FONT_SAMPLE}
           </p>
           <p className="text-xs text-muted-foreground">{t(language, "settings.readingPreviewHint")}</p>
+        </section>
+        <SectionLabel label={t(language, "settings.readerTools")} />
+        <RadioGroupPrimitive.Root
+          dir={direction}
+          value={readerToolLabels ? "labels" : "icons"}
+          onValueChange={(value) => onReaderToolLabelsChange?.(value === "labels")}
+          className="mx-4 mb-6 grid grid-cols-2 gap-2"
+          aria-label={t(language, "settings.readerTools")}
+        >
+          <ChoiceRadioItem value="labels" className="px-3 py-3">
+            {t(language, "settings.iconsWithLabels")}
+          </ChoiceRadioItem>
+          <ChoiceRadioItem value="icons" className="px-3 py-3">
+            {t(language, "settings.iconsOnly")}
+          </ChoiceRadioItem>
+        </RadioGroupPrimitive.Root>
+        <section
+          className="mx-4 mb-6 rounded-2xl border border-border bg-card p-3"
+          aria-labelledby="reader-footer-preview-title"
+        >
+          <h3 id="reader-footer-preview-title" className="text-sm font-semibold text-foreground">
+            {t(language, "settings.footerPreview")}
+          </h3>
+          <p className="mt-1 text-xs text-muted-foreground">{t(language, "settings.footerPreviewHint")}</p>
+          <ReaderFooterPreview language={language} />
         </section>
         <SectionLabel label={t(language, "settings.reading")} />
         <div className="mx-4 overflow-hidden rounded-3xl border border-border/40 bg-card shadow-raised">

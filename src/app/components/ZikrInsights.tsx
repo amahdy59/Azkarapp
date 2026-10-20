@@ -32,7 +32,7 @@ export function ZikrInsights({
   return (
     <section data-testid="zikr-insights" className="mt-5 space-y-3 border-t border-border pt-4">
       <h3 className="text-base font-bold">{progressText(language, "insights.itemsTitle")}</h3>
-      <p className="text-xs leading-relaxed text-muted-foreground">{progressText(language, "insights.itemsScope")}</p>
+      <p className="progress-help">{progressText(language, "insights.itemsScope")}</p>
       {!groups.length && (
         <p className="text-sm">{progressText(language, equal ? "insights.itemsEqual" : "insights.itemsEarly")}</p>
       )}
@@ -62,7 +62,7 @@ export function ZikrInsights({
                     <a
                       href={routeToHash({ view: "reader", categoryId: row.category, index, routineMode: "complete" })!}
                       aria-label={`${progressText(language, "insights.itemsRead")}: ${title}`}
-                      className="inline-flex min-h-11 items-center rounded-lg py-2 text-sm font-semibold underline underline-offset-4 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                      className="inline-flex min-h-11 items-center rounded-lg py-2 text-sm font-semibold underline underline-offset-4 progress-focus"
                     >
                       {title}
                     </a>

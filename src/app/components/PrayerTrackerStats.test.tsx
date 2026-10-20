@@ -1,3 +1,4 @@
+import { chooseProgressOption } from "../../test/progressSelect";
 import { fireEvent, render, screen, within, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { PrayerTrackerStats } from "./PrayerTrackerStats";
@@ -59,15 +60,16 @@ describe("prayer recording insights", () => {
       "Fajr: 67%; 2 days recorded",
     );
     expect(within(screen.getByTestId("insight-dhuhr")).getByRole("img")).toHaveAccessibleName(/0%; 0 days/);
-    fireEvent.click(screen.getByRole("button", { name: "Sunan Rawātib", exact: true }));
+    await chooseProgressOption(screen.getByRole("combobox", { name: "Practice" }), "rawatib");
+    expect(screen.getByRole("combobox", { name: "Practice" })).toHaveFocus();
     expect(within(screen.getByRole("list")).getAllByRole("img")).toHaveLength(4);
     expect(screen.queryByTestId("insight-asr")).not.toBeInTheDocument();
     expect(within(screen.getByTestId("insight-fajr")).getByRole("img")).toHaveAccessibleName(/33%; 1 day/);
-    fireEvent.click(screen.getByRole("button", { name: "Completed the azkar", exact: true }));
+    await chooseProgressOption(screen.getByRole("combobox", { name: "Practice" }), "adhkar");
     expect(within(screen.getByTestId("insight-dhuhr")).getByRole("img")).toHaveAccessibleName(/33%; 1 day/);
     expect(screen.queryByRole("table")).not.toBeInTheDocument();
-    expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Download prayer data (JSON)" }));
+    expect(screen.getAllByRole("combobox")).toHaveLength(2);
+    fireEvent.click(screen.getByRole("button", { name: "Prayer JSON" }));
     await waitFor(() => expect(saveFileToDevice).toHaveBeenCalled());
     expect(vi.mocked(saveFileToDevice).mock.calls.at(-1)?.[0].name).toBe("prayer-patterns-2026-01-01.json");
     expect(await screen.findByText("Data file saved.")).toBeInTheDocument();

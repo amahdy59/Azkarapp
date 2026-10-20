@@ -226,8 +226,11 @@
       border-bottom: 0 !important;
       box-shadow: none !important;
     }
-    /* One frost layer for Progress header, tabs and date navigation. */
-    html[data-app-material-resolved="glass"]:not(.high-contrast) .progress-screen-controls {
+    /* Progress keeps the scene/color unchanged. Only frost strengthens when
+       records pass behind the title, tabs and date navigation. */
+    html[data-app-material-resolved="glass"]:not(.high-contrast) [data-material-ui] .progress-screen-controls {
+      background: transparent !important;
+      box-shadow: none !important;
       inline-size: calc(100% + 2 * var(--spacing-page));
       margin-inline: calc(-1 * var(--spacing-page));
       padding-inline: var(--spacing-page);
@@ -240,6 +243,15 @@
       border: 0 !important;
       box-shadow: none !important;
     }
+    /* Parent frost cannot mask its own children. Independently scrolling
+       filters need title frost too, with no additional tint or dark fill. */
+    html[data-app-material-resolved="glass"]:not(.high-contrast)
+      .progress-screen-controls
+      .shared-screen-header[data-scrolled="true"] {
+      background: transparent !important;
+      backdrop-filter: var(--glass-chrome-frost) !important;
+      -webkit-backdrop-filter: var(--glass-chrome-frost) !important;
+    }
   }
 }
 .audio-lock-shield {
@@ -251,4 +263,33 @@
 /* Match the resolved page material, including system and high-contrast fallback. */
 html[data-app-material-resolved="glass"]:not(.high-contrast) .mushaf-material-hint {
   display: block;
+}
+
+/* Dropdowns cover functional text, unlike scene-backed cards. Protection must
+   survive nested backdrop roots, missing filters and every theme/layout. */
+html [data-dropdown-surface] {
+  background-color: var(--popover) !important;
+  max-width: calc(100vw - 1rem);
+}
+
+@supports (backdrop-filter: blur(1px)) {
+  @media not (forced-colors: active) {
+    html[data-app-material-resolved="glass"]:not(.high-contrast) [data-dropdown-surface] {
+      background-color: rgb(15 23 42) !important;
+    }
+  }
+}
+
+html [data-dropdown-surface] .accessible-combobox-options[role="listbox"] {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+@media (forced-colors: active) {
+  html [data-dropdown-surface] {
+    background: Canvas !important;
+    color: CanvasText;
+  }
 }

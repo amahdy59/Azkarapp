@@ -1,10 +1,70 @@
+import { chooseProgressOption } from "../../test/progressSelect";
 import { describe, it, expect, vi } from "vitest";
 import { act, render, screen, fireEvent } from "@testing-library/react";
 import { ProgressScreen } from "./ProgressScreen";
 import * as progressDomain from "../progress";
+import * as dashboardDomain from "../progressDashboard";
+import * as dailyPathDomain from "../dailyPath";
 import type { DailyCollectionCompletion, DailyHabitCompletion } from "../types";
 
+function openDetailedContext() {
+  const details = screen.getByTestId("progress-detailed-context") as HTMLDetailsElement;
+  details.open = true;
+  fireEvent(details, new Event("toggle"));
+}
+async function choosePeriod(period: string) {
+  await chooseProgressOption(screen.getAllByRole("combobox")[0]!, period);
+}
+
 describe("ProgressScreen", () => {
+  it("restores focused record controls after delayed native focus scrolling", () => {
+    let nextFrame: FrameRequestCallback | undefined;
+    const request = vi.spyOn(window, "requestAnimationFrame").mockImplementation((callback) => {
+      nextFrame = callback;
+      return 91;
+    });
+    const cancel = vi.spyOn(window, "cancelAnimationFrame").mockImplementation(() => undefined);
+    const { container, unmount } = render(
+      <ProgressScreen
+        dailyCompletions={[]}
+        progressDayStartHour={3}
+        calendarType="gregorian"
+        language="en"
+        direction="ltr"
+        onOpenShareModal={vi.fn()}
+      />,
+    );
+    const viewport = container.querySelector<HTMLElement>(".progress-screen")!;
+    const controls = screen.getByTestId("progress-sticky-controls");
+    const target = screen.getByRole("combobox", { name: "Show trend for" });
+    const controlsBounds = vi
+      .spyOn(controls, "getBoundingClientRect")
+      .mockReturnValue({ top: 0, bottom: 100 } as DOMRect);
+    const targetBounds = vi
+      .spyOn(target, "getBoundingClientRect")
+      .mockImplementation(() => ({ top: 250 - viewport.scrollTop }) as DOMRect);
+    try {
+      viewport.scrollTop = 200;
+      act(() => target.focus());
+      expect(viewport.scrollTop).toBe(134);
+      // Simulate the browser completing its own focus scrolling afterward.
+      viewport.scrollTop = 180;
+      act(() => nextFrame?.(0));
+      expect(viewport.scrollTop).toBe(134);
+      expect(target.getBoundingClientRect().top).toBeGreaterThanOrEqual(controls.getBoundingClientRect().bottom);
+      // A late frame must not scroll the view for a control that lost focus.
+      act(() => target.blur());
+      viewport.scrollTop = 180;
+      act(() => nextFrame?.(0));
+      expect(viewport.scrollTop).toBe(180);
+    } finally {
+      unmount();
+      controlsBounds.mockRestore();
+      targetBounds.mockRestore();
+      request.mockRestore();
+      cancel.mockRestore();
+    }
+  });
   it("refreshes memoized statistics at the configured devotional-day boundary", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date(2026, 9, 20, 2, 59, 30));
@@ -32,6 +92,8 @@ describe("ProgressScreen", () => {
   });
   it("reuses unchanged historical calculations during header scrolling and recomputes changed records", () => {
     const summary = vi.spyOn(progressDomain, "getGardenSummary");
+    const index = vi.spyOn(dashboardDomain, "indexProgressDashboard");
+    const pathIndex = vi.spyOn(dailyPathDomain, "createDailyPathIndex");
     const props = {
       dailyCompletions: [{ dayKey: "2026-08-01", category: "morning", timeZone: "UTC" }] as DailyCollectionCompletion[],
       progressDayStartHour: 3,
@@ -45,12 +107,16 @@ describe("ProgressScreen", () => {
     viewport.style.overflowY = "auto";
     fireEvent.resize(window);
     const initialCalculations = summary.mock.calls.length;
+    const initialIndexes = index.mock.calls.length;
+    expect(pathIndex).toHaveBeenCalledTimes(1);
     expect(initialCalculations).toBeGreaterThan(0);
     fireEvent.scroll(viewport, { target: { scrollTop: 120 } });
     expect(screen.getByTestId("progress-sticky-controls")).toHaveAttribute("data-scrolled", "true");
     fireEvent.scroll(viewport, { target: { scrollTop: 0 } });
     expect(screen.getByTestId("progress-sticky-controls")).not.toHaveAttribute("data-scrolled");
     expect(summary.mock.calls.length).toBe(initialCalculations);
+    expect(index.mock.calls.length).toBe(initialIndexes);
+    expect(pathIndex).toHaveBeenCalledTimes(1);
     rerender(
       <ProgressScreen
         {...props}
@@ -58,7 +124,11 @@ describe("ProgressScreen", () => {
       />,
     );
     expect(summary.mock.calls.length).toBeGreaterThan(initialCalculations);
+    expect(index.mock.calls.length).toBeGreaterThan(initialIndexes);
+    expect(pathIndex).toHaveBeenCalledTimes(2);
     summary.mockRestore();
+    index.mockRestore();
+    pathIndex.mockRestore();
   });
   const mockCompletions: DailyCollectionCompletion[] = [
     { dayKey: "2026-08-01", category: "morning", timeZone: "UTC" },
@@ -85,7 +155,10 @@ describe("ProgressScreen", () => {
       />,
     );
 
-    // Oasis Stage Card
+    expect(screen.getByTestId("progress-overview").children).toHaveLength(4);
+    expect(screen.queryByTestId("oasis-stage-card")).not.toBeInTheDocument();
+    openDetailedContext();
+    // Oasis Stage Card remains available as optional context.
     expect(screen.getByTestId("oasis-stage-card")).toBeInTheDocument();
     expect(screen.getByTestId("oasis-stage-card")).not.toHaveAttribute("open");
     expect(screen.getByRole("heading", { name: "كيف تُضاف النخلة", hidden: true })).toBeInTheDocument();
@@ -134,6 +207,8 @@ describe("ProgressScreen", () => {
       />,
     );
 
+    expect(screen.getByRole("heading", { name: "Your recorded progress" })).toBeInTheDocument();
+    openDetailedContext();
     expect(screen.getByTestId("oasis-stage-card")).toBeInTheDocument();
     expect(screen.getByText("Garden and past milestones")).toBeInTheDocument();
     expect(screen.getByText("7-Day Rhythm")).toBeInTheDocument();
@@ -157,14 +232,15 @@ describe("ProgressScreen", () => {
         onTogglePrayerTracking={onTogglePrayerTracking}
       />,
     );
-    expect(container.querySelector("input, select, textarea")).toBeNull();
+    openDetailedContext();
+    expect(container.querySelector('input[type="checkbox"], textarea')).toBeNull();
     expect(screen.queryByRole("button", { name: /ورد القرآن/ })).not.toBeInTheDocument();
     expect(screen.getByTestId("prayer-progress-summary")).toBeInTheDocument();
     expect(onToggleDailyHabit).not.toHaveBeenCalled();
     expect(onTogglePrayerTracking).not.toHaveBeenCalled();
   });
 
-  it("switches tabs between Day, Week, Month, and Year", async () => {
+  it("switches the shared range between Day, Week, Month, and Year", async () => {
     render(
       <ProgressScreen
         dailyCompletions={mockCompletions}
@@ -178,9 +254,9 @@ describe("ProgressScreen", () => {
     );
 
     // Switch to Week tab
-    const weekTab = screen.getByRole("tab", { name: "أسبوع" });
-    fireEvent.click(weekTab);
-    expect(weekTab).toHaveAttribute("aria-selected", "true");
+    openDetailedContext();
+    await choosePeriod("week");
+    expect(screen.getByRole("combobox", { name: "الفترة" })).toHaveAttribute("data-progress-value", "week");
     // Oasis stage card is exclusive to Day view
     expect(screen.queryByTestId("oasis-stage-card")).not.toBeInTheDocument();
     expect(await screen.findByRole("heading", { name: "إيقاع أذكارك" })).toBeInTheDocument();
@@ -188,19 +264,16 @@ describe("ProgressScreen", () => {
     expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
 
     // Switch to Month tab
-    const monthTab = screen.getByRole("tab", { name: "شهر" });
-    fireEvent.click(monthTab);
-    expect(monthTab).toHaveAttribute("aria-selected", "true");
+    await choosePeriod("month");
+    expect(screen.getByRole("combobox", { name: "الفترة" })).toHaveAttribute("data-progress-value", "month");
 
     // Switch to Year tab
-    const yearTab = screen.getByRole("tab", { name: "سنة" });
-    fireEvent.click(yearTab);
-    expect(yearTab).toHaveAttribute("aria-selected", "true");
+    await choosePeriod("year");
+    expect(screen.getByRole("combobox", { name: "الفترة" })).toHaveAttribute("data-progress-value", "year");
 
     // Switch back to Day tab
-    const dayTab = screen.getByRole("tab", { name: "يوم" });
-    fireEvent.click(dayTab);
-    expect(dayTab).toHaveAttribute("aria-selected", "true");
+    await choosePeriod("day");
+    expect(screen.getByRole("combobox", { name: "الفترة" })).toHaveAttribute("data-progress-value", "day");
     expect(screen.getByTestId("oasis-stage-card")).toBeInTheDocument();
   });
 
@@ -217,11 +290,12 @@ describe("ProgressScreen", () => {
         onPrayerResume={onPrayerResume}
       />,
     );
+    openDetailedContext();
     const summary = screen.getByTestId("prayer-progress-summary");
     expect(summary.querySelector("details, table")).toBeNull();
     expect(summary.querySelectorAll("li")).toHaveLength(5);
     expect(screen.queryByRole("button", { name: "Open Fajr" })).not.toBeInTheDocument();
-    expect(container.querySelector("input, select, textarea")).toBeNull();
+    expect(container.querySelector('input[type="checkbox"], textarea')).toBeNull();
     expect(onPrayerResume).not.toHaveBeenCalled();
   });
 
@@ -238,7 +312,8 @@ describe("ProgressScreen", () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole("tab", { name: "Week" }));
+    openDetailedContext();
+    await choosePeriod("week");
     expect(await screen.findByText("Your seven-day intention")).toBeInTheDocument();
   });
 
@@ -255,11 +330,12 @@ describe("ProgressScreen", () => {
         onTogglePrayerTracking={onTogglePrayerTracking}
       />,
     );
+    openDetailedContext();
     fireEvent.click(screen.getByRole("button", { name: "Previous period" }));
-    expect(container.querySelector("input, select, textarea")).toBeNull();
+    expect(container.querySelector('input[type="checkbox"], textarea')).toBeNull();
     expect(screen.getByTestId("prayer-progress-summary")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Next period" }));
-    expect(container.querySelector("input, select, textarea")).toBeNull();
+    expect(container.querySelector('input[type="checkbox"], textarea')).toBeNull();
     expect(onTogglePrayerTracking).not.toHaveBeenCalled();
   });
 });

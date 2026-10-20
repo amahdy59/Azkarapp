@@ -1,3 +1,4 @@
+import { chooseProgressOption } from "../../test/progressSelect";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { RoutineInsights } from "./RoutineInsights";
@@ -31,7 +32,7 @@ describe("routine insights", () => {
     const trends = within(screen.getByTestId("routine-trends"));
     expect(trends.getAllByRole("img")).toHaveLength(1);
     expect(trends.getByTestId("recording-time-line")).toBeInTheDocument();
-    fireEvent.click(trends.getByRole("button", { name: "Morning", exact: true }));
+    await chooseProgressOption(trends.getByRole("combobox", { name: "Routine" }), "morning");
     expect(trends.getByRole("img")).toHaveAccessibleName(/Remembrance over time.*Morning/);
     expect(trends.getByTestId("timeline-readout")).toHaveTextContent("100%");
     expect(screen.getByText(/Older item history is unavailable/)).toBeVisible();
@@ -40,7 +41,7 @@ describe("routine insights", () => {
       "#/settings/notifications",
     );
     expect(screen.queryByRole("table")).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Download routine data (JSON)" }));
+    fireEvent.click(screen.getByRole("button", { name: "Azkar JSON" }));
     expect(await screen.findByText("Data file saved.")).toBeVisible();
     const file = vi.mocked(saveFileToDevice).mock.calls.at(-1)![0];
     expect(file.name).toBe("azkar-patterns-2026-10-01.json");
@@ -51,8 +52,8 @@ describe("routine insights", () => {
     render(<RoutineInsights {...props} period="week" records={[]} weeklyGoalDays={4} isQuranDoneForDay={() => true} />);
     expect(screen.getByText("Your seven-day intention")).toBeVisible();
     expect(screen.getByText("Quran")).toBeVisible();
-    fireEvent.click(screen.getByRole("button", { name: "Download routine data (JSON)" }));
+    fireEvent.click(screen.getByRole("button", { name: "Azkar JSON" }));
     expect(await screen.findByText(/could not be saved/)).toBeVisible();
-    expect(screen.getByRole("button", { name: "Download routine data (JSON)" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Azkar JSON" })).toBeEnabled();
   });
 });

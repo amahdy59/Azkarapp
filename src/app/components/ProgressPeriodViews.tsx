@@ -228,12 +228,10 @@ export function ProgressWeekView({
 
         {/* Routine comparison disclosure inside the unified card */}
         <details className="mt-4 border-t border-border pt-1">
-          <summary className="min-h-11 cursor-pointer py-3 text-sm font-bold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+          <summary className="min-h-11 cursor-pointer py-3 text-sm font-bold text-foreground progress-focus">
             {t(language, "progressTrend.compareRoutines")}
           </summary>
-          <p className="mb-4 text-xs leading-relaxed text-muted-foreground">
-            {t(language, "progressTrend.elapsedDaysHint")}
-          </p>
+          <p className="mb-4 progress-help">{t(language, "progressTrend.elapsedDaysHint")}</p>
           <div className="space-y-4">
             {(["morning", "evening", "sleep"] as const).map((routine) => {
               const elapsed = weekStats.days.filter((day) => day.dayKey <= todayKey);
@@ -410,7 +408,7 @@ export function ProgressMonthView({
             type="button"
             aria-pressed={monthView === view}
             onClick={() => setMonthView(view)}
-            className={`min-h-11 rounded-xl border px-4 py-2 text-sm font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${monthView === view ? "border-primary bg-primary/15 text-foreground" : "border-border bg-card text-muted-foreground"}`}
+            className={`min-h-11 rounded-xl border px-4 py-2 text-sm font-bold progress-focus ${monthView === view ? "border-primary bg-primary/15 text-foreground" : "border-border bg-card text-muted-foreground"}`}
           >
             {t(language, view === "trend" ? "progressTrend.trendView" : "progressTrend.calendarDetails")}
           </button>

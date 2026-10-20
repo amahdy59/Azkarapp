@@ -47,10 +47,7 @@ for (const [language, width] of [
           page.getByTestId(route === "home" ? "home-utility-header" : "progress-sticky-controls"),
         ).toHaveAttribute("data-scrolled", "true");
         if (route === "progress")
-          await expect(page.getByTestId("progress-sticky-controls")).toHaveCSS(
-            "background-color",
-            "rgba(15, 23, 42, 0.36)",
-          );
+          await expect(page.getByTestId("progress-sticky-controls")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
         await capture(route + "-scrolled");
       }
     }
@@ -160,8 +157,13 @@ for (const [language, width] of [
         node.scrollTop = 120;
       });
       await expect(header).toHaveAttribute("data-scrolled", "true");
-      await expect(header).toHaveCSS("background-color", "rgba(15, 23, 42, 0.36)");
-      expect(await material()).not.toEqual(restingMaterial);
+      if (route === "progress") {
+        await expect(header).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+        expect(await material()).toEqual(restingMaterial);
+      } else {
+        await expect(header).toHaveCSS("background-color", "rgba(15, 23, 42, 0.36)");
+        expect(await material()).not.toEqual(restingMaterial);
+      }
       await expect(header).toHaveCSS("backdrop-filter", "blur(32px) saturate(1.35)");
       if (route === "progress") {
         await expect(header.locator(".shared-screen-header")).toHaveCSS("backdrop-filter", "none");
@@ -208,7 +210,7 @@ for (const [language, width] of [
         }, top);
         if (elevated) await expect(header).toHaveAttribute("data-scrolled", "true");
         else await expect(header).not.toHaveAttribute("data-scrolled");
-        if (elevated) expect(await material()).not.toEqual(restingMaterial);
+        if (elevated && route !== "progress") expect(await material()).not.toEqual(restingMaterial);
         else expect(await material()).toEqual(restingMaterial);
         await expect(header).toHaveCSS("backdrop-filter", elevated ? "blur(32px) saturate(1.35)" : "none");
       }

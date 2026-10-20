@@ -855,3 +855,35 @@ describe("explicit Home material", () => {
     }
   });
 });
+
+describe("reader footer label preference", () => {
+  it("defaults legacy and invalid values to labelled controls and retains icons-only", () => {
+    expect(normalizeAppState({}).settings.readerToolLabels).toBe(true);
+    expect(normalizeAppState({ settings: { readerToolLabels: "false" } }).settings.readerToolLabels).toBe(true);
+    const icons = normalizeAppState({ settings: { readerToolLabels: false } });
+    expect(icons.settings.readerToolLabels).toBe(false);
+    expect(
+      mergeAppStates(icons, { settings: { ...DEFAULT_APP_STATE.settings, readerToolLabels: true } }).settings
+        .readerToolLabels,
+    ).toBe(true);
+    const legacy = { ...DEFAULT_APP_STATE.settings };
+    delete legacy.readerToolLabels;
+    expect(mergeAppStates(icons, { settings: legacy }).settings.readerToolLabels).toBe(false);
+    expect(
+      mergeAppStates(DEFAULT_APP_STATE, { settings: { ...legacy, readerToolLabels: false } }).settings.readerToolLabels,
+    ).toBe(false);
+    saveAppState(icons);
+    expect(loadAppState().settings.readerToolLabels).toBe(false);
+  });
+});
+
+it("remembers English main text locally without accepting another device's preference", () => {
+  expect(normalizeAppState({}).settings.readerMeaningOnly).toBe(false);
+  expect(normalizeAppState({ settings: { readerMeaningOnly: "true" } }).settings.readerMeaningOnly).toBe(false);
+  const local = normalizeAppState({ settings: { readerMeaningOnly: true } });
+  expect(saveAppState(local)).toBe(true);
+  expect(loadAppState().settings.readerMeaningOnly).toBe(true);
+  expect(mergeAppStates(local, DEFAULT_APP_STATE).settings.readerMeaningOnly).toBe(true);
+  expect(mergeAppStates(DEFAULT_APP_STATE, local).settings.readerMeaningOnly).toBe(false);
+  expect(local.settings.readerMeaningOnly).toBe(true);
+});

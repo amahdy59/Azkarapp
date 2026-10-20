@@ -44,6 +44,8 @@ export function SettingsScreen({
   textSize,
   showTranslation,
   showTransliteration,
+  readerToolLabels = true,
+  onReaderToolLabelsChange,
   highContrast,
   boldText,
   reduceMotion,
@@ -329,6 +331,8 @@ export function SettingsScreen({
             zikrFont={zikrFont}
             showTranslation={showTranslation}
             showTransliteration={showTransliteration}
+            readerToolLabels={readerToolLabels}
+            onReaderToolLabelsChange={onReaderToolLabelsChange}
             onTextSizeChange={onTextSizeChange}
             onZikrFontChange={onZikrFontChange}
             onShowTranslationChange={onShowTranslationChange}

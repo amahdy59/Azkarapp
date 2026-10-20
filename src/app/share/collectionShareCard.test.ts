@@ -1,9 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import * as quranGlyphs from "./quranGlyphs";
 import {
   COLLECTION_STORY_HEIGHT,
   COLLECTION_STORY_WIDTH,
   generateAllCollectionStoryPages,
   generateCollectionStoryPage,
+  createCollectionSharePreparation,
+  getCompatibleShareFormats,
   renderCollectionStoryPage,
   type CollectionStoryPageInput,
 } from "./collectionShareCard";
@@ -75,6 +78,129 @@ beforeEach(() => {
 });
 
 describe("collectionShareCard", () => {
+  it("reuses exact glyph preparation across format checking and image generation only within one request", async () => {
+    const { canvas } = createMockCanvas();
+    const original = document.createElement.bind(document);
+    vi.spyOn(document, "createElement").mockImplementation(((tag: string) =>
+      tag === "canvas" ? canvas : original(tag)) as typeof document.createElement);
+    const prepare = vi.spyOn(quranGlyphs, "prepareQuranGlyphs").mockResolvedValue(undefined);
+    const items = [{ id: "quran", arabicText: "قُلْ هُوَ اللَّهُ أَحَدٌ", canonicalKey: "quran-112", quranText: true }];
+    const preparation = createCollectionSharePreparation();
+    const compatible = await getCompatibleShareFormats(items, {}, true, { preparation });
+    const pages = await generateAllCollectionStoryPages({
+      collectionTitle: "Test",
+      allItems: items,
+      single: true,
+      format: compatible[0],
+      preparation,
+    });
+    expect(pages.length).toBeGreaterThan(0);
+    expect(prepare).toHaveBeenCalledTimes(1);
+    await preparation.prepareGlyphs(items[0]!.arabicText, "another-canonical-key");
+    await preparation.prepareGlyphs("changed text", "quran-112");
+    expect(prepare).toHaveBeenCalledTimes(3);
+    await createCollectionSharePreparation().prepareGlyphs(items[0]!.arabicText, "quran-112");
+    expect(prepare).toHaveBeenCalledTimes(4);
+  });
+
+  it("stops cancelled format checking after pending glyphs without allocating a layout canvas", async () => {
+    const canvas = vi.spyOn(document, "createElement");
+    let finish!: (value: undefined) => void;
+    vi.spyOn(quranGlyphs, "prepareQuranGlyphs").mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          finish = resolve;
+        }),
+    );
+    const controller = new AbortController();
+    const checking = getCompatibleShareFormats([{ id: "quran", arabicText: "قُلْ", quranText: true }], {}, true, {
+      signal: controller.signal,
+    });
+    controller.abort();
+    finish(undefined);
+    await expect(checking).rejects.toMatchObject({ name: "AbortError" });
+    expect(canvas).not.toHaveBeenCalledWith("canvas");
+  });
+
+  it.each(["before preparation", "while fonts load"])(
+    "stops format checking %s without starting layout",
+    async (stage) => {
+      const originalFonts = Object.getOwnPropertyDescriptor(document, "fonts");
+      let finish!: () => void;
+      const ready = new Promise<void>((resolve) => {
+        finish = resolve;
+      });
+      const load = vi.fn(() => ready);
+      Object.defineProperty(document, "fonts", { configurable: true, value: { ready, load } });
+      const canvas = vi.spyOn(document, "createElement");
+      const controller = new AbortController();
+      try {
+        if (stage === "before preparation") controller.abort();
+        const checking = getCompatibleShareFormats(SAMPLE_PAGE.items, {}, false, { signal: controller.signal });
+        controller.abort();
+        finish();
+        await expect(checking).rejects.toMatchObject({ name: "AbortError" });
+        expect(canvas).not.toHaveBeenCalledWith("canvas");
+        if (stage === "before preparation") expect(load).not.toHaveBeenCalled();
+      } finally {
+        if (originalFonts) Object.defineProperty(document, "fonts", originalFonts);
+        else Reflect.deleteProperty(document, "fonts");
+      }
+    },
+  );
+  it("skips canvas/layout work when cancelled during glyph preparation", async () => {
+    const createElement = vi.spyOn(document, "createElement");
+    let finishGlyphs!: (value: undefined) => void;
+    const prepare = vi
+      .spyOn(quranGlyphs, "prepareQuranGlyphs")
+      .mockImplementation(() => new Promise((resolve) => (finishGlyphs = resolve)));
+    const controller = new AbortController();
+    const generating = generateAllCollectionStoryPages({
+      collectionTitle: "Test",
+      allItems: [{ id: "test", arabicText: "Test", quranText: true }],
+      signal: controller.signal,
+    });
+    expect(prepare).toHaveBeenCalledTimes(1);
+    controller.abort();
+    finishGlyphs(undefined);
+    await expect(generating).rejects.toMatchObject({ name: "AbortError" });
+    expect(createElement).not.toHaveBeenCalledWith("canvas");
+    expect(URL.createObjectURL).not.toHaveBeenCalled();
+  });
+  for (const stage of ["before preparation", "while fonts load"]) {
+    it(`skips canvas/layout work when cancelled ${stage}`, async () => {
+      const { canvas } = createMockCanvas();
+      const originalCreateElement = document.createElement.bind(document);
+      const createElement = vi
+        .spyOn(document, "createElement")
+        .mockImplementation(((tagName: string) =>
+          tagName === "canvas" ? canvas : originalCreateElement(tagName)) as typeof document.createElement);
+      const originalFonts = Object.getOwnPropertyDescriptor(document, "fonts");
+      let finishFonts!: () => void;
+      const ready = new Promise<void>((resolve) => (finishFonts = resolve));
+      const load = vi.fn(() => ready);
+      Object.defineProperty(document, "fonts", { configurable: true, value: { load, ready } });
+      const controller = new AbortController();
+      try {
+        if (stage === "before preparation") controller.abort();
+        const generating = generateAllCollectionStoryPages({
+          collectionTitle: SAMPLE_PAGE.collectionTitle,
+          allItems: SAMPLE_PAGE.items,
+          signal: controller.signal,
+        });
+        if (stage === "while fonts load") expect(load).toHaveBeenCalled();
+        controller.abort();
+        finishFonts();
+        await expect(generating).rejects.toMatchObject({ name: "AbortError" });
+        expect(createElement).not.toHaveBeenCalledWith("canvas");
+        expect(URL.createObjectURL).not.toHaveBeenCalled();
+        if (stage === "before preparation") expect(load).not.toHaveBeenCalled();
+      } finally {
+        if (originalFonts) Object.defineProperty(document, "fonts", originalFonts);
+        else Reflect.deleteProperty(document, "fonts");
+      }
+    });
+  }
   it("balances short summaries without moving devotional defaults, text or footer", () => {
     const { canvas, context } = createMockCanvas();
     const originalCreateElement = document.createElement.bind(document);

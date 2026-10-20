@@ -27,17 +27,14 @@
 .reader-tools-disclosure {
   display: contents;
 }
-.reader-tools-row .devotional-secondary-action {
+.reader-tools-row [data-press-compact] {
   flex: 0 0 auto;
   width: auto;
-  min-width: 44px;
   max-width: 100%;
-  min-height: 44px;
   padding: 10px 12px;
   gap: 6px;
-  background: transparent;
 }
-.reader-tools-row .devotional-secondary-action > span {
+.reader-tools-row [data-press-compact] > span {
   white-space: normal;
   overflow: visible;
   overflow-wrap: anywhere;
@@ -58,22 +55,49 @@
 .reader-text-scroll .reading-measure > div {
   min-height: 100%;
 }
-.reader-tool-short-label {
+/* Four distinct, generous targets; labels use each column's natural height. */
+.reader-tools-row {
+  --control-pressed-scale: var(--motion-scale-pressed);
+  gap: 12px;
+}
+.reader-tools-row [data-press-compact] {
+  min-width: 52px;
+  min-height: 52px;
+}
+html[data-reader-tool-labels="false"] .reader-tools-row {
+  --control-pressed-scale: var(--motion-scale-pressed-compact);
+}
+html[data-reader-tool-labels="false"] .reader-tools-row [data-press-compact] {
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  gap: 0;
+}
+html[data-reader-tool-labels="false"] .reader-tools-row .reader-tool-label {
   display: none;
 }
-
 @container reader-footer (max-width: 37.5rem) {
-  .reader-tools-row .devotional-secondary-action {
-    width: 44px;
-    height: 44px;
-    padding: 0;
-    gap: 0;
+  html:not([data-reader-tool-labels="false"]) .reader-tools-row {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 8px;
   }
-  .reader-tools-row .devotional-secondary-action > span {
-    display: none;
+  html:not([data-reader-tool-labels="false"]) .reader-tools-row [data-press-compact] {
+    flex-direction: column;
+    min-width: 0;
+    min-height: 64px;
+    padding: 8px 4px;
+    border-radius: var(--ds-radius-control);
   }
-  .reader-tools-row .devotional-secondary-action > .reader-tools-chevron {
-    display: flex;
+  .reader-tools-row .reader-tool-label {
+    font-size: 0.875rem;
+  }
+}
+/* Respect enlarged text rather than squeezing four labels into tiny cells. */
+@container reader-footer (max-width: 14rem) {
+  html:not([data-reader-tool-labels="false"]) .reader-tools-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -89,7 +113,7 @@
   display: block;
   flex-shrink: 0;
 }
-.reader-session-footer .devotional-secondary-action > span {
+.reader-session-footer [data-press-compact] > span {
   line-height: 1.25;
 }
 
@@ -170,4 +194,17 @@
 [data-reading-focus="true"] [data-reading-chrome],
 [data-reading-focus="true"] [data-reading-shortcuts] {
   display: none;
+}
+
+.reader-footer-composition[data-focus-mode="true"] .reader-tools-row {
+  display: flex;
+}
+
+.reader-footer-preview-stage {
+  container: reader-footer / inline-size;
+  min-width: 0;
+  pointer-events: none;
+}
+.reader-footer-preview-stage .reader-tools-row [data-press-compact] {
+  opacity: 1;
 }

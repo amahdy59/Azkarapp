@@ -63,6 +63,7 @@ function DropdownMenuContent({
     <DropdownMenuPrimitive.Portal>
       <DropdownMenuPrimitive.Content
         data-slot="dropdown-menu-content"
+        data-dropdown-surface=""
         sideOffset={sideOffset}
         collisionPadding={collisionPadding}
         className={cn(
@@ -256,6 +257,7 @@ function DropdownMenuSubContent({
   return (
     <DropdownMenuPrimitive.SubContent
       data-slot="dropdown-menu-sub-content"
+      data-dropdown-surface=""
       className={cn(
         menuSurface,
         "origin-(--radix-dropdown-menu-content-transform-origin)",

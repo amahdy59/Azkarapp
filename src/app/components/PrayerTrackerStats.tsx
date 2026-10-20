@@ -8,7 +8,8 @@ import { t } from "../i18n";
 import { progressText } from "../i18n/progressInsights";
 import { saveFileToDevice } from "../share/shareDispatcher";
 import { RecordingInsights } from "./RecordingInsights";
-import { Check } from "./icons";
+import { BarChart3 } from "./icons";
+import { ProgressSelectField } from "./ProgressSelectField";
 import { RecordingTimeline } from "./RecordingTimeline";
 import { PeriodComparison } from "./PeriodComparison";
 
@@ -107,34 +108,39 @@ export function PrayerTrackerStats({
   }
   return (
     <div className="space-y-5 px-4 pb-4 sm:px-5" data-testid="prayer-comparison">
-      <p className="text-xs leading-relaxed text-muted-foreground" data-testid="prayer-coverage-hint">
+      <p className="progress-help" data-testid="prayer-coverage-hint">
         {progressText(language, "insights.coverage", { days: formatNumerals(range.days, language) })}
       </p>
-      <div role="group" aria-label={t(language, "progress.comparePrayerMetric")} className="flex flex-wrap gap-2">
-        {METRICS.map((value) => (
-          <button
-            key={value}
-            type="button"
-            aria-pressed={metric === value}
-            onClick={() => setMetric(value)}
-            className={`min-h-11 rounded-xl border px-3 py-2 text-xs font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${metric === value ? "border-primary bg-primary/10 text-foreground" : "border-border text-muted-foreground"}`}
-          >
-            <span className="inline-flex items-center gap-2">
-              <Check size={14} aria-hidden="true" className={metric === value ? "" : "invisible"} />
-              {t(language, LABELS[value])}
-            </span>
-          </button>
-        ))}
-      </div>
       <div role="status" aria-atomic="true" className="sr-only">
         {t(language, LABELS[metric])}
       </div>
       <RecordingTimeline
-        key={metric}
         series={timelineSeries}
         language={language}
         period={activeTab}
-        title={`${progressText(language, "insights.prayerTimeline")} · ${t(language, LABELS[metric])}`}
+        title={progressText(language, "insights.prayerTimeline")}
+        seriesLabel={progressText(language, "insights.prayerFilter")}
+        leadingControl={
+          <ProgressSelectField
+            label={progressText(language, "insights.practiceFilter")}
+            language={language}
+            icon={BarChart3}
+            className="max-w-xs"
+            value={metric}
+            onChange={setMetric}
+            options={METRICS.map((value) => ({
+              value,
+              label: progressText(
+                language,
+                value === "fard"
+                  ? "insights.practiceFard"
+                  : value === "rawatib"
+                    ? "insights.practiceRawatib"
+                    : "insights.practiceAdhkar",
+              ),
+            }))}
+          />
+        }
         testId="prayer-trends"
       />
       <PeriodComparison
@@ -157,7 +163,7 @@ export function PrayerTrackerStats({
         practice="prayer"
       />
       <details className="text-xs text-muted-foreground">
-        <summary className="min-h-11 cursor-pointer py-3 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+        <summary className="min-h-11 cursor-pointer py-3 progress-focus">
           {progressText(language, "insights.aboutRecords")}
         </summary>
         <p>
@@ -170,7 +176,7 @@ export function PrayerTrackerStats({
           type="button"
           disabled={exportState === "saving"}
           onClick={() => void download()}
-          className="min-h-11 rounded-lg px-3 text-sm font-semibold text-foreground underline underline-offset-4 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-50"
+          className="progress-export"
         >
           {progressText(language, "insights.exportPrayers")}
         </button>

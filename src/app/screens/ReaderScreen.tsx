@@ -8,6 +8,7 @@ import {
   useEffect,
   useLayoutEffect,
   useRef,
+  useId,
   useState,
 } from "react";
 import "../../styles/animations/ZikrAnimations.css";
@@ -49,6 +50,7 @@ import {
   RefreshCw,
   Share2,
   Keyboard,
+  Translate,
 } from "../components/icons";
 import { t } from "../i18n";
 import { shouldReduceMotion, vibrateIfEnabled } from "../motionPreferences";
@@ -156,6 +158,8 @@ export function ReaderScreen({
   reduceMotion = false,
   showTranslation,
   showTransliteration,
+  readerMeaningOnly,
+  onReaderMeaningOnlyChange,
   textSize,
   onTextSizeChange,
   savedZikrIds,
@@ -207,6 +211,8 @@ export function ReaderScreen({
   reduceMotion?: boolean;
   showTranslation: boolean;
   showTransliteration: boolean;
+  readerMeaningOnly?: boolean;
+  onReaderMeaningOnlyChange?: (value: boolean) => void;
   textSize: TextSizeOption;
   onTextSizeChange: (value: TextSizeOption) => void;
   savedZikrIds: Set<string>;
@@ -290,6 +296,10 @@ export function ReaderScreen({
   const longSurah = isLongSurah(z);
   /** A surah short enough to be read here rather than in the Mushaf view. */
   const showSurahChrome = Boolean(z?.isSurah) && !longSurah;
+  const [localMeaningOnly, setLocalMeaningOnly] = useState(false);
+  const translationOnly = readerMeaningOnly ?? localMeaningOnly;
+  const readingRegionId = useId();
+  const showEnglishOnly = !isArabic && translationOnly && Boolean(z?.translation) && !longSurah;
   const [immersiveOpen, setImmersiveOpen] = useState(false);
   const restoreAudioFocusRef = useRef(false);
   useLayoutEffect(() => {
@@ -743,6 +753,34 @@ export function ReaderScreen({
       .trim();
   }
 
+  const renderReadingLanguageControl = () =>
+    !isArabic && !longSurah && z.translation ? (
+      <div className="reader-language-toolbar" data-prevent-count="true">
+        <button
+          type="button"
+          data-testid="reader-language-toggle"
+          aria-controls={readingRegionId}
+          onClick={(event) => {
+            event.stopPropagation();
+            setLocalMeaningOnly(!translationOnly);
+            onReaderMeaningOnlyChange?.(!translationOnly);
+            if (readingScrollRef.current) readingScrollRef.current.scrollTop = 0;
+          }}
+          className="inline-flex min-h-11 max-w-full items-center justify-center gap-2 rounded-xl border border-border-control bg-card px-4 py-2 text-label font-semibold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        >
+          <Translate size={18} className="shrink-0" aria-hidden="true" />
+          <span className="inline-grid min-w-0 [overflow-wrap:anywhere]">
+            <span className="col-start-1 row-start-1">
+              {t(language, showEnglishOnly ? "reader.showArabic" : "reader.showEnglishMeaning")}
+            </span>
+            <span className="invisible col-start-1 row-start-1" aria-hidden="true">
+              {t(language, showEnglishOnly ? "reader.showEnglishMeaning" : "reader.showArabic")}
+            </span>
+          </span>
+        </button>
+      </div>
+    ) : null;
+
   const renderReadingContent = () => (
     <article
       className={`w-full px-4 flex flex-col items-center justify-center text-center bg-transparent ${longSurah ? "" : "cursor-pointer touch-manipulation"}`}
@@ -811,47 +849,63 @@ export function ReaderScreen({
           {/* Short surahs keep their canonical Quran identity and text, without a
               decorative card competing with the passage. Long surahs open in the
               Mushaf view instead. */}
-          {showSurahChrome && <QuranSurahHeader zikr={z} language={language} />}
-
-          <div
-            className={showSurahChrome ? "w-full max-w-[42rem]" : "contents"}
-            data-testid={showSurahChrome ? "canonical-surah-passage" : undefined}
-          >
-            {z.isSurah && <QuranPrelude zikr={z} className="pointer-events-none" />}
-
-            {isQuranicText ? (
-              <QuranWordText
-                text={displayArabicText}
-                meanings={allWordMeanings}
-                showMeanings={showDifficultWords}
-                language={language}
-                style={{
-                  fontFamily: readingFontFamily,
-                  fontSize: readingFontSize,
-                  ...(isQuranicText ? QURAN_TEXT_STYLE : {}),
-                }}
-                onSelectMeanings={setWordMeaningSelection}
-                activeWordId={activeWordId}
-                canonicalKey={z.canonicalKey}
-              />
-            ) : (
+          {showEnglishOnly ? (
+            <section lang="en" dir="ltr" aria-label={t(language, "reader.translationLabel")}>
+              <h2 className="mb-3 text-label font-bold text-muted-foreground">
+                {t(language, "reader.translationLabel")}
+              </h2>
               <p
-                className="zikr-text pointer-events-none text-center font-medium leading-[1.85] text-foreground"
-                data-testid="zikr-text"
-                dir="rtl"
-                lang="ar"
-                style={{
-                  fontFamily: readingFontFamily,
-                  fontSize: readingFontSize,
-                  ...(isQuranicText ? QURAN_TEXT_STYLE : {}),
-                }}
+                data-testid="reader-main-translation"
+                className="text-center leading-relaxed text-foreground"
+                style={{ fontSize: readingFontSize }}
               >
-                {displayArabicText}
+                {z.translation}
               </p>
-            )}
-          </div>
+            </section>
+          ) : (
+            <>
+              {showSurahChrome && <QuranSurahHeader zikr={z} language={language} />}
 
-          {!isArabic && (showTranslation || showTransliteration) && (
+              <div
+                className={showSurahChrome ? "w-full max-w-[42rem]" : "contents"}
+                data-testid={showSurahChrome ? "canonical-surah-passage" : undefined}
+              >
+                {z.isSurah && <QuranPrelude zikr={z} className="pointer-events-none" />}
+
+                {isQuranicText ? (
+                  <QuranWordText
+                    text={displayArabicText}
+                    meanings={allWordMeanings}
+                    showMeanings={showDifficultWords}
+                    language={language}
+                    style={{
+                      fontFamily: readingFontFamily,
+                      fontSize: readingFontSize,
+                      ...(isQuranicText ? QURAN_TEXT_STYLE : {}),
+                    }}
+                    onSelectMeanings={setWordMeaningSelection}
+                    activeWordId={activeWordId}
+                    canonicalKey={z.canonicalKey}
+                  />
+                ) : (
+                  <p
+                    className="zikr-text pointer-events-none text-center font-medium leading-[1.85] text-foreground"
+                    data-testid="zikr-text"
+                    dir="rtl"
+                    lang="ar"
+                    style={{
+                      fontFamily: readingFontFamily,
+                      fontSize: readingFontSize,
+                      ...(isQuranicText ? QURAN_TEXT_STYLE : {}),
+                    }}
+                  >
+                    {displayArabicText}
+                  </p>
+                )}
+              </div>
+            </>
+          )}
+          {!showEnglishOnly && !isArabic && (showTranslation || showTransliteration) && (
             <div className="mt-5 space-y-4 border-t border-border pt-4 text-center">
               {showTranslation && z.translation && (
                 <section aria-labelledby="reader-translation-title">
@@ -1420,6 +1474,7 @@ export function ReaderScreen({
       data-zikr-id={z.id}
       data-counting-mode={longSurah ? "counter-only" : "canvas"}
       data-reader-layout={isDesktopReader ? "desktop" : "mobile"}
+      data-reader-scroll-recovery={!showMushaf && !isDesktopReader ? "true" : undefined}
       dir={direction}
       data-reader-category={catId}
       data-reading-focus={focusMode && !showMushaf ? "true" : "false"}
@@ -1670,9 +1725,11 @@ export function ReaderScreen({
                     </div>
                   )}
                   <div ref={readerMainRef} className="flex flex-1 min-h-0 flex-col justify-between select-none">
+                    {renderReadingLanguageControl()}
                     <div className="relative flex min-h-0 flex-1">
                       <div
                         ref={readingScrollRef}
+                        id={readingRegionId}
                         role="region"
                         tabIndex={0}
                         aria-label={t(language, "reader.readingText")}
@@ -1852,8 +1909,10 @@ export function ReaderScreen({
                   )}
                 </div>
               )}
+              {renderReadingLanguageControl()}
               <div
                 ref={readingScrollRef}
+                id={readingRegionId}
                 role="region"
                 tabIndex={0}
                 aria-label={t(language, "reader.readingText")}

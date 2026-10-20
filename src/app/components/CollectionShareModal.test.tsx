@@ -263,7 +263,8 @@ describe("CollectionShareModal", () => {
     const calls = vi.mocked(generateAllCollectionStoryPages).mock.calls.length;
     fireEvent.click(screen.getByRole("button", { name: "Next step" }));
     expect(screen.getByRole("button", { name: "Save", exact: true })).toBeEnabled();
-    fireEvent.click(screen.getByRole("button", { name: "Previous step" }));
+    expect(screen.queryByRole("button", { name: "Previous step" })).not.toBeInTheDocument();
+    goStep("design");
     expect(screen.getByRole("button", { name: "Gold · Evening" })).toHaveAttribute("aria-pressed", "true");
     fireEvent.click(screen.getByRole("button", { name: "Previous step" }));
     screen.getByText("Customize content").closest("details")!.open = true;
@@ -803,12 +804,11 @@ describe("CollectionShareModal", () => {
     goStep("share");
     const footer = screen.getByTestId("sharing-actions");
     expect(Array.from(footer.querySelectorAll("button")).map((button) => button.textContent)).toEqual([
-      "",
       "Share",
       "Save",
       "Copy image",
     ]);
-    expect(footer.querySelectorAll('button svg[aria-hidden="true"]')).toHaveLength(4);
+    expect(footer.querySelectorAll('button svg[aria-hidden="true"]')).toHaveLength(3);
     expect(screen.queryByText("Save and copy options")).not.toBeInTheDocument();
     expect(
       screen

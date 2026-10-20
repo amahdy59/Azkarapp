@@ -96,6 +96,9 @@ describe("dated prayer interval", () => {
     expect(fajr.state).toBe("next");
     expect(fajr.countdown).toMatch(/^\d\d:\d\d left$/);
     expect(fajr.remainingPercent).toBeGreaterThan(0);
+    const timeline = getPrayerTimeline(new Date("2026-10-14T23:00:00+03:00"), DEFAULT_LOCATION);
+    expect(fajr.countdownInterval).toEqual({ startsAt: timeline.current.at, endsAt: timeline.next.at });
+    expect(models.filter((model) => model.countdownInterval)).toHaveLength(1);
   });
 
   it("recovers invalid timezone input without losing the timing overview", () => {

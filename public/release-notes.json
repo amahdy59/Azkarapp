@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-20.2",
+  "release": "2026-10-20.3",
   "ar": [
-    "شارك بطاقتك مع نص اختياري، وانسخ القراءة أو رابطها من خطوة المشاركة.",
-    "تنقّل بين خطوات مترابطة ومعاينة متجاوبة، وتخطَّ التصميم للاحتفاظ ببطاقتك الحالية.",
-    "اختر خطة ورد القرآن بقوائم أبسط وأهداف لمس أوسع، مع عرض أوضح للخطة والسجل الأسبوعي.",
-    "تصفّح سجل التقدم بعمل حسابي أقل أثناء التمرير، مع خلفية تحمي أدوات الصفحة عند تعذّر التمويه الزجاجي."
+    "صفحة التقدم أصبحت بمعايير مختارة وخرائط تتجه من اليمين إلى اليسار بالعربية، مع تصدير السجلات الدقيقة.",
+    "عداد الثواني للصلاة القادمة مع دائرة متحركة خفيفة، ومنظومة حركة هادئة وفق تفضيل تقليل الحركة.",
+    "قوائم الاختيار محمية بسطح معتم يغطي النص الخلفي في جميع الوضعيات والألوان.",
+    "تحسينات في الموثوقية: استعادة الإعدادات، وإلغاء التصدير، وحسابات الحديقة الفعّالة عند التمرير."
   ],
   "en": [
-    "Share your card with optional text, and copy the reading or its link from the Share step.",
-    "Move through connected steps and a responsive preview, or skip design to keep your current card.",
-    "Choose your Quran reading plan with simpler menus and larger touch targets, with clearer plan and weekly records.",
-    "Browse Progress with less recalculation while scrolling, and protected page controls when glass blur is unavailable."
+    "Progress shows your chosen metrics and charts that run right to left in Arabic and left to right in English, with exact record exports.",
+    "A seconds countdown with a small animated ring appears on the next prayer card, with purposeful motion that respects Reduce Motion.",
+    "Dropdowns and pickers use a protected opaque surface that covers underlying text in every theme and material mode.",
+    "Reliability improvements: preference recovery, cancelled export cleanup, and efficient garden calculations while scrolling."
   ]
 }

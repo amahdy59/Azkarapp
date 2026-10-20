@@ -5,7 +5,7 @@ import { createRoot } from "react-dom/client";
 import { AppErrorBoundary } from "./app/components/AppErrorBoundary.tsx";
 import { ScreenFallback } from "./app/components/ScreenFallback.tsx";
 import { pruneStaleFridayProgress } from "./app/fridayProgress.ts";
-import { loadAppState } from "./app/state.ts";
+import { createAppStateReader } from "./app/state.ts";
 import { applyAppAppearance } from "./app/theme.ts";
 import { reportError, startPerformanceMonitoring } from "./lib/observability.ts";
 import "./styles/index.css";
@@ -18,8 +18,9 @@ const MarketingLanding = lazy(() => import("./app/screens/MarketingLanding.tsx")
 const isMarketingLanding =
   window.location.pathname.replace(/\/$/, "").endsWith("/landing") ||
   new URLSearchParams(window.location.search).get("view") === "landing";
-const Root = isMarketingLanding ? MarketingLanding : App;
-const initialAppearance = loadAppState().settings;
+const loadStartupState = createAppStateReader();
+const initialSnapshot = loadStartupState();
+const initialAppearance = initialSnapshot.settings;
 applyAppAppearance(isMarketingLanding ? { ...initialAppearance, language: "en", forceRtl: false } : initialAppearance);
 startPerformanceMonitoring();
 // Daily progress cleanup stays synchronous; optional cache maintenance runs after App commits.
@@ -45,7 +46,7 @@ document.querySelector<HTMLAnchorElement>(".skip-link")?.addEventListener("click
 createRoot(document.getElementById("root")!).render(
   <AppErrorBoundary>
     <Suspense fallback={<ScreenFallback language={isMarketingLanding ? "en" : initialAppearance.language} />}>
-      <Root />
+      {isMarketingLanding ? <MarketingLanding /> : <App loadStartupState={loadStartupState} />}
     </Suspense>
   </AppErrorBoundary>,
 );

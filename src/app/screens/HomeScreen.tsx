@@ -24,7 +24,7 @@ import { useHomePrayerScroll } from "../hooks/useHomePrayerScroll";
 import { usePrayerSelectionAnchor } from "../hooks/usePrayerSelectionAnchor";
 import { getReminderPlan, reminderCivilTime } from "../reminderPlan";
 import { TodaysPathSheet } from "../components/TodaysPathSheet";
-import { getDailyPathStatus } from "../dailyPath";
+import { createDailyPathIndex, getDailyPathStatus } from "../dailyPath";
 import { getLeadingPrayerMoment } from "../prayerMoment";
 import { estimateCompletionMinutes, getAzkarForMode, getRoutineProgress, isRoutineCategory } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
@@ -229,30 +229,29 @@ export function HomeScreen({
   /* How each day is judged. Days before the reader's daily path started keep
      the verdict they were lived under — see dailyPath.ts — so this is one
      function for both eras rather than a flag the callers have to remember. */
-  const judgeDay = useCallback(
-    (dayKey: string) => {
-      const status = getDailyPathStatus({
-        dayKey,
-        dailyCompletions,
-        wirdHistory: wirdHistory ?? {},
-        quranWirdPlan,
-        quranWirdDailyGoals,
-        prayerTracking,
-        mosquePrayerGoal,
-        dailyPathStartDayKey,
-      });
-      return { palm: status.palmEarned, qualifies: status.streakQualified };
-    },
-    [
+  const judgeDay = useMemo(() => {
+    const getDay = createDailyPathIndex({
       dailyCompletions,
-      dailyPathStartDayKey,
-      mosquePrayerGoal,
-      prayerTracking,
-      quranWirdDailyGoals,
+      wirdHistory: wirdHistory ?? {},
       quranWirdPlan,
-      wirdHistory,
-    ],
-  );
+      quranWirdDailyGoals,
+      prayerTracking,
+      mosquePrayerGoal,
+      dailyPathStartDayKey,
+    });
+    return (dayKey: string) => {
+      const status = getDay(dayKey);
+      return { palm: status.palmEarned, qualifies: status.streakQualified };
+    };
+  }, [
+    dailyCompletions,
+    dailyPathStartDayKey,
+    mosquePrayerGoal,
+    prayerTracking,
+    quranWirdDailyGoals,
+    quranWirdPlan,
+    wirdHistory,
+  ]);
 
   const gardenSummary = useMemo(
     () => getGardenSummary(dailyCompletions, now, progressDayStartHour, judgeDay),
@@ -563,9 +562,13 @@ export function HomeScreen({
     if (dismissedAutoPrayer && dismissedAutoPrayer !== autoPrayer) setDismissedAutoPrayer(null);
   }, [autoPrayer, dismissedAutoPrayer]);
 
+  const prayerControlFocused = () => !!homeStickyRef.current?.querySelector(".home-prayer-sticky-row button:focus");
   const handlePrayerOpen = (prayer: PrayerName | null) => {
     setSelectedPrayer(prayer);
     setDismissedAutoPrayer(prayer ? null : autoPrayer);
+    // WebKit can leave focus on the native horizontal scroll region after a
+    // pointer close. Reconcile now; only a prayer button holds its geometry.
+    if (!prayer) updatePrayerScroll(homeScrollRef.current?.scrollTop ?? 0, prayerControlFocused());
   };
   const hasPrimaryContext = showCompletionCard || showRoutineCard;
   const hasContextCompanion = Boolean(dailyEvidence);
@@ -601,17 +604,17 @@ export function HomeScreen({
             scrolledHomeRef.current = scrolled;
             setHasScrolledHomeContent(scrolled);
           }
-          updatePrayerScroll(
-            top,
-            expandedPrayer !== null || !!homeStickyRef.current?.querySelector(".home-prayer-sticky-row:focus-within"),
-          );
+          updatePrayerScroll(top, expandedPrayer !== null || prayerControlFocused());
         }}
       >
         {/* Sticky Header Overlay */}
         <div
           ref={homeStickyRef}
           onBlurCapture={(event) => {
-            if (!expandedPrayer && !event.currentTarget.contains(event.relatedTarget as Node | null))
+            if (
+              !expandedPrayer &&
+              !(event.relatedTarget instanceof Element && event.relatedTarget.closest(".home-prayer-sticky-row button"))
+            )
               updatePrayerScroll(homeScrollRef.current?.scrollTop ?? 0);
           }}
           data-testid="home-sticky-prayers"

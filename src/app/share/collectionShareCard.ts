@@ -37,6 +37,22 @@ import { SHARE_CONTINUATION_HEIGHT } from "./shareContinuation";
 
 export const COLLECTION_STORY_WIDTH = 1080;
 export const COLLECTION_STORY_HEIGHT = 1920;
+
+/** Owned by one generation, never retained globally or across changed content. */
+export function createCollectionSharePreparation() {
+  const glyphs = new Map<string, ReturnType<typeof prepareQuranGlyphs>>();
+  return {
+    prepareGlyphs(text: string, canonicalKey?: string) {
+      const key = JSON.stringify([canonicalKey, text]);
+      if (!glyphs.has(key)) glyphs.set(key, prepareQuranGlyphs(text, canonicalKey));
+      return glyphs.get(key)!;
+    },
+  };
+}
+
+function assertShareActive(signal?: AbortSignal) {
+  if (signal?.aborted) throw new DOMException("Cancelled", "AbortError");
+}
 export interface StoryCardItem extends ShareItem {
   benefitArabic?: string;
   surahNameArabic?: string;
@@ -399,11 +415,13 @@ export async function generateAllCollectionStoryPages(
     allItems: StoryCardItem[];
     targetPages?: number;
     signal?: AbortSignal;
+    preparation?: ReturnType<typeof createCollectionSharePreparation>;
     onPage?: (page: GeneratedCollectionStoryCard) => void;
   },
 ): Promise<GeneratedCollectionStoryCard[]> {
   const pages: GeneratedCollectionStoryCard[] = [];
   try {
+    if (options.signal?.aborted) throw new DOMException("Cancelled", "AbortError");
     if (typeof document !== "undefined" && document.fonts)
       await Promise.all([
         document.fonts.load(`500 52px ${SHARE_ARABIC_FONT}`, "اللَّهُمَّ"),
@@ -415,16 +433,20 @@ export async function generateAllCollectionStoryPages(
         document.fonts.load(`600 30px ${SHARE_UI_FONT}`, "WA ZAKER wa-zaker.com"),
         document.fonts.ready,
       ]);
-    const { ctx } = createCanvas();
+    if (options.signal?.aborted) throw new DOMException("Cancelled", "AbortError");
     const items = await Promise.all(
       options.allItems.map(async (item) => ({
         ...item,
         language: item.language ?? options.language ?? "ar",
         benefit: item.benefit ?? item.benefitArabic,
         title: item.title ?? item.surahNameArabic ?? (options.single ? options.collectionTitle : undefined),
-        quranRendering: item.quranText ? await prepareQuranGlyphs(item.arabicText, item.canonicalKey) : undefined,
+        quranRendering: item.quranText
+          ? await (options.preparation?.prepareGlyphs ?? prepareQuranGlyphs)(item.arabicText, item.canonicalKey)
+          : undefined,
       })),
     );
+    if (options.signal?.aborted) throw new DOMException("Cancelled", "AbortError");
+    const { ctx } = createCanvas();
     const layouts = layoutSharePages(ctx, items, options.format ?? "story", options.content, options.single);
     for (const layout of layouts) {
       if (options.signal?.aborted) throw new DOMException("Cancelled", "AbortError");
@@ -451,7 +473,9 @@ export async function getCompatibleShareFormats(
   items: ShareItem[],
   content: ShareContentOptions,
   single: boolean,
+  options: { signal?: AbortSignal; preparation?: ReturnType<typeof createCollectionSharePreparation> } = {},
 ): Promise<ShareFormat[]> {
+  assertShareActive(options.signal);
   if (document.fonts) {
     await Promise.all([
       document.fonts.load(`500 64px ${SHARE_ARABIC_FONT}`, "اللَّهُمَّ"),
@@ -463,14 +487,19 @@ export async function getCompatibleShareFormats(
       document.fonts.ready,
     ]);
   }
-  const { ctx } = createCanvas();
+  assertShareActive(options.signal);
   const prepared = await Promise.all(
     items.map(async (item) => ({
       ...item,
-      quranRendering: item.quranText ? await prepareQuranGlyphs(item.arabicText, item.canonicalKey) : undefined,
+      quranRendering: item.quranText
+        ? await (options.preparation?.prepareGlyphs ?? prepareQuranGlyphs)(item.arabicText, item.canonicalKey)
+        : undefined,
     })),
   );
+  assertShareActive(options.signal);
+  const { ctx } = createCanvas();
   return (Object.keys(SHARE_DIMENSIONS) as ShareFormat[]).filter((format) => {
+    assertShareActive(options.signal);
     try {
       layoutSharePages(ctx, prepared, format, content, single);
       return true;

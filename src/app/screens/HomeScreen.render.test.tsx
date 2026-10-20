@@ -183,6 +183,56 @@ describe("HomeScreen quick access", () => {
     expect(sticky).not.toHaveAttribute("data-prayer-cards-condensed");
   });
 
+  it("releases closed prayer geometry when WebKit leaves focus on the horizontal scroll region", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-10-16T14:00:00+03:00"));
+    render(
+      <HomeScreen
+        completed={emptyProgress()}
+        dailyCompletions={[]}
+        quietProgressEnabled
+        progressDayStartHour={4}
+        language="en"
+        direction="ltr"
+        onResume={() => undefined}
+        routineModes={routineModes}
+      />,
+    );
+    const sticky = screen.getByTestId("home-sticky-prayers");
+    const scroll = sticky.parentElement!;
+    const current = screen.getByTestId("prayer-card-dhuhr").querySelector("button")!;
+    const row = screen.getByTestId("home-all-prayers-row");
+    // Match the native keyboard focusability of the real narrow overflow row.
+    row.tabIndex = 0;
+    fireEvent.scroll(scroll, { target: { scrollTop: 150 } });
+    expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
+    act(() => current.focus());
+    fireEvent.click(current);
+    expect(current).toHaveAttribute("aria-expanded", "true");
+    fireEvent.scroll(scroll, { target: { scrollTop: 0 } });
+    act(() => row.focus());
+    expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
+    fireEvent.click(current);
+    expect(current).toHaveAttribute("aria-expanded", "false");
+    expect(row).toHaveFocus();
+    expect(sticky).not.toHaveAttribute("data-prayer-cards-condensed");
+    fireEvent.scroll(scroll, { target: { scrollTop: 150 } });
+    expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
+    fireEvent.scroll(scroll, { target: { scrollTop: 0 } });
+    expect(sticky).not.toHaveAttribute("data-prayer-cards-condensed");
+    // Real keyboard focus retains the hold until it leaves the prayer button.
+    fireEvent.scroll(scroll, { target: { scrollTop: 150 } });
+    act(() => current.focus());
+    fireEvent.click(current);
+    fireEvent.scroll(scroll, { target: { scrollTop: 0 } });
+    fireEvent.click(current);
+    expect(current).toHaveAttribute("aria-expanded", "false");
+    expect(current).toHaveFocus();
+    expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
+    act(() => row.focus());
+    expect(sticky).not.toHaveAttribute("data-prayer-cards-condensed");
+  });
+
   it("shows the completion card briefly, without actions, then returns to the normal hero", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date(2026, 7, 7, 9, 5));

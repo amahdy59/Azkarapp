@@ -152,7 +152,9 @@ describe("counting surface", () => {
     // obvious home for it, `.ui-icon-button` in tailwind-bridge.css, sits inside
     // `@layer components`, where layered-vs-unlayered !important inverts the
     // usual order — so it lives here, beside the rule it refines.
-    expect(surfaces).toContain("button.ui-icon-button:not(:disabled):not(.no-press):active");
-    expect(surfaces).toContain("scale(var(--motion-scale-pressed-compact)) !important");
+    expect(surfaces.replace(/\s+/g, "")).toContain(
+      'button.ui-icon-button:not(:disabled,.no-press,[aria-disabled="true"],[data-disabled]):active',
+    );
+    expect(surfaces).toContain("var(--motion-scale-pressed-compact)");
   });
 });

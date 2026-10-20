@@ -1,3 +1,4 @@
+import { chooseProgressOption } from "./helpers/progress";
 import { mkdir } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
@@ -32,10 +33,11 @@ for (const language of ["ar", "en"] as const) {
         { language, width },
       );
       await page.goto("/#/progress");
+      await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
       const garden = page.getByTestId("today-garden-card");
       await expect(garden).toBeVisible();
       await expect(garden.locator("img")).toHaveCount(0);
-      await page.getByRole("tab", { name: ar ? "شهر" : "Month", exact: true }).click();
+      await chooseProgressOption(page.getByRole("combobox", { name: ar ? "الفترة" : "Period", exact: true }), "month");
       const monthChart = page.getByTestId("today-garden-card");
       await expect(monthChart).toBeVisible();
       const prayerBounds = await page.getByTestId("progress-prayer-group").boundingBox();
@@ -49,12 +51,12 @@ for (const language of ["ar", "en"] as const) {
       const directory = `output/playwright/settings-progress-clarity/${testInfo.project.name}`;
       await mkdir(directory, { recursive: true });
       await page.screenshot({ path: `${directory}/${language}-${width}-month.png` });
-      await page.getByRole("tab", { name: ar ? "سنة" : "Year", exact: true }).click();
+      await chooseProgressOption(page.getByRole("combobox", { name: ar ? "الفترة" : "Period", exact: true }), "year");
       const chart = page.getByTestId("today-garden-card");
       await expect(chart).toBeVisible();
-      await expect(page.getByRole("combobox")).toHaveCount(0);
+      await expect(page.getByRole("combobox")).toHaveCount(6);
       const exportButton = chart.getByRole("button", {
-        name: ar ? "تنزيل بيانات الأذكار (JSON)" : "Download routine data (JSON)",
+        name: ar ? "تصدير الأوراد" : "Azkar JSON",
       });
       await exportButton.focus();
       await expect(exportButton).toBeFocused();

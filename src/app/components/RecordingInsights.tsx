@@ -34,13 +34,13 @@ export function RecordingInsights({
               {progressText(language, "insights.attention")}
             </dt>
             <dd className="mt-1 text-lg font-bold text-foreground">{list(pattern.attention)}</dd>
-            <dd className="mt-1 text-xs leading-relaxed text-muted-foreground">
+            <dd className="mt-1 progress-help">
               {progressText(language, practice === "prayer" ? "insights.prayerCue" : "insights.routineCue")}
             </dd>
             <dd>
               <a
                 href="#/settings/notifications"
-                className="mt-2 inline-flex min-h-11 items-center rounded-lg px-2 text-xs font-semibold text-foreground underline underline-offset-4 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                className="mt-2 inline-flex min-h-11 items-center rounded-lg px-2 text-xs font-semibold text-foreground underline underline-offset-4 progress-focus"
               >
                 {progressText(
                   language,

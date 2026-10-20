@@ -539,14 +539,16 @@ export default function AyahShareStudio({
         </div>
       </div>
       <footer className="ayah-share-footer">
-        <SharingStepNavigation
-          steps={steps}
-          step={step}
-          onChange={changeStep}
-          language={language}
-          disabled={busy}
-          onSkipDesign={() => changeStep("share")}
-        />
+        {step !== "share" && (
+          <SharingStepNavigation
+            steps={steps}
+            step={step}
+            onChange={changeStep}
+            language={language}
+            disabled={busy}
+            onSkipDesign={() => changeStep("share")}
+          />
+        )}
         <p
           role={error ? "alert" : "status"}
           className={`text-sm ${error ? "text-destructive" : "text-muted-foreground"}`}
@@ -568,7 +570,7 @@ export default function AyahShareStudio({
           </Button>
         )}
         {step === "share" && (
-          <div className="flex flex-wrap gap-2">
+          <div className="sharing-final-actions">
             <Button
               disabled={!ready}
               onClick={() => {

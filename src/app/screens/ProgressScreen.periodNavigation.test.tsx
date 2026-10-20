@@ -1,3 +1,4 @@
+import { chooseProgressOption } from "../../test/progressSelect";
 import { useState } from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
@@ -22,18 +23,18 @@ function RoutedProgress() {
   );
 }
 describe("Progress period navigation", () => {
-  it("preserves historical ranges and synchronizes externally restored periods without a long selector", () => {
+  it("preserves historical ranges and synchronizes externally restored periods through the shared range selector", async () => {
     render(<RoutedProgress />);
     fireEvent.click(screen.getByRole("button", { name: "Previous period" }));
     expect(screen.getByTestId("garden-view-date")).toHaveTextContent("2025");
-    expect(screen.getByTestId("routine-trends")).toBeVisible();
-    expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("tab", { name: "Month", exact: true }));
-    expect(screen.getByTestId("garden-view-date")).toHaveTextContent("October");
+    expect(screen.getByTestId("progress-main-trend")).toBeVisible();
+    expect(screen.getByRole("combobox", { name: "Period" })).toHaveAttribute("data-progress-value", "year");
+    await chooseProgressOption(screen.getByRole("combobox", { name: "Period" }), "month");
+    expect(screen.getByTestId("garden-view-date")).toHaveTextContent("1 – 31 Oct 2026");
     fireEvent.click(screen.getByRole("button", { name: "Previous period" }));
-    expect(screen.getByTestId("garden-view-date")).toHaveTextContent("September");
+    expect(screen.getByTestId("garden-view-date")).toHaveTextContent("1 – 30 Sept 2026");
     fireEvent.click(screen.getByRole("button", { name: "History back to year" }));
-    expect(screen.getByRole("tab", { name: "Year", exact: true })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("combobox", { name: "Period" })).toHaveAttribute("data-progress-value", "year");
     expect(screen.getByTestId("garden-view-date")).toHaveTextContent("2026");
   });
 });

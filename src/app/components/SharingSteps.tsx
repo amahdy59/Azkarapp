@@ -56,16 +56,17 @@ export function SharingStepNavigation({ steps, step, onChange, language, disable
   const index = steps.indexOf(step);
   return (
     <div className="sharing-step-navigation">
-      <Button
-        variant="outline"
-        size={index === 0 && onSkipDesign ? "icon" : "default"}
-        aria-label={t(language, "shareStudio.previousStep")}
-        disabled={disabled || index === 0}
-        onClick={() => onChange(steps[index - 1]!)}
-      >
-        <SharingArrow language={language} action="previous" />
-        {!(index === 0 && onSkipDesign) && t(language, "common.previous")}
-      </Button>
+      {index > 0 && (
+        <Button
+          variant="outline"
+          aria-label={t(language, "shareStudio.previousStep")}
+          disabled={disabled || index === 0}
+          onClick={() => onChange(steps[index - 1]!)}
+        >
+          <SharingArrow language={language} action="previous" />
+          {t(language, "common.previous")}
+        </Button>
+      )}
       {step === "content" && onSkipDesign && (
         <Button variant="ghost" disabled={disabled} onClick={onSkipDesign}>
           {t(language, "shareStudio.skipDesign")}

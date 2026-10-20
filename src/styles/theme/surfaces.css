@@ -306,8 +306,8 @@ input:disabled,
   cursor: not-allowed;
 }
 
-button:not(:disabled):not(.no-press),
-[role="button"]:not([aria-disabled="true"]):not(.no-press),
+button:not(:disabled, .no-press, [aria-disabled="true"], [data-disabled]),
+[role="button"]:not([aria-disabled="true"]):not([data-disabled]):not(.no-press),
 a[href]:not(.no-press),
 .interactive-elem {
   touch-action: manipulation;
@@ -320,7 +320,11 @@ a[href]:not(.no-press),
   transition:
     transform var(--motion-duration-release) var(--motion-ease-release),
     filter var(--motion-duration-fast) var(--motion-ease-standard),
-    opacity var(--motion-duration-press) var(--motion-ease-standard);
+    opacity var(--motion-duration-press) var(--motion-ease-standard),
+    color var(--motion-duration-fast) var(--motion-ease-standard),
+    background-color var(--motion-duration-fast) var(--motion-ease-standard),
+    border-color var(--motion-duration-fast) var(--motion-ease-standard),
+    box-shadow var(--motion-duration-fast) var(--motion-ease-standard);
 }
 
 /* One hover treatment for everything that acts.
@@ -334,26 +338,30 @@ a[href]:not(.no-press),
    sticks after a tap. Reduced motion keeps the change but removes its
    transition, through the rule above. */
 @media (hover: hover) and (pointer: fine) {
-  button:not(:disabled):not(.no-press):hover,
-  [role="button"]:not([aria-disabled="true"]):not(.no-press):hover,
+  button:not(:disabled, .no-press, [aria-disabled="true"], [data-disabled]):hover,
+  [role="button"]:not([aria-disabled="true"]):not([data-disabled]):not(.no-press):hover,
   a[href]:not(.no-press):not(.skip-link):hover,
   .interactive-elem:hover {
     filter: brightness(1.08);
   }
 }
 
-button:not(:disabled):not(.no-press):active,
-[role="button"]:not([aria-disabled="true"]):not(.no-press):active,
+button:not(:disabled, .no-press, [aria-disabled="true"], [data-disabled]):active,
+[role="button"]:not([aria-disabled="true"]):not([data-disabled]):not(.no-press):active,
 a[href]:not(.no-press):active,
 .interactive-elem:active {
-  transform: scale(var(--motion-scale-pressed)) !important;
+  transform: var(--control-press-transform, scale(var(--motion-scale-pressed))) !important;
   /* Going down is fast, the way a key gives under a finger. Only the transform
      half differs from the rule above; filter and opacity keep their timings so
      the hover lift does not lurch when a press begins. */
   transition:
     transform var(--motion-duration-press) var(--motion-ease-standard),
     filter var(--motion-duration-fast) var(--motion-ease-standard),
-    opacity var(--motion-duration-press) var(--motion-ease-standard);
+    opacity var(--motion-duration-press) var(--motion-ease-standard),
+    color var(--motion-duration-fast) var(--motion-ease-standard),
+    background-color var(--motion-duration-fast) var(--motion-ease-standard),
+    border-color var(--motion-duration-fast) var(--motion-ease-standard),
+    box-shadow var(--motion-duration-fast) var(--motion-ease-standard);
   opacity: 0.88;
 }
 
@@ -365,9 +373,79 @@ a[href]:not(.no-press):active,
    `@layer components`, and layered vs unlayered `!important` inverts the usual
    cascade order — too subtle a thing to rest a visible behaviour on. Same file,
    same layer, one more specificity point than the rule above. */
-button.ui-icon-button:not(:disabled):not(.no-press):active,
-.ui-icon-button[role="button"]:not([aria-disabled="true"]):not(.no-press):active {
-  transform: scale(var(--motion-scale-pressed-compact)) !important;
+button.ui-icon-button:not(:disabled, .no-press, [aria-disabled="true"], [data-disabled]):active,
+.ui-icon-button[role="button"]:not([aria-disabled="true"]):not([data-disabled]):not(.no-press):active {
+  transform: var(--control-press-transform, scale(var(--motion-scale-pressed-compact))) !important;
+}
+
+/* Keyboard activation shares pointer feedback, including Enter. */
+:is(
+    button,
+    a[href],
+    [role="button"],
+    [role="radio"],
+    [role="switch"],
+    [role="tab"],
+    [role="menuitem"],
+    [role="option"],
+    [role="checkbox"],
+    [role="menuitemradio"],
+    [role="menuitemcheckbox"],
+    summary
+  )[data-key-pressed]:not(:disabled, .no-press, [aria-disabled="true"], [data-disabled]) {
+  opacity: 0.88;
+  transform: var(--control-press-transform, scale(var(--motion-scale-pressed))) !important;
+  transition:
+    transform var(--motion-duration-press) var(--motion-ease-standard),
+    opacity var(--motion-duration-press) var(--motion-ease-standard);
+}
+button[data-press-compact]:not(:disabled, .no-press, [aria-disabled="true"], [data-disabled]):active,
+button[data-press-compact][data-key-pressed]:not(:disabled, .no-press, [aria-disabled="true"], [data-disabled]),
+button.ui-icon-button[data-key-pressed]:not(:disabled, .no-press, [aria-disabled="true"], [data-disabled]) {
+  transform: var(
+    --control-press-transform,
+    scale(var(--control-pressed-scale, var(--motion-scale-pressed-compact)))
+  ) !important;
+}
+:is(
+    [role="radio"],
+    [role="tab"],
+    [role="switch"],
+    [role="option"],
+    [role="checkbox"],
+    [role="menuitemradio"],
+    [role="menuitemcheckbox"],
+    summary
+  ):not([aria-disabled="true"]):not([data-disabled]):active {
+  opacity: 0.88;
+}
+input[type="range"]:not(:disabled) {
+  cursor: pointer;
+  transition: box-shadow var(--motion-duration-press) var(--motion-ease-standard);
+}
+input[type="range"]:not(:disabled):is(:active, :focus-visible) {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
+/* Component-specific active rules must not revive disabled semantic actions. */
+button:is([aria-disabled="true"], [data-disabled]):active {
+  transform: none !important;
+  filter: none !important;
+}
+[data-key-released]:not(:disabled, [aria-disabled="true"], [data-disabled]) {
+  --control-press-transform: none;
+  opacity: 1 !important;
+}
+
+/* One inherited override covers every pointer/keyboard press without a
+   specificity race between compact controls and reduced-motion rules. */
+:root.reduce-motion {
+  --control-press-transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --control-press-transform: none;
+  }
 }
 
 /* Elastic Overscroll & Container Boundaries */
@@ -395,14 +473,6 @@ button.ui-icon-button:not(:disabled):not(.no-press):active,
   animation-iteration-count: 1 !important;
   transition-duration: 0.01ms !important;
   scroll-behavior: auto !important;
-}
-
-/* Reduce-motion overrides for press effects */
-.reduce-motion button:active,
-.reduce-motion [role="button"]:active,
-.reduce-motion a:active,
-.reduce-motion .interactive-elem:active {
-  opacity: 0.88;
 }
 
 .reduce-motion button,

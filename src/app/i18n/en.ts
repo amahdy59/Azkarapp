@@ -1573,6 +1573,8 @@ const en = {
     targetPageLabel: "Target page",
   },
   reader: {
+    showArabic: "Show Arabic",
+    showEnglishMeaning: "Show English meaning",
     ayahAlKursi: "Ayah Al-Kursi",
     shortcutHelp: "Open keyboard help",
     characterShortcuts: "Enable single-key shortcuts for this visit",
@@ -2130,6 +2132,11 @@ const en = {
     skip: "Skip",
   },
   settings: {
+    footerPreview: "Footer preview",
+    footerPreviewHint: "Example of your reading controls.",
+    readerTools: "Reading footer buttons",
+    iconsWithLabels: "Icons with labels",
+    iconsOnly: "Icons only",
     appMaterial: "App appearance",
     appMaterialHint:
       "Choose Glass or Opaque for screens outside Home. Glass uses the current Home background; reading text keeps a stronger surface.",

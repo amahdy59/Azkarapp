@@ -281,6 +281,10 @@ export interface UserSettingsState {
   highContrast: boolean;
   boldText: boolean;
   reduceMotion: boolean;
+  /** Visible labels on devotional footer actions; absent legacy values default to true. */
+  readerToolLabels?: boolean;
+  /** Device-only main-text preference for the English Reader; never synchronized. */
+  readerMeaningOnly?: boolean;
   /** Blurred materials go solid. See the .reduce-transparency rules. */
   reduceTransparency: boolean;
   appMaterial?: "system" | "glass" | "solid";

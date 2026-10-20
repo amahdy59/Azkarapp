@@ -47,9 +47,50 @@ function renderRow(current: PrayerName) {
   return [...screen.getAllByTestId(/^prayer-card-/)].map((card) => card.dataset.prayer);
 }
 
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+  vi.useRealTimers();
+  vi.unstubAllGlobals();
+});
 
 describe("PrayerTrackerCards", () => {
+  it.each(["ar", "en"] as const)(
+    "shares one %s seconds clock across both visual copies without live announcements",
+    (language) => {
+      vi.useFakeTimers();
+      const now = Date.parse("2026-10-20T10:00:00Z");
+      vi.setSystemTime(now);
+      const { unmount } = render(
+        <PrayerTrackerCards
+          models={modelsWithCurrent("dhuhr").map((model) =>
+            model.state === "next"
+              ? { ...model, countdownInterval: { startsAt: now - 3600_000, endsAt: now + 8798_000 } }
+              : model,
+          )}
+          language={language}
+          direction={language === "ar" ? "rtl" : "ltr"}
+          records={[]}
+          dayKey="2026-10-20"
+          onToggle={vi.fn()}
+          onOpen={vi.fn()}
+          summaryOnly
+          compactSummary
+        />,
+      );
+      const card = screen.getByTestId("prayer-card-asr");
+      expect(card.querySelectorAll("[data-prayer-countdown]")).toHaveLength(2);
+      expect(vi.getTimerCount()).toBe(1);
+      expect(card.querySelector("[data-prayer-compact-countdown]")).toHaveAttribute("aria-hidden", "true");
+      expect(card.querySelector("[data-prayer-detail]")).toHaveTextContent(language === "ar" ? "٠٢:٢٦:٣٨" : "02:26:38");
+      expect(card.querySelector("button")).toHaveAccessibleDescription(
+        language === "ar" ? /الوقت المتبقي حتى العصر/ : /Time remaining until Asr/,
+      );
+      expect(card.querySelector("[aria-live], [role='progressbar'], [role='timer']")).toBeNull();
+      expect(card.querySelector(".prayer-countdown-digits")).toHaveAttribute("dir", "ltr");
+      unmount();
+      expect(vi.getTimerCount()).toBe(0);
+      vi.useRealTimers();
+    },
+  );
   it.each(["ar", "en"] as const)("exposes a text countdown without a redundant %s progress bar", (language) => {
     render(
       <PrayerTrackerCards

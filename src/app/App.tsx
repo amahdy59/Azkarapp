@@ -1,3 +1,4 @@
+import { useControlFeedback } from "./hooks/useControlFeedback";
 import { useNativeServices } from "./hooks/useNativeServices";
 import "../styles/theme/materials.css";
 import { lazy, Suspense, useState, useEffect, useRef, useCallback, useMemo } from "react";
@@ -202,12 +203,14 @@ const ProfileCompletionScreen = lazy(() =>
 
 // ─── Root App ─────────────────────────────────────────────────────────────────
 function AppContent({
+  loadStartupState,
   audioController,
   audioModuleLoading,
   requestAudioModule,
   buildPlaybackPlan,
   getAudioCoverage,
 }: {
+  loadStartupState?: () => AppStateSnapshot;
   /** `null` until the lazily-loaded audio chunk reports its controller. */
   audioController: AudioController | null;
   audioModuleLoading: boolean;
@@ -215,7 +218,7 @@ function AppContent({
   buildPlaybackPlan: AudioModule["buildPlaybackPlan"] | null;
   getAudioCoverage: AudioModule["getAudioCoverage"] | null;
 }) {
-  const [initialState] = useState(loadAppState);
+  const [initialState] = useState(loadStartupState ?? loadAppState);
   useEffect(scheduleStartupMaintenance, []);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(() => {
     try {
@@ -230,6 +233,9 @@ function AppContent({
   );
   const [routineModes, setRoutineModes] = useState(initialState.settings.routineModes);
   const [reduceMotion, setReduceMotion] = useState(initialState.settings.reduceMotion);
+  useControlFeedback();
+  const [readerToolLabels, setReaderToolLabels] = useState(initialState.settings.readerToolLabels ?? true);
+  const [readerMeaningOnly, setReaderMeaningOnly] = useState(initialState.settings.readerMeaningOnly ?? false);
 
   const {
     view,
@@ -736,7 +742,7 @@ function AppContent({
   const isArabic = selectedLang === "ar";
   const layoutDirection = isArabic || forceRtl ? "rtl" : "ltr";
 
-  const appStateSnapshot = useMemo<AppStateSnapshot>(
+  const appStateBase = useMemo<Omit<AppStateSnapshot, "partialZikrCounts" | "masbahaState">>(
     () => ({
       settings: {
         language: selectedLang,
@@ -749,6 +755,8 @@ function AppContent({
         highContrast,
         boldText,
         reduceMotion,
+        readerToolLabels,
+        readerMeaningOnly,
         reduceTransparency,
         homeWirdImages,
         appMaterial,
@@ -791,8 +799,6 @@ function AppContent({
       quranReadingPosition,
       quranWirdPlan,
       fridayProgress,
-      partialZikrCounts,
-      masbahaState,
     }),
     [
       boldText,
@@ -813,6 +819,8 @@ function AppContent({
       phone,
       avatarUrl,
       reduceMotion,
+      readerToolLabels,
+      readerMeaningOnly,
       reduceTransparency,
       reminders,
       locationSettings,
@@ -850,10 +858,13 @@ function AppContent({
       zikrFont,
       themeMode,
       fridayProgress,
-      partialZikrCounts,
       hijriDateOffset,
-      masbahaState,
     ],
+  );
+
+  const appStateSnapshot = useMemo<AppStateSnapshot>(
+    () => ({ ...appStateBase, partialZikrCounts, masbahaState }),
+    [appStateBase, partialZikrCounts, masbahaState],
   );
 
   // Hook modules
@@ -1156,6 +1167,8 @@ function AppContent({
     setHighContrast(state.settings.highContrast);
     setBoldText(state.settings.boldText);
     setReduceMotion(state.settings.reduceMotion);
+    setReaderToolLabels(state.settings.readerToolLabels ?? true);
+    setReaderMeaningOnly(state.settings.readerMeaningOnly ?? false);
     setReduceTransparency(state.settings.reduceTransparency);
     setAppMaterial(state.settings.appMaterial ?? "solid");
     setHomeMaterial(state.settings.homeMaterial ?? "inherit");
@@ -1351,6 +1364,7 @@ function AppContent({
         highContrast,
         boldText,
         reduceMotion,
+        readerToolLabels,
         reduceTransparency,
         appMaterial,
         forceRtl,
@@ -1367,6 +1381,7 @@ function AppContent({
     themeMode,
     highContrast,
     reduceMotion,
+    readerToolLabels,
     reduceTransparency,
     appMaterial,
     selectedLang,
@@ -2165,6 +2180,8 @@ function AppContent({
                   reduceMotion={reduceMotion}
                   showTranslation={showTranslation}
                   showTransliteration={showTransliteration}
+                  readerMeaningOnly={readerMeaningOnly}
+                  onReaderMeaningOnlyChange={setReaderMeaningOnly}
                   textSize={textSize}
                   onTextSizeChange={setTextSize}
                   savedZikrIds={savedZikrIds}
@@ -2416,6 +2433,8 @@ function AppContent({
                   onShowTransliterationChange={setShowTransliteration}
                   onHighContrastChange={setHighContrast}
                   onBoldTextChange={setBoldText}
+                  readerToolLabels={readerToolLabels}
+                  onReaderToolLabelsChange={setReaderToolLabels}
                   onReduceMotionChange={setReduceMotion}
                   onReduceTransparencyChange={setReduceTransparency}
                   onHomeWirdImagesChange={setHomeWirdImages}
@@ -2660,7 +2679,7 @@ function AppContent({
   );
 }
 
-export default function App() {
+export default function App({ loadStartupState }: { loadStartupState?: () => AppStateSnapshot } = {}) {
   const [audioModule, setAudioModule] = useState<AudioModule | null>(null);
   const [audioController, setAudioController] = useState<AudioController | null>(null);
   const [audioModuleLoading, setAudioModuleLoading] = useState(false);
@@ -2691,6 +2710,7 @@ export default function App() {
   return (
     <ActiveVisitorPresence>
       <AppContent
+        loadStartupState={loadStartupState}
         audioController={audioController}
         audioModuleLoading={audioModuleLoading}
         requestAudioModule={requestAudioModule}

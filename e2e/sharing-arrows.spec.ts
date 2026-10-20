@@ -92,13 +92,18 @@ for (const language of ["en", "ar"] as const) {
       await previous.focus();
       await page.keyboard.press("Home");
       if (!curated) {
+        await expect(
+          modal.getByRole("button", { name: t(language, "shareStudio.previousStep"), exact: true }),
+        ).toHaveCount(0);
+        await sharingStep(modal, "design");
         const stepPrevious = modal.getByRole("button", { name: t(language, "shareStudio.previousStep"), exact: true });
         const stepNext = modal.getByRole("button", { name: t(language, "shareStudio.nextStep"), exact: true });
         await outwardPair(stepPrevious, stepNext, language);
         await stepNext.click();
         await expect(
-          modal.getByRole("heading", { name: t(language, "shareStudio.stepdesign"), exact: true }),
+          modal.getByRole("heading", { name: t(language, "shareStudio.stepshare"), exact: true }),
         ).toBeFocused();
+        await sharingStep(modal, "design");
         await stepPrevious.click();
         await sharingStep(modal, "share");
       }

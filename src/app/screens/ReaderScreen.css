@@ -99,3 +99,25 @@
   box-shadow: none;
   background: var(--background);
 }
+
+/* A real flex row keeps the language action reachable without covering text. */
+.reader-language-toolbar {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: center;
+  padding: 4px 16px;
+  min-width: 0;
+}
+
+/* Short windows/enlarged text may need more chrome than fits at once. Native
+   page scrolling makes every action reachable without shrinking any target. */
+@media (max-height: 560px) {
+  [data-reader-scroll-recovery="true"] {
+    overflow-y: auto;
+    scroll-padding-block: 8px;
+  }
+}
+
+.reader-language-toolbar button {
+  scroll-margin-block: 8px;
+}

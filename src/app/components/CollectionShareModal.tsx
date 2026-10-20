@@ -32,6 +32,7 @@ import { useLayoutMode } from "../hooks/useLayoutMode";
 import type { AppLanguage, ThemeMode, Zikr, RoutineMode, PrayerName } from "../types";
 import {
   generateAllCollectionStoryPages,
+  createCollectionSharePreparation,
   getCompatibleShareFormats,
   releaseSharePages,
   SHARE_PALETTES,
@@ -411,7 +412,8 @@ export function CollectionShareModal({
     setStatus("");
     const rememberedId = activeItemRef.current;
     const navigationAtStart = navigationVersion.current;
-    getCompatibleShareFormats(exportItems, content, single)
+    const preparation = createCollectionSharePreparation();
+    getCompatibleShareFormats(exportItems, content, single, { signal: controller.signal, preparation })
       .then((formats) => {
         if (controller.signal.aborted) throw new DOMException("Cancelled", "AbortError");
         setCompatibleFormats(formats);
@@ -429,6 +431,7 @@ export function CollectionShareModal({
           qr,
           language: exportLanguage,
           signal: controller.signal,
+          preparation,
           onPage: (page) => {
             if (!controller.signal.aborted) {
               const replace = firstPage;
@@ -1365,18 +1368,6 @@ export function CollectionShareModal({
                 data-testid="sharing-export-actions"
                 className={`sharing-export-actions grid gap-2 ${wide ? "ms-auto max-w-xl" : ""}`}
               >
-                {steps.length > 1 && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    disabled={busy}
-                    aria-label={t(language, "shareStudio.previousStep")}
-                    title={t(language, "shareStudio.previousStep")}
-                    onClick={() => changeStep(steps[steps.length - 2]!)}
-                  >
-                    <SharingArrow language={language} action="previous" />
-                  </Button>
-                )}
                 <Button
                   variant={(mode === "image" ? scopedNative : nativeText) ? "default" : "outline"}
                   className="min-h-12 gap-1 px-2 whitespace-nowrap"

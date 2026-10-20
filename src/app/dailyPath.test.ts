@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getDailyPathStatus, wasPrayedAtMosque, type DailyPathInput } from "./dailyPath";
+import { createDailyPathIndex, getDailyPathStatus, wasPrayedAtMosque, type DailyPathInput } from "./dailyPath";
 import { getGardenSummary } from "./progress";
 import type { CategoryId, DailyCollectionCompletion, PrayerName, PrayerTrackingRecord } from "./types";
 
@@ -31,6 +31,50 @@ function status(over: Partial<DailyPathInput> = {}) {
     ...over,
   });
 }
+
+describe("revision-owned daily history index", () => {
+  it("agrees with individual judgments across historical policies, duplicate and missing records", () => {
+    const input = {
+      dailyCompletions: [
+        completion("morning", "2026-08-31"),
+        completion("morning"),
+        completion("morning"),
+        completion("evening"),
+        completion("before_sleep", "2026-10-19"),
+      ],
+      prayerTracking: [prayed("fajr", "mosque"), prayed("fajr", "home"), prayed("isha", "mosque", "2026-10-19")],
+      wirdHistory: { [DAY]: [1, 2, 2, 3], "2026-10-19": [10, 11] },
+      quranWirdPlan: { kind: "daily" as const, dailyPages: 3 },
+      quranWirdDailyGoals: { [DAY]: 3 },
+      dailyPathStartDayKey: BEFORE,
+      mosquePrayerGoal: 3,
+    };
+    const indexed = createDailyPathIndex(input);
+    for (const dayKey of ["2026-08-31", DAY, "2026-09-07", "2026-10-19", "2026-10-20"]) {
+      expect(indexed(dayKey)).toEqual(getDailyPathStatus({ ...input, dayKey }));
+    }
+    const changed = { ...input, dailyCompletions: [...input.dailyCompletions, completion("before_sleep")] };
+    expect(createDailyPathIndex(changed)(DAY)).toEqual(getDailyPathStatus({ ...changed, dayKey: DAY }));
+    expect(indexed(DAY).dhikr.beforeSleep).toBe(false);
+  });
+
+  it("judges each garden day once without caching across calculations", () => {
+    const seen = new Set<string>();
+    let calls = 0;
+    const judge = (dayKey: string) => {
+      expect(seen.has(dayKey)).toBe(false);
+      seen.add(dayKey);
+      calls++;
+      return { palm: true, qualifies: true };
+    };
+    const records = [completion("morning"), completion("morning", "2026-08-01")];
+    getGardenSummary(records, new Date(2026, 8, 6, 12), 0, judge);
+    expect(calls).toBe(8);
+    seen.clear();
+    getGardenSummary(records, new Date(2026, 8, 6, 12), 0, judge);
+    expect(calls).toBe(16);
+  });
+});
 
 describe("the dhikr pillar", () => {
   it.each([

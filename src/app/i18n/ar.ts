@@ -1547,6 +1547,8 @@ const ar = {
     targetPageLabel: "صفحة النهاية",
   },
   reader: {
+    showArabic: "عرض العربية",
+    showEnglishMeaning: "عرض المعنى بالإنجليزية",
     ayahAlKursi: "آية الكرسي",
     shortcutHelp: "فتح دليل اختصارات لوحة المفاتيح",
     characterShortcuts: "تفعيل اختصارات المفتاح الواحد خلال هذه الزيارة",
@@ -2130,6 +2132,11 @@ const ar = {
     skip: "\u062a\u062e\u0637\u064a",
   },
   settings: {
+    footerPreview: "معاينة أزرار القراءة",
+    footerPreviewHint: "مثال لأزرار القراءة حسب اختيارك.",
+    readerTools: "أزرار أسفل القراءة",
+    iconsWithLabels: "أيقونات مع نص",
+    iconsOnly: "أيقونات فقط",
     appMaterial: "مظهر التطبيق",
     appMaterialHint:
       "اختر المظهر الزجاجي أو المعتم للشاشات خارج الرئيسية. يستخدم الزجاجي خلفية الرئيسية الحالية، مع سطح أوضح لنصوص القراءة.",

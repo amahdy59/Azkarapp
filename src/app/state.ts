@@ -134,6 +134,8 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
     highContrast: false,
     boldText: false,
     reduceMotion: false,
+    readerToolLabels: true,
+    readerMeaningOnly: false,
     reduceTransparency: false,
     appMaterial: "solid",
     homeMaterial: "inherit",
@@ -785,9 +787,9 @@ function dedupeSavedZikrIds(values: unknown): string[] {
   ].sort();
 }
 
-function loadLegacySavedZikrIds() {
+function loadLegacySavedZikrIds(raw: string | null) {
   try {
-    return dedupeSavedZikrIds(JSON.parse(window.localStorage.getItem(LEGACY_SAVED_ZIKR_STORAGE_KEY) ?? "[]"));
+    return dedupeSavedZikrIds(JSON.parse(raw ?? "[]"));
   } catch {
     return [];
   }
@@ -920,6 +922,8 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
       boldText: typeof settings?.boldText === "boolean" ? settings.boldText : DEFAULT_APP_STATE.settings.boldText,
       reduceMotion:
         typeof settings?.reduceMotion === "boolean" ? settings.reduceMotion : DEFAULT_APP_STATE.settings.reduceMotion,
+      readerToolLabels: typeof settings?.readerToolLabels === "boolean" ? settings.readerToolLabels : true,
+      readerMeaningOnly: typeof settings?.readerMeaningOnly === "boolean" ? settings.readerMeaningOnly : false,
       homeWirdImages:
         typeof settings?.homeWirdImages === "boolean"
           ? settings.homeWirdImages
@@ -1058,21 +1062,57 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
  *
  * @returns {AppStateSnapshot} The merged application state.
  */
+interface AppStateReadCache {
+  raw?: string | null;
+  legacy?: string | null;
+  dayKey?: string;
+  snapshot?: AppStateSnapshot;
+}
+
+/** Boot-owned reuse, invalidated by exact storage bytes and devotional rollover.
+ * This also catches another tab writing while the lazy application code loads. */
+export function createAppStateReader() {
+  const cache: AppStateReadCache = {};
+  return () => readAppState(cache);
+}
+
 export function loadAppState(): AppStateSnapshot {
+  return readAppState();
+}
+
+function readAppState(cache?: AppStateReadCache): AppStateSnapshot {
   if (typeof window === "undefined") {
     return DEFAULT_APP_STATE;
   }
 
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      return {
-        ...DEFAULT_APP_STATE,
-        savedZikrIds: loadLegacySavedZikrIds(),
-      };
+    let legacy: string | null = null;
+    try {
+      legacy = window.localStorage.getItem(LEGACY_SAVED_ZIKR_STORAGE_KEY);
+    } catch {
+      // An unavailable legacy namespace must not hide the primary snapshot.
     }
-
-    return normalizeAppState(JSON.parse(raw), loadLegacySavedZikrIds());
+    if (
+      cache?.snapshot &&
+      cache.raw === raw &&
+      cache.legacy === legacy &&
+      cache.dayKey === getProgressDayKey(new Date(), cache.snapshot.settings.progressDayStartHour)
+    )
+      return cache.snapshot;
+    const snapshot = !raw
+      ? {
+          ...DEFAULT_APP_STATE,
+          savedZikrIds: loadLegacySavedZikrIds(legacy),
+        }
+      : normalizeAppState(JSON.parse(raw), loadLegacySavedZikrIds(legacy));
+    if (cache) {
+      cache.raw = raw;
+      cache.legacy = legacy;
+      cache.snapshot = snapshot;
+      cache.dayKey = getProgressDayKey(new Date(), snapshot.settings.progressDayStartHour);
+    }
+    return snapshot;
   } catch {
     return DEFAULT_APP_STATE;
   }
@@ -1098,10 +1138,50 @@ export function saveAppState(state: AppStateSnapshot): boolean {
   }
 }
 
-/** Resets preferences while preserving progress, sessions, saved items, and account metadata. */
-export function resetStoredSettings() {
+/** Mount-owned fast path for immutable application snapshots. External/imported
+ * values still use saveAppState's full normalization. One serialized base is
+ * retained; count changes never defer the actual durable single-key write. */
+export function createAppStateWriter() {
+  let previous: AppStateSnapshot | undefined;
+  let previousDay = "";
+  let baseJson = "";
+  const isBaseKey = (key: string) =>
+    key !== "partialZikrCounts" && key !== "masbahaState" && key !== "lastActiveDayKey";
+  return (snapshot: AppStateSnapshot): boolean => {
+    if (typeof window === "undefined") return false;
+    try {
+      const dayKey = getProgressDayKey(new Date(), snapshot.settings.progressDayStartHour);
+      const keys = Object.keys(snapshot).filter(isBaseKey) as (keyof AppStateSnapshot)[];
+      if (
+        !previous ||
+        previousDay !== dayKey ||
+        Object.keys(previous).filter(isBaseKey).length !== keys.length ||
+        keys.some((key) => previous![key] !== snapshot[key])
+      ) {
+        const normalized = normalizeAppState({ ...snapshot, lastActiveDayKey: dayKey });
+        baseJson = JSON.stringify({ ...normalized, partialZikrCounts: undefined, masbahaState: undefined }).slice(
+          0,
+          -1,
+        );
+        previous = { ...snapshot };
+        previousDay = dayKey;
+      }
+      const counters = JSON.stringify({
+        partialZikrCounts: normalizePartialZikrCounts(snapshot.partialZikrCounts),
+        masbahaState: normalizeMasbahaState(snapshot.masbahaState),
+      });
+      window.localStorage.setItem(STORAGE_KEY, `${baseJson},${counters.slice(1)}`);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+}
+
+/** Never discard the only saved snapshot when recovery cannot be committed. */
+export function resetStoredSettings(): boolean {
   if (typeof window === "undefined") {
-    return;
+    return false;
   }
 
   try {
@@ -1113,12 +1193,9 @@ export function resetStoredSettings() {
         settings: DEFAULT_APP_STATE.settings,
       }),
     );
+    return true;
   } catch {
-    try {
-      window.localStorage.removeItem(STORAGE_KEY);
-    } catch {
-      // The recovery screen can still reload with in-memory defaults.
-    }
+    return false;
   }
 }
 
@@ -1291,6 +1368,12 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
         typeof incoming.settings?.reduceMotion === "boolean"
           ? incoming.settings.reduceMotion
           : safeBase.settings.reduceMotion,
+      // A foreign snapshot must not change this device's reading-language choice.
+      readerMeaningOnly: safeBase.settings.readerMeaningOnly,
+      readerToolLabels:
+        typeof incoming.settings?.readerToolLabels === "boolean"
+          ? incoming.settings.readerToolLabels
+          : safeBase.settings.readerToolLabels,
       homeWirdImages:
         typeof incoming.settings?.homeWirdImages === "boolean"
           ? incoming.settings.homeWirdImages

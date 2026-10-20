@@ -29,6 +29,8 @@ export interface SettingsScreenProps {
   textSize: TextSizeOption;
   showTranslation: boolean;
   showTransliteration: boolean;
+  readerToolLabels?: boolean;
+  onReaderToolLabelsChange?: (value: boolean) => void;
   highContrast: boolean;
   boldText: boolean;
   reduceMotion: boolean;

@@ -48,6 +48,7 @@ export function buildPrayerCardModels(
         ? {
             countdown: t(language, "prayerTracking.timeLeft", { time: countdown }),
             remainingPercent: timeline.remainingPercent,
+            countdownInterval: { startsAt: timeline.current.at, endsAt: timeline.next.at },
           }
         : {}),
     };

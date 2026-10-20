@@ -3,7 +3,7 @@ import { recentDayKeys } from "../app/syncMerge";
 import { normalizeZikrHistory } from "../app/zikrHistory";
 
 export type RemoteSyncSnapshot = Omit<AppStateSnapshot, "settings" | "profile"> & {
-  settings: Omit<UserSettingsState, "location">;
+  settings: Omit<UserSettingsState, "location" | "readerMeaningOnly">;
   profile?: {
     displayName: string;
   };
@@ -17,6 +17,7 @@ export const FORBIDDEN_SYNC_KEYS = new Set([
   "phone",
   "accountUserId",
   "avatarUrl",
+  "readerMeaningOnly",
 ]);
 
 /**
@@ -51,7 +52,7 @@ export function assertNoForbiddenSyncFields(data: unknown, path = ""): void {
  * Bounds session history to the newest 100 entries.
  */
 export function buildRemoteSyncSnapshot(state: AppStateSnapshot): RemoteSyncSnapshot {
-  const safeSettings: Omit<UserSettingsState, "location"> = {
+  const safeSettings: Omit<UserSettingsState, "location" | "readerMeaningOnly"> = {
     language: state.settings.language,
     darkMode: state.settings.darkMode,
     themeMode: state.settings.themeMode,
@@ -62,6 +63,7 @@ export function buildRemoteSyncSnapshot(state: AppStateSnapshot): RemoteSyncSnap
     highContrast: state.settings.highContrast,
     boldText: state.settings.boldText,
     reduceMotion: state.settings.reduceMotion,
+    readerToolLabels: state.settings.readerToolLabels,
     reduceTransparency: state.settings.reduceTransparency,
     homeWirdImages: state.settings.homeWirdImages,
     hapticFeedback: state.settings.hapticFeedback,

@@ -793,10 +793,10 @@ for (const language of ["ar", "en"] as const) {
     const modal = await openSharing(page, language, "before-sleep", true);
     const actions = modal.getByTestId("sharing-export-actions");
     const labels = language === "ar" ? ["مشاركة", "حفظ", "نسخ الصورة"] : ["Share", "Save", "Copy image"];
-    await expect(actions.getByRole("button")).toHaveText(["", ...labels]);
+    await expect(actions.getByRole("button")).toHaveText(labels);
     await expect(
       actions.getByRole("button", { name: t(language, "shareStudio.previousStep"), exact: true }),
-    ).toBeEnabled();
+    ).toHaveCount(0);
     await expect(
       modal.getByText(language === "ar" ? "خيارات الحفظ والنسخ" : "Save and copy options", { exact: true }),
     ).toHaveCount(0);
@@ -806,15 +806,15 @@ for (const language of ["ar", "en"] as const) {
         return { top: bounds.top, height: bounds.height, width: bounds.width, left: bounds.left, right: bounds.right };
       }),
     );
-    expect(new Set(normal.slice(0, 3).map((button) => button.top)).size).toBe(1);
-    expect(normal[3]!.top).toBeGreaterThanOrEqual(normal[1]!.top + normal[1]!.height);
-    expect(normal[3]!.left).toBeCloseTo(Math.min(normal[1]!.left, normal[2]!.left), 0);
-    expect(normal[3]!.right).toBeCloseTo(Math.max(normal[1]!.right, normal[2]!.right), 0);
+    expect(new Set(normal.slice(0, 2).map((button) => button.top)).size).toBe(1);
+    expect(normal[2]!.top).toBeGreaterThanOrEqual(normal[1]!.top + normal[1]!.height);
+    expect(normal[2]!.left).toBeCloseTo(Math.min(normal[0]!.left, normal[1]!.left), 0);
+    expect(normal[2]!.right).toBeCloseTo(Math.max(normal[0]!.right, normal[1]!.right), 0);
     for (const button of normal) {
       expect(button.height).toBeGreaterThanOrEqual(44);
       expect(button.width).toBeGreaterThanOrEqual(44);
     }
-    await expect(actions.locator('button svg[aria-hidden="true"]')).toHaveCount(4);
+    await expect(actions.locator('button svg[aria-hidden="true"]')).toHaveCount(3);
     await page.screenshot({ path: testInfo.outputPath(`sharing-footer-${language}.png`) });
     await page.evaluate(() => {
       document.documentElement.style.fontSize = "200%";

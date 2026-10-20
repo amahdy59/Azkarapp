@@ -236,6 +236,24 @@ function database(responses: Record<string, QueryResult[]> = {}) {
 const sessionFor = (id: string) => ({ user: { id, email: "reader@example.test" } }) as unknown as Session;
 
 describe("remote synchronization boundaries", () => {
+  it("keeps main reading language on this device and omits it from uploads", async () => {
+    const local = { ...DEFAULT_APP_STATE, settings: { ...DEFAULT_APP_STATE.settings, readerMeaningOnly: true } };
+    expect(buildRemoteSettingsJson(local)).not.toHaveProperty("readerMeaningOnly");
+    database({
+      user_settings: [{ data: { dark_mode: true, settings_json: { readerMeaningOnly: false } }, error: null }],
+    });
+    expect((await loadRemoteState(sessionFor("local-language"), local)).settings.readerMeaningOnly).toBe(true);
+  });
+  it("round trips footer labels and preserves the local choice for legacy remote settings", async () => {
+    const local = { ...DEFAULT_APP_STATE, settings: { ...DEFAULT_APP_STATE.settings, readerToolLabels: false } };
+    expect(buildRemoteSettingsJson(local).readerToolLabels).toBe(false);
+    database({ user_settings: [{ data: { dark_mode: true, settings_json: {} }, error: null }] });
+    expect((await loadRemoteState(sessionFor("legacy-labels"), local)).settings.readerToolLabels).toBe(false);
+    database({
+      user_settings: [{ data: { dark_mode: true, settings_json: { readerToolLabels: true } }, error: null }],
+    });
+    expect((await loadRemoteState(sessionFor("labelled"), local)).settings.readerToolLabels).toBe(true);
+  });
   it("merges item history from account settings without overwriting local days", async () => {
     const row = {
       dayKey: "2026-10-01",

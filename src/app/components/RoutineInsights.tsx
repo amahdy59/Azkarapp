@@ -127,11 +127,12 @@ export function RoutineInsights({
       <h2 id="routine-insights-heading" data-testid="progress-primary-heading" className="text-lg font-black">
         {progressText(language, "insights.routineTitle")}
       </h2>
-      <p className="mb-5 mt-2 text-xs leading-relaxed text-muted-foreground">
+      <p className="mb-5 mt-2 progress-help">
         {progressText(language, "insights.coverage", { days: formatNumerals(data.days, language) })}
       </p>
       <RecordingTimeline
         series={timelineSeries}
+        seriesLabel={progressText(language, "insights.routineFilter")}
         language={language}
         period={period}
         title={progressText(language, "insights.routineTimeline")}
@@ -179,7 +180,7 @@ export function RoutineInsights({
           type="button"
           onClick={() => void download()}
           disabled={exportState === "saving"}
-          className="min-h-11 rounded-lg px-3 text-sm font-semibold text-foreground underline underline-offset-4 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-50"
+          className="progress-export"
         >
           {progressText(language, "insights.exportRoutines")}
         </button>

@@ -18,6 +18,7 @@ export interface AppAppearancePreferences {
   highContrast?: boolean;
   boldText?: boolean;
   reduceMotion?: boolean;
+  readerToolLabels?: boolean;
   reduceTransparency?: boolean;
   forceRtl?: boolean;
   colorBlindSupport?: ColorBlindSupport;
@@ -33,6 +34,7 @@ export function applyAppAppearance({
   highContrast = false,
   boldText = false,
   reduceMotion = false,
+  readerToolLabels = true,
   reduceTransparency = false,
   forceRtl = false,
   colorBlindSupport = "none",
@@ -59,6 +61,7 @@ export function applyAppAppearance({
   if (reduceTransparency) root.classList.add("reduce-transparency");
 
   const fontSizes: Record<TextSizeOption, string> = { small: "14px", medium: "16px", large: "18px" };
+  root.dataset.readerToolLabels = String(readerToolLabels);
   root.dataset.appMaterial = appMaterial;
   root.dataset.appMaterialResolved =
     !highContrast &&

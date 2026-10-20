@@ -56,6 +56,7 @@ test("installed app preserves item records and loads cold Progress offline", asy
   try {
     await context.setOffline(true);
     await page.goto("/#/progress/month");
+    await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
     await expect(page.getByTestId("zikr-insights")).toContainText("Patterns appear after three recorded days");
     await expect.poll(history).toEqual([expect.objectContaining({ completedIds: ["m-hm-77m"] })]);
   } finally {

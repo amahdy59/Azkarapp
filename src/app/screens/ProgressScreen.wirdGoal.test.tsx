@@ -1,8 +1,14 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { ProgressScreen } from "./ProgressScreen";
 import { getProgressDayKey } from "../progress";
 import type { DailyCollectionCompletion, QuranWirdPlan } from "../types";
+
+function openDailyDetails() {
+  const details = screen.getByTestId("progress-detailed-context") as HTMLDetailsElement;
+  details.open = true;
+  fireEvent(details, new Event("toggle"));
+}
 
 describe("ProgressScreen Quran wird completion consistency", () => {
   const now = new Date();
@@ -37,6 +43,7 @@ describe("ProgressScreen Quran wird completion consistency", () => {
       />,
     );
 
+    openDailyDetails();
     const wirdButton = screen.getByText("Quran Wird", { exact: true }).closest("div")!;
     expect(wirdButton.querySelector("button, input, select")).toBeNull();
     expect(within(wirdButton).getByText("0 / 4 pages")).toBeInTheDocument();
@@ -57,6 +64,7 @@ describe("ProgressScreen Quran wird completion consistency", () => {
       />,
     );
 
+    openDailyDetails();
     const wirdButton = screen.getByText("Quran Wird", { exact: true }).closest("div")!;
     expect(wirdButton.querySelector("button, input, select")).toBeNull();
     expect(within(wirdButton).getByText("1 / 4 pages")).toBeInTheDocument();
@@ -77,6 +85,7 @@ describe("ProgressScreen Quran wird completion consistency", () => {
       />,
     );
 
+    openDailyDetails();
     const wirdButton = screen.getByText("Quran Wird", { exact: true }).closest("div")!;
     expect(wirdButton.querySelector("button, input, select")).toBeNull();
     expect(within(wirdButton).getByText("Completed")).toBeInTheDocument();
@@ -97,8 +106,10 @@ describe("ProgressScreen Quran wird completion consistency", () => {
       />,
     );
 
+    openDailyDetails();
+    expect(screen.queryByText("Quran Wird", { exact: true })).not.toBeInTheDocument();
     expect(screen.queryByTestId("daily-companions-card")).not.toBeInTheDocument();
-    expect(screen.queryByText(/pages/i)).not.toBeInTheDocument();
+    expect(within(screen.getByTestId("today-garden-card")).queryByText(/pages/i)).not.toBeInTheDocument();
   });
 
   it("honors manual habit tick even when pages read is 0", () => {
@@ -116,6 +127,7 @@ describe("ProgressScreen Quran wird completion consistency", () => {
       />,
     );
 
+    openDailyDetails();
     const wirdButton = screen.getByText("Quran Wird", { exact: true }).closest("div")!;
     expect(wirdButton.querySelector("button, input, select")).toBeNull();
     expect(within(wirdButton).getByText("Completed")).toBeInTheDocument();
@@ -146,6 +158,7 @@ describe("ProgressScreen Quran wird completion consistency", () => {
       />,
     );
 
+    openDailyDetails();
     const wirdButton = screen.getByText("Quran Wird", { exact: true }).closest("div")!;
     expect(wirdButton.querySelector("button, input, select")).toBeNull();
     expect(within(wirdButton).getByText("3 / 20 pages")).toBeInTheDocument();

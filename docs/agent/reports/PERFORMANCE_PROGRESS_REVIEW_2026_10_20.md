@@ -1,5 +1,9 @@
 # Performance, stability and Progress review — 2026-10-20
 
+## Local follow-up after owner clarification
+
+The owner identifies Progress and withholds further pushes while working elsewhere. A genuine internal-controls overlap is now reproduced at 320×480 with 200% text: tabs pass through the always-transparent sticky title. Protect its own internally scrolled state with the existing opaque on-media surface and no second blur; retain transparent internal rest and outer record frost. Also repair keyboard clearance after measuring a focused tab behind that title. Cancelled exports now stop before discarded font/layout/canvas work at asynchronous boundaries. See [local phase report](../phases/PROGRESS_INTERNAL_HEADER_LOCAL_2026_10_20.md) for reproductions and final verification. The earlier unspecified-symptom caveat below records the initial investigation, preceding this clarification.
+
 ## Scope and evidence
 
 Reviewed shell/materials and header scroll ownership, Progress derivation/charts, clocks/startup deferral, sharing preparation/cancellation, the existing Progress proposal, local evidence and every failed job in Quality run 39357670363. This is a focused engineering review, not an exhaustive app/device certification. Physical GPU/inertial-scroll and assistive-technology acceptance remain separate.

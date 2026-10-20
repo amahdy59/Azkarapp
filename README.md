@@ -10,7 +10,7 @@ Production site: [amahdy59.github.io/Azkarapp](https://amahdy59.github.io/Azkara
 
 ## Product capabilities
 
-- Reviewed azkar collections with Arabic-first reading and optional English translation/transliteration
+- Reviewed azkar collections with Arabic-first reading and optional English translation/transliteration and a remembered on-device English main-text choice
 - Preview and share individual azkar or collections as complete image cards, text or contextual links, with selectable artwork/formats, explicit card selection, long-surah Mushaf reminders and one-file ZIP saving
 - Time-aware Home recommendations, next-prayer countdown, and Hijri date
 - Private on-device astronomical prayer timings with selectable calculation methods and manual minute adjustments

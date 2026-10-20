@@ -33,6 +33,13 @@ for (const language of ["ar", "en"] as const) {
           const button = element.getBoundingClientRect();
           const label = element.querySelector("span");
           const text = label?.getBoundingClientRect();
+          const stacked = getComputedStyle(element).flexDirection === "column";
+          if (stacked && text?.height) {
+            return {
+              iconOffset: Math.abs(icon.x + icon.width / 2 - (button.x + button.width / 2)),
+              textOffset: Math.abs(text.x + text.width / 2 - (button.x + button.width / 2)),
+            };
+          }
           return {
             iconOffset: Math.abs(icon.y + icon.height / 2 - (button.y + button.height / 2)),
             textOffset: text?.height ? Math.abs(text.y + text.height / 2 - (button.y + button.height / 2)) : 0,
@@ -325,7 +332,8 @@ for (const language of ["ar", "en"] as const) {
             left: getComputedStyle(element).paddingLeft,
             right: getComputedStyle(element).paddingRight,
           }));
-          expect(style.radius).toBe(surfaceRadius);
+          // Labelled phone tiles use the shared 0.875rem control radius; primary controls remain pills.
+          expect(style.radius).toBe(width < 600 ? "14px" : surfaceRadius);
           expect(style.left).toBe(style.right);
           padding.push(style.left);
         }

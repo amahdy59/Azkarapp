@@ -15,6 +15,7 @@ export function FridayProgressStats({
   calendarType,
   direction,
   now = new Date(),
+  range,
 }: {
   activeTab: "week" | "month" | "year";
   displayDate: Date;
@@ -22,10 +23,11 @@ export function FridayProgressStats({
   calendarType: CalendarType;
   direction: "rtl" | "ltr";
   now?: Date;
+  range?: { startKey: string; endKey: string };
 }) {
   const period = useMemo(
-    () => getPeriodRange(activeTab, displayDate, language, calendarType),
-    [activeTab, displayDate, language, calendarType],
+    () => range ?? getPeriodRange(activeTab, displayDate, language, calendarType),
+    [range, activeTab, displayDate, language, calendarType],
   );
 
   const { startKey, endKey } = getElapsedPeriod(period.startKey, period.endKey, now);

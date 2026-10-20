@@ -1,3 +1,4 @@
+import { chooseProgressOption } from "./helpers/progress";
 import { mkdir } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
@@ -36,6 +37,7 @@ for (const language of ["ar", "en"] as const) {
         { language, width },
       );
       await page.goto("/#/progress");
+      await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
       const summary = page.getByTestId("prayer-progress-summary");
       await expect(summary).toBeVisible();
       const before = await page.evaluate(() => {
@@ -44,9 +46,7 @@ for (const language of ["ar", "en"] as const) {
       });
       await expect(summary.getByRole("listitem")).toHaveCount(5);
       await expect(summary.getByText(ar ? "في المنزل" : "At home", { exact: true })).toBeVisible();
-      await expect(
-        page.locator(".progress-screen input, .progress-screen select, .progress-screen textarea"),
-      ).toHaveCount(0);
+      await expect(page.locator(".progress-screen input[type=checkbox], .progress-screen textarea")).toHaveCount(0);
       await expect(page.getByRole("button", { name: ar ? "فتح الفجر" : "Open Fajr", exact: true })).toHaveCount(0);
       await expect(summary.locator("details, table")).toHaveCount(0);
       if (width === 320)
@@ -68,15 +68,13 @@ for (const language of ["ar", "en"] as const) {
         ar ? "أتممت أذكار الصلاة" : "Completed the azkar",
       );
       await expect(summary.getByText(ar ? "في المسجد" : "At the mosque", { exact: true })).toBeVisible();
-      await expect(
-        page.locator(".progress-screen input, .progress-screen select, .progress-screen textarea"),
-      ).toHaveCount(0);
+      await expect(page.locator(".progress-screen input[type=checkbox], .progress-screen textarea")).toHaveCount(0);
       const after = await page.evaluate(() => {
         const state = JSON.parse(localStorage.getItem("azkarapp.state.v1")!);
         return { prayers: state.prayerTracking, completions: state.dailyCompletions, habits: state.dailyHabits };
       });
       expect(after).toEqual(before);
-      await page.getByRole("tab", { name: ar ? "أسبوع" : "Week", exact: true }).click();
+      await chooseProgressOption(page.getByRole("combobox", { name: ar ? "الفترة" : "Period", exact: true }), "week");
       await expect(summary).toHaveCount(0);
       await expect(page.getByTestId("prayer-comparison")).toBeVisible();
     });

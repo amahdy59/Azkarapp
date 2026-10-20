@@ -3,6 +3,7 @@ import { render, screen, act, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
 import App from "./App";
+import { DEFAULT_APP_STATE, loadAppState } from "./state";
 
 const loadAudioModuleMock = vi.hoisted(() => vi.fn());
 
@@ -78,6 +79,28 @@ vi.mock("./screens/ProgressScreen", () => ({
 }));
 
 describe("App Composition and Routing", () => {
+  it("reuses startup hydration instead of reading and normalizing storage twice", async () => {
+    const loadStartupState = vi.fn(() => DEFAULT_APP_STATE);
+    render(<App loadStartupState={loadStartupState} />);
+    // Hydration is synchronous, but the first mounted route crosses the mocked
+    // lazy Splash boundary. Resolve cold imports before starting the DOM query's
+    // timeout; coverage transforms must not become a hydration requirement.
+    await act(async () => {
+      await vi.dynamicImportSettled();
+    });
+    expect(await screen.findByTestId("nav-home")).toHaveAttribute("aria-current", "page");
+    expect(loadAppState).not.toHaveBeenCalled();
+    expect(loadStartupState).toHaveBeenCalledTimes(1);
+  });
+
+  it("retains standalone hydration without a startup reader", async () => {
+    render(<App />);
+    await act(async () => {
+      await vi.dynamicImportSettled();
+    });
+    expect(await screen.findByTestId("nav-home")).toHaveAttribute("aria-current", "page");
+    expect(loadAppState).toHaveBeenCalledTimes(1);
+  });
   beforeEach(() => {
     vi.clearAllMocks();
     loadAudioModuleMock.mockResolvedValue({

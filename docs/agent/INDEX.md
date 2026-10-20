@@ -1,3 +1,9 @@
+[Protected dropdowns](phases/DROPDOWN_PROTECTION_2026_10_20.md) fixes the supplied Juz-picker text bleed and stacking defect through portalled searchable pickers and a shared opaque dropdown contract across layouts/themes. Local only; preserve concurrent work, no commit/push/deployment.
+
+[Focused Progress dashboard report](reports/PROGRESS_FOCUSED_DASHBOARD_2026_10_20_REPORT.md) records the local layout/date-range implementation, app-matched menus, transparent scrolling frost, independent analytics and verification evidence. No commit, push or deployment.
+
+[Local reliability and performance](phases/LOCAL_RELIABILITY_PERFORMANCE_2026_10_20.md) applies all five owner-approved review recommendations: non-destructive recovery, generation-owned sharing preparation/cancellation, synchronous count-save reuse, boot hydration reuse and indexed historical judgments. Preserve concurrent Progress/reading changes; no commit, push or deployment.
+
 [Sharing board adaptation](phases/SHARING_BOARD_ADAPTATION_2026_10_19.md) applies the owner-approved balanced wide-screen preview/settings layout, explicit optional design skip, labelled artwork choices and truthful visible feedback. Keep current card generation and image-first flow; no hosted permissions/expiry/embed features. Local only; no push without confirmation.
 
 [Compact Quran wird plan form](phases/WIRD_COMPACT_PLAN_FORM_2026_10_19.md) applies the owner-approved four-choice Reading plan select, conditional completion schedule, selected-only fields and live summary. Existing saved kinds/calculations/history remain unchanged. Local only; owner confirmation is required before any push.
@@ -457,3 +463,13 @@ Local follow-up: [Concise, actionable Progress](phases/PROGRESS_REFINEMENTS_2026
 [Sharing and Quran plan release](phases/COMBINED_SHARING_WIRD_RELEASE_2026_10_20.md) records the owner's "push all changes" confirmation, superseding pending publication holds, and the verification/publication plan.
 
 [Performance, Progress and header review](phases/PERFORMANCE_PROGRESS_HEADER_REVIEW_2026_10_20.md) is the owner's subsequent review/repair request: measured scroll-calculation reuse, protected unavailable-frost headers, responsive target repair and release verification. [Review findings](reports/PERFORMANCE_PROGRESS_REVIEW_2026_10_20.md) prioritize future work and qualify the still-proposed Progress redesign.
+
+[Local Progress overlap and cancellation repair](phases/PROGRESS_INTERNAL_HEADER_LOCAL_2026_10_20.md) is the active follow-up. The owner identifies Progress and explicitly withholds further pushes while working elsewhere. Protect the title during independently scrolling filters, restore keyboard clearance and avoid cancelled export preparation. Preserve concurrent edits; leave this work local for review.
+
+[Focused Progress dashboard and date ranges](phases/PROGRESS_FOCUSED_DASHBOARD_2026_10_20.md) is the active owner-approved implementation, superseding the proposal-only dashboard status. Preserve the no-push hold and stronger-frost/no-darkening correction. Build shared ranges, concise independent metrics, one selected trend and useful optional comparisons/exact records with tested calendar/data semantics and responsive accessibility.
+
+[Footer, sharing and control feedback](phases/CONTROL_FEEDBACK_SHARING_2026_10_20.md) is the owner's current local-only control refinement, including the subsequent English-reader translation toggle. Preserve concurrent Progress and card work; no publication.
+
+[Remembered reading and feedback polish](phases/READING_PREFERENCES_FEEDBACK_POLISH_2026_10_20.md) is the owner's current approved follow-up: device-only meaning preference, stationary reading-language action, live Settings footer preview and finite interaction polish. All work stays local; the owner will handle pushing later.
+
+[Prayer seconds and purposeful motion](phases/PRAYER_SECONDS_AND_PURPOSEFUL_MOTION_2026_10_20.md) is the owner's approved local-only follow-up: one-line mobile seconds without “left”, a small functional interval ring, visibility-paused isolated clock and an explicit positive animation policy with OS/app reduced-motion alternatives. Preserve concurrent work; no publication.

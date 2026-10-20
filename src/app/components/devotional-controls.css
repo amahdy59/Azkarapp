@@ -1,0 +1,28 @@
+/* Shared action appearance, including the Settings preview. */
+.reader-dock {
+  --devotional-control-radius: 999px;
+}
+
+.reader-dock button {
+  border-radius: var(--devotional-control-radius);
+}
+
+.reader-dock .devotional-secondary-action,
+.adaptive-counter-nav.devotional-secondary-action {
+  background: var(--card);
+  border-color: color-mix(in srgb, var(--border-control) 55%, transparent);
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.reader-dock .devotional-secondary-action:hover:not(:disabled),
+.adaptive-counter-nav.devotional-secondary-action:hover:not(:disabled) {
+  background: var(--muted);
+  border-color: color-mix(in srgb, var(--primary) 25%, var(--border-control));
+}
+
+.reader-dock .devotional-secondary-action:focus-visible,
+.adaptive-counter-nav.devotional-secondary-action:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+}

@@ -70,13 +70,16 @@ for (const language of ["ar", "en"] as const) {
               };
             }),
           );
+          expect(new Set(geometry.map((item) => Math.round(item.top))).size).toBe(
+            // Standalone counters also retain their desktop keyboard-help target.
+            textScale === 2 && (width < 600 || route !== "azkar/morning/1") ? 2 : 1,
+          );
           for (const item of geometry) {
             expect(item.left).toBeGreaterThanOrEqual(0);
             expect(item.right).toBeLessThanOrEqual(width);
             expect(item.width).toBeGreaterThanOrEqual(44);
             expect(item.height).toBeGreaterThanOrEqual(44);
-            expect(item.top).toBeCloseTo(geometry[0].top, 0);
-            expect(item.labelVisible).toBe(width === 1440 && textScale === 1);
+            expect(item.labelVisible).toBe(true);
             expect(item.labelClipped).toBe(false);
             expect(item.ellipsis).toBe(false);
           }

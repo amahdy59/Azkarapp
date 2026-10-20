@@ -1,6 +1,6 @@
 # Progress: one date range, chosen metrics
 
-Status: proposed for owner review; no Progress behavior or persisted data changed in this release.
+Status: owner approved implementation on 2026-10-20; implemented locally and under verification. No commit/push is authorized. See [active phase](phases/PROGRESS_FOCUSED_DASHBOARD_2026_10_20.md). The original proposal below records design intent; preferences remain visit-local and schema/sync are unchanged.
 
 ## Follow-up review — 2026-10-20
 
@@ -55,4 +55,4 @@ The [GOV.UK select guidance](https://design-system.service.gov.uk/components/sel
 
 ## Decision requested for the next phase
 
-Approve the consistent overview with four default metrics, one shared Period selector including Custom, and one selectable prominent timeline. This is a proposed next phase; the current release changes sharing and the Quran wird overview only.
+The owner subsequently explicitly approved implementation of the layout and date-range redesign, including focused analytics, accessible charts and smart tables. The active local phase implements the shared Period/Custom model, independent overview and selected trend. Publication remains withheld at the owner's request.
