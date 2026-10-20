@@ -201,7 +201,7 @@ describe("collectionShareCard", () => {
       }
     });
   }
-  it("balances short summaries without moving devotional defaults, text or footer", () => {
+  it("balances short single readings without changing measured text, panel size or footer", () => {
     const { canvas, context } = createMockCanvas();
     const originalCreateElement = document.createElement.bind(document);
     vi.spyOn(document, "createElement").mockImplementation(((tagName: string) =>
@@ -212,13 +212,13 @@ describe("collectionShareCard", () => {
       format: "square" as const,
       items: [{ id: "record", arabicText: "Recorded practice", textDirection: "ltr" as const, hideRepetition: true }],
     };
-    renderCollectionStoryPage(input);
+    renderCollectionStoryPage({ ...input, contentAlignment: "start" });
     const normalPanel = vi.mocked(context.roundRect).mock.calls.find((call) => call[2] === 952)!;
     const normalText = vi.mocked(context.fillText).mock.calls.map((call) => call[0]);
     const normalFooter = vi.mocked(context.fillText).mock.calls.find((call) => call[0] === "wa-zaker.com")!;
     vi.mocked(context.roundRect).mockClear();
     vi.mocked(context.fillText).mockClear();
-    renderCollectionStoryPage({ ...input, contentAlignment: "center" });
+    renderCollectionStoryPage(input);
     const summaryPanel = vi.mocked(context.roundRect).mock.calls.find((call) => call[2] === 952)!;
     expect(summaryPanel[1]).toBeGreaterThan(normalPanel[1] + 100);
     expect(summaryPanel[2]).toBe(normalPanel[2]);

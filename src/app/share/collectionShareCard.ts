@@ -74,8 +74,8 @@ export interface CollectionStoryPageInput {
   url?: string;
   qr?: boolean;
   layout?: ShareLayoutPage;
-  /** Summary cards can balance a short record; devotional cards stay top-aligned. */
-  contentAlignment?: "start" | "center";
+  /** Short single readings balance within the frame; long readings keep their top anchor. */
+  contentAlignment?: "start" | "center" | "balanced";
 }
 export interface GeneratedCollectionStoryCard {
   pageNumber: number;
@@ -193,7 +193,13 @@ export function renderCollectionStoryPage(input: CollectionStoryPageInput): HTML
     layout.fragments.reduce((sum, fragment) => sum + fragment.height, 0) +
     (layout.fragments.length - 1) * SHARE_COMPACT.panelGap;
   const freeSpace = Math.max(0, geometry.bottom - geometry.top - totalHeight);
-  let y = geometry.top + (input.contentAlignment === "center" ? freeSpace / 2 : Math.min(24, freeSpace / 2));
+  const balanced =
+    (input.contentAlignment ?? "balanced") === "balanced" &&
+    input.single &&
+    layout.fragments.length === 1 &&
+    totalHeight < (geometry.bottom - geometry.top) * 0.7;
+  let y =
+    geometry.top + (input.contentAlignment === "center" || balanced ? freeSpace / 2 : Math.min(24, freeSpace / 2));
   for (const fragment of layout.fragments) {
     const x = 64;
     fillRoundedRect(ctx, x, y, geometry.width, fragment.height, 28, palette.surface);

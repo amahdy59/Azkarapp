@@ -110,8 +110,19 @@ for (const language of ["ar", "en"] as const) {
         });
         await page.screenshot({ path: testInfo.outputPath(`sharing-${language}-${viewport.width}-${step}.png`) });
         expect(bounds.scrollWidth).toBeLessThanOrEqual(bounds.width + 1);
-        if (viewport.width === 390)
-          expect(bounds.scroll - bounds.height, `${step} on ${viewport.width}px`).toBeLessThanOrEqual(1);
+        if (viewport.width === 390) {
+          // The owner now prioritizes a larger preview and stable full-screen
+          // chrome. Complete collection settings may scroll inside that frame.
+          expect((await modal.boundingBox())!.height).toBeCloseTo(viewport.height, 1);
+          const fields = modal.getByTestId("sharing-settings").getByRole("combobox");
+          for (const field of await fields.all()) {
+            await field.focus();
+            await expect(field).toBeInViewport();
+            const fieldBounds = (await field.boundingBox())!;
+            const footer = (await modal.getByTestId("sharing-actions").boundingBox())!;
+            expect(fieldBounds.y + fieldBounds.height).toBeLessThanOrEqual(footer.y + 1);
+          }
+        }
         await page.screenshot({ path: testInfo.outputPath(`sharing-${language}-${viewport.width}-${step}.png`) });
       }
     }

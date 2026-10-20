@@ -464,6 +464,9 @@ const en = {
     progressComplete: "Friday practices complete — may Allah accept your worship.",
   },
   library: {
+    searchFilters: "Search and filters",
+    showResults: "Show results",
+    clearFilters: "Clear filters",
     authenticTitle: "Authentic Verified Zikr Library",
     authenticSubtitle: "Authentic Sunnah & Sahabah Supplications",
     authenticSearch: "Search dhikr or benefit...",
@@ -1181,11 +1184,17 @@ const en = {
     translationUnavailable: "The English meaning for this page is unavailable.",
   },
   audioPlayer: {
+    unlockProgress: "Hold to unlock progress",
+    pinningHelp: "Keep this app on screen",
+    pinningHint:
+      "This lock protects app controls. To restrict leaving the app, use your device's App pinning or Guided Access.",
+    androidPinning: "Android App pinning help",
+    guidedAccess: "iPhone Guided Access help",
     lockControls: "Lock controls",
     controlsLocked: "Audio controls locked",
     lockHint:
       "Text and playback stay visible; screen controls are blocked. Hold for 2 seconds to unlock. Keyboard: hold Space or Enter, or press Escape to exit.",
-    holdToUnlock: "Hold to unlock",
+    holdToUnlock: "Hold 2 seconds to unlock",
     keepHolding: "Keep holding…",
     hidePlayer: "Hide player",
     showPlayer: "Show player",
@@ -2317,6 +2326,9 @@ const en = {
     level5Name: "Flourishing Oasis",
   },
   shareStudio: {
+    sharingContent: "What to share",
+    thisZikr: "This zikr",
+    entireCollection: "Entire collection",
     copyImage: "Copy image",
     saveText: "Save text",
     includeCaption: "Include text with image",

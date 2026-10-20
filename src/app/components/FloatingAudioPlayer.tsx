@@ -1311,6 +1311,28 @@ export function FloatingAudioPlayer({
                           />
                         )}
 
+                        <details className="text-sm text-foreground">
+                          <summary className="flex min-h-11 cursor-pointer items-center rounded-xl px-3 font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+                            {t(language, "audioPlayer.pinningHelp")}
+                          </summary>
+                          <p className="px-3 text-muted-foreground">{t(language, "audioPlayer.pinningHint")}</p>
+                          <a
+                            className="flex min-h-11 items-center px-3 underline"
+                            href="https://support.google.com/android/answer/9455138"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {t(language, "audioPlayer.androidPinning")}
+                          </a>
+                          <a
+                            className="flex min-h-11 items-center px-3 underline"
+                            href="https://support.apple.com/guide/iphone/iph7fad0d10/ios"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {t(language, "audioPlayer.guidedAccess")}
+                          </a>
+                        </details>
                         <Popover.Close asChild>
                           <button
                             type="button"

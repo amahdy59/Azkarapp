@@ -73,8 +73,17 @@ for (const language of ["ar", "en"] as const) {
     await unlock.focus();
     await page.keyboard.down("Space");
     await page.clock.runFor(1000);
+    await expect(dialog.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "50");
+    await page.screenshot({ path: testInfo.outputPath(`audio-unlock-half-${language}.png`) });
     await page.keyboard.up("Space");
     await page.clock.runFor(1500);
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByRole("progressbar")).toHaveCount(0);
+    const lockedUrl = page.url();
+    await page.evaluate(() => {
+      window.location.hash = "/settings";
+    });
+    await expect(page).toHaveURL(lockedUrl);
     await expect(dialog).toBeVisible();
     await page.keyboard.down("Space");
     await page.clock.runFor(2001);

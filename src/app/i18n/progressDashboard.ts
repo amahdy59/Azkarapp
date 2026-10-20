@@ -13,6 +13,7 @@ const en = {
   short_evening: "Evening",
   short_sleep: "Bedtime",
   period: "Period",
+  rangeFilters: "Date range and calendar",
   day: "Day",
   week: "Week",
   month: "Month",
@@ -104,6 +105,7 @@ const en = {
   chronological: "Dates run from earlier to later, left to right in English and right to left in Arabic.",
 };
 const ar: Record<keyof typeof en, string> = {
+  rangeFilters: "الفترة والتقويم",
   short_prayers: "الفرائض",
   short_routines: "الأوراد اليومية",
   short_pages: "صفحات القرآن",

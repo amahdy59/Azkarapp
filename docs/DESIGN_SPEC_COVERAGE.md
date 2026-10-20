@@ -4,6 +4,8 @@ This file maps the supplied July 2026 design specification to implementation evi
 
 ## Implemented
 
+- Owner-approved mobile refinement: stable full-screen sharing, selectable zikr/collection content, larger previews and balanced short readings; native compact Library/Progress filters with visible applied context; factual hold-to-unlock feedback and protected in-app navigation. Native OS pinning and human screen-reader/device acceptance remain separate.
+
 - Splash → language → login/guest → localized onboarding → Home flow.
 - Morning, Evening, and Sleep session cards with not-started, partial, and complete progress states.
 - Category browsing, zikr reader/counter, audio controls, completion summary, search, settings, and download/notification panels.

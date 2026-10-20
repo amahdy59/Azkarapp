@@ -1,3 +1,5 @@
+[Mobile sharing, compact filters and listening protection](phases/MOBILE_SHARING_FILTERS_LOCK_2026_10_20.md) is the active owner-approved implementation and release. Apply every reviewed recommendation and push the verified result, superseding earlier publication holds. Retain the committed integration repair and complete exact-commit Quality, Pages and production acceptance.
+
 [Protected dropdowns](phases/DROPDOWN_PROTECTION_2026_10_20.md) fixes the supplied Juz-picker text bleed and stacking defect through portalled searchable pickers and a shared opaque dropdown contract across layouts/themes. Local only; preserve concurrent work, no commit/push/deployment.
 
 [Focused Progress dashboard report](reports/PROGRESS_FOCUSED_DASHBOARD_2026_10_20_REPORT.md) records the local layout/date-range implementation, app-matched menus, transparent scrolling frost, independent analytics and verification evidence. No commit, push or deployment.

@@ -462,6 +462,9 @@ const ar = {
     progressComplete: "اكتملت أعمال الجمعة — تقبل الله طاعتك.",
   },
   library: {
+    searchFilters: "البحث والتصفية",
+    showResults: "عرض النتائج",
+    clearFilters: "مسح التصفية",
     authenticTitle: "مكتبة الأذكار المأثورة الموثقة",
     authenticSubtitle: "أذكار ثابتة عن النبي ﷺ وأصحابه",
     authenticSearch: "ابحث في الذكر أو فضله...",
@@ -1157,11 +1160,17 @@ const ar = {
     translationUnavailable: "المعنى بالإنجليزية غير متاح لهذه الصفحة.",
   },
   audioPlayer: {
+    unlockProgress: "تقدم الضغط لفتح القفل",
+    pinningHelp: "إبقاء التطبيق على الشاشة",
+    pinningHint:
+      "يحمي هذا القفل أزرار التطبيق. لمنع مغادرة التطبيق، استخدم تثبيت التطبيقات أو الوصول الموجّه من إعدادات جهازك.",
+    androidPinning: "مساعدة تثبيت التطبيقات في أندرويد",
+    guidedAccess: "مساعدة الوصول الموجّه في آيفون",
     lockControls: "قفل أزرار التشغيل",
     controlsLocked: "أزرار الصوت مقفلة",
     lockHint:
       "يبقى النص والتشغيل ظاهرين مع منع لمس الأزرار. اضغط مطولًا ثانيتين لفتح القفل. بلوحة المفاتيح: اضغط مطولًا على المسافة أو Enter، أو اضغط Escape للخروج.",
-    holdToUnlock: "اضغط مطولًا لفتح القفل",
+    holdToUnlock: "اضغط ثانيتين لفتح القفل",
     keepHolding: "استمر بالضغط…",
     hidePlayer: "إخفاء المشغّل",
     showPlayer: "إظهار المشغّل",
@@ -2320,6 +2329,9 @@ const ar = {
     level5Name: "واحة مزدهرة",
   },
   shareStudio: {
+    sharingContent: "ما تريد مشاركته",
+    thisZikr: "هذا الذكر",
+    entireCollection: "المجموعة كاملة",
     copyImage: "نسخ الصورة",
     saveText: "حفظ النص",
     includeCaption: "إرفاق نص مع الصورة",

@@ -137,7 +137,7 @@ test("Arabic large text keeps Progress controls and month details usable at comp
   await page.getByTestId("nav-progress").click();
   await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
 
-  const period = page.getByRole("combobox", { name: "الفترة", exact: true });
+  const period = page.getByRole("combobox", { name: "الفترة", exact: true, includeHidden: true });
   await period.click();
   const options = page.getByRole("option");
   await expect(options).toHaveCount(5);
@@ -228,7 +228,7 @@ test("month view shows routine patterns without the removed summary card", async
 
   await page.getByRole("link", { name: "Progress", exact: true }).click();
   await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
-  await chooseProgressOption(page.getByRole("combobox", { name: "Period", exact: true }), "month");
+  await chooseProgressOption(page.getByRole("combobox", { name: "Period", exact: true, includeHidden: true }), "month");
 
   await expect(page.getByTestId("today-garden-card").getByRole("heading", { name: /rhythm|إيقاع/ })).toBeVisible();
   await expect(page.getByRole("table")).toHaveCount(0);
@@ -279,7 +279,7 @@ test("weekly charts convey complete-day recording values through accessible text
 
   await page.getByRole("link", { name: "Progress", exact: true }).click();
   await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
-  await chooseProgressOption(page.getByRole("combobox", { name: "Period", exact: true }), "week");
+  await chooseProgressOption(page.getByRole("combobox", { name: "Period", exact: true, includeHidden: true }), "week");
 
   const garden = page.getByTestId("today-garden-card");
   await expect(garden.getByTestId("insight-morning").getByRole("img")).toHaveAccessibleName(

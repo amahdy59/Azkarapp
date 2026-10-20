@@ -48,7 +48,7 @@ for (const tab of ["يوم", "أسبوع", "شهر", "سنة"]) {
     await openProgress(page);
 
     await chooseProgressOption(
-      page.getByRole("combobox", { name: "الفترة", exact: true }),
+      page.getByRole("combobox", { name: "الفترة", exact: true, includeHidden: true }),
       { يوم: "day", أسبوع: "week", شهر: "month", سنة: "year" }[tab]!,
     );
     // The chart is the slowest thing to settle; wait on the panel, not a timer.
@@ -68,7 +68,7 @@ test("longer Progress periods compare five prayers with exact data available as 
   await openProgress(page);
 
   await expect(page.getByText(/أَحَبُّ الأَعْمَالِ/)).toBeHidden();
-  await chooseProgressOption(page.getByRole("combobox", { name: "الفترة", exact: true }), "week");
+  await chooseProgressOption(page.getByRole("combobox", { name: "الفترة", exact: true, includeHidden: true }), "week");
 
   await expect(page.getByTestId("prayer-comparison").getByRole("list").getByRole("img")).toHaveCount(5);
   await expect(page.getByRole("table")).toHaveCount(0);

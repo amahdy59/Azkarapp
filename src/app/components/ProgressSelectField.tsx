@@ -13,6 +13,7 @@ export function ProgressSelectField<Value extends string>({
   icon: Icon,
   className = "",
   triggerId,
+  onCloseAutoFocus,
 }: {
   label: string;
   value: Value;
@@ -22,6 +23,7 @@ export function ProgressSelectField<Value extends string>({
   icon: ComponentType<{ className?: string }>;
   className?: string;
   triggerId?: string;
+  onCloseAutoFocus?: (event: Event) => void;
 }) {
   const generatedId = useId();
   const id = triggerId ?? generatedId;
@@ -43,6 +45,7 @@ export function ProgressSelectField<Value extends string>({
           <SelectValue />
         </SelectTrigger>
         <SelectContent
+          onCloseAutoFocus={onCloseAutoFocus}
           align="start"
           sideOffset={4}
           collisionPadding={12}

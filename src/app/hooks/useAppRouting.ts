@@ -6,6 +6,7 @@ import { getAzkarForMode, getAzkarForPrayer, isRoutineCategory, registerLazyColl
 import { reportError } from "../../lib/observability";
 import { startSafeViewTransition } from "../utils/viewTransitions";
 import type { CategoryId, PrayerName, RoutineMode, View, RoutineCategoryId } from "../types";
+import { isAudioControlLocked } from "../audioControlLock";
 
 function categoryFromShortcutUrl(): CategoryId | null {
   const category = new URLSearchParams(window.location.search).get("category");
@@ -86,6 +87,7 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
 
   const routeLoadId = useRef(0);
   const inAppHistoryDepth = useRef(0);
+  const renderedLocation = useRef({ url: window.location.href, state: window.history.state });
 
   const hydrateRouteCategory = useCallback(
     async (
@@ -128,6 +130,7 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
 
   const push = useCallback(
     (to: View) => {
+      if (isAudioControlLocked()) return;
       window.history.pushState({ view: to }, "", window.location.href);
       inAppHistoryDepth.current += 1;
       startSafeViewTransition(() => {
@@ -141,6 +144,7 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
 
   const replace = useCallback(
     (to: View) => {
+      if (isAudioControlLocked()) return;
       window.history.replaceState({ view: to }, "", window.location.href);
       startSafeViewTransition(() => {
         flushSync(() => setView(to));
@@ -150,6 +154,7 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
   );
 
   const pop = useCallback(() => {
+    if (isAudioControlLocked()) return;
     if (inAppHistoryDepth.current > 0) {
       window.history.back();
     } else {
@@ -188,6 +193,7 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
     if (`${window.location.pathname}${window.location.hash}` !== target) {
       window.history.replaceState({ view }, "", target);
     }
+    renderedLocation.current = { url: window.location.href, state: window.history.state };
   }, [
     view,
     activeCat,
@@ -207,6 +213,12 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
   }, [view]);
 
   const applyRouteFromLocation = useCallback((): boolean => {
+    if (isAudioControlLocked()) {
+      // Restore only this document's rendered route. Never push history entries
+      // or attempt to prevent leaving the browser/operating system.
+      window.history.replaceState(renderedLocation.current.state, "", renderedLocation.current.url);
+      return true;
+    }
     const route = parseLocation(window.location.search, window.location.hash);
     if (!route) return false;
 
@@ -276,6 +288,7 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
 
   const pushRouteState = useCallback(
     (route: RouteState, update: () => void) => {
+      if (isAudioControlLocked()) return;
       const hash = routeToHash(route);
       if (!hash) return;
       const target = `${window.location.pathname}${hash}`;
@@ -309,6 +322,7 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
   );
 
   const backSettingsPanel = useCallback(() => {
+    if (isAudioControlLocked()) return;
     if (inAppHistoryDepth.current > 0) {
       window.history.back();
       return;
@@ -389,6 +403,7 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
 
   const handleNavTab = useCallback(
     (tab: NavTab) => {
+      if (isAudioControlLocked()) return;
       setActiveTab(tab);
       if (tab === "home") {
         push("home");

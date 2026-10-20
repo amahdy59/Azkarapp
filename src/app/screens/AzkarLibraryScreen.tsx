@@ -6,6 +6,7 @@ import { Search, Bookmark, ChevronNext, Lightbulb, X, Grid } from "../components
 import "./AzkarLibraryScreen.css";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { CategoryCard } from "../components/CategoryCard";
+import { ResponsiveFilters } from "../components/ResponsiveFilters";
 import { StatePanel } from "../components/StatePanel";
 import { TabList, tabPanelProps } from "../components/Tabs";
 import {
@@ -278,144 +279,193 @@ export function AzkarLibraryScreen({
           </div>
 
           <div className="mt-2 sm:mt-4">
-            <form
-              className="min-w-0"
-              onSubmit={(event) => {
-                event.preventDefault();
-                const query = searchQuery.trim();
-                if (query) onSearch?.(query);
-              }}
+            <ResponsiveFilters
+              label={t(language, "library.searchFilters")}
+              summary={
+                <>
+                  {section === "saved"
+                    ? t(language, "library.saved")
+                    : selectedGroupId === "all"
+                      ? t(language, "library.all")
+                      : t(
+                          language,
+                          `library.groups.${CATEGORY_GROUPS.find((group) => group.id === selectedGroupId)!.labelKey}`,
+                        )}
+                  {searchQuery.trim() ? ` · “${searchQuery.trim()}”` : ""}
+                </>
+              }
+              testId="library-filter-disclosure"
             >
-              <label htmlFor={searchInputId} className={`mb-1.5 block ${FIELD_LABEL_CLASS}`}>
-                {t(language, "library.search")}
-              </label>
-              <div className="field-shell flex h-12 min-w-0 items-center gap-3 rounded-2xl border border-border-control bg-card px-4 shadow-raised transition-colors focus-within:border-primary">
-                <Search size={19} className="shrink-0 text-primary" aria-hidden="true" />
-                <input
-                  id={searchInputId}
-                  type="text"
-                  value={searchQuery}
-                  placeholder={t(language, "library.searchPlaceholder")}
-                  dir={searchQuery.trim() ? "auto" : direction}
-                  lang={language}
-                  autoComplete="off"
-                  onChange={(event) => {
-                    setEntranceActive(false);
-                    setSearchQuery(event.currentTarget.value);
-                  }}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter") {
-                      event.preventDefault();
-                      const query = searchQuery.trim();
-                      if (query) onSearch?.(query);
-                    }
-                  }}
-                  className="h-11 min-w-0 flex-1 bg-transparent text-start text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
-                />
-                <button type="submit" className="hidden" aria-hidden="true" tabIndex={-1} />
-                {searchQuery && (
-                  <button
-                    type="button"
-                    onClick={() => setSearchQuery("")}
-                    className="-me-2.5 flex size-11 min-h-11 min-w-11 shrink-0 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer"
-                    aria-label={t(language, "search.clearAriaLabel")}
-                  >
-                    <X size={16} aria-hidden="true" />
-                  </button>
-                )}
-              </div>
-              <p
-                data-testid="library-filter-status"
-                className="sr-only"
-                role="status"
-                aria-live="polite"
-                aria-atomic="true"
-              >
-                {filterStatusMessage}
-              </p>
-            </form>
-          </div>
-
-          {section === "collections" && (
-            <div className="mt-3 flex min-w-0 items-center gap-2">
-              <div className="relative min-w-0 flex-1">
-                <div
-                  ref={groupScrollRef}
-                  onScroll={checkScrollAffordance}
-                  role="group"
-                  data-testid="library-category-group-scroll"
-                  className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto no-scrollbar pb-1"
-                  aria-label={t(language, "library.title")}
-                >
-                  <button
-                    type="button"
-                    ref={selectedGroupId === "all" ? selectedGroupRef : undefined}
-                    aria-pressed={selectedGroupId === "all"}
-                    onClick={() => {
-                      if (selectedGroupId !== "all") {
-                        vibrateIfEnabled(Boolean(hapticFeedback), 8);
-                      }
-                      setEntranceActive(false);
-                      setSelectedGroupId("all");
-                    }}
-                    className={`interactive-elem shrink-0 flex min-h-11 items-center justify-center rounded-2xl px-4 py-1.5 text-sm font-bold transition-colors cursor-pointer ${
-                      selectedGroupId === "all"
-                        ? "bg-primary text-primary-foreground shadow-sm"
-                        : "bg-card border border-border-control/50 text-muted-foreground hover:text-foreground hover:bg-muted"
-                    }`}
-                  >
-                    {t(language, "library.all")}
-                  </button>
-                  {CATEGORY_GROUPS.map((group) => (
-                    <button
-                      key={group.id}
-                      type="button"
-                      ref={selectedGroupId === group.id ? selectedGroupRef : undefined}
-                      aria-pressed={selectedGroupId === group.id}
-                      onClick={() => {
-                        if (selectedGroupId !== group.id) {
-                          vibrateIfEnabled(Boolean(hapticFeedback), 8);
-                        }
-                        setEntranceActive(false);
-                        setSelectedGroupId(group.id);
+              {({ compact, collapse }) => (
+                <>
+                  <div>
+                    <form
+                      className="min-w-0"
+                      onSubmit={(event) => {
+                        event.preventDefault();
+                        const query = searchQuery.trim();
+                        if (query) onSearch?.(query);
                       }}
-                      className={`interactive-elem shrink-0 flex min-h-11 items-center justify-center rounded-2xl px-4 py-1.5 text-sm font-bold transition-colors cursor-pointer ${
-                        selectedGroupId === group.id
-                          ? "bg-primary text-primary-foreground shadow-sm"
-                          : "bg-card border border-border-control/50 text-muted-foreground hover:text-foreground hover:bg-muted"
-                      }`}
                     >
-                      {t(language, `library.groups.${group.labelKey}`)}
-                    </button>
-                  ))}
-                </div>
-                {canScrollStart && (
-                  <div
-                    data-testid="library-scroll-fade-start"
-                    aria-hidden="true"
-                    className="pointer-events-none absolute inset-y-0 start-0 w-6 pb-1 transition-opacity"
-                    style={{
-                      background: isArabic
-                        ? "linear-gradient(to left, var(--background), transparent)"
-                        : "linear-gradient(to right, var(--background), transparent)",
-                    }}
-                  />
-                )}
-                {canScrollEnd && (
-                  <div
-                    data-testid="library-scroll-fade-end"
-                    aria-hidden="true"
-                    className="pointer-events-none absolute inset-y-0 end-0 w-6 pb-1 transition-opacity"
-                    style={{
-                      background: isArabic
-                        ? "linear-gradient(to right, var(--background), transparent)"
-                        : "linear-gradient(to left, var(--background), transparent)",
-                    }}
-                  />
-                )}
-              </div>
-            </div>
-          )}
+                      <label htmlFor={searchInputId} className={`mb-1.5 block ${FIELD_LABEL_CLASS}`}>
+                        {t(language, "library.search")}
+                      </label>
+                      <div className="field-shell flex h-12 min-w-0 items-center gap-3 rounded-2xl border border-border-control bg-card px-4 shadow-raised transition-colors focus-within:border-primary">
+                        <Search size={19} className="shrink-0 text-primary" aria-hidden="true" />
+                        <input
+                          id={searchInputId}
+                          type="text"
+                          value={searchQuery}
+                          placeholder={t(language, "library.searchPlaceholder")}
+                          dir={searchQuery.trim() ? "auto" : direction}
+                          lang={language}
+                          autoComplete="off"
+                          onChange={(event) => {
+                            setEntranceActive(false);
+                            setSearchQuery(event.currentTarget.value);
+                          }}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter") {
+                              event.preventDefault();
+                              const query = searchQuery.trim();
+                              if (query) onSearch?.(query);
+                            }
+                          }}
+                          className="h-11 min-w-0 flex-1 bg-transparent text-start text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+                        />
+                        <button type="submit" className="hidden" aria-hidden="true" tabIndex={-1} />
+                        {searchQuery && (
+                          <button
+                            type="button"
+                            onClick={() => setSearchQuery("")}
+                            className="-me-2.5 flex size-11 min-h-11 min-w-11 shrink-0 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer"
+                            aria-label={t(language, "search.clearAriaLabel")}
+                          >
+                            <X size={16} aria-hidden="true" />
+                          </button>
+                        )}
+                      </div>
+                      <p
+                        data-testid="library-filter-status"
+                        className="sr-only"
+                        role="status"
+                        aria-live="polite"
+                        aria-atomic="true"
+                      >
+                        {filterStatusMessage}
+                      </p>
+                    </form>
+                  </div>
+
+                  {section === "collections" && (
+                    <div className="mt-3 flex min-w-0 items-center gap-2">
+                      <div className="relative min-w-0 flex-1">
+                        <div
+                          ref={groupScrollRef}
+                          onScroll={checkScrollAffordance}
+                          role="group"
+                          data-testid="library-category-group-scroll"
+                          className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto no-scrollbar pb-1"
+                          aria-label={t(language, "library.title")}
+                        >
+                          <button
+                            type="button"
+                            ref={selectedGroupId === "all" ? selectedGroupRef : undefined}
+                            aria-pressed={selectedGroupId === "all"}
+                            onClick={() => {
+                              if (selectedGroupId !== "all") {
+                                vibrateIfEnabled(Boolean(hapticFeedback), 8);
+                              }
+                              setEntranceActive(false);
+                              setSelectedGroupId("all");
+                              if (!searchQuery.trim()) collapse();
+                            }}
+                            className={`interactive-elem shrink-0 flex min-h-11 items-center justify-center rounded-2xl px-4 py-1.5 text-sm font-bold transition-colors cursor-pointer ${
+                              selectedGroupId === "all"
+                                ? "bg-primary text-primary-foreground shadow-sm"
+                                : "bg-card border border-border-control/50 text-muted-foreground hover:text-foreground hover:bg-muted"
+                            }`}
+                          >
+                            {t(language, "library.all")}
+                          </button>
+                          {CATEGORY_GROUPS.map((group) => (
+                            <button
+                              key={group.id}
+                              type="button"
+                              ref={selectedGroupId === group.id ? selectedGroupRef : undefined}
+                              aria-pressed={selectedGroupId === group.id}
+                              onClick={() => {
+                                if (selectedGroupId !== group.id) {
+                                  vibrateIfEnabled(Boolean(hapticFeedback), 8);
+                                }
+                                setEntranceActive(false);
+                                setSelectedGroupId(group.id);
+                                if (!searchQuery.trim()) collapse();
+                              }}
+                              className={`interactive-elem shrink-0 flex min-h-11 items-center justify-center rounded-2xl px-4 py-1.5 text-sm font-bold transition-colors cursor-pointer ${
+                                selectedGroupId === group.id
+                                  ? "bg-primary text-primary-foreground shadow-sm"
+                                  : "bg-card border border-border-control/50 text-muted-foreground hover:text-foreground hover:bg-muted"
+                              }`}
+                            >
+                              {t(language, `library.groups.${group.labelKey}`)}
+                            </button>
+                          ))}
+                        </div>
+                        {canScrollStart && (
+                          <div
+                            data-testid="library-scroll-fade-start"
+                            aria-hidden="true"
+                            className="pointer-events-none absolute inset-y-0 start-0 w-6 pb-1 transition-opacity"
+                            style={{
+                              background: isArabic
+                                ? "linear-gradient(to left, var(--background), transparent)"
+                                : "linear-gradient(to right, var(--background), transparent)",
+                            }}
+                          />
+                        )}
+                        {canScrollEnd && (
+                          <div
+                            data-testid="library-scroll-fade-end"
+                            aria-hidden="true"
+                            className="pointer-events-none absolute inset-y-0 end-0 w-6 pb-1 transition-opacity"
+                            style={{
+                              background: isArabic
+                                ? "linear-gradient(to right, var(--background), transparent)"
+                                : "linear-gradient(to left, var(--background), transparent)",
+                            }}
+                          />
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  {compact && (
+                    <div className="flex flex-wrap gap-2 pt-2">
+                      <button
+                        type="button"
+                        className="min-h-11 rounded-xl border border-border-control px-3 text-sm font-semibold"
+                        onClick={collapse}
+                      >
+                        {t(language, "library.showResults")}
+                      </button>
+                      {(searchQuery || selectedGroupId !== "all") && (
+                        <button
+                          type="button"
+                          className="min-h-11 rounded-xl px-3 text-sm underline"
+                          onClick={() => {
+                            setSearchQuery("");
+                            setSelectedGroupId("all");
+                          }}
+                        >
+                          {t(language, "library.clearFilters")}
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </>
+              )}
+            </ResponsiveFilters>
+          </div>
         </header>
 
         <div

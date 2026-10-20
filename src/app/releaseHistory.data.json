@@ -1,5 +1,20 @@
 [
   {
+    "release": "2026-10-20.4",
+    "ar": [
+      "المشاركة تملأ شاشة الهاتف مع معاينة أكبر، ويمكنك الانتقال من ذكر واحد إلى المجموعة كاملة دون فقد تصميمك.",
+      "اختر مقاييس التقدم واعرض السجلات الدقيقة، مع مرشحات فترة قابلة للطي ورسوم تتبع اتجاه لغتك.",
+      "اطوِ البحث والتصفية في مكتبة الأذكار لتوفير مساحة للقراءة، مع بقاء اختيارك وكلمات البحث واضحة.",
+      "تابع تقدم الضغط لفتح قفل الاستماع، مع حماية التنقل داخل التطبيق ومساعدة تثبيته على شاشة جهازك."
+    ],
+    "en": [
+      "Sharing fills your phone screen with larger previews; switch from one zikr to its whole collection while keeping your design.",
+      "Choose your Progress metrics and inspect exact records, with collapsible date filters and charts that follow your language direction.",
+      "Collapse Library search and filters to give azkar more room, while keeping your selected category and search words visible.",
+      "See your hold-to-unlock progress, with protected in-app navigation and help keeping the app pinned on your device."
+    ]
+  },
+  {
     "release": "2026-10-20.3",
     "ar": [
       "صفحة التقدم أصبحت بمعايير مختارة وخرائط تتجه من اليمين إلى اليسار بالعربية، مع تصدير السجلات الدقيقة.",

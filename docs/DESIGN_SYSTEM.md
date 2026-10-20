@@ -1,3 +1,9 @@
+## Mobile sharing and compact filters — 2026-10-20
+
+Owner-approved follow-up: below the compact 600px shell boundary, sharing fills the dynamic viewport instead of resizing with each step. Retain safe areas, stable chrome, a scrolling body and enlarged/short-window whole-surface recovery. Ordinary previews grow to a readable 160–240px bound; larger content may scroll. This supersedes the former ordinary-phone no-settings-scroll target. Individual Reader sharing offers This zikr / Entire collection separately from card-export scope and retains design choices. Generated short single readings balance vertically when their measured panel uses less than 70% of the reading area; long and multi-fragment cards retain their top anchor. Fixed readable type, complete text, selected citations and numbered continuations remain authoritative.
+
+Progress and Library share native responsive disclosures. Collapsed Progress shows the actual period/calendar; date navigation and Today remain directly available and reflow at enlarged text. Library keeps Search and filters and its applied category/query visible. Presets/category selections collapse only when complete; typing and Custom date drafts do not. Summary focus recovers after collapse, fields stay exposed on wider layouts, and dropdowns retain protected portals. The listening unlock shows a factual, bounded two-second progress arc with an accessible progress value and explicit duration; there is no decorative loop or live announcement on every tick.
+
 ## Purposeful motion and compact prayer seconds — 2026-10-20
 
 The owner welcomes beautiful, functional animation and microinteractions as part of the default experience. Reduce Motion and the OS preference supply a calmer alternative. Use bounded data-driven feedback with stable geometry and paused hidden/offscreen work; retain contrast, sacred-text primacy and performance gates. See MOTION_SYSTEM.md for the authoritative policy.

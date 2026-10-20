@@ -1971,6 +1971,12 @@ export function ReaderScreen({
             routineMode={routineMode}
             prayer={isPrayerName(subCategory) ? subCategory : undefined}
             items={[z]}
+            collection={{
+              items: azkarList ?? [z],
+              title: displayCategoryName,
+              titleArabic: CATEGORIES.find((category) => category.id === catId)?.nameArabic,
+              titleEnglish: CATEGORIES.find((category) => category.id === catId)?.name,
+            }}
             language={language}
             themeMode={themeMode}
           />

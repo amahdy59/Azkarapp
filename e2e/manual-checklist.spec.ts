@@ -198,7 +198,7 @@ for (const viewport of VIEWPORTS.filter((item) => item.width <= 412)) {
       `${viewport.name} page title`,
     );
 
-    const period = page.getByRole("combobox", { name: "Period", exact: true });
+    const period = page.getByRole("combobox", { name: "Period", exact: true, includeHidden: true });
     for (const [index, value] of (["day", "week", "month", "year"] as const).entries()) {
       await chooseProgressOption(period, value);
       const heading = page.getByTestId("progress-primary-heading");
@@ -214,7 +214,7 @@ test("mobile headings: OnePlus Nord 4 keeps Arabic Progress titles readable with
   await seedAndOpen(page, { language: "ar" });
   await page.getByTestId("nav-progress").click();
 
-  const period = page.getByRole("combobox", { name: "الفترة", exact: true });
+  const period = page.getByRole("combobox", { name: "الفترة", exact: true, includeHidden: true });
   for (const [index, value] of (["day", "week", "month", "year"] as const).entries()) {
     await chooseProgressOption(period, value);
     const heading = page.getByTestId("progress-primary-heading");

@@ -90,7 +90,8 @@ export interface CollectionShareModalProps {
   dialogDescription?: string;
   initialFormat?: ShareFormat;
   initialScope?: "current" | "selected" | "all";
-  contentAlignment?: "start" | "center";
+  collection?: { items: Zikr[]; title: string; titleArabic?: string; titleEnglish?: string };
+  contentAlignment?: "start" | "center" | "balanced";
 }
 
 function supportsTextShare(data: ShareData): boolean {
@@ -105,16 +106,17 @@ function supportsTextShare(data: ShareData): boolean {
 export function CollectionShareModal({
   open,
   onClose,
-  collectionTitle,
-  collectionTitleArabic,
-  collectionTitleEnglish,
+  collectionTitle: initialTitle,
+  collectionTitleArabic: initialTitleArabic,
+  collectionTitleEnglish: initialTitleEnglish,
   collectionSubtitle,
   categoryId,
   readerIndex,
   routineMode,
   prayer,
-  single = false,
-  items,
+  single: initialSingle = false,
+  items: initialItems,
+  collection,
   language,
   themeMode = "light",
   shareItems,
@@ -124,8 +126,14 @@ export function CollectionShareModal({
   dialogDescription,
   initialFormat,
   initialScope = "current",
-  contentAlignment = "start",
+  contentAlignment = "balanced",
 }: CollectionShareModalProps) {
+  const [wholeCollection, setWholeCollection] = useState(false);
+  const single = initialSingle && !wholeCollection;
+  const items = wholeCollection && collection ? collection.items : initialItems;
+  const collectionTitle = wholeCollection && collection ? collection.title : initialTitle;
+  const collectionTitleArabic = wholeCollection && collection ? collection.titleArabic : initialTitleArabic;
+  const collectionTitleEnglish = wholeCollection && collection ? collection.titleEnglish : initialTitleEnglish;
   const direction = language === "ar" ? "rtl" : "ltr";
   const layoutMode = useLayoutMode();
   const wide = layoutMode === "expanded" || layoutMode === "large";
@@ -609,7 +617,7 @@ export function CollectionShareModal({
       describedById={descriptionId}
       testId="collection-share-modal"
       maxWidthClassName="max-w-5xl"
-      className="!max-h-[calc(100dvh-16px)] !w-[calc(100%-16px)] gap-0 max-md:!top-[max(8px,env(safe-area-inset-top))] max-md:!translate-y-0"
+      className="sharing-fullscreen sharing-collection-dialog gap-0"
     >
       <div ref={surface} className="sharing-surface sharing-collection" data-scroll-whole={scrollWhole || undefined}>
         <div className="sharing-dialog-header shrink-0 border-b border-border px-[16px] py-[8px] pe-[72px]">
@@ -962,6 +970,30 @@ export function CollectionShareModal({
                     <p className="mt-1 text-xs text-muted-foreground">{t(language, "shareStudio.designOptional")}</p>
                   )}
                 </div>
+                {currentStep === "content" && initialSingle && collection && collection.items.length > 1 && (
+                  <fieldset className="space-y-2" disabled={busy}>
+                    <legend className="text-sm font-semibold">{t(language, "shareStudio.sharingContent")}</legend>
+                    <div className="grid grid-cols-2 gap-2">
+                      {([false, true] as const).map((whole) => (
+                        <label key={String(whole)} className="sharing-choice text-sm">
+                          <input
+                            type="radio"
+                            name={`${scopeId}-content`}
+                            checked={wholeCollection === whole}
+                            onChange={() => {
+                              setWholeCollection(whole);
+                              setScope(whole ? "all" : "current");
+                              setSelected([]);
+                              setActive(0);
+                              setImageSource("generated");
+                            }}
+                          />
+                          {t(language, whole ? "shareStudio.entireCollection" : "shareStudio.thisZikr")}
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
+                )}
                 {currentStep === "content" && curatedPack && !curatedUnavailable && mode === "image" && (
                   <fieldset
                     className="sharing-artwork-source mt-3 grid min-w-0 gap-2 items-start"

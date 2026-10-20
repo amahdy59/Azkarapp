@@ -1,5 +1,9 @@
 # Azkarapp Motion System
 
+## Listening unlock feedback — 2026-10-20
+
+A two-second continuous hold shows factual elapsed progress in the lock-button arc. One local 100ms interval updates only that modal while held; release, cancellation, target exit, blur, backgrounding or unmount stops it. Progress uses immediate still updates in every motion mode, with no decorative loop, scale, live announcements or screen-wide clock. Keyboard hold and Escape recovery remain available; the accessible progress value agrees with the visible arc.
+
 ## Owner policy: purposeful motion is welcome — 2026-10-20
 
 Animation and microinteractions are an intentional part of the default product experience. Prefer beautiful, functional motion that confirms actions or reveals time, progress and changing state. Calm does not mean motionless. Existing Reduce Motion and the OS preference provide a calmer alternative; they are not reasons to omit considered default animation. Preserve visible state, focus, accuracy and immediate control in both modes.

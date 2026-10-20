@@ -1,5 +1,9 @@
 # Audio architecture
 
+## Hold progress and internal navigation protection — 2026-10-20
+
+The owner approves a factual elapsed-time unlock ring and a stronger in-app guard. A mount-owned temporary lock prevents routing actions and AudioPlayerSurface's hashchange collapse while the modal remains active; same-document route attempts restore the rendered URL without synthetic history pushes. The transparent shield and readable playback remain. One 100ms progress interval exists only during a continuous two-second hold; release, lost capture, movement outside, blur, hidden visibility and pagehide cancel it. Cleanup releases the guard and timers. Escape and native focus recovery remain available. Audio options explains Android App pinning/iOS Guided Access with official help links: this is not an OS or browser security lock. Queue advancement, media ownership, timing, counts and persisted state are unchanged.
+
 ## Visible learning while controls are locked — 2026-10-16
 
 Owner supersedes the centered opaque lock panel: the same modal focus trap and outside-dismiss protection now use a transparent, non-blurred full-screen touch shield. Only a small fixed safe-area hold-to-unlock pill is visible. The underlying exact text, audio progress and playback continue unchanged; pointer/keyboard controls behind it cannot activate. Continuous two-second pointer/Space/Enter hold, cancellation, focus restoration and Escape recovery remain. No media/session/count/recording/timing changes.

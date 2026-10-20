@@ -23,6 +23,11 @@ test("@cross-browser Azkar tab opens the library and exposes search", async ({ p
 
   await page.getByRole("link", { name: "Azkar", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Azkar Library", exact: true })).toBeVisible();
+  const filters = page.getByTestId("library-filter-disclosure");
+  if (!(await filters.evaluate((node) => (node as HTMLDetailsElement).open))) {
+    await expect(page.getByRole("textbox", { name: "Search azkar and duas", exact: true })).toBeHidden();
+    await filters.locator("summary").click();
+  }
   await expect(page.getByRole("textbox", { name: "Search azkar and duas", exact: true })).toBeVisible();
 
   await page.getByTestId("category-card-morning").click();
@@ -212,7 +217,7 @@ test("secondary app state is deep-linkable and browser Back restores Settings ro
   await expect(page.getByTestId("settings-sub-audio")).toBeVisible();
 
   await page.goto("/#/progress/month");
-  await expect(page.getByRole("combobox", { name: "Period", exact: true })).toHaveAttribute(
+  await expect(page.getByRole("combobox", { name: "Period", exact: true, includeHidden: true })).toHaveAttribute(
     "data-progress-value",
     "month",
   );

@@ -74,7 +74,10 @@ for (const language of ["ar", "en"] as const) {
         return { prayers: state.prayerTracking, completions: state.dailyCompletions, habits: state.dailyHabits };
       });
       expect(after).toEqual(before);
-      await chooseProgressOption(page.getByRole("combobox", { name: ar ? "الفترة" : "Period", exact: true }), "week");
+      await chooseProgressOption(
+        page.getByRole("combobox", { name: ar ? "الفترة" : "Period", exact: true, includeHidden: true }),
+        "week",
+      );
       await expect(summary).toHaveCount(0);
       await expect(page.getByTestId("prayer-comparison")).toBeVisible();
     });

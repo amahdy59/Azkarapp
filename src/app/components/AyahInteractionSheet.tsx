@@ -148,8 +148,8 @@ export function AyahInteractionSheet({
       showCloseButton={false}
       focusOnOpen
       maxWidthClassName={imageShare ? "max-w-[52rem]" : undefined}
-      dialogClassName={imageShare ? "h-[85dvh]" : undefined}
-      drawerClassName={imageShare ? "h-[92dvh] !max-h-[92dvh] !pb-0" : undefined}
+      dialogClassName={imageShare ? "sharing-fullscreen h-[85dvh]" : undefined}
+      drawerClassName={imageShare ? "sharing-fullscreen h-[92dvh]" : undefined}
     >
       <div
         className={`flex min-h-0 flex-1 flex-col ${imageShare ? "overflow-hidden" : "overflow-y-auto overscroll-contain pb-6"}`}

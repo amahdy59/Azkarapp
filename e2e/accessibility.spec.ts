@@ -190,6 +190,7 @@ test("search results expose concise accessible names", async ({ page }) => {
   await enterEnglishGuestMode(page);
   await page.getByTestId("nav-azkar").click();
   const searchInput = page.getByRole("textbox", { name: "Search azkar and duas" });
+  if (!(await searchInput.isVisible())) await page.getByTestId("library-filter-disclosure").locator("summary").click();
   await searchInput.fill("sleep");
   await searchInput.press("Enter");
 
@@ -204,6 +205,8 @@ test("search results expose concise accessible names", async ({ page }) => {
 test("library filtering announces the collection result count", async ({ page }) => {
   await enterEnglishGuestMode(page);
   await page.getByTestId("nav-azkar").click();
+  const filters = page.getByTestId("library-filter-disclosure");
+  if (!(await filters.evaluate((node) => (node as HTMLDetailsElement).open))) await filters.locator("summary").click();
   await page.getByRole("textbox", { name: "Search azkar and duas" }).fill("sleep");
 
   await expect(page.getByTestId("library-filter-status")).toHaveText("1 collection matches “sleep”");
@@ -214,7 +217,7 @@ test("Progress tabs expose a logical level-two heading in every view", async ({ 
   await enterEnglishGuestMode(page);
   await page.getByTestId("nav-progress").click();
 
-  const period = page.getByRole("combobox", { name: "Period", exact: true });
+  const period = page.getByRole("combobox", { name: "Period", exact: true, includeHidden: true });
   for (const value of ["day", "week", "month", "year"] as const) {
     await chooseProgressOption(period, value);
     await expect(page.getByTestId("progress-primary-heading")).toHaveRole("heading", { level: 2 });

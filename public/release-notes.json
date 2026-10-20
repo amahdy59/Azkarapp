@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-20.3",
+  "release": "2026-10-20.4",
   "ar": [
-    "صفحة التقدم أصبحت بمعايير مختارة وخرائط تتجه من اليمين إلى اليسار بالعربية، مع تصدير السجلات الدقيقة.",
-    "عداد الثواني للصلاة القادمة مع دائرة متحركة خفيفة، ومنظومة حركة هادئة وفق تفضيل تقليل الحركة.",
-    "قوائم الاختيار محمية بسطح معتم يغطي النص الخلفي في جميع الوضعيات والألوان.",
-    "تحسينات في الموثوقية: استعادة الإعدادات، وإلغاء التصدير، وحسابات الحديقة الفعّالة عند التمرير."
+    "المشاركة تملأ شاشة الهاتف مع معاينة أكبر، ويمكنك الانتقال من ذكر واحد إلى المجموعة كاملة دون فقد تصميمك.",
+    "اختر مقاييس التقدم واعرض السجلات الدقيقة، مع مرشحات فترة قابلة للطي ورسوم تتبع اتجاه لغتك.",
+    "اطوِ البحث والتصفية في مكتبة الأذكار لتوفير مساحة للقراءة، مع بقاء اختيارك وكلمات البحث واضحة.",
+    "تابع تقدم الضغط لفتح قفل الاستماع، مع حماية التنقل داخل التطبيق ومساعدة تثبيته على شاشة جهازك."
   ],
   "en": [
-    "Progress shows your chosen metrics and charts that run right to left in Arabic and left to right in English, with exact record exports.",
-    "A seconds countdown with a small animated ring appears on the next prayer card, with purposeful motion that respects Reduce Motion.",
-    "Dropdowns and pickers use a protected opaque surface that covers underlying text in every theme and material mode.",
-    "Reliability improvements: preference recovery, cancelled export cleanup, and efficient garden calculations while scrolling."
+    "Sharing fills your phone screen with larger previews; switch from one zikr to its whole collection while keeping your design.",
+    "Choose your Progress metrics and inspect exact records, with collapsible date filters and charts that follow your language direction.",
+    "Collapse Library search and filters to give azkar more room, while keeping your selected category and search words visible.",
+    "See your hold-to-unlock progress, with protected in-app navigation and help keeping the app pinned on your device."
   ]
 }

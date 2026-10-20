@@ -16,6 +16,7 @@ for (const language of ["ar", "en"] as const) {
       );
     }, language);
     await page.goto("/#/progress");
+    await page.getByTestId("progress-range-disclosure").locator("summary").click();
     const controls = page.getByTestId("progress-sticky-controls");
     const header = controls.getByTestId("shared-screen-header");
     await expect(header).toBeVisible();
@@ -26,8 +27,9 @@ for (const language of ["ar", "en"] as const) {
     const bounds = await header.boundingBox();
     const tabs = controls.getByTestId("progress-range-fields");
     const originalTabs = await tabs.boundingBox();
-    await controls.evaluate((node) => (node.scrollTop = 70));
-    await expect.poll(() => controls.evaluate((node) => node.scrollTop)).toBe(70);
+    const underTitle = Math.ceil(originalTabs!.y - (bounds!.y + bounds!.height) + 20);
+    await controls.evaluate((node, top) => (node.scrollTop = top), underTitle);
+    await expect.poll(() => controls.evaluate((node) => node.scrollTop)).toBe(underTitle);
     expect((await tabs.boundingBox())!.y).toBeLessThan(bounds!.y + bounds!.height);
     expect((await tabs.boundingBox())!.y).toBeLessThan(originalTabs!.y);
     await expect(header).toHaveAttribute("data-scrolled", "true");
@@ -61,6 +63,8 @@ for (const language of ["ar", "en"] as const) {
     await expect(controls).toHaveAttribute("data-scrolled", "true");
     await header.getByRole("button").focus();
     await controls.evaluate((node) => (node.scrollTop = 70));
+    await page.keyboard.press("Tab");
+    await expect(page.getByTestId("progress-range-disclosure").locator("summary")).toBeFocused();
     await page.keyboard.press("Tab");
     const selectedTab = controls.getByRole("combobox").first();
     await expect(selectedTab).toBeFocused();

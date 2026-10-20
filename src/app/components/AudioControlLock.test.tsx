@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
 import { AudioControlLock } from "./AudioControlLock";
+import { isAudioControlLocked } from "../audioControlLock";
 afterEach(() => vi.useRealTimers());
 it("ignores taps, cancels incomplete holds and unlocks after a continuous two-second keyboard hold", () => {
   vi.useFakeTimers();
@@ -28,4 +29,24 @@ it("does not dismiss on outside interaction and offers Escape recovery", () => {
   expect(unlock).not.toHaveBeenCalled();
   fireEvent.keyDown(screen.getByTestId("audio-unlock"), { key: "Escape" });
   expect(unlock).toHaveBeenCalledOnce();
+});
+it("reports elapsed hold progress, resets on backgrounding and releases its routing guard on unmount", () => {
+  vi.useFakeTimers();
+  const unlock = vi.fn();
+  const { unmount } = render(<AudioControlLock language="en" onUnlock={unlock} />);
+  expect(isAudioControlLocked()).toBe(true);
+  fireEvent.keyDown(screen.getByTestId("audio-unlock"), { key: "Enter" });
+  act(() => vi.advanceTimersByTime(1000));
+  expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "50");
+  fireEvent(window, new Event("blur"));
+  expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+  act(() => vi.advanceTimersByTime(3000));
+  expect(unlock).not.toHaveBeenCalled();
+  fireEvent.keyDown(screen.getByTestId("audio-unlock"), { key: " " });
+  act(() => vi.advanceTimersByTime(500));
+  expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "25");
+  unmount();
+  expect(isAudioControlLocked()).toBe(false);
+  act(() => vi.advanceTimersByTime(3000));
+  expect(unlock).not.toHaveBeenCalled();
 });

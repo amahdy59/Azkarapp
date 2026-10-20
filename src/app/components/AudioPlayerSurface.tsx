@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
+import { isAudioControlLocked } from "../audioControlLock";
 
 /** Expanded listening owns the main canvas, including the session header. */
 export function AudioPlayerSurface({
@@ -55,7 +56,9 @@ export function AudioPlayerSurface({
       event.stopImmediatePropagation();
       collapseRef.current();
     };
-    const onNavigate = () => collapseRef.current();
+    const onNavigate = () => {
+      if (!isAudioControlLocked()) collapseRef.current();
+    };
     window.addEventListener("keydown", onKeyDown, true);
     window.addEventListener("hashchange", onNavigate);
     return () => {

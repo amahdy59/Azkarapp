@@ -11,7 +11,7 @@ Production site: [amahdy59.github.io/Azkarapp](https://amahdy59.github.io/Azkara
 ## Product capabilities
 
 - Reviewed azkar collections with Arabic-first reading and optional English translation/transliteration and a remembered on-device English main-text choice
-- Preview and share individual azkar or collections as complete image cards, text or contextual links, with selectable artwork/formats, explicit card selection, long-surah Mushaf reminders and one-file ZIP saving
+- Preview and share individual azkar or collections as complete image cards, text or contextual links, with full-screen phone sharing, a This zikr / Entire collection choice, selectable artwork/formats, explicit card selection, long-surah Mushaf reminders and one-file ZIP saving
 - Time-aware Home recommendations, next-prayer countdown, and Hijri date
 - Private on-device astronomical prayer timings with selectable calculation methods and manual minute adjustments
 - Automatic geolocation, device IANA timezone detection, and DST handling without sending coordinates to a third party
@@ -20,6 +20,7 @@ Production site: [amahdy59.github.io/Azkarapp](https://amahdy59.github.io/Azkara
 - Optional Supabase Google, email OTP, and feature-flagged Apple authentication with cross-device synchronization
 - Installable PWA, offline app shell, update prompts, and quick actions
 - Responsive RTL/LTR layouts with WCAG-oriented automated checks
+- Compact phone Library/date filters retain their applied context; listening protection includes visible two-second unlock progress and optional device-pinning guidance
 
 ## Prayer times and daylight saving
 

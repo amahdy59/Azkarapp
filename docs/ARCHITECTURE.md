@@ -1,5 +1,13 @@
 # Application architecture
 
+## Mobile sharing, filters and listening protection — 2026-10-20
+
+Compact sharing fills the available dynamic viewport with safe-area padding and stable header/actions; the middle body scrolls, with existing whole-surface recovery for enlarged text and short windows. Reader supplies its actual mode/prayer-filtered collection alongside the selected zikr. CollectionShareModal owns transient content scope independently of current/selected/all exported cards, retaining design/language choices and cancelling obsolete generations. Short single-card readings balance vertically; measured text, continuation pagination and reviewed payloads remain unchanged.
+
+ResponsiveFilters reuses native details/summary: compact layouts start closed with the applied context visible, wider layouts expose fields. A completed preset/category choice collapses only on phones; search edits and Custom drafts remain open until the reader finishes. Radix close-focus recovery returns to the disclosure when its trigger becomes hidden. No filter preference or draft is persisted.
+
+AudioControlLock acquires a temporary counted interaction guard shared with useAppRouting and AudioPlayerSurface. It blocks internal navigation and presentation collapse; a changed same-document hash is replaced with the rendered route, without pushing synthetic history entries. Media completion/automatic queue progression remain unchanged. The two-second hold shows real elapsed progress and resets on release, pointer cancellation/leaving the target, blur, pagehide and hidden visibility. Unmount releases timers/guard; Escape remains accessible recovery. OS/browser exit is outside this guard; Audio options provides explicit device-pinning help.
+
 ## Isolated prayer seconds clock — 2026-10-20, local only
 
 Owner-approved local restoration repair: Home's geometry hold recognizes focused prayer buttons, not a focused horizontal browsing region. WebKit can leave that native region focused after a pointer close; handlePrayerOpen reconciles the current scroll immediately when closing, while real button focus retains its hold. Blur to non-prayer controls releases it. The 96px/8px thresholds, native focus/scroll ownership, date/record semantics and existing motion remain unchanged. No deferred callback, new timer, synthetic scrolling or focus stealing.

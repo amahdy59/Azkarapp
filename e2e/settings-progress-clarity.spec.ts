@@ -37,7 +37,10 @@ for (const language of ["ar", "en"] as const) {
       const garden = page.getByTestId("today-garden-card");
       await expect(garden).toBeVisible();
       await expect(garden.locator("img")).toHaveCount(0);
-      await chooseProgressOption(page.getByRole("combobox", { name: ar ? "الفترة" : "Period", exact: true }), "month");
+      await chooseProgressOption(
+        page.getByRole("combobox", { name: ar ? "الفترة" : "Period", exact: true, includeHidden: true }),
+        "month",
+      );
       const monthChart = page.getByTestId("today-garden-card");
       await expect(monthChart).toBeVisible();
       const prayerBounds = await page.getByTestId("progress-prayer-group").boundingBox();
@@ -51,7 +54,10 @@ for (const language of ["ar", "en"] as const) {
       const directory = `output/playwright/settings-progress-clarity/${testInfo.project.name}`;
       await mkdir(directory, { recursive: true });
       await page.screenshot({ path: `${directory}/${language}-${width}-month.png` });
-      await chooseProgressOption(page.getByRole("combobox", { name: ar ? "الفترة" : "Period", exact: true }), "year");
+      await chooseProgressOption(
+        page.getByRole("combobox", { name: ar ? "الفترة" : "Period", exact: true, includeHidden: true }),
+        "year",
+      );
       const chart = page.getByTestId("today-garden-card");
       await expect(chart).toBeVisible();
       await expect(page.getByRole("combobox")).toHaveCount(6);

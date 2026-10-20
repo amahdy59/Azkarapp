@@ -174,7 +174,10 @@ for (const language of ["ar", "en"] as const) {
     await individual.evaluate((node) => node.scrollIntoView({ block: "start" }));
     await page.screenshot({ path: `${directory}/${language}-zikr-phone.png` });
     await page.setViewportSize({ width: 1440, height: 1000 });
-    await chooseProgressOption(page.getByRole("combobox", { name: ar ? "الفترة" : "Period", exact: true }), "year");
+    await chooseProgressOption(
+      page.getByRole("combobox", { name: ar ? "الفترة" : "Period", exact: true, includeHidden: true }),
+      "year",
+    );
     await expect(page.getByTestId("routine-trends").getByTestId("recording-time-point")).toHaveCount(10);
     await page.getByRole("button", { name: ar ? "الفترة السابقة" : "Previous period", exact: true }).click();
     await expect(page.getByTestId("garden-view-date")).toContainText(ar ? "٢٠٢٥" : "2025");
@@ -184,7 +187,10 @@ for (const language of ["ar", "en"] as const) {
     await garden.evaluate((node) => node.scrollIntoView({ block: "start" }));
     await page.screenshot({ path: `${directory}/${language}-year-desktop.png` });
     await page.context().setOffline(true);
-    await chooseProgressOption(page.getByRole("combobox", { name: ar ? "الفترة" : "Period", exact: true }), "month");
+    await chooseProgressOption(
+      page.getByRole("combobox", { name: ar ? "الفترة" : "Period", exact: true, includeHidden: true }),
+      "month",
+    );
     await expect(garden.getByTestId("insight-morning").getByRole("img")).toHaveAccessibleName(ar ? /١٠٠٪/ : /100%/);
   });
 
@@ -243,7 +249,7 @@ for (const language of ["ar", "en"] as const) {
       const height = await scrollport.evaluate((node) => node.clientHeight);
       expect((await controls.boundingBox())!.height).toBeLessThanOrEqual(height * 0.7);
       for (const name of ar ? ["يوم", "أسبوع", "شهر", "سنة"] : ["Day", "Week", "Month", "Year"]) {
-        const period = page.getByRole("combobox", { name: ar ? "الفترة" : "Period", exact: true });
+        const period = page.getByRole("combobox", { name: ar ? "الفترة" : "Period", exact: true, includeHidden: true });
         const value = (
           {
             يوم: "day",
@@ -342,7 +348,7 @@ test("installed Progress restores meaningful charts after an offline reload", as
   await page.reload();
   await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
   await expect(page.getByTestId("today-garden-card")).toBeVisible();
-  await chooseProgressOption(page.getByRole("combobox", { name: "Period", exact: true }), "month");
+  await chooseProgressOption(page.getByRole("combobox", { name: "Period", exact: true, includeHidden: true }), "month");
   await expect(page.getByTestId("routine-trends").getByTestId("recording-time-point")).toHaveCount(3);
   await expect(page.getByTestId("prayer-trends").getByTestId("recording-time-line")).toBeVisible();
   await expect(

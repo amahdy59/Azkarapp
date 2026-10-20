@@ -73,6 +73,43 @@ function showCaption() {
   return screen.getByRole("textbox", { name: /Caption preview|معاينة النص المرفق/u });
 }
 describe("CollectionShareModal", () => {
+  it("switches content from one zikr to its collection while retaining the chosen design", async () => {
+    const { generateAllCollectionStoryPages } = await import("../share/collectionShareCard");
+    const collection = [...SAMPLE_ITEMS, { ...SAMPLE_ITEMS[0]!, id: "m-2", arabicText: "سبحان الله" }];
+    render(
+      <CollectionShareModal
+        open
+        single
+        onClose={vi.fn()}
+        collectionTitle="One zikr"
+        items={SAMPLE_ITEMS}
+        language="en"
+        initialFormat="square"
+        collection={{ items: collection, title: "Morning", titleEnglish: "Morning" }}
+      />,
+    );
+    await screen.findByRole("img");
+    fireEvent.click(screen.getByRole("radio", { name: "Entire collection" }));
+    await waitFor(() =>
+      expect(vi.mocked(generateAllCollectionStoryPages).mock.lastCall![0]).toMatchObject({
+        single: false,
+        format: "square",
+        collectionTitle: "Morning",
+        allItems: expect.arrayContaining([expect.objectContaining({ id: "m-2" })]),
+      }),
+    );
+    goStep("share");
+    expect(screen.getByRole("combobox", { name: "Cards to share" })).toHaveTextContent("All cards");
+    goStep("content");
+    fireEvent.click(screen.getByRole("radio", { name: "This zikr" }));
+    await waitFor(() =>
+      expect(vi.mocked(generateAllCollectionStoryPages).mock.lastCall![0]).toMatchObject({
+        single: true,
+        format: "square",
+        allItems: [expect.objectContaining({ id: "m-1" })],
+      }),
+    );
+  });
   it("skips optional design with the current export and choices intact", async () => {
     const { generateAllCollectionStoryPages } = await import("../share/collectionShareCard");
     const { shareSingleFile } = await import("../share/shareDispatcher");

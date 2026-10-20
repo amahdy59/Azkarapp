@@ -1,7 +1,8 @@
 import { chooseProgressOption } from "../../test/progressSelect";
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { ProgressRangeToolbar } from "./ProgressRangeToolbar";
+afterEach(() => vi.unstubAllGlobals());
 
 function setup() {
   const props = {
@@ -25,6 +26,28 @@ const edit = () => chooseProgressOption(screen.getByRole("combobox", { name: "Pe
 const setDate = (label: string, value: string) => fireEvent.change(screen.getByLabelText(label), { target: { value } });
 
 describe("ProgressRangeToolbar", () => {
+  it("collapses completed phone presets but keeps Custom drafts open across calendar changes", async () => {
+    vi.stubGlobal("innerWidth", 390);
+    const props = setup();
+    const disclosure = screen.getByTestId("progress-range-disclosure");
+    const summary = disclosure.querySelector("summary")!;
+    expect(disclosure).not.toHaveAttribute("open");
+    fireEvent.click(summary);
+    await chooseProgressOption(screen.getByRole("combobox", { name: "Period" }), "week");
+    expect(props.onPeriod).toHaveBeenCalledWith("week");
+    expect(disclosure).not.toHaveAttribute("open");
+    expect(summary).toHaveFocus();
+    fireEvent.click(summary);
+    await edit();
+    setDate("Start date", "2026-10-09");
+    await chooseProgressOption(screen.getByRole("combobox", { name: "Show dates in" }), "hijri");
+    expect(disclosure).toHaveAttribute("open");
+    expect(screen.getByLabelText("Start date")).toHaveValue("2026-10-09");
+    expect(props.onCustom).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(disclosure).not.toHaveAttribute("open");
+    expect(summary).toHaveFocus();
+  });
   it("keeps drafts unapplied and clips the default Custom end to today", async () => {
     const props = setup();
     await edit();
