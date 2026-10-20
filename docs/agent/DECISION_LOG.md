@@ -5063,3 +5063,7 @@ Owner stepper follow-up: enlarge the 1/2/3 circles to 2rem and color the same co
 ## Combined publication authorization — 2026-10-20
 
 The owner's subsequent "push all changes" instruction explicitly confirms publication of all pending changes and supersedes the sharing-board and compact-wird publication holds above. Preserve the separate Progress proposal as documentation only. Verify the pending sharing and Quran planning work, refresh and archive the newest-only bilingual release notes, commit and push to main through the intact hook, then monitor exact-commit Quality, Pages build/deploy and production smoke. Record results in the combined release report; do not infer deployment from a successful push.
+
+## Performance, stability and header review — 2026-10-20
+
+The owner asks for performance/stability enhancements, review of Progress improvements and correct content behind header backgrounds during upward scrolling. Diagnose and repair demonstrated defects without a planning gate. Stabilize Progress date/empty-record identities, retain record/clock invalidation and use an opaque base controls surface when frost is unavailable; supported Glass, 8px/2px hysteresis and stationary Library behavior stay unchanged. Shared select options use 48px targets matching compact form fields. Keep the larger Progress composition/custom-range/preferences proposal separate from this bounded repair. Continue the authorized release; exact-commit CI findings require remediation without reducing assertions, timeouts or inventory.

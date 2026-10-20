@@ -231,6 +231,7 @@ test("offers clear RTL reading choices and free reading without progress trackin
     optionState.every(
       ({ direction, textAlign, minHeight }) => direction === "rtl" && textAlign === "right" && minHeight >= 44,
     ),
+    JSON.stringify(optionState),
   ).toBe(true);
   expect(optionState[0]?.selected).toBe("true");
   expect(optionState[0]?.check).toBe(1);

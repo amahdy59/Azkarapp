@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-20",
+  "release": "2026-10-20.2",
   "ar": [
-    "أضف نصًا اختياريًا إلى الصورة التي تشاركها، وانسخ نص القراءة أو رابطها المباشر.",
-    "تنقّل بين خطوات المشاركة الواضحة، واختر المحتوى واللغة بقوائم تملأ عرض الهاتف.",
-    "راجع بطاقتك بجوار إعداداتها على الشاشات الواسعة، وتخطَّ التصميم عندما تكون جاهزًا للمشاركة.",
-    "اضبط ورد القرآن بقوائم مختصرة، وتابع خطتك وسجل أسبوعك بعرض أوضح على الأجهزة اللوحية والحاسوب."
+    "شارك بطاقتك مع نص اختياري، وانسخ القراءة أو رابطها من خطوة المشاركة.",
+    "تنقّل بين خطوات مترابطة ومعاينة متجاوبة، وتخطَّ التصميم للاحتفاظ ببطاقتك الحالية.",
+    "اختر خطة ورد القرآن بقوائم أبسط وأهداف لمس أوسع، مع عرض أوضح للخطة والسجل الأسبوعي.",
+    "تصفّح سجل التقدم بعمل حسابي أقل أثناء التمرير، مع خلفية تحمي أدوات الصفحة عند تعذّر التمويه الزجاجي."
   ],
   "en": [
-    "Add optional text to the image you share, and copy the reading text or its direct link.",
-    "Move through clear sharing steps and choose content and language with full-width phone menus.",
-    "Review your card beside its settings on wide screens, and skip design when you are ready to share.",
-    "Set your Quran reading plan with compact menus, and see your plan and weekly history more clearly on tablets and computers."
+    "Share your card with optional text, and copy the reading or its link from the Share step.",
+    "Move through connected steps and a responsive preview, or skip design to keep your current card.",
+    "Choose your Quran reading plan with simpler menus and larger touch targets, with clearer plan and weekly records.",
+    "Browse Progress with less recalculation while scrolling, and protected page controls when glass blur is unavailable."
   ]
 }

@@ -42,6 +42,16 @@ test("scrolled Home protects gaps with one continuous ground and preserves fallb
   expect(ground!.width).toBe(header!.width);
   expect(ground!.x).toBe(header!.x);
   await page.screenshot({ path: testInfo.outputPath("scrolled-protected-frost.png"), scale: "css" });
+  for (const top of [300, 150, 96, 48, 12]) {
+    await sticky.locator("..").evaluate((node, top) => {
+      node.scrollTop = top;
+    }, top);
+    await expect(sticky).toHaveAttribute("data-scrolled", "true");
+    await expect(sticky).toHaveCSS("backdrop-filter", "blur(32px) saturate(1.35)");
+    await expect(page.getByTestId("home-utility-header")).toHaveCSS("backdrop-filter", "none");
+    expect(await sticky.boundingBox()).toEqual(ground);
+  }
+  await page.screenshot({ path: testInfo.outputPath("scroll-up-protected-frost.png"), scale: "css" });
   expect((await new AxeBuilder({ page }).include('[data-testid="home-sticky-prayers"]').analyze()).violations).toEqual(
     [],
   );

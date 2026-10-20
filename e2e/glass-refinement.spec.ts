@@ -182,6 +182,16 @@ for (const [language, width] of [
       await expect(header).toHaveAttribute("data-scrolled", "true");
       await page.locator("[data-nested-scroll-probe]").evaluate((node) => node.remove());
       await capture("scrolled");
+      const fixedBounds = await header.boundingBox();
+      for (const top of [240, 96, 48, 12]) {
+        await viewport.evaluate((node, top) => {
+          node.scrollTop = top;
+        }, top);
+        await expect(header).toHaveAttribute("data-scrolled", "true");
+        await expect(header).toHaveCSS("backdrop-filter", "blur(32px) saturate(1.35)");
+        expect(await header.boundingBox()).toEqual(fixedBounds);
+      }
+      await capture("scroll-up-protected");
       expect((await new AxeBuilder({ page }).include(".app-main").analyze()).violations).toEqual([]);
       await page.screenshot({
         path: testInfo.outputPath(`${language}-${width}-${route.replaceAll("/", "-")}-protected.png`),

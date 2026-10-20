@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { t } from "../src/app/i18n";
 import { expectSharingStepGeometry, sharingStep } from "./helpers/sharing";
 
@@ -8,38 +8,43 @@ test.beforeEach(async ({ page }) => {
   await page.route("**/__browser-test-api/v1/visitors", (route) => route.fulfill({ json: { active: 1 } }));
 });
 
+async function openSharingBoard(page: Page, language: "ar" | "en") {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  page.on("console", (message) => {
+    if (message.type() === "error") errors.push(message.text());
+  });
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.addInitScript((language) => {
+    localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+    localStorage.setItem(
+      "azkarapp.state.v1",
+      JSON.stringify({
+        settings: { language, reduceMotion: true, themeMode: "midnight" },
+        profile: { isGuest: true },
+      }),
+    );
+    Object.defineProperty(navigator, "canShare", { configurable: true, value: () => true });
+    Object.defineProperty(navigator, "share", { configurable: true, value: async () => {} });
+    Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText: async () => {} } });
+  }, language);
+  // Match the supplied board's collection; full Morning exports have separate coverage.
+  await page.goto("/#/azkar/before-sleep");
+  await page.getByTestId("share-collection-button").click();
+  const modal = page.getByTestId("collection-share-modal");
+  const preview = modal.getByTestId("sharing-preview");
+  const settings = modal.getByTestId("sharing-settings");
+  const image = preview.getByRole("img");
+  await expect(image).toBeVisible();
+  await expect(preview.getByRole("group")).toHaveAttribute("aria-busy", "false");
+  return { errors, modal, preview, settings, image };
+}
+
 for (const language of ["ar", "en"] as const) {
   test(`sharing board layout keeps real previews, optional design and precise feedback in ${language} @cross-browser`, async ({
     page,
   }, testInfo) => {
-    const errors: string[] = [];
-    page.on("pageerror", (error) => errors.push(error.message));
-    page.on("console", (message) => {
-      if (message.type() === "error") errors.push(message.text());
-    });
-    await page.setViewportSize({ width: 1280, height: 900 });
-    await page.addInitScript((language) => {
-      localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
-      localStorage.setItem(
-        "azkarapp.state.v1",
-        JSON.stringify({
-          settings: { language, reduceMotion: true, themeMode: "midnight" },
-          profile: { isGuest: true },
-        }),
-      );
-      Object.defineProperty(navigator, "canShare", { configurable: true, value: () => true });
-      Object.defineProperty(navigator, "share", { configurable: true, value: async () => {} });
-      Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText: async () => {} } });
-    }, language);
-    // Match the supplied board's collection; full Morning exports have separate coverage.
-    await page.goto("/#/azkar/before-sleep");
-    await page.getByTestId("share-collection-button").click();
-    const modal = page.getByTestId("collection-share-modal");
-    const preview = modal.getByTestId("sharing-preview");
-    const settings = modal.getByTestId("sharing-settings");
-    const image = preview.getByRole("img");
-    await expect(image).toBeVisible();
-    await expect(preview.getByRole("group")).toHaveAttribute("aria-busy", "false");
+    const { errors, modal, preview, settings, image } = await openSharingBoard(page, language);
     for (const choice of ["curated", "generated"] as const) {
       const button = modal.getByRole("button", { name: t(language, `shareStudio.${choice}Tab`), exact: true });
       await expect(button.locator(".sharing-choice-icon svg")).toBeVisible();
@@ -105,6 +110,18 @@ for (const language of ["ar", "en"] as const) {
     await modal.getByRole("button", { name: t(language, "shareStudio.save"), exact: true }).click();
     expect((await download).suggestedFilename()).toMatch(/square.*\.png$/u);
     await expect(feedback).toHaveText(t(language, "shareStudio.downloaded"));
+    expect(errors).toEqual([]);
+  });
+
+  test(`sharing board reflows square previews on phones and enlarged text in ${language} @cross-browser`, async ({
+    page,
+  }, testInfo) => {
+    const { errors, modal, preview, image } = await openSharingBoard(page, language);
+    await sharingStep(modal, "design");
+    await modal.getByRole("combobox", { name: t(language, "shareStudio.format"), exact: true }).click();
+    await page.getByRole("option", { name: t(language, "shareStudio.square"), exact: true }).click();
+    await expect(image).toHaveAttribute("height", "1080");
+    await expect(preview.getByRole("group")).toHaveAttribute("aria-busy", "false", { timeout: 60000 });
     for (const width of [320, 390]) {
       await page.setViewportSize({ width, height: 900 });
       await sharingStep(modal, "content");

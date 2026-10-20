@@ -2,6 +2,12 @@
 
 Status: proposed for owner review; no Progress behavior or persisted data changed in this release.
 
+## Follow-up review — 2026-10-20
+
+The owner requests another review of these improvements alongside performance, stability and header rendering. Retain the proposed four independent overview metrics, one chosen trend, optional comparisons/exact records and explicit selected period. Implement that composition with the existing four verified periods first. Expose Custom only after range-domain acceptance proves civil/devotional boundaries, Hijri month lengths, partial/future exclusions and equal complete-day comparisons. Keep metric choice visit-local initially; saving preferences requires the existing normalization/backup/sync tests. Preserve exact values, keyboard/pointer exploration, exports, honest unavailable history and free-reading behavior.
+
+Measured immediate issue: a down/up header-elevation cycle recomputed unchanged garden history twice because selected dates and empty defaults changed identity. Stabilizing these inputs removes those two recomputations without changing records or totals. Regressions require changed records and the configured devotional-day boundary to invalidate the result. The larger dashboard redesign is still proposed. See [review findings](reports/PERFORMANCE_PROGRESS_REVIEW_2026_10_20.md).
+
 ## What the implementation shows
 
 ProgressScreen already shares Day/Week/Month/Year and period navigation, but changes composition between daily records and historical analytics. PrayerTrackerStats and RoutineInsights each expand into a timeline, comparisons, explanations and export actions. Friday and reflective context follow them. The result is a long page even though the underlying date selection is shared. The remedy is a compact overview with a consistent hierarchy, rather than compressing every existing chart.

@@ -1,5 +1,9 @@
 # Application architecture
 
+## Progress rendering and header fallback — 2026-10-20
+
+Progress retains stable selected-date and empty optional-record identities across presentation-only header elevation renders. Record changes, calendar/period navigation and the existing clock invalidate derived history; the devotional-day boundary is unchanged. Progress controls start with an opaque theme background, overridden by supported Glass inside its existing feature query. A selected Glass preference without frost must not expose moving records beneath filters. No persistence, calculation or shell change.
+
 ## Complete sharing and common sizes — 2026-10-19, local only
 
 `shareLayout` continues oversized quotations and selected additions across measured, numbered fragments at existing reading sizes. Each part repeats its heading and selected citation; original items stay intact for Text/ZIP, with duplicate identities removed from selected-card archive text. Benefits supplies the entire section independently of its screen batch, explicit bilingual payloads, no repetition metadata and all-card scope by default. Short individual evidence uses centered Square cards.

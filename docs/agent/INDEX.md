@@ -455,3 +455,5 @@ Local follow-up: [Concise, actionable Progress](phases/PROGRESS_REFINEMENTS_2026
 [Progress unified-range proposal](PROGRESS_UNIFIED_RANGE_PLAN_2026_10_19.md) reviews the existing long statistics page and proposes a shared Day/Week/Month/Year/Custom filter, chosen metrics and one selectable prominent timeline. Plan only; no Progress data/presentation change in this sharing/wird release.
 
 [Sharing and Quran plan release](phases/COMBINED_SHARING_WIRD_RELEASE_2026_10_20.md) records the owner's "push all changes" confirmation, superseding pending publication holds, and the verification/publication plan.
+
+[Performance, Progress and header review](phases/PERFORMANCE_PROGRESS_HEADER_REVIEW_2026_10_20.md) is the owner's subsequent review/repair request: measured scroll-calculation reuse, protected unavailable-frost headers, responsive target repair and release verification. [Review findings](reports/PERFORMANCE_PROGRESS_REVIEW_2026_10_20.md) prioritize future work and qualify the still-proposed Progress redesign.

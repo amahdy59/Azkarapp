@@ -57,6 +57,9 @@ import type {
 /** The wird is the three time-of-day routines. After-prayer adhkar are tracked
  *  per prayer in their own section below, the same split Home uses. */
 const WIRD_CATEGORY_IDS = ["morning", "evening", "before_sleep"] as const satisfies readonly CategoryId[];
+const EMPTY_PRAYER_TRACKING: readonly PrayerTrackingRecord[] = [];
+const EMPTY_DAILY_HABITS: readonly DailyHabitCompletion[] = [];
+const EMPTY_ZIKR_HISTORY: readonly ZikrDayRecord[] = [];
 
 function renderTierMark(level: GardenLevel, size = 32) {
   switch (level) {
@@ -88,8 +91,8 @@ export function ProgressScreen({
   language,
   direction,
   onOpenShareModal,
-  prayerTracking = [],
-  dailyHabits = [],
+  prayerTracking = EMPTY_PRAYER_TRACKING,
+  dailyHabits = EMPTY_DAILY_HABITS,
   wirdHistory,
   quranWirdPlan,
   quranWirdDailyGoals,
@@ -98,7 +101,7 @@ export function ProgressScreen({
   weeklyGoalDays,
   initialPeriod = "day",
   onPeriodChange,
-  zikrHistory = [],
+  zikrHistory = EMPTY_ZIKR_HISTORY,
 }: {
   dailyCompletions: DailyCollectionCompletion[];
   progressDayStartHour: number;
@@ -161,7 +164,12 @@ export function ProgressScreen({
   }, [initialPeriod]);
 
   const isArabic = language === "ar";
-  const displayDate = shiftCalendarDate(now, activeTab, offset, calendarType);
+  // Header elevation changes presentation only. Keep the date identity stable
+  // so those scroll-state renders do not rebuild unchanged lifetime history.
+  const displayDate = useMemo(
+    () => shiftCalendarDate(now, activeTab, offset, calendarType),
+    [now, activeTab, offset, calendarType],
+  );
   const periodHeading = getProgressPeriodHeading(displayDate, activeTab, offset, language, calendarType);
 
   const handleTabChange = (tab: "day" | "week" | "month" | "year") => {

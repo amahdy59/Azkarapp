@@ -1,9 +1,65 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { act, render, screen, fireEvent } from "@testing-library/react";
 import { ProgressScreen } from "./ProgressScreen";
+import * as progressDomain from "../progress";
 import type { DailyCollectionCompletion, DailyHabitCompletion } from "../types";
 
 describe("ProgressScreen", () => {
+  it("refreshes memoized statistics at the configured devotional-day boundary", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 9, 20, 2, 59, 30));
+    const summary = vi.spyOn(progressDomain, "getGardenSummary");
+    try {
+      render(
+        <ProgressScreen
+          dailyCompletions={[]}
+          progressDayStartHour={3}
+          calendarType="gregorian"
+          language="en"
+          direction="ltr"
+          onOpenShareModal={vi.fn()}
+        />,
+      );
+      const initialCalculations = summary.mock.calls.length;
+      expect(summary.mock.results.at(-1)?.value.today.dayKey).toBe("2026-10-19");
+      act(() => vi.advanceTimersByTime(30050));
+      expect(summary.mock.calls.length).toBeGreaterThan(initialCalculations);
+      expect(summary.mock.results.at(-1)?.value.today.dayKey).toBe("2026-10-20");
+    } finally {
+      summary.mockRestore();
+      vi.useRealTimers();
+    }
+  });
+  it("reuses unchanged historical calculations during header scrolling and recomputes changed records", () => {
+    const summary = vi.spyOn(progressDomain, "getGardenSummary");
+    const props = {
+      dailyCompletions: [{ dayKey: "2026-08-01", category: "morning", timeZone: "UTC" }] as DailyCollectionCompletion[],
+      progressDayStartHour: 3,
+      calendarType: "gregorian" as const,
+      language: "en" as const,
+      direction: "ltr" as const,
+      onOpenShareModal: vi.fn(),
+    };
+    const { container, rerender } = render(<ProgressScreen {...props} />);
+    const viewport = container.querySelector<HTMLElement>(".progress-screen")!;
+    viewport.style.overflowY = "auto";
+    fireEvent.resize(window);
+    const initialCalculations = summary.mock.calls.length;
+    expect(initialCalculations).toBeGreaterThan(0);
+    fireEvent.scroll(viewport, { target: { scrollTop: 120 } });
+    expect(screen.getByTestId("progress-sticky-controls")).toHaveAttribute("data-scrolled", "true");
+    fireEvent.scroll(viewport, { target: { scrollTop: 0 } });
+    expect(screen.getByTestId("progress-sticky-controls")).not.toHaveAttribute("data-scrolled");
+    expect(summary.mock.calls.length).toBe(initialCalculations);
+    rerender(
+      <ProgressScreen
+        {...props}
+        dailyCompletions={[...props.dailyCompletions, { dayKey: "2026-08-01", category: "evening", timeZone: "UTC" }]}
+      />,
+    );
+    expect(summary.mock.calls.length).toBeGreaterThan(initialCalculations);
+    summary.mockRestore();
+  });
   const mockCompletions: DailyCollectionCompletion[] = [
     { dayKey: "2026-08-01", category: "morning", timeZone: "UTC" },
     { dayKey: "2026-08-01", category: "evening", timeZone: "UTC" },

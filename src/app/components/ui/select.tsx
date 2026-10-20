@@ -120,7 +120,7 @@ function SelectItem({
       data-slot="select-item"
       className={cn(
         MENU_OPTION_STATE,
-        "[&_svg:not([class*='text-'])]:text-muted-foreground relative flex min-h-11 w-full cursor-default items-center justify-between gap-2 rounded-xl py-2.5 ps-3 pe-9 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "[&_svg:not([class*='text-'])]:text-muted-foreground relative flex min-h-12 w-full cursor-default items-center justify-between gap-2 rounded-xl py-2.5 ps-3 pe-9 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       {...props}

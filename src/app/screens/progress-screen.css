@@ -6,6 +6,9 @@
 }
 
 .progress-screen-controls {
+  /* Start with a protected surface. Supported Glass overrides it in the
+     material feature query; unavailable frost must never expose moving text. */
+  background: var(--background);
   position: sticky;
   inset-block-start: 0;
   z-index: 40;
@@ -19,11 +22,6 @@
     background-color 150ms ease,
     box-shadow 150ms ease,
     border-color 150ms ease;
-}
-
-html:not([data-app-material-resolved="glass"]) .progress-screen-controls,
-html.high-contrast .progress-screen-controls {
-  background: var(--background);
 }
 
 html:not([data-app-material-resolved="glass"]) .progress-screen-controls[data-scrolled="true"],

@@ -1,3 +1,7 @@
+## Progress fallback and compact menu targets — 2026-10-20
+
+The complete Progress title/filter group starts with the opaque theme ground. Supported Glass overrides it through the existing feature query; unavailable frost keeps the opaque reading protection while records scroll in either direction. Preserve existing Glass tint, 8px/2px hysteresis, one frost owner, keyboard clearance and the Library's stationary scene header. Shared select options use 48px minimum targets, matching compact-form triggers and retaining enlarged labels, selection and RTL alignment.
+
 ## Home scroll frost — 2026-10-19
 
 The owner's latest screenshot correction supersedes the 88% dark shared ground and stacked header tint. Scrolled Home Glass uses one continuous 60% on-media tint, restrained directional reflection and stationary 32px/135% frost across the header, prayer row, gaps and gutters. Its nested utility header is transparent and child cards retain their existing tint/edges without another filter. Resting cards/header, independent Home/App choices and opaque/high-contrast/reduced-transparency/forced-color recovery remain authoritative. Prayer geometry uses the synchronized 220ms motion described in MOTION_SYSTEM.md; no text scaling, animated blur or scroll-position writes.
