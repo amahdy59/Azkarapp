@@ -1,4 +1,4 @@
-import { useId, type ComponentType } from "react";
+import { useEffect, useId, useRef, type ComponentType, type PointerEvent as ReactPointerEvent } from "react";
 import type { AppLanguage } from "../types";
 import { FIELD_LABEL_CLASS } from "./FormField";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
@@ -27,6 +27,33 @@ export function ProgressSelectField<Value extends string>({
 }) {
   const generatedId = useId();
   const id = triggerId ?? generatedId;
+  const keyboardIntent = useRef(false);
+  const pointerPosition = useRef<{ x: number; y: number } | undefined>(undefined);
+  useEffect(() => {
+    const trackPointer = (event: PointerEvent) => {
+      const previous = pointerPosition.current;
+      if (event.pointerType !== "mouse" || (previous && (previous.x !== event.clientX || previous.y !== event.clientY)))
+        keyboardIntent.current = false;
+      pointerPosition.current = { x: event.clientX, y: event.clientY };
+    };
+    const usePointer = () => {
+      keyboardIntent.current = false;
+    };
+    document.addEventListener("pointermove", trackPointer, true);
+    document.addEventListener("pointerdown", usePointer, true);
+    return () => {
+      document.removeEventListener("pointermove", trackPointer, true);
+      document.removeEventListener("pointerdown", usePointer, true);
+    };
+  }, []);
+  const useKeyboard = () => {
+    keyboardIntent.current = true;
+  };
+  const preserveKeyboardFocus = (event: ReactPointerEvent) => {
+    // WebKit emits stationary pointer events when a menu scrolls/repositions
+    // beneath the cursor. Only actual pointer movement may take keyboard focus.
+    if (keyboardIntent.current) event.preventDefault();
+  };
   return (
     <div className={`progress-select-field min-w-0 space-y-1 ${className}`}>
       <label id={`${id}-label`} htmlFor={id} className={`block ${FIELD_LABEL_CLASS}`}>
@@ -38,6 +65,7 @@ export function ProgressSelectField<Value extends string>({
           aria-labelledby={`${id}-label`}
           className="progress-select-trigger"
           data-progress-value={value}
+          onKeyDownCapture={useKeyboard}
         >
           <span className="progress-select-leading" aria-hidden="true">
             <Icon className="size-4" />
@@ -51,6 +79,8 @@ export function ProgressSelectField<Value extends string>({
           collisionPadding={12}
           className="progress-select-content"
           aria-labelledby={`${id}-label`}
+          onKeyDownCapture={useKeyboard}
+          onPointerMoveCapture={preserveKeyboardFocus}
           viewportProps={{
             // Enlarged labels can scroll even in a five-option menu. Give its
             // viewport direct keyboard access alongside Radix option navigation.
@@ -67,6 +97,7 @@ export function ProgressSelectField<Value extends string>({
               value={option.value}
               textValue={option.label}
               data-progress-value={option.value}
+              onPointerLeave={preserveKeyboardFocus}
             >
               {option.label}
             </SelectItem>

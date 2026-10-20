@@ -175,18 +175,22 @@ export function ProgressScreen({
     const controls = controlsRef.current;
     const scrollport = controls?.closest<HTMLElement>(".app-screen-surface");
     if (!controls || !scrollport) return;
+    const header = controls.querySelector<HTMLElement>(".shared-screen-header");
     const measure = () => {
       scrollport.style.setProperty("--progress-controls-max-height", `${scrollport.clientHeight * 0.6}px`);
       scrollport.style.setProperty("--progress-controls-height", `${controls.getBoundingClientRect().height}px`);
+      controls.style.setProperty("--progress-title-height", `${header?.getBoundingClientRect().height ?? 0}px`);
     };
     measure();
     const observer = typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(measure);
     observer?.observe(controls);
     observer?.observe(scrollport);
+    if (header) observer?.observe(header);
     return () => {
       observer?.disconnect();
       scrollport.style.removeProperty("--progress-controls-height");
       scrollport.style.removeProperty("--progress-controls-max-height");
+      controls.style.removeProperty("--progress-title-height");
     };
   }, []);
   const activePeriodRef = useRef(initialPeriod);

@@ -17,6 +17,7 @@
   padding-block-start: env(safe-area-inset-top);
   max-block-size: var(--progress-controls-max-height, 60dvh);
   overflow-y: auto;
+  scroll-padding-block-start: var(--progress-title-height, 0px);
   overscroll-behavior: contain;
   transition:
     background-color 150ms ease,
