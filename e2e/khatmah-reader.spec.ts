@@ -56,8 +56,10 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   const pageNavigation = page.getByRole("navigation", { name: "التنقل بين صفحات المصحف" });
   await expect(mushafPage).toBeVisible();
   const backIcon = page.getByTestId("mushaf-top-left-back").locator("svg");
-  await expect(backIcon).toHaveAttribute("data-rtl-flip", "");
-  await expect(backIcon).toHaveCSS("transform", "matrix(-1, 0, 0, 1, 0, 0)");
+  // The Arabic back control sits on the right edge and uses a physical right
+  // arrow, independent of the printed page's always-RTL text direction.
+  await expect(backIcon).not.toHaveAttribute("data-rtl-flip", "");
+  await expect(backIcon).toHaveCSS("transform", "none");
   await expect(pageNavigation).toBeAttached();
   await expect(page.getByRole("navigation", { name: /التنقل (السفلي|الرئيسي)/ })).toHaveCount(0);
   const initialBox = await mushafPage.boundingBox();
@@ -544,11 +546,14 @@ test("turns pages by swipe without hiding the permanent controls", async ({ page
   await expect(page.getByTestId("mushaf-page-bookmark")).toBeVisible();
 });
 
-test("touch swipes cycle themes and toggle focus mode while short pages retain native scrolling", async ({ page }) => {
+test("touch swipes reverse themes and taps toggle focus mode while short pages retain native scrolling", async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.getByRole("button", { name: "متابعة القراءة" }).click();
   const paper = page.locator(".mushaf-paper");
   await expect(page.getByRole("article", { name: "صفحة ٤٢" })).toBeVisible();
+  const initialTheme = await page.getByRole("article").getAttribute("data-theme");
   await expect.poll(() => paper.evaluate((element) => getComputedStyle(element).touchAction)).toBe("pinch-zoom");
   const client = await page.context().newCDPSession(page);
   await client.send("Emulation.setTouchEmulationEnabled", { enabled: true });
@@ -567,7 +572,16 @@ test("touch swipes cycle themes and toggle focus mode while short pages retain n
   };
   await swipe(-140);
   await expect(page.getByTestId("mushaf-theme-hud")).toBeVisible();
+  await expect(page.getByRole("article")).not.toHaveAttribute("data-theme", initialTheme!);
   await swipe(140);
+  await expect(page.getByRole("article")).toHaveAttribute("data-theme", initialTheme!);
+  await expect(page.getByTestId("mushaf-focus-exit")).toBeHidden();
+  const box = (await paper.boundingBox())!;
+  await client.send("Input.dispatchTouchEvent", {
+    type: "touchStart",
+    touchPoints: [{ x: box.x + box.width / 2, y: box.y + box.height / 2 }],
+  });
+  await client.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
   await expect(page.getByTestId("mushaf-focus-exit")).toBeVisible();
   await page.getByTestId("mushaf-focus-exit").click();
   await page.setViewportSize({ width: 643, height: 275 });

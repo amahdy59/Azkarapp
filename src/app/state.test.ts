@@ -243,6 +243,15 @@ describe("app state persistence", () => {
     expect(legacy).not.toHaveProperty("mushafKeepControlsVisible");
   });
 
+  it("remembers disabled Mushaf colour swipes locally without remote snapshots replacing them", () => {
+    expect(normalizeAppState({}).mushafColorGestures).toBe(true);
+    expect(normalizeAppState({ mushafColorGestures: "false" }).mushafColorGestures).toBe(true);
+    const base = normalizeAppState({ mushafColorGestures: false });
+    expect(base.mushafColorGestures).toBe(false);
+    expect(mergeAppStates(base, normalizeAppState({})).mushafColorGestures).toBe(false);
+    expect(mergeAppStates(normalizeAppState({}), base).mushafColorGestures).toBe(true);
+  });
+
   it("keeps a place in each multi-page surah and drops impossible pages", () => {
     const state = normalizeAppState({
       surahReadingPages: { "friday-kahf": 297, "q-mulk": 0, "q-sajdah": 605, "": 300, "q-yaseen": "440" },

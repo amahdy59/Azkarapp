@@ -1345,6 +1345,10 @@ const en = {
     continueAdditional: "Continue with {count} additional azkar",
   },
   mushaf: {
+    colorGestures: "Swipe to change page colour",
+    gestureGuide: "Reading gestures",
+    gestureGuideBody:
+      "Tap the middle of the page to show or hide tools. When colour swipes are on, swipe up for the next colour and down for the previous one. Only the Mushaf changes; enlarged pages keep normal scrolling.",
     wordMeaning: "Meaning of {word}",
     pageNavigation: "Mushaf page navigation",
     pagePosition: "Page {position} — choose another page",
@@ -1383,6 +1387,7 @@ const en = {
     glassColorHint: "Page colors apply with Solid appearance. Change the surface in Settings → Appearance.",
     themeTitle: "Display Theme",
     themeFollowApp: "Follow app theme",
+    pageColorHint: "Applies to the Mushaf only. Swipe up for the next colour, or down for the previous colour.",
     themeMidnight: "Midnight navy",
     themeDark: "Quiet charcoal",
     themeLight: "Warm ivory",

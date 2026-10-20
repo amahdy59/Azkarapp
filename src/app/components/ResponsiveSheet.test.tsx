@@ -3,6 +3,25 @@ import { describe, expect, it, vi } from "vitest";
 import { Modal, SheetHeader } from "./ResponsiveSheet";
 
 describe("Modal accessibility", () => {
+  it("allows explicit recovery when a menu opener becomes hidden", async () => {
+    const recovery = document.createElement("button");
+    recovery.textContent = "Selected dates";
+    document.body.append(recovery);
+    const onCloseAutoFocus = vi.fn((event: Event) => {
+      event.preventDefault();
+      recovery.focus();
+    });
+    const view = render(
+      <Modal open onClose={vi.fn()} onCloseAutoFocus={onCloseAutoFocus} title="Dates" direction="ltr">
+        <button>Apply</button>
+      </Modal>,
+    );
+    await waitFor(() => expect(screen.getByTestId("modal-close-button")).toHaveFocus());
+    view.unmount();
+    await waitFor(() => expect(recovery).toHaveFocus());
+    expect(onCloseAutoFocus).toHaveBeenCalledOnce();
+    recovery.remove();
+  });
   it("restores focus to an opener inside another dialog", async () => {
     const outer = document.createElement("section");
     outer.setAttribute("role", "dialog");

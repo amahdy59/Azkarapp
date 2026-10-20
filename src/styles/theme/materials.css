@@ -86,6 +86,12 @@
     }
     /* Exact .bg-card is the legacy surface contract; shared primitives carry
        explicit ownership. Opacity/hover utility substrings never opt in. */
+    html[data-app-material-resolved="glass"]:not(.high-contrast)
+      [data-material-ui]
+      .progress-records-surface.glass-reading {
+      background-color: color-mix(in srgb, var(--on-media-surface) 82%, transparent);
+      backdrop-filter: var(--glass-frost);
+    }
     html[data-app-material-resolved="glass"]:not(.high-contrast) [data-material-ui] [data-material-elevation="flat"] {
       box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08);
     }
@@ -135,7 +141,11 @@
        tint when nested backdrop roots cannot sample the whole reading layer.
        Keep the frost, with enough fill to protect the gloss independently. */
     html[data-app-material-resolved="glass"]:not(.high-contrast)
-      :is(.quran-word-popover:is([role="tooltip"], [role="dialog"]), .mushaf-protected-overlay[role="dialog"]) {
+      :is(
+        .quran-word-popover:is([role="tooltip"], [role="dialog"]),
+        .mushaf-protected-overlay[role="dialog"],
+        .progress-date-sheet[role="dialog"]
+      ) {
       background-color: rgb(15 23 42);
     }
     html:not(.high-contrast) [role="dialog"].hero-glass,

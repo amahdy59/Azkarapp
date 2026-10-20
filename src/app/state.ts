@@ -185,6 +185,7 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
   savedZikrIds: [],
   khatmahPage: 1,
   mushafTheme: "follow-app",
+  mushafColorGestures: true,
   mushafLayout: "auto",
   mushafToolbarSide: "right",
   mushafTextScale: "medium",
@@ -1013,6 +1014,7 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
         ? Math.floor(parsed.khatmahPage)
         : 1,
     mushafTheme: normalizeMushafTheme(parsed.mushafTheme),
+    mushafColorGestures: parsed.mushafColorGestures !== false,
     mushafLayout: parsed.mushafLayout === "single" || parsed.mushafLayout === "spread" ? parsed.mushafLayout : "auto",
     mushafToolbarSide: parsed.mushafToolbarSide === "left" ? "left" : "right",
     mushafTextScale: normalizeMushafTextScale(parsed.mushafTextScale),
@@ -1472,6 +1474,7 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
     savedZikrIds: dedupeSavedZikrIds([...(safeBase.savedZikrIds ?? []), ...(incoming.savedZikrIds ?? [])]),
     khatmahPage: incoming.khatmahPage ?? safeBase.khatmahPage ?? 1,
     mushafTheme: normalizeMushafTheme(incoming.mushafTheme ?? safeBase.mushafTheme),
+    mushafColorGestures: safeBase.mushafColorGestures ?? true,
     mushafLayout:
       incoming.mushafLayout === "single" || incoming.mushafLayout === "spread"
         ? incoming.mushafLayout

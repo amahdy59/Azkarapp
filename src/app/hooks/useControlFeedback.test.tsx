@@ -95,3 +95,31 @@ it("handles disclosures and semantic choices while excluding unavailable and rea
     expect(button).not.toHaveAttribute("data-key-pressed");
   }
 });
+
+it("releases keyboard feedback on Escape, pointer handoff and page exit without generating actions", () => {
+  const onClick = vi.fn();
+  function Controls() {
+    useControlFeedback();
+    return <button onClick={onClick}>Action</button>;
+  }
+  const { unmount } = render(<Controls />);
+  const button = screen.getByRole("button", { name: "Action" });
+  for (const cancel of [
+    () => fireEvent.keyDown(button, { key: "Escape" }),
+    () => fireEvent.pointerDown(document.body),
+    () => fireEvent(window, new Event("pagehide")),
+    () => fireEvent(document, new Event("visibilitychange")),
+  ]) {
+    fireEvent.keyDown(button, { key: " " });
+    expect(button).toHaveAttribute("data-key-pressed");
+    cancel();
+    expect(button).not.toHaveAttribute("data-key-pressed");
+    expect(onClick).not.toHaveBeenCalled();
+  }
+  fireEvent.keyDown(button, { key: "Enter" });
+  fireEvent.pointerDown(button);
+  expect(button).not.toHaveAttribute("data-key-released");
+  unmount();
+  fireEvent.keyDown(button, { key: "Enter" });
+  expect(button).not.toHaveAttribute("data-key-pressed");
+});

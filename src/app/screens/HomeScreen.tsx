@@ -901,7 +901,7 @@ export function HomeScreen({
                   >
                     <div className="flex items-center gap-3.5 min-w-0">
                       <span
-                        className={`flex size-11 shrink-0 items-center justify-center rounded-2xl transition-colors ${
+                        className={`control-cue flex size-11 shrink-0 items-center justify-center rounded-2xl ${
                           homeVisualEffects
                             ? "border border-white/20 bg-white/10 text-on-media-accent"
                             : "border border-primary/30 bg-primary/10 text-primary"
@@ -930,7 +930,7 @@ export function HomeScreen({
                       }`}
                     >
                       <span>{t(language, "common.open")}</span>
-                      <ArrowNext size={14} data-rtl-flip aria-hidden="true" className="shrink-0" />
+                      <ArrowNext size={14} data-rtl-flip aria-hidden="true" className="control-cue shrink-0" />
                     </span>
                   </button>
                 )}
@@ -948,7 +948,7 @@ export function HomeScreen({
                   >
                     <div className="flex items-center gap-3.5 min-w-0">
                       <span
-                        className={`flex size-11 shrink-0 items-center justify-center rounded-2xl transition-colors ${
+                        className={`control-cue flex size-11 shrink-0 items-center justify-center rounded-2xl ${
                           homeVisualEffects
                             ? "border border-white/20 bg-white/10 text-on-media-accent"
                             : "border border-primary/30 bg-primary/10 text-primary"
@@ -972,7 +972,7 @@ export function HomeScreen({
                       }`}
                     >
                       <span>{t(language, "common.open")}</span>
-                      <ArrowNext size={14} data-rtl-flip aria-hidden="true" className="shrink-0" />
+                      <ArrowNext size={14} data-rtl-flip aria-hidden="true" className="control-cue shrink-0" />
                     </span>
                   </button>
                 )}

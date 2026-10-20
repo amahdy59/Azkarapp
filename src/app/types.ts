@@ -475,6 +475,8 @@ export interface AppStateSnapshot {
   khatmahPage?: number;
   /** Mushaf color preference; follows the app theme unless explicitly overridden. */
   mushafTheme?: MushafTheme;
+  /** Device-only vertical page-colour shortcut; explicit colour choices stay available. */
+  mushafColorGestures?: boolean;
   mushafLayout?: MushafLayout;
   /** Which edge of a wide reading surface carries the vertical tool rail. */
   mushafToolbarSide?: MushafToolbarSide;

@@ -209,7 +209,7 @@ export function PrayerRoutineCard({
             <span className="min-w-0 truncate" title={ctaLabel}>
               {ctaLabel}
             </span>
-            <ArrowNext size={20} className="shrink-0 transition-transform group-hover:scale-110" aria-hidden="true" />
+            <ArrowNext size={20} className="control-cue shrink-0" aria-hidden="true" />
           </button>
           {quickShare?.available && (
             <div className="flex shrink-0 items-stretch gap-2">

@@ -324,6 +324,7 @@ const MushafTextLine = memo(function MushafTextLine({
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
+                    e.stopPropagation();
                     onActiveWordChange(
                       isOpen
                         ? null
@@ -1350,7 +1351,7 @@ export function MushafPageViewer({
     const travel = pageTransitionDirection === "forward" ? "-28px" : "28px";
     const animation = paper.animate(
       [
-        { opacity: 0.35, transform: `translateX(${travel})` },
+        { opacity: 0.8, transform: `translateX(${travel})` },
         { opacity: 1, transform: "translateX(0)" },
       ],
       { duration: 220, easing: "cubic-bezier(0.22, 1, 0.36, 1)", fill: "both" },
@@ -1628,6 +1629,10 @@ export function MushafPageViewer({
         className={`mushaf-paper flex min-h-0 min-w-0 flex-1 ${facingPage || facingContent ? "mushaf-spread" : ""}`}
         data-page-transition={pageTransitionDirection}
         dir="rtl"
+        // WebKit can start dragging the text selection on a reverse swipe,
+        // stealing pointer-up from the page. Keep native selection/copy, but
+        // let the reader's gestures own movement instead of HTML drag/drop.
+        onDragStart={(event) => event.preventDefault()}
         onPointerDown={(event) => {
           if (event.target instanceof Element && event.target.closest("[data-mushaf-meaning]")) {
             paperTap.current = null;

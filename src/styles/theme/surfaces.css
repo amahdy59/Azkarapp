@@ -421,11 +421,16 @@ button.ui-icon-button[data-key-pressed]:not(:disabled, .no-press, [aria-disabled
 }
 input[type="range"]:not(:disabled) {
   cursor: pointer;
-  transition: box-shadow var(--motion-duration-press) var(--motion-ease-standard);
+  transition:
+    background-color var(--motion-duration-press) var(--motion-ease-standard),
+    box-shadow var(--motion-duration-press) var(--motion-ease-standard);
 }
 input[type="range"]:not(:disabled):is(:active, :focus-visible) {
   outline: 2px solid var(--ring);
   outline-offset: 3px;
+  /* Native WebKit ranges suppress box shadows; retain a visible still tint. */
+  background-color: color-mix(in srgb, var(--ring) 8%, transparent);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--ring) 18%, transparent);
 }
 /* Component-specific active rules must not revive disabled semantic actions. */
 button:is([aria-disabled="true"], [data-disabled]):active {
@@ -441,10 +446,12 @@ button:is([aria-disabled="true"], [data-disabled]):active {
    specificity race between compact controls and reduced-motion rules. */
 :root.reduce-motion {
   --control-press-transform: none;
+  --control-cue-scale: 1;
 }
 @media (prefers-reduced-motion: reduce) {
   :root {
     --control-press-transform: none;
+    --control-cue-scale: 1;
   }
 }
 

@@ -1,5 +1,20 @@
 [
   {
+    "release": "2026-10-20.5",
+    "ar": [
+      "أغلق شرح الكلمة بلمسه أو بلمس الكلمة نفسها، وتحكّم بأدوات المصحف بضغطة واحدة مع سهم رجوع يتجه نحو حافة الشاشة.",
+      "فعّل سحب ألوان المصحف أو أوقفه من إعدادات القراءة، مع دليل للإيماءات وخيارات واضحة لا تغيّر لون التطبيق.",
+      "تبدأ صفحات المصحف وخطوطها معًا، وتظهر القراءة دون انتظار شروح الكلمات، مع انتقال سلس بين الصفحات.",
+      "اختر تاريخًا أو اليوم أو شهرًا أو فترة لكل أقسام التقدم، مع سجل أوضح وتفاصيل مركّزة واستجابة أدق للأزرار ولوحة المفاتيح."
+    ],
+    "en": [
+      "Dismiss meanings by tapping them or the same word, with one-tap Mushaf tools and Back arrows pointing towards the screen edge.",
+      "Turn Mushaf colour swipes on or off in Reading Settings, with a gesture guide and clear choices that leave the app theme unchanged.",
+      "Mushaf pages and fonts start loading together; reading appears without waiting for word meanings, with smoother page transitions.",
+      "Choose one date, Today, a month or a range for every Progress tab, with clearer records, focused details and more reliable button and keyboard feedback."
+    ]
+  },
+  {
     "release": "2026-10-20.4",
     "ar": [
       "المشاركة تملأ شاشة الهاتف مع معاينة أكبر، ويمكنك الانتقال من ذكر واحد إلى المجموعة كاملة دون فقد تصميمك.",

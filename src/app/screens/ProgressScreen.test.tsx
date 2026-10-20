@@ -1,6 +1,6 @@
 import { chooseProgressOption } from "../../test/progressSelect";
 import { describe, it, expect, vi } from "vitest";
-import { act, render, screen, fireEvent } from "@testing-library/react";
+import { act, render, screen, fireEvent, within } from "@testing-library/react";
 import { ProgressScreen } from "./ProgressScreen";
 import * as progressDomain from "../progress";
 import * as dashboardDomain from "../progressDashboard";
@@ -12,11 +12,50 @@ function openDetailedContext() {
   details.open = true;
   fireEvent(details, new Event("toggle"));
 }
+async function chooseDetail(topic: string) {
+  await chooseProgressOption(screen.getByRole("combobox", { name: /Explore details|استكشاف التفاصيل/ }), topic);
+}
 async function choosePeriod(period: string) {
   await chooseProgressOption(screen.getAllByRole("combobox")[0]!, period);
 }
 
 describe("ProgressScreen", () => {
+  it("uses a chosen calendar month including leap days and real empty-state navigation", () => {
+    const onOpenHome = vi.fn();
+    const onOpenKhatmah = vi.fn();
+    render(
+      <ProgressScreen
+        dailyCompletions={[]}
+        progressDayStartHour={3}
+        calendarType="hijri"
+        language="en"
+        direction="ltr"
+        onOpenShareModal={vi.fn()}
+        onOpenHome={onOpenHome}
+        onOpenKhatmah={onOpenKhatmah}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Go to Home" }));
+    fireEvent.click(screen.getByRole("button", { name: "Open Quran plan" }));
+    expect(onOpenHome).toHaveBeenCalledOnce();
+    expect(onOpenKhatmah).toHaveBeenCalledOnce();
+    fireEvent.click(screen.getByRole("button", { name: /Choose dates:/ }));
+    fireEvent.click(screen.getByRole("radio", { name: "Month" }));
+    fireEvent.change(screen.getByLabelText("Gregorian month"), { target: { value: "2024-02" } });
+    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
+    expect(screen.getByTestId("garden-view-date")).toHaveTextContent(/1\s*–\s*29 Feb 2024/);
+    expect(screen.getByRole("combobox", { name: "Period", hidden: true })).toHaveAttribute(
+      "data-progress-value",
+      "month",
+    );
+    expect(screen.getByRole("combobox", { name: "Show dates in", hidden: true })).toHaveAttribute(
+      "data-progress-value",
+      "gregorian",
+    );
+    fireEvent.click(screen.getByTestId("progress-tab-records"));
+    expect(screen.queryByRole("searchbox")).not.toBeInTheDocument();
+    expect(screen.getByText("No saved records in this period.")).toBeInTheDocument();
+  });
   it("restores focused record controls after delayed native focus scrolling", () => {
     let nextFrame: FrameRequestCallback | undefined;
     const request = vi.spyOn(window, "requestAnimationFrame").mockImplementation((callback) => {
@@ -36,6 +75,7 @@ describe("ProgressScreen", () => {
     );
     const viewport = container.querySelector<HTMLElement>(".progress-screen")!;
     const controls = screen.getByTestId("progress-sticky-controls");
+    fireEvent.click(screen.getByTestId("progress-tab-trends"));
     const target = screen.getByRole("combobox", { name: "Show trend for" });
     const controlsBounds = vi
       .spyOn(controls, "getBoundingClientRect")
@@ -141,7 +181,7 @@ describe("ProgressScreen", () => {
     { dayKey: "2026-08-01", habit: "mosque_3", timeZone: "UTC" },
   ];
 
-  it("renders Arabic version with Oasis Stage Card and 7-day rhythm strip in Day view", () => {
+  it("renders Arabic version with Oasis Stage Card and 7-day rhythm strip in Day view", async () => {
     const onOpenShareModal = vi.fn();
     render(
       <ProgressScreen
@@ -158,6 +198,8 @@ describe("ProgressScreen", () => {
     expect(screen.getByTestId("progress-overview").children).toHaveLength(4);
     expect(screen.queryByTestId("oasis-stage-card")).not.toBeInTheDocument();
     openDetailedContext();
+    expect(screen.getByTestId("progress-prayer-group")).toBeInTheDocument();
+    await chooseDetail("reflection");
     // Oasis Stage Card remains available as optional context.
     expect(screen.getByTestId("oasis-stage-card")).toBeInTheDocument();
     expect(screen.getByTestId("oasis-stage-card")).not.toHaveAttribute("open");
@@ -183,17 +225,18 @@ describe("ProgressScreen", () => {
     expect(screen.getByText("إيقاع الأيام السبعة")).toBeInTheDocument();
     expect(screen.queryByText(/★/)).not.toBeInTheDocument();
 
-    // Qur'an and remembrance follow the primary prayer group.
+    await chooseDetail("routines");
+    // Quran and remembrance are available in their own topic.
     expect(screen.getByTestId("today-garden-card")).toBeInTheDocument();
     expect(screen.getByText("الورد اليومي")).toBeInTheDocument();
 
-    expect(screen.getByTestId("progress-prayer-group")).toBeInTheDocument();
+    expect(screen.queryByTestId("progress-prayer-group")).not.toBeInTheDocument();
 
     // Progress uses efficient themed rows, not Home's decorative photo cards.
     expect(screen.getByTestId("today-garden-card").querySelector("img")).toBeNull();
   });
 
-  it("renders English version with proper headings and LTR layout", () => {
+  it("renders English version with proper headings and LTR layout", async () => {
     const onOpenShareModal = vi.fn();
     render(
       <ProgressScreen
@@ -209,9 +252,11 @@ describe("ProgressScreen", () => {
 
     expect(screen.getByRole("heading", { name: "Your recorded progress" })).toBeInTheDocument();
     openDetailedContext();
+    await chooseDetail("reflection");
     expect(screen.getByTestId("oasis-stage-card")).toBeInTheDocument();
     expect(screen.getByText("Garden and past milestones")).toBeInTheDocument();
     expect(screen.getByText("7-Day Rhythm")).toBeInTheDocument();
+    await chooseDetail("routines");
     expect(screen.getByTestId("today-garden-card")).toBeInTheDocument();
     expect(screen.getByText("Daily wird records")).toBeInTheDocument();
   });
@@ -259,9 +304,11 @@ describe("ProgressScreen", () => {
     expect(screen.getByRole("combobox", { name: "الفترة" })).toHaveAttribute("data-progress-value", "week");
     // Oasis stage card is exclusive to Day view
     expect(screen.queryByTestId("oasis-stage-card")).not.toBeInTheDocument();
+    await chooseDetail("routines");
     expect(await screen.findByRole("heading", { name: "إيقاع أذكارك" })).toBeInTheDocument();
     expect(screen.queryByRole("table")).not.toBeInTheDocument();
-    expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+    expect(within(screen.getByTestId("progress-detailed-context")).queryByRole("progressbar")).not.toBeInTheDocument();
+    expect(within(screen.getByTestId("progress-overview")).getAllByRole("progressbar")).toHaveLength(2);
 
     // Switch to Month tab
     await choosePeriod("month");
@@ -274,6 +321,7 @@ describe("ProgressScreen", () => {
     // Switch back to Day tab
     await choosePeriod("day");
     expect(screen.getByRole("combobox", { name: "الفترة" })).toHaveAttribute("data-progress-value", "day");
+    await chooseDetail("reflection");
     expect(screen.getByTestId("oasis-stage-card")).toBeInTheDocument();
   });
 
@@ -314,6 +362,7 @@ describe("ProgressScreen", () => {
 
     openDetailedContext();
     await choosePeriod("week");
+    await chooseDetail("routines");
     expect(await screen.findByText("Your seven-day intention")).toBeInTheDocument();
   });
 

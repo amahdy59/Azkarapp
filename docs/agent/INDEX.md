@@ -1,4 +1,8 @@
-[Mobile sharing, compact filters and listening protection](phases/MOBILE_SHARING_FILTERS_LOCK_2026_10_20.md) is the active owner-approved implementation and release. Apply every reviewed recommendation and push the verified result, superseding earlier publication holds. Retain the committed integration repair and complete exact-commit Quality, Pages and production acceptance.
+[Motion and control polish](phases/MOTION_CONTROL_POLISH_2026_10_20.md) records the owner's local-only audit, keyboard/pointer cancellation, shared still-aware icon cues, native range engagement and further purposeful-motion recommendations. Preserve concurrent work; no commit, push or deployment.
+
+[Mushaf interactions and focused Progress](phases/MUSHAF_INTERACTIONS_PROGRESS_TABS_2026_10_20.md) is the active owner-approved continuation: apply all six screenshot-review recommendations, preserving the verified mobile-sharing release and complete release gates. Fix tap ownership/meaning dismissal, reversible Mushaf colours, critical loading, task-based sheets, clearer filter disclosures and Overview/Trends/Records navigation.
+
+[Mobile sharing, compact filters and listening protection](phases/MOBILE_SHARING_FILTERS_LOCK_2026_10_20.md) is deployed and verified at 642520bd; exact-commit Quality, Pages and production smoke passed.
 
 [Protected dropdowns](phases/DROPDOWN_PROTECTION_2026_10_20.md) fixes the supplied Juz-picker text bleed and stacking defect through portalled searchable pickers and a shared opaque dropdown contract across layouts/themes. Local only; preserve concurrent work, no commit/push/deployment.
 
@@ -475,3 +479,4 @@ Local follow-up: [Concise, actionable Progress](phases/PROGRESS_REFINEMENTS_2026
 [Remembered reading and feedback polish](phases/READING_PREFERENCES_FEEDBACK_POLISH_2026_10_20.md) is the owner's current approved follow-up: device-only meaning preference, stationary reading-language action, live Settings footer preview and finite interaction polish. All work stays local; the owner will handle pushing later.
 
 [Prayer seconds and purposeful motion](phases/PRAYER_SECONDS_AND_PURPOSEFUL_MOTION_2026_10_20.md) is the owner's approved local-only follow-up: one-line mobile seconds without “left”, a small functional interval ring, visibility-paused isolated clock and an explicit positive animation policy with OS/app reduced-motion alternatives. Preserve concurrent work; no publication.
+Latest release authority: the owner approves final Progress/Mushaf polish and requests publishing all pending changes. This supersedes the coordinated hold in [Mushaf interactions and focused Progress](phases/MUSHAF_INTERACTIONS_PROGRESS_TABS_2026_10_20.md); this chat owns final integration/gates/CI/Pages verification. The motion/control scope remains frozen and included, with purposeful default motion preserved.

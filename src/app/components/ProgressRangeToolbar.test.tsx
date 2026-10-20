@@ -1,5 +1,5 @@
 import { chooseProgressOption } from "../../test/progressSelect";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ProgressRangeToolbar } from "./ProgressRangeToolbar";
 afterEach(() => vi.unstubAllGlobals());
@@ -14,6 +14,7 @@ function setup() {
     onPeriod: vi.fn(),
     onCalendar: vi.fn(),
     onCustom: vi.fn(),
+    onMonth: vi.fn(),
     onPrevious: vi.fn(),
     onNext: vi.fn(),
     onToday: vi.fn(),
@@ -26,6 +27,31 @@ const edit = () => chooseProgressOption(screen.getByRole("combobox", { name: "Pe
 const setDate = (label: string, value: string) => fireEvent.change(screen.getByLabelText(label), { target: { value } });
 
 describe("ProgressRangeToolbar", () => {
+  it("opens the shared date action, applies one day and restores its focus", () => {
+    const props = setup();
+    const trigger = screen.getByRole("button", { name: /Choose dates:/ });
+    fireEvent.click(trigger);
+    fireEvent.click(screen.getByRole("radio", { name: "One date" }));
+    setDate("Gregorian date", "2026-10-03");
+    expect(screen.queryByLabelText("End date")).not.toBeInTheDocument();
+    expect(props.onCustom).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
+    expect(props.onCustom).toHaveBeenCalledExactlyOnceWith({ startKey: "2026-10-03", endKey: "2026-10-03" });
+    expect(trigger).toHaveFocus();
+  });
+  it("validates a chosen month and applies it through the calendar-month boundary", () => {
+    const props = setup();
+    fireEvent.click(screen.getByRole("button", { name: /Choose dates:/ }));
+    fireEvent.click(screen.getByRole("radio", { name: "Month" }));
+    setDate("Gregorian month", "2026-11");
+    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
+    expect(screen.getByRole("alert")).toHaveTextContent("future");
+    expect(props.onMonth).not.toHaveBeenCalled();
+    setDate("Gregorian month", "2024-02");
+    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
+    expect(props.onMonth).toHaveBeenCalledExactlyOnceWith("2024-02");
+    expect(props.onCustom).not.toHaveBeenCalled();
+  });
   it("collapses completed phone presets but keeps Custom drafts open across calendar changes", async () => {
     vi.stubGlobal("innerWidth", 390);
     const props = setup();
@@ -40,13 +66,13 @@ describe("ProgressRangeToolbar", () => {
     fireEvent.click(summary);
     await edit();
     setDate("Start date", "2026-10-09");
-    await chooseProgressOption(screen.getByRole("combobox", { name: "Show dates in" }), "hijri");
+    await chooseProgressOption(screen.getByRole("combobox", { name: "Calendar", exact: true }), "hijri");
     expect(disclosure).toHaveAttribute("open");
     expect(screen.getByLabelText("Start date")).toHaveValue("2026-10-09");
     expect(props.onCustom).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
     expect(disclosure).not.toHaveAttribute("open");
-    expect(summary).toHaveFocus();
+    await waitFor(() => expect(screen.getByRole("button", { name: /Choose dates:/ })).toHaveFocus());
   });
   it("keeps drafts unapplied and clips the default Custom end to today", async () => {
     const props = setup();

@@ -1,4 +1,4 @@
-import { chooseProgressOption } from "./helpers/progress";
+import { chooseProgressOption, chooseProgressDetail } from "./helpers/progress";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
@@ -104,6 +104,7 @@ for (const language of ["en", "ar"] as const) {
     await openReturningHome(page);
     await page.getByTestId("nav-progress").click();
     await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
+    await chooseProgressDetail(page, "routines");
 
     const garden = page.getByTestId("today-garden-card");
     await expect(garden).toBeVisible();
@@ -136,6 +137,7 @@ test("Arabic large text keeps Progress controls and month details usable at comp
   await openReturningHome(page);
   await page.getByTestId("nav-progress").click();
   await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
+  await chooseProgressDetail(page, "routines");
 
   const period = page.getByRole("combobox", { name: "الفترة", exact: true, includeHidden: true });
   await page.getByTestId("progress-range-disclosure").locator("summary").click();
@@ -200,6 +202,8 @@ test("three completed main collections stay concise and explain the palm on dema
   await expect(page.getByRole("heading", { name: "How a palm is earned" })).toHaveCount(0);
   await page.goto("/#/progress");
   await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
+  await chooseProgressDetail(page, "routines");
+  await chooseProgressDetail(page, "reflection");
   await page.getByTestId("oasis-stage-card").locator("summary").click();
   const explanation = page.getByText(
     "A palm is planted in your oasis when you complete all of today's awrad (Morning, Evening, and Before Sleep azkar, and Qur'an wird).",
@@ -218,6 +222,7 @@ test("legacy garden visibility preferences no longer hide the current Wird or ad
 
   await page.getByRole("link", { name: "Progress", exact: true }).click();
   await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
+  await chooseProgressDetail(page, "routines");
   await expect(page.getByRole("switch", { name: /^Garden progress/ })).toHaveCount(0);
   await expect(page.getByTestId("garden-hidden-state")).toHaveCount(0);
   await expect(page.getByTestId("today-garden-card")).toBeVisible();
@@ -229,6 +234,7 @@ test("month view shows routine patterns without the removed summary card", async
 
   await page.getByRole("link", { name: "Progress", exact: true }).click();
   await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
+  await chooseProgressDetail(page, "routines");
   await chooseProgressOption(page.getByRole("combobox", { name: "Period", exact: true, includeHidden: true }), "month");
 
   await expect(page.getByTestId("today-garden-card").getByRole("heading", { name: /rhythm|إيقاع/ })).toBeVisible();
@@ -253,24 +259,22 @@ test("both Home and Progress keep prayer tracking outside the wird card", async 
 
   await page.getByRole("link", { name: "Progress", exact: true }).click();
   await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
+  await chooseProgressDetail(page, "routines");
 
   const progressGarden = page.getByTestId("today-garden-card");
   await expect(progressGarden.getByRole("button", { name: /After Prayer Azkar/ })).toHaveCount(0);
 
   // Prayer facts remain in their own read-only group, outside daily wird.
+  await chooseProgressDetail(page, "prayers");
   const prayerGroup = page.getByTestId("progress-prayer-group");
   await expect(prayerGroup).toBeVisible();
   await expect(prayerGroup.getByTestId("prayer-progress-summary").getByRole("listitem")).toHaveCount(5);
   await expect(prayerGroup.locator("input, table")).toHaveCount(0);
-  expect(
-    await page.evaluate(() => {
-      // Compared inside the page: Node.DOCUMENT_POSITION_* only exists there.
-      const card = document.querySelector('[data-testid="today-garden-card"]');
-      const section = document.querySelector('[data-testid="progress-prayer-group"]');
-      if (!card || !section) return false;
-      return Boolean(section.compareDocumentPosition(card) & Node.DOCUMENT_POSITION_FOLLOWING);
-    }),
-  ).toBe(true);
+  await expect(progressGarden).toHaveCount(0);
+  await chooseProgressDetail(page, "routines");
+  await expect(progressGarden).toBeVisible();
+  await expect(prayerGroup).toHaveCount(0);
+  await expect(progressGarden.locator("input, textarea")).toHaveCount(0);
 });
 
 test("weekly charts convey complete-day recording values through accessible text", async ({ page }) => {
@@ -280,6 +284,7 @@ test("weekly charts convey complete-day recording values through accessible text
 
   await page.getByRole("link", { name: "Progress", exact: true }).click();
   await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
+  await chooseProgressDetail(page, "routines");
   await chooseProgressOption(page.getByRole("combobox", { name: "Period", exact: true, includeHidden: true }), "week");
 
   const garden = page.getByTestId("today-garden-card");

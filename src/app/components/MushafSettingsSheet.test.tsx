@@ -3,6 +3,38 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { MushafSettingsSheet } from "./MushafSettingsSheet";
 
 describe("MushafSettingsSheet", () => {
+  it("offers optional colour swipes and a reversible gesture guide without closing settings", () => {
+    const onSelectColorGestures = vi.fn();
+    const onClose = vi.fn();
+    render(
+      <MushafSettingsSheet
+        open
+        onClose={onClose}
+        language="en"
+        direction="ltr"
+        theme="light"
+        onSelectTheme={vi.fn()}
+        mushafLayout="auto"
+        toolbarSide="right"
+        pageNumber={42}
+        surahName="Al-Baqarah"
+        colorGestures={false}
+        onSelectColorGestures={onSelectColorGestures}
+      />,
+    );
+    const control = screen.getByRole("switch", { name: "Swipe to change page colour" });
+    expect(control).toHaveAttribute("aria-checked", "false");
+    fireEvent.click(control);
+    expect(onSelectColorGestures).toHaveBeenCalledWith(true);
+    const guide = screen.getByText("Reading gestures").closest("details")!;
+    expect(guide).not.toHaveAttribute("open");
+    fireEvent.click(screen.getByText("Reading gestures"));
+    expect(guide).toHaveAttribute("open");
+    expect(guide).toHaveTextContent("enlarged pages keep normal scrolling");
+    fireEvent.click(screen.getByText("Reading gestures"));
+    expect(guide).not.toHaveAttribute("open");
+    expect(onClose).not.toHaveBeenCalled();
+  });
   it("renders theme options, layout options and bookmark toggle", () => {
     const onSelectTheme = vi.fn();
     const onSelectLayout = vi.fn();

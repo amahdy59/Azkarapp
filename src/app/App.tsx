@@ -425,6 +425,7 @@ function AppContent({
     [setQuranPage],
   );
   const [mushafTheme, setMushafTheme] = useState<MushafTheme>(initialState.mushafTheme ?? "follow-app");
+  const [mushafColorGestures, setMushafColorGestures] = useState(initialState.mushafColorGestures !== false);
   const [mushafLayout, setMushafLayout] = useState<MushafLayout>(initialState.mushafLayout ?? "auto");
   const [mushafToolbarSide, setMushafToolbarSide] = useState<MushafToolbarSide>(
     initialState.mushafToolbarSide ?? "right",
@@ -785,6 +786,7 @@ function AppContent({
       savedZikrIds: [...savedZikrIds].sort(),
       khatmahPage,
       mushafTheme,
+      mushafColorGestures,
       mushafLayout,
       mushafToolbarSide,
       mushafTextScale,
@@ -839,6 +841,7 @@ function AppContent({
       savedZikrIds,
       khatmahPage,
       mushafTheme,
+      mushafColorGestures,
       mushafLayout,
       mushafToolbarSide,
       mushafTextScale,
@@ -1211,6 +1214,7 @@ function AppContent({
     setSavedZikrIds(new Set(state.savedZikrIds));
     setKhatmahPage(state.khatmahPage ?? 1);
     setMushafTheme(state.mushafTheme ?? "follow-app");
+    setMushafColorGestures(state.mushafColorGestures !== false);
     setMushafLayout(state.mushafLayout ?? "auto");
     setMushafToolbarSide(state.mushafToolbarSide ?? "right");
     setMushafTextScale(state.mushafTextScale ?? "medium");
@@ -1986,6 +1990,7 @@ function AppContent({
                   direction={layoutDirection}
                   onOpenShareModal={() => setShowShareModal(true)}
                   onSelectCategory={openCategory}
+                  onOpenHome={() => push("home")}
                   locationSettings={locationSettings}
                   prayerTracking={prayerTracking}
                   onTogglePrayerTracking={handleTogglePrayerTracking}
@@ -2281,6 +2286,8 @@ function AppContent({
                   onMushafModeChange={setReaderInMushafMode}
                   mushafSettings={{
                     theme: mushafTheme,
+                    colorGestures: mushafColorGestures,
+                    onSelectColorGestures: setMushafColorGestures,
                     appTheme: themeMode,
                     onSelectTheme: setMushafTheme,
                     layout: mushafLayout,
@@ -2524,6 +2531,8 @@ function AppContent({
                   reduceMotion={reduceMotion}
                   hapticFeedback={hapticFeedback}
                   mushafTheme={mushafTheme}
+                  colorGestures={mushafColorGestures}
+                  onSelectColorGestures={setMushafColorGestures}
                   appTheme={themeMode}
                   setMushafTheme={setMushafTheme}
                   mushafLayout={mushafLayout}

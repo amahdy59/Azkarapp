@@ -1,5 +1,9 @@
 # Azkarapp
 
+Mushaf colour swipes can be switched off in Reading Settings; the device remembers the choice. Progress keeps the chosen date first, with secondary calendar settings and a clearer exact-records surface.
+
+Mushaf reading tools hide/show with one centre tap; tap the same highlighted word or its explanation to close it. Vertical swipes move forwards/backwards through Mushaf-only page colours, with visible choices and Follow app available in Reading options. Progress separates Overview, Trends and Records while retaining one selected date range; tap a summary card to inspect its trend.
+
 ## Isolated browser backend
 
 The browser test server forcibly builds with a loopback Cloudflare API namespace (`/__browser-test-api`) on its own preview port. General local/CI UI tests must never write visitor heartbeats, device registrations or snapshots to production. Feature specs supply deliberate route fixtures when a successful response is needed. Real production smoke is a separate, limited verification step. Production/Pages builds keep their normal API configuration.

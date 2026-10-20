@@ -1,4 +1,4 @@
-import { chooseProgressOption } from "./helpers/progress";
+import { chooseProgressOption, chooseProgressDetail } from "./helpers/progress";
 import { mkdir } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
@@ -34,6 +34,7 @@ for (const language of ["ar", "en"] as const) {
       );
       await page.goto("/#/progress");
       await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
+      await chooseProgressDetail(page, "routines");
       const garden = page.getByTestId("today-garden-card");
       await expect(garden).toBeVisible();
       await expect(garden.locator("img")).toHaveCount(0);
@@ -43,8 +44,10 @@ for (const language of ["ar", "en"] as const) {
       );
       const monthChart = page.getByTestId("today-garden-card");
       await expect(monthChart).toBeVisible();
-      const prayerBounds = await page.getByTestId("progress-prayer-group").boundingBox();
       const chartBounds = await monthChart.boundingBox();
+      await chooseProgressDetail(page, "prayers");
+      const prayerBounds = await page.getByTestId("progress-prayer-group").boundingBox();
+      await chooseProgressDetail(page, "routines");
       expect(Math.abs(prayerBounds!.x - chartBounds!.x)).toBeLessThanOrEqual(1);
       expect(Math.abs(prayerBounds!.width - chartBounds!.width)).toBeLessThanOrEqual(1);
       await expect(monthChart.getByTestId("insight-morning").getByRole("img")).toHaveAccessibleName(
@@ -63,7 +66,7 @@ for (const language of ["ar", "en"] as const) {
       const rangeFilters = page.getByTestId("progress-range-disclosure");
       if (!(await rangeFilters.evaluate((node) => (node as HTMLDetailsElement).open)))
         await rangeFilters.locator("summary").click();
-      await expect(page.getByRole("combobox")).toHaveCount(6);
+      await expect(page.getByRole("combobox")).toHaveCount(4);
       const exportButton = chart.getByRole("button", {
         name: ar ? "تصدير الأوراد" : "Azkar JSON",
       });

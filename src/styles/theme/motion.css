@@ -89,6 +89,20 @@
   animation: menu-pop var(--motion-duration-standard) var(--motion-ease-enter);
 }
 
+/* Independent scale preserves an icon's existing RTL rotation. */
+.control-cue {
+  scale: 1;
+  transition: scale var(--motion-duration-fast) var(--motion-ease-standard);
+}
+button:not(:disabled, [aria-disabled="true"], [data-disabled], .no-press):focus-visible .control-cue {
+  scale: var(--control-cue-scale, 1.08);
+}
+@media (hover: hover) and (pointer: fine) {
+  button:not(:disabled, [aria-disabled="true"], [data-disabled], .no-press):hover .control-cue {
+    scale: var(--control-cue-scale, 1.08);
+  }
+}
+
 /* Keep persistent navigation out of the route crossfade. Only the unique main
    canvas transitions; screen-owned headers travel with their own content. */
 .app-main-view {

@@ -44,6 +44,21 @@ html.high-contrast .progress-screen-controls[data-scrolled="true"] {
   gap: 0.75rem;
 }
 
+.progress-range-toolbar {
+  display: grid;
+  gap: 8px;
+}
+
+/* Reclaim header chrome at enlarged text while preserving the reader's size
+   and the shared 48px Close target. Fields keep their independent scroll. */
+.progress-date-sheet-header {
+  padding: 8px 16px;
+  gap: 8px;
+}
+.progress-date-sheet-header [data-testid="sheet-header-title"] {
+  font-size: var(--text-base);
+}
+
 /* The same control anatomy as Settings and Sharing, with room for translated
    labels. Menus escape the sticky scroll container through the shared portal. */
 .progress-select-trigger[data-slot="select-trigger"] {
@@ -105,6 +120,22 @@ html.high-contrast .progress-screen-controls[data-scrolled="true"] {
   gap: 0.75rem;
 }
 
+.progress-metric-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-xl);
+}
+
+.progress-metric-link:focus-visible {
+  outline: none;
+}
+
+.progress-metric-link:focus-visible::after {
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+}
+
 @container progress-dashboard (min-width: 18rem) {
   .progress-overview-grid,
   .progress-metric-choices {
@@ -121,7 +152,7 @@ html.high-contrast .progress-screen-controls[data-scrolled="true"] {
 @media (min-width: 64rem) {
   .progress-range-toolbar {
     display: grid;
-    grid-template-columns: minmax(18rem, 24rem) minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 24rem);
     align-items: end;
     gap: 0.75rem;
   }

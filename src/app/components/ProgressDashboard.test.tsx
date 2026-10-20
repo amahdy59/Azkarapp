@@ -38,22 +38,44 @@ function props() {
     onExport: vi.fn().mockResolvedValue(undefined),
   };
 }
-function openRecords() {
-  const details = screen.getByText("Exact daily records", { selector: "summary" }).parentElement as HTMLDetailsElement;
-  details.open = true;
-  fireEvent(details, new Event("toggle"));
-}
 describe("ProgressDashboard", () => {
-  it("leads with four independent reconciled counts, one chart and no mounted table", async () => {
-    render(<ProgressDashboard {...props()} />);
+  it("explains empty and target-only periods without hiding known goals or inventing activity", () => {
+    const empty = indexProgressDashboard({ ...input, dailyCompletions: [], wirdHistory: {} }, "2026-10-20");
+    const { rerender } = render(
+      <ProgressDashboard {...props()} records={empty} emptyActions={<button>Continue</button>} />,
+    );
+    expect(screen.getByTestId("progress-empty-period")).toHaveTextContent("No activity recorded");
+    expect(screen.getByRole("button", { name: "Continue" })).toBeInTheDocument();
+    expect(screen.getByTestId("progress-metric-quranGoals")).toHaveTextContent("0 of 1");
+    rerender(<ProgressDashboard {...props()} />);
+    expect(screen.queryByTestId("progress-empty-period")).not.toBeInTheDocument();
+  });
+  it("offers a real week action from a one-day trend without drawing a misleading line", () => {
+    const onChooseWeek = vi.fn();
+    render(<ProgressDashboard {...props()} period="day" view="trends" onChooseWeek={onChooseWeek} />);
+    fireEvent.click(screen.getByRole("button", { name: "View this week" }));
+    expect(onChooseWeek).toHaveBeenCalledOnce();
+    expect(screen.queryByTestId("progress-main-trend")).not.toBeInTheDocument();
+  });
+  it("leads with four independent counts and truthful bars, with charts and records in their own views", async () => {
+    const onShowTrend = vi.fn();
+    const { rerender } = render(<ProgressDashboard {...props()} onShowTrend={onShowTrend} />);
     expect(screen.getByTestId("progress-overview").children).toHaveLength(4);
     expect(screen.getByTestId("progress-metric-routines")).toHaveTextContent("19 of 60");
     expect(screen.getByTestId("progress-metric-pages")).toHaveTextContent("190");
     expect(screen.getByTestId("progress-metric-quranGoals")).toHaveTextContent("0 of 1");
-    expect(screen.getAllByTestId("progress-main-trend")).toHaveLength(1);
+    expect(screen.queryByTestId("progress-main-trend")).not.toBeInTheDocument();
     expect(screen.queryByRole("table")).not.toBeInTheDocument();
     expect(screen.getAllByText(/Included:/)).toHaveLength(1);
-    await chooseProgressOption(screen.getByRole("combobox", { name: "Show trend for" }), "pages");
+    expect(within(screen.getByTestId("progress-metric-routines")).getByRole("progressbar")).toHaveAttribute(
+      "aria-valuetext",
+      "19 of 60",
+    );
+    expect(within(screen.getByTestId("progress-metric-pages")).queryByRole("progressbar")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Explore Quran pages read" }));
+    expect(onShowTrend).toHaveBeenCalledOnce();
+    rerender(<ProgressDashboard {...props()} view="trends" onShowTrend={onShowTrend} />);
+    expect(screen.getAllByTestId("progress-main-trend")).toHaveLength(1);
     expect(screen.getByTestId("progress-main-trend")).toHaveTextContent("count scale starts at zero");
     expect(screen.getByTestId("recording-time-scale")).not.toHaveTextContent("%");
   });
@@ -87,7 +109,7 @@ describe("ProgressDashboard", () => {
     expect(screen.getByTestId("progress-overview").children).toHaveLength(4);
   });
   it("prevents an empty dashboard and keeps unsaved edits out of the table", () => {
-    render(<ProgressDashboard {...props()} />);
+    const { rerender } = render(<ProgressDashboard {...props()} />);
     fireEvent.click(screen.getByRole("button", { name: "Choose metrics" }));
     for (const checkbox of screen.getAllByRole("checkbox").filter((element) => (element as HTMLInputElement).checked))
       fireEvent.click(checkbox);
@@ -95,12 +117,12 @@ describe("ProgressDashboard", () => {
     expect(screen.getByText("Choose at least one metric.")).toBeInTheDocument();
     expect(screen.getByTestId("progress-overview").children).toHaveLength(4);
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
-    openRecords();
+    rerender(<ProgressDashboard {...props()} view="records" />);
     expect(within(screen.getByRole("table")).getAllByRole("columnheader")).toHaveLength(5);
     expect(screen.getAllByRole("rowheader")).toHaveLength(10);
   });
   it("uses a snapshot instead of a one-point line in Day view", () => {
-    render(
+    const { rerender } = render(
       <ProgressDashboard
         {...props()}
         period="day"
@@ -109,23 +131,37 @@ describe("ProgressDashboard", () => {
       />,
     );
     expect(screen.queryByTestId("progress-main-trend")).not.toBeInTheDocument();
-    expect(screen.getByText(/One day is a snapshot/)).toBeInTheDocument();
     expect(screen.getByTestId("progress-metric-quranGoals")).toHaveTextContent("0 of 1");
+    rerender(
+      <ProgressDashboard
+        {...props()}
+        view="trends"
+        period="day"
+        range={{ startKey: "2026-10-20", endKey: "2026-10-20" }}
+        currentDay
+      />,
+    );
+    expect(screen.getByText(/One day is a snapshot/)).toBeInTheDocument();
+    expect(screen.queryByTestId("progress-main-trend")).not.toBeInTheDocument();
   });
   it("keeps unknown past goals distinct from a zero completion rate", async () => {
-    render(<ProgressDashboard {...props()} range={{ startKey: "2026-10-01", endKey: "2026-10-19" }} />);
+    const { rerender } = render(
+      <ProgressDashboard {...props()} range={{ startKey: "2026-10-01", endKey: "2026-10-19" }} />,
+    );
     expect(screen.getByTestId("progress-metric-quranGoals")).toHaveTextContent("—");
     expect(screen.getByTestId("progress-metric-quranGoals")).toHaveTextContent("No known goal days");
+    expect(within(screen.getByTestId("progress-metric-quranGoals")).queryByRole("progressbar")).not.toBeInTheDocument();
+    rerender(<ProgressDashboard {...props()} view="trends" range={{ startKey: "2026-10-01", endKey: "2026-10-19" }} />);
     await chooseProgressOption(screen.getByRole("combobox", { name: "Show trend for" }), "quranGoals");
     expect(screen.getByTestId("timeline-readout")).toHaveTextContent("—");
     expect(screen.queryByTestId("recording-time-line")).not.toBeInTheDocument();
   });
-  it("reports save errors and recovery without applying table pagination/search to the export", async () => {
+  it("reports save errors and recovery without applying table pagination to the export", async () => {
     const properties = props();
     properties.onExport.mockRejectedValueOnce(new Error("cancelled"));
-    render(<ProgressDashboard {...properties} />);
-    openRecords();
-    fireEvent.change(screen.getByRole("searchbox"), { target: { value: "not a day" } });
+    render(<ProgressDashboard {...properties} view="records" />);
+    fireEvent.click(screen.getByRole("button", { name: "Next records" }));
+    expect(screen.queryByRole("searchbox")).not.toBeInTheDocument();
     const button = screen.getByRole("button", { name: "Export JSON" });
     fireEvent.click(button);
     await screen.findByText("Could not save. Try again.");
@@ -138,10 +174,12 @@ describe("ProgressDashboard", () => {
     let finish!: () => void;
     const properties = props();
     properties.onExport.mockImplementationOnce(() => new Promise<void>((resolve) => (finish = resolve)));
-    const { rerender } = render(<ProgressDashboard {...properties} />);
+    const { rerender } = render(<ProgressDashboard {...properties} view="records" />);
     fireEvent.click(screen.getByRole("button", { name: "Export JSON" }));
     expect(screen.getByText("Saving…")).toBeInTheDocument();
-    rerender(<ProgressDashboard {...properties} range={{ startKey: "2026-09-01", endKey: "2026-09-30" }} />);
+    rerender(
+      <ProgressDashboard {...properties} view="records" range={{ startKey: "2026-09-01", endKey: "2026-09-30" }} />,
+    );
     await act(async () => finish());
     await waitFor(() => expect(screen.queryByText("Selected-period data saved.")).not.toBeInTheDocument());
     expect(screen.getByRole("button", { name: "Export JSON" })).toBeEnabled();

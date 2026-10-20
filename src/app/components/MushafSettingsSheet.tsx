@@ -1,11 +1,12 @@
 import { MushafMaterialHint } from "./MushafMaterialHint";
 import { MushafMagnificationControl } from "./MushafMagnificationControl";
-import { Modal, SheetHeader, SidePanel } from "./ResponsiveSheet";
+import { ResponsiveSheet, SheetHeader, SidePanel } from "./ResponsiveSheet";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage, MushafLayout, MushafTextScale, MushafToolbarSide, MushafTheme, ThemeMode } from "../types";
 import { Check, SlidersHorizontal } from "./icons";
 import { MushafKeyboardShortcutList } from "./MushafKeyboardShortcuts";
+import { ToggleTrack } from "./SettingsRow";
 
 export interface MushafSettingsSheetProps {
   open: boolean;
@@ -15,6 +16,8 @@ export interface MushafSettingsSheetProps {
   theme: MushafTheme;
   appTheme?: ThemeMode;
   onSelectTheme: (theme: MushafTheme) => void;
+  colorGestures?: boolean;
+  onSelectColorGestures?: (enabled: boolean) => void;
   mushafLayout: MushafLayout;
   onSelectLayout?: (layout: MushafLayout) => void;
   autoSpreadRoom?: boolean;
@@ -88,6 +91,8 @@ export function MushafSettingsSheet({
   theme,
   appTheme = "midnight",
   onSelectTheme,
+  colorGestures = true,
+  onSelectColorGestures,
   mushafLayout,
   onSelectLayout,
   autoSpreadRoom = false,
@@ -210,6 +215,29 @@ export function MushafSettingsSheet({
           </div>
         </section>
 
+        {onSelectColorGestures && (
+          <section className="flex flex-col gap-2">
+            <button
+              type="button"
+              role="switch"
+              aria-checked={colorGestures}
+              onClick={() => onSelectColorGestures(!colorGestures)}
+              className="flex min-h-12 cursor-pointer items-center justify-between gap-3 rounded-lg text-sm font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            >
+              <span>{t(language, "mushaf.colorGestures")}</span>
+              <ToggleTrack checked={colorGestures} />
+            </button>
+            <details className="rounded-xl border border-border px-3">
+              <summary className="min-h-11 cursor-pointer py-3 text-xs font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+                {t(language, "mushaf.gestureGuide")}
+              </summary>
+              <p className="pb-3 text-xs leading-relaxed text-muted-foreground">
+                {t(language, "mushaf.gestureGuideBody")}
+              </p>
+            </details>
+          </section>
+        )}
+
         {/* Section 2: Page Layout (Segmented Control when available) */}
         {autoSpreadRoom && onSelectLayout && (
           <section aria-labelledby="mushaf-layout-heading" className="flex flex-col gap-2.5">
@@ -322,7 +350,7 @@ export function MushafSettingsSheet({
   }
 
   return (
-    <Modal
+    <ResponsiveSheet
       open={open}
       onClose={onClose}
       title={t(language, "mushaf.readingSettings")}
@@ -331,10 +359,11 @@ export function MushafSettingsSheet({
       testId="mushaf-settings-sheet"
       maxWidthClassName="max-w-md"
       overlayClassName="bg-black/50"
-      className={`mushaf-protected-overlay ${sheetSurfaceClass}`}
+      dialogClassName={`mushaf-protected-overlay ${sheetSurfaceClass}`}
+      drawerClassName={`mushaf-protected-overlay ${sheetSurfaceClass}`}
       showCloseButton={false}
     >
       {body}
-    </Modal>
+    </ResponsiveSheet>
   );
 }

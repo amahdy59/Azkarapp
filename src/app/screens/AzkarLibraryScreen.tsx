@@ -280,6 +280,7 @@ export function AzkarLibraryScreen({
 
           <div className="mt-2 sm:mt-4">
             <ResponsiveFilters
+              language={language}
               label={t(language, "library.searchFilters")}
               summary={
                 <>

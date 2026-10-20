@@ -22,7 +22,7 @@ describe("QuranWordPopover and QuranWordMeaningSheet", () => {
       <QuranWordPopover meanings={[sampleMeaning]} anchorEl={anchor} language="en" direction="ltr" onClose={vi.fn()} />,
     );
     try {
-      const gloss = screen.getByRole("tooltip");
+      const gloss = screen.getByRole("dialog");
       expect(gloss.parentElement).toBe(document.body);
       expect(gloss).toHaveClass("theme-light");
       expect(canvas).not.toContainElement(gloss);
@@ -55,6 +55,57 @@ describe("QuranWordPopover and QuranWordMeaningSheet", () => {
       unmount();
       window.removeEventListener("keydown", readerShortcut);
       anchorEl.remove();
+    }
+  });
+
+  it("leaves anchor toggling to the word, dismisses by tapping the chip and preserves All meanings", () => {
+    const anchor = document.createElement("button");
+    document.body.append(anchor);
+    const onClose = vi.fn();
+    const onShowAll = vi.fn();
+    const { unmount } = render(
+      <QuranWordPopover
+        meanings={[sampleMeaning]}
+        anchorEl={anchor}
+        language="en"
+        direction="ltr"
+        onClose={onClose}
+        onShowAll={onShowAll}
+      />,
+    );
+    try {
+      fireEvent.pointerDown(anchor);
+      expect(onClose).not.toHaveBeenCalled();
+      fireEvent.click(screen.getByTestId("quran-word-popover-all"));
+      expect(onShowAll).toHaveBeenCalledOnce();
+      expect(onClose).not.toHaveBeenCalled();
+      fireEvent.click(screen.getByTestId("quran-word-popover-dismiss"));
+      expect(onClose).toHaveBeenCalledOnce();
+    } finally {
+      unmount();
+      anchor.remove();
+    }
+  });
+
+  it("consumes an outside paper dismissal before the page can turn or hide its tools", () => {
+    const anchor = document.createElement("button");
+    const paper = document.createElement("div");
+    paper.className = "mushaf-paper";
+    paper.append(anchor);
+    document.body.append(paper);
+    const onClose = vi.fn();
+    const paperTap = vi.fn();
+    paper.addEventListener("pointerdown", paperTap);
+    const { unmount } = render(
+      <QuranWordPopover meanings={[sampleMeaning]} anchorEl={anchor} language="en" direction="ltr" onClose={onClose} />,
+    );
+    try {
+      fireEvent.pointerDown(paper);
+      expect(onClose).toHaveBeenCalledOnce();
+      expect(paperTap).not.toHaveBeenCalled();
+    } finally {
+      unmount();
+      paper.remove();
     }
   });
 

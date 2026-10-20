@@ -71,7 +71,13 @@ export function QuranWordPopover({
        button ever acted on it. */
     const dismiss = (event?: Event) => {
       const target = event?.target;
-      if (target instanceof Node && ref.current?.contains(target)) return;
+      if (target instanceof Node && (ref.current?.contains(target) || anchorEl?.contains(target))) return;
+      // The first ordinary paper tap dismisses the gloss, without also
+      // turning the page or hiding its tools underneath the explanation.
+      if (target instanceof Element && target.closest(".mushaf-paper") && !target.closest("button, [role=button], a")) {
+        event?.stopPropagation();
+        event?.preventDefault();
+      }
       onClose();
     };
     const onKey = (event: KeyboardEvent) => {
@@ -108,7 +114,7 @@ export function QuranWordPopover({
       window.removeEventListener("scroll", onScroll, { capture: true });
       window.removeEventListener("resize", onScroll);
     };
-  }, [open, onClose]);
+  }, [open, anchorEl, onClose]);
 
   if (!open || !meanings) return null;
 
@@ -121,10 +127,18 @@ export function QuranWordPopover({
   return createPortal(
     <div
       ref={ref}
-      role={onShowAll ? "dialog" : "tooltip"}
-      aria-label={onShowAll ? `${t(language, "reader.wordMeaningLabel")}: ${primary.word}` : undefined}
+      role="dialog"
+      aria-label={`${t(language, "reader.wordMeaningLabel")}: ${primary.word}`}
       dir={direction}
       data-testid="quran-word-popover"
+      data-prevent-count="true"
+      onPointerDown={(event) => event.stopPropagation()}
+      onPointerUp={(event) => {
+        event.stopPropagation();
+        // Padding is part of the chip too. Native child buttons keep their
+        // own click/keyboard actions, especially the separate All meanings.
+        if (event.target instanceof Element && !event.target.closest("button")) onClose();
+      }}
       data-above={fallback?.above ? "true" : undefined}
       className={`quran-word-popover ${
         anchorEl
@@ -144,7 +158,15 @@ export function QuranWordPopover({
       }
     >
       <div className="grid min-w-0 gap-2.5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-stretch sm:gap-4">
-        <div className="flex min-w-0 flex-col justify-center gap-1" lang="ar" dir="rtl">
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label={t(language, "reader.closeWordMeaning")}
+          data-testid="quran-word-popover-dismiss"
+          className="flex min-h-11 min-w-0 flex-col justify-center gap-1 rounded-lg text-start focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          lang="ar"
+          dir="rtl"
+        >
           <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-1">
             <span className="font-ui-arabic text-lg font-bold text-primary">{primary.word}</span>
             <span className="font-ui-arabic text-micro font-bold text-primary/80">
@@ -154,14 +176,19 @@ export function QuranWordPopover({
           <span className="font-ui-arabic text-sm font-bold leading-relaxed text-foreground">
             {primary.explanationArabic}
           </span>
-        </div>
+        </button>
 
         <div className="flex min-w-0 items-center justify-between gap-2 border-t border-border/40 pt-2 sm:flex-col sm:items-end sm:justify-center sm:border-s sm:border-t-0 sm:ps-4 sm:pt-0">
-          <div className="flex min-w-0 flex-col items-start gap-1">
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label={t(language, "common.close")}
+            className="flex min-h-11 min-w-11 flex-col items-start justify-center gap-1 rounded-lg focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          >
             <bdi className="inline-flex items-center rounded-md bg-muted/60 px-1.5 py-0.5 text-micro font-bold text-muted-foreground">
               {t(language, "reader.ayahLabel", { ayah: formatNumerals(primary.ayahNumber, language) })}
             </bdi>
-          </div>
+          </button>
           {onShowAll && (
             <button
               type="button"

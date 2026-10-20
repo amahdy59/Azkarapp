@@ -94,7 +94,7 @@ function WirdCategoryCard({
         src={imageSrc}
         alt=""
         aria-hidden="true"
-        className="absolute inset-0 h-full w-full object-cover transition-transform duration-slow ease-out group-hover:scale-105"
+        className="absolute inset-0 h-full w-full object-cover"
         loading="lazy"
       />
       {/* Translucent Glass Scrim & Ambient Overlay — inline style avoids generating new Tailwind gradient utilities */}

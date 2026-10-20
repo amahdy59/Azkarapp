@@ -1,3 +1,4 @@
+import { chooseProgressDetail } from "./helpers/progress";
 import { expect, test } from "@playwright/test";
 import { sharingContent, sharingStep, sharingCaption, sharingReadingLink } from "./helpers/sharing";
 import { t } from "../src/app/i18n";
@@ -91,6 +92,7 @@ for (const language of ["ar", "en"] as const) {
       if (section === "quran") {
         await page.goto("/#/progress");
         await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
+        await chooseProgressDetail(page, "reflection");
         await page.getByTestId("oasis-stage-card").locator("summary").click();
         await expect(page.getByRole("heading", { name: t(language, "garden.explanationLabel") })).toBeVisible();
       }

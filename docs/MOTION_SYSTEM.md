@@ -1,5 +1,15 @@
 # Azkarapp Motion System
 
+## Keyboard/pointer parity and native ranges — 2026-10-20, local only
+
+Home action icons share one 150ms, 1.08 scale cue on keyboard focus and fine-pointer hover. Independent CSS scale preserves existing RTL arrow rotation; disabled actions and OS/app reduced motion retain the still icon. Routine-card photography stays stationary. Native ranges retain immediate values and use a 90ms engagement tint/halo alongside the existing focus outline, with immediate still feedback in reduced motion. No thumb-position interpolation, scripted input, new timer or haptic is added. Delegated keyboard press presentation releases on Escape, pointer handoff and page exit as well as blur, cancellation, visibility and unmount; native activation remains browser-owned.
+
+See [local motion review and evidence](agent/phases/MOTION_CONTROL_POLISH_2026_10_20.md). Shared coverage is not a claim that every control state or real-device assistive-technology interaction has been verified. Further motion should prioritize truthful asynchronous completion, save/undo confirmation and small localized transitions for newly revealed non-reading context; preserve reading geometry and immediate continuous input.
+
+## Mushaf gesture and page-turn ownership — 2026-10-20
+
+Both hosts keep a single 220ms, 28px directional paper arrival with a restrained 80%-to-full opacity handoff; surrounding tools stay stationary. Committed swipes reset their drag without a competing CSS settle. Only incomplete drags settle back. Pointer cancellation never commits a page change. Current content remains in place until its replacement is ready; meanings do not gate readiness. OS/application reduced motion removes movement and keeps full contrast, factual progress and gesture outcomes. No page curl, duplicate page/toolbar mount, animation loop or new dependency is introduced. Shared filter chevrons and tab indicators use existing finite motion and reduced-motion recovery.
+
 ## Listening unlock feedback — 2026-10-20
 
 A two-second continuous hold shows factual elapsed progress in the lock-button arc. One local 100ms interval updates only that modal while held; release, cancellation, target exit, blur, backgrounding or unmount stops it. Progress uses immediate still updates in every motion mode, with no decorative loop, scale, live announcements or screen-wide clock. Keyboard hold and Escape recovery remain available; the accessible progress value agrees with the visible arc.

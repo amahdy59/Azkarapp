@@ -20,6 +20,10 @@ export function useControlFeedback() {
       pressed = null;
     };
     const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        release();
+        return;
+      }
       if (
         event.isComposing ||
         event.ctrlKey ||
@@ -53,13 +57,18 @@ export function useControlFeedback() {
     const onKeyUp = (event: KeyboardEvent) => {
       if (event.key === "Enter" || event.key === " ") release();
     };
+    const onPointerDown = () => {
+      release();
+      clearReleased();
+    };
     document.addEventListener("keydown", onKeyDown, true);
     document.addEventListener("keyup", onKeyUp, true);
     document.addEventListener("focusout", release, true);
     document.addEventListener("pointercancel", release, true);
-    document.addEventListener("pointerdown", clearReleased, true);
+    document.addEventListener("pointerdown", onPointerDown, true);
     document.addEventListener("visibilitychange", release);
     window.addEventListener("blur", release);
+    window.addEventListener("pagehide", release);
     return () => {
       release();
       clearReleased();
@@ -67,9 +76,10 @@ export function useControlFeedback() {
       document.removeEventListener("keyup", onKeyUp, true);
       document.removeEventListener("focusout", release, true);
       document.removeEventListener("pointercancel", release, true);
-      document.removeEventListener("pointerdown", clearReleased, true);
+      document.removeEventListener("pointerdown", onPointerDown, true);
       document.removeEventListener("visibilitychange", release);
       window.removeEventListener("blur", release);
+      window.removeEventListener("pagehide", release);
     };
   }, []);
 }

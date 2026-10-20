@@ -1,5 +1,5 @@
 import { progressText } from "../src/app/i18n/progressInsights";
-import { chooseProgressOption } from "./helpers/progress";
+import { chooseProgressOption, chooseProgressDetail } from "./helpers/progress";
 import { mkdir, readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
@@ -81,12 +81,14 @@ for (const language of ["ar", "en"] as const) {
     const rangeFilters = page.getByTestId("progress-range-disclosure");
     if (!(await rangeFilters.evaluate((node) => (node as HTMLDetailsElement).open)))
       await rangeFilters.locator("summary").click();
-    await expect(page.getByRole("combobox")).toHaveCount(6);
+    // Range, topic and the two prayer selectors remain independently available.
+    await expect(page.getByRole("combobox")).toHaveCount(5);
     await expect(page.getByTestId("prayer-coverage-hint")).toContainText(ar ? "١٧" : "17 complete days");
     await expect(prayers.getByTestId("insight-fajr").getByRole("img")).toHaveAccessibleName(
       ar ? /١٠٠٪/ : /100%; 17 days/,
     );
     await expect(prayers.getByTestId("insight-isha").getByRole("img")).toHaveAccessibleName(ar ? /٤٧٪/ : /47%; 8 days/);
+    await chooseProgressDetail(page, "routines");
     await expect(garden.getByTestId("insight-morning").getByRole("img")).toHaveAccessibleName(
       ar ? /١٠٠٪/ : /100%; 17 days/,
     );
@@ -152,6 +154,7 @@ for (const language of ["ar", "en"] as const) {
       routineTimeline.getByRole("combobox", { name: progressText(language, "insights.routineFilter"), exact: true }),
       "all",
     );
+    await chooseProgressDetail(page, "prayers");
     await chooseProgressOption(
       prayers.getByRole("combobox", { name: progressText(language, "insights.practiceFilter"), exact: true }),
       "rawatib",
@@ -172,6 +175,7 @@ for (const language of ["ar", "en"] as const) {
       .getByTestId("recording-time-plot")
       .evaluate((node) => node.scrollIntoView({ block: "center" }));
     await page.screenshot({ path: `${directory}/${language}-prayer-chart-phone.png` });
+    await chooseProgressDetail(page, "routines");
     await garden.evaluate((node) => node.scrollIntoView({ block: "start" }));
     await page.screenshot({ path: `${directory}/${language}-month-phone.png` });
     await individual.evaluate((node) => node.scrollIntoView({ block: "start" }));
@@ -203,6 +207,7 @@ for (const language of ["ar", "en"] as const) {
     await seedProgress(page, language);
     await page.goto("/#/progress/month");
     await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
+    await chooseProgressDetail(page, "routines");
     const [download] = await Promise.all([
       page.waitForEvent("download"),
       page
@@ -343,6 +348,7 @@ test("installed Progress restores meaningful charts after an offline reload", as
   await seedProgress(page, "en");
   await page.goto("/#/progress/month");
   await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
+  await chooseProgressDetail(page, "routines");
   await expect(page.getByTestId("routine-trends").getByTestId("recording-time-point")).toHaveCount(3);
   await page.evaluate(async () => navigator.serviceWorker.ready);
   await page.reload();
@@ -350,10 +356,13 @@ test("installed Progress restores meaningful charts after an offline reload", as
   await page.context().setOffline(true);
   await page.reload();
   await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
+  await chooseProgressDetail(page, "routines");
   await expect(page.getByTestId("today-garden-card")).toBeVisible();
   await chooseProgressOption(page.getByRole("combobox", { name: "Period", exact: true, includeHidden: true }), "month");
   await expect(page.getByTestId("routine-trends").getByTestId("recording-time-point")).toHaveCount(3);
+  await chooseProgressDetail(page, "prayers");
   await expect(page.getByTestId("prayer-trends").getByTestId("recording-time-line")).toBeVisible();
+  await chooseProgressDetail(page, "routines");
   await expect(
     page.getByTestId("today-garden-card").getByTestId("insight-morning").getByRole("img"),
   ).toHaveAccessibleName(/100%; 17 days/);

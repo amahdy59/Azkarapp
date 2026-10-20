@@ -30,8 +30,8 @@ for (const language of ["ar", "en"] as const) {
     await word.click();
     const gloss = page.getByTestId("quran-word-popover");
     await expect(gloss).toBeVisible();
-    // The tooltip path must receive the same protected material as dialogs.
-    await expect(gloss).toHaveAttribute("role", "tooltip");
+    // The dismissible non-modal gloss keeps the protected reading material.
+    await expect(gloss).toHaveAttribute("role", "dialog");
     await expect(gloss).toHaveCSS("background-color", "rgb(15, 23, 42)");
     await expect(gloss).toHaveCSS("backdrop-filter", "blur(28px) saturate(1.35)");
     await expect(gloss).toHaveCSS("opacity", "1");

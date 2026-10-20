@@ -56,17 +56,29 @@ describe("ProgressRecordsTable", () => {
     expect(dates().every((day) => Number(day.slice(-2)) % 2 === 1)).toBe(true);
     expect(records[0].dayKey).toBe("2026-10-01");
   });
-  it("searches dates, resets pagination and exposes an honest empty match state", () => {
-    setup();
-    fireEvent.click(screen.getByRole("button", { name: "Next records" }));
-    fireEvent.change(screen.getByRole("searchbox", { name: "Find a date" }), { target: { value: "2026-10-0" } });
-    expect(dates()).toHaveLength(9);
-    expect(dates()[0]).toBe("2026-10-09");
-    expect(screen.getByRole("button", { name: "Previous records" })).toBeDisabled();
-    fireEvent.change(screen.getByRole("searchbox"), { target: { value: "not a recorded day" } });
+  it("uses the shared period scope without another date-search field", () => {
+    const { rerender } = setup();
+    expect(screen.queryByRole("searchbox")).not.toBeInTheDocument();
+    expect(screen.getAllByRole("rowheader")).toHaveLength(10);
+    rerender(
+      <ProgressRecordsTable
+        records={[records[1]!]}
+        metrics={["prayers", "pages", "quranGoals"]}
+        language="en"
+        calendar="gregorian"
+      />,
+    );
+    expect(dates()).toEqual(["2026-10-02"]);
+    rerender(
+      <ProgressRecordsTable
+        records={[]}
+        metrics={["prayers", "pages", "quranGoals"]}
+        language="en"
+        calendar="gregorian"
+      />,
+    );
     expect(screen.queryByRole("rowheader")).not.toBeInTheDocument();
-    expect(screen.getByText("No matching recorded days.")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Next records" })).toBeDisabled();
+    expect(screen.getByText("No saved records in this period.")).toBeInTheDocument();
   });
   it("renders unavailable metric cells as a dash, distinct from a recorded zero", () => {
     setup();

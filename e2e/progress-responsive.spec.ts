@@ -1,4 +1,4 @@
-import { chooseProgressOption } from "./helpers/progress";
+import { chooseProgressOption, chooseProgressDetail } from "./helpers/progress";
 import { expect, test, type Page } from "@playwright/test";
 
 /**
@@ -24,6 +24,7 @@ async function openProgress(page: Page) {
   });
   await page.goto("/#/progress");
   await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
+  await chooseProgressDetail(page, "routines");
   await expect(page.getByTestId("today-garden-card")).toBeVisible();
 }
 
@@ -70,10 +71,12 @@ test("longer Progress periods compare five prayers with exact data available as 
   await expect(page.getByText(/أَحَبُّ الأَعْمَالِ/)).toBeHidden();
   await chooseProgressOption(page.getByRole("combobox", { name: "الفترة", exact: true, includeHidden: true }), "week");
 
+  await chooseProgressDetail(page, "prayers");
   await expect(page.getByTestId("prayer-comparison").getByRole("list").getByRole("img")).toHaveCount(5);
   await expect(page.getByRole("table")).toHaveCount(0);
   await page.getByTestId("progress-range-disclosure").locator("summary").click();
-  await expect(page.getByRole("combobox")).toHaveCount(6);
+  // The main trend selector now belongs to the separate Trends tab.
+  await expect(page.getByRole("combobox")).toHaveCount(5);
   const download = page.getByTestId("prayer-comparison").getByRole("button", { name: "تصدير الصلاة" });
   await download.focus();
   await expect(download).toBeFocused();

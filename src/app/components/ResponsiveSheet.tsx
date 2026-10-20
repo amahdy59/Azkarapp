@@ -158,6 +158,8 @@ export function SheetHeader({
 }
 
 interface ModalProps {
+  /** Explicit recovery when the opener unmounts or becomes hidden. */
+  onCloseAutoFocus?: (event: Event) => void;
   preventOutsideDismiss?: boolean;
   returnFocusRef?: MutableRefObject<HTMLElement | null>;
   returnFocusScopeId?: string;
@@ -196,6 +198,7 @@ interface ModalProps {
  * that — see DEC-025.
  */
 export function Modal({
+  onCloseAutoFocus,
   returnFocusRef,
   returnFocusScopeId,
   open,
@@ -234,6 +237,10 @@ export function Modal({
         />
         <DialogPrimitive.Content
           {...focusScope}
+          onCloseAutoFocus={(event) => {
+            onCloseAutoFocus?.(event);
+            if (!event.defaultPrevented) focusScope.onCloseAutoFocus(event);
+          }}
           style={style}
           onInteractOutside={preventOutsideDismiss ? (event) => event.preventDefault() : undefined}
           data-testid={testId}
@@ -363,6 +370,7 @@ export interface ResponsiveSheetProps extends Omit<ModalProps, "className"> {
  * provide focus containment, focus restore, Escape dismissal, and scroll lock.
  */
 export function ResponsiveSheet({
+  onCloseAutoFocus,
   open,
   onClose,
   title,
@@ -404,6 +412,7 @@ export function ResponsiveSheet({
   if (!isCompact) {
     return (
       <Modal
+        onCloseAutoFocus={onCloseAutoFocus}
         returnFocusRef={returnFocusRef}
         returnFocusScopeId={returnFocusScopeId}
         open={open}
@@ -434,6 +443,10 @@ export function ResponsiveSheet({
     >
       <DrawerContent
         {...focusScope}
+        onCloseAutoFocus={(event) => {
+          onCloseAutoFocus?.(event);
+          if (!event.defaultPrevented) focusScope.onCloseAutoFocus(event);
+        }}
         data-testid={testId}
         data-prevent-count="true"
         aria-describedby={describedById}

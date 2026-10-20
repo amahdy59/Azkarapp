@@ -883,7 +883,9 @@ export function ReaderScreen({
                       fontSize: readingFontSize,
                       ...(isQuranicText ? QURAN_TEXT_STYLE : {}),
                     }}
-                    onSelectMeanings={setWordMeaningSelection}
+                    onSelectMeanings={(selection) =>
+                      setWordMeaningSelection((current) => (current?.anchor === selection.anchor ? null : selection))
+                    }
                     activeWordId={activeWordId}
                     canonicalKey={z.canonicalKey}
                   />

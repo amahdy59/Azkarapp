@@ -35,3 +35,30 @@ test.each([false, true])("compacts build metadata without changing paths, import
 test("does nothing when the build has no manifest", () => {
   expect(() => compactBuildManifest().generateBundle.handler({}, {})).not.toThrow();
 });
+
+test("interns generated keys without changing the complete file dependency graph or source entries", () => {
+  const generated = "_a-very-long-generated-chunk-name-abc123.js";
+  const data = {
+    "index.html": { file: "assets/index.js", isEntry: true, imports: [generated, "external"] },
+    [generated]: { file: "assets/shared-abc123.js", imports: ["#0"], css: ["assets/shared.css"] },
+    "#0": { file: "assets/retained.js", imports: [generated] },
+    "src/Reader.tsx": { file: "assets/reader.js", imports: [generated] },
+  };
+  const asset = { type: "asset", source: JSON.stringify(data) };
+  compactBuildManifest().generateBundle.handler({}, { ".vite/manifest.json": asset });
+  const compacted = JSON.parse(asset.source);
+  const graph = (manifest) =>
+    Object.values(manifest)
+      .map((entry) => ({
+        ...entry,
+        imports: entry.imports?.map((key) => manifest[key]?.file ?? key),
+      }))
+      .sort((a, b) => a.file.localeCompare(b.file));
+  expect(graph(compacted)).toEqual(graph(data));
+  expect(compacted["index.html"].isEntry).toBe(true);
+  expect(compacted["src/Reader.tsx"].file).toBe(data["src/Reader.tsx"].file);
+  expect(compacted["#0"].file).toBe(data["#0"].file);
+  expect(compacted).not.toHaveProperty(generated);
+  expect(Object.keys(compacted)).toHaveLength(Object.keys(data).length);
+  expect(Buffer.byteLength(asset.source)).toBeLessThan(Buffer.byteLength(JSON.stringify(data)));
+});
