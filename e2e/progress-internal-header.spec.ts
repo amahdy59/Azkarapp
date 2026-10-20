@@ -64,6 +64,18 @@ for (const language of ["ar", "en"] as const) {
     await header.getByRole("button").focus();
     await controls.evaluate((node) => (node.scrollTop = 70));
     await page.keyboard.press("Tab");
+    await expect(
+      controls.getByRole("button", { name: language === "ar" ? "الفترة السابقة" : "Previous period", exact: true }),
+    ).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(
+      controls.getByRole("button", { name: language === "ar" ? /^اختيار التواريخ:/ : /^Choose dates:/ }),
+    ).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(
+      controls.getByRole("button", { name: language === "ar" ? "اليوم" : "Today", exact: true }),
+    ).toBeFocused();
+    await page.keyboard.press("Tab");
     await expect(page.getByTestId("progress-range-disclosure").locator("summary")).toBeFocused();
     await page.keyboard.press("Tab");
     const selectedTab = controls.getByRole("combobox").first();

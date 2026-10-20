@@ -41,8 +41,18 @@ for (const material of ["glass", "solid"] as const) {
           await page.setViewportSize({ width, height: 1000 });
           await read.scrollIntoViewIfNeeded();
           await expect(read).toBeVisible();
-          const titleBox = (await panel.locator("h2").boundingBox())!;
-          const sunriseBox = (await panel.getByTestId("prayer-sunrise-context").boundingBox())!;
+          // Compare related geometry in one layout sample: responsive font/
+          // parent settling can occur between separate browser round trips.
+          const { titleBox, sunriseBox } = await panel.evaluate((node) => {
+            const rect = (element: Element) => {
+              const { x, y, width, height } = element.getBoundingClientRect();
+              return { x, y, width, height };
+            };
+            return {
+              titleBox: rect(node.querySelector("h2")!),
+              sunriseBox: rect(node.querySelector('[data-testid="prayer-sunrise-context"]')!),
+            };
+          });
           expect(sunriseBox.y).toBeGreaterThanOrEqual(titleBox.y + titleBox.height);
           expect(language === "ar" ? sunriseBox.x + sunriseBox.width : sunriseBox.x).toBeCloseTo(
             language === "ar" ? titleBox.x + titleBox.width : titleBox.x,
@@ -75,13 +85,23 @@ for (const material of ["glass", "solid"] as const) {
             : Math.max(readBox.x - (labelBox.x + labelBox.width), labelBox.x - (readBox.x + readBox.width));
           expect(gap).toBeCloseTo(8, 0);
           if (width === 1440) {
-            const evidenceBox = (await panel.getByTestId("prayer-moment-virtue").boundingBox())!;
-            const virtueTitle = (await panel.locator(".prayer-evidence-desktop-title").boundingBox())!;
+            const { titleBox, sunriseBox, evidenceBox, virtueTitle, attributionBox } = await panel.evaluate((node) => {
+              const rect = (selector: string) => {
+                const { x, y, width, height } = node.querySelector(selector)!.getBoundingClientRect();
+                return { x, y, width, height };
+              };
+              return {
+                titleBox: rect("h2"),
+                sunriseBox: rect('[data-testid="prayer-sunrise-context"]'),
+                evidenceBox: rect('[data-testid="prayer-moment-virtue"]'),
+                virtueTitle: rect(".prayer-evidence-desktop-title"),
+                attributionBox: rect('[data-testid="prayer-virtue-attribution"]'),
+              };
+            });
             expect(Math.abs(virtueTitle.y - titleBox.y)).toBeLessThanOrEqual(1);
             expect(evidenceBox.y).toBeCloseTo(titleBox.y, 0);
             expect(virtueTitle.height).toBeCloseTo(titleBox.height, 0);
             const attribution = panel.getByTestId("prayer-virtue-attribution");
-            const attributionBox = (await attribution.boundingBox())!;
             expect(attributionBox.y).toBeCloseTo(sunriseBox.y, 0);
             await expect(attribution).toHaveCSS("font-size", "13px");
             expect(language === "ar" ? attributionBox.x + attributionBox.width : attributionBox.x).toBeCloseTo(

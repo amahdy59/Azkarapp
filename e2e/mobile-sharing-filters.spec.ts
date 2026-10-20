@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { t } from "../src/app/i18n";
 import { sharingStep } from "./helpers/sharing";
-import { chooseProgressOption } from "./helpers/progress";
+import { chooseProgressOption, expectProgressFilterFocus } from "./helpers/progress";
 
 for (const language of ["ar", "en"] as const) {
   test.describe(`mobile refinement ${language}`, () => {
@@ -61,14 +61,17 @@ for (const language of ["ar", "en"] as const) {
       await expect(filters).not.toHaveAttribute("open");
       await expect(filters.locator("summary")).toContainText(ar ? "أسبوع" : "Week");
       await chooseProgressOption(period, "custom");
-      const start = filters.getByLabel(ar ? "تاريخ البداية" : "Start date", { exact: true });
-      const end = filters.getByLabel(ar ? "تاريخ النهاية" : "End date", { exact: true });
+      const editor = page.getByTestId("progress-date-sheet");
+      await expect(editor).toBeVisible();
+      const start = editor.getByLabel(ar ? "تاريخ البداية" : "Start date", { exact: true });
+      const end = editor.getByLabel(ar ? "تاريخ النهاية" : "End date", { exact: true });
       await start.fill("2026-10-01");
       await end.fill("2026-10-02");
       await expect(filters).toHaveAttribute("open");
-      await filters.getByRole("button", { name: ar ? "تطبيق" : "Apply", exact: true }).click();
+      await editor.getByRole("button", { name: ar ? "تطبيق" : "Apply", exact: true }).click();
+      await expect(editor).toBeHidden();
       await expect(filters).not.toHaveAttribute("open");
-      await expect(filters.locator("summary")).toBeFocused();
+      await expectProgressFilterFocus(period);
       await expect(page.getByTestId("garden-view-date")).toContainText(ar ? "١" : "1");
       for (const width of [320, 834, 1280]) {
         await page.setViewportSize({ width, height: 900 });

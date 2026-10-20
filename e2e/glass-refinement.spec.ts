@@ -39,6 +39,10 @@ for (const [language, width] of [
       await expect(scene).toHaveCSS("opacity", "1");
       await capture(route.replaceAll("/", "-"));
       if (route === "home" || route === "progress") {
+        if (route === "progress") {
+          await page.getByTestId("progress-detailed-context").locator("summary").click();
+          await expect(page.getByTestId("progress-prayer-group")).toBeVisible();
+        }
         const scrollport = page.locator(route === "home" ? ".home-content-scroll" : ".app-screen-surface");
         await scrollport.evaluate((node) => {
           node.scrollTop = 220;

@@ -244,6 +244,10 @@ for (const language of ["ar", "en"] as const) {
         await page.evaluate(() => {
           document.documentElement.style.fontSize = "200%";
         });
+      // Detailed topics are deliberately optional; open real chart content
+      // before exercising the historical page's sticky scrolling contract.
+      await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
+      await expect(page.getByTestId("prayer-comparison")).toBeVisible();
       const controls = page.getByTestId("progress-sticky-controls");
       const scrollport = page.locator(".progress-screen");
       const before = await controls.boundingBox();
@@ -253,7 +257,6 @@ for (const language of ["ar", "en"] as const) {
       await expect.poll(() => controls.evaluate((node) => node.getBoundingClientRect().top)).toBeCloseTo(before!.y, 0);
       expect(await scrollport.evaluate((node) => node.scrollTop)).toBeGreaterThan(0);
       await expect(page.getByRole("heading", { name: ar ? "التقدم" : "Progress", exact: true })).toBeInViewport();
-      await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
       const height = await scrollport.evaluate((node) => node.clientHeight);
       expect((await controls.boundingBox())!.height).toBeLessThanOrEqual(height * 0.7);
       for (const name of ar ? ["يوم", "أسبوع", "شهر", "سنة"] : ["Day", "Week", "Month", "Year"]) {

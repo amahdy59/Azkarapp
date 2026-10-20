@@ -356,6 +356,7 @@ for (const language of ["ar", "en"] as const) {
         await page.getByTestId("progress-range-disclosure").locator("summary").click();
         const fields = page.getByTestId("progress-range-fields");
         const controls = fields.getByRole("combobox");
+        expect(await fields.evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(true);
         const first = (await controls.nth(0).boundingBox())!;
         const second = (await controls.nth(1).boundingBox())!;
         expect(Math.abs(first.x - second.x)).toBeLessThan(1);
