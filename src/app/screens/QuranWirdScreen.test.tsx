@@ -1,8 +1,16 @@
 import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+import userEvent from "@testing-library/user-event";
+import type { QuranWirdPlan } from "../types";
 import { getProgressDayKey } from "../progress";
 import { QuranWirdScreen } from "./QuranWirdScreen";
 import { currentSaturdayWeekKeys } from "./quranWirdWeek";
+
+async function chooseField(label: string, option: string) {
+  const user = userEvent.setup();
+  await user.click(screen.getByRole("combobox", { name: label, exact: true }));
+  await user.click(screen.getByRole("option", { name: option, exact: true }));
+}
 
 function renderScreen() {
   const today = getProgressDayKey(new Date(), 4);
@@ -36,13 +44,15 @@ describe("QuranWirdScreen", () => {
     expect(screen.queryByRole("button", { name: /record a page/i })).not.toBeInTheDocument();
   });
 
-  it("offers a draft mode for plan changes", () => {
+  it("offers a draft mode for plan changes", async () => {
     const props = renderScreen();
     fireEvent.click(screen.getByRole("button", { name: "Edit" }));
     expect(screen.getByRole("spinbutton", { name: "Pages per day" })).toBeInTheDocument();
-    expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Reading plan" })).toHaveTextContent("Pages per day");
+    expect(screen.getAllByRole("combobox")).toHaveLength(1);
 
-    fireEvent.click(screen.getByRole("radio", { name: /Finish in one Gregorian month/i }));
+    await chooseField("Reading plan", "Finish on a schedule");
+    await chooseField("Completion schedule", "End of this Gregorian month");
     fireEvent.click(screen.getByRole("button", { name: "Save plan" }));
 
     expect(props.onPlanChange).toHaveBeenCalledWith(
@@ -55,10 +65,10 @@ describe("QuranWirdScreen", () => {
     );
   });
 
-  it("offers free reading without goals or history summaries", () => {
+  it("offers free reading without goals or history summaries", async () => {
     const props = renderScreen();
     fireEvent.click(screen.getByRole("button", { name: "Edit" }));
-    fireEvent.click(screen.getByRole("radio", { name: /Read freely/i }));
+    await chooseField("Reading plan", "Read freely");
     fireEvent.click(screen.getByRole("button", { name: "Save plan" }));
 
     expect(props.onPlanChange).toHaveBeenCalledWith(expect.objectContaining({ kind: "free", dailyPages: 0 }));
@@ -141,7 +151,7 @@ describe("QuranWirdScreen", () => {
     expect(screen.queryByRole("region", { name: "This week" })).not.toBeInTheDocument();
   });
 
-  it("uses a Saturday-to-Friday week and fills Arabic progress from the right", () => {
+  it("uses a Saturday-to-Friday week and fills Arabic progress from the right", async () => {
     expect(currentSaturdayWeekKeys(new Date("2026-08-22T12:00:00"))).toEqual([
       "2026-08-22",
       "2026-08-23",
@@ -158,19 +168,21 @@ describe("QuranWirdScreen", () => {
     expect(screen.getAllByRole("progressbar")[1]).toHaveAttribute("dir", "rtl");
 
     fireEvent.click(screen.getByRole("button", { name: "تعديل" }));
-    for (const radio of screen.getAllByRole("radio")) {
-      expect(radio.closest("label")?.querySelector("span")).toHaveClass("text-right");
-    }
+    const readingPlan = screen.getByRole("combobox", { name: "خطة القراءة" });
+    expect(readingPlan.closest("[dir]")).toHaveAttribute("dir", "rtl");
+    expect(readingPlan).toHaveTextContent("صفحات كل يوم");
+    await chooseField("خطة القراءة", "الإتمام في موعد");
+    expect(screen.getByRole("combobox", { name: "موعد الإتمام" })).toHaveTextContent("نهاية الشهر الهجري الحالي");
   });
 
-  it("configures a repeating wird plan for juz, surah, or custom page range", () => {
+  it("configures a repeating wird plan for juz, surah, or custom page range", async () => {
     const props = renderScreen();
     cleanup();
     const onPlanChange = vi.fn();
     render(<QuranWirdScreen {...props} onPlanChange={onPlanChange} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Edit" }));
-    fireEvent.click(screen.getByRole("radio", { name: /Daily fixed section/i }));
+    await chooseField("Reading plan", "Repeat a fixed section");
 
     // Juz scope defaults to the reader's current position (Juz 2: pages 22-41)
     const juzSelect = screen.getByRole("combobox", { name: /Juz/i });
@@ -196,8 +208,8 @@ describe("QuranWirdScreen", () => {
 
     // Now test custom scope
     fireEvent.click(screen.getByRole("button", { name: "Edit" }));
-    fireEvent.click(screen.getByRole("radio", { name: /Daily fixed section/i }));
-    fireEvent.click(screen.getByRole("button", { name: "Custom range" }));
+    await chooseField("Reading plan", "Repeat a fixed section");
+    await chooseField("Section type", "Custom range");
     const startInput = screen.getByLabelText("From page");
     const endInput = screen.getByLabelText("To page");
     fireEvent.change(startInput, { target: { value: "10" } });
@@ -284,14 +296,15 @@ describe("QuranWirdScreen", () => {
     expect(screen.getByText("Today's Wird complete")).toBeInTheDocument();
   });
 
-  it("configures a custom plan with start page, target page, and duration days", () => {
+  it("configures a custom plan with start page, target page, and duration days", async () => {
     const props = renderScreen();
     cleanup();
     const onPlanChange = vi.fn();
     render(<QuranWirdScreen {...props} onPlanChange={onPlanChange} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Edit" }));
-    fireEvent.click(screen.getByRole("radio", { name: /Custom Khatmah/i }));
+    await chooseField("Reading plan", "Finish on a schedule");
+    await chooseField("Completion schedule", "Custom duration");
 
     const startInput = screen.getByLabelText("From page");
     const targetInput = screen.getByLabelText("To page");
@@ -335,5 +348,96 @@ describe("QuranWirdScreen", () => {
     // 21 / 604 pages and 1 / 30 juzs
     expect(screen.getByText("21 / 604")).toBeInTheDocument();
     expect(screen.getByText("1 / 30")).toBeInTheDocument();
+  });
+  it.each([
+    ["daily", "Pages per day", undefined],
+    ["repeating", "Repeat a fixed section", undefined],
+    ["hijriMonth", "Finish on a schedule", "End of this Hijri month"],
+    ["gregorianMonth", "Finish on a schedule", "End of this Gregorian month"],
+    ["custom", "Finish on a schedule", "Custom duration"],
+    ["free", "Read freely", undefined],
+  ] as const)("edits the saved %s plan without changing its kind or range", (kind, mode, schedule) => {
+    const props = renderScreen();
+    cleanup();
+    const plan: QuranWirdPlan = {
+      kind,
+      dailyPages: kind === "free" ? 0 : 4,
+      startedDayKey: getProgressDayKey(new Date(), 4),
+      ...(kind === "repeating" ? { repeatScope: "custom" as const, repeatStartPage: 10, repeatEndPage: 13 } : {}),
+      ...(["hijriMonth", "gregorianMonth", "custom"].includes(kind)
+        ? { startPage: 22, targetPage: 100, durationDays: 20 }
+        : {}),
+    };
+    render(<QuranWirdScreen {...props} plan={plan} />);
+    fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+    expect(screen.getByRole("combobox", { name: "Reading plan" })).toHaveTextContent(mode);
+    if (schedule) expect(screen.getByRole("combobox", { name: "Completion schedule" })).toHaveTextContent(schedule);
+    fireEvent.click(screen.getByRole("button", { name: "Save plan" }));
+    expect(props.onPlanChange).toHaveBeenCalledWith(expect.objectContaining(plan));
+  });
+
+  it("keeps choices draft-only, cancels edits and hides irrelevant fields", async () => {
+    const props = renderScreen();
+    fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+    const plan = screen.getByRole("combobox", { name: "Reading plan" });
+    expect(plan).toHaveAccessibleDescription("Choose a fixed number of pages for each day.");
+    await chooseField("Reading plan", "Finish on a schedule");
+    await chooseField("Completion schedule", "Custom duration");
+    fireEvent.change(screen.getByLabelText("Days to complete"), { target: { value: "60" } });
+    expect(screen.getByTestId("wird-plan-summary")).toHaveTextContent("Estimated completion");
+    await chooseField("Reading plan", "Read freely");
+    expect(screen.queryByRole("spinbutton")).not.toBeInTheDocument();
+    expect(screen.queryByRole("combobox", { name: "Completion schedule" })).not.toBeInTheDocument();
+    expect(props.onPlanChange).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
+    expect(props.onPlanChange).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+    expect(screen.getByRole("combobox", { name: "Reading plan" })).toHaveTextContent("Pages per day");
+    expect(screen.getByLabelText("Pages per day")).toHaveValue(4);
+  });
+
+  it("selects a searchable Surah and saves its exact repeating range", async () => {
+    const props = renderScreen();
+    fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+    await chooseField("Reading plan", "Repeat a fixed section");
+    await chooseField("Section type", "Surah");
+    fireEvent.click(screen.getByRole("combobox", { name: /^Select Surah/ }));
+    fireEvent.click(within(screen.getByRole("listbox")).getByText("Surah Al-Fatihah"));
+    fireEvent.click(screen.getByRole("button", { name: "Save plan" }));
+    expect(props.onPlanChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: "repeating",
+        repeatScope: "surah",
+        repeatNumber: 1,
+        repeatStartPage: 1,
+        repeatEndPage: 1,
+        dailyPages: 1,
+      }),
+    );
+  });
+
+  it("disables daily-page steppers at their limits and updates the summary", () => {
+    renderScreen();
+    fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+    const input = screen.getByRole("spinbutton", { name: "Pages per day" });
+    fireEvent.change(input, { target: { value: "1" } });
+    expect(screen.getByRole("button", { name: "Decrease" })).toBeDisabled();
+    fireEvent.change(input, { target: { value: "604" } });
+    expect(screen.getByRole("button", { name: "Increase" })).toBeDisabled();
+    expect(screen.getByTestId("wird-plan-summary")).toHaveTextContent("Around 604 pages/day");
+  });
+
+  it("dismisses the plan menu with Escape and returns keyboard focus", async () => {
+    renderScreen();
+    fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+    const user = userEvent.setup();
+    const plan = screen.getByRole("combobox", { name: "Reading plan" });
+    await user.click(plan);
+    expect(screen.getAllByRole("option")).toHaveLength(4);
+    await user.keyboard("{Escape}");
+    expect(plan).toHaveFocus();
+    expect(plan).toHaveTextContent("Pages per day");
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
   });
 });

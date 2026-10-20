@@ -5,13 +5,13 @@
 
 import { isNativeAndroid } from "../native/platform";
 
-export const SHARED_APP_URL = "https://wa-zaker.com/";
+import { getImageCaption } from "./shareCaption";
+export { SHARED_APP_URL } from "./shareCaption";
 
 /** Share targets commonly use text as the caption accompanying image files. */
 export function imageShareText(files: readonly File[], text?: string): string | undefined {
   if (!files.some((file) => file.type.startsWith("image/"))) return text;
-  if (text?.includes("https://wa-zaker.com")) return text;
-  return [text?.trim(), SHARED_APP_URL].filter(Boolean).join("\n\n");
+  return getImageCaption(text);
 }
 
 export type MultiShareMethod = "shared" | "downloaded" | "cancelled" | "error";

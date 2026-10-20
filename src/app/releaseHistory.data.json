@@ -1,5 +1,20 @@
 [
   {
+    "release": "2026-10-20",
+    "ar": [
+      "أضف نصًا اختياريًا إلى الصورة التي تشاركها، وانسخ نص القراءة أو رابطها المباشر.",
+      "تنقّل بين خطوات المشاركة الواضحة، واختر المحتوى واللغة بقوائم تملأ عرض الهاتف.",
+      "راجع بطاقتك بجوار إعداداتها على الشاشات الواسعة، وتخطَّ التصميم عندما تكون جاهزًا للمشاركة.",
+      "اضبط ورد القرآن بقوائم مختصرة، وتابع خطتك وسجل أسبوعك بعرض أوضح على الأجهزة اللوحية والحاسوب."
+    ],
+    "en": [
+      "Add optional text to the image you share, and copy the reading text or its direct link.",
+      "Move through clear sharing steps and choose content and language with full-width phone menus.",
+      "Review your card beside its settings on wide screens, and skip design when you are ready to share.",
+      "Set your Quran reading plan with compact menus, and see your plan and weekly history more clearly on tablets and computers."
+    ]
+  },
+  {
     "release": "2026-10-19.5",
     "ar": [
       "تظل معاينة البطاقة الحالية ظاهرة أثناء تغيير تصميمها، حتى عند اختيار بطاقات متأخرة.",

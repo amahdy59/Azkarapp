@@ -19,6 +19,7 @@ interface SharingStepsProps {
   onChange: (step: SharingStep) => void;
   language: AppLanguage;
   disabled?: boolean;
+  onSkipDesign?: () => void;
 }
 
 /** Ordinary navigation, not tabs: every step is editable without losing choices. */
@@ -28,7 +29,7 @@ export function SharingSteps({ steps, step, onChange, language, disabled }: Shar
     <nav aria-label={t(language, "shareStudio.steps")} className="sharing-steps">
       <ol>
         {steps.map((value, index) => (
-          <li key={value}>
+          <li key={value} data-state={index < current ? "past" : index === current ? "current" : "upcoming"}>
             <button
               type="button"
               aria-current={step === value ? "step" : undefined}
@@ -51,19 +52,25 @@ export function SharingSteps({ steps, step, onChange, language, disabled }: Shar
   );
 }
 
-export function SharingStepNavigation({ steps, step, onChange, language, disabled }: SharingStepsProps) {
+export function SharingStepNavigation({ steps, step, onChange, language, disabled, onSkipDesign }: SharingStepsProps) {
   const index = steps.indexOf(step);
   return (
     <div className="sharing-step-navigation">
       <Button
         variant="outline"
+        size={index === 0 && onSkipDesign ? "icon" : "default"}
         aria-label={t(language, "shareStudio.previousStep")}
         disabled={disabled || index === 0}
         onClick={() => onChange(steps[index - 1]!)}
       >
         <SharingArrow language={language} action="previous" />
-        {t(language, "common.previous")}
+        {!(index === 0 && onSkipDesign) && t(language, "common.previous")}
       </Button>
+      {step === "content" && onSkipDesign && (
+        <Button variant="ghost" disabled={disabled} onClick={onSkipDesign}>
+          {t(language, "shareStudio.skipDesign")}
+        </Button>
+      )}
       {index < steps.length - 1 && (
         <Button
           aria-label={t(language, "shareStudio.nextStep")}

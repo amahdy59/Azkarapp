@@ -1,3 +1,5 @@
+import { SharingCaption } from "./SharingCaption";
+import { getImageCaption } from "../share/shareCaption";
 import { ShareFormatSelect } from "./ShareFormatSelect";
 import { SharingArrow, SharingSteps, SharingStepNavigation, type SharingStep } from "./SharingSteps";
 import { QURAN_TEXT_STYLE } from "../quranTypography";
@@ -12,7 +14,7 @@ import { canShareMultipleFiles, downloadFile, shareMultipleFiles } from "../shar
 import { createShareArchive } from "../share/shareArchive";
 import { reportError } from "../../lib/observability";
 import { Button } from "./ui/button";
-import { Copy, Download, Share2, X } from "./icons";
+import { Download, Share2, X, Maximize, Minimize } from "./icons";
 import "./ayah-share-studio.css";
 import { AyahMushafText } from "./AyahMushafText";
 
@@ -47,6 +49,8 @@ export default function AyahShareStudio({
   onOptionsChange?: (options: AyahShareOptions) => void;
 }) {
   const [step, setStep] = useState<SharingStep>("content");
+  const [inspect, setInspect] = useState(false);
+  const [includeCaption, setIncludeCaption] = useState(false);
   const steps = ["content", "design", "share"] as const;
   const stepHeading = useRef<HTMLHeadingElement>(null);
   const changeStep = (next: SharingStep) => {
@@ -221,13 +225,19 @@ export default function AyahShareStudio({
     !generationFailed &&
     (!includeTranslation || Boolean(translation));
   const files = pages.map((page) => page.file);
+  const readingLink = /^\d+:\d+$/u.test(verseKey) ? `https://quran.com/${verseKey.replace(":", "/")}` : undefined;
+  const captionText = getImageCaption([completeText, readingLink].filter(Boolean).join("\n\n"));
   const nativeShare = pages.length > 0 && canShareMultipleFiles(files);
   const share = async () => {
     if (!ready || !nativeShare) return;
     setBusy(true);
     setError(false);
     try {
-      const result = await shareMultipleFiles(files, { title, text: completeText, downloadFallback: false });
+      const result = await shareMultipleFiles(files, {
+        title,
+        text: includeCaption ? captionText : undefined,
+        downloadFallback: false,
+      });
       setStatus(
         t(
           language,
@@ -282,9 +292,6 @@ export default function AyahShareStudio({
           <h2 ref={heading} tabIndex={-1} className="text-lg font-semibold text-foreground">
             {t(language, "reader.ayahCardTitle")}
           </h2>
-          <p className="text-sm text-muted-foreground" dir="auto">
-            {title}
-          </p>
         </div>
         <Button variant="ghost" size="icon" onClick={onClose} aria-label={t(language, "common.close")}>
           <X aria-hidden="true" />
@@ -294,7 +301,24 @@ export default function AyahShareStudio({
         </div>
       </header>
       <div className="ayah-share-body" data-vaul-no-drag>
-        <div className="ayah-share-preview" aria-busy={generating}>
+        <div className="ayah-share-preview" data-inspect={inspect || undefined} aria-busy={generating}>
+          {current && (
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+              <span className="text-sm font-bold">{t(language, "shareStudio.previewHeading")}</span>
+              <Button
+                variant="outline"
+                className="min-h-11 h-auto whitespace-normal"
+                aria-expanded={inspect}
+                onClick={() => setInspect((value) => !value)}
+              >
+                {inspect ? <Minimize aria-hidden="true" /> : <Maximize aria-hidden="true" />}
+                {t(language, inspect ? "shareStudio.closeInspect" : "shareStudio.inspect")}
+              </Button>
+            </div>
+          )}
+          <p className="mb-2 text-sm text-muted-foreground" dir="auto">
+            {title}
+          </p>
           {current ? (
             <figure>
               <img
@@ -338,7 +362,7 @@ export default function AyahShareStudio({
             </div>
           )}
         </div>
-        <div className="space-y-4 min-w-0">
+        <div className="ayah-share-settings space-y-4 min-w-0">
           <div>
             <h3
               ref={stepHeading}
@@ -348,6 +372,9 @@ export default function AyahShareStudio({
               {t(language, `shareStudio.step${step}`)}
             </h3>
             <p className="sr-only">{t(language, `shareStudio.step${step}Hint`)}</p>
+            {step === "design" && (
+              <p className="mt-1 text-xs text-muted-foreground">{t(language, "shareStudio.designOptional")}</p>
+            )}
           </div>
           {step === "design" && (
             <ShareFormatSelect
@@ -441,6 +468,46 @@ export default function AyahShareStudio({
             </details>
           )}
           {step === "share" && (
+            <SharingCaption
+              language={language}
+              included={includeCaption}
+              onIncludedChange={setIncludeCaption}
+              text={captionText}
+              readingLink={readingLink}
+              busy={busy}
+              disabled={includeTranslation && !translationLoaded}
+              canCopy={typeof navigator.clipboard?.writeText === "function"}
+              onSaveText={(value) => {
+                try {
+                  downloadFile(
+                    new File([value], `ayah-${verseKey.replace(":", "-")}.txt`, { type: "text/plain;charset=utf-8" }),
+                  );
+                  setError(false);
+                  setStatus(t(language, "reader.ayahCardDownloadStarted"));
+                } catch (cause) {
+                  reportError(cause, "ayah-card-save-text");
+                  setError(true);
+                  setStatus(t(language, "reader.shareError"));
+                }
+              }}
+              onCopy={async (value) => {
+                try {
+                  await navigator.clipboard.writeText(value);
+                  setError(false);
+                  setStatus(
+                    t(language, value === readingLink ? "shareStudio.readingLinkCopied" : "shareStudio.textCopied"),
+                  );
+                  return true;
+                } catch (cause) {
+                  reportError(cause, "ayah-card-copy");
+                  setError(true);
+                  setStatus(t(language, "reader.copyError"));
+                  return false;
+                }
+              }}
+            />
+          )}
+          {step === "share" && (
             <details className="rounded-xl border border-border p-3 text-center">
               <summary className="min-h-11 cursor-pointer text-sm font-semibold">
                 {t(language, "reader.ayahCardText")}
@@ -463,31 +530,7 @@ export default function AyahShareStudio({
                   <p>{input.meanings.text}</p>
                 </div>
               )}
-              <Button
-                variant="outline"
-                className="mt-3"
-                disabled={
-                  busy ||
-                  typeof navigator.clipboard?.writeText !== "function" ||
-                  (includeTranslation && !translationLoaded)
-                }
-                onClick={() => {
-                  void Promise.resolve()
-                    .then(() => navigator.clipboard.writeText(completeText))
-                    .then(() => {
-                      setError(false);
-                      setStatus(t(language, "reader.ayahCopied"));
-                    })
-                    .catch((cause) => {
-                      reportError(cause, "ayah-card-copy");
-                      setError(true);
-                      setStatus(t(language, "reader.copyError"));
-                    });
-                }}
-              >
-                <Copy aria-hidden="true" />
-                {t(language, "shareStudio.copyText")}
-              </Button>
+
               {typeof navigator.clipboard?.writeText !== "function" && (
                 <p className="mt-2 text-sm text-muted-foreground">{t(language, "shareStudio.copyTextUnavailable")}</p>
               )}
@@ -496,7 +539,14 @@ export default function AyahShareStudio({
         </div>
       </div>
       <footer className="ayah-share-footer">
-        <SharingStepNavigation steps={steps} step={step} onChange={changeStep} language={language} disabled={busy} />
+        <SharingStepNavigation
+          steps={steps}
+          step={step}
+          onChange={changeStep}
+          language={language}
+          disabled={busy}
+          onSkipDesign={() => changeStep("share")}
+        />
         <p
           role={error ? "alert" : "status"}
           className={`text-sm ${error ? "text-destructive" : "text-muted-foreground"}`}

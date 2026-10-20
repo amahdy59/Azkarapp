@@ -1,3 +1,7 @@
+[Sharing board adaptation](phases/SHARING_BOARD_ADAPTATION_2026_10_19.md) applies the owner-approved balanced wide-screen preview/settings layout, explicit optional design skip, labelled artwork choices and truthful visible feedback. Keep current card generation and image-first flow; no hosted permissions/expiry/embed features. Local only; no push without confirmation.
+
+[Compact Quran wird plan form](phases/WIRD_COMPACT_PLAN_FORM_2026_10_19.md) applies the owner-approved four-choice Reading plan select, conditional completion schedule, selected-only fields and live summary. Existing saved kinds/calculations/history remain unchanged. Local only; owner confirmation is required before any push.
+
 [Prominent Progress time series](phases/PROGRESS_TIME_SERIES_2026_10_18.md) responds to the owner's chart correction: large inspectable remembrance and prayer lines precede retained comparisons and actionable insights. This supersedes the miniature-trend presentation in [Actionable Progress insights](phases/PROGRESS_ACTIONABLE_INSIGHTS_2026_10_18.md), preserving complete-day analysis, JSON exports and honest individual-zikr history limits. Local only; preserve pending work and do not publish.
 
 # AI Improvement System Index
@@ -447,3 +451,7 @@ Local follow-up: [Concise, actionable Progress](phases/PROGRESS_REFINEMENTS_2026
 [Home frost, motion and Android handoff](phases/FROST_MOTION_ANDROID_HANDOFF_2026_10_19.md) is the active owner-requested follow-up: one softer scrolled Home material, synchronized 220ms prayer geometry/details and verified Android build/developer handoff. Persistent native-file downloads and device/Play acceptance remain explicit Android follow-up work. The owner's latest instruction withholds push/deployment until returning for review.
 
 [Sharing steps and truthful availability](phases/SHARING_STEPS_AND_AVAILABILITY_2026_10_19.md) is the active owner-requested sharing phase: Content/Design/Share, retained live preview, explicit dropdown menus, existing reviewed English content, honest presets/capabilities and responsive/accessibility verification.
+
+[Progress unified-range proposal](PROGRESS_UNIFIED_RANGE_PLAN_2026_10_19.md) reviews the existing long statistics page and proposes a shared Day/Week/Month/Year/Custom filter, chosen metrics and one selectable prominent timeline. Plan only; no Progress data/presentation change in this sharing/wird release.
+
+[Sharing and Quran plan release](phases/COMBINED_SHARING_WIRD_RELEASE_2026_10_20.md) records the owner's "push all changes" confirmation, superseding pending publication holds, and the verification/publication plan.

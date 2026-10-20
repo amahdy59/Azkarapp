@@ -605,3 +605,17 @@ shareAvailability derives addition counts and presets from the same nonempty con
 SharingArrow uses physical icons selected by the dialog language so an outer RTL container cannot mirror an English control. Preview navigation is an intrinsic-width group adjacent to its card; its keyboard handler updates the active generated or approved-artwork collection.
 
 The completed preview snapshot is presentation-only. If the selected later replacement has not streamed yet, the studio keeps its prior image and count visible, with navigation and exports disabled. Current-request pages alone determine export readiness and payloads, including when the replacement sequence becomes shorter.
+
+## Image captions — 2026-10-19
+
+shareCaption owns pure image attribution formatting and meaningful reading-link filtering. shareDispatcher delegates to the same caption formatter so preview and actual image payload agree. SharingCaption receives prepared text and callbacks; it owns only transient presentation/pending/manual-copy state and has no services or persistence. Collection/Ayah studios own clipboard/download operations, selected-reading text and opt-in caption state outside image-generation keys. Normal sharing remains image-first; failed image-fit recovery retains explicit full text. Approved artwork uses metadata captions without source interpretation. No saved-data/schema/network dependency change.
+
+## Compact Quran wird plan editing — 2026-10-19
+
+QuranWirdScreen derives four presentation modes from existing plan kinds. Scheduled mode reveals hijriMonth/gregorianMonth/custom without persisting a new kind; existing createPlan and normalization/calculation boundaries remain authoritative. SelectField composes labelled existing Radix select primitives with prepared values/options and contains no persistence/network/domain logic. The screen owns draft state, submission/cancellation and focus return. A small atomic status announces only the derived summary. Month-plan dates use their explicit calendar for display; other estimates retain the application calendar. No saved-history/schema changes.
+
+## Sharing board layout adaptation — 2026-10-19
+
+Named inline-size containers own collection/Ayah column reflow instead of coupling it to the navigation shell tier. Grid areas place settings/preview according to application direction, preserving existing semantic DOM and phone order. SharingStepNavigation accepts an optional skip callback; studios retain all design/export ownership and move to Share without regenerating. Collection operation status now lives visibly in the existing footer and is cleared by stage changes; errors retain alert semantics. No generation, persisted-state, network, caption or content capability boundary changes.
+
+SharingArtworkChoice is pure presentation: the studio provides its existing icon, label, description, selected/disabled state and callback. It owns only a unique description ID, using aria-pressed/aria-describedby without storage or export logic. The Share-step device-capability explanation remains associated with its action while scrolling with settings, allowing the persistent footer to fit at 200% text.

@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { chooseWirdOption } from "./helpers/wird";
 
 test.beforeEach(async ({ page }) => {
   // The reader no longer talks to api.quran.com at all; blocking the remote
@@ -200,33 +201,43 @@ test("offers clear RTL reading choices and free reading without progress trackin
   await page.getByTestId("nav-quran").click();
   await page.getByRole("button", { name: "تعديل" }).click();
 
-  const radios = page.getByRole("radio");
-  await expect(radios).toHaveCount(6);
-  await expect(page.getByRole("combobox")).toHaveCount(0);
-  await expect(page.getByRole("radio", { name: /صفحات كل يوم/ })).toBeChecked();
-
-  const optionState = await radios.evaluateAll((elements) =>
-    elements.map((radio) => {
-      const label = radio.closest("label");
-      const text = label?.querySelector("span");
-      const box = label?.getBoundingClientRect();
-      const styles = label ? getComputedStyle(label) : null;
+  const planSelect = page.getByRole("combobox", { name: "خطة القراءة", exact: true });
+  await expect(page.getByRole("radio")).toHaveCount(0);
+  await expect(page.getByRole("combobox")).toHaveCount(1);
+  await expect(planSelect).toContainText("صفحات كل يوم");
+  expect((await planSelect.boundingBox())!.height).toBeGreaterThanOrEqual(48);
+  await planSelect.click();
+  const options = page.getByRole("option");
+  await expect(options).toHaveCount(4);
+  const optionState = await options.evaluateAll((elements) =>
+    elements.map((option) => {
+      const styles = getComputedStyle(option);
       return {
-        direction: label ? getComputedStyle(label).direction : "",
-        textAlign: text ? getComputedStyle(text).textAlign : "",
-        minHeight: box?.height ?? 0,
-        backgroundColor: styles?.backgroundColor ?? "",
-        borderColor: styles?.borderColor ?? "",
+        direction: styles.direction,
+        textAlign:
+          getComputedStyle(option.querySelector("span")!).textAlign === "start"
+            ? styles.direction === "rtl"
+              ? "right"
+              : "left"
+            : getComputedStyle(option.querySelector("span")!).textAlign,
+        minHeight: option.getBoundingClientRect().height,
+        backgroundColor: styles.backgroundColor,
+        selected: option.getAttribute("aria-selected"),
+        check: option.querySelectorAll("svg").length,
       };
     }),
   );
   expect(
     optionState.every(
-      ({ direction, textAlign, minHeight }) => direction === "rtl" && textAlign === "right" && minHeight >= 64,
+      ({ direction, textAlign, minHeight }) => direction === "rtl" && textAlign === "right" && minHeight >= 44,
     ),
   ).toBe(true);
+  expect(optionState[0]?.selected).toBe("true");
+  expect(optionState[0]?.check).toBe(1);
+  expect(optionState[1]?.check).toBe(0);
   expect(optionState[0]?.backgroundColor).not.toBe(optionState[1]?.backgroundColor);
-  expect(optionState[0]?.borderColor).not.toBe(optionState[1]?.borderColor);
+  await page.keyboard.press("Escape");
+  await expect(planSelect).toBeFocused();
 
   const accessibility = await new AxeBuilder({ page })
     .include('[data-testid="quran-wird-content"]')
@@ -235,7 +246,8 @@ test("offers clear RTL reading choices and free reading without progress trackin
     .analyze();
   expect(accessibility.violations).toEqual([]);
 
-  await page.getByRole("radio", { name: /ختمة في شهر هجري/ }).check();
+  await chooseWirdOption(page, "ar", "plan", "scheduled");
+  await chooseWirdOption(page, "ar", "schedule", "hijriMonth");
   await page.getByRole("button", { name: "حفظ الخطة" }).click();
   await expect(page.getByText("تقدم هذا الشهر")).toBeVisible();
   await expect(page.getByRole("progressbar", { name: /صفحة في خطة/ })).toBeVisible();
@@ -243,7 +255,7 @@ test("offers clear RTL reading choices and free reading without progress trackin
   await expect(page.getByRole("region", { name: "هذا الأسبوع" })).toHaveCount(0);
 
   await page.getByRole("button", { name: "تعديل" }).click();
-  await page.getByRole("radio", { name: /قراءة حرة/ }).check();
+  await chooseWirdOption(page, "ar", "plan", "free");
   await expect(page.getByText(/سيُحفظ موضعك/)).toBeVisible();
   await page.getByRole("button", { name: "حفظ الخطة" }).click();
   await expect(page.getByText("القراءة الحرة مفعّلة")).toBeVisible();
@@ -269,7 +281,8 @@ test("offers clear RTL reading choices and free reading without progress trackin
 test("custom plan presets and section search remain keyboard usable with 44px targets", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 700 });
   await page.getByRole("button", { name: "تعديل" }).click();
-  await page.getByRole("radio", { name: /ختمة مخصصة/ }).check();
+  await chooseWirdOption(page, "ar", "plan", "scheduled");
+  await chooseWirdOption(page, "ar", "schedule", "custom");
   const presets = page.getByRole("button", { name: /^[٣٦٩١][٠٨]+ أيام الإتمام$/ });
   await expect(presets).toHaveCount(4);
   for (const preset of await presets.all()) {
@@ -281,7 +294,7 @@ test("custom plan presets and section search remain keyboard usable with 44px ta
   await page.keyboard.press("Enter");
   await expect(page.getByLabel("أيام الإتمام", { exact: true })).toHaveValue("30");
 
-  await page.getByRole("radio", { name: /وِرد يومي ثابت/ }).check();
+  await chooseWirdOption(page, "ar", "plan", "repeating");
   const choice = page.getByRole("combobox", { name: /^اختر الجزء/ });
   await choice.focus();
   await page.keyboard.press("Enter");

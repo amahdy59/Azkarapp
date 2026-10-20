@@ -627,7 +627,7 @@ export function getShareText(
         .filter(Boolean)
         .join("\n\n"),
     ),
-    url,
+    items.some((item) => item.readingUrl === url) ? undefined : url,
   ]
     .filter(Boolean)
     .join("\n\n────────\n\n");

@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { sharingContent, sharingStep, sharingCaption, sharingReadingLink } from "./helpers/sharing";
 import { t } from "../src/app/i18n";
 import { WIRD_EVIDENCE_BY_SECTION, WIRD_SECTION_ORDER } from "../src/app/content/wirdBenefits";
 
@@ -34,29 +35,16 @@ for (const language of ["ar", "en"] as const) {
       await opener.click();
       const dialog = page.getByRole("dialog", { name: t(language, "wirdBenefits.shareEvidence"), exact: true });
       await expect(dialog).toBeVisible();
-      await expect(dialog.getByRole("button", { name: t(language, "shareStudio.image"), exact: true })).toHaveAttribute(
-        "aria-pressed",
-        "true",
-      );
+      await expect(dialog.getByRole("group", { name: t(language, "shareStudio.method"), exact: true })).toHaveCount(0);
       await expect(dialog.getByRole("img").first()).toBeVisible();
-      const settings = dialog
-        .locator("details")
-        .filter({ has: page.locator("summary", { hasText: t(language, "shareStudio.imageSettings") }) });
-      await settings.evaluate((element) => {
-        (element as HTMLDetailsElement).open = true;
-      });
+      await sharingStep(dialog, "design");
       const format = dialog.getByRole("combobox", { name: t(language, "shareStudio.format") });
       await expect(format).toBeEnabled();
       await format.click();
       await page.getByRole("option", { name: t(language, "shareStudio.square"), exact: true }).click();
       await expect(format).toContainText(t(language, "shareStudio.square"));
       if (section === "quran") {
-        await dialog
-          .locator("details")
-          .filter({ has: page.locator("summary", { hasText: t(language, "shareStudio.contentOptions") }) })
-          .evaluate((element) => {
-            (element as HTMLDetailsElement).open = true;
-          });
+        await sharingContent(dialog);
         const translation = dialog.getByRole("checkbox", { name: t(language, "shareStudio.meaning"), exact: true });
         await expect(translation).toBeEnabled();
         await translation.check();
@@ -64,8 +52,10 @@ for (const language of ["ar", "en"] as const) {
         await expect(qr).toBeEnabled();
         await qr.check();
         // Use a portrait with enough space for complete translation and the source QR.
+        await sharingStep(dialog, "design");
         await format.click();
         await page.getByRole("option", { name: t(language, "shareStudio.portrait"), exact: true }).click();
+        await sharingStep(dialog, "share");
         const save = dialog.getByRole("button", { name: t(language, "shareStudio.save"), exact: true });
         await expect(save).toBeEnabled();
         await expect
@@ -87,13 +77,13 @@ for (const language of ["ar", "en"] as const) {
         });
         await page.screenshot({ path: testInfo.outputPath(`wird-sharing-studio-${language}.png`) });
       }
-      await dialog.getByRole("button", { name: t(language, "shareStudio.text"), exact: true }).click();
+      await sharingStep(dialog, "share");
+      await sharingCaption(dialog);
       const text = await dialog.getByRole("textbox").inputValue();
       expect(text).toContain(item.kind === "quran" ? item.text.ar : item.text[language]);
       expect(text).toContain(item.source[language]);
       if (item.attribution) expect(text).toContain(item.attribution[language]);
-      await dialog.getByRole("button", { name: t(language, "shareStudio.link"), exact: true }).click();
-      await expect(dialog.getByRole("textbox")).toHaveValue(item.sourceUrl);
+      expect(await sharingReadingLink(dialog)).toBe(item.sourceUrl);
       await page.keyboard.press("Escape");
       await expect(dialog).toHaveCount(0);
       await expect(opener).toBeFocused();

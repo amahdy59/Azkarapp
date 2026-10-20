@@ -22,18 +22,12 @@ for (const language of ["ar", "en"] as const) {
       .getByRole("button", { name: language === "ar" ? "مشاركة بطاقة التقدم" : "Share Progress Card", exact: true })
       .click();
     const modal = page.getByTestId("collection-share-modal");
-    const methods = modal.getByRole("group", {
-      name: language === "ar" ? "طريقة المشاركة" : "Sharing method",
-      exact: true,
-    });
-    const image = methods.getByRole("button", { name: language === "ar" ? "صورة" : "Image", exact: true });
-    const text = methods.getByRole("button", { name: language === "ar" ? "نص" : "Text", exact: true });
-    await expect(image).toHaveAttribute("aria-pressed", "true");
-    const widths = await Promise.all(
-      [image, text].map((button) => button.evaluate((node) => node.getBoundingClientRect().width)),
-    );
-    expect(widths[0]).toBeGreaterThan(widths[1]! * 1.5);
+    // The owner-approved single image workflow replaces the Image/Text/Link chooser.
+    await expect(modal.getByRole("group", { name: t(language, "shareStudio.method"), exact: true })).toHaveCount(0);
     await sharingStep(modal, "share");
+    await expect(
+      modal.getByRole("button", { name: t(language, "shareStudio.copyReadingLink"), exact: true }),
+    ).toHaveCount(0);
     const preview = modal.getByTestId("sharing-preview").getByRole("img");
     await expect(preview).toBeVisible();
     await expect(preview).toHaveAttribute("width", "1080");
@@ -62,16 +56,24 @@ for (const language of ["ar", "en"] as const) {
     await page.evaluate(() => {
       document.documentElement.style.fontSize = "200%";
     });
-    for (const button of await methods.getByRole("button").all()) {
+    await expect(modal).toHaveCSS("font-size", "32px");
+    for (const button of await modal.locator(".sharing-caption").getByRole("button").all()) {
       await expect(button).toBeVisible();
       expect(await button.evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(true);
     }
     const actions = modal.getByTestId("sharing-actions");
     for (const button of await actions.getByRole("button").all()) {
       await expect(button).toBeVisible();
-      expect(await button.evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(true);
+      const bounds = await button.evaluate((node) => ({
+        label: node.getAttribute("aria-label") ?? node.textContent,
+        scroll: node.scrollWidth,
+        width: node.clientWidth,
+      }));
+      expect(bounds.scroll <= bounds.width, JSON.stringify(bounds)).toBe(true);
     }
     expect(await modal.evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(true);
+    await actions.scrollIntoViewIfNeeded();
+    await page.screenshot({ path: testInfo.outputPath(`image-first-${language}-200percent.png`) });
   });
 }
 
@@ -103,10 +105,13 @@ for (const language of ["ar", "en"] as const) {
     const before = await page.evaluate(() => JSON.parse(localStorage.getItem("azkarapp.state.v1")!).completed);
     await trigger.click();
     const modal = page.getByTestId("collection-share-modal");
+    // Intrinsic previews may resize the surface; phone navigation stays anchored.
+    await expect.poll(async () => (await modal.boundingBox())?.y).toBe(8);
     await sharingStep(modal, "share");
     const image = modal.getByTestId("sharing-preview").getByRole("img");
     await expect(image).toHaveAttribute("width", "1080");
     await expect(image).toHaveAttribute("height", "1080");
+    expect((await modal.boundingBox())?.y).toBe(8);
     const download = page.waitForEvent("download");
     await modal
       .getByTestId("sharing-actions")

@@ -28,6 +28,19 @@ function goStep(step: "content" | "design" | "share") {
 }
 
 describe("AyahShareStudio", () => {
+  it("skips optional design without regenerating or resetting the selected format", async () => {
+    render(
+      <AyahShareStudio {...props} options={{ format: "square", includeTranslation: false, includeMeanings: false }} />,
+    );
+    await screen.findByRole("img");
+    const calls = generateAyahCards.mock.calls.length;
+    fireEvent.click(screen.getByRole("button", { name: "Skip design" }));
+    await waitFor(() => expect(screen.getByRole("heading", { name: "Share", exact: true })).toHaveFocus());
+    expect(generateAyahCards).toHaveBeenCalledTimes(calls);
+    expect(screen.getByRole("button", { name: "Share card" })).toBeEnabled();
+    goStep("design");
+    expect(screen.getByRole("combobox", { name: "Image size" })).toHaveTextContent("Square");
+  });
   it("regenerates bounded text size and respects the fit preference", async () => {
     render(<AyahShareStudio {...props} />);
     goStep("design");
@@ -80,6 +93,17 @@ describe("AyahShareStudio", () => {
     expect(disconnect).toHaveBeenCalledOnce();
     expect(cancel).toHaveBeenCalled();
   });
+  it("offers an explicit preview expansion without changing the generated card", async () => {
+    render(<AyahShareStudio {...props} />);
+    const image = await screen.findByRole("img");
+    const source = image.getAttribute("src");
+    fireEvent.click(screen.getByRole("button", { name: "Enlarge preview" }));
+    const collapse = screen.getByRole("button", { name: "Reduce preview" });
+    expect(collapse).toHaveAttribute("aria-expanded", "true");
+    expect(image).toHaveAttribute("src", source);
+    fireEvent.click(collapse);
+    expect(screen.getByRole("button", { name: "Enlarge preview" })).toHaveAttribute("aria-expanded", "false");
+  });
   beforeEach(() => {
     vi.clearAllMocks();
     vi.stubGlobal("URL", Object.assign(URL, { revokeObjectURL: vi.fn() }));
@@ -131,7 +155,12 @@ describe("AyahShareStudio", () => {
     expect(shareMultipleFiles).toHaveBeenCalledOnce();
     expect(await screen.findByRole("status")).toHaveTextContent("Sharing cancelled");
     expect(shareMultipleFiles.mock.lastCall![1]).toMatchObject({ downloadFallback: false });
-    expect(shareMultipleFiles.mock.lastCall![1].text).toContain("Saheeh International");
+    expect(shareMultipleFiles.mock.lastCall![1].text).toBeUndefined();
+    await user.click(screen.getByRole("checkbox", { name: "Include text with image" }));
+    const caption = (screen.getByRole("textbox", { name: "Caption preview" }) as HTMLTextAreaElement).value;
+    expect(caption).toContain("Saheeh International");
+    await user.click(screen.getByRole("button", { name: "Share card" }));
+    expect(shareMultipleFiles.mock.lastCall![1].text).toBe(caption);
     await user.click(screen.getByRole("button", { name: "Save this card" }));
     expect(downloadFile).toHaveBeenCalledOnce();
     unmount();
@@ -233,7 +262,7 @@ describe("AyahShareStudio", () => {
     goStep("share");
     await user.click(screen.getByText("Read the card text"));
     await user.click(screen.getByRole("button", { name: "Copy text" }));
-    await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Ayah copied"));
+    await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Reading text copied."));
     expect(await navigator.clipboard.readText()).toContain("Saheeh International");
     await user.click(screen.getByRole("button", { name: "Close" }));
     expect(props.onClose).toHaveBeenCalled();

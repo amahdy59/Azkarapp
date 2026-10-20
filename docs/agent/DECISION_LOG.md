@@ -5035,3 +5035,31 @@ Expose existing source-compared English meanings omitted by the Home/Quran Benef
 The owner's subsequent follow-up prioritizes minimizing scrolling and asks for research-backed input selection. Use compact primary dropdown fields, visible small theme choices and native independent checkboxes in optional disclosures; remove repeated help, oversized theme samples and the separate final review block. Verify measured common-phone bounds as well as enlarged/narrow recovery. Do not claim that removing all scrolling is possible without compromising enlarged text or complete readable content.
 
 The owner supplied an English preview with inward arrows spread across the panel. Keep the card navigation grouped beside its preview, explicitly resolve arrows from the dialog language and verify both pointer and keyboard movement for generated and approved cards. Reserve room so the complete controls remain visible above the footer.
+
+## Sharing geometry and Quran wird adaptation — 2026-10-19
+
+Owner supplies phone screenshots of unnecessary preview whitespace and asks for explicit expand/collapse, modern progress, full-width content/language dropdowns and responsive refinement. Apply intrinsic preview sizing, compact spacing and an accessible native step-progress indicator. Also improve the Quran wird overview on tablets/desktops while preserving its phone layout. The owner asks for a Progress review and good plan for unified date ranges/custom metrics; document that separately for review before the broader implementation. Standing release authority applies to the bounded sharing/wird changes.
+
+Owner correction: combine the duplicate progress bar/count and numbered steps into one connected numbered stepper. Keep editable stages, accessible position labels and aria-current; remove the separate bar/count.
+
+Owner explicitly approves one image-first flow: final-step Include text with image and exact caption preview, secondary Copy text, and Copy reading link only for a meaningful reading/collection. Remove ordinary Text/Link modes. Preserve manual clipboard recovery and text saving; approved artwork captions use existing title/link metadata, never invented transcription.
+
+## Owner publication hold and single-line action follow-up
+
+The owner explicitly requires confirmation before any further push. This supersedes standing release authority for all pending changes: do not push until the owner confirms the concrete reviewed result. Replace the cramped cards-to-share row with one full-width labelled select and give image-copy its own wide footer row on phones; ordinary labels stay one line without truncation or smaller text. Enlarged text retains accessible reflow. Quran wird layout is implemented locally; Progress remains the separate documented proposal only.
+
+## Compact Quran wird planning — 2026-10-19
+
+The owner explicitly approves all recommendations following the six-card screenshot: four Reading plan choices, a subordinate Hijri/Gregorian/custom-duration schedule, selected-only fields/help, searchable Juz/Surah choices, numeric page/day controls, one compact live summary and explicit Save/Cancel. Replace the section-scope button row with a labelled select; retain compact duration shortcuts. Reuse select primitives and preserve canonical plan kinds, adaptive calculations, day boundaries, saved progress, offline behavior and normalization. This supersedes Phase 72 presentation only. No extra wizard, dependency, religious-content or persisted-schema change. Keep all work local under the current publication hold. See phases/WIRD_COMPACT_PLAN_FORM_2026_10_19.md.
+
+## Sharing board adaptation — 2026-10-19
+
+The owner approves the reviewed combination of board 2 desktop proportions and board 1 control grouping: balance settings and actual preview, use container-width reflow and a compact expandable phone preview, keep one stepper and add an explicit optional Design skip that preserves the current choices. Label artwork as supported approved/custom image designs; rename Interactive studio to Custom design to avoid implying a hosted experience. Remove redundant approved-card pagination dots. Show atomic visible copy/download/share-handoff feedback and clear it when moving stages. Source continues to mean reference/citation, distinct from Arabic text, meaning and label language. No new hosted link permissions/expiry, embeds, interactive mode, alternate output style, decorative phone frame or celebration page. Preserve exact images/captions/reading links, all source content and persistence. Latest publication hold remains. See phases/SHARING_BOARD_ADAPTATION_2026_10_19.md.
+
+Owner visual clarification: both supplied boards govern the complete look and feel, including the illustrated choice icons, header, buttons and panels. Apply the existing icon family and theme materials, retaining supported image-first behavior and actual exported images. Illustrate the two artwork choices with document/brush icons and descriptions; keep menu chevrons clear alongside globe/translation icons. Preserve all reading content and explicit publication hold. At enlarged text, keep device-share recovery in the Share settings so the action footer remains reachable.
+
+Owner stepper follow-up: enlarge the 1/2/3 circles to 2rem and color the same connected indicator as stages change. Completed lines fill fully, current outgoing lines fill halfway, upcoming lines remain neutral, and RTL uses the correct fill origin. Keep circle/label/connector clearance derived from one size token, 44px minimum action targets, responsive wrapping, and compact outer padding. Preserve the single indicator and existing focus/state semantics.
+
+## Combined publication authorization — 2026-10-20
+
+The owner's subsequent "push all changes" instruction explicitly confirms publication of all pending changes and supersedes the sharing-board and compact-wird publication holds above. Preserve the separate Progress proposal as documentation only. Verify the pending sharing and Quran planning work, refresh and archive the newest-only bilingual release notes, commit and push to main through the intact hook, then monitor exact-commit Quality, Pages build/deploy and production smoke. Record results in the combined release report; do not infer deployment from a successful push.

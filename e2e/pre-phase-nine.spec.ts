@@ -1,4 +1,4 @@
-import { sharingStep } from "./helpers/sharing";
+import { sharingStep, sharingCaption } from "./helpers/sharing";
 import { expect, test, type Page } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 import benefitsHadithReadings from "../src/app/content/benefitsHadithReadings.json" with { type: "json" };
@@ -160,14 +160,14 @@ test("Library Benefits entry shares complete evidence and attribution through th
   await evidence.getByRole("button", { name: /^Share .+ benefit$/ }).click();
   const studio = page.getByTestId("collection-share-modal");
   await expect(studio).toBeVisible();
-  await studio.getByRole("button", { name: "Text", exact: true }).click();
+  await sharingCaption(studio);
   const payload = await studio.getByRole("textbox").inputValue();
   expect(payload).toContain(body);
   expect(payload).toContain(source);
   expect(payload).toContain("\n");
   await sharingStep(studio, "share");
   const download = page.waitForEvent("download");
-  await studio.getByRole("button", { name: "Save", exact: true }).click();
+  await studio.getByRole("button", { name: "Save text", exact: true }).click();
   const saved = await download;
   expect(saved.suggestedFilename()).toBe("azkar.txt");
   expect(await readFile((await saved.path())!, "utf8")).toBe(payload);
@@ -192,7 +192,7 @@ test("complete Arabic hadith remains readable at 320px and shares its complete s
   await fatimah.getByRole("button").click();
   const studio = page.getByTestId("collection-share-modal");
   await expect(studio).toBeVisible();
-  await studio.getByRole("button", { name: "نص", exact: true }).click();
+  await sharingCaption(studio);
   expect(await studio.getByRole("textbox").inputValue()).toContain(benefitsHadithReadings["h-fatima"].ar);
 });
 

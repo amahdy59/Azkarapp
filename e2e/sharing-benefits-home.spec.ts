@@ -1,4 +1,4 @@
-import { sharingStep } from "./helpers/sharing";
+import { sharingStep, sharingCaption } from "./helpers/sharing";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { readFile } from "node:fs/promises";
@@ -44,9 +44,8 @@ for (const language of ["ar", "en"] as const) {
     const save = modal.getByRole("button", { name: t(language, "shareStudio.save"), exact: true });
     await expect(save).toBeEnabled({ timeout: 60000 });
     await expect(modal.getByRole("alert")).toHaveCount(0);
-    await expect(modal.getByRole("button", { name: t(language, "shareStudio.scopeall"), exact: true })).toHaveAttribute(
-      "aria-pressed",
-      "true",
+    await expect(modal.getByRole("combobox", { name: t(language, "shareStudio.scope"), exact: true })).toContainText(
+      t(language, "shareStudio.scopeall"),
     );
     const draws = await page.evaluate(
       () => (window as unknown as { sharingDraws: { text: string; font: string }[] }).sharingDraws,
@@ -70,7 +69,7 @@ for (const language of ["ar", "en"] as const) {
     await expect
       .poll(() =>
         modal
-          .getByRole("button", { name: t(language, "shareStudio.image"), exact: true })
+          .getByRole("checkbox", { name: t(language, "shareStudio.includeCaption"), exact: true })
           .evaluate((node) => getComputedStyle(node).opacity),
       )
       .toBe("1");
@@ -133,7 +132,7 @@ for (const language of ["ar", "en"] as const) {
     const modal = page.getByTestId("collection-share-modal");
     await sharingStep(modal, "share");
     await expect(modal.getByRole("img").first()).toBeVisible();
-    await modal.getByRole("button", { name: t(language, "shareStudio.text"), exact: true }).click();
+    await sharingCaption(modal);
     const clean = (text: string) =>
       text
         .replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069]/gu, "")

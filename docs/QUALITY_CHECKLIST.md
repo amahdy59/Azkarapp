@@ -1,5 +1,7 @@
 # Engineering and release checklist
 
+Sharing footer text enlargement: after applying 200% text, verify the actual computed font and strict per-button overflow bounds in all engines. Copy image retains its wider column span; resetting its placement can strand it in the 44px back-button track in Firefox during font-relative container reflow. Keep ordinary phone labels and the existing enlarged-text viewport/action bounds intact.
+
 CI browser scheduling uses nine Linux jobs with the complete existing inventory; each installs only its required browser engines. `pnpm test:e2e:inventory` rejects missing, extra or duplicate cases before publishing the matrix. `Quality / verify` requires the quality job, every browser job and every mergeable report; Pages still requires its successful exact-current-main workflow. Feature selection and the local smoke do not replace this full CI gate. Avoid another full local run merely to repeat an unchanged successful CI commit. See `docs/agent/TEST_STRATEGY.md` for focused development and scheduling-only validation.
 
 ## Reading reliability follow-up
@@ -154,3 +156,23 @@ Follow [docs/ANDROID.md](ANDROID.md). Require Android compilation, lint and nati
 Sharing arrow acceptance checks the actual rendered SVG tip direction and button positions in both languages, generated and approved artwork. Require complete visible 44px controls, nearby card/counter grouping, correct boundary disabling, pointer Previous/Next and keyboard ArrowLeft/ArrowRight/Home/End on the active collection.
 
 Regenerate while viewing a later card: publish only the first replacement page, assert the prior selected image and count remain visible, and verify navigation/Save stay disabled. Resolve a shorter replacement sequence and verify the new first card becomes available.
+
+Sharing action reflow is checked at 200% text size in Firefox as well as Chromium/WebKit, including Progress-card sharing. Preserve strict scrollWidth <= clientWidth assertions for every action, and capture the enlarged footer. Wird evidence tests enter Design/Content/Share through the actual step navigation while retaining every export, source, text/link and return-focus assertion.
+
+Sharing follow-up acceptance: assert connected step progress, full-width phone fields, image/frame geometry in expanded and collapsed states at 320/390/834/1280px, outward card arrows, live generation retention and keyboard focus. Quran-wird responsive cases verify phone stacking, tablet/desktop columns, compact week history and 320px/200% text without horizontal clipping. Retain browser-engine and export assertions.
+
+Caption acceptance: compare the exact shown caption with intercepted native file-share data, default attribution-only sharing, selected-card changes, full text copying/saving and exact reading-link copying. Generic home/progress URLs must not gain a reading-link action. Test missing/denied clipboard focus/selection recovery, image-state preservation, approved-artwork metadata, offline source/translation exports, RTL/LTR and narrow/enlarged layout. Native receiving-app caption handling still requires physical-device acceptance.
+
+At normal text sizes, measure actual text-line rectangles for the scope dropdown and export labels at 320/390/834/1280px in both languages. Preserve 200% text recovery separately. Owner confirmation is required before publishing the current local sharing/wird refinement.
+
+## Compact Quran wird form acceptance — 2026-10-19
+
+Verify four top-level choices and the three schedule kinds, all six saved plan types, exact custom/repeating ranges, unchanged reading position/history, draft-only changes and Cancel. Check visible labels/hints, selected-state cues, keyboard choice/Escape/Enter submission, focus return and minimum 44px targets. Capture Arabic/English 320/390/834/1280px and 200% text, including the Juz selector and custom fields; no horizontal overflow or clipped labels. Run QuranWirdScreen/quranWirdGoal/state/i18n units, quran-wird-plan-form and existing khatmah-reader planning regressions plus responsive overview checks, full pnpm check and Pages build. Native receiving-app sharing and the separate Progress redesign remain outside this form change.
+
+## Sharing board adaptation acceptance — 2026-10-19
+
+Measure balanced settings/preview columns and Arabic/English placement at 834/1280px; verify intrinsic real-image bounds, nearby outward arrows and container reflow at 320/390px and 200% text. Skip design must preserve format/content/current image, focus Share and remain disabled during an operation. Keep exact caption/native/download/link assertions, clear stage-local status, verify visible precise feedback and actual retry/manual-copy recovery. Retain the default 390px scroll bounds and full-width phone fields. Check both generated/approved cards and the Ayah studio, selected states, keyboard/focus/Escape, axe and existing source-integrity rules.
+
+For the board-inspired sharing finish, compare the actual browser capture with both supplied boards at matching dialog widths, including focused crops of the header, illustrated choices, menus, selection marks and footer. Verify decorative icon semantics, descriptive choice names, keyboard activation, rectangular buttons, preview panel padding, two-column additions, light/dark themes and full-width phone fields. Keep unchanged 200% footer bounds and 390px default no-scroll assertions; use actual computed grid geometry rather than the former inline column implementation. Capture and inspect console errors with the test-only visitor endpoint explicitly fulfilled. Record the final comparison in project-root design-qa.md.
+
+For the larger sharing stepper, assert at least 32px circles, at least 5px label clearance, positive connector width centered on each circle, neutral/primary distinction and the exact completed/current/upcoming fill in RTL/LTR. Wait for the browser style frame through ordinary retrying assertions, never a fixed delay. Include collection and Ayah studios at 200% text; retain unchanged no-scroll and header/footer bounds.

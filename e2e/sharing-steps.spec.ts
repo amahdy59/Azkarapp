@@ -108,6 +108,7 @@ for (const language of ["ar", "en"] as const) {
           body: JSON.stringify(bounds),
           contentType: "application/json",
         });
+        await page.screenshot({ path: testInfo.outputPath(`sharing-${language}-${viewport.width}-${step}.png`) });
         expect(bounds.scrollWidth).toBeLessThanOrEqual(bounds.width + 1);
         if (viewport.width === 390)
           expect(bounds.scroll - bounds.height, `${step} on ${viewport.width}px`).toBeLessThanOrEqual(1);

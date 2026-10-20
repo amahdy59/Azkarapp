@@ -398,3 +398,9 @@ describe("complete share layouts", () => {
     expect(text).toContain("#/azkar/morning/1");
   });
 });
+
+it("includes an identical reading/source link only once in complete share text", () => {
+  const url = "https://quran.com/2/255";
+  const value = getShareText([{ id: "verse", arabicText: "نص", readingUrl: url }], "en", {}, "Reading", url);
+  expect(value.split(url)).toHaveLength(2);
+});

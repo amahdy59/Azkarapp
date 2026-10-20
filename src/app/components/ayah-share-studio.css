@@ -1,4 +1,5 @@
 .ayah-share-studio {
+  container: ayah-sharing / inline-size;
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -39,10 +40,6 @@
 .ayah-share-header > button:last-of-type {
   grid-column: 3;
   grid-row: 1;
-}
-.ayah-share-header p {
-  grid-column: 1 / -1;
-  font-size: 0.75rem;
 }
 .ayah-share-body {
   flex: 1;
@@ -89,7 +86,10 @@
 .ayah-share-preview img,
 .ayah-share-placeholder {
   display: block;
-  width: 100%;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  margin-inline: auto;
   max-height: 20dvh;
   object-fit: contain;
   border-radius: var(--ds-radius-control);
@@ -137,15 +137,25 @@
   max-width: 100%;
   overflow-wrap: anywhere;
 }
-.ayah-share-header p {
-  overflow-wrap: anywhere;
-}
-@media (min-width: 768px) {
+@container ayah-sharing (min-width: 44rem) {
   .ayah-share-body {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    grid-template-areas: "settings preview";
     align-items: start;
   }
-  .ayah-share-preview img {
-    max-height: 45dvh;
+  .ayah-share-settings {
+    grid-area: settings;
   }
+  .ayah-share-preview {
+    grid-area: preview;
+    border-inline-start: 1px solid var(--border);
+    padding-inline-start: 1rem;
+  }
+  .ayah-share-preview img {
+    max-height: min(52dvh, 480px);
+  }
+}
+
+.ayah-share-preview[data-inspect] img {
+  max-height: 60dvh;
 }

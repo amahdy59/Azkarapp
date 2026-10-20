@@ -1,4 +1,4 @@
-import { sharingStep } from "./helpers/sharing";
+import { expectSharingStepGeometry, sharingStep } from "./helpers/sharing";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { t } from "../src/app/i18n";
@@ -35,6 +35,7 @@ for (const language of ["ar", "en"] as const) {
     await expect(studio.getByRole("heading", { name: t(language, "reader.ayahCardTitle"), exact: true })).toBeFocused();
     const preview = studio.getByRole("img");
     await expect(preview).toBeVisible();
+    await expectSharingStepGeometry(studio);
     await expect(preview).toBeInViewport();
     await expect(studio.locator(".ayah-share-footer")).toBeInViewport();
     const initialSave = studio.getByRole("button", { name: t(language, "reader.ayahCardDownload"), exact: true });
@@ -120,6 +121,7 @@ for (const language of ["ar", "en"] as const) {
       await expect(option.getByTestId("share-format-platforms").locator(":scope > span")).toHaveCount(2);
       await option.click();
       await sharingStep(studio, "share");
+      await expectSharingStepGeometry(studio);
       const save = studio.getByRole("button", { name: t(language, "reader.ayahCardDownload"), exact: true });
       await expect(save).toBeEnabled();
       await expect(preview).toHaveAttribute(
@@ -202,8 +204,22 @@ for (const language of ["ar", "en"] as const) {
       ).toBeInViewport();
       await sharingStep(studio, "share");
       const enlargedSave = studio.getByRole("button", { name: t(language, "reader.ayahCardDownload"), exact: true });
+      await expect(enlargedSave).toBeEnabled();
       await enlargedSave.focus();
       await expect(enlargedSave).toBeInViewport();
+      await testInfo.attach(`enlarged-header-${theme}.json`, {
+        body: JSON.stringify(
+          await studio.locator(".ayah-share-header").evaluate((node) =>
+            [...node.querySelectorAll("h2, p, nav, ol, nav button")].map((child) => ({
+              tag: child.tagName,
+              text: child.textContent,
+              height: child.getBoundingClientRect().height,
+              width: child.getBoundingClientRect().width,
+            })),
+          ),
+        ),
+        contentType: "application/json",
+      });
       expect((await studio.locator(".ayah-share-header").boundingBox())!.height).toBeLessThan(280);
       const geometry = await studio.evaluate((element) => ({
         fits: element.scrollWidth <= element.clientWidth + 1,
