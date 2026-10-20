@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { chooseProgressOption } from "./helpers/progress";
 
 async function enterEnglishGuestMode(page: import("@playwright/test").Page) {
   await page.goto("/");
@@ -213,8 +214,9 @@ test("Progress tabs expose a logical level-two heading in every view", async ({ 
   await enterEnglishGuestMode(page);
   await page.getByTestId("nav-progress").click();
 
-  for (const tabName of ["Day", "Week", "Month", "Year"] as const) {
-    await page.getByRole("tab", { name: tabName, exact: true }).click();
+  const period = page.getByRole("combobox", { name: "Period", exact: true });
+  for (const value of ["day", "week", "month", "year"] as const) {
+    await chooseProgressOption(period, value);
     await expect(page.getByTestId("progress-primary-heading")).toHaveRole("heading", { level: 2 });
   }
 });

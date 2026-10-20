@@ -75,6 +75,7 @@ for (const language of ["ar", "en"] as const) {
     expect(url).toMatch(/#\/azkar\/morning/u);
     await link.click();
     await expect.poll(async () => (await copies())[1]).toBe(url);
+    await modal.getByTestId("sharing-preview").scrollIntoViewIfNeeded();
     await expect(modal.getByTestId("sharing-preview").getByRole("img")).toBeInViewport({ ratio: 1 });
     expect(
       (await new AxeBuilder({ page }).include('[data-testid="collection-share-modal"]').analyze()).violations,

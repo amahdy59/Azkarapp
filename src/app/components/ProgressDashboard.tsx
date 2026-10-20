@@ -120,7 +120,7 @@ export function ProgressDashboard({
     <div className="progress-dashboard space-y-5" data-testid="progress-dashboard">
       <section aria-labelledby={`${id}-overview`}>
         <div className="flex flex-wrap items-start justify-between gap-2">
-          <h2 id={`${id}-overview`} className="min-w-0 flex-1 text-lg font-bold">
+          <h2 id={`${id}-overview`} data-testid="progress-primary-heading" className="min-w-0 flex-1 text-lg font-bold">
             {text(language, "overview")}
           </h2>
           <button
@@ -227,6 +227,7 @@ export function ProgressDashboard({
             <div
               key={key}
               className="min-w-0 rounded-xl border border-border bg-card p-3 sm:p-4"
+              data-material-card
               data-testid={`progress-metric-${key}`}
             >
               <dt className="text-xs font-semibold leading-relaxed text-muted-foreground">{text(language, key)}</dt>
@@ -257,6 +258,7 @@ export function ProgressDashboard({
       <section
         className="progress-trend-card rounded-2xl border border-border bg-card p-4 sm:p-5"
         aria-labelledby={`${id}-trend`}
+        data-material-card
       >
         <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
           <h2 id={`${id}-trend`} className="text-lg font-bold">

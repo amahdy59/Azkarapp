@@ -8,6 +8,7 @@
  */
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Locator, type Page } from "@playwright/test";
+import { chooseProgressOption } from "./helpers/progress";
 
 type Settings = Record<string, unknown>;
 
@@ -197,11 +198,11 @@ for (const viewport of VIEWPORTS.filter((item) => item.width <= 412)) {
       `${viewport.name} page title`,
     );
 
-    const tabs = page.getByRole("tab");
-    for (let index = 0; index < 4; index += 1) {
-      await tabs.nth(index).click();
+    const period = page.getByRole("combobox", { name: "Period", exact: true });
+    for (const [index, value] of (["day", "week", "month", "year"] as const).entries()) {
+      await chooseProgressOption(period, value);
       const heading = page.getByTestId("progress-primary-heading");
-      const context = `${viewport.name} Progress tab ${index + 1}`;
+      const context = `${viewport.name} Progress period ${value}`;
       if (index < 2) await expectSingleLineHeading(heading, context);
       else await expectUnclippedHeading(heading, context, 2);
     }
@@ -213,11 +214,11 @@ test("mobile headings: OnePlus Nord 4 keeps Arabic Progress titles readable with
   await seedAndOpen(page, { language: "ar" });
   await page.getByTestId("nav-progress").click();
 
-  const tabs = page.getByRole("tab");
-  for (let index = 0; index < 4; index += 1) {
-    await tabs.nth(index).click();
+  const period = page.getByRole("combobox", { name: "الفترة", exact: true });
+  for (const [index, value] of (["day", "week", "month", "year"] as const).entries()) {
+    await chooseProgressOption(period, value);
     const heading = page.getByTestId("progress-primary-heading");
-    const context = `OnePlus Nord 4 Arabic Progress tab ${index + 1}`;
+    const context = `OnePlus Nord 4 Arabic Progress period ${value}`;
     if (index < 2) await expectSingleLineHeading(heading, context);
     else await expectUnclippedHeading(heading, context, 2);
   }

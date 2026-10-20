@@ -90,6 +90,7 @@ for (const language of ["ar", "en"] as const) {
       await page.screenshot({ path: testInfo.outputPath(`wird-evidence-${language}.png`) });
       if (section === "quran") {
         await page.goto("/#/progress");
+        await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
         await page.getByTestId("oasis-stage-card").locator("summary").click();
         await expect(page.getByRole("heading", { name: t(language, "garden.explanationLabel") })).toBeVisible();
       }

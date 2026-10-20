@@ -233,7 +233,7 @@ export function AccessibleCombobox({
                     setActiveIndex(-1);
                     searchInputRef.current?.focus();
                   }}
-                  className="absolute inset-y-0 end-0 flex w-11 items-center justify-center rounded-xl text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                  className="absolute inset-y-0 end-0 flex h-11 w-11 min-h-11 min-w-11 items-center justify-center rounded-xl text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                   aria-label={t(language, "common.clear")}
                 >
                   <X size={14} aria-hidden="true" />

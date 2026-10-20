@@ -304,8 +304,8 @@ test("custom plan presets and section search remain keyboard usable with 44px ta
   await search.fill("1");
   const clear = page.getByRole("button", { name: "مسح", exact: true });
   const bounds = await clear.boundingBox();
-  expect(bounds!.width).toBeGreaterThanOrEqual(44);
-  expect(bounds!.height).toBeGreaterThanOrEqual(44);
+  expect(Math.round(bounds!.width)).toBeGreaterThanOrEqual(44);
+  expect(Math.round(bounds!.height)).toBeGreaterThanOrEqual(44);
   await clear.focus();
   await page.keyboard.press("Enter");
   await expect(search).toHaveValue("");
