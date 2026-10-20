@@ -47,6 +47,9 @@ for (const language of ["ar", "en"] as const) {
         if (width === 1440)
           await expect(page.locator(".app-sidebar")).toHaveCSS("backdrop-filter", "blur(32px) saturate(1.35)");
         if (flow === "utilities") {
+          const filters = page.getByTestId("library-filter-disclosure");
+          if (!(await filters.evaluate((node) => (node as HTMLDetailsElement).open)))
+            await filters.locator("summary").click();
           await page.getByRole("textbox").fill(language === "ar" ? "اغفر" : "forgive");
           const result = page.getByTestId("matching-zikr-card").first();
           await expect(result).toHaveCSS("backdrop-filter", filter);

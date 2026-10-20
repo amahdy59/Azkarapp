@@ -138,6 +138,7 @@ test("Arabic large text keeps Progress controls and month details usable at comp
   await page.getByTestId("progress-detailed-context").locator(":scope > summary").click();
 
   const period = page.getByRole("combobox", { name: "الفترة", exact: true, includeHidden: true });
+  await page.getByTestId("progress-range-disclosure").locator("summary").click();
   await period.click();
   const options = page.getByRole("option");
   await expect(options).toHaveCount(5);

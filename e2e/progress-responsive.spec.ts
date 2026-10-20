@@ -72,6 +72,7 @@ test("longer Progress periods compare five prayers with exact data available as 
 
   await expect(page.getByTestId("prayer-comparison").getByRole("list").getByRole("img")).toHaveCount(5);
   await expect(page.getByRole("table")).toHaveCount(0);
+  await page.getByTestId("progress-range-disclosure").locator("summary").click();
   await expect(page.getByRole("combobox")).toHaveCount(6);
   const download = page.getByTestId("prayer-comparison").getByRole("button", { name: "تصدير الصلاة" });
   await download.focus();

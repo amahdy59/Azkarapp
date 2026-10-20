@@ -9,6 +9,7 @@ export async function expectProgressFilterFocus(control: Locator) {
 }
 
 export async function chooseProgressOption(control: Locator, value: string) {
+  await control.waitFor({ state: "attached" });
   const disclosure = control.page().getByTestId("progress-range-disclosure");
   if (!(await control.isVisible()) && (await disclosure.count())) await disclosure.locator("summary").click();
   const id = await control.getAttribute("id");

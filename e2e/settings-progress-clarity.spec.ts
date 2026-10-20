@@ -60,6 +60,9 @@ for (const language of ["ar", "en"] as const) {
       );
       const chart = page.getByTestId("today-garden-card");
       await expect(chart).toBeVisible();
+      const rangeFilters = page.getByTestId("progress-range-disclosure");
+      if (!(await rangeFilters.evaluate((node) => (node as HTMLDetailsElement).open)))
+        await rangeFilters.locator("summary").click();
       await expect(page.getByRole("combobox")).toHaveCount(6);
       const exportButton = chart.getByRole("button", {
         name: ar ? "تصدير الأوراد" : "Azkar JSON",

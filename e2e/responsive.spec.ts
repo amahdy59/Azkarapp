@@ -414,6 +414,7 @@ test("the Library displays unified section tabs beside the heading across mobile
   await expect(collectionsTab).toBeVisible();
   await expect(savedTab).toBeVisible();
 
+  await page.getByTestId("library-filter-disclosure").locator("summary").click();
   const allPill = page.getByRole("button", { name: "All", exact: true });
   await expect(allPill).toBeVisible();
   await expect(page.getByRole("button", { name: "Daily Azkar", exact: true })).toBeVisible();
@@ -495,8 +496,8 @@ for (const language of ["ar", "en"] as const) {
           expect(Math.abs(iconBox.y + iconBox.height / 2 - buttonBox.y - buttonBox.height / 2)).toBeLessThan(1);
         }
         expect(tabsBox.width).toBeLessThanOrEqual(scale === "100%" ? 110 : 200);
-        const formBox = await page.locator("header form").boundingBox();
-        expect(formBox!.y - (tabsBox.y + tabsBox.height)).toBeCloseTo(scale === "100%" ? 8 : 16, 0);
+        const filtersBox = await page.getByTestId("library-filter-disclosure").boundingBox();
+        expect(filtersBox!.y - (tabsBox.y + tabsBox.height)).toBeCloseTo(scale === "100%" ? 8 : 16, 0);
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       }
     }

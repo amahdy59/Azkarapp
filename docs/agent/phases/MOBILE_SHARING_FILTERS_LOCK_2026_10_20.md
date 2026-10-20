@@ -28,6 +28,14 @@ Browser automation does not establish physical-device touch, TalkBack/VoiceOver 
 - Screenshots and failure traces: output/playwright/mobile-refinements and output/playwright/mobile-refinements-corrected. Corrected machine-readable report: output/mobile-refinements-corrected-browser.json. Wider integration evidence is saved separately under output/playwright/mobile-refinements-integration.
 - Final release report, exact gate/CI results and production smoke evidence are retained in output/mobile-sharing-filters-lock-release-2026-10-20. The full report follows the repository PHASE_REPORT template. Publication is complete only after exact-commit Quality, Pages build/deploy and production checks succeed.
 
+## Responsive CI fixture follow-up
+
+The first published candidate cf87c598 passed CI quality and Android but its phone/tablet shard exposed nine outdated fixture expectations: the hidden range fields were counted before expansion, Library filters were assumed always open, and the title spacing check still measured the hidden search form. An immediate isVisible check also raced tablet route loading. Keep the six-control inventory assertion and original spacing/target/tab assertions; open disclosures explicitly, measure the visible filter boundary and await the mounted input before interaction. The correction changes tests and this report only. All 15 affected cases then passed locally across desktop, phone and tablet Chromium in 54.5 seconds. Existing assertions, inventory, timeouts and coverage remain intact; the full exact-commit CI gate is still required.
+
+The desktop CI partition also identified the same visible-control inventory expectation in optional patterns/clarity fixtures and a search geometry fixture that resized from wide to compact without reopening search. These fixtures now explicitly expose the controls before asserting their unchanged inventory/bounds. No runtime change or fresh user-visible release note is needed for this tests/documentation-only remediation.
+
+The remaining inspected partition logs identified equivalent legacy entry points in completion sharing, Glass search and large-text period selection. Completion now asserts the owner-approved zero-inset full-screen bounds while retaining its unchanged-progress/PNG/focus/axe checks; search and period fixtures explicitly open the native disclosure. Corrected local evidence totals 68 passing cases: 15 desktop/phone/tablet responsive cases (54.5s), 31 optional-pattern/clarity cases across three engines (4.4m), and 22 completion/search/Glass/large-text cases (2.8m). Reports use the mobile-refinements-*-remediation names under output. No test, assertion, timeout, coverage threshold or inventory entry was removed.
+
 ## Recommended follow-up
 
 Physical phone safe-area, touch, screen-reader and device-pinning acceptance. Keep those separate from automated browser evidence.

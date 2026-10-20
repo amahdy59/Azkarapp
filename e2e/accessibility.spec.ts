@@ -190,7 +190,8 @@ test("search results expose concise accessible names", async ({ page }) => {
   await enterEnglishGuestMode(page);
   await page.getByTestId("nav-azkar").click();
   const searchInput = page.getByRole("textbox", { name: "Search azkar and duas" });
-  if (!(await searchInput.isVisible())) await page.getByTestId("library-filter-disclosure").locator("summary").click();
+  const filters = page.getByTestId("library-filter-disclosure");
+  if (!(await filters.evaluate((node) => (node as HTMLDetailsElement).open))) await filters.locator("summary").click();
   await searchInput.fill("sleep");
   await searchInput.press("Enter");
 

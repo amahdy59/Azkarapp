@@ -105,13 +105,14 @@ for (const language of ["ar", "en"] as const) {
     const before = await page.evaluate(() => JSON.parse(localStorage.getItem("azkarapp.state.v1")!).completed);
     await trigger.click();
     const modal = page.getByTestId("collection-share-modal");
-    // Intrinsic previews may resize the surface; phone navigation stays anchored.
-    await expect.poll(async () => (await modal.boundingBox())?.y).toBe(8);
+    // Phone sharing fills the viewport while the artwork retains intrinsic size.
+    await expect.poll(async () => (await modal.boundingBox())?.y).toBe(0);
+    expect((await modal.boundingBox())!.height).toBeCloseTo(844, 1);
     await sharingStep(modal, "share");
     const image = modal.getByTestId("sharing-preview").getByRole("img");
     await expect(image).toHaveAttribute("width", "1080");
     await expect(image).toHaveAttribute("height", "1080");
-    expect((await modal.boundingBox())?.y).toBe(8);
+    expect((await modal.boundingBox())?.y).toBe(0);
     const download = page.waitForEvent("download");
     await modal
       .getByTestId("sharing-actions")

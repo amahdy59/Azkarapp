@@ -78,6 +78,9 @@ for (const language of ["ar", "en"] as const) {
     );
     await expect(prayerTimeline.getByTestId("timeline-readout")).toContainText(ar ? "١٠٠٪" : "100%");
     await expect(page.getByRole("table")).toHaveCount(0);
+    const rangeFilters = page.getByTestId("progress-range-disclosure");
+    if (!(await rangeFilters.evaluate((node) => (node as HTMLDetailsElement).open)))
+      await rangeFilters.locator("summary").click();
     await expect(page.getByRole("combobox")).toHaveCount(6);
     await expect(page.getByTestId("prayer-coverage-hint")).toContainText(ar ? "١٧" : "17 complete days");
     await expect(prayers.getByTestId("insight-fajr").getByRole("img")).toHaveAccessibleName(

@@ -86,6 +86,7 @@ test("search keeps the same inventory, edited query and saved routine preference
   await page.setViewportSize({ width: 390, height: 844 });
   await returningGuest(page, "en");
   await page.goto("/#/azkar");
+  await page.getByTestId("library-filter-disclosure").locator("summary").click();
   const input = page.getByRole("textbox");
   await input.fill("steadfast");
   await expect(page.getByTestId("matching-zikr-card")).toHaveCount(3);
