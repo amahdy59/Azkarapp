@@ -2,25 +2,30 @@ import { expect, test, type Locator } from "@playwright/test";
 import { t } from "../src/app/i18n";
 import { sharingStep } from "./helpers/sharing";
 
-async function arrowGeometry(button: Locator) {
-  return button.evaluate((node) => {
-    const path = node.querySelector("path")!;
-    const svg = node.querySelector("svg")!;
-    const start = path.getPointAtLength(0).matrixTransform(path.getScreenCTM()!);
-    const tip = path.getPointAtLength(path.getTotalLength() / 2).matrixTransform(path.getScreenCTM()!);
-    return {
-      x: node.getBoundingClientRect().x,
-      pointsRight: tip.x > start.x,
-      width: node.getBoundingClientRect().width,
-      height: node.getBoundingClientRect().height,
-      transform: getComputedStyle(svg).transform,
-    };
-  });
-}
-
 async function outwardPair(previous: Locator, next: Locator, language: "en" | "ar") {
-  const before = await arrowGeometry(previous);
-  const after = await arrowGeometry(next);
+  const nextLabel = await next.getAttribute("aria-label");
+  // A responsive dialog can reflow between browser round trips after resize.
+  // Compare both siblings in one layout, retaining the physical SVG checks.
+  const { before, after } = await previous.evaluate((node, label) => {
+    const nextButton = Array.from(node.parentElement!.querySelectorAll("button")).find(
+      (button) => button.getAttribute("aria-label") === label,
+    )!;
+    const geometry = (button: Element) => {
+      const path = button.querySelector("path")!;
+      const svg = button.querySelector("svg")!;
+      const start = path.getPointAtLength(0).matrixTransform(path.getScreenCTM()!);
+      const tip = path.getPointAtLength(path.getTotalLength() / 2).matrixTransform(path.getScreenCTM()!);
+      const bounds = button.getBoundingClientRect();
+      return {
+        x: bounds.x,
+        pointsRight: tip.x > start.x,
+        width: bounds.width,
+        height: bounds.height,
+        transform: getComputedStyle(svg).transform,
+      };
+    };
+    return { before: geometry(node), after: geometry(nextButton) };
+  }, nextLabel);
   expect(before.pointsRight).toBe(language === "ar");
   expect(after.pointsRight).toBe(language === "en");
   expect(before.x < after.x).toBe(language === "en");
