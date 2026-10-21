@@ -1,15 +1,15 @@
 {
-  "release": "2026-10-21.2",
+  "release": "2026-10-21.3",
   "ar": [
-    "اقرأ أوقات الصلاة بحجم أكبر داخل البطاقات الحالية، مع بقاء البطاقات المطوية بحجمها المعتاد.",
-    "تابع الوقت المتبقي للصلاة بأرقام أوضح وحلقة أنقى تمتلئ تدريجيًا مع اقتراب موعدها.",
-    "استمتع باستجابة أوضح لأزرار المشاركة والتحديث وأدوات الرئيسية، مع بديل هادئ عند تفعيل تقليل الحركة.",
-    "ميّز الصلاة الحالية بمؤشر «الآن» بلون أزرار التطبيق ولمعة هادئة، مع الحفاظ على وضوحه في أوضاع تسهيل الاستخدام."
+    "شاهد أوقات الصلاة بأرقام أكبر داخل البطاقات نفسها، مع الحفاظ على حجم العرض المطوي ومسافات واضحة حول النص.",
+    "اقرأ العدّ التنازلي بسهولة أكبر، مع حلقة بسيطة تزداد امتلاءً كلما اقترب موعد الصلاة.",
+    "تفاعل مع أدوات الرئيسية والمشاركة والتحديث باستجابة أوضح، أو اختر تقليل الحركة لعرض أهدأ.",
+    "تعرّف إلى الصلاة الحالية من مؤشر «الآن» المتناسق مع لون الزر الرئيسي، بلمعة خفيفة وبدائل واضحة لتسهيل الاستخدام."
   ],
   "en": [
-    "Read larger prayer times within the existing cards, while collapsed cards keep their familiar size.",
-    "Follow the remaining prayer time with clearer digits and a cleaner ring that fills as prayer time approaches.",
-    "Get clearer feedback from Home sharing, refresh and everyday actions, with a calmer alternative when Reduce Motion is enabled.",
-    "Spot the current prayer with a Now indicator that matches the app's buttons and adds a soft gloss, with clear accessibility alternatives."
+    "See larger prayer times in the same cards, with familiar collapsed sizing and clear space around the text.",
+    "Read the countdown more easily, with a simple ring that fills as the next prayer gets closer.",
+    "Enjoy clearer feedback from Home tools, sharing and refresh, or choose Reduce Motion for a calmer view.",
+    "Recognize the current prayer with a Now pill that matches the main button, with a soft gloss and clear accessibility alternatives."
   ]
 }

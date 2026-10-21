@@ -17,6 +17,8 @@ This request supersedes the historical requirement for identical expanded/collap
 
 ## Verification report
 
+Exact-commit CI exposed a narrow-icon top inset below the historical 10px floor and an older gap probe that treated the transparent time line as visible text. Preserve the inset floor by using a 30px expanded narrow icon with 3px lift (28px condensed), restoring the original icon dimensions in the enlarged-text fallback. Measure the existing 10px desktop column gap from the name column, and add direct digit/icon/name/footer clearance checks instead of treating the expanded line's unused negative-margin area as ink. Retain every existing inset, card-size, footer, focus and enlarged-text threshold. Re-run the affected hierarchy and transition tests across engines before the full gates and remediation release.
+
 Additional owner steering requests gloss on the gold “Now” pill to match the other indicators. Add a static top highlight over the opaque gold base with no layout change or animation. Verify flat high-contrast/forced-color alternatives and an opaque ground under reduced transparency alongside the bilingual geometry and motion cases.
 
 WebKit diagnostics exposed stale inherited expansion values in descendant relative-font calculations after live viewport changes. Use explicit digit font/clearance endpoints with the same 220ms standard curve as the existing inherited shell transition; retain one external geometry owner and native CSS reversal. Add separate viewport cases and a live-resize regression, preserving every fit/footprint assertion and existing timeouts. The isolated before/after diagnostic is retained alongside the phase evidence.

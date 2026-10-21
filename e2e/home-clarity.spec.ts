@@ -105,6 +105,7 @@ for (const language of ["ar", "en"] as const) {
           const bounds = card.getBoundingClientRect();
           const name = card.querySelector("h3")!.getBoundingClientRect();
           const time = card.querySelector('[id^="prayer-summary-time"]')!.getBoundingClientRect();
+          const digits = card.querySelector("[data-prayer-time-digits]")!.getBoundingClientRect();
           const icon = card.querySelector("[data-prayer-icon]")!.getBoundingClientRect();
           const style = getComputedStyle(card);
           const padding = getComputedStyle(card.querySelector("button")!);
@@ -129,7 +130,12 @@ for (const language of ["ar", "en"] as const) {
             visibleTopInset: icon.top - bounds.top,
             visibleIdentityInset: bounds.right - identity.right,
             visibleTimeInset: bounds.right - time.right,
-            actualColumnGap: time.left - icon.right,
+            // The expanded line reaches below the icon; its empty flex space
+            // is not ink. Preserve the name-column gap and check actual digits.
+            actualColumnGap: name.left - icon.right,
+            timeClearsIcon: digits.left >= icon.right || digits.right <= icon.left || digits.top >= icon.bottom,
+            timeClearsName: digits.top >= name.bottom,
+            timeClearsFooter: digits.bottom <= footer.top,
             width: bounds.width,
             footerTop: footer.top,
             footerHeight: footer.height,
@@ -138,6 +144,10 @@ for (const language of ["ar", "en"] as const) {
       });
       expect(
         geometry.every((card) => card.aligned && card.iconAbove && card.bounded),
+        JSON.stringify(geometry),
+      ).toBe(true);
+      expect(
+        geometry.every((card) => card.timeClearsIcon && card.timeClearsName && card.timeClearsFooter),
         JSON.stringify(geometry),
       ).toBe(true);
       expect(geometry.every((card) => card.height <= 156)).toBe(true);
@@ -226,6 +236,18 @@ for (const language of ["ar", "en"] as const) {
       await page.locator("html").evaluate((node) => {
         node.style.fontSize = "32px";
       });
+      // Container queries can expose the enlarged grid before descendant
+      // typography/margins settle. Verify actual resized type and card fit.
+      await expect
+        .poll(() =>
+          row.locator("article").evaluateAll((nodes) =>
+            nodes.every((card) => {
+              const time = card.querySelector('[id^="prayer-summary-time"]')!;
+              return parseFloat(getComputedStyle(time).fontSize) >= 32 && card.scrollWidth <= card.clientWidth + 1;
+            }),
+          ),
+        )
+        .toBe(true);
       // Firefox delivers the footer's ResizeObserver after the font-size
       // mutation. Assert the settled shared geometry, not its intervening frame.
       await expect

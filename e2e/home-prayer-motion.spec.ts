@@ -43,8 +43,19 @@ for (const [language, width] of [
         path: `output/playwright/glass-refinement/home-motion/${testInfo.project.name}/${language}-${width}-${state}.png`,
         scale: "css",
       });
-    const expanded = (await card.boundingBox())!.height;
     const digits = card.locator("[data-prayer-time-digits]");
+    await expect
+      .poll(() =>
+        digits.evaluate((node) =>
+          Number(
+            (
+              parseFloat(getComputedStyle(node).fontSize) / parseFloat(getComputedStyle(node.parentElement!).fontSize)
+            ).toFixed(2),
+          ),
+        ),
+      )
+      .toBe(1.4);
+    const expanded = (await card.boundingBox())!.height;
     const expandedFont = await digits.evaluate((node) => parseFloat(getComputedStyle(node).fontSize));
     const expandedSticky = (await sticky.boundingBox())!.height;
     await capture("expanded");
@@ -102,6 +113,15 @@ for (const [language, width] of [
       for (const animation of node.getAnimations({ subtree: true })) animation.finish();
     });
     await expect(sticky).toHaveCSS("--home-prayer-expansion", "0");
+    await expect
+      .poll(() =>
+        digits.evaluate((node) =>
+          Math.abs(
+            parseFloat(getComputedStyle(node).fontSize) - parseFloat(getComputedStyle(node.parentElement!).fontSize),
+          ),
+        ),
+      )
+      .toBeLessThan(0.01);
     const compact = (await card.boundingBox())!.height;
     const compactFont = await digits.evaluate((node) => parseFloat(getComputedStyle(node).fontSize));
     expect(middleFont).toBeGreaterThan(compactFont);

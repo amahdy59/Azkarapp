@@ -616,7 +616,9 @@
     --prayer-time-drop: 0.5rem;
   }
   .home-prayer-identity > [data-prayer-icon] {
-    translate: 0 -0.375rem;
+    width: calc(1.75rem + 0.125rem * var(--home-prayer-expansion, 1));
+    height: calc(1.75rem + 0.125rem * var(--home-prayer-expansion, 1));
+    translate: 0 -0.1875rem;
     transition: translate var(--motion-duration-standard) var(--motion-ease-standard);
   }
 }
@@ -683,6 +685,7 @@
   }
   .home-prayer-identity > [data-prayer-icon] {
     grid-row: 1;
+    width: min(100%, calc(1.75rem + 0.25rem * var(--home-prayer-expansion, 1)));
     height: calc(1.75rem + 0.25rem * var(--home-prayer-expansion, 1));
     translate: none;
   }
