@@ -1,5 +1,11 @@
 # Prayer times, location, timezone, and DST
 
+## Larger expanded Home times — 2026-10-21
+
+Owner follow-ups: the Now pill shares the routine CTA's semantic primary/foreground colors with a static gloss. Remaining-time digits increase from 14px to 15px in the footer and from 12px to 13px in the condensed copy, with the same 18px compact line footprint. The ring becomes a clean, thicker arc without clock hands and retains clockwise elapsed-interval fill: empty at the interval start and full when the next prayer is due. This is decorative redundancy for the exact numeric countdown, not a new timer or completion signal.
+
+The owner approves 40% larger time digits inside the existing expanded Home summary dimensions. Period labels stay small; collapsed digits retain their previous size. Explicit glyph endpoints follow the same 220ms standard curve as the inherited card/footer/countdown transition, avoiding WebKit's stale inherited relative-font calculation after live resizing. Calculation, timing, emphasis, tracking, scroll thresholds and timers stay unchanged. At enlarged text in narrow cards, retain the existing natural full-row reflow instead of forcing extra enlargement. Both motion preferences cancel the transition immediately. Verify digit/icon/name/footer separation, equal card dimensions and bilingual fit in addition to timing-domain tests.
+
 ## Next-prayer seconds and interval ring — 2026-10-20, local only
 
 The owner's subsequent approved WebKit restoration repair distinguishes native horizontal-list focus from an active prayer button. Closing details reconciles current scroll without moving focus; real keyboard focus on a prayer button still holds card geometry until it leaves. Horizontal browsing alone cannot leave closed cards stuck condensed at the top. Existing 96px/8px hysteresis, accessible region focusability and native horizontal scrolling remain.

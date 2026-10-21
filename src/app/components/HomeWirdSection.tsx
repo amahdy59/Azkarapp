@@ -85,7 +85,7 @@ export function HomeWirdSection({
             onClick={onOpenWirdBenefits}
             className="flex min-h-11 items-center gap-2 rounded-xl px-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           >
-            <Info size={20} aria-hidden="true" />
+            <Info size={20} className="control-cue" aria-hidden="true" />
             {t(language, "wirdBenefits.openCta")}
           </button>
         )}
@@ -162,7 +162,7 @@ export function HomeWirdSection({
             >
               <Icon
                 size={28}
-                className={onGlass || showImages ? "text-on-media-accent" : "text-primary"}
+                className={`control-cue ${onGlass || showImages ? "text-on-media-accent" : "text-primary"}`}
                 aria-hidden="true"
               />
               <span className="flex w-full min-w-0 items-center justify-between gap-2">
@@ -171,7 +171,7 @@ export function HomeWirdSection({
                   <span className="text-sm text-muted-foreground">{status}</span>
                 </span>
                 <span className="flex shrink-0 items-center gap-2" aria-hidden="true">
-                  <ChevronNext size={18} data-rtl-flip />
+                  <ChevronNext size={18} className="control-cue" data-rtl-flip />
                 </span>
               </span>
             </div>

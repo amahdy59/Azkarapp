@@ -1,13 +1,15 @@
 {
-  "release": "2026-10-21.1",
+  "release": "2026-10-21.2",
   "ar": [
-    "تظهر أزرار المسبحة والصلاة على النبي بانتظام، مع إخفاء نص الفائدة عند اختيار الأيقونات فقط.",
-    "اقرأ معاينات أطول للأذكار داخل القائمة، مع ترتيب أوضح للأعداد المحفوظة وبقاء النص الكامل متاحًا.",
-    "استخدم قوائم الاختيار وأزرار العد مع النص المكبّر، دون تداخل الحقول أو فقدان الوصول إلى أدوات أسفل الصفحة."
+    "اقرأ أوقات الصلاة بحجم أكبر داخل البطاقات الحالية، مع بقاء البطاقات المطوية بحجمها المعتاد.",
+    "تابع الوقت المتبقي للصلاة بأرقام أوضح وحلقة أنقى تمتلئ تدريجيًا مع اقتراب موعدها.",
+    "استمتع باستجابة أوضح لأزرار المشاركة والتحديث وأدوات الرئيسية، مع بديل هادئ عند تفعيل تقليل الحركة.",
+    "ميّز الصلاة الحالية بمؤشر «الآن» بلون أزرار التطبيق ولمعة هادئة، مع الحفاظ على وضوحه في أوضاع تسهيل الاستخدام."
   ],
   "en": [
-    "Masbaha and Salawat tools now match consistently, with the Benefit label hidden when you choose icons only.",
-    "Read longer dhikr previews in the picker, with clearer saved counts and the complete text still available.",
-    "Use pickers and counting controls with enlarged text, without overlapping fields or losing access to footer actions."
+    "Read larger prayer times within the existing cards, while collapsed cards keep their familiar size.",
+    "Follow the remaining prayer time with clearer digits and a cleaner ring that fills as prayer time approaches.",
+    "Get clearer feedback from Home sharing, refresh and everyday actions, with a calmer alternative when Reduce Motion is enabled.",
+    "Spot the current prayer with a Now indicator that matches the app's buttons and adds a soft gloss, with clear accessibility alternatives."
   ]
 }

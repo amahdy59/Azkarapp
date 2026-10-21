@@ -28,4 +28,11 @@ describe("absolute prayer countdown", () => {
     expect(prayerCountdownReading(interval, interval.endsAt - 146_380, "en").text).toBe("00:02:27");
     expect(prayerCountdownReading(interval, interval.endsAt - 145_380, "en").text).toBe("00:02:26");
   });
+  it("fills the interval from empty to full as the next prayer approaches", () => {
+    const duration = interval.endsAt - interval.startsAt;
+    const stages = [0, 0.25, 0.5, 0.75, 1].map(
+      (fraction) => prayerCountdownReading(interval, interval.startsAt + duration * fraction, "en").elapsedPercent,
+    );
+    expect(stages).toEqual([0, 25, 50, 75, 100]);
+  });
 });

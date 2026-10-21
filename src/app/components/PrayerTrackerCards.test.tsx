@@ -77,6 +77,9 @@ describe("PrayerTrackerCards", () => {
         />,
       );
       const card = screen.getByTestId("prayer-card-asr");
+      const time = card.querySelector('[id="prayer-summary-time-asr"]');
+      expect(time?.querySelector("[data-prayer-time-digits]")).toHaveTextContent(language === "ar" ? "٤:٣١" : "4:31");
+      expect(time).toHaveTextContent(language === "ar" ? "٤:٣١ م" : "4:31 PM");
       expect(card.querySelectorAll("[data-prayer-countdown]")).toHaveLength(2);
       expect(vi.getTimerCount()).toBe(1);
       expect(card.querySelector("[data-prayer-compact-countdown]")).toHaveAttribute("aria-hidden", "true");

@@ -320,11 +320,11 @@ function PrayerCard({
             >
               {periodStart > 0 ? (
                 <>
-                  {timeLabel.slice(0, periodStart)}{" "}
+                  <span data-prayer-time-digits>{timeLabel.slice(0, periodStart)}</span>{" "}
                   <span className="text-xs font-semibold">{timeLabel.slice(periodStart + 1)}</span>
                 </>
               ) : (
-                timeLabel
+                <span data-prayer-time-digits>{timeLabel}</span>
               )}
             </p>
           </div>

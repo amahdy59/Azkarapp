@@ -169,7 +169,21 @@ describe("HomeCards", () => {
 
     const refreshBtn = screen.getByTestId("daily-evidence-refresh");
     expect(refreshBtn).toHaveAttribute("aria-label", "عرض تذكير آخر");
+    expect(refreshBtn).toHaveClass("ui-icon-button");
+    const originalIcon = refreshBtn.querySelector("svg");
+    expect(originalIcon).not.toHaveClass("home-refresh-feedback");
+    refreshBtn.focus();
     fireEvent.click(refreshBtn);
     expect(onRefresh).toHaveBeenCalledTimes(1);
+    expect(refreshBtn).toHaveFocus();
+    expect(refreshBtn.querySelector("svg")).toHaveClass("home-refresh-feedback");
+    expect(refreshBtn.querySelector("svg")).not.toBe(originalIcon);
+    const firstRefreshIcon = refreshBtn.querySelector("svg");
+    fireEvent.click(refreshBtn);
+    expect(onRefresh).toHaveBeenCalledTimes(2);
+    expect(refreshBtn.querySelector("svg")).not.toBe(firstRefreshIcon);
+    expect(refreshBtn).toHaveFocus();
+    expect(screen.getByTestId("daily-evidence-share")).toHaveAttribute("aria-haspopup", "dialog");
+    expect(screen.getByTestId("daily-evidence-share")).toHaveAttribute("aria-expanded", "false");
   });
 });

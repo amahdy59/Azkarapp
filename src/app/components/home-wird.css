@@ -21,9 +21,25 @@
 .home-prayer-sticky[data-home-motion="reduced"] {
   transition: none;
 }
+/* WebKit can cache inherited registered values across size containers when
+   motion is off. Apply the same static endpoint directly in this still path. */
+.reduce-motion .home-prayer-sticky *,
+.home-prayer-sticky[data-home-motion="reduced"] * {
+  --home-prayer-expansion: 1;
+}
+.reduce-motion .home-prayer-sticky[data-prayer-cards-condensed] *,
+.home-prayer-sticky[data-home-motion="reduced"][data-prayer-cards-condensed] * {
+  --home-prayer-expansion: 0;
+}
 @media (prefers-reduced-motion: reduce) {
   .home-prayer-sticky {
     transition: none;
+  }
+  .home-prayer-sticky * {
+    --home-prayer-expansion: 1;
+  }
+  .home-prayer-sticky[data-prayer-cards-condensed] * {
+    --home-prayer-expansion: 0;
   }
 }
 .home-photo-canvas .hero-glass.home-glass-surface {
@@ -266,6 +282,76 @@
   background-color: rgb(2 6 23 / 0.2);
 }
 
+/* Local feedback uses the shared press response without moving card content. */
+.home-icon-action {
+  position: relative;
+}
+.home-icon-action::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: inherit;
+  background: currentColor;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--motion-duration-fast) var(--motion-ease-standard);
+}
+.home-icon-action:enabled:focus-visible::before {
+  opacity: 0.1;
+}
+.home-action-cue {
+  transition:
+    scale var(--motion-duration-fast) var(--motion-ease-standard),
+    translate var(--motion-duration-fast) var(--motion-ease-standard);
+}
+.home-icon-action:enabled:focus-visible .home-action-cue {
+  translate: 0 var(--home-action-lift, -2px);
+}
+.home-photo-canvas :is(a, summary):focus-visible .control-cue {
+  scale: var(--control-cue-scale, 1.08);
+}
+@media (hover: hover) and (pointer: fine) {
+  .home-icon-action:enabled:hover::before {
+    opacity: 0.1;
+  }
+  .home-icon-action:enabled:hover .home-action-cue {
+    translate: 0 var(--home-action-lift, -2px);
+  }
+  .home-photo-canvas :is(a, summary):hover .control-cue {
+    scale: var(--control-cue-scale, 1.08);
+  }
+}
+.home-icon-action:enabled:is(:active, [data-key-pressed])::before {
+  opacity: 0.18;
+}
+.home-refresh-feedback {
+  animation: home-refresh-confirm var(--motion-duration-standard) var(--motion-ease-standard);
+}
+@keyframes home-refresh-confirm {
+  from {
+    transform: rotate(-180deg);
+    opacity: 0.5;
+  }
+  to {
+    transform: rotate(0);
+    opacity: 1;
+  }
+}
+.reduce-motion .home-photo-canvas {
+  --home-action-lift: 0px;
+}
+.reduce-motion .home-refresh-feedback {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-photo-canvas {
+    --home-action-lift: 0px;
+  }
+  .home-refresh-feedback {
+    animation: none;
+  }
+}
+
 .home-prayer-summary-card {
   container-type: inline-size;
   align-self: stretch;
@@ -330,12 +416,15 @@
   inset: 0;
   z-index: 1;
   border-radius: inherit;
+  transition: background-color var(--motion-duration-fast) var(--motion-ease-standard);
 }
 .home-prayer-summary-button:enabled::after {
   cursor: pointer;
 }
-.home-prayer-summary-button:enabled:hover::after {
-  background: rgb(255 255 255 / 0.025);
+@media (hover: hover) and (pointer: fine) {
+  .home-prayer-summary-button:enabled:hover::after {
+    background: rgb(255 255 255 / 0.025);
+  }
 }
 .home-prayer-summary-button:enabled:active::after {
   background: rgb(255 255 255 / 0.08);
@@ -484,11 +573,55 @@
   grid-row: 3;
 }
 .home-prayer-timing > p {
+  --prayer-time-size: clamp(1rem, 12cqi, 1.75rem);
   grid-row: 2;
-  font-size: clamp(1rem, 12cqi, 1.75rem);
-  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.25rem;
+  /* Keep the original line's footprint. Only the actual digits grow into
+     available space; the inherited handoff also restores the compact type. */
+  height: calc(var(--prayer-time-size) * 1.2);
+  max-width: none;
+  margin-left: calc(-2.375rem * var(--home-prayer-expansion, 1));
+  font-size: var(--prayer-time-size);
+  line-height: 1;
+  direction: ltr;
   white-space: nowrap;
   text-align: right;
+}
+.home-prayer-timing > p > span {
+  translate: 0 var(--prayer-time-drop, 0.25rem);
+  transition: translate var(--motion-duration-standard) var(--motion-ease-standard);
+}
+.home-prayer-timing [data-prayer-time-digits] {
+  font-size: calc(var(--prayer-time-size) * 1.4);
+  /* Explicit endpoints avoid WebKit retaining an inherited em calculation
+     after a viewport change. The fixed line keeps the card footprint stable. */
+  transition:
+    font-size var(--motion-duration-standard) var(--motion-ease-standard),
+    translate var(--motion-duration-standard) var(--motion-ease-standard);
+}
+.home-prayer-sticky[data-prayer-cards-condensed] .home-prayer-timing > p > span {
+  translate: 0 0;
+}
+.home-prayer-sticky[data-prayer-cards-condensed] [data-prayer-time-digits] {
+  font-size: var(--prayer-time-size);
+}
+.home-prayer-sticky[data-home-motion="reduced"] [data-prayer-time-digits] {
+  transition: none;
+}
+@container (max-width: 9rem) {
+  .home-prayer-timing > p {
+    --prayer-time-drop: 0.5rem;
+  }
+  .home-prayer-identity > [data-prayer-icon] {
+    translate: 0 -0.375rem;
+    transition: translate var(--motion-duration-standard) var(--motion-ease-standard);
+  }
+}
+.home-prayer-sticky[data-prayer-cards-condensed] [data-prayer-icon] {
+  translate: 0 0;
 }
 .home-prayer-timing > [data-prayer-state-label] {
   position: absolute;
@@ -522,6 +655,9 @@
   border-radius: 999px;
   background: linear-gradient(180deg, rgb(255 255 255 / 0.12), rgb(2 6 23 / 0.14));
 }
+.home-prayer-status-pill .prayer-countdown-digits {
+  font-size: 0.9375rem;
+}
 @container (max-width: 9rem) {
   .home-prayer-status-pill > svg {
     display: none;
@@ -532,11 +668,23 @@
 @container (max-width: 7rem) {
   .home-prayer-timing > p {
     grid-column: 1 / -1;
+    display: block;
+    height: auto;
+    margin-left: 0;
+    translate: none;
+    line-height: 1.2;
     white-space: normal;
+  }
+  .home-prayer-timing [data-prayer-time-digits] {
+    font-size: 1em;
+  }
+  .home-prayer-timing > p > span {
+    translate: none;
   }
   .home-prayer-identity > [data-prayer-icon] {
     grid-row: 1;
     height: calc(1.75rem + 0.25rem * var(--home-prayer-expansion, 1));
+    translate: none;
   }
 }
 .home-prayer-now-dot {
@@ -546,12 +694,22 @@
   background: currentColor;
 }
 .home-prayer-summary-card[data-prayer-state="current"] .home-prayer-status-pill {
-  color: #0a1228;
-  background: #f4c54b;
-  border-color: #fff0bd;
+  color: var(--primary-foreground);
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.18), transparent 52%, rgb(2 6 23 / 0.05)) var(--primary);
+  border-color: color-mix(in srgb, var(--primary) 80%, var(--primary-foreground));
   box-shadow:
-    0 0 16px rgb(244 197 75 / 0.2),
-    inset 0 1px 0 rgb(255 255 255 / 0.5);
+    0 0 16px color-mix(in srgb, var(--primary) 20%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 0.3);
+}
+.high-contrast .home-prayer-summary-card[data-prayer-state="current"] .home-prayer-status-pill {
+  background-image: none;
+  box-shadow: none;
+}
+@media (forced-colors: active) {
+  .home-prayer-summary-card[data-prayer-state="current"] .home-prayer-status-pill {
+    background-image: none;
+    box-shadow: none;
+  }
 }
 .home-prayer-summary-card.hero-glass {
   border-radius: 1.5rem;
@@ -681,8 +839,8 @@ html.reduce-transparency .home-photo-canvas:not(.home-force-glass) .home-prayer-
   inset-inline: 0.75rem;
   bottom: 0.5rem;
   text-align: right;
-  font-size: 0.75rem;
-  line-height: 1.5;
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
   opacity: 0;
   transition: opacity 60ms linear;
 }

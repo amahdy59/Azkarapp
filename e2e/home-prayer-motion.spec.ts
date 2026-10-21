@@ -44,6 +44,8 @@ for (const [language, width] of [
         scale: "css",
       });
     const expanded = (await card.boundingBox())!.height;
+    const digits = card.locator("[data-prayer-time-digits]");
+    const expandedFont = await digits.evaluate((node) => parseFloat(getComputedStyle(node).fontSize));
     const expandedSticky = (await sticky.boundingBox())!.height;
     await capture("expanded");
     const paused = await sticky.evaluate(
@@ -62,6 +64,11 @@ for (const [language, width] of [
               animation.pause();
               animation.currentTime = 0;
             }
+            for (const font of node.getAnimations({ subtree: true }))
+              if (font instanceof CSSTransition && ["font-size", "translate"].includes(font.transitionProperty)) {
+                font.pause();
+                font.currentTime = 0;
+              }
             resolve(Boolean(animation));
           });
           observer.observe(node, { attributes: true, attributeFilter: ["data-prayer-cards-condensed"] });
@@ -75,11 +82,16 @@ for (const [language, width] of [
     // At time zero the actual card shape is still expanded: no hidden-footer snap.
     expect((await card.boundingBox())!.height).toBeCloseTo(expanded, 0);
     await sticky.evaluate((node) => {
-      for (const animation of node.getAnimations())
-        if (animation instanceof CSSTransition && animation.transitionProperty === "--home-prayer-expansion")
+      for (const animation of node.getAnimations({ subtree: true }))
+        if (
+          animation instanceof CSSTransition &&
+          ["--home-prayer-expansion", "font-size", "translate"].includes(animation.transitionProperty)
+        )
           animation.currentTime = 100;
     });
     const middle = (await card.boundingBox())!.height;
+    const middleFont = await digits.evaluate((node) => parseFloat(getComputedStyle(node).fontSize));
+    expect(middleFont).toBeLessThan(expandedFont);
     expect(middle).toBeLessThan(expanded - 2);
     await capture("middle");
     // The new countdown arrives during the final 60ms, finishing with the
@@ -87,10 +99,14 @@ for (const [language, width] of [
     await expect(sticky.locator("[data-prayer-compact-countdown]")).toHaveCSS("transition-delay", "0.16s");
     await expect(sticky.locator("[data-prayer-footer]").first()).toHaveCSS("transition-delay", "0s");
     await sticky.evaluate((node) => {
-      for (const animation of node.getAnimations()) animation.finish();
+      for (const animation of node.getAnimations({ subtree: true })) animation.finish();
     });
     await expect(sticky).toHaveCSS("--home-prayer-expansion", "0");
     const compact = (await card.boundingBox())!.height;
+    const compactFont = await digits.evaluate((node) => parseFloat(getComputedStyle(node).fontSize));
+    expect(middleFont).toBeGreaterThan(compactFont);
+    expect(expandedFont / compactFont).toBeCloseTo(1.4, 1);
+    await expect(digits).toHaveCSS("transform", "none");
     expect(middle).toBeGreaterThan(compact + 2);
     expect(compact).toBeLessThan(expanded - 20);
     expect((await sticky.boundingBox())!.height).toBeLessThan(expandedSticky - 35);

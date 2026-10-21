@@ -1,5 +1,7 @@
 # Azkarapp
 
+Home prayer times are larger inside the same expanded cards and return to their original size when collapsed. Share, Refresh, routine/Wird and shortcut actions have consistent keyboard/pointer feedback, with immediate still alternatives under Reduce Motion.
+
 Mushaf colour swipes can be switched off in Reading Settings; the device remembers the choice. Progress keeps the chosen date first, with secondary calendar settings and a clearer exact-records surface.
 
 Mushaf reading tools hide/show with one centre tap; tap the same highlighted word or its explanation to close it. Vertical swipes move forwards/backwards through Mushaf-only page colours, with visible choices and Follow app available in Reading options. Progress separates Overview, Trends and Records while retaining one selected date range; tap a summary card to inspect its trend.

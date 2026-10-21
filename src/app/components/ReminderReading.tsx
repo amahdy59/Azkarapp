@@ -102,7 +102,11 @@ export function ReminderReading({
             }}
           >
             {reminderText(language, expanded ? "home.collapseEvidence" : "home.expandEvidence")}
-            <ChevronDown size={16} aria-hidden="true" className={expanded ? "rotate-180" : undefined} />
+            <ChevronDown
+              size={16}
+              aria-hidden="true"
+              className={`transition-transform duration-fast ease-standard ${expanded ? "rotate-180" : ""}`}
+            />
           </button>
         )}
       </div>
@@ -124,7 +128,11 @@ export function ReminderReading({
           className={`flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-lg px-1 text-label font-semibold [&::-webkit-details-marker]:hidden ${accent} ${focus}`}
         >
           {reminderText(language, "home.evidenceMeaning")}
-          <ChevronDown size={18} aria-hidden="true" className="shrink-0 group-open:rotate-180" />
+          <ChevronDown
+            size={18}
+            aria-hidden="true"
+            className="shrink-0 transition-transform duration-fast ease-standard group-open:rotate-180"
+          />
         </summary>
         <div className="pt-2">
           <p className={`text-label leading-relaxed ${secondary}`} dir="auto">

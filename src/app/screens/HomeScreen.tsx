@@ -660,12 +660,12 @@ export function HomeScreen({
                   className="home-header-path-button pointer-events-auto flex min-h-11 items-center gap-1.5 rounded-xl px-2.5 text-sm font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring min-[600px]:hidden"
                 >
                   <span className="flex items-center gap-1" aria-hidden="true">
-                    <PalmTreeMark size={20} strokeWidth={3} />
+                    <PalmTreeMark size={20} className="control-cue" strokeWidth={3} />
                     <bdi>{formatNumerals(gardenSummary.lifetimePalms, language)}</bdi>
                   </span>
                   <span className="home-header-path-divider" aria-hidden="true" />
                   <span className="flex items-center gap-1" aria-hidden="true">
-                    <Zap size={18} />
+                    <Zap size={18} className="control-cue" />
                     <bdi>{formatNumerals(gardenSummary.currentUsageStreak ?? 0, language)}</bdi>
                   </span>
                 </button>
@@ -680,12 +680,12 @@ export function HomeScreen({
                     {t(language, "dailyPath.title")}
                   </span>
                   <span className="flex items-center gap-1" aria-hidden="true">
-                    <PalmTreeMark size={20} strokeWidth={3} />
+                    <PalmTreeMark size={20} className="control-cue" strokeWidth={3} />
                     <bdi>{formatNumerals(gardenSummary.lifetimePalms, language)}</bdi>
                   </span>
                   <span className="home-header-path-divider" aria-hidden="true" />
                   <span className="flex items-center gap-1" aria-hidden="true">
-                    <Zap size={18} />
+                    <Zap size={18} className="control-cue" />
                     <bdi>{formatNumerals(gardenSummary.currentUsageStreak ?? 0, language)}</bdi>
                   </span>
                 </button>

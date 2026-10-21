@@ -26,6 +26,7 @@ for (const language of ["ar", "en"] as const) {
       const card = page.locator('[data-density="summary"][data-prayer-state="next"]');
       const digits = card.locator("[data-prayer-footer] .prayer-countdown-digits");
       const arc = card.locator("[data-prayer-footer] .prayer-countdown-arc");
+      await expect(digits).toHaveCSS("font-size", "15px");
       await expect(digits).toHaveText(language === "ar" ? /^[٠-٩]{2}:[٠-٩]{2}:[٠-٩]{2}$/ : /^\d{2}:\d{2}:\d{2}$/);
       await expect(arc).toHaveCSS("transition-duration", "0.22s");
       await expect(card.locator("[data-prayer-footer] .prayer-countdown-seconds")).toHaveCSS(
@@ -78,6 +79,10 @@ for (const language of ["ar", "en"] as const) {
       });
       await expect(sticky).toHaveAttribute("data-prayer-cards-condensed", "true");
       await expect(card.locator("[data-prayer-compact-countdown]")).toHaveCSS("opacity", "1");
+      await expect(card.locator("[data-prayer-compact-countdown] .prayer-countdown-digits")).toHaveCSS(
+        "font-size",
+        "13px",
+      );
       await assertFit();
       await page.evaluate(() => {
         document.documentElement.style.fontSize = "200%";

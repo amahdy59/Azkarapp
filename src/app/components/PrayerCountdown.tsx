@@ -29,7 +29,7 @@ export function PrayerCountdown({
       )}
       <span className="prayer-countdown-visual" aria-hidden="true">
         <svg className="prayer-countdown-ring" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
-          <circle className="prayer-countdown-track" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+          <circle className="prayer-countdown-track" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
           <circle
             key={interval.endsAt}
             className="prayer-countdown-arc"
@@ -37,19 +37,12 @@ export function PrayerCountdown({
             cy="12"
             r="10"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="3"
             strokeLinecap="round"
             pathLength="100"
             strokeDasharray="100"
             strokeDashoffset={100 - reading.elapsedPercent}
             transform="rotate(-90 12 12)"
-          />
-          <path
-            d="M12 6.5V12L15.5 14"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
           />
         </svg>
         {before && <span className="prayer-countdown-word">{before}</span>}

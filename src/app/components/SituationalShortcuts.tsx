@@ -83,7 +83,7 @@ export function SituationalShortcuts({
                 onOpen(id);
               }}
             >
-              <Icon size={20} className="shrink-0" aria-hidden="true" />
+              <Icon size={20} className="control-cue shrink-0" aria-hidden="true" />
               <span className="min-w-0">{t(language, SHORTCUT_LABELS[id])}</span>
             </a>
           );

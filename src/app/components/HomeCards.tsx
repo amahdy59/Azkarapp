@@ -224,9 +224,9 @@ export function PrayerRoutineCard({
                 onPointerDown={quickShare.prepare}
                 onFocus={quickShare.prepare}
                 onClick={quickShare.share}
-                className={`inline-flex min-h-[52px] w-[52px] shrink-0 items-center justify-center rounded-2xl border border-current/30 ${onGlass ? "bg-on-media-surface/40 text-on-media-accent hover:bg-on-media-surface/60" : "bg-card text-foreground hover:bg-muted"} focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50`}
+                className={`home-icon-action inline-flex min-h-[52px] w-[52px] shrink-0 items-center justify-center rounded-2xl border border-current/30 ${onGlass ? "bg-on-media-surface/40 text-on-media-accent hover:bg-on-media-surface/60" : "bg-card text-foreground hover:bg-muted"} focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50`}
               >
-                <Share2 size={20} aria-hidden="true" />
+                <Share2 size={20} className="control-cue home-action-cue" aria-hidden="true" />
               </button>
             </div>
           )}
@@ -544,6 +544,7 @@ function DailyEvidenceCardContent({
   const [readingEvidence, setReadingEvidence] = useState<DailyEvidence | null>(null);
   const [focusedEvidence, setFocusedEvidence] = useState<DailyEvidence | null>(null);
   const [sharingEvidence, setSharingEvidence] = useState<DailyEvidence | null>(null);
+  const [refreshSequence, setRefreshSequence] = useState(0);
   const evidence = sharingEvidence ?? readingEvidence ?? focusedEvidence ?? incomingEvidence;
   return (
     <HomeCard
@@ -590,9 +591,11 @@ function DailyEvidenceCardContent({
             aria-label={reminderText(language, "home.shareEvidence")}
             title={reminderText(language, "home.shareEvidence")}
             data-testid="daily-evidence-share"
-            className={`ui-icon-button -my-1.5 flex size-11 shrink-0 items-center justify-center rounded-full transition-colors hover:opacity-80 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring motion-reduce:transition-none ${onGlass ? "text-on-media-accent hover:text-on-media" : "text-primary hover:text-foreground"}`}
+            aria-haspopup="dialog"
+            aria-expanded={Boolean(sharingEvidence)}
+            className={`home-icon-action ui-icon-button -my-1.5 flex size-11 shrink-0 items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring motion-reduce:transition-none ${onGlass ? "text-on-media-accent hover:text-on-media" : "text-primary hover:text-foreground"}`}
           >
-            <Share2 size={16} aria-hidden="true" />
+            <Share2 size={16} className="control-cue home-action-cue" aria-hidden="true" />
           </button>
           {onRefresh && (
             <button
@@ -601,15 +604,21 @@ function DailyEvidenceCardContent({
                 setReadingEvidence(null);
                 setFocusedEvidence(null);
                 onRefresh();
+                setRefreshSequence((sequence) => sequence + 1);
               }}
               aria-label={reminderText(language, "home.nextDailyEvidence")}
               title={reminderText(language, "home.nextDailyEvidence")}
               data-testid="daily-evidence-refresh"
-              className={`-my-1.5 -me-1.5 flex size-11 shrink-0 items-center justify-center rounded-full transition-transform hover:opacity-80 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring motion-reduce:transition-none ${
+              className={`home-icon-action ui-icon-button -my-1.5 -me-1.5 flex size-11 shrink-0 items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring motion-reduce:transition-none ${
                 onGlass ? "text-on-media-muted hover:text-on-media" : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              <RefreshCw size={16} aria-hidden="true" />
+              <RefreshCw
+                key={refreshSequence}
+                size={16}
+                className={`control-cue ${refreshSequence > 0 ? "home-refresh-feedback" : ""}`}
+                aria-hidden="true"
+              />
             </button>
           )}
         </div>

@@ -1,4 +1,6 @@
-[Motion and control polish](phases/MOTION_CONTROL_POLISH_2026_10_20.md) records the owner's local-only audit, keyboard/pointer cancellation, shared still-aware icon cues, native range engagement and further purposeful-motion recommendations. Preserve concurrent work; no commit, push or deployment.
+[Larger Home prayer times and action feedback](phases/HOME_PRAYER_TIME_AND_ACTIONS_2026_10_21.md) is the active owner-approved phase: enlarge expanded digits within the existing card dimensions, preserve collapsed typography and coordinated motion, and refine Home Share/Refresh and common action cues. Preserve unrelated work and complete the repository's release gates.
+
+[Motion and control polish](phases/MOTION_CONTROL_POLISH_2026_10_20.md) records the earlier motion foundation, keyboard/pointer cancellation, shared still-aware icon cues and native range engagement. Its prior publication hold was superseded by the final Progress/Mushaf release decision; retain its motion and cancellation contracts.
 
 [Mushaf interactions and focused Progress](phases/MUSHAF_INTERACTIONS_PROGRESS_TABS_2026_10_20.md) is the active owner-approved continuation: apply all six screenshot-review recommendations, preserving the verified mobile-sharing release and complete release gates. Fix tap ownership/meaning dismissal, reversible Mushaf colours, critical loading, task-based sheets, clearer filter disclosures and Overview/Trends/Records navigation.
 
