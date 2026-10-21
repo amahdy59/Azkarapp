@@ -1,15 +1,13 @@
 {
-  "release": "2026-10-21",
+  "release": "2026-10-21.1",
   "ar": [
-    "أظهر أدوات المصحف بضغطة واحدة وأغلق شرح الكلمة بلمسه أو بلمس الكلمة، مع أسهم رجوع تتجه نحو حافة الشاشة.",
-    "اختر ألوان المصحف أو تنقّل بينها بالسحب لأعلى ولأسفل، مع إمكانية إيقاف الإيماءة ودليل موجز في إعدادات القراءة.",
-    "اقرأ الصفحة دون انتظار شروح الكلمات، مع تحميل الخطوط والصفحات معًا وانتقال سلس يحافظ على ثبات الأدوات.",
-    "استخدم تاريخًا موحدًا لأقسام التقدم مع سجل أوضح وقوائم تناسب النص المكبّر، وتحكّم بالأزرار ولوحة المفاتيح بثبات أكبر."
+    "تظهر أزرار المسبحة والصلاة على النبي بانتظام، مع إخفاء نص الفائدة عند اختيار الأيقونات فقط.",
+    "اقرأ معاينات أطول للأذكار داخل القائمة، مع ترتيب أوضح للأعداد المحفوظة وبقاء النص الكامل متاحًا.",
+    "استخدم قوائم الاختيار وأزرار العد مع النص المكبّر، دون تداخل الحقول أو فقدان الوصول إلى أدوات أسفل الصفحة."
   ],
   "en": [
-    "Reveal Mushaf tools with one tap and dismiss meanings by tapping them or the same word, with Back arrows pointing towards the screen edge.",
-    "Choose Mushaf colours or swipe up and down between them, with an optional gesture switch and a short guide in Reading Settings.",
-    "Read without waiting for word meanings, with fonts and pages loading together and smooth page turns that keep tools stationary.",
-    "Use one date scope across Progress, with clearer records, menus that fit enlarged text, and more reliable button and keyboard feedback."
+    "Masbaha and Salawat tools now match consistently, with the Benefit label hidden when you choose icons only.",
+    "Read longer dhikr previews in the picker, with clearer saved counts and the complete text still available.",
+    "Use pickers and counting controls with enlarged text, without overlapping fields or losing access to footer actions."
   ]
 }

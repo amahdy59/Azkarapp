@@ -3,6 +3,7 @@ import type { AppLanguage } from "../types";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { ChevronDown } from "./icons";
+import "./devotional-picker.css";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -49,9 +50,11 @@ export function AuthenticZikrPicker({
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
+          tabIndex={0}
           align="start"
           collisionPadding={16}
-          className="w-[calc(100vw-2rem)] max-w-sm sm:w-96 max-h-[70vh] overflow-y-auto"
+          className="w-[calc(100vw-2rem)] max-w-sm sm:w-96 overflow-y-auto"
+          style={{ maxHeight: "min(70dvh, var(--radix-dropdown-menu-content-available-height))" }}
         >
           <DropdownMenuLabel className="px-3 py-2 text-xs font-black text-muted-foreground">
             {t(language, "counter.chooseDhikr")}
@@ -66,8 +69,9 @@ export function AuthenticZikrPicker({
             }}
           >
             {items.map((item) => {
-              const label = isArabic ? item.shortNameAr : item.shortNameEn;
+              const shortLabel = isArabic ? item.shortNameAr : item.shortNameEn;
               const fullText = isArabic ? item.textAr : item.textEn;
+              const label = /(?:\.{3}|…)$/u.test(shortLabel) ? fullText : shortLabel;
               const saved = savedItems?.[item.id];
               const hasProgress = Boolean(saved && saved.count > 0);
 
@@ -75,14 +79,22 @@ export function AuthenticZikrPicker({
                 <DropdownMenuRadioItem
                   key={item.id}
                   value={item.id}
-                  className="font-bold min-w-0 cursor-pointer py-2"
+                  className="devotional-picker-option font-bold min-w-0 cursor-pointer"
                   title={fullText}
                   data-testid={`zikr-option-${item.id}`}
                 >
-                  <span className="flex flex-col min-w-0 flex-1 py-0.5">
-                    <span className="min-w-0 font-bold leading-[1.7] break-words text-start text-sm">{label}</span>
+                  <span className="devotional-picker-choice">
+                    <span
+                      className="devotional-picker-preview min-w-0 font-bold leading-[1.7] break-words text-start text-sm"
+                      dir="auto"
+                    >
+                      {label}
+                    </span>
                     {hasProgress && (
-                      <span className="text-micro font-semibold text-primary/90 leading-tight mt-0.5" dir="ltr">
+                      <span
+                        className="devotional-picker-count text-micro font-semibold text-primary/90 leading-tight"
+                        dir="ltr"
+                      >
                         {formatNumerals(saved!.count, language)} / {formatNumerals(saved!.target, language)}
                       </span>
                     )}

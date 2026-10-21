@@ -1,0 +1,49 @@
+/* Let available width, rather than a character count, fit each language. */
+.counter-reading-canvas {
+  /* Preserve a usable reading/footer region; the existing screen scrollport
+     can reveal it when enlarged chrome exceeds a short viewport. */
+  min-block-size: 16rem;
+}
+.counter-picker-row {
+  flex-wrap: wrap;
+}
+.counter-picker-row > div {
+  flex: 1 1 min(100%, 8rem);
+  min-inline-size: 0;
+}
+.devotional-picker-option {
+  min-block-size: 64px;
+  padding-block: 10px;
+}
+.devotional-picker-choice {
+  display: flex;
+  flex: 1;
+  min-inline-size: 0;
+  align-items: center;
+  gap: 12px;
+}
+.devotional-picker-preview {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  min-inline-size: 0;
+}
+.devotional-picker-choice > .devotional-picker-preview {
+  flex: 1;
+}
+.devotional-picker-count {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+/* Enlarged text gets its own count line instead of narrowing the reading. */
+@media (max-width: 359px) {
+  .devotional-picker-choice {
+    flex-wrap: wrap;
+    gap: 4px 12px;
+  }
+  .devotional-picker-choice > .devotional-picker-preview {
+    flex-basis: 100%;
+  }
+}

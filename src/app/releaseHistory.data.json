@@ -1,5 +1,18 @@
 [
   {
+    "release": "2026-10-21.1",
+    "ar": [
+      "تظهر أزرار المسبحة والصلاة على النبي بانتظام، مع إخفاء نص الفائدة عند اختيار الأيقونات فقط.",
+      "اقرأ معاينات أطول للأذكار داخل القائمة، مع ترتيب أوضح للأعداد المحفوظة وبقاء النص الكامل متاحًا.",
+      "استخدم قوائم الاختيار وأزرار العد مع النص المكبّر، دون تداخل الحقول أو فقدان الوصول إلى أدوات أسفل الصفحة."
+    ],
+    "en": [
+      "Masbaha and Salawat tools now match consistently, with the Benefit label hidden when you choose icons only.",
+      "Read longer dhikr previews in the picker, with clearer saved counts and the complete text still available.",
+      "Use pickers and counting controls with enlarged text, without overlapping fields or losing access to footer actions."
+    ]
+  },
+  {
     "release": "2026-10-21",
     "ar": [
       "أظهر أدوات المصحف بضغطة واحدة وأغلق شرح الكلمة بلمسه أو بلمس الكلمة، مع أسهم رجوع تتجه نحو حافة الشاشة.",

@@ -112,7 +112,7 @@ describe("CustomCounterScreen Component", () => {
     expect(counter).toHaveTextContent("1");
   });
 
-  it("exposes an authentic zikr dropdown menu with short names and selection confirmation", async () => {
+  it("exposes expanded abbreviated previews, named options and selection confirmation", async () => {
     const user = userEvent.setup();
     render(<CustomCounterScreen isArabic={false} direction="ltr" onBack={vi.fn()} />);
 
@@ -120,7 +120,9 @@ describe("CustomCounterScreen Component", () => {
     await user.click(picker);
 
     expect(screen.getByRole("menu")).toBeInTheDocument();
-    expect(screen.getByRole("menuitemradio", { name: /Subhanallahi wa bihamdihi\.\.\./i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("menuitemradio", { name: "Subhanallahi wa bihamdihi, Subhanallahil-Azeem" }),
+    ).toBeInTheDocument();
     expect(screen.getByRole("menuitemradio", { name: /Hawqalah/i })).toBeInTheDocument();
     expect(screen.getByRole("menuitemradio", { name: /Sayyid al-Istighfar/i })).toBeInTheDocument();
 

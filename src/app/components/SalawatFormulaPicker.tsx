@@ -1,6 +1,7 @@
 import type { AppLanguage } from "../types";
 import { t } from "../i18n";
 import { ChevronDown } from "./icons";
+import "./devotional-picker.css";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -79,9 +80,11 @@ export function SalawatFormulaPicker({
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
+          tabIndex={0}
           align="start"
           collisionPadding={16}
-          className="w-[calc(100vw-2rem)] max-w-sm sm:w-96 max-h-[70vh] overflow-y-auto"
+          className="w-[calc(100vw-2rem)] max-w-sm sm:w-96 overflow-y-auto"
+          style={{ maxHeight: "min(70dvh, var(--radix-dropdown-menu-content-available-height))" }}
         >
           <DropdownMenuLabel className="px-3 py-2 text-xs font-black text-muted-foreground">
             {t(language, "fridaySalawat.chooseFormula")}
@@ -97,14 +100,17 @@ export function SalawatFormulaPicker({
               <DropdownMenuRadioItem
                 key={formula.id}
                 value={formula.id}
-                className="flex flex-col items-start gap-1 py-2.5"
+                className="devotional-picker-option"
+                title={isArabic ? formula.textAr : formula.transliterationEn}
                 data-testid={`salawat-formula-option-${formula.id}`}
               >
-                <span className="font-bold text-foreground" dir="auto">
-                  {isArabic ? formula.nameAr : formula.nameEn}
-                </span>
-                <span className="text-xs text-muted-foreground line-clamp-2" dir="auto">
-                  {isArabic ? formula.textAr : formula.transliterationEn}
+                <span className="flex min-w-0 flex-1 flex-col items-stretch gap-1">
+                  <span className="break-words font-bold text-foreground" dir="auto">
+                    {isArabic ? formula.nameAr : formula.nameEn}
+                  </span>
+                  <span className="devotional-picker-preview text-xs leading-relaxed text-muted-foreground" dir="auto">
+                    {isArabic ? formula.textAr : formula.transliterationEn}
+                  </span>
                 </span>
               </DropdownMenuRadioItem>
             ))}
