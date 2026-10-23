@@ -2,6 +2,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { downloadMushaf, getMushafDownloadStatus, removeDownloadedMushaf } from "./mushafOfflineCache";
 import { FONT_CACHE_NAME, MUSHAF_CACHE_NAME } from "./qcfMushaf";
 
+vi.mock("./nativeMushafDownload", () => ({
+  fetchNativeBinaryResource: (url: string, signal?: AbortSignal) => fetch(url, { signal }),
+}));
+
 afterEach(() => vi.unstubAllGlobals());
 
 describe("mushafOfflineCache", () => {

@@ -7,6 +7,7 @@ import { reportError } from "../../lib/observability";
 import { startSafeViewTransition } from "../utils/viewTransitions";
 import type { CategoryId, PrayerName, RoutineMode, View, RoutineCategoryId } from "../types";
 import { isAudioControlLocked } from "../audioControlLock";
+import { isNativeAndroid } from "../native/platform";
 
 function categoryFromShortcutUrl(): CategoryId | null {
   const category = new URLSearchParams(window.location.search).get("category");
@@ -285,6 +286,36 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding, reduceMoti
       window.removeEventListener("hashchange", handleHashChange);
     };
   }, [applyRouteFromLocation, hasCompletedOnboarding, reduceMotion]);
+
+  useEffect(() => {
+    if (!isNativeAndroid()) return;
+
+    let removeListener: (() => void) | undefined;
+    let cancelled = false;
+    void import("@capacitor/app")
+      .then(({ App }) =>
+        App.addListener("backButton", () => {
+          if (view === "home") {
+            void App.exitApp();
+          } else if (inAppHistoryDepth.current > 0) {
+            window.history.back();
+          } else {
+            setActiveTab("home");
+            replace("home");
+          }
+        }),
+      )
+      .then((listener) => {
+        if (cancelled) void listener.remove();
+        else removeListener = () => void listener.remove();
+      })
+      .catch((error) => reportError(error, "android-back-navigation"));
+
+    return () => {
+      cancelled = true;
+      removeListener?.();
+    };
+  }, [replace, view]);
 
   const pushRouteState = useCallback(
     (route: RouteState, update: () => void) => {

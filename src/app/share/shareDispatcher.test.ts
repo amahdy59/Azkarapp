@@ -3,12 +3,23 @@ import {
   canCopyImage,
   canShareMultipleFiles,
   copyImageToClipboard,
+  saveFile,
+  shareNativeText,
   shareMultipleFiles,
   shareSingleFile,
   imageShareText,
 } from "./shareDispatcher";
+import { isNativeAndroid, saveWithAndroid, shareWithAndroid } from "./nativeSharing";
+
+vi.mock("./nativeSharing", () => ({
+  isNativeAndroid: vi.fn(() => false),
+  saveWithAndroid: vi.fn().mockResolvedValue(undefined),
+  shareWithAndroid: vi.fn().mockResolvedValue(undefined),
+}));
 
 afterEach(() => {
+  vi.mocked(isNativeAndroid).mockReturnValue(false);
+  vi.clearAllMocks();
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
@@ -16,6 +27,33 @@ afterEach(() => {
 describe("shareDispatcher", () => {
   const dummyFile1 = new File(["dummy1"], "card-1.png", { type: "image/png" });
   const dummyFile2 = new File(["dummy2"], "card-2.png", { type: "image/png" });
+
+  it("shares files through the Android bridge instead of Web Share", async () => {
+    vi.mocked(isNativeAndroid).mockReturnValue(true);
+    const share = vi.fn();
+    vi.stubGlobal("navigator", { share, canShare: () => false });
+    const status: string[] = [];
+
+    const result = await shareMultipleFiles([dummyFile1, dummyFile2], {
+      title: "Cards",
+      onStatus: (value) => status.push(value),
+    });
+
+    expect(result).toEqual({ method: "shared", fileCount: 2 });
+    expect(shareWithAndroid).toHaveBeenCalledWith({ title: "Cards", text: undefined, files: [dummyFile1, dummyFile2] });
+    expect(share).not.toHaveBeenCalled();
+    expect(status).toEqual(["sharing", "shared"]);
+  });
+
+  it("routes Android text share and save actions through the native bridge", async () => {
+    vi.mocked(isNativeAndroid).mockReturnValue(true);
+
+    await expect(shareNativeText({ title: "Card", text: "Remember Allah" })).resolves.toBe(true);
+    await saveFile(dummyFile1);
+
+    expect(shareWithAndroid).toHaveBeenCalledWith({ title: "Card", text: "Remember Allah" });
+    expect(saveWithAndroid).toHaveBeenCalledWith(dummyFile1);
+  });
 
   it("retains captions and adds one app link only to image payloads", () => {
     expect(imageShareText([dummyFile1], "Evening cards")).toBe("Evening cards\n\nhttps://wa-zaker.com/");

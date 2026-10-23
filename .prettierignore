@@ -1,4 +1,7 @@
 dist
+android/**/build/**
+android/.gradle/**
+android/app/src/main/assets/**
 node_modules
 src/imports
 src/app/components/ui

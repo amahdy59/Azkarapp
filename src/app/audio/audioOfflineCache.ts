@@ -4,6 +4,7 @@ import type { AudioPreferences, AudioVariant } from "./audioTypes";
 import { getPreferredVoiceId, resolveAudioAsset } from "./resolveAudioAsset";
 import { isAudioSourceAllowed } from "./platformAudioPolicy";
 import { AudioDownloadError, transferAudio, type AudioDownloadPhase } from "./audioDownloadTransfer";
+import { isNativeAndroid } from "../native/capacitorPlatform";
 
 export interface AudioDownloadProgress {
   phase: AudioDownloadPhase;
@@ -195,6 +196,34 @@ async function isVerifiedCachedAudio(cache: Cache, item: ReturnType<typeof getDo
     return true;
   } catch {
     return false;
+  }
+}
+
+/**
+ * Android's Capacitor WebView can write to Cache Storage, but does not run the
+ * PWA service worker that normally maps an audio element's network request
+ * back to that cache. Give native playback a temporary Blob URL instead.
+ *
+ * The response entered this cache only after the download path verified its
+ * MIME type, byte length, and checksum. Browser/PWA playback keeps its URL so
+ * Workbox can continue to serve range requests from the same cache.
+ */
+export function canUseNativeCachedAudio() {
+  return typeof window !== "undefined" && isNativeAndroid() && "caches" in window;
+}
+
+export async function getNativeCachedAudioUrl(url: string): Promise<string | null> {
+  if (!canUseNativeCachedAudio()) return null;
+  try {
+    const cache = await caches.open(AUDIO_CACHE_NAME);
+    const response = await cache.match(url);
+    if (!response?.ok) return null;
+    const blob = await response.blob();
+    return blob.size > 0 ? URL.createObjectURL(blob) : null;
+  } catch {
+    // A cache read must never make online playback fail. The caller falls back
+    // to the approved hosted URL when this WebView denies or loses its cache.
+    return null;
   }
 }
 

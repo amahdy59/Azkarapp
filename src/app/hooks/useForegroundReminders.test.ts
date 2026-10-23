@@ -7,6 +7,7 @@ import {
   getDueReminder,
   getNextReminderDelay,
   synchronizeReminderTimes,
+  getUpcomingNativeReminders,
 } from "./useForegroundReminders";
 
 const morningTime = new Date(2026, 6, 17, 7, 30, 30);
@@ -184,5 +185,92 @@ describe("location-based reminder schedules", () => {
     expect(methodFour.morning.time).not.toBe(methodFive.morning.time);
     expect(methodFour.before_sleep.time).not.toBe(methodFive.before_sleep.time);
     expect(methodFour.evening.time).toBe(methodFive.evening.time);
+  });
+});
+
+describe("native Android reminder schedules", () => {
+  it("keeps configured routine times while calculating prayer reminders from location", () => {
+    const location = {
+      latitude: 30.0444,
+      longitude: 31.2357,
+      cityName: "Cairo",
+      calculationMethod: 5,
+      autoDetect: false,
+      timeZone: "Africa/Cairo",
+    };
+    const reminders = {
+      ...DEFAULT_APP_STATE.settings.reminders,
+      morning: { enabled: true, time: "07:30" },
+      evening: { enabled: false, time: "18:30" },
+      before_sleep: { enabled: false, time: "22:00" },
+      after_prayer: { enabled: false, time: "13:00" },
+      prayer: { enabled: false, leadMinutes: 15 as const },
+    };
+    const now = new Date(2026, 6, 17, 7, 0);
+    const scheduled = getUpcomingNativeReminders(reminders, [], "en", location, now, 1);
+
+    expect(scheduled).toHaveLength(1);
+    expect(scheduled[0]!.kind).toBe("morning");
+    expect(scheduled[0]!.at).toEqual(new Date(2026, 6, 17, 7, 30));
+  });
+
+  it("pre-schedules future reminders in a rolling window with stable OS alarm times", () => {
+    const reminders = {
+      ...DEFAULT_APP_STATE.settings.reminders,
+      morning: { enabled: true, time: "07:30" },
+      evening: { enabled: false, time: "18:30" },
+      before_sleep: { enabled: false, time: "22:00" },
+      after_prayer: { enabled: false, time: "13:00" },
+      prayer: { enabled: true, leadMinutes: 15 as const },
+    };
+    const now = new Date(2026, 6, 17, 7, 0);
+    const scheduled = getUpcomingNativeReminders(reminders, [], "en", undefined, now, 2);
+
+    expect(scheduled.length).toBe(11);
+    expect(scheduled[0]!.at.getTime()).toBeLessThan(scheduled[1]!.at.getTime());
+    expect(scheduled.some(({ kind }) => kind === "morning")).toBe(true);
+    expect(scheduled.some(({ kind, at }) => kind === "prayer:fajr" && at.getDate() === now.getDate())).toBe(false);
+    expect(new Set(scheduled.map(({ id }) => id)).size).toBe(scheduled.length);
+    expect(scheduled.every(({ at }) => at > now)).toBe(true);
+  });
+
+  it("omits a completed routine for today while retaining later scheduled days", () => {
+    const reminders = {
+      ...DEFAULT_APP_STATE.settings.reminders,
+      morning: { enabled: true, time: "07:30" },
+      onlyWhenIncomplete: true,
+    };
+    const now = new Date(2026, 6, 17, 7, 0);
+    const completion = [{ category: "morning" as const, dayKey: "2026-07-17", timeZone: "UTC" }];
+    const scheduled = getUpcomingNativeReminders(reminders, completion, "en", undefined, now, 2);
+
+    expect(scheduled.filter(({ kind }) => kind === "morning")).toHaveLength(1);
+    expect(scheduled.find(({ kind }) => kind === "morning")!.at.getDate()).toBe(18);
+  });
+
+  it("uses date-specific prayer times when building future alarms", () => {
+    const location = {
+      latitude: 30.0444,
+      longitude: 31.2357,
+      cityName: "Cairo",
+      calculationMethod: 5,
+      autoDetect: false,
+      timeZone: "Africa/Cairo",
+    };
+    const reminders = {
+      ...DEFAULT_APP_STATE.settings.reminders,
+      morning: { enabled: true, time: "07:30" },
+      evening: { enabled: false, time: "18:30" },
+      before_sleep: { enabled: false, time: "22:00" },
+      prayer: { enabled: true, leadMinutes: 10 as const },
+    };
+    const now = new Date(2026, 6, 17, 0, 0);
+    const scheduled = getUpcomingNativeReminders(reminders, [], "en", location, now, 2);
+    const fajr = scheduled.find(({ kind, at }) => kind === "prayer:fajr" && at.getDate() === 18)!;
+    const expected = getEstimatedPrayerTimes(new Date(2026, 6, 18, 12), location).fajr;
+    const [hours, minutes] = expected.split(":").map(Number);
+    const expectedAt = new Date(2026, 6, 18, hours!, minutes! - 10);
+
+    expect(fajr.at.getTime()).toBe(expectedAt.getTime());
   });
 });

@@ -3,7 +3,7 @@
  * fallback downloading for desktop and older browsers.
  */
 
-import { isNativeAndroid } from "../native/platform";
+import { isNativeAndroid, saveWithAndroid, shareWithAndroid } from "./nativeSharing";
 
 import { getImageCaption } from "./shareCaption";
 export { SHARED_APP_URL } from "./shareCaption";
@@ -16,13 +16,6 @@ export function imageShareText(files: readonly File[], text?: string): string | 
 
 export type MultiShareMethod = "shared" | "downloaded" | "cancelled" | "error";
 
-export async function saveFileToDevice(file: File): Promise<void> {
-  if (isNativeAndroid()) {
-    const { saveNativeFile } = await import("../native/saveFile");
-    await saveNativeFile(file);
-  } else downloadFile(file);
-}
-
 export interface MultiShareResult {
   method: MultiShareMethod;
   fileCount: number;
@@ -32,6 +25,7 @@ export interface MultiShareResult {
  * Checks if the browser supports sharing an array of files via Web Share Level 2.
  */
 export function canShareMultipleFiles(files: File[]): boolean {
+  if (isNativeAndroid()) return files.length > 0;
   if (
     typeof navigator === "undefined" ||
     typeof navigator.share !== "function" ||
@@ -85,6 +79,13 @@ export async function shareSingleFile(
     return { method: "error", fileCount: 0 };
   }
 
+  if (isNativeAndroid()) {
+    options.onStatus?.("sharing");
+    await shareWithAndroid({ title: options.title, text: options.text, files: [file] });
+    options.onStatus?.("shared");
+    return { method: "shared", fileCount: 1 };
+  }
+
   if (canShareMultipleFiles([file])) {
     try {
       options.onStatus?.("sharing");
@@ -107,7 +108,7 @@ export async function shareSingleFile(
   // Fallback to downloading
   if (options.downloadFallback === false) throw new Error("File sharing unavailable.");
   options.onStatus?.("downloading");
-  await saveFileToDevice(file);
+  downloadFile(file);
   options.onStatus?.("downloaded");
   return { method: "downloaded", fileCount: 1 };
 }
@@ -127,6 +128,25 @@ export function downloadFile(file: File): void {
   setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
 
+/** Saves exports through Android's public Downloads collection in the native app. */
+export async function saveFile(file: File): Promise<void> {
+  if (isNativeAndroid()) {
+    await saveWithAndroid(file);
+    return;
+  }
+  downloadFile(file);
+}
+
+/** Compatibility name used by the newer native export panels. */
+export const saveFileToDevice = saveFile;
+
+/** Shares plain text and links through Android's system chooser in the native app. */
+export async function shareNativeText(options: { title?: string; text?: string; url?: string }): Promise<boolean> {
+  if (!isNativeAndroid()) return false;
+  await shareWithAndroid(options);
+  return true;
+}
+
 /**
  * Downloads multiple files sequentially with a small delay to prevent browser download throttling.
  */
@@ -134,7 +154,7 @@ export async function downloadFilesSequentially(files: File[], delayMs = 180): P
   for (let i = 0; i < files.length; i += 1) {
     const file = files[i];
     if (!file) continue;
-    await saveFileToDevice(file);
+    downloadFile(file);
     if (i < files.length - 1 && delayMs > 0) {
       await new Promise((resolve) => setTimeout(resolve, delayMs));
     }
@@ -156,6 +176,13 @@ export async function shareMultipleFiles(
 ): Promise<MultiShareResult> {
   if (!files || files.length === 0) {
     return { method: "error", fileCount: 0 };
+  }
+
+  if (isNativeAndroid()) {
+    options.onStatus?.("sharing");
+    await shareWithAndroid({ title: options.title, text: options.text, files });
+    options.onStatus?.("shared");
+    return { method: "shared", fileCount: files.length };
   }
 
   if (canShareMultipleFiles(files)) {

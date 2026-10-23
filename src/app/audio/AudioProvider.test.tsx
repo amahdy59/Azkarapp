@@ -1,4 +1,5 @@
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { Capacitor } from "@capacitor/core";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { FloatingAudioPlayer } from "../components/FloatingAudioPlayer";
 import { AudioProvider, useAudioController } from "./AudioProvider";
@@ -173,6 +174,7 @@ afterEach(() => {
   cleanup();
   window.localStorage.clear();
   FakeAudio.rejectPlayWith = null;
+  vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
 
@@ -194,6 +196,27 @@ function QueueHarness({ queue }: { queue: PlaybackPlan }) {
 }
 
 describe("AudioProvider integration", () => {
+  it("plays verified Android downloads from Cache Storage instead of requesting the network URL", async () => {
+    vi.stubGlobal("Audio", FakeAudio);
+    vi.spyOn(Capacitor, "isNativePlatform").mockReturnValue(true);
+    vi.spyOn(Capacitor, "getPlatform").mockReturnValue("android");
+    const cachedResponse = new Response(new Uint8Array([1, 2, 3]), { headers: { "content-type": "audio/mpeg" } });
+    const match = vi.fn(async () => cachedResponse.clone());
+    vi.stubGlobal("caches", { open: vi.fn(async () => ({ match })) });
+    vi.spyOn(URL, "createObjectURL").mockReturnValue("blob:cached-audio");
+
+    render(
+      <AudioProvider>
+        <Harness />
+      </AudioProvider>,
+    );
+
+    fireEvent.click(screen.getByText("Start"));
+
+    await waitFor(() => expect(FakeAudio.latest?.src).toBe("blob:cached-audio"));
+    expect(match).toHaveBeenCalledWith("https://audio.example.test/segment.mp3");
+  });
+
   it("defaults a single-entry start to Play all and retains manual choice across new plans and remount", () => {
     vi.stubGlobal("Audio", FakeAudio);
     let controller!: ReturnType<typeof useAudioController>;
